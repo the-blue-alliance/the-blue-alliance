@@ -1,0 +1,264 @@
+{
+  "playoff": {
+    "average_cargo_points": 21.529411764705884, 
+    "average_cargo_ship_cargo_count": [
+      64.70588235294117, 
+      85.29411764705883, 
+      76.47058823529412, 
+      55.88235294117647, 
+      55.88235294117647, 
+      85.29411764705883, 
+      94.11764705882354, 
+      76.47058823529412
+    ], 
+    "average_cargo_ship_cargo_preload_count": [
+      2.9411764705882355, 
+      11.764705882352942, 
+      17.647058823529413, 
+      11.764705882352942, 
+      0.0, 
+      0.0
+    ], 
+    "average_cargo_ship_hatch_panel_count": [
+      97.05882352941177, 
+      97.05882352941177, 
+      94.11764705882354, 
+      61.76470588235294, 
+      61.76470588235294, 
+      97.05882352941177, 
+      100.0, 
+      100.0
+    ], 
+    "average_cargo_ship_hatch_panel_preload_count": [
+      97.05882352941177, 
+      88.23529411764706, 
+      82.3529411764706, 
+      88.23529411764706, 
+      100.0, 
+      100.0
+    ], 
+    "average_foul_score": 3.5, 
+    "average_hab_climb_teleop": 11.558823529411764, 
+    "average_hatch_panel_points": 8.058823529411764, 
+    "average_points_auto": 13.764705882352942, 
+    "average_points_teleop": 41.14705882352941, 
+    "average_rocket_cargo_count": {
+      "lowLeftFar": 35.294117647058826, 
+      "lowLeftNear": 35.294117647058826, 
+      "lowRightFar": 11.764705882352942, 
+      "lowRightNear": 17.647058823529413, 
+      "midLeftFar": 0.0, 
+      "midLeftNear": 0.0, 
+      "midRightFar": 11.764705882352942, 
+      "midRightNear": 11.764705882352942, 
+      "topLeftFar": 0.0, 
+      "topLeftNear": 0.0, 
+      "topRightFar": 0.0, 
+      "topRightNear": 0.0
+    }, 
+    "average_rocket_hatch_panel_count": {
+      "lowLeftFar": 44.11764705882353, 
+      "lowLeftNear": 67.6470588235294, 
+      "lowRightFar": 23.529411764705884, 
+      "lowRightNear": 50.0, 
+      "midLeftFar": 2.9411764705882355, 
+      "midLeftNear": 14.705882352941176, 
+      "midRightFar": 20.58823529411765, 
+      "midRightNear": 20.58823529411765, 
+      "topLeftFar": 0.0, 
+      "topLeftNear": 0.0, 
+      "topRightFar": 2.9411764705882355, 
+      "topRightNear": 2.9411764705882355
+    }, 
+    "average_sandstorm_bonus_auto": 13.764705882352942, 
+    "average_score": 56.73529411764706, 
+    "average_win_margin": 18.176470588235293, 
+    "average_win_score": 65.82352941176471, 
+    "climb_rp_achieved": [
+      9, 
+      34, 
+      26.470588235294116
+    ], 
+    "complete_1_rocket_count": [
+      0, 
+      34, 
+      0.0
+    ], 
+    "complete_2_rockets_count": [
+      0, 
+      34, 
+      0.0
+    ], 
+    "cross_hab_line_count": [
+      100, 
+      102, 
+      98.03921568627452
+    ], 
+    "cross_hab_line_sandstorm_count": [
+      99, 
+      102, 
+      97.05882352941177
+    ], 
+    "high_score": [
+      94, 
+      "2019nyny_qf1m1", 
+      "QF1-1"
+    ], 
+    "level1_climb_count": [
+      59, 
+      102, 
+      57.84313725490196
+    ], 
+    "level2_climb_count": [
+      20, 
+      102, 
+      19.607843137254903
+    ], 
+    "level3_climb_count": [
+      8, 
+      102, 
+      7.8431372549019605
+    ], 
+    "rocket_rp_achieved": [
+      0, 
+      34, 
+      0.0
+    ], 
+    "unicorn_matches": [
+      0, 
+      34, 
+      0.0
+    ]
+  }, 
+  "qual": {
+    "average_cargo_points": 14.668831168831169, 
+    "average_cargo_ship_cargo_count": [
+      59.74025974025974, 
+      65.58441558441558, 
+      68.83116883116882, 
+      34.41558441558441, 
+      33.116883116883116, 
+      67.53246753246754, 
+      56.493506493506494, 
+      46.103896103896105
+    ], 
+    "average_cargo_ship_cargo_preload_count": [
+      1.2987012987012987, 
+      3.896103896103896, 
+      7.142857142857143, 
+      8.441558441558442, 
+      7.142857142857143, 
+      3.896103896103896
+    ], 
+    "average_cargo_ship_hatch_panel_count": [
+      98.7012987012987, 
+      97.40259740259741, 
+      96.1038961038961, 
+      46.753246753246756, 
+      49.35064935064935, 
+      94.8051948051948, 
+      96.1038961038961, 
+      96.1038961038961
+    ], 
+    "average_cargo_ship_hatch_panel_preload_count": [
+      98.7012987012987, 
+      96.1038961038961, 
+      92.85714285714286, 
+      91.55844155844156, 
+      92.85714285714286, 
+      96.1038961038961
+    ], 
+    "average_foul_score": 4.454545454545454, 
+    "average_hab_climb_teleop": 8.318181818181818, 
+    "average_hatch_panel_points": 5.2727272727272725, 
+    "average_points_auto": 10.636363636363637, 
+    "average_points_teleop": 28.25974025974026, 
+    "average_rocket_cargo_count": {
+      "lowLeftFar": 9.090909090909092, 
+      "lowLeftNear": 11.03896103896104, 
+      "lowRightFar": 11.03896103896104, 
+      "lowRightNear": 9.74025974025974, 
+      "midLeftFar": 3.2467532467532467, 
+      "midLeftNear": 3.2467532467532467, 
+      "midRightFar": 3.896103896103896, 
+      "midRightNear": 1.948051948051948, 
+      "topLeftFar": 0.6493506493506493, 
+      "topLeftNear": 0.6493506493506493, 
+      "topRightFar": 1.2987012987012987, 
+      "topRightNear": 1.2987012987012987
+    }, 
+    "average_rocket_hatch_panel_count": {
+      "lowLeftFar": 19.48051948051948, 
+      "lowLeftNear": 33.76623376623377, 
+      "lowRightFar": 20.12987012987013, 
+      "lowRightNear": 31.818181818181817, 
+      "midLeftFar": 7.792207792207792, 
+      "midLeftNear": 9.74025974025974, 
+      "midRightFar": 6.4935064935064934, 
+      "midRightNear": 12.337662337662337, 
+      "topLeftFar": 3.896103896103896, 
+      "topLeftNear": 3.896103896103896, 
+      "topRightFar": 2.5974025974025974, 
+      "topRightNear": 4.545454545454546
+    }, 
+    "average_sandstorm_bonus_auto": 10.636363636363637, 
+    "average_score": 43.35064935064935, 
+    "average_win_margin": 21.350649350649352, 
+    "average_win_score": 54.02597402597402, 
+    "climb_rp_achieved": [
+      20, 
+      154, 
+      12.987012987012987
+    ], 
+    "complete_1_rocket_count": [
+      2, 
+      154, 
+      1.2987012987012987
+    ], 
+    "complete_2_rockets_count": [
+      0, 
+      154, 
+      0.0
+    ], 
+    "cross_hab_line_count": [
+      450, 
+      462, 
+      97.40259740259741
+    ], 
+    "cross_hab_line_sandstorm_count": [
+      375, 
+      462, 
+      81.16883116883118
+    ], 
+    "high_score": [
+      94, 
+      "2019nyny_qm37", 
+      "Q37"
+    ], 
+    "level1_climb_count": [
+      252, 
+      462, 
+      54.54545454545455
+    ], 
+    "level2_climb_count": [
+      58, 
+      462, 
+      12.554112554112555
+    ], 
+    "level3_climb_count": [
+      15, 
+      462, 
+      3.2467532467532467
+    ], 
+    "rocket_rp_achieved": [
+      2, 
+      154, 
+      1.2987012987012987
+    ], 
+    "unicorn_matches": [
+      1, 
+      154, 
+      0.6493506493506493
+    ]
+  }
+}

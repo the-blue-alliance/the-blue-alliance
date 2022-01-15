@@ -1,6 +1,6 @@
-{% for matchstat, stats in matchstats_dict.items %}
+{% for matchstat, stats in matchstats_dict.items() %}
     <h2>Got {{stats|length}} {{matchstat}}</h2>
-    {% for team, value in stats.items %}
+    {% for team, value in stats.items() %}
         <ul>
             <li>{{team}}</li>
             <li>{{value}}</li>

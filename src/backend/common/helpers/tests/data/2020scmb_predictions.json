@@ -1,0 +1,4473 @@
+{
+  "match_prediction_stats": {
+    "playoff": {
+      "brier_scores": {
+        "win_loss": 0.10790459159548918
+      }, 
+      "err_mean": 27.41276274959663, 
+      "err_var": 373.88007281120457, 
+      "wl_accuracy": 86.66666666666667, 
+      "wl_accuracy_75": 100.0
+    }, 
+    "qual": {
+      "brier_scores": {
+        "win_loss": 0.22399115676189577
+      }, 
+      "err_mean": 26.022131629245504, 
+      "err_var": 585.890608352343, 
+      "wl_accuracy": 62.10526315789474, 
+      "wl_accuracy_75": 83.33333333333333
+    }
+  }, 
+  "match_predictions": {
+    "playoff": {
+      "2020scmb_f1m1": {
+        "blue": {
+          "endgame_points": 50.46902208921384, 
+          "endgame_points_var": 472.69255631825706, 
+          "power_cells_scored": 20.757855596816462, 
+          "power_cells_scored_var": 120.55673563727782, 
+          "prob_face_boss": 0.330556390777172, 
+          "prob_shield_energized": 0.005052967190691149, 
+          "prob_shield_operational": 0.2519543611716234, 
+          "score": 132.03471986960022, 
+          "score_var": 1046.8171689565015
+        }, 
+        "prob": 0.9187929071386285, 
+        "red": {
+          "endgame_points": 51.50831967005083, 
+          "endgame_points_var": 336.4312065781254, 
+          "power_cells_scored": 39.74419225527262, 
+          "power_cells_scored_var": 209.4644151775732, 
+          "prob_face_boss": 0.3216957435448333, 
+          "prob_shield_energized": 0.26123992713323385, 
+          "prob_shield_operational": 0.23099935867063004, 
+          "score": 187.28643837406054, 
+          "score_var": 517.4107732525719
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_f1m2": {
+        "blue": {
+          "endgame_points": 50.95770743553929, 
+          "endgame_points_var": 425.711515583609, 
+          "power_cells_scored": 22.038794152312434, 
+          "power_cells_scored_var": 123.45306924804457, 
+          "prob_face_boss": 0.33060292446628636, 
+          "prob_shield_energized": 0.007621677925033099, 
+          "prob_shield_operational": 0.2480680795992023, 
+          "score": 135.08777621380665, 
+          "score_var": 1025.1272734783574
+        }, 
+        "prob": 0.9184570701503956, 
+        "red": {
+          "endgame_points": 53.086045596589464, 
+          "endgame_points_var": 318.17382306441414, 
+          "power_cells_scored": 40.02611686182948, 
+          "power_cells_scored_var": 185.77773646756256, 
+          "prob_face_boss": 0.3491525599878049, 
+          "prob_shield_energized": 0.25514360921954016, 
+          "prob_shield_operational": 0.25209269208954255, 
+          "score": 189.51883696092062, 
+          "score_var": 497.83710479602445
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_f1m3": {
+        "blue": {
+          "endgame_points": 52.29398248844757, 
+          "endgame_points_var": 404.1031922687559, 
+          "power_cells_scored": 22.608430626445802, 
+          "power_cells_scored_var": 115.12186098696202, 
+          "prob_face_boss": 0.3507339363523758, 
+          "prob_shield_energized": 0.006952201858728468, 
+          "prob_shield_operational": 0.26367145733451236, 
+          "score": 137.38709483844448, 
+          "score_var": 982.8458539935843
+        }, 
+        "prob": 0.9217570516836602, 
+        "red": {
+          "endgame_points": 54.34332778793243, 
+          "endgame_points_var": 299.7239777823029, 
+          "power_cells_scored": 40.347661907511124, 
+          "power_cells_scored_var": 167.3539277663418, 
+          "prob_face_boss": 0.37193285091343997, 
+          "prob_shield_energized": 0.2518020709788765, 
+          "prob_shield_operational": 0.26909693640838617, 
+          "score": 192.84269591827712, 
+          "score_var": 548.7964690336909
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qf1m1": {
+        "blue": {
+          "endgame_points": 35.15171524660753, 
+          "endgame_points_var": 704.0212857673771, 
+          "power_cells_scored": 12.96066686736214, 
+          "power_cells_scored_var": 145.30525489906546, 
+          "prob_face_boss": 0.17451027081553516, 
+          "prob_shield_energized": 0.0013959911997984964, 
+          "prob_shield_operational": 0.13030880825743463, 
+          "score": 83.7275206904362, 
+          "score_var": 1127.8966159621382
+        }, 
+        "prob": 0.9376454478809044, 
+        "red": {
+          "endgame_points": 44.761228295462885, 
+          "endgame_points_var": 349.8753118676533, 
+          "power_cells_scored": 32.34809451407838, 
+          "power_cells_scored_var": 286.67599477307647, 
+          "prob_face_boss": 0.2076243910798159, 
+          "prob_shield_energized": 0.1626841004452766, 
+          "prob_shield_operational": 0.13962613031182713, 
+          "score": 153.85615576601114, 
+          "score_var": 958.5239424648669
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qf1m2": {
+        "blue": {
+          "endgame_points": 38.192066904440054, 
+          "endgame_points_var": 602.7021297584869, 
+          "power_cells_scored": 12.29172071126194, 
+          "power_cells_scored_var": 118.80397393175339, 
+          "prob_face_boss": 0.1871877854281051, 
+          "prob_shield_energized": 0.0003788287198662754, 
+          "prob_shield_operational": 0.13742244706910056, 
+          "score": 85.74865438783078, 
+          "score_var": 924.2814790560199
+        }, 
+        "prob": 0.9741372329731555, 
+        "red": {
+          "endgame_points": 48.69385200184647, 
+          "endgame_points_var": 394.3461184282846, 
+          "power_cells_scored": 34.980644045497016, 
+          "power_cells_scored_var": 260.77420173438105, 
+          "prob_face_boss": 0.28456085242159734, 
+          "prob_shield_energized": 0.19265557443901238, 
+          "prob_shield_operational": 0.2057857482130585, 
+          "score": 166.65553926174243, 
+          "score_var": 805.3287047188921
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qf2m1": {
+        "blue": {
+          "endgame_points": 37.38932469292841, 
+          "endgame_points_var": 835.9218693741486, 
+          "power_cells_scored": 10.212160282352475, 
+          "power_cells_scored_var": 127.66040299785575, 
+          "prob_face_boss": 0.21709462161112492, 
+          "prob_shield_energized": 0.00029852602002911066, 
+          "prob_shield_operational": 0.1697939562673142, 
+          "score": 88.47653479911, 
+          "score_var": 935.8894936756883
+        }, 
+        "prob": 0.6781132811809052, 
+        "red": {
+          "endgame_points": 54.953714050167974, 
+          "endgame_points_var": 988.478421602508, 
+          "power_cells_scored": 11.280026992037971, 
+          "power_cells_scored_var": 119.51023503287739, 
+          "prob_face_boss": 0.4362416861942683, 
+          "prob_shield_energized": 0.0002798833753777652, 
+          "prob_shield_operational": 0.3746594503462415, 
+          "score": 109.86975032161476, 
+          "score_var": 1204.3447269039552
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qf2m2": {
+        "blue": {
+          "endgame_points": 41.18617230120872, 
+          "endgame_points_var": 732.6998882974957, 
+          "power_cells_scored": 9.052820295252369, 
+          "power_cells_scored_var": 113.64450806612379, 
+          "prob_face_boss": 0.24351296065865324, 
+          "prob_shield_energized": 8.939431058496705e-05, 
+          "prob_shield_operational": 0.1894936085144644, 
+          "score": 91.5727890289701, 
+          "score_var": 838.6363414897253
+        }, 
+        "prob": 0.7044928813118001, 
+        "red": {
+          "endgame_points": 57.06248830655987, 
+          "endgame_points_var": 800.7513737601997, 
+          "power_cells_scored": 12.671899671266022, 
+          "power_cells_scored_var": 109.01743198197923, 
+          "prob_face_boss": 0.45866086510258475, 
+          "prob_shield_energized": 0.00025134140724225595, 
+          "prob_shield_operational": 0.3895463022148, 
+          "score": 115.31949946129266, 
+          "score_var": 1114.1969533405313
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qf3m1": {
+        "blue": {
+          "endgame_points": 51.65149956392439, 
+          "endgame_points_var": 683.9160724531242, 
+          "power_cells_scored": 12.667823362359131, 
+          "power_cells_scored_var": 153.0269892941571, 
+          "prob_face_boss": 0.374775115219387, 
+          "prob_shield_energized": 0.0016568957319033073, 
+          "prob_shield_operational": 0.304877227982013, 
+          "score": 113.05847707527556, 
+          "score_var": 2047.375090109973
+        }, 
+        "prob": 0.7107442740899511, 
+        "red": {
+          "endgame_points": 65.06429600227729, 
+          "endgame_points_var": 682.9747148097723, 
+          "power_cells_scored": 24.5979884355259, 
+          "power_cells_scored_var": 241.1277719282568, 
+          "prob_face_boss": 0.5768272917554473, 
+          "prob_shield_energized": 0.05803847317734789, 
+          "prob_shield_operational": 0.5009815022187026, 
+          "score": 148.11556289120213, 
+          "score_var": 1934.5139855851696
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qf3m2": {
+        "blue": {
+          "endgame_points": 59.08007337479869, 
+          "endgame_points_var": 509.10442468402704, 
+          "power_cells_scored": 6.55853176892237, 
+          "power_cells_scored_var": 105.8759361934971, 
+          "prob_face_boss": 0.4837392896613899, 
+          "prob_shield_energized": 1.8561373605230358e-05, 
+          "prob_shield_operational": 0.39651839937030064, 
+          "score": 107.5883794897332, 
+          "score_var": 1598.5076628484214
+        }, 
+        "prob": 0.7714321365899559, 
+        "red": {
+          "endgame_points": 69.07058492422715, 
+          "endgame_points_var": 680.5170397277406, 
+          "power_cells_scored": 24.281457700627463, 
+          "power_cells_scored_var": 199.07581278549185, 
+          "prob_face_boss": 0.6359705893672876, 
+          "prob_shield_energized": 0.03989401260120684, 
+          "prob_shield_operational": 0.5619994488968738, 
+          "score": 149.70333512893825, 
+          "score_var": 1609.439291855376
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qf4m1": {
+        "blue": {
+          "endgame_points": 47.48791089178388, 
+          "endgame_points_var": 737.7163689708641, 
+          "power_cells_scored": 15.74220211672797, 
+          "power_cells_scored_var": 183.4075058980912, 
+          "prob_face_boss": 0.3225195221674353, 
+          "prob_shield_energized": 0.00702945949846312, 
+          "prob_shield_operational": 0.25954369133408084, 
+          "score": 110.40752434779358, 
+          "score_var": 849.5304261517701
+        }, 
+        "prob": 0.5983249863334481, 
+        "red": {
+          "endgame_points": 46.735369199864046, 
+          "endgame_points_var": 292.9897826831253, 
+          "power_cells_scored": 16.246863656050323, 
+          "power_cells_scored_var": 204.01690814776327, 
+          "prob_face_boss": 0.21918710895924032, 
+          "prob_shield_energized": 0.010921607740634443, 
+          "prob_shield_operational": 0.1429746902305603, 
+          "score": 121.76969848326635, 
+          "score_var": 1232.4454466559662
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qf4m2": {
+        "blue": {
+          "endgame_points": 42.97344678274483, 
+          "endgame_points_var": 645.1594831867645, 
+          "power_cells_scored": 16.68206852504624, 
+          "power_cells_scored_var": 149.6417520567883, 
+          "prob_face_boss": 0.2513214898349132, 
+          "prob_shield_energized": 0.004122061274343114, 
+          "prob_shield_operational": 0.19291964699467012, 
+          "score": 114.10104839288218, 
+          "score_var": 746.6992139196846
+        }, 
+        "prob": 0.6486767732351674, 
+        "red": {
+          "endgame_points": 51.64376904087081, 
+          "endgame_points_var": 350.1932084767818, 
+          "power_cells_scored": 19.440388492057153, 
+          "power_cells_scored_var": 208.59985878382085, 
+          "prob_face_boss": 0.3276050208031108, 
+          "prob_shield_energized": 0.02034666220098602, 
+          "prob_shield_operational": 0.23769905339216013, 
+          "score": 132.1803646031861, 
+          "score_var": 1496.1744914468431
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_sf1m1": {
+        "blue": {
+          "endgame_points": 62.657758229088365, 
+          "endgame_points_var": 857.5022308275352, 
+          "power_cells_scored": 12.407651280398506, 
+          "power_cells_scored_var": 90.95488524272909, 
+          "prob_face_boss": 0.5361586314671369, 
+          "prob_shield_energized": 6.230577969490447e-05, 
+          "prob_shield_operational": 0.4681241870082111, 
+          "score": 120.20134651012555, 
+          "score_var": 1080.561746935015
+        }, 
+        "prob": 0.8586485755186739, 
+        "red": {
+          "endgame_points": 46.83699930733914, 
+          "endgame_points_var": 350.27505761607233, 
+          "power_cells_scored": 36.43261613805494, 
+          "power_cells_scored_var": 228.67592019167984, 
+          "prob_face_boss": 0.24092952171710358, 
+          "prob_shield_energized": 0.20296863349506422, 
+          "prob_shield_operational": 0.1659056468661515, 
+          "score": 165.57604955575778, 
+          "score_var": 703.4708825116804
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_sf1m2": {
+        "blue": {
+          "endgame_points": 67.12771340081142, 
+          "endgame_points_var": 843.5645308646706, 
+          "power_cells_scored": 13.361352198604779, 
+          "power_cells_scored_var": 84.88791811754763, 
+          "prob_face_boss": 0.5969302480085454, 
+          "prob_shield_energized": 5.484217412865533e-05, 
+          "prob_shield_operational": 0.5291995207190878, 
+          "score": 127.00092355020537, 
+          "score_var": 1218.1781426846296
+        }, 
+        "prob": 0.888087854533826, 
+        "red": {
+          "endgame_points": 49.44694324154128, 
+          "endgame_points_var": 350.03830870320104, 
+          "power_cells_scored": 38.932883862129756, 
+          "power_cells_scored_var": 235.49532002192376, 
+          "prob_face_boss": 0.28635877865366044, 
+          "prob_shield_energized": 0.25590715455449387, 
+          "prob_shield_operational": 0.2029019856796248, 
+          "score": 178.80389085865318, 
+          "score_var": 595.4193155104838
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_sf2m1": {
+        "blue": {
+          "endgame_points": 52.230086621315095, 
+          "endgame_points_var": 291.993997948653, 
+          "power_cells_scored": 20.778720964154378, 
+          "power_cells_scored_var": 181.73950220485565, 
+          "prob_face_boss": 0.3246609355566905, 
+          "prob_shield_energized": 0.018156772937757304, 
+          "prob_shield_operational": 0.22743812733333968, 
+          "score": 134.3850362770062, 
+          "score_var": 1253.1909581077696
+        }, 
+        "prob": 0.6443387396067016, 
+        "red": {
+          "endgame_points": 72.38559112856538, 
+          "endgame_points_var": 646.9969574041211, 
+          "power_cells_scored": 25.44530648711178, 
+          "power_cells_scored_var": 177.84339626303725, 
+          "prob_face_boss": 0.6868456683495486, 
+          "prob_shield_energized": 0.038674771816653575, 
+          "prob_shield_operational": 0.6142289026953203, 
+          "score": 153.6655071086565, 
+          "score_var": 1461.0156085055166
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_sf2m2": {
+        "blue": {
+          "endgame_points": 46.11003608004998, 
+          "endgame_points_var": 519.4348727963076, 
+          "power_cells_scored": 20.98736269859475, 
+          "power_cells_scored_var": 155.21147183645695, 
+          "prob_face_boss": 0.2711142718994838, 
+          "prob_shield_energized": 0.012272294836869313, 
+          "prob_shield_operational": 0.20360024303638524, 
+          "score": 128.83756814597643, 
+          "score_var": 1303.7942971909358
+        }, 
+        "prob": 0.6208344904333751, 
+        "red": {
+          "endgame_points": 64.28479468752664, 
+          "endgame_points_var": 551.0567935799704, 
+          "power_cells_scored": 25.389868861936705, 
+          "power_cells_scored_var": 153.98404317158736, 
+          "prob_face_boss": 0.5724161947735484, 
+          "prob_shield_energized": 0.02854264763518899, 
+          "prob_shield_operational": 0.487847225701749, 
+          "score": 144.4031999029874, 
+          "score_var": 1255.7001067562394
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_sf2m3": {
+        "blue": {
+          "endgame_points": 48.521687664205025, 
+          "endgame_points_var": 497.82570817202793, 
+          "power_cells_scored": 20.732954373980462, 
+          "power_cells_scored_var": 135.89284243050682, 
+          "prob_face_boss": 0.30347027519388003, 
+          "prob_shield_energized": 0.0076576803725032505, 
+          "prob_shield_operational": 0.23009315983649015, 
+          "score": 130.2809551939905, 
+          "score_var": 1152.724483010708
+        }, 
+        "prob": 0.6306394570786292, 
+        "red": {
+          "endgame_points": 67.44603331650654, 
+          "endgame_points_var": 565.236639420513, 
+          "power_cells_scored": 25.352964096316573, 
+          "power_cells_scored_var": 135.43123088954286, 
+          "prob_face_boss": 0.6229323724818172, 
+          "prob_shield_energized": 0.02107834508501405, 
+          "prob_shield_operational": 0.5409724229723145, 
+          "score": 146.21613360283888, 
+          "score_var": 1129.7116692136065
+        }, 
+        "winning_alliance": "red"
+      }
+    }, 
+    "qual": {
+      "2020scmb_qm1": {
+        "blue": {
+          "endgame_points": 0.0, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 0.0, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.04163225833177531, 
+          "prob_shield_energized": 0.07860637667000203, 
+          "prob_shield_operational": 0.030300984856003077, 
+          "score": 0.0, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 0.0, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 0.0, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.04163225833177531, 
+          "prob_shield_energized": 0.07860637667000203, 
+          "prob_shield_operational": 0.030300984856003077, 
+          "score": 0.0, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm10": {
+        "blue": {
+          "endgame_points": 25.555555555555557, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 9.722222222222221, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.16003222136610962, 
+          "prob_shield_energized": 0.12842836363038623, 
+          "prob_shield_operational": 0.12742186390379862, 
+          "score": 64.61111111111111, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 25.555555555555557, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 9.722222222222221, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.16003222136610962, 
+          "prob_shield_energized": 0.12842836363038623, 
+          "prob_shield_operational": 0.12742186390379862, 
+          "score": 64.61111111111111, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm11": {
+        "blue": {
+          "endgame_points": 26.333333333333336, 
+          "endgame_points_var": 940.6666666666667, 
+          "power_cells_scored": 10.333333333333332, 
+          "power_cells_scored_var": 802.5, 
+          "prob_face_boss": 0.13616854013872104, 
+          "prob_shield_energized": 0.08613563194097318, 
+          "prob_shield_operational": 0.10370476049926702, 
+          "score": 70.86666666666667, 
+          "score_var": 5114.5
+        }, 
+        "prob": 0.5586952964733041, 
+        "red": {
+          "endgame_points": 21.25, 
+          "endgame_points_var": 1176.0, 
+          "power_cells_scored": 8.041666666666666, 
+          "power_cells_scored_var": 1070.0, 
+          "prob_face_boss": 0.1292438120413728, 
+          "prob_shield_energized": 0.10526074137696573, 
+          "prob_shield_operational": 0.10101737322519821, 
+          "score": 55.125, 
+          "score_var": 6250.333333333334
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm12": {
+        "blue": {
+          "endgame_points": 30.000000000000004, 
+          "endgame_points_var": 649.1666666666667, 
+          "power_cells_scored": 9.946969696969695, 
+          "power_cells_scored_var": 697.5, 
+          "prob_face_boss": 0.11950760660047166, 
+          "prob_shield_energized": 0.06960909105162794, 
+          "prob_shield_operational": 0.08476838104364504, 
+          "score": 72.17424242424242, 
+          "score_var": 4064.666666666667
+        }, 
+        "prob": 0.5570476423480561, 
+        "red": {
+          "endgame_points": 25.0, 
+          "endgame_points_var": 772.6666666666667, 
+          "power_cells_scored": 7.78030303030303, 
+          "power_cells_scored_var": 631.3333333333334, 
+          "prob_face_boss": 0.10399096532557084, 
+          "prob_shield_energized": 0.05045093813745427, 
+          "prob_shield_operational": 0.07507380207291603, 
+          "score": 59.17424242424243, 
+          "score_var": 4143.666666666667
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm13": {
+        "blue": {
+          "endgame_points": 32.901069518716575, 
+          "endgame_points_var": 778.7590612002376, 
+          "power_cells_scored": 9.626411170528817, 
+          "power_cells_scored_var": 646.8364527629233, 
+          "prob_face_boss": 0.16575667911731828, 
+          "prob_shield_energized": 0.06079535791486412, 
+          "prob_shield_operational": 0.12502222359031867, 
+          "score": 76.36972667855022, 
+          "score_var": 4380.837046939989
+        }, 
+        "prob": 0.5425525261070462, 
+        "red": {
+          "endgame_points": 30.410539215686278, 
+          "endgame_points_var": 773.9509803921569, 
+          "power_cells_scored": 8.65482026143791, 
+          "power_cells_scored_var": 636.2303921568628, 
+          "prob_face_boss": 0.14375386409391688, 
+          "prob_shield_energized": 0.05485469064887494, 
+          "prob_shield_operational": 0.10687278314695581, 
+          "score": 66.4934640522876, 
+          "score_var": 4160.0441176470595
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm14": {
+        "blue": {
+          "endgame_points": 24.195804195804193, 
+          "endgame_points_var": 722.6262626262627, 
+          "power_cells_scored": 12.302253302253302, 
+          "power_cells_scored_var": 748.3131313131314, 
+          "prob_face_boss": 0.0914437870862379, 
+          "prob_shield_energized": 0.08987555779549483, 
+          "prob_shield_operational": 0.06451769387613215, 
+          "score": 72.11383061383061, 
+          "score_var": 4246.853535353535
+        }, 
+        "prob": 0.6006640303148241, 
+        "red": {
+          "endgame_points": 18.169332644635368, 
+          "endgame_points_var": 778.9221829606005, 
+          "power_cells_scored": 7.457170611556373, 
+          "power_cells_scored_var": 659.5351191048561, 
+          "prob_face_boss": 0.0669609386352823, 
+          "prob_shield_energized": 0.05287201664715191, 
+          "prob_shield_operational": 0.04667681027943171, 
+          "score": 48.75791269937732, 
+          "score_var": 4137.854101601075
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm15": {
+        "blue": {
+          "endgame_points": 17.948859778284877, 
+          "endgame_points_var": 924.9637403176403, 
+          "power_cells_scored": 6.895791537637955, 
+          "power_cells_scored_var": 738.1913048954111, 
+          "prob_face_boss": 0.08338455983711845, 
+          "prob_shield_energized": 0.06060959179598391, 
+          "prob_shield_operational": 0.06092411383075669, 
+          "score": 49.965477890451844, 
+          "score_var": 4373.6580875018535
+        }, 
+        "prob": 0.5561371444283081, 
+        "red": {
+          "endgame_points": 21.42857142857143, 
+          "endgame_points_var": 654.6666666666667, 
+          "power_cells_scored": 7.482142857142857, 
+          "power_cells_scored_var": 613.6666666666667, 
+          "prob_face_boss": 0.06584203253461984, 
+          "prob_shield_energized": 0.04687111874465333, 
+          "prob_shield_operational": 0.04429246014226895, 
+          "score": 62.8452380952381, 
+          "score_var": 3948.833333333333
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm16": {
+        "blue": {
+          "endgame_points": 22.946747378464902, 
+          "endgame_points_var": 719.8360492525412, 
+          "power_cells_scored": 10.657674686088065, 
+          "power_cells_scored_var": 737.855358537144, 
+          "prob_face_boss": 0.08363172582665057, 
+          "prob_shield_energized": 0.07904289719694702, 
+          "prob_shield_operational": 0.05850936699153364, 
+          "score": 65.41342277564641, 
+          "score_var": 4185.971492648162
+        }, 
+        "prob": 0.5480881617654789, 
+        "red": {
+          "endgame_points": 29.015875043384863, 
+          "endgame_points_var": 714.9689892841866, 
+          "power_cells_scored": 8.804819247919115, 
+          "power_cells_scored_var": 670.1395203812776, 
+          "prob_face_boss": 0.12327585036484257, 
+          "prob_shield_energized": 0.06024578000215819, 
+          "prob_shield_operational": 0.08919010065220345, 
+          "score": 76.5936723996792, 
+          "score_var": 4375.239442071638
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm17": {
+        "blue": {
+          "endgame_points": 33.10199890776625, 
+          "endgame_points_var": 788.9732264833074, 
+          "power_cells_scored": 12.582334784420112, 
+          "power_cells_scored_var": 769.4117049553086, 
+          "prob_face_boss": 0.16912961537575466, 
+          "prob_shield_energized": 0.09460778532275449, 
+          "prob_shield_operational": 0.12805819888537073, 
+          "score": 88.03575330310206, 
+          "score_var": 4520.805912456192
+        }, 
+        "prob": 0.6275696090007619, 
+        "red": {
+          "endgame_points": 22.837345113482492, 
+          "endgame_points_var": 644.1022694845071, 
+          "power_cells_scored": 8.56705438949015, 
+          "power_cells_scored_var": 659.6362486876093, 
+          "prob_face_boss": 0.07155634151287926, 
+          "prob_shield_energized": 0.05771088535550717, 
+          "prob_shield_operational": 0.048325656746871726, 
+          "score": 57.0926923786606, 
+          "score_var": 4520.464561274593
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm18": {
+        "blue": {
+          "endgame_points": 39.1586407429177, 
+          "endgame_points_var": 767.6257128373783, 
+          "power_cells_scored": 11.55025007080015, 
+          "power_cells_scored_var": 780.6254110846012, 
+          "prob_face_boss": 0.22595604792588442, 
+          "prob_shield_energized": 0.09006109739326207, 
+          "prob_shield_operational": 0.17548820764098993, 
+          "score": 88.09035069122724, 
+          "score_var": 4199.528759002042
+        }, 
+        "prob": 0.5859497286034037, 
+        "red": {
+          "endgame_points": 25.662906558533507, 
+          "endgame_points_var": 871.2232549379034, 
+          "power_cells_scored": 9.305057978140349, 
+          "power_cells_scored_var": 713.8483688641925, 
+          "prob_face_boss": 0.12235006101249257, 
+          "prob_shield_energized": 0.06867876424231767, 
+          "prob_shield_operational": 0.09131254751166296, 
+          "score": 68.04556802747456, 
+          "score_var": 4322.239372060045
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm19": {
+        "blue": {
+          "endgame_points": 22.482268435503272, 
+          "endgame_points_var": 814.0864843829074, 
+          "power_cells_scored": 8.459404901013686, 
+          "power_cells_scored_var": 721.1481083171814, 
+          "prob_face_boss": 0.0942673935936158, 
+          "prob_shield_energized": 0.06556566184275359, 
+          "prob_shield_operational": 0.06809022330330383, 
+          "score": 63.31281434416927, 
+          "score_var": 4363.6458996683095
+        }, 
+        "prob": 0.5159947414292405, 
+        "red": {
+          "endgame_points": 25.934016285218775, 
+          "endgame_points_var": 919.355998350479, 
+          "power_cells_scored": 10.533576272426945, 
+          "power_cells_scored_var": 822.9549875537641, 
+          "prob_face_boss": 0.13060930565971107, 
+          "prob_shield_energized": 0.08997777466143164, 
+          "prob_shield_operational": 0.09880018405026869, 
+          "score": 67.11557058633042, 
+          "score_var": 4627.8067121617905
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm2": {
+        "blue": {
+          "endgame_points": 37.5, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 22.5, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.2580014677217932, 
+          "prob_shield_energized": 0.22213901565093463, 
+          "prob_shield_operational": 0.2136394530859882, 
+          "score": 116.0, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 37.5, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 22.5, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.2580014677217932, 
+          "prob_shield_energized": 0.22213901565093463, 
+          "prob_shield_operational": 0.2136394530859882, 
+          "score": 116.0, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm20": {
+        "blue": {
+          "endgame_points": 20.497267518167735, 
+          "endgame_points_var": 788.0109166971417, 
+          "power_cells_scored": 9.856886393386873, 
+          "power_cells_scored_var": 824.1956770405442, 
+          "prob_face_boss": 0.07968155122527876, 
+          "prob_shield_energized": 0.08636987869051493, 
+          "prob_shield_operational": 0.05644532237581501, 
+          "score": 59.121992539905584, 
+          "score_var": 4948.377865380331
+        }, 
+        "prob": 0.5019558063506817, 
+        "red": {
+          "endgame_points": 22.471532472932562, 
+          "endgame_points_var": 811.859249925644, 
+          "power_cells_scored": 10.11099082518422, 
+          "power_cells_scored_var": 729.9242740259764, 
+          "prob_face_boss": 0.09390168495937157, 
+          "prob_shield_energized": 0.0750155730702391, 
+          "prob_shield_operational": 0.06777279591732122, 
+          "score": 59.60673711398965, 
+          "score_var": 4828.289998785229
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm21": {
+        "blue": {
+          "endgame_points": 26.82843845115162, 
+          "endgame_points_var": 767.4817658891645, 
+          "power_cells_scored": 8.749657140761157, 
+          "power_cells_scored_var": 769.7049150289752, 
+          "prob_face_boss": 0.11557930028228314, 
+          "prob_shield_energized": 0.07341782296448329, 
+          "prob_shield_operational": 0.08412286599112284, 
+          "score": 62.83059829305199, 
+          "score_var": 5327.010608036544
+        }, 
+        "prob": 0.5125282073796076, 
+        "red": {
+          "endgame_points": 23.76808015876651, 
+          "endgame_points_var": 686.5392306831235, 
+          "power_cells_scored": 7.9597888783933115, 
+          "power_cells_scored_var": 733.0575947093839, 
+          "prob_face_boss": 0.08336344302265974, 
+          "prob_shield_energized": 0.06478556867382657, 
+          "prob_shield_operational": 0.05778723974820332, 
+          "score": 59.68211451948222, 
+          "score_var": 4721.515862579503
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm22": {
+        "blue": {
+          "endgame_points": 32.98046654794166, 
+          "endgame_points_var": 697.2754076725512, 
+          "power_cells_scored": 7.8814899277685875, 
+          "power_cells_scored_var": 422.38783683554595, 
+          "prob_face_boss": 0.1530982155189471, 
+          "prob_shield_energized": 0.022712440311157156, 
+          "prob_shield_operational": 0.11264392480947993, 
+          "score": 75.85200226890692, 
+          "score_var": 2927.9797350925382
+        }, 
+        "prob": 0.6801027213922384, 
+        "red": {
+          "endgame_points": 20.973183790603343, 
+          "endgame_points_var": 750.8589586204325, 
+          "power_cells_scored": 4.995706951298965, 
+          "power_cells_scored_var": 470.52202400076845, 
+          "prob_face_boss": 0.07718814365618254, 
+          "prob_shield_energized": 0.02124746528279331, 
+          "prob_shield_operational": 0.05405875564640428, 
+          "score": 41.64118578053061, 
+          "score_var": 2415.953721394048
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm23": {
+        "blue": {
+          "endgame_points": 19.25263668283434, 
+          "endgame_points_var": 474.72691648904106, 
+          "power_cells_scored": 8.34135260200152, 
+          "power_cells_scored_var": 419.32026865096304, 
+          "prob_face_boss": 0.03073115409454874, 
+          "prob_shield_energized": 0.023541867079666323, 
+          "prob_shield_operational": 0.01788040914771516, 
+          "score": 56.93552150476502, 
+          "score_var": 2991.10293222379
+        }, 
+        "prob": 0.6322370155968108, 
+        "red": {
+          "endgame_points": 41.275013761596256, 
+          "endgame_points_var": 726.4169972819767, 
+          "power_cells_scored": 7.390801926198449, 
+          "power_cells_scored_var": 403.09632616367173, 
+          "prob_face_boss": 0.24360601738069443, 
+          "prob_shield_energized": 0.019111555154987858, 
+          "prob_shield_operational": 0.18935813883926889, 
+          "score": 82.36494785798088, 
+          "score_var": 2676.4421125646372
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm24": {
+        "blue": {
+          "endgame_points": 39.94543190398549, 
+          "endgame_points_var": 861.5133774970544, 
+          "power_cells_scored": 14.522604321324373, 
+          "power_cells_scored_var": 525.7744641153253, 
+          "prob_face_boss": 0.2472231194154979, 
+          "prob_shield_energized": 0.06634112906825007, 
+          "prob_shield_operational": 0.1966625114702234, 
+          "score": 106.58924875069116, 
+          "score_var": 3309.832196543534
+        }, 
+        "prob": 0.5979076261869186, 
+        "red": {
+          "endgame_points": 31.901591043244537, 
+          "endgame_points_var": 597.0160899041396, 
+          "power_cells_scored": 13.636713610941278, 
+          "power_cells_scored_var": 492.92556695186767, 
+          "prob_face_boss": 0.12507691387952935, 
+          "prob_shield_energized": 0.05560224499392885, 
+          "prob_shield_operational": 0.08777101110952867, 
+          "score": 87.09706245147527, 
+          "score_var": 2870.981445702201
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm25": {
+        "blue": {
+          "endgame_points": 16.19953077848311, 
+          "endgame_points_var": 590.4806649247585, 
+          "power_cells_scored": 7.430341382705667, 
+          "power_cells_scored_var": 442.4329176285877, 
+          "prob_face_boss": 0.03573317567095158, 
+          "prob_shield_energized": 0.02406043790021084, 
+          "prob_shield_operational": 0.022307535717141613, 
+          "score": 48.99496660772627, 
+          "score_var": 3156.8776208757417
+        }, 
+        "prob": 0.7429725616851632, 
+        "red": {
+          "endgame_points": 33.29085009672023, 
+          "endgame_points_var": 523.3463131379177, 
+          "power_cells_scored": 17.132286629490395, 
+          "power_cells_scored_var": 551.9476954111606, 
+          "prob_face_boss": 0.12149959312764391, 
+          "prob_shield_energized": 0.08747893544271834, 
+          "prob_shield_operational": 0.08286040151070884, 
+          "score": 99.98590237938558, 
+          "score_var": 2949.389707357741
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm26": {
+        "blue": {
+          "endgame_points": 33.6502194014391, 
+          "endgame_points_var": 567.6372168108401, 
+          "power_cells_scored": 15.665078600345252, 
+          "power_cells_scored_var": 525.344125037863, 
+          "prob_face_boss": 0.13437073011130884, 
+          "prob_shield_energized": 0.07292067561594917, 
+          "prob_shield_operational": 0.09411591441897604, 
+          "score": 87.07525553386222, 
+          "score_var": 2886.8070140879536
+        }, 
+        "prob": 0.6157685605550958, 
+        "red": {
+          "endgame_points": 28.517366545079277, 
+          "endgame_points_var": 560.3581594667234, 
+          "power_cells_scored": 5.5818691311629385, 
+          "power_cells_scored_var": 492.33150332018, 
+          "prob_face_boss": 0.09176591528723765, 
+          "prob_shield_energized": 0.025186587765597457, 
+          "prob_shield_operational": 0.061636506854262696, 
+          "score": 62.940256388847175, 
+          "score_var": 3834.5961074143543
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm27": {
+        "blue": {
+          "endgame_points": 13.95951862318216, 
+          "endgame_points_var": 611.0944737335013, 
+          "power_cells_scored": 8.733444715706092, 
+          "power_cells_scored_var": 508.9511945669061, 
+          "prob_face_boss": 0.03126952481777745, 
+          "prob_shield_energized": 0.03714126315646338, 
+          "prob_shield_operational": 0.019474881318212622, 
+          "score": 62.04448011917641, 
+          "score_var": 3379.9740434048363
+        }, 
+        "prob": 0.5680219543346328, 
+        "red": {
+          "endgame_points": 33.8317424341123, 
+          "endgame_points_var": 694.4171655196824, 
+          "power_cells_scored": 10.779266940743124, 
+          "power_cells_scored_var": 512.0933710158992, 
+          "prob_face_boss": 0.16034643453484454, 
+          "prob_shield_energized": 0.04561165802758871, 
+          "prob_shield_operational": 0.11844907708656027, 
+          "score": 75.46885363990624, 
+          "score_var": 2758.6119783766035
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm28": {
+        "blue": {
+          "endgame_points": 22.52698035471415, 
+          "endgame_points_var": 536.4168867528958, 
+          "power_cells_scored": 8.39405446219368, 
+          "power_cells_scored_var": 473.45442103159485, 
+          "prob_face_boss": 0.05283573378149364, 
+          "prob_shield_energized": 0.031008991944543984, 
+          "prob_shield_operational": 0.03333872470188637, 
+          "score": 63.16505401024892, 
+          "score_var": 3207.0075159800235
+        }, 
+        "prob": 0.6488763894570347, 
+        "red": {
+          "endgame_points": 36.39304431599221, 
+          "endgame_points_var": 650.2773694102593, 
+          "power_cells_scored": 12.453302665404692, 
+          "power_cells_scored_var": 521.6595778174719, 
+          "prob_face_boss": 0.17728965157344745, 
+          "prob_shield_energized": 0.054785169251427845, 
+          "prob_shield_operational": 0.13096996016177376, 
+          "score": 93.69799880800505, 
+          "score_var": 3172.019172537454
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm29": {
+        "blue": {
+          "endgame_points": 25.936345229985573, 
+          "endgame_points_var": 1010.1620276802735, 
+          "power_cells_scored": 13.462970682319954, 
+          "power_cells_scored_var": 621.6674093002069, 
+          "prob_face_boss": 0.14191493150561585, 
+          "prob_shield_energized": 0.07703724841067783, 
+          "prob_shield_operational": 0.10952239089322946, 
+          "score": 82.02252751546109, 
+          "score_var": 2785.492229715513
+        }, 
+        "prob": 0.5058307296254995, 
+        "red": {
+          "endgame_points": 37.123276759317164, 
+          "endgame_points_var": 762.882775124936, 
+          "power_cells_scored": 11.230473596948777, 
+          "power_cells_scored_var": 510.7304024565657, 
+          "prob_face_boss": 0.20376259340596603, 
+          "prob_shield_energized": 0.047334534366147096, 
+          "prob_shield_operational": 0.1564195430019808, 
+          "score": 80.84297529714709, 
+          "score_var": 3727.4577535513054
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm3": {
+        "blue": {
+          "endgame_points": 28.749999999999996, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 14.749999999999998, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.18349927291754753, 
+          "prob_shield_energized": 0.16140195275208913, 
+          "prob_shield_operational": 0.1476772676017475, 
+          "score": 76.25, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 28.749999999999996, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 14.749999999999998, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.18349927291754753, 
+          "prob_shield_energized": 0.16140195275208913, 
+          "prob_shield_operational": 0.1476772676017475, 
+          "score": 76.25, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm30": {
+        "blue": {
+          "endgame_points": 29.17008555970013, 
+          "endgame_points_var": 585.8883373897096, 
+          "power_cells_scored": 8.904593254932232, 
+          "power_cells_scored_var": 458.9077874967178, 
+          "prob_face_boss": 0.10138605104761067, 
+          "prob_shield_energized": 0.030625351577315385, 
+          "prob_shield_operational": 0.06940178185362922, 
+          "score": 65.2150279847704, 
+          "score_var": 2999.0653605259913
+        }, 
+        "prob": 0.5238572149485128, 
+        "red": {
+          "endgame_points": 28.545222669575516, 
+          "endgame_points_var": 648.8378799144557, 
+          "power_cells_scored": 8.250777317789103, 
+          "power_cells_scored_var": 573.6402571742565, 
+          "prob_face_boss": 0.10844088614966996, 
+          "prob_shield_energized": 0.04443649086647938, 
+          "prob_shield_operational": 0.07619304998767862, 
+          "score": 60.37060750188417, 
+          "score_var": 3555.5333570020157
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm31": {
+        "blue": {
+          "endgame_points": 36.67688427527186, 
+          "endgame_points_var": 580.1316833756543, 
+          "power_cells_scored": 12.1386823385876, 
+          "power_cells_scored_var": 567.6885768830349, 
+          "prob_face_boss": 0.16643985579354992, 
+          "prob_shield_energized": 0.06092068702035702, 
+          "prob_shield_operational": 0.11981344592433896, 
+          "score": 89.70750014015792, 
+          "score_var": 3139.7027767946493
+        }, 
+        "prob": 0.5067113581434601, 
+        "red": {
+          "endgame_points": 34.34619984415875, 
+          "endgame_points_var": 734.1076945999083, 
+          "power_cells_scored": 10.933247585429795, 
+          "power_cells_scored_var": 548.7257372596438, 
+          "prob_face_boss": 0.17186281206654197, 
+          "prob_shield_energized": 0.05207538106345089, 
+          "prob_shield_operational": 0.12894981969203967, 
+          "score": 88.30558955691116, 
+          "score_var": 3804.1252645200093
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm32": {
+        "blue": {
+          "endgame_points": 31.043908699201047, 
+          "endgame_points_var": 757.2586936531943, 
+          "power_cells_scored": 7.222006068772568, 
+          "power_cells_scored_var": 536.8732811458248, 
+          "prob_face_boss": 0.14634306098628436, 
+          "prob_shield_energized": 0.0356889044737132, 
+          "prob_shield_operational": 0.10861182889703036, 
+          "score": 62.118004876431485, 
+          "score_var": 3410.0027081560515
+        }, 
+        "prob": 0.5075912569039307, 
+        "red": {
+          "endgame_points": 27.275727523740485, 
+          "endgame_points_var": 514.7061554658803, 
+          "power_cells_scored": 6.442659833311284, 
+          "power_cells_scored_var": 379.0099554940674, 
+          "prob_face_boss": 0.07459262570328307, 
+          "prob_shield_energized": 0.014407984907502613, 
+          "prob_shield_operational": 0.04817578746939377, 
+          "score": 60.65729826920234, 
+          "score_var": 2482.0458730241744
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm33": {
+        "blue": {
+          "endgame_points": 27.733127648442796, 
+          "endgame_points_var": 618.5564879985092, 
+          "power_cells_scored": 7.80094595427303, 
+          "power_cells_scored_var": 331.14847687664655, 
+          "prob_face_boss": 0.09725024090740408, 
+          "prob_shield_energized": 0.011787146995729691, 
+          "prob_shield_operational": 0.06701221540685842, 
+          "score": 56.83787395912131, 
+          "score_var": 1956.4107285720838
+        }, 
+        "prob": 0.5360342312863904, 
+        "red": {
+          "endgame_points": 16.52523343250229, 
+          "endgame_points_var": 600.045191975024, 
+          "power_cells_scored": 9.149049975512968, 
+          "power_cells_scored_var": 359.30399185614885, 
+          "prob_face_boss": 0.03796685591721982, 
+          "prob_shield_energized": 0.017760754745357543, 
+          "prob_shield_operational": 0.023913659359040107, 
+          "score": 62.47099572500016, 
+          "score_var": 1922.450520115159
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm34": {
+        "blue": {
+          "endgame_points": 32.14953099882925, 
+          "endgame_points_var": 720.9244346900246, 
+          "power_cells_scored": 13.86229196259411, 
+          "power_cells_scored_var": 351.1247051908972, 
+          "prob_face_boss": 0.14980734558901176, 
+          "prob_shield_energized": 0.030384049483473508, 
+          "prob_shield_operational": 0.1105743187562207, 
+          "score": 85.94806619135811, 
+          "score_var": 2459.329098808253
+        }, 
+        "prob": 0.5126865018966535, 
+        "red": {
+          "endgame_points": 40.208631162182115, 
+          "endgame_points_var": 795.5633378558643, 
+          "power_cells_scored": 10.594762299051908, 
+          "power_cells_scored_var": 465.218843256015, 
+          "prob_face_boss": 0.24143969976762492, 
+          "prob_shield_energized": 0.03749043817961639, 
+          "prob_shield_operational": 0.18971476638473606, 
+          "score": 88.15820103990873, 
+          "score_var": 2369.340216511701
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm35": {
+        "blue": {
+          "endgame_points": 19.02001960017777, 
+          "endgame_points_var": 426.3377666133106, 
+          "power_cells_scored": 6.558951427395499, 
+          "power_cells_scored_var": 322.97008203259907, 
+          "prob_face_boss": 0.023588936088326018, 
+          "prob_shield_energized": 0.009098316205470969, 
+          "prob_shield_operational": 0.012978493415966241, 
+          "score": 55.33201040863977, 
+          "score_var": 1941.6991878290123
+        }, 
+        "prob": 0.5664734108366709, 
+        "red": {
+          "endgame_points": 18.114500235021648, 
+          "endgame_points_var": 665.8487859339034, 
+          "power_cells_scored": 5.839961004692203, 
+          "power_cells_scored_var": 338.7581938078015, 
+          "prob_face_boss": 0.052271786800176745, 
+          "prob_shield_energized": 0.009514355861466317, 
+          "prob_shield_operational": 0.03460989679972526, 
+          "score": 44.742899949679675, 
+          "score_var": 2059.5342723367626
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm36": {
+        "blue": {
+          "endgame_points": 24.96241452620074, 
+          "endgame_points_var": 748.6019756541025, 
+          "power_cells_scored": 10.071639905087114, 
+          "power_cells_scored_var": 331.6919875543896, 
+          "prob_face_boss": 0.10016959307728412, 
+          "prob_shield_energized": 0.016280173446709956, 
+          "prob_shield_operational": 0.07168849688215229, 
+          "score": 66.47695572512487, 
+          "score_var": 2119.1654561187715
+        }, 
+        "prob": 0.6989937386683259, 
+        "red": {
+          "endgame_points": 39.7715609950462, 
+          "endgame_points_var": 421.9025641533316, 
+          "power_cells_scored": 16.838356890188585, 
+          "power_cells_scored_var": 480.8924251832294, 
+          "prob_face_boss": 0.162356565987529, 
+          "prob_shield_energized": 0.07124126448659951, 
+          "prob_shield_operational": 0.10967788087111185, 
+          "score": 103.52772527674097, 
+          "score_var": 2928.278806033985
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm37": {
+        "blue": {
+          "endgame_points": 29.080697274549294, 
+          "endgame_points_var": 517.0488680031291, 
+          "power_cells_scored": 14.25037006733387, 
+          "power_cells_scored_var": 457.51508870753526, 
+          "prob_face_boss": 0.08695213227160214, 
+          "prob_shield_energized": 0.05212350010896538, 
+          "prob_shield_operational": 0.05709300852498467, 
+          "score": 88.21209251860444, 
+          "score_var": 2592.889441622417
+        }, 
+        "prob": 0.5828933322336856, 
+        "red": {
+          "endgame_points": 33.726195356843746, 
+          "endgame_points_var": 419.77400685355497, 
+          "power_cells_scored": 18.796577177447688, 
+          "power_cells_scored_var": 508.17771122696104, 
+          "prob_face_boss": 0.09985548607710082, 
+          "prob_shield_energized": 0.09015098303213609, 
+          "prob_shield_operational": 0.0634531311666473, 
+          "score": 102.86157119233282, 
+          "score_var": 2306.0500482766315
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm38": {
+        "blue": {
+          "endgame_points": 37.47337113996688, 
+          "endgame_points_var": 616.8998325093808, 
+          "power_cells_scored": 13.38705777613219, 
+          "power_cells_scored_var": 323.3955057656919, 
+          "prob_face_boss": 0.18221356425561597, 
+          "prob_shield_energized": 0.02383238551475375, 
+          "prob_shield_operational": 0.13387254560300765, 
+          "score": 85.65021827928702, 
+          "score_var": 2800.489261976695
+        }, 
+        "prob": 0.6190974817683279, 
+        "red": {
+          "endgame_points": 23.864979856377605, 
+          "endgame_points_var": 475.6923100251138, 
+          "power_cells_scored": 7.097881973794381, 
+          "power_cells_scored_var": 436.4375915824888, 
+          "prob_face_boss": 0.04878182955952459, 
+          "prob_shield_energized": 0.02244193226924618, 
+          "prob_shield_operational": 0.029645440709296866, 
+          "score": 63.133459065534446, 
+          "score_var": 2717.838461969633
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm39": {
+        "blue": {
+          "endgame_points": 26.535314823255625, 
+          "endgame_points_var": 429.3600707189217, 
+          "power_cells_scored": 12.13633512019534, 
+          "power_cells_scored_var": 324.3829243563284, 
+          "prob_face_boss": 0.05315398241289393, 
+          "prob_shield_energized": 0.02034022650668854, 
+          "prob_shield_operational": 0.03170443317130256, 
+          "score": 69.68180255642321, 
+          "score_var": 2309.09677995332
+        }, 
+        "prob": 0.5863338240482854, 
+        "red": {
+          "endgame_points": 31.810296155946688, 
+          "endgame_points_var": 533.512946181846, 
+          "power_cells_scored": 15.000640437981213, 
+          "power_cells_scored_var": 423.59852074207606, 
+          "prob_face_boss": 0.11114820969036443, 
+          "prob_shield_energized": 0.04927368231605278, 
+          "prob_shield_operational": 0.07537115939643835, 
+          "score": 85.01469011495902, 
+          "score_var": 2632.192127680149
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm4": {
+        "blue": {
+          "endgame_points": 28.333333333333336, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 12.333333333333336, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.18032218807446942, 
+          "prob_shield_energized": 0.14491935880375406, 
+          "prob_shield_operational": 0.14491935880375406, 
+          "score": 68.83333333333333, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 28.333333333333336, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 12.333333333333336, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.18032218807446942, 
+          "prob_shield_energized": 0.14491935880375406, 
+          "prob_shield_operational": 0.14491935880375406, 
+          "score": 68.83333333333333, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm40": {
+        "blue": {
+          "endgame_points": 20.189847981705828, 
+          "endgame_points_var": 546.8585223744225, 
+          "power_cells_scored": 7.03419931596453, 
+          "power_cells_scored_var": 447.20369509995675, 
+          "prob_face_boss": 0.044342138883525006, 
+          "prob_shield_energized": 0.023602171258353843, 
+          "prob_shield_operational": 0.027670358081011592, 
+          "score": 50.179866288670276, 
+          "score_var": 3146.2995151889736
+        }, 
+        "prob": 0.7869840513426778, 
+        "red": {
+          "endgame_points": 56.14938532992693, 
+          "endgame_points_var": 957.1382599786168, 
+          "power_cells_scored": 12.712017538522309, 
+          "power_cells_scored_var": 376.6003929369458, 
+          "prob_face_boss": 0.45047406828653735, 
+          "prob_shield_energized": 0.03074763986045026, 
+          "prob_shield_operational": 0.3874087784148119, 
+          "score": 112.7134828106451, 
+          "score_var": 3025.3420800962776
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm41": {
+        "blue": {
+          "endgame_points": 41.27908151298494, 
+          "endgame_points_var": 771.0391054667157, 
+          "power_cells_scored": 11.668433281191186, 
+          "power_cells_scored_var": 486.97468629470603, 
+          "prob_face_boss": 0.250091985361384, 
+          "prob_shield_energized": 0.045351715314096985, 
+          "prob_shield_operational": 0.19647871427211683, 
+          "score": 102.55235773433628, 
+          "score_var": 2554.983480769875
+        }, 
+        "prob": 0.6909106284267175, 
+        "red": {
+          "endgame_points": 29.12106104297972, 
+          "endgame_points_var": 503.9737149082157, 
+          "power_cells_scored": 6.302723658471905, 
+          "power_cells_scored_var": 403.87464403818353, 
+          "prob_face_boss": 0.08448930692343737, 
+          "prob_shield_energized": 0.016810063014487953, 
+          "prob_shield_operational": 0.054997385810342525, 
+          "score": 65.50714226798114, 
+          "score_var": 2968.9740415762053
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm42": {
+        "blue": {
+          "endgame_points": 34.78337069992846, 
+          "endgame_points_var": 509.08194691924916, 
+          "power_cells_scored": 11.23274973536118, 
+          "power_cells_scored_var": 365.049442401303, 
+          "prob_face_boss": 0.1318651998507473, 
+          "prob_shield_energized": 0.02403809479634278, 
+          "prob_shield_operational": 0.09024941024627142, 
+          "score": 80.93699770255849, 
+          "score_var": 2361.7681468634187
+        }, 
+        "prob": 0.698148684614015, 
+        "red": {
+          "endgame_points": 19.09344819455105, 
+          "endgame_points_var": 847.7137681344029, 
+          "power_cells_scored": 5.202175439143042, 
+          "power_cells_scored_var": 399.6702852037877, 
+          "prob_face_boss": 0.08001452096755801, 
+          "prob_shield_energized": 0.014233339351500063, 
+          "prob_shield_operational": 0.057431872898453085, 
+          "score": 43.975375716383375, 
+          "score_var": 2708.464342398633
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm43": {
+        "blue": {
+          "endgame_points": 26.608544543931075, 
+          "endgame_points_var": 340.51630656416376, 
+          "power_cells_scored": 11.95087675737442, 
+          "power_cells_scored_var": 278.1673904595542, 
+          "prob_face_boss": 0.03518415638368244, 
+          "prob_shield_energized": 0.01316227639684997, 
+          "prob_shield_operational": 0.01874030876553867, 
+          "score": 74.23176909369795, 
+          "score_var": 2021.0137771787172
+        }, 
+        "prob": 0.5994030275196482, 
+        "red": {
+          "endgame_points": 23.864238491804528, 
+          "endgame_points_var": 641.5758658199397, 
+          "power_cells_scored": 9.935749373004125, 
+          "power_cells_scored_var": 299.64813550256895, 
+          "prob_face_boss": 0.07684241002781855, 
+          "prob_shield_energized": 0.01201343311099845, 
+          "prob_shield_operational": 0.05218411064271167, 
+          "score": 58.152826216642666, 
+          "score_var": 2056.504266792631
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm44": {
+        "blue": {
+          "endgame_points": 32.36505123668356, 
+          "endgame_points_var": 716.2517546837785, 
+          "power_cells_scored": 7.986307335047031, 
+          "power_cells_scored_var": 288.548807320584, 
+          "prob_face_boss": 0.1508990740949938, 
+          "prob_shield_energized": 0.007879370846362699, 
+          "prob_shield_operational": 0.11134413053541703, 
+          "score": 77.43995673321815, 
+          "score_var": 2326.4329895473147
+        }, 
+        "prob": 0.7721545600100952, 
+        "red": {
+          "endgame_points": 29.60467714089154, 
+          "endgame_points_var": 453.81053312172696, 
+          "power_cells_scored": 23.63433284278769, 
+          "power_cells_scored_var": 387.88311890156024, 
+          "prob_face_boss": 0.07681575665413565, 
+          "prob_shield_energized": 0.09888331224049973, 
+          "prob_shield_operational": 0.04830336897459264, 
+          "score": 127.16717815417691, 
+          "score_var": 2117.3818927417155
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm45": {
+        "blue": {
+          "endgame_points": 23.991416771062198, 
+          "endgame_points_var": 492.4530553600954, 
+          "power_cells_scored": 12.913626241849215, 
+          "power_cells_scored_var": 224.58892658903466, 
+          "prob_face_boss": 0.05233261745913098, 
+          "prob_shield_energized": 0.008020993040534385, 
+          "prob_shield_operational": 0.03230413225485895, 
+          "score": 74.91192889222795, 
+          "score_var": 1897.8208137902457
+        }, 
+        "prob": 0.6048512442737735, 
+        "red": {
+          "endgame_points": 15.459367690219256, 
+          "endgame_points_var": 474.40666898103683, 
+          "power_cells_scored": 8.599920364451902, 
+          "power_cells_scored_var": 324.147013973405, 
+          "prob_face_boss": 0.020430290468091084, 
+          "prob_shield_energized": 0.012418136303592009, 
+          "prob_shield_operational": 0.011467937295105424, 
+          "score": 58.43914380484589, 
+          "score_var": 1939.410868628034
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm46": {
+        "blue": {
+          "endgame_points": 23.78011152039136, 
+          "endgame_points_var": 594.6684825991184, 
+          "power_cells_scored": 8.308344368643507, 
+          "power_cells_scored_var": 262.08464664117093, 
+          "prob_face_boss": 0.06873423841785986, 
+          "prob_shield_energized": 0.005976431788538572, 
+          "prob_shield_operational": 0.045483218544946524, 
+          "score": 58.78838069236359, 
+          "score_var": 2243.3120899941227
+        }, 
+        "prob": 0.7239161621060375, 
+        "red": {
+          "endgame_points": 35.41737546435268, 
+          "endgame_points_var": 716.3581490526528, 
+          "power_cells_scored": 15.687332859149464, 
+          "power_cells_scored_var": 454.50997441593165, 
+          "prob_face_boss": 0.17918744183149204, 
+          "prob_shield_energized": 0.059077640747898785, 
+          "prob_shield_operational": 0.1345195336348024, 
+          "score": 100.00415423426284, 
+          "score_var": 2562.880796995135
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm47": {
+        "blue": {
+          "endgame_points": 36.36613859744658, 
+          "endgame_points_var": 587.2931832412205, 
+          "power_cells_scored": 7.659943768616948, 
+          "power_cells_scored_var": 298.2010534402499, 
+          "prob_face_boss": 0.1647230075569781, 
+          "prob_shield_energized": 0.008333834956498753, 
+          "prob_shield_operational": 0.11869197109082275, 
+          "score": 75.77317405872417, 
+          "score_var": 1617.1142241511545
+        }, 
+        "prob": 0.6483866903884249, 
+        "red": {
+          "endgame_points": 14.366406476345665, 
+          "endgame_points_var": 319.1679484043917, 
+          "power_cells_scored": 7.159399963145393, 
+          "power_cells_scored_var": 339.6720858598553, 
+          "prob_face_boss": 0.005319795528324844, 
+          "prob_shield_energized": 0.011597114352445814, 
+          "prob_shield_operational": 0.002297093192009214, 
+          "score": 54.536781187382125, 
+          "score_var": 1490.1870018934858
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm48": {
+        "blue": {
+          "endgame_points": 38.66940978753286, 
+          "endgame_points_var": 389.1570468145451, 
+          "power_cells_scored": 11.839160418574004, 
+          "power_cells_scored_var": 324.47152511064263, 
+          "prob_face_boss": 0.13978504345329812, 
+          "prob_shield_energized": 0.01955676665261552, 
+          "prob_shield_operational": 0.09097998951076347, 
+          "score": 106.78287089221865, 
+          "score_var": 1485.572382509247
+        }, 
+        "prob": 0.8232475709426124, 
+        "red": {
+          "endgame_points": 18.55042011803299, 
+          "endgame_points_var": 407.6786629290089, 
+          "power_cells_scored": 5.839485823096869, 
+          "power_cells_scored_var": 277.05106685958594, 
+          "prob_face_boss": 0.020042663809222816, 
+          "prob_shield_energized": 0.004756793358611233, 
+          "prob_shield_operational": 0.010709870450816172, 
+          "score": 50.67238498956441, 
+          "score_var": 2171.787151641631
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm49": {
+        "blue": {
+          "endgame_points": 15.814665409360812, 
+          "endgame_points_var": 362.6628798707834, 
+          "power_cells_scored": 11.947720234639807, 
+          "power_cells_scored_var": 275.61555245696036, 
+          "prob_face_boss": 0.010164860939662068, 
+          "prob_shield_energized": 0.012812766826350686, 
+          "prob_shield_operational": 0.004900671800650014, 
+          "score": 70.51059695087963, 
+          "score_var": 1672.7791383940419
+        }, 
+        "prob": 0.6105274475415969, 
+        "red": {
+          "endgame_points": 21.990882912406896, 
+          "endgame_points_var": 515.6744262057792, 
+          "power_cells_scored": 6.3406142659009, 
+          "power_cells_scored_var": 278.760600187324, 
+          "prob_face_boss": 0.047086312104197114, 
+          "prob_shield_energized": 0.005308672242558821, 
+          "prob_shield_operational": 0.029114601756840885, 
+          "score": 52.29860811110201, 
+          "score_var": 2536.8948810772877
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm5": {
+        "blue": {
+          "endgame_points": 29.375, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 11.875, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.18832986112588412, 
+          "prob_shield_energized": 0.14192595430343324, 
+          "prob_shield_operational": 0.15187963950671923, 
+          "score": 70.75, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 29.375, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 11.875, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.18832986112588412, 
+          "prob_shield_energized": 0.14192595430343324, 
+          "prob_shield_operational": 0.15187963950671923, 
+          "score": 70.75, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm50": {
+        "blue": {
+          "endgame_points": 47.619890580486825, 
+          "endgame_points_var": 837.892494912121, 
+          "power_cells_scored": 11.92198365436433, 
+          "power_cells_scored_var": 320.5065763019306, 
+          "prob_face_boss": 0.33443797217417826, 
+          "prob_shield_energized": 0.01917540534183182, 
+          "prob_shield_operational": 0.27411170449011724, 
+          "score": 96.22620123542463, 
+          "score_var": 2086.3924113147136
+        }, 
+        "prob": 0.5883249593777731, 
+        "red": {
+          "endgame_points": 40.4571342381309, 
+          "endgame_points_var": 687.6846721324589, 
+          "power_cells_scored": 9.032209081223675, 
+          "power_cells_scored_var": 315.99591911140965, 
+          "prob_face_boss": 0.2280646610149507, 
+          "prob_shield_energized": 0.012276035102679494, 
+          "prob_shield_operational": 0.17466169916039898, 
+          "score": 81.14333195373939, 
+          "score_var": 2478.5016465830995
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm51": {
+        "blue": {
+          "endgame_points": 28.281295993019725, 
+          "endgame_points_var": 660.3462719676105, 
+          "power_cells_scored": 9.199101605534379, 
+          "power_cells_scored_var": 300.31574786383146, 
+          "prob_face_boss": 0.10854088873632062, 
+          "prob_shield_energized": 0.010818012400442, 
+          "prob_shield_operational": 0.07651665760090831, 
+          "score": 70.14692285714605, 
+          "score_var": 2085.1754119815255
+        }, 
+        "prob": 0.5212247217387668, 
+        "red": {
+          "endgame_points": 37.44951237239384, 
+          "endgame_points_var": 551.9218273720068, 
+          "power_cells_scored": 8.118977776203257, 
+          "power_cells_scored_var": 295.1504964209638, 
+          "prob_face_boss": 0.16855768990670117, 
+          "prob_shield_energized": 0.008666231705419025, 
+          "prob_shield_operational": 0.12045612679275375, 
+          "score": 73.61066229748825, 
+          "score_var": 2149.464471778424
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm52": {
+        "blue": {
+          "endgame_points": 42.88749439919799, 
+          "endgame_points_var": 663.9473065141124, 
+          "power_cells_scored": 11.677464296638856, 
+          "power_cells_scored_var": 346.7757842926412, 
+          "prob_face_boss": 0.25330663909832696, 
+          "prob_shield_energized": 0.022522911246790178, 
+          "prob_shield_operational": 0.19540048814346023, 
+          "score": 81.81148271727152, 
+          "score_var": 2956.8165887261966
+        }, 
+        "prob": 0.6941521737078863, 
+        "red": {
+          "endgame_points": 47.821050267715876, 
+          "endgame_points_var": 709.0664791519396, 
+          "power_cells_scored": 15.87850677536715, 
+          "power_cells_scored_var": 459.23964925066537, 
+          "prob_face_boss": 0.32370305912533104, 
+          "prob_shield_energized": 0.06110356318948862, 
+          "prob_shield_operational": 0.25941863563909207, 
+          "score": 118.14863476678283, 
+          "score_var": 2166.666029345958
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm53": {
+        "blue": {
+          "endgame_points": 24.5512412136221, 
+          "endgame_points_var": 486.39187989036026, 
+          "power_cells_scored": 2.5421278509392953, 
+          "power_cells_scored_var": 275.3383375242039, 
+          "prob_face_boss": 0.053989852333482524, 
+          "prob_shield_energized": 0.0025567668440927838, 
+          "prob_shield_operational": 0.03332301352527134, 
+          "score": 44.3795194411359, 
+          "score_var": 1903.5739233990435
+        }, 
+        "prob": 0.5586634247533189, 
+        "red": {
+          "endgame_points": 29.907705434944432, 
+          "endgame_points_var": 732.87074512633, 
+          "power_cells_scored": 5.374136148217243, 
+          "power_cells_scored_var": 273.0515968060597, 
+          "prob_face_boss": 0.13315889938014736, 
+          "prob_shield_energized": 0.004143981565748578, 
+          "prob_shield_operational": 0.09743990224460952, 
+          "score": 54.34954353057456, 
+          "score_var": 2660.2541882874084
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm54": {
+        "blue": {
+          "endgame_points": 12.436261840852994, 
+          "endgame_points_var": 419.5963903766718, 
+          "power_cells_scored": 6.084729956790289, 
+          "power_cells_scored_var": 247.03601897273606, 
+          "prob_face_boss": 0.010116771184549789, 
+          "prob_shield_energized": 0.003162548236487206, 
+          "prob_shield_operational": 0.005142739403813379, 
+          "score": 40.9805841765264, 
+          "score_var": 1934.7925483609488
+        }, 
+        "prob": 0.6630588521562185, 
+        "red": {
+          "endgame_points": 27.95560235571807, 
+          "endgame_points_var": 674.1960823090931, 
+          "power_cells_scored": 7.947031068808387, 
+          "power_cells_scored_var": 266.92673972007435, 
+          "prob_face_boss": 0.10857824393006676, 
+          "prob_shield_energized": 0.005989783541361593, 
+          "prob_shield_operational": 0.07683472563890326, 
+          "score": 66.73635834347604, 
+          "score_var": 1811.006853937181
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm55": {
+        "blue": {
+          "endgame_points": 14.237395757512392, 
+          "endgame_points_var": 248.6701361665945, 
+          "power_cells_scored": 11.896824192980214, 
+          "power_cells_scored_var": 280.3579067628607, 
+          "prob_face_boss": 0.0018538831080980867, 
+          "prob_shield_energized": 0.013348385478815006, 
+          "prob_shield_operational": 0.0006430078789552152, 
+          "score": 66.33844375411486, 
+          "score_var": 1829.2531351916973
+        }, 
+        "prob": 0.6106561039872782, 
+        "red": {
+          "endgame_points": 26.968678723859867, 
+          "endgame_points_var": 250.0568138174458, 
+          "power_cells_scored": 13.122931893597672, 
+          "power_cells_scored_var": 277.16507961955386, 
+          "prob_face_boss": 0.018360755777671933, 
+          "prob_shield_energized": 0.015580836633279582, 
+          "prob_shield_operational": 0.008085376837200453, 
+          "score": 83.18851120134453, 
+          "score_var": 1765.752209898821
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm56": {
+        "blue": {
+          "endgame_points": 17.44331424346838, 
+          "endgame_points_var": 455.7121302767222, 
+          "power_cells_scored": 8.448442490717326, 
+          "power_cells_scored_var": 219.69050071235057, 
+          "prob_face_boss": 0.023101789114797322, 
+          "prob_shield_energized": 0.003110396319609743, 
+          "prob_shield_operational": 0.012948623777014223, 
+          "score": 68.10913043814381, 
+          "score_var": 2204.454014868097
+        }, 
+        "prob": 0.6227363004240877, 
+        "red": {
+          "endgame_points": 8.18320618026653, 
+          "endgame_points_var": 605.8956687317702, 
+          "power_cells_scored": 5.2600203052143915, 
+          "power_cells_scored_var": 306.93906311040735, 
+          "prob_face_boss": 0.017641537903815285, 
+          "prob_shield_energized": 0.006269156779818319, 
+          "prob_shield_operational": 0.010493363164076008, 
+          "score": 47.805591406748896, 
+          "score_var": 2012.0883777002425
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm57": {
+        "blue": {
+          "endgame_points": 33.90518900030554, 
+          "endgame_points_var": 734.6760280989802, 
+          "power_cells_scored": 8.16736843678909, 
+          "power_cells_scored_var": 229.725733991742, 
+          "prob_face_boss": 0.16784056411489678, 
+          "prob_shield_energized": 0.003529682733238504, 
+          "prob_shield_operational": 0.125649022780693, 
+          "score": 76.39385011343165, 
+          "score_var": 1347.4708316683896
+        }, 
+        "prob": 0.5179833448302966, 
+        "red": {
+          "endgame_points": 20.949019675919295, 
+          "endgame_points_var": 365.98172343478296, 
+          "power_cells_scored": 13.579236594533088, 
+          "power_cells_scored_var": 323.91022524466405, 
+          "prob_face_boss": 0.02061158099405036, 
+          "prob_shield_energized": 0.0245286765300905, 
+          "prob_shield_operational": 0.010649578073122057, 
+          "score": 78.86816813827194, 
+          "score_var": 1663.4262159078119
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm58": {
+        "blue": {
+          "endgame_points": 59.38199962351351, 
+          "endgame_points_var": 738.3806468109261, 
+          "power_cells_scored": 13.252950288663456, 
+          "power_cells_scored_var": 306.3264677776474, 
+          "prob_face_boss": 0.49092762037277016, 
+          "prob_shield_energized": 0.02055427069639637, 
+          "prob_shield_operational": 0.4181032795819425, 
+          "score": 121.82344571441342, 
+          "score_var": 1698.2397134871555
+        }, 
+        "prob": 0.8335096704749304, 
+        "red": {
+          "endgame_points": 25.609290814926595, 
+          "endgame_points_var": 733.1697012997183, 
+          "power_cells_scored": 10.750350432544641, 
+          "power_cells_scored_var": 256.9062598102362, 
+          "prob_face_boss": 0.10202400529529032, 
+          "prob_shield_energized": 0.008507513967686009, 
+          "prob_shield_operational": 0.07286776772454806, 
+          "score": 63.08561916736588, 
+          "score_var": 1982.8005094044931
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm59": {
+        "blue": {
+          "endgame_points": 44.474204099400545, 
+          "endgame_points_var": 980.0725234655683, 
+          "power_cells_scored": 10.824160901643612, 
+          "power_cells_scored_var": 294.2713454606711, 
+          "prob_face_boss": 0.3099701330521676, 
+          "prob_shield_energized": 0.01302607832340641, 
+          "prob_shield_operational": 0.2560252399160938, 
+          "score": 94.247594734664, 
+          "score_var": 2026.155721010016
+        }, 
+        "prob": 0.5836084234766448, 
+        "red": {
+          "endgame_points": 39.54188533633824, 
+          "endgame_points_var": 629.3491731831093, 
+          "power_cells_scored": 10.116674036167685, 
+          "power_cells_scored_var": 214.9772360374514, 
+          "prob_face_boss": 0.20739533313354974, 
+          "prob_shield_energized": 0.0040012866586686124, 
+          "prob_shield_operational": 0.15510061657536967, 
+          "score": 81.49321121555037, 
+          "score_var": 1623.1052999839162
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm6": {
+        "blue": {
+          "endgame_points": 27.5, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 11.9, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.1740723124765311, 
+          "prob_shield_energized": 0.14208814348897558, 
+          "prob_shield_operational": 0.13950815660568194, 
+          "score": 70.6, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 27.5, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 11.9, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.1740723124765311, 
+          "prob_shield_energized": 0.14208814348897558, 
+          "prob_shield_operational": 0.13950815660568194, 
+          "score": 70.6, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm60": {
+        "blue": {
+          "endgame_points": 29.143113270083596, 
+          "endgame_points_var": 352.7894417418151, 
+          "power_cells_scored": 8.47235190196287, 
+          "power_cells_scored_var": 256.572502434968, 
+          "prob_face_boss": 0.05020839344058858, 
+          "prob_shield_energized": 0.0057006813041140525, 
+          "prob_shield_operational": 0.02812853351948741, 
+          "score": 61.5470853389239, 
+          "score_var": 1530.5030420694352
+        }, 
+        "prob": 0.6131114880654358, 
+        "red": {
+          "endgame_points": 25.44489125917679, 
+          "endgame_points_var": 420.8539491554527, 
+          "power_cells_scored": 10.944237723701537, 
+          "power_cells_scored_var": 322.0196384186328, 
+          "prob_face_boss": 0.046051698101795546, 
+          "prob_shield_energized": 0.016973526186305987, 
+          "prob_shield_operational": 0.02691932251562945, 
+          "score": 79.29353450794322, 
+          "score_var": 2281.3380988512877
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm61": {
+        "blue": {
+          "endgame_points": 30.91441188853117, 
+          "endgame_points_var": 511.8977085387765, 
+          "power_cells_scored": 11.196028778649307, 
+          "power_cells_scored_var": 328.53654071667523, 
+          "prob_face_boss": 0.09930148168574748, 
+          "prob_shield_energized": 0.01850426513821224, 
+          "prob_shield_operational": 0.06596495654451262, 
+          "score": 88.1560518118203, 
+          "score_var": 2115.7180873048737
+        }, 
+        "prob": 0.5458664504239321, 
+        "red": {
+          "endgame_points": 34.76532661858513, 
+          "endgame_points_var": 521.4373964195375, 
+          "power_cells_scored": 8.536657050936316, 
+          "power_cells_scored_var": 248.2813305654993, 
+          "prob_face_boss": 0.13456087453093635, 
+          "prob_shield_energized": 0.005114819455775188, 
+          "prob_shield_operational": 0.09274331679133008, 
+          "score": 80.5716285052722, 
+          "score_var": 2216.9427798529873
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm62": {
+        "blue": {
+          "endgame_points": 46.233437659164686, 
+          "endgame_points_var": 532.8980307935093, 
+          "power_cells_scored": 7.399894310126002, 
+          "power_cells_scored_var": 219.4771833983517, 
+          "prob_face_boss": 0.2754696975584252, 
+          "prob_shield_energized": 0.0024923791553221886, 
+          "prob_shield_operational": 0.20812398927520115, 
+          "score": 96.63002229033907, 
+          "score_var": 1926.4691062301474
+        }, 
+        "prob": 0.536844579809101, 
+        "red": {
+          "endgame_points": 47.04711339560711, 
+          "endgame_points_var": 1004.329751062593, 
+          "power_cells_scored": 10.919216673387492, 
+          "power_cells_scored_var": 268.2921226852209, 
+          "prob_face_boss": 0.34137171055452664, 
+          "prob_shield_energized": 0.010038992560882254, 
+          "prob_shield_operational": 0.2855286465142234, 
+          "score": 91.10223259240004, 
+          "score_var": 1645.7520693541344
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm63": {
+        "blue": {
+          "endgame_points": 45.31717068444048, 
+          "endgame_points_var": 465.7552656025945, 
+          "power_cells_scored": 10.544381011979398, 
+          "power_cells_scored_var": 293.07414366333546, 
+          "prob_face_boss": 0.2481421926001226, 
+          "prob_shield_energized": 0.012341853554229232, 
+          "prob_shield_operational": 0.1808767304173764, 
+          "score": 90.41050036594596, 
+          "score_var": 2834.0999134234025
+        }, 
+        "prob": 0.5760852481578717, 
+        "red": {
+          "endgame_points": 51.08389797842972, 
+          "endgame_points_var": 1118.4852306655653, 
+          "power_cells_scored": 10.142413223220977, 
+          "power_cells_scored_var": 285.79957342954367, 
+          "prob_face_boss": 0.3948886351855898, 
+          "prob_shield_energized": 0.010766594310572364, 
+          "prob_shield_operational": 0.3386667459752951, 
+          "score": 104.98844522071107, 
+          "score_var": 2937.4767302809078
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm64": {
+        "blue": {
+          "endgame_points": 34.18679539549496, 
+          "endgame_points_var": 596.5985424072237, 
+          "power_cells_scored": 8.566592935619223, 
+          "power_cells_scored_var": 176.99833942922933, 
+          "prob_face_boss": 0.14529698000554347, 
+          "prob_shield_energized": 0.001186134102884595, 
+          "prob_shield_operational": 0.10355992518091428, 
+          "score": 75.13318334604949, 
+          "score_var": 1538.463406227368
+        }, 
+        "prob": 0.5160005083864376, 
+        "red": {
+          "endgame_points": 26.284312417348985, 
+          "endgame_points_var": 350.1773694278458, 
+          "power_cells_scored": 11.341516765606723, 
+          "power_cells_scored_var": 247.20186461629123, 
+          "prob_face_boss": 0.03579451172811232, 
+          "prob_shield_energized": 0.008306254287359538, 
+          "prob_shield_operational": 0.019276966958917452, 
+          "score": 73.06656798435706, 
+          "score_var": 1115.1576606627564
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm65": {
+        "blue": {
+          "endgame_points": 13.317351055318435, 
+          "endgame_points_var": 412.3743267741936, 
+          "power_cells_scored": 8.085397154203648, 
+          "power_cells_scored_var": 188.92827149857123, 
+          "prob_face_boss": 0.01075687245915069, 
+          "prob_shield_energized": 0.0014570143023696636, 
+          "prob_shield_operational": 0.005462862892890663, 
+          "score": 45.38674284600704, 
+          "score_var": 2207.74979985929
+        }, 
+        "prob": 0.7747147497000553, 
+        "red": {
+          "endgame_points": 25.36649645678817, 
+          "endgame_points_var": 212.41968566230855, 
+          "power_cells_scored": 16.511887057210014, 
+          "power_cells_scored_var": 273.9675343287859, 
+          "prob_face_boss": 0.008743907382931626, 
+          "prob_shield_energized": 0.024835001430621784, 
+          "prob_shield_operational": 0.003270519221782564, 
+          "score": 91.19149270489746, 
+          "score_var": 1478.1514284739822
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm66": {
+        "blue": {
+          "endgame_points": 10.184939211960481, 
+          "endgame_points_var": 919.9266101439591, 
+          "power_cells_scored": 10.013739456072173, 
+          "power_cells_scored_var": 254.42345816474375, 
+          "prob_face_boss": 0.05025155560903394, 
+          "prob_shield_energized": 0.007259111015921693, 
+          "prob_shield_operational": 0.035360008147323874, 
+          "score": 57.919557934595844, 
+          "score_var": 1463.3616615968256
+        }, 
+        "prob": 0.5036828384735387, 
+        "red": {
+          "endgame_points": 12.409137319217688, 
+          "endgame_points_var": 237.18952301599217, 
+          "power_cells_scored": 8.766372041850587, 
+          "power_cells_scored_var": 276.0175404531769, 
+          "prob_face_boss": 0.0010003666694275992, 
+          "prob_shield_energized": 0.007723988072209975, 
+          "prob_shield_operational": 0.0003191694404975909, 
+          "score": 58.44368211536162, 
+          "score_var": 1760.0134230274612
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm67": {
+        "blue": {
+          "endgame_points": 32.65950448150079, 
+          "endgame_points_var": 835.6084100671897, 
+          "power_cells_scored": 11.675114165919792, 
+          "power_cells_scored_var": 216.85940151684986, 
+          "prob_face_boss": 0.17212215281218513, 
+          "prob_shield_energized": 0.005628796088063881, 
+          "prob_shield_operational": 0.13161668717705544, 
+          "score": 85.65827893482599, 
+          "score_var": 1756.209475325591
+        }, 
+        "prob": 0.5222006984384355, 
+        "red": {
+          "endgame_points": 34.98474402680844, 
+          "endgame_points_var": 797.5427331917701, 
+          "power_cells_scored": 7.630539233167309, 
+          "power_cells_scored_var": 252.7655347603016, 
+          "prob_face_boss": 0.18786689037000848, 
+          "prob_shield_energized": 0.0046329884783035125, 
+          "prob_shield_operational": 0.14392882355659276, 
+          "score": 82.53507163011565, 
+          "score_var": 1390.377940418552
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm68": {
+        "blue": {
+          "endgame_points": 29.122562452623285, 
+          "endgame_points_var": 325.3666612230688, 
+          "power_cells_scored": 2.940842478383298, 
+          "power_cells_scored_var": 233.31541306523528, 
+          "prob_face_boss": 0.04346614675718952, 
+          "prob_shield_energized": 0.0012832220115686077, 
+          "prob_shield_operational": 0.023350574031954174, 
+          "score": 58.302403998260914, 
+          "score_var": 1492.8771996277283
+        }, 
+        "prob": 0.7801259547924304, 
+        "red": {
+          "endgame_points": 37.44309696367007, 
+          "endgame_points_var": 386.7948851048933, 
+          "power_cells_scored": 15.550257818627891, 
+          "power_cells_scored_var": 240.95713771283147, 
+          "prob_face_boss": 0.12570407626026758, 
+          "prob_shield_energized": 0.015585654368676982, 
+          "prob_shield_operational": 0.08058199931618315, 
+          "score": 96.9677813154094, 
+          "score_var": 1011.5828330602508
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm69": {
+        "blue": {
+          "endgame_points": 46.98776123543435, 
+          "endgame_points_var": 895.8371398430216, 
+          "power_cells_scored": 16.27052162618463, 
+          "power_cells_scored_var": 326.6027843822426, 
+          "prob_face_boss": 0.33187271322828615, 
+          "prob_shield_energized": 0.035066975114113275, 
+          "prob_shield_operational": 0.27365318553771323, 
+          "score": 114.77729492585925, 
+          "score_var": 2377.9219067882477
+        }, 
+        "prob": 0.6129647126635309, 
+        "red": {
+          "endgame_points": 42.06975701218127, 
+          "endgame_points_var": 877.3882239368062, 
+          "power_cells_scored": 10.423469227844087, 
+          "power_cells_scored_var": 193.85391574950054, 
+          "prob_face_boss": 0.2724807664323131, 
+          "prob_shield_energized": 0.0027969954684914367, 
+          "prob_shield_operational": 0.2194275608195203, 
+          "score": 94.86833255258108, 
+          "score_var": 2432.3372021099694
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm7": {
+        "blue": {
+          "endgame_points": 27.083333333333325, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 10.666666666666666, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.17099965036127907, 
+          "prob_shield_energized": 0.13423604548186385, 
+          "prob_shield_operational": 0.13685474899665473, 
+          "score": 65.33333333333333, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 27.083333333333325, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 10.666666666666666, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.17099965036127907, 
+          "prob_shield_energized": 0.13423604548186385, 
+          "prob_shield_operational": 0.13685474899665473, 
+          "score": 65.33333333333333, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm70": {
+        "blue": {
+          "endgame_points": 30.501156957719026, 
+          "endgame_points_var": 431.1204096337324, 
+          "power_cells_scored": 7.75685754070603, 
+          "power_cells_scored_var": 205.94715450943642, 
+          "prob_face_boss": 0.07770042120040499, 
+          "prob_shield_energized": 0.0020270932084807125, 
+          "prob_shield_operational": 0.048304656047224226, 
+          "score": 77.57946576633444, 
+          "score_var": 2510.704672288394
+        }, 
+        "prob": 0.5895772449658121, 
+        "red": {
+          "endgame_points": 32.95155391488928, 
+          "endgame_points_var": 666.8967264436245, 
+          "power_cells_scored": 7.480435593065218, 
+          "power_cells_scored_var": 189.02592080235434, 
+          "prob_face_boss": 0.1474573113270813, 
+          "prob_shield_energized": 0.0012643039810577017, 
+          "prob_shield_operational": 0.10729975899758559, 
+          "score": 62.93859311940752, 
+          "score_var": 1669.1387410527018
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm71": {
+        "blue": {
+          "endgame_points": 30.842250049828486, 
+          "endgame_points_var": 416.9623025369948, 
+          "power_cells_scored": 12.310293961497713, 
+          "power_cells_scored_var": 245.8940392138653, 
+          "prob_face_boss": 0.0766566222912275, 
+          "prob_shield_energized": 0.009648218024768118, 
+          "prob_shield_operational": 0.04718453627728525, 
+          "score": 86.1195552631446, 
+          "score_var": 1615.6343416610175
+        }, 
+        "prob": 0.5054143209112731, 
+        "red": {
+          "endgame_points": 36.834813008972105, 
+          "endgame_points_var": 350.26660493301245, 
+          "power_cells_scored": 14.398559127048292, 
+          "power_cells_scored_var": 267.2531342104795, 
+          "prob_face_boss": 0.10790253206557365, 
+          "prob_shield_energized": 0.01714814935920672, 
+          "prob_shield_operational": 0.06617238585088603, 
+          "score": 86.97559757954376, 
+          "score_var": 2362.6511561995485
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm72": {
+        "blue": {
+          "endgame_points": 25.447890831524504, 
+          "endgame_points_var": 345.62542452337243, 
+          "power_cells_scored": 11.04591654394764, 
+          "power_cells_scored_var": 261.4143818478944, 
+          "prob_face_boss": 0.031546242067129304, 
+          "prob_shield_energized": 0.00945155890798155, 
+          "prob_shield_operational": 0.01668984217396896, 
+          "score": 63.47946087664526, 
+          "score_var": 2038.0373186415661
+        }, 
+        "prob": 0.8145592809009792, 
+        "red": {
+          "endgame_points": 50.0246703374641, 
+          "endgame_points_var": 581.3562061290057, 
+          "power_cells_scored": 13.456172745998625, 
+          "power_cells_scored_var": 241.54148836397752, 
+          "prob_face_boss": 0.3395397340578452, 
+          "prob_shield_energized": 0.011097580222759418, 
+          "prob_shield_operational": 0.2672698757506864, 
+          "score": 114.62880500124223, 
+          "score_var": 1229.385684205075
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm73": {
+        "blue": {
+          "endgame_points": 29.726577735365467, 
+          "endgame_points_var": 620.1399425051316, 
+          "power_cells_scored": 11.31430478834313, 
+          "power_cells_scored_var": 223.22385986358032, 
+          "prob_face_boss": 0.11205481263498251, 
+          "prob_shield_energized": 0.005828598493072157, 
+          "prob_shield_operational": 0.07832118277864963, 
+          "score": 90.43144663307429, 
+          "score_var": 2225.496480215422
+        }, 
+        "prob": 0.6949899957272958, 
+        "red": {
+          "endgame_points": 32.466447391757086, 
+          "endgame_points_var": 361.52116070456543, 
+          "power_cells_scored": 6.216194687085917, 
+          "power_cells_scored_var": 214.80183543299975, 
+          "prob_face_boss": 0.07379601763712296, 
+          "prob_shield_energized": 0.001754784942237575, 
+          "prob_shield_operational": 0.04353524044574275, 
+          "score": 60.07336677122596, 
+          "score_var": 1317.1823800940165
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm74": {
+        "blue": {
+          "endgame_points": 46.026435394835445, 
+          "endgame_points_var": 586.9393645537191, 
+          "power_cells_scored": 17.713853169332396, 
+          "power_cells_scored_var": 265.50604111508164, 
+          "prob_face_boss": 0.2820438633813436, 
+          "prob_shield_energized": 0.027425139470149462, 
+          "prob_shield_operational": 0.21676562012103706, 
+          "score": 110.52259757396189, 
+          "score_var": 889.4532712951649
+        }, 
+        "prob": 0.8514024755941038, 
+        "red": {
+          "endgame_points": 15.943993481451745, 
+          "endgame_points_var": 284.7749522386682, 
+          "power_cells_scored": 6.661079740033178, 
+          "power_cells_scored_var": 187.0296507180472, 
+          "prob_face_boss": 0.004518073205053819, 
+          "prob_shield_energized": 0.0009811386841837022, 
+          "prob_shield_operational": 0.00182471180604038, 
+          "score": 58.716027776534816, 
+          "score_var": 1580.2497924001796
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm75": {
+        "blue": {
+          "endgame_points": 19.75383644546858, 
+          "endgame_points_var": 200.84477002515212, 
+          "power_cells_scored": 7.152557389572186, 
+          "power_cells_scored_var": 174.6114777299638, 
+          "prob_face_boss": 0.0022567920381597606, 
+          "prob_shield_energized": 0.0007704016376197664, 
+          "prob_shield_operational": 0.000704865173728253, 
+          "score": 56.61455023834854, 
+          "score_var": 1315.6312525529052
+        }, 
+        "prob": 0.786444198430764, 
+        "red": {
+          "endgame_points": 52.43086344048282, 
+          "endgame_points_var": 511.2418414490761, 
+          "power_cells_scored": 10.201848222384637, 
+          "power_cells_scored_var": 186.10061805033135, 
+          "prob_face_boss": 0.36890318858699644, 
+          "prob_shield_energized": 0.0022272073172430185, 
+          "prob_shield_operational": 0.2891415450350059, 
+          "score": 99.2892134418743, 
+          "score_var": 1571.9996635937955
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm76": {
+        "blue": {
+          "endgame_points": 48.91946660322708, 
+          "endgame_points_var": 920.2651269316374, 
+          "power_cells_scored": 9.649902760998252, 
+          "power_cells_scored_var": 123.35543325853962, 
+          "prob_face_boss": 0.357458017355889, 
+          "prob_shield_energized": 0.00019782879002305798, 
+          "prob_shield_operational": 0.29802715391220214, 
+          "score": 99.7886375253099, 
+          "score_var": 1686.817103623103
+        }, 
+        "prob": 0.5685499919459328, 
+        "red": {
+          "endgame_points": 39.31532541186358, 
+          "endgame_points_var": 674.7045805317669, 
+          "power_cells_scored": 10.276635440059115, 
+          "power_cells_scored_var": 216.3049263468095, 
+          "prob_face_boss": 0.21292077291228007, 
+          "prob_shield_energized": 0.004232546797698689, 
+          "prob_shield_operational": 0.16137561046589655, 
+          "score": 90.05818497869586, 
+          "score_var": 1488.3247050865884
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm77": {
+        "blue": {
+          "endgame_points": 13.06286717546473, 
+          "endgame_points_var": 421.4304069728306, 
+          "power_cells_scored": 6.529584286709193, 
+          "power_cells_scored_var": 157.96153528661546, 
+          "prob_face_boss": 0.011115216959713514, 
+          "prob_shield_energized": 0.00036351696312264536, 
+          "prob_shield_operational": 0.005703645645513733, 
+          "score": 49.67224894128286, 
+          "score_var": 2001.6873542062542
+        }, 
+        "prob": 0.6667838100729614, 
+        "red": {
+          "endgame_points": 41.646910946584946, 
+          "endgame_points_var": 237.91722150952089, 
+          "power_cells_scored": 12.299590528400456, 
+          "power_cells_scored_var": 197.52910813040273, 
+          "prob_face_boss": 0.11705051338143957, 
+          "prob_shield_energized": 0.004510048326342386, 
+          "prob_shield_operational": 0.06501047917817471, 
+          "score": 77.60463787548528, 
+          "score_var": 2197.467329454046
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm78": {
+        "blue": {
+          "endgame_points": 21.010017895242115, 
+          "endgame_points_var": 999.317065778224, 
+          "power_cells_scored": 6.995974852094466, 
+          "power_cells_scored_var": 194.7475802703637, 
+          "prob_face_boss": 0.10871463824996475, 
+          "prob_shield_energized": 0.0013065848694338023, 
+          "prob_shield_operational": 0.08202774386927614, 
+          "score": 61.77599795546784, 
+          "score_var": 1579.8172234866058
+        }, 
+        "prob": 0.508487867529938, 
+        "red": {
+          "endgame_points": 30.755761274159532, 
+          "endgame_points_var": 469.9588085856831, 
+          "power_cells_scored": 6.274381882159542, 
+          "power_cells_scored_var": 173.39361057491288, 
+          "prob_face_boss": 0.08866924443106106, 
+          "prob_shield_energized": 0.0005879143477707238, 
+          "prob_shield_operational": 0.05709487655070489, 
+          "score": 60.6171517804806, 
+          "score_var": 1386.4412453093175
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm79": {
+        "blue": {
+          "endgame_points": 31.844525583980058, 
+          "endgame_points_var": 421.2588363527757, 
+          "power_cells_scored": 10.550287764106903, 
+          "power_cells_scored_var": 224.31755785122607, 
+          "prob_face_boss": 0.08506406387438004, 
+          "prob_shield_energized": 0.005126019593113984, 
+          "prob_shield_operational": 0.053111786047666976, 
+          "score": 77.63842281870853, 
+          "score_var": 1637.06036188177
+        }, 
+        "prob": 0.600205635857401, 
+        "red": {
+          "endgame_points": 17.07806169051848, 
+          "endgame_points_var": 264.21693535503584, 
+          "power_cells_scored": 9.245904332699032, 
+          "power_cells_scored_var": 150.64373799412377, 
+          "prob_face_boss": 0.00413823693473736, 
+          "prob_shield_energized": 0.0005998201875503373, 
+          "prob_shield_operational": 0.0015982525024146321, 
+          "score": 63.9326022849494, 
+          "score_var": 1277.3798326853296
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm8": {
+        "blue": {
+          "endgame_points": 27.142857142857142, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 10.0, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.1714364652448579, 
+          "prob_shield_energized": 0.13011810130859458, 
+          "prob_shield_operational": 0.13723168073201908, 
+          "score": 65.0, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 27.142857142857142, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 10.0, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.1714364652448579, 
+          "prob_shield_energized": 0.13011810130859458, 
+          "prob_shield_operational": 0.13723168073201908, 
+          "score": 65.0, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm80": {
+        "blue": {
+          "endgame_points": 26.760242310588843, 
+          "endgame_points_var": 351.0321525362361, 
+          "power_cells_scored": 20.539252915644155, 
+          "power_cells_scored_var": 242.34064053048436, 
+          "prob_face_boss": 0.038021175752489644, 
+          "prob_shield_energized": 0.03375678159609952, 
+          "prob_shield_operational": 0.0206257222367916, 
+          "score": 106.35955682356717, 
+          "score_var": 1504.2794961804475
+        }, 
+        "prob": 0.8147561098303533, 
+        "red": {
+          "endgame_points": 17.139383256048326, 
+          "endgame_points_var": 158.32491760119467, 
+          "power_cells_scored": 5.403547061676077, 
+          "power_cells_scored_var": 217.4554630194011, 
+          "prob_face_boss": 0.00032924050377070024, 
+          "prob_shield_energized": 0.0015561694995607223, 
+          "prob_shield_operational": 7.12819595488634e-05, 
+          "score": 53.74099297612862, 
+          "score_var": 1947.8617502236725
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm81": {
+        "blue": {
+          "endgame_points": 26.648414937727416, 
+          "endgame_points_var": 416.57155937019536, 
+          "power_cells_scored": 12.425074990047197, 
+          "power_cells_scored_var": 228.20602008272314, 
+          "prob_face_boss": 0.051121676052505616, 
+          "prob_shield_energized": 0.00773595948983985, 
+          "prob_shield_operational": 0.030118781946510187, 
+          "score": 69.93842483005584, 
+          "score_var": 1333.3374012503768
+        }, 
+        "prob": 0.5679764387502715, 
+        "red": {
+          "endgame_points": 23.04042354103351, 
+          "endgame_points_var": 305.9448082144562, 
+          "power_cells_scored": 8.9405945686192, 
+          "power_cells_scored_var": 174.90720856889362, 
+          "prob_face_boss": 0.017299146167316093, 
+          "prob_shield_energized": 0.0012267845726522397, 
+          "prob_shield_operational": 0.008222524000111697, 
+          "score": 60.424289335820035, 
+          "score_var": 1754.1562164908282
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm82": {
+        "blue": {
+          "endgame_points": 22.642431915198657, 
+          "endgame_points_var": 357.5767239976915, 
+          "power_cells_scored": 8.082264739102616, 
+          "power_cells_scored_var": 215.4526486662938, 
+          "prob_face_boss": 0.024101349085681067, 
+          "prob_shield_energized": 0.00265472894308294, 
+          "prob_shield_operational": 0.01254573288832872, 
+          "score": 60.32328295551183, 
+          "score_var": 1442.007865812074
+        }, 
+        "prob": 0.6479608420390621, 
+        "red": {
+          "endgame_points": 36.82694062558196, 
+          "endgame_points_var": 779.4722781368941, 
+          "power_cells_scored": 9.218741796629303, 
+          "power_cells_scored_var": 214.188708307612, 
+          "prob_face_boss": 0.20326672022045056, 
+          "prob_shield_energized": 0.0032819806582431443, 
+          "prob_shield_operational": 0.1564636357786735, 
+          "score": 83.73094068258649, 
+          "score_var": 2356.0190883707537
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm83": {
+        "blue": {
+          "endgame_points": 31.1202520950459, 
+          "endgame_points_var": 183.9261678927963, 
+          "power_cells_scored": 12.968397507275588, 
+          "power_cells_scored_var": 300.016263758359, 
+          "prob_face_boss": 0.016607674777494585, 
+          "prob_shield_energized": 0.018752259718796793, 
+          "prob_shield_operational": 0.006242178185126068, 
+          "score": 78.51090693184196, 
+          "score_var": 1393.9297676452925
+        }, 
+        "prob": 0.5175195606807406, 
+        "red": {
+          "endgame_points": 24.802903649540035, 
+          "endgame_points_var": 334.68869317791956, 
+          "power_cells_scored": 12.609953343320456, 
+          "power_cells_scored_var": 231.77954573479064, 
+          "prob_face_boss": 0.027182498303986002, 
+          "prob_shield_energized": 0.008418235273145447, 
+          "prob_shield_operational": 0.014002257183357014, 
+          "score": 80.99191898607822, 
+          "score_var": 1795.7870641829802
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm84": {
+        "blue": {
+          "endgame_points": 53.77601560159506, 
+          "endgame_points_var": 794.3470531101851, 
+          "power_cells_scored": 11.424869283000158, 
+          "power_cells_scored_var": 284.1138614544711, 
+          "prob_face_boss": 0.4126113567915072, 
+          "prob_shield_energized": 0.01289940345502505, 
+          "prob_shield_operational": 0.3452276451262428, 
+          "score": 112.77996832048375, 
+          "score_var": 1608.557261486284
+        }, 
+        "prob": 0.6327340421021265, 
+        "red": {
+          "endgame_points": 35.61525043775731, 
+          "endgame_points_var": 430.78648431385346, 
+          "power_cells_scored": 16.319044332199706, 
+          "power_cells_scored_var": 248.23077174651192, 
+          "prob_face_boss": 0.12002474448600209, 
+          "prob_shield_energized": 0.019026754797105694, 
+          "prob_shield_operational": 0.0784222615518766, 
+          "score": 94.97880759090403, 
+          "score_var": 1147.1470888152173
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm85": {
+        "blue": {
+          "endgame_points": 29.710269888523424, 
+          "endgame_points_var": 524.2826624880968, 
+          "power_cells_scored": 5.4269516487000296, 
+          "power_cells_scored_var": 156.840158287853, 
+          "prob_face_boss": 0.09294159241988686, 
+          "prob_shield_energized": 0.0002513820371101705, 
+          "prob_shield_operational": 0.06163121443999087, 
+          "score": 57.17224918812337, 
+          "score_var": 1586.3202607919768
+        }, 
+        "prob": 0.7040893671021989, 
+        "red": {
+          "endgame_points": 28.504235546766637, 
+          "endgame_points_var": 398.59000683212844, 
+          "power_cells_scored": 12.227885056510656, 
+          "power_cells_scored_var": 139.0985588764898, 
+          "prob_face_boss": 0.05733208424074154, 
+          "prob_shield_energized": 0.0009108314141016427, 
+          "prob_shield_operational": 0.03377380600739566, 
+          "score": 87.2796374298511, 
+          "score_var": 1566.467471124349
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm86": {
+        "blue": {
+          "endgame_points": 60.79941793828836, 
+          "endgame_points_var": 765.071332306555, 
+          "power_cells_scored": 19.43874786869544, 
+          "power_cells_scored_var": 237.82512061854086, 
+          "prob_face_boss": 0.5115284927940005, 
+          "prob_shield_energized": 0.02762685939893661, 
+          "prob_shield_operational": 0.43964659468641143, 
+          "score": 135.54525870064154, 
+          "score_var": 1994.6157441665005
+        }, 
+        "prob": 0.9640717153954959, 
+        "red": {
+          "endgame_points": 12.944991326862176, 
+          "endgame_points_var": 418.03790853979854, 
+          "power_cells_scored": 4.326946611353488, 
+          "power_cells_scored_var": 139.79284984021928, 
+          "prob_face_boss": 0.010683630809040334, 
+          "prob_shield_energized": 7.893276721659959e-05, 
+          "prob_shield_operational": 0.005448598816770733, 
+          "score": 36.01404741262728, 
+          "score_var": 1062.8467157480904
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm87": {
+        "blue": {
+          "endgame_points": 33.87925059939822, 
+          "endgame_points_var": 535.3692431209113, 
+          "power_cells_scored": 9.752465982158864, 
+          "power_cells_scored_var": 180.28827640848027, 
+          "prob_face_boss": 0.12946811816058945, 
+          "prob_shield_energized": 0.0017333894838515995, 
+          "prob_shield_operational": 0.08931209052615674, 
+          "score": 86.4307705735028, 
+          "score_var": 1752.9545916648365
+        }, 
+        "prob": 0.5382362145074233, 
+        "red": {
+          "endgame_points": 36.74480995918738, 
+          "endgame_points_var": 783.2862997166524, 
+          "power_cells_scored": 8.707846091391215, 
+          "power_cells_scored_var": 194.45233988265124, 
+          "prob_face_boss": 0.20300918779565214, 
+          "prob_shield_energized": 0.001929634387875634, 
+          "prob_shield_operational": 0.15634982161915412, 
+          "score": 80.58006601054082, 
+          "score_var": 1962.0007846788212
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm88": {
+        "blue": {
+          "endgame_points": 26.048059707171777, 
+          "endgame_points_var": 157.73994421147586, 
+          "power_cells_scored": 5.628479110732215, 
+          "power_cells_scored_var": 174.6934091200072, 
+          "prob_face_boss": 0.0034327688630213515, 
+          "prob_shield_energized": 0.0005163658592555187, 
+          "prob_shield_operational": 0.0009630286184791892, 
+          "score": 66.03429031684185, 
+          "score_var": 1220.3432677984201
+        }, 
+        "prob": 0.5871915045055488, 
+        "red": {
+          "endgame_points": 24.10231319044965, 
+          "endgame_points_var": 530.8275007243445, 
+          "power_cells_scored": 11.3106655076242, 
+          "power_cells_scored_var": 192.28546093563213, 
+          "prob_face_boss": 0.05960714077770568, 
+          "prob_shield_energized": 0.003284153253946265, 
+          "prob_shield_operational": 0.03794095380707929, 
+          "score": 77.27995832798659, 
+          "score_var": 1384.83586814771
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm89": {
+        "blue": {
+          "endgame_points": 33.99785128577663, 
+          "endgame_points_var": 686.5628670318165, 
+          "power_cells_scored": 13.684939073553895, 
+          "power_cells_scored_var": 255.4749394411084, 
+          "prob_face_boss": 0.16051106565874995, 
+          "prob_shield_energized": 0.013571390245937232, 
+          "prob_shield_operational": 0.11836846625630937, 
+          "score": 89.87553600100904, 
+          "score_var": 843.7968013630041
+        }, 
+        "prob": 0.7963979963302279, 
+        "red": {
+          "endgame_points": 14.137173507497868, 
+          "endgame_points_var": 272.4509116106072, 
+          "power_cells_scored": 13.516336474244762, 
+          "power_cells_scored_var": 208.25214147078904, 
+          "prob_face_boss": 0.002730187857473254, 
+          "prob_shield_energized": 0.006968957540554044, 
+          "prob_shield_operational": 0.0010299450897630624, 
+          "score": 46.678902785067365, 
+          "score_var": 1872.487129393858
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm9": {
+        "blue": {
+          "endgame_points": 25.3125, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 9.375, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.15833077776802418, 
+          "prob_shield_energized": 0.12633769435630227, 
+          "prob_shield_operational": 0.12596390689208548, 
+          "score": 62.6875, 
+          "score_var": 7500.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "endgame_points": 25.3125, 
+          "endgame_points_var": 1200.0, 
+          "power_cells_scored": 9.375, 
+          "power_cells_scored_var": 1200.0, 
+          "prob_face_boss": 0.15833077776802418, 
+          "prob_shield_energized": 0.12633769435630227, 
+          "prob_shield_operational": 0.12596390689208548, 
+          "score": 62.6875, 
+          "score_var": 7500.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm90": {
+        "blue": {
+          "endgame_points": 28.620827671708827, 
+          "endgame_points_var": 429.98062144675157, 
+          "power_cells_scored": 11.21336447438328, 
+          "power_cells_scored_var": 180.81189144332154, 
+          "prob_face_boss": 0.06510527049214831, 
+          "prob_shield_energized": 0.002476158340836143, 
+          "prob_shield_operational": 0.03968108078617627, 
+          "score": 80.06296130452397, 
+          "score_var": 1239.2492665434852
+        }, 
+        "prob": 0.6390460011094803, 
+        "red": {
+          "endgame_points": 28.5934241905994, 
+          "endgame_points_var": 706.5212479613042, 
+          "power_cells_scored": 5.245588971011122, 
+          "power_cells_scored_var": 136.0348968059588, 
+          "prob_face_boss": 0.11868898110462212, 
+          "prob_shield_energized": 8.791493994564359e-05, 
+          "prob_shield_operational": 0.08539434014644143, 
+          "score": 61.798811888766814, 
+          "score_var": 1394.1615995041857
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm91": {
+        "blue": {
+          "endgame_points": 39.95681690904567, 
+          "endgame_points_var": 474.29837084068345, 
+          "power_cells_scored": 18.447028063558434, 
+          "power_cells_scored_var": 194.62927897258987, 
+          "prob_face_boss": 0.17870166371221718, 
+          "prob_shield_energized": 0.014261156711657952, 
+          "prob_shield_operational": 0.1250905464214387, 
+          "score": 117.90542957897416, 
+          "score_var": 1173.7591867134502
+        }, 
+        "prob": 0.7444659986597564, 
+        "red": {
+          "endgame_points": 53.182318932306515, 
+          "endgame_points_var": 492.44859330735056, 
+          "power_cells_scored": 10.013437506865397, 
+          "power_cells_scored_var": 206.26152535695354, 
+          "prob_face_boss": 0.37933614574554286, 
+          "prob_shield_energized": 0.0033177939811350754, 
+          "prob_shield_operational": 0.2971762007808285, 
+          "score": 89.68736074882236, 
+          "score_var": 669.9469259093534
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm92": {
+        "blue": {
+          "endgame_points": 46.88621707247374, 
+          "endgame_points_var": 853.4814012494734, 
+          "power_cells_scored": 8.626060056831207, 
+          "power_cells_scored_var": 101.99392621194065, 
+          "prob_face_boss": 0.32675884969420765, 
+          "prob_shield_energized": 3.197577517788375e-05, 
+          "prob_shield_operational": 0.2676192883130457, 
+          "score": 95.04162701470125, 
+          "score_var": 1329.1929204045005
+        }, 
+        "prob": 0.594600227959304, 
+        "red": {
+          "endgame_points": 21.173638281633554, 
+          "endgame_points_var": 153.8082675287434, 
+          "power_cells_scored": 12.796516405144452, 
+          "power_cells_scored_var": 196.6873947470773, 
+          "prob_face_boss": 0.0008720494318360528, 
+          "prob_shield_energized": 0.004919449346868943, 
+          "prob_shield_operational": 0.00020479268506412573, 
+          "score": 82.46381966261306, 
+          "score_var": 1431.2631285436446
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm93": {
+        "blue": {
+          "endgame_points": 35.39052404918384, 
+          "endgame_points_var": 542.9319169922517, 
+          "power_cells_scored": 9.024430252053769, 
+          "power_cells_scored_var": 167.89396468302323, 
+          "prob_face_boss": 0.14544758115452394, 
+          "prob_shield_energized": 0.0010172272937650773, 
+          "prob_shield_operational": 0.10190988574320703, 
+          "score": 73.90391447836201, 
+          "score_var": 1539.825769784395
+        }, 
+        "prob": 0.5146235532552047, 
+        "red": {
+          "endgame_points": 29.40012774960433, 
+          "endgame_points_var": 346.475176899539, 
+          "power_cells_scored": 13.906696959303694, 
+          "power_cells_scored_var": 236.08526822600834, 
+          "prob_face_boss": 0.05009524137729082, 
+          "prob_shield_energized": 0.011186738611279168, 
+          "prob_shield_operational": 0.02790296165764894, 
+          "score": 71.86566739427235, 
+          "score_var": 1550.7072368183412
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2020scmb_qm94": {
+        "blue": {
+          "endgame_points": 20.717784449399403, 
+          "endgame_points_var": 646.9332383193607, 
+          "power_cells_scored": 9.52231325649295, 
+          "power_cells_scored_var": 199.637848783433, 
+          "prob_face_boss": 0.06124295392701551, 
+          "prob_shield_energized": 0.0026028243548430474, 
+          "prob_shield_operational": 0.040841494845688, 
+          "score": 66.73395267129995, 
+          "score_var": 1841.4022725471987
+        }, 
+        "prob": 0.7173200835994362, 
+        "red": {
+          "endgame_points": 49.10094120147136, 
+          "endgame_points_var": 585.9571659656706, 
+          "power_cells_scored": 12.69085561035698, 
+          "power_cells_scored_var": 241.33911077460306, 
+          "prob_face_boss": 0.32626421941458805, 
+          "prob_shield_energized": 0.009713514914676424, 
+          "prob_shield_operational": 0.2556521671112021, 
+          "score": 100.83533497835435, 
+          "score_var": 1677.1286058389364
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2020scmb_qm95": {
+        "blue": {
+          "endgame_points": 31.11804214044741, 
+          "endgame_points_var": 463.6408592274019, 
+          "power_cells_scored": 6.500758765730845, 
+          "power_cells_scored_var": 161.22831242023074, 
+          "prob_face_boss": 0.08990659621856656, 
+          "prob_shield_energized": 0.00040840143567155707, 
+          "prob_shield_operational": 0.057796975755382674, 
+          "score": 65.76147184628152, 
+          "score_var": 1740.8622419914655
+        }, 
+        "prob": 0.7363015106889136, 
+        "red": {
+          "endgame_points": 47.912523225132425, 
+          "endgame_points_var": 332.2220034727306, 
+          "power_cells_scored": 7.735331324072141, 
+          "power_cells_scored_var": 166.44559219743041, 
+          "prob_face_boss": 0.2536125113640001, 
+          "prob_shield_energized": 0.0006907957450582591, 
+          "prob_shield_operational": 0.17425489365825053, 
+          "score": 99.52238359089512, 
+          "score_var": 1112.884460254036
+        }, 
+        "winning_alliance": "red"
+      }
+    }
+  }, 
+  "ranking_prediction_stats": {
+    "last_played_match": "2020scmb_qm95"
+  }, 
+  "ranking_predictions": [
+    [
+      "frc694", 
+      [
+        1.0, 
+        1, 
+        1.0, 
+        1, 
+        21.0, 
+        21, 
+        21
+      ]
+    ], 
+    [
+      "frc3824", 
+      [
+        2.0, 
+        2, 
+        2.0, 
+        2, 
+        20.0, 
+        20, 
+        20
+      ]
+    ], 
+    [
+      "frc2614", 
+      [
+        3.0, 
+        3, 
+        3.0, 
+        3, 
+        20.0, 
+        20, 
+        20
+      ]
+    ], 
+    [
+      "frc4020", 
+      [
+        4.0, 
+        4, 
+        4.0, 
+        4, 
+        18.0, 
+        18, 
+        18
+      ]
+    ], 
+    [
+      "frc4075", 
+      [
+        5.0, 
+        5, 
+        5.0, 
+        5, 
+        17.0, 
+        17, 
+        17
+      ]
+    ], 
+    [
+      "frc1708", 
+      [
+        6.0, 
+        6, 
+        6.0, 
+        6, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc3653", 
+      [
+        7.0, 
+        7, 
+        7.0, 
+        7, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc1293", 
+      [
+        8.0, 
+        8, 
+        8.0, 
+        8, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc4533", 
+      [
+        9.0, 
+        9, 
+        9.0, 
+        9, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc6366", 
+      [
+        10.0, 
+        10, 
+        10.0, 
+        10, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc5130", 
+      [
+        11.0, 
+        11, 
+        11.0, 
+        11, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc4451", 
+      [
+        12.0, 
+        12, 
+        12.0, 
+        12, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc3490", 
+      [
+        13.0, 
+        13, 
+        13.0, 
+        13, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc281", 
+      [
+        14.0, 
+        14, 
+        14.0, 
+        14, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc2815", 
+      [
+        15.0, 
+        15, 
+        15.0, 
+        15, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc1758", 
+      [
+        16.0, 
+        16, 
+        16.0, 
+        16, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc4083", 
+      [
+        17.0, 
+        17, 
+        17.0, 
+        17, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc283", 
+      [
+        18.0, 
+        18, 
+        18.0, 
+        18, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc846", 
+      [
+        19.0, 
+        19, 
+        19.0, 
+        19, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc4243", 
+      [
+        20.0, 
+        20, 
+        20.0, 
+        20, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc343", 
+      [
+        21.0, 
+        21, 
+        21.0, 
+        21, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc1287", 
+      [
+        22.0, 
+        22, 
+        22.0, 
+        22, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc4471", 
+      [
+        23.0, 
+        23, 
+        23.0, 
+        23, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc3492", 
+      [
+        24.0, 
+        24, 
+        24.0, 
+        24, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc3976", 
+      [
+        25.0, 
+        25, 
+        25.0, 
+        25, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc4748", 
+      [
+        26.0, 
+        26, 
+        26.0, 
+        26, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc1553", 
+      [
+        27.0, 
+        27, 
+        27.0, 
+        27, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc7431", 
+      [
+        28.0, 
+        28, 
+        28.0, 
+        28, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc1539", 
+      [
+        29.0, 
+        29, 
+        29.0, 
+        29, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc4050", 
+      [
+        30.0, 
+        30, 
+        30.0, 
+        30, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc342", 
+      [
+        31.0, 
+        31, 
+        31.0, 
+        31, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc4965", 
+      [
+        32.0, 
+        32, 
+        32.0, 
+        32, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc108", 
+      [
+        33.0, 
+        33, 
+        33.0, 
+        33, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc5410", 
+      [
+        34.0, 
+        34, 
+        34.0, 
+        34, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc4582", 
+      [
+        35.0, 
+        35, 
+        35.0, 
+        35, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc3140", 
+      [
+        36.0, 
+        36, 
+        36.0, 
+        36, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc6626", 
+      [
+        37.0, 
+        37, 
+        37.0, 
+        37, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc2183", 
+      [
+        38.0, 
+        38, 
+        38.0, 
+        38, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc1051", 
+      [
+        39.0, 
+        39, 
+        39.0, 
+        39, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc7085", 
+      [
+        40.0, 
+        40, 
+        40.0, 
+        40, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc5777", 
+      [
+        41.0, 
+        41, 
+        41.0, 
+        41, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc6961", 
+      [
+        42.0, 
+        42, 
+        42.0, 
+        42, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc5022", 
+      [
+        43.0, 
+        43, 
+        43.0, 
+        43, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc3651", 
+      [
+        44.0, 
+        44, 
+        44.0, 
+        44, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc744", 
+      [
+        45.0, 
+        45, 
+        45.0, 
+        45, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc3489", 
+      [
+        46.0, 
+        46, 
+        46.0, 
+        46, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc4074", 
+      [
+        47.0, 
+        47, 
+        47.0, 
+        47, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc6693", 
+      [
+        48.0, 
+        48, 
+        48.0, 
+        48, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc6167", 
+      [
+        49.0, 
+        49, 
+        49.0, 
+        49, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc8137", 
+      [
+        50.0, 
+        50, 
+        50.0, 
+        50, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc6222", 
+      [
+        51.0, 
+        51, 
+        51.0, 
+        51, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc4847", 
+      [
+        52.0, 
+        52, 
+        52.0, 
+        52, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc2187", 
+      [
+        53.0, 
+        53, 
+        53.0, 
+        53, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc4073", 
+      [
+        54.0, 
+        54, 
+        54.0, 
+        54, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc5063", 
+      [
+        55.0, 
+        55, 
+        55.0, 
+        55, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc5842", 
+      [
+        56.0, 
+        56, 
+        56.0, 
+        56, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc1369", 
+      [
+        57.0, 
+        57, 
+        57.0, 
+        57, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc4267", 
+      [
+        58.0, 
+        58, 
+        58.0, 
+        58, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc1398", 
+      [
+        59.0, 
+        59, 
+        59.0, 
+        59, 
+        5.0, 
+        5, 
+        5
+      ]
+    ], 
+    [
+      "frc5943", 
+      [
+        60.0, 
+        60, 
+        60.0, 
+        60, 
+        4.0, 
+        4, 
+        4
+      ]
+    ], 
+    [
+      "frc5472", 
+      [
+        61.0, 
+        61, 
+        61.0, 
+        61, 
+        2.0, 
+        2, 
+        2
+      ]
+    ], 
+    [
+      "frc1319", 
+      [
+        62.0, 
+        62, 
+        62.0, 
+        62, 
+        2.0, 
+        2, 
+        2
+      ]
+    ], 
+    [
+      "frc4764", 
+      [
+        63.0, 
+        63, 
+        63.0, 
+        63, 
+        2.0, 
+        2, 
+        2
+      ]
+    ]
+  ], 
+  "stat_mean_vars": {
+    "playoff": {
+      "endgame_points": {
+        "mean": {
+          "frc1051": 24.3008876165958, 
+          "frc108": 11.133109433099317, 
+          "frc1287": 16.832285905935635, 
+          "frc1293": 13.443893527233616, 
+          "frc1319": 1.773803078098536, 
+          "frc1369": -0.6662474389122783, 
+          "frc1398": 3.8126377862076417, 
+          "frc1539": 12.978293816153869, 
+          "frc1553": 9.97484700859864, 
+          "frc1708": 12.479255140044751, 
+          "frc1758": 12.944230431932853, 
+          "frc2183": 8.993864046742004, 
+          "frc2187": 7.675887786662463, 
+          "frc2614": 27.849960996109555, 
+          "frc281": 11.932451419348798, 
+          "frc2815": 17.356855265922754, 
+          "frc283": 12.286213668130515, 
+          "frc3140": 9.26895831547431, 
+          "frc342": 13.3109120592387, 
+          "frc343": 18.11335384212161, 
+          "frc3489": 16.23528073696703, 
+          "frc3490": 16.07716800317297, 
+          "frc3492": 17.374676626035743, 
+          "frc3651": 4.381784128169674, 
+          "frc3653": 27.782028719983224, 
+          "frc3824": 32.13404634400583, 
+          "frc3976": 6.01989336195978, 
+          "frc4020": 13.694918149411, 
+          "frc4050": 21.803824532516753, 
+          "frc4073": 4.568662329947755, 
+          "frc4074": 9.83726175182494, 
+          "frc4075": 29.222520208368508, 
+          "frc4083": 18.148846523501497, 
+          "frc4243": 21.196562987573426, 
+          "frc4267": 2.3209923674008954, 
+          "frc4451": 17.65138519677264, 
+          "frc4471": 12.520429344600513, 
+          "frc4533": 18.84909398474555, 
+          "frc4582": 7.932618957110078, 
+          "frc4748": 5.740518161467318, 
+          "frc4764": -0.22494229931357723, 
+          "frc4847": 6.975163046317661, 
+          "frc4965": 7.617194795523512, 
+          "frc5022": 0.1133398438885187, 
+          "frc5063": 6.505933122372117, 
+          "frc5130": 11.76288167193082, 
+          "frc5410": 15.048686408834337, 
+          "frc5472": 2.789925381897202, 
+          "frc5777": 8.759956149665282, 
+          "frc5842": -1.0569350171433578, 
+          "frc5943": 3.4339427743364364, 
+          "frc6167": 11.126309715983771, 
+          "frc6222": 11.389831874766266, 
+          "frc6366": 17.808232213657703, 
+          "frc6626": 9.765122616086405, 
+          "frc6693": 7.017476948515636, 
+          "frc694": 27.70417920658858, 
+          "frc6961": 6.563211311977495, 
+          "frc7085": 16.78578550254967, 
+          "frc7431": 10.26118618706824, 
+          "frc744": 13.652033156167084, 
+          "frc8137": -0.6716798447856861, 
+          "frc846": 2.682477022195334
+        }, 
+        "var": {
+          "frc1051": 357.00524675725995, 
+          "frc108": 89.419472183835, 
+          "frc1287": 233.94761096944956, 
+          "frc1293": 354.0127428508786, 
+          "frc1319": 25.883183922646694, 
+          "frc1369": 96.96731415627592, 
+          "frc1398": 39.66388296735285, 
+          "frc1539": 165.21721100460178, 
+          "frc1553": 109.73050269422092, 
+          "frc1708": 206.11351013098084, 
+          "frc1758": 13.320376541717195, 
+          "frc2183": 28.14898798739871, 
+          "frc2187": 64.04337951187331, 
+          "frc2614": 192.77064556733893, 
+          "frc281": 180.2812826101855, 
+          "frc2815": 80.93450740373339, 
+          "frc283": 265.1583504963167, 
+          "frc3140": 98.10717120647647, 
+          "frc342": 121.91307451758193, 
+          "frc343": 281.6050902988283, 
+          "frc3489": 24.812427518607052, 
+          "frc3490": 227.43557796097699, 
+          "frc3492": 96.34707776853486, 
+          "frc3651": 193.79374735379, 
+          "frc3653": 308.3531463157224, 
+          "frc3824": 425.04595223494204, 
+          "frc3976": 78.06607556621239, 
+          "frc4020": 230.53742982741076, 
+          "frc4050": 105.60927125701019, 
+          "frc4073": 62.538509661455016, 
+          "frc4074": 17.874967818286105, 
+          "frc4075": 331.1173897854974, 
+          "frc4083": 266.3607567832245, 
+          "frc4243": 304.3044516719896, 
+          "frc4267": 46.11136369223085, 
+          "frc4451": 72.07954662431109, 
+          "frc4471": 97.10617525703827, 
+          "frc4533": 315.36094878884114, 
+          "frc4582": 85.86872132196979, 
+          "frc4748": 132.22835519715363, 
+          "frc4764": 51.19816011399317, 
+          "frc4847": 341.6196394184845, 
+          "frc4965": 64.29215057230982, 
+          "frc5022": 419.12563405042374, 
+          "frc5063": 45.031062085396314, 
+          "frc5130": 155.6951411590596, 
+          "frc5410": 248.94181331633754, 
+          "frc5472": 5.9779053603934535, 
+          "frc5777": 173.6484217211694, 
+          "frc5842": 50.22232919458791, 
+          "frc5943": 160.75961190270664, 
+          "frc6167": 203.25301227335586, 
+          "frc6222": 68.01936491531842, 
+          "frc6366": 248.58555105341674, 
+          "frc6626": 100.02697889439366, 
+          "frc6693": 139.20949048421846, 
+          "frc694": 55.866171413174904, 
+          "frc6961": 120.37628358052142, 
+          "frc7085": 122.8989394555883, 
+          "frc7431": 137.52760492331294, 
+          "frc744": 137.2938395442009, 
+          "frc8137": 142.6084119082645, 
+          "frc846": 185.21970172884042
+        }
+      }, 
+      "power_cells_scored": {
+        "mean": {
+          "frc1051": 2.5929367349220755, 
+          "frc108": 8.447620511145415, 
+          "frc1287": 3.841808425585275, 
+          "frc1293": 2.4789510504118395, 
+          "frc1319": 3.2084759710318007, 
+          "frc1369": 1.2579034927796942, 
+          "frc1398": 0.2851916549061028, 
+          "frc1539": 3.1891100025007124, 
+          "frc1553": 2.1431260346641876, 
+          "frc1708": 1.8618954013790063, 
+          "frc1758": 11.68594303165543, 
+          "frc2183": 7.103342000988252, 
+          "frc2187": 4.248074902101017, 
+          "frc2614": 9.208866543896102, 
+          "frc281": 4.748504806240959, 
+          "frc2815": 1.4199358089823082, 
+          "frc283": 2.887827215164238, 
+          "frc3140": 1.125334889726788, 
+          "frc342": 4.951943571404286, 
+          "frc343": 8.727015582723723, 
+          "frc3489": 7.620953788441968, 
+          "frc3490": 5.153318280018462, 
+          "frc3492": 3.0777789415390022, 
+          "frc3651": 1.5481960782089026, 
+          "frc3653": 5.459996431416565, 
+          "frc3824": 5.815904737705144, 
+          "frc3976": 1.8513346138835718, 
+          "frc4020": 12.589584861414325, 
+          "frc4050": 4.010914534566591, 
+          "frc4073": 1.766411017574921, 
+          "frc4074": 1.498255266792357, 
+          "frc4075": 4.782224713446685, 
+          "frc4083": 1.8742249460712261, 
+          "frc4243": 0.7036071396909906, 
+          "frc4267": 2.028985941334803, 
+          "frc4451": 12.41891264631973, 
+          "frc4471": 1.616480847079579, 
+          "frc4533": 1.5441506349436647, 
+          "frc4582": 2.1578784156706026, 
+          "frc4748": 1.3516743394686568, 
+          "frc4764": 1.5180982692826461, 
+          "frc4847": 2.2218435117256066, 
+          "frc4965": 6.459365189398704, 
+          "frc5022": 2.359226013726347, 
+          "frc5063": -0.19882528577211023, 
+          "frc5130": 2.6863472159693744, 
+          "frc5410": 4.1512277446149515, 
+          "frc5472": 4.368901101892438, 
+          "frc5777": 3.047210678903263, 
+          "frc5842": 1.5164149984767303, 
+          "frc5943": 2.2566787716354737, 
+          "frc6167": 4.228007146794662, 
+          "frc6222": 2.2988716001136713, 
+          "frc6366": 3.178194754702444, 
+          "frc6626": 1.4467671694229445, 
+          "frc6693": 0.7193733582223072, 
+          "frc694": 16.07213401444137, 
+          "frc6961": 1.9597085873246947, 
+          "frc7085": 3.1335547390858736, 
+          "frc7431": 1.939024331172981, 
+          "frc744": 7.268504203806776, 
+          "frc8137": 2.059640909163516, 
+          "frc846": 3.0423298422648255
+        }, 
+        "var": {
+          "frc1051": 60.05131206646915, 
+          "frc108": 58.01547385657799, 
+          "frc1287": 38.40605790490509, 
+          "frc1293": 35.33163412813321, 
+          "frc1319": 62.162860937141474, 
+          "frc1369": 49.02822418135717, 
+          "frc1398": 30.255060827947066, 
+          "frc1539": 11.26128788823699, 
+          "frc1553": 56.68631351769784, 
+          "frc1708": 58.70512130176059, 
+          "frc1758": 35.157920758940776, 
+          "frc2183": 46.88837127699046, 
+          "frc2187": 64.60428498920224, 
+          "frc2614": 49.41350078564773, 
+          "frc281": 44.843995961131924, 
+          "frc2815": 27.39448499185926, 
+          "frc283": 54.862633321172645, 
+          "frc3140": 63.80804190625519, 
+          "frc342": 7.692886344736309, 
+          "frc343": 78.56376529346338, 
+          "frc3489": 13.88253346518496, 
+          "frc3490": 14.88491190992582, 
+          "frc3492": 18.59929093529552, 
+          "frc3651": 52.47658391813027, 
+          "frc3653": 26.26364336548959, 
+          "frc3824": 19.87354770094368, 
+          "frc3976": 71.51618506952032, 
+          "frc4020": 66.53356292508242, 
+          "frc4050": 8.745764990158623, 
+          "frc4073": 94.76015187782748, 
+          "frc4074": 33.39752438655445, 
+          "frc4075": 39.32907180892724, 
+          "frc4083": 53.23068268196168, 
+          "frc4243": 48.12676503305824, 
+          "frc4267": 41.04120445001948, 
+          "frc4451": 89.64946248942621, 
+          "frc4471": 51.735148250195074, 
+          "frc4533": 59.39535855512749, 
+          "frc4582": 57.591747463906295, 
+          "frc4748": 86.91079465481397, 
+          "frc4764": 53.455187062440146, 
+          "frc4847": 66.89888803954862, 
+          "frc4965": 67.7416005974525, 
+          "frc5022": 108.57600108776592, 
+          "frc5063": 37.21041837250749, 
+          "frc5130": 12.674894031311924, 
+          "frc5410": 75.6765929951526, 
+          "frc5472": 44.70590399085555, 
+          "frc5777": 53.67174694120045, 
+          "frc5842": 32.87170078804172, 
+          "frc5943": 56.205984053849605, 
+          "frc6167": 87.06209995603929, 
+          "frc6222": 76.75460968113212, 
+          "frc6366": 33.94156034841771, 
+          "frc6626": 32.6009425253292, 
+          "frc6693": 44.161901733167696, 
+          "frc694": 65.66244408231861, 
+          "frc6961": 71.85470740425853, 
+          "frc7085": 46.482697140035, 
+          "frc7431": 26.1829741271255, 
+          "frc744": 54.60700242308336, 
+          "frc8137": 48.69935110655558, 
+          "frc846": 47.222151242018136
+        }
+      }, 
+      "score": {
+        "mean": {
+          "frc1051": 38.07348799134513, 
+          "frc108": 34.52189997074891, 
+          "frc1287": 32.97506076913102, 
+          "frc1293": 21.666908742612378, 
+          "frc1319": 19.719092794786448, 
+          "frc1369": 12.252326913770354, 
+          "frc1398": 10.434414932859793, 
+          "frc1539": 27.483716072589697, 
+          "frc1553": 18.449067646093475, 
+          "frc1708": 35.210740672097295, 
+          "frc1758": 50.8505321984765, 
+          "frc2183": 37.833753007292145, 
+          "frc2187": 25.02482299437731, 
+          "frc2614": 66.47717032857814, 
+          "frc281": 34.69400478891412, 
+          "frc2815": 28.232007679835245, 
+          "frc283": 27.276613273805918, 
+          "frc3140": 18.022526391640106, 
+          "frc342": 36.388024539117424, 
+          "frc343": 48.91346971397965, 
+          "frc3489": 30.351058400949324, 
+          "frc3490": 35.433949838118444, 
+          "frc3492": 32.20331268195103, 
+          "frc3651": 12.84293225097153, 
+          "frc3653": 51.2418072448984, 
+          "frc3824": 58.06346490074806, 
+          "frc3976": 19.234979428454267, 
+          "frc4020": 57.32122112909131, 
+          "frc4050": 48.616331032084105, 
+          "frc4073": 12.269425382942668, 
+          "frc4074": 22.90802057953374, 
+          "frc4075": 51.51196952325532, 
+          "frc4083": 28.81850518436577, 
+          "frc4243": 32.451034072689815, 
+          "frc4267": 9.740486326453121, 
+          "frc4451": 56.40765557432176, 
+          "frc4471": 25.94187928598558, 
+          "frc4533": 26.7159949382254, 
+          "frc4582": 20.329098700628865, 
+          "frc4748": 22.009903259564794, 
+          "frc4764": -1.9701658361210899, 
+          "frc4847": 13.490091164096839, 
+          "frc4965": 33.27930952068843, 
+          "frc5022": 12.970706481563802, 
+          "frc5063": 19.08565821869979, 
+          "frc5130": 23.186313263133425, 
+          "frc5410": 31.211847241185165, 
+          "frc5472": 25.095569812130506, 
+          "frc5777": 19.88142870608662, 
+          "frc5842": 11.516588751178812, 
+          "frc5943": 10.158467847994261, 
+          "frc6167": 25.10780989227918, 
+          "frc6222": 15.387612698024505, 
+          "frc6366": 31.89656167752468, 
+          "frc6626": 22.01713834347722, 
+          "frc6693": 13.017321841093857, 
+          "frc694": 84.67094259070932, 
+          "frc6961": 16.15885002142549, 
+          "frc7085": 29.866189669378556, 
+          "frc7431": 26.47220325514181, 
+          "frc744": 40.77195198907141, 
+          "frc8137": 16.54973849297354, 
+          "frc846": 19.839667895552616
+        }, 
+        "var": {
+          "frc1051": 669.1176144261705, 
+          "frc108": 552.9602361110987, 
+          "frc1287": 434.3168794885569, 
+          "frc1293": 17.212397349131123, 
+          "frc1319": 336.2381922129564, 
+          "frc1369": 563.584088981072, 
+          "frc1398": 370.59428343663933, 
+          "frc1539": 190.66511413934273, 
+          "frc1553": 668.2713257966682, 
+          "frc1708": 653.3448078862812, 
+          "frc1758": 304.41445904914985, 
+          "frc2183": 270.4289348277883, 
+          "frc2187": 477.7552978516168, 
+          "frc2614": 211.80807341396667, 
+          "frc281": 596.1584042980015, 
+          "frc2815": 200.52478844681573, 
+          "frc283": 531.6967282397036, 
+          "frc3140": 236.24335219389113, 
+          "frc342": 218.07754446851902, 
+          "frc343": 258.6015311675188, 
+          "frc3489": 418.30367652673607, 
+          "frc3490": 489.20358760191016, 
+          "frc3492": 126.46400120815083, 
+          "frc3651": 449.1096169345342, 
+          "frc3653": 397.4618742567047, 
+          "frc3824": 424.48959874844473, 
+          "frc3976": 653.9995364062103, 
+          "frc4020": 145.423232348544, 
+          "frc4050": 456.1329747863367, 
+          "frc4073": 224.09070682946498, 
+          "frc4074": 367.34061868492876, 
+          "frc4075": 571.4890089572182, 
+          "frc4083": 292.565804259233, 
+          "frc4243": 770.6711611525099, 
+          "frc4267": 338.19947723233156, 
+          "frc4451": 182.05380245133833, 
+          "frc4471": 295.00902015386384, 
+          "frc4533": 700.4119221303914, 
+          "frc4582": 786.7227761915384, 
+          "frc4748": 613.0084156572336, 
+          "frc4764": 501.23772629784327, 
+          "frc4847": 423.70393458571954, 
+          "frc4965": 521.3623453019244, 
+          "frc5022": 457.95944715915095, 
+          "frc5063": 434.2917469026694, 
+          "frc5130": 270.0393684828759, 
+          "frc5410": 124.62418873921234, 
+          "frc5472": 278.34451307357324, 
+          "frc5777": 406.8943372129178, 
+          "frc5842": 168.04191739625352, 
+          "frc5943": 625.0101559672863, 
+          "frc6167": 223.14461935917595, 
+          "frc6222": 121.92783890184, 
+          "frc6366": 241.2875644629446, 
+          "frc6626": 551.0083173142012, 
+          "frc6693": 488.6974129047358, 
+          "frc694": 98.95877763599702, 
+          "frc6961": 695.390908362492, 
+          "frc7085": 234.89461030562893, 
+          "frc7431": 447.1781958583542, 
+          "frc744": 490.3179158905758, 
+          "frc8137": 548.2480087137743, 
+          "frc846": 492.07598939411787
+        }
+      }
+    }, 
+    "qual": {
+      "endgame_points": {
+        "mean": {
+          "frc1051": 24.212528734518663, 
+          "frc108": 8.800465621782857, 
+          "frc1287": 17.713504107178178, 
+          "frc1293": 12.247170064094714, 
+          "frc1319": 2.040136838465117, 
+          "frc1369": -0.17932962227194382, 
+          "frc1398": 4.671207032142006, 
+          "frc1539": 7.203256505784662, 
+          "frc1553": 10.497933925386835, 
+          "frc1708": 11.38075064218363, 
+          "frc1758": 9.600216126384778, 
+          "frc2183": 10.119507088794737, 
+          "frc2187": 7.593059619711367, 
+          "frc2614": 25.17591434403091, 
+          "frc281": 13.097741075077352, 
+          "frc2815": 16.522399295355903, 
+          "frc283": 13.088656460810782, 
+          "frc3140": 10.277758077840677, 
+          "frc342": 11.621151091284686, 
+          "frc343": 19.092626050193687, 
+          "frc3489": 15.722817814515492, 
+          "frc3490": 13.751018042379947, 
+          "frc3492": 14.312817638719544, 
+          "frc3651": 4.808737719465123, 
+          "frc3653": 22.798684307982803, 
+          "frc3824": 32.691582301117926, 
+          "frc3976": 6.851863586552065, 
+          "frc4020": 11.210848951385316, 
+          "frc4050": 21.323159080356476, 
+          "frc4073": 4.976000472397732, 
+          "frc4074": 10.00081851348381, 
+          "frc4075": 25.46586590865142, 
+          "frc4083": 18.28119727903807, 
+          "frc4243": 22.75286218579195, 
+          "frc4267": 2.3061302485971353, 
+          "frc4451": 17.391219807695773, 
+          "frc4471": 13.40359971303638, 
+          "frc4533": 18.466420758281735, 
+          "frc4582": 8.578240366251102, 
+          "frc4748": 6.74792554665094, 
+          "frc4764": 0.5885465028568406, 
+          "frc4847": 7.786863270044975, 
+          "frc4965": 8.171670509756588, 
+          "frc5022": 0.7090518573329984, 
+          "frc5063": 5.856431732054901, 
+          "frc5130": 9.185993644931353, 
+          "frc5410": 12.287766473014269, 
+          "frc5472": 2.5233795750485153, 
+          "frc5777": 9.605530269028874, 
+          "frc5842": -1.1927277689052997, 
+          "frc5943": 3.5401047701685746, 
+          "frc6167": 10.394595287428434, 
+          "frc6222": 11.394036057689881, 
+          "frc6366": 18.99920491020264, 
+          "frc6626": 9.239013366187853, 
+          "frc6693": 6.214209585745617, 
+          "frc694": 24.138373267006717, 
+          "frc6961": 7.5481063012143315, 
+          "frc7085": 17.06987105259507, 
+          "frc7431": 10.27937130548099, 
+          "frc744": 12.329334059493888, 
+          "frc8137": -0.6098025102874818, 
+          "frc846": 4.2924679208267325
+        }, 
+        "var": {
+          "frc1051": 354.34557320608025, 
+          "frc108": 57.66519316953996, 
+          "frc1287": 246.3126312290854, 
+          "frc1293": 406.6283158819381, 
+          "frc1319": 3.722140030651719, 
+          "frc1369": 77.20063881912701, 
+          "frc1398": 33.061089107484456, 
+          "frc1539": 230.24328541507612, 
+          "frc1553": 84.27549673119493, 
+          "frc1708": 267.366769445689, 
+          "frc1758": 32.75550434324969, 
+          "frc2183": 74.6733174881878, 
+          "frc2187": 63.15404271450752, 
+          "frc2614": 144.64999382568573, 
+          "frc281": 166.52630866616497, 
+          "frc2815": 60.09555688158087, 
+          "frc283": 244.9007509963202, 
+          "frc3140": 92.22515549821787, 
+          "frc342": 76.2391472613997, 
+          "frc343": 342.24970807088084, 
+          "frc3489": 63.78523095772918, 
+          "frc3490": 254.9751216988797, 
+          "frc3492": 159.8507931927905, 
+          "frc3651": 177.30604166817784, 
+          "frc3653": 364.70177234718324, 
+          "frc3824": 471.39823467173295, 
+          "frc3976": 67.34028984000878, 
+          "frc4020": 235.31770514807462, 
+          "frc4050": 156.22099885952665, 
+          "frc4073": 70.12615658052592, 
+          "frc4074": 10.852879918062563, 
+          "frc4075": 382.16787207231846, 
+          "frc4083": 257.8341572262764, 
+          "frc4243": 289.5566402233202, 
+          "frc4267": 43.781446723849044, 
+          "frc4451": 111.00839144225297, 
+          "frc4471": 84.73270167726888, 
+          "frc4533": 365.33336679197345, 
+          "frc4582": 79.67900012187035, 
+          "frc4748": 108.69384480854859, 
+          "frc4764": 45.267661016436435, 
+          "frc4847": 316.3118985357928, 
+          "frc4965": 50.749488727461994, 
+          "frc5022": 408.65874914887735, 
+          "frc5063": 78.3498737768353, 
+          "frc5130": 162.85819262466075, 
+          "frc5410": 277.86075557649957, 
+          "frc5472": 10.922907722888642, 
+          "frc5777": 146.87320698601366, 
+          "frc5842": 48.306653532895346, 
+          "frc5943": 155.4033773348146, 
+          "frc6167": 215.12198121763404, 
+          "frc6222": 62.282648955344776, 
+          "frc6366": 294.12367778292526, 
+          "frc6626": 91.27317624565833, 
+          "frc6693": 127.47645276546397, 
+          "frc694": 79.87353562237772, 
+          "frc6961": 138.9783542214812, 
+          "frc7085": 118.43509333501932, 
+          "frc7431": 113.04359321216972, 
+          "frc744": 172.56947936455634, 
+          "frc8137": 122.02621687838148, 
+          "frc846": 167.49848266341687
+        }
+      }, 
+      "power_cells_scored": {
+        "mean": {
+          "frc1051": 2.5483232732218037, 
+          "frc108": 6.399845527824243, 
+          "frc1287": 4.274206249905342, 
+          "frc1293": 3.1682785986892283, 
+          "frc1319": 3.09546468478195, 
+          "frc1369": 1.2787221564356543, 
+          "frc1398": 0.2992037950423023, 
+          "frc1539": 2.347191911342607, 
+          "frc1553": 2.3389478521642872, 
+          "frc1708": 3.65014943606033, 
+          "frc1758": 8.889966105809988, 
+          "frc2183": 6.239552040383215, 
+          "frc2187": 4.637634079724356, 
+          "frc2614": 6.439885356107606, 
+          "frc281": 4.986752194014805, 
+          "frc2815": 0.6413897614414319, 
+          "frc283": 3.8358960197977963, 
+          "frc3140": 1.4328533537012422, 
+          "frc342": 2.6507272970440496, 
+          "frc343": 7.441131069357327, 
+          "frc3489": 7.071772288916317, 
+          "frc3490": 5.848862898033462, 
+          "frc3492": 3.6727067621037, 
+          "frc3651": 1.6071597729263507, 
+          "frc3653": 4.383950611897172, 
+          "frc3824": 5.586537137332049, 
+          "frc3976": 2.3561890762514572, 
+          "frc4020": 10.223416044057862, 
+          "frc4050": 3.9766760838988224, 
+          "frc4073": 2.1082846704552645, 
+          "frc4074": 1.6029022197552785, 
+          "frc4075": 4.665853792002472, 
+          "frc4083": 2.1469124302268088, 
+          "frc4243": 1.2696402394051918, 
+          "frc4267": 2.0545141208036526, 
+          "frc4451": 11.879090354999136, 
+          "frc4471": 1.8081390739450889, 
+          "frc4533": 1.5571203585917117, 
+          "frc4582": 2.539553276401752, 
+          "frc4748": 1.9888750827385888, 
+          "frc4764": 1.8303376265150102, 
+          "frc4847": 1.8899449716140635, 
+          "frc4965": 6.490097344875523, 
+          "frc5022": 3.089665056903711, 
+          "frc5063": -0.3426748207165309, 
+          "frc5130": 2.8262371245537823, 
+          "frc5410": 4.247933009065485, 
+          "frc5472": 3.9434586796834807, 
+          "frc5777": 3.127506577533152, 
+          "frc5842": 1.7626427387952812, 
+          "frc5943": 2.373505251540322, 
+          "frc6167": 4.264799993374144, 
+          "frc6222": 2.3182880371827963, 
+          "frc6366": 2.1165261971976754, 
+          "frc6626": 0.9704274963466206, 
+          "frc6693": 0.6540562065231029, 
+          "frc694": 13.307818347903074, 
+          "frc6961": 2.569227336542034, 
+          "frc7085": 3.4826309251533467, 
+          "frc7431": 1.735423880346233, 
+          "frc744": 7.423471071339319, 
+          "frc8137": 1.4692097229462253, 
+          "frc846": 3.7032191360038236
+        }, 
+        "var": {
+          "frc1051": 57.664215792059494, 
+          "frc108": 88.08698766809489, 
+          "frc1287": 39.87247324229935, 
+          "frc1293": 39.062278981019716, 
+          "frc1319": 56.88354138977961, 
+          "frc1369": 46.64308087678154, 
+          "frc1398": 28.385902152188915, 
+          "frc1539": 30.35687320833772, 
+          "frc1553": 51.32301154959853, 
+          "frc1708": 52.289541786371096, 
+          "frc1758": 78.05532046326374, 
+          "frc2183": 48.2543832179454, 
+          "frc2187": 59.35714738132293, 
+          "frc2614": 86.55837296195166, 
+          "frc281": 38.56536092806892, 
+          "frc2815": 36.96001820186772, 
+          "frc283": 38.80950417636937, 
+          "frc3140": 57.292867716903004, 
+          "frc342": 33.29222684158323, 
+          "frc343": 87.69634983284821, 
+          "frc3489": 55.010533984262814, 
+          "frc3490": 25.176839760433737, 
+          "frc3492": 30.9128746247567, 
+          "frc3651": 48.556728826971714, 
+          "frc3653": 43.60901888163099, 
+          "frc3824": 56.23181537982211, 
+          "frc3976": 60.34750743410642, 
+          "frc4020": 97.38863115187134, 
+          "frc4050": 21.674236369687836, 
+          "frc4073": 87.97154412532991, 
+          "frc4074": 25.958750764067332, 
+          "frc4075": 38.689393134373226, 
+          "frc4083": 44.4988311108414, 
+          "frc4243": 31.732871933718833, 
+          "frc4267": 37.9953566410745, 
+          "frc4451": 122.70886691616106, 
+          "frc4471": 41.03151660847294, 
+          "frc4533": 65.56041946984425, 
+          "frc4582": 47.242099577541694, 
+          "frc4748": 73.00288387039517, 
+          "frc4764": 45.78385860458292, 
+          "frc4847": 65.83199582358552, 
+          "frc4965": 59.07383999542485, 
+          "frc5022": 99.80498649472443, 
+          "frc5063": 51.665731944419875, 
+          "frc5130": 23.014844186976134, 
+          "frc5410": 94.10704906101874, 
+          "frc5472": 48.58485767635572, 
+          "frc5777": 42.879124264573726, 
+          "frc5842": 27.478414716155875, 
+          "frc5943": 50.84442386912807, 
+          "frc6167": 86.0934827661787, 
+          "frc6222": 74.75744290655848, 
+          "frc6366": 41.33389717631494, 
+          "frc6626": 33.5600853786889, 
+          "frc6693": 42.92720103361103, 
+          "frc694": 109.22871360678104, 
+          "frc6961": 69.6901072335115, 
+          "frc7085": 37.75546162725836, 
+          "frc7431": 20.660980586587502, 
+          "frc744": 61.71353650576847, 
+          "frc8137": 46.92654429559853, 
+          "frc846": 31.394091151911056
+        }
+      }, 
+      "score": {
+        "mean": {
+          "frc1051": 37.7636657085077, 
+          "frc108": 28.89587024081866, 
+          "frc1287": 32.589482746075646, 
+          "frc1293": 22.373981088115123, 
+          "frc1319": 19.359912497364363, 
+          "frc1369": 12.883305347175892, 
+          "frc1398": 11.277929112557585, 
+          "frc1539": 20.11639822664432, 
+          "frc1553": 20.223063502473746, 
+          "frc1708": 38.33625323566389, 
+          "frc1758": 37.167666421524885, 
+          "frc2183": 35.76065282980517, 
+          "frc2187": 25.9967153014885, 
+          "frc2614": 59.586260712212145, 
+          "frc281": 36.31049256582138, 
+          "frc2815": 27.293983592476454, 
+          "frc283": 30.42539823653051, 
+          "frc3140": 19.536526523483886, 
+          "frc342": 31.150060917000346, 
+          "frc343": 45.648280008684885, 
+          "frc3489": 31.590899565962385, 
+          "frc3490": 34.36595447253841, 
+          "frc3492": 29.481683753106083, 
+          "frc3651": 13.464978910106227, 
+          "frc3653": 43.50573692163603, 
+          "frc3824": 60.17024586951976, 
+          "frc3976": 20.954005437927506, 
+          "frc4020": 45.79116387732887, 
+          "frc4050": 48.638248772604456, 
+          "frc4073": 13.494067361664019, 
+          "frc4074": 23.585111479920144, 
+          "frc4075": 47.62325251889792, 
+          "frc4083": 29.45329404396345, 
+          "frc4243": 35.225945974726145, 
+          "frc4267": 9.514195637681512, 
+          "frc4451": 57.389608991014306, 
+          "frc4471": 27.720504455904646, 
+          "frc4533": 27.232600711224965, 
+          "frc4582": 21.919843475575306, 
+          "frc4748": 24.652606327708657, 
+          "frc4764": -0.15827628048166664, 
+          "frc4847": 13.681382683525573, 
+          "frc4965": 33.301372290079684, 
+          "frc5022": 15.947539514109453, 
+          "frc5063": 16.221082216155516, 
+          "frc5130": 20.95216691178057, 
+          "frc5410": 28.828506669667085, 
+          "frc5472": 24.323264926972453, 
+          "frc5777": 21.281755709243505, 
+          "frc5842": 11.557555291504729, 
+          "frc5943": 10.917678278518617, 
+          "frc6167": 23.624713917763632, 
+          "frc6222": 15.296543371519672, 
+          "frc6366": 30.049743591690103, 
+          "frc6626": 20.567712485886936, 
+          "frc6693": 12.64213928620652, 
+          "frc694": 71.30084647933336, 
+          "frc6961": 16.950906884050358, 
+          "frc7085": 30.718354592496073, 
+          "frc7431": 25.731442042203042, 
+          "frc744": 38.709867715682115, 
+          "frc8137": 14.816710535586038, 
+          "frc846": 23.58004586598741
+        }, 
+        "var": {
+          "frc1051": 646.6102199298012, 
+          "frc108": 640.8001481732864, 
+          "frc1287": 484.41993225944356, 
+          "frc1293": 23.953716420727858, 
+          "frc1319": 286.4444085750912, 
+          "frc1369": 558.9375591225835, 
+          "frc1398": 376.4823435492442, 
+          "frc1539": 226.08626406004868, 
+          "frc1553": 646.0387084530811, 
+          "frc1708": 681.1705319040607, 
+          "frc1758": 459.085253659745, 
+          "frc2183": 253.73752292400945, 
+          "frc2187": 465.26563239975053, 
+          "frc2614": 327.92926896236384, 
+          "frc281": 586.5415003041637, 
+          "frc2815": 306.9020177036532, 
+          "frc283": 459.40533416792414, 
+          "frc3140": 210.9260338774838, 
+          "frc342": 265.4914547967455, 
+          "frc343": 291.370550588931, 
+          "frc3489": 728.173746411435, 
+          "frc3490": 567.3444470096293, 
+          "frc3492": 195.2920087777227, 
+          "frc3651": 435.24060981932115, 
+          "frc3653": 413.44413149143986, 
+          "frc3824": 729.2998316765168, 
+          "frc3976": 600.2108075273259, 
+          "frc4020": 234.52634745847618, 
+          "frc4050": 629.5789132353688, 
+          "frc4073": 197.55027714950623, 
+          "frc4074": 323.0845052683072, 
+          "frc4075": 517.495621560107, 
+          "frc4083": 233.12418959680426, 
+          "frc4243": 689.0376905475289, 
+          "frc4267": 317.28461650623956, 
+          "frc4451": 427.4326674315295, 
+          "frc4471": 242.61168304196585, 
+          "frc4533": 827.3172365045122, 
+          "frc4582": 741.3998615374056, 
+          "frc4748": 554.1118194197508, 
+          "frc4764": 474.09477193726025, 
+          "frc4847": 413.1289759967933, 
+          "frc4965": 465.55080944091924, 
+          "frc5022": 445.45185213707333, 
+          "frc5063": 532.5797385395609, 
+          "frc5130": 315.95093877483305, 
+          "frc5410": 220.90044534212123, 
+          "frc5472": 291.6222960387319, 
+          "frc5777": 341.3064551191505, 
+          "frc5842": 128.13660430974613, 
+          "frc5943": 591.4176203427211, 
+          "frc6167": 212.09688373454114, 
+          "frc6222": 110.04593047463426, 
+          "frc6366": 262.16958047834623, 
+          "frc6626": 530.742870838138, 
+          "frc6693": 478.0531735880189, 
+          "frc694": 253.4127445887566, 
+          "frc6961": 723.8625711924608, 
+          "frc7085": 191.40343286131565, 
+          "frc7431": 382.93169072039115, 
+          "frc744": 567.3482723901228, 
+          "frc8137": 490.7165969250584, 
+          "frc846": 435.88571621212367
+        }
+      }
+    }
+  }
+}

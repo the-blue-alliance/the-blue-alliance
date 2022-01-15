@@ -15,6 +15,7 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws, safe_cast
 
+from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.listify import listify
@@ -341,6 +342,7 @@ def event_details(event_key: EventKey) -> Response:
     # Write new models
     if (
         teams and event.year == SeasonHelper.get_max_year()
+        or Environment.is_dev()
     ):  # Only update from latest year
         teams = TeamManipulator.createOrUpdate(teams)
 

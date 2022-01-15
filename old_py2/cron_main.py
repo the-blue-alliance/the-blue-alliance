@@ -13,7 +13,6 @@ from controllers.cron_controller import \
     MatchTimePredictionsEnqueue, MatchTimePredictionsDo, BlueZoneUpdateDo, SuggestionQueueDailyNag, RemapTeamsDo
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
-from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueue
 from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import UpcomingNotificationDo
 from controllers.cron_controller import UpdateLiveEventsDo
@@ -38,9 +37,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/get/hof_teams', HallOfFameTeamsGet),
                                ('/tasks/math/enqueue/event_short_name_calc_enqueue/([0-9]*)', EventShortNameCalcEnqueue),
                                ('/tasks/math/do/event_short_name_calc_do/(.*)', EventShortNameCalcDo),
-                               ('/tasks/math/enqueue/event_matchstats/(.*)', EventMatchstatsEnqueue),
                                ('/tasks/math/enqueue/eventteam_update/(.*)', EventTeamUpdateEnqueue),
-                               ('/tasks/math/do/event_matchstats/(.*)', EventMatchstatsDo),
                                ('/tasks/math/do/eventteam_repair', EventTeamRepairDo),
                                ('/tasks/math/do/eventteam_update/(.*)', EventTeamUpdate),
                                ('/tasks/math/do/final_matches_repair/([0-9]*)', FinalMatchesRepairDo),

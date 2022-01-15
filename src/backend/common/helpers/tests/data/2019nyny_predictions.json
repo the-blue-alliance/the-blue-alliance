@@ -1,0 +1,3555 @@
+{
+  "match_prediction_stats": {
+    "playoff": {
+      "brier_scores": {
+        "win_loss": 0.17116063076708274
+      }, 
+      "err_mean": 7.1715100020794145, 
+      "err_var": 81.36827869585709, 
+      "wl_accuracy": 76.47058823529412, 
+      "wl_accuracy_75": 87.5
+    }, 
+    "qual": {
+      "brier_scores": {
+        "win_loss": 0.20281001443640398
+      }, 
+      "err_mean": 9.550982577590121, 
+      "err_var": 49.95050501600782, 
+      "wl_accuracy": 66.23376623376623, 
+      "wl_accuracy_75": 100.0
+    }
+  }, 
+  "match_predictions": {
+    "playoff": {
+      "2019nyny_f1m1": {
+        "blue": {
+          "hab_climb_points": 9.83131868903664, 
+          "hab_climb_points_var": 19.433378125040356, 
+          "prob_complete_rocket": 1.9433714597560936e-06, 
+          "prob_hab_docking": 0.12050211110246423, 
+          "rocket_pieces_scored": 1.2993249921650523, 
+          "rocket_pieces_scored_var": 5.37077605890612, 
+          "score": 53.586783224284815, 
+          "score_var": 160.58105445218092
+        }, 
+        "prob": 0.9423503799900423, 
+        "red": {
+          "hab_climb_points": 19.202579156312172, 
+          "hab_climb_points_var": 16.55818971709659, 
+          "prob_complete_rocket": 0.3457893294925002, 
+          "prob_hab_docking": 0.8491474889749715, 
+          "rocket_pieces_scored": 10.577219716129102, 
+          "rocket_pieces_scored_var": 12.862383837397926, 
+          "score": 81.50596223798027, 
+          "score_var": 153.72041318125576
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_f1m2": {
+        "blue": {
+          "hab_climb_points": 9.744947843919466, 
+          "hab_climb_points_var": 18.87146773633567, 
+          "prob_complete_rocket": 1.680579128882087e-05, 
+          "prob_hab_docking": 0.11319888038906667, 
+          "rocket_pieces_scored": 1.6476209761794751, 
+          "rocket_pieces_scored_var": 6.230259881305415, 
+          "score": 53.97219858810874, 
+          "score_var": 158.75021528181503
+        }, 
+        "prob": 0.9491843236753157, 
+        "red": {
+          "hab_climb_points": 19.411619847354874, 
+          "hab_climb_points_var": 15.057352108182595, 
+          "prob_complete_rocket": 0.3590407999149885, 
+          "prob_hab_docking": 0.8722107815071467, 
+          "rocket_pieces_scored": 10.725951443358145, 
+          "rocket_pieces_scored_var": 12.453749194195323, 
+          "score": 82.57631254225058, 
+          "score_var": 146.57444512139324
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf1m1": {
+        "blue": {
+          "hab_climb_points": 12.789548156911284, 
+          "hab_climb_points_var": 42.71102462865666, 
+          "prob_complete_rocket": 6.984537014353975e-05, 
+          "prob_hab_docking": 0.3675952468525733, 
+          "rocket_pieces_scored": 2.8623386171999026, 
+          "rocket_pieces_scored_var": 5.755898436256999, 
+          "score": 45.545927289761806, 
+          "score_var": 412.11060815542555
+        }, 
+        "prob": 0.9074803923650459, 
+        "red": {
+          "hab_climb_points": 18.853851810450827, 
+          "hab_climb_points_var": 31.18602382507552, 
+          "prob_complete_rocket": 0.36846851847011775, 
+          "prob_hab_docking": 0.7549358374390329, 
+          "rocket_pieces_scored": 10.608003184617706, 
+          "rocket_pieces_scored_var": 17.17215469124243, 
+          "score": 77.91391206761327, 
+          "score_var": 184.290951126553
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf1m2": {
+        "blue": {
+          "hab_climb_points": 11.99317095943774, 
+          "hab_climb_points_var": 37.46325399797404, 
+          "prob_complete_rocket": 3.121217545087873e-05, 
+          "prob_hab_docking": 0.3116234498656988, 
+          "rocket_pieces_scored": 2.2460115470256357, 
+          "rocket_pieces_scored_var": 5.936012336144288, 
+          "score": 45.592215759524464, 
+          "score_var": 401.53778267656963
+        }, 
+        "prob": 0.9272111064577131, 
+        "red": {
+          "hab_climb_points": 19.436433451123108, 
+          "hab_climb_points_var": 25.546548855892016, 
+          "prob_complete_rocket": 0.3616769197075327, 
+          "prob_hab_docking": 0.8099586600699504, 
+          "rocket_pieces_scored": 10.6925811771492, 
+          "rocket_pieces_scored_var": 13.641807301080213, 
+          "score": 81.43499467014766, 
+          "score_var": 205.03104148220604
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf2m1": {
+        "blue": {
+          "hab_climb_points": 12.875972648508744, 
+          "hab_climb_points_var": 9.110104633181063, 
+          "prob_complete_rocket": 3.146762583838836e-08, 
+          "prob_hab_docking": 0.2408043239828973, 
+          "rocket_pieces_scored": 0.7281655096281161, 
+          "rocket_pieces_scored_var": 4.3406405129868695, 
+          "score": 50.055134990247105, 
+          "score_var": 127.66927368101862
+        }, 
+        "prob": 0.6777378957719478, 
+        "red": {
+          "hab_climb_points": 10.954419091616826, 
+          "hab_climb_points_var": 13.764776142027277, 
+          "prob_complete_rocket": 0.0001678842782771861, 
+          "prob_hab_docking": 0.13776270258712642, 
+          "rocket_pieces_scored": 4.397940656527254, 
+          "rocket_pieces_scored_var": 4.494052078206409, 
+          "score": 58.17760145410219, 
+          "score_var": 182.25359835446332
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf2m2": {
+        "blue": {
+          "hab_climb_points": 11.416096230119441, 
+          "hab_climb_points_var": 16.928021873088856, 
+          "prob_complete_rocket": 6.983741362986962e-10, 
+          "prob_hab_docking": 0.19185786942781968, 
+          "rocket_pieces_scored": 0.5574888119757193, 
+          "rocket_pieces_scored_var": 3.5701949323476083, 
+          "score": 48.88786686875849, 
+          "score_var": 125.77142102873853
+        }, 
+        "prob": 0.7068452036274446, 
+        "red": {
+          "hab_climb_points": 11.28580926721536, 
+          "hab_climb_points_var": 10.153115141479496, 
+          "prob_complete_rocket": 0.0002503505189012101, 
+          "prob_hab_docking": 0.12187995756298509, 
+          "rocket_pieces_scored": 3.683981440908234, 
+          "rocket_pieces_scored_var": 5.709226860255589, 
+          "score": 57.93739000717517, 
+          "score_var": 150.76200342242092
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf2m3": {
+        "blue": {
+          "hab_climb_points": 11.986097674677097, 
+          "hab_climb_points_var": 16.434075566521216, 
+          "prob_complete_rocket": 5.860727458895099e-10, 
+          "prob_hab_docking": 0.22860217120347448, 
+          "rocket_pieces_scored": 0.6523593962201252, 
+          "rocket_pieces_scored_var": 3.478816735498998, 
+          "score": 50.9276624367489, 
+          "score_var": 128.2340687658694
+        }, 
+        "prob": 0.6626967670291022, 
+        "red": {
+          "hab_climb_points": 11.285762322190369, 
+          "hab_climb_points_var": 9.388149744087634, 
+          "prob_complete_rocket": 0.00019144016224659222, 
+          "prob_hab_docking": 0.1127150276462654, 
+          "rocket_pieces_scored": 3.9562059801103406, 
+          "rocket_pieces_scored_var": 5.129453234510375, 
+          "score": 57.79886524451034, 
+          "score_var": 139.62699357596316
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf3m1": {
+        "blue": {
+          "hab_climb_points": 7.717414882043281, 
+          "hab_climb_points_var": 7.86427264838991, 
+          "prob_complete_rocket": 2.3690792826380758e-06, 
+          "prob_hab_docking": 0.004703378351376131, 
+          "rocket_pieces_scored": 1.7664219613223069, 
+          "rocket_pieces_scored_var": 5.001170808956059, 
+          "score": 44.395144989501276, 
+          "score_var": 108.7925892515156
+        }, 
+        "prob": 0.750641562848575, 
+        "red": {
+          "hab_climb_points": 10.182122404834178, 
+          "hab_climb_points_var": 23.85317070106342, 
+          "prob_complete_rocket": 3.4573071775456654e-06, 
+          "prob_hab_docking": 0.1619519212670264, 
+          "rocket_pieces_scored": 0.8686774859601553, 
+          "rocket_pieces_scored_var": 6.128906028770757, 
+          "score": 55.32365914094981, 
+          "score_var": 152.16729222936274
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf3m2": {
+        "blue": {
+          "hab_climb_points": 6.597246282187398, 
+          "hab_climb_points_var": 11.062429177763931, 
+          "prob_complete_rocket": 8.743721398030146e-07, 
+          "prob_hab_docking": 0.005762456266633409, 
+          "rocket_pieces_scored": 1.5277208085295677, 
+          "rocket_pieces_scored_var": 4.798868429034451, 
+          "score": 43.24040528234839, 
+          "score_var": 108.97376012369358
+        }, 
+        "prob": 0.7744290779657671, 
+        "red": {
+          "hab_climb_points": 9.926193787104477, 
+          "hab_climb_points_var": 21.173428070796117, 
+          "prob_complete_rocket": 0.00017400018536961603, 
+          "prob_hab_docking": 0.1350892602104823, 
+          "rocket_pieces_scored": 1.6229923443193437, 
+          "rocket_pieces_scored_var": 8.417570726827801, 
+          "score": 55.261957413950334, 
+          "score_var": 145.5567578963334
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf3m3": {
+        "blue": {
+          "hab_climb_points": 7.488576518145196, 
+          "hab_climb_points_var": 14.360797027865026, 
+          "prob_complete_rocket": 3.9370361508694884e-06, 
+          "prob_hab_docking": 0.02373213165634991, 
+          "rocket_pieces_scored": 2.0380692895479644, 
+          "rocket_pieces_scored_var": 4.969904488730763, 
+          "score": 46.409353899881324, 
+          "score_var": 122.52536336202267
+        }, 
+        "prob": 0.7046168326447529, 
+        "red": {
+          "hab_climb_points": 10.241430078090652, 
+          "hab_climb_points_var": 20.5141815608615, 
+          "prob_complete_rocket": 4.743506447713042e-05, 
+          "prob_hab_docking": 0.1467145230086584, 
+          "rocket_pieces_scored": 1.5635159896791218, 
+          "rocket_pieces_scored_var": 7.148802615002717, 
+          "score": 55.163640513732304, 
+          "score_var": 142.5196902201076
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf4m1": {
+        "blue": {
+          "hab_climb_points": 5.528458577278991, 
+          "hab_climb_points_var": 44.919604142514395, 
+          "prob_complete_rocket": 0.02816006447238184, 
+          "prob_hab_docking": 0.0787989061351495, 
+          "rocket_pieces_scored": 5.4026240777613435, 
+          "rocket_pieces_scored_var": 11.949101307015455, 
+          "score": 51.048849768548685, 
+          "score_var": 111.8621167884389
+        }, 
+        "prob": 0.7171612141304351, 
+        "red": {
+          "hab_climb_points": 7.607397905202142, 
+          "hab_climb_points_var": 18.877611681954907, 
+          "prob_complete_rocket": 0.0022874302811070057, 
+          "prob_hab_docking": 0.04442756307656748, 
+          "rocket_pieces_scored": 4.300931891752363, 
+          "rocket_pieces_scored_var": 7.372341611295567, 
+          "score": 61.431550417236394, 
+          "score_var": 214.8370576860376
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf4m2": {
+        "blue": {
+          "hab_climb_points": 6.0097115172380375, 
+          "hab_climb_points_var": 43.242284442054114, 
+          "prob_complete_rocket": 0.023639538461953213, 
+          "prob_hab_docking": 0.0857875949581206, 
+          "rocket_pieces_scored": 5.68743367145517, 
+          "rocket_pieces_scored_var": 10.125577797480222, 
+          "score": 51.52456762745133, 
+          "score_var": 111.16376657600071
+        }, 
+        "prob": 0.7059378276789294, 
+        "red": {
+          "hab_climb_points": 6.987316549344197, 
+          "hab_climb_points_var": 12.401495109116475, 
+          "prob_complete_rocket": 0.0009137191854466931, 
+          "prob_hab_docking": 0.011443609201609806, 
+          "rocket_pieces_scored": 4.259942902641598, 
+          "rocket_pieces_scored_var": 6.1664288779846395, 
+          "score": 61.165313286655405, 
+          "score_var": 205.74507461208455
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qf4m3": {
+        "blue": {
+          "hab_climb_points": 6.491408336355583, 
+          "hab_climb_points_var": 41.8068016394045, 
+          "prob_complete_rocket": 0.024545265459996912, 
+          "prob_hab_docking": 0.0940980460385592, 
+          "rocket_pieces_scored": 4.67342869578069, 
+          "rocket_pieces_scored_var": 13.862374971489967, 
+          "score": 51.774908291054025, 
+          "score_var": 111.24175878455898
+        }, 
+        "prob": 0.6421376418246334, 
+        "red": {
+          "hab_climb_points": 7.37394311373349, 
+          "hab_climb_points_var": 11.721983496783139, 
+          "prob_complete_rocket": 0.0009586271414092629, 
+          "prob_hab_docking": 0.012960058334408386, 
+          "rocket_pieces_scored": 3.6714490782316958, 
+          "rocket_pieces_scored_var": 7.205144331206693, 
+          "score": 58.35807932942224, 
+          "score_var": 215.52784967111924
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_sf1m1": {
+        "blue": {
+          "hab_climb_points": 11.842110576801225, 
+          "hab_climb_points_var": 9.41604557153739, 
+          "prob_complete_rocket": 0.00014878209338031745, 
+          "prob_hab_docking": 0.1517135236728504, 
+          "rocket_pieces_scored": 3.964929420180044, 
+          "rocket_pieces_scored_var": 4.933823348182028, 
+          "score": 58.339034811774376, 
+          "score_var": 125.53457270908476
+        }, 
+        "prob": 0.923540554560478, 
+        "red": {
+          "hab_climb_points": 19.101328733725857, 
+          "hab_climb_points_var": 21.189058225187512, 
+          "prob_complete_rocket": 0.38095620560665955, 
+          "prob_hab_docking": 0.8135304892427295, 
+          "rocket_pieces_scored": 10.910221498008893, 
+          "rocket_pieces_scored_var": 12.938264971930238, 
+          "score": 82.90194357890776, 
+          "score_var": 169.8002329707417
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_sf1m2": {
+        "blue": {
+          "hab_climb_points": 11.899695824230502, 
+          "hab_climb_points_var": 9.182004802048281, 
+          "prob_complete_rocket": 0.00021719014150134441, 
+          "prob_hab_docking": 0.1531205590973933, 
+          "rocket_pieces_scored": 3.453321590002459, 
+          "rocket_pieces_scored_var": 5.901167213360056, 
+          "score": 59.99905866819902, 
+          "score_var": 128.05061739431818
+        }, 
+        "prob": 0.9203761599503195, 
+        "red": {
+          "hab_climb_points": 18.931297711879573, 
+          "hab_climb_points_var": 18.276433223120762, 
+          "prob_complete_rocket": 0.40024868461250107, 
+          "prob_hab_docking": 0.8211042432657851, 
+          "rocket_pieces_scored": 11.105571947074784, 
+          "rocket_pieces_scored_var": 12.527615814981672, 
+          "score": 83.299763505657, 
+          "score_var": 145.96524948696918
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_sf2m1": {
+        "blue": {
+          "hab_climb_points": 6.429996958756129, 
+          "hab_climb_points_var": 42.6373329143786, 
+          "prob_complete_rocket": 0.015305190847668237, 
+          "prob_hab_docking": 0.09468254575263768, 
+          "rocket_pieces_scored": 4.44058338671441, 
+          "rocket_pieces_scored_var": 12.224315569281211, 
+          "score": 52.84032006523816, 
+          "score_var": 107.08691850008755
+        }, 
+        "prob": 0.5287394217507118, 
+        "red": {
+          "hab_climb_points": 9.652634175927561, 
+          "hab_climb_points_var": 20.564712003519148, 
+          "prob_complete_rocket": 1.6945041477756106e-05, 
+          "prob_hab_docking": 0.11916407799436035, 
+          "rocket_pieces_scored": 1.47802571533953, 
+          "rocket_pieces_scored_var": 6.441933706369809, 
+          "score": 54.0271200287564, 
+          "score_var": 163.8491421735411
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_sf2m2": {
+        "blue": {
+          "hab_climb_points": 5.610003417438017, 
+          "hab_climb_points_var": 41.92609603145748, 
+          "prob_complete_rocket": 0.010088676223604764, 
+          "prob_hab_docking": 0.07350355538652442, 
+          "rocket_pieces_scored": 4.13743091797013, 
+          "rocket_pieces_scored_var": 11.455604204780007, 
+          "score": 52.00327315442253, 
+          "score_var": 103.01279456230013
+        }, 
+        "prob": 0.5543769421901135, 
+        "red": {
+          "hab_climb_points": 9.93018423075331, 
+          "hab_climb_points_var": 19.96552177437988, 
+          "prob_complete_rocket": 5.455459348269187e-06, 
+          "prob_hab_docking": 0.12826651216926765, 
+          "rocket_pieces_scored": 1.3299535543887055, 
+          "rocket_pieces_scored_var": 5.885260716888697, 
+          "score": 54.22751265149891, 
+          "score_var": 161.62431152613186
+        }, 
+        "winning_alliance": "red"
+      }
+    }, 
+    "qual": {
+      "2019nyny_qm1": {
+        "blue": {
+          "hab_climb_points": 9.131178545995013, 
+          "hab_climb_points_var": 11.452595165958371, 
+          "prob_complete_rocket": 0.0006146756147247245, 
+          "prob_hab_docking": 0.04144138621580651, 
+          "rocket_pieces_scored": 0.7394668735457604, 
+          "rocket_pieces_scored_var": 12.138925338105569, 
+          "score": 39.347756667886195, 
+          "score_var": 415.78836944463717
+        }, 
+        "prob": 0.5352440823849796, 
+        "red": {
+          "hab_climb_points": 8.408879717594111, 
+          "hab_climb_points_var": 30.650950754581146, 
+          "prob_complete_rocket": 0.007771287152340434, 
+          "prob_hab_docking": 0.11692073205544584, 
+          "rocket_pieces_scored": 3.1709598243722175, 
+          "rocket_pieces_scored_var": 13.31624349014006, 
+          "score": 42.09517002502574, 
+          "score_var": 548.847778926668
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm10": {
+        "blue": {
+          "hab_climb_points": 10.367192259135233, 
+          "hab_climb_points_var": 10.580117795294662, 
+          "prob_complete_rocket": 8.57319054725636e-06, 
+          "prob_hab_docking": 0.07718098538060136, 
+          "rocket_pieces_scored": 2.7669070852402156, 
+          "rocket_pieces_scored_var": 4.6124500063478395, 
+          "score": 51.29057561131817, 
+          "score_var": 49.873205833204494
+        }, 
+        "prob": 0.8374602022102953, 
+        "red": {
+          "hab_climb_points": 5.291726423213872, 
+          "hab_climb_points_var": 28.707956485471733, 
+          "prob_complete_rocket": 0.00010020511188879588, 
+          "prob_hab_docking": 0.03499868364572334, 
+          "rocket_pieces_scored": 2.3685978381055888, 
+          "rocket_pieces_scored_var": 6.7087828875454, 
+          "score": 27.64838704595968, 
+          "score_var": 527.3192886533159
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm11": {
+        "blue": {
+          "hab_climb_points": 9.097439649560819, 
+          "hab_climb_points_var": 33.13378816454564, 
+          "prob_complete_rocket": 0.005790788011299952, 
+          "prob_hab_docking": 0.152580797766516, 
+          "rocket_pieces_scored": 1.9906270663109074, 
+          "rocket_pieces_scored_var": 15.718593100360627, 
+          "score": 36.71313735391763, 
+          "score_var": 675.2516876953888
+        }, 
+        "prob": 0.5707167399188643, 
+        "red": {
+          "hab_climb_points": 10.93901568130994, 
+          "hab_climb_points_var": 31.764069909077143, 
+          "prob_complete_rocket": 0.0002486544759940923, 
+          "prob_hab_docking": 0.23559366323707698, 
+          "rocket_pieces_scored": 1.88016589155431, 
+          "rocket_pieces_scored_var": 8.44576396851511, 
+          "score": 42.30862740567635, 
+          "score_var": 310.72045636771685
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm12": {
+        "blue": {
+          "hab_climb_points": 5.615264639835874, 
+          "hab_climb_points_var": 24.416013178944198, 
+          "prob_complete_rocket": 0.0012306478085208905, 
+          "prob_hab_docking": 0.02876508259792776, 
+          "rocket_pieces_scored": 1.4246706783080885, 
+          "rocket_pieces_scored_var": 12.197167021157652, 
+          "score": 38.376133526173916, 
+          "score_var": 419.2376637097791
+        }, 
+        "prob": 0.5332250921844437, 
+        "red": {
+          "hab_climb_points": 8.561250690179884, 
+          "hab_climb_points_var": 40.63203171955186, 
+          "prob_complete_rocket": 0.0071819854269337124, 
+          "prob_hab_docking": 0.15622208900815626, 
+          "rocket_pieces_scored": 2.0105153339613158, 
+          "rocket_pieces_scored_var": 16.651475000619826, 
+          "score": 41.36643310621467, 
+          "score_var": 866.9702692014654
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm13": {
+        "blue": {
+          "hab_climb_points": 8.177728769767112, 
+          "hab_climb_points_var": 22.1600024625244, 
+          "prob_complete_rocket": 0.017586033891453967, 
+          "prob_hab_docking": 0.07363353061910027, 
+          "rocket_pieces_scored": 2.9217924659395313, 
+          "rocket_pieces_scored_var": 18.57505655447931, 
+          "score": 40.85969990262207, 
+          "score_var": 889.3021603704155
+        }, 
+        "prob": 0.5617487835919757, 
+        "red": {
+          "hab_climb_points": 6.930095944439225, 
+          "hab_climb_points_var": 11.336474380716979, 
+          "prob_complete_rocket": 1.785655179276091e-09, 
+          "prob_hab_docking": 0.008269776848629062, 
+          "rocket_pieces_scored": -0.2610431321302551, 
+          "rocket_pieces_scored_var": 4.314411434565724, 
+          "score": 35.9956034999312, 
+          "score_var": 90.36181577346203
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm14": {
+        "blue": {
+          "hab_climb_points": 7.773517142543589, 
+          "hab_climb_points_var": 17.818250837448602, 
+          "prob_complete_rocket": 0.0015647195999248797, 
+          "prob_hab_docking": 0.04345171880688703, 
+          "rocket_pieces_scored": 0.5106389633180779, 
+          "rocket_pieces_scored_var": 15.120163127456987, 
+          "score": 30.365470805208343, 
+          "score_var": 559.957374603458
+        }, 
+        "prob": 0.5489084884716564, 
+        "red": {
+          "hab_climb_points": 7.743310323117631, 
+          "hab_climb_points_var": 32.392648440498014, 
+          "prob_complete_rocket": 0.014763968857722798, 
+          "prob_hab_docking": 0.10115195158277546, 
+          "rocket_pieces_scored": 2.6122673564910563, 
+          "rocket_pieces_scored_var": 18.606202369343947, 
+          "score": 35.34328881300231, 
+          "score_var": 1080.425193924438
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm15": {
+        "blue": {
+          "hab_climb_points": 10.42298990540658, 
+          "hab_climb_points_var": 42.351087066359526, 
+          "prob_complete_rocket": 0.1689655493121951, 
+          "prob_hab_docking": 0.24092987912106367, 
+          "rocket_pieces_scored": 7.121101793714352, 
+          "rocket_pieces_scored_var": 25.922433506486733, 
+          "score": 53.56924838786291, 
+          "score_var": 492.28867573157515
+        }, 
+        "prob": 0.5418063095920154, 
+        "red": {
+          "hab_climb_points": 7.850226766971742, 
+          "hab_climb_points_var": 40.67171062894807, 
+          "prob_complete_rocket": 0.011761129788989244, 
+          "prob_hab_docking": 0.13112171787922422, 
+          "rocket_pieces_scored": 3.600559600362809, 
+          "rocket_pieces_scored_var": 13.753845817139563, 
+          "score": 50.48816848551422, 
+          "score_var": 368.99848319718217
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm16": {
+        "blue": {
+          "hab_climb_points": 6.32421074919824, 
+          "hab_climb_points_var": 35.479873834372, 
+          "prob_complete_rocket": 1.506765546288591e-05, 
+          "prob_hab_docking": 0.07262376400107962, 
+          "rocket_pieces_scored": 1.357056257373658, 
+          "rocket_pieces_scored_var": 6.506434163763258, 
+          "score": 30.50863920535096, 
+          "score_var": 747.7491897884532
+        }, 
+        "prob": 0.5836078103933194, 
+        "red": {
+          "hab_climb_points": 6.943612147579353, 
+          "hab_climb_points_var": 19.437641948168036, 
+          "prob_complete_rocket": 0.0005169258307236024, 
+          "prob_hab_docking": 0.03382458009584843, 
+          "rocket_pieces_scored": 1.36588181335133, 
+          "rocket_pieces_scored_var": 10.503912576717063, 
+          "score": 38.176485772112734, 
+          "score_var": 571.2340509219853
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm17": {
+        "blue": {
+          "hab_climb_points": 9.304165512882324, 
+          "hab_climb_points_var": 10.7396036978554, 
+          "prob_complete_rocket": 0.011291079277187754, 
+          "prob_hab_docking": 0.04110066108670396, 
+          "rocket_pieces_scored": 2.2960460069024835, 
+          "rocket_pieces_scored_var": 18.107717588705185, 
+          "score": 36.66734189536187, 
+          "score_var": 958.5968691426832
+        }, 
+        "prob": 0.5452075842782578, 
+        "red": {
+          "hab_climb_points": 7.911699798586706, 
+          "hab_climb_points_var": 22.06244333610309, 
+          "prob_complete_rocket": 0.0018212894694156212, 
+          "prob_hab_docking": 0.06563782246273475, 
+          "rocket_pieces_scored": 2.0130565687594375, 
+          "rocket_pieces_scored_var": 11.797966288076186, 
+          "score": 40.89360013414108, 
+          "score_var": 426.38552765898294
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm18": {
+        "blue": {
+          "hab_climb_points": 8.38953268916968, 
+          "hab_climb_points_var": 29.9060079563221, 
+          "prob_complete_rocket": 0.004126899532012507, 
+          "prob_hab_docking": 0.11337065421366543, 
+          "rocket_pieces_scored": 2.5053826560405508, 
+          "rocket_pieces_scored_var": 12.919664951479222, 
+          "score": 44.70569093963847, 
+          "score_var": 1040.4555232617695
+        }, 
+        "prob": 0.5276271724400949, 
+        "red": {
+          "hab_climb_points": 8.740740125387322, 
+          "hab_climb_points_var": 34.516774406826194, 
+          "prob_complete_rocket": 2.651006309606352e-05, 
+          "prob_hab_docking": 0.1433501478760164, 
+          "rocket_pieces_scored": 2.0491016336773376, 
+          "rocket_pieces_scored_var": 6.061131693388875, 
+          "score": 47.14419026110858, 
+          "score_var": 197.47819899558937
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm19": {
+        "blue": {
+          "hab_climb_points": 9.472566810819128, 
+          "hab_climb_points_var": 31.97298559704054, 
+          "prob_complete_rocket": 0.0006540541823665258, 
+          "prob_hab_docking": 0.1641524079017398, 
+          "rocket_pieces_scored": 0.5638498254201203, 
+          "rocket_pieces_scored_var": 12.659462782166417, 
+          "score": 35.295790129882334, 
+          "score_var": 644.8606047114442
+        }, 
+        "prob": 0.6139794023023049, 
+        "red": {
+          "hab_climb_points": 6.741362898545352, 
+          "hab_climb_points_var": 13.502285817928703, 
+          "prob_complete_rocket": 2.903545626153914e-09, 
+          "prob_hab_docking": 0.01230321378755983, 
+          "rocket_pieces_scored": -0.5117402564094389, 
+          "rocket_pieces_scored_var": 4.6180450203707535, 
+          "score": 26.05792834365675, 
+          "score_var": 371.9218812318742
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm2": {
+        "blue": {
+          "hab_climb_points": 10.266605006743248, 
+          "hab_climb_points_var": 18.674718801869265, 
+          "prob_complete_rocket": 0.010652051675837937, 
+          "prob_hab_docking": 0.13668564199733613, 
+          "rocket_pieces_scored": 3.2571694506644127, 
+          "rocket_pieces_scored_var": 14.41735200597337, 
+          "score": 53.43461021929052, 
+          "score_var": 254.19073044308482
+        }, 
+        "prob": 0.6249524249212501, 
+        "red": {
+          "hab_climb_points": 9.320586207830324, 
+          "hab_climb_points_var": 42.5376707470542, 
+          "prob_complete_rocket": 0.013142586787672439, 
+          "prob_hab_docking": 0.19193264693511092, 
+          "rocket_pieces_scored": 2.40274445732707, 
+          "rocket_pieces_scored_var": 18.655926106354606, 
+          "score": 42.4684812080321, 
+          "score_var": 931.1683021854427
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm20": {
+        "blue": {
+          "hab_climb_points": 11.35836390731453, 
+          "hab_climb_points_var": 7.274302789644144, 
+          "prob_complete_rocket": 1.8746750107823118e-07, 
+          "prob_hab_docking": 0.08847454632337648, 
+          "rocket_pieces_scored": 1.445893461631755, 
+          "rocket_pieces_scored_var": 4.314194511682308, 
+          "score": 50.294620330209106, 
+          "score_var": 310.25566775405355
+        }, 
+        "prob": 0.7147877545230378, 
+        "red": {
+          "hab_climb_points": 6.838831794088943, 
+          "hab_climb_points_var": 14.49847629373861, 
+          "prob_complete_rocket": 5.045228722577733e-06, 
+          "prob_hab_docking": 0.016042888016479795, 
+          "rocket_pieces_scored": 1.2254782947925833, 
+          "rocket_pieces_scored_var": 5.9551149454251995, 
+          "score": 34.30496963444948, 
+          "score_var": 483.8143834675809
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm21": {
+        "blue": {
+          "hab_climb_points": 8.869800153906947, 
+          "hab_climb_points_var": 44.027209829681716, 
+          "prob_complete_rocket": 0.037170398943198624, 
+          "prob_hab_docking": 0.1777752373982313, 
+          "rocket_pieces_scored": 3.4582816037634294, 
+          "rocket_pieces_scored_var": 22.911442159912824, 
+          "score": 37.81497519834324, 
+          "score_var": 1072.3907943454522
+        }, 
+        "prob": 0.7771066470473758, 
+        "red": {
+          "hab_climb_points": 14.506622971236336, 
+          "hab_climb_points_var": 43.41886273950466, 
+          "prob_complete_rocket": 0.3428149720689426, 
+          "prob_hab_docking": 0.4701568872074511, 
+          "rocket_pieces_scored": 10.018249558069652, 
+          "rocket_pieces_scored_var": 23.96805135809468, 
+          "score": 66.92588618491457, 
+          "score_var": 385.34813087650167
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm22": {
+        "blue": {
+          "hab_climb_points": 6.463763616940124, 
+          "hab_climb_points_var": 6.28438731200719, 
+          "prob_complete_rocket": 2.5019684276594845e-06, 
+          "prob_hab_docking": 0.0003306508127339791, 
+          "rocket_pieces_scored": 0.41201113691544283, 
+          "rocket_pieces_scored_var": 6.444754588299074, 
+          "score": 35.414127213467054, 
+          "score_var": 256.531229373854
+        }, 
+        "prob": 0.788656039457098, 
+        "red": {
+          "hab_climb_points": 12.940207725827797, 
+          "hab_climb_points_var": 27.87383938878892, 
+          "prob_complete_rocket": 0.04180468036710083, 
+          "prob_hab_docking": 0.3482150023165915, 
+          "rocket_pieces_scored": 5.5631236941839095, 
+          "rocket_pieces_scored_var": 13.842015916571636, 
+          "score": 53.92889283062436, 
+          "score_var": 276.73048112480853
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm23": {
+        "blue": {
+          "hab_climb_points": 6.359600221586289, 
+          "hab_climb_points_var": 23.979170088593452, 
+          "prob_complete_rocket": 0.00031266821193609573, 
+          "prob_hab_docking": 0.03882559201559865, 
+          "rocket_pieces_scored": 0.9156183425775586, 
+          "rocket_pieces_scored_var": 10.502051461539109, 
+          "score": 26.707997664916576, 
+          "score_var": 988.2223907953572
+        }, 
+        "prob": 0.5913002774587713, 
+        "red": {
+          "hab_climb_points": 6.128322321447147, 
+          "hab_climb_points_var": 23.850147003520327, 
+          "prob_complete_rocket": 0.017029526027832143, 
+          "prob_hab_docking": 0.03463889852901403, 
+          "rocket_pieces_scored": 2.939907082605364, 
+          "rocket_pieces_scored_var": 18.27473009048314, 
+          "score": 35.697561946442505, 
+          "score_var": 527.6515686971629
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm24": {
+        "blue": {
+          "hab_climb_points": 5.937452108404417, 
+          "hab_climb_points_var": 37.91906747725556, 
+          "prob_complete_rocket": 8.41407271227057e-05, 
+          "prob_hab_docking": 0.07054994651496083, 
+          "rocket_pieces_scored": 1.1226605312568998, 
+          "rocket_pieces_scored_var": 8.358191066744066, 
+          "score": 34.90598591340388, 
+          "score_var": 227.501517958633
+        }, 
+        "prob": 0.5399557980111149, 
+        "red": {
+          "hab_climb_points": 8.399057267669908, 
+          "hab_climb_points_var": 41.25116625168066, 
+          "prob_complete_rocket": 0.00037803130791780326, 
+          "prob_hab_docking": 0.15203351818387278, 
+          "rocket_pieces_scored": 0.38243567929132516, 
+          "rocket_pieces_scored_var": 11.895515592986243, 
+          "score": 31.980518463885556, 
+          "score_var": 622.8432322179358
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm25": {
+        "blue": {
+          "hab_climb_points": 8.074817525863114, 
+          "hab_climb_points_var": 23.03776682338329, 
+          "prob_complete_rocket": 0.0003122856741559765, 
+          "prob_hab_docking": 0.0745361168070775, 
+          "rocket_pieces_scored": 0.7395076064534118, 
+          "rocket_pieces_scored_var": 10.83630970427216, 
+          "score": 39.42050281804267, 
+          "score_var": 532.0205180641086
+        }, 
+        "prob": 0.5838141601818421, 
+        "red": {
+          "hab_climb_points": 6.4995233172443845, 
+          "hab_climb_points_var": 26.015803111824354, 
+          "prob_complete_rocket": 0.0003520839513124763, 
+          "prob_hab_docking": 0.04779954842667922, 
+          "rocket_pieces_scored": 0.7101813328837688, 
+          "rocket_pieces_scored_var": 11.10451612958276, 
+          "score": 32.71712150013738, 
+          "score_var": 470.99354405204735
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm26": {
+        "blue": {
+          "hab_climb_points": 4.9147206719468635, 
+          "hab_climb_points_var": 39.487696645915385, 
+          "prob_complete_rocket": 0.002640760135821596, 
+          "prob_hab_docking": 0.054254224924080496, 
+          "rocket_pieces_scored": 2.479194025207682, 
+          "rocket_pieces_scored_var": 11.6504791783284, 
+          "score": 36.63421192351885, 
+          "score_var": 677.4305415835169
+        }, 
+        "prob": 0.5145797293551322, 
+        "red": {
+          "hab_climb_points": 7.117840108034482, 
+          "hab_climb_points_var": 42.461495942476304, 
+          "prob_complete_rocket": 0.023510669278680063, 
+          "prob_hab_docking": 0.11321309916013511, 
+          "rocket_pieces_scored": 3.5932124969489134, 
+          "rocket_pieces_scored_var": 17.91655221838768, 
+          "score": 35.35479530177706, 
+          "score_var": 547.613681370205
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm27": {
+        "blue": {
+          "hab_climb_points": 8.497435909018487, 
+          "hab_climb_points_var": 51.89550240245717, 
+          "prob_complete_rocket": 0.0033741559236999397, 
+          "prob_hab_docking": 0.18335562276838724, 
+          "rocket_pieces_scored": 1.8129380579022942, 
+          "rocket_pieces_scored_var": 14.140826894953644, 
+          "score": 46.6147462314802, 
+          "score_var": 288.07520656388743
+        }, 
+        "prob": 0.646432829885379, 
+        "red": {
+          "hab_climb_points": 5.988026934109845, 
+          "hab_climb_points_var": 20.784595676443665, 
+          "prob_complete_rocket": 6.828834397953898e-08, 
+          "prob_hab_docking": 0.02403563073113535, 
+          "rocket_pieces_scored": 0.43186591842593947, 
+          "rocket_pieces_scored_var": 4.818804330852088, 
+          "score": 38.36802773405534, 
+          "score_var": 193.7200774433432
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm28": {
+        "blue": {
+          "hab_climb_points": 8.746825268994254, 
+          "hab_climb_points_var": 30.3973063143527, 
+          "prob_complete_rocket": 2.673138821407406e-09, 
+          "prob_hab_docking": 0.12835896197622043, 
+          "rocket_pieces_scored": 1.4540869740266962, 
+          "rocket_pieces_scored_var": 3.265389297985836, 
+          "score": 40.01695056021048, 
+          "score_var": 208.8923457419094
+        }, 
+        "prob": 0.7810857022482862, 
+        "red": {
+          "hab_climb_points": 13.431326248773921, 
+          "hab_climb_points_var": 34.142575063401814, 
+          "prob_complete_rocket": 0.2506968425780658, 
+          "prob_hab_docking": 0.3941714629102503, 
+          "rocket_pieces_scored": 9.185620482288972, 
+          "rocket_pieces_scored_var": 17.524314541424157, 
+          "score": 58.226282953507095, 
+          "score_var": 341.9350438706449
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm29": {
+        "blue": {
+          "hab_climb_points": 7.877056349483738, 
+          "hab_climb_points_var": 16.318445441011104, 
+          "prob_complete_rocket": 0.00011153574848754566, 
+          "prob_hab_docking": 0.03892703700107336, 
+          "rocket_pieces_scored": 0.3588781165310326, 
+          "rocket_pieces_scored_var": 9.945358576932465, 
+          "score": 31.59949012565168, 
+          "score_var": 730.6424975987852
+        }, 
+        "prob": 0.6153255020251267, 
+        "red": {
+          "hab_climb_points": 5.652270232222207, 
+          "hab_climb_points_var": 44.04914311816334, 
+          "prob_complete_rocket": 0.00014287359852049875, 
+          "prob_hab_docking": 0.07950085908147164, 
+          "rocket_pieces_scored": 3.068726871590956, 
+          "rocket_pieces_scored_var": 6.060641209003598, 
+          "score": 41.96967286104932, 
+          "score_var": 520.0952412317564
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm3": {
+        "blue": {
+          "hab_climb_points": 11.751840583131528, 
+          "hab_climb_points_var": 24.572199123018095, 
+          "prob_complete_rocket": 0.022939214542792463, 
+          "prob_hab_docking": 0.25614937609247357, 
+          "rocket_pieces_scored": 2.620411525018969, 
+          "rocket_pieces_scored_var": 22.071129142386827, 
+          "score": 47.934177334472736, 
+          "score_var": 829.461332520043
+        }, 
+        "prob": 0.5068389001400738, 
+        "red": {
+          "hab_climb_points": 10.19034759847277, 
+          "hab_climb_points_var": 25.17537959785903, 
+          "prob_complete_rocket": 0.016710389807277348, 
+          "prob_hab_docking": 0.16888668032605092, 
+          "rocket_pieces_scored": 2.688209639674849, 
+          "rocket_pieces_scored_var": 19.166147360898183, 
+          "score": 47.226801536914806, 
+          "score_var": 873.110543151954
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm30": {
+        "blue": {
+          "hab_climb_points": 8.504145955658462, 
+          "hab_climb_points_var": 8.214794878857777, 
+          "prob_complete_rocket": 4.3587355946783646e-13, 
+          "prob_hab_docking": 0.011713238749242905, 
+          "rocket_pieces_scored": -0.8085695432256006, 
+          "rocket_pieces_scored_var": 3.2097290940577263, 
+          "score": 27.074554878717297, 
+          "score_var": 310.50468372309615
+        }, 
+        "prob": 0.6944504102507576, 
+        "red": {
+          "hab_climb_points": 6.041037291440315, 
+          "hab_climb_points_var": 37.340303554224796, 
+          "prob_complete_rocket": 0.0018817267308657293, 
+          "prob_hab_docking": 0.07130812608817616, 
+          "rocket_pieces_scored": 1.5199706940182511, 
+          "rocket_pieces_scored_var": 13.083592029081153, 
+          "score": 40.166978811572555, 
+          "score_var": 352.39762551023557
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm31": {
+        "blue": {
+          "hab_climb_points": 8.28563595805542, 
+          "hab_climb_points_var": 28.20626994986523, 
+          "prob_complete_rocket": 3.863380783208914e-05, 
+          "prob_hab_docking": 0.10307062853235627, 
+          "rocket_pieces_scored": 2.1208060558425164, 
+          "rocket_pieces_scored_var": 6.2467017700136, 
+          "score": 39.56042569275994, 
+          "score_var": 368.3138805737894
+        }, 
+        "prob": 0.5859322060351617, 
+        "red": {
+          "hab_climb_points": 6.236896175551925, 
+          "hab_climb_points_var": 41.064433529934334, 
+          "prob_complete_rocket": 0.000879335876717624, 
+          "prob_hab_docking": 0.0857354508643402, 
+          "rocket_pieces_scored": 0.46012743688971536, 
+          "rocket_pieces_scored_var": 13.60839289863312, 
+          "score": 32.28599544016699, 
+          "score_var": 754.4925327746637
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm32": {
+        "blue": {
+          "hab_climb_points": 16.27515272086547, 
+          "hab_climb_points_var": 11.670271186766126, 
+          "prob_complete_rocket": 0.0051522502219660815, 
+          "prob_hab_docking": 0.6455258143880724, 
+          "rocket_pieces_scored": 3.8508655951752924, 
+          "rocket_pieces_scored_var": 10.090186548315351, 
+          "score": 59.91343352723801, 
+          "score_var": 350.25252608952866
+        }, 
+        "prob": 0.720113224528843, 
+        "red": {
+          "hab_climb_points": 8.521306106441845, 
+          "hab_climb_points_var": 25.93529890578524, 
+          "prob_complete_rocket": 0.009446865976949992, 
+          "prob_hab_docking": 0.10165808837321899, 
+          "rocket_pieces_scored": 3.1230534680638167, 
+          "rocket_pieces_scored_var": 14.297865664986357, 
+          "score": 44.93980030525253, 
+          "score_var": 309.00071770838764
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm33": {
+        "blue": {
+          "hab_climb_points": 9.041177494904185, 
+          "hab_climb_points_var": 14.553428606144694, 
+          "prob_complete_rocket": 0.02533088782846815, 
+          "prob_hab_docking": 0.059145367079159294, 
+          "rocket_pieces_scored": 4.899289095562068, 
+          "rocket_pieces_scored_var": 13.20098256501074, 
+          "score": 52.72724811797568, 
+          "score_var": 890.765526748896
+        }, 
+        "prob": 0.6895549266611842, 
+        "red": {
+          "hab_climb_points": 5.460249148886636, 
+          "hab_climb_points_var": 40.62464558087629, 
+          "prob_complete_rocket": 0.0001350433662811179, 
+          "prob_hab_docking": 0.06723231235903504, 
+          "rocket_pieces_scored": 0.462632762068987, 
+          "rocket_pieces_scored_var": 10.033058502790496, 
+          "score": 32.75526256205799, 
+          "score_var": 739.8563978467686
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm34": {
+        "blue": {
+          "hab_climb_points": 10.91378974671419, 
+          "hab_climb_points_var": 10.963507064975628, 
+          "prob_complete_rocket": 0.00010534213002610926, 
+          "prob_hab_docking": 0.10858514757221494, 
+          "rocket_pieces_scored": 0.7559084363385458, 
+          "rocket_pieces_scored_var": 9.206052313999061, 
+          "score": 36.692808056702745, 
+          "score_var": 191.47356517548494
+        }, 
+        "prob": 0.5131375054489606, 
+        "red": {
+          "hab_climb_points": 6.761503919352451, 
+          "hab_climb_points_var": 28.989728358115897, 
+          "prob_complete_rocket": 0.0008247051659484583, 
+          "prob_hab_docking": 0.0629933509459577, 
+          "rocket_pieces_scored": 2.294260053026502, 
+          "rocket_pieces_scored_var": 9.511674965219427, 
+          "score": 37.634474935679265, 
+          "score_var": 625.9212333697642
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm35": {
+        "blue": {
+          "hab_climb_points": 6.943747382795548, 
+          "hab_climb_points_var": 35.141311624537806, 
+          "prob_complete_rocket": 3.1168151103377895e-06, 
+          "prob_hab_docking": 0.0870709961385372, 
+          "rocket_pieces_scored": -0.1982378611620389, 
+          "rocket_pieces_scored_var": 7.288579296681874, 
+          "score": 43.457390132918334, 
+          "score_var": 409.3843843794624
+        }, 
+        "prob": 0.6926911893751658, 
+        "red": {
+          "hab_climb_points": 5.2169279484785145, 
+          "hab_climb_points_var": 38.98222517205941, 
+          "prob_complete_rocket": 1.4254289055770641e-05, 
+          "prob_hab_docking": 0.05856875607229761, 
+          "rocket_pieces_scored": 0.3949890545139425, 
+          "rocket_pieces_scored_var": 7.689301735575083, 
+          "score": 28.595009267792282, 
+          "score_var": 461.95973401823153
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm36": {
+        "blue": {
+          "hab_climb_points": 10.237164325302256, 
+          "hab_climb_points_var": 35.86033180392172, 
+          "prob_complete_rocket": 1.4377119494923818e-09, 
+          "prob_hab_docking": 0.2132048825121562, 
+          "rocket_pieces_scored": 0.26680525759454177, 
+          "rocket_pieces_scored_var": 3.9036489734182553, 
+          "score": 44.007379144479486, 
+          "score_var": 420.01716035271625
+        }, 
+        "prob": 0.6051587481359519, 
+        "red": {
+          "hab_climb_points": 4.624581196636733, 
+          "hab_climb_points_var": 18.787155632602815, 
+          "prob_complete_rocket": 0.0001390328517532069, 
+          "prob_hab_docking": 0.008339015910240777, 
+          "rocket_pieces_scored": 2.9811164800092786, 
+          "rocket_pieces_scored_var": 6.156240459382598, 
+          "score": 35.95346393337881, 
+          "score_var": 491.7699012216483
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm37": {
+        "blue": {
+          "hab_climb_points": 7.669927155787873, 
+          "hab_climb_points_var": 9.857852897183324, 
+          "prob_complete_rocket": 0.0003828849427367498, 
+          "prob_hab_docking": 0.009781510784310554, 
+          "rocket_pieces_scored": 0.6931522882520976, 
+          "rocket_pieces_scored_var": 11.291300211198273, 
+          "score": 26.7333573615241, 
+          "score_var": 328.32618324857435
+        }, 
+        "prob": 0.69096689124327, 
+        "red": {
+          "hab_climb_points": 8.63624833633897, 
+          "hab_climb_points_var": 10.541950762144882, 
+          "prob_complete_rocket": 0.002780014366693173, 
+          "prob_hab_docking": 0.024998775942748686, 
+          "rocket_pieces_scored": 1.93809920113658, 
+          "rocket_pieces_scored_var": 13.16943148276405, 
+          "score": 39.37395550837155, 
+          "score_var": 314.425309562502
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm38": {
+        "blue": {
+          "hab_climb_points": 9.371598188532179, 
+          "hab_climb_points_var": 17.112030181187805, 
+          "prob_complete_rocket": 0.0011587451908985358, 
+          "prob_hab_docking": 0.08681815458213549, 
+          "rocket_pieces_scored": 1.2766222450701366, 
+          "rocket_pieces_scored_var": 12.392093659997562, 
+          "score": 45.17049324094728, 
+          "score_var": 632.4706264485453
+        }, 
+        "prob": 0.5709527623945488, 
+        "red": {
+          "hab_climb_points": 10.474334872366466, 
+          "hab_climb_points_var": 11.431917962540773, 
+          "prob_complete_rocket": 2.1674233840918156e-05, 
+          "prob_hab_docking": 0.09036449595322327, 
+          "rocket_pieces_scored": 0.5556538101405756, 
+          "rocket_pieces_scored_var": 7.833862316764261, 
+          "score": 39.55346662513857, 
+          "score_var": 354.43645169311935
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm39": {
+        "blue": {
+          "hab_climb_points": 6.9600813588709265, 
+          "hab_climb_points_var": 16.8689853713097, 
+          "prob_complete_rocket": 2.1530859669161018e-05, 
+          "prob_hab_docking": 0.025142925864506838, 
+          "rocket_pieces_scored": 1.6501285335901812, 
+          "rocket_pieces_scored_var": 6.402313043684635, 
+          "score": 37.47064250395451, 
+          "score_var": 431.7593824770211
+        }, 
+        "prob": 0.6320853354821176, 
+        "red": {
+          "hab_climb_points": 8.541559615990142, 
+          "hab_climb_points_var": 15.19305692091106, 
+          "prob_complete_rocket": 0.0021047181027213924, 
+          "prob_hab_docking": 0.04876646259213091, 
+          "rocket_pieces_scored": 3.878803101571891, 
+          "rocket_pieces_scored_var": 8.051804387269538, 
+          "score": 49.20069931205387, 
+          "score_var": 777.0496650463775
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm4": {
+        "blue": {
+          "hab_climb_points": 9.884355936503392, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.03350129439697347, 
+          "prob_hab_docking": 0.16243335232515554, 
+          "rocket_pieces_scored": 2.4824327828374915, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 44.075861981081076, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5351059204147457, 
+        "red": {
+          "hab_climb_points": 9.591991940688379, 
+          "hab_climb_points_var": 13.843162045024696, 
+          "prob_complete_rocket": 0.0031940885816807985, 
+          "prob_hab_docking": 0.07304033433704282, 
+          "rocket_pieces_scored": 1.9197488992878196, 
+          "rocket_pieces_scored_var": 13.662211332945612, 
+          "score": 40.51002965463748, 
+          "score_var": 437.7888975095555
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm40": {
+        "blue": {
+          "hab_climb_points": 11.319560596984306, 
+          "hab_climb_points_var": 16.07670799550775, 
+          "prob_complete_rocket": 0.0022086727805863404, 
+          "prob_hab_docking": 0.17933243487293238, 
+          "rocket_pieces_scored": 3.4172948131364467, 
+          "rocket_pieces_scored_var": 9.089953372439576, 
+          "score": 35.93198164244316, 
+          "score_var": 348.9269968302447
+        }, 
+        "prob": 0.8372555368151269, 
+        "red": {
+          "hab_climb_points": 11.953209386235548, 
+          "hab_climb_points_var": 38.6026714437137, 
+          "prob_complete_rocket": 0.2618530334671141, 
+          "prob_hab_docking": 0.31193204212189984, 
+          "rocket_pieces_scored": 9.080348840920172, 
+          "rocket_pieces_scored_var": 20.965569910376853, 
+          "score": 58.969439065405304, 
+          "score_var": 200.04385534619522
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm41": {
+        "blue": {
+          "hab_climb_points": 10.167012757935574, 
+          "hab_climb_points_var": 30.507302611925684, 
+          "prob_complete_rocket": 0.0001171631640628501, 
+          "prob_hab_docking": 0.19078383363123064, 
+          "rocket_pieces_scored": 2.8717433047296854, 
+          "rocket_pieces_scored_var": 6.156889763574692, 
+          "score": 52.48446660837175, 
+          "score_var": 484.23232849058206
+        }, 
+        "prob": 0.7103723445446174, 
+        "red": {
+          "hab_climb_points": 7.1981018154037075, 
+          "hab_climb_points_var": 38.751537255336686, 
+          "prob_complete_rocket": 0.0008942096517137177, 
+          "prob_hab_docking": 0.10504786948606193, 
+          "rocket_pieces_scored": 2.8218005074650505, 
+          "rocket_pieces_scored_var": 8.635561669350071, 
+          "score": 33.381825610193275, 
+          "score_var": 702.7009982960263
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm42": {
+        "blue": {
+          "hab_climb_points": 7.989686718310408, 
+          "hab_climb_points_var": 32.05476696646673, 
+          "prob_complete_rocket": 0.00022717920086723353, 
+          "prob_hab_docking": 0.10782078943145645, 
+          "rocket_pieces_scored": 0.17955618371112717, 
+          "rocket_pieces_scored_var": 11.364907016833941, 
+          "score": 31.489584566955564, 
+          "score_var": 561.3293249302393
+        }, 
+        "prob": 0.6046819975155391, 
+        "red": {
+          "hab_climb_points": 6.329519051039701, 
+          "hab_climb_points_var": 28.072274460565417, 
+          "prob_complete_rocket": 0.0006586119998329698, 
+          "prob_hab_docking": 0.05087207197110488, 
+          "rocket_pieces_scored": 1.7123186451241956, 
+          "rocket_pieces_scored_var": 10.257220957842971, 
+          "score": 39.37009178751167, 
+          "score_var": 319.7783133502661
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm43": {
+        "blue": {
+          "hab_climb_points": 5.475102308988139, 
+          "hab_climb_points_var": 41.52318213487548, 
+          "prob_complete_rocket": 0.0005200135058335276, 
+          "prob_hab_docking": 0.06968541174258691, 
+          "rocket_pieces_scored": 2.569629108089325, 
+          "rocket_pieces_scored_var": 8.268953207482767, 
+          "score": 41.751118913165776, 
+          "score_var": 250.1870507931987
+        }, 
+        "prob": 0.518207403775792, 
+        "red": {
+          "hab_climb_points": 6.3755867689026875, 
+          "hab_climb_points_var": 31.006674091727398, 
+          "prob_complete_rocket": 5.594765210359398e-05, 
+          "prob_hab_docking": 0.06071206216557168, 
+          "rocket_pieces_scored": 1.3164416920938864, 
+          "rocket_pieces_scored_var": 7.647678326154773, 
+          "score": 40.346046810770034, 
+          "score_var": 696.9647804058341
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm44": {
+        "blue": {
+          "hab_climb_points": 11.531507454329677, 
+          "hab_climb_points_var": 12.532615052847685, 
+          "prob_complete_rocket": 7.933622378186733e-05, 
+          "prob_hab_docking": 0.16360218333093668, 
+          "rocket_pieces_scored": 3.64046398178621, 
+          "rocket_pieces_scored_var": 4.898352737592923, 
+          "score": 50.3317396989127, 
+          "score_var": 200.52926320857182
+        }, 
+        "prob": 0.5947954013544994, 
+        "red": {
+          "hab_climb_points": 7.590880713437305, 
+          "hab_climb_points_var": 20.073959660379185, 
+          "prob_complete_rocket": 0.0006330584477489687, 
+          "prob_hab_docking": 0.04909682013727812, 
+          "rocket_pieces_scored": 0.08771348802567447, 
+          "rocket_pieces_scored_var": 13.655925301413102, 
+          "score": 43.05648703805499, 
+          "score_var": 719.1624643326809
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm45": {
+        "blue": {
+          "hab_climb_points": 15.114302283872467, 
+          "hab_climb_points_var": 45.8125240571575, 
+          "prob_complete_rocket": 0.1488825455138607, 
+          "prob_hab_docking": 0.5067367777810843, 
+          "rocket_pieces_scored": 7.7517695491155365, 
+          "rocket_pieces_scored_var": 16.646237785157794, 
+          "score": 76.08282525816992, 
+          "score_var": 228.03099163334878
+        }, 
+        "prob": 0.8496366185403252, 
+        "red": {
+          "hab_climb_points": 10.11925787673934, 
+          "hab_climb_points_var": 13.62956220990856, 
+          "prob_complete_rocket": 0.00031723992295218384, 
+          "prob_hab_docking": 0.09307725690394952, 
+          "rocket_pieces_scored": 1.7530653270241572, 
+          "rocket_pieces_scored_var": 8.995864256048328, 
+          "score": 53.97618276585467, 
+          "score_var": 228.28830580070743
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm46": {
+        "blue": {
+          "hab_climb_points": 10.594380625480245, 
+          "hab_climb_points_var": 38.189218372588975, 
+          "prob_complete_rocket": 6.02936557569933e-07, 
+          "prob_hab_docking": 0.23794976951337565, 
+          "rocket_pieces_scored": 1.147973958602944, 
+          "rocket_pieces_scored_var": 4.996917804423937, 
+          "score": 44.51857448752244, 
+          "score_var": 536.8938292084938
+        }, 
+        "prob": 0.710639345216888, 
+        "red": {
+          "hab_climb_points": 9.900334191130009, 
+          "hab_climb_points_var": 28.879196734063942, 
+          "prob_complete_rocket": 5.403967022310496e-06, 
+          "prob_hab_docking": 0.17131978057653385, 
+          "rocket_pieces_scored": 0.4655255344165621, 
+          "rocket_pieces_scored_var": 6.871037845653999, 
+          "score": 28.980781863122232, 
+          "score_var": 246.16808241972785
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm47": {
+        "blue": {
+          "hab_climb_points": 5.451813367342387, 
+          "hab_climb_points_var": 20.67100228738757, 
+          "prob_complete_rocket": 6.689391955827517e-05, 
+          "prob_hab_docking": 0.017859989309355173, 
+          "rocket_pieces_scored": 1.1103664425702435, 
+          "rocket_pieces_scored_var": 8.129071134747598, 
+          "score": 32.291489198390096, 
+          "score_var": 331.0412722017491
+        }, 
+        "prob": 0.6995926914834496, 
+        "red": {
+          "hab_climb_points": 6.85206184573944, 
+          "hab_climb_points_var": 31.88606103812557, 
+          "prob_complete_rocket": 4.395371751686472e-05, 
+          "prob_hab_docking": 0.07451914813351057, 
+          "rocket_pieces_scored": 0.7696150364809042, 
+          "rocket_pieces_scored_var": 8.200286524190792, 
+          "score": 45.984207868069234, 
+          "score_var": 353.8081210034041
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm48": {
+        "blue": {
+          "hab_climb_points": 9.448048836216651, 
+          "hab_climb_points_var": 5.461307321161851, 
+          "prob_complete_rocket": 0.0001570567429709513, 
+          "prob_hab_docking": 0.008757104523981818, 
+          "rocket_pieces_scored": 4.034421991630014, 
+          "rocket_pieces_scored_var": 4.886703578407043, 
+          "score": 55.58892555533496, 
+          "score_var": 394.3872680087572
+        }, 
+        "prob": 0.8004319887117559, 
+        "red": {
+          "hab_climb_points": 5.064784399311748, 
+          "hab_climb_points_var": 54.87718145910527, 
+          "prob_complete_rocket": 0.0018093216460007833, 
+          "prob_hab_docking": 0.08993385158594247, 
+          "rocket_pieces_scored": 1.6159616711300075, 
+          "rocket_pieces_scored_var": 12.736759803588042, 
+          "score": 25.825816030107816, 
+          "score_var": 851.6504601179289
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm49": {
+        "blue": {
+          "hab_climb_points": 6.680447349557117, 
+          "hab_climb_points_var": 9.374600029360632, 
+          "prob_complete_rocket": 4.825158194332602e-06, 
+          "prob_hab_docking": 0.0032917163855614717, 
+          "rocket_pieces_scored": 2.5799459785188756, 
+          "rocket_pieces_scored_var": 4.532178212890524, 
+          "score": 44.413930248897444, 
+          "score_var": 224.9882955827251
+        }, 
+        "prob": 0.5187527938218417, 
+        "red": {
+          "hab_climb_points": 5.471152431036532, 
+          "hab_climb_points_var": 36.61167238815224, 
+          "prob_complete_rocket": 2.570145376412647e-06, 
+          "prob_hab_docking": 0.057649135643890626, 
+          "rocket_pieces_scored": 0.7013877005263723, 
+          "rocket_pieces_scored_var": 6.142073756786372, 
+          "score": 45.416562205865915, 
+          "score_var": 229.63449142283375
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm5": {
+        "blue": {
+          "hab_climb_points": 12.889246579549205, 
+          "hab_climb_points_var": 40.793070415893666, 
+          "prob_complete_rocket": 0.054916398583902515, 
+          "prob_hab_docking": 0.3705189034171683, 
+          "rocket_pieces_scored": 4.108032286051369, 
+          "rocket_pieces_scored_var": 24.361469613871687, 
+          "score": 54.173264125986925, 
+          "score_var": 584.3445335706771
+        }, 
+        "prob": 0.7143246461979875, 
+        "red": {
+          "hab_climb_points": 9.245342672200774, 
+          "hab_climb_points_var": 9.420924918161852, 
+          "prob_complete_rocket": 1.3316927449658067e-07, 
+          "prob_hab_docking": 0.03040484866671278, 
+          "rocket_pieces_scored": -0.6495655765357775, 
+          "rocket_pieces_scored_var": 6.042826366031, 
+          "score": 38.05489935424967, 
+          "score_var": 226.45196669403106
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm50": {
+        "blue": {
+          "hab_climb_points": 6.414417603876766, 
+          "hab_climb_points_var": 14.470982632484322, 
+          "prob_complete_rocket": 0.010980308427085417, 
+          "prob_hab_docking": 0.012005792617446387, 
+          "rocket_pieces_scored": 4.487367618654073, 
+          "rocket_pieces_scored_var": 10.752656268588062, 
+          "score": 40.05676617720741, 
+          "score_var": 156.69337986804663
+        }, 
+        "prob": 0.5967030782594205, 
+        "red": {
+          "hab_climb_points": 8.287304285876933, 
+          "hab_climb_points_var": 16.77784819708685, 
+          "prob_complete_rocket": 2.3178341523877322e-07, 
+          "prob_hab_docking": 0.05062632934139044, 
+          "rocket_pieces_scored": 1.0924414654266639, 
+          "rocket_pieces_scored_var": 4.682249372492007, 
+          "score": 35.09069546075703, 
+          "score_var": 254.76225463029414
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm51": {
+        "blue": {
+          "hab_climb_points": 6.572440284156914, 
+          "hab_climb_points_var": 22.903817991263402, 
+          "prob_complete_rocket": 3.1376414499906247e-06, 
+          "prob_hab_docking": 0.039123133901803886, 
+          "rocket_pieces_scored": 1.045985817946361, 
+          "rocket_pieces_scored_var": 5.881207403194799, 
+          "score": 33.04345683466681, 
+          "score_var": 375.18437538388855
+        }, 
+        "prob": 0.655643897915574, 
+        "red": {
+          "hab_climb_points": 6.47994642013015, 
+          "hab_climb_points_var": 18.389903914414305, 
+          "prob_complete_rocket": 0.0006630882955653838, 
+          "prob_hab_docking": 0.023472676754681787, 
+          "rocket_pieces_scored": 2.1298397318898337, 
+          "rocket_pieces_scored_var": 9.452998240145414, 
+          "score": 43.25924470516955, 
+          "score_var": 275.1169717834039
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm52": {
+        "blue": {
+          "hab_climb_points": 6.344399892574941, 
+          "hab_climb_points_var": 7.855144320121562, 
+          "prob_complete_rocket": 0.005363143179834218, 
+          "prob_hab_docking": 0.001006510825897422, 
+          "rocket_pieces_scored": 4.864387973571225, 
+          "rocket_pieces_scored_var": 7.821213131855537, 
+          "score": 49.85526407945523, 
+          "score_var": 199.77054229296454
+        }, 
+        "prob": 0.5542318782346882, 
+        "red": {
+          "hab_climb_points": 8.320542946469484, 
+          "hab_climb_points_var": 27.199250875895867, 
+          "prob_complete_rocket": 4.00594010185884e-08, 
+          "prob_hab_docking": 0.10014161301189728, 
+          "rocket_pieces_scored": 0.5469885283985378, 
+          "rocket_pieces_scored_var": 4.554059648506008, 
+          "score": 46.96492361553307, 
+          "score_var": 249.51287959703205
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm53": {
+        "blue": {
+          "hab_climb_points": 6.681352567067629, 
+          "hab_climb_points_var": 15.512104868780668, 
+          "prob_complete_rocket": 0.002502310635238203, 
+          "prob_hab_docking": 0.017338336906735474, 
+          "rocket_pieces_scored": 1.1237459127361988, 
+          "rocket_pieces_scored_var": 15.016043186355763, 
+          "score": 41.86081355863879, 
+          "score_var": 363.84467931050034
+        }, 
+        "prob": 0.6477532195297453, 
+        "red": {
+          "hab_climb_points": 13.104969011760893, 
+          "hab_climb_points_var": 12.95801693295364, 
+          "prob_complete_rocket": 1.0257320992579366e-08, 
+          "prob_hab_docking": 0.2992920378297338, 
+          "rocket_pieces_scored": 1.1368392546138955, 
+          "rocket_pieces_scored_var": 3.752819666473359, 
+          "score": 31.887376227460326, 
+          "score_var": 327.68659025577915
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm54": {
+        "blue": {
+          "hab_climb_points": 7.776216462591902, 
+          "hab_climb_points_var": 48.11845472389808, 
+          "prob_complete_rocket": 2.662496747518617e-07, 
+          "prob_hab_docking": 0.14884980233569123, 
+          "rocket_pieces_scored": -0.10953842038471759, 
+          "rocket_pieces_scored_var": 5.83242245898839, 
+          "score": 37.176345292947474, 
+          "score_var": 981.6325727847277
+        }, 
+        "prob": 0.5579610211606827, 
+        "red": {
+          "hab_climb_points": 6.285480657809889, 
+          "hab_climb_points_var": 12.21247641660135, 
+          "prob_complete_rocket": 5.396152191750048e-09, 
+          "prob_hab_docking": 0.006321236616415815, 
+          "rocket_pieces_scored": 2.10612280811804, 
+          "rocket_pieces_scored_var": 2.9941788719047713, 
+          "score": 32.27707214928091, 
+          "score_var": 147.48277350078848
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm55": {
+        "blue": {
+          "hab_climb_points": 9.379184724948207, 
+          "hab_climb_points_var": 22.769503821571075, 
+          "prob_complete_rocket": 0.009750526940144555, 
+          "prob_hab_docking": 0.11941060973363626, 
+          "rocket_pieces_scored": 4.035351205528039, 
+          "rocket_pieces_scored_var": 11.626729671423245, 
+          "score": 43.77477277226645, 
+          "score_var": 367.9243060094316
+        }, 
+        "prob": 0.620530092464807, 
+        "red": {
+          "hab_climb_points": 4.853684468874691, 
+          "hab_climb_points_var": 20.296327831051755, 
+          "prob_complete_rocket": 0.0016713613339454092, 
+          "prob_hab_docking": 0.012156017741489444, 
+          "rocket_pieces_scored": 2.5820290288759518, 
+          "rocket_pieces_scored_var": 10.301436578657745, 
+          "score": 35.69632838764258, 
+          "score_var": 325.0821502865973
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm56": {
+        "blue": {
+          "hab_climb_points": 10.36988541767899, 
+          "hab_climb_points_var": 22.41836473126578, 
+          "prob_complete_rocket": 4.763322619671939e-06, 
+          "prob_hab_docking": 0.16406449471807383, 
+          "rocket_pieces_scored": 0.5545141264393085, 
+          "rocket_pieces_scored_var": 6.682245146091743, 
+          "score": 30.90702210297252, 
+          "score_var": 236.09831534160577
+        }, 
+        "prob": 0.7380679760259434, 
+        "red": {
+          "hab_climb_points": 7.7827425147197555, 
+          "hab_climb_points_var": 13.32458630532405, 
+          "prob_complete_rocket": 0.0001243594975792739, 
+          "prob_hab_docking": 0.024010869111570132, 
+          "rocket_pieces_scored": 1.3398937212592292, 
+          "rocket_pieces_scored_var": 8.466673457189367, 
+          "score": 45.86728034623025, 
+          "score_var": 314.77720738193085
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm57": {
+        "blue": {
+          "hab_climb_points": 5.41716865833498, 
+          "hab_climb_points_var": 16.57405832457222, 
+          "prob_complete_rocket": 0.0006738625089200978, 
+          "prob_hab_docking": 0.009289968264669879, 
+          "rocket_pieces_scored": 3.6808418472617497, 
+          "rocket_pieces_scored_var": 6.734960716229331, 
+          "score": 45.648802364919945, 
+          "score_var": 199.404220022723
+        }, 
+        "prob": 0.9154262618762545, 
+        "red": {
+          "hab_climb_points": 16.084463557109714, 
+          "hab_climb_points_var": 35.64125418293343, 
+          "prob_complete_rocket": 0.2434952381036144, 
+          "prob_hab_docking": 0.5720718004553192, 
+          "rocket_pieces_scored": 9.054203097955977, 
+          "rocket_pieces_scored_var": 17.960016065997447, 
+          "score": 72.4560805977538, 
+          "score_var": 180.72627619729786
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm58": {
+        "blue": {
+          "hab_climb_points": 5.473285271964665, 
+          "hab_climb_points_var": 40.34909208603238, 
+          "prob_complete_rocket": 0.00017784189389802307, 
+          "prob_hab_docking": 0.0668362728071139, 
+          "rocket_pieces_scored": 1.4668249736068244, 
+          "rocket_pieces_scored_var": 8.700619292582383, 
+          "score": 42.015260510751034, 
+          "score_var": 689.7867146016449
+        }, 
+        "prob": 0.5227971449726467, 
+        "red": {
+          "hab_climb_points": 7.592876572345815, 
+          "hab_climb_points_var": 11.674789373222007, 
+          "prob_complete_rocket": 7.81284681461436e-06, 
+          "prob_hab_docking": 0.015085843532307464, 
+          "rocket_pieces_scored": 0.593370797622907, 
+          "rocket_pieces_scored_var": 6.972874880248355, 
+          "score": 44.03043979248826, 
+          "score_var": 552.4760174465912
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm59": {
+        "blue": {
+          "hab_climb_points": 7.951773491894346, 
+          "hab_climb_points_var": 44.39834131695151, 
+          "prob_complete_rocket": 2.647700261260155e-07, 
+          "prob_hab_docking": 0.14507724982216696, 
+          "rocket_pieces_scored": 0.25935417510619196, 
+          "rocket_pieces_scored_var": 5.480146515947249, 
+          "score": 44.79941143106234, 
+          "score_var": 70.2261970666755
+        }, 
+        "prob": 0.7035008692060011, 
+        "red": {
+          "hab_climb_points": 12.05507899709205, 
+          "hab_climb_points_var": 23.60398322461367, 
+          "prob_complete_rocket": 0.0015674700273415887, 
+          "prob_hab_docking": 0.27220716272815715, 
+          "rocket_pieces_scored": 2.8386716820188553, 
+          "rocket_pieces_scored_var": 9.617029239494515, 
+          "score": 55.40717348554085, 
+          "score_var": 323.64865832247375
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm6": {
+        "blue": {
+          "hab_climb_points": 8.306794777264791, 
+          "hab_climb_points_var": 20.233855235613056, 
+          "prob_complete_rocket": 0.013272052691156722, 
+          "prob_hab_docking": 0.06837911048007395, 
+          "rocket_pieces_scored": 3.273407778871543, 
+          "rocket_pieces_scored_var": 15.477637207737178, 
+          "score": 38.492814595701475, 
+          "score_var": 558.1611946593297
+        }, 
+        "prob": 0.5820168834755322, 
+        "red": {
+          "hab_climb_points": 9.842978732591767, 
+          "hab_climb_points_var": 22.35300024578551, 
+          "prob_complete_rocket": 0.01413258576043086, 
+          "prob_hab_docking": 0.13768825161873888, 
+          "rocket_pieces_scored": 2.5808651418649236, 
+          "rocket_pieces_scored_var": 18.437949450288617, 
+          "score": 46.12598627037357, 
+          "score_var": 800.8874582389602
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm60": {
+        "blue": {
+          "hab_climb_points": 7.095713124214395, 
+          "hab_climb_points_var": 17.962103731117494, 
+          "prob_complete_rocket": 0.005635303010500969, 
+          "prob_hab_docking": 0.031089119703021306, 
+          "rocket_pieces_scored": 2.8080018015998958, 
+          "rocket_pieces_scored_var": 13.15648492984068, 
+          "score": 46.74575294617108, 
+          "score_var": 207.36512178701287
+        }, 
+        "prob": 0.7381394466519454, 
+        "red": {
+          "hab_climb_points": 6.764210444939797, 
+          "hab_climb_points_var": 23.381261270605258, 
+          "prob_complete_rocket": 1.7362956850064393e-08, 
+          "prob_hab_docking": 0.044263259954106626, 
+          "rocket_pieces_scored": 0.1833316166459092, 
+          "rocket_pieces_scored_var": 4.589633809181546, 
+          "score": 33.60627094677033, 
+          "score_var": 217.28641143163776
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm61": {
+        "blue": {
+          "hab_climb_points": 18.14420223103202, 
+          "hab_climb_points_var": 45.08796457079981, 
+          "prob_complete_rocket": 0.1317743620345162, 
+          "prob_hab_docking": 0.6801980037779223, 
+          "rocket_pieces_scored": 7.031237053339894, 
+          "rocket_pieces_scored_var": 19.750573680192677, 
+          "score": 64.16664978300496, 
+          "score_var": 460.24027807787803
+        }, 
+        "prob": 0.9049326677164733, 
+        "red": {
+          "hab_climb_points": 6.716781381708129, 
+          "hab_climb_points_var": 14.353898661202052, 
+          "prob_complete_rocket": 3.3780259345306263e-06, 
+          "prob_hab_docking": 0.014396016621701535, 
+          "rocket_pieces_scored": 1.2073023216578425, 
+          "rocket_pieces_scored_var": 5.749063566021992, 
+          "score": 23.144620691834202, 
+          "score_var": 520.0885771530627
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm62": {
+        "blue": {
+          "hab_climb_points": 7.085432189294934, 
+          "hab_climb_points_var": 34.9480957778951, 
+          "prob_complete_rocket": 2.8081885483643987e-08, 
+          "prob_hab_docking": 0.09031802484735474, 
+          "rocket_pieces_scored": 0.8238644172583311, 
+          "rocket_pieces_scored_var": 4.235328699645631, 
+          "score": 41.54279355650383, 
+          "score_var": 339.8035338137785
+        }, 
+        "prob": 0.5854157859845778, 
+        "red": {
+          "hab_climb_points": 10.330575578747757, 
+          "hab_climb_points_var": 12.024249828173698, 
+          "prob_complete_rocket": 0.0003327572362037401, 
+          "prob_hab_docking": 0.08905667294546937, 
+          "rocket_pieces_scored": 0.5783086400153263, 
+          "rocket_pieces_scored_var": 11.262465294463345, 
+          "score": 47.02331289559929, 
+          "score_var": 305.3580581465801
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm63": {
+        "blue": {
+          "hab_climb_points": 6.725746271626345, 
+          "hab_climb_points_var": 14.06780144717177, 
+          "prob_complete_rocket": 0.00013324434825445763, 
+          "prob_hab_docking": 0.013690184110451975, 
+          "rocket_pieces_scored": 4.081356678876357, 
+          "rocket_pieces_scored_var": 4.71736205247839, 
+          "score": 57.81456749232289, 
+          "score_var": 40.48504387599307
+        }, 
+        "prob": 0.8964172710493867, 
+        "red": {
+          "hab_climb_points": 5.582315714336566, 
+          "hab_climb_points_var": 17.56289438334816, 
+          "prob_complete_rocket": 2.463527916662933e-06, 
+          "prob_hab_docking": 0.012312904156341675, 
+          "rocket_pieces_scored": 0.6755282496612487, 
+          "rocket_pieces_scored_var": 6.1462248728534234, 
+          "score": 34.68513995738793, 
+          "score_var": 295.7364187303085
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm64": {
+        "blue": {
+          "hab_climb_points": 5.759410504775079, 
+          "hab_climb_points_var": 47.241469526576246, 
+          "prob_complete_rocket": 0.0005325763762498159, 
+          "prob_hab_docking": 0.08940479745398777, 
+          "rocket_pieces_scored": 1.7885553487633372, 
+          "rocket_pieces_scored_var": 9.735422345833054, 
+          "score": 35.138840553575974, 
+          "score_var": 373.5590100519506
+        }, 
+        "prob": 0.5070587923875836, 
+        "red": {
+          "hab_climb_points": 4.825358171238243, 
+          "hab_climb_points_var": 12.132735186616795, 
+          "prob_complete_rocket": 1.4295246852924492e-07, 
+          "prob_hab_docking": 0.0017442398144236204, 
+          "rocket_pieces_scored": 1.909653413957356, 
+          "rocket_pieces_scored_var": 3.8650286322238436, 
+          "score": 35.53117557143188, 
+          "score_var": 118.05939636484038
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm65": {
+        "blue": {
+          "hab_climb_points": 7.175611825400366, 
+          "hab_climb_points_var": 4.288031660435763, 
+          "prob_complete_rocket": 1.3816514685460746e-05, 
+          "prob_hab_docking": 7.888249824961058e-05, 
+          "rocket_pieces_scored": 0.8396166204469538, 
+          "rocket_pieces_scored_var": 7.087381458387833, 
+          "score": 41.07821493608857, 
+          "score_var": 278.70289898503813
+        }, 
+        "prob": 0.5706487400794762, 
+        "red": {
+          "hab_climb_points": 9.739707865286071, 
+          "hab_climb_points_var": 35.52915753525278, 
+          "prob_complete_rocket": 0.013580576093741081, 
+          "prob_hab_docking": 0.18875175989161463, 
+          "rocket_pieces_scored": 5.2430956624933245, 
+          "rocket_pieces_scored_var": 9.354656450634492, 
+          "score": 46.345874302388246, 
+          "score_var": 596.821531843776
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm66": {
+        "blue": {
+          "hab_climb_points": 9.575190989946512, 
+          "hab_climb_points_var": 13.623509955980715, 
+          "prob_complete_rocket": 0.0009023165327550764, 
+          "prob_hab_docking": 0.07081635282316334, 
+          "rocket_pieces_scored": 4.411328432026831, 
+          "rocket_pieces_scored_var": 5.913523920982527, 
+          "score": 54.51816510827431, 
+          "score_var": 373.0908299818064
+        }, 
+        "prob": 0.8247674812848983, 
+        "red": {
+          "hab_climb_points": 10.231890771428617, 
+          "hab_climb_points_var": 19.6593447366853, 
+          "prob_complete_rocket": 2.2059622351022767e-08, 
+          "prob_hab_docking": 0.14110247051987057, 
+          "rocket_pieces_scored": 0.22476628579831853, 
+          "rocket_pieces_scored_var": 4.62813747221743, 
+          "score": 31.792198819706062, 
+          "score_var": 219.34523348122391
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm67": {
+        "blue": {
+          "hab_climb_points": 5.534857433110053, 
+          "hab_climb_points_var": 19.441638105296448, 
+          "prob_complete_rocket": 0.00033483828702451923, 
+          "prob_hab_docking": 0.015910678156337843, 
+          "rocket_pieces_scored": 1.2533511899903487, 
+          "rocket_pieces_scored_var": 9.980530467290226, 
+          "score": 30.558705912771067, 
+          "score_var": 462.16940469268764
+        }, 
+        "prob": 0.7775717326598532, 
+        "red": {
+          "hab_climb_points": 7.214011477877115, 
+          "hab_climb_points_var": 13.252015503903706, 
+          "prob_complete_rocket": 6.661338147750939e-16, 
+          "prob_hab_docking": 0.0162254128118835, 
+          "rocket_pieces_scored": 2.1984092330452847, 
+          "rocket_pieces_scored_var": 1.5081057117178376, 
+          "score": 49.54401680180942, 
+          "score_var": 155.31825246637038
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm68": {
+        "blue": {
+          "hab_climb_points": 7.810082836613445, 
+          "hab_climb_points_var": 22.993207494033896, 
+          "prob_complete_rocket": 1.5098221923692812e-05, 
+          "prob_hab_docking": 0.06688199244775173, 
+          "rocket_pieces_scored": 1.0152905062907436, 
+          "rocket_pieces_scored_var": 6.932546030506797, 
+          "score": 38.86383533066156, 
+          "score_var": 332.79448323594534
+        }, 
+        "prob": 0.5548470840299353, 
+        "red": {
+          "hab_climb_points": 9.19170926940497, 
+          "hab_climb_points_var": 17.456082836874714, 
+          "prob_complete_rocket": 8.450140949189944e-07, 
+          "prob_hab_docking": 0.08223521111674081, 
+          "rocket_pieces_scored": -0.7529972867855818, 
+          "rocket_pieces_scored_var": 7.09635318856704, 
+          "score": 41.73651432320602, 
+          "score_var": 101.05305430498265
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm69": {
+        "blue": {
+          "hab_climb_points": 2.6541997022601427, 
+          "hab_climb_points_var": 17.90673943125427, 
+          "prob_complete_rocket": 0.004030975352605215, 
+          "prob_hab_docking": 0.0017642434584441702, 
+          "rocket_pieces_scored": 2.871413428663826, 
+          "rocket_pieces_scored_var": 11.871099839079587, 
+          "score": 26.274658610272112, 
+          "score_var": 297.8888632524956
+        }, 
+        "prob": 0.8412308843485319, 
+        "red": {
+          "hab_climb_points": 14.420265144057295, 
+          "hab_climb_points_var": 27.059558546635294, 
+          "prob_complete_rocket": 7.441111681272261e-07, 
+          "prob_hab_docking": 0.45563087692939175, 
+          "rocket_pieces_scored": 1.7252851283653716, 
+          "rocket_pieces_scored_var": 4.5576607462878, 
+          "score": 51.97154426327559, 
+          "score_var": 363.0628111521638
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm7": {
+        "blue": {
+          "hab_climb_points": 12.697938109313279, 
+          "hab_climb_points_var": 46.85241904496122, 
+          "prob_complete_rocket": 0.30388454069579296, 
+          "prob_hab_docking": 0.3683152835944471, 
+          "rocket_pieces_scored": 8.701659709654372, 
+          "rocket_pieces_scored_var": 41.29668238971809, 
+          "score": 57.27855413743137, 
+          "score_var": 927.2054898416498
+        }, 
+        "prob": 0.6885968532300262, 
+        "red": {
+          "hab_climb_points": 8.727407666662517, 
+          "hab_climb_points_var": 24.37625890132447, 
+          "prob_complete_rocket": 0.010880688774088876, 
+          "prob_hab_docking": 0.10195908865480086, 
+          "rocket_pieces_scored": 0.7044602671329147, 
+          "rocket_pieces_scored_var": 24.234557611788375, 
+          "score": 35.81708657998861, 
+          "score_var": 976.5264158941757
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm70": {
+        "blue": {
+          "hab_climb_points": 5.560959804680776, 
+          "hab_climb_points_var": 12.209130837097021, 
+          "prob_complete_rocket": 4.596142355595134e-10, 
+          "prob_hab_docking": 0.0034526337922136108, 
+          "rocket_pieces_scored": 0.11374106406486297, 
+          "rocket_pieces_scored_var": 3.7686409591775143, 
+          "score": 28.85639485044387, 
+          "score_var": 212.64767709349866
+        }, 
+        "prob": 0.8873722548680136, 
+        "red": {
+          "hab_climb_points": 13.182542047245633, 
+          "hab_climb_points_var": 17.19279973707284, 
+          "prob_complete_rocket": 0.016982481009183426, 
+          "prob_hab_docking": 0.33057724445383896, 
+          "rocket_pieces_scored": 5.963898397260457, 
+          "rocket_pieces_scored_var": 8.102922509406248, 
+          "score": 57.23872787108523, 
+          "score_var": 335.1370689974548
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm71": {
+        "blue": {
+          "hab_climb_points": 7.7601638732989935, 
+          "hab_climb_points_var": 8.934063557520977, 
+          "prob_complete_rocket": 1.291751039467215e-09, 
+          "prob_hab_docking": 0.007714113406964929, 
+          "rocket_pieces_scored": -0.2711293088375387, 
+          "rocket_pieces_scored_var": 4.244701220464966, 
+          "score": 46.5825181590686, 
+          "score_var": 448.8882998050168
+        }, 
+        "prob": 0.5614057505428419, 
+        "red": {
+          "hab_climb_points": 5.215810858437321, 
+          "hab_climb_points_var": 16.138752904115012, 
+          "prob_complete_rocket": 3.0259978850866176e-05, 
+          "prob_hab_docking": 0.007435414109585925, 
+          "rocket_pieces_scored": 2.065760435476986, 
+          "rocket_pieces_scored_var": 6.134975359253204, 
+          "score": 42.27275826209016, 
+          "score_var": 328.89137411842955
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm72": {
+        "blue": {
+          "hab_climb_points": 5.623528486021673, 
+          "hab_climb_points_var": 12.693542575500636, 
+          "prob_complete_rocket": 1.1758058148458872e-05, 
+          "prob_hab_docking": 0.004247060817699211, 
+          "rocket_pieces_scored": 1.677036711049751, 
+          "rocket_pieces_scored_var": 5.959608764739487, 
+          "score": 42.33633480164873, 
+          "score_var": 292.76501679688175
+        }, 
+        "prob": 0.5282329393908023, 
+        "red": {
+          "hab_climb_points": 10.278248668585123, 
+          "hab_climb_points_var": 19.672046250984323, 
+          "prob_complete_rocket": 1.425866401028042e-05, 
+          "prob_hab_docking": 0.1435329949189601, 
+          "rocket_pieces_scored": 0.9399858245608806, 
+          "rocket_pieces_scored_var": 6.984279798568563, 
+          "score": 43.94820437224551, 
+          "score_var": 225.13000269127673
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm73": {
+        "blue": {
+          "hab_climb_points": 7.131153899383635, 
+          "hab_climb_points_var": 8.790519186122054, 
+          "prob_complete_rocket": 0.00011550141249250245, 
+          "prob_hab_docking": 0.003976984639273873, 
+          "rocket_pieces_scored": 2.700105306335186, 
+          "rocket_pieces_scored_var": 6.377966748276663, 
+          "score": 42.51119824835604, 
+          "score_var": 132.18238410567693
+        }, 
+        "prob": 0.5040796355986121, 
+        "red": {
+          "hab_climb_points": 10.334335777959446, 
+          "hab_climb_points_var": 19.951429142413726, 
+          "prob_complete_rocket": 3.038990068260361e-06, 
+          "prob_hab_docking": 0.1481170331161088, 
+          "rocket_pieces_scored": 1.6588973292786955, 
+          "rocket_pieces_scored_var": 5.225815841973898, 
+          "score": 42.70569232879478, 
+          "score_var": 229.53969860376858
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm74": {
+        "blue": {
+          "hab_climb_points": 4.6043291553447965, 
+          "hab_climb_points_var": 19.91583293385314, 
+          "prob_complete_rocket": 6.284568157877146e-06, 
+          "prob_hab_docking": 0.009917635084101484, 
+          "rocket_pieces_scored": 0.9634855112186562, 
+          "rocket_pieces_scored_var": 6.385620197698827, 
+          "score": 20.310739359071803, 
+          "score_var": 489.257005054105
+        }, 
+        "prob": 0.8322801494119989, 
+        "red": {
+          "hab_climb_points": 10.555756679490592, 
+          "hab_climb_points_var": 29.820740775805746, 
+          "prob_complete_rocket": 1.754202682968664e-05, 
+          "prob_hab_docking": 0.2078685321965169, 
+          "rocket_pieces_scored": 0.8131956841674317, 
+          "rocket_pieces_scored_var": 7.309690944457189, 
+          "score": 45.00071795969822, 
+          "score_var": 167.78791874216836
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm75": {
+        "blue": {
+          "hab_climb_points": 7.855550349300758, 
+          "hab_climb_points_var": 45.25239176482577, 
+          "prob_complete_rocket": 2.1525086157936357e-09, 
+          "prob_hab_docking": 0.14410480196184405, 
+          "rocket_pieces_scored": 0.4728355792426246, 
+          "rocket_pieces_scored_var": 3.8536215836538696, 
+          "score": 38.476188913917646, 
+          "score_var": 138.47066359448192
+        }, 
+        "prob": 0.5027721064238134, 
+        "red": {
+          "hab_climb_points": 4.480517098507363, 
+          "hab_climb_points_var": 40.65334487941078, 
+          "prob_complete_rocket": 0.0015211348760233445, 
+          "prob_hab_docking": 0.04948611456493013, 
+          "rocket_pieces_scored": 1.776103179025644, 
+          "rocket_pieces_scored_var": 11.902612706209986, 
+          "score": 38.26993051676551, 
+          "score_var": 742.6119274854633
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm76": {
+        "blue": {
+          "hab_climb_points": 9.504996865312142, 
+          "hab_climb_points_var": 17.705502212707167, 
+          "prob_complete_rocket": 7.711847826996632e-10, 
+          "prob_hab_docking": 0.09579129023858957, 
+          "rocket_pieces_scored": 2.283527534370667, 
+          "rocket_pieces_scored_var": 2.5879855240978267, 
+          "score": 47.52186838438797, 
+          "score_var": 169.65203542728057
+        }, 
+        "prob": 0.6881272447590835, 
+        "red": {
+          "hab_climb_points": 11.644893605108715, 
+          "hab_climb_points_var": 42.049162262090576, 
+          "prob_complete_rocket": 0.10187651677062615, 
+          "prob_hab_docking": 0.302437981591124, 
+          "rocket_pieces_scored": 6.8142086846679195, 
+          "rocket_pieces_scored_var": 16.64891026688352, 
+          "score": 57.559109401648996, 
+          "score_var": 249.01043275260753
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm77": {
+        "blue": {
+          "hab_climb_points": 9.372030222032347, 
+          "hab_climb_points_var": 3.3998613854791055, 
+          "prob_complete_rocket": 1.2037474581672036e-05, 
+          "prob_hab_docking": 0.0011356363308915318, 
+          "rocket_pieces_scored": 1.0092756567038152, 
+          "rocket_pieces_scored_var": 6.772491569495734, 
+          "score": 39.781207697627266, 
+          "score_var": 113.02032130591554
+        }, 
+        "prob": 0.8381488693461834, 
+        "red": {
+          "hab_climb_points": 6.734626708161544, 
+          "hab_climb_points_var": 16.484067815702723, 
+          "prob_complete_rocket": 0.00012425078845412774, 
+          "prob_hab_docking": 0.02088635935174321, 
+          "rocket_pieces_scored": 2.3268913992606004, 
+          "rocket_pieces_scored_var": 6.970577950408089, 
+          "score": 57.5984336560534, 
+          "score_var": 212.93111620040415
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019nyny_qm8": {
+        "blue": {
+          "hab_climb_points": 8.768021521288022, 
+          "hab_climb_points_var": 18.73929456516789, 
+          "prob_complete_rocket": 0.006235662226376171, 
+          "prob_hab_docking": 0.07498678665506475, 
+          "rocket_pieces_scored": 1.0378864318267675, 
+          "rocket_pieces_scored_var": 19.249660373157244, 
+          "score": 42.87238154229556, 
+          "score_var": 833.8685408328797
+        }, 
+        "prob": 0.5741523039698045, 
+        "red": {
+          "hab_climb_points": 9.003399594646215, 
+          "hab_climb_points_var": 19.96668201870994, 
+          "prob_complete_rocket": 0.0001149713997190549, 
+          "prob_hab_docking": 0.08979817659646616, 
+          "rocket_pieces_scored": 0.41852239381173106, 
+          "rocket_pieces_scored_var": 9.88502416018149, 
+          "score": 35.31095195228383, 
+          "score_var": 801.9327767489798
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019nyny_qm9": {
+        "blue": {
+          "hab_climb_points": 6.852756910458564, 
+          "hab_climb_points_var": 37.083759350680886, 
+          "prob_complete_rocket": 0.003965654227168214, 
+          "prob_hab_docking": 0.09046695730685039, 
+          "rocket_pieces_scored": 1.3534558427669054, 
+          "rocket_pieces_scored_var": 16.080323263095035, 
+          "score": 37.8015136339423, 
+          "score_var": 745.6341786504987
+        }, 
+        "prob": 0.6424493781918825, 
+        "red": {
+          "hab_climb_points": 14.689058861508677, 
+          "hab_climb_points_var": 21.205272692975985, 
+          "prob_complete_rocket": 0.0664949278126441, 
+          "prob_hab_docking": 0.47308239625329473, 
+          "rocket_pieces_scored": 4.540195231603777, 
+          "rocket_pieces_scored_var": 24.653288432760373, 
+          "score": 52.17565976185969, 
+          "score_var": 805.1308008339186
+        }, 
+        "winning_alliance": "red"
+      }
+    }
+  }, 
+  "ranking_prediction_stats": {
+    "last_played_match": "2019nyny_qm77"
+  }, 
+  "ranking_predictions": [
+    [
+      "frc1796", 
+      [
+        1.0, 
+        1, 
+        1.0, 
+        1, 
+        23.0, 
+        23, 
+        23
+      ]
+    ], 
+    [
+      "frc4122", 
+      [
+        2.0, 
+        2, 
+        2.0, 
+        2, 
+        20.0, 
+        20, 
+        20
+      ]
+    ], 
+    [
+      "frc7522", 
+      [
+        3.0, 
+        3, 
+        3.0, 
+        3, 
+        19.0, 
+        19, 
+        19
+      ]
+    ], 
+    [
+      "frc1880", 
+      [
+        4.0, 
+        4, 
+        4.0, 
+        4, 
+        18.0, 
+        18, 
+        18
+      ]
+    ], 
+    [
+      "frc6401", 
+      [
+        5.0, 
+        5, 
+        5.0, 
+        5, 
+        18.0, 
+        18, 
+        18
+      ]
+    ], 
+    [
+      "frc694", 
+      [
+        6.0, 
+        6, 
+        6.0, 
+        6, 
+        17.0, 
+        17, 
+        17
+      ]
+    ], 
+    [
+      "frc354", 
+      [
+        7.0, 
+        7, 
+        7.0, 
+        7, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc7004", 
+      [
+        8.0, 
+        8, 
+        8.0, 
+        8, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc2579", 
+      [
+        9.0, 
+        9, 
+        9.0, 
+        9, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc1660", 
+      [
+        10.0, 
+        10, 
+        10.0, 
+        10, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc333", 
+      [
+        11.0, 
+        11, 
+        11.0, 
+        11, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc5781", 
+      [
+        12.0, 
+        12, 
+        12.0, 
+        12, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc1155", 
+      [
+        13.0, 
+        13, 
+        13.0, 
+        13, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc1635", 
+      [
+        14.0, 
+        14, 
+        14.0, 
+        14, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc4571", 
+      [
+        15.0, 
+        15, 
+        15.0, 
+        15, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc2869", 
+      [
+        16.0, 
+        16, 
+        16.0, 
+        16, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc5298", 
+      [
+        17.0, 
+        17, 
+        17.0, 
+        17, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc5202", 
+      [
+        18.0, 
+        18, 
+        18.0, 
+        18, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc7036", 
+      [
+        19.0, 
+        19, 
+        19.0, 
+        19, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc7458", 
+      [
+        20.0, 
+        20, 
+        20.0, 
+        20, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc4640", 
+      [
+        21.0, 
+        21, 
+        21.0, 
+        21, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc5421", 
+      [
+        22.0, 
+        22, 
+        22.0, 
+        22, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc1600", 
+      [
+        23.0, 
+        23, 
+        23.0, 
+        23, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc395", 
+      [
+        24.0, 
+        24, 
+        24.0, 
+        24, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc5806", 
+      [
+        25.0, 
+        25, 
+        25.0, 
+        25, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc4299", 
+      [
+        26.0, 
+        26, 
+        26.0, 
+        26, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc640", 
+      [
+        27.0, 
+        27, 
+        27.0, 
+        27, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc4383", 
+      [
+        28.0, 
+        28, 
+        28.0, 
+        28, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc4263", 
+      [
+        29.0, 
+        29, 
+        29.0, 
+        29, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc2344", 
+      [
+        30.0, 
+        30, 
+        30.0, 
+        30, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc7050", 
+      [
+        31.0, 
+        31, 
+        31.0, 
+        31, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc334", 
+      [
+        32.0, 
+        32, 
+        32.0, 
+        32, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc6195", 
+      [
+        33.0, 
+        33, 
+        33.0, 
+        33, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc7668", 
+      [
+        34.0, 
+        34, 
+        34.0, 
+        34, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc743", 
+      [
+        35.0, 
+        35, 
+        35.0, 
+        35, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc5599", 
+      [
+        36.0, 
+        36, 
+        36.0, 
+        36, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc2265", 
+      [
+        37.0, 
+        37, 
+        37.0, 
+        37, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc1230", 
+      [
+        38.0, 
+        38, 
+        38.0, 
+        38, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc6636", 
+      [
+        39.0, 
+        39, 
+        39.0, 
+        39, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc7272", 
+      [
+        40.0, 
+        40, 
+        40.0, 
+        40, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc335", 
+      [
+        41.0, 
+        41, 
+        41.0, 
+        41, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc2895", 
+      [
+        42.0, 
+        42, 
+        42.0, 
+        42, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc4528", 
+      [
+        43.0, 
+        43, 
+        43.0, 
+        43, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc6590", 
+      [
+        44.0, 
+        44, 
+        44.0, 
+        44, 
+        5.0, 
+        5, 
+        5
+      ]
+    ], 
+    [
+      "frc4773", 
+      [
+        45.0, 
+        45, 
+        45.0, 
+        45, 
+        5.0, 
+        5, 
+        5
+      ]
+    ], 
+    [
+      "frc3419", 
+      [
+        46.0, 
+        46, 
+        46.0, 
+        46, 
+        4.0, 
+        4, 
+        4
+      ]
+    ], 
+    [
+      "frc3760", 
+      [
+        47.0, 
+        47, 
+        47.0, 
+        47, 
+        4.0, 
+        4, 
+        4
+      ]
+    ], 
+    [
+      "frc3004", 
+      [
+        48.0, 
+        48, 
+        48.0, 
+        48, 
+        4.0, 
+        4, 
+        4
+      ]
+    ], 
+    [
+      "frc3204", 
+      [
+        49.0, 
+        49, 
+        49.0, 
+        49, 
+        4.0, 
+        4, 
+        4
+      ]
+    ], 
+    [
+      "frc6873", 
+      [
+        50.0, 
+        50, 
+        50.0, 
+        50, 
+        2.0, 
+        2, 
+        2
+      ]
+    ], 
+    [
+      "frc6435", 
+      [
+        51.0, 
+        51, 
+        51.0, 
+        51, 
+        2.0, 
+        2, 
+        2
+      ]
+    ]
+  ], 
+  "stat_mean_vars": {
+    "playoff": {
+      "hab_climb_points": {
+        "mean": {
+          "frc1155": 1.4049631708343093, 
+          "frc1230": 2.404968891174061, 
+          "frc1600": 3.9515117185538986, 
+          "frc1635": 7.098290342064419, 
+          "frc1660": 1.1028511859310395, 
+          "frc1796": 8.682751446925723, 
+          "frc1880": 6.9803743886875935, 
+          "frc2265": 3.2628465937742206, 
+          "frc2344": 4.4183083559094145, 
+          "frc2579": 1.2315381340401994, 
+          "frc2869": 2.577690524075311, 
+          "frc2895": 1.1349393447132836, 
+          "frc3004": 0.6517140685975981, 
+          "frc3204": 1.168438837887655, 
+          "frc333": 2.74653599423477, 
+          "frc334": 1.6762138161194777, 
+          "frc335": 2.1972718096799846, 
+          "frc3419": 1.0961814986969305, 
+          "frc354": 3.817058137253726, 
+          "frc3760": -0.1092709876777018, 
+          "frc395": 2.67994888218288, 
+          "frc4122": 5.762294149009845, 
+          "frc4263": 2.5183597889289984, 
+          "frc4299": 2.2526602774697726, 
+          "frc4383": 1.9252711643775537, 
+          "frc4528": 3.1080482788973827, 
+          "frc4571": 3.1264023227020217, 
+          "frc4640": 2.0934532157486725, 
+          "frc4773": 1.783567625185087, 
+          "frc5202": 1.905502565118958, 
+          "frc5298": 1.9690966831289374, 
+          "frc5421": 3.0705954292432027, 
+          "frc5599": 3.4268825585715157, 
+          "frc5781": 2.9937099054725445, 
+          "frc5806": 1.3546028170281064, 
+          "frc6195": 2.8499546134812843, 
+          "frc640": 2.295714049733725, 
+          "frc6401": 5.440786776599451, 
+          "frc6435": 1.054304200405002, 
+          "frc6590": 1.5934148592969142, 
+          "frc6636": 1.651745370483637, 
+          "frc6873": 0.7792324222060247, 
+          "frc694": 7.46602180665493, 
+          "frc7004": 3.6548206284040092, 
+          "frc7036": 2.4964895033460452, 
+          "frc7050": 4.824715435211864, 
+          "frc7272": 1.3390256580676425, 
+          "frc743": 2.2442033721543275, 
+          "frc7458": 4.426838187127781, 
+          "frc7522": 3.0872482466071944, 
+          "frc7668": 2.4133734278938306
+        }, 
+        "var": {
+          "frc1155": 3.211483404476875, 
+          "frc1230": 7.407888254183335, 
+          "frc1600": 3.474139656529436, 
+          "frc1635": 24.820173034425707, 
+          "frc1660": 6.184565239642868, 
+          "frc1796": 10.241012338371954, 
+          "frc1880": 0.6371748517434825, 
+          "frc2265": 1.0842542826295092, 
+          "frc2344": 3.101130687607585, 
+          "frc2579": 32.728936221499154, 
+          "frc2869": 2.7976406229151034, 
+          "frc2895": 2.6129365288934765, 
+          "frc3004": 9.077228622273797, 
+          "frc3204": 8.252024762122431, 
+          "frc333": 8.865117373437425, 
+          "frc334": 1.1714534972610202, 
+          "frc335": 6.973237751077831, 
+          "frc3419": 3.929618263429582, 
+          "frc354": 4.3678430857226385, 
+          "frc3760": 3.834201320924905, 
+          "frc395": 6.5761078570645735, 
+          "frc4122": 12.862343708943692, 
+          "frc4263": 14.953452494647248, 
+          "frc4299": 4.508478000248119, 
+          "frc4383": 6.4160503658294745, 
+          "frc4528": 6.932123082569442, 
+          "frc4571": 2.063452142880208, 
+          "frc4640": 2.33850209418242, 
+          "frc4773": 2.5506408497294766, 
+          "frc5202": 0.6541055596798527, 
+          "frc5298": 2.290162354286637, 
+          "frc5421": 13.028757099811061, 
+          "frc5599": 3.1632567169214054, 
+          "frc5781": 23.944361566470516, 
+          "frc5806": 8.09056009762582, 
+          "frc6195": 3.100579589821689, 
+          "frc640": 0.8374059818578942, 
+          "frc6401": 2.0413864761701666, 
+          "frc6435": 11.131047774801058, 
+          "frc6590": 6.202363594389014, 
+          "frc6636": 2.6091744059564577, 
+          "frc6873": 5.539551754777663, 
+          "frc694": 3.732085487181133, 
+          "frc7004": 11.611551259818944, 
+          "frc7036": 19.915862415938584, 
+          "frc7050": 11.654457335261235, 
+          "frc7272": 1.1644379368950988, 
+          "frc743": 3.027844864709879, 
+          "frc7458": 21.958047000799446, 
+          "frc7522": 0.4452451254230382, 
+          "frc7668": 1.5084679967981722
+        }
+      }, 
+      "rocket_pieces_scored": {
+        "mean": {
+          "frc1155": 1.5866177590284136, 
+          "frc1230": 0.40480352126985986, 
+          "frc1600": -0.2770466537747877, 
+          "frc1635": 0.39300095290756265, 
+          "frc1660": 1.3084019332154135, 
+          "frc1796": 6.912121795494033, 
+          "frc1880": -0.497968342466846, 
+          "frc2265": 0.38645882055318426, 
+          "frc2344": 1.147193701898767, 
+          "frc2579": 0.6616767673270294, 
+          "frc2869": 0.051857978113686753, 
+          "frc2895": 1.1037400222768632, 
+          "frc3004": -0.0054900762816013325, 
+          "frc3204": 0.9422783164115169, 
+          "frc333": 1.9571442265991807, 
+          "frc334": 1.160978203253525, 
+          "frc335": -0.10035394473189797, 
+          "frc3419": 1.0992026421343186, 
+          "frc354": 2.939993242301728, 
+          "frc3760": -0.17976233544150008, 
+          "frc395": 0.1015479941948222, 
+          "frc4122": 0.009145239037374756, 
+          "frc4263": 0.21408046461639718, 
+          "frc4299": 0.008378639795405287, 
+          "frc4383": 0.0655729463198702, 
+          "frc4528": 0.42758047208845323, 
+          "frc4571": 1.4305703451758316, 
+          "frc4640": 0.43078139596753473, 
+          "frc4773": -0.03756006076631703, 
+          "frc5202": -0.2581145134092673, 
+          "frc5298": -0.645993356600073, 
+          "frc5421": 1.0544234600901423, 
+          "frc5599": 0.432807288919403, 
+          "frc5781": 1.7681566650526417, 
+          "frc5806": -0.23091215980267868, 
+          "frc6195": 0.0020975915384134243, 
+          "frc640": 0.48588958067117094, 
+          "frc6401": 0.08295856335194715, 
+          "frc6435": 0.04288673627113737, 
+          "frc6590": 0.38144075958747814, 
+          "frc6636": 0.2571517563627724, 
+          "frc6873": -0.1514992587591102, 
+          "frc694": 3.427370827310929, 
+          "frc7004": 0.4413262820869125, 
+          "frc7036": 1.0227346665392363, 
+          "frc7050": 0.5919573340993689, 
+          "frc7272": 0.2567786013558867, 
+          "frc743": 0.07534936494696876, 
+          "frc7458": -0.007853152169644162, 
+          "frc7522": 2.210226520152402, 
+          "frc7668": 0.8213995907091305
+        }, 
+        "var": {
+          "frc1155": 1.141035350837025, 
+          "frc1230": 2.2304254512587605, 
+          "frc1600": 0.100200890909552, 
+          "frc1635": 2.735213551264463, 
+          "frc1660": 0.4895008612587094, 
+          "frc1796": 10.046274443075632, 
+          "frc1880": 0.026651431756178887, 
+          "frc2265": 1.2557306458793984, 
+          "frc2344": 2.992825644092079, 
+          "frc2579": 3.0284577462079736, 
+          "frc2869": 2.1742042940788853, 
+          "frc2895": 6.337659784716295, 
+          "frc3004": 3.028451104603468, 
+          "frc3204": 3.2575242948251866, 
+          "frc333": 2.7275932465959873, 
+          "frc334": 5.541061117546969, 
+          "frc335": 2.487737627502031, 
+          "frc3419": 1.3146153506259326, 
+          "frc354": 4.008293303373986, 
+          "frc3760": 0.5046791721068871, 
+          "frc395": 1.7384830733737089, 
+          "frc4122": 2.915020236389504, 
+          "frc4263": 0.7070695276871485, 
+          "frc4299": 1.1585957756991323, 
+          "frc4383": 1.6907854412341752, 
+          "frc4528": 1.6438329965601384, 
+          "frc4571": 4.031942105398711, 
+          "frc4640": 1.5168246307381303, 
+          "frc4773": 0.29128928825704004, 
+          "frc5202": 0.4105156770765095, 
+          "frc5298": 0.019273642001332567, 
+          "frc5421": 3.643036719208201, 
+          "frc5599": 1.1996049064958358, 
+          "frc5781": 2.61335603424476, 
+          "frc5806": 0.5017655214615747, 
+          "frc6195": 1.4843388793964558, 
+          "frc640": 1.3994144691928554, 
+          "frc6401": 1.2502618613517662, 
+          "frc6435": 2.3820790415731263, 
+          "frc6590": 3.0757756161048055, 
+          "frc6636": 1.1846314609041648, 
+          "frc6873": 1.2627763409197172, 
+          "frc694": 1.1517441052402935, 
+          "frc7004": 0.05282552739912089, 
+          "frc7036": 2.6612659670280148, 
+          "frc7050": 2.514351243301066, 
+          "frc7272": 2.2835098030704506, 
+          "frc743": 2.1218424723366853, 
+          "frc7458": 0.5650241901812189, 
+          "frc7522": 1.9542678759860062, 
+          "frc7668": 1.280870280411543
+        }
+      }, 
+      "score": {
+        "mean": {
+          "frc1155": 17.510886035720016, 
+          "frc1230": 14.380123410024517, 
+          "frc1600": 16.315424432074334, 
+          "frc1635": 16.03689481187409, 
+          "frc1660": 11.659365289069779, 
+          "frc1796": 36.85779886787051, 
+          "frc1880": 25.27557529795386, 
+          "frc2265": 17.136631276596038, 
+          "frc2344": 12.969081410020362, 
+          "frc2579": 14.229174440694365, 
+          "frc2869": 14.071849747148105, 
+          "frc2895": 8.930195915369346, 
+          "frc3004": 7.790766949088182, 
+          "frc3204": 7.306796492062189, 
+          "frc333": 22.63401250325274, 
+          "frc334": 13.674346715459379, 
+          "frc335": 12.877077515063224, 
+          "frc3419": 12.79509375250268, 
+          "frc354": 21.651028031622467, 
+          "frc3760": 8.41393853623881, 
+          "frc395": 15.010675928119396, 
+          "frc4122": 22.38946280524062, 
+          "frc4263": 11.147267790692407, 
+          "frc4299": 11.146253660883211, 
+          "frc4383": 14.782387918216664, 
+          "frc4528": 8.498463439760991, 
+          "frc4571": 21.53919237000249, 
+          "frc4640": 14.720926743831775, 
+          "frc4773": 2.2749426505191273, 
+          "frc5202": 10.047046320762792, 
+          "frc5298": 15.1947565228764, 
+          "frc5421": 15.295599169686463, 
+          "frc5599": 13.248616691420592, 
+          "frc5781": 15.766060636513949, 
+          "frc5806": 12.491755069184876, 
+          "frc6195": 9.931307918521886, 
+          "frc640": 11.12400805880387, 
+          "frc6401": 15.366354463053494, 
+          "frc6435": 3.4257115963006446, 
+          "frc6590": 7.664394967328935, 
+          "frc6636": 15.072715545232409, 
+          "frc6873": 8.48048466759246, 
+          "frc694": 28.58188239778404, 
+          "frc7004": 20.487193619037843, 
+          "frc7036": 14.884699394783503, 
+          "frc7050": 14.206708971750691, 
+          "frc7272": 12.3011284129872, 
+          "frc743": 11.462043950067692, 
+          "frc7458": 15.076410636666688, 
+          "frc7522": 22.761213335519226, 
+          "frc7668": 8.781430282125811
+        }, 
+        "var": {
+          "frc1155": 88.4122669684576, 
+          "frc1230": 47.88188191680927, 
+          "frc1600": 279.93368123550533, 
+          "frc1635": 30.621236159787184, 
+          "frc1660": 132.34523200686306, 
+          "frc1796": 48.130168345401245, 
+          "frc1880": 28.48677495204002, 
+          "frc2265": 40.07345578158176, 
+          "frc2344": 186.78747361065035, 
+          "frc2579": 48.444891468581766, 
+          "frc2869": 51.904897417226024, 
+          "frc2895": 107.13285824003562, 
+          "frc3004": 144.65322817508354, 
+          "frc3204": 201.18374576465231, 
+          "frc333": 5.369789214540563, 
+          "frc334": 52.85928900242966, 
+          "frc335": 83.45033158091539, 
+          "frc3419": 19.68283216556496, 
+          "frc354": 76.19096602387113, 
+          "frc3760": 67.9057909501732, 
+          "frc395": 99.56913447370147, 
+          "frc4122": 18.433050896131412, 
+          "frc4263": 98.3550035916713, 
+          "frc4299": 66.7629990341372, 
+          "frc4383": 58.58456328849173, 
+          "frc4528": 84.28125344285434, 
+          "frc4571": 26.199899282108266, 
+          "frc4640": 87.31988118842072, 
+          "frc4773": 96.40120331153508, 
+          "frc5202": 51.36987151140033, 
+          "frc5298": 60.581801431936256, 
+          "frc5421": 152.73634213287906, 
+          "frc5599": 48.957614627195916, 
+          "frc5781": 240.88754252208386, 
+          "frc5806": 24.78875485813665, 
+          "frc6195": 38.98322706324256, 
+          "frc640": 70.31746796849981, 
+          "frc6401": 37.513379049778024, 
+          "frc6435": 292.52743481638487, 
+          "frc6590": 179.3122088788144, 
+          "frc6636": 4.262847127012992, 
+          "frc6873": 42.41510931577643, 
+          "frc694": 58.37082099441022, 
+          "frc7004": 36.52172825927049, 
+          "frc7036": 452.6532383854333, 
+          "frc7050": 128.18106379530659, 
+          "frc7272": 109.72425535651375, 
+          "frc743": 24.117550105715523, 
+          "frc7458": 123.7373984678129, 
+          "frc7522": 163.66273555197256, 
+          "frc7668": 47.59571754195155
+        }
+      }
+    }, 
+    "qual": {
+      "hab_climb_points": {
+        "mean": {
+          "frc1155": 1.5848458153439497, 
+          "frc1230": 2.5205638488960544, 
+          "frc1600": 4.057342252939596, 
+          "frc1635": 6.53324001456065, 
+          "frc1660": 0.8005181837395916, 
+          "frc1796": 8.480848394338787, 
+          "frc1880": 6.788390357767639, 
+          "frc2265": 3.091393096505318, 
+          "frc2344": 4.34782264120647, 
+          "frc2579": 1.1767247848986793, 
+          "frc2869": 2.765077348268703, 
+          "frc2895": 1.1623790839629453, 
+          "frc3004": 0.6749145506552408, 
+          "frc3204": 1.2675213502785851, 
+          "frc333": 2.6487548431750483, 
+          "frc334": 1.5296183507367744, 
+          "frc335": 2.260303289221902, 
+          "frc3419": 0.7630411314492863, 
+          "frc354": 3.407185475292596, 
+          "frc3760": -0.016464287633030483, 
+          "frc395": 2.527530961634992, 
+          "frc4122": 5.808731467609927, 
+          "frc4263": 2.5793868264612954, 
+          "frc4299": 2.318731559857173, 
+          "frc4383": 2.503333111375815, 
+          "frc4528": 3.1607162907890576, 
+          "frc4571": 3.0732488262514606, 
+          "frc4640": 2.2212939686878084, 
+          "frc4773": 1.7552232814931004, 
+          "frc5202": 1.9247099265879688, 
+          "frc5298": 2.0765320665661333, 
+          "frc5421": 3.0775680086535706, 
+          "frc5599": 3.5028635841708784, 
+          "frc5781": 2.5116132304015393, 
+          "frc5806": 1.3144487138246923, 
+          "frc6195": 2.6672861764434925, 
+          "frc640": 2.230313025095072, 
+          "frc6401": 6.079405057809866, 
+          "frc6435": 1.0566145446710884, 
+          "frc6590": 1.5995604904977019, 
+          "frc6636": 1.6497331030153561, 
+          "frc6873": 0.6571670005919751, 
+          "frc694": 7.275370569919012, 
+          "frc7004": 4.328344623197687, 
+          "frc7036": 2.5626874247655946, 
+          "frc7050": 4.757223927540664, 
+          "frc7272": 1.485188256124525, 
+          "frc743": 2.2591302325571734, 
+          "frc7458": 3.7300437542720233, 
+          "frc7522": 3.0478911327794185, 
+          "frc7668": 2.5461065559844887
+        }, 
+        "var": {
+          "frc1155": 6.9370055307181016, 
+          "frc1230": 6.959438264876638, 
+          "frc1600": 3.0921586581795584, 
+          "frc1635": 16.011914942757834, 
+          "frc1660": 3.783896364402257, 
+          "frc1796": 16.128134415438403, 
+          "frc1880": 1.7682015342921171, 
+          "frc2265": 6.674589443789923, 
+          "frc2344": 0.02732044852833576, 
+          "frc2579": 37.105434032435795, 
+          "frc2869": 0.16149099560081265, 
+          "frc2895": 2.12204291821101, 
+          "frc3004": 7.6938263145115835, 
+          "frc3204": 9.553537971335063, 
+          "frc333": 3.7960372400263367, 
+          "frc334": 3.881589915703264, 
+          "frc335": 7.068851792974502, 
+          "frc3419": 5.565472615204325, 
+          "frc354": 5.8500456404541765, 
+          "frc3760": 2.1998001359941313, 
+          "frc395": 3.806471302314915, 
+          "frc4122": 17.684609272255226, 
+          "frc4263": 15.437219309339735, 
+          "frc4299": 4.385201045184686, 
+          "frc4383": 1.7029405237818165, 
+          "frc4528": 5.659036073495984, 
+          "frc4571": 6.444574126708632, 
+          "frc4640": 0.45654101151351617, 
+          "frc4773": 1.633397570673368, 
+          "frc5202": 0.4975964497900599, 
+          "frc5298": 3.102488158275987, 
+          "frc5421": 12.861546227704158, 
+          "frc5599": 3.0146434475698176, 
+          "frc5781": 14.02707132691453, 
+          "frc5806": 12.464723134759273, 
+          "frc6195": 3.2055102218801523, 
+          "frc640": 0.6789483205386521, 
+          "frc6401": 0.9671854730608299, 
+          "frc6435": 9.525015214700566, 
+          "frc6590": 5.956284739684934, 
+          "frc6636": 2.4668645660487702, 
+          "frc6873": 8.175554900417412, 
+          "frc694": 8.592486931826791, 
+          "frc7004": 5.596094199282339, 
+          "frc7036": 19.674937073617787, 
+          "frc7050": 9.761642039060208, 
+          "frc7272": 2.1212598436913455, 
+          "frc743": 3.211049941349957, 
+          "frc7458": 12.472611561061877, 
+          "frc7522": 0.2550278578750801, 
+          "frc7668": 0.8097610833363333
+        }
+      }, 
+      "rocket_pieces_scored": {
+        "mean": {
+          "frc1155": 1.2103286941625124, 
+          "frc1230": 0.48101586849417277, 
+          "frc1600": -0.28066859803248156, 
+          "frc1635": 0.6488102403400426, 
+          "frc1660": 0.975891103354157, 
+          "frc1796": 6.848981257791449, 
+          "frc1880": -0.2737343080520256, 
+          "frc2265": 0.40489919579409606, 
+          "frc2344": 0.9538490811157248, 
+          "frc2579": 1.1366098456931597, 
+          "frc2869": -0.05488347666730402, 
+          "frc2895": 0.9886960934387978, 
+          "frc3004": -0.014018657842909715, 
+          "frc3204": 0.8859977113141616, 
+          "frc333": 2.507471567548202, 
+          "frc334": 1.6677414300782727, 
+          "frc335": -0.13935555774538724, 
+          "frc3419": 1.4431193934584972, 
+          "frc354": 3.208055982671267, 
+          "frc3760": -0.17794378870342936, 
+          "frc395": -0.18348409360463805, 
+          "frc4122": -0.2068724676530483, 
+          "frc4263": 0.214149299392903, 
+          "frc4299": -0.04217027273527382, 
+          "frc4383": 0.18273021493112296, 
+          "frc4528": 0.32166625506895763, 
+          "frc4571": 1.7485342624360518, 
+          "frc4640": 0.40080115012502193, 
+          "frc4773": -0.05391224750103037, 
+          "frc5202": -0.24944226821690987, 
+          "frc5298": -0.6319715573379636, 
+          "frc5421": 1.0230734036467528, 
+          "frc5599": 0.3666487582210865, 
+          "frc5781": 1.9536158271625772, 
+          "frc5806": 0.021822717638441645, 
+          "frc6195": -0.02427502554133902, 
+          "frc640": 0.43837525093818336, 
+          "frc6401": 0.17990739362250913, 
+          "frc6435": 0.03349940642337042, 
+          "frc6590": 0.3121880209325788, 
+          "frc6636": 0.18520598708091776, 
+          "frc6873": -0.13439175432147293, 
+          "frc694": 3.3278631380234445, 
+          "frc7004": 0.36444405734909174, 
+          "frc7036": 0.9001079820270124, 
+          "frc7050": 0.44797402826506705, 
+          "frc7272": 0.16253862118257395, 
+          "frc743": 0.11031005225539459, 
+          "frc7458": 0.24585396210423532, 
+          "frc7522": 2.4687019093130234, 
+          "frc7668": 0.7122166531201205
+        }, 
+        "var": {
+          "frc1155": 1.5571135613486686, 
+          "frc1230": 1.9491465798042205, 
+          "frc1600": 0.3721962235847457, 
+          "frc1635": 2.7404171061854052, 
+          "frc1660": 1.1144586322236956, 
+          "frc1796": 12.557975320014178, 
+          "frc1880": 0.5363958868979065, 
+          "frc2265": 1.2402524606566645, 
+          "frc2344": 2.712558449068306, 
+          "frc2579": 3.0453812216721676, 
+          "frc2869": 1.8633011882621464, 
+          "frc2895": 6.400660614459656, 
+          "frc3004": 2.9222828400899785, 
+          "frc3204": 3.4937228043566053, 
+          "frc333": 2.8816128728951846, 
+          "frc334": 6.088444900096833, 
+          "frc335": 2.388114876606819, 
+          "frc3419": 0.6083441115211495, 
+          "frc354": 3.1060900886003036, 
+          "frc3760": 0.13813418944565958, 
+          "frc395": 1.4730553011927547, 
+          "frc4122": 2.7905939029490012, 
+          "frc4263": 0.6061109785971828, 
+          "frc4299": 1.2735088957171543, 
+          "frc4383": 1.8197643017116676, 
+          "frc4528": 1.200402833303086, 
+          "frc4571": 5.014554891571552, 
+          "frc4640": 1.7128872534133701, 
+          "frc4773": 0.15441598607917595, 
+          "frc5202": 0.5199631416959032, 
+          "frc5298": 0.3989094974878686, 
+          "frc5421": 3.4744212473576526, 
+          "frc5599": 1.1342631067125155, 
+          "frc5781": 2.3304696129313327, 
+          "frc5806": 0.9265469303938466, 
+          "frc6195": 1.286764885776635, 
+          "frc640": 1.0708381369011715, 
+          "frc6401": 2.0859421944689953, 
+          "frc6435": 2.2066662625879214, 
+          "frc6590": 2.9883189056893444, 
+          "frc6636": 1.0905781736782614, 
+          "frc6873": 1.4620595412256066, 
+          "frc694": 3.3689816991481067, 
+          "frc7004": 0.0962812472290343, 
+          "frc7036": 2.4896795766687796, 
+          "frc7050": 2.128999092902294, 
+          "frc7272": 2.07371865147559, 
+          "frc743": 2.196631932165281, 
+          "frc7458": 0.6991868381688325, 
+          "frc7522": 2.1209429063504834, 
+          "frc7668": 1.2860856230270743
+        }
+      }, 
+      "score": {
+        "mean": {
+          "frc1155": 18.43888689319882, 
+          "frc1230": 14.116419560964653, 
+          "frc1600": 16.132733812514473, 
+          "frc1635": 15.98052935136268, 
+          "frc1660": 13.26906572629337, 
+          "frc1796": 35.14595610885001, 
+          "frc1880": 24.88638562129869, 
+          "frc2265": 15.754024846295412, 
+          "frc2344": 14.375264355276274, 
+          "frc2579": 14.553948846641786, 
+          "frc2869": 14.42052513540521, 
+          "frc2895": 8.907427722026169, 
+          "frc3004": 7.2671991513435, 
+          "frc3204": 7.518693928483881, 
+          "frc333": 22.632021566951618, 
+          "frc334": 13.75303079673536, 
+          "frc335": 12.642386400205687, 
+          "frc3419": 12.310589555565663, 
+          "frc354": 21.18807158001056, 
+          "frc3760": 8.52689537967661, 
+          "frc395": 16.737006034287614, 
+          "frc4122": 22.93565584923206, 
+          "frc4263": 11.188496944430057, 
+          "frc4299": 10.679870781500066, 
+          "frc4383": 14.871928283178688, 
+          "frc4528": 8.50419252815686, 
+          "frc4571": 23.373256339177587, 
+          "frc4640": 14.413090934831473, 
+          "frc4773": 2.406800833943932, 
+          "frc5202": 9.813801190066922, 
+          "frc5298": 15.786290423676993, 
+          "frc5421": 15.127524823818188, 
+          "frc5599": 13.019564888096037, 
+          "frc5781": 15.021001740195043, 
+          "frc5806": 13.966290691571492, 
+          "frc6195": 9.884036188961314, 
+          "frc640": 10.941697033576725, 
+          "frc6401": 15.040716058299736, 
+          "frc6435": 3.5640602291400945, 
+          "frc6590": 7.427746416737109, 
+          "frc6636": 15.108935412572864, 
+          "frc6873": 8.462284366426633, 
+          "frc694": 27.1182452352301, 
+          "frc7004": 20.35824961971364, 
+          "frc7036": 15.217742634897961, 
+          "frc7050": 14.317379471067918, 
+          "frc7272": 12.590600056833663, 
+          "frc743": 10.985418206945788, 
+          "frc7458": 14.447065444622217, 
+          "frc7522": 24.47817858942786, 
+          "frc7668": 8.736781823936273
+        }, 
+        "var": {
+          "frc1155": 103.70479896427727, 
+          "frc1230": 59.876516768871, 
+          "frc1600": 282.42454777513564, 
+          "frc1635": 42.18767725857803, 
+          "frc1660": 15.58876640422391, 
+          "frc1796": 59.61674812417701, 
+          "frc1880": 62.67376102414853, 
+          "frc2265": 58.00444222838987, 
+          "frc2344": 83.76467096522919, 
+          "frc2579": 29.909403996539577, 
+          "frc2869": 20.519454961637077, 
+          "frc2895": 100.22345875208242, 
+          "frc3004": 169.82596681449007, 
+          "frc3204": 187.05676757656943, 
+          "frc333": 2.7066890652106705, 
+          "frc334": 82.42717337603952, 
+          "frc335": 86.03183761948472, 
+          "frc3419": 10.460721983851332, 
+          "frc354": 107.55812702192893, 
+          "frc3760": 70.05409298870306, 
+          "frc395": 10.356924528955675, 
+          "frc4122": 32.252176884586675, 
+          "frc4263": 92.44207513386701, 
+          "frc4299": 88.76787084690147, 
+          "frc4383": 56.39833816295312, 
+          "frc4528": 79.11001815984804, 
+          "frc4571": 42.1909109533227, 
+          "frc4640": 97.57174590324817, 
+          "frc4773": 101.17217176514876, 
+          "frc5202": 53.33106389684729, 
+          "frc5298": 67.03540628280417, 
+          "frc5421": 154.42676410927416, 
+          "frc5599": 47.7730745814378, 
+          "frc5781": 277.15556621474406, 
+          "frc5806": 24.836662722500183, 
+          "frc6195": 35.6572887479156, 
+          "frc640": 78.63890175489219, 
+          "frc6401": 30.838788271604834, 
+          "frc6435": 292.05091853477325, 
+          "frc6590": 180.47098413901327, 
+          "frc6636": 6.402200611866048, 
+          "frc6873": 49.49117135462306, 
+          "frc694": 66.15959593695023, 
+          "frc7004": 42.485166586184924, 
+          "frc7036": 439.20118200510876, 
+          "frc7050": 122.85003829733802, 
+          "frc7272": 105.93957826431209, 
+          "frc743": 8.736195379049278, 
+          "frc7458": 93.05168218898655, 
+          "frc7522": 157.53467379831542, 
+          "frc7668": 46.07537693954993
+        }
+      }
+    }
+  }
+}

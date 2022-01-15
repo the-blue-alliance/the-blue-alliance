@@ -267,7 +267,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 models,
                 _queue="post-update-hooks",
                 _target="py3-tasks-io",
-                _url="/_ah/queue/deferred_manipulator_runPostDeleteHook",
+                _url=f"/_ah/queue/deferred_{cls.__name__}_runPostDeleteHook",
             )
 
     @classmethod
@@ -292,7 +292,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 updated_models,
                 _queue="post-update-hooks",
                 _target="py3-tasks-io",
-                _url="/_ah/queue/deferred_manipulator_runPostUpdateHook",
+                _url=f"/_ah/queue/deferred_{cls.__name__}_runPostUpdateHook",
             )
 
     """
@@ -379,7 +379,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 # this does not exist in Cloud Tasks
                 # _transactional=ndb.in_transaction(),
                 _target="py3-tasks-io",
-                _url="/_ah/queue/deferred_manipulator_clearCache",
+                _url=f"/_ah/queue/deferred_{cls.__name__}_clearCache",
             )
 
     @classmethod

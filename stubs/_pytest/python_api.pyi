@@ -1,4 +1,4 @@
-from typing import overload, Tuple, Union
+from typing import Any, overload, Tuple, Union
 
 @overload
 def raises(

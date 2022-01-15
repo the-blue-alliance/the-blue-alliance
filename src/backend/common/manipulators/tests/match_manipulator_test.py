@@ -229,6 +229,7 @@ def test_updateHook_taskqueueThrows(
         set_number=1,
         match_number=1,
     )
+    test_match._updated_attrs = {"alliances_json"}
     mock_taskqueue.side_effect = Exception
     MatchManipulator._run_post_update_hook([test_match])
 
