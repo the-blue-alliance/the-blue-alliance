@@ -730,8 +730,8 @@ class PlayoffAdvancementHelper(object):
         cls, event, playoff_advancement, comp_level
     ):
         level_order = COMP_LEVELS_PLAY_ORDER[comp_level]
-        next_level = COMP_LEVELS_PLAY_ORDER.keys()[
-            COMP_LEVELS_PLAY_ORDER.values().index(level_order + 1)
+        next_level = list(COMP_LEVELS_PLAY_ORDER.keys())[
+            list(COMP_LEVELS_PLAY_ORDER.values()).index(level_order + 1)
         ]
         data = {
             "level": comp_level,
@@ -752,7 +752,7 @@ class PlayoffAdvancementHelper(object):
         for i, alliance in enumerate(playoff_advancement[comp_level]):
             rank = i + 1
             data["rankings"].append(
-                cls._make_2015_alliance_advancement_row_for_apiv3_for_apiv3(
+                cls._make_2015_alliance_advancement_row_for_apiv3(
                     event, alliance, rank, comp_level
                 )
             )
