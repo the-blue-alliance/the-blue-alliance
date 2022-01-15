@@ -404,7 +404,7 @@ class Event(CachedModel):
         return "Week {}".format(week + 1)
 
     @ndb.tasklet
-    def get_teams_async(self) -> Generator[TypedFuture[List["Team"]], None, None]:
+    def get_teams_async(self) -> Generator[Any, Any, TypedFuture[List["Team"]]]:
         from backend.common.queries import team_query
 
         self._teams = yield team_query.EventTeamsQuery(

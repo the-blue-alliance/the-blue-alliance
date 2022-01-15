@@ -38,11 +38,10 @@ class EventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
 
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Match]]:
-        match_keys = yield Match.query(
+        matches = yield Match.query(
             Match.event == ndb.Key(Event, event_key)
-        ).fetch_async(keys_only=True)
-        matches = yield ndb.get_multi_async(match_keys)
-        return list(filter(None, matches))
+        ).fetch_async()
+        return matches
 
 
 class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):

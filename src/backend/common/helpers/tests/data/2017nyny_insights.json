@@ -1,0 +1,166 @@
+{
+  "playoff": {
+    "average_foul_score": 12.36111111111111, 
+    "average_fuel_points": 4.555555555555555, 
+    "average_fuel_points_auto": 3.2777777777777777, 
+    "average_fuel_points_teleop": 1.2777777777777777, 
+    "average_high_goals": 7.472222222222222, 
+    "average_high_goals_auto": 3.2777777777777777, 
+    "average_high_goals_teleop": 4.194444444444445, 
+    "average_low_goals": 0.0, 
+    "average_low_goals_auto": 0.0, 
+    "average_low_goals_teleop": 0.0, 
+    "average_mobility_points_auto": 14.722222222222221, 
+    "average_points_auto": 56.333333333333336, 
+    "average_points_teleop": 220.72222222222223, 
+    "average_rotor_points": 135.0, 
+    "average_rotor_points_auto": 38.333333333333336, 
+    "average_rotor_points_teleop": 96.66666666666667, 
+    "average_score": 283.30555555555554, 
+    "average_takeoff_points_teleop": 105.55555555555556, 
+    "average_win_margin": 113.94444444444444, 
+    "average_win_score": 340.27777777777777, 
+    "high_kpa": [
+      41, 
+      "2017nyny_sf1m1", 
+      "SF1-1"
+    ], 
+    "high_score": [
+      495, 
+      "2017nyny_qf4m2", 
+      "QF4-2"
+    ], 
+    "kpa_achieved": [
+      1, 
+      36, 
+      2.7777777777777777
+    ], 
+    "mobility_counts": [
+      106, 
+      108, 
+      98.14814814814815
+    ], 
+    "rotor_1_engaged": [
+      36, 
+      36, 
+      100.0
+    ], 
+    "rotor_1_engaged_auto": [
+      23, 
+      36, 
+      63.888888888888886
+    ], 
+    "rotor_2_engaged": [
+      36, 
+      36, 
+      100.0
+    ], 
+    "rotor_2_engaged_auto": [
+      0, 
+      36, 
+      0.0
+    ], 
+    "rotor_3_engaged": [
+      32, 
+      36, 
+      88.88888888888889
+    ], 
+    "rotor_4_engaged": [
+      6, 
+      36, 
+      16.666666666666668
+    ], 
+    "takeoff_counts": [
+      76, 
+      108, 
+      70.37037037037037
+    ], 
+    "unicorn_matches": [
+      0, 
+      36, 
+      0.0
+    ]
+  }, 
+  "qual": {
+    "average_foul_score": 13.3125, 
+    "average_fuel_points": 3.25625, 
+    "average_fuel_points_auto": 1.3375, 
+    "average_fuel_points_teleop": 1.91875, 
+    "average_high_goals": 7.2125, 
+    "average_high_goals_auto": 1.3375, 
+    "average_high_goals_teleop": 5.875, 
+    "average_low_goals": 0.1875, 
+    "average_low_goals_auto": 0.0125, 
+    "average_low_goals_teleop": 0.175, 
+    "average_mobility_points_auto": 11.96875, 
+    "average_points_auto": 37.30625, 
+    "average_points_teleop": 148.66875, 
+    "average_rotor_points": 103.25, 
+    "average_rotor_points_auto": 24.0, 
+    "average_rotor_points_teleop": 79.25, 
+    "average_score": 199.2875, 
+    "average_takeoff_points_teleop": 67.5, 
+    "average_win_margin": 87.25, 
+    "average_win_score": 242.9125, 
+    "high_kpa": [
+      46, 
+      "2017nyny_qm1", 
+      "Q1"
+    ], 
+    "high_score": [
+      370, 
+      "2017nyny_qm64", 
+      "Q64"
+    ], 
+    "kpa_achieved": [
+      5, 
+      160, 
+      3.125
+    ], 
+    "mobility_counts": [
+      383, 
+      480, 
+      79.79166666666667
+    ], 
+    "rotor_1_engaged": [
+      160, 
+      160, 
+      100.0
+    ], 
+    "rotor_1_engaged_auto": [
+      64, 
+      160, 
+      40.0
+    ], 
+    "rotor_2_engaged": [
+      149, 
+      160, 
+      93.125
+    ], 
+    "rotor_2_engaged_auto": [
+      0, 
+      160, 
+      0.0
+    ], 
+    "rotor_3_engaged": [
+      69, 
+      160, 
+      43.125
+    ], 
+    "rotor_4_engaged": [
+      3, 
+      160, 
+      1.875
+    ], 
+    "takeoff_counts": [
+      216, 
+      480, 
+      45.0
+    ], 
+    "unicorn_matches": [
+      0, 
+      160, 
+      0.0
+    ]
+  }
+}

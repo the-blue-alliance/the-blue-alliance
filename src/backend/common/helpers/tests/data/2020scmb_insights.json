@@ -1,0 +1,166 @@
+{
+  "playoff": {
+    "achieve_stage1_count": [
+      28, 
+      30, 
+      93.33333333333333
+    ], 
+    "achieve_stage2_count": [
+      3, 
+      30, 
+      10.0
+    ], 
+    "achieve_stage3_count": [
+      0, 
+      30, 
+      0.0
+    ], 
+    "average_cell_count": 25.066666666666666, 
+    "average_cell_count_auto": 7.733333333333333, 
+    "average_cell_count_bottom": 1.6666666666666667, 
+    "average_cell_count_bottom_auto": 0.23333333333333334, 
+    "average_cell_count_bottom_teleop": 1.4333333333333333, 
+    "average_cell_count_inner": 4.3, 
+    "average_cell_count_inner_auto": 1.2, 
+    "average_cell_count_inner_teleop": 3.1, 
+    "average_cell_count_outer": 19.1, 
+    "average_cell_count_outer_auto": 6.3, 
+    "average_cell_count_outer_teleop": 12.8, 
+    "average_cell_count_teleop": 17.333333333333332, 
+    "average_cell_points_auto": 32.86666666666667, 
+    "average_cell_points_teleop": 36.333333333333336, 
+    "average_cell_score": 69.2, 
+    "average_control_panel_points": 1.0, 
+    "average_endgame_points": 61.833333333333336, 
+    "average_foul_score": 3.9, 
+    "average_init_line_points_auto": 15.0, 
+    "average_num_robots_hanging": 1.9666666666666666, 
+    "average_points_auto": 47.86666666666667, 
+    "average_points_teleop": 99.16666666666667, 
+    "average_score": 150.93333333333334, 
+    "average_win_margin": 48.93333333333333, 
+    "average_win_score": 175.4, 
+    "exit_init_line_count": [
+      90, 
+      90, 
+      100.0
+    ], 
+    "generator_energized_rp_achieved": [
+      0, 
+      30, 
+      0.0
+    ], 
+    "generator_level_count": [
+      20, 
+      30, 
+      66.66666666666667
+    ], 
+    "generator_operational_rp_achieved": [
+      0, 
+      30, 
+      0.0
+    ], 
+    "hang_count": [
+      59, 
+      90, 
+      65.55555555555556
+    ], 
+    "high_score": [
+      254, 
+      "2020scmb_sf1m1", 
+      "SF1-1"
+    ], 
+    "park_count": [
+      16, 
+      90, 
+      17.77777777777778
+    ], 
+    "unicorn_matches": [
+      0, 
+      30, 
+      0.0
+    ]
+  }, 
+  "qual": {
+    "achieve_stage1_count": [
+      113, 
+      190, 
+      59.473684210526315
+    ], 
+    "achieve_stage2_count": [
+      1, 
+      190, 
+      0.5263157894736842
+    ], 
+    "achieve_stage3_count": [
+      0, 
+      190, 
+      0.0
+    ], 
+    "average_cell_count": 10.957894736842105, 
+    "average_cell_count_auto": 3.473684210526316, 
+    "average_cell_count_bottom": 1.4526315789473685, 
+    "average_cell_count_bottom_auto": 0.3, 
+    "average_cell_count_bottom_teleop": 1.1526315789473685, 
+    "average_cell_count_inner": 1.5421052631578946, 
+    "average_cell_count_inner_auto": 0.5421052631578948, 
+    "average_cell_count_inner_teleop": 1.0, 
+    "average_cell_count_outer": 7.963157894736842, 
+    "average_cell_count_outer_auto": 2.6315789473684212, 
+    "average_cell_count_outer_teleop": 5.331578947368421, 
+    "average_cell_count_teleop": 7.484210526315789, 
+    "average_cell_points_auto": 14.378947368421052, 
+    "average_cell_points_teleop": 14.81578947368421, 
+    "average_cell_score": 29.194736842105264, 
+    "average_control_panel_points": 0.05263157894736842, 
+    "average_endgame_points": 34.23684210526316, 
+    "average_foul_score": 8.210526315789474, 
+    "average_init_line_points_auto": 12.236842105263158, 
+    "average_num_robots_hanging": 0.9315789473684211, 
+    "average_points_auto": 26.61578947368421, 
+    "average_points_teleop": 49.10526315789474, 
+    "average_score": 83.93157894736842, 
+    "average_win_margin": 42.36842105263158, 
+    "average_win_score": 105.11578947368422, 
+    "exit_init_line_count": [
+      465, 
+      570, 
+      81.57894736842105
+    ], 
+    "generator_energized_rp_achieved": [
+      0, 
+      190, 
+      0.0
+    ], 
+    "generator_level_count": [
+      57, 
+      190, 
+      30.0
+    ], 
+    "generator_operational_rp_achieved": [
+      31, 
+      190, 
+      16.31578947368421
+    ], 
+    "hang_count": [
+      177, 
+      570, 
+      31.05263157894737
+    ], 
+    "high_score": [
+      200, 
+      "2020scmb_qm19", 
+      "Q19"
+    ], 
+    "park_count": [
+      245, 
+      570, 
+      42.98245614035088
+    ], 
+    "unicorn_matches": [
+      0, 
+      190, 
+      0.0
+    ]
+  }
+}

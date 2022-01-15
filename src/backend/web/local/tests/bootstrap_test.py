@@ -276,7 +276,17 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
     mock_event_rankings_url(requests_mock, event.key_name, rankings)
     mock_event_alliances_url(requests_mock, event.key_name, alliances)
     mock_event_awards_url(requests_mock, event.key_name, [award])
-    mock_event_predictions_url(requests_mock, event.key_name, {})
+    mock_event_predictions_url(
+        requests_mock,
+        event.key_name,
+        {
+            "match_predictions": None,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
+    )
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -307,7 +317,13 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
         id="2020nyny",
         rankings2=rankings,
         alliance_selections=alliances,
-        predictions={},
+        predictions={
+            "match_predictions": None,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
     )
     assert expected_details == remove_auto_add_properties(stored_details)
 
@@ -333,7 +349,17 @@ def test_bootstrap_event_with_district(
     mock_event_rankings_url(requests_mock, event.key_name, [])
     mock_event_alliances_url(requests_mock, event.key_name, [])
     mock_event_awards_url(requests_mock, event.key_name, [])
-    mock_event_predictions_url(requests_mock, event.key_name, {})
+    mock_event_predictions_url(
+        requests_mock,
+        event.key_name,
+        {
+            "match_predictions": None,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
+    )
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"

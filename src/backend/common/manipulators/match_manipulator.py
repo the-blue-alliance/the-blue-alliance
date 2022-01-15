@@ -48,9 +48,33 @@ def match_post_delete_hook(deleted_models: List[Match]) -> None:
 
 @MatchManipulator.register_post_update_hook
 def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
+    affected_stats_event_keys = set()
     for updated_model in updated_models:
         MatchPostUpdateHooks.firebase_update(updated_model)
         MatchPostUpdateHooks.enqueue_stats(updated_model)
+
+        # Only attrs that affect stats
+        if (
+            updated_model.is_new
+            or set(["alliances_json", "score_breakdown_json"]).intersection(
+                set(updated_model.updated_attrs)
+            )
+            != set()
+        ):
+            affected_stats_event_keys.add(updated_model.model.event.id())
+
+    # Enqueue statistics
+    for event_key in affected_stats_event_keys:
+        # Enqueue task to calculate matchstats
+        try:
+            taskqueue.add(
+                url=f"/tasks/math/do/event_matchstats/{event_key}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="default",
+            )
+        except Exception:
+            logging.exception(f"Error enqueuing event_matchstats for {event_key}")
 
 
 class MatchPostUpdateHooks:
@@ -172,25 +196,5 @@ class MatchPostUpdateHooks:
                 TBANSHelper.schedule_upcoming_matches(event)
             except Exception, exception:
                 logging.error("Eror scheduling match_upcoming for: {}".format(event.key_name))
-                logging.error(traceback.format_exc())
-
-        '''
-        Enqueue firebase push
-        '''
-        affected_stats_event_keys = set()
-        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
-            # Only attrs that affect stats
-            if is_new or set(['alliances_json', 'score_breakdown_json']).intersection(set(updated_attrs)) != set():
-                affected_stats_event_keys.add(match.event.id())
-
-        # Enqueue statistics
-        for event_key in affected_stats_event_keys:
-            # Enqueue task to calculate matchstats
-            try:
-                taskqueue.add(
-                    url='/tasks/math/do/event_matchstats/' + event_key,
-                    method='GET')
-            except Exception:
-                logging.error("Error enqueuing event_matchstats for {}".format(event_key))
                 logging.error(traceback.format_exc())
     """

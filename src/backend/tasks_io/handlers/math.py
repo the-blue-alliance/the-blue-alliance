@@ -1,7 +1,8 @@
 import json
-from typing import List
+import logging
+from typing import List, Optional
 
-from flask import abort, Blueprint, make_response, request, url_for
+from flask import abort, Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
@@ -10,6 +11,10 @@ from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.futures import TypedFuture
 from backend.common.helpers.district_helper import DistrictHelper
 from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.event_insights_helper import EventInsightsHelper
+from backend.common.helpers.match_helper import MatchHelper
+from backend.common.helpers.matchstats_helper import MatchstatsHelper
+from backend.common.helpers.prediction_helper import PredictionHelper
 from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -21,7 +26,7 @@ from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import DistrictKey, EventKey, Year
 from backend.common.models.team import Team
 from backend.common.queries.district_query import DistrictsInYearQuery
-from backend.common.queries.event_query import DistrictEventsQuery
+from backend.common.queries.event_query import DistrictEventsQuery, EventListQuery
 from backend.common.queries.team_query import DistrictTeamsQuery
 
 
@@ -177,4 +182,98 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(f"Finished calculating rankings for: {district_key}")
+    return make_response("")
+
+
+@blueprint.route("/tasks/math/enqueue/event_matchstats/now", defaults={"year": None})
+@blueprint.route("/tasks/math/enqueue/event_matchstats/<int:year>")
+def enqueue_event_matchstats(year: Optional[Year]) -> str:
+    """
+    Enqueues Matchstats calculation
+    """
+    if year is None:
+        events = EventHelper.events_within_a_day()
+    else:
+        events: List[Event] = EventListQuery(year=year).fetch()
+
+    events = EventHelper.sorted_events(events)
+    for event in events:
+        taskqueue.add(
+            url="/tasks/math/do/event_matchstats/" + event.key_name,
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="run-in-order",  # Because predictions depend on past events
+        )
+
+    template_values = {
+        "event_count": len(events),
+        "year": year,
+    }
+
+    return render_template("math/event_matchstats_enqueue.html", **template_values)
+
+
+@blueprint.route("/tasks/math/do/event_matchstats/<event_key>")
+def event_matchstats_calc(event_key: EventKey) -> Response:
+    """
+    Calculates match stats (OPR/DPR/CCWM) for an event
+    Calculates predictions for an event
+    Calculates insights for an event
+    """
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, event.year)
+    if not any([v != {} for v in matchstats_dict.values()]):
+        logging.warning("Matchstat calculation for {} failed!".format(event_key))
+        matchstats_dict = None
+
+    predictions_dict = None
+    if (
+        event.year in {2016, 2017, 2018, 2019, 2020}
+        and event.event_type_enum in SEASON_EVENT_TYPES
+    ) or event.enable_predictions:
+        sorted_matches = MatchHelper.play_order_sorted_matches(event.matches)
+        (
+            match_predictions,
+            match_prediction_stats,
+            stat_mean_vars,
+        ) = PredictionHelper.get_match_predictions(sorted_matches)
+        (
+            ranking_predictions,
+            ranking_prediction_stats,
+        ) = PredictionHelper.get_ranking_predictions(sorted_matches, match_predictions)
+
+        predictions_dict = {
+            "match_predictions": match_predictions,
+            "match_prediction_stats": match_prediction_stats,
+            "stat_mean_vars": stat_mean_vars,
+            "ranking_predictions": ranking_predictions,
+            "ranking_prediction_stats": ranking_prediction_stats,
+        }
+
+    event_insights = EventInsightsHelper.calculate_event_insights(
+        event.matches, event.year
+    )
+
+    event_details = EventDetails(
+        id=event_key,
+        matchstats=matchstats_dict,
+        predictions=predictions_dict,
+        insights=event_insights,
+    )
+    EventDetailsManipulator.createOrUpdate(event_details)
+
+    template_values = {
+        "matchstats_dict": matchstats_dict,
+    }
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("math/event_matchstats_do.html", **template_values)
+        )
+
     return make_response("")

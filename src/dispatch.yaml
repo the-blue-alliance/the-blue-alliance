@@ -8,5 +8,8 @@ dispatch:
   - url: "*/backend-tasks/*"
     service: py3-tasks-io
 
+  - url: "*/_ah/queue/deferred*"
+    service: py3-tasks-io
+
   - url: "*/*"
     service: py3-web

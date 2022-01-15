@@ -20,7 +20,7 @@ def always_drain_taskqueue(
             if task.payload:
                 deferred.run(task.payload)
 
-    get_queues = ["default"]
+    get_queues = ["default", "run-in-order"]
     for queue in get_queues:
         tasks = taskqueue_stub.get_filtered_tasks(queue_names=queue)
         for task in tasks:
