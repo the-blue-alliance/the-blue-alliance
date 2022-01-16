@@ -33,3 +33,20 @@ describe("GameDay", () => {
     await expect(page).toMatch("Select a layout");
   });
 });
+
+describe("APIv3 Docs", () => {
+  beforeAll(async () => {
+    await page.goto("http://localhost:8080/apidocs/v3");
+    await page.waitForSelector("#swagger_url");
+  });
+
+  it('should be titled "APIv3 - The Blue Alliance"', async () => {
+    await expect(page.title()).resolves.toMatch("APIv3 - The Blue Alliance");
+  });
+
+  it("should render overview", async () => {
+    await expect(page).toMatch(
+      "Information and statistics about FIRST Robotics Competition teams and events."
+    );
+  });
+});
