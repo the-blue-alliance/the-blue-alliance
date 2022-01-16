@@ -1,8 +1,54 @@
+from typing import List, TypedDict
+
 from google.appengine.ext import ndb
 
+from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event import Event
 from backend.common.models.location import Location
 from backend.common.queries.dict_converters.converter_base import ConverterBase
+
+
+class DummyModel(ndb.Model):
+    int_prop = ndb.IntegerProperty()
+
+
+class DummyDict(TypedDict):
+    int_val: int
+
+
+class DummyConverter(ConverterBase):
+    SUBVERSIONS = {
+        ApiMajorVersion.API_V3: 0,
+    }
+
+    @classmethod
+    def _convert_list(
+        cls, model_list: List[DummyModel], version: ApiMajorVersion
+    ) -> List[DummyDict]:
+        return list(map(cls.converter_v3, model_list))
+
+    @classmethod
+    def converter_v3(cls, model: DummyModel) -> DummyDict:
+        return {
+            "int_val": model.int_prop,
+        }
+
+
+def test_convert_single() -> None:
+    converted = DummyConverter(DummyModel(int_prop=604)).convert(ApiMajorVersion.API_V3)
+    assert converted == {"int_val": 604}
+
+
+def test_convert_multi() -> None:
+    converted = DummyConverter(
+        [DummyModel(int_prop=254), DummyModel(int_prop=604)]
+    ).convert(ApiMajorVersion.API_V3)
+    assert converted == [{"int_val": 254}, {"int_val": 604}]
+
+
+def test_convert_none() -> None:
+    converted = DummyConverter(None).convert(ApiMajorVersion.API_V3)
+    assert converted is None
 
 
 def test_constructLocation_v3() -> None:
