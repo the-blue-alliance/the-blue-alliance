@@ -78,11 +78,17 @@ def test_point_query_exists_sync() -> None:
     result = query.fetch()
     assert result == m
 
+    result_dict = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert result_dict == DummyConverter.converter_v3(m)
+
 
 def test_point_query_not_exists_sync() -> None:
     query = DummyModelPointQuery(model_key="test")
     result = query.fetch()
     assert result is None
+
+    result_dict = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert result_dict is None
 
 
 def test_point_query_exists_async() -> None:
@@ -95,6 +101,9 @@ def test_point_query_exists_async() -> None:
     result = result_future.get_result()
     assert result == m
 
+    result_dict = query.fetch_dict_async(ApiMajorVersion.API_V3).get_result()
+    assert result_dict == DummyConverter.converter_v3(m)
+
 
 def test_point_query_not_exists_async() -> None:
     query = DummyModelPointQuery(model_key="test")
@@ -103,20 +112,30 @@ def test_point_query_not_exists_async() -> None:
     result = result_future.get_result()
     assert result is None
 
+    result_dict = query.fetch_dict_async(ApiMajorVersion.API_V3).get_result()
+    assert result_dict is None
+
 
 def test_range_query_empty_sync() -> None:
     query = DummyModelRangeQuery(min=0, max=10)
-    result = query.fetch()
 
+    result = query.fetch()
     assert result == []
+
+    result_dict = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert result_dict == []
 
 
 def test_range_query_empty_async() -> None:
     query = DummyModelRangeQuery(min=0, max=10)
+
     result_future = query.fetch_async()
     result = result_future.get_result()
-
     assert result == []
+
+    result_dict_future = query.fetch_dict_async(ApiMajorVersion.API_V3)
+    result_dict = result_dict_future.get_result()
+    assert result_dict == []
 
 
 def test_range_query_with_data_sync() -> None:
@@ -127,6 +146,9 @@ def test_range_query_with_data_sync() -> None:
     result = query.fetch()
     assert len(result) == 3
 
+    result_dict = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result_dict) == 3
+
 
 def test_range_query_with_data_async() -> None:
     keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
@@ -136,6 +158,10 @@ def test_range_query_with_data_async() -> None:
     result_future = query.fetch_async()
     result = result_future.get_result()
     assert len(result) == 3
+
+    result_dict_future = query.fetch_dict_async(ApiMajorVersion.API_V3)
+    result_dict = result_dict_future.get_result()
+    assert len(result_dict) == 3
 
 
 def test_cached_query() -> None:

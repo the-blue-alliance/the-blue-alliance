@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import Any, Dict, Generator, Generic, Optional, Set, Type
+from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture
@@ -26,15 +26,18 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     def _query_async(self) -> TypedFuture[QueryReturn]:
         ...
 
-    def _do_query(self, *args, **kwargs) -> TypedFuture[QueryReturn]:
+    @ndb.tasklet
+    def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
         # This gives CachedDatabaseQuery a place to hook into
-        return self._query_async(*args, **kwargs)
+        res = yield self._query_async(*args, **kwargs)
+        return res
 
+    @ndb.tasklet
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
-    ) -> TypedFuture[DictQueryReturn]:
+    ) -> Generator[Any, Any, Union[None, DictQueryReturn, List[DictQueryReturn]]]:
         # This gives CachedDatabaseQuery a place to hook into
-        res = self._query_async(*args, **kwargs)
+        res = yield self._query_async(*args, **kwargs)
 
         if self.DICT_CONVERTER is None:
             raise Exception(
@@ -42,10 +45,7 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
             )
 
         # See https://github.com/facebook/pyre-check/issues/267
-        dict_res = self.DICT_CONVERTER(  # pyre-ignore[45]
-            safe_cast(QueryReturn, res)
-        ).convert(_dict_version)
-        return safe_cast(TypedFuture[DictQueryReturn], dict_res)
+        return self.DICT_CONVERTER(res).convert(_dict_version)  # pyre-ignore[45]
 
     def fetch(self) -> QueryReturn:
         return self.fetch_async().get_result()
@@ -136,7 +136,7 @@ class CachedDatabaseQuery(
     @ndb.tasklet
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
-    ) -> Generator[Any, Any, DictQueryReturn]:
+    ) -> Generator[Any, Any, Union[None, DictQueryReturn, List[DictQueryReturn]]]:
         if not self.DICT_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             return result

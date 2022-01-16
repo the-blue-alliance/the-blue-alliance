@@ -21,6 +21,8 @@ class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
         self, version: ApiMajorVersion
     ) -> Union[None, DictQueryReturn, List[DictQueryReturn]]:
         with Span("{}.convert".format(self.__class__.__name__)):
+            if self._query_return is None:
+                return None
             converted_query_return = self._convert_list(
                 listify(self._query_return), version
             )

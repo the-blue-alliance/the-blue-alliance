@@ -211,6 +211,12 @@ def test_event_details(ndb_stub, api_client: Client) -> None:
         event_short="casj",
         event_type_enum=EventType.REGIONAL,
     ).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
     alliances = [
         EventAlliance(picks=["frc1", "frc2", "frc3"]),
         EventAlliance(picks=["frc4", "frc5", "frc6"]),
@@ -236,6 +242,13 @@ def test_event_details(ndb_stub, api_client: Client) -> None:
         alliance_selections=alliances,
         district_points=district_points,
     ).put()
+
+    # No event details
+    alliances_resp = api_client.get(
+        "/api/v3/event/2020casj/alliances", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert alliances_resp.status_code == 200
+    assert alliances_resp.json is None
 
     # Alliances response
     alliances_resp = api_client.get(
