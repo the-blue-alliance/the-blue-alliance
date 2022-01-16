@@ -107,16 +107,12 @@ class FRCAPI:
                 "awards expects either an event_code, team_number, or both"
             )
 
-        # Work around a bug with the v3.0 awards endpoint where teamNumber is non-optional.
-        # Passing a `0` will get us all awards for an Event
-        # https://usfirst.collab.net/sf/go/artf6025
-        if event_code is not None and team_number is None:
-            team_number = 0
-
         if event_code is not None and team_number is not None:
-            endpoint = f"/{year}/awards/{event_code}/{team_number}"
-        else:
-            endpoint = f"/{year}/awards/{event_code or team_number}"
+            endpoint = f"/{year}/awards/eventteam/{event_code}/{team_number}"
+        elif event_code is not None:
+            endpoint = f"/{year}/awards/event/{event_code}"
+        else:  # team_number is not None
+            endpoint = f"/{year}/awards/team/{team_number}"
 
         return self._get(endpoint)
 
