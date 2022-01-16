@@ -26,15 +26,18 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     def _query_async(self) -> TypedFuture[QueryReturn]:
         ...
 
+    @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> TypedFuture[QueryReturn]:
         # This gives CachedDatabaseQuery a place to hook into
-        return self._query_async(*args, **kwargs)
+        res = yield self._query_async(*args, **kwargs)
+        return res
 
+    @ndb.tasklet
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
     ) -> TypedFuture[DictQueryReturn]:
         # This gives CachedDatabaseQuery a place to hook into
-        res = self._query_async(*args, **kwargs)
+        res = yield self._query_async(*args, **kwargs)
 
         if self.DICT_CONVERTER is None:
             raise Exception(
