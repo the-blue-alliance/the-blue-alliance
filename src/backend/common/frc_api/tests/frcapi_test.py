@@ -122,7 +122,7 @@ def test_awards_event_code() -> None:
     with patch.object(FRCAPI, "_get") as mock_get:
         api.awards(2020, event_code="MIKET")
 
-    mock_get.assert_called_once_with("/2020/awards/MIKET/0")
+    mock_get.assert_called_once_with("/2020/awards/event/MIKET")
 
 
 def test_awards_team_number() -> None:
@@ -130,7 +130,7 @@ def test_awards_team_number() -> None:
     with patch.object(FRCAPI, "_get") as mock_get:
         api.awards(2020, team_number=2337)
 
-    mock_get.assert_called_once_with("/2020/awards/2337")
+    mock_get.assert_called_once_with("/2020/awards/team/2337")
 
 
 def test_awards_event_code_team_number() -> None:
@@ -138,7 +138,7 @@ def test_awards_event_code_team_number() -> None:
     with patch.object(FRCAPI, "_get") as mock_get:
         api.awards(2020, event_code="MIKET", team_number=2337)
 
-    mock_get.assert_called_once_with("/2020/awards/MIKET/2337")
+    mock_get.assert_called_once_with("/2020/awards/eventteam/MIKET/2337")
 
 
 def test_district_list() -> None:
