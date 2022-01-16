@@ -170,14 +170,14 @@ def test_team_social_media(ndb_stub, api_client: Client) -> None:
         year=None,
         media_type_enum=MediaType.FACEBOOK_PROFILE,
         foreign_key="test",
-        details_json="{}",
+        details_json=None,
     ).put()
     Media(
         references=[ndb.Key("Team", "frc254")],
         year=None,
         media_type_enum=MediaType.GITHUB_PROFILE,
         foreign_key="test",
-        details_json="{}",
+        details_json=None,
     ).put()
 
     resp = api_client.get(
