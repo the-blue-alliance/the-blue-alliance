@@ -94,6 +94,9 @@ def event_detail(event_key: EventKey, detail_type: str) -> Response:
     event_details = EventDetailsQuery(event_key=event_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
+    if event_details is None:
+        return profiled_jsonify(None)
+
     detail = event_details.get(detail_type)
     if detail_type == "alliances" and detail:
         add_alliance_status(event_key, detail)
