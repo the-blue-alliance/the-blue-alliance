@@ -79,11 +79,11 @@ class Media(CachedModel):
         super(Media, self).__init__(*args, **kw)
 
     @property
-    def details(self) -> Dict:
+    def details(self) -> Optional[Dict]:
         # TODO add better typing
         if self._details is None and self.details_json is not None:
             self._details = json.loads(self.details_json)
-        return none_throws(self._details)
+        return self._details
 
     @property
     def private_details(self) -> Optional[Dict]:
@@ -121,7 +121,7 @@ class Media(CachedModel):
     @property
     def cdphotothread_image_url(self) -> str:
         return "https://web.archive.org/web/0im_/https://www.chiefdelphi.com/media/img/{}".format(
-            self.details["image_partial"]
+            none_throws(self.details)["image_partial"]
         )
 
     @property
@@ -211,9 +211,13 @@ class Media(CachedModel):
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url
         elif self.media_type_enum == MediaType.GRABCAD:
-            return self.details["model_image"].replace("card.jpg", "large.png")
+            return none_throws(self.details)["model_image"].replace(
+                "card.jpg", "large.png"
+            )
         elif self.media_type_enum == MediaType.ONSHAPE:
-            return self.details["model_image"].replace("300x300", "600x340")
+            return none_throws(self.details)["model_image"].replace(
+                "300x300", "600x340"
+            )
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_direct_url
         else:
@@ -246,9 +250,9 @@ class Media(CachedModel):
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url_med
         elif self.media_type_enum == MediaType.GRABCAD:
-            return self.details["model_image"]
+            return none_throws(self.details)["model_image"]
         elif self.media_type_enum == MediaType.ONSHAPE:
-            return self.details["model_image"]
+            return none_throws(self.details)["model_image"]
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_direct_url_med
         else:
@@ -261,9 +265,13 @@ class Media(CachedModel):
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url_sm
         elif self.media_type_enum == MediaType.GRABCAD:
-            return self.details["model_image"].replace("large.jpg", "tiny.jpg")
+            return none_throws(self.details)["model_image"].replace(
+                "large.jpg", "tiny.jpg"
+            )
         elif self.media_type_enum == MediaType.ONSHAPE:
-            return self.details["model_image"].replace("300x300", "300x170")
+            return none_throws(self.details)["model_image"].replace(
+                "300x300", "300x170"
+            )
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_direct_url_sm
         else:

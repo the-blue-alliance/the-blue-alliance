@@ -341,8 +341,7 @@ def event_details(event_key: EventKey) -> Response:
 
     # Write new models
     if (
-        teams and event.year == SeasonHelper.get_max_year()
-        or Environment.is_dev()
+        teams and event.year == SeasonHelper.get_max_year() or Environment.is_dev()
     ):  # Only update from latest year
         teams = TeamManipulator.createOrUpdate(teams)
 
