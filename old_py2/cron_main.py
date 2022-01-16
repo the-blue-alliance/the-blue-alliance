@@ -10,7 +10,7 @@ from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import HallOfFameTeamsGet
 
 from controllers.cron_controller import \
-    MatchTimePredictionsEnqueue, MatchTimePredictionsDo, BlueZoneUpdateDo, SuggestionQueueDailyNag, RemapTeamsDo
+    BlueZoneUpdateDo, SuggestionQueueDailyNag, RemapTeamsDo
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import FinalMatchesRepairDo
@@ -41,8 +41,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/math/do/eventteam_repair', EventTeamRepairDo),
                                ('/tasks/math/do/eventteam_update/(.*)', EventTeamUpdate),
                                ('/tasks/math/do/final_matches_repair/([0-9]*)', FinalMatchesRepairDo),
-                               ('/tasks/math/enqueue/predict_match_times', MatchTimePredictionsEnqueue),
-                               ('/tasks/math/do/predict_match_times/(.*)', MatchTimePredictionsDo),
                                ('/tasks/notifications/upcoming_match', UpcomingNotificationDo),
                                ('/tasks/admin/enqueue/clear_mobile_duplicates', AdminMobileClearEnqueue),
                                ('/tasks/admin/clear_mobile_duplicates', AdminMobileClear),
