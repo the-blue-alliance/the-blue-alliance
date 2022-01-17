@@ -91,7 +91,12 @@ app.url_map.converters["model_type"] = ModelTypeConverter
 app.url_map.converters["event_detail_type"] = EventDetailTypeConverter
 
 api_v3 = Blueprint("apiv3", __name__, url_prefix="/api/v3")
-CORS(api_v3, origins="*", methods=["OPTIONS", "GET"], allow_headers=["X-TBA-Auth-Key"])
+CORS(
+    api_v3,
+    origins="*",
+    methods=["OPTIONS", "GET"],
+    allow_headers=["X-TBA-Auth-Key", "If-None-Match", "If-Modified-Since"],
+)
 
 # Overall Status
 api_v3.add_url_rule("/status", view_func=status)
