@@ -2,12 +2,14 @@ from flask import abort, redirect, request, url_for
 from werkzeug.wrappers import Response
 
 from backend.common.manipulators.robot_manipulator import RobotManipulator
+from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event_team import EventTeam
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamParticipationQuery
+from backend.common.sitevars.website_blacklist import WebsiteBlacklist
 from backend.web.profiled_render import render_template
 
 
@@ -98,5 +100,32 @@ def team_robot_name_update() -> Response:
         robot_name=name.strip(),
     )
     RobotManipulator.createOrUpdate(robot)
+
+    return redirect(url_for("admin.team_detail", team_number=team.team_number))
+
+
+def team_website_update() -> Response:
+    team_key = request.values.get("team_key")
+    website = request.values.get("website")
+
+    # Quick and dirty and bad URL validation - brought to you by StackOverflow
+    # Needs a valid netlock and scheme to be valid
+    def lazy_validate_url(url) -> bool:
+        from urllib.parse import urlparse
+
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])
+
+    team = Team.get_by_id(team_key)
+    if not team:
+        abort(404)
+
+    if not website:
+        # Clear website
+        team.website = ""
+    elif lazy_validate_url(website) and not WebsiteBlacklist.is_blacklisted(website):
+        team.website = website
+
+    TeamManipulator.createOrUpdate(team)
 
     return redirect(url_for("admin.team_detail", team_number=team.team_number))
