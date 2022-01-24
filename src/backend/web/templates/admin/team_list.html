@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Teams{% endblock %}
 
@@ -29,7 +29,7 @@ $("#go_button").click(function() {
 
 <ul class="pagination pagination-small">
     {% for page_label in page_labels %}
-    <li{% if forloop.counter0 == page_num %} class="active"{% endif %}><a href="/admin/teams{% if not forloop.first %}/{{forloop.counter0}}{% endif %}">{{page_label}}</a></li>
+    <li{% if loop.index0 == page_num %} class="active"{% endif %}><a href="/admin/teams{% if not loop.first %}/{{ loop.index0 }}{% endif %}">{{page_label}}</a></li>
     {% endfor %}
 </ul>
 
@@ -42,7 +42,7 @@ $("#go_button").click(function() {
 
     {% for team in teams %}
     <tr>
-        <td><a href="/admin/team/{{team.team_number}}">{{ team.team_number }}</a></td>
+        <td><a href="/admin/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
         <td>{{ team.name }}</td>
         <td>{{ team.nickname }}</td>
     </tr>

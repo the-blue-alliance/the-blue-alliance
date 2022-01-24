@@ -28,8 +28,7 @@ from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonS
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
 from controllers.admin.admin_tbans_controller import AdminTBANS
-from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList, \
-    AdminTeamRobotNameUpdate
+from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamRobotNameUpdate
 from controllers.admin.admin_team_media_mod import AdminTeamMediaModCodeList, AdminTeamMediaModCodeAdd, AdminTeamMediaModCodeEdit
 from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList, AdminUserPermissionsList, \
     AdminUserLookup
@@ -100,11 +99,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/playoff_advancement/add', AdminPlayoffAdvancementAddController),
                                ('/admin/playoff_advancement/purge/(.*)', AdminPlayoffAdvancementPurgeController),
                                ('/admin/suggestions/create/test', AdminCreateTestSuggestions),
-                               ('/admin/teams/([0-9]*)', AdminTeamList),
-                               ('/admin/teams', AdminTeamList),
                                ('/admin/team/create/test', AdminTeamCreateTest),
-                               ('/admin/team/set_robot_name', AdminTeamRobotNameUpdate),
-                               ('/admin/team/(.*)', AdminTeamDetail),
                                ('/admin/users/([0-9]*)', AdminUserList),
                                ('/admin/users', AdminUserList),
                                ('/admin/users/permissions', AdminUserPermissionsList),

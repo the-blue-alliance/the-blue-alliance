@@ -59,10 +59,5 @@ def sort_by(values, prop):
 
 
 @register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
-
-
-@register.filter
 def match_short(match_key):
     return jinja2_filters.match_short(match_key)
