@@ -13,6 +13,7 @@ from backend.web.handlers.admin.team import (
     team_detail,
     team_list,
     team_robot_name_update,
+    team_website_update,
 )
 from backend.web.profiled_render import render_template
 
@@ -56,6 +57,8 @@ admin_routes.add_url_rule("/teams", view_func=team_list)
 admin_routes.add_url_rule("/teams/<int:page_num>", view_func=team_list)
 admin_routes.add_url_rule("/team/<int:team_number>", view_func=team_detail)
 admin_routes.add_url_rule(
+    "/team/website", view_func=team_website_update, methods=["POST"]
+)
+admin_routes.add_url_rule(
     "/team/set_robot_name", view_func=team_robot_name_update, methods=["POST"]
 )
-# admin_routes.add_url_rule("/team/<int:team_number>", view_func=team_detail)
