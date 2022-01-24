@@ -6592,6 +6592,176 @@
           }
         }
       },
+      "Match_Score_Breakdown_2022": {
+        "type": "object",
+        "properties": {
+          "blue": {
+            "$ref": "#/components/schemas/Match_Score_Breakdown_2022_Alliance"
+          },
+          "red": {
+            "$ref": "#/components/schemas/Match_Score_Breakdown_2022_Alliance"
+          }
+        },
+        "description": "See the 2022 FMS API documentation for a description of each value. https://frc-api-docs.firstinspires.org"
+      },
+      "Match_Score_Breakdown_2022_Alliance": {
+        "type": "object",
+        "properties": {
+          "taxiRobot1": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "endgameRobot1": {
+            "type": "string",
+            "enum": [
+              "Traversal",
+              "High",
+              "Mid",
+              "Low",
+              "None"
+            ]
+          },
+          "taxiRobot2": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "endgameRobot2": {
+            "type": "string",
+            "enum": [
+              "Traversal",
+              "High",
+              "Mid",
+              "Low",
+              "None"
+            ]
+          },
+          "taxiRobot3": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "endgameRobot3": {
+            "type": "string",
+            "enum": [
+              "Traversal",
+              "High",
+              "Mid",
+              "Low",
+              "None"
+            ]
+          },
+          "autoCargoLowerNear": {
+            "type": "integer"
+          },
+          "autoCargoLowerFar": {
+            "type": "integer"
+          },
+          "autoCargoLowerBlue": {
+            "type": "integer"
+          },
+          "autoCargoLowerRed": {
+            "type": "integer"
+          },
+          "autoCargoUpperNear": {
+            "type": "integer"
+          },
+          "autoCargoUpperFar": {
+            "type": "integer"
+          },
+          "autoCargoUpperBlue": {
+            "type": "integer"
+          },
+          "autoCargoUpperRed": {
+            "type": "integer"
+          },
+          "autoCargoTotal": {
+            "type": "integer"
+          },
+          "teleopCargoLowerNear": {
+            "type": "integer"
+          },
+          "teleopCargoLowerFar": {
+            "type": "integer"
+          },
+          "teleopCargoLowerBlue": {
+            "type": "integer"
+          },
+          "teleopCargoLowerRed": {
+            "type": "integer"
+          },
+          "teleopCargoUpperNear": {
+            "type": "integer"
+          },
+          "teleopCargoUpperFar": {
+            "type": "integer"
+          },
+          "teleopCargoUpperBlue": {
+            "type": "integer"
+          },
+          "teleopCargoUpperRed": {
+            "type": "integer"
+          },
+          "teleopCargoTotal": {
+            "type": "integer"
+          },
+          "matchCargoTotal": {
+            "type": "integer"
+          },
+          "autoTaxiPoints": {
+            "type": "integer"
+          },
+          "autoCargoPoints": {
+            "type": "integer"
+          },
+          "autoPoints": {
+            "type": "integer"
+          },
+          "quintetAchieved": {
+            "type": "boolean"
+          },
+          "teleopCargoPoints": {
+            "type": "integer"
+          },
+          "endgamePoints": {
+            "type": "integer"
+          },
+          "teleopPoints": {
+            "type": "integer"
+          },
+          "cargoBonusRankingPoint": {
+            "type": "boolean"
+          },
+          "hangarBonusRankingPoint": {
+            "type": "boolean"
+          },
+          "foulCount": {
+            "type": "integer"
+          },
+          "techFoulCount": {
+            "type": "integer"
+          },
+          "adjustPoints": {
+            "type": "integer"
+          },
+          "foulPoints": {
+            "type": "integer"
+          },
+          "rp": {
+            "type": "integer"
+          },
+          "totalPoints": {
+            "type": "integer"
+          }
+        }
+      },
       "Media": {
         "required": [
           "type",
