@@ -53,7 +53,7 @@
     "puppeteer": "^13.1.1",
     "style-loader": "^3.3.1",
     "webpack": "^5.67.0",
-    "webpack-cli": "^4.9.1"
+    "webpack-cli": "^4.9.2"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --watch",
