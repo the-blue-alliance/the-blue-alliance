@@ -73,9 +73,6 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
         for event in response["Events"]:
             code = event["code"].lower()
-            # Drop 2022ont0 - fake registration event
-            if code == "ONT0" and self.season == 2022:
-                continue
 
             api_event_type = event["type"].lower()
             event_type = (
