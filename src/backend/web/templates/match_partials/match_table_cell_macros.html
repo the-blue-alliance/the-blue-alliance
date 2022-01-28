@@ -76,8 +76,9 @@
       or match.score_breakdown.get(alliance_color).kPaBonusPoints
       or match.score_breakdown.get(alliance_color).autoQuestRankingPoint
       or match.score_breakdown.get(alliance_color).completeRocketRankingPoint
-      or match.score_breakdown.get(alliance_color).shieldEnergizedRankingPoint %}
-    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% elif match.year == 2019 %}Complete Rocket{% elif match.year == 2020 %}Shield Energized{% endif %}">
+      or match.score_breakdown.get(alliance_color).shieldEnergizedRankingPoint
+      or match.score_breakdown.get(alliance_color).cargoBonusRankingPoint %}
+    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% elif match.year == 2019 %}Complete Rocket{% elif match.year == 2020 %}Shield Energized{% elif match.year == 2022 %}Cargo Bonus{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
@@ -86,8 +87,9 @@
       or match.score_breakdown.get(alliance_color).rotorBonusPoints
       or match.score_breakdown.get(alliance_color).faceTheBossRankingPoint
       or match.score_breakdown.get(alliance_color).habDockingRankingPoint
-      or match.score_breakdown.get(alliance_color).shieldOperationalRankingPoint %}
-    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% elif match.year == 2018 %}Face The Boss{% elif match.year == 2019 %}HAB Docking{% elif match.year == 2020 %}Shield Operational{% endif %}">
+      or match.score_breakdown.get(alliance_color).shieldOperationalRankingPoint
+      or match.score_breakdown.get(alliance_color).hangarBonusRankingPoint %}
+    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% elif match.year == 2018 %}Face The Boss{% elif match.year == 2019 %}HAB Docking{% elif match.year == 2020 %}Shield Operational{% elif match.year == 2022 %}Hangar Bonus{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
@@ -140,6 +142,14 @@
     {% else %}
       {% if match.score_breakdown.get(alliance_color).get('shieldEnergizedRankingPoint') %}E
       {% elif match.score_breakdown.get(alliance_color).get('shieldOperationalRankingPoint') %}O
+      {% else %}--{% endif %}
+    {% endif %}
+  {% elif match.year == 2022 and match.has_been_played and match.score_breakdown %}
+    {% if match.score_breakdown.get(alliance_color).get('cargoBonusRankingPoint') and match.score_breakdown.get(alliance_color).get('hangarBonusRankingPoint') %}
+    C / H
+    {% else %}
+      {% if match.score_breakdown.get(alliance_color).get('cargoBonusRankingPoint') %}C
+      {% elif match.score_breakdown.get(alliance_color).get('hangarBonusRankingPoint') %}H
       {% else %}--{% endif %}
     {% endif %}
   {% else %}
