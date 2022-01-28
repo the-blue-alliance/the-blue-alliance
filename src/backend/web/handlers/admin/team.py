@@ -62,6 +62,8 @@ def team_detail(team_number: int) -> str:
 
     team_medias_by_year = {}
     for media in team_medias:
+        if not media.year:
+            continue
         if media.year in team_medias_by_year:
             team_medias_by_year[media.year].append(media)
         else:
