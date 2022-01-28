@@ -1,0 +1,301 @@
+{% macro taxi(team, did_taxi) %}
+{% if did_taxi %}
+<span class="glyphicon glyphicon-ok" rel="tooltip" title="{{team|digits}}"></span>
+{% else %}
+<span class="glyphicon glyphicon-remove" rel="tooltip" title="{{team|digits}}"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro auto_cargo(alliance_breakdown) %}
+<span class="glyphicon glyphicon-down" rel="tooltip" title="Lower Hub"></span>
+{{alliance_breakdown.autoCargoLowerNear +
+  alliance_breakdown.autoCargoLowerFar +
+  alliance_breakdown.autoCargoLowerBlue + 
+  alliance_breakdown.autoCargoLowerRed}}
+<span class="glyphicon glyphicon-up" rel="tooltip" title="Upper Hub"></span>
+{{alliance_breakdown.autoCargoUpperNear +
+  alliance_breakdown.autoCargoUpperFar +
+  alliance_breakdown.autoCargoUpperBlue + 
+  alliance_breakdown.autoCargoUpperRed}}
+{% endmacro %}
+
+{% macro quintet(alliance_breakdown) %}
+{% if alliance_breakdown.quintetAchieved %}
+<span class="glyphicon glyphicon-ok"></span>
+{% else %}
+<span class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro teleop_cargo(alliance_breakdown) %}
+<span class="glyphicon glyphicon-down" rel="tooltip" title="Lower Hub"></span>
+{{alliance_breakdown.teleopCargoLowerNear +
+  alliance_breakdown.teleopCargoLowerFar +
+  alliance_breakdown.teleopCargoLowerBlue + 
+  alliance_breakdown.teleopCargoLowerRed}}
+<span class="glyphicon glyphicon-up" rel="tooltip" title="Upper Hub"></span>
+{{alliance_breakdown.teleopCargoUpperNear +
+  alliance_breakdown.teleopCargoUpperFar +
+  alliance_breakdown.teleopCargoUpperBlue + 
+  alliance_breakdown.teleopCargoUpperRed}}
+{% endmacro %}
+
+{% macro endgame(team, endgame_result) %}
+{% if endgame_result == 'Traversal' %}
+  <span rel="tooltip" title="{{team|digits}}">Traversal (+15)</span>
+{% elif endgame_result == 'High' %}
+  <span rel="tooltip" title="{{team|digits}}">High (+10)</span>
+{% elif endgame_result == 'Mid' %}
+  <span rel="tooltip" title="{{team|digits}}">Mid (+6)</span>
+{% elif endgame_result == 'Low' %}
+  <span rel="tooltip" title="{{team|digits}}">Low (+4)</span>
+{% else %}
+  <span rel="tooltip" title="{{team|digits}}" class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro rp_bonus(earned) %}
+{% if earned %}
+<span class="glyphicon glyphicon-ok"></span> (+1 RP)
+{% else %}
+<span class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro fouls(alliance_breakdown) %}
++{%if alliance_breakdown.foulCount%}{{alliance_breakdown.foulCount * 4}}{%else%}0{%endif%} /
++{%if alliance_breakdown.techFoulCount%}{{alliance_breakdown.techFoulCount * 8}}{%else%}0{%endif%}
+{% endmacro %}
+
+<table class="match-table">
+  <tbody>
+    <!-- Autonomous -->
+    {% if "taxiRobot1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{taxi(match.alliances.red.teams.0, match.score_breakdown.red.taxiRobot1 == 'Yes')}}
+        {{taxi(match.alliances.red.teams.1, match.score_breakdown.red.taxiRobot2 == 'Yes')}}
+        {{taxi(match.alliances.red.teams.2, match.score_breakdown.red.taxiRobot3 == 'Yes')}}
+        (+{{match.score_breakdown.red.autoTaxiPoints}})
+      </td>
+      <td>Taxi</td>
+      <td class="blue" colspan="2">
+        {{taxi(match.alliances.blue.teams.0, match.score_breakdown.blue.taxiRobot1 == 'Yes')}}
+        {{taxi(match.alliances.blue.teams.1, match.score_breakdown.blue.taxiRobot2 == 'Yes')}}
+        {{taxi(match.alliances.blue.teams.2, match.score_breakdown.blue.taxiRobot3 == 'Yes')}}
+        (+{{match.score_breakdown.blue.autoTaxiPoints}})
+      </td>
+    </tr>
+    {% endif %}
+    {% if "autoCargoLowerNear" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{auto_cargo(match.score_breakdown.red)}}
+      </td>
+      <td>Auto Cargo Count</td>
+      <td class="blue" colspan="2">
+        {{auto_cargo(match.score_breakdown.blue)}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "quintetAchieved" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="red" colspan="2">
+        {{quintet(match.score_breakdown.red)}}
+      </td>
+      <td>Quintet</td>
+      <td class="blue" colspan="2">
+        {{quintet(match.score_breakdown.blue)}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "autoCargoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.autoCargoPoints}}
+      </td>
+      <td>Auto Cargo Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.autoCargoPoints}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "autoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        <b>{% if match.score_breakdown.red.autoPoints %}{{match.score_breakdown.red.autoPoints}}{%else%}0{%endif%}</b>
+      </td>
+      <th>Total Auto</th>
+      <td class="blueScore" colspan="2">
+        <b>{% if match.score_breakdown.blue.autoPoints %}{{match.score_breakdown.blue.autoPoints}}{%else%}0{%endif%}</b>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop -->
+    {% if "teleopCargoLowerNear" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{teleop_cargo(match.score_breakdown.red)}}
+      </td>
+      <td>Teleop Cargo Count</td>
+      <td class="blue" colspan="2">
+        {{teleop_cargo(match.score_breakdown.blue)}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "teleopCargoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.teleopCargoPoints}}
+      </td>
+      <td>Teleop Cargo Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.teleopCargoPoints}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Robot 1 Endgame -->
+    {% if "endgameRobot1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.0, match.score_breakdown.red.endgameRobot1)}}
+      </td>
+      <td>Robot 1 Endgame</td>
+      <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.0, match.score_breakdown.blue.endgameRobot1)}}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 2 Endgame -->
+    {% if "endgameRobot2" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.1, match.score_breakdown.red.endgameRobot2)}}
+      </td>
+      <td>Robot 1 Endgame</td>
+      <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.1, match.score_breakdown.blue.endgameRobot2)}}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 3 Endgame -->
+    {% if "endgameRobot3" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.2, match.score_breakdown.red.endgameRobot3)}}
+      </td>
+      <td>Robot 1 Endgame</td>
+      <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.2, match.score_breakdown.blue.endgameRobot3)}}
+      </td>
+    </tr>
+    {% endif %}
+
+    {% if "endgamePoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.endgamePoints}}
+      </td>
+      <td>Hangar Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.endgamePoints}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "teleopPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        <b>{% if match.score_breakdown.red.teleopPoints %}{{match.score_breakdown.red.teleopPoints}}{%else%}0{%endif%}</b>
+      </td>
+      <th>Total Teleop</th>
+      <td class="blueScore" colspan="2">
+        <b>{% if match.score_breakdown.blue.teleopPoints %}{{match.score_breakdown.blue.teleopPoints}}{%else%}0{%endif%}</b>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Bonus RP -->
+    {% if "cargoBonusRankingPoint" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{rp_bonus(match.score_breakdown.red.cargoBonusRankingPoint)}}
+      </td>
+      <td>Cargo Bonus</td>
+      <td class="blue" colspan="2">
+        {{rp_bonus(match.score_breakdown.blue.cargoBonusRankingPoint)}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "hangarBonusRankingPoint" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{rp_bonus(match.score_breakdown.red.hangarBonusRankingPoint)}}
+      </td>
+      <td>Hangar Bonus</td>
+      <td class="blue" colspan="2">
+        {{rp_bonus(match.score_breakdown.blue.hangarBonusRankingPoint)}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Fouls & Adjustments -->
+    {% if "foulCount" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{fouls(match.score_breakdown.red)}}
+      </td>
+      <td>Fouls / Tech Fouls</td>
+      <td class="blue" colspan="2">
+        {{fouls(match.score_breakdown.blue)}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "adjustPoints" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.adjustPoints%}{{match.score_breakdown.red.adjustPoints}}{%else%}0{%endif%}</td>
+      <td>Adjustments</td>
+      <td class="blue" colspan="2">{%if match.score_breakdown.blue.adjustPoints%}{{match.score_breakdown.blue.adjustPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{%if match.score_breakdown.red.totalPoints%}{{match.score_breakdown.red.totalPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Score</th>
+      <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+
+    {% if 'rp' in match.score_breakdown.red and match.comp_level == 'qm' %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.cargoBonusRankingPoint %}
+        <svg class="top-left-dot" rel="tooltip" title="Cargo Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.red.hangarBonusRankingPoint %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Hangar Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.red.rp}} RP
+      </td>
+      <td>Ranking Points</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.cargoBonusRankingPoint %}
+        <svg class="top-left-dot" rel="tooltip" title="Cargo Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.blue.hangarBonusRankingPoint %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Hangar Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.blue.rp}} RP
+      </td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
