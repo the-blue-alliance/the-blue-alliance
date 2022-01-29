@@ -43,6 +43,10 @@ dispatch:
 - url: "py3.thebluealliance.com/api/*"
   service: py3-api
 
+# API docs
+- url: "*/apidocs/v3"
+  service: api
+
 - url: "py3.thebluealliance.com/*"
   service: py3-web
 
