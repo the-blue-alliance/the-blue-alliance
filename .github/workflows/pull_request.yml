@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: 3.9
       - name: Cache pip
@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: 3.9
       - name: Cache pip
@@ -60,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: 3.9
       - name: Cache pip
@@ -126,7 +126,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: 3.9
       - name: Cache pip
@@ -154,7 +154,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: 3.9
       - name: Set up Node
@@ -183,7 +183,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Python 3.9
-        uses: actions/setup-python@v2.3.0
+        uses: actions/setup-python@v2.3.2
         with:
           python-version: 3.9
       - name: Cache pip
