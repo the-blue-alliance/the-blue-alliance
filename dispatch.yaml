@@ -47,6 +47,10 @@ dispatch:
 - url: "*/apidocs/v3"
   service: py3-web
 
+# API docs (swagger)
+- url: "*/swagger/api_v3.json"
+  service: py3-web
+
 - url: "py3.thebluealliance.com/*"
   service: py3-web
 
