@@ -12,6 +12,6 @@ numpy==1.22.2
 oauth2client==4.1.3
 pyre-extensions==0.0.27
 requests==2.27.1
-typing-extensions==4.0.1
+typing-extensions==4.1.1
 Werkzeug==2.0.3
 appengine-python-standard-tbafork==0.4.0dev2
