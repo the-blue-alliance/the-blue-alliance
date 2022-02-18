@@ -27,7 +27,7 @@
         <h1 class="visible-xs end_header" id="district-name">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
 
         <div class="btn-group">
-          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" style="white-space:normal; word-wrap: break-word; word-break: normal;" href="#">
             {{district_name}}
             <span class="caret"></span>
           </a>
