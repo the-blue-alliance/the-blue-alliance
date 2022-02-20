@@ -116,7 +116,7 @@ class EventDetails(CachedModel):
                 if game_year == 2021:
                     # 2021 did not have matches played for rankings
                     continue
-                elif game_year in {2017, 2018, 2019, 2020, 2021}:
+                elif game_year in {2017, 2018, 2019, 2020, 2021, 2022}:
                     rank["extra_stats"] = [
                         int(round(rank["sort_orders"][0] * rank["matches_played"])),
                     ]
@@ -136,7 +136,7 @@ class EventDetails(CachedModel):
             if game_year == 2021:
                 # 2021 did not have matches played for rankings
                 pass
-            elif game_year in {2017, 2018, 2019, 2020, 2021}:
+            elif game_year in {2017, 2018, 2019, 2020, 2021, 2022}:
                 extra_stats_info = [{"name": "Total Ranking Points", "precision": 0}]
             elif sort_order_info is not None:
                 extra_stats_info = [

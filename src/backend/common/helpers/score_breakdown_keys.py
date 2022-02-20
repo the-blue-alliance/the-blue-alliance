@@ -307,7 +307,7 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "teleopCargoUpperNear",
             "teleopCargoUpperRed",
             "teleopPoints",
-            "totalPoints"
+            "totalPoints",
         ]
     ),
 }
