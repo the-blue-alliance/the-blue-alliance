@@ -7,12 +7,12 @@
 {% endmacro %}
 
 {% macro auto_cargo(alliance_breakdown) %}
-<span class="glyphicon glyphicon-down" rel="tooltip" title="Lower Hub"></span>
+<span class="glyphicon glyphicon-chevron-down" rel="tooltip" title="Lower Hub"></span>
 {{alliance_breakdown.autoCargoLowerNear +
   alliance_breakdown.autoCargoLowerFar +
   alliance_breakdown.autoCargoLowerBlue + 
   alliance_breakdown.autoCargoLowerRed}}
-<span class="glyphicon glyphicon-up" rel="tooltip" title="Upper Hub"></span>
+<span class="glyphicon glyphicon-chevron-up" rel="tooltip" title="Upper Hub"></span>
 {{alliance_breakdown.autoCargoUpperNear +
   alliance_breakdown.autoCargoUpperFar +
   alliance_breakdown.autoCargoUpperBlue + 
@@ -28,12 +28,12 @@
 {% endmacro %}
 
 {% macro teleop_cargo(alliance_breakdown) %}
-<span class="glyphicon glyphicon-down" rel="tooltip" title="Lower Hub"></span>
+<span class="glyphicon glyphicon-chevron-down" rel="tooltip" title="Lower Hub"></span>
 {{alliance_breakdown.teleopCargoLowerNear +
   alliance_breakdown.teleopCargoLowerFar +
   alliance_breakdown.teleopCargoLowerBlue + 
   alliance_breakdown.teleopCargoLowerRed}}
-<span class="glyphicon glyphicon-up" rel="tooltip" title="Upper Hub"></span>
+<span class="glyphicon glyphicon-chevron-up" rel="tooltip" title="Upper Hub"></span>
 {{alliance_breakdown.teleopCargoUpperNear +
   alliance_breakdown.teleopCargoUpperFar +
   alliance_breakdown.teleopCargoUpperBlue + 
