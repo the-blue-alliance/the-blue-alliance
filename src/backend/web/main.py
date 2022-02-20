@@ -13,6 +13,7 @@ from backend.web.handlers.apidocs import apidocs_trusted_v1, apidocs_v3
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
+from backend.web.handlers.eventwizard import eventwizard
 from backend.web.handlers.gameday import gameday, gameday_redirect
 from backend.web.handlers.index import about, index
 from backend.web.handlers.match import match_detail
@@ -65,6 +66,8 @@ app.add_url_rule(
     '/events/<regex("[a-z]+"):district_abbrev>/<int:year>', view_func=district_detail
 )
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
+
+app.add_url_rule("/eventwizard", view_func=eventwizard)
 
 app.add_url_rule("/match/<match_key>", view_func=match_detail)
 
