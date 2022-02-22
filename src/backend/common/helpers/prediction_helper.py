@@ -708,7 +708,7 @@ class PredictionHelper:
         elif event.year == 2022:
             relevant_stats = [
                 ("score", 0, 20 ** 2),
-                ("power_cells_scored", 0, 10 ** 2),
+                ("cargo_scored", 0, 10 ** 2),
                 ("endgame_points", 0, 10 ** 2),
             ]
         else:
