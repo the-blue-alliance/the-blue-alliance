@@ -173,8 +173,8 @@ class EventInsightsHelper:
                         1 if alliance_breakdown["hangarBonusRankingPoint"] else 0
                     )
                     total_cargo_points += (
-                        alliance_breakdown["autoCellPoints"]
-                        + alliance_breakdown["teleopCellPoints"]
+                        alliance_breakdown["autoCargoPoints"]
+                        + alliance_breakdown["teleopCargoPoints"]
                     )
 
                     alliance_win = alliance_color == match.winning_alliance
