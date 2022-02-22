@@ -348,6 +348,21 @@ class ContributionCalculator:
                                 "{}Cells{}".format(mode, goal)
                             ]
                     means[color] = count
+                elif self._stat == "cargo_scored":
+                    auto_count = 0
+                    for goal in ["Lower", "Upper"]:
+                        for exit in ["Near", "Far", "Red", "Blue"]:
+                            auto_count += score_breakdown[color][
+                                "autoCargo{}{}".format(goal, exit)
+                            ]
+                    # Approximate Quintet by adding 2 to count
+                    count = auto_count + 2 if auto_count >= 5 else auto_count
+                    for goal in ["Lower", "Upper"]:
+                        for exit in ["Near", "Far", "Red", "Blue"]:
+                            count += score_breakdown[color][
+                                "teleopCargo{}{}".format(goal, exit)
+                            ]
+                    means[color] = count
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -594,6 +609,23 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
                     prediction[color]["prob_shield_operational"] = prob
+                # 2022
+                if stat == "cargo_scored":
+                    required_pieces = 20
+
+                    mu = mean_vars[color][stat]["mean"] - required_pieces
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_cargo_bonus"] = prob
+                if stat == "endgame_points":
+                    required_points = 16
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_hangar_bonus"] = prob
 
         # Prob win
         red_score = prediction["red"]["score"]
@@ -672,6 +704,12 @@ class PredictionHelper:
                 ("score", 0, 50 ** 2),
                 ("power_cells_scored", 0, 20 ** 2),
                 ("endgame_points", 0, 20 ** 2),
+            ]
+        elif event.year == 2022:
+            relevant_stats = [
+                ("score", 0, 20 ** 2),
+                ("power_cells_scored", 0, 10 ** 2),
+                ("endgame_points", 0, 10 ** 2),
             ]
         else:
             relevant_stats = []
@@ -908,6 +946,16 @@ class PredictionHelper:
                             sampled_tiebreaker[alliance_color] = score_breakdown[
                                 alliance_color
                             ]["totalPoints"]
+                        elif match.year == 2022:
+                            sampled_rp1[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["cargoBonusRankingPoint"]
+                            sampled_rp2[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["hangarBonusRankingPoint"]
+                            sampled_tiebreaker[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["totalPoints"]
                 else:
                     prediction = qual_predictions[none_throws(match.key.string_id())]
                     if np.random.uniform(high=1) < prediction["prob"]:
@@ -973,6 +1021,18 @@ class PredictionHelper:
                             sampled_rp2[alliance_color] = (
                                 np.random.uniform(high=1)
                                 < color_prediction["prob_shield_operational"]
+                            )
+                            sampled_tiebreaker[alliance_color] = color_prediction[
+                                "score"
+                            ]
+                        elif match.year == 2022:
+                            sampled_rp1[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_cargo_bonus"]
+                            )
+                            sampled_rp2[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_hangar_bonus"]
                             )
                             sampled_tiebreaker[alliance_color] = color_prediction[
                                 "score"

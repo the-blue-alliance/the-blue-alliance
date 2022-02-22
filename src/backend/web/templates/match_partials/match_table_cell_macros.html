@@ -166,6 +166,8 @@
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_complete_rocket)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_hab_docking)|limit_prob}}%</em>
   {% elif match.year == 2020 %}
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_shield_energized)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_shield_operational)|limit_prob}}%</em>
+  {% elif match.year == 2022 %}
+  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_cargo_bonus)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_hangar_bonus)|limit_prob}}%</em>
   {% endif %}
 </td>
 {% endmacro %}
