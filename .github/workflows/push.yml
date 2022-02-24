@@ -86,7 +86,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Node
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3.0.0
         with:
           node-version: "14"
       - name: Cache node modules
@@ -106,7 +106,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Set up Node
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3.0.0
         with:
           node-version: "14"
       - name: Cache node modules
@@ -163,7 +163,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Set up Node
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3.0.0
         with:
           node-version: "14"
       - name: Cache node modules
@@ -206,7 +206,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
       - name: Set up Node
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3.0.0
         with:
           node-version: "14"
       - name: Cache node modules
