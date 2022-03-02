@@ -57,24 +57,50 @@ class WebcastOnlineHelper:
     @ndb.tasklet
     def _add_twitch_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
         client_id = TwitchSecrets.client_id()
-        if client_id:
-            url = "https://api.twitch.tv/helix/streams?user_login={}".format(
+        client_secret = TwitchSecrets.client_secret()
+        if client_id and client_secret:
+            # Get auth token
+            auth_url = "https://id.twitch.tv/oauth2/token?client_id={}&client_secret={}&grant_type=client_credentials".format(
+                client_id, client_secret
+            )
+            try:
+                rpc = urlfetch.create_rpc()
+                result = yield urlfetch.make_fetch_call(rpc, auth_url, method="POST")
+            except Exception as e:
+                logging.error("URLFetch failed when getting Twitch auth token.")
+                logging.error(e)
+                raise ndb.Return(None)
+
+            if result.status_code == 200:
+                response = json.loads(result.content)
+                token = response["access_token"]
+            else:
+                logging.warning(
+                    "Twitch auth failed with status code: {}".format(result.status_code)
+                )
+                logging.warning(result.content)
+                raise ndb.Return(None)
+
+            # Get webcast status
+            status_url = "https://api.twitch.tv/helix/streams?user_login={}".format(
                 webcast["channel"]
             )
             try:
                 rpc = urlfetch.create_rpc()
                 result = yield urlfetch.make_fetch_call(
                     rpc,
-                    url,
+                    status_url,
                     headers={
+                        "Authorization": "Bearer {}".format(token),
                         "Client-ID": client_id,
                     },
                 )
-            except Exception:
-                logging.exception("URLFetch failed for: {}".format(url))
+            except Exception as e:
+                logging.exception("URLFetch failed for: {}".format(status_url))
+                logging.error(e)
                 return None
         else:
-            logging.warning("Must have Twitch Client ID")
+            logging.warning("Must have Twitch Client ID & Secret")
             return None
 
         if result.status_code == 200:

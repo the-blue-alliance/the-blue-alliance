@@ -549,22 +549,21 @@ class Event(CachedModel):
                 self._webcast = None
         return self._webcast or []
 
-    """
     @property
     def webcast_status(self):
-        from helpers.webcast_online_helper import WebcastOnlineHelper
+        from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
+
         WebcastOnlineHelper.add_online_status(self.current_webcasts)
 
-        overall_status = 'offline'
+        overall_status = "offline"
         for webcast in self.current_webcasts:
-            status = webcast.get('status')
-            if status == 'online':
-                overall_status = 'online'
+            status = webcast.get("status")
+            if status == "online":
+                overall_status = "online"
                 break
-            elif status == 'unknown':
-                overall_status = 'unknown'
+            elif status == "unknown":
+                overall_status = "unknown"
         return overall_status
-    """
 
     @property
     def current_webcasts(self) -> List[Webcast]:
