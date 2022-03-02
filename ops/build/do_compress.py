@@ -76,7 +76,7 @@ def main(kind=None):
         # print('Compressing Firebase Messaging Serviceworker JavaScript...')
         # compress_js(SCRIPTS_FIREBASE_SERVICEWORKER, SCRIPTS_FIREBASE_SERVICEWORKER_OUT)
         #
-        print('Compressing EventWizard JavaScript...')
+        print("Compressing EventWizard JavaScript...")
         compress_js(SCRIPTS_EVENTWIZARD, SCRIPTS_EVENTWIZARD_OUT)
 
     if kind == "css" or kind is None:

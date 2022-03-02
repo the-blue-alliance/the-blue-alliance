@@ -43,6 +43,7 @@ class CacheIf(abc.ABC):
         self,
         mapping: Dict[bytes, Any],
         time: Optional[int] = None,
+        namespace: Optional[str] = None,
     ) -> None:
         """Set multiple keys' values at once, regardless of previous contents.
 
@@ -52,6 +53,7 @@ class CacheIf(abc.ABC):
             from current time (up to 1 month).
             By default, items never expire, though items may be evicted due to
             memory pressure.
+        namespace: Optional namespace
 
         Returns:
         A list of keys whose values were NOT set.  On total success,
@@ -79,6 +81,7 @@ class CacheIf(abc.ABC):
     def get_multi(
         self,
         keys: List[bytes],
+        namespace: Optional[str] = None,
     ) -> Dict[bytes, Optional[Any]]:
         """Looks up multiple keys from memcache in one operation.
 
@@ -90,6 +93,7 @@ class CacheIf(abc.ABC):
             does the sharding and hashing automatically, though, so the hash
             value is ignored.  To memcache, keys are just series of bytes,
             and not in any particular encoding.
+        namespace: Optional namespace
 
         Returns:
         A dictionary of the keys and values that were present in memcache.
