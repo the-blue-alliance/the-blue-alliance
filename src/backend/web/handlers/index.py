@@ -61,15 +61,19 @@ def index_kickoff(template_values: Dict[str, Any]) -> str:
 def index_buildseason(template_values: Dict[str, Any]) -> str:
     special_webcasts = FirebasePusher.get_special_webcasts()
     effective_season_year = SeasonHelper.effective_season_year()
-    template_values.update({
-        "year": effective_season_year,
-        "seasonstart_datetime_utc": SeasonHelper.first_event_datetime_utc(
-            effective_season_year
-        ),
-        "events": EventHelper.week_events(),
-        "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
-        "special_webcasts": special_webcasts,
-    })
+    template_values.update(
+        {
+            "year": effective_season_year,
+            "seasonstart_datetime_utc": SeasonHelper.first_event_datetime_utc(
+                effective_season_year
+            ),
+            "events": EventHelper.week_events(),
+            "any_webcast_online": any(
+                w.get("status") == "online" for w in special_webcasts
+            ),
+            "special_webcasts": special_webcasts,
+        }
+    )
     return render_template("index/index_buildseason.html", template_values)
 
 
@@ -84,22 +88,30 @@ def index_competitionseason(template_values: Dict[str, Any]) -> str:
         for event in week_events:
             if event.now and event.webcast:
                 for event_webcast in event.webcast:
-                    if (special_webcast.get('type', '') == event_webcast.get('type', '') and
-                            special_webcast.get('channel', '') == event_webcast.get('channel', '') and
-                            special_webcast.get('file', '') == event_webcast.get('file', '')):
+                    if (
+                        special_webcast.get("type", "") == event_webcast.get("type", "")
+                        and special_webcast.get("channel", "")
+                        == event_webcast.get("channel", "")
+                        and special_webcast.get("file", "")
+                        == event_webcast.get("file", "")
+                    ):
                         add = False
                         break
             if not add:
                 break
         if add:
             special_webcasts.append(special_webcast)
-    
-    template_values.update({
-        "events": week_events,
-        "any_webcast_online": any(w.get('status') == 'online' for w in special_webcasts),
-        "special_webcasts": special_webcasts,
-        "popular_teams_events": popular_teams_events,
-    })
+
+    template_values.update(
+        {
+            "events": week_events,
+            "any_webcast_online": any(
+                w.get("status") == "online" for w in special_webcasts
+            ),
+            "special_webcasts": special_webcasts,
+            "popular_teams_events": popular_teams_events,
+        }
+    )
     return render_template("index/index_competitionseason.html", template_values)
 
 
