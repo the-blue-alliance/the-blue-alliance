@@ -12,7 +12,7 @@ jobs:
     name: "[py3] Type Check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -35,7 +35,7 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -58,7 +58,7 @@ jobs:
     name: "[py3] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -84,7 +84,7 @@ jobs:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Node
         uses: actions/setup-node@v3.0.0
         with:
@@ -104,7 +104,7 @@ jobs:
     name: "[node] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Node
         uses: actions/setup-node@v3.0.0
         with:
@@ -129,7 +129,7 @@ jobs:
     name: "[bash] Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -157,7 +157,7 @@ jobs:
     name: Build Web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -196,7 +196,7 @@ jobs:
         ports:
           - 5000:5000
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -259,7 +259,7 @@ jobs:
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -281,7 +281,7 @@ jobs:
     needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, ops-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -308,7 +308,7 @@ jobs:
     needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
@@ -330,7 +330,7 @@ jobs:
     needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2.3.2
         with:
