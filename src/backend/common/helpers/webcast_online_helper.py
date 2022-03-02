@@ -67,7 +67,7 @@ class WebcastOnlineHelper:
                 rpc = urlfetch.create_rpc()
                 result = yield urlfetch.make_fetch_call(rpc, auth_url, method="POST")
             except Exception as e:
-                logging.error("URLFetch failed for: {}".format(auth_url))
+                logging.error("URLFetch failed when getting Twitch auth token.")
                 logging.error(e)
                 raise ndb.Return(None)
 

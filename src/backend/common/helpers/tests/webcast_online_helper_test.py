@@ -34,6 +34,12 @@ def set_youtube_secrets(ndb_stub) -> None:
     GoogleApiSecret.put({"api_key": "secret"})
 
 
+class MockTwitchAuth:
+    def __call__(self, url, payload, method, headers, request, response, **kwargs):
+        response.StatusCode = 200
+        response.Content = json.dumps({"access_token": "123testtoken"}).encode()
+
+
 class MockTwitchApi:
     def __init__(self, online=True, fail=False, throw=False) -> None:
         self.online = online
@@ -158,7 +164,8 @@ def test_add_online_status_twitch_no_secrets(
 ) -> None:
     gae_testbed.init_urlfetch_stub(
         urlmatchers=[
-            (lambda url: urlparse(url).netloc == "api.twitch.tv", MockTwitchApi())
+            (lambda url: urlparse(url).netloc == "id.twitch.tv", MockTwitchAuth()),
+            (lambda url: urlparse(url).netloc == "api.twitch.tv", MockTwitchApi()),
         ]
     )
     webcast = Webcast(
@@ -175,10 +182,11 @@ def test_add_online_status_twitch_http_failue(
 ) -> None:
     gae_testbed.init_urlfetch_stub(
         urlmatchers=[
+            (lambda url: urlparse(url).netloc == "id.twitch.tv", MockTwitchAuth()),
             (
                 lambda url: urlparse(url).netloc == "api.twitch.tv",
                 MockTwitchApi(fail=True),
-            )
+            ),
         ]
     )
     webcast = Webcast(
@@ -195,10 +203,11 @@ def test_add_online_status_twitch_http_error(
 ) -> None:
     gae_testbed.init_urlfetch_stub(
         urlmatchers=[
+            (lambda url: urlparse(url).netloc == "id.twitch.tv", MockTwitchAuth()),
             (
                 lambda url: urlparse(url).netloc == "api.twitch.tv",
                 MockTwitchApi(throw=True),
-            )
+            ),
         ]
     )
     webcast = Webcast(
@@ -215,6 +224,7 @@ def test_add_online_status_twitch(
 ) -> None:
     gae_testbed.init_urlfetch_stub(
         urlmatchers=[
+            (lambda url: urlparse(url).netloc == "id.twitch.tv", MockTwitchAuth()),
             (lambda url: urlparse(url).netloc == "api.twitch.tv", MockTwitchApi()),
         ]
     )
@@ -234,6 +244,7 @@ def test_add_online_status_twitch_offline(
 ) -> None:
     gae_testbed.init_urlfetch_stub(
         urlmatchers=[
+            (lambda url: urlparse(url).netloc == "id.twitch.tv", MockTwitchAuth()),
             (
                 lambda url: urlparse(url).netloc == "api.twitch.tv",
                 MockTwitchApi(online=False),
