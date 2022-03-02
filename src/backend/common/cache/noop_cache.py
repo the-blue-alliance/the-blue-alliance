@@ -20,6 +20,7 @@ class NoopCache(CacheIf):
         self,
         mapping: Dict[bytes, Any],
         time: Optional[int] = None,
+        namespace: Optional[str] = None,
     ) -> None:
         return None
 
@@ -30,6 +31,7 @@ class NoopCache(CacheIf):
     def get_multi(
         self,
         keys: List[bytes],
+        namespace: Optional[str] = None,
     ) -> Dict[bytes, Optional[Any]]:
         self.miss_count += len(keys)
         return {k: None for k in keys}

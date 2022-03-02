@@ -1,12 +1,12 @@
 from typing import List, Tuple, Union
 
-from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
+from backend.common.memcache import MemcacheClient
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.favorite import Favorite
 from backend.common.models.team import Team
-from backend.common.models.event_team import EventTeam
 
 
 class TeamHelper(object):
@@ -30,8 +30,9 @@ class TeamHelper(object):
 
         # Calculate popular teams
         # Get cached team keys
+        memcache = MemcacheClient.get()
         event_team_keys = memcache.get_multi(
-            events_by_key.keys(), namespace="event-team-keys"
+            list(events_by_key.keys()), namespace="event-team-keys"
         )
 
         # Get uncached team keys
