@@ -77,9 +77,9 @@ cron:
   url: /tasks/do/update_live_events
   schedule: every 5 minutes
 
-#- description: Predict Match Times
-#  url: /tasks/math/enqueue/predict_match_times
-#  schedule: every 1 minutes
+- description: Predict Match Times
+  url: /tasks/math/enqueue/predict_match_times
+  schedule: every 1 minutes
 
 - description: Suggestion Queue Nag
   url: /tasks/do/nag_suggestions
