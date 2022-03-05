@@ -7,6 +7,7 @@ from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
+from backend.web.context_processors import render_time_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
 from backend.web.handlers.apidocs import apidocs_trusted_v1, apidocs_v3
@@ -86,6 +87,7 @@ app.register_error_handler(404, handle_404)
 app.register_error_handler(500, handle_500)
 
 app.context_processor(_user_context_processor)
+app.context_processor(render_time_context_processor)
 
 register_template_filters(app)
 maybe_install_local_routes(app, csrf)
