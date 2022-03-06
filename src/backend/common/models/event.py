@@ -583,16 +583,20 @@ class Event(CachedModel):
                 current_webcasts.append(webcast)
         return current_webcasts
 
-    """
     @property
     def online_webcasts(self):
         current_webcasts = self.current_webcasts
 
-        from helpers.webcast_online_helper import WebcastOnlineHelper
+        from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
+
         WebcastOnlineHelper.add_online_status(current_webcasts)
 
-        return filter(lambda x: x.get('status', '') != 'offline', current_webcasts if current_webcasts else [])
-    """
+        return list(
+            filter(
+                lambda x: x.get("status", "") != "offline",
+                current_webcasts if current_webcasts else [],
+            )
+        )
 
     @property
     def has_first_official_webcast(self) -> bool:
@@ -746,6 +750,7 @@ class Event(CachedModel):
             return recent_matches[0]
         else:
             return None
+    """
 
     def team_awards(self):
         # Returns a dictionary of awards for teams
@@ -756,4 +761,3 @@ class Event(CachedModel):
                 a.append(award)
                 team_awards[team_key] = a
         return team_awards
-    """

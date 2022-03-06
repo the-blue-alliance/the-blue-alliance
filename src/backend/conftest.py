@@ -70,6 +70,14 @@ def taskqueue_stub(
 
 
 @pytest.fixture()
+def urlfetch_stub(
+    gae_testbed: testbed.Testbed,
+) -> testbed.urlfetch_stub.URLFetchServiceStub:
+    gae_testbed.init_urlfetch_stub()
+    return gae_testbed.get_stub(testbed.URLFETCH_SERVICE_NAME)
+
+
+@pytest.fixture()
 def memcache_stub(
     gae_testbed: testbed.Testbed,
     monkeypatch: pytest.MonkeyPatch,

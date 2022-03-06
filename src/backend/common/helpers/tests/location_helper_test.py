@@ -390,12 +390,12 @@ class TestLocationHelper(unittest.TestCase):
         LocationHelper.update_event_location(event)
         self.assertEqual(
             event.normalized_location.name,
-            u"Instituto Tecnol\xf3gico de Estudios Superiores de Monterrey",
+            "Instituto Tecnol\xf3gico de Estudios Superiores de Monterrey",
         )
         # self.assertEqual(event.normalized_location.formatted_address, u'Paseo del Tecnol\xf3gico 751, La Rosita, Amp la Rosita, 27250 Torre\xf3n, Coah., Mexico')
         # self.assertEqual(event.normalized_location.street_number, None)
         # self.assertEqual(event.normalized_location.street, None)
-        self.assertEqual(event.normalized_location.city, u"Torre\xf3n")
+        self.assertEqual(event.normalized_location.city, "Torre\xf3n")
         self.assertEqual(event.normalized_location.state_prov, "Coahuila de Zaragoza")
         self.assertEqual(event.normalized_location.state_prov_short, "Coah.")
         self.assertEqual(event.normalized_location.country, "Mexico")
@@ -706,7 +706,7 @@ class TestLocationHelper(unittest.TestCase):
             id="frc3354",
             name="Mabe/Bombardier Aerospace Mexico/Coca Cola/Grupo Salinas/Fundacion Azteca/Navex/Red Cross/United Nations/Lego Education/Foundation For a Drug Free World & Tec de Monterrey",
             city="Queretaro",
-            state_prov=u"Quer\xe9taro",
+            state_prov="Quer\xe9taro",
             postalcode="76130",
             country="Mexico",
         )
@@ -716,8 +716,8 @@ class TestLocationHelper(unittest.TestCase):
         # self.assertEqual(team.normalized_location.formatted_address, u'San Pablo, 76130 Santiago de Quer\xe9taro, Qro., Mexico')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
-        self.assertEqual(team.normalized_location.city, u"Santiago de Quer\xe9taro")
-        self.assertEqual(team.normalized_location.state_prov, u"Quer\xe9taro")
+        self.assertEqual(team.normalized_location.city, "Santiago de Quer\xe9taro")
+        self.assertEqual(team.normalized_location.state_prov, "Quer\xe9taro")
         self.assertEqual(team.normalized_location.state_prov_short, "Qro.")
         self.assertEqual(team.normalized_location.country, "Mexico")
         self.assertEqual(team.normalized_location.country_short, "MX")
@@ -742,7 +742,7 @@ class TestLocationHelper(unittest.TestCase):
         # Team 3933 (Mexican team, special symbols, odd school name)
         team = Team(
             id="frc3933",
-            name=u"General Motors Mexico & Tecnol\xe1gico de Monterrey Campus Santa Fe",
+            name="General Motors Mexico & Tecnol\xe1gico de Monterrey Campus Santa Fe",
             city="Mexico",
             state_prov="Distrito Federal",
             postalcode="01389",
@@ -830,12 +830,12 @@ class TestLocationHelper(unittest.TestCase):
         # self.assertEqual(team.normalized_location.formatted_address, u'Harbiye, 34367 \u015ei\u015fli/\u0130stanbul, Turkey')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
-        self.assertTrue(team.normalized_location.city in {"Istanbul", u"\u0130stanbul"})
+        self.assertTrue(team.normalized_location.city in {"Istanbul", "\u0130stanbul"})
         self.assertTrue(
-            team.normalized_location.state_prov in {"Istanbul", u"\u0130stanbul"}
+            team.normalized_location.state_prov in {"Istanbul", "\u0130stanbul"}
         )
         self.assertTrue(
-            team.normalized_location.state_prov_short in {"Istanbul", u"\u0130stanbul"}
+            team.normalized_location.state_prov_short in {"Istanbul", "\u0130stanbul"}
         )
         self.assertEqual(team.normalized_location.country, "Turkey")
         self.assertEqual(team.normalized_location.country_short, "TR")
@@ -860,7 +860,7 @@ class TestLocationHelper(unittest.TestCase):
         # Team 6231 (Turkish team, odd school name)
         team = Team(
             id="frc6231",
-            name=u"Haydar Ak\u0131n Mesleki Teknik Anadolu L\u0131ses\u0131 & Immib Bahcelievler Erkan Avci Mesleki ve Teknik Anadolu Lisesi",
+            name="Haydar Ak\u0131n Mesleki Teknik Anadolu L\u0131ses\u0131 & Immib Bahcelievler Erkan Avci Mesleki ve Teknik Anadolu Lisesi",
             city="Istanbul",
             state_prov="Istanbul",
             postalcode=None,
@@ -872,12 +872,12 @@ class TestLocationHelper(unittest.TestCase):
         # self.assertEqual(team.normalized_location.formatted_address, u'Bah\xe7elievler, K\xfclt\xfcr Sk. No:3, . K\xfclt\xfcr Sk. Bah\xe7elievler/\u0130stanbul, Turkey')
         # self.assertEqual(team.normalized_location.street_number, '3')
         # self.assertEqual(team.normalized_location.street, u'K\xfclt\xfcr Sokak')
-        self.assertTrue(team.normalized_location.city in {"Istanbul", u"\u0130stanbul"})
+        self.assertTrue(team.normalized_location.city in {"Istanbul", "\u0130stanbul"})
         self.assertTrue(
-            team.normalized_location.state_prov in {"Istanbul", u"\u0130stanbul"}
+            team.normalized_location.state_prov in {"Istanbul", "\u0130stanbul"}
         )
         self.assertTrue(
-            team.normalized_location.state_prov_short in {"Istanbul", u"\u0130stanbul"}
+            team.normalized_location.state_prov_short in {"Istanbul", "\u0130stanbul"}
         )
         self.assertEqual(team.normalized_location.country, "Turkey")
         self.assertEqual(team.normalized_location.country_short, "TR")
@@ -890,7 +890,7 @@ class TestLocationHelper(unittest.TestCase):
         # Team 4403 (Turkish team, odd school name)
         team = Team(
             id="frc4403",
-            name=u"MET MEX PE\xd1OLES, S.A. DE C.V. & Tec de Monterrey Campus Laguna",
+            name="MET MEX PE\xd1OLES, S.A. DE C.V. & Tec de Monterrey Campus Laguna",
             city="Torreon",
             state_prov="Coahuila",
             postalcode="27250",
@@ -902,7 +902,7 @@ class TestLocationHelper(unittest.TestCase):
         # self.assertEqual(team.normalized_location.formatted_address, u'Residencial Campestre la Rosita, 27250 Torre\xf3n, Coah., Mexico')
         # self.assertEqual(team.normalized_location.street_number, None)
         # self.assertEqual(team.normalized_location.street, None)
-        self.assertEqual(team.normalized_location.city, u"Torre\xf3n")
+        self.assertEqual(team.normalized_location.city, "Torre\xf3n")
         self.assertEqual(team.normalized_location.state_prov, "Coahuila de Zaragoza")
         self.assertEqual(team.normalized_location.state_prov_short, "Coah.")
         self.assertEqual(team.normalized_location.country, "Mexico")

@@ -63,11 +63,11 @@ class DistrictHelper:
         y = s * math.sqrt(
             (
                 math.sqrt(
-                    (((2 / (math.pi * a)) + ((math.log(1 - x ** 2)) / 2)) ** 2)
-                    - ((math.log(1 - x ** 2)) / a)
+                    (((2 / (math.pi * a)) + ((math.log(1 - x**2)) / 2)) ** 2)
+                    - ((math.log(1 - x**2)) / a)
                 )
             )
-            - ((2 / (math.pi * a)) + (math.log(1 - x ** 2)) / 2)
+            - ((2 / (math.pi * a)) + (math.log(1 - x**2)) / 2)
         )
         return y
 

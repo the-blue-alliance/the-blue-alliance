@@ -192,7 +192,7 @@ The Blue Alliance Admins\
         city = suggestion.contents["city"]
         state = suggestion.contents["state"]
         country = suggestion.contents["country"]
-        address = u"{}\n{}\n{}, {}, {}".format(venue, address, city, state, country)
+        address = "{}\n{}\n{}, {}, {}".format(venue, address, city, state, country)
         return none_throws(suggestion.key.id()), Event(
             end_date=end_date,
             event_type_enum=EventType.OFFSEASON,

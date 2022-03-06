@@ -14,7 +14,11 @@ class ClientType(enum.IntEnum):
     WEB = 3
 
 
-FCM_CLIENTS: Set[ClientType] = {ClientType.OS_IOS, ClientType.WEB}
+FCM_CLIENTS: Set[ClientType] = {
+    ClientType.OS_ANDROID,
+    ClientType.OS_IOS,
+    ClientType.WEB,
+}
 
 
 NAMES: Dict[ClientType, str] = {
