@@ -94,38 +94,54 @@ def test_mobile_client_list_only_verified() -> None:
     ).fetch()
 
 
-# def test_delete_for_messaging_id(self):
-#     user_id_one = 'user_id_one'
-#     messaging_id_one = 'messaging_id1'
-#     messaging_id_two = 'messaging_id2'
-#
-#     user_id_two = 'user_id_two'
-#     messaging_id_three = 'messaging_id3'
-#
-#     for (user_id, messaging_ids) in [(user_id_one, [messaging_id_one, messaging_id_two]), (user_id_two, [messaging_id_three])]:
-#         for messaging_id in messaging_ids:
-#             MobileClient(
-#                 parent=ndb.Key(Account, user_id),
-#                 user_id=user_id,
-#                 messaging_id=messaging_id,
-#                 client_type=ClientType.OS_IOS,
-#                 device_uuid=messaging_id[::-1],
-#                 display_name='Phone').put()
-#
-#     MobileClient.delete_for_messaging_id(messaging_id_one)
-#
-#     clients_one = [client.messaging_id for client in MobileClient.query(MobileClient.user_id == 'user_id_one').fetch()]
-#     clients_two = [client.messaging_id for client in MobileClient.query(MobileClient.user_id == 'user_id_two').fetch()]
-#
-#     self.assertEqual(clients_one, [messaging_id_two])
-#     self.assertEqual(clients_two, [messaging_id_three])
-#
-#     MobileClient.delete_for_messaging_id(messaging_id_two)
-#
-#     clients_one = [client.messaging_id for client in MobileClient.query(MobileClient.user_id == 'user_id_one').fetch()]
-#     clients_two = [client.messaging_id for client in MobileClient.query(MobileClient.user_id == 'user_id_two').fetch()]
-#
-#     self.assertEqual(clients_one, [])
-#     self.assertEqual(clients_two, [messaging_id_three])
-#
-#     MobileClient.delete_for_messaging_id('does_not_exist')
+def test_delete_for_messaging_id():
+    user_id_one = "user_id_one"
+    messaging_id_one = "messaging_id1"
+    messaging_id_two = "messaging_id2"
+
+    user_id_two = "user_id_two"
+    messaging_id_three = "messaging_id3"
+
+    for (user_id, messaging_ids) in [
+        (user_id_one, [messaging_id_one, messaging_id_two]),
+        (user_id_two, [messaging_id_three]),
+    ]:
+        for messaging_id in messaging_ids:
+            MobileClient(
+                parent=ndb.Key(Account, user_id),
+                user_id=user_id,
+                messaging_id=messaging_id,
+                client_type=ClientType.OS_IOS,
+                device_uuid=messaging_id[::-1],
+                display_name="Phone",
+            ).put()
+
+    MobileClientQuery.delete_for_messaging_id(messaging_id_one)
+
+    clients_one = [
+        client.messaging_id
+        for client in MobileClientQuery(user_ids=["user_id_one"]).fetch()
+    ]
+    clients_two = [
+        client.messaging_id
+        for client in MobileClientQuery(user_ids=["user_id_two"]).fetch()
+    ]
+
+    assert clients_one == [messaging_id_two]
+    assert clients_two == [messaging_id_three]
+
+    MobileClientQuery.delete_for_messaging_id(messaging_id_two)
+
+    clients_one = [
+        client.messaging_id
+        for client in MobileClientQuery(user_ids=["user_id_one"]).fetch()
+    ]
+    clients_two = [
+        client.messaging_id
+        for client in MobileClientQuery(user_ids=["user_id_two"]).fetch()
+    ]
+
+    assert clients_one == []
+    assert clients_two == [messaging_id_three]
+
+    MobileClientQuery.delete_for_messaging_id("does_not_exist")

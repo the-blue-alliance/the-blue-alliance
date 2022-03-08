@@ -1,5 +1,7 @@
 from typing import Any, Generator, List
 
+from google.appengine.ext import ndb
+
 from backend.common.consts.client_type import ClientType
 from backend.common.models.mobile_client import MobileClient
 from backend.common.queries.database_query import DatabaseQuery
@@ -40,12 +42,14 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
         clients = yield mobile_clients_query.fetch_async()
         return list(clients)
 
-    # @staticmethod
-    # def delete_for_messaging_id(messaging_id):
-    #     """
-    #     Delete the mobile client(s) with the associated messaging_id.
-    #     Args:
-    #         messaging_id (string): The messaging_id to filter for.
-    #     """
-    #     to_delete = MobileClient.query(MobileClient.messaging_id == messaging_id).fetch(keys_only=True)
-    #     ndb.delete_multi(to_delete)
+    @staticmethod
+    def delete_for_messaging_id(messaging_id):
+        """
+        Delete the mobile client(s) with the associated messaging_id.
+        Args:
+            messaging_id (string): The messaging_id to filter for.
+        """
+        to_delete = MobileClient.query(MobileClient.messaging_id == messaging_id).fetch(
+            keys_only=True
+        )
+        ndb.delete_multi(to_delete)

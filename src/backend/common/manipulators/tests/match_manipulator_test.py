@@ -44,14 +44,14 @@ class TestMatchManipulator(unittest.TestCase):
             set_number=1,
             match_number=1,
             team_key_names=[
-                u"frc69",
-                u"frc571",
-                u"frc176",
-                u"frc3464",
-                u"frc20",
-                u"frc1073",
+                "frc69",
+                "frc571",
+                "frc176",
+                "frc3464",
+                "frc20",
+                "frc1073",
             ],
-            youtube_videos=[u"P3C2BOtL7e8", u"tst1", u"tst2", u"tst3"],
+            youtube_videos=["P3C2BOtL7e8", "tst1", "tst2", "tst3"],
         )
 
         self.new_match = Match(
@@ -79,14 +79,14 @@ class TestMatchManipulator(unittest.TestCase):
             set_number=1,
             match_number=1,
             team_key_names=[
-                u"frc69",
-                u"frc571",
-                u"frc176",
-                u"frc3464",
-                u"frc20",
-                u"frc1073",
+                "frc69",
+                "frc571",
+                "frc176",
+                "frc3464",
+                "frc20",
+                "frc1073",
             ],
-            youtube_videos=[u"TqY324xLU4s", u"tst1", u"tst3", u"tst4"],
+            youtube_videos=["TqY324xLU4s", "tst1", "tst3", "tst4"],
         )
 
     def assertMergedMatch(self, match: Match, is_auto_union: bool) -> None:
@@ -98,11 +98,11 @@ class TestMatchManipulator(unittest.TestCase):
         if is_auto_union:
             self.assertEqual(
                 set(match.youtube_videos),
-                {u"P3C2BOtL7e8", u"TqY324xLU4s", u"tst1", u"tst2", u"tst3", u"tst4"},
+                {"P3C2BOtL7e8", "TqY324xLU4s", "tst1", "tst2", "tst3", "tst4"},
             )
         else:
             self.assertEqual(
-                match.youtube_videos, [u"TqY324xLU4s", u"tst1", u"tst3", u"tst4"]
+                match.youtube_videos, ["TqY324xLU4s", "tst1", "tst3", "tst4"]
             )
         self.assertEqual(
             none_throws(match.score_breakdown)[AllianceColor.RED]["auto"], 80
@@ -114,7 +114,7 @@ class TestMatchManipulator(unittest.TestCase):
         self.assertEqual(match.match_number, 1)
         self.assertEqual(
             match.team_key_names,
-            [u"frc69", u"frc571", u"frc176", u"frc3464", u"frc20", u"frc1073"],
+            ["frc69", "frc571", "frc176", "frc3464", "frc20", "frc1073"],
         )
 
     def test_createOrUpdate(self) -> None:
