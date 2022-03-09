@@ -478,7 +478,7 @@ class Match(CachedModel):
         event_key, match = match_key.split("_", 1)
 
         match_fragment_key_name_regex = re.compile(
-            r"(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$"
+            r"^(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$"
         )
 
         valid_event_key = Event.validate_key_name(event_key)
