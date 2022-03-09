@@ -50,12 +50,12 @@ def get_base_qual_match(**kwargs) -> Match:
     )
 
 
-@pytest.mark.parametrize("key", ["2019nyny_qm1", "2010ct_sf1m3"])
+@pytest.mark.parametrize("key", ["2019nyny_qm1", "2010ct_sf1m3", "2022dc306_qm1"])
 def test_valid_key_names(key: str) -> None:
     assert Match.validate_key_name(key) is True
 
 
-@pytest.mark.parametrize("key", ["frc177", "2010ct_qm1m1", "2010ctf1m1", "2010ct_f1"])
+@pytest.mark.parametrize("key", ["frc177", "2010ct_qm1m1", "2010ctf1m1", "2010ct_f1", "_", "123", "2022_dc306_qm1"])
 def test_invalid_key_names(key: str) -> None:
     assert Match.validate_key_name(key) is False
 
