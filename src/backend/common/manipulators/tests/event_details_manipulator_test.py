@@ -1,15 +1,30 @@
 import unittest
+from typing import Optional
+from unittest.mock import patch
 
 import pytest
+from google.appengine.ext import deferred
+from google.appengine.ext import testbed
+from pyre_extensions import none_throws
 
+from backend.common.consts.event_type import EventType
+from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
+from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestEventDetailsManipulator(unittest.TestCase):
+
+    taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
+
+    @pytest.fixture(autouse=True)
+    def store_taskqueue_stub(self, taskqueue_stub):
+        self.taskqueue_stub = taskqueue_stub
+
     def setUp(self):
         self.old_alliance_selections = {
             "1": {"picks": ["frc254", "frc469", "frc2848", "frc74"], "declines": []},
@@ -32,6 +47,14 @@ class TestEventDetailsManipulator(unittest.TestCase):
             "7": {"picks": ["frc3478", "frc177", "frc294", "frc230"], "declines": []},
             "8": {"picks": ["frc624", "frc987", "frc3476", "frc3015"], "declines": []},
         }
+
+        self.event = Event(
+            id="2011ct",
+            event_short="ct",
+            year=2011,
+            event_type_enum=EventType.REGIONAL,
+        )
+        self.event.put()
 
         self.old_event_details = EventDetails(
             id="2011ct",
@@ -91,3 +114,65 @@ class TestEventDetailsManipulator(unittest.TestCase):
                 self.new_event_details, self.old_event_details
             )
         )
+
+    def test_postUpdateHook_calcs(self):
+        EventDetailsManipulator.createOrUpdate(self.old_event_details)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            deferred.run(task.payload)
+
+        # Ensure we have a district_points_calc test enqueued
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="default"
+        )
+        assert len(tasks) == 2
+
+        assert tasks[0].url == "/tasks/math/do/district_points_calc/2011ct"
+        assert tasks[1].url == "/tasks/math/do/event_team_status/2011ct"
+
+    def test_postUpdateHook_notifications(self):
+        import datetime
+
+        # Setup our event to be "now"
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        self.old_event_details.put()
+        EventDetailsManipulator.createOrUpdate(self.new_event_details)
+
+        # But the update hook should have skipped adding it
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            with patch.object(
+                TBANSHelper, "alliance_selection"
+            ) as mock_alliance_selection:
+                deferred.run(task.payload)
+
+        # Make sure we attempted to dispatch push notifications
+        mock_alliance_selection.assert_called_with(self.event)
+
+    def test_postUpdateHook_notifications_notWithinADay(self):
+        self.old_event_details.put()
+        EventDetailsManipulator.createOrUpdate(self.new_event_details)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            with patch.object(
+                TBANSHelper, "alliance_selection"
+            ) as mock_alliance_selection:
+                deferred.run(task.payload)
+
+        # Event is not configured to be within a day - skip it
+        mock_alliance_selection.assert_not_called()

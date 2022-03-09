@@ -1,11 +1,17 @@
 import json
 import unittest
+from typing import Optional
+from unittest.mock import patch
 
 import pytest
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
+from google.appengine.ext import testbed
+from pyre_extensions import none_throws
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.models.award import Award
 from backend.common.models.event import Event
@@ -14,6 +20,13 @@ from backend.common.models.team import Team
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestAwardManipulator(unittest.TestCase):
+
+    taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
+
+    @pytest.fixture(autouse=True)
+    def store_taskqueue_stub(self, taskqueue_stub):
+        self.taskqueue_stub = taskqueue_stub
+
     def setUp(self):
         self.event = Event(
             id="2013casj",
@@ -21,6 +34,7 @@ class TestAwardManipulator(unittest.TestCase):
             year=2013,
             event_type_enum=EventType.REGIONAL,
         )
+        self.event.put()
 
         self.old_award = Award(
             id=Award.render_key_name(self.event.key_name, AwardType.WINNER),
@@ -135,3 +149,59 @@ class TestAwardManipulator(unittest.TestCase):
             ),
             False,
         )
+
+    def test_postUpdateHook_districtPoints(self):
+        AwardManipulator.createOrUpdate(self.new_award)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            deferred.run(task.payload)
+
+        # Ensure we have a district_points_calc test enqueued
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="default"
+        )
+        assert len(tasks) == 1
+
+        task = tasks[0]
+        assert task.url == "/tasks/math/do/district_points_calc/2013casj"
+
+    def test_postUpdateHook_notifications(self):
+        import datetime
+
+        # Setup our event to be "now"
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        AwardManipulator.createOrUpdate(self.new_award)
+
+        # But the update hook should have skipped adding it
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            with patch.object(TBANSHelper, "awards") as mock_awards:
+                deferred.run(task.payload)
+
+        # Make sure we attempted to dispatch push notifications
+        mock_awards.assert_called_with(self.event)
+
+    def test_postUpdateHook_notifications_notWithinADay(self):
+        AwardManipulator.createOrUpdate(self.new_award)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            with patch.object(TBANSHelper, "awards") as mock_awards:
+                deferred.run(task.payload)
+
+        # Event is not configured to be within a day - skip it
+        mock_awards.assert_not_called()

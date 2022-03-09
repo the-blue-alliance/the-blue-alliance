@@ -1,6 +1,7 @@
 import json
 import unittest
 from unittest import mock
+from unittest.mock import patch
 
 import pytest
 from google.appengine.api import taskqueue
@@ -8,7 +9,9 @@ from google.appengine.ext import deferred, ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.firebase_pusher import FirebasePusher
+from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -299,3 +302,32 @@ def test_deleteHook_firebaseThrows(mock_firebase, ndb_context, taskqueue_stub) -
     assert len(tasks) == 1
     for task in tasks:
         deferred.run(task.payload)
+
+
+def test_postUpdateHook_notifications(ndb_context, taskqueue_stub) -> None:
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        with patch.object(Event, "now", return_value=True), patch.object(
+            TBANSHelper, "match_score"
+        ) as mock_match_score:
+            deferred.run(task.payload)
+
+    # Test that a bunch of notifications are sent
+    mock_match_score.assert_called_once_with(test_match)

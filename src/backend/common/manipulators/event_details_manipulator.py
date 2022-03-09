@@ -1,11 +1,14 @@
 import logging
+import traceback
 from typing import List
 
 from google.appengine.api import taskqueue
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
+from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 
 
@@ -59,6 +62,24 @@ def event_details_post_update_hook(
         except Exception:
             logging.exception(f"Error enqueuing event_team_status for {event_key}")
 
+        print(updated_model.updated_attrs)
+
+        event = Event.get_by_id(event_key)
+        if (
+            event
+            and event.within_a_day
+            and "alliance_selections" in updated_model.updated_attrs
+        ):
+            try:
+                TBANSHelper.alliance_selection(event)
+            except Exception:
+                logging.error(
+                    "Error sending alliance update notification for {}".format(
+                        event.key_name
+                    )
+                )
+                logging.error(traceback.format_exc())
+
 
 """ndb
     @classmethod
@@ -67,19 +88,6 @@ def event_details_post_update_hook(
         To run after models have been updated
         '''
         for (event_details, updated_attrs) in zip(event_details_list, updated_attr_list):
-            event = Event.get_by_id(event_details.key.id())
-            if event.within_a_day and "alliance_selections" in updated_attrs:
-                try:
-                    NotificationHelper.send_alliance_update(event)
-                except Exception:
-                    logging.error("Error sending alliance update notification for {}".format(event.key_name))
-                    logging.error(traceback.format_exc())
-                try:
-                    TBANSHelper.alliance_selection(event)
-                except Exception:
-                    logging.error("Error sending alliance update notification for {}".format(event.key_name))
-                    logging.error(traceback.format_exc())
-
             try:
                 FirebasePusher.update_event_details(event_details)
             except Exception:
