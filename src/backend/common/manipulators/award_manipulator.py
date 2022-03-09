@@ -1,4 +1,6 @@
 import json
+import logging
+import traceback
 from typing import List, Set
 
 from google.appengine.api import taskqueue
@@ -6,6 +8,7 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.award import Award
 from backend.common.models.cached_model import TAffectedReferences
@@ -78,28 +81,13 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
             queue_name="default",
         )
 
-
-"""
-    @classmethod
-    def postUpdateHook(cls, awards, updated_attr_list, is_new_list):
-        # Note, updated_attr_list will always be empty, for now
-        # Still needs to be implemented in updateMerge
-        # See helpers.EventManipulator
-        events = []
-        for (award, updated_attrs) in zip(awards, updated_attr_list):
-            event = award.event
-            if event not in events:
-                events.append(event)
-
-        for event in events:
-            if event.get().within_a_day:
-                try:
-                    NotificationHelper.send_award_update(event.get())
-                except Exception:
-                    logging.error("Error sending award update for {}".format(event.id()))
-                try:
-                    TBANSHelper.awards(event.get())
-                except Exception, exception:
-                    logging.error("Error sending {} award updates: {}".format(event.id(), exception))
-                    logging.error(traceback.format_exc())
-"""
+        # Send push notifications if the awards post was within +/- 1 day of the Event
+        event = event_key.get()
+        if event and event.within_a_day:
+            try:
+                TBANSHelper.awards(event)
+            except Exception as exception:
+                logging.error(
+                    "Error sending {} award updates: {}".format(event.id(), exception)
+                )
+                logging.error(traceback.format_exc())
