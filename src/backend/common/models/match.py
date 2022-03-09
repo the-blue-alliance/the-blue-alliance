@@ -480,9 +480,11 @@ class Match(CachedModel):
         match_fragment_key_name_regex = re.compile(
             r"(?:qm|ef\dm|qf\dm|sf\dm|f\dm)\d+$"
         )
+
+        valid_event_key = Event.validate_key_name(event_key)
+        valid_match_fragment = re.match(match_fragment_key_name_regex, match)
         
-        return Event.validate_key_name(event_key) and
-            re.match(match_fragment_key_name_regex, match)
+        return True if (valid_event_key and valid_match_fragment) else False
 
     def within_seconds(self, seconds: int) -> bool:
         """
