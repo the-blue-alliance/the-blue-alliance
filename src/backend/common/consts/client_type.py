@@ -15,7 +15,6 @@ class ClientType(enum.IntEnum):
 
 
 FCM_CLIENTS: Set[ClientType] = {
-    ClientType.OS_ANDROID,
     ClientType.OS_IOS,
     ClientType.WEB,
 }
