@@ -4,7 +4,11 @@ import logging
 import firebase_admin
 from google.appengine.ext import deferred
 
-from backend.common.consts.client_type import ClientType, FCM_CLIENTS
+from backend.common.consts.client_type import (
+    ClientType,
+    FCM_CLIENTS,
+    FCM_LEGACY_CLIENTS,
+)
 from backend.common.consts.notification_type import (
     ENABLED_EVENT_NOTIFICATIONS,
     ENABLED_MATCH_NOTIFICATIONS,
@@ -444,24 +448,39 @@ class TBANSHelper:
 
     @classmethod
     def _send(cls, users, notification):
+        fcm_clients_future = MobileClientQuery(
+            users, client_types=FCM_CLIENTS
+        ).fetch_async()
+        legacy_fcm_clients_future = MobileClientQuery(
+            users, client_types=FCM_LEGACY_CLIENTS
+        ).fetch_async()
+        webhook_clients_future = MobileClientQuery(
+            users, client_types=[ClientType.WEBHOOK]
+        ).fetch_async()
+
         # Send to FCM clients
-        fcm_clients = MobileClientQuery(users, client_types=FCM_CLIENTS).fetch()
+        fcm_clients = fcm_clients_future.get_result()
         if fcm_clients:
             cls._defer_fcm(fcm_clients, notification)
 
+        # Send to Android clients
+        # These use the webhook data format, but over FCM
+        legacy_fcm_clients = legacy_fcm_clients_future.get_result()
+        if legacy_fcm_clients:
+            cls._defer_fcm(legacy_fcm_clients, notification, legacy_data_format=True)
+
         # Send to webhooks
-        webhook_clients = MobileClientQuery(
-            users, client_types=[ClientType.WEBHOOK]
-        ).fetch()
+        webhook_clients = webhook_clients_future.get_result()
         if webhook_clients:
             cls._defer_webhook(webhook_clients, notification)
 
     @classmethod
-    def _defer_fcm(cls, clients, notification):
+    def _defer_fcm(cls, clients, notification, legacy_data_format=False):
         deferred.defer(
             cls._send_fcm,
             clients,
             notification,
+            legacy_data_format,
             _target="py3-tasks-io",
             _queue="push-notifications",
             _url="/_ah/queue/deferred_notification_send",
@@ -479,7 +498,9 @@ class TBANSHelper:
         )
 
     @classmethod
-    def _send_fcm(cls, clients, notification, backoff_iteration=0):
+    def _send_fcm(
+        cls, clients, notification, legacy_data_format=False, backoff_iteration=0
+    ):
         # Only send to FCM clients if notifications are enabled
         if not cls._notifications_enabled():
             return 1
@@ -506,6 +527,7 @@ class TBANSHelper:
                 firebase_app,
                 notification,
                 tokens=[client.messaging_id for client in subclients],
+                legacy_data_format=legacy_data_format,
             )
             logging.info(str(fcm_request))
 
@@ -582,6 +604,7 @@ class TBANSHelper:
                     cls._send_fcm,
                     retry_clients,
                     notification,
+                    legacy_data_format,
                     backoff_iteration + 1,
                     _countdown=backoff_time,
                     _target="py3-tasks-io",
