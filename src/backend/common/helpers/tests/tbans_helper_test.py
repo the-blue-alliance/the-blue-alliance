@@ -2,6 +2,7 @@ import datetime
 import json
 import unittest
 
+import mock
 import pytest
 from firebase_admin import messaging
 from firebase_admin.exceptions import (
@@ -23,7 +24,11 @@ from google.appengine.ext import testbed
 from mock import ANY, patch
 
 from backend.common.consts.award_type import AwardType
-from backend.common.consts.client_type import ClientType, FCM_CLIENTS
+from backend.common.consts.client_type import (
+    ClientType,
+    FCM_CLIENTS,
+    FCM_LEGACY_CLIENTS,
+)
 from backend.common.consts.client_type import NAMES as CLIENT_TYPE_NAMES
 from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
@@ -317,7 +322,7 @@ class TestTBANSHelper(unittest.TestCase):
             # Make sure our taskqueue tasks execute what we expect
             with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
                 deferred.run(tasks[0].payload)
-                mock_send_fcm.assert_called_once_with([client], ANY)
+                mock_send_fcm.assert_called_once_with([client], ANY, False)
                 # Make sure the notification is a BroadcastNotification
                 notification = mock_send_fcm.call_args[0][1]
                 assert isinstance(notification, BroadcastNotification)
@@ -930,6 +935,9 @@ class TestTBANSHelper(unittest.TestCase):
             c.put()
 
         expected_fcm = [c for c in clients if c.client_type in FCM_CLIENTS]
+        expected_legacy_fcm = [
+            c for c in clients if c.client_type in FCM_LEGACY_CLIENTS
+        ]
         expected_webhook = [c for c in clients if c.client_type == ClientType.WEBHOOK]
 
         notification = MockNotification()
@@ -937,7 +945,14 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper, "_defer_webhook"
         ) as mock_webhook:
             TBANSHelper._send(["user_id"], notification)
-            mock_fcm.assert_called_once_with(expected_fcm, notification)
+            mock_fcm.assert_has_calls(
+                [
+                    mock.call(expected_fcm, notification),
+                    mock.call(
+                        expected_legacy_fcm, notification, legacy_data_format=True
+                    ),
+                ]
+            )
             mock_webhook.assert_called_once_with(expected_webhook, notification)
 
     def test_defer_fcm(self):
@@ -958,7 +973,7 @@ class TestTBANSHelper(unittest.TestCase):
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
             deferred.run(tasks[0].payload)
-            mock_send_fcm.assert_called_once_with([client], ANY)
+            mock_send_fcm.assert_called_once_with([client], ANY, False)
 
     def test_defer_webhook(self):
         client = MobileClient(
@@ -1022,7 +1037,7 @@ class TestTBANSHelper(unittest.TestCase):
             autospec=True,
         ) as mock_init:
             exit_code = TBANSHelper._send_fcm(clients, MockNotification())
-            mock_init.assert_called_once_with(ANY, ANY, expected)
+            mock_init.assert_called_once_with(ANY, ANY, expected, False)
             assert exit_code == 0
 
     def test_send_fcm_batch(self):
@@ -1155,7 +1170,7 @@ class TestTBANSHelper(unittest.TestCase):
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
             deferred.run(tasks[0].payload)
-            mock_send_fcm.assert_called_once_with([client], ANY, 1)
+            mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
 
     def test_send_fcm_third_party_auth_error(self):
         client = MobileClient(
@@ -1251,7 +1266,7 @@ class TestTBANSHelper(unittest.TestCase):
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
             deferred.run(tasks[0].payload)
-            mock_send_fcm.assert_called_once_with([client], ANY, 1)
+            mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
 
     def test_send_fcm_unavailable_error(self):
         client = MobileClient(
@@ -1285,7 +1300,7 @@ class TestTBANSHelper(unittest.TestCase):
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
             deferred.run(tasks[0].payload)
-            mock_send_fcm.assert_called_once_with([client], ANY, 1)
+            mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
 
     def test_send_fcm_unhandled_error(self):
         client = MobileClient(
@@ -1337,7 +1352,7 @@ class TestTBANSHelper(unittest.TestCase):
                 "logging.error"
             ):
                 call_time = time.time()
-                TBANSHelper._send_fcm([client], MockNotification(), i)
+                TBANSHelper._send_fcm([client], MockNotification(), False, i)
 
                 # Check that we queue'd for a retry with the proper countdown time
                 tasks = self.taskqueue_stub.get_filtered_tasks(
@@ -1349,7 +1364,7 @@ class TestTBANSHelper(unittest.TestCase):
                 # Make sure our taskqueue tasks execute what we expect
                 with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
                     deferred.run(tasks[0].payload)
-                    mock_send_fcm.assert_called_once_with([client], ANY, i + 1)
+                    mock_send_fcm.assert_called_once_with([client], ANY, False, i + 1)
 
                 self.taskqueue_stub.FlushQueue("push-notifications")
 

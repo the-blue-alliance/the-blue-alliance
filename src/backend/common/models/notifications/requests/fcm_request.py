@@ -19,7 +19,7 @@ class FCMRequest(Request):
         tokens (list, string): The FCM registration tokens (up to 100) to send a message to.
     """
 
-    def __init__(self, app, notification, tokens=None):
+    def __init__(self, app, notification, tokens=None, legacy_data_format=False):
         """
         Note:
             Should only supply one delivery method - either token, topic, or connection.
@@ -40,6 +40,7 @@ class FCMRequest(Request):
             )
 
         self.tokens = tokens
+        self.legacy_data_format = legacy_data_format
 
     def __str__(self):
         return "FCMRequest(tokens={}, notification={})".format(
@@ -95,9 +96,12 @@ class FCMRequest(Request):
             apns_config.payload.aps.content_available = True
 
         # Add `notification_type` to data payload
-        data_payload = (
-            self.notification.data_payload if self.notification.data_payload else {}
-        )
+        if self.legacy_data_format:
+            data_payload = self.legacy_data_format()
+        else:
+            data_payload = (
+                self.notification.data_payload if self.notification.data_payload else {}
+            )
         # Remove `None` from data payload, since FCM won't accept them
         data_payload = {k: v for k, v in data_payload.items() if v is not None}
         from backend.common.consts.notification_type import (
@@ -116,3 +120,17 @@ class FCMRequest(Request):
             webpush=webpush_config,
             apns=apns_config,
         )
+
+    def _legacy_data_format(self):
+        from backend.common.consts.notification_type import (
+            TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
+        )
+
+        json_dict = {
+            "message_type": NOTIFICATION_TYPE_NAMES[self.notification.__class__._type()]
+        }
+
+        if self.notification.webhook_message_data:
+            json_dict["message_data"] = self.notification.webhook_message_data
+
+        return json_dict

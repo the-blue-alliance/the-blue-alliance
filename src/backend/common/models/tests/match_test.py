@@ -55,7 +55,9 @@ def test_valid_key_names(key: str) -> None:
     assert Match.validate_key_name(key) is True
 
 
-@pytest.mark.parametrize("key", ["frc177", "2010ct_qm1m1", "2010ctf1m1", "2010ct_f1", "2022on_306_qm15"])
+@pytest.mark.parametrize(
+    "key", ["frc177", "2010ct_qm1m1", "2010ctf1m1", "2010ct_f1", "2022on_306_qm15"]
+)
 def test_invalid_key_names(key: str) -> None:
     assert Match.validate_key_name(key) is False
 
