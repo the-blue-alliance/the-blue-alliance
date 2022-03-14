@@ -20,7 +20,7 @@ The main differences is that the global cache is shared between requests, while 
 
 ## Application Level Query Caching
 
-TBA's workload often involves making complex queries that span many datastore entires (for example, fetching the list of all matches at an event). The output of these queries is used by the webapp to render output pages and is also transformed into JSON objects for API representation.
+TBA's workload often involves making complex queries that span many datastore entries (for example, fetching the list of all matches at an event). The output of these queries is used by the webapp to render output pages and is also transformed into JSON objects for API representation.
 
 The results of these queries is highly deterministic and repeatable, so it is a good candidate for caching. Plus, for large range queries, we can minimize round trips to the datastore by storing the entire response in a single object.
 
