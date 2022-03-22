@@ -8,7 +8,7 @@ from backend.common.consts.alliance_color import (
     AllianceColor,
     TMatchWinner,
 )
-from backend.common.consts.comp_level import ELIM_LEVELS
+from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.models.match import Match
 
 
@@ -38,19 +38,24 @@ class MatchTiebreakers(object):
             tiebreakers = cls._tiebreak_2016(red_breakdown, blue_breakdown)
 
         elif match.year == 2017 and not (
-            match.comp_level == "f" and match.match_number <= 3
+            match.comp_level == CompLevel.F and match.match_number <= 3
         ):  # Finals can't be tiebroken. Only overtime
             tiebreakers = cls._tiebreak_2017(red_breakdown, blue_breakdown)
 
         elif match.year == 2019 and not (
-            match.comp_level == "f" and match.match_number <= 3
+            match.comp_level == CompLevel.F and match.match_number <= 3
         ):  # Finals can't be tiebroken. Only overtime
             tiebreakers = cls._tiebreak_2019(red_breakdown, blue_breakdown)
 
         elif match.year == 2020 and not (
-            match.comp_level == "f" and match.match_number <= 3
+            match.comp_level == CompLevel.F and match.match_number <= 3
         ):  # Finals can't be tiebroken. Only overtime
             tiebreakers = cls._tiebreak_2020(red_breakdown, blue_breakdown)
+
+        elif match.year == 2022 and not (
+            match.comp_level == CompLevel.F and match.match_number <= 3
+        ):  # Finals can't be tiebroken. Only overtime
+            tiebreakers = cls._tiebreak_2022(red_breakdown, blue_breakdown)
 
         else:
             tiebreakers = []
@@ -63,6 +68,38 @@ class MatchTiebreakers(object):
             elif tiebreaker[1] > tiebreaker[0]:
                 return AllianceColor.BLUE
         return ""
+
+    @classmethod
+    def _tiebreak_2022(
+        cls, red_breakdown: Dict, blue_breakdown: Dict
+    ) -> List[TCriteria]:
+        tiebreakers: List[TCriteria] = []
+
+        # Cumulative FOUL and TECH FOUL points due to opponent rule violations
+        if "foulPoints" in red_breakdown and "foulPoints" in blue_breakdown:
+            tiebreakers.append(
+                (red_breakdown["foulPoints"], blue_breakdown["foulPoints"])
+            )
+        else:
+            tiebreakers.append(None)
+
+        # Cumulative HANGAR points
+        if "endgamePoints" in red_breakdown and "endgamePoints" in blue_breakdown:
+            tiebreakers.append(
+                (red_breakdown["endgamePoints"], blue_breakdown["endgamePoints"])
+            )
+        else:
+            tiebreakers.append(None)
+
+        # Cumulative AUTO TAXI + CARGO points
+        if "autoPoints" in red_breakdown and "autoPoints" in blue_breakdown:
+            tiebreakers.append(
+                (red_breakdown["autoPoints"], blue_breakdown["autoPoints"])
+            )
+        else:
+            tiebreakers.append(None)
+
+        return tiebreakers
 
     @classmethod
     def _tiebreak_2020(
