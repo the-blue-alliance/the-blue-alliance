@@ -274,11 +274,8 @@ class DistrictHelper:
         for team in teams:
             if type(team) == ndb.tasklets.Future:
                 team = team.get_result()
-            bonus = 0
-            if team.rookie_year == year:
-                bonus = 10
-            elif team.rookie_year == year - 1:
-                bonus = 5
+            bonus = cls._get_rookie_bonus(year, team.rookie_year)
+
             team_totals[team.key_name]["rookie_bonus"] = bonus
             team_totals[team.key_name]["point_total"] += bonus
 
@@ -302,6 +299,28 @@ class DistrictHelper:
         return dict(
             filter(lambda item: item[0] in valid_team_keys, team_totals.items())
         )
+
+    @classmethod
+    def _get_rookie_bonus(cls, year: Year, team_rookie_year: Year) -> int:
+        bonus = 0
+        if team_rookie_year == year:
+            bonus = 10
+        elif team_rookie_year == year - 1:
+            bonus = 5
+
+        # Handle special 2022/2023 rookie accounting due to pandemic
+        # See: https://www.firstinspires.org/robotics/frc/blog/2021-2022-rookie-awards-and-district-points
+        if year == 2022:
+            if team_rookie_year in {2021, 2022}:
+                bonus = 10
+            elif team_rookie_year == 2020:
+                bonus = 5
+
+        elif year == 2023:
+            if team_rookie_year in {2021, 2022}:
+                bonus = 5
+
+        return bonus
 
     @classmethod
     def _calc_elim_match_points(
