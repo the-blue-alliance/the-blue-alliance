@@ -42,8 +42,8 @@ class FMSAPITeamDetailsParser(
             team = Team(
                 id="frc{}".format(teamData["teamNumber"]),
                 team_number=teamData["teamNumber"],
-                name=teamData["nameFull"],
-                nickname=teamData["nameShort"],
+                name=teamData["nameFull"].strip(),
+                nickname=teamData["nameShort"].strip(),
                 school_name=teamData.get("schoolName"),
                 home_cmp=teamData.get("homeCMP").lower()
                 if teamData.get("homeCMP")
