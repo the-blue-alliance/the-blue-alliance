@@ -5,6 +5,7 @@ from pyre_extensions import none_throws
 
 from backend.common.helpers.district_helper import DistrictHelper
 from backend.common.models.event import Event
+from backend.common.models.keys import Year
 from backend.common.models.team import Team
 
 
@@ -118,3 +119,23 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
         "rookie_bonus": 0,
         "tiebreakers": [150, 90, 42, 60, 0],
     }
+
+
+@pytest.mark.parametrize(
+    "year,rookie_year,bonus",
+    [
+        (2020, 2020, 10),
+        (2020, 2019, 5),
+        (2022, 2022, 10),
+        (2022, 2021, 10),
+        (2022, 2020, 5),
+        (2022, 2019, 0),
+        (2023, 2023, 10),
+        (2023, 2022, 5),
+        (2023, 2021, 5),
+        (2023, 2020, 0),
+        (2023, 2019, 0),
+    ]
+)
+def test_pandemic_rookie_edge_cases(year: Year, rookie_year: Year, bonus: int) -> None:
+    assert DistrictHelper._get_rookie_bonus(year, rookie_year) == bonus
