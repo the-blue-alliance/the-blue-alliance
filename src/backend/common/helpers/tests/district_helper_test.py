@@ -12,6 +12,7 @@ from backend.common.models.team import Team
 @pytest.mark.parametrize(
     "event_key",
     [
+        "2022on305",  # A 2022 single day event
         "2019nyny",  # A regular event
         "2015nyny",  # 2015 is special (average score ranking)
         "2018necmp",  # DCMP has 3x multiplier

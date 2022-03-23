@@ -12,6 +12,7 @@ from backend.common.consts.award_type import AwardType, NON_JUDGED_NON_TEAM_AWAR
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.district_point_values import DistrictPointValues
 from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.futures import TypedFuture
 from backend.common.helpers.match_helper import (
     MatchHelper,
@@ -120,6 +121,7 @@ class DistrictHelper:
             )
 
         # alliance points
+        logging.info(f"event {event}")
         if event.event_type_enum == EventType.DISTRICT_CMP and event.divisions:
             # If this is a DCMP that has divisions, there are no alliance points
             # awarded, since a team would have got them in the division already
@@ -592,6 +594,21 @@ class DistrictHelper:
                     team_points[alliance["picks"][0]] = int(48 - (1.5 * n))
                     team_points[alliance["picks"][1]] = int(48 - (1.5 * n))
                     team_points[alliance["picks"][2]] = int((n + 1) * 1.5)
+                    n += 1
+            elif (
+                event.year == 2022
+                and event.event_type_enum == EventType.DISTRICT
+                and event.playoff_type == PlayoffType.BRACKET_4_TEAM
+            ):
+                # 2022 single day district event modifications:
+                # For Single-Day Events, ALLIANCE CAPTAINS #1, 2, 3, and 4 receive 16, 14, 12, and 10 points respectively.
+                # For Single-Day Events, first through eighth picks receive 16, 14, 12, 10, 8, 6, 4, and 2 points respectively.
+                # See Section 11.8.1
+                # https://firstfrc.blob.core.windows.net/frc2022/Manual/Sections/2022FRCGameManual-11.pdf
+                for n, alliance in enumerate(alliance_selections):
+                    team_points[alliance["picks"][0]] = int(16 - (2 * n))
+                    team_points[alliance["picks"][1]] = int(16 - (2 * n))
+                    team_points[alliance["picks"][2]] = int(16 - (2 * (n + 4)))
                     n += 1
             else:
                 for n, alliance in enumerate(alliance_selections):
