@@ -90,6 +90,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
         "point_total": 70,
         "qual_scores": [85, 71, 69],
         "rookie_bonus": 0,
+        "other_bonus": 0,
         "tiebreakers": [30, 30, 16, 19, 0],
     }
     assert rankings["frc4362"] == {
@@ -118,7 +119,93 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
         "point_total": 267,
         "qual_scores": [104, 97, 93],
         "rookie_bonus": 0,
+        "other_bonus": 0,
         "tiebreakers": [150, 90, 42, 60, 0],
+    }
+
+
+def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
+    setup_full_event("2022on305")
+    setup_full_event("2022on306")
+
+    events = [
+        none_throws(Event.get_by_id("2022on305")),
+        none_throws(Event.get_by_id("2022on306")),
+    ]
+    teams = [
+        none_throws(Team.get_by_id("frc2200")),
+        none_throws(Team.get_by_id("frc610")),
+        none_throws(Team.get_by_id("frc1241")),
+    ]
+
+    rankings = DistrictHelper.calculate_rankings(events, teams, 2022)
+    assert len(rankings) == 3
+    assert rankings["frc2200"] == {
+        "event_points": [
+            (
+                events[0],
+                {
+                    "alliance_points": 16,
+                    "award_points": 0,
+                    "elim_points": 20,
+                    "qual_points": 22,
+                    "total": 58,
+                },
+            ),
+            (
+                events[1],
+                {
+                    "alliance_points": 16,
+                    "award_points": 5,
+                    "elim_points": 20,
+                    "qual_points": 22,
+                    "total": 63,
+                },
+            ),
+        ],
+        "point_total": 123,
+        "qual_scores": [93, 82, 82],
+        "rookie_bonus": 0,
+        "other_bonus": 2,
+        "tiebreakers": [40, 20, 32, 22, 0],
+    }
+    assert rankings["frc610"] == {
+        "event_points": [
+            (
+                events[0],
+                {
+                    "alliance_points": 16,
+                    "award_points": 5,
+                    "elim_points": 20,
+                    "qual_points": 18,
+                    "total": 59,
+                },
+            )
+        ],
+        "point_total": 59,
+        "qual_scores": [52, 41, 40],
+        "rookie_bonus": 0,
+        "other_bonus": 0,
+        "tiebreakers": [20, 20, 16, 18, 0],
+    }
+    assert rankings["frc1241"] == {
+        "event_points": [
+            (
+                events[1],
+                {
+                    "alliance_points": 14,
+                    "award_points": 5,
+                    "elim_points": 10,
+                    "qual_points": 12,
+                    "total": 41,
+                },
+            )
+        ],
+        "point_total": 41,
+        "qual_scores": [67, 56, 45],
+        "rookie_bonus": 0,
+        "other_bonus": 0,
+        "tiebreakers": [10, 10, 14, 12, 0],
     }
 
 

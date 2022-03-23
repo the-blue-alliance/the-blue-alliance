@@ -56,6 +56,10 @@ class DistrictPointValues:
     EI_AND_RAS_DEFAULT = 8
     OTHER_AWARD_DEFAULT = 5
 
+    # Points for playing your first two events as
+    # back-to-back single day events
+    BACK_TO_BACK_2022_BONUS = 2
+
     # Pre-2014 Awards, all worth either 5 or 2 points
     LEGACY_5_PT_AWARDS = {
         2013: [
