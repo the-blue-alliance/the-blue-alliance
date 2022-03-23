@@ -123,7 +123,6 @@ class DistrictHelper:
             )
 
         # alliance points
-        logging.info(f"event {event}")
         if event.event_type_enum == EventType.DISTRICT_CMP and event.divisions:
             # If this is a DCMP that has divisions, there are no alliance points
             # awarded, since a team would have got them in the division already
