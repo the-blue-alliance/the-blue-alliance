@@ -29,6 +29,10 @@ cron:
   url: /tasks/enqueue/fmsapi_awards/now
   schedule: every 1 hours
 
+- description: FIRST award scraping for current year (for one day events with separate awards shows)
+  url: /tasks/enqueue/fmsapi_awards/2022
+  schedule: every wednesday 04:00
+
 - description: Hall of Fame team list scraping
   url: /tasks/get/hof_teams
   schedule: every thursday 01:00
