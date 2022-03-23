@@ -115,12 +115,13 @@ def test_calc(
             tiebreakers=[],
             qual_scores=[],
             rookie_bonus=0,
+            other_bonus=0,
         )
     }
 
     resp = tasks_client.get("/tasks/math/do/district_rankings_calc/2020ne")
     assert resp.status_code == 200
-    assert resp.data == b"Finished calculating rankings for: 2020ne"
+    assert b"Finished calculating rankings for: 2020ne" in resp.data
 
     district = District.get_by_id("2020ne")
     assert district is not None
@@ -161,6 +162,7 @@ def test_calc_no_output_in_taskqueue(
             tiebreakers=[],
             qual_scores=[],
             rookie_bonus=0,
+            other_bonus=0,
         )
     }
 

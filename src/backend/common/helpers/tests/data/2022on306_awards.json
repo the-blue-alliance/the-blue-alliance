@@ -1,0 +1,150 @@
+[
+  {
+    "award_type": 0, 
+    "event_key": "2022on306", 
+    "name": "District Chairman's Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4476"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 1, 
+    "event_key": "2022on306", 
+    "name": "District Event Winner", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc2200"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc5409"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc7902"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 13, 
+    "event_key": "2022on306", 
+    "name": "Judges' Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4343"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 14, 
+    "event_key": "2022on306", 
+    "name": "Highest Rookie Seed", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc8735"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 15, 
+    "event_key": "2022on306", 
+    "name": "Rookie Inspiration Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc8731"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 16, 
+    "event_key": "2022on306", 
+    "name": "Industrial Design Award sponsored by General Motors", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc1241"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 2, 
+    "event_key": "2022on306", 
+    "name": "District Event Finalist", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4976"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc1241"
+      }, 
+      {
+        "awardee": null, 
+        "team_key": "frc6397"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 20, 
+    "event_key": "2022on306", 
+    "name": "Creativity Award sponsored by Rockwell Automation", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc4976"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 27, 
+    "event_key": "2022on306", 
+    "name": "Imagery Award in honor of Jack Kamen", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc5409"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 29, 
+    "event_key": "2022on306", 
+    "name": "Innovation in Control Award", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc7480"
+      }
+    ], 
+    "year": 2022
+  }, 
+  {
+    "award_type": 71, 
+    "event_key": "2022on306", 
+    "name": "Autonomous Award sponsored by Ford", 
+    "recipient_list": [
+      {
+        "awardee": null, 
+        "team_key": "frc2200"
+      }
+    ], 
+    "year": 2022
+  }
+]

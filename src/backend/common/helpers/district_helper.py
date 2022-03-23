@@ -2,6 +2,7 @@ import heapq
 import logging
 import math
 from collections import defaultdict
+from datetime import timedelta
 from typing import cast, DefaultDict, Dict, List, Set, Tuple, TypedDict, Union
 
 from google.appengine.ext import ndb
@@ -12,6 +13,7 @@ from backend.common.consts.award_type import AwardType, NON_JUDGED_NON_TEAM_AWAR
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.district_point_values import DistrictPointValues
 from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.futures import TypedFuture
 from backend.common.helpers.match_helper import (
     MatchHelper,
@@ -26,7 +28,7 @@ from backend.common.models.event_district_points import (
     TeamAtEventDistrictPoints,
     TeamAtEventDistrictPointTiebreakers,
 )
-from backend.common.models.keys import TeamKey, Year
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 
@@ -41,6 +43,7 @@ class DistrictRankingTeamTotal(TypedDict):
     tiebreakers: List[int]
     qual_scores: List[int]
     rookie_bonus: int
+    other_bonus: int
 
 
 class DistrictHelper:
@@ -193,7 +196,8 @@ class DistrictHelper:
         year: Year,
     ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two events and district championship
-        team_attendance_count: DefaultDict[TeamKey, int] = defaultdict(int)
+        events_by_key: Dict[EventKey, Event] = {}
+        team_attendance: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
         team_totals: Dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
             lambda: DistrictRankingTeamTotal(
                 event_points=[],
@@ -201,17 +205,19 @@ class DistrictHelper:
                 rookie_bonus=0,
                 tiebreakers=5 * [0],
                 qual_scores=[],
+                other_bonus=0,
             )
         )
         for event in events:
+            events_by_key[event.key_name] = event
             event_district_points = event.district_points
             if event_district_points is not None:
                 for team_key in set(event_district_points["points"].keys()).union(
                     set(event_district_points["tiebreakers"].keys())
                 ):
-                    team_attendance_count[team_key] += 1
+                    team_attendance[team_key].append(event.key_name)
                     if (
-                        team_attendance_count[team_key] <= 2
+                        len(team_attendance[team_key]) <= 2
                         or event.event_type_enum == EventType.DISTRICT_CMP
                         or event.event_type_enum == EventType.DISTRICT_CMP_DIVISION
                     ):
@@ -280,6 +286,29 @@ class DistrictHelper:
             team_totals[team.key_name]["point_total"] += bonus
 
             valid_team_keys.add(team.key_name)
+
+        # Compute bonus for back to back Single-Day Events
+        # Special case for 2022
+        # 2 points for teams playing 2 Single-Day Events on 1 weekend,
+        # provided the 2 events are the team’s first 2 events
+        # See Section 11.8.1
+        # https://firstfrc.blob.core.windows.net/frc2022/Manual/Sections/2022FRCGameManual-11.pdf
+        if year == 2022:
+            for team_key, attendance in team_attendance.items():
+                event1 = (
+                    events_by_key.get(attendance[0]) if len(attendance) > 0 else None
+                )
+                event2 = (
+                    events_by_key.get(attendance[1]) if len(attendance) > 1 else None
+                )
+
+                if event1 is None or event2 is None:
+                    continue
+
+                if event1.start_date + timedelta(days=1) == event2.start_date:
+                    bonus = DistrictPointValues.BACK_TO_BACK_2022_BONUS
+                    team_totals[team_key]["other_bonus"] = bonus
+                    team_totals[team_key]["point_total"] += bonus
 
         team_totals = dict(
             sorted(
@@ -592,6 +621,21 @@ class DistrictHelper:
                     team_points[alliance["picks"][0]] = int(48 - (1.5 * n))
                     team_points[alliance["picks"][1]] = int(48 - (1.5 * n))
                     team_points[alliance["picks"][2]] = int((n + 1) * 1.5)
+                    n += 1
+            elif (
+                event.year == 2022
+                and event.event_type_enum == EventType.DISTRICT
+                and event.playoff_type == PlayoffType.BRACKET_4_TEAM
+            ):
+                # 2022 single day district event modifications:
+                # For Single-Day Events, ALLIANCE CAPTAINS #1, 2, 3, and 4 receive 16, 14, 12, and 10 points respectively.
+                # For Single-Day Events, first through eighth picks receive 16, 14, 12, 10, 8, 6, 4, and 2 points respectively.
+                # See Section 11.8.1
+                # https://firstfrc.blob.core.windows.net/frc2022/Manual/Sections/2022FRCGameManual-11.pdf
+                for n, alliance in enumerate(alliance_selections):
+                    team_points[alliance["picks"][0]] = int(16 - (2 * n))
+                    team_points[alliance["picks"][1]] = int(16 - (2 * n))
+                    team_points[alliance["picks"][2]] = int(16 - (2 * (n + 4)))
                     n += 1
             else:
                 for n, alliance in enumerate(alliance_selections):

@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.event_short_name_helper import EventShortNameHelper
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.models.district import District
@@ -30,6 +31,15 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         "offseason": EventType.OFFSEASON,
         "offseasonwithazuresync": EventType.OFFSEASON,
         "remote": EventType.REMOTE,
+    }
+
+    PLAYOFF_TYPES = {
+        # Bracket Types
+        "FourAlliance": PlayoffType.BRACKET_4_TEAM,
+        "EightAlliance": PlayoffType.BRACKET_8_TEAM,
+        "SixteenAlliance": PlayoffType.BRACKET_16_TEAM,
+        # Round Robin Types
+        "SixAlliance": PlayoffType.ROUND_ROBIN_6_TEAM,
     }
 
     NON_OFFICIAL_EVENT_TYPES = ["offseason"]
@@ -153,6 +163,8 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             if event_key in events_to_change_dates:
                 start = end.replace(hour=0, minute=0, second=0, microsecond=0)
 
+            playoff_type = self.PLAYOFF_TYPES.get(event.get("allianceCount"))
+
             events.append(
                 Event(
                     id=event_key,
@@ -161,6 +173,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                     event_short=code,
                     event_type_enum=event_type,
                     official=official,
+                    playoff_type=playoff_type,
                     start_date=start,
                     end_date=end,
                     venue=venue,

@@ -127,6 +127,7 @@
                 <th>Event 2</th>
                 <th>District Champ</th>
                 <th>Rookie Bonus</th>
+                {% if year == 2022 %}<th>Other Bonus</th>{% endif %}
                 <th>Total Points</th>
                 <th>Qualified for DCMP</th>
                 <th>Qualified for CMP</th>
@@ -168,6 +169,15 @@
                   --
                   {% endif %}
                 </td>
+                {% if year == 2022 %}
+                <td>
+                  {% if item.other_bonus %}
+                  {{item.other_bonus}}
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                {% endif %}
                 <td><strong>{{item.point_total}}</strong></td>
                 <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].dcmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
                 <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].cmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
