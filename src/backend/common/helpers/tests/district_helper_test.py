@@ -135,7 +135,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
         (2023, 2021, 5),
         (2023, 2020, 0),
         (2023, 2019, 0),
-    ]
+    ],
 )
 def test_pandemic_rookie_edge_cases(year: Year, rookie_year: Year, bonus: int) -> None:
     assert DistrictHelper._get_rookie_bonus(year, rookie_year) == bonus

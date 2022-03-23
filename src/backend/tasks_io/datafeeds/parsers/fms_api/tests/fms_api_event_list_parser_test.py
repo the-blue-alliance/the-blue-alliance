@@ -5,6 +5,7 @@ import json
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_list_parser import (
     FMSAPIEventListParser,
@@ -501,3 +502,16 @@ def test_parse_division_parent_2018(test_data_importer):
         else:
             assert event.parent_event is None
             assert event.divisions == []
+
+
+def test_parse_2022_one_day_event(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2022on305.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, districts = FMSAPIEventListParser(2022).parse(data)
+    assert len(events) == 1
+    assert len(districts) == 1
+
+    event = events[0]
+    assert event.playoff_type == PlayoffType.BRACKET_4_TEAM
