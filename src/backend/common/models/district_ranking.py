@@ -4,7 +4,11 @@ from backend.common.models.event_district_points import TeamAtEventDistrictPoint
 from backend.common.models.keys import TeamKey
 
 
-class DistrictRanking(TypedDict):
+class _DistrictRankingOptional(TypedDict, total=False):
+    other_bonus: int
+
+
+class DistrictRanking(_DistrictRankingOptional):
     rank: int
     team_key: TeamKey
     point_total: int

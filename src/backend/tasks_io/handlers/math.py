@@ -171,6 +171,9 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
             )
             point_detail["event_points"].append(event_points)
 
+        if district.year == 2022:
+            point_detail["other_bonus"] = points.get("other_bonus", 0)
+
         rankings.append(point_detail)
         current_rank += 1
 
@@ -181,7 +184,9 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
     if (
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
-        return make_response(f"Finished calculating rankings for: {district_key}")
+        return make_response(
+            f"Finished calculating rankings for: {district_key}:\n{rankings}"
+        )
     return make_response("")
 
 
