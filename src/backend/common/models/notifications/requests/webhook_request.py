@@ -53,7 +53,7 @@ class WebhookRequest(Request):
         # https://github.com/the-blue-alliance/the-blue-alliance/issues/2576
         valid_url = True
 
-        response = requests.post(self.url, data=json.loads(payload), headers=headers)
+        response = requests.post(self.url, data=payload, headers=headers)
         if response.status_code == requests.codes.ok:
             self.defer_track_notification(1)
         if response.status_code == 400:
