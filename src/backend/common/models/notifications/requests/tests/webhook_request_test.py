@@ -1,10 +1,8 @@
-import urllib
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
+
+import pytest
 
 from backend.common.models.notifications.requests.request import Request
-from backend.common.models.notifications.requests.tests.mocks.urllib.mock_http_error import (
-    MockHTTPError,
-)
 from backend.common.models.notifications.requests.webhook_request import (
     WebhookRequest,
 )
@@ -88,17 +86,18 @@ def test_send_headers():
         "secret",
     )
 
-    with patch.object(urllib.request, "urlopen") as mock_urlopen:
-        message.send()
-    mock_urlopen.assert_called_once()
-    request = mock_urlopen.call_args_list[0][0][0]
-    assert request is not None
-    assert request.headers == {
-        "X-tba-checksum": "82bb620ceffa9ee31480e60b98f1881251fb68c3",
-        "Content-type": 'application/json; charset="utf-8"',
-        "X-tba-hmac": "a143b493f9a31077f7ff742dc3f59c8d73e6e2c2f09dde5f1a73c33059b77151",
-        "X-tba-version": "1",
+    headers = {
+        "Content-Type": 'application/json; charset="utf-8"',
+        "X-TBA-Version": "1",
+        "X-TBA-Checksum": "82bb620ceffa9ee31480e60b98f1881251fb68c3",
+        "X-TBA-HMAC": "a143b493f9a31077f7ff742dc3f59c8d73e6e2c2f09dde5f1a73c33059b77151",
     }
+
+    with patch("requests.post") as mock_post:
+        message.send()
+    mock_post.assert_called_once_with(
+        "https://www.thebluealliance.com", data=ANY, headers=headers
+    )
 
 
 def test_send():
@@ -108,35 +107,30 @@ def test_send():
         "secret",
     )
 
-    with patch.object(urllib.request, "urlopen") as mock_urlopen, patch.object(
-        message, "defer_track_notification"
-    ) as mock_track:
+    with patch(
+        "requests.post", return_value=Mock(status_code=200)
+    ) as mock_post, patch.object(message, "defer_track_notification") as mock_track:
         success = message.send()
-    mock_urlopen.assert_called_once()
+    mock_post.assert_called_once()
     mock_track.assert_called_once_with(1)
     assert success
 
 
-def test_send_errors():
+@pytest.mark.parametrize("code", [400, 401, 500])
+def test_send_errors(code):
     message = WebhookRequest(
         MockNotification(webhook_message_data={"data": "value"}),
         "https://www.thebluealliance.com",
         "secret",
     )
 
-    for code in [400, 401, 500]:
-        error_mock = Mock()
-        error_mock.side_effect = MockHTTPError(code)
-
-        with patch.object(
-            urllib.request, "urlopen", error_mock
-        ) as mock_urlopen, patch.object(
-            message, "defer_track_notification"
-        ) as mock_track:
-            success = message.send()
-        mock_urlopen.assert_called_once()
-        mock_track.assert_not_called()
-        assert success
+    with patch(
+        "requests.post", return_value=Mock(status_code=code)
+    ) as mock_post, patch.object(message, "defer_track_notification") as mock_track:
+        success = message.send()
+    mock_post.assert_called_once()
+    mock_track.assert_not_called()
+    assert success
 
 
 def test_send_error_unknown():
@@ -146,14 +140,11 @@ def test_send_error_unknown():
         "secret",
     )
 
-    error_mock = Mock()
-    error_mock.side_effect = MockHTTPError(-1)
-
-    with patch.object(
-        urllib.request, "urlopen", error_mock
-    ) as mock_urlopen, patch.object(message, "defer_track_notification") as mock_track:
+    with patch(
+        "requests.post", return_value=Mock(status_code=-1)
+    ) as mock_post, patch.object(message, "defer_track_notification") as mock_track:
         success = message.send()
-    mock_urlopen.assert_called_once()
+    mock_post.assert_called_once()
     mock_track.assert_not_called()
     assert success
 
@@ -165,56 +156,13 @@ def test_send_fail_404():
         "secret",
     )
 
-    error_mock = Mock()
-    error_mock.side_effect = MockHTTPError(404)
-
-    with patch.object(
-        urllib.request, "urlopen", error_mock
-    ) as mock_urlopen, patch.object(message, "defer_track_notification") as mock_track:
+    with patch(
+        "requests.post", return_value=Mock(status_code=404)
+    ) as mock_post, patch.object(message, "defer_track_notification") as mock_track:
         success = message.send()
-    mock_urlopen.assert_called_once()
+    mock_post.assert_called_once()
     mock_track.assert_not_called()
     assert not success
-
-
-def test_send_fail_url_error():
-    message = WebhookRequest(
-        MockNotification(webhook_message_data={"data": "value"}),
-        "https://www.thebluealliance.com",
-        "secret",
-    )
-
-    error_mock = Mock()
-    error_mock.side_effect = urllib.error.URLError("testing")
-
-    with patch.object(
-        urllib.request, "urlopen", error_mock
-    ) as mock_urlopen, patch.object(message, "defer_track_notification") as mock_track:
-        success = message.send()
-    mock_urlopen.assert_called_once()
-    mock_track.assert_not_called()
-    assert not success
-
-
-def test_send_fail_deadline_error():
-    message = WebhookRequest(
-        MockNotification(webhook_message_data={"data": "value"}),
-        "https://www.thebluealliance.com",
-        "secret",
-    )
-
-    error_mock = Mock()
-    error_mock.side_effect = Exception(
-        "Deadline exceeded while waiting for HTTP response from URL: https://thebluealliance.com"
-    )
-
-    with patch.object(
-        urllib.request, "urlopen", error_mock
-    ) as mock_urlopen, patch.object(message, "defer_track_notification") as mock_track:
-        success = message.send()
-    mock_urlopen.assert_called_once()
-    mock_track.assert_not_called()
-    assert success
 
 
 def test_send_error_other():
@@ -227,10 +175,9 @@ def test_send_error_other():
     error_mock = Mock()
     error_mock.side_effect = Exception("testing")
 
-    with patch.object(
-        urllib.request, "urlopen", error_mock
-    ) as mock_urlopen, patch.object(message, "defer_track_notification") as mock_track:
-        success = message.send()
-    mock_urlopen.assert_called_once()
+    with patch("requests.post", error_mock) as mock_post, patch.object(
+        message, "defer_track_notification"
+    ) as mock_track, pytest.raises(Exception):
+        message.send()
+    mock_post.assert_called_once()
     mock_track.assert_not_called()
-    assert success

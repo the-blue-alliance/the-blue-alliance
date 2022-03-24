@@ -1,3 +1,7 @@
+import json
+
+import requests
+
 from backend.common.models.notifications.requests.request import Request
 
 
@@ -44,44 +48,30 @@ class WebhookRequest(Request):
         headers["X-TBA-HMAC"] = self._generate_webhook_hmac(payload)
 
         import logging
-        import urllib
-
-        request = urllib.request.Request(self.url, payload, headers=headers)
 
         # TODO: Consider more useful way to surface error messages
         # https://github.com/the-blue-alliance/the-blue-alliance/issues/2576
         valid_url = True
-        try:
-            urllib.request.urlopen(request)
+
+        response = requests.post(self.url, data=json.loads(payload), headers=headers)
+        if response.status_code == requests.codes.ok:
             self.defer_track_notification(1)
-        except urllib.error.HTTPError as e:
-            if e.code == 400:
-                logging.warning("400, Bad request for URL: {}".format(self.url))
-            elif e.code == 401:
-                logging.warning(
-                    "401, Webhook unauthorized for URL: {}".format(self.url)
-                )
-            elif e.code == 404:
-                logging.warning("404, Invalid URL: {}".format(self.url))
-                valid_url = False
-            elif e.code == 500:
-                logging.warning("500, Internal error on server sending message")
-            else:
-                logging.warning(
-                    "Unexpected HTTPError: " + str(e.code) + " " + str(e.reason)
-                )
-        except urllib.error.URLError as e:
+        if response.status_code == 400:
+            logging.warning("400, Bad request for URL: {}".format(self.url))
+        elif response.status_code == 401:
+            logging.warning("401, Webhook unauthorized for URL: {}".format(self.url))
+        elif response.status_code == 404:
+            logging.warning("404, Invalid URL: {}".format(self.url))
             valid_url = False
-            logging.warning("URLError: " + str(e.reason))
-        except Exception as ex:
-            logging.warning(
-                "Other Exception ({}): {}".format(ex.__class__.__name__, str(ex))
-            )
+        elif response.status_code == 500:
+            logging.warning("500, Internal error on server sending message")
+        else:
+            logging.warning("Unexpected status_code: " + str(response.status_code))
 
         return valid_url
 
     def _json_string(self):
-        """JSON string representation of an WebhookRequest object.
+        """JSON dict representation of an WebhookRequest object.
 
         JSON for WebhookRequest will look like...
         {
@@ -90,7 +80,7 @@ class WebhookRequest(Request):
         }
 
         Returns:
-            string: JSON representation of the WebhookRequest.
+            dict: JSON representation of the WebhookRequest.
         """
         from backend.common.consts.notification_type import (
             TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
@@ -102,8 +92,6 @@ class WebhookRequest(Request):
 
         if self.notification.webhook_message_data:
             json_dict["message_data"] = self.notification.webhook_message_data
-
-        import json
 
         return json.dumps(json_dict, ensure_ascii=True)
 
