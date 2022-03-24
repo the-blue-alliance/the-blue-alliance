@@ -79,6 +79,7 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
             method="GET",
             target="py3-tasks-io",
             queue_name="default",
+            countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
         )
 
         # Send push notifications if the awards post was within +/- 1 day of the Event
