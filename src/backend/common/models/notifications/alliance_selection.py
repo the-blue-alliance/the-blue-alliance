@@ -1,8 +1,15 @@
+from typing import Any, Dict, Optional
+
+from pyre_extensions import none_throws
+
+from backend.common.consts.notification_type import NotificationType
+from backend.common.models.event import Event
 from backend.common.models.notifications.notification import Notification
+from backend.common.models.team import Team
 
 
 class AllianceSelectionNotification(Notification):
-    def __init__(self, event, team=None):
+    def __init__(self, event: Event, team: Optional[Team] = None) -> None:
         self.event = event
         self.team = team
 
@@ -18,29 +25,29 @@ class AllianceSelectionNotification(Notification):
             )
 
     @classmethod
-    def _type(cls):
-        from backend.common.consts.notification_type import NotificationType
-
+    def _type(cls) -> NotificationType:
         return NotificationType.ALLIANCE_SELECTION
 
     @property
-    def fcm_notification(self):
+    def fcm_notification(self) -> Optional[Any]:
         body = ["{} alliances have been updated.".format(self.event.normalized_name)]
         # Add alliance information for team
         if self.team and self.alliance:
             sub_body = ["Team {}".format(self.team.team_number)]
-            if self.alliance["picks"][0] == self.team.key_name:
+            if self.alliance["picks"][0] == none_throws(self.team).key_name:
                 sub_body.append("is Captain of")
             else:
                 sub_body.append("is on")
             # Get alliance number
-            alliance_number = self.event.alliance_selections.index(self.alliance) + 1
+            alliance_number = (
+                none_throws(self.event.alliance_selections).index(self.alliance) + 1
+            )
             sub_body.append("Alliance {} with".format(alliance_number))
             # [3:] to remove "frc" prefix
             team_names = [
                 "Team {}".format(team_key[3:])
                 for team_key in self.alliance["picks"]
-                if team_key != self.team.key_name
+                if team_key != none_throws(self.team).key_name
             ]
             # A gorgeous, gramatically correct list comprehension
             # Format is like "Team 1, Team 2, and Team 3" or just "Team 2 and Team 3"
@@ -57,7 +64,7 @@ class AllianceSelectionNotification(Notification):
         )
 
     @property
-    def data_payload(self):
+    def data_payload(self) -> Optional[Dict[str, Any]]:
         payload = {"event_key": self.event.key_name}
 
         if self.team:
@@ -66,12 +73,12 @@ class AllianceSelectionNotification(Notification):
         return payload
 
     @property
-    def webhook_message_data(self):
+    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
         from backend.common.queries.dict_converters.event_converter import (
             EventConverter,
         )
 
-        payload = self.data_payload
+        payload = none_throws(self.data_payload)
         payload["event_name"] = self.event.name
         payload["event"] = EventConverter.eventConverter_v3(self.event)
         return payload

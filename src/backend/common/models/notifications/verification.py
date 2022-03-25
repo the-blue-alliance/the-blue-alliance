@@ -1,3 +1,6 @@
+from typing import Any, Dict, List, Optional, Tuple
+
+from backend.common.consts.notification_type import NotificationType
 from backend.common.models.notifications.notification import Notification
 
 
@@ -10,7 +13,7 @@ class VerificationNotification(Notification):
         verification_key (string): SHA1 of url + secret
     """
 
-    def __init__(self, url, secret):
+    def __init__(self, url: str, secret: str) -> None:
         """
         Args:
             url (string): The URL to send the notification payload to.
@@ -20,7 +23,7 @@ class VerificationNotification(Notification):
         self.secret = secret
         self._generate_key()
 
-    def _generate_key(self):
+    def _generate_key(self) -> None:
         import hashlib
 
         ch = hashlib.sha1()
@@ -32,15 +35,13 @@ class VerificationNotification(Notification):
         self.verification_key = ch.hexdigest()
 
     @classmethod
-    def _type(cls):
-        from backend.common.consts.notification_type import NotificationType
-
+    def _type(cls) -> NotificationType:
         return NotificationType.VERIFICATION
 
     # Only webhook message data is defined - because we'll only ever send verification to webhooks
     @property
-    def webhook_message_data(self):
+    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
         return {"verification_key": self.verification_key}
 
-    def _additional_logging_values(self):
+    def _additional_logging_values(self) -> List[Tuple[str, Any]]:
         return [(self.verification_key, "verification_key")]

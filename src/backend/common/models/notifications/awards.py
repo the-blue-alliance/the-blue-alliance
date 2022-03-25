@@ -1,21 +1,28 @@
+from typing import Any, Dict, Optional
+
+from pyre_extensions import none_throws
+
 from backend.common.consts.award_type import AwardType
+from backend.common.consts.notification_type import NotificationType
+from backend.common.models.event import Event
 from backend.common.models.notifications.notification import Notification
+from backend.common.models.team import Team
 
 
 class AwardsNotification(Notification):
-    def __init__(self, event, team=None):
+    def __init__(self, event: Event, team: Optional[Team] = None) -> None:
         self.event = event
         self.team = team
         self.team_awards = event.team_awards().get(team.key, []) if team else []
 
     @classmethod
-    def _type(cls):
+    def _type(cls) -> NotificationType:
         from backend.common.consts.notification_type import NotificationType
 
         return NotificationType.AWARDS
 
     @property
-    def fcm_notification(self):
+    def fcm_notification(self) -> Optional[Any]:
         from firebase_admin import messaging
 
         # Construct Team-specific payload
@@ -31,9 +38,9 @@ class AwardsNotification(Notification):
             else:
                 body = "won {} awards".format(len(self.team_awards))
             return messaging.Notification(
-                title="Team {} Awards".format(self.team.team_number),
+                title="Team {} Awards".format(none_throws(self.team).team_number),
                 body="Team {} {} at the {} {}.".format(
-                    self.team.team_number,
+                    none_throws(self.team).team_number,
                     body,
                     self.event.year,
                     self.event.normalized_name,
@@ -49,7 +56,7 @@ class AwardsNotification(Notification):
         )
 
     @property
-    def data_payload(self):
+    def data_payload(self) -> Optional[Dict[str, Any]]:
         payload = {"event_key": self.event.key_name}
 
         if self.team:
@@ -58,8 +65,8 @@ class AwardsNotification(Notification):
         return payload
 
     @property
-    def webhook_message_data(self):
-        payload = self.data_payload
+    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
+        payload = none_throws(self.data_payload)
         payload["event_name"] = self.event.name
 
         from backend.common.helpers.award_helper import AwardHelper
