@@ -53,20 +53,27 @@ class WebhookRequest(Request):
         # https://github.com/the-blue-alliance/the-blue-alliance/issues/2576
         valid_url = True
 
-        response = requests.post(self.url, data=payload, headers=headers)
-        if response.status_code == requests.codes.ok:
-            self.defer_track_notification(1)
-        elif response.status_code == 400:
-            logging.warning("400, Bad request for URL: {}".format(self.url))
-        elif response.status_code == 401:
-            logging.warning("401, Webhook unauthorized for URL: {}".format(self.url))
-        elif response.status_code == 404:
-            logging.warning("404, Invalid URL: {}".format(self.url))
-            valid_url = False
-        elif response.status_code == 500:
-            logging.warning("500, Internal error on server sending message")
-        else:
-            logging.warning("Unexpected status_code: " + str(response.status_code))
+        try:
+            response = requests.post(self.url, data=payload, headers=headers)
+            if response.status_code == requests.codes.ok:
+                self.defer_track_notification(1)
+            elif response.status_code == 400:
+                logging.warning(f"400, Bad request for URL: {self.url}")
+            elif response.status_code == 401:
+                logging.warning(f"401, Webhook unauthorized for URL: {self.url}")
+            elif response.status_code == 404:
+                logging.warning(f"404, Invalid URL: {self.url}")
+                valid_url = False
+            elif response.status_code == 500:
+                logging.warning(
+                    f"500, Internal error on server sending message for URL: {self.url}"
+                )
+            else:
+                logging.warning(
+                    f"{str(response.status_code)}, Unexpected status_code for URL: {self.url}"
+                )
+        except Exception as e:
+            logging.error(f"Other Exception ({e.__class__.__name__}): {str(e)}")
 
         return valid_url
 
