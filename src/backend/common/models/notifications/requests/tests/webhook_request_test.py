@@ -177,7 +177,7 @@ def test_send_error_other():
 
     with patch("requests.post", error_mock) as mock_post, patch.object(
         message, "defer_track_notification"
-    ) as mock_track, pytest.raises(Exception):
+    ) as mock_track:
         message.send()
     mock_post.assert_called_once()
     mock_track.assert_not_called()
