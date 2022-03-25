@@ -1,33 +1,39 @@
+from typing import Any, cast, Dict, Optional
+
+from pyre_extensions import none_throws
+
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.notification_type import NotificationType
+from backend.common.models.match import Match
 from backend.common.models.notifications.notification import Notification
+from backend.common.models.team import Team
 
 
 class MatchScoreNotification(Notification):
-    def __init__(self, match, team=None):
+    def __init__(self, match: Match, team: Optional[Team] = None) -> None:
         self.match = match
         self.event = match.event.get()
         self.team = team
 
     @classmethod
-    def _type(cls):
-        from backend.common.consts.notification_type import NotificationType
-
+    def _type(cls) -> NotificationType:
         return NotificationType.MATCH_SCORE
 
     @property
-    def fcm_notification(self):
-        winning_alliance = self.match.winning_alliance
-        losing_alliance = self.match.losing_alliance
+    def fcm_notification(self) -> Optional[Any]:
+        if self.match.winning_alliance == "":
+            alliance_one = self.match.alliances[AllianceColor.RED]
+        else:
+            alliance_one = self.match.alliances[
+                cast(AllianceColor, self.match.winning_alliance)
+            ]
 
-        alliance_one = (
-            self.match.alliances[winning_alliance]
-            if winning_alliance
-            else self.match.alliances["red"]
-        )
-        alliance_two = (
-            self.match.alliances[losing_alliance]
-            if losing_alliance
-            else self.match.alliances["blue"]
-        )
+        if self.match.losing_alliance == "":
+            alliance_two = self.match.alliances[AllianceColor.BLUE]
+        else:
+            alliance_two = self.match.alliances[
+                cast(AllianceColor, self.match.losing_alliance)
+            ]
 
         # [3:] to remove 'frc' prefix
         alliance_one_teams = ", ".join([team[3:] for team in alliance_one["teams"]])
@@ -58,7 +64,7 @@ class MatchScoreNotification(Notification):
         )
 
     @property
-    def data_payload(self):
+    def data_payload(self) -> Optional[Dict[str, Any]]:
         payload = {"event_key": self.event.key_name, "match_key": self.match.key_name}
 
         if self.team:
@@ -67,12 +73,12 @@ class MatchScoreNotification(Notification):
         return payload
 
     @property
-    def webhook_message_data(self):
+    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
         from backend.common.queries.dict_converters.match_converter import (
             MatchConverter,
         )
 
-        payload = self.data_payload
+        payload = none_throws(self.data_payload)
         # Remove the FCM-only keys
         del payload["match_key"]
 

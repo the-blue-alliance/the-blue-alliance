@@ -1,11 +1,17 @@
 import calendar
 import logging
+from typing import Any, Dict, Optional
 
+from pyre_extensions import none_throws
+
+from backend.common.consts.notification_type import NotificationType
+from backend.common.models.event import Event
+from backend.common.models.match import Match
 from backend.common.models.notifications.notification import Notification
 
 
 class EventScheduleNotification(Notification):
-    def __init__(self, event, next_match=None):
+    def __init__(self, event: Event, next_match: Optional[Match] = None) -> None:
         self.event = event
 
         if not next_match:
@@ -17,13 +23,11 @@ class EventScheduleNotification(Notification):
             self.next_match = next_match
 
     @classmethod
-    def _type(cls):
-        from backend.common.consts.notification_type import NotificationType
-
+    def _type(cls) -> NotificationType:
         return NotificationType.SCHEDULE_UPDATED
 
     @property
-    def fcm_notification(self):
+    def fcm_notification(self) -> Optional[Any]:
         body = f"The {self.event.normalized_name} match schedule has been updated."
         if self.next_match and self.next_match.time:
             time = self.next_match.time.strftime("%H:%M")
@@ -49,12 +53,12 @@ class EventScheduleNotification(Notification):
         )
 
     @property
-    def data_payload(self):
+    def data_payload(self) -> Optional[Dict[str, Any]]:
         return {"event_key": self.event.key_name}
 
     @property
-    def webhook_message_data(self):
-        payload = self.data_payload
+    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
+        payload = none_throws(self.data_payload)
         if self.next_match and self.next_match.time:
             payload["first_match_time"] = calendar.timegm(
                 self.next_match.time.utctimetuple()

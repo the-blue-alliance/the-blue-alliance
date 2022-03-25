@@ -1,9 +1,15 @@
+from typing import Any, Dict, List, Optional, Tuple
+
+from backend.common.consts.notification_type import NotificationType
+from backend.common.models.fcm.platform_config import PlatformConfig
+
+
 class Notification(object):
     """
     Base notification classs - represents message, data, and platform config payloads for notifications.
     """
 
-    def __str__(self):
+    def __str__(self) -> str:
         values = [
             value
             for value in [
@@ -30,10 +36,10 @@ class Notification(object):
             "{}={}".format(str(value[1]), str(value[0])) for value in values
         ]
         value_string = " ".join(value_strings)
-        return "{}({})".format(self.__class__.__name__, value_string)
+        return f"{self.__class__.__name__}({value_string})"
 
     @classmethod
-    def _type(cls):
+    def _type(cls) -> NotificationType:
         """Corresponding NotificationType for this notification
 
         Returns:
@@ -42,7 +48,7 @@ class Notification(object):
         raise NotImplementedError("Notification subclass must implement type")
 
     @property
-    def fcm_notification(self):
+    def fcm_notification(self) -> Optional[Any]:
         """FCM Notification object to use for FCM.
 
         Returns:
@@ -51,7 +57,7 @@ class Notification(object):
         return None
 
     @property
-    def data_payload(self):
+    def data_payload(self) -> Optional[Dict[str, Any]]:
         """Arbitrary key/value payload.
 
         Returns:
@@ -60,7 +66,7 @@ class Notification(object):
         return None
 
     @property
-    def platform_config(self):
+    def platform_config(self) -> Optional[PlatformConfig]:
         """Default config to use for all platforms.
 
         Note:
@@ -68,12 +74,12 @@ class Notification(object):
             those values will be used for their specific platforms instead of this one.
 
         Returns:
-            tbans.models.fcm.PlatformConfig: None if no platform config is necessary.
+            backend.common.models.fcm.platform_config.PlatformConfig: None if no platform config is necessary.
         """
         return None
 
     @property
-    def android_config(self):
+    def android_config(self) -> Optional[Any]:
         """Android specific options for messages sent through FCM connection server.
 
         Returns:
@@ -82,7 +88,7 @@ class Notification(object):
         return None
 
     @property
-    def apns_config(self):
+    def apns_config(self) -> Optional[Any]:
         """Apple Push Notification Service specific options for messages sent through FCM connection server.
 
         Returns:
@@ -91,7 +97,7 @@ class Notification(object):
         return None
 
     @property
-    def webpush_config(self):
+    def webpush_config(self) -> Optional[Any]:
         """Webpush protocol options for messages sent through FCM connection server.
 
         Returns:
@@ -100,7 +106,7 @@ class Notification(object):
         return None
 
     @property
-    def webhook_message_data(self):
+    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
         """`message_data` dictionary for a webhook request.
 
         Note:
@@ -111,6 +117,6 @@ class Notification(object):
         """
         return self.data_payload
 
-    def _additional_logging_values(self):
+    def _additional_logging_values(self) -> List[Tuple[str, Any]]:
         """Return a list of value (or None)/name tuples to be adding to str for logging"""
         return []
