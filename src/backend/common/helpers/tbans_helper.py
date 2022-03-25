@@ -427,6 +427,14 @@ class TBANSHelper:
         for match in next_matches:
             cls.schedule_upcoming_match(match, user_id)
 
+    @classmethod
+    def updated_favorites(cls, user_id: str):
+        from backend.common.models.notifications.update_favorites import (
+            UpdateFavoritesNotification,
+        )
+        cls._send([user_id], UpdateFavoritesNotification())
+        # TODO: ONLY send to FCM clients...
+
     @staticmethod
     def verify_webhook(url: str, secret: str) -> str:
         """Immediately dispatch a Verification to a webhook"""

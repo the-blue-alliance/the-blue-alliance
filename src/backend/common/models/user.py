@@ -10,6 +10,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.helpers.mytba import MyTBA
+from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.favorite import Favorite
@@ -123,26 +124,48 @@ class User:
             FavoriteQuery(account=none_throws(self._account), keys_only=True).fetch()
         )
 
+    """ Adds a Favorite for a model key/type. Returns Favorite if the model already exists """
     def add_favorite(model_key: str, model_type: ModelType) -> Optional[Favorite]:
-        """ Adds a Favorite for a model key/type. Returns None if the model already exists """
+        if self._account is None:
+            return None
+
         query = Favorite.query(
-            parent=user_account_key,
-            Favorite.model_key == fav.model_key,
-            Favorite.model_type == fav.model_type,
-            ancestor=ndb.Key(Account, fav.user_id)
+            Favorite.model_key == model_key,
+            Favorite.model_type == model_type,
+            Favorite.user_id == none_throws(self.uid),
+            ancestor=none_throws(self.account_key)
         )
-        if .count() == 0:
+        if query.count() == 0:
             # Favorite doesn't exist, add it
-            fav.put()
+            favorite = Favorite(
+                parent=none_throws(self.account_key),
+                user_id=none_throws(self.uid),
+                model_type=model_type,
+                model_key=model_key,
+            )
+            favorite.put()
             # Send updates to user's other devices
-            NotificationHelper.send_favorite_update(fav.user_id, device_key)
-            return 200
+            TBANSHelper.
+            NotificationHelper.send_favorite_update(favorite.user_id, device_key)  # TODO: Do this...
+            return favorite
         else:
             # Favorite already exists. Don't add it again
-            return 304
+            return query.fetch(1)[0]
 
     def remove_favorite() -> None:
-        pass
+        to_delete = Favorite.query(
+            Favorite.model_key == model_key,
+            Favorite.model_type == model_type,
+            ancestor=ndb.Key(Account, user_id) ## Aaaah?
+        ).fetch(keys_only=True)
+        if len(to_delete) > 0:
+            ndb.delete_multi(to_delete)
+            # Send updates to user's other devices
+            NotificationHelper.send_favorite_update(user_id, device_key)
+            return 200
+        else:
+            # Favorite doesn't exist. Can't delete it
+            return 404
 
     @property
     def subscriptions(self) -> List[Subscription]:

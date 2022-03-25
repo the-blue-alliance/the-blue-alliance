@@ -251,7 +251,7 @@ def mytba() -> str:
             )
             for (event, matches) in event_matches
         ],
-        # "status": request.get('status'),
+        "status": session.pop("mytba_status", None),
         "year": SeasonHelper.effective_season_year(),
     }
     return render_template("mytba.html", **template_values)
@@ -301,19 +301,10 @@ def mytba_team(team_number: TeamNumber) -> Response:
     team_key = none_throws(team.key.string_id())
 
     if request.method == "POST":
-        user_account_key = none_throws(user.account_key)
-        user_uid = none_throws(user.uid)
-
         if request.form.get("is_favorite"):
-            favorite = Favorite(
-                parent=user_account_key,
-                user_id=user_uid,
-                model_type=ModelType.TEAM,
-                model_key=team_key,
-            )
-            MyTBAHelper.add_favorite(favorite)
+            user.add_favorite(team_key, ModelType.TEAM)
         else:
-            MyTBAHelper.remove_favorite(current_user_id, team_key, ModelType.TEAM)
+            user.remove_favorite(team_key, ModelType.TEAM)
 
         notification_types = request.form.getlist("notification_types")
         if notification_types:
@@ -328,8 +319,8 @@ def mytba_team(team_number: TeamNumber) -> Response:
         else:
             MyTBAHelper.remove_subscription(current_user_id, team_key, ModelType.TEAM)
 
-        # TODO: Set status
-        # status=team_updated
+        session["mytba_status"] = "team_updated"
+
         return redirect(url_for("account.mytba", _anchor="my-teams"))
     else:
         mytba = user.myTBA
