@@ -56,7 +56,7 @@ class WebhookRequest(Request):
         response = requests.post(self.url, data=payload, headers=headers)
         if response.status_code == requests.codes.ok:
             self.defer_track_notification(1)
-        if response.status_code == 400:
+        elif response.status_code == 400:
             logging.warning("400, Bad request for URL: {}".format(self.url))
         elif response.status_code == 401:
             logging.warning("401, Webhook unauthorized for URL: {}".format(self.url))
