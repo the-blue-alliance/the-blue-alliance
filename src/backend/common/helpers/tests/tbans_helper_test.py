@@ -1021,7 +1021,10 @@ class TestTBANSHelper(unittest.TestCase):
         assert exit_code == 2
 
     def test_send_fcm_filter_fcm_clients(self):
-        expected = ["client_type_{}".format(client_type) for client_type in FCM_CLIENTS]
+        expected = [
+            "client_type_{}".format(client_type)
+            for client_type in (FCM_CLIENTS | FCM_LEGACY_CLIENTS)
+        ]
         clients = [
             MobileClient(
                 parent=ndb.Key(Account, "user_id"),

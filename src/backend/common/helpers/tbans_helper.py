@@ -511,7 +511,11 @@ class TBANSHelper:
             return 2
 
         # Make sure we"re only sending to FCM clients
-        clients = [client for client in clients if client.client_type in FCM_CLIENTS]
+        clients = [
+            client
+            for client in clients
+            if client.client_type in (FCM_CLIENTS | FCM_LEGACY_CLIENTS)
+        ]
 
         from backend.common.models.notifications.requests.fcm_request import (
             FCMRequest,
