@@ -111,12 +111,13 @@ class FMSAPIHybridScheduleParser(
             team_key_names: List[TeamKey] = []
             null_team = False
 
+            # Sort by station to ensure correct ordering. Kind of hacky.
             sorted_teams = list(
                 sorted(
                     match.get("teams", match.get("Teams", [])),
                     key=lambda team: team["station"],
                 )
-            )  # Sort by station to ensure correct ordering. Kind of hacky.
+            )
             for team in sorted_teams:
                 if team["teamNumber"] is None:
                     null_team = True
