@@ -1,3 +1,5 @@
+import json
+
 from firebase_admin import messaging
 from googleapiclient import (
     _helpers,
@@ -131,6 +133,8 @@ class FCMRequest(Request):
         }
 
         if self.notification.webhook_message_data:
-            json_dict["message_data"] = self.notification.webhook_message_data
+            json_dict["message_data"] = json.dumps(
+                self.notification.webhook_message_data
+            )
 
         return json_dict
