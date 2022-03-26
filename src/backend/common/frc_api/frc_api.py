@@ -1,16 +1,12 @@
 import datetime
 import json
 import logging
-import re
 from typing import Literal, Optional
 
 import requests
 
 from backend.common.models.keys import Year
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
-
-
-TCompLevel = Literal["qual", "playoff"]
 
 
 class FRCAPI:
@@ -83,19 +79,17 @@ class FRCAPI:
         endpoint = f"/{year}/rankings/{event_short}"
         return self._get(endpoint)
 
-    def match_schedule(self, year: Year, event_short: str, level: TCompLevel):
-        # This does not include results
-        endpoint = f"/{year}/schedule/{event_short}?tournamentLevel={level}"
-        return self._get(endpoint)
+    def matches_hybrid(
+        self, year: Year, event_short: str, level: Literal["qual", "playoff"]
+    ) -> requests.Response:
+        endpoint = f"/{year}/schedule/{event_short}/{level}/hybrid"
 
-    def matches(self, year: Year, event_short: str, level: TCompLevel):
-        # This includes both played/unplayed matches at the event
-        # but doesn't include full results
-        endpoint = f"/{year}/matches/{event_short}?tournamentLevel={level}"
-        return self._get(endpoint)
+        # hybrid schedule requires v2.0 because it doesn't exist in v3.0
+        # https://usfirst.collab.net/sf/go/artf6030
+        return self._get(endpoint, version="v2.0")
 
     def match_scores(
-        self, year: Year, event_short: str, level: TCompLevel
+        self, year: Year, event_short: str, level: Literal["qual", "playoff"]
     ) -> requests.Response:
         # technically "qual"/"playoff" are invalid tournament levels as per the docs,
         # but they seem to work?
@@ -161,15 +155,6 @@ class FRCAPI:
             get_files as cloud_storage_get_files,
             read as cloud_storage_read,
         )
-
-        if version == "v2.0" and "/schedule" in endpoint and "hybrid" not in endpoint:
-            # The hybrid schedule endpoint doesn't exist in newer versions,
-            # so hack the URLs to make things work with older data
-            # /2022/schedule/CADA/qual/hybrid
-            # /2022/schedule/CADA?tournamentLevel=qual
-            regex = re.search(r"/(\d+)/schedule/(\w+)\?tournamentLevel=(\w+)", endpoint)
-            if regex:
-                endpoint = f"/{regex.group(1)}/schedule/{regex.group(2)}/{regex.group(3)}/hybrid"
 
         # Get list of responses
         try:
