@@ -1,5 +1,5 @@
 import calendar
-from typing import Any, Dict, Optional
+from typing import Any, cast, Dict, Optional
 
 from pyre_extensions import none_throws
 
@@ -57,7 +57,7 @@ class MatchUpcomingNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, Any]]:
+    def data_payload(self) -> Optional[Dict[str, str]]:
         payload = {
             "event_key": self.event.key_name,
             "match_key": self.match.key_name,
@@ -70,7 +70,7 @@ class MatchUpcomingNotification(Notification):
 
     @property
     def webhook_message_data(self) -> Optional[Dict[str, Any]]:
-        payload = none_throws(self.data_payload)
+        payload = cast(Dict[str, Any], none_throws(self.data_payload))
         payload["event_name"] = self.event.name
         payload["team_keys"] = self.match.team_key_names
 

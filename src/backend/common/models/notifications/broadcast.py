@@ -28,7 +28,7 @@ class BroadcastNotification(Notification):
         return messaging.Notification(title=self.title, body=self.message)
 
     @property
-    def data_payload(self) -> Optional[Dict[str, Any]]:
+    def data_payload(self) -> Optional[Dict[str, str]]:
         payload = {}
 
         if self.url:

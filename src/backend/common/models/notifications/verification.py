@@ -43,5 +43,5 @@ class VerificationNotification(Notification):
     def webhook_message_data(self) -> Optional[Dict[str, Any]]:
         return {"verification_key": self.verification_key}
 
-    def _additional_logging_values(self) -> List[Tuple[str, Any]]:
+    def _additional_logging_values(self) -> List[Tuple[str, str]]:
         return [(self.verification_key, "verification_key")]

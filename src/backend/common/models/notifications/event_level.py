@@ -1,6 +1,6 @@
 import calendar
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, cast, Dict, Optional
 
 from pyre_extensions import none_throws
 
@@ -49,12 +49,12 @@ class EventLevelNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, Any]]:
+    def data_payload(self) -> Optional[Dict[str, str]]:
         return {"comp_level": self.match.comp_level, "event_key": self.event.key_name}
 
     @property
     def webhook_message_data(self) -> Optional[Dict[str, Any]]:
-        payload = none_throws(self.data_payload)
+        payload = cast(Dict[str, Any], none_throws(self.data_payload))
         payload["event_name"] = self.event.name
         if self.match.time:
             payload["scheduled_time"] = calendar.timegm(self.match.time.utctimetuple())

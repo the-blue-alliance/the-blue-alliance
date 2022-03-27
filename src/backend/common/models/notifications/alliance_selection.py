@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, cast, Dict, Optional
 
 from pyre_extensions import none_throws
 
@@ -64,7 +64,7 @@ class AllianceSelectionNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, Any]]:
+    def data_payload(self) -> Optional[Dict[str, str]]:
         payload = {"event_key": self.event.key_name}
 
         if self.team:
@@ -78,7 +78,7 @@ class AllianceSelectionNotification(Notification):
             EventConverter,
         )
 
-        payload = none_throws(self.data_payload)
+        payload = cast(Dict[str, Any], none_throws(self.data_payload))
         payload["event_name"] = self.event.name
         payload["event"] = EventConverter.eventConverter_v3(self.event)
         return payload
