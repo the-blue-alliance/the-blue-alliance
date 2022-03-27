@@ -129,7 +129,9 @@ class FCMRequest(Request):
         )
 
         json_dict = {
-            "message_type": NOTIFICATION_TYPE_NAMES[self.notification.__class__._type()]
+            "notification_type": NOTIFICATION_TYPE_NAMES[
+                self.notification.__class__._type()
+            ]
         }
 
         if self.notification.webhook_message_data:
