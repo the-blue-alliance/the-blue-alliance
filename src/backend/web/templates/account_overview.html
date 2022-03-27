@@ -308,15 +308,15 @@
                   {{ client.short_id }}
                 {% endif %}
               </td>
-              <td><form action="/notifications/broadcast" method="post">
-                <input name="client_id" type="hidden" value="{{ client.key.id() }}" />
+              <td><form action="{{ url_for('account.ping') }}" method="post">
+                <input name="mobile_client_id" type="hidden" value="{{ client.key.id() }}" />
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="ping btn btn-default" {{ '' if ping_enabled else 'disabled' }}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
               </form></td>
               <td>
                 {% if client.is_webhook %}
                 <form action="/webhooks/delete" method="post">
-                  <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                  <input name="client_id" type="hidden" value="{{ client.key.id() }}" />
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                   <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
