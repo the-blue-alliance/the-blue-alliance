@@ -83,6 +83,15 @@ def bootstrap_post() -> Response:
         )
     )
 
+@local_routes.route("/bootstrap_key")
+def bootstrap_key() -> Response:
+    target_key= request.args.get("target_key")
+    apiv3_key = request.args.get("apiv3_key")
+
+    LocalDataBootstrap.bootstrap_key(target_key, apiv3_key)
+
+    return make_response(profiled_jsonify({'OK':'Yes'}), 200)
+
 
 @local_routes.route("/bootstrap_key")
 def bootstrap_key() -> Response:
