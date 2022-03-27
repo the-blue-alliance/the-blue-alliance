@@ -40,6 +40,7 @@ def test_blueprint() -> None:
         "/account/edit": "account.edit",
         "/account/mytba": "account.mytba",
         "/account": "account.overview",
+        "/account/ping": "account.ping",
     }
 
 
@@ -225,7 +226,10 @@ def test_overview_ping_sent(
     captured_templates: List[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
-    response = web_client.get("/account?ping_sent={}".format(ping_sent))
+    with web_client:
+        with web_client.session_transaction() as session:  # pyre-ignore[16]
+            session["ping_sent"] = ping_sent
+        response = web_client.get("/account")
 
     assert response.status_code == 200
     assert len(captured_templates) == 1

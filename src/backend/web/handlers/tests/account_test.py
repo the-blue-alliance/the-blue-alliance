@@ -7,7 +7,11 @@ from _pytest.monkeypatch import MonkeyPatch
 from flask.testing import FlaskClient
 
 import backend
+from backend.common.consts.client_type import ClientType
 from backend.common.consts.model_type import ModelType
+from backend.common.helpers.tbans_helper import TBANSHelper
+from backend.common.models.account import Account
+from backend.common.models.mobile_client import MobileClient
 from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests.helpers import get_page_title
 
@@ -610,3 +614,70 @@ def test_mytba(
         )
     ]
     assert context["year"] == mock_year
+
+
+@pytest.mark.parametrize("ping_sent, expected", [(True, "1"), (False, "0")])
+def test_ping_client(
+    ping_sent,
+    expected,
+    login_user,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+):
+    c1 = MobileClient(
+        parent=login_user.account_key,
+        user_id=str(login_user.account_key.id()),
+        messaging_id="token_1",
+        client_type=ClientType.OS_IOS,
+    )
+    c1.put()
+
+    with web_client, patch.object(
+        TBANSHelper, "ping", return_value=ping_sent
+    ) as mock_ping:
+        response = web_client.post(
+            "/account/ping", data={"mobile_client_id": c1.key.id()}
+        )
+
+    mock_ping.assert_called_with(c1)
+
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
+        assert session.get("ping_sent") == expected
+
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account"
+
+
+def test_ping_not_our_client(
+    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+):
+    # Insert two mobile clients - one for our user, and one for another user
+    # Make sure we can only ping the one for our user - not the other user
+    other_account = Account(
+        email="some_other_account@tba.com",
+        registered=True,
+    )
+    other_account.put()
+
+    c1 = MobileClient(
+        parent=other_account.key,
+        user_id=str(other_account.key.id()),
+        messaging_id="token_1",
+        client_type=ClientType.OS_IOS,
+    )
+    c1.put()
+
+    with web_client, patch.object(TBANSHelper, "ping", return_value=True) as mock_ping:
+        response = web_client.post(
+            "/account/ping", data={"mobile_client_id": c1.key.id()}
+        )
+
+    mock_ping.assert_not_called()
+
+    with web_client.session_transaction() as session:  # pyre-ignore[16]
+        assert session.get("ping_sent") == "0"
+
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account"

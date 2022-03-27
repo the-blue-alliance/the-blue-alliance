@@ -30,7 +30,6 @@ from controllers.match_timeline_controller import MatchTimelineHandler
 from controllers.mytba_controller import MyTBALiveController
 from controllers.nearby_controller import NearbyController
 from controllers.nightbot_controller import NightbotTeamNextmatchHandler, NightbotTeamStatuskHandler
-from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
 from controllers.short_controller import ShortEventHandler, ShortTeamHandler
 from controllers.suggestions.suggest_apiwrite_controller import SuggestApiWriteController
@@ -116,7 +115,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/mod/redeem', TeamAdminRedeem, 'mod-redeem', strict_slash=True),
       RedirectRoute(r'/mytba', MyTBALiveController, 'mytba-live', strict_slash=True),
       RedirectRoute(r'/nearby', NearbyController, 'nearby', strict_slash=True),
-      RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
       RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
       RedirectRoute(r'/predictions', PredictionsHandler, 'predictions', strict_slash=True),

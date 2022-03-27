@@ -43,7 +43,7 @@ def overview() -> str:
         "webhook_verification_success": request.args.get(
             "webhook_verification_success"
         ),
-        "ping_sent": request.args.get("ping_sent"),
+        "ping_sent": session.pop("ping_sent", None),
         "ping_enabled": NotificationsEnable.notifications_enabled(),
         "auth_write_type_names": AUTH_TYPE_WRITE_TYPE_NAMES,
     }
@@ -249,6 +249,34 @@ def mytba() -> str:
         "year": SeasonHelper.effective_season_year(),
     }
     return render_template("mytba.html", **template_values)
+
+
+@blueprint.route("/ping", methods=["POST"])
+@enforce_login
+def ping():
+    user = none_throws(current_user())
+    response = redirect(url_for("account.overview"))
+
+    mobile_client_id = request.form.get("mobile_client_id")
+
+    from backend.common.models.mobile_client import MobileClient
+
+    client = MobileClient.get_by_id(
+        int(mobile_client_id), parent=none_throws(user.account_key)
+    )
+    if client is None:
+        session["ping_sent"] = "0"
+        return response
+
+    from backend.common.helpers.tbans_helper import TBANSHelper
+
+    success = TBANSHelper.ping(client)
+    if success:
+        session["ping_sent"] = "1"
+    else:
+        session["ping_sent"] = "0"
+
+    return response
 
 
 # class myTBAAddHotMatchesController(LoggedInHandler):
