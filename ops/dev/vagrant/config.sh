@@ -22,6 +22,6 @@ function project {
         project=$(get_project_from_key "$cred_file")
         echo "$project"
     else
-        echo "test"
+        echo "demo-test"
     fi
 }
