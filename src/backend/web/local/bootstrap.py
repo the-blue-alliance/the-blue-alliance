@@ -19,6 +19,7 @@ from backend.common.queries.dict_converters.team_converter import TeamConverter
 
 class LocalDataBootstrap:
     AUTH_HEADER = "X-TBA-Auth-Key"
+    recycled_session = requests.Session()
 
     @classmethod
     def store_district(cls, data: Dict) -> District:
@@ -86,10 +87,22 @@ class LocalDataBootstrap:
     @classmethod
     def fetch_endpoint(cls, endpoint: str, auth_token: str) -> Dict:
         full_url = f"https://www.thebluealliance.com/api/v3/{endpoint}"
-        r = requests.get(
+        r = cls.recycled_session.get(
             full_url, headers={cls.AUTH_HEADER: auth_token, "User-agent": "Mozilla/5.0"}
         )
         return r.json()
+
+    # This method uses the first event ever endpoint as I cannot easily find a
+    # stub to verify the authenticity of a key, since the /status endpoint
+    # seems to be periodically returning valid data even without a key.
+
+    @classmethod
+    def verify_apiv3_key(cls, auth_token: str) -> bool:
+        api_status = cls.fetch_endpoint("event/1992cmp", auth_token)
+
+        if "Error" not in api_status.keys():
+            return True
+        return False
 
     @classmethod
     def fetch_team(cls, team_key: TeamKey, auth_token: str) -> Dict:
