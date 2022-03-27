@@ -57,7 +57,7 @@ class Notification(object):
         return None
 
     @property
-    def data_payload(self) -> Optional[Dict[str, Any]]:
+    def data_payload(self) -> Optional[Dict[str, str]]:
         """Arbitrary key/value payload.
 
         Returns:
@@ -117,6 +117,6 @@ class Notification(object):
         """
         return self.data_payload
 
-    def _additional_logging_values(self) -> List[Tuple[str, Any]]:
+    def _additional_logging_values(self) -> List[Tuple[str, str]]:
         """Return a list of value (or None)/name tuples to be adding to str for logging"""
         return []

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, cast, Dict, Optional
 
 from pyre_extensions import none_throws
 
@@ -29,11 +29,11 @@ class DistrictPointsNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, Any]]:
+    def data_payload(self) -> Optional[Dict[str, str]]:
         return {"district_key": self.district.key_name}
 
     @property
     def webhook_message_data(self) -> Optional[Dict[str, Any]]:
-        payload = none_throws(self.data_payload)
+        payload = cast(Dict[str, Any], none_throws(self.data_payload))
         payload["district_name"] = self.district.display_name
         return payload

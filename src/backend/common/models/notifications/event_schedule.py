@@ -1,6 +1,6 @@
 import calendar
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, cast, Dict, Optional
 
 from pyre_extensions import none_throws
 
@@ -53,12 +53,12 @@ class EventScheduleNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, Any]]:
+    def data_payload(self) -> Optional[Dict[str, str]]:
         return {"event_key": self.event.key_name}
 
     @property
     def webhook_message_data(self) -> Optional[Dict[str, Any]]:
-        payload = none_throws(self.data_payload)
+        payload = cast(Dict[str, Any], none_throws(self.data_payload))
         if self.next_match and self.next_match.time:
             payload["first_match_time"] = calendar.timegm(
                 self.next_match.time.utctimetuple()

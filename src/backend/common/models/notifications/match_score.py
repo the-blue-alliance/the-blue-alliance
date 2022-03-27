@@ -64,7 +64,7 @@ class MatchScoreNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, Any]]:
+    def data_payload(self) -> Optional[Dict[str, str]]:
         payload = {"event_key": self.event.key_name, "match_key": self.match.key_name}
 
         if self.team:
@@ -78,7 +78,7 @@ class MatchScoreNotification(Notification):
             MatchConverter,
         )
 
-        payload = none_throws(self.data_payload)
+        payload = cast(Dict[str, Any], none_throws(self.data_payload))
         # Remove the FCM-only keys
         del payload["match_key"]
 
