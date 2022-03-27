@@ -13,6 +13,9 @@
             {% if view_url %}
                 <p>You can view your imported data <a class="alert-link" href="{{view_url}}">here</a>.</p>
             {% endif %}
+            {% if long_running %}
+            <p>You're importing a lot of data!  It might not be ready right away, but it will be eventually, check the Admin Dashboard.</p>
+            {% endif %}
         </div>
     {% elif status %}
         <div class="alert alert-danger alert-dismissible" data-status="{{status}}">
@@ -21,7 +24,7 @@
             {% if status == "bad_key" %}
                 <p>We don't know how to import that key!</p>
             {% elif status == "bad_apiv3" %}
-                <p>Make sure to supply a valid APIv3 key!</p>
+                <p>Make sure to supply a valid APIv3 key!  The production instance of TBA thinks you supplied an invalid APIv3 key.</p>
             {% endif %}
         </div>
     {% endif %}
