@@ -9,6 +9,11 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 pip install -r src/requirements.txt
 
+# Create empty keys file if one does not already exist
+if [ ! -f /tba/src/backend/web/static/javascript/tba_js/tba_keys.js ]; then
+    cp /tba/src/backend/web/static/javascript/tba_js/tba_keys_template.js /tba/src/backend/web/static/javascript/tba_js/tba_keys.js
+fi
+
 # nodejs dependencies
 NVM_DIR="/nvm"
 # shellcheck source=/dev/null
