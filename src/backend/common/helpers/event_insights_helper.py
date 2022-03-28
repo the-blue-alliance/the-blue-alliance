@@ -223,8 +223,8 @@ class EventInsightsHelper:
             / opportunities_1x,
             "quintet_count": [
                 quintet_count,
-                opportunities_3x,
-                100.0 * float(quintet_count) / opportunities_3x,
+                opportunities_1x,
+                100.0 * float(quintet_count) / opportunities_1x,
             ],
             "average_cargo_points_auto": float(cargo_points_auto) / opportunities_1x,
             "average_points_auto": float(points_auto) / opportunities_1x,
