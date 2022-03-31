@@ -94,3 +94,8 @@ TODO
 ### Event Rankings
 
 TODO, but `EventDetails.renderable_rankings` needs updating and explain how/why
+
+## Championship Events
+
+We use the `cmp_registration_hacks` heavily to tweak how we import data around CMPs.
+ - 2Champs Naming - use the `event_name_override` to override the name. Use "FIRST Championship" before the event (until division registrations are out), and "Einstein Field" afterwards.
