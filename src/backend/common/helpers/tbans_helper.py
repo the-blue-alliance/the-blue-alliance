@@ -337,15 +337,10 @@ class TBANSHelper:
             fcm_request = FCMRequest(
                 firebase_app, notification, tokens=[client.messaging_id]
             )
-            logging.info("Ping - {}".format(str(fcm_request)))
 
             batch_response = fcm_request.send()
             if batch_response.failure_count > 0:
-                response = batch_response.responses[0]
-                logging.info("Error Sending Ping - {}".format(response.exception))
                 return False
-            else:
-                logging.info("Ping Sent")
         else:
             raise Exception("Unsupported FCM client type: {}".format(client_type))
 
@@ -364,12 +359,8 @@ class TBANSHelper:
         webhook_request = WebhookRequest(
             notification, client.messaging_id, client.secret
         )
-        logging.info("Ping - {}".format(str(webhook_request)))
 
-        success = webhook_request.send()
-        logging.info("Ping Sent")
-
-        return success
+        return webhook_request.send()
 
     @classmethod
     def schedule_upcoming_match(cls, match, user_id=None):
@@ -403,11 +394,6 @@ class TBANSHelper:
         # Schedule `match_upcoming` notifications for Match 1 and Match 2
         # Match 3 (and onward) will be dispatched after Match 1 (or Match N - 2) has been played
         if not event.matches:
-            logging.error(
-                "Unable to schedule `match_upcoming` notification for {} - no matches".format(
-                    event.key_name
-                )
-            )
             return
 
         from backend.common.helpers.match_helper import MatchHelper
@@ -439,10 +425,7 @@ class TBANSHelper:
         )
 
         webhook_request = WebhookRequest(notification, url, secret)
-        logging.info("Verification - {}".format(str(webhook_request)))
-
         webhook_request.send()
-        logging.info("Verification Key - {}".format(notification.verification_key))
 
         return notification.verification_key
 
@@ -533,7 +516,6 @@ class TBANSHelper:
                 tokens=[client.messaging_id for client in subclients],
                 legacy_data_format=legacy_data_format,
             )
-            logging.info(str(fcm_request))
 
             batch_response = fcm_request.send()
             retry_clients = []
@@ -560,18 +542,8 @@ class TBANSHelper:
             ):
                 client = subclients[index]
                 if isinstance(response.exception, UnregisteredError):
-                    logging.info(
-                        "Deleting unregistered client with ID: {}".format(
-                            client.messaging_id
-                        )
-                    )
                     MobileClientQuery.delete_for_messaging_id(client.messaging_id)
                 elif isinstance(response.exception, SenderIdMismatchError):
-                    logging.info(
-                        "Deleting mismatched client with ID: {}".format(
-                            client.messaging_id
-                        )
-                    )
                     MobileClientQuery.delete_for_messaging_id(client.messaging_id)
                 elif isinstance(response.exception, QuotaExceededError):
                     logging.error("Qutoa exceeded - retrying client...")
@@ -639,8 +611,6 @@ class TBANSHelper:
             webhook_request = WebhookRequest(
                 notification, client.messaging_id, client.secret
             )
-            logging.info(str(webhook_request))
-
             webhook_request.send()
 
         return 0

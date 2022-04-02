@@ -1,4 +1,3 @@
-import logging
 from functools import wraps
 from typing import Set
 
@@ -25,13 +24,11 @@ def api_authenticated(func):
             )
 
             auth_owner_id = None
-            auth_owner_mechanism = None
 
             if auth_key:
                 auth = ApiAuthAccess.get_by_id(auth_key)
                 if auth and auth.is_read_key:
                     auth_owner_id = auth.owner.id() if auth.owner else None
-                    auth_owner_mechanism = f"X-TBA-Auth-Key: {auth_key}"
                 else:
                     return (
                         {
@@ -43,7 +40,6 @@ def api_authenticated(func):
                 user = current_user()
                 if user:
                     auth_owner_id = user.account_key.id()
-                    auth_owner_mechanism = "LOGGED IN"
                 else:
                     return (
                         {
@@ -52,7 +48,6 @@ def api_authenticated(func):
                         401,
                     )
 
-            logging.info(f"Auth owner: {auth_owner_id}, {auth_owner_mechanism}")
             # Set for our GA event tracking in `track_call_after_response`
             g.auth_owner_id = auth_owner_id
 

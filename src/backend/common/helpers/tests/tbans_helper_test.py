@@ -1084,17 +1084,10 @@ class TestTBANSHelper(unittest.TestCase):
             MobileClientQuery,
             "delete_for_messaging_id",
             wraps=MobileClientQuery.delete_for_messaging_id,
-        ) as mock_delete, patch(
-            "logging.info"
-        ) as mock_info:
+        ) as mock_delete:
             exit_code = TBANSHelper._send_fcm([client], MockNotification())
             mock_delete.assert_called_once_with("messaging_id")
             assert exit_code == 0
-            mock_info.assert_called_with(
-                "Deleting unregistered client with ID: messaging_id"
-            )
-
-        # TODO: Check logging?
 
         # Sanity check
         self.assertEqual(fcm_messaging_ids("user_id"), [])
@@ -1124,15 +1117,10 @@ class TestTBANSHelper(unittest.TestCase):
             MobileClientQuery,
             "delete_for_messaging_id",
             wraps=MobileClientQuery.delete_for_messaging_id,
-        ) as mock_delete, patch(
-            "logging.info"
-        ) as mock_info:
+        ) as mock_delete:
             exit_code = TBANSHelper._send_fcm([client], MockNotification())
             mock_delete.assert_called_once_with("messaging_id")
             assert exit_code == 0
-            mock_info.assert_called_with(
-                "Deleting mismatched client with ID: messaging_id"
-            )
 
         # Sanity check
         self.assertEqual(fcm_messaging_ids("user_id"), [])
