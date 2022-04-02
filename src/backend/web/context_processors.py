@@ -4,5 +4,7 @@ from typing import Dict, Optional
 
 def render_time_context_processor() -> Dict[str, Optional[datetime]]:
     return dict(
-        render_time=datetime.now(timezone.utc).astimezone().replace(second=0, microsecond=0)  # pyre-ignore[16]
+        render_time=datetime.now(timezone.utc)  # pyre-ignore[16]
+        .astimezone()
+        .replace(second=0, microsecond=0)
     )  # Prevent ETag from changing too quickly

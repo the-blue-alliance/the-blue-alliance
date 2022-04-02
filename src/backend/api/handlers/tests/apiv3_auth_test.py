@@ -1,5 +1,4 @@
 import json
-import logging
 from unittest.mock import patch
 
 import pytest
@@ -18,7 +17,7 @@ from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
-def test_not_authenticated(ndb_stub, api_client: Client, caplog) -> None:
+def test_not_authenticated(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -28,17 +27,15 @@ def test_not_authenticated(ndb_stub, api_client: Client, caplog) -> None:
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
-        with caplog.at_level(logging.INFO):
-            resp = api_client.get("/api/v3/team/frc254")
+        resp = api_client.get("/api/v3/team/frc254")
 
-        assert len(caplog.records) == 0
         assert g.get("auth_owner_id", None) is None
 
     assert resp.status_code == 401
     assert "required" in resp.json["Error"]
 
 
-def test_bad_auth(ndb_stub, api_client: Client, caplog) -> None:
+def test_bad_auth(ndb_stub, api_client: Client) -> None:
     account = Account()
     ApiAuthAccess(
         id="test_auth_key", auth_types_enum=[AuthType.READ_API], owner=account.key
@@ -48,12 +45,10 @@ def test_bad_auth(ndb_stub, api_client: Client, caplog) -> None:
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
-        with caplog.at_level(logging.INFO):
-            resp = api_client.get(
-                "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "bad_auth_key"}
-            )
+        resp = api_client.get(
+            "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "bad_auth_key"}
+        )
 
-        assert len(caplog.records) == 0
         assert g.get("auth_owner_id", None) is None
 
     assert resp.status_code == 401
@@ -61,9 +56,7 @@ def test_bad_auth(ndb_stub, api_client: Client, caplog) -> None:
 
 
 @pytest.mark.parametrize("account", [None, Account()])
-def test_authenticated_header(
-    ndb_stub, api_client: Client, account: Account, caplog
-) -> None:
+def test_authenticated_header(ndb_stub, api_client: Client, account: Account) -> None:
     if account:
         account.put()
     ApiAuthAccess(
@@ -76,18 +69,9 @@ def test_authenticated_header(
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
-        with caplog.at_level(logging.INFO):
-            resp = api_client.get(
-                "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
-            )
-
-        assert len(caplog.records) == 2
-        record = caplog.records[0]
-        assert record.levelno == logging.INFO
-        if account:
-            assert record.message == "Auth owner: 1, X-TBA-Auth-Key: test_auth_key"
-        else:
-            assert record.message == "Auth owner: None, X-TBA-Auth-Key: test_auth_key"
+        resp = api_client.get(
+            "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+        )
 
         if account:
             assert g.auth_owner_id == account.key.id()
@@ -96,9 +80,7 @@ def test_authenticated_header(
 
 
 @pytest.mark.parametrize("account", [None, Account()])
-def test_authenticated_urlparam(
-    ndb_stub, api_client: Client, account: Account, caplog
-) -> None:
+def test_authenticated_urlparam(ndb_stub, api_client: Client, account: Account) -> None:
     if account:
         account.put()
     ApiAuthAccess(
@@ -111,16 +93,7 @@ def test_authenticated_urlparam(
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
-        with caplog.at_level(logging.INFO):
-            resp = api_client.get("/api/v3/team/frc254?X-TBA-Auth-Key=test_auth_key")
-
-        assert len(caplog.records) == 2
-        record = caplog.records[0]
-        assert record.levelno == logging.INFO
-        if account:
-            assert record.message == "Auth owner: 1, X-TBA-Auth-Key: test_auth_key"
-        else:
-            assert record.message == "Auth owner: None, X-TBA-Auth-Key: test_auth_key"
+        resp = api_client.get("/api/v3/team/frc254?X-TBA-Auth-Key=test_auth_key")
 
         if account:
             assert g.auth_owner_id == account.key.id()
@@ -128,7 +101,7 @@ def test_authenticated_urlparam(
     assert resp.status_code == 200
 
 
-def test_authenticated_user(ndb_stub, api_client: Client, caplog) -> None:
+def test_authenticated_user(ndb_stub, api_client: Client) -> None:
     email = "zach@thebluealliance.com"
     account = Account(email=email)
 
@@ -138,15 +111,9 @@ def test_authenticated_user(ndb_stub, api_client: Client, caplog) -> None:
     with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
-        with patch.object(
-            auth, "_decoded_claims", return_value={"email": email}
-        ), caplog.at_level(logging.INFO):
+        with patch.object(auth, "_decoded_claims", return_value={"email": email}):
             resp = api_client.get("/api/v3/team/frc254")
 
-        assert len(caplog.records) == 2
-        record = caplog.records[0]
-        assert record.levelno == logging.INFO
-        assert record.message == "Auth owner: 1, LOGGED IN"
         assert g.auth_owner_id == account.key.id()
 
     assert resp.status_code == 200

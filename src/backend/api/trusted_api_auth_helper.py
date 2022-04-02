@@ -1,6 +1,5 @@
 import datetime
 import hashlib
-import logging
 from typing import Optional, Set
 
 from flask import abort, make_response, request
@@ -97,9 +96,6 @@ class TrustedApiAuthHelper:
             auth.secret if auth else None, request.path, request.get_data(as_text=True)
         )
         if not auth or expected_sig != auth_sig:
-            logging.info(
-                "Auth sig: {}, Expected sig: {}".format(auth_sig, expected_sig)
-            )
             abort(
                 make_response(
                     profiled_jsonify(
