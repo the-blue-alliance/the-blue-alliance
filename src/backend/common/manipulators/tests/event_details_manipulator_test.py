@@ -131,8 +131,8 @@ class TestEventDetailsManipulator(unittest.TestCase):
         )
         assert len(tasks) == 2
 
-        assert tasks[0].url == "/tasks/math/do/district_points_calc/2011ct"
-        assert tasks[1].url == "/tasks/math/do/event_team_status/2011ct"
+        assert tasks[0].url == "/tasks/math/do/event_team_status/2011ct"
+        assert tasks[1].url == "/tasks/math/do/district_points_calc/2011ct"
 
     def test_postUpdateHook_notifications(self):
         import datetime
