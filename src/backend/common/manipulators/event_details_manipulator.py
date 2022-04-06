@@ -47,6 +47,7 @@ def event_details_post_update_hook(
                 method="GET",
                 target="py3-tasks-io",
                 queue_name="default",
+                countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
             )
         except Exception:
             logging.exception(f"Error enqueuing district_points_calc for {event_key}")
