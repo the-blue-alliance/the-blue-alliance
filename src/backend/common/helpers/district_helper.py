@@ -248,7 +248,7 @@ class DistrictHelper:
                             ]
                             team_totals[team_key]["tiebreakers"][3] = max(
                                 event_district_points["points"][team_key][
-                                    "qual_points"
+                                    "alliance_points"
                                 ],
                                 team_totals[team_key]["tiebreakers"][3],
                             )

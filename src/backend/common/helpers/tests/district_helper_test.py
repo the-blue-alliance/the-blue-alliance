@@ -91,7 +91,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
         "qual_scores": [85, 71, 69],
         "rookie_bonus": 0,
         "other_bonus": 0,
-        "tiebreakers": [30, 30, 16, 19, 0],
+        "tiebreakers": [30, 30, 16, 16, 0],
     }
     assert rankings["frc4362"] == {
         "event_points": [
@@ -120,7 +120,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
         "qual_scores": [104, 97, 93],
         "rookie_bonus": 0,
         "other_bonus": 0,
-        "tiebreakers": [150, 90, 42, 60, 0],
+        "tiebreakers": [150, 90, 42, 42, 0],
     }
 
 
@@ -167,7 +167,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
         "qual_scores": [93, 82, 82],
         "rookie_bonus": 0,
         "other_bonus": 2,
-        "tiebreakers": [40, 20, 32, 22, 0],
+        "tiebreakers": [40, 20, 32, 16, 0],
     }
     assert rankings["frc610"] == {
         "event_points": [
@@ -186,7 +186,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
         "qual_scores": [52, 41, 40],
         "rookie_bonus": 0,
         "other_bonus": 0,
-        "tiebreakers": [20, 20, 16, 18, 0],
+        "tiebreakers": [20, 20, 16, 16, 0],
     }
     assert rankings["frc1241"] == {
         "event_points": [
@@ -205,7 +205,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
         "qual_scores": [67, 56, 45],
         "rookie_bonus": 0,
         "other_bonus": 0,
-        "tiebreakers": [10, 10, 14, 12, 0],
+        "tiebreakers": [10, 10, 14, 14, 0],
     }
 
 
