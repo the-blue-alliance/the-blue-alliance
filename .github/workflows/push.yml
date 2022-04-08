@@ -287,7 +287,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Download production artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: web-build
           path: src/build
