@@ -90,10 +90,6 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     updated_match.is_new
                     or "alliances_json" in updated_match.updated_attrs
                 ):
-                    # There is a score update for this match, push a notification
-                    logging.info(
-                        "Sending push notifications for {}".format(match.key_name)
-                    )
                     try:
                         TBANSHelper.match_score(match)
                     except Exception as exception:
