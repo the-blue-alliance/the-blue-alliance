@@ -175,6 +175,34 @@ def test_parse_cmp_subdivision(test_data_importer):
     assert event.district_key is None
 
 
+def test_parse_cmp_division(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2022gal.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, _ = FMSAPIEventListParser(2022).parse(data)
+    event = events[0]
+
+    assert event.key_name == "2022gal"
+    assert event.name == "Galileo Division"
+    assert event.short_name == "Galileo"
+    assert event.event_short == "gal"
+    assert event.official is True
+    assert event.start_date == datetime.datetime(
+        year=2022, month=4, day=20, hour=0, minute=0, second=0
+    )
+    assert event.end_date == datetime.datetime(
+        year=2022, month=4, day=23, hour=23, minute=59, second=59
+    )
+    assert event.venue == "George R. Brown Convention Center"
+    assert event.city == "Houston"
+    assert event.state_prov == "TX"
+    assert event.country == "USA"
+    assert event.year == 2022
+    assert event.event_type_enum == EventType.CMP_DIVISION
+    assert event.district_key is None
+
+
 def test_parse_offseason(test_data_importer):
     path = test_data_importer._get_path(__file__, "data/2015_event_list.json")
     with open(path, "r") as f:

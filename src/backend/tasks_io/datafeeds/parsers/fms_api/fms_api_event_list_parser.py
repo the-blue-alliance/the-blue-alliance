@@ -26,6 +26,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         "districtchampionshipdivision": EventType.DISTRICT_CMP_DIVISION,
         "districtchampionship": EventType.DISTRICT_CMP,
         "districtchampionshipwithlevels": EventType.DISTRICT_CMP,
+        "championshipdivision": EventType.CMP_DIVISION,
         "championshipsubdivision": EventType.CMP_DIVISION,
         "championship": EventType.CMP_FINALS,
         "offseason": EventType.OFFSEASON,
@@ -90,6 +91,14 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 if code == "week0"
                 else self.EVENT_TYPES.get(api_event_type, None)
             )
+            if api_event_type == "championshipdivision" and self.season != 2022:
+                # 2022 only has one championship and the API uses ChampionshipSubdivision
+                # for some reason. This didn't come up before because pre-2champs divisions
+                # also reproted as ChampionshipSubDivision. Weird.
+                logging.warning(
+                    f"Skipping event {code} with type {api_event_type} as not a real division"
+                )
+                continue
             if event_type is None and not self.event_short:
                 logging.warning(
                     "Event type '{}' not recognized!".format(api_event_type)
