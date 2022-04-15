@@ -219,22 +219,6 @@ class AdminRebuildDivisionsDo(LoggedInHandler):
         self.response.out.write(output)
 
 
-class AdminClearEventTeamsDo(LoggedInHandler):
-    """
-    Remove all eventteams from an event
-    """
-    def get(self, event_key):
-        self._require_admin()
-        event = Event.get_by_id(event_key)
-        if not event:
-            self.abort(404)
-            return
-        existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
-        EventTeamManipulator.delete_keys(existing_event_team_keys)
-
-        self.response.out.write("Deleted {} EventTeams from {}".format(len(existing_event_team_keys), event_key))
-
-
 class AdminCreateDistrictTeamsDo(LoggedInHandler):
     def get(self, year):
         year = int(year)
