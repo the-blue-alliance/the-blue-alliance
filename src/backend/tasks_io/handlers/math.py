@@ -12,6 +12,7 @@ from backend.common.futures import TypedFuture
 from backend.common.helpers.district_helper import DistrictHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
+from backend.common.helpers.event_team_updater import EventTeamUpdater
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
 from backend.common.helpers.prediction_helper import PredictionHelper
@@ -19,6 +20,7 @@ from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
+from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
@@ -282,3 +284,46 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
         )
 
     return make_response("")
+
+
+@blueprint.route("/tasks/math/enqueue/eventteam_update/<when>")
+def enqueue_eventteam_update(when: str) -> str:
+    if when == "all":
+        event_keys = Event.query().fetch(10000, keys_only=True)
+    else:
+        event_keys = Event.query(Event.year == int(when)).fetch(10000, keys_only=True)
+
+    for event_key in event_keys:
+        taskqueue.add(
+            url="/tasks/math/do/eventteam_update/" + event_key.id(), method="GET"
+        )
+
+    template_values = {
+        "event_keys": event_keys,
+    }
+
+    return render_template("math/eventteam_update_enqueue.html", **template_values)
+
+
+@blueprint.route("/tasks/math/do/eventteam_update/<event_key>")
+def update_eventteams(event_key: EventKey) -> str:
+    """
+    Task that updates the EventTeam index for an Event.
+    Can only update or delete EventTeams for unregistered teams.
+    ^^^ Does it actually do this? Eugene -- 2013/07/30
+    """
+    _, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
+
+    if event_teams:
+        event_teams = list(filter(lambda et: et.team.get() is not None, event_teams))
+        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+
+    if et_keys_to_del:
+        EventTeamManipulator.delete_keys(et_keys_to_del)
+
+    template_values = {
+        "event_teams": event_teams,
+        "deleted_event_teams_keys": et_keys_to_del,
+    }
+
+    return render_template("math/eventteam_update_do.html", **template_values)
