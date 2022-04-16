@@ -110,55 +110,6 @@ class EventTeamRepairDo(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class EventTeamUpdate(webapp.RequestHandler):
-    """
-    Task that updates the EventTeam index for an Event.
-    Can only update or delete EventTeams for unregistered teams.
-    ^^^ Does it actually do this? Eugene -- 2013/07/30
-    """
-    def get(self, event_key):
-        _, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
-
-        if event_teams:
-            event_teams = filter(lambda et: et.team.get() is not None, event_teams)
-            event_teams = EventTeamManipulator.createOrUpdate(event_teams)
-
-        if et_keys_to_del:
-            EventTeamManipulator.delete_keys(et_keys_to_del)
-
-        template_values = {
-            'event_teams': event_teams,
-            'deleted_event_teams_keys': et_keys_to_del
-        }
-
-        path = os.path.join(os.path.dirname(__file__),
-                            '../templates/math/eventteam_update_do.html')
-        self.response.out.write(template.render(path, template_values))
-
-
-class EventTeamUpdateEnqueue(webapp.RequestHandler):
-    """
-    Handles enqueing building attendance for Events.
-    """
-    def get(self, when):
-        if when == "all":
-            event_keys = Event.query().fetch(10000, keys_only=True)
-        else:
-            event_keys = Event.query(Event.year == int(when)).fetch(10000, keys_only=True)
-
-        for event_key in event_keys:
-            taskqueue.add(
-                url='/tasks/math/do/eventteam_update/' + event_key.id(),
-                method='GET')
-
-        template_values = {
-            'event_keys': event_keys,
-        }
-
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
-
-
 class FinalMatchesRepairDo(webapp.RequestHandler):
     """
     Repairs zero-indexed final matches
