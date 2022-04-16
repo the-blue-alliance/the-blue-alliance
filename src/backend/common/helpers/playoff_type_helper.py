@@ -42,6 +42,10 @@ class PlayoffTypeHelper:
                 elif playoff_type == PlayoffType.BRACKET_4_TEAM and match_number <= 12:
                     # Account for a 4 team bracket where numbering starts at 1
                     match_number += 12
+                elif playoff_type == PlayoffType.BRACKET_2_TEAM and match_number <= 18:
+                    # Account for a 2 team bracket where numbering starts at 1
+                    match_number += 18
+
                 if match_number <= 12:
                     return CompLevel.QF
                 elif match_number <= 18:
@@ -93,6 +97,9 @@ class PlayoffTypeHelper:
         else:
             if playoff_type == PlayoffType.BRACKET_4_TEAM and match_number <= 12:
                 match_number += 12
+            elif playoff_type == PlayoffType.BRACKET_2_TEAM and match_number <= 18:
+                match_number += 18
+
             return (
                 BRACKET_OCTO_ELIM_MAPPING[match_number]
                 if playoff_type == PlayoffType.BRACKET_16_TEAM

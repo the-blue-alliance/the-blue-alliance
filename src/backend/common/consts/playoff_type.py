@@ -15,9 +15,10 @@ class DoubleElimBracket(str, enum.Enum):
 @enum.unique
 class PlayoffType(enum.IntEnum):
     # Standard Brackets
-    BRACKET_8_TEAM = 0
     BRACKET_16_TEAM = 1
+    BRACKET_8_TEAM = 0
     BRACKET_4_TEAM = 2
+    BRACKET_2_TEAM = 9
 
     # 2015 is special
     AVG_SCORE_8_TEAM = 3
@@ -37,9 +38,10 @@ class PlayoffType(enum.IntEnum):
 
 
 BRACKET_TYPES: Set[PlayoffType] = {
+    PlayoffType.BRACKET_2_TEAM,
+    PlayoffType.BRACKET_4_TEAM,
     PlayoffType.BRACKET_8_TEAM,
     PlayoffType.BRACKET_16_TEAM,
-    PlayoffType.BRACKET_4_TEAM,
 }
 
 
@@ -50,9 +52,10 @@ DOUBLE_ELIM_TYPES: Set[PlayoffType] = {
 
 # Names for Rendering
 TYPE_NAMES: Dict[PlayoffType, str] = {
+    PlayoffType.BRACKET_16_TEAM: "Elimination Bracket (16 Alliances)",
     PlayoffType.BRACKET_8_TEAM: "Elimination Bracket (8 Alliances)",
     PlayoffType.BRACKET_4_TEAM: "Elimination Bracket (4 Alliances)",
-    PlayoffType.BRACKET_16_TEAM: "Elimination Bracket (16 Alliances)",
+    PlayoffType.BRACKET_2_TEAM: "Elimination Bracket (2 Alliances)",
     PlayoffType.AVG_SCORE_8_TEAM: "Average Score (8 Alliances)",
     PlayoffType.ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)",
     PlayoffType.DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",

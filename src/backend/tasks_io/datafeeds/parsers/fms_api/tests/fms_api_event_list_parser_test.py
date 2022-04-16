@@ -543,3 +543,16 @@ def test_parse_2022_one_day_event(test_data_importer):
 
     event = events[0]
     assert event.playoff_type == PlayoffType.BRACKET_4_TEAM
+
+
+def test_parse_2022_two_alliance_dcmp(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2022txcmp.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, districts = FMSAPIEventListParser(2022).parse(data)
+    assert len(events) == 1
+    assert len(districts) == 1
+
+    event = events[0]
+    assert event.playoff_type == PlayoffType.BRACKET_2_TEAM

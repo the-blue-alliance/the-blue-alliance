@@ -36,6 +36,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
     PLAYOFF_TYPES = {
         # Bracket Types
+        "TwoAlliance": PlayoffType.BRACKET_2_TEAM,
         "FourAlliance": PlayoffType.BRACKET_4_TEAM,
         "EightAlliance": PlayoffType.BRACKET_8_TEAM,
         "SixteenAlliance": PlayoffType.BRACKET_16_TEAM,
