@@ -15,7 +15,7 @@
     "prettier": "^2.6.2",
     "prop-types": "^15.8.1",
     "query-string": "^7.1.1",
-    "react": "^17.0.2",
+    "react": "^18.0.0",
     "react-addons-transition-group": "^15.4.1",
     "react-bootstrap": "^2.3.0",
     "react-bootstrap-dialog": "^0.13.0",
