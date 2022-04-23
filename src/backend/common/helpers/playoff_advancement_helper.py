@@ -89,6 +89,7 @@ class PlayoffAdvancementHelper(object):
         2019: ["Cargo Points", "Hatch Panel Points"],
         2020: [],
         2021: [],
+        2022: ["Hangar Points", "Auto Taxi/Cargo Points"],
     }
 
     ADVANCEMENT_COUNT_2015: Dict[CompLevel, int] = {
@@ -485,6 +486,17 @@ class PlayoffAdvancementHelper(object):
                                         )
                                         tiebreaker2.append(
                                             breakdown[color]["hatchPanelPoints"]
+                                        )
+                                    elif (
+                                        year == 2022
+                                        and match.score_breakdown is not None
+                                    ):
+                                        breakdown = none_throws(match.score_breakdown)
+                                        tiebreaker1.append(
+                                            breakdown[color]["endgamePoints"]
+                                        )
+                                        tiebreaker2.append(
+                                            breakdown[color]["autoPoints"]
                                         )
                                     else:
                                         tiebreaker1.append(
