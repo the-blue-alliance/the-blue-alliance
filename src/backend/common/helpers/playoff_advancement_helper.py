@@ -489,6 +489,9 @@ class PlayoffAdvancementHelper(object):
                                             if len(tiebreak_keys) > 0
                                             else None
                                         )
+                                        tiebreaker1.append(
+                                            breakdown[color][key1] if key1 else 0
+                                        )
 
                                         key2 = (
                                             tiebreak_keys[1]
