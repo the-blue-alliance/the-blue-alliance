@@ -83,6 +83,15 @@ class BracketItem(TypedDict):
 
 class PlayoffAdvancementHelper(object):
 
+    ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS: Dict[Year, List[str]] = {
+        2017: ["score"],
+        2018: ["endgamePoints", "autoPoints"],
+        2019: ["cargoPoints", "hatchPanelPoints"],
+        2020: [],
+        2021: [],
+        2022: ["endgamePoints", "autoPoints"],
+    }
+
     ROUND_ROBIN_TIEBREAKERS: Dict[Year, List[str]] = {
         2017: ["Match Points"],
         2018: ["Park/Climb Points", "Auto Points"],
@@ -465,44 +474,31 @@ class PlayoffAdvancementHelper(object):
                                     record["losses"] += 1
                                 if match.has_been_played:
                                     champ_points.append(cp)
+
                                     if (
-                                        year == 2018
+                                        year in cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS
                                         and match.score_breakdown is not None
                                     ):
                                         breakdown = none_throws(match.score_breakdown)
-                                        tiebreaker1.append(
-                                            breakdown[color]["endgamePoints"]
+                                        tiebreak_keys = (
+                                            cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS[year]
+                                        )
+
+                                        key1 = (
+                                            tiebreak_keys[0]
+                                            if len(tiebreak_keys) > 0
+                                            else None
+                                        )
+
+                                        key2 = (
+                                            tiebreak_keys[1]
+                                            if len(tiebreak_keys) > 1
+                                            else None
                                         )
                                         tiebreaker2.append(
-                                            breakdown[color]["autoPoints"]
+                                            breakdown[color][key2] if key2 else 0
                                         )
-                                    elif (
-                                        year == 2019
-                                        and match.score_breakdown is not None
-                                    ):
-                                        breakdown = none_throws(match.score_breakdown)
-                                        tiebreaker1.append(
-                                            breakdown[color]["cargoPoints"]
-                                        )
-                                        tiebreaker2.append(
-                                            breakdown[color]["hatchPanelPoints"]
-                                        )
-                                    elif (
-                                        year == 2022
-                                        and match.score_breakdown is not None
-                                    ):
-                                        breakdown = none_throws(match.score_breakdown)
-                                        tiebreaker1.append(
-                                            breakdown[color]["endgamePoints"]
-                                        )
-                                        tiebreaker2.append(
-                                            breakdown[color]["autoPoints"]
-                                        )
-                                    else:
-                                        tiebreaker1.append(
-                                            match.alliances[color]["score"]
-                                        )
-                                        tiebreaker2.append(0)
+
                                     advancement[comp_level][j] = advancement[
                                         comp_level
                                     ][j]._replace(
@@ -518,48 +514,28 @@ class PlayoffAdvancementHelper(object):
                         else:
                             is_new = True
 
-                    if year == 2018 and match.score_breakdown is not None:
+                    if (
+                        year in cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS
+                        and match.score_breakdown is not None
+                    ):
                         breakdown = none_throws(match.score_breakdown)
+                        tiebreak_keys = cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS[year]
+
+                        key1 = tiebreak_keys[0] if len(tiebreak_keys) > 0 else None
                         tiebreaker1 = (
-                            breakdown[color]["endgamePoints"]
-                            if match.has_been_played
+                            breakdown[color][key1]
+                            if key1 and match.has_been_played
                             else 0
                         )
+
+                        key2 = tiebreak_keys[1] if len(tiebreak_keys) > 1 else None
                         tiebreaker2 = (
-                            breakdown[color]["autoPoints"]
-                            if match.has_been_played
-                            else 0
-                        )
-                    elif year == 2019 and match.score_breakdown is not None:
-                        breakdown = none_throws(match.score_breakdown)
-                        tiebreaker1 = (
-                            breakdown[color]["cargoPoints"]
-                            if match.has_been_played
-                            else 0
-                        )
-                        tiebreaker2 = (
-                            breakdown[color]["hatchPanelPoints"]
-                            if match.has_been_played
-                            else 0
-                        )
-                    elif year == 2022 and match.score_breakdown is not None:
-                        breakdown = none_throws(match.score_breakdown)
-                        tiebreaker1 = (
-                            breakdown[color]["endgamePoints"]
-                            if match.has_been_played
-                            else 0
-                        )
-                        tiebreaker2 = (
-                            breakdown[color]["autoPoints"]
-                            if match.has_been_played
+                            breakdown[color][key2]
+                            if key2 and match.has_been_played
                             else 0
                         )
                     else:
-                        tiebreaker1 = (
-                            match.alliances[color]["score"]
-                            if match.has_been_played
-                            else 0
-                        )
+                        tiebreaker1 = 0
                         tiebreaker2 = 0
 
                     record: WLTRecord = {"wins": 0, "losses": 0, "ties": 0}
