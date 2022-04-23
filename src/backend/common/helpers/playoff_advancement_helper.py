@@ -542,6 +542,18 @@ class PlayoffAdvancementHelper(object):
                             if match.has_been_played
                             else 0
                         )
+                    elif year == 2022 and match.score_breakdown is not None:
+                        breakdown = none_throws(match.score_breakdown)
+                        tiebreaker1 = (
+                            breakdown[color]["endgamePoints"]
+                            if match.has_been_played
+                            else 0
+                        )
+                        tiebreaker2 = (
+                            breakdown[color]["autoPoints"]
+                            if match.has_been_played
+                            else 0
+                        )
                     else:
                         tiebreaker1 = (
                             match.alliances[color]["score"]
