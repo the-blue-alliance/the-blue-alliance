@@ -16,6 +16,7 @@ AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
     (AwardType.WINNER, (["championship winner"], [])),
     (AwardType.WINNER, (["championship champion"], [])),
     (AwardType.WINNER, (["division champion"], [])),
+    (AwardType.WINNER, (["division winner"], [])),
     (AwardType.WINNER, (["championship subdivision winner"], [])),
     (AwardType.WINNER, (["district event winner"], [])),
     (AwardType.WINNER, (["winner", "1"], [])),

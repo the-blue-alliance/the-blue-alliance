@@ -32,6 +32,7 @@ def test_organize_awards() -> None:
         ("Winner #1", AwardType.WINNER),
         ("Division Winner #2", AwardType.WINNER),
         ("Newton - Division Champion #3", AwardType.WINNER),
+        ("Championship Division Winner", AwardType.WINNER),
         ("Championship Winner #3", AwardType.WINNER),
         ("Championship Champion #4", AwardType.WINNER),
         ("Championship Champion", AwardType.WINNER),
