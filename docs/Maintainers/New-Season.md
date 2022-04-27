@@ -60,10 +60,10 @@ TODO
 
 The match breakdown JSON format should be communicated from FIRST before the first event happens either via email or [from the API documentation](https://frc-api-docs.firstinspires.org). Once we know the format-
 
-* Add the API breakdown keys to [score_breakdown_keys.py](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/helpers/score_breakdown_keys.py) to support parsing from the FRC API ([2022 Example](https://github.com/the-blue-alliance/the-blue-alliance/pull/4195))
-* Add a new [match_breakdown_{year}.html](https://github.com/the-blue-alliance/the-blue-alliance/tree/py3/src/backend/web/templates/match_partials/match_breakdown) page to show match breakdowns on the match page ([2022 Example](https://github.com/the-blue-alliance/the-blue-alliance/pull/4195/files#diff-a8a491e43dc48c7848f2217aef3814b32f2de6dacd35e7180028b4f7574b5c31))
-* Update the [`swagger/api_v3.json`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/static/swagger/api_v3.json) with new `Match_Score_Breakdown_{year}` and `Match_Score_Breakdown_{year}_Alliance` models ([2022 Example](https://github.com/the-blue-alliance/the-blue-alliance/pull/4195/files#diff-47a7c4cba3cd134ecf1af29f5fe3fdf79f03b58e2661a89c21eb8e6b42f7744b))
-* Optionally, [Match.score_breakdown](https://github.com/the-blue-alliance/the-blue-alliance/blob/07912c3d278c102d9bc58da3cb0e78baf5d9a8ba/src/backend/common/models/match.py#L195) (and possibly [fms_api_match_parser.py](https://github.com/the-blue-alliance/the-blue-alliance/blob/07912c3d278c102d9bc58da3cb0e78baf5d9a8ba/src/backend/tasks_io/datafeeds/parsers/fms_api/fms_api_match_parser.py#L368-L389), but probably not) if there need to be any TBA-derived fields on the match breakdown JSON
+- Add the API breakdown keys to [score_breakdown_keys.py](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/helpers/score_breakdown_keys.py) to support parsing from the FRC API ([2022 Example](https://github.com/the-blue-alliance/the-blue-alliance/pull/4195))
+- Add a new [match*breakdown*{year}.html](https://github.com/the-blue-alliance/the-blue-alliance/tree/py3/src/backend/web/templates/match_partials/match_breakdown) page to show match breakdowns on the match page ([2022 Example](https://github.com/the-blue-alliance/the-blue-alliance/pull/4195/files#diff-a8a491e43dc48c7848f2217aef3814b32f2de6dacd35e7180028b4f7574b5c31))
+- Update the [`swagger/api_v3.json`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/static/swagger/api_v3.json) with new `Match_Score_Breakdown_{year}` and `Match_Score_Breakdown_{year}_Alliance` models ([2022 Example](https://github.com/the-blue-alliance/the-blue-alliance/pull/4195/files#diff-47a7c4cba3cd134ecf1af29f5fe3fdf79f03b58e2661a89c21eb8e6b42f7744b))
+- Optionally, [Match.score_breakdown](https://github.com/the-blue-alliance/the-blue-alliance/blob/07912c3d278c102d9bc58da3cb0e78baf5d9a8ba/src/backend/common/models/match.py#L195) (and possibly [fms_api_match_parser.py](https://github.com/the-blue-alliance/the-blue-alliance/blob/07912c3d278c102d9bc58da3cb0e78baf5d9a8ba/src/backend/tasks_io/datafeeds/parsers/fms_api/fms_api_match_parser.py#L368-L389), but probably not) if there need to be any TBA-derived fields on the match breakdown JSON
 
 Do not include the `alliance` field in the score breakdown keys.
 
@@ -98,4 +98,6 @@ TODO, but `EventDetails.renderable_rankings` needs updating and explain how/why
 ## Championship Events
 
 We use the `cmp_registration_hacks` heavily to tweak how we import data around CMPs.
- - 2Champs Naming - use the `event_name_override` to override the name. Use "FIRST Championship" before the event (until division registrations are out), and "Einstein Field" afterwards.
+
+- 2Champs Naming - use the `event_name_override` to override the name. Use "FIRST Championship" before the event (until division registrations are out), and "Einstein Field" afterwards.
+- Add Einstein to `set_start_to_last_day` after division registrations are out.
