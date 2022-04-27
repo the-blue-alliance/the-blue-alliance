@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
   openssh-server
 
 # Setup python environmenet
-ENV PYTHON_VERSION python3.9
+ENV PYTHON_VERSION python3.10
 RUN apt-get install -y \
     "$PYTHON_VERSION" \
     "$PYTHON_VERSION-venv" \
