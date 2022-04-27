@@ -74,6 +74,12 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         self.season = season
         self.event_short = short
 
+    def get_code_and_short_name(self, season, code):
+        # Even though 2022 Einstein is listed as "cmptx", we don't want it to say "(Houston)".
+        if season == 2022 and code == "cmptx":
+            return (code, "{}")
+        return self.EVENT_CODE_EXCEPTIONS[code]
+
     def parse(self, response: Dict[str, Any]) -> Tuple[List[Event], List[District]]:
         events: List[Event] = []
         districts: Dict[DistrictKey, District] = {}
@@ -145,7 +151,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
             # Special cases for champs
             if code in self.EVENT_CODE_EXCEPTIONS:
-                code, short_name = self.EVENT_CODE_EXCEPTIONS[code]
+                code, short_name = self.get_code_and_short_name(self.season, code)
 
                 # FIRST indicates CMP registration before divisions are assigned by adding all teams
                 # to Einstein. We will hack around that by not storing divisions and renaming
