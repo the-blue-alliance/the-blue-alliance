@@ -151,5 +151,10 @@ AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
     (AwardType.ENGINEERING_DESIGN, (["engineering design"], [])),
     (AwardType.DESIGNERS, (["designer's"], [])),
     (AwardType.CONCEPT, (["concept"], [])),
+    (AwardType.GAME_DESIGN_CHALLENGE_WINNER, (["game design challenge winner"], [])),
+    (
+        AwardType.GAME_DESIGN_CHALLENGE_FINALIST,
+        (["game design challenge finalist"], []),
+    ),
     (AwardType.OTHER, (["other", "offseason award", "offseason event award"], [])),
 ]

@@ -102,6 +102,8 @@ class AwardType(enum.IntEnum):
     ENGINEERING_DESIGN = 77
     DESIGNERS = 78
     CONCEPT = 79
+    GAME_DESIGN_CHALLENGE_WINNER = 80
+    GAME_DESIGN_CHALLENGE_FINALIST = 81
 
 
 AWARD_TYPES: Set[AwardType] = {a for a in AwardType}
@@ -113,6 +115,7 @@ BLUE_BANNER_AWARDS: Set[AwardType] = {
     AwardType.WINNER,
     AwardType.WOODIE_FLOWERS,
     AwardType.SKILLS_COMPETITION_WINNER,
+    AwardType.GAME_DESIGN_CHALLENGE_WINNER,
 }
 
 
