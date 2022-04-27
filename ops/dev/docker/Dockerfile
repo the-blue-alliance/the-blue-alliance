@@ -6,16 +6,21 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # Get base system dependencies
 RUN apt-get update && apt-get install -y \
-  wget \
-  curl \
-  unzip \
-  sudo \
-  jq \
-  tmux \
-  vim \
-  openssh-server
+    wget \
+    curl \
+    unzip \
+    sudo \
+    jq \
+    tmux \
+    vim \
+    openssh-server
 
-# Setup python environmenet
+# Needed for Python 3.9
+RUN apt-get install software-properties-common -y
+RUN add-apt-repository ppa:deadsnakes/ppa -y
+RUN apt-get update
+
+# Setup python environment
 ENV PYTHON_VERSION python3.9
 RUN apt-get install -y \
     "$PYTHON_VERSION" \
