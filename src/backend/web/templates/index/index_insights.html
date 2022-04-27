@@ -24,24 +24,32 @@
         <div class="row">
           <div class="col-xs-12">
             <h3>Highest Scoring Qual Match{% if match_highscore.data.qual|length > 1 %}es{% endif %} <small>(Minus Penalties)</small></h3>
-            {% for match in  match_highscore.data.qual %}
+            {% for match in match_highscore.data.qual %}
               <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
               <table class="match-table insights-table">
                 <thead>
                   <tr class="key">
-                    <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
+                    <th colspan="{{match.alliances.get('red').get('teams')|length}}">Teams</th>
                     <th>Score</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for items in match.alliances.items()|reverse %}
                   <tr>
-                    {% for team in items.1.teams %}
-                    <td class="{{items.0}}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+                    {% for team in match.alliances.get('red').get('teams') %}
+                      <td class="red{% if match.winning_alliance == red %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
                     {% endfor %}
-                    <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score == "-1" %}?{% else %}{{ items.1.score }}{% endif %}</td>
+                    <td class="redScore{% if match.winning_alliance == red %} winner{% endif %}">
+                      {% if match.alliances.get('red').get('score') == "-1" %}?{% else %}{{ match.alliances.get('red').get('score') }}{% endif %}
+                    </td>
                   </tr>
-                  {% endfor %}
+                  <tr>
+                    {% for team in match.alliances.get('blue').get('teams') %}
+                      <td class="blue{% if match.winning_alliance == blue %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+                    {% endfor %}
+                    <td class="blueScore{% if match.winning_alliance == blue %} winner{% endif %}">
+                      {% if match.alliances.get('blue').get('score') == "-1" %}?{% else %}{{ match.alliances.get('blue').get('score') }}{% endif %}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             {% endfor %}
@@ -58,19 +66,27 @@
               <table class="match-table insights-table">
                 <thead>
                   <tr class="key">
-                    <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
+                    <th colspan="{{match.alliances.get('red').get('teams')|length}}">Teams</th>
                     <th>Score</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for items in match.alliances.items()|reverse %}
                   <tr>
-                    {% for team in items.1.teams %}
-                    <td class="{{items.0}}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+                    {% for team in match.alliances.get('red').get('teams') %}
+                      <td class="red{% if match.winning_alliance == red %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
                     {% endfor %}
-                    <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score == "-1" %}?{% else %}{{ items.1.score }}{% endif %}</td>
+                    <td class="redScore{% if match.winning_alliance == red %} winner{% endif %}">
+                      {% if match.alliances.get('red').get('score') == "-1" %}?{% else %}{{ match.alliances.get('red').get('score') }}{% endif %}
+                    </td>
                   </tr>
-                  {% endfor %}
+                  <tr>
+                    {% for team in match.alliances.get('blue').get('teams') %}
+                      <td class="blue{% if match.winning_alliance == blue %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+                    {% endfor %}
+                    <td class="blueScore{% if match.winning_alliance == blue %} winner{% endif %}">
+                      {% if match.alliances.get('blue').get('score') == "-1" %}?{% else %}{{ match.alliances.get('blue').get('score') }}{% endif %}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             {% endfor %}
