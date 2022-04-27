@@ -97,8 +97,15 @@ def test_event_rankings() -> None:
 def test_event_schedule() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
-        api.matches_hybrid(2020, "MIKET", "qual")
-    mock_get.assert_called_once_with("/2020/schedule/MIKET/qual/hybrid", version="v2.0")
+        api.match_schedule(2020, "MIKET", "qual")
+    mock_get.assert_called_once_with("/2020/schedule/MIKET?tournamentLevel=qual")
+
+
+def test_event_matches() -> None:
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.matches(2020, "MIKET", "qual")
+    mock_get.assert_called_once_with("/2020/matches/MIKET?tournamentLevel=qual")
 
 
 def test_event_scores() -> None:
