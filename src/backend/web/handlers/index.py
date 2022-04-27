@@ -29,7 +29,7 @@ def index() -> Response:
             timedelta(minutes=5),
         ),
         LandingType.CHAMPS: (index_champs, timedelta(minutes=5)),
-        LandingType.OFFSEASON: (index_offseason, timedelta(days=1)),
+        LandingType.OFFSEASON: (index_offseason, timedelta(minutes=5)),
         LandingType.INSIGHTS: (index_insights, timedelta(minutes=5)),
     }
     landing_type = LandingConfig.current_landing_type()
