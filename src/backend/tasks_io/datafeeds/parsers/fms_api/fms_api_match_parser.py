@@ -8,6 +8,7 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.media_type import MediaType
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
@@ -15,6 +16,7 @@ from backend.common.models.event import Event
 from backend.common.models.keys import MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
+from backend.common.suggestions.media_parser import MediaParser
 from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 QF_SF_MAP = {
@@ -191,6 +193,16 @@ class FMSAPIHybridScheduleParser(
                         post_result_time
                     )
 
+            youtube_videos = []
+            video_link = match.get("matchVideoLink")
+            if video_link:
+                video_suggestion = MediaParser.partial_media_dict_from_url(video_link)
+                if (
+                    video_suggestion
+                    and video_suggestion["media_type_enum"] == MediaType.YOUTUBE_VIDEO
+                ):
+                    youtube_videos.append(video_suggestion["foreign_key"])
+
             # Check for tiebreaker matches
             existing_match = Match.get_by_id(
                 key_name
@@ -265,6 +277,7 @@ class FMSAPIHybridScheduleParser(
                     actual_time=actual_time,
                     post_result_time=post_result_time,
                     alliances_json=json.dumps(alliances),
+                    youtube_videos=youtube_videos,
                 )
             )
 
