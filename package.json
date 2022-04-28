@@ -27,7 +27,7 @@
     "react-ga": "^3.3.0",
     "react-redux": "^7.2.8",
     "react-select": "^5.3.1",
-    "redux": "^4.1.2",
+    "redux": "^4.2.0",
     "redux-thunk": "^2.4.1",
     "reselect": "^4.1.5",
     "swagger-ui": "^4.5.2"
