@@ -489,7 +489,7 @@ class TBANSHelper:
             return 1
 
         # Only allow so many retries
-        backoff_time = 2 ** backoff_iteration
+        backoff_time = 2**backoff_iteration
         if backoff_time > MAXIMUM_BACKOFF:
             return 2
 
