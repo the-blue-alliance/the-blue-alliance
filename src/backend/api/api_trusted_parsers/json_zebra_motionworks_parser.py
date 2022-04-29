@@ -35,7 +35,7 @@ class JSONZebraMotionWorksParser:
         }]
         """
         try:
-            data = safe_json.loads(zebra_motion_json, List[ZebraData])
+            data = safe_json.loads(zebra_motion_json, List[ZebraData], validate=False)
         except safe_json.InvalidJson as e:
             raise ParserInputException(e.msg)
 
@@ -92,7 +92,7 @@ class JSONZebraMotionWorksParser:
     @classmethod
     def _parse_team(cls, team: ZebraTeamData, data_length: int) -> ZebraTeamData:
         # Check team_key format
-        team_key = team["team_key"]
+        team_key = team.get("team_key", "")
         if not Team.validate_key_name(team_key):
             raise ParserInputException(
                 "Bad 'team_key': '{}'. Must follow format 'frcXXX'.".format(team_key)
