@@ -29,7 +29,7 @@ def test_update_authkeys(login_gae_admin, web_client: Client) -> None:
     }
     resp = web_client.post("/admin/authkeys", data=data)
     assert resp.status_code == 302
-    assert resp.headers["Location"] == "http://localhost/admin/authkeys"
+    assert resp.headers["Location"] == "/admin/authkeys"
 
     google_secrets = GoogleApiSecret.get()
     firebase_secrets = FirebaseSecrets.get()
