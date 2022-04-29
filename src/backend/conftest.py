@@ -49,11 +49,11 @@ def ndb_stub(
 
     # monkeypatch the ndb library to work with freezegun
     fake_datetime = getattr(freezegun_api, "FakeDatetime")  # pyre-ignore[16]
-    v = getattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", {})
+    v = getattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", {})  # pyre-ignore[16]
     v[fake_datetime] = datastore_types.ValidatePropertyNothing
     monkeypatch.setattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", v)
 
-    p = getattr(datastore_types, "_PACK_PROPERTY_VALUES", {})
+    p = getattr(datastore_types, "_PACK_PROPERTY_VALUES", {})  # pyre-ignore[16]
     p[fake_datetime] = datastore_types.PackDatetime
     monkeypatch.setattr(datastore_types, "_PACK_PROPERTY_VALUES", p)
 

@@ -106,7 +106,9 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
             "replace-preferred-{}".format(suggestion.key.id()), None
         )
         year = int(
-            request.form.get(f"year-{suggestion.key.id()}", suggestion.contents["year"])
+            request.form.get(
+                f"year-{suggestion.key.id()}", none_throws(suggestion.contents["year"])
+            )
         )
 
         # Override year if necessary

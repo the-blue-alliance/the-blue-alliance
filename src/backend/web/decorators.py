@@ -1,13 +1,14 @@
 from functools import wraps
 from typing import Callable, Set
 
-from flask import abort, redirect, request, Response, url_for
+from flask import abort, redirect, request, url_for
+from flask.typing import ResponseValue
 
 from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
 
 
-def require_login_only(f: Callable) -> Response:
+def require_login_only(f: Callable[..., ResponseValue]) -> Callable[..., ResponseValue]:
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = current_user()
@@ -18,7 +19,7 @@ def require_login_only(f: Callable) -> Response:
     return decorated_function
 
 
-def require_login(f: Callable):
+def require_login(f: Callable[..., ResponseValue]) -> Callable[..., ResponseValue]:
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = current_user()
@@ -31,7 +32,7 @@ def require_login(f: Callable):
     return decorated_function
 
 
-def enforce_login(f: Callable):
+def enforce_login(f: Callable[..., ResponseValue]) -> Callable[..., ResponseValue]:
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = current_user()
@@ -42,7 +43,7 @@ def enforce_login(f: Callable):
     return decorated_function
 
 
-def require_admin(f: Callable) -> Response:
+def require_admin(f: Callable[..., ResponseValue]) -> Callable[..., ResponseValue]:
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = current_user()
@@ -55,8 +56,10 @@ def require_admin(f: Callable) -> Response:
     return decorated_function
 
 
-def require_permission(permission: AccountPermission):
-    def decorator(f: Callable):
+def require_permission(
+    permission: AccountPermission,
+) -> Callable[..., Callable[..., ResponseValue]]:
+    def decorator(f: Callable[..., ResponseValue]) -> Callable[..., ResponseValue]:
         @wraps(f)
         def decorated_function(*args, **kwargs):
             user = current_user()
@@ -71,8 +74,10 @@ def require_permission(permission: AccountPermission):
     return decorator
 
 
-def require_any_permission(permissions: Set[AccountPermission]):
-    def decorator(f: Callable):
+def require_any_permission(
+    permissions: Set[AccountPermission],
+) -> Callable[..., Callable[..., ResponseValue]]:
+    def decorator(f: Callable[..., ResponseValue]) -> Callable[..., ResponseValue]:
         @wraps(f)
         def decorated_function(*args, **kwargs):
             user = current_user()

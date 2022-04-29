@@ -3,7 +3,7 @@ from typing import Optional
 
 class WebsiteHelper:
     @staticmethod
-    def format_url(website_url: str) -> Optional[str]:
+    def format_url(website_url: Optional[str]) -> Optional[str]:
         """
         Updates a URL to have the correct format. For example, it will change
         "website.com" to "http://website.com", while keeping

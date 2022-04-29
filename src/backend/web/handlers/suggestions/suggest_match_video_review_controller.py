@@ -1,6 +1,7 @@
 from typing import Optional
 
 from flask import redirect, request
+from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission
@@ -26,7 +27,7 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBase[Match]):
         target_key = request.form.get(
             "key-{}".format(suggestion.key.id()), suggestion.target_key
         )
-        match = Match.get_by_id(target_key)
+        match = Match.get_by_id(none_throws(target_key))
         if not match:
             return None
         return MatchSuggestionAccepter.accept_suggestion(match, suggestion)

@@ -76,7 +76,7 @@ def register() -> Response:
     else:
         next = request.args.get("next")
         # Make sure `next` is safe - otherwise drop it
-        next = next if is_safe_url(next) else None
+        next = next if next and is_safe_url(next) else None
         return make_response(render_template("account_register.html", next=next))
 
 

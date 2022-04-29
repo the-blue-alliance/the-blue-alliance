@@ -4,6 +4,7 @@ from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
@@ -22,15 +23,19 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBase[Event]):
 
     def create_target_model(self, suggestion: Suggestion) -> Event:
         webcast = Webcast(
-            type=request.form.get("webcast_type"),
-            channel=request.form.get("webcast_channel"),
+            type=WebcastType(request.form.get("webcast_type", "")),
+            channel=request.form.get("webcast_channel", ""),
         )
-        if request.form.get("webcast_file"):
-            webcast["file"] = request.form.get("webcast_file")
-        if request.form.get("webcast_date"):
-            webcast["date"] = request.form.get("webcast_date")
 
-        event = none_throws(Event.get_by_id(request.form.get("event_key")))
+        webcast_file = request.form.get("webcast_file")
+        if webcast_file:
+            webcast["file"] = webcast_file
+
+        webcast_date = request.form.get("webcast_date")
+        if webcast_date:
+            webcast["date"] = webcast_date
+
+        event = none_throws(Event.get_by_id(none_throws(request.form.get("event_key"))))
 
         # This used to defer?
         EventWebcastAdder.add_webcast(event, webcast)
@@ -79,7 +84,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBase[Event]):
         event_key = request.form.get("event_key")
         verdict = request.form.get("verdict")
         if verdict == "accept":
-            suggestion_key = request.form.get("suggestion_key")
+            suggestion_key = request.form.get("suggestion_key", "")
             suggestion_key = (
                 int(suggestion_key) if suggestion_key.isdigit() else suggestion_key
             )
@@ -89,7 +94,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBase[Event]):
             )
 
         elif verdict == "reject":
-            suggestion_key = request.form.get("suggestion_key")
+            suggestion_key = request.form.get("suggestion_key", "")
             suggestion_key = (
                 int(suggestion_key) if suggestion_key.isdigit() else suggestion_key
             )
@@ -97,7 +102,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBase[Event]):
             return redirect("/suggest/event/webcast/review?success=reject")
 
         elif verdict == "reject_all":
-            suggestion_keys = request.form.get("suggestion_keys").split(",")
+            suggestion_keys = request.form.get("suggestion_keys", "").split(",")
             suggestion_keys = [
                 int(suggestion_key) if suggestion_key.isdigit() else suggestion_key
                 for suggestion_key in suggestion_keys

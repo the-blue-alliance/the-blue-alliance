@@ -61,7 +61,7 @@ class SuggestOffseasonEventReviewController(
         if existing_event:
             return SuggestOffseasonTargetModel(status="duplicate_key", event_key=None)
 
-        first_code = request.form.get("first_code", "")
+        first_code = request.form.get("first_code")
         event = Event(
             id=event_key,
             end_date=end_date,
@@ -77,9 +77,9 @@ class SuggestOffseasonEventReviewController(
             short_name=request.form.get("short_name"),
             start_date=start_date,
             website=request.form.get("website"),
-            year=int(request.form.get("year")),
+            year=int(request.form.get("year", "")),
             first_code=first_code,
-            official=(not first_code == ""),
+            official=(first_code is not None and first_code != ""),
         )
         EventManipulator.createOrUpdate(event)
 
@@ -157,7 +157,7 @@ The Blue Alliance Admins\
         super().post()
         self.verify_permissions()
 
-        id_str = request.form.get("suggestion_id")
+        id_str = request.form.get("suggestion_id", "")
         suggestion_id = int(id_str) if id_str.isdigit() else id_str
         verdict = request.form.get("verdict")
         if verdict == "accept":

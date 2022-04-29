@@ -8,18 +8,21 @@
     "stubs",
     {"site-package": "fakeredis"},
     {"site-package": "firebase_admin"},
+    {"site-package": "flask"},
     {"site-package": "flask_caching"},
     {"site-package": "flask_cors"},
     {"site-package": "freezegun"},
     {"site-package": "google/appengine"},
     {"site-package": "google/auth"},
     {"site-package": "google/cloud/storage"},
+    {"site-package": "jinja2"},
     {"site-package": "numpy"},
     {"site-package": "pytest"},
     {"site-package": "_pytest"},
     {"site-package": "pyre_extensions"},
     {"site-package": "redis"},
     {"site-package": "requests_mock"},
-    {"site-package": "rq"}
+    {"site-package": "rq"},
+    {"site-package": "werkzeug"}
   ]
 }

@@ -65,7 +65,9 @@ class SuggestDesignsReviewController(SuggestionsReviewBase[Media]):
         )
 
     def _fastpath_review(self) -> Response:
-        suggestion: Optional[Suggestion] = Suggestion.get_by_id(request.args.get("id"))
+        suggestion: Optional[Suggestion] = Suggestion.get_by_id(
+            request.args.get("id", "")
+        )
         status = None
         if suggestion and suggestion.target_model == "robot":
             if suggestion.review_state == SuggestionState.REVIEW_PENDING:
