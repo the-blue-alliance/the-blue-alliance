@@ -65,7 +65,7 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     callback1.assert_not_called()
     callback2.assert_not_called()
     with app.test_request_context("/0"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)  # pyre-ignore[6]
     callback1.assert_not_called()
     callback2.assert_not_called()
 
@@ -73,7 +73,7 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     callback1.assert_not_called()
     callback2.assert_not_called()
     with app.test_request_context("/1"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)  # pyre-ignore[6]
     callback1.assert_called_once()
     callback2.assert_not_called()
 
@@ -81,7 +81,7 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     callback1.assert_called_once()
     callback2.assert_not_called()
     with app.test_request_context("/2"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)  # pyre-ignore[6]
     callback1.assert_called_once()
     callback2.assert_called_once()
 

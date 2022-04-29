@@ -21,7 +21,7 @@ def configure_flask_cache(app: Flask) -> None:
     }
     cache = Cache(config=config)
     cache.init_app(app)
-    app.cache = cache
+    setattr(app, "cache", cache)
 
 
 def make_cached_response(*args: Any, ttl: timedelta) -> Response:

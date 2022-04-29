@@ -1,3 +1,5 @@
+from typing import cast
+
 from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated
@@ -18,7 +20,7 @@ def status() -> Response:
     down_events_sitevar_future = Sitevar.get_by_id_async("apistatus.down_events")
 
     status = dict()
-    status.update(ApiStatus.status())
+    status.update(cast(dict, ApiStatus.status()))
 
     down_events_sitevar = down_events_sitevar_future.get_result()
     down_events_list = down_events_sitevar.contents if down_events_sitevar else None

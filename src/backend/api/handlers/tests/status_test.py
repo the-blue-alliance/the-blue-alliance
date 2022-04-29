@@ -1,3 +1,5 @@
+from typing import cast
+
 import pytest
 from werkzeug.test import Client
 
@@ -26,7 +28,7 @@ def test_status(fmsapi_down, ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
 
     expected_status = dict()
-    expected_status.update(status)
+    expected_status.update(cast(dict, status))
     expected_status["down_events"] = []
     expected_status["is_datafeed_down"] = fmsapi_down
 

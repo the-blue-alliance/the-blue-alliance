@@ -195,7 +195,7 @@ def test_edit_no_account_id(login_user, web_client: FlaskClient) -> None:
     with web_client:
         response = web_client.post("/account/edit", data={})
 
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_edit_status") == "account_edit_failure"
 
     assert response.status_code == 302
@@ -208,7 +208,7 @@ def test_edit_no_account_id_follow_redirect(
 ) -> None:
     with web_client:
         response = web_client.post("/account/edit", follow_redirects=True, data={})
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_edit_status") is None
 
     assert response.status_code == 200
@@ -223,7 +223,7 @@ def test_edit_no_account_id_follow_redirect(
 def test_edit_mismatch_account_id(login_user, web_client: FlaskClient) -> None:
     with web_client:
         response = web_client.post("/account/edit", data={"account_id": "def"})
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_edit_status") == "account_edit_failure"
 
     assert response.status_code == 302
@@ -238,7 +238,7 @@ def test_edit_mismatch_account_id_follow_redirect(
         response = web_client.post(
             "/account/edit", follow_redirects=True, data={"account_id": "def"}
         )
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_edit_status") is None
 
     assert response.status_code == 200
@@ -255,7 +255,7 @@ def test_edit_no_display_name(login_user, web_client: FlaskClient) -> None:
 
     with web_client:
         response = web_client.post("/account/edit", data={"account_id": login_user.uid})
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_edit_status") == "account_edit_failure_name"
 
     assert response.status_code == 302
@@ -272,7 +272,7 @@ def test_edit_no_display_name_follow_redirect(
         response = web_client.post(
             "/account/edit", follow_redirects=True, data={"account_id": login_user.uid}
         )
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_edit_status") is None
 
     assert response.status_code == 200
@@ -293,7 +293,7 @@ def test_edit_success(login_user, web_client: FlaskClient) -> None:
         response = web_client.post(
             "/account/edit", data={"account_id": login_user.uid, "display_name": "Zach"}
         )
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_edit_status") is None
         assert session.get("account_status") == "account_edit_success"
 
@@ -431,7 +431,7 @@ def test_read_key_add_no_description(login_user, web_client: FlaskClient) -> Non
         login_user, "add_api_read_key"
     ) as mock_add_api_read_key, web_client:
         response = web_client.post("/account/api/read_key_add")
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_status") == "read_key_add_no_description"
 
     mock_add_api_read_key.assert_not_called()
@@ -447,7 +447,7 @@ def test_read_key_add_no_api_key(login_user, web_client: FlaskClient) -> None:
         response = web_client.post(
             "/account/api/read_key_add", data={"description": "Testing"}
         )
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_status") == "read_key_add_failure"
 
     mock_add_api_read_key.assert_called_with("Testing")
@@ -463,7 +463,7 @@ def test_read_key_add(login_user, web_client: FlaskClient) -> None:
         response = web_client.post(
             "/account/api/read_key_add", data={"description": "Testing"}
         )
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_status") == "read_key_add_success"
 
     mock_add_api_read_key.assert_called_with("Testing")
@@ -475,7 +475,7 @@ def test_read_key_add(login_user, web_client: FlaskClient) -> None:
 def test_read_key_delete_no_key_id(login_user, web_client: FlaskClient) -> None:
     with patch.object(login_user, "delete_api_key") as mock_delete_api_key, web_client:
         response = web_client.post("/account/api/read_key_delete")
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_status") == "read_key_delete_failure"
 
     mock_delete_api_key.assert_not_called()
@@ -493,7 +493,7 @@ def test_read_key_delete_no_api_key(login_user, web_client: FlaskClient) -> None
         response = web_client.post(
             "/account/api/read_key_delete", data={"key_id": "abcd"}
         )
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_status") == "read_key_delete_failure"
 
     mock_delete_api_key.assert_not_called()
@@ -512,7 +512,7 @@ def test_read_key_delete(login_user, web_client: FlaskClient) -> None:
         response = web_client.post(
             "/account/api/read_key_delete", data={"key_id": "abcd"}
         )
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("account_status") == "read_key_delete_success"
 
     mock_delete_api_key.assert_called_with(mock_api_key)
@@ -641,7 +641,7 @@ def test_ping_client(
 
     mock_ping.assert_called_with(c1)
 
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("ping_sent") == expected
 
     assert response.status_code == 302
@@ -675,7 +675,7 @@ def test_ping_not_our_client(
 
     mock_ping.assert_not_called()
 
-    with web_client.session_transaction() as session:  # pyre-ignore[16]
+    with web_client.session_transaction() as session:
         assert session.get("ping_sent") == "0"
 
     assert response.status_code == 302

@@ -37,16 +37,16 @@ def authkeys_get() -> str:
 
 
 def authkeys_post() -> Response:
-    google_key = request.form.get("google_secret")
-    firebase_key = request.form.get("firebase_secret")
-    fmsapi_user = request.form.get("fmsapi_user")
-    fmsapi_secret = request.form.get("fmsapi_secret")
-    web_client_id = request.form.get("web_client_id")
-    android_client_id = request.form.get("android_client_id")
-    ios_client_id = request.form.get("ios_client_id")
-    gcm_key = request.form.get("gcm_key")
-    twitch_client_id = request.form.get("twitch_secret")
-    livestream_key = request.form.get("livestream_secret")
+    google_key = request.form.get("google_secret", "")
+    firebase_key = request.form.get("firebase_secret", "")
+    fmsapi_user = request.form.get("fmsapi_user", "")
+    fmsapi_secret = request.form.get("fmsapi_secret", "")
+    web_client_id = request.form.get("web_client_id", "")
+    android_client_id = request.form.get("android_client_id", "")
+    ios_client_id = request.form.get("ios_client_id", "")
+    gcm_key = request.form.get("gcm_key", "")
+    twitch_client_id = request.form.get("twitch_secret", "")
+    livestream_key = request.form.get("livestream_secret", "")
 
     GoogleApiSecret.put({"api_key": google_key})
     FirebaseSecrets.put({"FIREBASE_SECRET": firebase_key})

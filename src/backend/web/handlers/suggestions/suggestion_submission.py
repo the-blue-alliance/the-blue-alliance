@@ -48,9 +48,9 @@ def suggest_webcast() -> str:
 @blueprint.route("/suggest/event/webcast", methods=["POST"])
 @require_login
 def submit_webcast() -> Response:
-    event_key = request.form.get("event_key")
-    webcast_url = request.form.get("webcast_url")
-    webcast_date = request.form.get("webcast_date")
+    event_key = request.form.get("event_key", "")
+    webcast_url = request.form.get("webcast_url", "")
+    webcast_date = request.form.get("webcast_date", "")
 
     if not webcast_url:
         return redirect(
@@ -421,20 +421,20 @@ def suggest_offseason() -> Response:
 @enforce_login
 def submit_offseason() -> Response:
     user = none_throws(current_user())
-    event_name = request.form.get("name", None)
+    event_name = request.form.get("name", "")
     website = WebsiteHelper.format_url(request.form.get("website", None))
     status, failures = SuggestionCreator.createOffseasonEventSuggestion(
         author_account_key=none_throws(user.account_key),
         name=event_name,
-        start_date=request.form.get("start_date", None),
-        end_date=request.form.get("end_date", None),
+        start_date=request.form.get("start_date", ""),
+        end_date=request.form.get("end_date", ""),
         website=website,
-        venue_name=request.form.get("venue_name", None),
-        address=request.form.get("venue_address", None),
-        city=request.form.get("venue_city", None),
-        state=request.form.get("venue_state", None),
-        country=request.form.get("venue_country", None),
-        first_code=request.form.get("first_code", None),
+        venue_name=request.form.get("venue_name", ""),
+        address=request.form.get("venue_address", ""),
+        city=request.form.get("venue_city", ""),
+        state=request.form.get("venue_state", ""),
+        country=request.form.get("venue_country", ""),
+        first_code=request.form.get("first_code"),
     )
     if status != "success":
         # Don't completely wipe form data if validation fails

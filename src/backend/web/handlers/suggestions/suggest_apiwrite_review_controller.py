@@ -53,7 +53,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBase[ApiWriteTargetModel]
             for _ in range(16)
         )
         auth_types = request.form.getlist("auth_types") or []
-        expiration_offset = int(request.form.get("expiration_days"))
+        expiration_offset = int(request.form.get("expiration_days", ""))
         if expiration_offset != -1:
             expiration_event_end = event.end_date + timedelta(
                 days=expiration_offset + 1
@@ -121,7 +121,7 @@ TBA Admins
         super().post()
         self.verify_permissions()
 
-        suggestion_id = int(request.form.get("suggestion_id"))
+        suggestion_id = int(request.form.get("suggestion_id", ""))
         verdict = request.form.get("verdict")
         message = request.form.get("user_message")
 

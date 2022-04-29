@@ -133,7 +133,7 @@ def test_overview_status(
     web_client: FlaskClient,
 ) -> None:
     with web_client:
-        with web_client.session_transaction() as session:  # pyre-ignore[16]
+        with web_client.session_transaction() as session:
             session["account_status"] = status
         response = web_client.get("/account")
 
@@ -227,7 +227,7 @@ def test_overview_ping_sent(
     web_client: FlaskClient,
 ) -> None:
     with web_client:
-        with web_client.session_transaction() as session:  # pyre-ignore[16]
+        with web_client.session_transaction() as session:
             session["ping_sent"] = ping_sent
         response = web_client.get("/account")
 

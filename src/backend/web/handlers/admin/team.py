@@ -84,8 +84,8 @@ def team_detail(team_number: int) -> str:
 
 
 def team_robot_name_update() -> Response:
-    team_key = request.values.get("team_key")
-    year = int(request.values.get("robot_year"))
+    team_key = request.values.get("team_key", "")
+    year = int(request.values.get("robot_year", ""))
     name = request.values.get("robot_name")
 
     team = Team.get_by_id(team_key)
@@ -107,8 +107,8 @@ def team_robot_name_update() -> Response:
 
 
 def team_website_update() -> Response:
-    team_key = request.values.get("team_key")
-    website = request.values.get("website")
+    team_key = request.values.get("team_key", "")
+    website = request.values.get("website", "")
 
     # Quick and dirty and bad URL validation - brought to you by StackOverflow
     # Needs a valid netlock and scheme to be valid

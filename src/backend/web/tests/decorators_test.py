@@ -3,7 +3,7 @@ from urllib.parse import parse_qsl, urlparse
 
 import pytest
 import werkzeug
-from flask import request
+from flask import make_response, request
 
 import backend.common.auth as backend_auth
 from backend.common.consts.account_permission import AccountPermission
@@ -24,7 +24,7 @@ def test_require_login_only_no_user() -> None:
     func = Mock()
     decorated_func = require_login_only(func)
     with app.test_request_context("/"):
-        response = decorated_func(None, request)
+        response = make_response(decorated_func(None, request))
     assert not func.called
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/account/login"
@@ -49,7 +49,7 @@ def test_require_login_no_user() -> None:
     func = Mock()
     decorated_func = require_login(func)
     with app.test_request_context("/"):
-        response = decorated_func(request)
+        response = make_response(decorated_func(request))
     assert not func.called
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/account/login"
@@ -64,7 +64,7 @@ def test_require_login_not_registered() -> None:
     with patch.object(
         backend_auth, "_decoded_claims", return_value={"abc": "abc"}
     ), app.test_request_context("/"):
-        response = decorated_func(request)
+        response = make_response(decorated_func(request))
     assert not func.called
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/account/register"
@@ -121,7 +121,7 @@ def test_require_admin_no_user() -> None:
     func = Mock()
     decorated_func = require_admin(func)
     with app.test_request_context("/"):
-        response = decorated_func(None, request)
+        response = make_response(decorated_func(None, request))
     assert not func.called
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/account/login"
@@ -167,7 +167,7 @@ def test_require_permission_user(ndb_stub) -> None:
     func = Mock()
     decorated_func = require_permission(AccountPermission.REVIEW_MEDIA)(func)
     with app.test_request_context("/"):
-        response = decorated_func(None, request)
+        response = make_response(decorated_func(None, request))
     assert not func.called
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/account/login"
