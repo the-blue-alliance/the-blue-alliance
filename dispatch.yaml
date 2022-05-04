@@ -11,6 +11,9 @@ dispatch:
     
 - url: "www.thebluealliance.com/gameday*"
   service: py3-web
+    
+- url: "www.thebluealliance.com/insights*"
+  service: py3-web
 
 - url: "www.thebluealliance.com/team*"
   service: py3-web
