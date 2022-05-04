@@ -29,7 +29,7 @@ class EventInsightsHelper(object):
         qual_matches = []
         playoff_matches = []
         for match in matches:
-            if match.comp_level == CompLevel.QM:
+            if match.comp_level == 'qm':
                 qual_matches.append(match)
             else:
                 playoff_matches.append(match)
@@ -83,8 +83,8 @@ class EventInsightsHelper(object):
             if not match.has_been_played:
                 continue
 
-            red_score = match.alliances[AllianceColor.RED]["score"]
-            blue_score = match.alliances[AllianceColor.BLUE]["score"]
+            red_score = match.alliances['red']["score"]
+            blue_score = match.alliances['blue']["score"]
             win_score = max(red_score, blue_score)
 
             winning_scores += win_score
@@ -98,7 +98,7 @@ class EventInsightsHelper(object):
             if score_breakdown is None:
                 continue
 
-            for alliance_color in ALLIANCE_COLORS:
+            for alliance_color in ['red', 'blue']:
                 try:
                     alliance_breakdown = score_breakdown[alliance_color]
 
@@ -113,7 +113,7 @@ class EventInsightsHelper(object):
                     points_teleop += alliance_breakdown["teleopPoints"]
 
                     # Counts
-                    for i in range(3):
+                    for i in xrange(3):
                         init_line = "taxiRobot{}".format(i + 1)
                         if alliance_breakdown[init_line] == "Yes":
                             taxi_count += 1
