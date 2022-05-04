@@ -26,7 +26,7 @@
           {% if match.tba_video %}
             {% include "video_partials/tbavideo_player.html" %}
           {% elif match.youtube_videos_formatted %}
-            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% set youtube_video = match.youtube_videos_formatted[0] %}
             {% include "video_partials/youtube_video_player.html" %}
           {% endif %}
         </div>
@@ -47,7 +47,7 @@
           {% if match.tba_video %}
             {% include "video_partials/tbavideo_player.html" %}
           {% elif match.youtube_videos_formatted %}
-            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% set youtube_video = match.youtube_videos_formatted[0] %}
             {% include "video_partials/youtube_video_player.html" %}
           {% endif %}
         </div>
@@ -68,7 +68,7 @@
           {% if match.tba_video %}
             {% include "video_partials/tbavideo_player.html" %}
           {% elif match.youtube_videos_formatted %}
-            {% set youtube_video = match.youtube_videos_formatted.0 %}
+            {% set youtube_video = match.youtube_videos_formatted[0] %}
             {% include "video_partials/youtube_video_player.html" %}
           {% endif %}
         </div>
@@ -88,19 +88,31 @@
       <table class="match-table">
         <thead>
           <tr class="key">
-            <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
+            <th colspan="{{match.alliances.get('red').get('teams')|length}}">Teams</th>
             <th>Score</th>
           </tr>
         </thead>
         <tbody>
-          {% for items in match.alliances.items()|reverse %}
           <tr>
-            {% for team in items.1.teams %}
-              <td class="{{ items.0 }}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{ team|strip_frc }}">{{ team|strip_frc }}</a></td>
+            {% for team in match.alliances.get('red').get('teams') %}
+            <td class="red{% if match.winning_alliance == 'red' %} winner{% endif %}"><a
+                href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
             {% endfor %}
-            <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score == "-1" %}?{% else %}{{ items.1.score }}{% endif %}</td>
+            <td class="redScore{% if match.winning_alliance == 'red' %} winner{% endif %}">
+              {% if match.alliances.get('red').get('score') == "-1" %}?{% else %}{{ match.alliances.get('red').get('score') }}{%
+              endif %}
+            </td>
           </tr>
-          {% endfor %}
+          <tr>
+            {% for team in match.alliances.get('blue').get('teams') %}
+            <td class="blue{% if match.winning_alliance == 'blue' %} winner{% endif %}"><a
+                href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+            {% endfor %}
+            <td class="blueScore{% if match.winning_alliance == 'blue' %} winner{% endif %}">
+              {% if match.alliances.get('blue').get('score') == "-1" %}?{% else %}{{ match.alliances.get('blue').get('score') }}{%
+              endif %}
+            </td>
+          </tr>
         </tbody>
       </table>
       {% endfor %}
