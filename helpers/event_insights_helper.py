@@ -75,7 +75,7 @@ class EventInsightsHelper(object):
         total_cargo_points = 0
         total_scores = 0
         foul_scores = 0
-        high_score: Tuple[int, str, str] = (0, "", "")
+        high_score = (0, "", "")
 
         finished_matches = 0
         has_insights = False
