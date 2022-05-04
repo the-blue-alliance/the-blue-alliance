@@ -61,8 +61,8 @@ dispatch:
   service: default
 
 # Beta PWA
-- url: "beta.thebluealliance.com/*"
-  service: pwa-ssr
+# - url: "beta.thebluealliance.com/*"
+#   service: pwa-ssr
 
 # Send low-frequency long-running tasks to backend module
 # Uses B2 instance for higher CPU/memory limits
