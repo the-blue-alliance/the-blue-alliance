@@ -1,11 +1,11 @@
-# from email import utils
 # import math
+import email
 import re
+import time
 
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.match import Match
 
-# import time
 # import urllib
 #
 # from models.match import Match
@@ -89,14 +89,14 @@ def strip_frc(s):
 
 # def urlencode(s):
 #     return urllib.quote(s.encode('utf8'))
-#
-#
-# def rfc2822(datetime):
-#     tt = datetime.timetuple()
-#     timestamp = time.mktime(tt)
-#     return utils.formatdate(timestamp)
-#
-#
+
+
+def rfc2822(datetime):
+    tt = datetime.timetuple()
+    timestamp = time.mktime(tt)
+    return email.utils.formatdate(timestamp)
+
+
 def slugify(value):
     """
     Based on django's slugify template
@@ -151,6 +151,7 @@ _filters = {
     "strip_frc": strip_frc,
     "digits": digits,
     "limit_prob": limit_prob,
+    "rfc2822": rfc2822,
     "slugify": slugify,
     "isoformat": isoformat,
     "yt_start": yt_start,
