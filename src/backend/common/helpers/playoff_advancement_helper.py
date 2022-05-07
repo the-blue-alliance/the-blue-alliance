@@ -84,7 +84,7 @@ class BracketItem(TypedDict):
 class PlayoffAdvancementHelper(object):
 
     ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS: Dict[Year, List[str]] = {
-        2017: ["score"],
+        2017: ["totalPoints"],
         2018: ["endgamePoints", "autoPoints"],
         2019: ["cargoPoints", "hatchPanelPoints"],
         2020: [],
