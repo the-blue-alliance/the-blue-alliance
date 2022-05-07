@@ -1,0 +1,44 @@
+{
+  "address": "1001 Avenida De Las Americas, Houston, TX 77010, USA", 
+  "city": "Houston", 
+  "country": "USA", 
+  "district": null, 
+  "division_keys": [
+    "2022carv", 
+    "2022gal", 
+    "2022hop", 
+    "2022new", 
+    "2022roe", 
+    "2022tur"
+  ], 
+  "end_date": "2022-04-23", 
+  "event_code": "cmptx", 
+  "event_type": 4, 
+  "event_type_string": "Championship Finals", 
+  "first_event_code": "CMPTX", 
+  "first_event_id": null, 
+  "gmaps_place_id": "ChIJgw3vTiK_QIYRsMwBp668_Lo", 
+  "gmaps_url": "https://maps.google.com/?q=1001+Avenida+De+Las+Americas,+Houston,+TX+77010,+USA&ftid=0x8640bf224eef0d83:0xbafcbcaea701ccb0", 
+  "key": "2022cmptx", 
+  "lat": 29.7520006, 
+  "lng": -95.3576434, 
+  "location_name": "1001 Avenida De Las Americas", 
+  "name": "Einstein Field", 
+  "parent_event_key": null, 
+  "playoff_type": 4, 
+  "playoff_type_string": "Round Robin (6 Alliances)", 
+  "postal_code": "77010", 
+  "short_name": "Einstein", 
+  "start_date": "2022-04-23", 
+  "state_prov": "TX", 
+  "timezone": "America/Chicago", 
+  "webcasts": [
+    {
+      "channel": "firstinspires", 
+      "type": "twitch"
+    }
+  ], 
+  "website": "https://www.firstchampionship.org", 
+  "week": null, 
+  "year": 2022
+}
