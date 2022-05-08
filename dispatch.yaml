@@ -20,6 +20,9 @@ dispatch:
 
 - url: "www.thebluealliance.com/match/*"
   service: py3-web
+  
+- url: "www.thebluealliance.com/suggest/*"
+  service: py3-web
 
 - url: "www.thebluealliance.com/py3_css/*"
   service: py3-web
