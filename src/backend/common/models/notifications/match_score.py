@@ -79,8 +79,6 @@ class MatchScoreNotification(Notification):
         )
 
         payload = cast(Dict[str, Any], none_throws(self.data_payload))
-        # Remove the FCM-only keys
-        del payload["match_key"]
 
         payload["event_name"] = self.event.name
         payload["match"] = MatchConverter.matchConverter_v3(self.match)

@@ -58,8 +58,9 @@ class TestMatchVideoNotification(unittest.TestCase):
     def test_webhook_message_data(self):
         # Has `event_name`
         payload = self.notification.webhook_message_data
-        assert len(payload) == 3
+        assert len(payload) == 4
         assert payload["event_key"] == self.event.key_name
+        assert payload["match_key"] == "{}_qm1".format(self.event.key_name)
         assert payload["event_name"] == "Present Test Event"
         assert payload["match"] is not None
 
@@ -67,8 +68,9 @@ class TestMatchVideoNotification(unittest.TestCase):
         team = Team.get_by_id("frc1")
         notification = MatchVideoNotification(self.match, team)
         payload = notification.webhook_message_data
-        assert len(payload) == 4
+        assert len(payload) == 5
         assert payload["event_key"] == self.event.key_name
+        assert payload["match_key"] == "{}_qm1".format(self.event.key_name)
         assert payload["event_name"] == "Present Test Event"
         assert payload["team_key"] == "frc1"
         assert payload["match"] is not None

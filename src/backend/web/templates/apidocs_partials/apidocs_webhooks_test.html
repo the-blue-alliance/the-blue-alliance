@@ -1,0 +1,40 @@
+{% if type in enabled %}
+<h4>Test Notification</h4>
+    <form method="POST" action="/apidocs/webhooks/test/{{ type.value }}" class="form-horizontal" role="form" onsubmit="event.preventDefault()">
+        <div class="row">
+            {% if event_key %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Event Key</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" required value="{{ event_key }}" name="event_key">
+                </div>
+            </div>
+            {% endif %}
+            {% if match_key %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Match Key</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" required value="{{ match_key }}" name="match_key">
+                </div>
+            </div>
+            {% endif %}
+            {% if district_key %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">District Key</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" required value="{{ district_key }}" name="district_key">
+                </div>
+            </div>
+            {% endif %}
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-10">
+                    <button class="btn btn-info webhook-send-btn" type="submit">Send Test {{ enabled[type] }}</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="alert webhook-alert"></div>
+        </div>
+    </form>
+{% endif %}
