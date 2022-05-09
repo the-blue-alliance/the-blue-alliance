@@ -10,7 +10,7 @@ from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import render_time_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
-from backend.web.handlers.apidocs import apidocs_trusted_v1, apidocs_v3
+from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
@@ -49,8 +49,6 @@ app.url_map.strict_slashes = False
 
 app.add_url_rule("/", view_func=index)
 app.add_url_rule("/about", view_func=about)
-app.add_url_rule("/apidocs/trusted/v1", view_func=apidocs_trusted_v1)
-app.add_url_rule("/apidocs/v3", view_func=apidocs_v3)
 
 app.add_url_rule("/watch/<alias>", view_func=gameday_redirect)
 app.add_url_rule("/gameday/<alias>", view_func=gameday_redirect)
@@ -82,6 +80,7 @@ app.add_url_rule("/teams", view_func=team_list, defaults={"page": 1})
 app.add_url_rule("/insights", view_func=insights_overview)
 app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
 
+app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
 app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)

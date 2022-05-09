@@ -1,0 +1,673 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Webhooks{% endblock %}
+
+{% block meta_description %}Documentation for The Blue Alliance's webhook API.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <div class="tba-sidebar tba-sidebar-collapsed">
+          <ul class="nav tba-sidenav">
+            <li><a class="smooth-scroll" href="#overview">Overview</a></li>
+            <li><a class="smooth-scroll" href="#request">Request Structure</a><li>
+            <li><a class="smooth-scroll" href="#configuration">Configuration</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#validation">Validation</a></li>
+                <li><a class="smooth-scroll" href="#testing">Testing</a></li>
+                <li><a class="smooth-scroll" href="#firehose">The Firehose</a></li>
+            </ul></li>
+            <li><a class="smooth-scroll" href="#notifications">Notification Types</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#upcoming_match">Upcoming Match</a></li>
+                <li><a class="smooth-scroll" href="#match_score">Match Score</a></li>
+                <li><a class="smooth-scroll" href="#match_video">Match Video</a></li>
+                <li><a class="smooth-scroll" href="#level_starting">Competition Level Starting</a></li>
+                <li><a class="smooth-scroll" href="#alliance_selection">Alliance Selection</a></li>
+                <li><a class="smooth-scroll" href="#awards">Awards Posted</a></li>
+                <!-- <li><a class="smooth-scroll" href="#media_posted">Media Posted</a></li> -->
+                <!-- <li><a class="smooth-scroll" href="#district_points">District Points Updated</a></li> -->
+                <li><a class="smooth-scroll" href="#schedule_updated">Event Schedule Updated</a></li>
+                <!-- <li><a class="smooth-scroll" href="#final_results">Event Final Results</a></li> -->
+                <li><a class="smooth-scroll" href="#ping">Ping</a></li>
+                <li><a class="smooth-scroll" href="#broadcast">Broadcast</a></li>
+                <li><a class="smooth-scroll" href="#verification">Webhook Verification</a></li>
+            </ul></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      <h1 class="endheader">Webhooks</h1>
+      <h2 id="overview">Overview</h2>
+        <p>This documentation is for using webhooks with The Blue Alliance's dataset, which allow our server to push notifications to you, but only when the data is updated. Notifications will be sent as HTTP POST requests to a URL that your specify. This API does not replace the regular <a href="/apidocs">API</a>; it should be used to replace excessive polling or in other situations where realtime notifications are beneficial.</p>
+
+      <h2 id="request">Request Structure</h2>
+        <p>Each request will contain a payload of JSON data containing information about the event that has been pushed to you. Each request will contain a <code>message_type</code> and <code>message_data</code> field. The <code>message_type</code> field can be used to determine the data being sent. The <code>message_data</code> is the data specific to the message being sent. Details of each type of supported event is below.</p>
+        <p>Each request also contains a <code>X-TBA-HMAC</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that is set by the server when you create the webhook concatenated with the payload string. This is caculated using <a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf">NIST's HMAC algorithm</a>, using SHA256. You can see <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/7443c5bbfc817e9faa1b084aa9d5de267a45e785/src/backend/common/models/notifications/requests/webhook_request.py#L99" target="_blank">in the code</a> where this is calculated.
+
+      <h2 id="configuration">Configuration</h2>
+        <p>Webhooks are tied to your TBA Account - you can create them from your <a href="/account">account overview</a>. You will have to enter a URL that will receive the pushed notification. You also have to enter a secret key used to secure requests - we recommend using a long randomly generated string. When you receive a webhook, TBA will send a HTTP POST request to the URL you have entered, so make sure you're listening. Not responding or returning an error code may cause your webhook to be deleted.</p>
+      <h3 id="validation">Validation</h3>
+        <p>Once you create a webhook from the web interface, The Blue Alliance will push an initial notification to your server. The message will be of type 'verification' and look something like this: <code>{"message_type": "verification", "message_data": {"verification_key": "a93774ec6197d456f4aaadfea5fdba6697e71e6a"}}</code>
+        Once you receive a verification message, go to your <a href="/account">account overview</a>, where you can verify the webhook you just created. If you need to, you can resend a new verification code (keep in mind that only the most recently sent code will properly verify a webhook). Until you have verified your webhook, it will not recieve any notifications from The Blue Alliance. You can still ping a webhook from the account panel without verification in order to make sure it's working properly - but no other notifications will go through. So be sure to verify your webhooks soon after making them!</p>
+        <p>We will periodically prune non-responsive webhooks by checking if a webhook responds to a ping request with a 200 status code. Your webhook should handle responding to a ping to ensure it does not get pruned.</p>
+      <h3 id="testing">Testing</h3>
+        <p>If you want to test out recieving webhooks on your local computer, you can use a program called <a href="https://ngrok.com/download">ngrok</a> to expose a port on your device to the internet. You can check out <a href="https://developer.github.com/webhooks/configuring/">this page</a> from GitHub's documentation to see a brief overview of testing webhooks using ngrok. There is a small example script with some instructions <a href="https://github.com/phil-lopreiato/tba-webhook-test" target="_blank">here</a>.</p>
+        <p>Additionally, each notification type that is enabled will have a section for "testing" where you can send a static instance of that notification type to all of your devices. This feature will use the account you currently have logged in, and send it to every device registered with that account. Every event referenced will be 2014necmp and every match will be 2014necmp_f1m1.</p>
+      <a href="https://tba-notification-firehose.appspot.com/"><h3 id="firehose">The Firehose</h3></a>
+        <p>If you want your webhook to recieve updates for <i>every</i> event in a year, you can subscribe to the TBA Notification Firehose. On the <a href="/account/mytba">myTBA Page</a> for your account, go to the Subscriptions tab. At the bottom of the page, you can subscribe to all events in this year. Choose the notification types you would like to be updated for, and submit. Keep in mind that this subscription is only good for one season - if you want to continue receiving updates next season, you will have to subscribe again. <strong>Beware:</strong> subscribing to the firsthose will also send every notification to all your connected mobile devices. We recommend you not subscribe to the Firehose using an account that is also connected to your phone, unless you want a constant stream of notifications, there as well.</p>
+        <p>You can see an example App Engine site that is subscribed to the Firehose, stores all the incoming data in the ndb, and displays it <a href="https://github.com/the-blue-alliance/the-blue-alliance-notification-firehose" target="_blank">here</a>.</p>
+
+    <h2 id="notifications">Notification Types</h2>
+      <p>Please keep in mind that not all notification types have been implemented or enabled yet. Watch the <code>ENABLED_NOTIFICATIONS</code> dictionary of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/notification_type.py">this file</a> to see which types are enabled on the server.</p>
+
+      <h3 id="upcoming_match">Upcoming Match Notification</h3>
+        <p>These notifications are after scores have been posted for match N - 2. In the case of a match schedule first being released or matches between days (ex: the first match on the second day of an event), this notification will be sent ~7m before the start of the match.</p>
+        <h4>Structure</h4>
+          <p>Message Key: <code>upcoming_match</code></p>
+          <table class="table">
+            <caption><code>message_data</code> Fields</caption>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Description</th>
+                <th>Examples</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>event_key</code></td>
+                <td>TBA API key for the Event the Match will be played at</td>
+                <td>2014necmp</td>
+              </tr>
+              <tr>
+                <td><code>match_key</code></td>
+                <td>TBA API key for the Match</td>
+                <td>2014necmp_f1m1</td>
+              </tr>
+              <tr>
+                <td><code>team_key</code></td>
+                <td><b>(Optional)</b> TBA API key for the Team. Will only be included if the upcoming match notification is being sent for a Team subscription.</td>
+                <td>frc7332</td>
+              </tr>
+              <tr>
+                <td><code>event_name</code></td>
+                <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+                <td>New England FRC Region Championship</td>
+              </tr>
+              <tr>
+                <td><code>team_keys</code></td>
+                <td>List of TBA API Team keys for all teams participating in the match</td>
+                <td>frc195, frc558, ...</td>
+              </tr>
+              <tr>
+                <td><code>scheduled_time</code></td>
+                <td><b>(Optional)</b> Time that the match was originally scheduled for, in UNIX UTC. Will not be included if the match does not have a scheduled start time</td>
+                <td>1397330280</td>
+              </tr>
+              <tr>
+                <td><code>predicted_time</code></td>
+                <td><b>(Optional)</b> Time that the match is predicted to start at based on the times that scores were posted for previous events, in UNIX UTC. Will not be included if the match start time cannot be predicted</td>
+                <td>1397330280</td>
+              </tr>
+              <tr>
+                <td><code>webcast</code></td>
+                <td><b>(Optional)</b> A TBA API <a href="/apidocs/v3#model-Webcast">Webcast</a> object for the Event. Only one webcast will be sent, regardless of how many webcasts the Event has. Will only include webcasts that have been determined to be "online". Will not be included if there are no online webcats for the event.</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+
+        <h4>Example JSON</h4>
+          <pre class="example-json">
+          {"message_data": {"event_key": "2014necmp", "match_key": "2014necmp_f1m1", "event_name": "New England FRC Region Championship", "team_keys": ["frc195", "frc558", "frc5122", "frc177", "frc230", "frc4055"], "scheduled_time": 1397330280, "predicted_time": 1397330280, "webcast": {"type": "twitch", "channel": "nefirst_blue"}}, "message_type": "upcoming_match"}
+          </pre>
+        {% with type=types.upcoming_match, match_key='2014necmp_f1m1' %}
+          {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+        {% endwith %}
+
+      <h3 id="match_score">Match Score Notification</h3>
+        <p>This notification is sent every time a match score at a live event is updated.</p>
+
+      <h4>Structure</h4>
+        <p>Message Key: <code>match_score</code></p>
+        <table class="table">
+          <caption><code>message_data</code> Fields</caption>
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Description</th>
+              <th>Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>event_key</code></td>
+              <td>TBA API key for the Event the Match will be played at</td>
+              <td>2014necmp</td>
+            </tr>
+            <tr>
+              <td><code>match_key</code></td>
+              <td>TBA API key for the Match</td>
+              <td>2014necmp_f1m1</td>
+            </tr>
+            <tr>
+              <td><code>team_key</code></td>
+              <td><b>(Optional)</b> TBA API key for the Team. Will only be included if the upcoming match notification is being sent for a Team subscription.</td>
+              <td>frc7332</td>
+            </tr>
+            <tr>
+              <td><code>event_name</code></td>
+              <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+              <td>New England FRC Region Championship</td>
+            </tr>
+            <tr>
+              <td><code>match</code></td>
+              <td>A TBA API <a href="/apidocs/v3#model-Match">Match</a> object for the match.</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Example JSON</h4>
+          <pre class="example-json">
+          {"message_data": {"event_name": "New England FRC Region Championship", "match": {"comp_level": "f", "match_number": 1, "videos": [], "time_string": "3:18 PM", "set_number": 1, "key": "2014necmp_f1m1", "time": 1397330280, "score_breakdown": null, "alliances": {"blue": {"score": 154, "teams": ["frc177", "frc230", "frc4055"]}, "red": {"score": 78, "teams": ["frc195", "frc558", "frc5122"]} }, "event_key": "2014necmp"} }, "message_type": "match_score"}
+          </pre>
+
+        {% with type=types.match_score, match_key='2014necmp_f1m1' %}
+          {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+        {% endwith %}
+
+
+      <h3 id="match_video">Match Video Notification</h3>
+        <p>This notification is sent every time a match video is added to a match.</p>
+
+      <h4>Structure</h4>
+        <p>Message Key: <code>match_video</code></p>
+        <table class="table">
+          <caption><code>message_data</code> Fields</caption>
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Description</th>
+              <th>Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>event_key</code></td>
+              <td>TBA API key for the Event the Match was played at</td>
+              <td>2014necmp</td>
+            </tr>
+            <tr>
+              <td><code>match_key</code></td>
+              <td>TBA API key for the Match</td>
+              <td>2014necmp_f1m1</td>
+            </tr>
+            <tr>
+              <td><code>team_key</code></td>
+              <td><b>(Optional)</b> TBA API key for the Team. Will only be included if the upcoming match notification is being sent for a Team subscription.</td>
+              <td>frc7332</td>
+            </tr>
+            <tr>
+              <td><code>event_name</code></td>
+              <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+              <td>New England FRC Region Championship</td>
+            </tr>
+            <tr>
+              <td><code>match</code></td>
+              <td>A TBA API <a href="/apidocs/v3#model-Match">Match</a> object for the match.</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Example JSON</h4>
+          <pre class="example-json">
+          {"message_data": {"event_name": "New England FRC Region Championship", "match": {"comp_level": "f", "match_number": 1, "videos": [{"key": "ZrDxXDC1y5I", "type": "youtube"}], "time_string": "3:18 PM", "set_number": 1, "key": "2014necmp_f1m1", "time": 1397330280, "score_breakdown": null, "event_key": "2014necmp"} }, "message_type": "match_video"}
+          </pre>
+
+        {% with type=types.match_video, match_key='2014necmp_f1m1' %}
+          {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+        {% endwith %}
+
+
+        <h3 id="level_starting">Competition Level Starting Notification</h3>
+          <p>This notification is sent at the same time as <a class="smooth-scroll" href="#upcoming_match">Upcoming Match Notifications</a> are. If the next upcoming match is of a different type (qual, quarterfinal, semifinal, etc.), then this notification will also be sent out.</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>starting_comp_level</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>event_key</code></td>
+                  <td>TBA API key for the Event the Match will be played at</td>
+                  <td>2014necmp</td>
+                </tr>
+                <tr>
+                  <td><code>event_name</code></td>
+                  <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+                  <td>New England FRC Region Championship</td>
+                </tr>
+                <tr>
+                  <td><code>comp_level</code></td>
+                  <td>One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/comp_level.py#L6-L11">these strings</a> representing the competition level that is starting</td>
+                  <td>qf</td>
+                </tr>
+                <tr>
+                  <td><code>scheduled_time</code></td>
+                  <td><b>(Optional)</b> Time that the first match of the comp level was originally scheduled for, in UNIX UTC. Will not be included if the match does not have a scheduled start time</td>
+                  <td>1397330280</td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_name": "New England FRC Region Championship", "comp_level": "f", "event_key": "2014necmp", "scheduled_time": 1397330280}, "message_type": "starting_comp_level"}
+            </pre>
+            {% with type=types.starting_comp_level, match_key='2014necmp_f1m1' %}
+              {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+            {% endwith %}
+
+
+        <h3 id="alliance_selection">Alliance Selection Notification</h3>
+          <p>These notifications are posted after alliance selection results have been posted for the event.</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>alliance_selection</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>event_key</code></td>
+                  <td>TBA API key for the Event the alliance selection results were posted at</td>
+                  <td>2014necmp</td>
+                </tr>
+                <tr>
+                  <td><code>team_key</code></td>
+                  <td><b>(Optional)</b> TBA API key for the Team. Will only be included if the upcoming match notification is being sent for a Team subscription.</td>
+                  <td>frc7332</td>
+                </tr>
+                <tr>
+                  <td><code>event_name</code></td>
+                  <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+                  <td>New England FRC Region Championship</td>
+                </tr>
+                <tr>
+                  <td><code>event</code></td>
+                  <td>A TBA API <a href="/apidocs/v3#model-Event">Event</a> object for the event.</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_name": "New England FRC Region Championship", "event_key": "2014necmp", "event": {"key": "2014necmp", "website": "http://www.nefirst.org/", "official": true, "end_date": "2014-04-12", "name": "New England FRC Region Championship", "short_name": "New England", "facebook_eid": null, "event_district_string": "New England", "venue_address": "Boston University\nAgganis Arena\nBoston, MA 02215\nUSA", "event_district": 3, "location": "Boston, MA, USA", "event_code": "necmp", "year": 2014, "webcast": [], "alliances": [{"declines": [], "picks": ["frc195", "frc558", "frc5122"]}, {"declines": [], "picks": ["frc1153", "frc125", "frc4048"]}, {"declines": [], "picks": ["frc230", "frc177", "frc4055"]}, {"declines": [], "picks": ["frc716", "frc78", "frc811"]}, {"declines": [], "picks": ["frc1519", "frc3467", "frc58"]}, {"declines": [], "picks": ["frc131", "frc175", "frc1073"]}, {"declines": [], "picks": ["frc228", "frc3525", "frc2168"]}, {"declines": [], "picks": ["frc172", "frc1058", "frc2067"]}], "event_type_string": "District Championship", "start_date": "2014-04-10", "event_type": 2} }, "message_type": "alliance_selection"}
+            </pre>
+            {% with type=types.alliance_selection, event_key='2014necmp' %}
+              {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+            {% endwith %}
+
+
+        <h3 id="awards">Awards Posted Notification</h3>
+          <p>This notification is sent every time an award is added at a live event</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>awards_posted</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>event_key</code></td>
+                  <td>TBA API key for the Event the alliance selection results were posted at</td>
+                  <td>2014necmp</td>
+                </tr>
+                <tr>
+                  <td><code>team_key</code></td>
+                  <td><b>(Optional)</b> TBA API key for the Team. Will only be included if the upcoming match notification is being sent for a Team subscription.</td>
+                  <td>frc7332</td>
+                </tr>
+                <tr>
+                  <td><code>event_name</code></td>
+                  <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+                  <td>New England FRC Region Championship</td>
+                </tr>
+                <tr>
+                  <td><code>awards</code></td>
+                  <td>A list of TBA API <a href="/apidocs/v3#model-Award">Award</a> objects that are being awarded. In the case of an Event subscription, all awards for the event will be sent. In the case of a Team subscription, only awards won by the team will be sent.</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_key": "2014necmp", "event_name": "New England FRC Region Championship", "awards": [{"event_key": "2014necmp", "award_type": 0, "name": "Regional Chairman's Award", "recipient_list": [{"team_number": 2067, "awardee": null}, {"team_number": 78, "awardee": null}, {"team_number": 811, "awardee": null}, {"team_number": 2648, "awardee": null}], "year": 2014}]}, "message_type": "awards_posted"}
+            </pre>
+            {% with type=types.awards_posted, event_key='2014necmp' %}
+              {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+            {% endwith %}
+
+
+        <!-- <h3 id="media_posted">Team Media Posted Notification</h3>
+          <p>This notification is sent out whenever new team media is posted (can be either photos or videos).</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>awards_posted</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>event_key</code></td>
+                  <td>TBA API key for the Event the alliance selection results were posted at</td>
+                  <td>2014necmp</td>
+                </tr>
+                <tr>
+                  <td><code>team_key</code></td>
+                  <td><b>(Optional)</b> TBA API key for the Team. Will only be included if the upcoming match notification is being sent for a Team subscription.</td>
+                  <td>frc7332</td>
+                </tr>
+                <tr>
+                  <td><code>event_name</code></td>
+                  <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+                  <td>New England FRC Region Championship</td>
+                </tr>
+                <tr>
+                  <td><code>awards</code></td>
+                  <td>A list of TBA API <a href="/apidocs/v3#model-Award">Award</a> objects that are being awarded. In the case of an Event subscription, all awards for the event will be sent. In the case of a Team subscription, only awards won by the team will be sent.</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre>
+            Not yet implemented
+            </pre> -->
+
+        <!-- <h3 id="district_points">District Points Updated Notification</h3>
+          <p>This notification is sent when points are recalculated for a district</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>district_points_updated</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>district_key</code></td>
+                  <td>TBA API key for the District</td>
+                  <td>2014ne</td>
+                </tr>
+                <tr>
+                  <td><code>district_name</code></td>
+                  <td>The human readable shortname for the District</td>
+                  <td>New England</td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"district_key": "2014ne", "district_name": "New England"}, "message_type": "district_points_updated"}
+            </pre>
+            {% with type=types.district_points_updated, district_key='2014ne' %}
+              {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+            {% endwith %} -->
+
+
+        <h3 id="schedule_updated">Event Schedule Updated</h3>
+          <p>This notification is sent when new unplayed matches are added to a live event.</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>schedule_updated</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>event_key</code></td>
+                  <td>TBA API key for the Event the alliance selection results were posted at</td>
+                  <td>2014necmp</td>
+                </tr>
+                <tr>
+                  <td><code>event_name</code></td>
+                  <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+                  <td>New England FRC Region Championship</td>
+                </tr>
+                <tr>
+                  <td><code>first_match_time</code></td>
+                  <td><b>(Optional)</b> Time that the next unplayed match for the event is scheduled for, in UNIX UTC. Will not be included if the match does not have a scheduled start time</td>
+                  <td>1397330280</td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_key": "2014necmp", "event_name": "New England FRC Region Championship", "first_match_time": 1397330280}, "message_type": "schedule_updated"}
+            </pre>
+            {% with type=types.starting_comp_level, event_key='2014necmp', match_key='2014necmp_f1m1' %}
+              {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+            {% endwith %}
+
+        <!-- <h3 id="final_results">Final Results Notification</h3>
+          <p>This notification is sent upon the conclusion of a live event</p>
+        <h4>Structure</h4>
+            <ul>
+              <li>message_type: "final_results"
+              <li>fields in message_data object<ul>
+                <li>"team_key"</li>
+                <li>"team_name"</li>
+                <li>"event_key"</li>
+                <li>"event_name"</li></ul></li>
+            </ul>
+          <h4>Example JSON</h4>
+          <pre>
+            <i>Not yet implemented</i>
+          </pre>
+        {% if types.final_results in enabled %}
+{#        <h4>Test Notification</h4>#}
+            {# LeoCodes21 - final_results is unimplemented so there is nothing here for now. #}
+{#            <a href="/notifications/test/{{types.final_results}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Final Results</a>#}
+        {% endif %} -->
+
+
+        <h3 id="ping">Ping Notification</h3>
+          <p>This notification is sent from the <a href="/account">Account Overview</a> page to an individual one of the user's connected devices.</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>ping</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>title</code></td>
+                  <td></td>
+                  <td>Test Notification</td>
+                </tr>
+                <tr>
+                  <td><code>desc</code></td>
+                  <td></td>
+                  <td>This is a test message ensuring your device can recieve push messages from The Blue Alliance.</td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"title": "Test Message", "desc": "This is a test message ensuring your device can recieve push messages from The Blue Alliance."}, "message_type": "ping"}
+            </pre>
+
+
+        <h3 id="broadcast">Broadcast</h3>
+          <p>This notification can be sent by TBA Admins when they want to announce something important.</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>broadcast</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>title</code></td>
+                  <td>Title of the notification to be shown</td>
+                  <td>Test</td>
+                </tr>
+                <tr>
+                  <td><code>desc</code></td>
+                  <td>Contents of the notification</td>
+                  <td>Test Broadcast</td>
+                </tr>
+                <tr>
+                  <td><code>url</code></td>
+                  <td><b>(Optional)</b> A URL with additional information</td>
+                  <td>http://foo.bar</td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"title": "Test", "desc": "Test Broadcast", "url": "http://foo.bar"}, "message_type": "broadcast"}
+            </pre>
+
+
+        <h3 id="verification">Verification</h3>
+          <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="/account">Account Overview</a> page for the webhook before it recieves live updates.</p>
+          <h4>Structure</h4>
+          <p>Message Key: <code>verification</code></p>
+          <table class="table">
+            <caption><code>message_data</code> Fields</caption>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Description</th>
+                <th>Examples</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>verification_key</code></td>
+                <td>The SHA1 verification key for the webhook</td>
+                <td>8279a61abdeee0cf46a86136bf888188a4b18cdf</td>
+              </tr>
+            </tbody>
+          </table>
+            <h4>Example JSON</h4>
+              <pre class="example-json">
+              {"message_data": {"verification_key": "8279a61abdeee0cf46a86136bf888188a4b18cdf"}, "message_type": "verification"}
+              </pre>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+$( document ).ready(function() {
+    $('.example-json').each(function(){
+        var jsonObject = JSON.parse($(this).html());
+        var stringified = JSON.stringify(jsonObject, null, 2)
+        $(this).html(stringified);
+    });
+
+    var csrf_token = "{{ csrf_token() }}";
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+
+    $('.webhook-send-btn').click(function(e){
+        e.preventDefault();
+        $(this).attr('disabled', true);
+        $(this).addClass('disabled');
+        $(this.form).find('.webhook-alert').css('display', 'none');
+        $(this.form).find('.webhook-alert').removeClass('alert-success');
+        $(this.form).find('.webhook-alert').removeClass('alert-danger');
+
+        $.post(this.form.action, $(this.form).serialize()).done(function (data) {
+            if (data === "ok") {
+                $(this.form).find('.webhook-alert').addClass('alert-success');
+            } else {
+                $(this.form).find('.webhook-alert').addClass('alert-danger');
+            }
+
+            $(this.form).find('.webhook-alert').css('display', 'block');
+            $(this.form).find('.webhook-alert').text(data === "ok" ? "Sent webhook!" : data);
+
+            $(this).attr('disabled', false);
+            $(this).removeClass('disabled');
+
+            setTimeout(function() {
+                $(this.form).find('.webhook-alert').css('display', 'none');
+            }.bind(this), 5000)
+        }.bind(this)).fail(function (error) {
+            if (error.status == 401) {
+              alert('Please login before sending test notifications.');
+            } else {
+              alert('Something went horribly wrong. Try again.');
+            }
+            $(this).attr('disabled', false);
+            $(this).removeClass('disabled');
+        });
+    });
+
+    $('.webhook-alert').hide();
+});
+</script>
+{% endblock %}

@@ -12,9 +12,7 @@ from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMTo
       YouTubePlaylistHandler, AllowedApiWriteEventsHandler, PlayoffTypeGetHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, EventRemapTeamsHandler, WebcastHandler
 from controllers.apiai_controller import APIAIHandler
-from controllers.apidocs_controller import AddDataHandler, ApiV3DocumentationHandler, \
-      ApiV2DocumentationHandler, ApiTrustedDocumentationHandler, WebhookDocumentationHandler, \
-      ApiDocumentationOverviewHandler
+from controllers.apidocs_controller import AddDataHandler, WebhookDocumentationHandler
 from controllers.event_controller import EventList, EventDetail, EventRss, \
       EventNextMatchHandler
 from controllers.event_wizard_controller import EventWizardHandler, ReactEventWizardHandler
@@ -54,7 +52,6 @@ from controllers.suggestions.suggest_social_media_review_controller import \
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController, SuggestTeamSocialMediaController
 from controllers.suggestions.suggest_team_media_review_controller import SuggestTeamMediaReviewController
 from controllers.team_admin_controller import TeamAdminRedeem, TeamAdminDashboard
-from controllers.test_notification_controller import TestNotificationController
 from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory
 from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVerify, WebhookVerificationSend
 
@@ -78,12 +75,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/mytba/team/<team_number:[0-9]+>', MyTBATeamController, 'account-mytba-team', strict_slash=True),
       RedirectRoute(r'/add-data', AddDataHandler, 'add-data', strict_slash=True),
       RedirectRoute(r'/advanced_team_search', AdvancedSearchController, 'advanced_team_search', strict_slash=True),
-      RedirectRoute(r'/apidocs/v2', ApiV2DocumentationHandler, 'api-documentation-v2', strict_slash=True),
-      RedirectRoute(r'/apidocs/v3', ApiV3DocumentationHandler, 'api-documentation-v3', strict_slash=True),
-      RedirectRoute(r'/apidocs/trusted/v1', ApiTrustedDocumentationHandler, 'api-docs-trusted-v1', strict_slash=True),
-      RedirectRoute(r'/apidocs', ApiDocumentationOverviewHandler, 'api-documentation', strict_slash=True),
-      RedirectRoute(r'/apidocs/trusted', redirect_to='/apidocs/trusted/v1', name='api-trusted-documentation', strict_slash=True),
-      RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/avatars/<year:[0-9]+>', AvatarsHandler, 'avatars', strict_slash=True),
       RedirectRoute(r'/bigquery', redirect_to='https://console.cloud.google.com/bigquery?project=tbatv-prod-hrd&p=tbatv-prod-hrd&d=the_blue_alliance&page=dataset'),
@@ -115,7 +106,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/mod/redeem', TeamAdminRedeem, 'mod-redeem', strict_slash=True),
       RedirectRoute(r'/mytba', MyTBALiveController, 'mytba-live', strict_slash=True),
       RedirectRoute(r'/nearby', NearbyController, 'nearby', strict_slash=True),
-      RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
       RedirectRoute(r'/predictions', PredictionsHandler, 'predictions', strict_slash=True),
       RedirectRoute(r'/privacy', PrivacyHandler, 'privacy', strict_slash=True),
