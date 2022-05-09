@@ -6,6 +6,9 @@ dispatch:
 - url: "www.thebluealliance.com/about"
   service: py3-web
 
+- url: "www.thebluealliance.com/apidocs*"
+  service: py3-web
+
 - url: "www.thebluealliance.com/event*"
   service: py3-web
     
