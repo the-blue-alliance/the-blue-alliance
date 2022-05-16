@@ -9,7 +9,7 @@ from controllers.admin.admin_apistatus_controller import AdminApiStatus
 from controllers.admin.admin_contbuild_controller import AdminContbuildController
 from controllers.admin.admin_district_controller import AdminDistrictList, AdminDistrictEdit, \
     AdminDistrictCreate
-from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, \
+from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, \
     AdminAddAllianceBackup, AdminEventRemoveWebcast, AdminRefetchEventLocation, AdminPlayoffAdvancementAddController, AdminPlayoffAdvancementPurgeController, AdminEventDeleteMatches
 from controllers.admin.admin_gameday_controller import AdminGamedayDashboard
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain,
@@ -36,7 +36,7 @@ from controllers.admin.admin_main_landing_controller import AdminMainLandingEdit
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
 
-app = webapp2.WSGIApplication([('/admin/', AdminMain), 
+app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/api_auth/add', AdminApiAuthAdd),
                                ('/admin/api_auth/delete/(.*)', AdminApiAuthDelete),
                                ('/admin/api_auth/edit/(.*)', AdminApiAuthEdit),
@@ -58,8 +58,6 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/event/update_loaction/(.*)', AdminRefetchEventLocation),
                                ('/admin/event/create', AdminEventCreate),
                                ('/admin/event/create/test', AdminEventCreateTest),
-                               ('/admin/event/delete/(.*)', AdminEventDelete),
-                               ('/admin/event/edit/(.*)', AdminEventEdit),
                                ('/admin/event/delete_matches/(.*)/(.*)/(.*)', AdminEventDeleteMatches),
                                ('/admin/gameday', AdminGamedayDashboard),
                                ('/admin/awards', AdminAwardDashboard),

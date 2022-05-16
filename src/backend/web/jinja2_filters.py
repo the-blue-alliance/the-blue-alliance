@@ -48,6 +48,16 @@ def isoformat(datetime):
     return datetime.isoformat()
 
 
+def utc_timezone_datetime(datetime):
+    """
+    Used with Python 3 for <time datetime= tag where the datetime does not have a timezone
+    already associated with it. Adds a UTC timezone to the given datetime
+    """
+    from datetime import timezone
+
+    return datetime.astimezone(timezone.utc)
+
+
 # def union(one, two):
 #     return set(one) | set(two)
 #
@@ -147,6 +157,7 @@ def get_item(dictionary, key):
 
 _filters = {
     "strftime": strftime,
+    "utc_timezone_datetime": utc_timezone_datetime,
     "floatformat": floatformat,
     "strip_frc": strip_frc,
     "digits": digits,

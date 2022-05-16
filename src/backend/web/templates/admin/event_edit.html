@@ -1,14 +1,14 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}{{event.key_name}} - Edit{% endblock %}
 
 {% block content %}
 
-<p class="pull-right"><a class="btn btn-danger btn-small" href="/admin/event/delete/{{event.key_name}}"><span class="glyphicon glyphicon-trash"></span> Delete</a></p>
+<p class="pull-right"><a class="btn btn-danger btn-small" href="/admin/event/{{event.key_name}}/delete"><span class="glyphicon glyphicon-trash"></span> Delete</a></p>
 
 <h1>Edit {{ event.key_name }}</h1>
 
-<form action="/admin/event/edit/{{event.key_name}}" method="post">
+<form action="/admin/event/{{event.key_name}}/edit" method="post">
     <legend>Edit {{ event.year }} {{ event.name }}</legend>
     <table class="table table-striped table-hover table-condensed">
         <tr>
@@ -18,13 +18,13 @@
         <tr>
             <td>Dates</td>
             <td>
-                <input type="text" name="start_date" value="{{ event.start_date|date:"Y-m-d" }}" placeholder="2012-04-04"/> to <input type="text" name="end_date" value="{{ event.end_date|date:"Y-m-d" }}" placeholder="2012-04-06" />
+                <input type="text" name="start_date" value="{{ event.start_date|strftime("%Y-%m-%d") }}" placeholder="2012-04-04"/> to <input type="text" name="end_date" value="{{ event.end_date|strftime("%Y-%m-%d") }}" placeholder="2012-04-06" />
             </td>
         </tr>
 
         <tr>
             <td>Dates</td>
-            <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
+            <td>{{ event.start_date|strftime("%b %d, %Y") }} to {{ event.end_date|strftime("%b %d, %Y") }}</td>
         </tr>
         <tr>
             <td>Short Name</td>
@@ -49,8 +49,8 @@
         <tr>
             <td>Event Type</td>
             <td><select name="event_type">
-                {% for type, name in event_types.iteritems %}
-                  <option value="{{ type }}" {% if type == event.event_type_enum %}selected{% endif %}>{{ name }}</option>
+                {% for type, name in event_types.items() %}
+                  <option value="{{ type.value }}" {% if type.value == event.event_type_enum %}selected{% endif %}>{{ name }}</option>
                 {% endfor %}
             </select></td>
         </tr>
@@ -61,8 +61,8 @@
         <tr>
             <td>Playoff Type</td>
             <td><select name="playoff_type">
-                {% for type, name in playoff_types.iteritems %}
-                  <option value="{{ type }}" {% if type == event.playoff_type %}selected{% endif %}>{{ name }}</option>
+                {% for type, name in playoff_types.items() %}
+                  <option value="{{ type.value }}" {% if type.value == event.playoff_type %}selected{% endif %}>{{ name }}</option>
                 {% endfor %}
             </select></td>
         </tr>
@@ -112,7 +112,7 @@
         </tr>
         <tr>
             <td>Parent Event</td>
-            <td><input type="text" name="parent_event" value="{% if event.parent_event %}{{ event.parent_event.id }}{% endif %}"/></td>
+            <td><input type="text" name="parent_event" value="{% if event.parent_event %}{{ event.parent_event.string_id() }}{% endif %}"/></td>
         </tr>
         <tr>
             <td>Event Divisions</td>
@@ -133,6 +133,7 @@
             <td><textarea name="rankings_json">{{rankings}}</textarea></td>
         </tr>
     </table>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save Event</button>
     <a href="/admin/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>

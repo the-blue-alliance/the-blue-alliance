@@ -2,7 +2,12 @@ from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
 from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
-from backend.web.handlers.admin.event import event_detail, event_list
+from backend.web.handlers.admin.event import (
+    event_delete,
+    event_detail,
+    event_edit,
+    event_list,
+)
 from backend.web.handlers.admin.sitevars import (
     sitevar_create,
     sitevar_edit,
@@ -42,6 +47,12 @@ def task_launcher() -> str:
 # More complex endpoints should be split out into their own files
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_get, methods=["GET"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_post, methods=["POST"])
+admin_routes.add_url_rule(
+    "/event/<event_key>/delete", view_func=event_delete, methods=["GET", "POST"]
+)
+admin_routes.add_url_rule(
+    "/event/<event_key>/edit", view_func=event_edit, methods=["GET", "POST"]
+)
 admin_routes.add_url_rule("/event/<event_key>", view_func=event_detail)
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)
