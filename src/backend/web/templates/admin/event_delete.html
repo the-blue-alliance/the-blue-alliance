@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}{{event.key_name}} - Delete{% endblock %}
 
@@ -6,11 +6,12 @@
 
 <h1>Delete {{ event.key_name }}?</h1>
 
-<form action="/admin/event/delete/{{event.key_name}}" method="post">
+<form action="/admin/event/{{event.key_name}}/delete" method="post">
     <legend>Delete {{ event.year }} {{ event.name }}?</legend>
     <p>This will also delete it&rsquo;s EventTeams and Matches.</p>
 
     <a href="/admin/event/{{event.key_name}}" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-ban-circle"></span> Cancel Delete</a>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <button type="submit" class="btn btn-danger btn-small pull-right"><span class="glyphicon glyphicon-trash"></span> Delete Event</button>
 </form>

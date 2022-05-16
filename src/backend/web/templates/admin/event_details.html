@@ -7,7 +7,7 @@
 <h1 xmlns="http://www.w3.org/1999/html">{{event.key_name}} - {{ event.name }}</h1>
 
 <div class="btn-group">
-    <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+    <a href="/admin/event/{{event.key_name}}/edit" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Edit</a>
     <a href="/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
     <button class="btn btn-danger" form="event_cache_clear"><span class="glyphicon glyphicon-trash"></span> Clear Cache</button>
 </div>
@@ -79,7 +79,7 @@
     </tr>
     <tr>
         <td>Event District Key</td>
-        <td>{{ event.district_key }}</td>
+        <td>{%if event.district_key.id %}{{ event.district_key.string_id() }}{% endif %}</td>
     </tr>
     <tr>
         <td>Playoff Type</td>
@@ -143,11 +143,11 @@
     </tr>
     <tr>
         <td>Parent Event</td>
-        <td>{% if event.parent_event %}<a href="/admin/event/{{ event.parent_event.id }}">{{ event.parent_event.id }}</a>{% else %}None{% endif %}</td>
+        <td>{% if event.parent_event %}<a href="/admin/event/{{ event.parent_event.string_id() }}">{{ event.parent_event.string_id() }}</a>{% else %}None{% endif %}</td>
     </tr>
     <tr>
         <td>Divisions</td>
-        <td>{{ event.divisions|length }} Divisions - {% for div_key in event.divisions %}<a href="/admin/event/{{ div_key.id }}">{{ div_key.id }}</a>, {% endfor %}<ul>
+        <td>{{ event.divisions|length }} Divisions - {% for div_key in event.divisions %}<a href="/admin/event/{{ div_key.string_id() }}">{{ div_key.string_id() }}</a>, {% endfor %}<ul>
         </ul></td>
     </tr>
     <tr>
@@ -161,7 +161,7 @@
     </tr>
     <tr>
         <td>Created - Updated</td>
-        <td>{{ event.created }} - {{ event.updated }}</td>
+        <td><time datetime="{{ event.created|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time> - <time datetime="{{ event.updated|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.updated|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time></td>
     </tr>
 </table>
 </div>
