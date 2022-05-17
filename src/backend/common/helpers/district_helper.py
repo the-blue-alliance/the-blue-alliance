@@ -635,7 +635,7 @@ class DistrictHelper:
                 for n, alliance in enumerate(alliance_selections):
                     team_points[alliance["picks"][0]] = int(16 - (2 * n))
                     team_points[alliance["picks"][1]] = int(16 - (2 * n))
-                    team_points[alliance["picks"][2]] = int(16 - (2 * (n + 4)))
+                    team_points[alliance["picks"][2]] = int(2 + (2 * n))
                     n += 1
             else:
                 for n, alliance in enumerate(alliance_selections):
