@@ -186,7 +186,7 @@ class JsonDataImporter(object):
         [DistrictConverter.dictToModel_v3(d).put() for d in data]
         [
             DistrictTeam(
-                id=DistrictTeam.renderKeyName(d["key"], team_key),
+                id=DistrictTeam.render_key_name(d["key"], team_key),
                 team=ndb.Key(Team, team_key),
                 district_key=ndb.Key(District, d["key"]),
                 year=d["year"],

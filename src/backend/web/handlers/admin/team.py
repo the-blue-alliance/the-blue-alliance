@@ -96,7 +96,7 @@ def team_robot_name_update() -> Response:
         abort(400)
 
     robot = Robot(
-        id=Robot.renderKeyName(team_key, year),
+        id=Robot.render_key_name(team_key, year),
         team=team.key,
         year=year,
         robot_name=name.strip(),

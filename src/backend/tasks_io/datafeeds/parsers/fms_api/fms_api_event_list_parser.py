@@ -122,7 +122,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 name, district_code=event["districtCode"]
             )
             district_key = (
-                District.renderKeyName(self.season, event["districtCode"].lower())
+                District.render_key_name(self.season, event["districtCode"].lower())
                 if event["districtCode"]
                 else None
             )

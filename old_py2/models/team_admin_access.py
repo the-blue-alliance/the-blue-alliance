@@ -24,12 +24,12 @@ class TeamAdminAccess(ndb.Model):
 
     @property
     def key_name(self):
-        return self.renderKeyName(self.team_number, self.year)
+        return self.render_key_name(self.team_number, self.year)
 
     @property
     def team_key(self):
         return ndb.Key(Team, "frc{}".format(self.team_number))
 
     @classmethod
-    def renderKeyName(cls, teamNumber, year):
-        return "frc{}_{}".format(teamNumber, year)
+    def render_key_name(cls, team_number, year):
+        return "frc{}_{}".format(team_number, year)

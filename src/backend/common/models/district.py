@@ -67,7 +67,7 @@ class District(CachedModel):
         return True if match else False
 
     @classmethod
-    def renderKeyName(
+    def render_key_name(
         cls, year: Year, district_abbrev: DistrictAbbreviation
     ) -> DistrictKey:
         # Like 2016ne or 2016fim

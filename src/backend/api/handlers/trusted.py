@@ -208,7 +208,7 @@ def update_event_matches(event_key: EventKey) -> Response:
     needs_time: List[Match] = []
     for match in parsed_matches:
         match = Match(
-            id=Match.renderKeyName(
+            id=Match.render_key_name(
                 event.key_name,
                 match["comp_level"],
                 match["set_number"],

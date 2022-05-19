@@ -307,7 +307,7 @@ class Match(CachedModel):
 
     @property
     def key_name(self) -> MatchKey:
-        return self.renderKeyName(
+        return self.render_key_name(
             self.event_key_name, self.comp_level, self.set_number, self.match_number
         )
 
@@ -461,7 +461,7 @@ class Match(CachedModel):
         return None
 
     @classmethod
-    def renderKeyName(
+    def render_key_name(
         cls,
         event_key_name: EventKey,
         comp_level: CompLevel,

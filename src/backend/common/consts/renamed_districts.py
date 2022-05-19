@@ -16,7 +16,7 @@ CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
 }
 
 
-class RenamedDistricts(object):
+class RenamedDistricts:
     @staticmethod
     def get_equivalent_codes(code: DistrictAbbreviation) -> List[DistrictAbbreviation]:
         # Returns a list of equivalent district codes

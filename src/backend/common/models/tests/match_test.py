@@ -282,7 +282,7 @@ def test_winning_alliance_not_2015(
         ),
     }
     match = Match(
-        id=Match.renderKeyName("2010ct", CompLevel.QM, 1, 1),
+        id=Match.render_key_name("2010ct", CompLevel.QM, 1, 1),
         event=ndb.Key(Event, "2010ct"),
         year=2010,
         comp_level=CompLevel.QM,
@@ -329,7 +329,7 @@ def test_winning_alliance_2015(
         ),
     }
     match = Match(
-        id=Match.renderKeyName("2015ct", comp_level, 1, 1),
+        id=Match.render_key_name("2015ct", comp_level, 1, 1),
         event=ndb.Key(Event, "2015ct"),
         year=2015,
         comp_level=comp_level,

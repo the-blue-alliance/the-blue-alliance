@@ -134,7 +134,7 @@ class FinalMatchesRepairDo(webapp.RequestHandler):
 
             event = ndb.get_multi([match.event])[0]
             match.set_number = 1
-            match.key = ndb.Key(Match, Match.renderKeyName(
+            match.key = ndb.Key(Match, Match.render_key_name(
                 event.key.id(),
                 match.comp_level,
                 match.set_number,

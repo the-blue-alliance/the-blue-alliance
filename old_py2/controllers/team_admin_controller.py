@@ -61,7 +61,7 @@ class TeamAdminDashboard(LoggedInHandler):
         years = set([access.year for access in existing_access])
         teams_future = ndb.get_multi_async(team_keys)
         robot_keys = [
-            ndb.Key(Robot, Robot.renderKeyName(team.id(), now.year)) for team in team_keys
+            ndb.Key(Robot, Robot.render_key_name(team.id(), now.year)) for team in team_keys
         ]
         robots_future = ndb.get_multi_async(robot_keys)
         social_media_futures = [
@@ -157,7 +157,7 @@ class TeamAdminDashboard(LoggedInHandler):
         elif action == "set_team_info":
             robot_name = self.request.get("robot_name").strip()
             current_year = datetime.datetime.now().year
-            robot_key = Robot.renderKeyName(team.key_name, current_year)
+            robot_key = Robot.render_key_name(team.key_name, current_year)
             if robot_name:
                 robot = Robot(
                     id=robot_key,

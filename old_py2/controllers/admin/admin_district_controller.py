@@ -55,7 +55,7 @@ class AdminDistrictEdit(LoggedInHandler):
         self._require_admin()
 
         district = District(
-            id=District.renderKeyName(self.request.get("year"), self.request.get("abbreviation")),
+            id=District.render_key_name(self.request.get("year"), self.request.get("abbreviation")),
             year=int(self.request.get("year")),
             abbreviation=self.request.get("abbreviation"),
             display_name=self.request.get("display_name")

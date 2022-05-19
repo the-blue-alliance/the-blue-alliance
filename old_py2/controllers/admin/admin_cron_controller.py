@@ -235,7 +235,7 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
         for team_key, districts in team_districts.iteritems():
             most_frequent_district_key = max(set(districts), key=districts.count)
             logging.info("Assuming team {} belongs to {}".format(team_key, most_frequent_district_key))
-            dt_key = DistrictTeam.renderKeyName(most_frequent_district_key, team_key)
+            dt_key = DistrictTeam.render_key_name(most_frequent_district_key, team_key)
             new_district_teams.append(DistrictTeam(id=dt_key, year=year, team=ndb.Key(Team, team_key), district_key=ndb.Key(District, most_frequent_district_key)))
 
         logging.info("Finishing updating old district teams from event teams")
@@ -266,7 +266,7 @@ class AdminCreateDistrictsDo(LoggedInHandler):
 
         for dcmp in year_dcmps:
             district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
-            district_key = District.renderKeyName(year, district_abbrev)
+            district_key = District.render_key_name(year, district_abbrev)
             logging.info("Creating {}".format(district_key))
 
             district = District(
@@ -282,7 +282,7 @@ class AdminCreateDistrictsDo(LoggedInHandler):
 
         for dcmp in year_dcmps:
             district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
-            district_key = District.renderKeyName(year, district_abbrev)
+            district_key = District.render_key_name(year, district_abbrev)
             district_events_future = DistrictEventsQuery(district_key).fetch_async()
 
             district_events = district_events_future.get_result()
@@ -295,7 +295,7 @@ class AdminCreateDistrictsDo(LoggedInHandler):
 
         for dcmp in year_dcmps:
             district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
-            district_key = District.renderKeyName(year, district_abbrev)
+            district_key = District.render_key_name(year, district_abbrev)
             districtteams_future = DistrictTeam.query(DistrictTeam.year == year, DistrictTeam.district == DistrictType.abbrevs.get(district_abbrev, None)).fetch_async()
 
             districtteams = districtteams_future.get_result()

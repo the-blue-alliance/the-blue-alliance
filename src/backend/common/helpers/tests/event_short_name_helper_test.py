@@ -24,7 +24,7 @@ def create_districts(ndb_stub, taskqueue_stub):
         year = 2017
         districts.append(
             District(
-                id=District.renderKeyName(year, code),
+                id=District.render_key_name(year, code),
                 year=year,
                 abbreviation=code,
             )

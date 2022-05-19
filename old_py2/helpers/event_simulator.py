@@ -222,7 +222,7 @@ class EventSimulator(object):
                 }
                 for i in xrange(new_match.match_number):
                     win_counts[Match.get_by_id(
-                        Match.renderKeyName(
+                        Match.render_key_name(
                             new_match.event.id(),
                             new_match.comp_level,
                             new_match.set_number,
@@ -277,7 +277,7 @@ class EventSimulator(object):
                 }
                 for i in xrange(new_match.match_number):
                     win_counts[Match.get_by_id(
-                        Match.renderKeyName(
+                        Match.render_key_name(
                             new_match.event.id(),
                             new_match.comp_level,
                             new_match.set_number,
