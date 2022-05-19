@@ -48,7 +48,6 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # Event code used in FIRST's API, if different from event_short
     year: Year = ndb.IntegerProperty(required=True)
-    # event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
     district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
@@ -102,7 +101,6 @@ class Event(CachedModel):
         "end_date",
         "event_short",
         "event_type_enum",
-        "event_district_enum",
         "district_key",
         "custom_hashtag",
         "enable_predictions",

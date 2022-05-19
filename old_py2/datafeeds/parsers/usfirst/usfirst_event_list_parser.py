@@ -4,7 +4,6 @@ import logging
 
 from bs4 import BeautifulSoup
 
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
 from helpers.event_helper import EventHelper
@@ -33,7 +32,6 @@ class UsfirstEventListParser(ParserBase):
                     event_type_str = unicode(tds[0].string)
                     district_name_str = None
                 event["event_type_enum"] = EventHelper.parseEventType(event_type_str)
-                event["event_district_enum"] = EventHelper.parseDistrictName(district_name_str)
                 url_get_params = urlparse.parse_qs(urlparse.urlparse(tds[1].a["href"]).query)
                 event["first_eid"] = url_get_params["eid"][0]
 
