@@ -13,7 +13,7 @@ class FMSAPIDistrictListParser(ParserJSON[List[District]]):
 
         for district in response["districts"]:
             district_code = district["code"].lower()
-            district_key = District.renderKeyName(self.season, district_code)
+            district_key = District.render_key_name(self.season, district_code)
             districts.append(
                 District(
                     id=district_key,

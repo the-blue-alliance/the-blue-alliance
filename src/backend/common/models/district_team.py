@@ -42,7 +42,7 @@ class DistrictTeam(CachedModel):
 
     @property
     def key_name(self) -> DistrictTeamKey:
-        return self.renderKeyName(self.district_key.id(), self.team.id())
+        return self.render_key_name(self.district_key.id(), self.team.id())
 
     @classmethod
     def validate_key_name(cls, key: str) -> bool:
@@ -54,5 +54,5 @@ class DistrictTeam(CachedModel):
         )
 
     @classmethod
-    def renderKeyName(self, districtKey: DistrictKey, teamKey: TeamKey):
-        return "{}_{}".format(districtKey, teamKey)
+    def render_key_name(self, district_key: DistrictKey, team_key: TeamKey):
+        return "{}_{}".format(district_key, team_key)

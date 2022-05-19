@@ -57,11 +57,11 @@ class FMSAPITeamDetailsParser(
 
             districtTeam = None
             if teamData["districtCode"]:
-                districtKey = District.renderKeyName(
+                districtKey = District.render_key_name(
                     self.year, teamData["districtCode"].lower()
                 )
                 districtTeam = DistrictTeam(
-                    id=DistrictTeam.renderKeyName(districtKey, team.key_name),
+                    id=DistrictTeam.render_key_name(districtKey, team.key_name),
                     team=ndb.Key(Team, team.key_name),
                     year=self.year,
                     district_key=ndb.Key(District, districtKey),
@@ -73,7 +73,7 @@ class FMSAPITeamDetailsParser(
                 # data returned in the API that year is garbage. So let's not
                 # import it, with the hope that it'll come back in the future
                 robot = Robot(
-                    id=Robot.renderKeyName(team.key_name, self.year),
+                    id=Robot.render_key_name(team.key_name, self.year),
                     team=ndb.Key(Team, team.key_name),
                     year=self.year,
                     robot_name=teamData["robotName"].strip(),

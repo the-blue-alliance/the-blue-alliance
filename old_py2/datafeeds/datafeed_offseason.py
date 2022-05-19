@@ -15,7 +15,7 @@ class DatafeedOffseason(DatafeedBase):
         logging.info(matches)
 
         return [Match(
-            id=Match.renderKeyName(
+            id=Match.render_key_name(
                 event.key.id(),
                 match.get("comp_level", None),
                 match.get("set_number", 0),

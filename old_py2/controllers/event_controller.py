@@ -313,7 +313,7 @@ class EventInsights(CacheableHandler):
                     }
                 }
                 matches['qm'].append(Match(
-                    id=Match.renderKeyName(
+                    id=Match.render_key_name(
                         event_key,
                         'qm',
                         1,

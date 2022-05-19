@@ -87,7 +87,7 @@ class FMSAPIHybridScheduleParser(
             set_number, match_number = PlayoffTypeHelper.get_set_match_number(
                 event.playoff_type, comp_level, match["matchNumber"]
             )
-            key_name = Match.renderKeyName(
+            key_name = Match.render_key_name(
                 event_key, comp_level.value, set_number, match_number
             )
             match_identifiers.append((key_name, comp_level, set_number, match_number))
@@ -248,7 +248,7 @@ class FMSAPIHybridScheduleParser(
                     continue
 
                 match_number = match_count + 1
-                new_key_name = Match.renderKeyName(
+                new_key_name = Match.render_key_name(
                     event_key, comp_level.value, set_number, match_number
                 )
                 remapped_matches[key_name] = new_key_name
@@ -403,7 +403,7 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
                         ] = completedRocket
 
             match_details_by_key[
-                Match.renderKeyName(
+                Match.render_key_name(
                     "{}{}".format(self.year, self.event_short),
                     comp_level.value,
                     set_number,

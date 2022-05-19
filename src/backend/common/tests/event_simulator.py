@@ -253,7 +253,7 @@ class EventSimulator:
                     win_counts[
                         none_throws(  # pyre-ignore[6]
                             Match.get_by_id(
-                                Match.renderKeyName(
+                                Match.render_key_name(
                                     none_throws(new_match.event.string_id()),
                                     new_match.comp_level,
                                     new_match.set_number,
@@ -326,7 +326,7 @@ class EventSimulator:
                     win_counts[
                         none_throws(  # pyre-ignore[6]
                             Match.get_by_id(
-                                Match.renderKeyName(
+                                Match.render_key_name(
                                     none_throws(new_match.event.string_id()),
                                     new_match.comp_level,
                                     new_match.set_number,

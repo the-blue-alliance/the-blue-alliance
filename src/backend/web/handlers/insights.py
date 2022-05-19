@@ -21,7 +21,7 @@ def insights_overview() -> Response:
 
     insights = ndb.get_multi(
         [
-            ndb.Key(Insight, Insight.renderKeyName(0, insight_name))
+            ndb.Key(Insight, Insight.render_key_name(0, insight_name))
             for insight_name in Insight.INSIGHT_NAMES.values()
         ]
     )
@@ -57,7 +57,7 @@ def insights_detail(year: int) -> Response:
 
     insights = ndb.get_multi(
         [
-            ndb.Key(Insight, Insight.renderKeyName(year, insight_name))
+            ndb.Key(Insight, Insight.render_key_name(year, insight_name))
             for insight_name in Insight.INSIGHT_NAMES.values()
         ]
     )

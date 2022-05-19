@@ -90,10 +90,10 @@ class Insight(ndb.Model):
         """
         Returns the string of the key_name of the Insight object before writing it.
         """
-        return self.renderKeyName(self.year, self.name)
+        return self.render_key_name(self.year, self.name)
 
     @classmethod
-    def renderKeyName(cls, year, name):
+    def render_key_name(cls, year, name):
         if year == 0:
             return "insights" + "_" + str(name)
         else:

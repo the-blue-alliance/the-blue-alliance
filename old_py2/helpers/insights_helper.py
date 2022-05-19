@@ -162,7 +162,7 @@ class InsightsHelper(object):
         """
         Create Insight object given data, name, and year
         """
-        return Insight(id=Insight.renderKeyName(year, name),
+        return Insight(id=Insight.render_key_name(year, name),
                        name=name,
                        year=year,
                        data_json=json.dumps(data))

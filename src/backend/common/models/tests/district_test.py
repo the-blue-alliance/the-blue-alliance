@@ -14,7 +14,7 @@ def test_invalid_key_names(key: str) -> None:
 
 
 def test_render_key_name() -> None:
-    assert District.renderKeyName(2016, "ne") == "2016ne"
+    assert District.render_key_name(2016, "ne") == "2016ne"
 
 
 def test_key_name() -> None:

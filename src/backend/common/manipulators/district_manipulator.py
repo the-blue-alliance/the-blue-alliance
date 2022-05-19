@@ -34,7 +34,7 @@ def district_post_update_hook(updated_models: List[TUpdatedModel[District]]) -> 
     """
     for updated in updated_models:
         if updated.is_new and (not updated.model.display_name):
-            last_year_key = District.renderKeyName(
+            last_year_key = District.render_key_name(
                 updated.model.year - 1, updated.model.abbreviation
             )
             last_year_district = District.get_by_id(last_year_key)

@@ -286,7 +286,7 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         response = form.submit().follow()
         self.assertEqual(response.status_int, 301)
 
-        robot = Robot.get_by_id(Robot.renderKeyName('frc1124', self.now.year))
+        robot = Robot.get_by_id(Robot.render_key_name('frc1124', self.now.year))
         self.assertIsNotNone(robot)
         self.assertEqual(robot.robot_name, 'Test Robot Name')
 
@@ -295,7 +295,7 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         self.giveTeamAdminAccess()
 
         Robot(
-            id=Robot.renderKeyName(self.team.key_name, self.now.year),
+            id=Robot.render_key_name(self.team.key_name, self.now.year),
             team=self.team.key,
             year=self.now.year,
             robot_name='First Robot Name',
@@ -307,7 +307,7 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         response = form.submit().follow()
         self.assertEqual(response.status_int, 301)
 
-        robot = Robot.get_by_id(Robot.renderKeyName('frc1124', self.now.year))
+        robot = Robot.get_by_id(Robot.render_key_name('frc1124', self.now.year))
         self.assertIsNotNone(robot)
         self.assertEqual(robot.robot_name, 'Second Robot Name')
 
@@ -316,7 +316,7 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         self.giveTeamAdminAccess()
 
         Robot(
-            id=Robot.renderKeyName(self.team.key_name, self.now.year),
+            id=Robot.render_key_name(self.team.key_name, self.now.year),
             team=self.team.key,
             year=self.now.year,
             robot_name='First Robot Name',
@@ -328,7 +328,7 @@ class TestSuggestTeamAdminSuggestionReview(unittest2.TestCase):
         response = form.submit().follow()
         self.assertEqual(response.status_int, 301)
 
-        robot = Robot.get_by_id(Robot.renderKeyName('frc1124', self.now.year))
+        robot = Robot.get_by_id(Robot.render_key_name('frc1124', self.now.year))
         self.assertIsNone(robot)
 
     """

@@ -35,11 +35,11 @@ class Robot(CachedModel):
 
     @property
     def key_name(self) -> RobotKey:
-        return self.renderKeyName(self.team.id(), self.year)
+        return self.render_key_name(self.team.id(), self.year)
 
     @classmethod
-    def renderKeyName(cls, teamKey: TeamKey, year: Year) -> RobotKey:
-        return "{}_{}".format(teamKey, year)
+    def render_key_name(cls, team_key: TeamKey, year: Year) -> RobotKey:
+        return "{}_{}".format(team_key, year)
 
     @classmethod
     def validate_key_name(cls, key: str) -> bool:

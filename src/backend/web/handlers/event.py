@@ -292,7 +292,7 @@ def event_insights(event_key: EventKey) -> Response:
             }
             matches[CompLevel.QM].append(
                 Match(
-                    id=Match.renderKeyName(event_key, CompLevel.QM, 1, match_number),
+                    id=Match.render_key_name(event_key, CompLevel.QM, 1, match_number),
                     event=event.key,
                     year=event.year,
                     set_number=1,

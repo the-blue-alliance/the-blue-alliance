@@ -31,7 +31,7 @@ def setup_matches(n: int = 5) -> None:
     ndb.put_multi(
         [
             Match(
-                id=Match.renderKeyName("2014casj", CompLevel.QM, 1, i),
+                id=Match.render_key_name("2014casj", CompLevel.QM, 1, i),
                 comp_level=CompLevel.QM,
                 set_number=1,
                 match_number=i,
