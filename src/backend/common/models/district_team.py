@@ -12,15 +12,10 @@ class DistrictTeam(CachedModel):
     """
     DistrictTeam represents the "home district" for a team in a year
     key_name is like <year><district_short>_<team_key> (e.g. 2015ne_frc1124)
-    district_short is one of DistrictType.type_abbrevs
     """
 
     team = ndb.KeyProperty(kind=Team)
     year: Year = ndb.IntegerProperty()
-    # One of DistrictType constants, DEPRECATED, use district_key
-    # district = (
-    #    ndb.IntegerProperty()
-    # )
     district_key = ndb.KeyProperty(kind=District)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)

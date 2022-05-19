@@ -6,7 +6,6 @@ import re
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 from models.district import District
@@ -67,13 +66,6 @@ class EventHelper(object):
         EventHelper.sort_events(events)
         memcache.set('EventHelper.week_events():event_keys', [e.key for e in events], 60*60)
         return events
-
-    @classmethod
-    def parseDistrictName(cls, district_name_str):
-        district = DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
-
-        # Fall back to checking abbreviations if needed
-        return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(district_name_str, DistrictType.NO_DISTRICT)
 
     @classmethod
     def parseEventType(self, event_type_str):

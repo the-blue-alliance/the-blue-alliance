@@ -11,7 +11,6 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
-from consts.district_type import DistrictType
 from consts.playoff_type import PlayoffType
 from database import event_query, media_query
 from database.district_query import DistrictsInYearQuery, DistrictQuery
