@@ -5,12 +5,14 @@ import requests
 
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.district_manipulator import DistrictManipulator
+from backend.common.manipulators.event_details_manipulator import (
+    EventDetailsManipulator,
+)
 from backend.common.manipulators.event_manipulator import EventManipulator
-from backend.common.manipulators.event_details_manipulator import EventDetailsManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
-from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
+from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -52,7 +54,9 @@ class LocalDataBootstrap:
         return TeamManipulator.createOrUpdate(team)
 
     @staticmethod
-    def store_team_media(data: Dict, year: Optional[int], team_key: Optional[TeamKey]) -> Media:
+    def store_team_media(
+        data: Dict, year: Optional[int], team_key: Optional[TeamKey]
+    ) -> Media:
         media = MediaConverter.dictToModel_v3(data, year, team_key)
 
         return MediaManipulator.createOrUpdate(media)

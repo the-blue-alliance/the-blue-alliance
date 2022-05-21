@@ -145,7 +145,9 @@ def mock_team_detail_url(m: RequestsMocker, team: Team) -> None:
     )
 
 
-def mock_team_media_url(m: RequestsMocker, team: Team, media: List[Media], year: int) -> None:
+def mock_team_media_url(
+    m: RequestsMocker, team: Team, media: List[Media], year: int
+) -> None:
     m.register_uri(
         "GET",
         f"https://www.thebluealliance.com/api/v3/team/{team.key_name}/media/{year}",
@@ -258,7 +260,9 @@ def test_bootstrap_unknown_key() -> None:
     assert resp is None
 
 
-def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker, taskqueue_stub) -> None:
+def test_bootstrap_team(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     team = make_team(254)
     mock_team_detail_url(requests_mock, team)
 
@@ -278,7 +282,9 @@ def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker, taskqueue_st
     assert media[1] == remove_auto_add_properties(stored_media2)
 
 
-def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker, taskqueue_stub) -> None:
+def test_bootstrap_match(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     match = make_match("2020nyny_qm1")
     mock_match_detail_url(requests_mock, match)
 
@@ -289,7 +295,9 @@ def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker, taskqueue_s
     assert match == remove_auto_add_properties(stored_match)
 
 
-def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker, taskqueue_stub) -> None:
+def test_bootstrap_event(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     event = make_event("2020nyny")
     team1 = make_team(254)
     team2 = make_team(255)
