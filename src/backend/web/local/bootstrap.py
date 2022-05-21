@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 import requests
@@ -9,11 +10,13 @@ from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, MatchKey, TeamKey
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.award_converter import AwardConverter
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import MatchConverter
+from backend.common.queries.dict_converters.media_converter import MediaConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
 
 
@@ -44,6 +47,14 @@ class LocalDataBootstrap:
         # TeamManipulator.createOrUpdate(team)
         team.put()
         return team
+
+    @staticmethod
+    def store_team_media(data: Dict, year: Optional[int], team_key: Optional[TeamKey]) -> Media:
+        media = MediaConverter.dictToModel_v3(data, year, team_key)
+
+        # MediaManipulator.createOrUpdate(team)
+        media.put()
+        return media
 
     @classmethod
     def store_match(cls, data: Dict) -> Match:
@@ -94,6 +105,10 @@ class LocalDataBootstrap:
     @classmethod
     def fetch_team(cls, team_key: TeamKey, auth_token: str) -> Dict:
         return cls.fetch_endpoint(f"team/{team_key}", auth_token)
+
+    @classmethod
+    def fetch_team_media(cls, team_key: TeamKey, year: int, auth_token: str) -> Dict:
+        return cls.fetch_endpoint(f"team/{team_key}/media/{year}", auth_token)
 
     @classmethod
     def fetch_event(cls, event_key: EventKey, auth_token: str) -> Dict:
@@ -147,6 +162,11 @@ class LocalDataBootstrap:
         elif Team.validate_key_name(key):
             team_data = cls.fetch_team(key, apiv3_key)
             cls.store_team(team_data)
+
+            year = datetime.now().year
+            for media in cls.fetch_team_media(key, year, apiv3_key):
+                cls.store_team_media(media, year, key)
+
             return f"/team/{key[3:]}"
         elif key.isdigit():
             event_keys = [
