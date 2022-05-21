@@ -55,7 +55,7 @@ def make_team(team_num: TeamNumber) -> Team:
     )
 
 
-def make_media(team_num: TeamNumber, year: int) -> Team:
+def make_media(team_num: TeamNumber, year: int) -> List[Media]:
     return [
         Media(
             id="imgur_HSHpnyg",
