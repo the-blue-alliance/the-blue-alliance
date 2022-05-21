@@ -278,7 +278,7 @@ def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker, taskqueue_st
     assert media[1] == remove_auto_add_properties(stored_media2)
 
 
-def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker) -> None:
+def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker, taskqueue_stub) -> None:
     match = make_match("2020nyny_qm1")
     mock_match_detail_url(requests_mock, match)
 
@@ -289,7 +289,7 @@ def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker) -> None:
     assert match == remove_auto_add_properties(stored_match)
 
 
-def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
+def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker, taskqueue_stub) -> None:
     event = make_event("2020nyny")
     team1 = make_team(254)
     team2 = make_team(255)
@@ -377,7 +377,7 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
 
 
 def test_bootstrap_event_with_district(
-    ndb_context, requests_mock: RequestsMocker
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
 ) -> None:
     district = District(
         id="2020ne",
