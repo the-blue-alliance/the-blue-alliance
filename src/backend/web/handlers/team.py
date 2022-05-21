@@ -117,5 +117,6 @@ def team_list(page: int) -> str:
         "page_labels": page_labels,
         "cur_page_label": cur_page_label,
         "current_page": page,
+        "current_season": SeasonHelper.get_current_season()
     }
     return render_template("team_list.html", template_values)
