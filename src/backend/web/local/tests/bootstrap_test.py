@@ -258,7 +258,7 @@ def test_bootstrap_unknown_key() -> None:
     assert resp is None
 
 
-def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker) -> None:
+def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker, taskqueue_stub) -> None:
     team = make_team(254)
     mock_team_detail_url(requests_mock, team)
 

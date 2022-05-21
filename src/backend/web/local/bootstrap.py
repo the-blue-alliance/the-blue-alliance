@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 
 import requests
 
+from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -52,8 +53,7 @@ class LocalDataBootstrap:
     def store_team_media(data: Dict, year: Optional[int], team_key: Optional[TeamKey]) -> Media:
         media = MediaConverter.dictToModel_v3(data, year, team_key)
 
-        # MediaManipulator.createOrUpdate(team)
-        media.put()
+        MediaManipulator.createOrUpdate(media)
         return media
 
     @classmethod
