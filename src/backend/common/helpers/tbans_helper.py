@@ -1,5 +1,6 @@
 import datetime
 import logging
+from typing import List
 
 import firebase_admin
 from google.appengine.ext import deferred
@@ -16,6 +17,7 @@ from backend.common.consts.notification_type import (
     NotificationType,
 )
 from backend.common.models.mobile_client import MobileClient
+from backend.common.models.notifications.notification import Notification
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
 from backend.common.queries.mobile_client_query import MobileClientQuery
@@ -224,10 +226,10 @@ class TBANSHelper:
 
         next_matches = MatchHelper.upcoming_matches(event.matches, num=2)
         # TODO: Think about if we need special-case handling for replayed matches
-        # (I don"t think we do because if a match gets replayed at EoD, we"ll cancel/reschedule
-        # for that match notification. If a match gets replayed back-to-back (which doesn"t happen?)
+        # (I don't think we do because if a match gets replayed at EoD, we'll cancel/reschedule
+        # for that match notification. If a match gets replayed back-to-back (which doesn't happen?)
         # sending a second notification is probably fine.
-        # If there are not 2 scheduled matches (end of Quals, end of Quarters, etc.) don"t send
+        # If there are not 2 scheduled matches (end of Quals, end of Quarters, etc.) don't send
         if len(next_matches) < 2:
             return
 
@@ -403,7 +405,7 @@ class TBANSHelper:
         if len(next_matches) == 0:
             return
 
-        # Only schedule/send upcoming matches for new levels - if a schedule gets updated mid-way through the event, don"t
+        # Only schedule/send upcoming matches for new levels - if a schedule gets updated mid-way through the event, don't
         # bother sending new notifications (this is to prevent a bug where we send a bunch of duplicate notifications)
         if not (next_matches[0].set_number == 1 and next_matches[0].match_number == 1):
             return
@@ -430,15 +432,15 @@ class TBANSHelper:
         return notification.verification_key
 
     @classmethod
-    def _send(cls, users, notification):
+    def _send(cls, user_ids: List[str], notification: Notification):
         fcm_clients_future = MobileClientQuery(
-            users, client_types=FCM_CLIENTS
+            user_ids, client_types=list(FCM_CLIENTS)
         ).fetch_async()
         legacy_fcm_clients_future = MobileClientQuery(
-            users, client_types=FCM_LEGACY_CLIENTS
+            user_ids, client_types=list(FCM_LEGACY_CLIENTS)
         ).fetch_async()
         webhook_clients_future = MobileClientQuery(
-            users, client_types=[ClientType.WEBHOOK]
+            user_ids, client_types=[ClientType.WEBHOOK]
         ).fetch_async()
 
         # Send to FCM clients
@@ -493,7 +495,7 @@ class TBANSHelper:
         if backoff_time > MAXIMUM_BACKOFF:
             return 2
 
-        # Make sure we"re only sending to FCM clients
+        # Make sure we're only sending to FCM clients
         clients = [
             client
             for client in clients
@@ -596,7 +598,7 @@ class TBANSHelper:
         if not cls._notifications_enabled():
             return 1
 
-        # Make sure we"re only sending to webhook clients
+        # Make sure we're only sending to webhook clients
         clients = [
             client for client in clients if client.client_type == ClientType.WEBHOOK
         ]
