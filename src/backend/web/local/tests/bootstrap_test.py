@@ -145,7 +145,7 @@ def mock_team_detail_url(m: RequestsMocker, team: Team) -> None:
     )
 
 
-def mock_team_media_url(m: RequestsMocker, team: Team, media: Media, year: int) -> None:
+def mock_team_media_url(m: RequestsMocker, team: Team, media: List[Media], year: int) -> None:
     m.register_uri(
         "GET",
         f"https://www.thebluealliance.com/api/v3/team/{team.key_name}/media/{year}",
