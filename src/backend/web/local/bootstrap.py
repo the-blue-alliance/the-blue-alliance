@@ -1,7 +1,18 @@
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 import requests
 
+from backend.common.manipulators.award_manipulator import AwardManipulator
+from backend.common.manipulators.district_manipulator import DistrictManipulator
+from backend.common.manipulators.event_details_manipulator import (
+    EventDetailsManipulator,
+)
+from backend.common.manipulators.event_manipulator import EventManipulator
+from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
+from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.manipulators.media_manipulator import MediaManipulator
+from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -9,11 +20,13 @@ from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, MatchKey, TeamKey
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.award_converter import AwardConverter
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import MatchConverter
+from backend.common.queries.dict_converters.media_converter import MediaConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
 
 
@@ -23,16 +36,13 @@ class LocalDataBootstrap:
     @classmethod
     def store_district(cls, data: Dict) -> District:
         district = DistrictConverter.dictToModel_v3(data)
-        district.put()
 
-        # return DistrictManipulator.createOrUpdate(district)
-        return district
+        return DistrictManipulator.createOrUpdate(district)
 
     @classmethod
     def store_event(cls, data: Dict) -> Event:
         event = EventConverter.dictToModel_v3(data)
-        event.put()
-        # return EventManipulator.createOrUpdate(event)
+        EventManipulator.createOrUpdate(event)
 
         cls.store_district(data["district"]) if data["district"] else None
         return event
@@ -41,17 +51,21 @@ class LocalDataBootstrap:
     def store_team(data: Dict) -> Team:
         team = TeamConverter.dictToModel_v3(data)
 
-        # TeamManipulator.createOrUpdate(team)
-        team.put()
-        return team
+        return TeamManipulator.createOrUpdate(team)
+
+    @staticmethod
+    def store_team_media(
+        data: Dict, year: Optional[int], team_key: Optional[TeamKey]
+    ) -> Media:
+        media = MediaConverter.dictToModel_v3(data, year, team_key)
+
+        return MediaManipulator.createOrUpdate(media)
 
     @classmethod
     def store_match(cls, data: Dict) -> Match:
         match = MatchConverter.dictToModel_v3(data)
 
-        # return MatchManipulator.createOrUpdate(match)
-        match.put()
-        return match
+        return MatchManipulator.createOrUpdate(match)
 
     @staticmethod
     def store_eventteam(team: Team, event: Event) -> EventTeam:
@@ -60,9 +74,7 @@ class LocalDataBootstrap:
         eventteam.team = team.key
         eventteam.year = event.year
 
-        # return EventTeamManipulator.createOrUpdate(eventteam)
-        eventteam.put()
-        return eventteam
+        return EventTeamManipulator.createOrUpdate(eventteam)
 
     @classmethod
     def store_eventdetail(
@@ -71,17 +83,13 @@ class LocalDataBootstrap:
         detail = EventDetails.get_or_insert(event.key_name)
         setattr(detail, detail_type, data)
 
-        # return EventDetailsManipulator.createOrUpdate(detail)
-        detail.put()
-        return detail
+        return EventDetailsManipulator.createOrUpdate(detail)
 
     @classmethod
     def store_award(cls, data: Dict, event: Event) -> Award:
         award = AwardConverter.dictToModel_v3(data, event)
 
-        # return AwardManipulator.createOrUpdate(award)
-        award.put()
-        return award
+        return AwardManipulator.createOrUpdate(award)
 
     @classmethod
     def fetch_endpoint(cls, endpoint: str, auth_token: str) -> Dict:
@@ -94,6 +102,10 @@ class LocalDataBootstrap:
     @classmethod
     def fetch_team(cls, team_key: TeamKey, auth_token: str) -> Dict:
         return cls.fetch_endpoint(f"team/{team_key}", auth_token)
+
+    @classmethod
+    def fetch_team_media(cls, team_key: TeamKey, year: int, auth_token: str) -> Dict:
+        return cls.fetch_endpoint(f"team/{team_key}/media/{year}", auth_token)
 
     @classmethod
     def fetch_event(cls, event_key: EventKey, auth_token: str) -> Dict:
@@ -147,6 +159,11 @@ class LocalDataBootstrap:
         elif Team.validate_key_name(key):
             team_data = cls.fetch_team(key, apiv3_key)
             cls.store_team(team_data)
+
+            year = datetime.now().year
+            for media in cls.fetch_team_media(key, year, apiv3_key):
+                cls.store_team_media(media, year, key)
+
             return f"/team/{key[3:]}"
         elif key.isdigit():
             event_keys = [

@@ -10,6 +10,7 @@ from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.alliance import EventAlliance, MatchAlliance
 from backend.common.models.award import Award
@@ -21,6 +22,7 @@ from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, TeamNumber
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.award_converter import AwardConverter
 from backend.common.queries.dict_converters.event_converter import EventConverter
@@ -28,6 +30,7 @@ from backend.common.queries.dict_converters.event_details_converter import (
     EventDetailsConverter,
 )
 from backend.common.queries.dict_converters.match_converter import MatchConverter
+from backend.common.queries.dict_converters.media_converter import MediaConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
 from backend.web.local.bootstrap import LocalDataBootstrap
 
@@ -50,6 +53,29 @@ def make_team(team_num: TeamNumber) -> Team:
         name=f"Team {team_num}",
         website="https://www.thebluealliance.com",
     )
+
+
+def make_media(team_num: TeamNumber, year: int) -> List[Media]:
+    return [
+        Media(
+            id="imgur_HSHpnyg",
+            media_type_enum=MediaType.IMGUR,
+            foreign_key="HSHpnyg",
+            details_json=json.dumps({}),
+            references=[ndb.Key(Team, f"frc{team_num}")],
+            preferred_references=[ndb.Key(Team, f"frc{team_num}")],
+            year=year,
+        ),
+        Media(
+            id="imgur_MdhOTCR",
+            media_type_enum=MediaType.IMGUR,
+            foreign_key="MdhOTCR",
+            details_json=json.dumps({}),
+            references=[ndb.Key(Team, f"frc{team_num}")],
+            preferred_references=[ndb.Key(Team, f"frc{team_num}")],
+            year=year,
+        ),
+    ]
 
 
 def make_event(event_key: EventKey) -> Event:
@@ -116,6 +142,18 @@ def mock_team_detail_url(m: RequestsMocker, team: Team) -> None:
         headers={"X-TBA-Auth-Key": "test_apiv3"},
         status_code=200,
         json=TeamConverter(team).convert(ApiMajorVersion.API_V3),
+    )
+
+
+def mock_team_media_url(
+    m: RequestsMocker, team: Team, media: List[Media], year: int
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/team/{team.key_name}/media/{year}",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json=MediaConverter(media).convert(ApiMajorVersion.API_V3),
     )
 
 
@@ -222,9 +260,15 @@ def test_bootstrap_unknown_key() -> None:
     assert resp is None
 
 
-def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker) -> None:
+def test_bootstrap_team(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     team = make_team(254)
     mock_team_detail_url(requests_mock, team)
+
+    year = datetime.now().year
+    media = make_media(254, year)
+    mock_team_media_url(requests_mock, team, media, year)
 
     resp = LocalDataBootstrap.bootstrap_key("frc254", "test_apiv3")
     assert resp == "/team/254"
@@ -232,8 +276,15 @@ def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker) -> None:
     stored_team = Team.get_by_id("frc254")
     assert team == remove_auto_add_properties(stored_team)
 
+    stored_media1 = Media.get_by_id("imgur_HSHpnyg")
+    assert media[0] == remove_auto_add_properties(stored_media1)
+    stored_media2 = Media.get_by_id("imgur_MdhOTCR")
+    assert media[1] == remove_auto_add_properties(stored_media2)
 
-def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker) -> None:
+
+def test_bootstrap_match(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     match = make_match("2020nyny_qm1")
     mock_match_detail_url(requests_mock, match)
 
@@ -244,7 +295,9 @@ def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker) -> None:
     assert match == remove_auto_add_properties(stored_match)
 
 
-def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
+def test_bootstrap_event(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     event = make_event("2020nyny")
     team1 = make_team(254)
     team2 = make_team(255)
@@ -332,7 +385,7 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
 
 
 def test_bootstrap_event_with_district(
-    ndb_context, requests_mock: RequestsMocker
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
 ) -> None:
     district = District(
         id="2020ne",
