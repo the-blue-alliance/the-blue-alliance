@@ -92,6 +92,8 @@ def do_later():
 Custom URLs can be supported as well using a more manual process. A route must be created that calls to `deferred.application` to handle the original request. This is not recommended, but can be done.
 
 ```python
+from google.appengine.ext import deferred
+
 @app.route("/do_the_thing")
 def do_the_thing():
     # Providing a custom URL.

@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import cast, Dict, List
 
-from google.appengine.ext import ndb
+from google.appengine.ext import deferred, ndb
 from requests_mock.mocker import Mocker as RequestsMocker
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -20,7 +20,7 @@ from backend.common.models.event_details import EventDetails
 from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, MatchKey, TeamKey, TeamNumber
+from backend.common.models.keys import EventKey, MatchKey, TeamKey, TeamNumber, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
@@ -243,6 +243,17 @@ def mock_event_awards_url(
     )
 
 
+def mock_events_url(m: RequestsMocker, year: Year, events: List[Event]) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/events/{year}",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        json=[
+            EventConverter(event).convert(ApiMajorVersion.API_V3) for event in events
+        ],
+    )
+
+
 def mock_event_predictions_url(
     m: RequestsMocker, event_key: EventKey, predictions: EventPredictions
 ) -> None:
@@ -382,6 +393,52 @@ def test_bootstrap_event(
 
     stored_award = Award.get_by_id("2020nyny_0")
     assert award == remove_auto_add_properties(stored_award)
+
+
+def test_bootstrap_year(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
+    # Assert no tasks in the queue
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+    e1 = make_event("2020miket")
+    e2 = make_event("2020mike2")
+    mock_events_url(requests_mock, 2020, [e1, e2])
+
+    for event in [e1, e2]:
+        mock_event_detail_url(requests_mock, event)
+        mock_event_teams_url(requests_mock, event.key_name, [])
+        mock_event_matches_url(requests_mock, event.key_name, [])
+        mock_event_rankings_url(requests_mock, event.key_name, [])
+        mock_event_alliances_url(requests_mock, event.key_name, [])
+        mock_event_awards_url(requests_mock, event.key_name, [])
+        mock_event_predictions_url(
+            requests_mock,
+            event.key_name,
+            {
+                "match_predictions": None,
+                "match_prediction_stats": None,
+                "stat_mean_vars": None,
+                "ranking_predictions": None,
+                "ranking_prediction_stats": None,
+            },
+        )
+
+    resp = LocalDataBootstrap.bootstrap_key("2020", "test_apiv3")
+    assert resp == "/events/2020"
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 2
+
+    for task in tasks:
+        deferred.run(task.payload)
+
+    stored_e1 = Event.get_by_id("2020miket")
+    assert e1 == remove_auto_add_properties(stored_e1)
+
+    stored_e2 = Event.get_by_id("2020mike2")
+    assert e2 == remove_auto_add_properties(stored_e2)
 
 
 def test_bootstrap_event_with_district(
