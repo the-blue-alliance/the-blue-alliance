@@ -39,47 +39,33 @@ def event_details_post_update_hook(
     updated_models: List[TUpdatedModel[EventDetails]],
 ) -> None:
     for updated_model in updated_models:
-        # Enqueue task to calculate district points
         event_key = updated_model.model.key_name
-        try:
-            taskqueue.add(
-                url=f"/tasks/math/do/district_points_calc/{event_key}",
-                method="GET",
-                target="py3-tasks-io",
-                queue_name="default",
-                countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
-            )
-        except Exception:
-            logging.exception(f"Error enqueuing district_points_calc for {event_key}")
+
+        # Enqueue task to calculate district points
+        taskqueue.add(
+            url=f"/tasks/math/do/district_points_calc/{event_key}",
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+            countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
+        )
 
         # Enqueue task to calculate event team status
-        try:
+        taskqueue.add(
+            url=f"/tasks/math/do/event_team_status/{event_key}",
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
+
+        event = Event.get_by_id(event_key)
+        if event and event.within_a_day and "alliance_selections" in updated_model.updated_attrs:
             taskqueue.add(
-                url=f"/tasks/math/do/event_team_status/{event_key}",
+                url=f"/tbans/alliance_selections/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
                 queue_name="default",
             )
-        except Exception:
-            logging.exception(f"Error enqueuing event_team_status for {event_key}")
-
-        print(updated_model.updated_attrs)
-
-        event = Event.get_by_id(event_key)
-        if (
-            event
-            and event.within_a_day
-            and "alliance_selections" in updated_model.updated_attrs
-        ):
-            try:
-                TBANSHelper.alliance_selection(event)
-            except Exception:
-                logging.error(
-                    "Error sending alliance update notification for {}".format(
-                        event.key_name
-                    )
-                )
-                logging.error(traceback.format_exc())
 
 
 """ndb

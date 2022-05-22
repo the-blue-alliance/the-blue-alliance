@@ -85,10 +85,10 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
         # Send push notifications if the awards post was within +/- 1 day of the Event
         event = event_key.get()
         if event and event.within_a_day:
-            try:
-                TBANSHelper.awards(event)
-            except Exception as exception:
-                logging.error(
-                    "Error sending {} award updates: {}".format(event.id(), exception)
-                )
-                logging.error(traceback.format_exc())
+            taskqueue.add(
+                url=f"/tbans/awards/{event_key.string_id()}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="default",
+                countdown=300,  # Wait ~5m so cache clearing can run
+            )
