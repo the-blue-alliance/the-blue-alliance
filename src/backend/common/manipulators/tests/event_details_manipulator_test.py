@@ -8,7 +8,6 @@ from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )

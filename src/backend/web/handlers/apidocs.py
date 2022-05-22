@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import requests
 from flask import Blueprint, make_response, redirect, request, Response, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response as WerkzeugResponse
@@ -11,7 +12,6 @@ from backend.common.consts.notification_type import (
 )
 from backend.common.consts.notification_type import TYPES as NOTIFICATION_TYPES
 from backend.common.decorators import cached_public
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.web.decorators import enforce_login
 from backend.web.profiled_render import render_template
 
@@ -66,9 +66,15 @@ def apidocs_webhooks_notification(type: int) -> Response:
 
     user = none_throws(current_user())
     user_id = user.uid
+    data = {"user_id": user_id}
 
     success_response = make_response("ok", 200)
     error_response = make_response("", 400)
+    origin = request.headers.get("Origin")
+
+    import logging
+
+    logging.warning(origin)
 
     try:
         notification_type = NotificationType(type)
@@ -84,20 +90,15 @@ def apidocs_webhooks_notification(type: int) -> Response:
         if not event_key:
             return error_response
 
-        from backend.common.models.event import Event
-
-        event = Event.get_by_id(event_key)
-        if not event:
-            return error_response
-
+        # TODO: Update these... do NOT ned to be sync, right?
         if notification_type == NotificationType.ALLIANCE_SELECTION:
-            TBANSHelper.alliance_selection(event, user_id=user_id)
+            requests.post(f"/tbans/alliance_selections/{event_key}", data=data)
             return success_response
         elif notification_type == NotificationType.AWARDS:
-            TBANSHelper.awards(event, user_id=user_id)
+            requests.post(f"/tbans/awards/{event_key}", data=data)
             return success_response
         elif notification_type == NotificationType.SCHEDULE_UPDATED:
-            TBANSHelper.event_schedule(event, user_id=user_id)
+            requests.post(f"/tbans/event_schedule/{event_key}", data=data)
             return success_response
 
         return error_response
@@ -111,23 +112,17 @@ def apidocs_webhooks_notification(type: int) -> Response:
         if not match_key:
             return error_response
 
-        from backend.common.models.match import Match
-
-        match = Match.get_by_id(match_key)
-        if not match:
-            return error_response
-
         if notification_type == NotificationType.UPCOMING_MATCH:
-            TBANSHelper.match_upcoming(match, user_id=user_id)
+            requests.post(f"/tbans/match_upcoming/{match_key}", data=data)
             return success_response
         elif notification_type == NotificationType.MATCH_SCORE:
-            TBANSHelper.match_score(match, user_id=user_id)
+            requests.post(f"/tbans/match_score/{match_key}", data=data)
             return success_response
         elif notification_type == NotificationType.LEVEL_STARTING:
-            TBANSHelper.event_level(match, user_id=user_id)
+            requests.post(f"/tbans/event_level/{match_key}", data=data)
             return success_response
         elif notification_type == NotificationType.MATCH_VIDEO:
-            TBANSHelper.match_video(match, user_id=user_id)
+            requests.post(f"/tbans/match_video/{match_key}", data=data)
             return success_response
 
         return error_response

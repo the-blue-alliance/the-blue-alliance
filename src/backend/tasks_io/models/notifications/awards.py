@@ -6,7 +6,7 @@ from backend.common.consts.award_type import AwardType
 from backend.common.consts.notification_type import NotificationType
 from backend.common.models.event import Event
 from backend.common.models.team import Team
-from backend.tasks_io.models.notifications import Notification
+from backend.tasks_io.models.notifications.notification import Notification
 
 
 class AwardsNotification(Notification):

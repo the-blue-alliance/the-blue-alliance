@@ -14,7 +14,6 @@ from backend.common.consts.notification_type import (
     NotificationType,
 )
 from backend.common.consts.notification_type import TYPES as NOTIFICATION_TYPES
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.event import Event
 from backend.common.models.match import Match, MatchAlliance
 from backend.web.handlers.conftest import CapturedTemplate

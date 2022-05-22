@@ -1,6 +1,4 @@
 import json
-import logging
-import traceback
 from typing import List, Set
 
 from google.appengine.api import taskqueue
@@ -8,7 +6,6 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing import get_affected_queries
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.award import Award
 from backend.common.models.cached_model import TAffectedReferences

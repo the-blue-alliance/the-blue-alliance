@@ -4,7 +4,7 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.notification_type import NotificationType
 from backend.common.models.district import District
-from backend.tasks_io.models.notifications import Notification
+from backend.tasks_io.models.notifications.notification import Notification
 
 
 class DistrictPointsNotification(Notification):

@@ -3,7 +3,7 @@ import json
 import requests
 
 from backend.tasks_io.models.notification_requests.request import Request
-from backend.tasks_io.models.notifications import Notification
+from backend.tasks_io.models.notifications.notification import Notification
 
 
 WEBHOOK_VERSION = 1

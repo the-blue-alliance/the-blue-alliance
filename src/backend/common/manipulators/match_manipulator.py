@@ -6,7 +6,6 @@ from google.appengine.api import taskqueue
 
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.helpers.firebase_pusher import FirebasePusher
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.match import Match
@@ -82,6 +81,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     unplayed_match_events = []
     for updated_match in updated_models:
         match = updated_match.model
+        match_key = match.key_name
         event = match.event.get()
         # Only continue if the event is currently happening
         if event and event.now:
@@ -90,15 +90,12 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     updated_match.is_new
                     or "alliances_json" in updated_match.updated_attrs
                 ):
-                    try:
-                        TBANSHelper.match_score(match)
-                    except Exception as exception:
-                        logging.error(
-                            "Error sending match {} updates: {}".format(
-                                match.key_name, exception
-                            )
-                        )
-                        logging.error(traceback.format_exc())
+                    taskqueue.add(
+                        url=f"/tbans/match_score/{match_key}",
+                        method="GET",
+                        target="py3-tasks-io",
+                        queue_name="default",
+                    )
             else:
                 if updated_match.is_new or (
                     set(["alliances_json", "time", "time_string"]).intersection(
@@ -111,34 +108,34 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     if event not in unplayed_match_events:
                         unplayed_match_events.append(event)
 
-        print(updated_match.updated_attrs)
         # Try to send video notifications
         if "_video_added" in updated_match.updated_attrs:
-            try:
-                TBANSHelper.match_video(match)
-            except Exception as exception:
-                logging.error("Error sending match video updates: {}".format(exception))
-                logging.error(traceback.format_exc())
+            taskqueue.add(
+                url=f"/tbans/match_video/{match_key}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="default",
+            )
 
     """
     If we have an unplayed match during an event within a day, send out a schedule update notification
     """
     for event in unplayed_match_events:
-        try:
-            TBANSHelper.event_schedule(event)
-        except Exception:
-            logging.error(
-                "Eror sending schedule updates for: {}".format(event.key_name)
-            )
-            logging.error(traceback.format_exc())
-        try:
-            # When an event gets a new schedule, we should schedule `match_upcoming` notifications for the first matches for the event
-            TBANSHelper.schedule_upcoming_matches(event)
-        except Exception:
-            logging.error(
-                "Eror scheduling match_upcoming for: {}".format(event.key_name)
-            )
-            logging.error(traceback.format_exc())
+        event_key = event.key_name
+
+        taskqueue.add(
+            url=f"/tbans/event_schedule/{event_key}",
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
+
+        taskqueue.add(
+            url=f"/tbans/schedule_upcoming_matches/{event_key}",
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
 
 
 class MatchPostUpdateHooks:

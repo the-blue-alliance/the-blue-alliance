@@ -1,5 +1,5 @@
 from backend.common.google_analytics import GoogleAnalytics
-from backend.tasks_io.models.notifications import Notification
+from backend.tasks_io.models.notifications.notification import Notification
 
 
 class Request(object):

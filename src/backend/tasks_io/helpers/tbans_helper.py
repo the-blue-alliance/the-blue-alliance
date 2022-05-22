@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import List
+from typing import List, Optional
 
 import firebase_admin
 from google.appengine.ext import deferred
@@ -16,6 +16,8 @@ from backend.common.consts.notification_type import (
     ENABLED_TEAM_NOTIFICATIONS,
     NotificationType,
 )
+from backend.common.models.event import Event
+from backend.common.models.match import Match
 from backend.common.models.mobile_client import MobileClient
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
@@ -29,17 +31,17 @@ from backend.tasks_io.models.notifications import (
     MatchScoreNotification,
     MatchUpcomingNotification,
     MatchVideoNotification,
-    Notification,
     PingNotification,
     VerificationNotification,
 )
+from backend.tasks_io.models.notifications.notification import Notification
 
 
 MAXIMUM_BACKOFF = 32
 MATCH_UPCOMING_MINUTES = datetime.timedelta(minutes=-7)
 
 
-def _firebase_app():
+def _firebase_app() -> firebase_admin.App:
     from firebase_admin import credentials
 
     try:
@@ -62,7 +64,7 @@ class TBANSHelper:
     """
 
     @classmethod
-    def alliance_selection(cls, event, user_id=None):
+    def alliance_selection(cls, event: Event, user_id: str = None) -> None:
         # Send to Event subscribers
         if NotificationType.ALLIANCE_SELECTION in ENABLED_EVENT_NOTIFICATIONS:
             users = [user_id] if user_id else []
@@ -101,7 +103,7 @@ class TBANSHelper:
     """
 
     @classmethod
-    def awards(cls, event, user_id=None):
+    def awards(cls, event: Event, user_id: str = None) -> None:
         # Send to Event subscribers
         if NotificationType.AWARDS in ENABLED_EVENT_NOTIFICATIONS:
             users = [user_id] if user_id else []
@@ -128,7 +130,14 @@ class TBANSHelper:
                     cls._send(users, AwardsNotification(event, team))
 
     @classmethod
-    def broadcast(cls, client_types, title, message, url=None, app_version=None):
+    def broadcast(
+        cls,
+        client_types: List[ClientType],
+        title: str,
+        message: str,
+        url: Optional[str] = None,
+        app_version: Optional[str] = None,
+    ) -> None:
         notification = BroadcastNotification(title, message, url, app_version)
 
         # Send to FCM clients
@@ -149,7 +158,7 @@ class TBANSHelper:
                 cls._defer_webhook(clients, notification)
 
     @classmethod
-    def event_level(cls, match, user_id=None):
+    def event_level(cls, match: Match, user_id: str = None) -> None:
         # Send to Event subscribers
         if NotificationType.LEVEL_STARTING in ENABLED_EVENT_NOTIFICATIONS:
             users = [user_id] if user_id else []
@@ -161,7 +170,7 @@ class TBANSHelper:
                 cls._send(users, EventLevelNotification(match))
 
     @classmethod
-    def event_schedule(cls, event, user_id=None):
+    def event_schedule(cls, event: Event, user_id: str = None) -> None:
         # Send to Event subscribers
         if NotificationType.SCHEDULE_UPDATED in ENABLED_EVENT_NOTIFICATIONS:
             users = [user_id] if user_id else []
@@ -173,7 +182,7 @@ class TBANSHelper:
                 cls._send(users, EventScheduleNotification(event))
 
     @classmethod
-    def match_score(cls, match, user_id=None):
+    def match_score(cls, match: Match, user_id: str = None) -> None:
         event = match.event.get()
 
         # Send to Event subscribers
@@ -225,7 +234,7 @@ class TBANSHelper:
         cls.schedule_upcoming_match(next_match, user_id)
 
     @classmethod
-    def match_upcoming(cls, match, user_id=None):
+    def match_upcoming(cls, match: Match, user_id: str = None) -> None:
         # Send to Event subscribers
         if NotificationType.UPCOMING_MATCH in ENABLED_EVENT_NOTIFICATIONS:
             users = [user_id] if user_id else []
@@ -262,7 +271,7 @@ class TBANSHelper:
             cls.event_level(match, user_id)
 
     @classmethod
-    def match_video(cls, match, user_id=None):
+    def match_video(cls, match: Match, user_id: str = None) -> None:
         # Send to Event subscribers
         if NotificationType.MATCH_VIDEO in ENABLED_EVENT_NOTIFICATIONS:
             users = [user_id] if user_id else []
@@ -295,7 +304,7 @@ class TBANSHelper:
                 cls._send(users, MatchVideoNotification(match))
 
     @staticmethod
-    def ping(client):
+    def ping(client: MobileClient) -> bool:
         """Immediately dispatch a Ping to either FCM or a webhook"""
         if client.client_type == ClientType.WEBHOOK:
             return TBANSHelper._ping_webhook(client)
@@ -303,7 +312,7 @@ class TBANSHelper:
             return TBANSHelper._ping_client(client)
 
     @staticmethod
-    def _ping_client(client):
+    def _ping_client(client: MobileClient) -> bool:
         client_type = client.client_type
         if client_type in FCM_CLIENTS:
             notification = PingNotification()
@@ -325,7 +334,7 @@ class TBANSHelper:
         return True
 
     @staticmethod
-    def _ping_webhook(client):
+    def _ping_webhook(client: MobileClient) -> bool:
         notification = PingNotification()
 
         from backend.tasks_io.models.notification_requests import WebhookRequest
@@ -337,7 +346,7 @@ class TBANSHelper:
         return webhook_request.send()
 
     @classmethod
-    def schedule_upcoming_match(cls, match, user_id=None):
+    def schedule_upcoming_match(cls, match: Match, user_id: str = None) -> None:
         from google.appengine.api import taskqueue
 
         queue = taskqueue.Queue("push-notifications")
@@ -364,7 +373,7 @@ class TBANSHelper:
             )
 
     @classmethod
-    def schedule_upcoming_matches(cls, event, user_id=None):
+    def schedule_upcoming_matches(cls, event: Event, user_id: str = None) -> None:
         # Schedule `match_upcoming` notifications for Match 1 and Match 2
         # Match 3 (and onward) will be dispatched after Match 1 (or Match N - 2) has been played
         if not event.matches:
@@ -386,7 +395,7 @@ class TBANSHelper:
             cls.schedule_upcoming_match(match, user_id)
 
     @staticmethod
-    def verify_webhook(url, secret):
+    def verify_webhook(url: str, secret: str) -> str:
         """Immediately dispatch a Verification to a webhook"""
         notification = VerificationNotification(url, secret)
 
@@ -398,7 +407,7 @@ class TBANSHelper:
         return notification.verification_key
 
     @classmethod
-    def _send(cls, user_ids: List[str], notification: Notification):
+    def _send(cls, user_ids: List[str], notification: Notification) -> None:
         fcm_clients_future = MobileClientQuery(
             user_ids, client_types=list(FCM_CLIENTS)
         ).fetch_async()
@@ -426,7 +435,12 @@ class TBANSHelper:
             cls._defer_webhook(webhook_clients, notification)
 
     @classmethod
-    def _defer_fcm(cls, clients, notification, legacy_data_format=False):
+    def _defer_fcm(
+        cls,
+        clients: List[MobileClient],
+        notification: Notification,
+        legacy_data_format: bool = False,
+    ) -> None:
         deferred.defer(
             cls._send_fcm,
             clients,
@@ -438,7 +452,9 @@ class TBANSHelper:
         )
 
     @classmethod
-    def _defer_webhook(cls, clients, notification):
+    def _defer_webhook(
+        cls, clients: List[MobileClient], notification: Notification
+    ) -> None:
         deferred.defer(
             cls._send_webhook,
             clients,
@@ -450,7 +466,11 @@ class TBANSHelper:
 
     @classmethod
     def _send_fcm(
-        cls, clients, notification, legacy_data_format=False, backoff_iteration=0
+        cls,
+        clients: List[MobileClient],
+        notification: Notification,
+        legacy_data_format: bool = False,
+        backoff_iteration: int = 0,
     ):
         # Only send to FCM clients if notifications are enabled
         if not cls._notifications_enabled():
@@ -559,7 +579,9 @@ class TBANSHelper:
         return 0
 
     @classmethod
-    def _send_webhook(cls, clients, notification):
+    def _send_webhook(
+        cls, clients: List[MobileClient], notification: Notification
+    ) -> None:
         # Only send to webhooks if notifications are enabled
         if not cls._notifications_enabled():
             return 1
@@ -583,7 +605,7 @@ class TBANSHelper:
 
     # Returns a list of debug strings for a FirebaseException
     @classmethod
-    def _debug_string(cls, exception):
+    def _debug_string(cls, exception) -> str:
         debug_strings = [exception.code, str(exception)]
         if exception.http_response:
             debug_strings.append(str(exception.http_response.json()))

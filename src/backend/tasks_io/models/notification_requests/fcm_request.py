@@ -7,7 +7,7 @@ from googleapiclient import (
 )  # Fix positional argument warnings - can remove once we upgrade to firebase-admin=4.0.0
 
 from backend.tasks_io.models.notification_requests.request import Request
-from backend.tasks_io.models.notifications import Notification
+from backend.tasks_io.models.notifications.notification import Notification
 
 _helpers.positional_parameters_enforcement = _helpers.POSITIONAL_IGNORE
 

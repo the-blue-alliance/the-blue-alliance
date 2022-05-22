@@ -1,5 +1,6 @@
 import datetime
 
+import requests
 from flask import (
     abort,
     Blueprint,
@@ -255,28 +256,17 @@ def mytba() -> str:
 @enforce_login
 def ping():
     user = none_throws(current_user())
-    response = redirect(url_for("account.overview"))
-
     mobile_client_id = request.form.get("mobile_client_id")
 
-    from backend.common.models.mobile_client import MobileClient
-
-    client = MobileClient.get_by_id(
-        int(mobile_client_id), parent=none_throws(user.account_key)
+    response = requests.post(
+        f"/tbans/ping", data={"mobile_client_id": mobile_client_id, "user_id": user.uid}
     )
-    if client is None:
-        session["ping_sent"] = "0"
-        return response
-
-    from backend.common.helpers.tbans_helper import TBANSHelper
-
-    success = TBANSHelper.ping(client)
-    if success:
+    if respose.ok:
         session["ping_sent"] = "1"
     else:
         session["ping_sent"] = "0"
 
-    return response
+    return redirect(url_for("account.overview"))
 
 
 # class myTBAAddHotMatchesController(LoggedInHandler):

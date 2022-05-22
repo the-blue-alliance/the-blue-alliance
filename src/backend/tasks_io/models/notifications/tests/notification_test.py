@@ -3,7 +3,7 @@ from firebase_admin import messaging
 
 from backend.common.consts.fcm.platform_priority import PlatformPriority
 from backend.tasks_io.models.fcm.platform_config import PlatformConfig
-from backend.tasks_io.models.notifications import Notification
+from backend.tasks_io.models.notifications.notification import Notification
 from backend.tasks_io.models.notifications.tests.mocks.notifications.mock_notification import (
     MockNotification,
 )

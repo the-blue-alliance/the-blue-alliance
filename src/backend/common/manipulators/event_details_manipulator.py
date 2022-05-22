@@ -1,11 +1,8 @@
-import logging
-import traceback
 from typing import List
 
 from google.appengine.api import taskqueue
 
 from backend.common.cache_clearing import get_affected_queries
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.event import Event
@@ -59,7 +56,11 @@ def event_details_post_update_hook(
         )
 
         event = Event.get_by_id(event_key)
-        if event and event.within_a_day and "alliance_selections" in updated_model.updated_attrs:
+        if (
+            event
+            and event.within_a_day
+            and "alliance_selections" in updated_model.updated_attrs
+        ):
             taskqueue.add(
                 url=f"/tbans/alliance_selections/{event_key}",
                 method="GET",

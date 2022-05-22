@@ -11,7 +11,6 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.models.award import Award
 from backend.common.models.event import Event

@@ -1,5 +1,5 @@
 from backend.common.consts.notification_type import NotificationType
-from backend.tasks_io.models.notifications import Notification
+from backend.tasks_io.models.notifications.notification import Notification
 
 
 class MockNotification(Notification):

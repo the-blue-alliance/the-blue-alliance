@@ -7,7 +7,7 @@ from pyre_extensions import none_throws
 from backend.common.consts.notification_type import NotificationType
 from backend.common.models.event import Event
 from backend.common.models.match import Match
-from backend.tasks_io.models.notifications import Notification
+from backend.tasks_io.models.notifications.notification import Notification
 
 
 class EventScheduleNotification(Notification):

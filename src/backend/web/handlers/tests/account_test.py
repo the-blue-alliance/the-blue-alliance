@@ -9,7 +9,6 @@ from flask.testing import FlaskClient
 import backend
 from backend.common.consts.client_type import ClientType
 from backend.common.consts.model_type import ModelType
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.account import Account
 from backend.common.models.mobile_client import MobileClient
 from backend.web.handlers.conftest import CapturedTemplate

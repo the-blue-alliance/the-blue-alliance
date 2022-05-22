@@ -11,7 +11,6 @@ from pyre_extensions import none_throws
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.firebase_pusher import FirebasePusher
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
 from backend.common.models.match import Match
