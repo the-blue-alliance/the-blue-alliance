@@ -119,16 +119,14 @@ def team_list(page: int) -> str:
         "num_teams": num_teams,
         "page_labels": page_labels,
         "cur_page_label": cur_page_label,
-        "current_page": page,
-        "current_season": SeasonHelper.get_current_season()
+        "current_page": page
     }
     return render_template("team_list.html", template_values)
 
 
 @cached_public
 def avatar_list(year: Optional[Year] = None) -> Response:
-    if not year:
-        return redirect(url_for('avatar_list', year=SeasonHelper.get_current_season()))
+    year = year or SeasonHelper.get_current_season()
 
     valid_years = list(range(2018, SeasonHelper.get_max_year() + 1))
     valid_years.remove(2021)  # No avatars in 2021 :(
