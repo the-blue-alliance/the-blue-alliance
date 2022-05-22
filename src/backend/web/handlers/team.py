@@ -1,12 +1,15 @@
 import datetime
 from datetime import timedelta
+from typing import Optional
 
-from flask import abort, Response
+from flask import abort, Response, redirect, url_for
+from backend.common.consts.media_type import MediaType
 
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.keys import TeamNumber, Year
+from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.event_query import TeamYearEventsQuery
 from backend.common.queries.team_query import (
@@ -120,3 +123,28 @@ def team_list(page: int) -> str:
         "current_season": SeasonHelper.get_current_season()
     }
     return render_template("team_list.html", template_values)
+
+
+@cached_public
+def avatar_list(year: Optional[Year] = None) -> Response:
+    if not year:
+        return redirect(url_for('avatar_list', year=SeasonHelper.get_current_season()))
+
+    valid_years = list(range(2018, SeasonHelper.get_max_year() + 1))
+    valid_years.remove(2021)  # No avatars in 2021 :(
+
+    if year not in valid_years:
+        abort(404)
+
+    avatars_future = Media.query(Media.media_type_enum
+                                 == MediaType.AVATAR, Media.year == year).fetch_async()
+    avatars = sorted(avatars_future.get_result(),
+                     key=lambda a: int(a.references[0].id()[3:]))
+
+    template_values = {
+        "year": year,
+        "valid_years": valid_years,
+        "avatars": avatars
+    }
+
+    return render_template("avatars.html", template_values)
