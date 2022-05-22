@@ -119,7 +119,7 @@ def team_list(page: int) -> str:
         "num_teams": num_teams,
         "page_labels": page_labels,
         "cur_page_label": cur_page_label,
-        "current_page": page
+        "current_page": page,
     }
     return render_template("team_list.html", template_values)
 
