@@ -16,7 +16,7 @@ from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
 from backend.web.handlers.eventwizard import eventwizard
 from backend.web.handlers.gameday import gameday, gameday_redirect
-from backend.web.handlers.index import about, index
+from backend.web.handlers.index import about, index, avatar_list
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
 from backend.web.handlers.suggestions.suggestion_review import (
@@ -26,7 +26,6 @@ from backend.web.handlers.suggestions.suggestion_submission import (
     blueprint as suggestion_blueprint,
 )
 from backend.web.handlers.team import (
-    avatar_list,
     team_canonical,
     team_detail,
     team_history,
