@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from typing import Any, Callable, cast, Dict, Tuple, Optional
+from typing import Any, Callable, cast, Dict, Optional, Tuple
 
-from flask import Response, abort
+from flask import abort, Response
 from google.appengine.ext import ndb
 
 from backend.common.consts.landing_type import LandingType
