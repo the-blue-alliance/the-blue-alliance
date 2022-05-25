@@ -3,6 +3,7 @@ from typing import Any, Callable, cast, Dict, Optional, Tuple
 
 from flask import abort, Response
 from google.appengine.ext import ndb
+from google.appengine.api import memcache
 
 from backend.common.consts.landing_type import LandingType
 from backend.common.consts.media_type import MediaType
@@ -204,10 +205,25 @@ def avatar_list(year: Optional[Year] = None) -> Response:
     if year not in valid_years:
         abort(404)
 
-    avatars_future = Media.query(
-        Media.media_type_enum == MediaType.AVATAR, Media.year == year
-    ).fetch_async()
-    avatars = sorted(avatars_future.get_result(), key=lambda a: a.team_number)
+    avatars = []
+    shards = memcache.get_multi([f'{year}avatars_{i}' for i in range(10)])
+    if len(shards) == 10:  # If missing a shard, must refetch all
+        for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
+            avatars += shard
+
+    if not avatars:
+        avatars_future = Media.query(
+            Media.media_type_enum == MediaType.AVATAR, Media.year == year
+        ).fetch_async()
+        avatars = sorted(avatars_future.get_result(), key=lambda a: a.team_number)
+
+        shards = {}
+        size = len(avatars) / 10 + 1
+        for i in range(10):
+            start = i * size
+            end = start + size
+            shards[f'{year}avatars_{i}'] = avatars[int(start):int(end)]
+        memcache.set_multi(shards, 60 * 60 * 24)
 
     template_values = {
         "year": year,
