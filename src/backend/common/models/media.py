@@ -9,7 +9,7 @@ from backend.common.consts.media_tag import MediaTag
 from backend.common.consts.media_type import MediaType
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.event import Event
-from backend.common.models.keys import MediaKey, TeamNumber, Year
+from backend.common.models.keys import MediaKey, Year
 from backend.common.models.team import Team
 
 
@@ -281,11 +281,3 @@ class Media(CachedModel):
     def avatar_image_source(self) -> str:
         image = json.loads(self.details_json)
         return "data:image/png;base64, {}".format(image["base64Image"])
-
-    @property
-    def team_number(self) -> TeamNumber:
-        """
-        Returns the associated team number for a piece of media.
-        """
-
-        return TeamNumber(self.references[0].id()[3:])
