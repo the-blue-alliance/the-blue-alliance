@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 from typing import Any, Callable, cast, Dict, Optional, Tuple
 
 from flask import abort, Response
-from google.appengine.ext import ndb
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 
 from backend.common.consts.landing_type import LandingType
 from backend.common.consts.media_type import MediaType
@@ -206,7 +206,7 @@ def avatar_list(year: Optional[Year] = None) -> Response:
         abort(404)
 
     avatars = []
-    shards = memcache.get_multi([f'{year}avatars_{i}' for i in range(10)])
+    shards = memcache.get_multi([f"{year}avatars_{i}" for i in range(10)])
     if len(shards) == 10:  # If missing a shard, must refetch all
         for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
             avatars += shard
@@ -222,7 +222,7 @@ def avatar_list(year: Optional[Year] = None) -> Response:
         for i in range(10):
             start = i * size
             end = start + size
-            shards[f'{year}avatars_{i}'] = avatars[int(start):int(end)]
+            shards[f"{year}avatars_{i}"] = avatars[int(start) : int(end)]
         memcache.set_multi(shards, 60 * 60 * 24)
 
     template_values = {
