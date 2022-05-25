@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from typing import Any, Callable, cast, Dict, Optional, Tuple
 
 from flask import abort, Response
-from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 from backend.common.consts.landing_type import LandingType
@@ -13,6 +12,7 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
+from backend.common.memcache import MemcacheClient
 from backend.common.models.insight import Insight
 from backend.common.models.keys import Year
 from backend.common.models.media import Media
@@ -205,8 +205,12 @@ def avatar_list(year: Optional[Year] = None) -> Response:
     if year not in valid_years:
         abort(404)
 
+    memcache = MemcacheClient.get()
+
     avatars = []
-    shards = memcache.get_multi([f"{year}avatars_{i}" for i in range(10)])
+    shards = memcache.get_multi(
+        [f"{year}avatars_{i}".encode("utf-8") for i in range(10)]
+    )
     if len(shards) == 10:  # If missing a shard, must refetch all
         for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
             avatars += shard
