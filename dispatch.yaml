@@ -9,6 +9,9 @@ dispatch:
 - url: "www.thebluealliance.com/apidocs*"
   service: py3-web
 
+- url: "www.thebluealliance.com/avatars*"
+  service: py3-web
+
 - url: "www.thebluealliance.com/event*"
   service: py3-web
     
@@ -49,10 +52,6 @@ dispatch:
 # Python 3 Migration
 - url: "py3.thebluealliance.com/api/*"
   service: py3-api
-
-# API docs
-- url: "*/apidocs/v3"
-  service: py3-web
 
 # API docs (swagger)
 - url: "*/swagger/api_v3.json"
