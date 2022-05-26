@@ -18,7 +18,7 @@ from controllers.event_controller import EventList, EventDetail, EventRss, \
 from controllers.event_wizard_controller import EventWizardHandler, ReactEventWizardHandler
 from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
-from controllers.main_controller import AvatarsHandler, TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
+from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, FIRSTHOFHandler, \
     OprHandler, PredictionsHandler, PrivacyHandler, SearchHandler, \
     ThanksHandler, handle_404, handle_500, \
     WebcastsHandler, ApiWriteHandler, BrandHandler
@@ -76,7 +76,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/add-data', AddDataHandler, 'add-data', strict_slash=True),
       RedirectRoute(r'/advanced_team_search', AdvancedSearchController, 'advanced_team_search', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
-      RedirectRoute(r'/avatars/<year:[0-9]+>', AvatarsHandler, 'avatars', strict_slash=True),
       RedirectRoute(r'/bigquery', redirect_to='https://console.cloud.google.com/bigquery?project=tbatv-prod-hrd&p=tbatv-prod-hrd&d=the_blue_alliance&page=dataset'),
       RedirectRoute(r'/brand', BrandHandler, 'brand', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
