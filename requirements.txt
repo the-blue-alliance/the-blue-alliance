@@ -6,3 +6,4 @@ Paver==1.2.4
 pep8==1.7.0
 pyyaml
 grpcio==1.0.0
+protobuf==3.17.3
