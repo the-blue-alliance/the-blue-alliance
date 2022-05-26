@@ -1,17 +1,21 @@
 from datetime import datetime, timedelta
-from typing import Any, Callable, cast, Dict, Tuple
+from typing import Any, Callable, cast, Dict, Optional, Tuple
 
-from flask import Response
+from flask import abort, Response
 from google.appengine.ext import ndb
 
 from backend.common.consts.landing_type import LandingType
+from backend.common.consts.media_type import MediaType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
+from backend.common.memcache import MemcacheClient
 from backend.common.models.insight import Insight
+from backend.common.models.keys import Year
+from backend.common.models.media import Media
 from backend.common.sitevars.landing_config import LandingConfig
 from backend.web.profiled_render import render_template
 
@@ -189,3 +193,48 @@ def index_insights(template_values: Dict[str, Any]) -> str:
 @cached_public
 def about() -> str:
     return render_template("about.html")
+
+
+@cached_public
+def avatar_list(year: Optional[Year] = None) -> Response:
+    year = year or SeasonHelper.get_current_season()
+
+    valid_years = list(range(2018, SeasonHelper.get_max_year() + 1))
+    valid_years.remove(2021)  # No avatars in 2021 :(
+
+    if year not in valid_years:
+        abort(404)
+
+    memcache = MemcacheClient.get()
+
+    avatars = []
+    shards = memcache.get_multi(
+        [f"{year}avatars_{i}".encode("utf-8") for i in range(10)]
+    )
+    if len(shards) == 10:  # If missing a shard, must refetch all
+        for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
+            avatars += shard
+
+    if not avatars:
+        avatars_future = Media.query(
+            Media.media_type_enum == MediaType.AVATAR, Media.year == year
+        ).fetch_async()
+        avatars = sorted(
+            avatars_future.get_result(), key=lambda a: a.references[0].id()[3:]
+        )
+
+        shards = {}
+        size = len(avatars) / 10 + 1
+        for i in range(10):
+            start = i * size
+            end = start + size
+            shards[f"{year}avatars_{i}"] = avatars[int(start) : int(end)]
+        memcache.set_multi(shards, 60 * 60 * 24)
+
+    template_values = {
+        "year": year,
+        "valid_years": valid_years,
+        "avatars": avatars,
+    }
+
+    return render_template("avatars.html", template_values)

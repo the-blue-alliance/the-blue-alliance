@@ -16,7 +16,7 @@ from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
 from backend.web.handlers.eventwizard import eventwizard
 from backend.web.handlers.gameday import gameday, gameday_redirect
-from backend.web.handlers.index import about, index
+from backend.web.handlers.index import about, avatar_list, index
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
 from backend.web.handlers.suggestions.suggestion_review import (
@@ -76,6 +76,9 @@ app.add_url_rule("/team/<int:team_number>/<int:year>", view_func=team_detail)
 app.add_url_rule("/team/<int:team_number>/history", view_func=team_history)
 app.add_url_rule("/teams/<int:page>", view_func=team_list)
 app.add_url_rule("/teams", view_func=team_list, defaults={"page": 1})
+
+app.add_url_rule("/avatars", view_func=avatar_list)
+app.add_url_rule("/avatars/<int:year>", view_func=avatar_list)
 
 app.add_url_rule("/insights", view_func=insights_overview)
 app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
