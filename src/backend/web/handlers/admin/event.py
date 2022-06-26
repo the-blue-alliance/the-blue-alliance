@@ -215,7 +215,7 @@ def event_edit(event_key: EventKey) -> Response:
             parent_event=parent_key,
             divisions=division_keys,
         )
-        event = EventManipulator.createOrUpdate(event, auto_union=True)
+        event = EventManipulator.createOrUpdate(event, auto_union=False)
 
         alliance_selections_json = request.form.get("alliance_selections_json")
         rankings_json = request.form.get("rankings_json")
