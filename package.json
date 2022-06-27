@@ -43,7 +43,7 @@
     "css-loader": "^6.7.1",
     "eslint": "^8.18.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^4.1.0",
     "eslint-plugin-react": "^7.30.1",
     "jest-cli": "^28.1.1",
     "jest-puppeteer": "^6.1.0",
