@@ -576,19 +576,19 @@ class TBANSHelper:
                         )
                     )
 
-            if retry_clients:
-                # Try again, with exponential backoff
-                deferred.defer(
-                    cls._send_fcm,
-                    retry_clients,
-                    notification,
-                    legacy_data_format,
-                    backoff_iteration + 1,
-                    _countdown=backoff_time,
-                    _target="py3-tasks-io",
-                    _queue="push-notifications",
-                    _url="/_ah/queue/deferred_notification_send",
-                )
+            # if retry_clients:
+            #     # Try again, with exponential backoff
+            #     deferred.defer(
+            #         cls._send_fcm,
+            #         retry_clients,
+            #         notification,
+            #         legacy_data_format,
+            #         backoff_iteration + 1,
+            #         _countdown=backoff_time,
+            #         _target="py3-tasks-io",
+            #         _queue="push-notifications",
+            #         _url="/_ah/queue/deferred_notification_send",
+            #     )
 
         return 0
 
