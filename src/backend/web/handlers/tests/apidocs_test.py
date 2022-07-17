@@ -158,7 +158,7 @@ def test_apidocs_webhooks_notification_event(
             f"/apidocs/webhooks/test/{type.value}", data={"event_key": "2019nyny"}
         )
     assert response.status_code == 200
-    mock_tbans_call.assert_called_once_with(apidocs_event, user_id=login_user.uid)
+    mock_tbans_call.assert_called_once_with(apidocs_event, user_id=str(login_user.uid))
 
 
 @pytest.mark.parametrize("type", match_notification_types)
@@ -194,4 +194,4 @@ def test_apidocs_webhooks_notification_match(
             f"/apidocs/webhooks/test/{type.value}", data={"match_key": "2019nyny_qm1"}
         )
     assert response.status_code == 200
-    mock_tbans_call.assert_called_once_with(apidocs_match, user_id=login_user.uid)
+    mock_tbans_call.assert_called_once_with(apidocs_match, user_id=str(login_user.uid))

@@ -65,7 +65,7 @@ def apidocs_webhooks_notification(type: int) -> Response:
     # district_key = request.form.get("district_key")
 
     user = none_throws(current_user())
-    user_id = user.uid
+    user_id = str(user.uid)
 
     success_response = make_response("ok", 200)
     error_response = make_response("", 400)
