@@ -29,12 +29,12 @@ class WebhookRequest(Request):
         self.url = url
         self.secret = secret
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "WebhookRequest(notification={} url={})".format(
             str(self.notification), self.url
         )
 
-    def send(self):
+    def send(self) -> bool:
         """Attempt to send the notification."""
         # Build the request
         headers = {
@@ -62,7 +62,7 @@ class WebhookRequest(Request):
 
         return valid_url
 
-    def _json_string(self):
+    def _json_string(self) -> str:
         """JSON dict representation of an WebhookRequest object.
 
         JSON for WebhookRequest will look like...
