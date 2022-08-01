@@ -3,9 +3,9 @@
   "info": {
     "title": "The Blue Alliance API v3",
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.8.0",
+    "version": "3.8.2",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "servers": [
     {
@@ -48,7 +48,7 @@
         "operationId": "getStatus",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           }
         ],
         "responses": {
@@ -61,8 +61,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -100,7 +100,7 @@
         "operationId": "getTeams",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/page_num"
@@ -116,8 +116,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -158,7 +158,7 @@
         "operationId": "getTeamsSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/page_num"
@@ -174,8 +174,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -217,7 +217,7 @@
         "operationId": "getTeamsKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/page_num"
@@ -233,8 +233,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -275,7 +275,7 @@
         "operationId": "getTeamsByYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/year"
@@ -294,8 +294,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -336,7 +336,7 @@
         "operationId": "getTeamsByYearSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/year"
@@ -355,8 +355,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -397,7 +397,7 @@
         "operationId": "getTeamsByYearKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/year"
@@ -416,8 +416,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -458,7 +458,7 @@
         "operationId": "getTeam",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -474,8 +474,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -512,7 +512,7 @@
         "operationId": "getTeamSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -528,8 +528,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -566,7 +566,7 @@
         "operationId": "getTeamYearsParticipated",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -582,8 +582,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -624,7 +624,7 @@
         "operationId": "getTeamDistricts",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -640,8 +640,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -681,7 +681,7 @@
         "operationId": "getTeamRobots",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -697,8 +697,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -739,7 +739,7 @@
         "operationId": "getTeamEvents",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -755,8 +755,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -797,7 +797,7 @@
         "operationId": "getTeamEventsSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -813,8 +813,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -855,7 +855,7 @@
         "operationId": "getTeamEventsKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -871,8 +871,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -914,7 +914,7 @@
         "operationId": "getTeamEventsByYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -933,8 +933,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -975,7 +975,7 @@
         "operationId": "getTeamEventsByYearSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -994,8 +994,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1036,7 +1036,7 @@
         "operationId": "getTeamEventsByYearKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1055,8 +1055,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1099,7 +1099,7 @@
         "operationId": "getTeamEventsStatusesByYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1118,8 +1118,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1162,7 +1162,7 @@
         "operationId": "getTeamEventMatches",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1181,8 +1181,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1224,7 +1224,7 @@
         "operationId": "getTeamEventMatchesSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1243,8 +1243,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1286,7 +1286,7 @@
         "operationId": "getTeamEventMatchesKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1305,8 +1305,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1348,7 +1348,7 @@
         "operationId": "getTeamEventAwards",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1367,8 +1367,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1409,7 +1409,7 @@
         "operationId": "getTeamEventStatus",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1428,8 +1428,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1466,7 +1466,7 @@
         "operationId": "getTeamAwards",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1482,8 +1482,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1523,7 +1523,7 @@
         "operationId": "getTeamAwardsByYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1542,8 +1542,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1584,7 +1584,7 @@
         "operationId": "getTeamMatchesByYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1603,8 +1603,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1645,7 +1645,7 @@
         "operationId": "getTeamMatchesByYearSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1664,8 +1664,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1706,7 +1706,7 @@
         "operationId": "getTeamMatchesByYearKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1725,8 +1725,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1767,7 +1767,7 @@
         "operationId": "getTeamMediaByYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1786,8 +1786,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1827,7 +1827,7 @@
         "operationId": "getTeamMediaByTag",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1846,8 +1846,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1888,7 +1888,7 @@
         "operationId": "getTeamMediaByTagYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1910,8 +1910,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -1952,7 +1952,7 @@
         "operationId": "getTeamSocialMedia",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/team_key"
@@ -1968,8 +1968,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2011,7 +2011,7 @@
         "operationId": "getEventsByYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/year"
@@ -2027,8 +2027,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2070,7 +2070,7 @@
         "operationId": "getEventsByYearSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/year"
@@ -2086,8 +2086,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2129,7 +2129,7 @@
         "operationId": "getEventsByYearKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/year"
@@ -2145,8 +2145,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2188,7 +2188,7 @@
         "operationId": "getEvent",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2204,8 +2204,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2243,7 +2243,7 @@
         "operationId": "getEventSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2259,8 +2259,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2298,7 +2298,7 @@
         "operationId": "getEventAlliances",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2314,8 +2314,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2356,7 +2356,7 @@
         "operationId": "getEventInsights",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2372,8 +2372,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2411,7 +2411,7 @@
         "operationId": "getEventOPRs",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2427,8 +2427,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2466,7 +2466,7 @@
         "operationId": "getEventPredictions",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2482,8 +2482,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2521,7 +2521,7 @@
         "operationId": "getEventRankings",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2537,8 +2537,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2577,7 +2577,7 @@
         "operationId": "getEventDistrictPoints",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2593,8 +2593,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2634,7 +2634,7 @@
         "operationId": "getEventTeams",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2650,8 +2650,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2694,7 +2694,7 @@
         "operationId": "getEventTeamsSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2710,8 +2710,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2754,7 +2754,7 @@
         "operationId": "getEventTeamsKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2770,8 +2770,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2815,7 +2815,7 @@
         "operationId": "getEventTeamsStatuses",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2831,8 +2831,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2875,7 +2875,7 @@
         "operationId": "getEventMatches",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2891,8 +2891,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2934,7 +2934,7 @@
         "operationId": "getEventMatchesSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -2950,8 +2950,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -2993,7 +2993,7 @@
         "operationId": "getEventMatchesKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -3009,8 +3009,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3053,7 +3053,7 @@
         "operationId": "getEventMatchTimeseries",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -3069,8 +3069,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3112,7 +3112,7 @@
         "operationId": "getEventAwards",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/event_key"
@@ -3128,8 +3128,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3170,7 +3170,7 @@
         "operationId": "getMatch",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/match_key"
@@ -3186,8 +3186,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3225,7 +3225,7 @@
         "operationId": "getMatchSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/match_key"
@@ -3241,8 +3241,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3280,7 +3280,7 @@
         "operationId": "getMatchTimeseries",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/match_key"
@@ -3296,8 +3296,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3339,7 +3339,7 @@
         "operationId": "getMatchZebra",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/match_key"
@@ -3355,8 +3355,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3394,7 +3394,7 @@
         "operationId": "getDistrictsByYear",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/year"
@@ -3410,8 +3410,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3454,7 +3454,7 @@
         "operationId": "getDistrictEvents",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/district_key"
@@ -3470,8 +3470,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3514,7 +3514,7 @@
         "operationId": "getDistrictEventsSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "name": "district_key",
@@ -3536,8 +3536,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3580,7 +3580,7 @@
         "operationId": "getDistrictEventsKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/district_key"
@@ -3596,8 +3596,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3641,7 +3641,7 @@
         "operationId": "getDistrictTeams",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/district_key"
@@ -3657,8 +3657,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3701,7 +3701,7 @@
         "operationId": "getDistrictTeamsSimple",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/district_key"
@@ -3717,8 +3717,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3761,7 +3761,7 @@
         "operationId": "getDistrictTeamsKeys",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/district_key"
@@ -3777,8 +3777,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -3822,7 +3822,7 @@
         "operationId": "getDistrictRankings",
         "parameters": [
           {
-            "$ref": "#/components/parameters/If-Modified-Since"
+            "$ref": "#/components/parameters/If-None-Match"
           },
           {
             "$ref": "#/components/parameters/district_key"
@@ -3838,8 +3838,8 @@
                   "type": "string"
                 }
               },
-              "Last-Modified": {
-                "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header.",
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
                 "schema": {
                   "type": "string"
                 }
@@ -7115,10 +7115,10 @@
           "type": "string"
         }
       },
-      "If-Modified-Since": {
-        "name": "If-Modified-Since",
+      "If-None-Match": {
+        "name": "If-None-Match",
         "in": "header",
-        "description": "Value of the `Last-Modified` header in the most recently cached response by the client.",
+        "description": "Value of the `ETag` header in the most recently cached response by the client.",
         "schema": {
           "type": "string"
         }
