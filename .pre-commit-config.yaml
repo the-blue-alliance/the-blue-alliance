@@ -2,6 +2,12 @@ repos:
 - repo: local
   hooks:
     # These run on the default stages (pre-commit)
+    - id: py3-deps
+      name: "[py3] venv Dependencies"
+      always_run: true
+      language: script
+      entry: ./ops/check_venv_deps.sh
+      stages: [commit]
     - id: py3-type
       name: "[py3] Type Checking"
       types: [file, python]
