@@ -20,6 +20,7 @@ from backend.web.handlers.gameday import gameday, gameday_redirect
 from backend.web.handlers.index import about, avatar_list, index
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
+from backend.web.handlers.opr import opr
 from backend.web.handlers.suggestions.suggestion_review import (
     blueprint as suggestion_review_blueprint,
 )
@@ -83,6 +84,8 @@ app.add_url_rule("/avatars/<int:year>", view_func=avatar_list)
 
 app.add_url_rule("/insights", view_func=insights_overview)
 app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
+
+app.add_url_rule("/opr", view_func=opr)
 
 app.add_url_rule("/bigquery", view_func=bigquery)
 
