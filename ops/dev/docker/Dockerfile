@@ -15,13 +15,13 @@ RUN apt-get update && apt-get install -y \
     vim \
     openssh-server
 
-# Needed for Python 3.9
+# Needed for Python 3.10
 RUN apt-get install software-properties-common -y
 RUN add-apt-repository ppa:deadsnakes/ppa -y
 RUN apt-get update
 
 # Setup python environment
-ENV PYTHON_VERSION python3.9
+ENV PYTHON_VERSION python3.10
 RUN apt-get install -y \
     "$PYTHON_VERSION" \
     "$PYTHON_VERSION-venv" \

@@ -87,12 +87,16 @@ else
     assert_google_application_credentials
 fi
 
+# The CLI doesn't recognize python310 as a valid runtime yet
+# but it'll still happy run things using the underlying 3.10 binary
+runtime_version="python39"
+
 set -x
 dev_appserver.py \
     --runtime_python_path=/usr/bin/python3 \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \
-    --runtime="python39" \
+    --runtime="$runtime_version" \
     --application="$application" \
     "${env[@]}" \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
