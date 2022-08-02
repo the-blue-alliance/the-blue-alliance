@@ -260,10 +260,10 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
+      - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.8'
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0
         with:
@@ -282,10 +282,10 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
+      - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.8'
       - name: Download production artifacts
         uses: actions/download-artifact@v3
         with:
@@ -309,10 +309,10 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
+      - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.8'
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0
         with:
@@ -331,10 +331,10 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
+      - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.8'
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0
         with:
