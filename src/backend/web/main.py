@@ -27,6 +27,7 @@ from backend.web.handlers.suggestions.suggestion_review import (
 from backend.web.handlers.suggestions.suggestion_submission import (
     blueprint as suggestion_blueprint,
 )
+from backend.web.handlers.swag import swag
 from backend.web.handlers.team import (
     team_canonical,
     team_detail,
@@ -88,6 +89,8 @@ app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
 app.add_url_rule("/opr", view_func=opr)
 
 app.add_url_rule("/bigquery", view_func=bigquery)
+
+app.add_url_rule("/swag", view_func=swag)
 
 app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
