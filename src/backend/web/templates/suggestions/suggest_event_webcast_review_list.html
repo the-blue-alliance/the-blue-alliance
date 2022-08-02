@@ -12,6 +12,7 @@
     <h1>{{ suggestion_sets|length }} Pending Webcast Suggestions</h1>
 
     <form action="/suggest/event/webcast/review" method="post" id="review_webcasts">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="col-xs-12">
 
             {% if success == "accept" %}
@@ -49,6 +50,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <form action="/suggest/event/webcast/review" method="post" id="reject_all_{{ suggestion_set.event.key_name }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <input type="hidden" name="suggestion_keys" value="{% for suggestion in suggestion_set.suggestions %}{{suggestion.key.id()}}{% if not loop.last %},{% endif %}{% endfor %}" />
                             <input type="hidden" name="event_key" value="{{suggestion_set.event.key_name}}" />
                             <button type="submit" class="btn btn-xs btn-danger pull-right" name="verdict" value="reject_all"><span class="glyphicon glyphicon-thumbs-down"></span> Reject All</button>
@@ -72,6 +74,7 @@
                                     <div class="col-xs-6">
                                         <p><strong><a href="{{suggestion.contents.webcast_url}}" target="_blank" rel="noopener noreferrer">{{suggestion.contents.webcast_url}}</a></strong></p>
                                         <form action="/suggest/event/webcast/review" method="post" id="review_{{ suggestion.key.id() }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                             {% if suggestion.webcast_template %}
                                                 {% set webcast = suggestion.contents['webcast_dict'] %}
                                                 <div style="height:300px;">

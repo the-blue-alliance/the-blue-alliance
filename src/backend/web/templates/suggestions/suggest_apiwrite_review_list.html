@@ -55,6 +55,7 @@
             <p><strong>User's role:</strong> {{ suggestion.contents.affiliation }}</p>
 
             <form action="/suggest/apiwrite/review" method="post" id="apiwrite_review_{{ suggestion_id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <h4>Requested Auth Types</h4>
                 <ul>
                 {% for type,name in auth_names.items() %}
