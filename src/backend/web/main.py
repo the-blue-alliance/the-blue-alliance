@@ -9,6 +9,7 @@ from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import render_time_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
+from backend.web.handlers.add_data import add_data
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.bigquery import bigquery
@@ -87,6 +88,8 @@ app.add_url_rule("/avatars/<int:year>", view_func=avatar_list)
 
 app.add_url_rule("/insights", view_func=insights_overview)
 app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
+
+app.add_url_rule("/add-data", view_func=add_data)
 
 app.add_url_rule("/opr", view_func=opr)
 
