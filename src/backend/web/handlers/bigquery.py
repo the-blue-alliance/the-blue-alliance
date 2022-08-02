@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from flask import redirect, Response
-
+from flask import redirect
+from werkzeug.wrappers.response import Response
 from backend.common.decorators import cached_public
 
 
