@@ -1,10 +1,10 @@
 from datetime import timedelta
 
-from flask import redirect
+from flask import redirect, Response
 
 from backend.common.decorators import cached_public
 
 
 @cached_public(ttl=timedelta(seconds=61))
-def bigquery() -> str:
+def bigquery() -> Response:
     return redirect("https://console.cloud.google.com/bigquery?project=tbatv-prod-hrd&p=tbatv-prod-hrd&d=the_blue_alliance&page=dataset")
