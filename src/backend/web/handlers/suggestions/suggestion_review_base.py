@@ -31,6 +31,7 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
         super(SuggestionsReviewBase, self).__init__(*args, **kw)
         # TODO port over TeamAdminAccess
         self.existing_access = []
+        self.user = current_user()
         if not self.ALLOW_TEAM_ADMIN_ACCESS:
             # For suggestion types that are enabled for delegated mod tools
             # they'll make their own call where they know the team id
@@ -39,14 +40,17 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
 
     def verify_write_permissions(self, suggestion: Suggestion) -> None:
         # Allow users who have the global permissions
-        user = current_user()
-        if not user:
+        if not self.user:
             raise HTTPException(
                 response=redirect(url_for("account.login", next=request.url))
             )
+
+        if self.user.is_admin:
+            return
+
         if all(
             [
-                p in (none_throws(user).permissions or [])
+                p in (none_throws(self.user).permissions or [])
                 for p in self.REQUIRED_PERMISSIONS
             ]
         ):
@@ -65,12 +69,16 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
         abort(401)
 
     def verify_permissions(self) -> None:
-        user = current_user()
-        if not user:
+        if not self.user:
             raise HTTPException(
                 response=redirect(url_for("account.login", next=request.url))
             )
-        user_permissions: List[AccountPermission] = none_throws(user).permissions or []
+        if self.user.is_admin:
+            return
+
+        user_permissions: List[AccountPermission] = (
+            none_throws(self.user).permissions or []
+        )
         for permission in self.REQUIRED_PERMISSIONS:
             if permission not in user_permissions:
                 abort(401)
@@ -114,12 +122,11 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             return None
 
         # Do all DB writes
-        user = none_throws(current_user())
         ret = self.create_target_model(suggestion)
         if self.was_create_success(ret):
             # Mark Suggestion as accepted
             suggestion.review_state = SuggestionState.REVIEW_ACCEPTED
-            suggestion.reviewer = user.account_key
+            suggestion.reviewer = self.user.account_key
             suggestion.reviewed_at = datetime.datetime.now()
             suggestion.put()
         return ret
@@ -142,9 +149,8 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
 
     @ndb.transactional(xg=True)
     def _reject_suggestion(self, suggestion: Suggestion) -> None:
-        user = none_throws(current_user())
         if suggestion.review_state == SuggestionState.REVIEW_PENDING:
             suggestion.review_state = SuggestionState.REVIEW_REJECTED
-            suggestion.reviewer = user.account_key
+            suggestion.reviewer = self.user.account_key
             suggestion.reviewed_at = datetime.datetime.now()
             suggestion.put()

@@ -65,7 +65,7 @@ def require_permission(
             user = current_user()
             if not user:
                 return redirect(url_for("account.login", next=request.url))
-            if permission not in user.permissions:
+            if not user.is_admin and permission not in user.permissions:
                 return abort(401)
             return f(*args, **kwargs)
 
@@ -83,7 +83,9 @@ def require_any_permission(
             user = current_user()
             if not user:
                 return redirect(url_for("account.login", next=request.url))
-            if not permissions.intersection(user.permissions or {}):
+            if not user.is_admin and not permissions.intersection(
+                user.permissions or {}
+            ):
                 return abort(401)
             return f(*args, **kwargs)
 

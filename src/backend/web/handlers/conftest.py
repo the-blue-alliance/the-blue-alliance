@@ -40,6 +40,7 @@ def login_user(ndb_stub, monkeypatch: MonkeyPatch):
 
     mock_user = Mock(spec=User)
     mock_user.is_registered = True
+    mock_user.is_admin = False
     mock_user.api_read_keys = []
     mock_user.api_write_keys = []
     mock_user.mobile_clients = []
@@ -51,6 +52,12 @@ def login_user(ndb_stub, monkeypatch: MonkeyPatch):
 
     monkeypatch.setattr(auth, "_current_user", mock_current_user)
     return mock_user
+
+
+@pytest.fixture
+def login_admin(login_user):
+    login_user.is_admin = True
+    return login_user
 
 
 CapturedTemplate = Tuple[Template, Dict[str, Any]]  # (template, context)

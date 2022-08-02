@@ -1,5 +1,5 @@
 <ul class="nav nav-pills nav-stacked" id="suggestion-review-list">
-    {% if media_permission in user.permissions %}
+    {% if user.is_admin or media_permission in user.permissions %}
     <li{% if suggestions.match %} class="active"{% endif %} id="match-video-suggestions">
         <a href="/suggest/match/video/review">
             <span class="badge pull-right">{{suggestions.match}}</span>
@@ -27,7 +27,7 @@
     </li>
     {% endif %}
 
-    {% if event_media_permission in user.permissions %}
+    {% if user.is_admin or event_media_permission in user.permissions %}
     <li{% if suggestions.event_media %} class="active"{% endif %} id="event-media-suggestions">
         <a href="/suggest/event/media/review">
             <span class="badge pull-right">{{suggestions.event_media}}</span>
@@ -36,7 +36,7 @@
     </li>
     {% endif %}
 
-    {% if cad_permission in user.permissions %}
+    {% if user.is_admin or cad_permission in user.permissions %}
     <li{% if suggestions.cad %} class="active"{% endif %} id="team-cad-suggestions">
         <a href="/suggest/cad/review">
             <span class="badge pull-right">{{suggestions.cad}}</span>
@@ -45,7 +45,7 @@
     </li>
     {% endif %}
 
-    {% if offseason_permission in user.permissions %}
+    {% if user.is_admin or offseason_permission in user.permissions %}
     <li{% if suggestions.offseason %} class="active"{% endif %} id="offseason-event-suggestions">
         <a href="/suggest/offseason/review">
             <span class="badge pull-right">{{suggestions.offseason}}</span>
@@ -54,7 +54,7 @@
     </li>
     {% endif %}
 
-    {% if apiwrite_permission in user.permissions %}
+    {% if user.is_admin or apiwrite_permission in user.permissions %}
     <li{% if suggestions.apiwrite %} class="active"{% endif %} id="apiwrite-suggestions">
         <a href="/suggest/apiwrite/review">
             <span class="badge pull-right">{{suggestions.apiwrite}}</span>

@@ -9,6 +9,19 @@ from backend.common.consts.account_permission import (
     SUGGESTION_PERMISSIONS,
 )
 
+PERMISSION_TO_SUGGESTION_ITEMS = {
+    AccountPermission.REVIEW_MEDIA: [
+        "match-video-suggestions",
+        "event-webcast-suggestions",
+        "team-media-suggestions",
+        "team-social-media-suggestions",
+    ],
+    AccountPermission.REVIEW_EVENT_MEDIA: ["event-media-suggestions"],
+    AccountPermission.REVIEW_DESIGNS: ["team-cad-suggestions"],
+    AccountPermission.REVIEW_OFFSEASON_EVENTS: ["offseason-event-suggestions"],
+    AccountPermission.REVIEW_APIWRITE: ["apiwrite-suggestions"],
+}
+
 
 @pytest.fixture(params=SUGGESTION_PERMISSIONS)
 def suggestion_permissions(request):
@@ -39,24 +52,30 @@ def test_shows_review_for_permissions(
     response = web_client.get("/suggest/review")
     assert response.status_code == 200
 
-    permission_to_suggestion_item = {
-        AccountPermission.REVIEW_MEDIA: [
-            "match-video-suggestions",
-            "event-webcast-suggestions",
-            "team-media-suggestions",
-            "team-social-media-suggestions",
-        ],
-        AccountPermission.REVIEW_EVENT_MEDIA: ["event-media-suggestions"],
-        AccountPermission.REVIEW_DESIGNS: ["team-cad-suggestions"],
-        AccountPermission.REVIEW_OFFSEASON_EVENTS: ["offseason-event-suggestions"],
-        AccountPermission.REVIEW_APIWRITE: ["apiwrite-suggestions"],
-    }
+    soup = BeautifulSoup(response.data, "html.parser")
+    review_list = soup.find("ul", id="suggestion-review-list")
+    assert review_list is not None
+
+    expected_review_items = PERMISSION_TO_SUGGESTION_ITEMS[suggestion_permissions]
+    review_items = review_list.find_all("li")
+    assert review_items is not None
+    assert set([i["id"] for i in review_items]) == set(expected_review_items)
+
+
+def test_shows_all_reviews_for_admin(
+    login_admin, suggestion_permissions, web_client: Client
+) -> None:
+    response = web_client.get("/suggest/review")
+    assert response.status_code == 200
 
     soup = BeautifulSoup(response.data, "html.parser")
     review_list = soup.find("ul", id="suggestion-review-list")
     assert review_list is not None
 
-    expected_review_items = permission_to_suggestion_item[suggestion_permissions]
+    expected_review_items = PERMISSION_TO_SUGGESTION_ITEMS[suggestion_permissions]
     review_items = review_list.find_all("li")
     assert review_items is not None
-    assert set([i["id"] for i in review_items]) == set(expected_review_items)
+    assert (
+        set(expected_review_items).issubset(set([i["id"] for i in review_items]))
+        is True
+    )
