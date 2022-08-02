@@ -12,9 +12,7 @@ REQUIREMENTS_FILES = [
 def test_requirements():
     missing_requirements = []
     for requirement_file in REQUIREMENTS_FILES:
-        requirements = pkg_resources.parse_requirements(
-            requirement_file.read_text()
-        )
+        requirements = pkg_resources.parse_requirements(requirement_file.read_text())
         for requirement in requirements:
             requirement = str(requirement)
             try:
