@@ -9,11 +9,8 @@ from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import render_time_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
-from backend.web.handlers.add_data import add_data
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
-from backend.web.handlers.bigquery import bigquery
-from backend.web.handlers.contact import contact
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
@@ -22,16 +19,21 @@ from backend.web.handlers.gameday import gameday, gameday_redirect
 from backend.web.handlers.index import about, avatar_list, index
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
-from backend.web.handlers.opr import opr
-from backend.web.handlers.privacy import privacy
-from backend.web.handlers.static import brand
+from backend.web.handlers.static import (
+    add_data,
+    bigquery,
+    brand,
+    contact,
+    opr,
+    privacy,
+    swag,
+)
 from backend.web.handlers.suggestions.suggestion_review import (
     blueprint as suggestion_review_blueprint,
 )
 from backend.web.handlers.suggestions.suggestion_submission import (
     blueprint as suggestion_blueprint,
 )
-from backend.web.handlers.swag import swag
 from backend.web.handlers.team import (
     team_canonical,
     team_detail,
@@ -90,18 +92,15 @@ app.add_url_rule("/avatars/<int:year>", view_func=avatar_list)
 app.add_url_rule("/insights", view_func=insights_overview)
 app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
 
+# Static pages
 app.add_url_rule("/add-data", view_func=add_data)
-
 app.add_url_rule("/brand", view_func=brand)
-
-app.add_url_rule("/opr", view_func=opr)
-
 app.add_url_rule("/contact", view_func=contact)
-
+app.add_url_rule("/opr", view_func=opr)
 app.add_url_rule("/privacy", view_func=privacy)
 
+# Off-site redirects
 app.add_url_rule("/bigquery", view_func=bigquery)
-
 app.add_url_rule("/swag", view_func=swag)
 
 app.register_blueprint(apidocs_blueprint)
