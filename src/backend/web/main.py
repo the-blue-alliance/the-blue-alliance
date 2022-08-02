@@ -12,6 +12,7 @@ from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.bigquery import bigquery
+from backend.web.handlers.contact import contact
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
@@ -87,6 +88,8 @@ app.add_url_rule("/insights", view_func=insights_overview)
 app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
 
 app.add_url_rule("/opr", view_func=opr)
+
+app.add_url_rule("/contact", view_func=contact)
 
 app.add_url_rule("/bigquery", view_func=bigquery)
 
