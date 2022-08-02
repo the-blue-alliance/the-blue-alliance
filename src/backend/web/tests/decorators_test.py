@@ -212,6 +212,26 @@ def test_require_permission(ndb_stub) -> None:
     func.assert_called_with(None, request)
 
 
+def test_require_permission_admin(ndb_stub) -> None:
+    from backend.web.main import app
+
+    a = Account(
+        email="zach@thebluealliance.com",
+        permissions=[],
+    )
+    a.put()
+
+    func = Mock()
+    with patch.object(
+        backend_auth,
+        "_decoded_claims",
+        return_value={"email": "zach@thebluealliance.com", "admin": True},
+    ), app.test_request_context("/"):
+        decorated_func = require_permission(AccountPermission.REVIEW_MEDIA)(func)
+        decorated_func(None, request)
+    func.assert_called_with(None, request)
+
+
 def test_require_any_permission_false(ndb_stub) -> None:
     from backend.web.main import app
 
@@ -269,6 +289,28 @@ def test_require_any_permission(ndb_stub) -> None:
         backend_auth,
         "_decoded_claims",
         return_value={"email": "zach@thebluealliance.com"},
+    ), app.test_request_context("/"):
+        decorated_func = require_any_permission(
+            {AccountPermission.REVIEW_MEDIA, AccountPermission.REVIEW_EVENT_MEDIA}
+        )(func)
+        decorated_func(None, request)
+    func.assert_called_with(None, request)
+
+
+def test_require_any_permission_admin(ndb_stub) -> None:
+    from backend.web.main import app
+
+    a = Account(
+        email="zach@thebluealliance.com",
+        permissions=[],
+    )
+    a.put()
+
+    func = Mock()
+    with patch.object(
+        backend_auth,
+        "_decoded_claims",
+        return_value={"email": "zach@thebluealliance.com", "admin": True},
     ), app.test_request_context("/"):
         decorated_func = require_any_permission(
             {AccountPermission.REVIEW_MEDIA, AccountPermission.REVIEW_EVENT_MEDIA}
