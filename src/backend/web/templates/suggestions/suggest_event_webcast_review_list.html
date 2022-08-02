@@ -55,7 +55,7 @@
                             <input type="hidden" name="event_key" value="{{suggestion_set.event.key_name}}" />
                             <button type="submit" class="btn btn-xs btn-danger pull-right" name="verdict" value="reject_all"><span class="glyphicon glyphicon-thumbs-down"></span> Reject All</button>
                         </form>
-                        <h3 class="panel-title"><a href="/event/{{suggestion_set.event.key_name}}">{{suggestion_set.event.name}} ({{suggestion_set.event.start_date.strftime("M jS")}} - {{suggestion_set.event.end_date.strftime("M jS")}})</a></h3>
+                        <h3 class="panel-title"><a href="/event/{{suggestion_set.event.key_name}}">{{suggestion_set.event.name}} ({{suggestion_set.event.start_date|strftime("%b %d%t")}} - {{suggestion_set.event.end_date|strftime("%b %d%t")}})</a></h3>
                     </div>
                     <div class="panel-body">
                         <ul><strong>Existing Webcasts</strong>
