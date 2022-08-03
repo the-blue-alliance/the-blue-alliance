@@ -504,8 +504,8 @@ class PredictionHelper:
                     if is_playoff:
                         prediction[color]["score"] += prob * 25
                         prob_int = int(prob * 100)
-                        prediction[color]["score_var"] += np.var(
-                            np.asarray([0] * (100 - prob_int) + [25] * prob_int)
+                        prediction[color]["score_var"] += float(
+                            np.var(np.asarray([0] * (100 - prob_int) + [25] * prob_int))
                         )
 
                 elif stat == "crossings":
@@ -522,8 +522,8 @@ class PredictionHelper:
                     if is_playoff:
                         prediction[color]["score"] += prob * 20
                         prob_int = int(prob * 100)
-                        prediction[color]["score_var"] += np.var(
-                            np.asarray([0] * (100 - prob_int) + [20] * prob_int)
+                        prediction[color]["score_var"] += float(
+                            np.var(np.asarray([0] * (100 - prob_int) + [20] * prob_int))
                         )
                 # 2017
                 if stat == "pressure":
@@ -539,8 +539,8 @@ class PredictionHelper:
                     if is_playoff:
                         prediction[color]["score"] += prob * 20
                         prob_int = int(prob * 100)
-                        prediction[color]["score_var"] += np.var(
-                            np.asarray([0] * (100 - prob_int) + [20] * prob_int)
+                        prediction[color]["score_var"] += float(
+                            np.var(np.asarray([0] * (100 - prob_int) + [20] * prob_int))
                         )
                 if stat == "gears":
                     requried_gears = 12
@@ -555,8 +555,10 @@ class PredictionHelper:
                     if is_playoff:
                         prediction[color]["score"] += prob * 100
                         prob_int = int(prob * 100)
-                        prediction[color]["score_var"] += np.var(
-                            np.asarray([0] * (100 - prob_int) + [100] * prob_int)
+                        prediction[color]["score_var"] += float(
+                            np.var(
+                                np.asarray([0] * (100 - prob_int) + [100] * prob_int)
+                            )
                         )
                 # 2018
                 if stat == "auto_points":
@@ -823,10 +825,10 @@ class PredictionHelper:
                 wl_accuracy_75=None
                 if played_matches_75 == 0
                 else 100 * float(correct_predictions_75) / played_matches_75,
-                err_mean=np.mean(np.asarray(score_differences))
+                err_mean=float(np.mean(np.asarray(score_differences)))
                 if score_differences
                 else None,
-                err_var=np.var(np.asarray(score_differences))
+                err_var=float(np.var(np.asarray(score_differences)))
                 if score_differences
                 else None,
                 brier_scores=brier_scores,
@@ -1079,11 +1081,11 @@ class PredictionHelper:
 
         rankings: Dict[TeamKey, TRankingPrediction] = {}
         for team, team_rankings in all_rankings.items():
-            avg_rank = np.mean(np.asarray(team_rankings))
+            avg_rank = int(np.mean(np.asarray(team_rankings)))
             min_rank = min(team_rankings)
             median_rank = int(np.median(np.asarray(team_rankings)))
             max_rank = max(team_rankings)
-            avg_rp = np.mean(np.asarray(all_ranking_points[team]))
+            avg_rp = float(np.mean(np.asarray(all_ranking_points[team])))
             min_rp = min(all_ranking_points[team])
             max_rp = max(all_ranking_points[team])
 
