@@ -40,7 +40,8 @@ def hall_of_fame_overview() -> Response:
                 )
             )
 
-    teams_by_year = sorted(teams_by_year.items(), key=lambda k: -k)
+    teams_by_year = sorted(teams_by_year.items(), key=lambda k_v: -k_v[0])
+
     for _, team in teams_by_year:
         team.sort(key=lambda x: x[1].get_result().start_date)
 

@@ -1,0 +1,36 @@
+{
+  "address": "1132, 200 Bedford St #101, Manchester, NH 03101, USA",
+  "city": "Manchester",
+  "country": "USA",
+  "district": null,
+  "division_keys": [
+
+  ],
+  "end_date": "2021-06-30",
+  "event_code": "cmpaw",
+  "event_type": 4,
+  "event_type_string": "Championship Finals",
+  "first_event_code": "CMPAW",
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJAUrtOChP4okRGKESFx2fpLk",
+  "gmaps_url": "https://maps.google.com/?cid=13376991740487180568",
+  "key": "2021cmpaw",
+  "lat": 42.9896383,
+  "lng": -71.467803,
+  "location_name": "FIRST",
+  "name": "FIRST Robotics Competition Championship Level Awards Only Event",
+  "parent_event_key": null,
+  "playoff_type": 0,
+  "playoff_type_string": null,
+  "postal_code": "03101",
+  "short_name": "FIRST Robotics Competition Championship Level Awards Only",
+  "start_date": "2021-06-30",
+  "state_prov": "NH",
+  "timezone": "America/New_York",
+  "webcasts": [
+
+  ],
+  "website": "http://None",
+  "week": null,
+  "year": 2021
+}
