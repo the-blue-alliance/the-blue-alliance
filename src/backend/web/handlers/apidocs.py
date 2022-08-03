@@ -19,7 +19,7 @@ from backend.web.profiled_render import render_template
 blueprint = Blueprint("apidocs", __name__, url_prefix="/apidocs")
 
 
-@blueprint.route("/")
+@blueprint.route("")
 @cached_public(ttl=timedelta(weeks=1))
 def apidocs_overview() -> str:
     return render_template("apidocs_overview.html")
