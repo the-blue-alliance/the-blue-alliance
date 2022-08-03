@@ -50,6 +50,12 @@ class TeamEventHistory(NamedTuple):
     awards: List[str]
 
 
+class TeamHOFInfo(NamedTuple):
+    team_number: int
+    year: int
+    event: str
+
+
 class ParsedTeam(NamedTuple):
     team_number: TeamNumber
     team_number_link: Optional[str]
@@ -323,3 +329,25 @@ def get_all_teams(resp_data: str) -> List[ParsedTeam]:
         return []
     assert len(tables) == 2
     return get_teams_from_table(tables[0]) + get_teams_from_table(tables[1])
+
+
+def get_HOF_awards(resp_data: str) -> Optional[List[TeamHOFInfo]]:
+    soup = bs4.BeautifulSoup(resp_data, "html.parser")
+    banners = soup.find_all("div", class_="panel-default")
+
+    # print(banners)
+
+    # for b in banners:
+    #     print(b)
+    #     print("---------------")
+    #     team_number = re.match(r"\/team\/(\d+)", b.find("a")["href"])[1]
+    #     print("---------------")
+
+    return [
+        TeamHOFInfo(
+            team_number=int(re.match(r"\/team\/(\d+)", b.find("a")["href"])[1]),
+            year=2022,  # .join(e.find_all("td")[1].stripped_strings),
+            event="",  # list(e.find_all("td")[2].stripped_strings),
+        )
+        for b in banners
+    ]
