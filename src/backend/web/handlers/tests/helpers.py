@@ -338,9 +338,12 @@ def get_HOF_awards(resp_data: str) -> Optional[List[TeamHOFInfo]]:
     return [
         TeamHOFInfo(
             team_number=int(re.match(r"\/team\/(\d+)", b.find("a")["href"])[1]),
-            year=re.match(
-                r"(\d+)", b.find("div", {"class": "award-event"}).find("span").string
-            )[1],
+            year=int(
+                re.match(
+                    r"(\d+)",
+                    b.find("div", {"class": "award-event"}).find("span").string,
+                )[1]
+            ),
             event=b.find("div", {"class": "award-event"}).find("span").string,
         )
         for b in banners

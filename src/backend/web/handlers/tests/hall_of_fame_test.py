@@ -20,12 +20,12 @@ def test_2022_hof_info(web_client: Client, setup_hof_awards) -> None:
     hof_awards = helpers.get_HOF_awards(resp.data)
     assert hof_awards == [
         helpers.TeamHOFInfo(
-            team_number=1629, year="2022", event="2022 Houston Championship"
+            team_number=1629, year=2022, event="2022 Houston Championship"
         ),
         helpers.TeamHOFInfo(
-            team_number=503, year="2021", event="2021 Manchester Championship"
+            team_number=503, year=2021, event="2021 Manchester Championship"
         ),
         helpers.TeamHOFInfo(
-            team_number=4613, year="2021", event="2021 Manchester Championship"
+            team_number=4613, year=2021, event="2021 Manchester Championship"
         ),
     ]
