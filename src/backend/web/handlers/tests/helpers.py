@@ -5,6 +5,7 @@ from typing import Generator, List, NamedTuple, Optional, Tuple
 
 import bs4
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
 from backend.common.models.district import District
@@ -337,11 +338,15 @@ def get_HOF_awards(resp_data: str) -> Optional[List[TeamHOFInfo]]:
 
     return [
         TeamHOFInfo(
-            team_number=int(re.match(r"\/team\/(\d+)", b.find("a")["href"])[1]),
+            team_number=int(
+                none_throws(re.match(r"\/team\/(\d+)", b.find("a")["href"]))[1]
+            ),
             year=int(
-                re.match(
-                    r"(\d+)",
-                    b.find("div", {"class": "award-event"}).find("span").string,
+                none_throws(
+                    re.match(
+                        r"(\d+)",
+                        b.find("div", {"class": "award-event"}).find("span").string,
+                    )
                 )[1]
             ),
             event=b.find("div", {"class": "award-event"}).find("span").string,
