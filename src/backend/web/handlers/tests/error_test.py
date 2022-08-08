@@ -1,3 +1,5 @@
+import importlib
+
 from typing import Tuple
 
 import bs4
@@ -19,13 +21,17 @@ def test_handle_404(web_client: Client) -> None:
 
 
 def test_handle_500() -> None:
-    from backend.web.main import app
+    from backend.web import main
+
+    # Other tests might have run a request which dirties the previously
+    # imported app, so let's forcibly clear it here to start clean
+    importlib.reload(main)
 
     def always_throw() -> str:
         raise Exception("welp")
 
-    app.add_url_rule("/throw_500", view_func=always_throw)
-    client = app.test_client()
+    main.app.add_url_rule("/throw_500", view_func=always_throw)
+    client = main.app.test_client()
 
     resp = client.get("/throw_500")
     assert resp.status_code == 500
