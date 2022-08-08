@@ -205,3 +205,17 @@ def setup_full_match(test_data_importer):
 @pytest.fixture
 def setup_full_year_events(test_data_importer) -> None:
     test_data_importer.import_event_list(__file__, "tests/data/all_events_2019.json")
+
+
+@pytest.fixture
+def setup_hof_awards(test_data_importer) -> None:
+    def import_event(event_key, team_keys) -> None:
+        for team_key in team_keys:
+            test_data_importer.import_team(__file__, f"tests/data/{team_key}.json")
+
+        test_data_importer.import_event(__file__, f"tests/data/{event_key}.json")
+        test_data_importer.import_award_list(
+            __file__, f"tests/data/{event_key}_awards.json"
+        )
+
+    return import_event

@@ -16,6 +16,7 @@ from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
 from backend.web.handlers.eventwizard import eventwizard
 from backend.web.handlers.gameday import gameday, gameday_redirect
+from backend.web.handlers.hall_of_fame import hall_of_fame_overview
 from backend.web.handlers.index import about, avatar_list, index
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
@@ -91,6 +92,8 @@ app.add_url_rule("/avatars/<int:year>", view_func=avatar_list)
 
 app.add_url_rule("/insights", view_func=insights_overview)
 app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
+
+app.add_url_rule("/hall-of-fame", view_func=hall_of_fame_overview)
 
 # Static pages
 app.add_url_rule("/add-data", view_func=add_data)

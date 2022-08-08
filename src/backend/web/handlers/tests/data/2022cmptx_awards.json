@@ -1,0 +1,166 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2022cmptx",
+    "name": "Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1629"
+      }
+    ],
+    "year": 2022
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022cmptx",
+    "name": "Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1619"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc254"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3175"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6672"
+      }
+    ],
+    "year": 2022
+  },
+  {
+    "award_type": 2,
+    "event_key": "2022cmptx",
+    "name": "Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1577"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4414"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2539"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4099"
+      }
+    ],
+    "year": 2022
+  },
+  {
+    "award_type": 3,
+    "event_key": "2022cmptx",
+    "name": "Woodie Flowers Award",
+    "recipient_list": [
+      {
+        "awardee": "Christine Sapio",
+        "team_key": "frc2486"
+      }
+    ],
+    "year": 2022
+  },
+  {
+    "award_type": 4,
+    "event_key": "2022cmptx",
+    "name": "FIRST Dean's List Award",
+    "recipient_list": [
+      {
+        "awardee": "Alicia Ramirez",
+        "team_key": "frc2383"
+      },
+      {
+        "awardee": "Ethan Brown",
+        "team_key": "frc5338"
+      },
+      {
+        "awardee": "Leslie Kim",
+        "team_key": "frc3928"
+      },
+      {
+        "awardee": "Nate King",
+        "team_key": "frc2129"
+      },
+      {
+        "awardee": "Nazlı Eren",
+        "team_key": "frc2905"
+      },
+      {
+        "awardee": "Thomas Gormley",
+        "team_key": "frc2834"
+      },
+      {
+        "awardee": "Arvind Seshan",
+        "team_key": "frc8027"
+      },
+      {
+        "awardee": "Christopher Palazzo",
+        "team_key": "frc871"
+      },
+      {
+        "awardee": "Trevor Langley",
+        "team_key": "frc5188"
+      },
+      {
+        "awardee": "Joyce Yang",
+        "team_key": "frc1967"
+      }
+    ],
+    "year": 2022
+  },
+  {
+    "award_type": 5,
+    "event_key": "2022cmptx",
+    "name": "Volunteer of the Year",
+    "recipient_list": [
+      {
+        "awardee": "Chuck Dickerson",
+        "team_key": null
+      }
+    ],
+    "year": 2022
+  },
+  {
+    "award_type": 69,
+    "event_key": "2022cmptx",
+    "name": "Chairman's Award Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1511"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1629"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2438"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2468"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6652"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6429"
+      }
+    ],
+    "year": 2022
+  }
+]
