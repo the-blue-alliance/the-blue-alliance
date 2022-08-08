@@ -50,7 +50,7 @@ def test_get_event_short_event_first_code():
 
 
 def test_get_event_short_event_cmp():
-    assert DatafeedFMSAPI._get_event_short("arc") == "archimedes"
+    assert DatafeedFMSAPI._get_event_short("arc", None) == "archimedes"
 
 
 def test_get_root(fms_api_secrets):

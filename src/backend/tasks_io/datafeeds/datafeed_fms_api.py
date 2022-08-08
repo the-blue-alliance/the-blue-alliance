@@ -168,7 +168,9 @@ class DatafeedFMSAPI:
         self, event_key: EventKey
     ) -> List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]]:
         year = int(event_key[:4])
-        event_code = self._get_event_short(event_key[4:])
+        event_short = event_key[4:]
+        event = Event.get_by_id(event_key)
+        event_code = self._get_event_short(event_short, event)
 
         parser = FMSAPITeamDetailsParser(year)
         models: List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]] = []
@@ -207,7 +209,7 @@ class DatafeedFMSAPI:
                 division = self.SUBDIV_TO_DIV[event.event_short]
 
             api_awards_response = self.api.awards(
-                event.year, event_code=DatafeedFMSAPI._get_event_short(division)
+                event.year, event_code=DatafeedFMSAPI._get_event_short(division, event)
             )
             awards += (
                 self._parse(
@@ -396,7 +398,7 @@ class DatafeedFMSAPI:
         return advancement
 
     @classmethod
-    def _get_event_short(self, event_short: str, event: Optional[Event] = None) -> str:
+    def _get_event_short(self, event_short: str, event: Optional[Event]) -> str:
         # First, check if we've manually set the FRC API key
         if event and event.first_code:
             return event.first_code
