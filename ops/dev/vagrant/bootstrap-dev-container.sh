@@ -6,8 +6,8 @@ mkdir -p /datastore
 
 # The datastore emulator requires grpcio
 python -m pip install --upgrade pip
-pip install -r requirements.txt
-pip install -r src/requirements.txt
+pip install --ignore-installed -r requirements.txt
+pip install --ignore-installed -r src/requirements.txt
 
 # Create empty keys file if one does not already exist
 if [ ! -f /tba/src/backend/web/static/javascript/tba_js/tba_keys.js ]; then
