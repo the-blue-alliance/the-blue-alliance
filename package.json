@@ -64,6 +64,7 @@
     "lintfix": "eslint --fix ."
   },
   "jest": {
+    "verbose": true,
     "automock": false,
     "roots": [
       "<rootDir>/ops",
