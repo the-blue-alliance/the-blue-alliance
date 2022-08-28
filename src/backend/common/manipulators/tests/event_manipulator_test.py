@@ -124,7 +124,7 @@ class TestEventManipulator(unittest.TestCase):
         for task in tasks:
             # This lets us ensure that the devserver can run our task
             # See https://github.com/GoogleCloudPlatform/appengine-python-standard/issues/45
-            six.ensure_text(task.payload)
+            six.ensure_binary(task.payload)
             deferred.run(task.payload)
 
         assert none_throws(Event.get_by_id("2011ct")).timezone_id is not None
