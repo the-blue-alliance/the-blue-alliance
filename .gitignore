@@ -16,6 +16,7 @@ coverage.xml
 venv/
 .testmondata
 .vscode
+.idea
 
 # Compiled/Intermediate Files #
 ###############################

@@ -41,6 +41,7 @@ from backend.web.handlers.team import (
     team_history,
     team_list,
 )
+from backend.web.handlers.webcasts import webcast_list
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
@@ -94,6 +95,8 @@ app.add_url_rule("/insights", view_func=insights_overview)
 app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
 
 app.add_url_rule("/hall-of-fame", view_func=hall_of_fame_overview)
+
+app.add_url_rule("/webcasts", view_func=webcast_list)
 
 # Static pages
 app.add_url_rule("/add-data", view_func=add_data)
