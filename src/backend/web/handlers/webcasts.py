@@ -11,7 +11,7 @@ from backend.web.profiled_render import render_template
 @cached_public
 def webcast_list() -> Response:
     year = datetime.now().year
-    events = Event.query(Event.year == year).order(Event.start_date)
+    events = Event.query(Event.year == year).order(Event.start_date).fetch(500)
 
     template_values = {
         "events": events,
