@@ -1,20 +1,23 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from werkzeug.wrappers import Response
 
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
-from backend.common.models.event import Event
+from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.queries.event_query import EventListQuery
 from backend.web.profiled_render import render_template
 
 
 @cached_public
 def webcast_list() -> Response:
-    year = datetime.now().year
-    events = Event.query(Event.year == year).order(Event.start_date).fetch(500)
+    year = SeasonHelper.get_current_season()
+    events = EventListQuery(year).fetch()
+    sorted_events = EventHelper.sorted_events(events)
 
     template_values = {
-        "events": events,
+        "events": sorted_events,
         "year": year,
     }
 
