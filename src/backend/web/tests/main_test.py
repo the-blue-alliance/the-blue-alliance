@@ -16,10 +16,12 @@ def test_app_secret_key(ndb_stub) -> None:
     assert main.app.secret_key is None
 
     # Setting up the secret key will run before the first request
-    assert len(main.app.before_first_request_funcs) > 0
+    assert len(main.app.before_request_funcs) > 0
 
     # Force run the before-first-request functions
-    main.app.try_trigger_before_first_request_functions()
+    with main.app.test_request_context():
+        for func in main.app.before_request_funcs[None]:
+            func()
 
     # Make sure they set the secret key
     assert main.app.secret_key == FlaskSecrets.DEFAULT_SECRET_KEY
