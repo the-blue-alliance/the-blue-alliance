@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 
 from firebase_admin import auth
 from flask import session
+from google.auth import exceptions
 
 from backend.common.firebase import app
 from backend.common.models.user import User
@@ -37,7 +38,7 @@ def _decoded_claims() -> Optional[Dict[str, Any]]:
     # if the user's Firebase session was revoked, user deleted/disabled, etc.
     try:
         return auth.verify_session_cookie(session_cookie, check_revoked=True, app=app())
-    except auth.InvalidSessionCookieError:
+    except (auth.InvalidSessionCookieError, exceptions.DefaultCredentialsError):
         # Session cookie is invalid, expired or revoked. Force user to login.
         return None
 
