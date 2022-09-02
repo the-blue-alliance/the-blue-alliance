@@ -48,9 +48,9 @@ class AfterResponseMiddleware:
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
-    @app.before_first_request
+    @app.before_request
     def _app_before():
-        if configure_secret_key:
+        if configure_secret_key and not app.secret_key:
             _set_secret_key(app)
 
     # The middlewares get added in order of this last, and each wraps the previous
