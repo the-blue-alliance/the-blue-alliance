@@ -328,21 +328,6 @@ class AdminRefetchEventLocation(LoggedInHandler):
         self.redirect('/admin/event/{}'.format(event_key_id))
 
 
-class AdminEventCreate(LoggedInHandler):
-    """
-    Create an Event. POSTs to AdminEventEdit.
-    """
-    def get(self):
-        self._require_admin()
-
-        self.template_values.update({
-            "event_types": EventType.type_names,
-        })
-
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
-        self.response.out.write(template.render(path, self.template_values))
-
-
 class AdminEventCreateTest(LoggedInHandler):
     """
     Create a test event that is happening now.
