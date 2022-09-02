@@ -192,7 +192,9 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
 
     start_date = None
     if request.form.get("start_date"):
-        start_date = datetime.datetime.strptime(request.form.get("start_date"), "%Y-%m-%d")
+        start_date = datetime.datetime.strptime(
+            request.form.get("start_date"), "%Y-%m-%d"
+        )
 
     end_date = None
     if request.form.get("end_date"):
@@ -202,12 +204,18 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
     district_key = request.form.get("event_district_key", None)
     parent_key = request.form.get("parent_event", None)
 
-    division_key_names = json.loads(request.form.get('divisions', '[]'))
-    division_keys = [ndb.Key(Event, key) for key in division_key_names] if division_key_names else []
+    division_key_names = json.loads(request.form.get("divisions", "[]"))
+    division_keys = (
+        [ndb.Key(Event, key) for key in division_key_names]
+        if division_key_names
+        else []
+    )
 
     website = WebsiteHelper.format_url(request.form.get("website"))
 
-    key = str(request.form.get("year")) + str.lower(str(request.form.get("event_short")))
+    key = str(request.form.get("year")) + str.lower(
+        str(request.form.get("event_short"))
+    )
     if event_key is not None and event_key != key:
         abort(400)
 
@@ -215,9 +223,11 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         id=key,
         end_date=end_date,
         event_short=request.form.get("event_short"),
-        first_code=first_code if first_code and first_code != 'None' else None,
+        first_code=first_code if first_code and first_code != "None" else None,
         event_type_enum=int(request.form.get("event_type", EventType.UNLABLED)),
-        district_key=ndb.Key(District, request.form.get("event_district_key")) if district_key and district_key != 'None' else None,
+        district_key=ndb.Key(District, request.form.get("event_district_key"))
+        if district_key and district_key != "None"
+        else None,
         venue=request.form.get("venue"),
         venue_address=request.form.get("venue_address"),
         city=request.form.get("city"),
@@ -230,22 +240,32 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         website=website,
         first_eid=request.form.get("first_eid"),
         year=int(none_throws(request.form.get("year"))),
-        official={"true": True, "false": False}.get(request.form.get("official", "false").lower()),
-        enable_predictions={"true": True, "false": False}.get(request.form.get("enable_predictions", "false").lower()),
+        official={"true": True, "false": False}.get(
+            request.form.get("official", "false").lower()
+        ),
+        enable_predictions={"true": True, "false": False}.get(
+            request.form.get("enable_predictions", "false").lower()
+        ),
         facebook_eid=request.form.get("facebook_eid"),
         custom_hashtag=request.form.get("custom_hashtag"),
         webcast_json=request.form.get("webcast_json"),
         playoff_type=int(request.form.get("playoff_type", PlayoffType.BRACKET_8_TEAM)),
-        parent_event=ndb.Key(Event, parent_key) if parent_key and parent_key.lower() != 'none' else None,
+        parent_event=ndb.Key(Event, parent_key)
+        if parent_key and parent_key.lower() != "none"
+        else None,
         divisions=division_keys,
     )
     event = EventManipulator.createOrUpdate(event)
 
-    if request.form.get("alliance_selections_json") or request.form.get("rankings_json"):
+    if request.form.get("alliance_selections_json") or request.form.get(
+        "rankings_json"
+    ):
         event_details = EventDetails(
             id=event_key,
-            alliance_selections=json.loads(request.form.get("alliance_selections_json", "[]")),
-            rankings=json.loads(request.form.get("rankings_json", "[]"))
+            alliance_selections=json.loads(
+                request.form.get("alliance_selections_json", "[]")
+            ),
+            rankings=json.loads(request.form.get("rankings_json", "[]")),
         )
         EventDetailsManipulator.createOrUpdate(event_details)
 
@@ -253,3 +273,62 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
     # MemcacheWebcastFlusher.flushEvent(event.key_name)
 
     return redirect(url_for("admin.event_detail", event_key=event.key_name))
+
+
+def event_detail_post(event_key: EventKey) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    reg_sitevar = ChampsRegistrationHacks.get()
+    new_divisions_to_skip = reg_sitevar["divisions_to_skip"]
+    if request.form.get("event_sync_disable"):
+        if event_key not in new_divisions_to_skip:
+            new_divisions_to_skip.append(event_key)
+    else:
+        new_divisions_to_skip = list(
+            filter(lambda e: e != event_key, new_divisions_to_skip)
+        )
+    new_start_day_to_last = reg_sitevar["set_start_to_last_day"]
+    if request.form.get("set_start_day_to_last"):
+        if event_key not in new_start_day_to_last:
+            new_start_day_to_last.append(event_key)
+    else:
+        new_start_day_to_last = list(
+            filter(lambda e: e != event_key, new_start_day_to_last)
+        )
+    new_skip_eventteams = reg_sitevar["skip_eventteams"]
+    if request.form.get("skip_eventteams"):
+        if event_key not in new_skip_eventteams:
+            new_skip_eventteams.append(event_key)
+    else:
+        new_skip_eventteams = list(
+            filter(lambda e: e != event_key, new_skip_eventteams)
+        )
+    new_name_overrides = reg_sitevar["event_name_override"]
+    form_name_override = request.form.get("event_name_override")
+    if form_name_override:
+        if not any(o["event"] == event_key for o in new_name_overrides):
+            new_name_overrides.append(
+                {
+                    "event": event_key,
+                    "name": form_name_override,
+                    "short_name": form_name_override,
+                }
+            )
+    else:
+        new_name_overrides = list(
+            filter(lambda o: o["event"] != event_key, new_name_overrides)
+        )
+    ChampsRegistrationHacks.put(
+        {
+            "divisions_to_skip": new_divisions_to_skip,
+            "set_start_to_last_day": new_start_day_to_last,
+            "skip_eventteams": new_skip_eventteams,
+            "event_name_override": new_name_overrides,
+        }
+    )
+    return redirect(url_for("admin.event_detail", event_key=event_key))

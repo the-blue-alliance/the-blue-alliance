@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}API Auth Add{% endblock %}
 
@@ -57,6 +57,7 @@
         </tr>
     </table>
 
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add</button>
     <a href="/admin/" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel</a>
 </form>
