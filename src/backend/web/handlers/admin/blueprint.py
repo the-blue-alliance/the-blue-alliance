@@ -1,11 +1,20 @@
 from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
+from backend.web.handlers.admin.api_auth import (
+    api_auth_add,
+    api_auth_delete,
+    api_auth_delete_post,
+    api_auth_edit,
+    api_auth_edit_post,
+    api_auth_manage,
+)
 from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
 from backend.web.handlers.admin.event import (
     event_create,
     event_delete,
     event_detail,
+    event_detail_post,
     event_edit,
     event_edit_post,
     event_list,
@@ -47,6 +56,22 @@ def task_launcher() -> str:
 
 
 # More complex endpoints should be split out into their own files
+admin_routes.add_url_rule("/api_auth/add", view_func=api_auth_add, methods=["GET"])
+admin_routes.add_url_rule(
+    "/api_auth/delete/<auth_id>", view_func=api_auth_delete, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/api_auth/delete/<auth_id>", view_func=api_auth_delete_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/api_auth/edit/<auth_id>", view_func=api_auth_edit, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/api_auth/edit/<auth_id>", view_func=api_auth_edit_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/api_auth/manage", view_func=api_auth_manage, methods=["GET"]
+)
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_get, methods=["GET"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_post, methods=["POST"])
 admin_routes.add_url_rule("/event/create", view_func=event_create, methods=["GET"])
@@ -60,9 +85,15 @@ admin_routes.add_url_rule(
     "/event/<event_key>/edit", view_func=event_edit_post, methods=["POST"]
 )
 admin_routes.add_url_rule(
-    "/event/edit", view_func=event_edit_post, defaults={"event_key": None}, methods=["POST"],
+    "/event/edit",
+    view_func=event_edit_post,
+    defaults={"event_key": None},
+    methods=["POST"],
 )
-admin_routes.add_url_rule("/event/<event_key>", view_func=event_detail)
+admin_routes.add_url_rule("/event/<event_key>", view_func=event_detail, methods=["GET"])
+admin_routes.add_url_rule(
+    "/event/<event_key>", view_func=event_detail_post, methods=["POST"]
+)
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)
 admin_routes.add_url_rule("/sitevars", view_func=sitevars_list)

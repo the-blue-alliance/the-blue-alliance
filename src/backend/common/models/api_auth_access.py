@@ -2,6 +2,7 @@ import datetime
 from typing import List, Optional
 
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.account import Account
@@ -84,3 +85,9 @@ class ApiAuthAccess(ndb.Model):
     @property
     def is_write_key(self) -> bool:
         return not self.is_read_key
+
+    @property
+    def event_list_str(self) -> str:
+        return ",".join(
+            [none_throws(event_key.string_id()) for event_key in self.event_list]
+        )
