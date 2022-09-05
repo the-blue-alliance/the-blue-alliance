@@ -51,6 +51,12 @@ def bootstrap_post() -> Response:
     )
 
 
+@local_routes.route("/sdk_version")
+def sdk_version() -> str:
+    with open("/usr/lib/google-cloud-sdk/VERSION", "r") as version_file:
+        return version_file.read()
+
+
 def maybe_register(app: Flask, csrf: CSRFProtect) -> None:
     if Environment.is_dev():
         app.register_blueprint(local_routes)

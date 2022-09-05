@@ -53,4 +53,11 @@ repos:
       language: script
       always_run: true
       stages: [post-checkout]
+    - id: gcloud-sdk-version
+      name: "Checking Google Cloud SDK Version"
+      entry: ./ops/check_sdk_version.sh
+      language: script
+      always_run: true
+      stages: [post-checkout]
+
 
