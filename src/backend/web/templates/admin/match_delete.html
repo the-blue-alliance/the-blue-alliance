@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}{{match.key_name}} - Delete{% endblock %}
 
@@ -10,6 +10,8 @@
     <legend>Delete match?</legend>
 
     <a href="/admin/match/{{match.key_name}}" class="btn btn-lg"><i class="icon-ban-circle"></i> Cancel Delete</a>
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <button type="submit" class="btn btn-danger btn-small pull-right"><i class="icon-trash"></i> Delete Match</button>
 </form>

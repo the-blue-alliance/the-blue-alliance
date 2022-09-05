@@ -19,6 +19,15 @@ from backend.web.handlers.admin.event import (
     event_edit_post,
     event_list,
 )
+from backend.web.handlers.admin.match import (
+    match_add,
+    match_dashboard,
+    match_delete,
+    match_delete_post,
+    match_detail,
+    match_edit,
+    match_edit_post,
+)
 from backend.web.handlers.admin.sitevars import (
     sitevar_create,
     sitevar_edit,
@@ -96,6 +105,21 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)
+admin_routes.add_url_rule("/matches", view_func=match_dashboard, methods=["GET"])
+admin_routes.add_url_rule("/match/add", view_func=match_add, methods=["POST"])
+admin_routes.add_url_rule("/match/<match_key>", view_func=match_detail, methods=["GET"])
+admin_routes.add_url_rule(
+    "/match/edit/<match_key>", view_func=match_edit, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/match/edit/<match_key>", view_func=match_edit_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/match/delete/<match_key>", view_func=match_delete, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/match/delete/<match_key>", view_func=match_delete_post, methods=["POST"]
+)
 admin_routes.add_url_rule("/sitevars", view_func=sitevars_list)
 admin_routes.add_url_rule("/sitevar/create", view_func=sitevar_create, methods=["GET"])
 admin_routes.add_url_rule(
