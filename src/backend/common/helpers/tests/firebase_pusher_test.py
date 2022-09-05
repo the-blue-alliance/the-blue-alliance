@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Dict
+from typing import Callable, Dict
 from urllib.parse import urlparse
 
 import pytest
@@ -10,7 +10,7 @@ import six
 from firebase_admin import exceptions as firebase_exceptions
 from freezegun import freeze_time
 from google.appengine.ext import deferred, ndb, testbed
-from pyre_extensions import none_throws
+from pyre_extensions import none_throws, safe_cast
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_status import WebcastStatus
@@ -78,7 +78,10 @@ def auto_add_stubs(
     # firebase_admin uses `requests` internally
     monkeypatch.setenv("FIREBASE_DATABASE_EMULATOR_HOST", "localhost:9070")
 
-    requests_mock.add_matcher(InMemoryRealtimeDb())
+    db = InMemoryRealtimeDb()
+    requests_mock.add_matcher(
+        safe_cast(Callable[[requests.Request], requests.Response], db)
+    )
 
 
 def drain_deferred(taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub) -> None:
