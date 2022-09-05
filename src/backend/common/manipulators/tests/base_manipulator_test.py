@@ -323,7 +323,8 @@ def test_cache_clearing(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # This lets us ensure that the devserver can run our task
-    six.ensure_binary(tasks[0].payload)
+    # See https://github.com/GoogleCloudPlatform/appengine-python-standard/issues/45
+    six.ensure_text(tasks[0].payload)
 
     # Run cache clearing manually
     deferred.run(tasks[0].payload)
