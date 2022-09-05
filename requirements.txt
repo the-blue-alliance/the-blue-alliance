@@ -12,5 +12,5 @@ pytest-cov
 pytest-custom_exit_code
 pytest-testmon
 PyYAML==6.0
-requests-mock==1.9.3
+requests-mock==1.10.0
 shellcheck-py
