@@ -4,6 +4,9 @@ set -e
 # Place for local datastore
 mkdir -p /datastore
 
+# Update system dependencies
+apt-get update && apt-get upgrade -y
+
 # The datastore emulator requires grpcio
 python -m pip install --upgrade pip
 pip install --ignore-installed -r requirements.txt

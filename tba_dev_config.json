@@ -7,5 +7,6 @@
     "cache_control_header_enabled": "false",
     "storage_mode": "local",
     "storage_path": "ops/dev/storage",
-    "save_frc_api_response": "false"
+    "save_frc_api_response": "false",
+    "min_gcloud_sdk_version": "380.0.0"
 }
