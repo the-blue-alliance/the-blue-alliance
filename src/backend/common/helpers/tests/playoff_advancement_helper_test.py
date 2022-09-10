@@ -161,3 +161,33 @@ def test_best_of_5_finals(test_data_importer) -> None:
     assert advancement.playoff_advancement is None
     assert advancement.double_elim_matches is None
     assert advancement.playoff_template is None
+
+
+def test_legacy_double_elim(test_data_importer) -> None:
+    event = create_event("2017wiwi", PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM)
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2017wiwi_matches.json"
+    )
+    organized_matches = MatchHelper.organized_matches(matches)[1]
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
+        event, organized_matches
+    )
+    assert advancement.bracket_table is not None
+    assert advancement.playoff_advancement is None
+    assert advancement.double_elim_matches is not None
+    assert advancement.playoff_template is None
+
+
+def test_double_elim(test_data_importer) -> None:
+    event = create_event("2022cctets", PlayoffType.DOUBLE_ELIM_8_TEAM)
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2022cctest_matches.json"
+    )
+    organized_matches = MatchHelper.organized_matches(matches)[1]
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
+        event, organized_matches
+    )
+    assert advancement.bracket_table is not None
+    assert advancement.playoff_advancement is None
+    assert advancement.double_elim_matches is not None
+    assert advancement.playoff_template is None

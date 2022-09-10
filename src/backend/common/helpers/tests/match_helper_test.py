@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.consts.playoff_type import DoubleElimBracket
+from backend.common.consts.playoff_type import DoubleElimRound, LegacyDoubleElimBracket
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -85,17 +85,91 @@ def test_organized_legacy_double_elim_matches(test_data_importer) -> None:
         organized_matches
     )
 
-    assert DoubleElimBracket.WINNER in double_elim_matches
-    assert DoubleElimBracket.LOSER in double_elim_matches
+    assert LegacyDoubleElimBracket.WINNER in double_elim_matches
+    assert LegacyDoubleElimBracket.LOSER in double_elim_matches
 
     assert all(
-        level in double_elim_matches[DoubleElimBracket.WINNER]
+        level in double_elim_matches[LegacyDoubleElimBracket.WINNER]
         for level in [CompLevel.EF, CompLevel.QF, CompLevel.SF, CompLevel.F]
     )
     assert all(
-        level in double_elim_matches[DoubleElimBracket.LOSER]
+        level in double_elim_matches[LegacyDoubleElimBracket.LOSER]
         for level in [CompLevel.EF, CompLevel.QF, CompLevel.SF, CompLevel.F]
     )
+
+    bracket_to_match_keys = {
+        bracket: {
+            comp_level: [m.short_key for m in matches]
+            for comp_level, matches in bracket_matches.items()
+        }
+        for bracket, bracket_matches in double_elim_matches.items()
+    }
+    assert bracket_to_match_keys[LegacyDoubleElimBracket.WINNER][CompLevel.EF] == [
+        "ef1m1",
+        "ef2m1",
+        "ef3m1",
+        "ef4m1",
+    ]
+    assert bracket_to_match_keys[LegacyDoubleElimBracket.WINNER][CompLevel.QF] == [
+        "qf1m1",
+        "qf2m1",
+    ]
+    assert bracket_to_match_keys[LegacyDoubleElimBracket.WINNER][CompLevel.SF] == [
+        "sf1m1"
+    ]
+    assert bracket_to_match_keys[LegacyDoubleElimBracket.WINNER][CompLevel.F] == [
+        "f2m1",
+        "f2m2",
+    ]
+
+    assert bracket_to_match_keys[LegacyDoubleElimBracket.LOSER][CompLevel.EF] == [
+        "ef5m1",
+        "ef6m1",
+        "ef6m2",
+        "ef6m3",
+    ]
+    assert bracket_to_match_keys[LegacyDoubleElimBracket.LOSER][CompLevel.QF] == [
+        "qf3m1",
+        "qf4m1",
+    ]
+    assert bracket_to_match_keys[LegacyDoubleElimBracket.LOSER][CompLevel.SF] == [
+        "sf2m1"
+    ]
+    assert bracket_to_match_keys[LegacyDoubleElimBracket.LOSER][CompLevel.F] == ["f1m1"]
+
+
+def test_organized_double_elim_matches(test_data_importer) -> None:
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2022cctest_matches.json"
+    )
+
+    _, organized_matches = MatchHelper.organized_matches(matches)
+    double_elim_matches = MatchHelper.organized_double_elim_matches(organized_matches)
+
+    assert len(double_elim_matches) == len(DoubleElimRound)
+    for round in DoubleElimRound:
+        assert round in double_elim_matches
+
+    round_to_match_keys = {
+        round: [m.short_key for m in matches]
+        for round, matches in double_elim_matches.items()
+    }
+    assert round_to_match_keys[DoubleElimRound.ROUND1] == [
+        "ef1m1",
+        "ef2m1",
+        "ef3m1",
+        "ef4m1",
+    ]
+    assert round_to_match_keys[DoubleElimRound.ROUND2] == [
+        "ef5m1",
+        "ef6m1",
+        "qf1m1",
+        "qf2m1",
+    ]
+    assert round_to_match_keys[DoubleElimRound.ROUND3] == ["qf3m1", "qf4m1"]
+    assert round_to_match_keys[DoubleElimRound.ROUND4] == ["sf1m1", "sf2m1"]
+    assert round_to_match_keys[DoubleElimRound.ROUND5] == ["f1m1"]
+    assert round_to_match_keys[DoubleElimRound.FINALS] == ["f2m1", "f2m2", "f2m3"]
 
 
 def test_play_order_sort(test_data_importer) -> None:

@@ -7,9 +7,19 @@ from backend.common.consts.comp_level import CompLevel
 
 
 @enum.unique
-class DoubleElimBracket(str, enum.Enum):
+class LegacyDoubleElimBracket(str, enum.Enum):
     WINNER = "winner"
     LOSER = "loser"
+
+
+@enum.unique
+class DoubleElimRound(str, enum.Enum):
+    ROUND1 = "Round 1"
+    ROUND2 = "Round 2"
+    ROUND3 = "Round 3"
+    ROUND4 = "Round 4"
+    ROUND5 = "Round 5"
+    FINALS = "Finals"
 
 
 @enum.unique
@@ -30,6 +40,9 @@ class PlayoffType(enum.IntEnum):
     # The legacy style is just a basic internet bracket
     # https://www.printyourbrackets.com/fillable-brackets/8-seeded-double-fillable.pdf
     LEGACY_DOUBLE_ELIM_8_TEAM = 5
+    # The "regular" style is the one that FIRST plans to trial for the 2023 season
+    # https://www.firstinspires.org/robotics/frc/blog/2022-timeout-and-playoff-tournament-updates
+    DOUBLE_ELIM_8_TEAM = 10
 
     # Festival of Champions
     BO5_FINALS = 6
@@ -48,6 +61,7 @@ BRACKET_TYPES: Set[PlayoffType] = {
 
 
 DOUBLE_ELIM_TYPES: Set[PlayoffType] = {
+    PlayoffType.DOUBLE_ELIM_8_TEAM,
     PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM,
 }
 
@@ -60,6 +74,7 @@ TYPE_NAMES: Dict[PlayoffType, str] = {
     PlayoffType.BRACKET_2_TEAM: "Elimination Bracket (2 Alliances)",
     PlayoffType.AVG_SCORE_8_TEAM: "Average Score (8 Alliances)",
     PlayoffType.ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)",
+    PlayoffType.DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
     PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM: "Legacy Double Elimination Bracket (8 Alliances)",
     PlayoffType.BO3_FINALS: "Best of 3 Finals",
     PlayoffType.BO5_FINALS: "Best of 5 Finals",
@@ -177,4 +192,33 @@ LEGACY_DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     # overall finals (winners bracket)
     14: (CompLevel.F, 2, 1),
     15: (CompLevel.F, 2, 2),
+}
+
+
+# Map a match number -> set/match for FIRST's 8 alliance double elim bracket
+# Based off:
+# https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/competition-manual/double_elimination_playoff_communication.pdf
+DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+    # round 1
+    1: (CompLevel.EF, 1, 1),
+    2: (CompLevel.EF, 2, 1),
+    3: (CompLevel.EF, 3, 1),
+    4: (CompLevel.EF, 4, 1),
+    # round 2
+    5: (CompLevel.EF, 5, 1),
+    6: (CompLevel.EF, 6, 1),
+    7: (CompLevel.QF, 1, 1),
+    8: (CompLevel.QF, 2, 1),
+    # round 3
+    9: (CompLevel.QF, 3, 1),
+    10: (CompLevel.QF, 4, 1),
+    # round 4
+    11: (CompLevel.SF, 1, 1),
+    12: (CompLevel.SF, 2, 1),
+    # round 5
+    13: (CompLevel.F, 1, 1),
+    # finals
+    14: (CompLevel.F, 2, 1),
+    15: (CompLevel.F, 2, 2),
+    16: (CompLevel.F, 2, 3),
 }

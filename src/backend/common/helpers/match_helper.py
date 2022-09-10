@@ -10,7 +10,11 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import COMP_LEVELS, CompLevel, ELIM_LEVELS
-from backend.common.consts.playoff_type import DoubleElimBracket, PlayoffType
+from backend.common.consts.playoff_type import (
+    DoubleElimRound,
+    LegacyDoubleElimBracket,
+    PlayoffType,
+)
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import MatchKey
@@ -18,9 +22,10 @@ from backend.common.models.match import Match
 
 
 TOrganizedMatches = Dict[CompLevel, List[Match]]
-TOrganizedDoubleElimMatches = Mapping[
-    DoubleElimBracket, Mapping[CompLevel, List[Match]]
+TOrganizedLegacyDoubleElimMatches = Mapping[
+    LegacyDoubleElimBracket, Mapping[CompLevel, List[Match]]
 ]
+TOrganizedDoubleElimMatches = Mapping[DoubleElimRound, List[Match]]
 TOrganizedKeys = Dict[CompLevel, List[MatchKey]]
 
 
@@ -79,7 +84,7 @@ class MatchHelper(object):
     @classmethod
     def organized_legacy_double_elim_matches(
         cls, organized_matches: TOrganizedMatches
-    ) -> TOrganizedDoubleElimMatches:
+    ) -> TOrganizedLegacyDoubleElimMatches:
         matches = collections.defaultdict(lambda: collections.defaultdict(list))
         for level in COMP_LEVELS:
             level_matches = organized_matches[level]
@@ -90,6 +95,22 @@ class MatchHelper(object):
                     level, match.set_number
                 )
                 matches[bracket][level].append(match)
+        return matches
+
+    @classmethod
+    def organized_double_elim_matches(
+        cls, organized_matches: TOrganizedMatches
+    ) -> TOrganizedDoubleElimMatches:
+        matches = collections.defaultdict(list)
+        for level in COMP_LEVELS:
+            level_matches = organized_matches[level]
+            if level == CompLevel.QM:
+                continue
+            for match in level_matches:
+                double_elim_round = PlayoffTypeHelper.get_double_elim_round(
+                    level, match.set_number
+                )
+                matches[double_elim_round].append(match)
         return matches
 
     @classmethod

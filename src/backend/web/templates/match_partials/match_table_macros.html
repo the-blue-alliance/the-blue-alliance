@@ -139,7 +139,7 @@
 </table>
 {% endmacro %}
 
-{% macro double_elim_table(matches, cur_team_key=None, playlist=None) %}
+{% macro legacy_double_elim_table(matches, cur_team_key=None, playlist=None) %}
   {% if matches.winner %}
     <h4>Winner's Bracket</h4>
     {{ elim_match_table(matches.winner, playlist=playlist) }}
@@ -148,6 +148,24 @@
     <h4>Loser's Bracket</h4>
     {{ elim_match_table(matches.loser, playlist=playlist) }}
   {% endif %}
+{% endmacro %}
+
+{% macro double_elim_table(matches, rounds, cur_team_key=None, playlist=None) %}
+  {% for round in rounds %}
+    {% if matches.get(round) %}
+      <h4>{{round.value}}</h4>
+        <table class="match-table" id="elim-match-table">
+          <thead>
+            {% include "match_partials/match_table_header.html" %}
+          </thead>
+          <tbody>
+            {% for match in matches.get(round) %}
+              {{mtrm.match_row_tr(match, cur_team_key)}}
+            {% endfor %}
+          </tbody>
+        </table>
+    {% endif %}
+  {% endfor %}
 {% endmacro %}
 
 {% macro full_match_table(matches, cur_team_key=None, playlist=None) %}

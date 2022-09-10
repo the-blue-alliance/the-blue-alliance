@@ -10,6 +10,7 @@ from typing import (
     NamedTuple,
     Optional,
     TypedDict,
+    Union,
 )
 
 from pyre_extensions import none_throws
@@ -26,6 +27,7 @@ from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.match_helper import (
     MatchHelper,
     TOrganizedDoubleElimMatches,
+    TOrganizedLegacyDoubleElimMatches,
     TOrganizedMatches,
 )
 from backend.common.models.alliance import EventAlliance
@@ -41,7 +43,9 @@ class PlayoffAdvancement(NamedTuple):
 
     bracket_table: Any
     playoff_advancement: Any
-    double_elim_matches: Optional[TOrganizedDoubleElimMatches]
+    double_elim_matches: Optional[
+        Union[TOrganizedDoubleElimMatches, TOrganizedLegacyDoubleElimMatches]
+    ]
     playoff_template: Optional[str]
 
 
@@ -120,12 +124,16 @@ class PlayoffAdvancementHelper(object):
     @classmethod
     def double_elim_matches(
         cls, event: Event, matches: TOrganizedMatches
-    ) -> Optional[TOrganizedDoubleElimMatches]:
+    ) -> Optional[
+        Union[TOrganizedDoubleElimMatches, TOrganizedLegacyDoubleElimMatches]
+    ]:
         double_elim_matches = None
         if event.playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
             double_elim_matches = MatchHelper.organized_legacy_double_elim_matches(
                 matches
             )
+        elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
+            double_elim_matches = MatchHelper.organized_double_elim_matches(matches)
         return double_elim_matches
 
     @classmethod
