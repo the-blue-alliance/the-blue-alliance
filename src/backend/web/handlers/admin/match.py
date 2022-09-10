@@ -63,6 +63,7 @@ def match_edit_post(match_key):
         if request.form.get("youtube_videos")
         else []
     )
+    display_name = request.form.get("display_name")
     team_key_names = list()
 
     for alliance in alliances:
@@ -80,6 +81,7 @@ def match_edit_post(match_key):
         tba_videos=tba_videos,
         youtube_videos=youtube_videos,
         no_auto_update=str(request.form.get("no_auto_update")).lower() == "true",
+        display_name=display_name if display_name != "None" else None,
     )
     MatchManipulator.createOrUpdate(match, auto_union=False)
 

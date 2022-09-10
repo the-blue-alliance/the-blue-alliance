@@ -109,6 +109,7 @@ class Match(CachedModel):
     tiebreak_match_key = ndb.KeyProperty(
         kind="Match"
     )  # Points to a match that was played to tiebreak this one
+    display_name: str = ndb.StringProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -123,6 +124,7 @@ class Match(CachedModel):
         "post_result_time",
         "push_sent",
         "tiebreak_match_key",
+        "display_name",
     }
 
     _list_attrs: Set[str] = {
@@ -325,6 +327,9 @@ class Match(CachedModel):
 
     @property
     def verbose_name(self) -> str:
+        if self.display_name:
+            return self.display_name
+
         from backend.common.helpers.event_helper import EventHelper
 
         if (

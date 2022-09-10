@@ -647,6 +647,11 @@
             "type": "string",
             "description": "UTC time of match in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
             "example": "2008-01-02T10:30:00.000Z"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "The name for the match, to be shown on the event page",
+            "example": "Quals 10"
           }
         }
       }
