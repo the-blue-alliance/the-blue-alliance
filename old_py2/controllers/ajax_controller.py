@@ -73,21 +73,6 @@ class AccountRegisterFCMToken(LoggedInHandler):
             client.put()
 
 
-class AccountFavoritesHandler(LoggedInHandler):
-    """
-    For getting an account's favorites
-    """
-    def get(self, model_type):
-        if not self.user_bundle.user:
-            self.response.set_status(401)
-            return
-
-        favorites = Favorite.query(
-            Favorite.model_type==int(model_type),
-            ancestor=ndb.Key(Account, self.user_bundle.user.user_id())).fetch()
-        self.response.out.write(json.dumps([ModelToDict.favoriteConverter(fav) for fav in favorites]))
-
-
 class AccountFavoritesAddHandler(LoggedInHandler):
     """
     For adding an account's favorites
