@@ -5,6 +5,7 @@ from datetime import timedelta
 from flask import Flask, make_response, Response
 from flask_caching import CachedResponse
 from freezegun import freeze_time
+from werkzeug.http import http_date
 
 from backend.common.cache.flask_response_cache import MemcacheFlaskResponseCache
 from backend.common.decorators import cached_public, memoize
@@ -119,6 +120,49 @@ def test_cached_public_etag(app: Flask) -> None:
     resp3 = app.test_client().get("/", headers={"If-None-Match": "bad-etag"})
     assert resp3.status_code == 200
     assert resp3.get_data(as_text=True) == "Hello!"
+
+
+def test_cached_304_not_modified(app: Flask) -> None:
+    start_time = datetime.datetime.now()
+
+    @app.route("/")
+    @cached_public
+    def view():
+        response = make_response("Hello!")
+        response.last_modified = start_time
+        return response
+
+    resp = app.test_client().get("/")
+    last_modified = resp.headers.get("Last-Modified")
+    assert last_modified is not None
+    assert last_modified == http_date(start_time)
+
+    # If we're asking for the same data as we've last received
+    resp2 = app.test_client().get(
+        "/", headers={"If-Modified-Since": http_date(start_time)}
+    )
+    assert resp2.status_code == 304
+    assert resp2.get_data(as_text=True) == ""
+
+    # Check that if we ask for a newer time, we'll get the data back
+    resp3 = app.test_client().get(
+        "/",
+        headers={
+            "If-Modified-Since": http_date(start_time + datetime.timedelta(seconds=-1))
+        },
+    )
+    assert resp3.status_code == 200
+    assert resp3.get_data(as_text=True) == "Hello!"
+
+    # But if we ask for something newer, we get the response back
+    resp3 = app.test_client().get(
+        "/",
+        headers={
+            "If-Modified-Since": http_date(start_time + datetime.timedelta(seconds=1))
+        },
+    )
+    assert resp3.status_code == 304
+    assert resp3.get_data(as_text=True) == ""
 
 
 def test_flask_cache_with_memcache(app: Flask, memcache_stub) -> None:
