@@ -241,6 +241,7 @@ def event_detail(event_key: EventKey) -> Response:
         "parent_event": parent_event_future.get_result()
         if parent_event_future
         else None,
+        "double_elim_rounds": playoff_type.DoubleElimRound.__members__.values(),
         "double_elim_matches": double_elim_matches,
         "double_elim_playoff_types": playoff_type.DOUBLE_ELIM_TYPES,
         "qual_playlist": qual_playlist,
