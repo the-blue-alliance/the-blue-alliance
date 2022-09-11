@@ -40,6 +40,10 @@ def cached_public(func: Optional[Callable] = None, ttl: Union[int, timedelta] = 
             if resp.headers.get("ETag", None) in str(request.if_none_match):
                 return Response(status=304)
 
+            if request.if_modified_since is not None and resp.last_modified is not None:
+                if request.if_modified_since >= resp.last_modified:
+                    return Response(status=304)
+
         return resp
 
     return decorated_function
