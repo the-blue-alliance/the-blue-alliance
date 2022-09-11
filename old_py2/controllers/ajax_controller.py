@@ -168,38 +168,6 @@ class LiveEventHandler(CacheableHandler):
         return json.dumps(event_dict)
 
 
-class TypeaheadHandler(CacheableHandler):
-    """
-    Currently just returns a list of all teams and events
-    Needs to be optimized at some point.
-    Tried a trie but the datastructure was too big to
-    fit into memcache efficiently
-    """
-    CACHE_VERSION = 2
-    CACHE_KEY_FORMAT = "typeahead_entries:{}"  # (search_key)
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
-
-    def __init__(self, *args, **kw):
-        super(TypeaheadHandler, self).__init__(*args, **kw)
-        self._cache_expiration = self.CACHE_HEADER_LENGTH
-
-    def get(self, search_key):
-        import urllib2
-        search_key = urllib2.unquote(search_key)
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(search_key)
-        super(TypeaheadHandler, self).get(search_key)
-
-    def _render(self, search_key):
-        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
-
-        entry = TypeaheadEntry.get_by_id(search_key)
-        if entry is None:
-            return '[]'
-        else:
-            self._last_modified = entry.updated
-            return entry.data_json
-
-
 class EventRemapTeamsHandler(CacheableHandler):
     """
     Returns the current team remapping for an event
