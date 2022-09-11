@@ -122,8 +122,10 @@ class PlayoffAdvancementHelper(object):
         cls, event: Event, matches: TOrganizedMatches
     ) -> Optional[TOrganizedDoubleElimMatches]:
         double_elim_matches = None
-        if event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            double_elim_matches = MatchHelper.organized_double_elim_matches(matches)
+        if event.playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
+            double_elim_matches = MatchHelper.organized_legacy_double_elim_matches(
+                matches
+            )
         return double_elim_matches
 
     @classmethod

@@ -27,7 +27,9 @@ class PlayoffType(enum.IntEnum):
     ROUND_ROBIN_6_TEAM = 4
 
     # Double Elimination Bracket
-    DOUBLE_ELIM_8_TEAM = 5
+    # The legacy style is just a basic internet bracket
+    # https://www.printyourbrackets.com/fillable-brackets/8-seeded-double-fillable.pdf
+    LEGACY_DOUBLE_ELIM_8_TEAM = 5
 
     # Festival of Champions
     BO5_FINALS = 6
@@ -46,7 +48,7 @@ BRACKET_TYPES: Set[PlayoffType] = {
 
 
 DOUBLE_ELIM_TYPES: Set[PlayoffType] = {
-    PlayoffType.DOUBLE_ELIM_8_TEAM,
+    PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM,
 }
 
 
@@ -58,7 +60,7 @@ TYPE_NAMES: Dict[PlayoffType, str] = {
     PlayoffType.BRACKET_2_TEAM: "Elimination Bracket (2 Alliances)",
     PlayoffType.AVG_SCORE_8_TEAM: "Average Score (8 Alliances)",
     PlayoffType.ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)",
-    PlayoffType.DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
+    PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM: "Legacy Double Elimination Bracket (8 Alliances)",
     PlayoffType.BO3_FINALS: "Best of 3 Finals",
     PlayoffType.BO5_FINALS: "Best of 5 Finals",
     PlayoffType.CUSTOM: "Custom",
@@ -151,7 +153,7 @@ BRACKET_OCTO_ELIM_MAPPING: Dict[int, Tuple[int, int]] = {
 # Map match number -> set/match for a 8 alliance double elim bracket
 # Based off: https://www.printyourbrackets.com/fillable-brackets/8-seeded-double-fillable.pdf
 # Matches 1-6 are ef, 7-10 are qf, 11/12 are sf, 13 is f1, and 14/15 are f2
-DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+LEGACY_DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     # octofinals (winners bracket)
     1: (CompLevel.EF, 1, 1),
     2: (CompLevel.EF, 2, 1),

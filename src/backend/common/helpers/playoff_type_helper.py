@@ -4,8 +4,8 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.playoff_type import (
     BRACKET_ELIM_MAPPING,
     BRACKET_OCTO_ELIM_MAPPING,
-    DOUBLE_ELIM_MAPPING,
     DoubleElimBracket,
+    LEGACY_DOUBLE_ELIM_MAPPING,
     PlayoffType,
 )
 
@@ -28,8 +28,8 @@ class PlayoffTypeHelper:
             elif playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
                 # Einstein 2017 for example. 15 round robin matches, then finals
                 return CompLevel.SF if match_number <= 15 else CompLevel.F
-            elif playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-                level, _, _ = DOUBLE_ELIM_MAPPING[match_number]
+            elif playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
+                level, _, _ = LEGACY_DOUBLE_ELIM_MAPPING[match_number]
                 return level
             elif (
                 playoff_type == PlayoffType.BO3_FINALS
@@ -86,8 +86,8 @@ class PlayoffTypeHelper:
                 return 1, match_number
             else:
                 return 1, match_number
-        elif playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            level, set, match = DOUBLE_ELIM_MAPPING[match_number]
+        elif playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
+            _, set, match = LEGACY_DOUBLE_ELIM_MAPPING[match_number]
             return set, match
         elif (
             playoff_type == PlayoffType.BO3_FINALS

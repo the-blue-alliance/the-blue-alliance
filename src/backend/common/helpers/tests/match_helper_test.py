@@ -75,13 +75,15 @@ def test_organized_matches_sorted(test_data_importer) -> None:
     )
 
 
-def test_organized_double_elim_matches(test_data_importer) -> None:
+def test_organized_legacy_double_elim_matches(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2017wiwi_matches.json"
     )
 
     _, organized_matches = MatchHelper.organized_matches(matches)
-    double_elim_matches = MatchHelper.organized_double_elim_matches(organized_matches)
+    double_elim_matches = MatchHelper.organized_legacy_double_elim_matches(
+        organized_matches
+    )
 
     assert DoubleElimBracket.WINNER in double_elim_matches
     assert DoubleElimBracket.LOSER in double_elim_matches
