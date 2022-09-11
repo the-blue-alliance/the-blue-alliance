@@ -41,6 +41,10 @@
             <td><input type="checkbox" name="no_auto_update" value="True" {% if match.no_auto_update %}checked="checked"{% endif %} /></td>
         </tr>
         <tr>
+            <td>Display Name</td>
+            <td><input class="form-control" type="text" name="display_name" value="{{match.display_name}}" /></td>
+        </tr>
+        <tr>
             <td>Team Key Names (Automatically generated)</td>
             <td><textarea class="form-control" name="disabled_team_key_names" disabled="disabled">{{match.team_key_names}}</textarea></td>
         </tr>

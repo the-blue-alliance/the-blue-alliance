@@ -224,6 +224,7 @@ def update_event_matches(event_key: EventKey) -> Response:
             score_breakdown_json=match["score_breakdown_json"],
             time_string=match["time_string"],
             time=match["time"],
+            display_name=match["display_name"],
         )
 
         if (not match.time or match.time == "") and match.time_string:

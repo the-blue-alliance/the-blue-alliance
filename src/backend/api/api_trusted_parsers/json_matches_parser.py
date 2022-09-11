@@ -30,6 +30,7 @@ class MatchInput(TypedDict, total=False):
     score_breakdowns: Mapping[AllianceColor, Dict[str, Any]]
     time_string: str
     time: str
+    display_name: str
 
 
 class ParsedMatch(TypedDict):
@@ -41,6 +42,7 @@ class ParsedMatch(TypedDict):
     time_string: str
     time: datetime.datetime
     team_key_names: Sequence[TeamKey]
+    display_name: Optional[str]
 
 
 class JSONMatchesParser:
@@ -72,6 +74,7 @@ class JSONMatchesParser:
             score_breakdown = match.get("score_breakdown", None)
             time_string = match.get("time_string", None)
             time_utc = match.get("time_utc", None)
+            display_name = match.get("display_name", None)
 
             if comp_level is None:
                 raise ParserInputException("Match must have a 'comp_level'")
@@ -165,6 +168,9 @@ class JSONMatchesParser:
                         "Could not parse 'time_utc'. Check that it is in ISO 8601 format."
                     )
 
+            if display_name is not None and type(display_name) is not str:
+                raise ParserInputException("'display_name' must be a string")
+
             # validation passed. build new dicts to sanitize
             parsed_alliances: Dict[AllianceColor, MatchAlliance] = {
                 AllianceColor.RED: {
@@ -192,6 +198,7 @@ class JSONMatchesParser:
                 "time": datetime_utc,
                 "team_key_names": parsed_alliances[AllianceColor.RED]["teams"]
                 + parsed_alliances[AllianceColor.BLUE]["teams"],
+                "display_name": display_name,
             }
 
             parsed_matches.append(parsed_match)
