@@ -77,7 +77,7 @@ class MatchHelper(object):
 
     # Assumed that organized_matches is called first
     @classmethod
-    def organized_double_elim_matches(
+    def organized_legacy_double_elim_matches(
         cls, organized_matches: TOrganizedMatches
     ) -> TOrganizedDoubleElimMatches:
         matches = collections.defaultdict(lambda: collections.defaultdict(list))
