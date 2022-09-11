@@ -10,6 +10,7 @@ from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import render_time_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
+from backend.web.handlers.ajax import typeahead_handler
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
@@ -108,6 +109,9 @@ app.add_url_rule("/privacy", view_func=privacy)
 # Off-site redirects
 app.add_url_rule("/bigquery", view_func=bigquery)
 app.add_url_rule("/swag", view_func=swag)
+
+# Ajax/Helper endpoints
+app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
 
 app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
