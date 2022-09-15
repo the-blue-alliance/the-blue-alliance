@@ -231,8 +231,11 @@ class PlayoffAdvancementHelper(object):
     ) -> Mapping[CompLevel, Mapping[str, BracketItem]]:
         complete_alliances = []
         bracket_table = defaultdict(lambda: defaultdict(dict))
-        for comp_level in [CompLevel.QF, CompLevel.SF, CompLevel.F]:
+        for comp_level in [CompLevel.EF, CompLevel.QF, CompLevel.SF, CompLevel.F]:
+            set_numbers = [m.set_number for m in matches[comp_level]]
             for match in matches[comp_level]:
+                is_lone_match = set_numbers.count(match.set_number) == 1
+
                 set_key = "{}{}".format(comp_level, match.set_number)
                 if set_key not in bracket_table[comp_level]:
                     bracket_table[comp_level][set_key] = {
@@ -280,6 +283,10 @@ class PlayoffAdvancementHelper(object):
                             break
                     else:
                         complete_alliances.append(alliance)
+                        if is_lone_match:
+                            bracket_table[comp_level][set_key][
+                                f"{color}_alliance"
+                            ] += cls.ordered_alliance(alliance, alliance_selections)
 
                 winner = match.winning_alliance
                 if not winner or winner == "":
@@ -304,7 +311,14 @@ class PlayoffAdvancementHelper(object):
                     bracket_table[comp_level][set_key][f"{loser}_record"]["losses"] + 1
                 )
 
-                n = 3 if event.playoff_type == PlayoffType.BO5_FINALS else 2
+                n = 2
+                if event.playoff_type == PlayoffType.BO5_FINALS:
+                    n = 3
+                elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM and not (
+                    comp_level == CompLevel.F
+                    and match.set_number == 2  # only the final is a BO3
+                ):
+                    n = 1
                 if bracket_table[comp_level][set_key]["red_wins"] == n:
                     bracket_table[comp_level][set_key][
                         "winning_alliance"
