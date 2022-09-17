@@ -110,3 +110,6 @@ def test_render_double_elim(web_client: Client, test_data_importer) -> None:
     elim_match_table = soup.find(id="elim-match-table")
     elim_matches = elim_match_table.find("tbody").find_all("tr")
     assert len(elim_matches) > 1
+
+    double_elim_bracket = soup.find(id="double-elim-bracket-table")
+    assert double_elim_bracket is not None

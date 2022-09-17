@@ -1,0 +1,75 @@
+#double-elim-bracket-wrapper {
+  overflow-x: auto;
+
+  /* Make sure tooltips aren't truncated by overflow */
+  margin-left: -20px;
+  width: calc(100% + 20px);
+}
+
+#double-elim-bracket-table {
+  margin-left: 20px;
+  width: calc(100% - 20px);
+
+  tr {
+    height: 31px;
+  }
+
+  td {
+    min-width: 10px;
+    position: relative;
+  }
+
+  .match {
+    min-width: 120px;
+    width: 140px;
+  }
+
+  .team-placeholder {
+    background-color: #f0f0f0;
+  }
+
+  .inner {
+    position: absolute;
+    top: 0%;
+    height: 100%;
+    width: 100%;
+  }
+
+  .inner.merger {
+    border: 2px solid black;
+    border-left: 0px;
+  }
+
+  .inner.snake {
+    top: -1px;
+    height: calc(100% + 1px);
+
+    border: 2px solid black;
+    border-left: 0px;
+    border-top: 0px;
+  }
+
+  .inner.top {
+    border-top: 2px solid black;
+  }
+
+  .dash {
+    border-bottom: 2px solid black;
+  }
+
+  .match-label {
+    position: absolute;
+    top: -22px;
+    left: 5px;
+    color: #777;
+    font-style: italic;
+  }
+
+  .match-table {
+    margin-bottom: 0px;
+  }
+
+  .gap-row {
+    height: 40px;
+  }
+}

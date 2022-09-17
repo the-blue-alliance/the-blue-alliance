@@ -1,0 +1,226 @@
+{% macro bracket_match(match, red_alliance_placeholder, blue_alliance_placeholder) %}
+  <table class="match-table">
+    {% if match %}
+      <tr>
+        <td>
+          <span rel="tooltip" data-placement="top" title="{{ match.red_alliance|join(', ') }}">
+            {{ match.red_name if match.red_name else 'Unknown' }}
+          </span>
+        </td>
+        <td class="redScore {% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_record.wins }}</td>
+      </tr>
+      <tr>
+        <td>
+          <span rel="tooltip" data-placement="bottom" title="{{ match.blue_alliance|join(', ') }}">
+            {{ match.blue_name if match.blue_name else 'Unknown' }}
+          </span>
+        </td>
+        <td class="blueScore {% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_record.wins }}</td>
+      </tr>
+    {% else %}
+      <tr>
+        <td class="team-placeholder">{{ red_alliance_placeholder }}</td>
+      </tr>
+      <tr>
+        <td class="team-placeholder">{{ blue_alliance_placeholder }}</td>
+      </tr>
+    {% endif %}
+  </table>
+{% endmacro %}
+
+<div id="double-elim-bracket-wrapper">
+  <table id="double-elim-bracket-table">
+    <tr class="gap-row"></tr>
+
+    <!--    Upper Bracket -->
+    <tr>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 1</span>
+        {{ bracket_match(bracket_table.ef.get('ef1'), 'Alliance 1', 'Alliance 8') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td rowspan="4" class="">
+        <div class="merger inner"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td class="dash"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 7</span>
+        {{ bracket_match(bracket_table.qf.get('qf1'), 'Winner of M1', 'Winner of M2') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="3"></td>
+      <td rowspan="8" colspan="3">
+        <div class="merger inner"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 2</span>
+        {{ bracket_match(bracket_table.ef.get('ef2'), 'Alliance 4', 'Alliance 5') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="16"></td>
+    </tr>
+
+    <tr>
+      <td colspan="4"></td>
+      <td class="dash" colspan="2"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 12</span>
+        {{ bracket_match(bracket_table.sf.get('sf2'), 'Winner of M7', 'Winner of M8') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="9"></td>
+      <td class="" colspan="3">
+        <div class="top inner"></div>
+      </td>
+      <td class="" rowspan="9">
+        <div class="merger inner"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 3</span>
+        {{ bracket_match(bracket_table.ef.get('ef3'), 'Alliance 3', 'Alliance 6') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td rowspan="4">
+        <div class="merger inner"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td class="dash"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 8</span>
+        {{ bracket_match(bracket_table.qf.get('qf2'), 'Winner of M3', 'Winner of M4') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="3"></td>
+      <td colspan="10"></td>
+      <td class="dash" colspan="1"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Finals</span>
+        {{ bracket_match(bracket_table.f.get('f2'), 'Winner of M12', 'Winner of M13') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 4</span>
+        {{ bracket_match(bracket_table.ef.get('ef4'), 'Alliance 2', 'Alliance 7') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td></td>
+    </tr>
+
+    <!--    Lower Bracket -->
+    <tr>
+      <td colspan="16"></td>
+    </tr>
+
+    <tr>
+      <td colspan="11"></td>
+      <td class="dash"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 13</span>
+        {{ bracket_match(bracket_table.f.get('f1'), 'Loser of M12', 'Winner of M11') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="5"></td>
+      <td class="dash" colspan="1"></td>
+
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 10</span>
+        {{ bracket_match(bracket_table.qf.get('qf4'), 'Loser of M8', 'Winner of M5') }}
+      </td>
+      <td colspan="3"></td>
+      <td rowspan="3">
+        <div class="snake inner"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="4"></td>
+      <td rowspan="2">
+        <div class="snake inner"></div>
+      </td>
+      <td colspan="1"></td>
+      <td rowspan="4" class="">
+        <div class="merger inner"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="3"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 5</span>
+        {{ bracket_match(bracket_table.ef.get('ef5'), 'Loser of M1', 'Winner of M2') }}
+      </td>
+      <td colspan="3"></td>
+      <td class="dash"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 11</span>
+        {{ bracket_match(bracket_table.sf.get('sf1'), 'Loser of M10', 'Winner of M9') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="1"></td>
+    </tr>
+
+    <tr>
+      <td colspan="5"></td>
+      <td class="dash" colspan="1"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 9</span>
+        {{ bracket_match(bracket_table.qf.get('qf3'), 'Loser of M7', 'Winner of M6') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="4"></td>
+      <td rowspan="2" class="path">
+        <div class="snake inner"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="3"></td>
+      <td rowspan="2" class="match">
+        <span class="match-label">Match 6</span>
+        {{ bracket_match(bracket_table.ef.get('ef6'), 'Loser of M3', 'Winner of M4') }}
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="1"></td>
+    </tr>
+
+    <tr class="gap-row"></tr>
+
+  </table>
+</div>

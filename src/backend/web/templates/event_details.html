@@ -211,6 +211,15 @@
           {% endif %}
         </div>
         {% endif %}
+
+        <!-- Double Elim Bracket -->
+        {% if event.playoff_type == 10 and (matches.ef or matches.qf or matches.sf or matches.f) %}
+          <div class="col-sm-12">
+            <h3>Playoff Bracket</h3>
+            {% include "bracket_partials/double_elim_bracket_table.html" %}
+          </div>
+        {% endif %}
+
       </div>
       <div class="row">
         <div class="col-sm-12">
