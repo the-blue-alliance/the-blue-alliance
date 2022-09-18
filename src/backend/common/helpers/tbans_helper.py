@@ -1,6 +1,6 @@
-import time
 import datetime
 import logging
+import time
 from typing import List, Optional
 
 import firebase_admin
@@ -572,10 +572,14 @@ class TBANSHelper:
             ):
                 client = subclients[index]
                 if isinstance(response.exception, UnregisteredError):
-                    logging.info(f"Deleting mobile client with ID: f{client.messaging_id}")
+                    logging.info(
+                        f"Deleting mobile client with ID: f{client.messaging_id}"
+                    )
                     MobileClientQuery.delete_for_messaging_id(client.messaging_id)
                 elif isinstance(response.exception, SenderIdMismatchError):
-                    logging.info(f"Deleting mobile client with ID: f{client.messaging_id}")
+                    logging.info(
+                        f"Deleting mobile client with ID: f{client.messaging_id}"
+                    )
                     MobileClientQuery.delete_for_messaging_id(client.messaging_id)
                 elif isinstance(response.exception, QuotaExceededError):
                     logging.error("Qutoa exceeded - retrying client...")

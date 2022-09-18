@@ -13,6 +13,7 @@ _helpers.positional_parameters_enforcement = _helpers.POSITIONAL_IGNORE
 MAXIMUM_TOKENS = 500
 # https://github.com/firebase/firebase-admin-python/blob/9e5b8e383e066c319a483285df903150d5029a34/firebase_admin/_messaging_encoder.py#L78
 
+
 class FCMRequest(Request):
     """Represents a notification payload and a delivery option to send to FCM.
     https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
