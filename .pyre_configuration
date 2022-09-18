@@ -14,7 +14,6 @@
     {"site-package": "freezegun"},
     {"site-package": "google/appengine"},
     {"site-package": "google/auth"},
-    {"site-package": "google/cloud/logging"},
     {"site-package": "google/cloud/storage"},
     {"site-package": "jinja2"},
     {"site-package": "numpy"},

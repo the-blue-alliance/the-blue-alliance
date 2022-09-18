@@ -1,7 +1,5 @@
 import logging
 
-import google.cloud.logging
-
 from backend.common.environment import Environment
 
 
@@ -12,7 +10,6 @@ def configure_logging() -> None:
         format="%(levelname)s\t %(asctime)s %(pathname)s:%(lineno)d] %(name)s: %(message)s",
     )
 
-    # Configure NDB logging
     ndb_log_level = Environment.ndb_log_level()
     if ndb_log_level:
         from google.appengine.ext import ndb
@@ -24,7 +21,3 @@ def configure_logging() -> None:
         ]
         for logger in ndb_loggers:
             logger.setLevel(ndb_log_level.upper())
-
-    # Configure GCP Logging
-    client = google.cloud.logging.Client()
-    client.setup_logging()
