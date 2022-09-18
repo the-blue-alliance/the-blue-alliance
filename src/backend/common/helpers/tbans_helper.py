@@ -1,3 +1,4 @@
+import time
 import datetime
 import logging
 from typing import List, Optional
@@ -544,7 +545,9 @@ class TBANSHelper:
                 legacy_data_format=legacy_data_format,
             )
 
+            logging.info(f"Sending FCM request: {time.strftime('%X')}")
             batch_response = fcm_request.send()
+            logging.info(f"Got FCM response: {time.strftime('%X')}")
             retry_clients = []
 
             # Handle our failed sends - this might include logging/alerting, removing old clients, or retrying sends
@@ -569,8 +572,10 @@ class TBANSHelper:
             ):
                 client = subclients[index]
                 if isinstance(response.exception, UnregisteredError):
+                    logging.info(f"Deleting mobile client with ID: f{client.messaging_id}")
                     MobileClientQuery.delete_for_messaging_id(client.messaging_id)
                 elif isinstance(response.exception, SenderIdMismatchError):
+                    logging.info(f"Deleting mobile client with ID: f{client.messaging_id}")
                     MobileClientQuery.delete_for_messaging_id(client.messaging_id)
                 elif isinstance(response.exception, QuotaExceededError):
                     logging.error("Qutoa exceeded - retrying client...")
