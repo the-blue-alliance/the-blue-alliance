@@ -45,7 +45,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",
-    "jest-cli": "^29.0.3",
+    "jest-cli": "^29.1.1",
     "jest-puppeteer": "^6.1.1",
     "less": "4.1.3",
     "md5": "^2.3.0",
