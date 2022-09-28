@@ -1,5 +1,6 @@
 import json
 import os
+from typing import List, Optional
 
 import pytest
 
@@ -9,8 +10,9 @@ from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import (
     PlayoffAdvancementHelper,
 )
+from backend.common.models.alliance import EventAlliance, EventAllianceBackup
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey
+from backend.common.models.keys import EventKey, TeamKey
 
 
 @pytest.fixture(autouse=True)
@@ -26,6 +28,57 @@ def create_event(event_key: EventKey, playoff_type: PlayoffType) -> Event:
         official=True,
         playoff_type=playoff_type,
     )
+
+
+@pytest.mark.parametrize(
+    "selections,team_keys,output",
+    [
+        # No alliance selections
+        (None, ["frc254", "frc255", "frc256"], None),
+        # Alliance not found in list
+        ([], ["frc254", "frc255", "frc256"], None),
+        # Exact match with explicit name
+        (
+            [
+                EventAlliance(
+                    picks=["frc254", "frc255", "frc256"], name="The Couch Alliance"
+                )
+            ],
+            ["frc254", "frc255", "frc256"],
+            "The Couch Alliance",
+        ),
+        # Exact match with implicit name
+        (
+            [EventAlliance(picks=["frc254", "frc255", "frc256"])],
+            ["frc254", "frc255", "frc256"],
+            "Alliance 1",
+        ),
+        # Exact match with backup
+        (
+            [
+                EventAlliance(
+                    picks=["frc254", "frc255", "frc256"],
+                    backup=EventAllianceBackup(**{"in": "frc257", "out": "frc256"}),
+                )
+            ],
+            ["frc254", "frc255", "frc257"],
+            "Alliance 1",
+        ),
+        # Alliance not found
+        (
+            [EventAlliance(picks=["frc254", "frc255", "frc256"])],
+            ["frc300", "frc301", "frc302"],
+            None,
+        ),
+    ],
+)
+def test_alliance_name(
+    selections: Optional[List[EventAlliance]],
+    team_keys: List[TeamKey],
+    output: Optional[str],
+) -> None:
+    name = PlayoffAdvancementHelper._alliance_name(team_keys, selections)
+    assert name == output
 
 
 def test_standard_bracket(test_data_importer) -> None:

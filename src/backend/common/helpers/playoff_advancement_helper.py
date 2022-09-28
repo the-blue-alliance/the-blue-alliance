@@ -434,7 +434,7 @@ class PlayoffAdvancementHelper(object):
                         match.alliances[color]["teams"], alliance_selections
                     )
                     alliance_name: str = (
-                        cls.alliance_name(
+                        cls._alliance_name(
                             match.alliances[color]["teams"], alliance_selections
                         )
                         or ""
@@ -654,33 +654,15 @@ class PlayoffAdvancementHelper(object):
     ) -> Optional[str]:
         if not alliance_selections:
             return None
-        for (
-            alliance_selection
-        ) in alliance_selections:  # search for alliance. could be more efficient
+        for (n, alliance_selection) in enumerate(
+            alliance_selections
+        ):  # search for alliance. could be more efficient
             picks = alliance_selection["picks"]
             if (
                 len(set(picks).intersection(set(team_keys))) >= 2
             ):  # if >= 2 teams are the same, then the alliance is the same
-                return alliance_selection.get("name")
+                return alliance_selection.get("name", f"Alliance {n+1}")
         return None
-
-    @classmethod
-    def alliance_name(
-        cls,
-        team_keys: List[TeamKey],
-        alliance_selections: Optional[List[EventAlliance]],
-    ) -> Optional[str]:
-        if alliance_selections:
-            for (
-                alliance_selection
-            ) in alliance_selections:  # search for alliance. could be more efficient
-                picks = alliance_selection["picks"]
-                if (
-                    len(set(picks).intersection(set(team_keys))) >= 2
-                ):  # if >= 2 teams are the same, then the alliance is the same
-                    return alliance_selection.get("name")
-
-        return ""
 
     @classmethod
     def create_playoff_advancement_response_for_apiv3(

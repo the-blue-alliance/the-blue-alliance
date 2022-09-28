@@ -11,7 +11,7 @@
     "level_name": "Quarterfinals", 
     "rankings": [
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 1",
         "extra_stats": [
           1
         ], 
@@ -27,7 +27,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 2",
         "extra_stats": [
           1
         ], 
@@ -43,7 +43,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 6",
         "extra_stats": [
           1
         ], 
@@ -59,7 +59,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 5",
         "extra_stats": [
           1
         ], 
@@ -75,7 +75,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 7",
         "extra_stats": [
           0
         ], 
@@ -91,7 +91,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 4",
         "extra_stats": [
           0
         ], 
@@ -107,7 +107,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 8",
         "extra_stats": [
           0
         ], 
@@ -123,7 +123,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 3",
         "extra_stats": [
           0
         ], 
@@ -160,7 +160,7 @@
     "level_name": "Semifinals", 
     "rankings": [
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 6",
         "extra_stats": [
           1
         ], 
@@ -176,7 +176,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 2",
         "extra_stats": [
           1
         ], 
@@ -192,7 +192,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 1",
         "extra_stats": [
           0
         ], 
@@ -208,7 +208,7 @@
         ]
       }, 
       {
-        "alliance_name": null, 
+        "alliance_name": "Alliance 5",
         "extra_stats": [
           0
         ], 
@@ -240,7 +240,7 @@
     "rankings": [
       {
         "alliance_color": "red", 
-        "alliance_name": null, 
+        "alliance_name": "Alliance 6",
         "extra_stats": [], 
         "matches_played": 2, 
         "record": {
@@ -259,7 +259,7 @@
       }, 
       {
         "alliance_color": "blue", 
-        "alliance_name": null, 
+        "alliance_name": "Alliance 2",
         "extra_stats": [], 
         "matches_played": 2, 
         "record": {
