@@ -4,6 +4,8 @@ dispatch:
   service: default
 - url: "www.thebluealliance.com/search*"
   service: default
+- url: "www.thebluealliance.com/mytba"
+  service: default
 - url: "www.thebluealliance.com/clientapi/*"
   service: default
   
