@@ -1,41 +1,11 @@
 dispatch:
-# Start serving certain pages from py3
-- url: "www.thebluealliance.com/"  # Just the homepage
-  service: py3-web
-
-- url: "www.thebluealliance.com/about"
-  service: py3-web
-
-- url: "www.thebluealliance.com/apidocs*"
-  service: py3-web
-
-- url: "www.thebluealliance.com/avatars*"
-  service: py3-web
-
-- url: "www.thebluealliance.com/event*"
-  service: py3-web
-    
-- url: "www.thebluealliance.com/gameday*"
-  service: py3-web
-    
-- url: "www.thebluealliance.com/insights*"
-  service: py3-web
-
-- url: "www.thebluealliance.com/team*"
-  service: py3-web
-
-- url: "www.thebluealliance.com/match/*"
-  service: py3-web
-  
-#- url: "www.thebluealliance.com/suggest/*"
-#  service: py3-web
-
-# match py3_css and py3_javascript
-- url: "www.thebluealliance.com/py3*"
-  service: py3-web
-    
-- url: "www.thebluealliance.com/watch/*"
-  service: py3-web
+# Pin these pages to py2
+- url: "www.thebluealliance.com/_/account/*"
+  service: default
+- url: "www.thebluealliance.com/search*"
+  service: default
+- url: "www.thebluealliance.com/clientapi/*"
+  service: default
   
 # APIs on py3 (both apiv3 and trusted api)
 - url: "www.thebluealliance.com/api/*"
@@ -49,17 +19,18 @@ dispatch:
 - url: "*/tasks/*"
   service: py3-tasks-io
 
-# Python 3 Migration
-- url: "py3.thebluealliance.com/api/*"
-  service: py3-api
-
 # API docs (swagger)
-- url: "*/swagger/api_v3.json"
+- url: "*/swagger/*"
+  service: py3-web
+  
+# Default catch-all to py3
+- url: "www.thebluealliance.com/*"
   service: py3-web
 
+# Explicitly choose py2 or py3 based on host
 - url: "py3.thebluealliance.com/*"
   service: py3-web
-
+  
 - url: "py2.thebluealliance.com/*"
   service: default
 
