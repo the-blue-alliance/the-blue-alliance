@@ -3,7 +3,7 @@
     {% if match %}
       <tr>
         <td>
-          <span rel="tooltip" data-placement="top" title="{{ match.red_alliance|join(', ') }}">
+          <span class="alliance-name" rel="tooltip" data-placement="top" title="{{ match.red_alliance|join(', ') }}">
             {{ match.red_name if match.red_name else 'Unknown' }}
           </span>
         </td>
@@ -11,7 +11,7 @@
       </tr>
       <tr>
         <td>
-          <span rel="tooltip" data-placement="bottom" title="{{ match.blue_alliance|join(', ') }}">
+          <span class="alliance-name" rel="tooltip" data-placement="bottom" title="{{ match.blue_alliance|join(', ') }}">
             {{ match.blue_name if match.blue_name else 'Unknown' }}
           </span>
         </td>
@@ -178,13 +178,13 @@
       <td colspan="3"></td>
       <td rowspan="2" class="match">
         <span class="match-label">Match 5</span>
-        {{ bracket_match(bracket_table.ef.get('ef5'), 'Loser of M1', 'Winner of M2') }}
+        {{ bracket_match(bracket_table.ef.get('ef5'), 'Loser of M1', 'Loser of M2') }}
       </td>
       <td colspan="3"></td>
       <td class="dash"></td>
       <td rowspan="2" class="match">
         <span class="match-label">Match 11</span>
-        {{ bracket_match(bracket_table.sf.get('sf1'), 'Loser of M10', 'Winner of M9') }}
+        {{ bracket_match(bracket_table.sf.get('sf1'), 'Winner of M10', 'Winner of M9') }}
       </td>
     </tr>
 
@@ -212,7 +212,7 @@
       <td colspan="3"></td>
       <td rowspan="2" class="match">
         <span class="match-label">Match 6</span>
-        {{ bracket_match(bracket_table.ef.get('ef6'), 'Loser of M3', 'Winner of M4') }}
+        {{ bracket_match(bracket_table.ef.get('ef6'), 'Loser of M3', 'Loser of M4') }}
       </td>
     </tr>
 
