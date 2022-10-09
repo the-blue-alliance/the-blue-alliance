@@ -29,6 +29,7 @@ from backend.web.handlers.static import (
     opr,
     privacy,
     swag,
+    thanks,
 )
 from backend.web.handlers.suggestions.suggestion_review import (
     blueprint as suggestion_review_blueprint,
@@ -105,6 +106,7 @@ app.add_url_rule("/brand", view_func=brand)
 app.add_url_rule("/contact", view_func=contact)
 app.add_url_rule("/opr", view_func=opr)
 app.add_url_rule("/privacy", view_func=privacy)
+app.add_url_rule("/thanks", view_func=thanks)
 
 # Off-site redirects
 app.add_url_rule("/bigquery", view_func=bigquery)
