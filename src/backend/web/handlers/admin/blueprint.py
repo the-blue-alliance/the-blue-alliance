@@ -40,6 +40,13 @@ from backend.web.handlers.admin.team import (
     team_robot_name_update,
     team_website_update,
 )
+from backend.web.handlers.admin.team_media_mod import (
+    team_media_mod_add,
+    team_media_mod_add_post,
+    team_media_mod_edit,
+    team_media_mod_edit_post,
+    team_media_mod_list,
+)
 from backend.web.profiled_render import render_template
 
 
@@ -133,6 +140,26 @@ admin_routes.add_url_rule("/teams/<int:page_num>", view_func=team_list)
 admin_routes.add_url_rule("/team/<int:team_number>", view_func=team_detail)
 admin_routes.add_url_rule(
     "/team/website", view_func=team_website_update, methods=["POST"]
+)
+admin_routes.add_url_rule("/media/modcodes/list", view_func=team_media_mod_list)
+admin_routes.add_url_rule(
+    "/media/modcodes/list/<int:year>", view_func=team_media_mod_list
+)
+admin_routes.add_url_rule(
+    "/media/modcodes/list/<int:year>/<int:page_num>", view_func=team_media_mod_list
+)
+admin_routes.add_url_rule("/media/modcodes/add", view_func=team_media_mod_add)
+admin_routes.add_url_rule(
+    "/media/modcodes/add", view_func=team_media_mod_add_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/media/modcodes/edit/<int:team_number>/<int:year>",
+    view_func=team_media_mod_edit,
+)
+admin_routes.add_url_rule(
+    "/media/modcodes/edit/<int:team_number>/<int:year>",
+    view_func=team_media_mod_edit_post,
+    methods=["POST"],
 )
 admin_routes.add_url_rule(
     "/team/set_robot_name", view_func=team_robot_name_update, methods=["POST"]
