@@ -8,6 +8,11 @@ dispatch:
   service: default
 - url: "www.thebluealliance.com/clientapi/*"
   service: default
+# match py2 css and javascript (py3 is prefixed with py3_)
+- url: "www.thebluealliance.com/css/*"
+  service: default
+- url: "www.thebluealliance.com/js/*"
+  service: default
   
 # APIs on py3 (both apiv3 and trusted api)
 - url: "www.thebluealliance.com/api/*"
