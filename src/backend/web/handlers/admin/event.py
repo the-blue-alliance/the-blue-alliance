@@ -3,6 +3,7 @@ import json
 from typing import Optional
 
 from flask import abort, redirect, request, url_for
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
@@ -332,3 +333,24 @@ def event_detail_post(event_key: EventKey) -> Response:
         }
     )
     return redirect(url_for("admin.event_detail", event_key=event_key))
+
+
+def event_remap_teams_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    remap_teams = {}
+    for key, value in json.loads(request.form.get("remap_teams", "{}")).items():
+        remap_teams["frc{}".format(key)] = "frc{}".format(value)
+
+    event.remap_teams = remap_teams
+    EventManipulator.createOrUpdate(event)
+
+    taskqueue.add(
+        queue_name="admin",
+        target="py3-tasks-io",
+        url=f"/tasks/do/remap_teams/{event.key_name}",
+        method="GET",
+    )
+    return redirect(url_for("admin.event_detail", event_key=event.key_name))

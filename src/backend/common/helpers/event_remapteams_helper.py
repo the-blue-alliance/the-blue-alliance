@@ -37,6 +37,7 @@ class EventRemapTeamsHelper:
             cls.remapteams_alliances(
                 none_throws(event.alliance_selections), event.remap_teams
             )
+
         # Remap rankings
         if event.rankings:
             cls.remapteams_rankings2(event.rankings, event.remap_teams)

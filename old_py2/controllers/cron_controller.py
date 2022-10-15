@@ -366,37 +366,3 @@ class BlueZoneUpdateDo(webapp.RequestHandler):
         except Exception, e:
             logging.error("BlueZone update failed")
             logging.exception(e)
-
-
-class RemapTeamsDo(webapp.RequestHandler):
-    """
-    Remaps teams within an Event. Useful for offseason events.
-    eg: 9254 -> 254B
-    """
-    def get(self, event_key):
-        event = Event.get_by_id(event_key)
-        if not event:
-            self.abort(404)
-
-        if not event.remap_teams:
-            return
-
-        event.prep_awards_matches_teams()
-
-        # Remap matches
-        EventHelper.remapteams_matches(event.matches, event.remap_teams)
-        MatchManipulator.createOrUpdate(event.matches)
-
-        # Remap alliance selections
-        if event.alliance_selections:
-            EventHelper.remapteams_alliances(event.alliance_selections, event.remap_teams)
-        # Remap rankings
-        if event.rankings:
-            EventHelper.remapteams_rankings(event.rankings, event.remap_teams)
-        if event.details and event.details.rankings2:
-            EventHelper.remapteams_rankings2(event.details.rankings2, event.remap_teams)
-        EventDetailsManipulator.createOrUpdate(event.details)
-
-        # Remap awards
-        EventHelper.remapteams_awards(event.awards, event.remap_teams)
-        AwardManipulator.createOrUpdate(event.awards, auto_union=False)
