@@ -18,6 +18,7 @@ from backend.web.handlers.admin.event import (
     event_edit,
     event_edit_post,
     event_list,
+    event_remap_teams_post,
 )
 from backend.web.handlers.admin.match import (
     match_add,
@@ -109,6 +110,9 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule("/event/<event_key>", view_func=event_detail, methods=["GET"])
 admin_routes.add_url_rule(
     "/event/<event_key>", view_func=event_detail_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/event/remap_teams/<event_key>", view_func=event_remap_teams_post, methods=["POST"]
 )
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)

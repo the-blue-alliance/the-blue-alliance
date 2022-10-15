@@ -197,6 +197,7 @@
 <form action="/admin/event/remap_teams/{{event.key_name}}" method="post">
   <textarea class="form-control" name="remap_teams"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-random"></span> Remap Teams</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 <h2>Add Teams</h2>

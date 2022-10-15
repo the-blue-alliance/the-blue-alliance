@@ -215,31 +215,6 @@ class AdminEventDeleteTeams(LoggedInHandler):
         self.redirect("/admin/event/" + event.key_name)
 
 
-class AdminEventRemapTeams(LoggedInHandler):
-    """
-    Remaps teams within an Event. Useful for offseason events.
-    eg: 9254 -> 254B
-    """
-    def post(self, event_key_id):
-        self._require_admin()
-        event = Event.get_by_id(event_key_id)
-
-        remap_teams = {}
-        for key, value in json.loads(self.request.get('remap_teams')).items():
-            remap_teams['frc{}'.format(key)] = 'frc{}'.format(value)
-
-        event.remap_teams = remap_teams
-        EventManipulator.createOrUpdate(event)
-
-        taskqueue.add(
-            url='/tasks/do/remap_teams/{}'.format(event.key_name),
-            method='GET',
-            queue_name='admin',
-        )
-
-        self.redirect("/admin/event/" + event.key_name)
-
-
 class AdminEventAddWebcast(LoggedInHandler):
     """
     Add a webcast to an Event.
