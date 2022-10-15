@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Admin Mod Keys{% endblock %}
 
@@ -23,12 +23,14 @@
     </tr>
     <tr>
       <td>Expiration</td>
-      <td><input type="text" name="expiration" value="{{ access.expiration|date:'Y-m-d' }}"/></td>
+      <td><input type="text" name="expiration" value="{{ access.expiration|strftime("%Y-%m-%d") }}"/></td>
     </tr>
     <tr>
       <td>Account</td>
       <td><input type="text" name="account_email" value="{{account_email}}"/></td>
   </table>
+
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save</button>
 </form>
 

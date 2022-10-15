@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Import Mod Keys{% endblock %}
 
@@ -15,6 +15,8 @@
     <input class="form-control" size="16" name="year" type="text" placeholder="year">
     <div class="well">team_number, auth_code</div>
     <textarea class="form-control" name="auth_codes_csv"></textarea><br>
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Import</button>
 </form>
 
