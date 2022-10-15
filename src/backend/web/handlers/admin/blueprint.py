@@ -1,6 +1,7 @@
 from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
+from backend.common.environment import Environment
 from backend.web.handlers.admin.api_auth import (
     api_auth_add,
     api_auth_delete,
@@ -64,6 +65,32 @@ def require_gae_admin() -> None:
     """
     if not gae_login.is_current_user_admin():
         abort(401)
+
+
+@admin_routes.route("/")
+def admin_home() -> str:
+    template_values = {
+        "memcache_stats": {
+            "hits": 0,
+            "misses": 0,
+        },
+        "databasequery_stats": {
+            "hits": 0,
+            "misses": 0,
+        },
+        "users": [],
+        "suggestions_count": 0,
+        "contbuild_enabled": False,
+        "git_branch_name": "",
+        "build_time": "",
+        "build_number": "",
+        "commit_hash": "",
+        "commit_author": "",
+        "commit_date": "",
+        "commit_msg": "",
+        "debug": Environment.is_dev(),
+    }
+    return render_template("admin/index.html", template_values)
 
 
 @admin_routes.route("/tasks")
