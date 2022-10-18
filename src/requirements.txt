@@ -6,7 +6,7 @@ Flask-Cors==3.0.10
 Flask-WTF==1.0.1
 google-api-python-client==2.64.0
 google-cloud-storage==2.5.0
-grpcio==1.49.1
+grpcio==1.50.0
 Jinja2==3.1.2
 numpy==1.23.4
 oauth2client==4.1.3
