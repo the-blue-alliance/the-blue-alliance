@@ -45,6 +45,7 @@
     <span class="input-group-addon">Admin Code: </span>
     <input class="form-control" size="16" name="auth_code">
   </div>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-link"></span> Link</button>
 </form>
 

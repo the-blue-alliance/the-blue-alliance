@@ -64,6 +64,7 @@
     <div class="alert alert-warning">
       <p>Changes may take up to 24 hours to appear everywhere, due to the way web browsers cache pages. Don't be alarmed if changes don't appear on your team page immediately</p>
     </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
   </form>
   {% endfor %}
@@ -109,6 +110,7 @@
           </div>
         </div>
         {% endfor %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="row">
             <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-pencil"></span> Act On Selected {{suggestion_names[suggestion_type]}}</button>
         </div>

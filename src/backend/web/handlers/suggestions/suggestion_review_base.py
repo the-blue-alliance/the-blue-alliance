@@ -12,9 +12,7 @@ from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.suggestion import Suggestion
-
-# from backend.common.models.team_admin_access import TeamAdminAccess
-
+from backend.common.models.team_admin_access import TeamAdminAccess
 
 TTargetModel = TypeVar("TTargetModel")
 
@@ -29,9 +27,15 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
 
     def __init__(self, *args, **kw) -> None:
         super(SuggestionsReviewBase, self).__init__(*args, **kw)
-        # TODO port over TeamAdminAccess
+
         self.existing_access = []
         self.user = current_user()
+        if self.user:
+            self.existing_access = TeamAdminAccess.query(
+                TeamAdminAccess.account == self.user.account_key,
+                TeamAdminAccess.expiration > datetime.datetime.now(),
+            ).fetch()
+
         if not self.ALLOW_TEAM_ADMIN_ACCESS:
             # For suggestion types that are enabled for delegated mod tools
             # they'll make their own call where they know the team id
