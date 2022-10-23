@@ -63,6 +63,10 @@ class TestJSONZebraMotionWorksParser(unittest.TestCase):
         parsed = JSONZebraMotionWorksParser.parse(json.dumps(self.data))
         self.assertEqual(parsed, self.data)
 
+    def testNotListOfDicts(self):
+        with self.assertRaises(ParserInputException):
+            JSONZebraMotionWorksParser.parse("""["some", "bad", "input"]""")
+
     def testMissingTimes(self):
         del self.data[0]["times"]
         with self.assertRaises(ParserInputException):
