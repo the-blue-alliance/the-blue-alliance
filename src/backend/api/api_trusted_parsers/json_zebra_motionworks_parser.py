@@ -41,6 +41,12 @@ class JSONZebraMotionWorksParser:
 
         parsed_data: List[ZebraData] = []
         for zebra_data in data:
+            # Check that 'zebra_data' is a dict
+            if not isinstance(zebra_data, dict):
+                raise ParserInputException(
+                    f"Zebra MotionWorks data must be a dict: {zebra_data}"
+                )
+
             # Check 'times' is an array of floats
             times = zebra_data.get("times", [])
             if not isinstance(times, list):
