@@ -1,4 +1,4 @@
-FROM ubuntu:rolling
+FROM ubuntu:22.04
 MAINTAINER The Blue Alliance
 
 # Set debconf to run non-interactively
