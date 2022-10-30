@@ -169,5 +169,5 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
         # Process rejects
         self._process_rejected(reject_keys)
 
-        return_url = request.args.get("return_url", "/suggest/team/media/review")
+        return_url = request.form.get("return_url", "/suggest/team/media/review")
         return redirect(return_url)
