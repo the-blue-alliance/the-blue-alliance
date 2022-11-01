@@ -50,3 +50,20 @@ describe("APIv3 Docs", () => {
     );
   });
 });
+
+describe("EventWizard2", () => {
+  beforeAll(async () => {
+    await page.goto("http://localhost:8080/eventwizard2");
+    await page.waitForSelector("#eventwizard");
+  });
+
+  it('should be titled "The Blue Alliance - EventWizard"', async () => {
+    await expect(page.title()).resolves.toMatch(
+      "The Blue Alliance - EventWizard"
+    );
+  });
+
+  it('should render "Select Event"', async () => {
+    await expect(page).toMatch("Select Event");
+  });
+});

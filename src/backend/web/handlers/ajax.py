@@ -3,6 +3,7 @@ from pyre_extensions import none_throws
 
 from backend.common.auth import current_user
 from backend.common.consts.model_type import ModelType
+from backend.common.consts.playoff_type import TYPE_NAMES as PLAYOFF_TYPE_NAMES
 from backend.common.decorators import cached_public
 from backend.common.models.favorite import Favorite
 from backend.common.models.typeahead_entry import TypeaheadEntry
@@ -19,6 +20,25 @@ def typeahead_handler(search_key: str) -> Response:
     response.content_type = 'application/json; charset="utf-8"'
     response.last_modified = entry.updated
     return response
+
+
+def account_apiwrite_events_handler() -> Response:
+    """
+    Get the events the current user is allowed to edit via the trusted API.
+    TODO: Actually implement.
+    """
+    return jsonify([])
+
+
+@cached_public
+def playoff_types_handler() -> Response:
+    """
+    Returns the possible playoff types, formatted for EventWizard dropdown
+    """
+    types = []
+    for type_enum, type_name in PLAYOFF_TYPE_NAMES.items():
+        types.append({'value': type_enum, 'label': type_name})
+    return jsonify(types)
 
 
 @enforce_login
