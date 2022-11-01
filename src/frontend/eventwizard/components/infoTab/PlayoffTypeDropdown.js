@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Select from "react-select";
+import AsyncSelect from "react-select/async";
 
 import EVENT_SHAPE from "../../constants/ApiEvent";
 
@@ -8,9 +8,7 @@ class PlayoffTypeDropdown extends Component {
   static loadPlayoffTypes() {
     return fetch("/_/playoff_types", {
       credentials: "same-origin",
-    })
-      .then((response) => response.json())
-      .then((types) => ({ options: types }));
+    }).then((response) => response.json());
   }
 
   render() {
@@ -20,7 +18,7 @@ class PlayoffTypeDropdown extends Component {
           Playoff Type
         </label>
         <div className="col-sm-10">
-          <Select.Async
+          <AsyncSelect
             name="selectType"
             placeholder="Choose playoff type..."
             loadingPlaceholder="Loading playoff types..."
@@ -29,7 +27,8 @@ class PlayoffTypeDropdown extends Component {
             value={this.props.eventInfo && this.props.eventInfo.playoff_type}
             loadOptions={PlayoffTypeDropdown.loadPlayoffTypes}
             onChange={this.props.setType}
-            disabled={this.props.eventInfo === null}
+            isDisabled={this.props.eventInfo === null}
+            defaultOptions
           />
         </div>
       </div>

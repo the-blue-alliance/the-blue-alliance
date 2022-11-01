@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Select from "react-select";
+import AsyncSelect from "react-select/async";
 
 class EventSelector extends Component {
   static loadEvents() {
@@ -10,7 +10,7 @@ class EventSelector extends Component {
       .then((response) => response.json())
       .then((events) => {
         events.push({ value: "_other", label: "Other" });
-        return { options: events };
+        return events;
       });
   }
 
@@ -60,7 +60,7 @@ class EventSelector extends Component {
           Select Event
         </label>
         <div className="col-sm-10">
-          <Select.Async
+          <AsyncSelect
             name="selectEvent"
             placeholder="Select an Event..."
             loadingPlaceholder="Loading Events..."
@@ -69,6 +69,7 @@ class EventSelector extends Component {
             value={this.state.eventSelectValue}
             loadOptions={EventSelector.loadEvents}
             onChange={this.onEventSelected}
+            defaultOptions
           />
           {eventKeyBox}
         </div>

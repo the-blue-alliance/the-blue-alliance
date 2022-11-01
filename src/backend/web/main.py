@@ -10,12 +10,17 @@ from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import render_time_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
-from backend.web.handlers.ajax import account_favorites_handler, typeahead_handler
+from backend.web.handlers.ajax import (
+    account_apiwrite_events_handler,
+    account_favorites_handler,
+    playoff_types_handler,
+    typeahead_handler,
+)
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
-from backend.web.handlers.eventwizard import eventwizard
+from backend.web.handlers.eventwizard import eventwizard, eventwizard2
 from backend.web.handlers.gameday import gameday, gameday_redirect
 from backend.web.handlers.hall_of_fame import hall_of_fame_overview
 from backend.web.handlers.index import about, avatar_list, index
@@ -84,6 +89,7 @@ app.add_url_rule(
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 
 app.add_url_rule("/eventwizard", view_func=eventwizard)
+app.add_url_rule("/eventwizard2", view_func=eventwizard2)
 
 app.add_url_rule("/match/<match_key>", view_func=match_detail)
 
@@ -117,8 +123,12 @@ app.add_url_rule("/swag", view_func=swag)
 
 # Ajax/Helper endpoints
 app.add_url_rule(
+    "/_/account/apiwrite_events", view_func=account_apiwrite_events_handler
+)
+app.add_url_rule(
     "/_/account/favorites/<int:model_type>", view_func=account_favorites_handler
 )
+app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)
 app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
 
 app.register_blueprint(apidocs_blueprint)
