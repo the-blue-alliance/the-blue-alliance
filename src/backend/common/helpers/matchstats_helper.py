@@ -9,14 +9,18 @@
 # x is OPR and should be n x 1
 
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import numpy.typing as npt
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
-from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
+from backend.common.consts.alliance_color import (
+    ALLIANCE_COLORS,
+    AllianceColor,
+    OPPONENT,
+)
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.memcache import MemcacheClient
@@ -27,6 +31,17 @@ from backend.common.queries import event_query
 
 
 TTeamIdMap = Dict[TeamId, int]
+StatAccessor = Callable[[Match, AllianceColor], float]
+
+
+OPR_ACCESSOR: StatAccessor = lambda match, color: match.alliances[color]["score"]
+DPR_ACCESSOR: StatAccessor = lambda match, color: match.alliances[OPPONENT[color]][
+    "score"
+]
+CCWM_ACCESSOR: StatAccessor = (
+    lambda match, color: match.alliances[color]["score"]
+    - match.alliances[OPPONENT[color]]["score"]
+)
 
 
 class MatchstatsHelper(object):
@@ -80,10 +95,7 @@ class MatchstatsHelper(object):
         cls,
         matches: List[Match],
         team_id_map: TTeamIdMap,
-        stat_type: StatType,
-        init_stats: Optional[Dict[StatType, Dict[TeamId, int]]] = None,
-        init_stats_default: int = 0,
-        limit_matches: Optional[int] = None,
+        stat_accessor: StatAccessor,
     ) -> npt.NDArray[np.float64]:
         n = len(team_id_map.keys())
         s = np.zeros((n, 1))
@@ -91,23 +103,11 @@ class MatchstatsHelper(object):
             if match.comp_level != CompLevel.QM:  # only consider quals matches
                 continue
 
-            treat_as_unplayed = (
-                limit_matches is not None and match.match_number > limit_matches
-            )
-
             for alliance_color in ALLIANCE_COLORS:
                 alliance_teams = [
                     team[3:] for team in match.alliances[alliance_color]["teams"]
                 ]
-                stat = cls._get_stat(
-                    stat_type,
-                    match,
-                    alliance_color,
-                    alliance_teams,
-                    init_stats,
-                    init_stats_default,
-                    treat_as_unplayed,
-                )
+                stat = stat_accessor(match, alliance_color)
                 for team in alliance_teams:
                     s[team_id_map[team]] += stat
         return s
@@ -119,18 +119,12 @@ class MatchstatsHelper(object):
         team_list: List[TeamId],
         team_id_map: TTeamIdMap,
         Minv: Any,
-        stat_type: StatType,
-        init_stats: Optional[Dict[StatType, Dict[TeamId, int]]] = None,
-        init_stats_default: int = 0,
-        limit_matches: Optional[int] = None,
+        stat_accessor: StatAccessor,
     ):
         s = cls.build_s_matrix(
             matches,
             team_id_map,
-            stat_type,
-            init_stats=init_stats,
-            init_stats_default=init_stats_default,
-            limit_matches=limit_matches,
+            stat_accessor,
         )
         x = np.dot(Minv, s)
 
@@ -138,50 +132,6 @@ class MatchstatsHelper(object):
         for team, stat in zip(team_list, x):
             stat_dict[team] = stat[0]
         return stat_dict
-
-    @classmethod
-    def _get_stat(
-        cls,
-        stat_type: StatType,
-        match: Match,
-        alliance_color: AllianceColor,
-        alliance_teams: List[TeamId],
-        init_stats: Optional[Dict[StatType, Dict[TeamId, int]]],
-        init_stats_default: int,
-        treat_as_unplayed: bool,
-    ) -> Optional[int]:
-        match_played = match.has_been_played and not treat_as_unplayed
-
-        if match_played:
-            if stat_type == StatType.OPR:
-                return match.alliances[alliance_color]["score"]
-            elif stat_type == StatType.DPR:
-                if alliance_color == AllianceColor.RED:
-                    other_alliance_color = AllianceColor.BLUE
-                else:
-                    other_alliance_color = AllianceColor.RED
-                return match.alliances[other_alliance_color]["score"]
-            elif stat_type == StatType.CCWM:
-                if alliance_color == AllianceColor.RED:
-                    other_alliance_color = AllianceColor.BLUE
-                else:
-                    other_alliance_color = AllianceColor.BLUE
-                return (
-                    match.alliances[alliance_color]["score"]
-                    - match.alliances[other_alliance_color]["score"]
-                )
-
-        # None of the above cases were met. Return default.
-        if init_stats and stat_type in init_stats:
-            total = 0
-            for team in alliance_teams:
-                total += init_stats[stat_type].get(team, init_stats_default)
-            return total
-        else:
-            total = 0
-            for team in alliance_teams:
-                total += init_stats_default
-            return total
 
     @classmethod
     def calculate_matchstats(cls, matches: List[Match], year: Year) -> EventMatchStats:
@@ -193,9 +143,9 @@ class MatchstatsHelper(object):
             return {}
         Minv = cls.build_Minv_matrix(matches, team_id_map, played_only=True)
 
-        oprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, StatType.OPR)
-        dprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, StatType.DPR)
-        ccwms_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, StatType.CCWM)
+        oprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, OPR_ACCESSOR)
+        dprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, DPR_ACCESSOR)
+        ccwms_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, CCWM_ACCESSOR)
 
         stats: EventMatchStats = {
             StatType.OPR: oprs_dict,
