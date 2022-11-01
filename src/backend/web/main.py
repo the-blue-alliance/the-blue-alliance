@@ -15,7 +15,7 @@ from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import event_detail, event_insights, event_list
-from backend.web.handlers.eventwizard import eventwizard
+from backend.web.handlers.eventwizard import eventwizard, eventwizard2
 from backend.web.handlers.gameday import gameday, gameday_redirect
 from backend.web.handlers.hall_of_fame import hall_of_fame_overview
 from backend.web.handlers.index import about, avatar_list, index
@@ -84,6 +84,7 @@ app.add_url_rule(
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 
 app.add_url_rule("/eventwizard", view_func=eventwizard)
+app.add_url_rule("/eventwizard2", view_func=eventwizard2)
 
 app.add_url_rule("/match/<match_key>", view_func=match_detail)
 
