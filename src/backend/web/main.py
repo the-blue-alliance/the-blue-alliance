@@ -10,7 +10,12 @@ from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import render_time_context_processor
 from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
-from backend.web.handlers.ajax import account_apiwrite_events_handler, account_favorites_handler, playoff_types_handler, typeahead_handler
+from backend.web.handlers.ajax import (
+    account_apiwrite_events_handler,
+    account_favorites_handler,
+    playoff_types_handler,
+    typeahead_handler,
+)
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
@@ -117,7 +122,9 @@ app.add_url_rule("/bigquery", view_func=bigquery)
 app.add_url_rule("/swag", view_func=swag)
 
 # Ajax/Helper endpoints
-app.add_url_rule("/_/account/apiwrite_events", view_func=account_apiwrite_events_handler)
+app.add_url_rule(
+    "/_/account/apiwrite_events", view_func=account_apiwrite_events_handler
+)
 app.add_url_rule(
     "/_/account/favorites/<int:model_type>", view_func=account_favorites_handler
 )

@@ -1,5 +1,6 @@
 import React from "react";
 import EventInfoContainer from "../containers/EventInfoContainer";
+import TeamListContainer from "../containers/TeamListContainer";
 
 const EventWizardTabFrame = () => (
   <div>
@@ -46,6 +47,7 @@ const EventWizardTabFrame = () => (
     </div>
     <div className="tab-content row">
       <EventInfoContainer />
+      <TeamListContainer />
       <div className="tab-pane" id="schedule">
         <h3>FMS Schedule</h3>
       </div>

@@ -37,7 +37,7 @@ def playoff_types_handler() -> Response:
     """
     types = []
     for type_enum, type_name in PLAYOFF_TYPE_NAMES.items():
-        types.append({'value': type_enum, 'label': type_name})
+        types.append({"value": type_enum, "label": type_name})
     return jsonify(types)
 
 
