@@ -9,7 +9,7 @@
 # x is OPR and should be n x 1
 
 from collections import defaultdict
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, OrderedDict, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -24,6 +24,7 @@ from backend.common.consts.alliance_color import (
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.memcache import MemcacheClient
+from backend.common.models.event_matchstats import Component, EventComponentOPRs
 from backend.common.models.keys import TeamId, Year
 from backend.common.models.match import Match
 from backend.common.models.stats import EventMatchStats, StatType
@@ -42,6 +43,18 @@ CCWM_ACCESSOR: StatAccessor = (
     lambda match, color: match.alliances[color]["score"]
     - match.alliances[OPPONENT[color]]["score"]
 )
+MANUAL_COMPONENTS = {
+    2019: {
+        "Cargo + Panel Points": lambda match, color: (
+            match.score_breakdown[color].get("cargoPoints", 0)
+            + match.score_breakdown[color].get("hatchPanelPoints", 0)
+        )
+    }
+}
+
+
+def make_default_component_accessor(component: Component) -> StatAccessor:
+    return lambda match, color: float(match.score_breakdown[color].get(component, 0))
 
 
 class MatchstatsHelper(object):
@@ -74,7 +87,6 @@ class MatchstatsHelper(object):
     def build_Minv_matrix(
         cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False
     ) -> npt.NDArray[np.float64]:
-
         n = len(team_id_map.keys())
         M = np.zeros((n, n))
         for match in matches:
@@ -154,6 +166,51 @@ class MatchstatsHelper(object):
         }
 
         return stats
+
+    @classmethod
+    def calculate_coprs(cls, matches: List[Match], year: Year) -> EventComponentOPRs:
+        coprs = OrderedDict()
+
+        if matches is None or len(matches) == 0:
+            return coprs
+
+        first_match = matches[0]
+        if first_match.score_breakdown is None:
+            return coprs
+
+        team_list, team_id_map = cls.build_team_mapping(matches)
+        if not team_list:
+            return {}
+
+        Minv = cls.build_Minv_matrix(matches, team_id_map, played_only=True)
+
+        if year in MANUAL_COMPONENTS.keys():
+            for name, accessor in MANUAL_COMPONENTS[year].items():
+                coprs[name] = cls.calc_stat(
+                    matches, team_list, team_id_map, Minv, accessor
+                )
+
+        # For each k-v in score_breakdown, attempt to convert v to a float.
+        # If we can't do that, we can't calculate a component OPR for it.
+        # As such, this will calculate cOPRs for any int/float/bool field.
+        # Use red on the first match just to get all the score_breakdown keys available.
+        for component, value in none_throws(first_match.score_breakdown)[
+            AllianceColor.RED
+        ].items():
+            try:
+                float(value)
+            except ValueError:
+                pass
+            else:
+                coprs[component] = cls.calc_stat(
+                    matches,
+                    team_list,
+                    team_id_map,
+                    Minv,
+                    make_default_component_accessor(component),
+                )
+
+        return coprs
 
     @classmethod
     def get_last_event_stats(
