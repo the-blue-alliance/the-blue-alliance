@@ -236,6 +236,11 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
         logging.warning("Matchstat calculation for {} failed!".format(event_key))
         matchstats_dict = None
 
+    coprs_dict = MatchstatsHelper.calculate_coprs(event.matches, event.year)
+    if len(coprs_dict.keys()) == 0:
+        logging.warning(f"COPR calculation for {event_key} failed!")
+        coprs_dict = None
+
     predictions_dict = None
     if (
         event.year in {2016, 2017, 2018, 2019, 2020, 2022}
@@ -269,6 +274,7 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
         matchstats=matchstats_dict,
         predictions=predictions_dict,
         insights=event_insights,
+        coprs=coprs_dict,
     )
     EventDetailsManipulator.createOrUpdate(event_details)
 

@@ -1,7 +1,7 @@
 import collections
 import json
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from flask import abort, redirect, request
 from google.appengine.ext import ndb
@@ -22,10 +22,17 @@ from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancement
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, Year
+from backend.common.models.event_matchstats import TeamStatMap
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
+
+
+def sort_and_limit_stats(
+    stats_dict: TeamStatMap, num_matchstats: int = 15
+) -> List[Tuple[TeamKey, float]]:
+    return sorted(stats_dict.items(), key=lambda t: -t[1])[:num_matchstats]
 
 
 @cached_public
@@ -137,14 +144,7 @@ def event_detail(event_key: EventKey) -> Response:
     if num_teams % 2 != 0:
         middle_value += 1
     teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
-
-    oprs = (
-        [i for i in event.matchstats["oprs"].items()]
-        if (event.matchstats is not None and "oprs" in event.matchstats)
-        else []
-    )
-    oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
-    oprs = oprs[:15]  # get the top 15 OPRs
+    oprs = sort_and_limit_stats(event.matchstats["oprs"] or {})
 
     if event.now:
         matches_recent = MatchHelper.recent_matches(cleaned_matches)
@@ -245,6 +245,7 @@ def event_detail(event_key: EventKey) -> Response:
         "double_elim_playoff_types": playoff_type.DOUBLE_ELIM_TYPES,
         "qual_playlist": qual_playlist,
         "elim_playlist": elim_playlist,
+        "coprs": event.coprs is None,
     }
 
     return make_cached_response(

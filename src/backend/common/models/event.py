@@ -452,6 +452,13 @@ class Event(CachedModel):
             return self.details.matchstats
 
     @property
+    def coprs(self):
+        if self.details is None:
+            return None
+        else:
+            return self.details.coprs
+
+    @property
     def rankings(self) -> Optional[List[EventRanking]]:
         if self.details is None:
             return None
