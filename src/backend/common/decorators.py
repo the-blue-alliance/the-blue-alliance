@@ -8,23 +8,33 @@ from flask_caching import CachedResponse
 from backend.common.environment import Environment
 
 
-def cached_public(func: Optional[Callable] = None, ttl: Union[int, timedelta] = 61):
+def cached_public(
+    func: Optional[Callable] = None,
+    ttl: Union[int, timedelta] = 61,
+    cache_redirects: bool = False,
+):
     timeout = ttl if isinstance(ttl, int) else ttl.total_seconds()
     if func is None:  # Handle no-argument decorator
-        return partial(cached_public, ttl=ttl)
+        return partial(cached_public, ttl=ttl, cache_redirects=cache_redirects)
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
+        status_codes = [200, 301, 302] if cache_redirects else [200]
+
         if hasattr(current_app, "cache") and Environment.flask_response_cache_enabled():
             cached = current_app.cache.cached(
                 timeout=timeout,
-                response_filter=lambda resp: make_response(resp).status_code == 200,
+                response_filter=lambda resp: make_response(resp).status_code
+                in status_codes,
                 query_string=True,
             )
             resp = make_response(cached(func)(*args, **kwargs))
         else:
             resp = make_response(func(*args, **kwargs))
-        if resp.status_code == 200 and Environment.cache_control_header_enabled():
+        if (
+            resp.status_code in status_codes
+            and Environment.cache_control_header_enabled()
+        ):
             # Only set cache headers for OK responses
             browser_timeout = timeout
             if isinstance(resp, CachedResponse):
