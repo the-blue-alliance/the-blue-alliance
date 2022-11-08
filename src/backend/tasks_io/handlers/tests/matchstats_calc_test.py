@@ -13,6 +13,7 @@ from backend.common.helpers.prediction_helper import PredictionHelper
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_insights import EventInsights
+from backend.common.models.event_matchstats import EventComponentOPRs
 from backend.common.models.event_predictions import (
     EventPredictions,
     TEventStatMeanVars,
@@ -89,7 +90,9 @@ def test_calc_no_event(tasks_client: Client) -> None:
 @mock.patch.object(PredictionHelper, "get_ranking_predictions")
 @mock.patch.object(PredictionHelper, "get_match_predictions")
 @mock.patch.object(MatchstatsHelper, "calculate_matchstats")
+@mock.patch.object(MatchstatsHelper, "calculate_coprs")
 def test_calc_matchstats(
+    coprs_mock: mock.Mock,
     matchstats_mock: mock.Mock,
     match_prediction_mock: mock.Mock,
     ranking_prediction_mock: mock.Mock,
@@ -104,6 +107,9 @@ def test_calc_matchstats(
     ).put()
     matchstats: EventMatchStats = {
         StatType.OPR: {"254": 100.0},
+    }
+    coprs: EventComponentOPRs = {
+        "MyComponent": {"254": 67.0},
     }
     match_predictions: Tuple[
         TMatchPredictions,
@@ -126,6 +132,7 @@ def test_calc_matchstats(
     match_prediction_mock.return_value = match_predictions
     ranking_prediction_mock.return_value = ranking_predictions
     event_insights_mock.return_value = event_insights
+    coprs_mock.return_value = coprs
 
     resp = tasks_client.get("/tasks/math/do/event_matchstats/2020test")
     assert resp.status_code == 200
@@ -142,13 +149,16 @@ def test_calc_matchstats(
         ranking_prediction_stats=ranking_predictions[1],
     )
     assert ed.insights == event_insights
+    assert ed.coprs == coprs
 
 
 @mock.patch.object(EventInsightsHelper, "calculate_event_insights")
 @mock.patch.object(PredictionHelper, "get_ranking_predictions")
 @mock.patch.object(PredictionHelper, "get_match_predictions")
 @mock.patch.object(MatchstatsHelper, "calculate_matchstats")
+@mock.patch.object(MatchstatsHelper, "calculate_coprs")
 def test_calc_matchstats_no_output_in_taskqueue(
+    coprs_mock: mock.Mock,
     matchstats_mock: mock.Mock,
     match_prediction_mock: mock.Mock,
     ranking_prediction_mock: mock.Mock,
@@ -163,6 +173,9 @@ def test_calc_matchstats_no_output_in_taskqueue(
     ).put()
     matchstats: EventMatchStats = {
         StatType.OPR: {"254": 100.0},
+    }
+    coprs: EventComponentOPRs = {
+        "MyComponent": {"254": 67.0},
     }
     match_predictions: Tuple[
         TMatchPredictions,
@@ -185,6 +198,7 @@ def test_calc_matchstats_no_output_in_taskqueue(
     match_prediction_mock.return_value = match_predictions
     ranking_prediction_mock.return_value = ranking_predictions
     event_insights_mock.return_value = event_insights
+    coprs_mock.return_value = coprs
 
     resp = tasks_client.get(
         "/tasks/math/do/event_matchstats/2020test",

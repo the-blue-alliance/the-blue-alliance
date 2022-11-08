@@ -8,8 +8,8 @@
 
 # x is OPR and should be n x 1
 
-from collections import defaultdict
-from typing import Any, Callable, Dict, List, OrderedDict, Tuple
+from collections import defaultdict, OrderedDict
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -24,7 +24,11 @@ from backend.common.consts.alliance_color import (
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.memcache import MemcacheClient
-from backend.common.models.event_matchstats import Component, EventComponentOPRs
+from backend.common.models.event_matchstats import (
+    Component,
+    EventComponentOPRs,
+    TeamStatMap,
+)
 from backend.common.models.keys import TeamId, Year
 from backend.common.models.match import Match
 from backend.common.models.stats import EventMatchStats, StatType
@@ -132,7 +136,7 @@ class MatchstatsHelper(object):
         team_id_map: TTeamIdMap,
         Minv: Any,
         stat_accessor: StatAccessor,
-    ):
+    ) -> TeamStatMap:
         s = cls.build_s_matrix(
             matches,
             team_id_map,
@@ -169,7 +173,7 @@ class MatchstatsHelper(object):
 
     @classmethod
     def calculate_coprs(cls, matches: List[Match], year: Year) -> EventComponentOPRs:
-        coprs = OrderedDict()
+        coprs: OrderedDict[Component, TeamStatMap] = OrderedDict()
 
         if matches is None or len(matches) == 0:
             return coprs

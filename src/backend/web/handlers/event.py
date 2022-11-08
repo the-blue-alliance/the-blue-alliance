@@ -1,7 +1,8 @@
 import collections
 import json
+import re
 from datetime import datetime, timedelta
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from flask import abort, redirect, request
 from google.appengine.ext import ndb
@@ -22,8 +23,8 @@ from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancement
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event import Event
-from backend.common.models.event_matchstats import TeamStatMap
-from backend.common.models.keys import EventKey, TeamKey, Year
+from backend.common.models.event_matchstats import Component, TeamStatMap
+from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
@@ -144,7 +145,21 @@ def event_detail(event_key: EventKey) -> Response:
     if num_teams % 2 != 0:
         middle_value += 1
     teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
-    oprs = sort_and_limit_stats(event.matchstats["oprs"] or {})
+
+    oprs = []
+    copr_leaders: Dict[Component, List[Tuple[TeamId, float]]] = {}
+
+    if event.matchstats is not None:
+        oprs = sort_and_limit_stats(event.matchstats["oprs"] or {})
+        copr_leaders["OPR"] = oprs
+
+    if event.coprs is not None:
+        for component, tsm in event.coprs.items():
+            copr_leaders[component] = sort_and_limit_stats(tsm)
+
+    copr_dropdown_div_id_map: Dict[Component, str] = {
+        k: re.sub("[^0-9a-zA-Z]+", "_", k) for k in copr_leaders.keys()
+    }
 
     if event.now:
         matches_recent = MatchHelper.recent_matches(cleaned_matches)
@@ -245,7 +260,9 @@ def event_detail(event_key: EventKey) -> Response:
         "double_elim_playoff_types": playoff_type.DOUBLE_ELIM_TYPES,
         "qual_playlist": qual_playlist,
         "elim_playlist": elim_playlist,
-        "coprs": event.coprs is None,
+        "has_coprs": event.coprs is not None,
+        "coprs_json": json.dumps(copr_leaders),
+        "copr_div_ids": copr_dropdown_div_id_map,
     }
 
     return make_cached_response(

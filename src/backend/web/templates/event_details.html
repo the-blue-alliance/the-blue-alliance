@@ -395,9 +395,13 @@
 
     {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}
     <div class="tab-pane" id="event-insights">
-      {{ coprs }}
-
-      {% if oprs|length > 0 %}
+      {% if has_coprs %}
+      <div class="row">
+        <div class="col-sm-12">
+          {% include "event_partials/event_copr_table.html" %}
+        </div>
+      </div>
+      {% elif oprs|length > 0 %}
       <div class="row">
         <div class="col-sm-12">
           {% include "event_partials/event_opr_table.html" %}

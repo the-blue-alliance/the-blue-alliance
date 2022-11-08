@@ -10,7 +10,7 @@ from backend.common.models.alliance import EventAlliance
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.event_insights import EventInsights
-from backend.common.models.event_matchstats import EventMatchstats, EventComponentOPRs
+from backend.common.models.event_matchstats import EventComponentOPRs, EventMatchstats
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
 from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
