@@ -365,7 +365,7 @@ def event_rss(event_key: EventKey) -> Response:
     template_values = {
         "event": event,
         "matches": matches,
-        "datetime": datetime.datetime.now(),
+        "datetime": datetime.now(),
     }
 
     response = make_cached_response(
