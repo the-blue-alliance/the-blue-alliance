@@ -21,9 +21,9 @@ from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import (
     event_detail,
-    event_rss,
     event_insights,
     event_list,
+    event_rss,
 )
 from backend.web.handlers.eventwizard import eventwizard, eventwizard2
 from backend.web.handlers.gameday import gameday, gameday_redirect
