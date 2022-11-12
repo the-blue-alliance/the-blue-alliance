@@ -350,3 +350,28 @@ def event_insights(event_key: EventKey) -> Response:
         render_template("event_insights.html", template_values),
         ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
     )
+
+
+@cached_public
+def event_rss(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+
+    if not event:
+        return redirect("/events")
+
+    cleaned_matches = event.matches
+    _, matches = MatchHelper.organized_matches(cleaned_matches)
+
+    template_values = {
+        "event": event,
+        "matches": matches,
+        "datetime": datetime.datetime.now(),
+    }
+
+    response = make_cached_response(
+        render_template("event_rss.xml", template_values),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+    )
+    response.headers["content-type"] = "application/xml; charset=UTF-8"
+
+    return response
