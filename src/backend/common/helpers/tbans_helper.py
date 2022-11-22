@@ -411,7 +411,9 @@ class TBANSHelper:
         # Cancel any previously-scheduled `match_upcoming` notifications for this match
         queue.delete_tasks(taskqueue.Task(name=task_name))
 
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(  # pyre-ignore[16]
+            tzinfo=None
+        )
         # If we know when our match is starting, schedule to send Xmins before start of match.
         # Otherwise, send immediately.
         if match.time is None or match.time + MATCH_UPCOMING_MINUTES <= now:

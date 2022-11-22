@@ -1,6 +1,6 @@
-import datetime
 import json
 import unittest
+from datetime import datetime, timedelta, timezone
 
 import mock
 import pytest
@@ -883,7 +883,9 @@ class TestTBANSHelper(unittest.TestCase):
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 0
 
-        self.match.time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        self.match.time = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(
+            hours=1
+        )
         # Make sure after calling our schedule_upcoming_match we defer the task
         TBANSHelper.schedule_upcoming_match(self.match)
 
@@ -900,7 +902,9 @@ class TestTBANSHelper(unittest.TestCase):
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 0
 
-        self.match.time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        self.match.time = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(
+            hours=1
+        )
         # Make sure after calling our schedule_upcoming_match we defer the task
         TBANSHelper.schedule_upcoming_match(self.match, "user_id")
 

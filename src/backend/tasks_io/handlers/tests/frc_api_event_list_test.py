@@ -80,20 +80,26 @@ def test_get_bad_year(tasks_client: Client) -> None:
     assert resp.status_code == 404
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_district_list")
 @mock.patch.object(DatafeedFMSAPI, "get_event_list")
-def test_get_no_events(event_list_mock, tasks_client: Client) -> None:
+def test_get_no_events(
+    event_list_mock, district_list_mock, tasks_client: Client
+) -> None:
     event_list_mock.return_value = ([], [])
+    district_list_mock.return_value = []
 
     resp = tasks_client.get("/backend-tasks/get/event_list/2020")
     assert resp.status_code == 200
     assert len(resp.data) > 0
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_district_list")
 @mock.patch.object(DatafeedFMSAPI, "get_event_list")
 def test_get_no_events_no_output_in_taskqueue(
-    event_list_mock, tasks_client: Client
+    event_list_mock, district_list_mock, tasks_client: Client
 ) -> None:
     event_list_mock.return_value = ([], [])
+    district_list_mock.return_value = []
 
     resp = tasks_client.get(
         "/backend-tasks/get/event_list/2020",

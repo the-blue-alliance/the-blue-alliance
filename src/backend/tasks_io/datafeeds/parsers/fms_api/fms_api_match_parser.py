@@ -228,7 +228,7 @@ class FMSAPIHybridScheduleParser(
                 and existing_match.actual_time != actual_time
                 and not self.is_blank_match(existing_match)
             ):
-                logging.warning("Match {} is tied!".format(existing_match.key.id()))
+                logging.info("Match {} is tied!".format(existing_match.key.id()))
 
                 # TODO: Only query within set if set_number ever gets indexed
                 match_count = 0
@@ -266,7 +266,7 @@ class FMSAPIHybridScheduleParser(
                 existing_match.tiebreak_match_key = ndb.Key(Match, key_name)
                 parsed_matches.append(existing_match)
 
-                logging.warning("Creating new match: {}".format(key_name))
+                logging.info("Creating new match: {}".format(key_name))
             elif existing_match:
                 remapped_matches[key_name] = existing_match.key.id()
                 key_name = existing_match.key.id()
