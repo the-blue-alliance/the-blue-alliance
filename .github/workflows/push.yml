@@ -271,7 +271,7 @@ jobs:
       - name: Setup Google Cloud Platform
         uses: google-github-actions/setup-gcloud@v1
         with:
-          version: "321.0.0"
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: gcloud app deploy src/queue.yaml
@@ -298,7 +298,7 @@ jobs:
       - name: Setup Google Cloud Platform
         uses: google-github-actions/setup-gcloud@v1
         with:
-          version: "321.0.0"
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh src/web.yaml
@@ -320,7 +320,7 @@ jobs:
       - name: Setup Google Cloud Platform
         uses: google-github-actions/setup-gcloud@v1
         with:
-          version: "321.0.0"
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh src/api.yaml
@@ -342,7 +342,7 @@ jobs:
       - name: Setup Google Cloud Platform
         uses: google-github-actions/setup-gcloud@v1
         with:
-          version: "321.0.0"
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh src/tasks_io.yaml
