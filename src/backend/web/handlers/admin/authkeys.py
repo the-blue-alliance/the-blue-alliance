@@ -5,6 +5,7 @@ from backend.common.sitevars.firebase_secrets import FirebaseSecrets
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 from backend.common.sitevars.gcm_server_key import GcmServerKey
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
+from backend.common.sitevars.instagram_api_secret import InstagramApiSecret
 from backend.common.sitevars.livestream_secrets import LivestreamSecrets
 from backend.common.sitevars.mobile_client_ids import MobileClientIds
 from backend.common.sitevars.twitch_secrets import TwitchSecrets
@@ -19,6 +20,7 @@ def authkeys_get() -> str:
     livestream_secrets = LivestreamSecrets.get()
     fmsapi_keys = FMSApiSecrets.get()
     clientIds = MobileClientIds.get()
+    instagram_secrets = InstagramApiSecret.get()
 
     template_values = {
         "google_secret": google_secrets.get("api_key", ""),
@@ -31,6 +33,7 @@ def authkeys_get() -> str:
         "gcm_key": gcm_serverKey.get("gcm_key", ""),
         "twitch_secret": twitch_secrets.get("client_id", ""),
         "livestream_secret": livestream_secrets.get("api_key", ""),
+        "instagram_secret": instagram_secrets.get("api_key", ""),
     }
 
     return render_template("admin/authkeys.html", template_values)
@@ -47,8 +50,10 @@ def authkeys_post() -> Response:
     gcm_key = request.form.get("gcm_key", "")
     twitch_client_id = request.form.get("twitch_secret", "")
     livestream_key = request.form.get("livestream_secret", "")
+    instagram_key = request.form.get("instagram_secret", "")
 
     GoogleApiSecret.put({"api_key": google_key})
+    InstagramApiSecret.put({"api_key": instagram_key})
     FirebaseSecrets.put({"FIREBASE_SECRET": firebase_key})
     FMSApiSecrets.put({"username": fmsapi_user, "authkey": fmsapi_secret})
     MobileClientIds.put(

@@ -18,6 +18,7 @@ from backend.web.handlers.ajax import (
 )
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import district_detail
+from backend.web.handlers.embed import instagram_oembed
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import (
     event_detail,
@@ -136,6 +137,7 @@ app.add_url_rule(
 )
 app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)
 app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
+app.add_url_rule("/instagram_oembed/<media_key>", view_func=instagram_oembed)
 
 app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
