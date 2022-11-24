@@ -19,7 +19,12 @@ from backend.web.handlers.ajax import (
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import district_detail
 from backend.web.handlers.error import handle_404, handle_500
-from backend.web.handlers.event import event_detail, event_insights, event_list
+from backend.web.handlers.event import (
+    event_detail,
+    event_insights,
+    event_list,
+    event_rss,
+)
 from backend.web.handlers.eventwizard import eventwizard, eventwizard2
 from backend.web.handlers.gameday import gameday, gameday_redirect
 from backend.web.handlers.hall_of_fame import hall_of_fame_overview
@@ -76,6 +81,7 @@ app.add_url_rule("/gameday/<alias>", view_func=gameday_redirect)
 app.add_url_rule("/gameday", view_func=gameday)
 
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
+app.add_url_rule("/event/<event_key>/feed", view_func=event_rss)
 app.add_url_rule("/event/<event_key>/insights", view_func=event_insights)
 app.add_url_rule("/events/<int:year>", view_func=event_list)
 app.add_url_rule(
