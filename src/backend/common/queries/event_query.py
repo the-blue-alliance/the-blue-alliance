@@ -63,6 +63,22 @@ class DistrictEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
         return events
 
 
+class RegionalEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "regional_events_{year}"
+    DICT_CONVERTER = EventConverter
+
+    def __init__(self, year: Year) -> None:
+        super().__init__(year=year)
+
+    @typed_tasklet
+    def _query_async(self, year: Year) -> Generator[Any, Any, List[Event]]:
+        events = yield Event.query(
+            Event.event_type_enum == EventType.REGIONAL, Event.year == year
+        ).fetch_async()
+        return events
+
+
 class DistrictChampsInYearQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "district_list_{year}"
