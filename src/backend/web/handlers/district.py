@@ -20,7 +20,7 @@ from backend.common.queries.district_query import (
     DistrictQuery,
     DistrictsInYearQuery,
 )
-from backend.common.queries.event_query import DistrictEventsQuery
+from backend.common.queries.event_query import DistrictEventsQuery, RegionalEventsQuery
 from backend.common.queries.team_query import DistrictTeamsQuery, EventTeamsQuery
 from backend.web.profiled_render import render_template
 
@@ -74,6 +74,7 @@ def district_detail(
     for dist in districts_in_year:
         valid_districts.append((dist.display_name, dist.abbreviation))
     valid_districts = sorted(valid_districts, key=itemgetter(0))
+    valid_districts.insert(0, ("Regional Events", "regional"))
 
     teams = TeamHelper.sort_teams(district_teams_future.get_result())
     team_keys = set([t.key.id() for t in teams])
@@ -154,5 +155,54 @@ def district_detail(
 
     return make_cached_response(
         render_template("district_details.html", template_values),
+        ttl=timedelta(minutes=15) if current_year else timedelta(days=1),
+    )
+
+
+@cached_public
+def regional_detail(year: Optional[Year]) -> Response:
+    explicit_year = year is not None
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    valid_years = SeasonHelper.get_valid_years()
+    if year not in valid_years:
+        abort(404)
+
+    events_future = RegionalEventsQuery(year).fetch_async()
+
+    # needed for valid_districts
+    districts_in_year_future = DistrictsInYearQuery(year).fetch_async()
+
+    current_year = False
+    if year == datetime.datetime.now().year:  # Only show active teams for current year
+        current_year = True
+
+    events = EventHelper.sorted_events(events_future.get_result())
+    if not events:
+        abort(404)
+
+    events_by_key = {}
+    for event in events:
+        events_by_key[event.key.id()] = event
+    week_events = EventHelper.group_by_week(events)
+
+    valid_districts: List[Tuple[str, DistrictAbbreviation]] = []
+    districts_in_year = districts_in_year_future.get_result()
+    for dist in districts_in_year:
+        valid_districts.append((dist.display_name, dist.abbreviation))
+    valid_districts = sorted(valid_districts, key=itemgetter(0))
+
+    template_values = {
+        "events": events,
+        "explicit_year": explicit_year,
+        "year": year,
+        "valid_years": valid_years,
+        "valid_districts": valid_districts,
+        "week_events": week_events,
+    }
+
+    return make_cached_response(
+        render_template("regional_details.html", template_values),
         ttl=timedelta(minutes=15) if current_year else timedelta(days=1),
     )

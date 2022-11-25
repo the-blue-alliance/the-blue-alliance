@@ -17,7 +17,7 @@ from backend.web.handlers.ajax import (
     typeahead_handler,
 )
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
-from backend.web.handlers.district import district_detail
+from backend.web.handlers.district import district_detail, regional_detail
 from backend.web.handlers.embed import instagram_oembed
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import (
@@ -85,6 +85,12 @@ app.add_url_rule("/event/<event_key>", view_func=event_detail)
 app.add_url_rule("/event/<event_key>/feed", view_func=event_rss)
 app.add_url_rule("/event/<event_key>/insights", view_func=event_insights)
 app.add_url_rule("/events/<int:year>", view_func=event_list)
+app.add_url_rule(
+    "/events/regional",
+    view_func=regional_detail,
+    defaults={"year": None},
+)
+app.add_url_rule("/events/regional/<int:year>", view_func=regional_detail)
 app.add_url_rule(
     '/events/<regex("[a-z]+"):district_abbrev>',
     view_func=district_detail,

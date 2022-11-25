@@ -66,7 +66,7 @@ def test_valid_districts_dropdown(ndb_stub, web_client: Client) -> None:
     )
     assert district_dropdown is not None
 
-    expected_districts = ["All Events", "FIM", "MAR"]
+    expected_districts = ["All Events", "Regional Events", "FIM", "MAR"]
     assert [
         y.string for y in district_dropdown.contents if y != "\n"
     ] == expected_districts

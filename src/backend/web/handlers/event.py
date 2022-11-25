@@ -11,6 +11,7 @@ from werkzeug.wrappers import Response
 from backend.common.consts import comp_level, playoff_type
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import COMP_LEVELS, CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.award_helper import AwardHelper
@@ -60,6 +61,10 @@ def event_list(year: Optional[Year] = None) -> Response:
     for district in districts_future.get_result():
         districts.append((district.abbreviation, district.display_name))
     districts = sorted(districts, key=lambda d: d[1])
+
+    # Special case to display a list of regionals
+    if any(map(lambda e: e.event_type_enum == EventType.REGIONAL, events)):
+        districts.insert(0, ("regional", "Regional Events"))
 
     valid_state_provs = set()
     for event in all_events_future.get_result():
