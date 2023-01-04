@@ -2,8 +2,12 @@ from typing import Dict, TypedDict
 
 from backend.common.models.keys import TeamKey
 
+TeamStatMap = Dict[TeamKey, float]
+Component = str
+EventComponentOPRs = Dict[Component, TeamStatMap]
+
 
 class EventMatchstats(TypedDict):
-    oprs: Dict[TeamKey, float]
-    dprs: Dict[TeamKey, float]
-    ccwms: Dict[TeamKey, float]
+    oprs: TeamStatMap
+    dprs: TeamStatMap
+    ccwms: TeamStatMap
