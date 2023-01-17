@@ -112,7 +112,7 @@ def district_detail(
                     )
                     continue
                 teams_and_statuses.append(
-                    (team, event_team.status, event_team.status_strings)
+                    (team, event_team.status, event_team.status_strings, [])
                 )
         if has_teams:
             teams_and_statuses.sort(key=lambda x: x[0].team_number)
