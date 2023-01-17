@@ -130,12 +130,15 @@ jobs:
         uses: actions/setup-node@v2.1.2
         with:
           node-version: "10.x"
-      - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v0
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
         with:
-          version: "321.0.0"
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCLOUD_AUTH }}
       - name: Cache pip
         if: contains(github.event.commits[0].message, '[dispatchonly]') == false
         uses: actions/cache@v2
