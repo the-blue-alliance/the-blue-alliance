@@ -23,10 +23,15 @@ from backend.common.consts.auth_type import (
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
 )
 from backend.common.consts.model_type import ModelType
+from backend.common.consts.notification_type import RENDER_NAMES as NOTIFICATION_RENDER_NAMES, ENABLED_TEAM_NOTIFICATIONS
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.models.favorite import Favorite
+from backend.common.models.subscription import Subscription
+from backend.common.models.keys import TeamNumber
+from backend.common.models.team import Team
 from backend.common.sitevars.notifications_enable import NotificationsEnable
 from backend.web.decorators import enforce_login, require_login, require_login_only
 from backend.web.redirect import is_safe_url, safe_next_redirect
@@ -249,6 +254,35 @@ def mytba() -> str:
         "year": SeasonHelper.effective_season_year(),
     }
     return render_template("mytba.html", **template_values)
+
+
+@blueprint.route("/mytba/team/<int:team_number>")
+@require_login
+def mytba_team(team_number: TeamNumber) -> str:
+    team_key = f'frc{team_number}'
+    team = Team.get_by_id(team_key)
+
+    if not team:
+        abort(404)
+
+    user = none_throws(current_user())
+    favorite = Favorite.query(Favorite.model_key==team_key, Favorite.model_type==ModelType.TEAM, ancestor=user.account_key).get()
+    subscription = Subscription.query(Favorite.model_key==team_key, Favorite.model_type==ModelType.TEAM, ancestor=user.account_key).get()
+
+    if not favorite and not subscription:  # New entry; default to being a favorite
+        is_favorite = True
+    else:
+        is_favorite = favorite is not None
+
+    enabled_notifications = [(en, NOTIFICATION_RENDER_NAMES[en]) for en in ENABLED_TEAM_NOTIFICATIONS]
+
+    template_values = {
+        "team": team,
+        "is_favorite": is_favorite,
+        "subscription": subscription,
+        "enabled_notifications": enabled_notifications
+    }
+    return render_template("mytba_team.html", **template_values)
 
 
 @blueprint.route("/ping", methods=["POST"])
