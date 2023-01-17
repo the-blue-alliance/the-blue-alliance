@@ -32,6 +32,7 @@ from backend.web.handlers.hall_of_fame import hall_of_fame_overview
 from backend.web.handlers.index import about, avatar_list, index
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
+from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.static import (
     add_data,
     bigquery,
@@ -57,7 +58,6 @@ from backend.web.handlers.team import (
 from backend.web.handlers.team_admin import (
     blueprint as team_admin,
 )
-from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.webcasts import webcast_list
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes

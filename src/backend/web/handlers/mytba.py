@@ -1,7 +1,10 @@
+import datetime
 from collections import defaultdict
+
+from flask import request
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
-from google.appengine.ext import ndb
 
 from backend.common.auth import current_user
 from backend.common.consts.model_type import ModelType
@@ -16,7 +19,6 @@ from backend.common.queries.award_query import TeamYearAwardsQuery
 from backend.common.queries.event_query import TeamYearEventsQuery
 from backend.web.decorators import require_login
 from backend.web.profiled_render import render_template
-from flask import request
 
 
 @require_login
@@ -29,6 +31,7 @@ def mytba_live() -> Response:
         year = current_season
 
     user = none_throws(current_user())
+    now = datetime.datetime.now()
 
     team_favorites_future = Favorite.query(
         Favorite.model_type == ModelType.TEAM, ancestor=user.account_key

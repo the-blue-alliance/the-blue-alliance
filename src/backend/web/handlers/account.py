@@ -24,16 +24,16 @@ from backend.common.consts.auth_type import (
 )
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import (
-    RENDER_NAMES as NOTIFICATION_RENDER_NAMES,
     ENABLED_TEAM_NOTIFICATIONS,
+    RENDER_NAMES as NOTIFICATION_RENDER_NAMES,
 )
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.favorite import Favorite
-from backend.common.models.subscription import Subscription
 from backend.common.models.keys import TeamNumber
+from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
 from backend.common.sitevars.notifications_enable import NotificationsEnable
 from backend.web.decorators import enforce_login, require_login, require_login_only
