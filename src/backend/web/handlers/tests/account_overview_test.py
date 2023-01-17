@@ -39,6 +39,7 @@ def test_blueprint() -> None:
         "/account/login": "account.login",
         "/account/edit": "account.edit",
         "/account/mytba": "account.mytba",
+        "/account/mytba/team/<int:team_number>": "account.mytba_team",
         "/account": "account.overview",
         "/account/ping": "account.ping",
     }
