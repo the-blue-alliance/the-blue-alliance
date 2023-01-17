@@ -22,7 +22,7 @@ from flask import request
 @require_login
 def mytba_live() -> Response:
     current_season = SeasonHelper.get_current_season()
-    year = request.args.get('year')
+    year = request.args.get("year")
     if year and year.isdigit():
         year = int(year)
     else:
@@ -30,9 +30,13 @@ def mytba_live() -> Response:
 
     user = none_throws(current_user())
 
-    team_favorites_future = Favorite.query(Favorite.model_type == ModelType.TEAM, ancestor=user.account_key).fetch_async()
+    team_favorites_future = Favorite.query(
+        Favorite.model_type == ModelType.TEAM, ancestor=user.account_key
+    ).fetch_async()
 
-    favorite_team_keys = map(lambda f: ndb.Key(Team, f.model_key), team_favorites_future.get_result())
+    favorite_team_keys = map(
+        lambda f: ndb.Key(Team, f.model_key), team_favorites_future.get_result()
+    )
     favorite_teams_future = ndb.get_multi_async(favorite_team_keys)
 
     favorite_teams = [team_future.get_result() for team_future in favorite_teams_future]
@@ -40,8 +44,12 @@ def mytba_live() -> Response:
     favorite_teams_events_futures = []
     favorite_teams_awards_futures = {}
     for team in favorite_teams:
-        favorite_teams_events_futures.append(TeamYearEventsQuery(team.key_name, year).fetch_async())
-        favorite_teams_awards_futures[team.key.id()] = TeamYearAwardsQuery(team.key_name, year).fetch_async()
+        favorite_teams_events_futures.append(
+            TeamYearEventsQuery(team.key_name, year).fetch_async()
+        )
+        favorite_teams_awards_futures[team.key.id()] = TeamYearAwardsQuery(
+            team.key_name, year
+        ).fetch_async()
 
     past_events_by_event = {}
     live_events_by_event = {}
@@ -53,7 +61,9 @@ def mytba_live() -> Response:
             continue
         EventHelper.sort_events(events)  # Sort by date
         for event in events:
-            favorite_event_team_keys.append(ndb.Key(EventTeam, '{}_{}'.format(event.key.id(), team.key.id())))
+            favorite_event_team_keys.append(
+                ndb.Key(EventTeam, "{}_{}".format(event.key.id(), team.key.id()))
+            )
             if event.within_a_day:
                 if event.key_name not in live_events_by_event:
                     live_events_by_event[event.key_name] = (event, [])
@@ -78,50 +88,74 @@ def mytba_live() -> Response:
     for event, teams in past_events_by_event.values():
         teams_and_statuses = []
         for team in teams:
-            event_team = EventTeam.get_by_id('{}_{}'.format(event.key.id(), team.key.id()))  # Should be in context cache
+            event_team = EventTeam.get_by_id(
+                "{}_{}".format(event.key.id(), team.key.id())
+            )  # Should be in context cache
             status_str = {
-                'alliance': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team.key.id(), event_team.status),
-                'playoff': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team.key.id(), event_team.status),
+                "alliance": EventTeamStatusHelper.generate_team_at_event_alliance_status_string(
+                    team.key.id(), event_team.status
+                ),
+                "playoff": EventTeamStatusHelper.generate_team_at_event_playoff_status_string(
+                    team.key.id(), event_team.status
+                ),
             }
-            teams_and_statuses.append((
-                team,
-                event_team.status,
-                status_str,
-                AwardHelper.organize_awards(event_team_awards[event.key.id()][team.key.id()])
-            ))
+            teams_and_statuses.append(
+                (
+                    team,
+                    event_team.status,
+                    status_str,
+                    AwardHelper.organize_awards(
+                        event_team_awards[event.key.id()][team.key.id()]
+                    ),
+                )
+            )
         teams_and_statuses.sort(key=lambda x: x[0].team_number)
         past_events_with_teams.append((event, teams_and_statuses))
     past_events_with_teams.sort(key=lambda x: x[0].name)
-    past_events_with_teams.sort(key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
-    past_events_with_teams.sort(key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
+    past_events_with_teams.sort(
+        key=lambda x: EventHelper.start_date_or_distant_future(x[0])
+    )
+    past_events_with_teams.sort(
+        key=lambda x: EventHelper.end_date_or_distant_future(x[0])
+    )
 
     live_events_with_teams = []
     for event, teams in live_events_by_event.values():
         teams_and_statuses = []
         for team in teams:
-            event_team = EventTeam.get_by_id('{}_{}'.format(event.key.id(), team.key.id()))  # Should be in context cache
+            event_team = EventTeam.get_by_id(
+                "{}_{}".format(event.key.id(), team.key.id())
+            )  # Should be in context cache
             status_str = {
-                'alliance': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team.key.id(), event_team.status),
-                'playoff': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team.key.id(), event_team.status),
+                "alliance": EventTeamStatusHelper.generate_team_at_event_alliance_status_string(
+                    team.key.id(), event_team.status
+                ),
+                "playoff": EventTeamStatusHelper.generate_team_at_event_playoff_status_string(
+                    team.key.id(), event_team.status
+                ),
             }
-            teams_and_statuses.append((
-                team,
-                event_team.status,
-                status_str
-            ))
+            teams_and_statuses.append((team, event_team.status, status_str))
         teams_and_statuses.sort(key=lambda x: x[0].team_number)
         live_events_with_teams.append((event, teams_and_statuses))
     live_events_with_teams.sort(key=lambda x: x[0].name)
-    live_events_with_teams.sort(key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
-    live_events_with_teams.sort(key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
+    live_events_with_teams.sort(
+        key=lambda x: EventHelper.start_date_or_distant_future(x[0])
+    )
+    live_events_with_teams.sort(
+        key=lambda x: EventHelper.end_date_or_distant_future(x[0])
+    )
 
     future_events_with_teams = []
     for event, teams in future_events_by_event.values():
         teams.sort(key=lambda t: t.team_number)
         future_events_with_teams.append((event, teams))
     future_events_with_teams.sort(key=lambda x: x[0].name)
-    future_events_with_teams.sort(key=lambda x: EventHelper.start_date_or_distant_future(x[0]))
-    future_events_with_teams.sort(key=lambda x: EventHelper.end_date_or_distant_future(x[0]))
+    future_events_with_teams.sort(
+        key=lambda x: EventHelper.start_date_or_distant_future(x[0])
+    )
+    future_events_with_teams.sort(
+        key=lambda x: EventHelper.end_date_or_distant_future(x[0])
+    )
 
     template_values = {
         "year": year,
