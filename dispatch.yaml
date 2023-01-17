@@ -4,8 +4,6 @@ dispatch:
   service: default
 - url: "www.thebluealliance.com/search*"
   service: default
-- url: "www.thebluealliance.com/mytba"
-  service: default
 - url: "www.thebluealliance.com/clientapi/*"
   service: default
 # match py2 css and javascript (py3 is prefixed with py3_)
