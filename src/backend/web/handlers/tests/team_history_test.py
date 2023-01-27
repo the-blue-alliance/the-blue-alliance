@@ -47,7 +47,9 @@ def test_team_info(web_client: Client, setup_full_team) -> None:
         == "Innovation First International/L3 Harris&Greenville High School"
     )
     assert team_info.rookie_year == "Rookie Year: 1992"
-    assert team_info.website == "http://www.robowranglers148.com/"
+    # Removed team website
+    # assert team_info.website == "http://www.robowranglers148.com/"
+    assert team_info.website is None
     assert team_info.district is None
     assert team_info.district_link is None
     assert team_info.social_media == [
