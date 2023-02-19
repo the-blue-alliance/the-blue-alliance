@@ -1,0 +1,455 @@
+{% macro mobility(team, did_mobility) %}
+{% if did_mobility %}
+<span class="glyphicon glyphicon-ok" rel="tooltip" title="{{team|digits}}"></span>
+{% else %}
+<span class="glyphicon glyphicon-remove" rel="tooltip" title="{{team|digits}}"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro auto_charge_station(team, charge_station_result, bridge_state) %}
+{% if charge_station_result == 'Docked' and bridge_state == 'Level' %}
+<span rel="tooltip" title="{{team|digits}}">Engaged (+12)</span>
+{% elif charge_station_result == 'Docked' and bridge_state == 'NotLevel' %}
+<span rel="tooltip" title="{{team|digits}}">Docked (+8)</span>
+{% else %}
+<span rel="tooltip" title="{{team|digits}}" class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro endgame(team, charge_station_result, bridge_state) %}
+{% if charge_station_result == 'Docked' and bridge_state == 'Level' %}
+<span rel="tooltip" title="{{team|digits}}">Engaged (+10)</span>
+{% elif charge_station_result == 'Docked' and bridge_state == 'NotLevel' %}
+<span rel="tooltip" title="{{team|digits}}">Docked (+6)</span>
+{% elif charge_station_result == 'Park' %}
+<span rel="tooltip" title="{{team|digits}}">Park (+2)</span>
+{% else %}
+<span rel="tooltip" title="{{team|digits}}" class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro coopertition_criteria(earned) %}
+{% if earned %}
+<span class="glyphicon glyphicon-ok"></span>
+{% else %}
+<span class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro rp_bonus(earned) %}
+{% if earned %}
+<span class="glyphicon glyphicon-ok"></span> (+1 RP)
+{% else %}
+<span class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro fouls(alliance_breakdown) %}
+{%if alliance_breakdown.foulCount%}{{alliance_breakdown.foulCount}} (+{{alliance_breakdown.foulCount * 5}}){%else%}0{%endif%} /
+{%if alliance_breakdown.techFoulCount%}{{alliance_breakdown.techFoulCount}} (+{{alliance_breakdown.techFoulCount * 12}}){%else%}0{%endif%}
+{% endmacro %}
+
+{% macro community(piece, auto_piece, row, index, links) %}
+{% set vars = {'is_link': False} %}
+{% for link in links %}
+    {% if link.row == row and index in link.nodes %}
+        {% if vars.update({'is_link': True}) %}{% endif %}
+    {% endif %}
+{% endfor %}
+
+<svg width="24px" height="24px" style="display: block; margin: auto;">
+    <rect width="24" , height="24" style="fill:{% if vars.is_link %}rgb(0,255,0,0.3){% else %}rgb(0,0,0,0){% endif %}; stroke-width:{% if auto_piece != 'None' and auto_piece == piece %}4{% else %}1{% endif %}; stroke:rgb(0,0,0,{% if auto_piece != 'None' and auto_piece == piece %}1.0{% else %}0.2{% endif %})" />
+    {% if piece == "Cube" %}
+    <polygon points="4,4 4,20 20,20, 20,4" style="fill:rgb(150,0,255);stroke-width:1;stroke:rgb(0,0,0)" />
+    {% elif piece == "Cone" %}
+    <polygon points="12,5 7,20 4,20 20,20 17,20" style="fill:rgb(255,200,0);stroke-width:1;stroke:rgb(0,0,0)" />
+    {% endif %}
+</svg>
+{% endmacro %}
+
+<table class="match-table">
+  <tbody>
+    <!-- Autonomous -->
+    {% if "mobilityRobot1" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{mobility(match.alliances.red.teams.0, match.score_breakdown.red.mobilityRobot1 == 'Yes')}}
+        {{mobility(match.alliances.red.teams.1, match.score_breakdown.red.mobilityRobot2 == 'Yes')}}
+        {{mobility(match.alliances.red.teams.2, match.score_breakdown.red.mobilityRobot3 == 'Yes')}}
+        (+{{match.score_breakdown.red.autoMobilityPoints}})
+      </td>
+      <td>Mobility</td>
+      <td class="blueScore" colspan="2">
+        {{mobility(match.alliances.blue.teams.0, match.score_breakdown.blue.mobilityRobot1 == 'Yes')}}
+        {{mobility(match.alliances.blue.teams.1, match.score_breakdown.blue.mobilityRobot2 == 'Yes')}}
+        {{mobility(match.alliances.blue.teams.2, match.score_breakdown.blue.mobilityRobot3 == 'Yes')}}
+        (+{{match.score_breakdown.blue.autoMobilityPoints}})
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Auto Game Piece Count -->
+    {% if "autoGamePieceCount" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{match.score_breakdown.red.autoGamePieceCount}}
+        </td>
+        <td>Auto Game Piece Count</td>
+        <td class="blue" colspan="2">
+            {{match.score_breakdown.blue.autoGamePieceCount}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Auto Game Piece Points -->
+    {% if "autoGamePiecePoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.autoGamePiecePoints}}
+      </td>
+      <td>Auto Game Piece Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.autoGamePiecePoints}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Robot 1 Auto Charge Station -->
+    {% if "autoChargeStationRobot1" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{auto_charge_station(match.alliances.red.teams.0, match.score_breakdown.red.autoChargeStationRobot1,
+            match.score_breakdown.red.autoBridgeState)}}
+        </td>
+        <td>Robot 1 Auto Charge Station</td>
+        <td class="blue" colspan="2">
+            {{auto_charge_station(match.alliances.blue.teams.0, match.score_breakdown.blue.autoChargeStationRobot1,
+            match.score_breakdown.blue.autoBridgeState)}}
+        </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 2 Auto Charge Station -->
+    {% if "autoChargeStationRobot2" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{auto_charge_station(match.alliances.red.teams.1, match.score_breakdown.red.autoChargeStationRobot2,
+            match.score_breakdown.red.autoBridgeState)}}
+        </td>
+        <td>Robot 2 Auto Charge Station</td>
+        <td class="blue" colspan="2">
+            {{auto_charge_station(match.alliances.blue.teams.1, match.score_breakdown.blue.autoChargeStationRobot2,
+            match.score_breakdown.blue.autoBridgeState)}}
+        </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 3 Auto Charge Station -->
+    {% if "autoChargeStationRobot3" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{auto_charge_station(match.alliances.red.teams.2, match.score_breakdown.red.autoChargeStationRobot3,
+            match.score_breakdown.red.autoBridgeState)}}
+        </td>
+        <td>Robot 3 Auto Charge Station</td>
+        <td class="blue" colspan="2">
+            {{auto_charge_station(match.alliances.blue.teams.2, match.score_breakdown.blue.autoChargeStationRobot3,
+            match.score_breakdown.blue.autoBridgeState)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Auto Points -->
+    {% if "autoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        <b>{% if match.score_breakdown.red.autoPoints %}{{match.score_breakdown.red.autoPoints}}{%else%}0{%endif%}</b>
+      </td>
+      <th>Total Auto</th>
+      <td class="blueScore" colspan="2">
+        <b>{% if match.score_breakdown.blue.autoPoints %}{{match.score_breakdown.blue.autoPoints}}{%else%}0{%endif%}</b>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop -->
+    <!-- Game Piece Count -->
+    {% if "teleopGamePieceCount" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{match.score_breakdown.red.teleopGamePieceCount}}
+        </td>
+        <td>Game Piece Count</td>
+        <td class="blue" colspan="2">
+            {{match.score_breakdown.blue.teleopGamePieceCount}}
+        </td>
+    </tr>
+    {% endif %}
+    <!-- Game Piece Points -->
+    {% if "teleopGamePiecePoints" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            {{match.score_breakdown.red.teleopGamePiecePoints}}
+        </td>
+        <td>Game Piece Points</td>
+        <td class="blueScore" colspan="2">
+            {{match.score_breakdown.blue.teleopGamePiecePoints}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Robot 1 Endgame -->
+    {% if "endGameChargeStationRobot1" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.0, match.score_breakdown.red.endGameChargeStationRobot1, match.score_breakdown.red.endGameBridgeState)}}
+      </td>
+      <td>Robot 1 Endgame</td>
+      <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.0, match.score_breakdown.blue.endGameChargeStationRobot1, match.score_breakdown.blue.endGameBridgeState)}}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 2 Endgame -->
+    {% if "endGameChargeStationRobot2" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.1, match.score_breakdown.red.endGameChargeStationRobot2, match.score_breakdown.red.endGameBridgeState)}}
+      </td>
+      <td>Robot 2 Endgame</td>
+      <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.1, match.score_breakdown.blue.endGameChargeStationRobot2, match.score_breakdown.blue.endGameBridgeState)}}
+      </td>
+    </tr>
+    {% endif %}
+    <!-- Robot 3 Endgame -->
+    {% if "endGameChargeStationRobot3" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.2, match.score_breakdown.red.endGameChargeStationRobot3, match.score_breakdown.red.endGameBridgeState)}}
+      </td>
+      <td>Robot 3 Endgame</td>
+      <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.2, match.score_breakdown.blue.endGameChargeStationRobot3, match.score_breakdown.blue.endGameBridgeState)}}
+      </td>
+    </tr>
+    {% endif %}
+
+    {% if "endGamePoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.endGamePoints}}
+      </td>
+      <td>Hangar Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.endGamePoints}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop Score -->
+    {% if "teleopPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        <b>{% if match.score_breakdown.red.teleopPoints %}{{match.score_breakdown.red.teleopPoints}}{%else%}0{%endif%}</b>
+      </td>
+      <th>Total Teleop</th>
+      <td class="blueScore" colspan="2">
+        <b>{% if match.score_breakdown.blue.teleopPoints %}{{match.score_breakdown.blue.teleopPoints}}{%else%}0{%endif%}</b>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Links -->
+    {% if "links" in match.score_breakdown.red and "linkPoints" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{match.score_breakdown.red.links|length}} (+{{match.score_breakdown.red.linkPoints}})
+        </td>
+        <td>Links</td>
+        <td class="blue" colspan="2">
+            {{match.score_breakdown.blue.links|length}} (+{{match.score_breakdown.blue.linkPoints}})
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Coopoertition Bonus -->
+    {% if "coopertitionCriteriaMet" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{coopertition_criteria(match.score_breakdown.red.coopertitionCriteriaMet)}}
+        </td>
+        <td>Coopertition Criteria Met</td>
+        <td class="blue" colspan="2">
+            {{coopertition_criteria(match.score_breakdown.blue.coopertitionCriteriaMet)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Bonus RP -->
+    {% if "sustainabilityBonusAchieved" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{rp_bonus(match.score_breakdown.red.sustainabilityBonusAchieved)}}
+      </td>
+      <td>Sustainability Bonus</td>
+      <td class="blue" colspan="2">
+        {{rp_bonus(match.score_breakdown.blue.sustainabilityBonusAchieved)}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "activationBonusAchieved" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{rp_bonus(match.score_breakdown.red.activationBonusAchieved)}}
+      </td>
+      <td>Activation Bonus</td>
+      <td class="blue" colspan="2">
+        {{rp_bonus(match.score_breakdown.blue.activationBonusAchieved)}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Fouls & Adjustments -->
+    {% if "foulCount" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{fouls(match.score_breakdown.blue)}}
+      </td>
+      <td>Fouls / Tech Fouls</td>
+      <td class="blue" colspan="2">
+        {{fouls(match.score_breakdown.red)}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "adjustPoints" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.adjustPoints%}{{match.score_breakdown.red.adjustPoints}}{%else%}0{%endif%}</td>
+      <td>Adjustments</td>
+      <td class="blue" colspan="2">{%if match.score_breakdown.blue.adjustPoints%}{{match.score_breakdown.blue.adjustPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{%if match.score_breakdown.red.totalPoints%}{{match.score_breakdown.red.totalPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Score</th>
+      <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+
+    {% if 'rp' in match.score_breakdown.red and match.comp_level == 'qm' %}
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.cargoBonusRankingPoint %}
+        <svg class="top-left-dot" rel="tooltip" title="Cargo Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.red.hangarBonusRankingPoint %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Hangar Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.red.rp}} RP
+      </td>
+      <td>Ranking Points</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.cargoBonusRankingPoint %}
+        <svg class="top-left-dot" rel="tooltip" title="Cargo Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.blue.hangarBonusRankingPoint %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Hangar Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.blue.rp}} RP
+      </td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+
+{% if 'teleopCommunity' in match.score_breakdown.red %}
+<h4>Scoring Location Breakdown</h4>
+<table class="match-table">
+    <tbody>
+        <tr class="key">
+            <td>Top</td>
+            <td>Mid</td>
+            <td>Bot</td>
+            <td></td>
+            <td>Bot</td>
+            <td>Mid</td>
+            <td>Top</td>
+        </tr>
+        <tr>
+            <td class="red">
+                <div style="display: flex; flex-direction: column-reverse;">
+                    {% for piece in match.score_breakdown.red.teleopCommunity.T %}
+                    <span>{{community(piece, match.score_breakdown.red.autoCommunity.T[loop.index0], 'Top', loop.index0, match.score_breakdown.red.links)}}</span>
+                    {% endfor %}
+                </div>
+            </td>
+            <td class="red">
+                <div style="display: flex; flex-direction: column-reverse;">
+                    {% for piece in match.score_breakdown.red.teleopCommunity.M %}
+                    <span>{{community(piece, match.score_breakdown.red.autoCommunity.M[loop.index0], 'Mid', loop.index0, match.score_breakdown.red.links)}}</span>
+                    {% endfor %}
+                </div>
+            </td>
+            <td class="red">
+                <div style="display: flex; flex-direction: column-reverse;">
+                    {% for piece in match.score_breakdown.red.teleopCommunity.B %}
+                    <span>{{community(piece, match.score_breakdown.red.autoCommunity.B[loop.index0], 'Bottom', loop.index0, match.score_breakdown.red.links)}}</span>
+                    {% endfor %}
+                </div>
+            </td>
+            <td></td>
+            <td class="blue">
+                <div style="display: flex; flex-direction: column;">
+                    {% for piece in match.score_breakdown.blue.teleopCommunity.B %}
+                    <span>{{community(piece, match.score_breakdown.blue.autoCommunity.B[loop.index0], 'Bottom', loop.index0, match.score_breakdown.blue.links)}}</span>
+                    {% endfor %}
+                </div>
+            </td>
+            <td class="blue">
+                <div style="display: flex; flex-direction: column;">
+                    {% for piece in match.score_breakdown.blue.teleopCommunity.M %}
+                    <span>{{community(piece, match.score_breakdown.blue.autoCommunity.M[loop.index0], 'Mid', loop.index0, match.score_breakdown.blue.links)}}</span>
+                    {% endfor %}
+                </div>
+            </td>
+            <td class="blue">
+                <div style="display: flex; flex-direction: column;">
+                    {% for piece in match.score_breakdown.blue.teleopCommunity.T %}
+                    <span>{{community(piece, match.score_breakdown.blue.autoCommunity.T[loop.index0], 'Top', loop.index0, match.score_breakdown.blue.links)}}</span>
+                    {% endfor %}
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div style="display: flex; flex-direction: row; align-items: center;">
+    <svg width="24px" height="24px" style="margin-right: 8px;">
+        <polygon points="12,5 7,20 4,20 20,20 17,20" style="fill:rgb(255,200,0);stroke-width:1;stroke:rgb(0,0,0)" />
+    </svg>
+    Cone
+</div>
+<div style="display: flex; flex-direction: row; align-items: center;">
+    <svg width="24px" height="24px" style="margin-right: 8px;">
+        <polygon points="4,4 4,20 20,20, 20,4" style="fill:rgb(150,0,255);stroke-width:1;stroke:rgb(0,0,0)" />
+    </svg>
+    Cube
+</div>
+<div style="display: flex; flex-direction: row; align-items: center;">
+    <svg width="24px" height="24px" style="margin-right: 8px;">
+        <rect width="24" , height="24" style="fill:rgb(0,0,0,0); stroke-width:4; stroke:rgb(0,0,0,1.0)" />
+    </svg>
+    Scored in auto
+</div>
+<div style="display: flex; flex-direction: row; align-items: center;">
+    <svg width="24px" height="24px" style="margin-right: 8px;">
+        <rect width="24" , height="24" style="fill:rgb(0,255,0,0.3); stroke-width:1; stroke:rgb(0,0,0,0.2)" />
+    </svg>
+    Part of a link
+</div>
+{% endif %}

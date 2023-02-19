@@ -94,6 +94,7 @@ TODO
 ### Event Rankings
 
 TODO, but `EventDetails.renderable_rankings` needs updating and explain how/why
+Also update `ranking_sort_orders.py`.
 
 ## Championship Events
 
