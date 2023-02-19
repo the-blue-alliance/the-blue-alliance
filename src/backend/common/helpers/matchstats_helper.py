@@ -53,7 +53,17 @@ MANUAL_COMPONENTS = {
             match.score_breakdown[color].get("cargoPoints", 0)
             + match.score_breakdown[color].get("hatchPanelPoints", 0)
         )
-    }
+    },
+    2023: {
+        "Total Game Piece Count": lambda match, color: (
+            match.score_breakdown[color].get("autoGamePieceCount", 0)
+            + match.score_breakdown[color].get("teleopGamePieceCount", 0)
+        ),
+        "Total Game Piece Points": lambda match, color: (
+            match.score_breakdown[color].get("autoGamePiecePoints", 0)
+            + match.score_breakdown[color].get("teleopGamePiecePoints", 0)
+        ),
+    },
 }
 
 
