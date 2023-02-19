@@ -15,7 +15,7 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import COMP_LEVELS_VERBOSE, CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.consts.playoff_type import PlayoffType, DOUBLE_ELIM_MAPPING_INVERSE
+from backend.common.consts.playoff_type import DOUBLE_ELIM_MAPPING_INVERSE, PlayoffType
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.cached_model import CachedModel
