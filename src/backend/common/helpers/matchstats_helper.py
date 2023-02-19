@@ -203,7 +203,7 @@ class MatchstatsHelper(object):
         ].items():
             try:
                 float(value)
-            except ValueError | TypeError:
+            except (ValueError, TypeError) as _:
                 pass
             else:
                 coprs[component] = cls.calc_stat(
