@@ -221,7 +221,9 @@ DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     14: (CompLevel.F, 2, 1),
     15: (CompLevel.F, 2, 2),
     16: (CompLevel.F, 2, 3),
-    17: (CompLevel.F, 2, 4),  # Overtime
+    17: (CompLevel.F, 2, 4),  # Overtime 1
+    18: (CompLevel.F, 2, 4),  # Overtime 2
+    19: (CompLevel.F, 2, 4),  # Overtime 3
 }
 
 DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
