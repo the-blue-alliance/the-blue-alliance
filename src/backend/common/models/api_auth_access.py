@@ -34,6 +34,8 @@ class ApiAuthAccess(ndb.Model):
     event_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         kind=Event, repeated=True
     )  # events for which auth is granted
+    # Allow access for all events marked official
+    all_official_events: bool = ndb.BooleanProperty()
     expiration: Optional[datetime.datetime] = ndb.DateTimeProperty()
 
     def put(self, *args, **kwargs):
