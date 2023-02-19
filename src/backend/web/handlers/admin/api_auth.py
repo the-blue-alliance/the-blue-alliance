@@ -130,6 +130,7 @@ def api_auth_edit_post(auth_id: str) -> Response:
     else:
         auth.description = request.form.get("description", "")
         auth.event_list = event_list
+        auth.all_official_events = all_official_events
         auth.auth_types_enum = auth_types_enum
         auth.owner = owner_key
         auth.expiration = expiration
