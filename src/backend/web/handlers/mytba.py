@@ -90,9 +90,9 @@ def mytba_live() -> Response:
     for event, teams in past_events_by_event.values():
         teams_and_statuses = []
         for team in teams:
-            event_team = none_throws(EventTeam.get_by_id(
-                "{}_{}".format(event.key.id(), team.key.id())
-            ))  # Should be in context cache
+            event_team = none_throws(
+                EventTeam.get_by_id("{}_{}".format(event.key.id(), team.key.id()))
+            )  # Should be in context cache
             teams_and_statuses.append(
                 (
                     team,
@@ -117,9 +117,9 @@ def mytba_live() -> Response:
     for event, teams in live_events_by_event.values():
         teams_and_statuses = []
         for team in teams:
-            event_team = none_throws(EventTeam.get_by_id(
-                "{}_{}".format(event.key.id(), team.key.id())
-            ))  # Should be in context cache
+            event_team = none_throws(
+                EventTeam.get_by_id("{}_{}".format(event.key.id(), team.key.id()))
+            )  # Should be in context cache
             teams_and_statuses.append(
                 (team, event_team.status, event_team.status_strings)
             )

@@ -79,8 +79,13 @@
       <td colspan="4"></td>
       <td class="dash" colspan="2"></td>
       <td rowspan="2" class="match">
+        {% if event.year >= 2023 %}
+        <span class="match-label">Match 11</span>
+        {{ bracket_match(bracket_table.sf.get('sf1'), 'Winner of M10', 'Winner of M9') }}
+        {% else %}
         <span class="match-label">Match 12</span>
         {{ bracket_match(bracket_table.sf.get('sf2'), 'Winner of M7', 'Winner of M8') }}
+        {% endif %}
       </td>
     </tr>
 
@@ -185,8 +190,13 @@
       <td colspan="3"></td>
       <td class="dash"></td>
       <td rowspan="2" class="match">
+        {% if event.year >= 2023 %}
+        <span class="match-label">Match 12</span>
+        {{ bracket_match(bracket_table.sf.get('sf2'), 'Winner of M7', 'Winner of M8') }}
+        {% else %}
         <span class="match-label">Match 11</span>
         {{ bracket_match(bracket_table.sf.get('sf1'), 'Winner of M10', 'Winner of M9') }}
+        {% endif %}
       </td>
     </tr>
 

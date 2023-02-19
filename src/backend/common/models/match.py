@@ -15,7 +15,7 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import COMP_LEVELS_VERBOSE, CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.consts.playoff_type import PlayoffType
+from backend.common.consts.playoff_type import DOUBLE_ELIM_MAPPING_INVERSE, PlayoffType
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.cached_model import CachedModel
@@ -332,7 +332,17 @@ class Match(CachedModel):
 
         from backend.common.helpers.event_helper import EventHelper
 
-        if (
+        event = self.event.get()
+        if event and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
+            if self.comp_level == "f" and self.set_number == 2:
+                return f"Finals {self.match_number}"
+            match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
+                (self.comp_level, self.set_number, self.match_number)
+            )
+            if match_num is None:
+                match_num = "?"
+            return f"Match {match_num}"
+        elif (
             self.comp_level == "qm"
             or self.comp_level == "f"
             or EventHelper.is_2015_playoff(self.event_key_name)
