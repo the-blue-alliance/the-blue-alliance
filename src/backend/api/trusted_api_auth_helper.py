@@ -119,7 +119,9 @@ class TrustedApiAuthHelper:
     ) -> Optional[str]:
         allowed_event_keys = [none_throws(ekey.string_id()) for ekey in auth.event_list]
         if event.key_name not in allowed_event_keys and not (
-            auth.all_official_events and event.official
+            auth.all_official_events
+            and event.official
+            and event.year == datetime.datetime.now().year
         ):
             return "Only allowed to edit events: {}".format(
                 ", ".join(allowed_event_keys)
