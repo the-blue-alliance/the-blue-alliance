@@ -221,9 +221,7 @@ def avatar_list(year: Optional[Year] = None) -> Response:
         ).fetch_async()
         avatars = avatars_future.get_result()
         avatars = filter(lambda a: len(a.references) > 0, avatars)
-        avatars = sorted(
-            avatars, key=lambda a: int(a.references[0].id()[3:])
-        )
+        avatars = sorted(avatars, key=lambda a: int(a.references[0].id()[3:]))
 
         shards = {}
         size = len(avatars) / 10 + 1
