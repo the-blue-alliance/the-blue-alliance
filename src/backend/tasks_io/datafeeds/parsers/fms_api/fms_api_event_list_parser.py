@@ -195,7 +195,9 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             if event_key in events_to_change_dates:
                 start = end.replace(hour=0, minute=0, second=0, microsecond=0)
 
-            playoff_type = self.get_playoff_type(self.season, event.get("allianceCount"))
+            playoff_type = self.get_playoff_type(
+                self.season, event.get("allianceCount")
+            )
 
             events.append(
                 Event(

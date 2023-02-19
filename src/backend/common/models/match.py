@@ -333,10 +333,12 @@ class Match(CachedModel):
         from backend.common.helpers.event_helper import EventHelper
 
         event = self.event.get()
-        if (event and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM):
+        if event and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
             if self.comp_level == "f" and self.set_number == 2:
                 return f"Finals {self.match_number}"
-            match_num = DOUBLE_ELIM_MAPPING.get((self.comp_level, self.set_number, self.match_number), "?")
+            match_num = DOUBLE_ELIM_MAPPING.get(
+                (self.comp_level, self.set_number, self.match_number), "?"
+            )
             return f"Match {match_num}"
         elif (
             self.comp_level == "qm"
