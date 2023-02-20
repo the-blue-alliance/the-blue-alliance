@@ -6,9 +6,9 @@
     <span id="coprSelector">Choose component</span> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    {% for component, component_id in copr_div_ids.items() %}
+    {% for copr_item in copr_data %}
         <li>
-            <a href="#" id="dropdown_{{ component_id }}">{{ component }}</a>
+            <a href="#" id="dropdown_{{ copr_item[1] }}">{{ copr_item[2] }}</a>
         </li>
     {% endfor %}
   </ul>
@@ -28,9 +28,9 @@
 <script>
     const coprs = JSON.parse('{{ coprs_json|safe }}');
 
-    function buildCoprTable(component) {
+    function buildCoprTable(component, readableName) {
         document.getElementById('componentColHeader').innerHTML = `COPR`;
-        document.getElementById('coprSelector').innerText = component;
+        document.getElementById('coprSelector').innerText = readableName;
         document.getElementById('coprTableBody').innerHTML = '';
         coprs[component].forEach((e) => {
             const teamId = e[0];
@@ -51,14 +51,15 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        {% for component, component_id in copr_div_ids.items() %}
-            $("#dropdown_{{ component_id }}").click(function(e) {
+        {% for copr_item in copr_data %}
+            $("#dropdown_{{ copr_item[1] }}").click(function(e) {
                e.preventDefault();
-               buildCoprTable("{{ component }}");
+               buildCoprTable("{{ copr_item[0] }}", "{{ copr_item[2] }}");
             });
+
         {% endfor %}
 
-        buildCoprTable("OPR");
+        buildCoprTable("OPR", "OPR");
     });
 </script>
 
