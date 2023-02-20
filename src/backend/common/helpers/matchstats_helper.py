@@ -63,6 +63,16 @@ MANUAL_COMPONENTS = {
             match.score_breakdown[color].get("autoGamePiecePoints", 0)
             + match.score_breakdown[color].get("teleopGamePiecePoints", 0)
         ),
+        "Foul Count Received": lambda match, color: (
+            match.score_breakdown[OPPONENT[color]].get("foulCount", 0)
+        ),
+        "Foul Points Received": lambda match, color: (
+            match.score_breakdown[OPPONENT[color]].get("foulPoints", 0)
+        ),
+        "Total Points Less Fouls": lambda match, color: (
+            match.score_breakdown[color].get("totalPoints", 0)
+            - match.score_breakdown[color].get("foulPoints", 0)
+        ),
     },
 }
 
