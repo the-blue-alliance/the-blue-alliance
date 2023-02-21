@@ -81,36 +81,36 @@ def captured_templates() -> Generator[List[CapturedTemplate], None, None]:
 
 def get_inputs_from_form(soup: BeautifulSoup) -> Dict:
     fields = {}
-    for input in soup.findAll("input"):
+    for form_input in soup.findAll("input"):
         # ignore submit/image with no name attribute
-        if input["type"] in ["submit", "image"] and "name" not in input:
+        if form_input["type"] in ["submit", "image"] and "name" not in form_input:
             continue
 
         # single element nome/value fields
-        if input["type"] in ["text", "hidden", "password", "submit", "image"]:
+        if form_input["type"] in ["text", "hidden", "password", "submit", "image"]:
             value = ""
-            if input.has_attr("value"):
-                value = input["value"]
-            fields[input["name"]] = value
+            if form_input.has_attr("value"):
+                value = form_input["value"]
+            fields[form_input["name"]] = value
             continue
 
         # checkboxes and radios
-        if input["type"] in ("checkbox", "radio"):
+        if form_input["type"] in ("checkbox", "radio"):
             value = ""
-            if input.has_attr("checked"):
-                if input.has_attr("value"):
-                    value = input["value"]
+            if form_input.has_attr("checked"):
+                if form_input.has_attr("value"):
+                    value = form_input["value"]
                 else:
                     value = "on"
-            if input.has_attr("name") and value:
-                fields[input["name"]] = value
+            if form_input.has_attr("name") and value:
+                fields[form_input["name"]] = value
 
-            if not input.has_attr("name"):
-                fields[input["name"]] = value
+            if not form_input.has_attr("name"):
+                fields[form_input["name"]] = value
 
             continue
 
-        assert False, "input type %s not supported" % input["type"]
+        assert False, "input type %s not supported" % form_input["type"]
 
     # textareas
     for textarea in soup.findAll("textarea"):
