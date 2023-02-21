@@ -32,7 +32,7 @@ from backend.web.profiled_render import render_template
 
 
 def sort_and_limit_stats(
-    stats_dict: TeamStatMap, num_matchstats: int = 15
+    stats_dict: TeamStatMap, num_matchstats: Optional[int] = None
 ) -> List[Tuple[TeamKey, float]]:
     return sorted(stats_dict.items(), key=lambda t: -t[1])[:num_matchstats]
 
