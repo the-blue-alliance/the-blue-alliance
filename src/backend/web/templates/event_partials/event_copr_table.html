@@ -30,7 +30,7 @@
     const coprs = JSON.parse('{{ coprs_json|safe }}');
 
     function buildCoprTable(component, readableName) {
-        document.getElementById('componentColHeader').innerHTML = component;
+        document.getElementById('componentColHeader').innerHTML = readableName;
         document.getElementById('coprSelector').innerText = readableName;
         document.getElementById('coprTableBody').innerHTML = '';
         coprs[component].forEach((e, idx) => {
