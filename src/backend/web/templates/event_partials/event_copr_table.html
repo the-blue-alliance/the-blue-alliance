@@ -6,7 +6,7 @@
     <span id="coprSelector">Choose component</span> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    {% for copr_item in copr_data %}
+    {% for copr_item in copr_items %}
         <li>
             <a href="#" id="dropdown_{{ copr_item[1] }}">{{ copr_item[2] }}</a>
         </li>
@@ -51,7 +51,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        {% for copr_item in copr_data %}
+        {% for copr_item in copr_items %}
             $("#dropdown_{{ copr_item[1] }}").click(function(e) {
                e.preventDefault();
                buildCoprTable("{{ copr_item[0] }}", "{{ copr_item[2] }}");
