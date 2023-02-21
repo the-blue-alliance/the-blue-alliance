@@ -8,7 +8,7 @@
         <td>
           <span class="alliance-name {% if match.winning_alliance == 'red' %}winner{% endif %}" rel="tooltip" data-placement="top" title="{{ match.red_name if match.red_name else 'Unknown' }}">
             {% set delim = joiner("-") %}
-            {% for team in match.red_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
+            {% for team in match.red_alliance %}{{ delim() }}{% if match.red_alliance|length > 3 %}<wbr>{% endif %}<a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
           </span>
         </td>
         <td class="redScore {% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_record.wins }}</td>
@@ -20,7 +20,7 @@
         <td>
           <span class="alliance-name {% if match.winning_alliance == 'blue' %}winner{% endif %}" rel="tooltip" data-placement="bottom" title="{{ match.blue_name if match.blue_name else 'Unknown' }}">
             {% set delim = joiner("-") %}
-            {% for team in match.blue_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
+            {% for team in match.blue_alliance %}{{ delim() }}{% if match.blue_alliance|length > 3 %}<wbr>{% endif %}<a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
           </span>
         </td>
         <td class="blueScore {% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_record.wins }}</td>
