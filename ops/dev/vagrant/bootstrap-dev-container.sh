@@ -22,6 +22,10 @@ NVM_DIR="/nvm"
 # shellcheck source=/dev/null
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 nvm use default
+# skip puppeteer chromium install on aarch64
+if [ "$(uname -m)" = "aarch64" ]; then
+    export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+fi
 npm install
 
 # Install the Firebase tools for the Firebase emulator
