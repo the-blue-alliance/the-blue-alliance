@@ -31,6 +31,24 @@ from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
 
 
+def convert_component_name(component_name: str) -> str:
+    """
+    Converts a camelCase componentName to a human readable title case name.
+
+    e.g. foulCount -> Foul Count, totalPoints -> Total Points, OPR -> OPR, rp -> RP
+    """
+    # for things like OPR that should stay all uppercase
+    if component_name.isupper():
+        return component_name
+
+    # for things like "rp" that should be totally uppercased
+    if component_name in ["rp"]:
+        return component_name.upper()
+
+    with_spaces = re.sub("([A-Z])", r" \1", component_name)
+    return with_spaces.title()
+
+
 def sort_and_limit_stats(
     stats_dict: TeamStatMap, num_matchstats: Optional[int] = None
 ) -> List[Tuple[TeamKey, float]]:
@@ -162,9 +180,11 @@ def event_detail(event_key: EventKey) -> Response:
         for component, tsm in event.coprs.items():
             copr_leaders[component] = sort_and_limit_stats(tsm)
 
-    copr_dropdown_div_id_map: Dict[Component, str] = {
-        k: re.sub("[^0-9a-zA-Z]+", "_", k) for k in copr_leaders.keys()
-    }
+    # Container for (component, componentValidHtmlId, and componentHumanReadableName) elements
+    copr_items: List[Tuple[Component, str, str]] = [
+        (k, re.sub("[^0-9a-zA-Z]+", "_", k), convert_component_name(k))
+        for k in copr_leaders.keys()
+    ]
 
     if event.now:
         matches_recent = MatchHelper.recent_matches(cleaned_matches)
@@ -268,7 +288,7 @@ def event_detail(event_key: EventKey) -> Response:
         "elim_playlist": elim_playlist,
         "has_coprs": event.coprs is not None,
         "coprs_json": json.dumps(copr_leaders),
-        "copr_div_ids": copr_dropdown_div_id_map,
+        "copr_items": copr_items,
     }
 
     return make_cached_response(
