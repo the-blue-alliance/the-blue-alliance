@@ -196,34 +196,34 @@ LEGACY_DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
 
 
 # Map a match number -> set/match for FIRST's 8 alliance double elim bracket
-# Based off:
-# https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/competition-manual/double_elimination_playoff_communication.pdf
+# Based off: https://firstfrc.blob.core.windows.net/frc2023/Manual/2023FRCGameManual.pdf
+# We consider everything before finals as "semi-finals" to match FIRST's match numbering.
 DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     # round 1
-    1: (CompLevel.EF, 1, 1),
-    2: (CompLevel.EF, 2, 1),
-    3: (CompLevel.EF, 3, 1),
-    4: (CompLevel.EF, 4, 1),
+    1: (CompLevel.SF, 1, 1),
+    2: (CompLevel.SF, 2, 1),
+    3: (CompLevel.SF, 3, 1),
+    4: (CompLevel.SF, 4, 1),
     # round 2
-    5: (CompLevel.EF, 5, 1),
-    6: (CompLevel.EF, 6, 1),
-    7: (CompLevel.QF, 1, 1),
-    8: (CompLevel.QF, 2, 1),
+    5: (CompLevel.SF, 5, 1),
+    6: (CompLevel.SF, 6, 1),
+    7: (CompLevel.SF, 7, 1),
+    8: (CompLevel.SF, 8, 1),
     # round 3
-    9: (CompLevel.QF, 3, 1),
-    10: (CompLevel.QF, 4, 1),
+    9: (CompLevel.SF, 9, 1),
+    10: (CompLevel.SF, 10, 1),
     # round 4
-    11: (CompLevel.SF, 1, 1),
-    12: (CompLevel.SF, 2, 1),
+    11: (CompLevel.SF, 11, 1),
+    12: (CompLevel.SF, 12, 1),
     # round 5
-    13: (CompLevel.F, 1, 1),
+    13: (CompLevel.SF, 13, 1),
     # finals
-    14: (CompLevel.F, 2, 1),
-    15: (CompLevel.F, 2, 2),
-    16: (CompLevel.F, 2, 3),
-    17: (CompLevel.F, 2, 4),  # Overtime 1
-    18: (CompLevel.F, 2, 4),  # Overtime 2
-    19: (CompLevel.F, 2, 4),  # Overtime 3
+    14: (CompLevel.F, 1, 1),
+    15: (CompLevel.F, 1, 2),
+    16: (CompLevel.F, 1, 3),
+    17: (CompLevel.F, 1, 4),  # Overtime 1
+    18: (CompLevel.F, 1, 5),  # Overtime 2
+    19: (CompLevel.F, 1, 6),  # Overtime 3
 }
 
 DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {

@@ -338,7 +338,7 @@ class Match(CachedModel):
             and event
             and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM
         ):
-            if self.comp_level == "f" and self.set_number == 2:
+            if self.comp_level == "f":
                 return f"Finals {self.match_number}"
             match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
                 (self.comp_level, self.set_number, self.match_number)
