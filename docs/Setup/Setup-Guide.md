@@ -16,6 +16,8 @@ Before starting the container, ensure that Vagrant and Docker are both up and ru
 $ vagrant up
 ```
 
+**Note:** If you're setting up an Apple Silicon Mac, you'll likely want to [use the local dockerfile](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Development-Runbook#using-the-local-dockerfile) for better performance. 
+
 After a little bit of installation and setup, a local instance of The Blue Alliance will be accessible at [localhost:8080](http://localhost:8080). The Google App Engine admin panel for the local instance can be access at [localhost:8000](http://localhost:8000).
 
 ## Working in the Container

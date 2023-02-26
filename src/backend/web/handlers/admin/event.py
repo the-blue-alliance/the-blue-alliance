@@ -180,14 +180,16 @@ def event_delete(event_key: EventKey) -> Response:
 
 
 def event_delete_matches(event_key: EventKey, comp_level, to_delete) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
     event = Event.get_by_id(event_key)
     if not event:
-        self.abort(404)
+        abort(404)
 
     _, organized_matches = MatchHelper.organized_matches(event.matches)
     if comp_level not in organized_matches:
-        self.abort(400)
-        return
+        abort(400)
 
     matches_to_delete = []
     if to_delete == "all":
@@ -197,7 +199,6 @@ def event_delete_matches(event_key: EventKey, comp_level, to_delete) -> Response
             m for m in organized_matches[comp_level] if not m.has_been_played
         ]
 
-    delete_count = len(matches_to_delete)
     if matches_to_delete:
         MatchManipulator.delete(matches_to_delete)
 
