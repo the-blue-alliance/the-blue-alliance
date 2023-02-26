@@ -1,6 +1,7 @@
 from flask import redirect, request, url_for
 from werkzeug.wrappers import Response
 
+from backend.common.sitevars.apiv3_key import Apiv3Key
 from backend.common.sitevars.firebase_secrets import FirebaseSecrets
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 from backend.common.sitevars.gcm_server_key import GcmServerKey
@@ -23,6 +24,7 @@ def authkeys_get() -> str:
     instagram_secrets = InstagramApiSecret.get()
 
     template_values = {
+        "apiv3_key": Apiv3Key.api_key(),
         "google_secret": google_secrets.get("api_key", ""),
         "firebase_secret": firebase_secrets.get("FIREBASE_SECRET", ""),
         "fmsapi_user": fmsapi_keys.get("username", ""),
@@ -51,6 +53,7 @@ def authkeys_post() -> Response:
     twitch_client_id = request.form.get("twitch_secret", "")
     livestream_key = request.form.get("livestream_secret", "")
     instagram_key = request.form.get("instagram_secret", "")
+    apiv3_key = request.form.get("apiv3_key", "")
 
     GoogleApiSecret.put({"api_key": google_key})
     InstagramApiSecret.put({"api_key": instagram_key})
@@ -64,6 +67,7 @@ def authkeys_post() -> Response:
         }
     )
     GcmServerKey.put({"gcm_key": gcm_key})
+    Apiv3Key.put({"apiv3_key": apiv3_key})
 
     twitch_secrets = TwitchSecrets.get()
     twitch_secrets["client_id"] = twitch_client_id
