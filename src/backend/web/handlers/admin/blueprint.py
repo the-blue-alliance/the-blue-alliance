@@ -14,6 +14,7 @@ from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
 from backend.web.handlers.admin.event import (
     event_create,
     event_delete,
+    event_delete_matches,
     event_detail,
     event_detail_post,
     event_edit,
@@ -140,6 +141,11 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/event/remap_teams/<event_key>", view_func=event_remap_teams_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/event/delete_matches/<event_key>/<comp_level>/<to_delete>",
+    view_func=event_delete_matches,
+    methods=["GET"],
 )
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)
