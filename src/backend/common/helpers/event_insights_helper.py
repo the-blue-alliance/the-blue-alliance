@@ -94,6 +94,7 @@ class EventInsightsHelper:
         teleop_bot_count = 0
         teleop_docked_count = 0
         teleop_engaged_count = 0
+        coopertition_count = 0
 
         teleop_piece_points = 0
         park_points = 0
@@ -195,6 +196,9 @@ class EventInsightsHelper:
                         x != "None" for x in alliance_breakdown["teleopCommunity"]["B"]
                     )
 
+                    coopertition_count += (
+                        1 if alliance_breakdown["coopertitionCriteriaMet"] else 0
+                    )
                     sustainability_bonus_count += (
                         1 if alliance_breakdown["sustainabilityBonusAchieved"] else 0
                     )
@@ -261,6 +265,11 @@ class EventInsightsHelper:
             "average_points_teleop": float(points_teleop) / opportunities_1x,
             # Overall
             "average_link_points": float(link_points) / opportunities_1x,
+            "coopertition": [
+                coopertition_count,
+                finished_matches,
+                100.0 * float(coopertition_count) / finished_matches,
+            ],
             "sustainability_bonus_rp": [
                 sustainability_bonus_count,
                 opportunities_1x,

@@ -334,16 +334,15 @@
       <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
     </tr>
 
-    {% if 'rp' in match.score_breakdown.red and match.comp_level == 'qm' %}
     <tr>
       <td class="red" colspan="2">
-        {% if match.score_breakdown.red.cargoBonusRankingPoint %}
-        <svg class="top-left-dot" rel="tooltip" title="Cargo Bonus">
+        {% if match.score_breakdown.red.sustainabilityBonusAchieved %}
+        <svg class="top-left-dot" rel="tooltip" title="Sustainability Bonus">
           <circle cx="2" cy="2" r="2"/>
         </svg>
         {% endif %}
-        {% if match.score_breakdown.red.hangarBonusRankingPoint %}
-        <svg class="top-left-dot-2" rel="tooltip" title="Hangar Bonus">
+        {% if match.score_breakdown.red.activationBonusAchieved %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Activation Bonus">
           <circle cx="2" cy="2" r="2"/>
         </svg>
         {% endif %}
@@ -351,20 +350,19 @@
       </td>
       <td>Ranking Points</td>
       <td class="blue" colspan="2">
-        {% if match.score_breakdown.blue.cargoBonusRankingPoint %}
-        <svg class="top-left-dot" rel="tooltip" title="Cargo Bonus">
+        {% if match.score_breakdown.blue.sustainabilityBonusAchieved %}
+        <svg class="top-left-dot" rel="tooltip" title="Sustainability Bonus">
           <circle cx="2" cy="2" r="2"/>
         </svg>
         {% endif %}
-        {% if match.score_breakdown.blue.hangarBonusRankingPoint %}
-        <svg class="top-left-dot-2" rel="tooltip" title="Hangar Bonus">
+        {% if match.score_breakdown.blue.activationBonusAchieved %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Activation Bonus">
           <circle cx="2" cy="2" r="2"/>
         </svg>
         {% endif %}
         +{{match.score_breakdown.blue.rp}} RP
       </td>
     </tr>
-    {% endif %}
   </tbody>
 </table>
 
