@@ -58,7 +58,7 @@
 {% endmacro %}
 
 {% macro drawNode(piece, auto_piece) %}
-  <rect width="24" height="24" style="fill:{% if auto_piece != 'None' %}rgb(0,255,0,0.3){% else %}rgb(0,0,0,0){% endif %}; stroke-width:1; stroke:rgb(0,0,0,0.2)" />
+  <rect x="1" y="1" width="22" height="22" rx="4" style="fill:{% if auto_piece != 'None' %}rgb(0,255,0,0.3){% else %}rgb(0,0,0,0){% endif %}; stroke:rgb(0,0,0,0.2)" />
   {% if piece == "Cube" %}
   {{ drawCube() }}
   {% elif piece == "Cone" %}
