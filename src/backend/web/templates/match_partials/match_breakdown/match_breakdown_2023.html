@@ -49,21 +49,50 @@
 {%if alliance_breakdown.techFoulCount%}{{alliance_breakdown.techFoulCount}} (+{{alliance_breakdown.techFoulCount * 12}}){%else%}0{%endif%}
 {% endmacro %}
 
-{% macro community(piece, auto_piece, row, index, links) %}
-{% set vars = {'is_link': False} %}
-{% for link in links %}
-    {% if link.row == row and index in link.nodes %}
-        {% if vars.update({'is_link': True}) %}{% endif %}
-    {% endif %}
-{% endfor %}
+{% macro drawCube() %}
+<polygon points="6,6 6,18 18,18, 18,6" style="fill:rgb(150,0,255);stroke-width:1;stroke:rgb(0,0,0)" />
+{% endmacro %}
 
-<svg width="24px" height="24px" style="display: block; margin: auto;">
-    <rect width="24" , height="24" style="fill:{% if vars.is_link %}rgb(0,255,0,0.3){% else %}rgb(0,0,0,0){% endif %}; stroke-width:{% if auto_piece != 'None' and auto_piece == piece %}4{% else %}1{% endif %}; stroke:rgb(0,0,0,{% if auto_piece != 'None' and auto_piece == piece %}1.0{% else %}0.2{% endif %})" />
-    {% if piece == "Cube" %}
-    <polygon points="4,4 4,20 20,20, 20,4" style="fill:rgb(150,0,255);stroke-width:1;stroke:rgb(0,0,0)" />
-    {% elif piece == "Cone" %}
-    <polygon points="12,5 7,20 4,20 20,20 17,20" style="fill:rgb(255,200,0);stroke-width:1;stroke:rgb(0,0,0)" />
+{% macro drawCone() %}
+  <polygon points="12,5 8,20 5,20 19,20 16,20" style="fill:rgb(255,200,0);stroke-width:1;stroke:rgb(0,0,0)" />
+{% endmacro %}
+
+{% macro drawNode(piece, auto_piece) %}
+  <rect x="1" y="1" width="22" height="22" rx="4" style="fill:{% if auto_piece != 'None' %}rgb(0,255,0,0.3){% else %}rgb(0,0,0,0){% endif %}; stroke:rgb(0,0,0,0.2)" />
+  {% if piece == "Cube" %}
+  {{ drawCube() }}
+  {% elif piece == "Cone" %}
+  {{ drawCone() }}
+  {% endif %}
+{% endmacro %}
+
+{% macro drawLink(start_offset) %}
+<rect x="2" y="{{ 2 + start_offset }}" width="20" height="69" rx="4"
+  style="fill:rgb(0,0,0,0.0); stroke-width:2; stroke:rgb(0,0,0,1.0)" />
+{% endmacro %}
+
+{% macro drawCommunity(breakdown, row, is_red) %}
+{% set pieces = breakdown.teleopCommunity[row]|reverse if is_red else breakdown.teleopCommunity[row] %}
+{% set auto_pieces = breakdown.autoCommunity[row]|reverse|list if is_red else breakdown.autoCommunity[row] %}
+<svg width="24px" height="216px" style="display: block; margin: auto;">
+  {% for piece in pieces %}
+  <g transform="translate(0, {{ loop.index0 * 24}})">
+    {{ drawNode(piece, auto_pieces[loop.index0]) }}
+  </g>
+  {% endfor %}
+
+  {% for link in breakdown.links %}
+    {% if (row == 'T' and link.row == 'Top') or 
+          (row == 'M' and link.row == 'Mid') or 
+          (row == 'B' and link.row == 'Bottom') %}
+          {{link.nodes}}
+      {% set start_offset =
+        (192 - 24 * link.nodes|max)
+        if is_red else
+        (24 * link.nodes|min) %}
+      {{ drawLink(start_offset) }}
     {% endif %}
+  {% endfor %}
 </svg>
 {% endmacro %}
 
@@ -381,73 +410,49 @@
         </tr>
         <tr>
             <td class="red">
-                <div style="display: flex; flex-direction: column-reverse;">
-                    {% for piece in match.score_breakdown.red.teleopCommunity.T %}
-                    <span>{{community(piece, match.score_breakdown.red.autoCommunity.T[loop.index0], 'Top', loop.index0, match.score_breakdown.red.links)}}</span>
-                    {% endfor %}
-                </div>
+              {{ drawCommunity(match.score_breakdown.red, "T", True) }}
             </td>
             <td class="red">
-                <div style="display: flex; flex-direction: column-reverse;">
-                    {% for piece in match.score_breakdown.red.teleopCommunity.M %}
-                    <span>{{community(piece, match.score_breakdown.red.autoCommunity.M[loop.index0], 'Mid', loop.index0, match.score_breakdown.red.links)}}</span>
-                    {% endfor %}
-                </div>
+              {{ drawCommunity(match.score_breakdown.red, "M", True) }}
             </td>
             <td class="red">
-                <div style="display: flex; flex-direction: column-reverse;">
-                    {% for piece in match.score_breakdown.red.teleopCommunity.B %}
-                    <span>{{community(piece, match.score_breakdown.red.autoCommunity.B[loop.index0], 'Bottom', loop.index0, match.score_breakdown.red.links)}}</span>
-                    {% endfor %}
-                </div>
+              {{ drawCommunity(match.score_breakdown.red, "B", True) }}
             </td>
             <td></td>
             <td class="blue">
-                <div style="display: flex; flex-direction: column;">
-                    {% for piece in match.score_breakdown.blue.teleopCommunity.B %}
-                    <span>{{community(piece, match.score_breakdown.blue.autoCommunity.B[loop.index0], 'Bottom', loop.index0, match.score_breakdown.blue.links)}}</span>
-                    {% endfor %}
-                </div>
+              {{ drawCommunity(match.score_breakdown.blue, "B", False) }}
             </td>
             <td class="blue">
-                <div style="display: flex; flex-direction: column;">
-                    {% for piece in match.score_breakdown.blue.teleopCommunity.M %}
-                    <span>{{community(piece, match.score_breakdown.blue.autoCommunity.M[loop.index0], 'Mid', loop.index0, match.score_breakdown.blue.links)}}</span>
-                    {% endfor %}
-                </div>
+              {{ drawCommunity(match.score_breakdown.blue, "M", False) }}
             </td>
             <td class="blue">
-                <div style="display: flex; flex-direction: column;">
-                    {% for piece in match.score_breakdown.blue.teleopCommunity.T %}
-                    <span>{{community(piece, match.score_breakdown.blue.autoCommunity.T[loop.index0], 'Top', loop.index0, match.score_breakdown.blue.links)}}</span>
-                    {% endfor %}
-                </div>
+              {{ drawCommunity(match.score_breakdown.blue, "T", False) }}
             </td>
         </tr>
     </tbody>
 </table>
 <div style="display: flex; flex-direction: row; align-items: center;">
     <svg width="24px" height="24px" style="margin-right: 8px;">
-        <polygon points="12,5 7,20 4,20 20,20 17,20" style="fill:rgb(255,200,0);stroke-width:1;stroke:rgb(0,0,0)" />
+        {{ drawCone() }}
     </svg>
     Cone
 </div>
 <div style="display: flex; flex-direction: row; align-items: center;">
     <svg width="24px" height="24px" style="margin-right: 8px;">
-        <polygon points="4,4 4,20 20,20, 20,4" style="fill:rgb(150,0,255);stroke-width:1;stroke:rgb(0,0,0)" />
+        {{ drawCube() }}
     </svg>
     Cube
 </div>
 <div style="display: flex; flex-direction: row; align-items: center;">
     <svg width="24px" height="24px" style="margin-right: 8px;">
-        <rect width="24" , height="24" style="fill:rgb(0,0,0,0); stroke-width:4; stroke:rgb(0,0,0,1.0)" />
+        <rect width="24" height="24" style="fill:rgb(0,255,0,0.3); stroke-width:1; stroke:rgb(0,0,0,0.2)" />
     </svg>
     Scored in auto
 </div>
 <div style="display: flex; flex-direction: row; align-items: center;">
     <svg width="24px" height="24px" style="margin-right: 8px;">
-        <rect width="24" , height="24" style="fill:rgb(0,255,0,0.3); stroke-width:1; stroke:rgb(0,0,0,0.2)" />
+        <rect x="2" y="2" width="20" height="20" rx="4" style="fill:rgb(0,0,0,0); stroke-width:2; stroke:rgb(0,0,0,1.0)" />
     </svg>
-    Part of a link
+    Link
 </div>
 {% endif %}
