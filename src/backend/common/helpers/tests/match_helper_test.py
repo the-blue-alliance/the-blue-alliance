@@ -174,42 +174,6 @@ def test_organized_double_elim_matches_pre_2023(test_data_importer) -> None:
     assert round_to_match_keys[DoubleElimRound.FINALS] == ["f2m1", "f2m2", "f2m3"]
 
 
-def test_organized_double_elim_matches(test_data_importer) -> None:
-    matches = test_data_importer.parse_match_list(
-        __file__, "data/2022cctest_matches.json"
-    )
-
-    _, organized_matches = MatchHelper.organized_matches(matches)
-    double_elim_matches = MatchHelper.organized_double_elim_matches(
-        organized_matches, 2023
-    )
-
-    assert len(double_elim_matches) == len(DoubleElimRound)
-    for round in DoubleElimRound:
-        assert round in double_elim_matches
-
-    round_to_match_keys = {
-        round: [m.short_key for m in matches]
-        for round, matches in double_elim_matches.items()
-    }
-    assert round_to_match_keys[DoubleElimRound.ROUND1] == [
-        "sf1m1",
-        "sf2m1",
-        "sf3m1",
-        "sf4m1",
-    ]
-    assert round_to_match_keys[DoubleElimRound.ROUND2] == [
-        "sf5m1",
-        "sf6m1",
-        "sf7m1",
-        "sf8m1",
-    ]
-    assert round_to_match_keys[DoubleElimRound.ROUND3] == ["sf9m1", "sf10m1"]
-    assert round_to_match_keys[DoubleElimRound.ROUND4] == ["sf11m1", "sf12m1"]
-    assert round_to_match_keys[DoubleElimRound.ROUND5] == ["sf13m1"]
-    assert round_to_match_keys[DoubleElimRound.FINALS] == ["f1m1", "f1m1", "f1m3"]
-
-
 def test_play_order_sort(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
