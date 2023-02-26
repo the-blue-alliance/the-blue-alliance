@@ -190,10 +190,12 @@ def event_delete_matches(event_key: EventKey, comp_level, to_delete) -> Response
         return
 
     matches_to_delete = []
-    if to_delete == 'all':
+    if to_delete == "all":
         matches_to_delete = [m for m in organized_matches[comp_level]]
-    elif to_delete == 'unplayed':
-        matches_to_delete = [m for m in organized_matches[comp_level] if not m.has_been_played]
+    elif to_delete == "unplayed":
+        matches_to_delete = [
+            m for m in organized_matches[comp_level] if not m.has_been_played
+        ]
 
     delete_count = len(matches_to_delete)
     if matches_to_delete:

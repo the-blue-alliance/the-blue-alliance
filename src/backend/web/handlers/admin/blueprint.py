@@ -142,7 +142,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/remap_teams/<event_key>", view_func=event_remap_teams_post, methods=["POST"]
 )
-admin_routes.add_url_rule("/event/delete_matches/<event_key>/<comp_level>/<to_delete>", view_func=event_delete_matches, methods=["GET"])
+admin_routes.add_url_rule(
+    "/event/delete_matches/<event_key>/<comp_level>/<to_delete>",
+    view_func=event_delete_matches,
+    methods=["GET"],
+)
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)
 admin_routes.add_url_rule("/matches", view_func=match_dashboard, methods=["GET"])

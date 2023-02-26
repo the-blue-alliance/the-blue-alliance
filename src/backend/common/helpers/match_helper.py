@@ -109,8 +109,10 @@ class MatchHelper(object):
             for match in level_matches:
                 if year < 2023:
                     # Match keys were re-worked in 2023.
-                    double_elim_round = PlayoffTypeHelper.get_double_elim_round_pre_2023(
-                        level, match.set_number
+                    double_elim_round = (
+                        PlayoffTypeHelper.get_double_elim_round_pre_2023(
+                            level, match.set_number
+                        )
                     )
                 else:
                     double_elim_round = PlayoffTypeHelper.get_double_elim_round(

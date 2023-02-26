@@ -146,7 +146,9 @@ class PlayoffTypeHelper:
         raise ValueError(f"Bad CompLevel {level}")
 
     @classmethod
-    def get_double_elim_round_pre_2023(cls, level: CompLevel, set: int) -> DoubleElimRound:
+    def get_double_elim_round_pre_2023(
+        cls, level: CompLevel, set: int
+    ) -> DoubleElimRound:
         if level == CompLevel.EF and set <= 4:
             return DoubleElimRound.ROUND1
         elif (level == CompLevel.EF and set <= 6) or (
