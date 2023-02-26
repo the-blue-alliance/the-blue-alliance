@@ -144,8 +144,8 @@ def test_organized_double_elim_matches_pre_2023(test_data_importer) -> None:
     )
 
     _, organized_matches = MatchHelper.organized_matches(matches)
-    double_elim_matches = MatchHelper.organized_double_elim_matches_pre_2023(
-        organized_matches
+    double_elim_matches = MatchHelper.organized_double_elim_matches(
+        organized_matches, 2022
     )
 
     assert len(double_elim_matches) == len(DoubleElimRound)
@@ -180,7 +180,9 @@ def test_organized_double_elim_matches(test_data_importer) -> None:
     )
 
     _, organized_matches = MatchHelper.organized_matches(matches)
-    double_elim_matches = MatchHelper.organized_double_elim_matches(organized_matches)
+    double_elim_matches = MatchHelper.organized_double_elim_matches(
+        organized_matches, 2022
+    )
 
     assert len(double_elim_matches) == len(DoubleElimRound)
     for round in DoubleElimRound:
