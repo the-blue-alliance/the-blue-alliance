@@ -66,16 +66,18 @@
   {% endif %}
 {% endmacro %}
 
-{% macro drawLink(startIdx) %}
-<rect x="2" y="{{ 2 + startIdx * 24 }}" width="20" height="69" rx="4"
+{% macro drawLink(start_offset) %}
+<rect x="2" y="{{ 2 + start_offset }}" width="20" height="69" rx="4"
   style="fill:rgb(0,0,0,0.0); stroke-width:2; stroke:rgb(0,0,0,1.0)" />
 {% endmacro %}
 
-{% macro community(breakdown, row) %}
+{% macro drawCommunity(breakdown, row, is_red) %}
+{% set pieces = breakdown.teleopCommunity[row]|reverse if is_red else breakdown.teleopCommunity[row] %}
+{% set auto_pieces = breakdown.autoCommunity[row]|reverse|list if is_red else breakdown.autoCommunity[row] %}
 <svg width="24px" height="216px" style="display: block; margin: auto;">
-  {% for piece in breakdown.teleopCommunity[row] %}
+  {% for piece in pieces %}
   <g transform="translate(0, {{ loop.index0 * 24}})">
-    {{ drawNode(piece, breakdown.autoCommunity[row][loop.index0]) }}
+    {{ drawNode(piece, auto_pieces[loop.index0]) }}
   </g>
   {% endfor %}
 
@@ -84,7 +86,11 @@
           (row == 'M' and link.row == 'Mid') or 
           (row == 'B' and link.row == 'Bottom') %}
           {{link.nodes}}
-      {{ drawLink(link.nodes | min) }}
+      {% set start_offset =
+        (192 - 24 * link.nodes|max)
+        if is_red else
+        (24 * link.nodes|min) %}
+      {{ drawLink(start_offset) }}
     {% endif %}
   {% endfor %}
 </svg>
@@ -406,23 +412,23 @@
         </tr>
         <tr>
             <td class="red">
-              {{ community(match.score_breakdown.red, "T") }}
+              {{ drawCommunity(match.score_breakdown.red, "T", True) }}
             </td>
             <td class="red">
-              {{ community(match.score_breakdown.red, "M") }}
+              {{ drawCommunity(match.score_breakdown.red, "M", True) }}
             </td>
             <td class="red">
-              {{ community(match.score_breakdown.red, "B") }}
+              {{ drawCommunity(match.score_breakdown.red, "B", True) }}
             </td>
             <td></td>
             <td class="blue">
-              {{ community(match.score_breakdown.blue, "B") }}
+              {{ drawCommunity(match.score_breakdown.blue, "B", False) }}
             </td>
             <td class="blue">
-              {{ community(match.score_breakdown.blue, "M") }}
+              {{ drawCommunity(match.score_breakdown.blue, "M", False) }}
             </td>
             <td class="blue">
-              {{ community(match.score_breakdown.blue, "T") }}
+              {{ drawCommunity(match.score_breakdown.blue, "T", False) }}
             </td>
         </tr>
     </tbody>
