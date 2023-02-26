@@ -99,7 +99,7 @@ class MatchHelper(object):
 
     @classmethod
     def organized_double_elim_matches(
-        cls, organized_matches: TOrganizedMatches
+        cls, organized_matches: TOrganizedMatches, year: int
     ) -> TOrganizedDoubleElimMatches:
         matches = collections.defaultdict(list)
         for level in COMP_LEVELS:
@@ -107,9 +107,17 @@ class MatchHelper(object):
             if level == CompLevel.QM:
                 continue
             for match in level_matches:
-                double_elim_round = PlayoffTypeHelper.get_double_elim_round(
-                    level, match.set_number
-                )
+                if year < 2023:
+                    # Match keys were re-worked in 2023.
+                    double_elim_round = (
+                        PlayoffTypeHelper.get_double_elim_round_pre_2023(
+                            level, match.set_number
+                        )
+                    )
+                else:
+                    double_elim_round = PlayoffTypeHelper.get_double_elim_round(
+                        level, match.set_number
+                    )
                 matches[double_elim_round].append(match)
         return matches
 

@@ -138,13 +138,15 @@ def test_organized_legacy_double_elim_matches(test_data_importer) -> None:
     assert bracket_to_match_keys[LegacyDoubleElimBracket.LOSER][CompLevel.F] == ["f1m1"]
 
 
-def test_organized_double_elim_matches(test_data_importer) -> None:
+def test_organized_double_elim_matches_pre_2023(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2022cctest_matches.json"
     )
 
     _, organized_matches = MatchHelper.organized_matches(matches)
-    double_elim_matches = MatchHelper.organized_double_elim_matches(organized_matches)
+    double_elim_matches = MatchHelper.organized_double_elim_matches(
+        organized_matches, 2022
+    )
 
     assert len(double_elim_matches) == len(DoubleElimRound)
     for round in DoubleElimRound:
