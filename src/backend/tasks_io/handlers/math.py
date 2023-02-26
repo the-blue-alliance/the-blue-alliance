@@ -282,6 +282,7 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
     template_values = {
         "matchstats_dict": matchstats_dict,
         "coprs_dict": coprs_dict,
+        "event_insights": event_insights,
     }
 
     if (
