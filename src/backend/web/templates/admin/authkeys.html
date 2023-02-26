@@ -10,6 +10,9 @@
 <form method="post">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 <table class="table table-striped">
+  <tr><th>TBA API</th></tr>
+  <tr><td>API v3 Key</td><td><input name="apiv3_key" value="{{apiv3_key}}" class="form-control"/></td></tr>
+
   <tr><th>Google</th></tr>
   <tr><td>API Key</td><td><input name="google_secret" value="{{google_secret}}" class="form-control"/></td></tr>
 
