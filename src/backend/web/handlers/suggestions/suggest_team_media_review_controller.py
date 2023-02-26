@@ -81,7 +81,8 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
 
         references = map(lambda r: r.get_result(), reference_futures)
         existing_preferred = map(
-            lambda futures: list(map(lambda x: x.get_result(), futures)), existing_preferred_futures
+            lambda futures: list(map(lambda x: x.get_result(), futures)),
+            existing_preferred_futures,
         )
 
         suggestions_and_references_and_preferred = zip(
