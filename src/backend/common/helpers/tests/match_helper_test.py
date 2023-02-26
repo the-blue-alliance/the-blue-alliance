@@ -181,7 +181,7 @@ def test_organized_double_elim_matches(test_data_importer) -> None:
 
     _, organized_matches = MatchHelper.organized_matches(matches)
     double_elim_matches = MatchHelper.organized_double_elim_matches(
-        organized_matches, 2022
+        organized_matches, 2023
     )
 
     assert len(double_elim_matches) == len(DoubleElimRound)
