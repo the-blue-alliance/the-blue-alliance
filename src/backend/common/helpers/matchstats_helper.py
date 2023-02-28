@@ -73,6 +73,30 @@ MANUAL_COMPONENTS = {
             match.score_breakdown[color].get("totalPoints", 0)
             - match.score_breakdown[color].get("foulPoints", 0)
         ),
+        "Total Cones Scored": lambda match, color: (
+            sum(
+                [
+                    match.score_breakdown[color]["autoCommunity"]["B"].count("Cone"),
+                    match.score_breakdown[color]["autoCommunity"]["M"].count("Cone"),
+                    match.score_breakdown[color]["autoCommunity"]["T"].count("Cone"),
+                    match.score_breakdown[color]["teleopCommunity"]["B"].count("Cone"),
+                    match.score_breakdown[color]["teleopCommunity"]["M"].count("Cone"),
+                    match.score_breakdown[color]["teleopCommunity"]["T"].count("Cone"),
+                ]
+            )
+        ),
+        "Total Cubes Scored": lambda match, color: (
+            sum(
+                [
+                    match.score_breakdown[color]["autoCommunity"]["B"].count("Cube"),
+                    match.score_breakdown[color]["autoCommunity"]["M"].count("Cube"),
+                    match.score_breakdown[color]["autoCommunity"]["T"].count("Cube"),
+                    match.score_breakdown[color]["teleopCommunity"]["B"].count("Cube"),
+                    match.score_breakdown[color]["teleopCommunity"]["M"].count("Cube"),
+                    match.score_breakdown[color]["teleopCommunity"]["T"].count("Cube"),
+                ]
+            )
+        ),
     },
 }
 
