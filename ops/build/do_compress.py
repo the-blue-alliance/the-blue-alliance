@@ -35,24 +35,10 @@ SCRIPTS_EVENTWIZARD = [
     "src/backend/web/static/javascript/tba_js/eventwizard.js",
 ]
 
-STYLESHEETS_MAIN = [
-    "src/backend/web/static/css/precompiled_css/jquery.fancybox.css",
-    "src/backend/web/static/css/precompiled_css/tablesorter.css",
-    "src/backend/web/static/xcharts/xcharts.min.css",
-    "src/build/temp/tba_style.main.css",
-]
-
 SCRIPTS_MAIN_OUT = "src/build/javascript/tba_combined_js.main.min.js"
 SCRIPTS_FIREBASE_OUT = "src/build/javascript/tba_combined_js.firebase.min.js"
 SCRIPTS_FIREBASE_SERVICEWORKER_OUT = "src/build/javascript/firebase-messaging-sw.js"
 SCRIPTS_EVENTWIZARD_OUT = "src/build/javascript/tba_combined_js.eventwizard.min.js"
-STYLESHEETS_MAIN_OUT = "src/build/css/tba_combined_style.main.min.css"
-
-
-def compress_css(in_files, out_file, verbose=False, temp_file=".temp"):
-    os.system("npx uglifycss {} --output {}".format(" ".join(in_files), out_file))
-    print("=> %s" % out_file)
-    print("")
 
 
 def compress_js(in_files, out_file):
@@ -62,7 +48,7 @@ def compress_js(in_files, out_file):
 
 
 def main(kind=None):
-    for directory in ["src/build/javascript", "src/build/css"]:
+    for directory in ["src/build/javascript"]:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
@@ -78,10 +64,6 @@ def main(kind=None):
         #
         print("Compressing EventWizard JavaScript...")
         compress_js(SCRIPTS_EVENTWIZARD, SCRIPTS_EVENTWIZARD_OUT)
-
-    if kind == "css" or kind is None:
-        print("Compressing Main CSS...")
-        compress_css(STYLESHEETS_MAIN, STYLESHEETS_MAIN_OUT)
 
 
 if __name__ == "__main__":
