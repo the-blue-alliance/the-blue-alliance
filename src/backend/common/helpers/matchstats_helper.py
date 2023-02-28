@@ -109,15 +109,15 @@ class MatchstatsHelper(object):
 
     @classmethod
     def build_Minv_matrix(
-        cls, matches: List[Match], team_id_map: TTeamIdMap, played_only: bool = False
+        cls, matches: List[Match], team_id_map: TTeamIdMap
     ) -> npt.NDArray[np.float64]:
         n = len(team_id_map.keys())
         M = np.zeros((n, n))
         for match in matches:
-            if match.comp_level != CompLevel.QM:  # only consider quals matches
+            # only consider quals matches that have been played
+            if (match.comp_level != CompLevel.QM) or (not match.has_been_played):
                 continue
-            if played_only and not match.has_been_played:
-                continue
+
             for alliance_color in ALLIANCE_COLORS:
                 alliance_teams = match.alliances[alliance_color]["teams"]
                 for team1 in alliance_teams:
@@ -136,7 +136,8 @@ class MatchstatsHelper(object):
         n = len(team_id_map.keys())
         s = np.zeros((n, 1))
         for match in matches:
-            if match.comp_level != CompLevel.QM:  # only consider quals matches
+            # only consider quals matches that have been played
+            if (match.comp_level != CompLevel.QM) or (not match.has_been_played):
                 continue
 
             for alliance_color in ALLIANCE_COLORS:
@@ -177,7 +178,7 @@ class MatchstatsHelper(object):
         team_list, team_id_map = cls.build_team_mapping(matches)
         if not team_list:
             return {}
-        Minv = cls.build_Minv_matrix(matches, team_id_map, played_only=True)
+        Minv = cls.build_Minv_matrix(matches, team_id_map)
 
         oprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, OPR_ACCESSOR)
         dprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, DPR_ACCESSOR)
@@ -206,7 +207,7 @@ class MatchstatsHelper(object):
         if not team_list:
             return {}
 
-        Minv = cls.build_Minv_matrix(matches, team_id_map, played_only=True)
+        Minv = cls.build_Minv_matrix(matches, team_id_map)
 
         if year in MANUAL_COMPONENTS.keys():
             for name, accessor in MANUAL_COMPONENTS[year].items():
