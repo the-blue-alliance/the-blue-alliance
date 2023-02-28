@@ -121,7 +121,14 @@ def mytba_live() -> Response:
                 EventTeam.get_by_id("{}_{}".format(event.key.id(), team.key.id()))
             )  # Should be in context cache
             teams_and_statuses.append(
-                (team, event_team.status, event_team.status_strings)
+                (
+                    team,
+                    event_team.status,
+                    event_team.status_strings,
+                    AwardHelper.organize_awards(
+                        event_team_awards[event.key.id()][team.key.id()]
+                    ),
+                )
             )
         teams_and_statuses.sort(key=lambda x: x[0].team_number)
         live_events_with_teams.append((event, teams_and_statuses))
