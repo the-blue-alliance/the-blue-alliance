@@ -165,6 +165,22 @@ def test_nonexistent_match(api_client: Client) -> None:
     assert response.status_code == 400
 
 
+def test_teams_partial_mismatch(api_client: Client) -> None:
+    setup_event()
+    setup_match()
+    setup_auth(access_types=[AuthType.ZEBRA_MOTIONWORKS])
+
+    data = copy.deepcopy(REQUEST_DATA)
+    data[0]["alliances"]["red"][0]["team_key"] = "frc9000"
+    request_body = json.dumps(data)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200, response.data
+
+
 def test_teams_mismatch(api_client: Client) -> None:
     setup_event()
     setup_match()
@@ -172,6 +188,7 @@ def test_teams_mismatch(api_client: Client) -> None:
 
     data = copy.deepcopy(REQUEST_DATA)
     data[0]["alliances"]["red"][0]["team_key"] = "frc9000"
+    data[0]["alliances"]["red"][1]["team_key"] = "frc9001"
     request_body = json.dumps(data)
     response = api_client.post(
         REQUEST_PATH,
