@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import requests
-from google.appengine.ext import deferred
+from google.appengine.ext import deferred, ndb
 
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.district_manipulator import DistrictManipulator
@@ -29,6 +29,7 @@ from backend.common.queries.dict_converters.event_converter import EventConverte
 from backend.common.queries.dict_converters.match_converter import MatchConverter
 from backend.common.queries.dict_converters.media_converter import MediaConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
+from backend.common.models.zebra_motionworks import ZebraMotionWorks
 
 
 class LocalDataBootstrap:
@@ -67,6 +68,14 @@ class LocalDataBootstrap:
         match = MatchConverter.dictToModel_v3(data)
 
         return MatchManipulator.createOrUpdate(match)
+
+    @classmethod
+    def store_match_zebra(cls, data: Dict) -> Match:
+        match_key = data["key"]
+        event_key = match_key.split("_")[0]
+        ZebraMotionWorks(
+            id=match_key, event=ndb.Key(Event, event_key), data=data
+        ).put()
 
     @staticmethod
     def store_eventteam(team: Team, event: Event) -> EventTeam:
@@ -115,6 +124,10 @@ class LocalDataBootstrap:
     @classmethod
     def fetch_match(cls, match_key: MatchKey, auth_token: str) -> Dict:
         return cls.fetch_endpoint(f"match/{match_key}", auth_token)
+
+    @classmethod
+    def fetch_match_zebra(cls, match_key: MatchKey, auth_token: str) -> Dict:
+        return cls.fetch_endpoint(f"match/{match_key}/zebra_motionworks", auth_token)
 
     @classmethod
     def fetch_event_detail(
@@ -166,6 +179,9 @@ class LocalDataBootstrap:
     def update_match(cls, key: MatchKey, auth_token: str) -> None:
         match_data = cls.fetch_match(key, auth_token)
         cls.store_match(match_data)
+
+        zebra_data = cls.fetch_match_zebra(key, auth_token)
+        cls.store_match_zebra(zebra_data)
 
     @classmethod
     def bootstrap_key(cls, key: str, apiv3_key: str) -> Optional[str]:
