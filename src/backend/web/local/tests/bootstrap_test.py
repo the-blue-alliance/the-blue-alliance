@@ -166,6 +166,7 @@ def mock_match_detail_url(m: RequestsMocker, match: Match) -> None:
         json=MatchConverter(match).convert(ApiMajorVersion.API_V3),
     )
 
+
 def mock_match_zebra_url(m: RequestsMocker, match: Match) -> None:
     m.register_uri(
         "GET",
@@ -174,6 +175,7 @@ def mock_match_zebra_url(m: RequestsMocker, match: Match) -> None:
         status_code=200,
         json=None,
     )
+
 
 def mock_event_detail_url(m: RequestsMocker, event: Event) -> None:
     m.register_uri(
