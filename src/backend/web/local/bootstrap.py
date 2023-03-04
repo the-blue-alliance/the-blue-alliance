@@ -23,13 +23,13 @@ from backend.common.models.keys import EventKey, MatchKey, TeamKey
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
+from backend.common.models.zebra_motionworks import ZebraMotionWorks
 from backend.common.queries.dict_converters.award_converter import AwardConverter
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import MatchConverter
 from backend.common.queries.dict_converters.media_converter import MediaConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
-from backend.common.models.zebra_motionworks import ZebraMotionWorks
 
 
 class LocalDataBootstrap:
@@ -70,12 +70,10 @@ class LocalDataBootstrap:
         return MatchManipulator.createOrUpdate(match)
 
     @classmethod
-    def store_match_zebra(cls, data: Dict) -> Match:
+    def store_match_zebra(cls, data: Dict) -> None:
         match_key = data["key"]
         event_key = match_key.split("_")[0]
-        ZebraMotionWorks(
-            id=match_key, event=ndb.Key(Event, event_key), data=data
-        ).put()
+        ZebraMotionWorks(id=match_key, event=ndb.Key(Event, event_key), data=data).put()
 
     @staticmethod
     def store_eventteam(team: Team, event: Event) -> EventTeam:
