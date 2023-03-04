@@ -173,7 +173,7 @@ def mock_match_zebra_url(m: RequestsMocker, match: Match) -> None:
         f"https://www.thebluealliance.com/api/v3/match/{match.key_name}/zebra_motionworks",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
         status_code=200,
-        json=None,
+        json={"key": match.key_name},
     )
 
 

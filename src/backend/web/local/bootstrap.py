@@ -71,6 +71,8 @@ class LocalDataBootstrap:
 
     @classmethod
     def store_match_zebra(cls, data: Dict) -> None:
+        if data is None:
+            return
         match_key = data["key"]
         event_key = match_key.split("_")[0]
         ZebraMotionWorks(id=match_key, event=ndb.Key(Event, event_key), data=data).put()
