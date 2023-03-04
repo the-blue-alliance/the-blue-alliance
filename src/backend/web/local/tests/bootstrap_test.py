@@ -166,6 +166,14 @@ def mock_match_detail_url(m: RequestsMocker, match: Match) -> None:
         json=MatchConverter(match).convert(ApiMajorVersion.API_V3),
     )
 
+def mock_match_zebra_url(m: RequestsMocker, match: Match) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/match/{match.key_name}/zebra_motionworks",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json=None,
+    )
 
 def mock_event_detail_url(m: RequestsMocker, event: Event) -> None:
     m.register_uri(
@@ -298,6 +306,7 @@ def test_bootstrap_match(
 ) -> None:
     match = make_match("2020nyny_qm1")
     mock_match_detail_url(requests_mock, match)
+    mock_match_zebra_url(requests_mock, match)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny_qm1", "test_apiv3")
     assert resp == "/match/2020nyny_qm1"
