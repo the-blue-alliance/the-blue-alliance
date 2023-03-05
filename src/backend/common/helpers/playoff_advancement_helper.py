@@ -290,6 +290,10 @@ class PlayoffAdvancementHelper(object):
                                 f"{color}_alliance"
                             ] += cls.ordered_alliance(alliance, alliance_selections)
 
+                # Skip if match hasn't been played
+                if not match.has_been_played:
+                    continue
+
                 winner = match.winning_alliance
                 if not winner or winner == "":
                     # if the match is a tie
