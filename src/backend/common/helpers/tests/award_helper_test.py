@@ -27,6 +27,7 @@ def test_organize_awards() -> None:
     "name,award_type",
     [
         ("Chairman's", AwardType.CHAIRMANS),
+        ("FIRST Impact Award", AwardType.CHAIRMANS),
         ("Chairman", AwardType.CHAIRMANS),
         ("Chairman's Award Finalist", AwardType.CHAIRMANS_FINALIST),
         ("Winner #1", AwardType.WINNER),
@@ -87,6 +88,7 @@ def test_organize_awards() -> None:
             "Autodesk Award for Visualization - Rising Star",
             AwardType.VISUALIZATION_RISING_STAR,
         ),
+        ("Team Sustainability Award", AwardType.SUSTAINABILITY),
         ("Some Random Award Winner", None),
         ("Random Champion", None),
         ("An Award", None),
