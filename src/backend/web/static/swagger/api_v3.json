@@ -6762,6 +6762,272 @@
           }
         }
       },
+      "Match_Score_Breakdown_2023": {
+        "type": "object",
+        "properties": {
+          "blue": {
+            "$ref": "#/components/schemas/Match_Score_Breakdown_2023_Alliance"
+          },
+          "red": {
+            "$ref": "#/components/schemas/Match_Score_Breakdown_2023_Alliance"
+          }
+        },
+        "description": "See the 2023 FMS API documentation for a description of each value. https://frc-api-docs.firstinspires.org"
+      },
+      "Match_Score_Breakdown_2023_Alliance": {
+        "type": "object",
+        "properties": {
+          "activationBonusAchieved": {
+            "type": "boolean"
+          },
+          "adjustPoints": {
+            "type": "integer"
+          },
+          "autoBridgeState": {
+            "type": "string",
+            "enum": [
+              "NotLevel",
+              "Level"
+            ]
+          },
+          "autoChargeStationPoints": {
+            "type": "integer"
+          },
+          "autoChargeStationRobot1": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Docked"
+            ]
+          },
+          "autoChargeStationRobot2": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Docked"
+            ]
+          },
+          "autoChargeStationRobot3": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Docked"
+            ]
+          },
+          "autoDocked": {
+            "type": "boolean"
+          },
+          "autoCommunity": {
+            "type": "object",
+            "properties": {
+              "B": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "None",
+                    "Cone",
+                    "Cube"
+                  ]
+                }
+              },
+              "M": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "None",
+                    "Cone",
+                    "Cube"
+                  ]
+                }
+              },
+              "T": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "None",
+                    "Cone",
+                    "Cube"
+                  ]
+                }
+              }
+            }
+          },
+          "autoGamePieceCount": {
+            "type": "integer"
+          },
+          "autoGamePiecePoints": {
+            "type": "integer"
+          },
+          "autoMobilityPoints": {
+            "type": "integer"
+          },
+          "mobilityRobot1": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "mobilityRobot2": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "mobilityRobot3": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ]
+          },
+          "autoPoints": {
+            "type": "integer"
+          },
+          "coopGamePieceCount": {
+            "type": "integer"
+          },
+          "coopertitionCriteriaMet": {
+            "type": "boolean"
+          },
+          "endGameBridgeState": {
+            "type": "string",
+            "enum": [
+              "NotLevel",
+              "Level"
+            ]
+          },
+          "endGameChargeStationPoints": {
+            "type": "integer"
+          },
+          "endGameChargeStationRobot1": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Docked"
+            ]
+          },
+          "endGameChargeStationRobot2": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Docked"
+            ]
+          },
+          "endGameChargeStationRobot3": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Docked"
+            ]
+          },
+          "endGameParkPoints": {
+            "type": "integer"
+          },
+          "foulCount": {
+            "type": "integer"
+          },
+          "foulPoints": {
+            "type": "integer"
+          },
+          "techFoulCount": {
+            "type": "integer"
+          },
+          "linkPoints": {
+            "type": "integer"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "nodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "None",
+                      "Cone",
+                      "Cube"
+                    ]
+                  }
+                },
+                "row": {
+                  "type": "string",
+                  "enum": [
+                    "Bottom",
+                    "Mid",
+                    "Top"
+                  ]
+                }
+              }
+            }
+          },
+          "sustainabilityBonusAchieved": {
+            "type": "boolean"
+          },
+          "teleopCommunity": {
+            "type": "object",
+            "properties": {
+              "B": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "None",
+                    "Cone",
+                    "Cube"
+                  ]
+                }
+              },
+              "M": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "None",
+                    "Cone",
+                    "Cube"
+                  ]
+                }
+              },
+              "T": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "None",
+                    "Cone",
+                    "Cube"
+                  ]
+                }
+              }
+            }
+          },
+          "teleopGamePieceCount": {
+            "type": "integer"
+          },
+          "teleopGamePiecePoints": {
+            "type": "integer"
+          },
+          "totalChargeStationPoints": {
+            "type": "integer"
+          },
+          "teleopPoints": {
+            "type": "integer"
+          },
+          "rp": {
+            "type": "integer"
+          },
+          "totalPoints": {
+            "type": "integer"
+          }
+        }
+      },
       "Media": {
         "required": [
           "type",
