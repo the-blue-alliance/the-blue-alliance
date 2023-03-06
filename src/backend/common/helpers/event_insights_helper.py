@@ -267,8 +267,8 @@ class EventInsightsHelper:
             "average_link_points": float(link_points) / opportunities_1x,
             "coopertition": [
                 coopertition_count,
-                finished_matches,
-                100.0 * float(coopertition_count) / finished_matches,
+                opportunities_1x,
+                100.0 * float(coopertition_count) / opportunities_1x,
             ],
             "sustainability_bonus_rp": [
                 sustainability_bonus_count,
