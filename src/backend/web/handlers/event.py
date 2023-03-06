@@ -173,7 +173,7 @@ def event_detail(event_key: EventKey) -> Response:
     copr_leaders: Dict[Component, List[Tuple[TeamId, float]]] = {}
 
     if event.matchstats is not None:
-        oprs = sort_and_limit_stats(event.matchstats["oprs"] or {})
+        oprs = sort_and_limit_stats(event.matchstats.get("oprs") or {})
         copr_leaders["OPR"] = oprs
 
     if event.coprs is not None:
