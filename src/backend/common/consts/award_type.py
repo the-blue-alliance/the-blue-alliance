@@ -104,6 +104,7 @@ class AwardType(enum.IntEnum):
     CONCEPT = 79
     GAME_DESIGN_CHALLENGE_WINNER = 80
     GAME_DESIGN_CHALLENGE_FINALIST = 81
+    SUSTAINABILITY = 82
 
 
 AWARD_TYPES: Set[AwardType] = {a for a in AwardType}

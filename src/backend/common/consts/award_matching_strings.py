@@ -9,8 +9,11 @@ list of the tuple.
 """
 AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
     (AwardType.CHAIRMANS, (["chairman"], ["hon", "finalist"])),
+    (AwardType.CHAIRMANS, (["first impact"], ["hon", "finalist"])),
     (AwardType.CHAIRMANS_HONORABLE_MENTION, (["chairman", "hon", "mention"], [])),
+    (AwardType.CHAIRMANS_HONORABLE_MENTION, (["first impact", "hon", "mention"], [])),
     (AwardType.CHAIRMANS_FINALIST, (["chairman", "finalist"], ["hon", "mention"])),
+    (AwardType.CHAIRMANS_FINALIST, (["first impact", "finalist"], ["hon", "mention"])),
     (AwardType.ENGINEERING_INSPIRATION, (["engineering inspiration"], [])),
     (AwardType.WINNER, (["regional winner"], [])),
     (AwardType.WINNER, (["championship winner"], [])),
@@ -156,5 +159,6 @@ AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
         AwardType.GAME_DESIGN_CHALLENGE_FINALIST,
         (["game design challenge finalist"], []),
     ),
+    (AwardType.SUSTAINABILITY, (["team sustainability"], [])),
     (AwardType.OTHER, (["other", "offseason award", "offseason event award"], [])),
 ]
