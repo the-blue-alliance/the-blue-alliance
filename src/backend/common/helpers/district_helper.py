@@ -721,12 +721,13 @@ class DistrictHelper:
             )
         else:
             elim_alliances = event.alliance_selections
-            elim_matches = organized_matches.get(
-                CompLevel.SF, []
-            ) + organized_matches.get(CompLevel.F, [])
-            cls._calc_elim_match_points(
-                district_points, elim_matches, elim_alliances, POINTS_MULTIPLIER
-            )
+            if elim_alliances is not None:
+                elim_matches = organized_matches.get(
+                    CompLevel.SF, []
+                ) + organized_matches.get(CompLevel.F, [])
+                cls._calc_elim_match_points(
+                    district_points, elim_matches, elim_alliances, POINTS_MULTIPLIER
+                )
 
     @classmethod
     def _alliance_selections_to_points(
