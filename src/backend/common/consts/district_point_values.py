@@ -41,12 +41,16 @@ class DistrictPointValues:
     QF_WIN = {2015: 5.0}
 
     SF_WIN_DEFAULT = 5
-    SF_WIN = {
-        2015: 3.3,
-    }
+    SF_WIN = {2015: 3.3}
 
     F_WIN_DEFAULT = 5
     F_WIN = {2015: 5.0}
+
+    # Double elimination bracket points (2023 onwards)
+    DE_SF_12_LOSS = 7
+    DE_SF_13_LOSS = 13
+    DE_F_LOSS = 20
+    DE_F_WIN = 30
 
     # Chairman's Award
     CHAIRMANS_DEFAULT = 10
