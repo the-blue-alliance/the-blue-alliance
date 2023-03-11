@@ -97,7 +97,7 @@ class EventInsightsHelper(object):
         win_margins = 0
         total_scores = 0
         foul_scores = 0
-        high_score:
+        high_score = (0, "", "")
 
         finished_matches = 0
         has_insights = False
