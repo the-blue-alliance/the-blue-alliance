@@ -25,7 +25,7 @@ class EventInsightsHelper(object):
             return None
 
     @classmethod
-    def calculate_event_insights_2023(cls, matches: List[Match]):
+    def calculate_event_insights_2023(cls, matches):
         qual_matches = []
         playoff_matches = []
         for match in matches:
