@@ -25,7 +25,7 @@ class EventInsightsHelper(object):
             return None
 
  @classmethod
-    def calculate_event_insights_2023(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2023(cls, matches: List[Match]):
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -61,9 +61,7 @@ class EventInsightsHelper(object):
         }
 
     @classmethod
-    def _calculate_event_insights_2023_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+    def _calculate_event_insights_2023_helper(cls, matches):
         # Auto
         mobility_count = 0
         auto_top_count = 0
