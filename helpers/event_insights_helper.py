@@ -29,7 +29,7 @@ class EventInsightsHelper(object):
         qual_matches = []
         playoff_matches = []
         for match in matches:
-            if match.comp_level == CompLevel.QM:
+            if match.comp_level == 'qm':
                 qual_matches.append(match)
             else:
                 playoff_matches.append(match)
