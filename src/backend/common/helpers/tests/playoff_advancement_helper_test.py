@@ -240,7 +240,13 @@ def test_double_elim(test_data_importer) -> None:
     advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
         event, organized_matches
     )
-    assert advancement.bracket_table is not None
+
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_2022cctest.json", "r"
+    ) as f:
+        expected_advancement = json.load(f)
+
+    assert json.loads(json.dumps(advancement.bracket_table)) == expected_advancement[0]
     assert advancement.playoff_advancement is None
     assert advancement.double_elim_matches is not None
     assert advancement.playoff_template is None

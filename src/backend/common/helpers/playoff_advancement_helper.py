@@ -320,11 +320,13 @@ class PlayoffAdvancementHelper(object):
                 n = 2
                 if event.playoff_type == PlayoffType.BO5_FINALS:
                     n = 3
-                elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM and not (
-                    comp_level == CompLevel.F
-                    and match.set_number == 2  # only the final is a BO3
-                ):
-                    n = 1
+                elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
+                    # only the final is a BO3
+                    if not (
+                        comp_level == CompLevel.F
+                        and match.set_number == set_numbers[-1]
+                    ):
+                        n = 1
                 if bracket_table[comp_level][set_key]["red_wins"] == n:
                     bracket_table[comp_level][set_key][
                         "winning_alliance"
