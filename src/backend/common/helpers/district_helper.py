@@ -377,8 +377,8 @@ class DistrictHelper:
             lambda: defaultdict(int)
         )
 
-        elim_alliance_matches_played: DefaultDict[int, int] = defaultdict(int)
-        elim_team_matches_played: DefaultDict[TeamKey, int] = defaultdict(int)
+        elim_alliance_wins: DefaultDict[int, int] = defaultdict(int)
+        elim_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
 
         for match in matches:
             if not match.has_been_played or match.winning_alliance == "":
@@ -402,24 +402,18 @@ class DistrictHelper:
                 match.alliances[losing_allaince]["teams"],
             )
 
-            elim_alliance_matches_played[winning_alliance_number] += 1
-            elim_alliance_matches_played[losing_alliance_number] += 1
+            elim_alliance_wins[winning_alliance_number] += 1
 
-            teams = (
-                match.alliances[winning_alliance]["teams"]
-                + match.alliances[losing_allaince]["teams"]
-            )
-
-            for team in teams:
-                elim_team_matches_played[team] += 1
+            for team in match.alliances[winning_alliance]["teams"]:
+                elim_team_wins[team] += 1
 
             # Loser of match 12 receives 7 points
             if match.comp_level == CompLevel.SF and match.set_number == 12:
                 for team in alliance_selections[losing_alliance_number]["picks"]:
                     multiplier = (
                         POINTS_MULTIPLIER
-                        * elim_team_matches_played[team]
-                        / elim_alliance_matches_played[losing_alliance_number]
+                        * elim_team_wins[team]
+                        / elim_alliance_wins[losing_alliance_number]
                     )
                     district_points["points"][team]["elim_points"] += math.ceil(
                         DistrictPointValues.DE_SF_12_LOSS * multiplier
@@ -430,8 +424,8 @@ class DistrictHelper:
                 for team in alliance_selections[losing_alliance_number]["picks"]:
                     multiplier = (
                         POINTS_MULTIPLIER
-                        * elim_team_matches_played[team]
-                        / elim_alliance_matches_played[losing_alliance_number]
+                        * elim_team_wins[team]
+                        / elim_alliance_wins[losing_alliance_number]
                     )
                     district_points["points"][team]["elim_points"] += math.ceil(
                         DistrictPointValues.DE_SF_13_LOSS * multiplier
@@ -445,8 +439,8 @@ class DistrictHelper:
                 for team in alliance_selections[winning_alliance_number]["picks"]:
                     multiplier = (
                         POINTS_MULTIPLIER
-                        * elim_team_matches_played[team]
-                        / elim_alliance_matches_played[winning_alliance_number]
+                        * elim_team_wins[team]
+                        / elim_alliance_wins[winning_alliance_number]
                     )
                     district_points["points"][team]["elim_points"] += math.ceil(
                         DistrictPointValues.DE_F_WIN * multiplier
@@ -456,8 +450,8 @@ class DistrictHelper:
                 for team in alliance_selections[losing_alliance_number]["picks"]:
                     multiplier = (
                         POINTS_MULTIPLIER
-                        * elim_team_matches_played[team]
-                        / elim_alliance_matches_played[losing_alliance_number]
+                        * elim_team_wins[team]
+                        / elim_alliance_wins[losing_alliance_number]
                     )
                     district_points["points"][team]["elim_points"] += math.ceil(
                         DistrictPointValues.DE_F_LOSS * multiplier
