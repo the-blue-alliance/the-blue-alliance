@@ -59,6 +59,9 @@ from backend.web.handlers.team_admin import (
     blueprint as team_admin,
 )
 from backend.web.handlers.webcasts import webcast_list
+from backend.web.handlers.webhooks import (
+    blueprint as webhooks,
+)
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
@@ -153,6 +156,7 @@ app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)
 app.register_blueprint(suggestion_review_blueprint)
 app.register_blueprint(team_admin)
+app.register_blueprint(webhooks)
 
 app.register_error_handler(404, handle_404)
 app.register_error_handler(500, handle_500)

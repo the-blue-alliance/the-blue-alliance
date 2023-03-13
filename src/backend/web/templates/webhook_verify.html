@@ -29,7 +29,8 @@
             </tr>
           </tbody>
         </table>
-        <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+        <input name="account_id" type="hidden" value="{{ user.uid }}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Verify Webhook</button>
         <a class="btn btn-default" href="/account"><span class="glyphicon glyphicon-remove"></span> Cancel</a>
       </form>
