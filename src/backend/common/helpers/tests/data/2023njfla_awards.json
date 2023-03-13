@@ -1,0 +1,226 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2023njfla",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc56"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 1,
+    "event_key": "2023njfla",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1923"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc125"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc484"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 10,
+    "event_key": "2023njfla",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9116"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 11,
+    "event_key": "2023njfla",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc219"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 13,
+    "event_key": "2023njfla",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4573"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 16,
+    "event_key": "2023njfla",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc125"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 17,
+    "event_key": "2023njfla",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 2,
+    "event_key": "2023njfla",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1676"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4573"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 20,
+    "event_key": "2023njfla",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc102"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 21,
+    "event_key": "2023njfla",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1676"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 27,
+    "event_key": "2023njfla",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc193"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 29,
+    "event_key": "2023njfla",
+    "name": "Innovation in Control Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc41"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 30,
+    "event_key": "2023njfla",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc222"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 4,
+    "event_key": "2023njfla",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Krish Nambiar",
+        "team_key": "frc75"
+      },
+      {
+        "awardee": "Eliza Krigsman",
+        "team_key": "frc1676"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 71,
+    "event_key": "2023njfla",
+    "name": "Autonomous Award sponsored by Ford",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3142"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 82,
+    "event_key": "2023njfla",
+    "name": "Team Sustainability Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1923"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_key": "2023njfla",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc75"
+      }
+    ],
+    "year": 2023
+  }
+]
