@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Blueprint, redirect, request
+from flask import Blueprint, redirect, request, url_for
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -32,7 +32,7 @@ def webhook_add_post():
     name = request.form.get("name")
 
     if not url or not name:
-        return redirect("/webhooks/add?error=1")
+        return url_for(".webhook_add", error=1)
 
     # Always generate secret server-side; previously allowed clients to set the secret
     secret = uuid.uuid4().hex
@@ -63,7 +63,7 @@ def webhook_add_post():
         current.secret = secret
         current.put()
 
-    return redirect("/account")
+    return redirect(url_for("account.overview"))
 
 
 @blueprint.route("/delete", methods=["POST"])
@@ -73,12 +73,12 @@ def webhook_delete():
 
     client_id = request.form.get("client_id")
     if not client_id:
-        return redirect("/")
+        return redirect(url_for("account.overview"))
 
     to_delete = ndb.Key(Account, user.account_key.id(), MobileClient, int(client_id))
     to_delete.delete()
 
-    return redirect("/account")
+    return redirect(url_for("account.overview"))
 
 
 @blueprint.route("/verify/<int:client_id>", methods=["GET"])
@@ -96,7 +96,7 @@ def webhook_verify_post(client_id):
 
     verification = request.form.get("code")
     if not verification:
-        return redirect("/webhooks/verify/{}?error=1".format(client_id))
+        return redirect(url_for(".webhook_verify", client_id=client_id, error=1))
 
     webhook = MobileClient.get_by_id(client_id, parent=user.account_key)
     if (
@@ -104,14 +104,14 @@ def webhook_verify_post(client_id):
         or webhook.client_type != ClientType.WEBHOOK
         or str(user.uid) != webhook.user_id
     ):
-        return redirect("/")
+        return redirect(url_for("account.overview"))
 
     if verification == webhook.verification_code:
         webhook.verified = True
         webhook.put()
-        return redirect("/account?webhook_verification_success=1")
+        return redirect(url_for("account.overview", webhook_verification_success=1))
     else:
-        return redirect("/webhooks/verify/{}?error=1".format(client_id))
+        return redirect(url_for(".webhook_verify", client_id=client_id, error=1))
 
 
 @blueprint.route("/send_verification", methods=["POST"])
@@ -121,7 +121,7 @@ def webhook_send_verification():
 
     client_id = request.form.get("client_id")
     if not client_id:
-        return redirect("/")
+        return redirect(url_for("account.overview"))
 
     webhook = MobileClient.get_by_id(int(client_id), parent=user.account_key)
     if (
@@ -129,7 +129,7 @@ def webhook_send_verification():
         or webhook.client_type != ClientType.WEBHOOK
         or str(user.uid) != webhook.user_id
     ):
-        return redirect("/")
+        return redirect(url_for("account.overview"))
 
     verification_key = TBANSHelper.verify_webhook(webhook.messaging_id, webhook.secret)
 
@@ -137,4 +137,4 @@ def webhook_send_verification():
     webhook.verified = False
     webhook.put()
 
-    return redirect("/account")
+    return redirect(url_for("account.overview"))
