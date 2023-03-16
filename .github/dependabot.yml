@@ -15,6 +15,7 @@ updates:
     interval: daily
   open-pull-requests-limit: 10
   ignore:
+  - dependency-name: swagger-ui
   - dependency-name: firebase
     versions:
     - 8.4.0
