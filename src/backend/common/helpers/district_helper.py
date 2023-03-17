@@ -377,7 +377,6 @@ class DistrictHelper:
             lambda: defaultdict(int)
         )
 
-
         elim_alliance_pts: DefaultDict[int, int] = defaultdict(int)
         elim_alliance_wins: DefaultDict[int, int] = defaultdict(int)
         elim_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
@@ -403,22 +402,29 @@ class DistrictHelper:
             elim_alliance_wins[winning_alliance_number] += 1
 
             for team in match.alliances[winning_alliance]["teams"]:
-                elim_alliances[team] = winning_alliance
+                elim_alliances[team] = winning_alliance_number
                 elim_team_wins[team] += 1
 
             if match.comp_level == CompLevel.SF:
-                elim_alliance_pts[winning_alliance_number] += DistrictPointValues.DE_SF_WIN[match.set_number]
-            elif match.comp_level == CompLevel.F and elim_num_wins[match_set_key][winning_alliance] >= 2:
-                elim_alliance_pts[winning_alliance_number] += DistrictPointValues.DE_F_WIN
+                elim_alliance_pts[
+                    winning_alliance_number
+                ] += DistrictPointValues.DE_SF_WIN[match.set_number]
+            elif (
+                match.comp_level == CompLevel.F
+                and elim_num_wins[match_set_key][winning_alliance] >= 2
+            ):
+                elim_alliance_pts[
+                    winning_alliance_number
+                ] += DistrictPointValues.DE_F_WIN
 
         for team in elim_alliances:
             alliance = elim_alliances[team]
             multiplier = (
-                POINTS_MULTIPLIER
-                * elim_team_wins[team]
-                / elim_alliance_wins[alliance]
+                POINTS_MULTIPLIER * elim_team_wins[team] / elim_alliance_wins[alliance]
             )
-            district_points["points"][team]["elim_points"] = math.ceil(elim_alliance_pts[alliance] * multiplier)
+            district_points["points"][team]["elim_points"] = math.ceil(
+                elim_alliance_pts[alliance] * multiplier
+            )
 
     @classmethod
     def _calc_elim_match_points_pre_2023(
