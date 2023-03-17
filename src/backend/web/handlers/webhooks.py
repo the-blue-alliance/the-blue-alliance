@@ -1,8 +1,9 @@
 import uuid
 
-from flask import Blueprint, redirect, request, Response, session, url_for
+from flask import Blueprint, redirect, request, session, url_for
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
+from werkzeug.wrappers.response import Response
 
 from backend.common.auth import current_user
 from backend.common.consts.client_type import ClientType
@@ -76,7 +77,7 @@ def webhook_delete() -> Response:
     if not client_id:
         return redirect(url_for("account.overview"))
 
-    to_delete = ndb.Key(Account, user.account_key.id(), MobileClient, int(client_id))
+    to_delete = ndb.Key(Account, user.uid, MobileClient, int(client_id))
     to_delete.delete()
 
     return redirect(url_for("account.overview"))
