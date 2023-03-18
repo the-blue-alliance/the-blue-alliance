@@ -46,6 +46,7 @@ def login_user(ndb_stub, monkeypatch: MonkeyPatch):
     mock_user.mobile_clients = []
     mock_user.permissions = []
     mock_user.account_key = account_key
+    mock_user.uid = account_key.id()
 
     def mock_current_user():
         return mock_user
