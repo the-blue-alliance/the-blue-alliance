@@ -1,6 +1,7 @@
 {% if type in enabled %}
 <h4>Test Notification</h4>
     <form method="POST" action="/apidocs/webhooks/test/{{ type.value }}" class="form-horizontal" role="form" onsubmit="event.preventDefault()">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="row">
             {% if event_key %}
             <div class="form-group">
