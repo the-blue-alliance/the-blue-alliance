@@ -120,7 +120,7 @@ class EventInsightsHelper(object):
             if score_breakdown is None:
                 continue
 
-            for alliance_color in ALLIANCE_COLORS:
+            for alliance_color in ['red', 'blue']:
                 try:
                     alliance_breakdown = score_breakdown[alliance_color]
 
