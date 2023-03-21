@@ -105,8 +105,8 @@ class EventInsightsHelper(object):
             if not match.has_been_played:
                 continue
 
-            red_score = match.alliances[AllianceColor.RED]["score"]
-            blue_score = match.alliances[AllianceColor.BLUE]["score"]
+            red_score = match.alliances["red"]["score"]
+            blue_score = match.alliances["blue"]["score"]
             win_score = max(red_score, blue_score)
 
             winning_scores += win_score
