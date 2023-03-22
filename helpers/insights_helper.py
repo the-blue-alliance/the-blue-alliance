@@ -527,13 +527,7 @@ class InsightsHelper(object):
             for _, matches in week_events:
                 numMatches += len(matches)
 
-        insight = None
-        if numMatches != 0:
-            insight = self._createInsight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)
-        if insight is not None:
-            return [insight]
-        else:
-            return []
+        return [self._createInsight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)]
 
     @classmethod
     def _calculateYearSpecific(self, week_event_matches, year):
