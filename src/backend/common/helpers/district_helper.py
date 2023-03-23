@@ -419,11 +419,9 @@ class DistrictHelper:
 
         for team in elim_alliances:
             alliance = elim_alliances[team]
-            multiplier = (
-                POINTS_MULTIPLIER * elim_team_wins[team] / elim_alliance_wins[alliance]
-            )
-            district_points["points"][team]["elim_points"] = math.ceil(
-                elim_alliance_pts[alliance] * multiplier
+            multiplier = elim_team_wins[team] / elim_alliance_wins[alliance]
+            district_points["points"][team]["elim_points"] = (
+                math.ceil(elim_alliance_pts[alliance] * multiplier) * POINTS_MULTIPLIER
             )
 
     @classmethod
