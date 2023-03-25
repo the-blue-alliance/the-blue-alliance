@@ -47,10 +47,8 @@ class DistrictPointValues:
     F_WIN = {2015: 5.0}
 
     # Double elimination bracket points (2023 onwards)
-    DE_SF_12_LOSS = 7
-    DE_SF_13_LOSS = 13
-    DE_F_LOSS = 20
-    DE_F_WIN = 30
+    DE_SF_WIN = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 13, 8: 13, 9: 7, 10: 7, 11: 7, 12: 6, 13: 7}
+    DE_F_WIN = 10
 
     # Chairman's Award
     CHAIRMANS_DEFAULT = 10
