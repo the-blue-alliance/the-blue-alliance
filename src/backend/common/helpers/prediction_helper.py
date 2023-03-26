@@ -750,8 +750,8 @@ class PredictionHelper:
             ]
         elif event.year == 2023:
             relevant_stats = [
-                ("score", 0, 20**2),  #random number in v idk what to put
-                ("links", 0, 10**2),
+                ("score", 0, 20**2),
+                ("links", 0, 3**2),
                 ("charge_station_points", 0, 10**2),
             ]
         else:
