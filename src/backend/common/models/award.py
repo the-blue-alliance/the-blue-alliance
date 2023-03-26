@@ -93,7 +93,10 @@ class Award(CachedModel):
 
     @property
     def normalized_name(self) -> str:
-        if self.year >= 2023 and self.award_type_enum in award_type.NORMALIZED_NAMES_2023:
+        if (
+            self.year >= 2023
+            and self.award_type_enum in award_type.NORMALIZED_NAMES_2023
+        ):
             return award_type.NORMALIZED_NAMES_2023[self.award_type_enum]
 
         if self.award_type_enum in award_type.NORMALIZED_NAMES:
