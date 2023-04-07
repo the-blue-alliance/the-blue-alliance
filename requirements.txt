@@ -1,4 +1,4 @@
-beautifulsoup4==4.12.1
+beautifulsoup4==4.12.2
 black==23.3.0
 flake8==6.0.0
 flake8-import-order
