@@ -17,6 +17,7 @@ from firebase_admin.messaging import (
     ThirdPartyAuthError,
     UnregisteredError,
 )
+from google.appengine.api import memcache
 from google.appengine.api.taskqueue import taskqueue
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
@@ -89,6 +90,9 @@ class TestTBANSHelper(unittest.TestCase):
         self.gae_testbed.init_taskqueue_stub(root_path="src/")
         self.taskqueue_stub = self.gae_testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
+        self.gae_testbed.init_memcache_stub()
+        self.memcache_stub = self.gae_testbed.get_stub(testbed.MEMCACHE_SERVICE_NAME)
+
         self.event = EventTestCreator.create_future_event()
         self.team = Team(id="frc7332", team_number=7332)
         self.team.put()
@@ -129,6 +133,27 @@ class TestTBANSHelper(unittest.TestCase):
         # Should be the same object
         assert app_one == app_two
 
+    def test_format_tbans_memcache_key(self):
+        suffix = "abcdefg"
+        assert (
+            TBANSHelper._format_tbans_memcache_key(suffix) == f"tbans_{suffix}".encode()
+        )
+
+    def test_has_sent_notification(self):
+        key = "2022miket_alliance_selection"
+        assert not TBANSHelper._has_sent_notification(key)
+        TBANSHelper._set_has_sent_notification(key)
+        assert TBANSHelper._has_sent_notification(key)
+        # Flush and double check that we've got a None again
+        memcache.Client().flush_all()
+        assert not TBANSHelper._has_sent_notification(key)
+
+    def test_set_has_sent_notification(self):
+        key = "2021miket_alliance_selection"
+        assert not TBANSHelper._has_sent_notification(key)
+        TBANSHelper._set_has_sent_notification(key)
+        assert TBANSHelper._has_sent_notification(key)
+
     def test_alliance_selection_no_users(self):
         # Test send not called with no subscribed users
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -142,6 +167,30 @@ class TestTBANSHelper(unittest.TestCase):
             mock_send.assert_called_once()
             user_id = mock_send.call_args[0][0]
             assert user_id == ["user_id"]
+
+    def test_alliance_selection_has_sent(self):
+        with patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.alliance_selection(self.event)
+            mock_has_sent_notification.assert_called_once()
+            mock_set_has_sent_notification.assert_not_called()
+
+    def test_alliance_selection_has_sent_user_id(self):
+        # Test send called with user id
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.alliance_selection(self.event, "user_id")
+            mock_has_sent_notification.assert_not_called()
+            mock_send.assert_called_once()
+            user_id = mock_send.call_args[0][0]
+            assert user_id == ["user_id"]
+            mock_set_has_sent_notification.assert_not_called()
 
     def test_alliance_selection(self):
         # Insert a Subscription for this Event and these Teams so we call to send
@@ -173,8 +222,13 @@ class TestTBANSHelper(unittest.TestCase):
             alliance_selections=[{"declines": [], "picks": ["frc7332"]}],
         ).put()
 
-        with patch.object(TBANSHelper, "_send") as mock_send:
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
             TBANSHelper.alliance_selection(self.event)
+            mock_has_sent_notification.assert_called_once()
             # Two calls total - First to the Event, second to frc7332, no call for frc1
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 2
@@ -193,6 +247,10 @@ class TestTBANSHelper(unittest.TestCase):
             assert team_notification.event == self.event
             assert team_notification.team == self.team
 
+            mock_set_has_sent_notification.assert_called_once_with(ANY)
+            set_has_sent_notification_args = mock_set_has_sent_notification.call_args
+            assert set_has_sent_notification_args.endswith("_alliance_selection")
+
     def test_awards_no_users(self):
         # Test send not called with no subscribed users
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -206,6 +264,30 @@ class TestTBANSHelper(unittest.TestCase):
             mock_send.assert_called_once()
             user_id = mock_send.call_args[0][0]
             assert user_id == ["user_id"]
+
+    def test_awards_has_sent(self):
+        with patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.awards(self.event)
+            mock_has_sent_notification.assert_called_once()
+            mock_set_has_sent_notification.assert_not_called()
+
+    def test_awards_has_sent_user_id(self):
+        # Test send called with user id
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.awards(self.event, "user_id")
+            mock_has_sent_notification.assert_not_called()
+            mock_send.assert_called_once()
+            user_id = mock_send.call_args[0][0]
+            assert user_id == ["user_id"]
+            mock_set_has_sent_notification.assert_not_called()
 
     def test_awards(self):
         # Insert some Awards for some Teams
@@ -255,8 +337,13 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.AWARDS],
         ).put()
 
-        with patch.object(TBANSHelper, "_send") as mock_send:
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
             TBANSHelper.awards(self.event)
+            mock_has_sent_notification.assert_called_once()
             # Three calls total - First to the Event, second to frc7332 (two awards), third to frc1 (one award)
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -281,6 +368,10 @@ class TestTBANSHelper(unittest.TestCase):
             assert event_notification.event == self.event
             assert event_notification.team == frc_1
             assert len(event_notification.team_awards) == 1
+
+            mock_set_has_sent_notification.assert_called_once_with(ANY)
+            set_has_sent_notification_args = mock_set_has_sent_notification.call_args
+            assert set_has_sent_notification_args.endswith("_awards")
 
     def test_broadcast_none(self):
         TBANSHelper.broadcast([], "Broadcast", "Test broadcast")
@@ -376,6 +467,30 @@ class TestTBANSHelper(unittest.TestCase):
             for call in mock_send.call_args_list:
                 assert call[0][0] == ["user_id"]
 
+    def test_event_level_has_sent(self):
+        with patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.event_level(self.match)
+            mock_has_sent_notification.assert_called_once()
+            mock_set_has_sent_notification.assert_not_called()
+
+    def test_event_level_has_sent_user_id(self):
+        # Test send called with user id
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.event_level(self.match, "user_id")
+            mock_has_sent_notification.assert_not_called()
+            mock_send.assert_called_once()
+            user_id = mock_send.call_args[0][0]
+            assert user_id == ["user_id"]
+            mock_set_has_sent_notification.assert_not_called()
+
     def test_event_level(self):
         # Insert a Subscription for this Event
         Subscription(
@@ -386,8 +501,13 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.LEVEL_STARTING],
         ).put()
 
-        with patch.object(TBANSHelper, "_send") as mock_send:
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
             TBANSHelper.event_level(self.match)
+            mock_has_sent_notification.assert_called_once()
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 1
             user_ids = mock_send.call_args[0][0]
@@ -396,6 +516,10 @@ class TestTBANSHelper(unittest.TestCase):
             assert isinstance(notification, EventLevelNotification)
             assert notification.match == self.match
             assert notification.event == self.event
+
+            mock_set_has_sent_notification.assert_called_once_with(ANY)
+            set_has_sent_notification_args = mock_set_has_sent_notification.call_args
+            assert set_has_sent_notification_args.endswith("_event_level")
 
     def test_event_schedule_no_users(self):
         # Test send not called with no subscribed users
@@ -412,6 +536,30 @@ class TestTBANSHelper(unittest.TestCase):
             for call in mock_send.call_args_list:
                 assert call[0][0] == ["user_id"]
 
+    def test_event_schedule_has_sent(self):
+        with patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.event_schedule(self.event)
+            mock_has_sent_notification.assert_called_once()
+            mock_set_has_sent_notification.assert_not_called()
+
+    def test_event_schedule_has_sent_user_id(self):
+        # Test send called with user id
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.event_schedule(self.event, "user_id")
+            mock_has_sent_notification.assert_not_called()
+            mock_send.assert_called_once()
+            user_id = mock_send.call_args[0][0]
+            assert user_id == ["user_id"]
+            mock_set_has_sent_notification.assert_not_called()
+
     def test_event_schedule(self):
         # Insert a Subscription for this Event
         Subscription(
@@ -422,8 +570,13 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.SCHEDULE_UPDATED],
         ).put()
 
-        with patch.object(TBANSHelper, "_send") as mock_send:
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
             TBANSHelper.event_schedule(self.event)
+            mock_has_sent_notification.assert_called_once()
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 1
             user_ids = mock_send.call_args[0][0]
@@ -431,6 +584,10 @@ class TestTBANSHelper(unittest.TestCase):
             notification = mock_send.call_args[0][1]
             assert isinstance(notification, EventScheduleNotification)
             assert notification.event == self.event
+
+            mock_set_has_sent_notification.assert_called_once_with(ANY)
+            set_has_sent_notification_args = mock_set_has_sent_notification.call_args
+            assert set_has_sent_notification_args.endswith("_event_schedule")
 
     def test_match_score_no_users(self):
         # Test send not called with no subscribed users
@@ -462,6 +619,46 @@ class TestTBANSHelper(unittest.TestCase):
             assert len(schedule_upcoming_match.call_args_list) == 1
             assert schedule_upcoming_match.call_args[0][1] == "user_id"
 
+    def test_match_score_has_sent(self):
+        with patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.match_score(self.match)
+            mock_has_sent_notification.assert_called_once()
+            mock_set_has_sent_notification.assert_not_called()
+
+    def test_match_score_has_sent_user_id(self):
+        # Set some upcoming matches for the Event
+        match_creator = MatchTestCreator(self.event)
+        teams = [
+            Team(id="frc%s" % team_number, team_number=team_number)
+            for team_number in range(6)
+        ]
+        self.event._teams = teams
+        match_creator.createIncompleteQuals()
+
+        # Test send called with user id
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "schedule_upcoming_match"
+        ) as schedule_upcoming_match, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.match_score(self.match, "user_id")
+            mock_has_sent_notification.assert_not_called()
+            mock_send.assert_called()
+            assert len(mock_send.call_args_list) == 3
+            for call in mock_send.call_args_list:
+                assert call[0][0] == ["user_id"]
+            # Make sure we called upcoming_match with the same user_id
+            schedule_upcoming_match.assert_called()
+            assert len(schedule_upcoming_match.call_args_list) == 1
+            assert schedule_upcoming_match.call_args[0][1] == "user_id"
+            mock_set_has_sent_notification.assert_not_called()
+
     def test_match_score(self):
         # Insert a Subscription for this Event, Team, and Match so we call to send
         Subscription(
@@ -486,8 +683,13 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.MATCH_SCORE],
         ).put()
 
-        with patch.object(TBANSHelper, "_send") as mock_send:
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
             TBANSHelper.match_score(self.match)
+            mock_has_sent_notification.assert_called_once()
             # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -501,6 +703,10 @@ class TestTBANSHelper(unittest.TestCase):
             # Check frc7332 notification
             notification = notifications[1]
             assert notification.team == self.team
+
+            mock_set_has_sent_notification.assert_called_once_with(ANY)
+            set_has_sent_notification_args = mock_set_has_sent_notification.call_args
+            assert set_has_sent_notification_args.endswith("_match_score")
 
     def test_match_score_match_upcoming(self):
         # Set some upcoming matches for the Event
@@ -525,6 +731,41 @@ class TestTBANSHelper(unittest.TestCase):
             assert len(schedule_upcoming_match.call_args) == 2
             assert schedule_upcoming_match.call_args[0][0] == next_matches.pop()
             assert schedule_upcoming_match.call_args[0][1] is None
+
+    def test_match_upcoming_has_sent(self):
+        with patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=True
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.match_upcoming(self.match)
+            mock_has_sent_notification.assert_called_once()
+            mock_set_has_sent_notification.assert_not_called()
+
+    def test_match_upcoming_has_sent_user_id(self):
+        # Set our match to be 1-1 so we can test event_level
+        self.match.set_number = 1
+        self.match.match_number = 1
+
+        # Test send called with user id
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "event_level"
+        ) as mock_event_level, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.match_upcoming(self.match, "user_id")
+            mock_has_sent_notification.assert_not_called()
+            mock_send.assert_called()
+            assert len(mock_send.call_args_list) == 3
+            for call in mock_send.call_args_list:
+                assert call[0][0] == ["user_id"]
+            # Make sure we called event_level with the same user_id
+            mock_event_level.assert_called()
+            assert len(mock_event_level.call_args_list) == 1
+            assert mock_event_level.call_args[0][1] == "user_id"
+            mock_set_has_sent_notification.assert_not_called()
 
     def test_match_upcoming_no_users(self):
         # Test send not called with no subscribed users
@@ -575,8 +816,24 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.UPCOMING_MATCH],
         ).put()
 
-        with patch.object(TBANSHelper, "_send") as mock_send:
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
             TBANSHelper.match_upcoming(self.match)
+
+            mock_has_sent_notification.assert_called()
+            mock_has_sent_notification_args_list = (
+                mock_has_sent_notification.call_args_list
+            )
+            assert mock_has_sent_notification_args_list[0].endswith(
+                "_qm1_match_upcoming"
+            )
+            assert mock_has_sent_notification_args_list[1].endswith(
+                "_qm1_match_upcoming"
+            )
+
             # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -590,6 +847,17 @@ class TestTBANSHelper(unittest.TestCase):
             # Check frc7332 notification
             notification = notifications[1]
             assert notification.team == self.team
+
+            mock_set_has_sent_notification.assert_called()
+            set_has_sent_notification_args_list = (
+                mock_set_has_sent_notification.call_args_list
+            )
+            assert set_has_sent_notification_args_list[0].endswith(
+                "_qm1_match_upcoming"
+            )
+            assert set_has_sent_notification_args_list[1].endswith(
+                "_qm1_match_upcoming"
+            )
 
     def test_match_upcoming_event_level(self):
         # Make sure we call event_level for a 1-1 match_upcoming

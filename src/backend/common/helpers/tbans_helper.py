@@ -18,6 +18,7 @@ from backend.common.consts.notification_type import (
     ENABLED_TEAM_NOTIFICATIONS,
     NotificationType,
 )
+from backend.common.memcache import MemcacheClient
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.mobile_client import MobileClient
@@ -53,8 +54,34 @@ class TBANSHelper:
     Helper class for sending push notifications via the FCM HTTPv1 API and sending data payloads to webhooks
     """
 
+    @staticmethod
+    def _format_tbans_memcache_key(key: str) -> bytes:
+        return f"tbans_{key}".encode()
+
+    @staticmethod
+    def _has_sent_notification(key: str) -> bool:
+        key = TBANSHelper._format_tbans_memcache_key(key)
+
+        memcache = MemcacheClient.get()
+        has_sent_notification: Optional[bool] = memcache.get(key)
+        if has_sent_notification is None:
+            return False
+        return has_sent_notification
+
+    @staticmethod
+    def _set_has_sent_notification(key: str, time_seconds: int = 60 * 60) -> None:
+        key = TBANSHelper._format_tbans_memcache_key(key)
+
+        memcache = MemcacheClient.get()
+        memcache.set(key, True, time_seconds)
+
     @classmethod
     def alliance_selection(cls, event: Event, user_id: Optional[str] = None) -> None:
+        memcache_key = f"{event.key_name}_alliance_selection"
+        # Always send if we're passing an individual user_id
+        if user_id is None and TBANSHelper._has_sent_notification(memcache_key):
+            return
+
         from backend.common.models.notifications.alliance_selection import (
             AllianceSelectionNotification,
         )
@@ -85,6 +112,9 @@ class TBANSHelper:
                 if users:
                     cls._send(users, AllianceSelectionNotification(event, team))
 
+        if not user_id:
+            TBANSHelper._set_has_sent_notification(memcache_key)
+
     """
     Dispatch Awards notifications to users subscribed to Event or Team Award notifications.
 
@@ -98,6 +128,11 @@ class TBANSHelper:
 
     @classmethod
     def awards(cls, event: Event, user_id: Optional[str] = None) -> None:
+        memcache_key = f"{event.key_name}_awards"
+        # Always send if we're passing an individual user_id
+        if user_id is None and TBANSHelper._has_sent_notification(memcache_key):
+            return
+
         from backend.common.models.notifications.awards import (
             AwardsNotification,
         )
@@ -126,6 +161,9 @@ class TBANSHelper:
                     )
                 if users:
                     cls._send(users, AwardsNotification(event, team))
+
+        if not user_id:
+            TBANSHelper._set_has_sent_notification(memcache_key)
 
     @classmethod
     def broadcast(
@@ -161,6 +199,13 @@ class TBANSHelper:
 
     @classmethod
     def event_level(cls, match: Match, user_id: Optional[str] = None) -> None:
+        event = match.event.get()
+
+        memcache_key = f"{match.key_name}_event_level"
+        # Always send if we're passing an individual user_id
+        if user_id is None and TBANSHelper._has_sent_notification(memcache_key):
+            return
+
         from backend.common.models.notifications.event_level import (
             EventLevelNotification,
         )
@@ -170,13 +215,21 @@ class TBANSHelper:
             users = [user_id] if user_id else []
             if not users:
                 users = Subscription.users_subscribed_to_event(
-                    match.event.get(), NotificationType.LEVEL_STARTING
+                    event, NotificationType.LEVEL_STARTING
                 )
             if users:
                 cls._send(users, EventLevelNotification(match))
 
+        if not user_id:
+            TBANSHelper._set_has_sent_notification(memcache_key)
+
     @classmethod
     def event_schedule(cls, event: Event, user_id: Optional[str] = None) -> None:
+        memcache_key = f"{event.key_name}_event_schedule"
+        # Always send if we're passing an individual user_id
+        if user_id is None and TBANSHelper._has_sent_notification(memcache_key):
+            return
+
         from backend.common.models.notifications.event_schedule import (
             EventScheduleNotification,
         )
@@ -191,8 +244,16 @@ class TBANSHelper:
             if users:
                 cls._send(users, EventScheduleNotification(event))
 
+        if not user_id:
+            TBANSHelper._set_has_sent_notification(memcache_key)
+
     @classmethod
     def match_score(cls, match: Match, user_id: Optional[str] = None) -> None:
+        memcache_key = f"{match.key_name}_match_score"
+        # Always send if we're passing an individual user_id
+        if user_id is None and TBANSHelper._has_sent_notification(memcache_key):
+            return
+
         event = match.event.get()
 
         from backend.common.models.notifications.match_score import (
@@ -230,6 +291,9 @@ class TBANSHelper:
             if users:
                 cls._send(users, MatchScoreNotification(match))
 
+        if not user_id:
+            TBANSHelper._set_has_sent_notification(memcache_key)
+
         # Send UPCOMING_MATCH for the N + 2 match after this one
         if not event.matches:
             return
@@ -249,6 +313,11 @@ class TBANSHelper:
 
     @classmethod
     def match_upcoming(cls, match: Match, user_id: Optional[str] = None) -> None:
+        memcache_key = f"{match.key_name}_match_upcoming"
+        # Always send if we're passing an individual user_id
+        if user_id is None and TBANSHelper._has_sent_notification(memcache_key):
+            return
+
         from backend.common.models.notifications.match_upcoming import (
             MatchUpcomingNotification,
         )
@@ -283,6 +352,9 @@ class TBANSHelper:
                 )
             if users:
                 cls._send(users, MatchUpcomingNotification(match))
+
+        if not user_id:
+            TBANSHelper._set_has_sent_notification(memcache_key)
 
         # Send LEVEL_STARTING for the first match of a new type
         if match.set_number == 1 and match.match_number == 1:
