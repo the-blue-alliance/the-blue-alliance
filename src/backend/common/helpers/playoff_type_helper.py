@@ -4,8 +4,8 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.playoff_type import (
     BRACKET_ELIM_MAPPING,
     BRACKET_OCTO_ELIM_MAPPING,
-    DOUBLE_ELIM_MAPPING,
     DOUBLE_ELIM_4_MAPPING,
+    DOUBLE_ELIM_MAPPING,
     DoubleElimRound,
     LEGACY_DOUBLE_ELIM_MAPPING,
     LegacyDoubleElimBracket,
