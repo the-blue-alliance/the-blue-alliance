@@ -122,6 +122,22 @@ class MatchHelper(object):
         return matches
 
     @classmethod
+    def organized_double_elim_4_matches(
+        cls, organized_matches: TOrganizedMatches
+    ) -> TOrganizedDoubleElimMatches:
+        matches = collections.defaultdict(list)
+        for level in COMP_LEVELS:
+            level_matches = organized_matches[level]
+            if level == CompLevel.QM:
+                continue
+            for match in level_matches:
+                double_elim_round = PlayoffTypeHelper.get_double_elim_4_round(
+                    level, match.set_number
+                )
+                matches[double_elim_round].append(match)
+        return matches
+
+    @classmethod
     def recent_matches(cls, matches: List[Match], num: int = 3) -> List[Match]:
         matches = list(filter(lambda x: x.has_been_played, matches))
         matches = cls.play_order_sorted_matches(matches)

@@ -136,6 +136,10 @@ class PlayoffAdvancementHelper(object):
             double_elim_matches = MatchHelper.organized_double_elim_matches(
                 matches, event.year
             )
+        elif event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+            double_elim_matches = MatchHelper.organized_double_elim_4_matches(
+                matches, event.year
+            )
         return double_elim_matches
 
     @classmethod
