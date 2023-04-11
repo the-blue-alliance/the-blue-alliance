@@ -86,7 +86,6 @@ class BracketItem(TypedDict):
 
 
 class PlayoffAdvancementHelper(object):
-
     ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS: Dict[Year, List[str]] = {
         2017: ["totalPoints"],
         2018: ["endgamePoints", "autoPoints"],
@@ -136,6 +135,8 @@ class PlayoffAdvancementHelper(object):
             double_elim_matches = MatchHelper.organized_double_elim_matches(
                 matches, event.year
             )
+        elif event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+            double_elim_matches = MatchHelper.organized_double_elim_4_matches(matches)
         return double_elim_matches
 
     @classmethod
@@ -662,7 +663,7 @@ class PlayoffAdvancementHelper(object):
     ) -> Optional[str]:
         if not alliance_selections:
             return None
-        for (n, alliance_selection) in enumerate(
+        for n, alliance_selection in enumerate(
             alliance_selections
         ):  # search for alliance. could be more efficient
             picks = alliance_selection["picks"]

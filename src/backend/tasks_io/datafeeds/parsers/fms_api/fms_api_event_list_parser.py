@@ -45,6 +45,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
     }
 
     DOUBLE_ELIM_PLAYOFF_TYPES = {
+        "FourAlliance": PlayoffType.DOUBLE_ELIM_4_TEAM,
         "EightAlliance": PlayoffType.DOUBLE_ELIM_8_TEAM,
     }
 

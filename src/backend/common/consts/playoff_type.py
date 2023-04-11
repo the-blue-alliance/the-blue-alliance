@@ -43,6 +43,8 @@ class PlayoffType(enum.IntEnum):
     # The "regular" style is the one that FIRST plans to trial for the 2023 season
     # https://www.firstinspires.org/robotics/frc/blog/2022-timeout-and-playoff-tournament-updates
     DOUBLE_ELIM_8_TEAM = 10
+    # The bracket used for districts with four divisions
+    DOUBLE_ELIM_4_TEAM = 11
 
     # Festival of Champions
     BO5_FINALS = 6
@@ -62,6 +64,7 @@ BRACKET_TYPES: Set[PlayoffType] = {
 
 DOUBLE_ELIM_TYPES: Set[PlayoffType] = {
     PlayoffType.DOUBLE_ELIM_8_TEAM,
+    PlayoffType.DOUBLE_ELIM_4_TEAM,
     PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM,
 }
 
@@ -75,6 +78,7 @@ TYPE_NAMES: Dict[PlayoffType, str] = {
     PlayoffType.AVG_SCORE_8_TEAM: "Average Score (8 Alliances)",
     PlayoffType.ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)",
     PlayoffType.DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
+    PlayoffType.DOUBLE_ELIM_4_TEAM: "Double Elimination Bracket (4 Alliances)",
     PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM: "Legacy Double Elimination Bracket (8 Alliances)",
     PlayoffType.BO3_FINALS: "Best of 3 Finals",
     PlayoffType.BO5_FINALS: "Best of 5 Finals",
@@ -224,6 +228,24 @@ DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     17: (CompLevel.F, 1, 4),  # Overtime 1
     18: (CompLevel.F, 1, 5),  # Overtime 2
     19: (CompLevel.F, 1, 6),  # Overtime 3
+}
+
+DOUBLE_ELIM_4_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+    # round 1
+    1: (CompLevel.SF, 1, 1),
+    2: (CompLevel.SF, 2, 1),
+    # round 2
+    3: (CompLevel.SF, 3, 1),
+    4: (CompLevel.SF, 4, 1),
+    # round 3
+    5: (CompLevel.SF, 5, 1),
+    # finals
+    6: (CompLevel.F, 1, 1),
+    7: (CompLevel.F, 1, 2),
+    8: (CompLevel.F, 1, 3),
+    9: (CompLevel.F, 1, 4),  # Overtime 1
+    10: (CompLevel.F, 1, 5),  # Overtime 2
+    11: (CompLevel.F, 1, 6),  # Overtime 3
 }
 
 DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
