@@ -370,6 +370,7 @@ class DistrictHelper:
         district_points: EventDistrictPoints,
         matches: List[Match],
         alliance_selections: List[EventAlliance],
+        playoff_type: PlayoffType,
         POINTS_MULTIPLIER: int,
     ):
         # match_set_key -> alliance -> num wins
@@ -381,6 +382,11 @@ class DistrictHelper:
         elim_alliance_wins: DefaultDict[int, int] = defaultdict(int)
         elim_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
         elim_alliances: DefaultDict[TeamKey, int] = defaultdict(int)
+
+        if playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+            sf_points = DistrictPointValues.DE_4_SF_WIN
+        else:
+            sf_points = DistrictPointValues.DE_SF_WIN
 
         for match in matches:
             if not match.has_been_played or match.winning_alliance == "":
@@ -408,7 +414,7 @@ class DistrictHelper:
             if match.comp_level == CompLevel.SF:
                 elim_alliance_pts[
                     winning_alliance_number
-                ] += DistrictPointValues.DE_SF_WIN[match.set_number]
+                ] += sf_points[match.set_number]
             elif (
                 match.comp_level == CompLevel.F
                 and elim_num_wins[match_set_key][winning_alliance] >= 2
@@ -687,7 +693,7 @@ class DistrictHelper:
                     CompLevel.SF, []
                 ) + organized_matches.get(CompLevel.F, [])
                 cls._calc_elim_match_points(
-                    district_points, elim_matches, elim_alliances, POINTS_MULTIPLIER
+                    district_points, elim_matches, elim_alliances, event.playoff_type, POINTS_MULTIPLIER
                 )
 
     @classmethod
