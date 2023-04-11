@@ -240,12 +240,12 @@ DOUBLE_ELIM_4_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     # round 3
     5: (CompLevel.SF, 5, 1),
     # finals
-    14: (CompLevel.F, 1, 1),
-    15: (CompLevel.F, 1, 2),
-    16: (CompLevel.F, 1, 3),
-    17: (CompLevel.F, 1, 4),  # Overtime 1
-    18: (CompLevel.F, 1, 5),  # Overtime 2
-    19: (CompLevel.F, 1, 6),  # Overtime 3
+    6: (CompLevel.F, 1, 1),
+    7: (CompLevel.F, 1, 2),
+    8: (CompLevel.F, 1, 3),
+    9: (CompLevel.F, 1, 4),  # Overtime 1
+    10: (CompLevel.F, 1, 5),  # Overtime 2
+    11: (CompLevel.F, 1, 6),  # Overtime 3
 }
 
 DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
