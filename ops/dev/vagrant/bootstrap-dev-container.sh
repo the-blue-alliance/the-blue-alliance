@@ -26,6 +26,8 @@ nvm use default
 if [ "$(uname -m)" = "aarch64" ]; then
     export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 fi
+
+echo "Running npm install... this may take a while..."
 npm install
 
 # Install the Firebase tools for the Firebase emulator
