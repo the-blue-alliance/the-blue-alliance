@@ -14,6 +14,7 @@ from backend.common.models.team import Team
     [
         "2023mijac",  # A 2023 event
         "2023njfla",  # A 2023 event with backup team district points (wins and losses)
+        "2023micmp",  # A double elimination DCMP with four divisions
         "2022on305",  # A 2022 single day event
         "2019nyny",  # A regular event
         "2015nyny",  # 2015 is special (average score ranking)
