@@ -49,7 +49,7 @@ def assert_coprs_values_equal(
     for component, oprs in coprs.items():
         assert oprs.keys() == expected_coprs[component].keys()
         for team_key, opr in oprs.items():
-            assert opr == approx(expected_coprs[component][team_key])
+            assert opr == approx(expected_coprs[component][team_key])  # pyre-ignore[16]
 
 
 def test_compute_matchstats_no_matches() -> None:
