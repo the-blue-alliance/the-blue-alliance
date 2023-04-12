@@ -11,7 +11,7 @@
   width: calc(100% - 20px);
 
   tr {
-    height: 31px;
+    height: 35px;
   }
 
   td {
@@ -20,8 +20,7 @@
   }
 
   .match {
-    min-width: 120px;
-    width: 140px;
+    min-width: 140px;
   }
 
   .team-placeholder {
@@ -67,14 +66,18 @@
 
   .match-table {
     margin-bottom: 0px;
+  }
 
-    .alliance-name {
-      border-bottom: 1px dotted #777
-    }
+  .match-table-wrapper {
+    position: absolute;
+    width: 100%;
 
-    .tooltip-inner {
-      width: 140px
-    }
+    top: -20px;
+    bottom: -20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .gap-row {

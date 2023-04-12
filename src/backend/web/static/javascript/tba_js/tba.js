@@ -29,7 +29,7 @@ $(document).ready(function(){
   var hash = window.location.hash;
   hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
-  $('.nav-tabs a, .nav-pills a').click(function (e) {
+  $('.nav-tabs a, .nav-pills a').not(".nav-pills#suggestion-review-list a").click(function (e) {
     e.preventDefault();
     window.location.hash = this.hash;
   });

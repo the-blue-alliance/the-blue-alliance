@@ -1,7 +1,8 @@
 import collections
 import json
+import re
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Dict, List, Optional, Tuple
 
 from flask import abort, redirect, request
 from google.appengine.ext import ndb
@@ -11,6 +12,7 @@ from werkzeug.wrappers import Response
 from backend.common.consts import comp_level, playoff_type
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import COMP_LEVELS, CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.award_helper import AwardHelper
@@ -22,10 +24,35 @@ from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancement
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, Year
+from backend.common.models.event_matchstats import Component, TeamStatMap
+from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
+
+
+def convert_component_name(component_name: str) -> str:
+    """
+    Converts a camelCase componentName to a human readable title case name.
+
+    e.g. foulCount -> Foul Count, totalPoints -> Total Points, OPR -> OPR, rp -> RP
+    """
+    # for things like OPR that should stay all uppercase
+    if component_name.isupper():
+        return component_name
+
+    # for things like "rp" that should be totally uppercased
+    if component_name in ["rp"]:
+        return component_name.upper()
+
+    with_spaces = re.sub("([A-Z])", r" \1", component_name)
+    return with_spaces.title()
+
+
+def sort_and_limit_stats(
+    stats_dict: TeamStatMap, num_matchstats: Optional[int] = None
+) -> List[Tuple[TeamKey, float]]:
+    return sorted(stats_dict.items(), key=lambda t: -t[1])[:num_matchstats]
 
 
 @cached_public
@@ -60,6 +87,10 @@ def event_list(year: Optional[Year] = None) -> Response:
     for district in districts_future.get_result():
         districts.append((district.abbreviation, district.display_name))
     districts = sorted(districts, key=lambda d: d[1])
+
+    # Special case to display a list of regionals
+    if any(map(lambda e: e.event_type_enum == EventType.REGIONAL, events)):
+        districts.insert(0, ("regional", "Regional Events"))
 
     valid_state_provs = set()
     for event in all_events_future.get_result():
@@ -138,13 +169,22 @@ def event_detail(event_key: EventKey) -> Response:
         middle_value += 1
     teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
 
-    oprs = (
-        [i for i in event.matchstats["oprs"].items()]
-        if (event.matchstats is not None and "oprs" in event.matchstats)
-        else []
-    )
-    oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
-    oprs = oprs[:15]  # get the top 15 OPRs
+    oprs = []
+    copr_leaders: Dict[Component, List[Tuple[TeamId, float]]] = {}
+
+    if event.matchstats is not None:
+        oprs = sort_and_limit_stats(event.matchstats.get("oprs") or {})
+        copr_leaders["OPR"] = oprs
+
+    if event.coprs is not None:
+        for component, tsm in event.coprs.items():
+            copr_leaders[component] = sort_and_limit_stats(tsm)
+
+    # Container for (component, componentValidHtmlId, and componentHumanReadableName) elements
+    copr_items: List[Tuple[Component, str, str]] = [
+        (k, re.sub("[^0-9a-zA-Z]+", "_", k), convert_component_name(k))
+        for k in copr_leaders.keys()
+    ]
 
     if event.now:
         matches_recent = MatchHelper.recent_matches(cleaned_matches)
@@ -246,6 +286,9 @@ def event_detail(event_key: EventKey) -> Response:
         "double_elim_playoff_types": playoff_type.DOUBLE_ELIM_TYPES,
         "qual_playlist": qual_playlist,
         "elim_playlist": elim_playlist,
+        "has_coprs": event.coprs is not None,
+        "coprs_json": json.dumps(copr_leaders),
+        "copr_items": copr_items,
     }
 
     return make_cached_response(
@@ -350,3 +393,28 @@ def event_insights(event_key: EventKey) -> Response:
         render_template("event_insights.html", template_values),
         ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
     )
+
+
+@cached_public
+def event_rss(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+
+    if not event:
+        return redirect("/events")
+
+    cleaned_matches = event.matches
+    _, matches = MatchHelper.organized_matches(cleaned_matches)
+
+    template_values = {
+        "event": event,
+        "matches": matches,
+        "datetime": datetime.now(),
+    }
+
+    response = make_cached_response(
+        render_template("event_rss.xml", template_values),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+    )
+    response.headers["content-type"] = "application/xml; charset=UTF-8"
+
+    return response

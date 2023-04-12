@@ -172,21 +172,19 @@ class Media(CachedModel):
 
     @property
     def instagram_direct_url(self) -> str:
-        return self.instagram_url_helper("l")
+        return self.instagram_url_helper(658)
 
     @property
     def instagram_direct_url_med(self) -> str:
-        return self.instagram_url_helper("m")
+        return self.instagram_url_helper(320)
 
     @property
     def instagram_direct_url_sm(self) -> str:
-        return self.instagram_url_helper("t")
+        return self.instagram_url_helper(320)
 
     def instagram_url_helper(self, size) -> str:
-        # Supported size values are t (thumbnail), m (medium), l (large)
-        # See the Instagram developer docs for more information:
-        # https://www.instagram.com/developer/embedding/#media_redirect!
-        return "{}/media/?size={}".format(self.instagram_url, size)
+        # The Oembed API supports widths between 320px and 658px
+        return f"/instagram_oembed/{self.foreign_key}?width={size}"
 
     @property
     def view_image_url(self) -> str:

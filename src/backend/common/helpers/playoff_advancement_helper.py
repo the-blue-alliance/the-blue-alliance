@@ -86,7 +86,6 @@ class BracketItem(TypedDict):
 
 
 class PlayoffAdvancementHelper(object):
-
     ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS: Dict[Year, List[str]] = {
         2017: ["totalPoints"],
         2018: ["endgamePoints", "autoPoints"],
@@ -133,7 +132,11 @@ class PlayoffAdvancementHelper(object):
                 matches
             )
         elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            double_elim_matches = MatchHelper.organized_double_elim_matches(matches)
+            double_elim_matches = MatchHelper.organized_double_elim_matches(
+                matches, event.year
+            )
+        elif event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+            double_elim_matches = MatchHelper.organized_double_elim_4_matches(matches)
         return double_elim_matches
 
     @classmethod
@@ -288,6 +291,10 @@ class PlayoffAdvancementHelper(object):
                                 f"{color}_alliance"
                             ] += cls.ordered_alliance(alliance, alliance_selections)
 
+                # Skip if match hasn't been played
+                if not match.has_been_played:
+                    continue
+
                 winner = match.winning_alliance
                 if not winner or winner == "":
                     # if the match is a tie
@@ -314,11 +321,13 @@ class PlayoffAdvancementHelper(object):
                 n = 2
                 if event.playoff_type == PlayoffType.BO5_FINALS:
                     n = 3
-                elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM and not (
-                    comp_level == CompLevel.F
-                    and match.set_number == 2  # only the final is a BO3
-                ):
-                    n = 1
+                elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
+                    # only the final is a BO3
+                    if not (
+                        comp_level == CompLevel.F
+                        and match.set_number == set_numbers[-1]
+                    ):
+                        n = 1
                 if bracket_table[comp_level][set_key]["red_wins"] == n:
                     bracket_table[comp_level][set_key][
                         "winning_alliance"
@@ -654,7 +663,7 @@ class PlayoffAdvancementHelper(object):
     ) -> Optional[str]:
         if not alliance_selections:
             return None
-        for (n, alliance_selection) in enumerate(
+        for n, alliance_selection in enumerate(
             alliance_selections
         ):  # search for alliance. could be more efficient
             picks = alliance_selection["picks"]

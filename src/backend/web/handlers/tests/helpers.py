@@ -151,6 +151,38 @@ def preseed_district(district_key: DistrictKey) -> Generator:
 
 
 @ndb.synctasklet
+def preseed_regional(event_key: EventKey) -> Generator:
+    year = int(event_key[:4])
+    yield ndb.put_multi_async(
+        [
+            Event(
+                id=f"{event_key}{i}",
+                event_short=f"{event_key[4:]}{i}",
+                year=year,
+                name=f"Event {i}",
+                district_key=None,
+                event_type_enum=EventType.REGIONAL,
+                official=True,
+                start_date=datetime(year, 3, 1) + timedelta(days=7 * i),
+                end_date=datetime(year, 3, 3) + timedelta(days=7 * i),
+            )
+            for i in range(1, 6)
+        ]
+    )
+    yield ndb.put_multi_async(
+        [
+            Team(
+                id=f"frc{i}",
+                team_number=i,
+                nickname=f"The {i} Team",
+                city=f"City {i}",
+            )
+            for i in range(1, 6)
+        ]
+    )
+
+
+@ndb.synctasklet
 def preseed_event_for_team(team_number: TeamNumber, event_key: EventKey) -> Generator:
     yield Event(
         id=event_key,

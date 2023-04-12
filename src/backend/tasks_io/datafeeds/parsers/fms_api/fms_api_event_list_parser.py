@@ -44,6 +44,11 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         "SixAlliance": PlayoffType.ROUND_ROBIN_6_TEAM,
     }
 
+    DOUBLE_ELIM_PLAYOFF_TYPES = {
+        "FourAlliance": PlayoffType.DOUBLE_ELIM_4_TEAM,
+        "EightAlliance": PlayoffType.DOUBLE_ELIM_8_TEAM,
+    }
+
     NON_OFFICIAL_EVENT_TYPES = ["offseason"]
 
     EVENT_CODE_EXCEPTIONS = {
@@ -79,6 +84,18 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         if season == 2022 and code == "cmptx":
             return (code, "{}")
         return self.EVENT_CODE_EXCEPTIONS[code]
+
+    def get_playoff_type(self, year, alliance_count):
+        playoff_type = None
+
+        # 2023+ uses double elim.
+        if year >= 2023:
+            playoff_type = self.DOUBLE_ELIM_PLAYOFF_TYPES.get(alliance_count)
+
+        if playoff_type is None:
+            playoff_type = self.PLAYOFF_TYPES.get(alliance_count)
+
+        return playoff_type
 
     def parse(self, response: Dict[str, Any]) -> Tuple[List[Event], List[District]]:
         events: List[Event] = []
@@ -179,7 +196,9 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             if event_key in events_to_change_dates:
                 start = end.replace(hour=0, minute=0, second=0, microsecond=0)
 
-            playoff_type = self.PLAYOFF_TYPES.get(event.get("allianceCount"))
+            playoff_type = self.get_playoff_type(
+                self.season, event.get("allianceCount")
+            )
 
             events.append(
                 Event(

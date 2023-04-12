@@ -1,12 +1,12 @@
-beautifulsoup4==4.11.1
-black==22.10.0
-flake8==5.0.4
+beautifulsoup4==4.12.2
+black==23.3.0
+flake8==6.0.0
 flake8-import-order
 flake8-tidy-imports
-blinker==1.5
+blinker==1.6.1
 freezegun==1.2.2
 pre-commit
-pyre-check==0.9.16
+pyre-check==0.9.18
 pytest
 pytest-cov
 pytest-custom_exit_code

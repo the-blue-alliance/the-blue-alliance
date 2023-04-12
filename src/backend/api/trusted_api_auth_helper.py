@@ -58,7 +58,7 @@ class TrustedApiAuthHelper:
         # that are valid for this event
         if user:
             user_has_auth = any(
-                cls._validate_auth(auth, event_key, required_auth_types) is None
+                cls._validate_auth(auth, event, required_auth_types) is None
                 for auth in user.api_write_keys
             )
             if user_has_auth:
@@ -106,7 +106,7 @@ class TrustedApiAuthHelper:
             )
 
         # Checks event key is valid, correct auth types, and expiration
-        error = cls._validate_auth(auth, event_key, required_auth_types)
+        error = cls._validate_auth(auth, event, required_auth_types)
         if error:
             abort(make_response(profiled_jsonify({"Error": error}), 401))
 
@@ -114,11 +114,15 @@ class TrustedApiAuthHelper:
     def _validate_auth(
         cls,
         auth: ApiAuthAccess,
-        event_key: EventKey,
+        event: Event,
         required_auth_types: Set[AuthType],
     ) -> Optional[str]:
         allowed_event_keys = [none_throws(ekey.string_id()) for ekey in auth.event_list]
-        if event_key not in allowed_event_keys:
+        if event.key_name not in allowed_event_keys and not (
+            auth.all_official_events
+            and event.official
+            and event.year == datetime.datetime.now().year
+        ):
             return "Only allowed to edit events: {}".format(
                 ", ".join(allowed_event_keys)
             )

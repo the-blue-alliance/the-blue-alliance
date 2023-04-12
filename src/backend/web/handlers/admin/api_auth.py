@@ -106,6 +106,10 @@ def api_auth_edit_post(auth_id: str) -> Response:
     else:
         event_list = []
 
+    all_official_events = False
+    if request.form.get("all_official_events"):
+        all_official_events = True
+
     if not auth:
         auth = ApiAuthAccess(
             id=auth_id,
@@ -120,11 +124,13 @@ def api_auth_edit_post(auth_id: str) -> Response:
                 for _ in range(64)
             ),
             event_list=event_list,
+            all_official_events=all_official_events,
             auth_types_enum=auth_types_enum,
         )
     else:
         auth.description = request.form.get("description", "")
         auth.event_list = event_list
+        auth.all_official_events = all_official_events
         auth.auth_types_enum = auth_types_enum
         auth.owner = owner_key
         auth.expiration = expiration

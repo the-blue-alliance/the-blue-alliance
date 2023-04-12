@@ -1,0 +1,250 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2023mijac",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1023"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 1,
+    "event_key": "2023mijac",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4453"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9210"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 10,
+    "event_key": "2023mijac",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9312"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 11,
+    "event_key": "2023mijac",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2611"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 13,
+    "event_key": "2023mijac",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4453"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 14,
+    "event_key": "2023mijac",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9210"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 15,
+    "event_key": "2023mijac",
+    "name": "Rookie Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9209"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 16,
+    "event_key": "2023mijac",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5066"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 17,
+    "event_key": "2023mijac",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2832"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 2,
+    "event_key": "2023mijac",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7501"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9312"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3322"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 20,
+    "event_key": "2023mijac",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5090"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 21,
+    "event_key": "2023mijac",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8373"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 27,
+    "event_key": "2023mijac",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 29,
+    "event_key": "2023mijac",
+    "name": "Innovation in Control Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 30,
+    "event_key": "2023mijac",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7660"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 4,
+    "event_key": "2023mijac",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Norah Harper",
+        "team_key": "frc1023"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 71,
+    "event_key": "2023mijac",
+    "name": "Autonomous Award sponsored by Ford",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4422"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 82,
+    "event_key": "2023mijac",
+    "name": "Team Sustainability Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7166"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_key": "2023mijac",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      }
+    ],
+    "year": 2023
+  }
+]

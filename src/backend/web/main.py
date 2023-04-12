@@ -17,15 +17,22 @@ from backend.web.handlers.ajax import (
     typeahead_handler,
 )
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
-from backend.web.handlers.district import district_detail
+from backend.web.handlers.district import district_detail, regional_detail
+from backend.web.handlers.embed import instagram_oembed
 from backend.web.handlers.error import handle_404, handle_500
-from backend.web.handlers.event import event_detail, event_insights, event_list
+from backend.web.handlers.event import (
+    event_detail,
+    event_insights,
+    event_list,
+    event_rss,
+)
 from backend.web.handlers.eventwizard import eventwizard, eventwizard2
 from backend.web.handlers.gameday import gameday, gameday_redirect
 from backend.web.handlers.hall_of_fame import hall_of_fame_overview
 from backend.web.handlers.index import about, avatar_list, index
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
+from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.static import (
     add_data,
     bigquery,
@@ -52,6 +59,9 @@ from backend.web.handlers.team_admin import (
     blueprint as team_admin,
 )
 from backend.web.handlers.webcasts import webcast_list
+from backend.web.handlers.webhooks import (
+    blueprint as webhooks,
+)
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
@@ -76,8 +86,15 @@ app.add_url_rule("/gameday/<alias>", view_func=gameday_redirect)
 app.add_url_rule("/gameday", view_func=gameday)
 
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
+app.add_url_rule("/event/<event_key>/feed", view_func=event_rss)
 app.add_url_rule("/event/<event_key>/insights", view_func=event_insights)
 app.add_url_rule("/events/<int:year>", view_func=event_list)
+app.add_url_rule(
+    "/events/regional",
+    view_func=regional_detail,
+    defaults={"year": None},
+)
+app.add_url_rule("/events/regional/<int:year>", view_func=regional_detail)
 app.add_url_rule(
     '/events/<regex("[a-z]+"):district_abbrev>',
     view_func=district_detail,
@@ -107,8 +124,9 @@ app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
 
 app.add_url_rule("/hall-of-fame", view_func=hall_of_fame_overview)
 
-app.add_url_rule("/webcasts", view_func=webcast_list)
+app.add_url_rule("/mytba", view_func=mytba_live)
 
+app.add_url_rule("/webcasts", view_func=webcast_list)
 # Static pages
 app.add_url_rule("/add-data", view_func=add_data)
 app.add_url_rule("/brand", view_func=brand)
@@ -130,6 +148,7 @@ app.add_url_rule(
 )
 app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)
 app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
+app.add_url_rule("/instagram_oembed/<media_key>", view_func=instagram_oembed)
 
 app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
@@ -137,6 +156,7 @@ app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)
 app.register_blueprint(suggestion_review_blueprint)
 app.register_blueprint(team_admin)
+app.register_blueprint(webhooks)
 
 app.register_error_handler(404, handle_404)
 app.register_error_handler(500, handle_500)

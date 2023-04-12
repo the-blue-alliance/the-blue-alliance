@@ -25,7 +25,7 @@ class MediaParser:
         MediaType.INSTAGRAM_IMAGE,
     }
 
-    OEMBED_PROVIDERS: Set[MediaType] = {MediaType.INSTAGRAM_IMAGE}
+    OEMBED_PROVIDERS: Set[MediaType] = set()
 
     # Dict that maps media types -> list of tuple of regex pattern and group # of foreign key
     FOREIGN_KEY_PATTERNS: Dict[MediaType, List[Tuple[str, int]]] = {
@@ -85,9 +85,7 @@ class MediaParser:
         "https://cad.onshape.com/api/documents/{}"  # Format w/ stripped foreign key
     )
 
-    OEMBED_DETAIL_URL: Dict[MediaType, str] = {
-        MediaType.INSTAGRAM_IMAGE: "https://api.instagram.com/oembed/?url=http://instagram.com/p/{}"
-    }
+    OEMBED_DETAIL_URL: Dict[MediaType, str] = {}
 
     @classmethod
     def partial_media_dict_from_url(cls, url: str) -> Optional[SuggestionDict]:

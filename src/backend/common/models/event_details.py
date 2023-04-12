@@ -10,7 +10,7 @@ from backend.common.models.alliance import EventAlliance
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.event_insights import EventInsights
-from backend.common.models.event_matchstats import EventMatchstats
+from backend.common.models.event_matchstats import EventComponentOPRs, EventMatchstats
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
 from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
@@ -42,6 +42,7 @@ class EventDetails(CachedModel):
     matchstats: EventMatchstats = safe_cast(
         EventMatchstats, ndb.JsonProperty()
     )  # for OPR, DPR, CCWM, etc.
+    coprs: EventComponentOPRs = safe_cast(EventComponentOPRs, ndb.JsonProperty())
     insights: EventInsights = safe_cast(EventInsights, ndb.JsonProperty())
     predictions: Optional[EventPredictions] = safe_cast(
         EventPredictions, ndb.JsonProperty()
@@ -60,6 +61,7 @@ class EventDetails(CachedModel):
         "alliance_selections",
         "district_points",
         "matchstats",
+        "coprs",
         "insights",
         "predictions",
         "rankings",
@@ -116,7 +118,7 @@ class EventDetails(CachedModel):
                 if game_year == 2021:
                     # 2021 did not have matches played for rankings
                     continue
-                elif game_year in {2017, 2018, 2019, 2020, 2021, 2022}:
+                elif game_year in {2017, 2018, 2019, 2020, 2021, 2022, 2023}:
                     rank["extra_stats"] = [
                         int(round(rank["sort_orders"][0] * rank["matches_played"])),
                     ]
@@ -136,7 +138,7 @@ class EventDetails(CachedModel):
             if game_year == 2021:
                 # 2021 did not have matches played for rankings
                 pass
-            elif game_year in {2017, 2018, 2019, 2020, 2021, 2022}:
+            elif game_year in {2017, 2018, 2019, 2020, 2021, 2022, 2023}:
                 extra_stats_info = [{"name": "Total Ranking Points", "precision": 0}]
             elif sort_order_info is not None:
                 extra_stats_info = [

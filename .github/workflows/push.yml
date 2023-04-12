@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -41,7 +41,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -64,7 +64,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -79,18 +79,18 @@ jobs:
         run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.2
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Node
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -106,11 +106,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Node
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -122,7 +122,7 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.2
         with:
           directory: ./.node_coverage/
   bash-lint:
@@ -135,7 +135,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -163,11 +163,11 @@ jobs:
         with:
           python-version: '3.10'
       - name: Set up Node
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -206,11 +206,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
       - name: Set up Node
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -233,7 +233,7 @@ jobs:
           driver-opts: network=host
       - name: Build Docker Image
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v4.0.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker
@@ -265,13 +265,13 @@ jobs:
         with:
           python-version: '3.8'
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          version: "321.0.0"
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: gcloud app deploy src/queue.yaml
@@ -292,13 +292,13 @@ jobs:
           name: web-build
           path: src/build
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          version: "321.0.0"
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh src/web.yaml
@@ -314,13 +314,13 @@ jobs:
         with:
           python-version: '3.8'
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          version: "321.0.0"
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh src/api.yaml
@@ -336,13 +336,13 @@ jobs:
         with:
           python-version: '3.8'
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          version: "321.0.0"
+          version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh src/tasks_io.yaml

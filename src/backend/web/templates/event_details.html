@@ -87,7 +87,7 @@
         {% endif %}
         {% if event.website %}<br><span class="glyphicon glyphicon-link"></span> <a href="{{ event.website }}" title="{{ event.name }}" target="_blank" rel="noopener noreferrer">{{ event.website }}</a>{% endif %}
         {% if event.first_eid or event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="{% if event.first_eid %}https://www.firstinspires.org/team-event-search/event?id={{event.first_eid}}{%elif event.official %}https://frc-events.firstinspires.org/{{event.year}}/{{event.first_api_code}}{%endif%}" target="_blank" rel="noopener noreferrer">firstinspires.org</a>{% endif %}
-        {% if event.year > 2021 %}{% if event.official %}<br><span class="glyphicon glyphicon-plus"></span> <a href="https://www.firstinspires.org/sites/default/files/uploads/frc/{{event.year}}-events/{{event.year}}_{{event.first_api_code}}_SiteInfo.pdf" target="_blank" rel="noopener noreferrer">COVID-19 Site Information</a>{% endif %}{% endif %}
+        {% if event.year == 2022 %}{% if event.official %}<br><span class="glyphicon glyphicon-plus"></span> <a href="https://www.firstinspires.org/sites/default/files/uploads/frc/{{event.year}}-events/{{event.year}}_{{event.first_api_code}}_SiteInfo.pdf" target="_blank" rel="noopener noreferrer">COVID-19 Site Information</a>{% endif %}{% endif %}
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event" target="_blank" rel="noopener noreferrer">RSVP on Facebook</a><br>{% endif %}
       </p>
     </div>
@@ -169,8 +169,8 @@
           {% if event.playoff_type == 5 %}
             <!-- PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM -->
             {{mtm.legacy_double_elim_table(double_elim_matches, double_elim_rounds, playlist=elim_playlist)}}
-          {% elif event.playoff_type == 10 %}
-            <!-- PlayoffType.DOUBLE_ELIM_8_TEAM -->
+          {% elif event.playoff_type == 10 or event.playoff_type == 11 %}
+            <!-- PlayoffType.DOUBLE_ELIM_8_TEAM or PlayoffType.DOUBLE_ELIM_4_TEAM -->
             {{mtm.double_elim_table(double_elim_matches, double_elim_rounds, playlist=elim_playlist)}}
           {% else %}
             {{mtm.elim_match_table(matches, playlist=elim_playlist)}}
@@ -212,11 +212,23 @@
         </div>
         {% endif %}
 
-        <!-- Double Elim Bracket -->
+        <!-- Double Elim 8 Bracket -->
         {% if event.playoff_type == 10 and (matches.ef or matches.qf or matches.sf or matches.f) %}
           <div class="col-sm-12">
             <h3>Playoff Bracket</h3>
+            {% if event.year < 2023 %}
+            {% include "bracket_partials/double_elim_bracket_table_pre_2023.html" %}
+            {% else %}
             {% include "bracket_partials/double_elim_bracket_table.html" %}
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <!-- Double Elim 4 Bracket -->
+        {% if event.playoff_type == 11 and (matches.ef or matches.qf or matches.sf or matches.f) %}
+          <div class="col-sm-12">
+            <h3>Playoff Bracket</h3>
+            {% include "bracket_partials/double_elim_4_bracket_table.html" %}
           </div>
         {% endif %}
 
@@ -410,7 +422,13 @@
 
     {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}
     <div class="tab-pane" id="event-insights">
-      {% if oprs|length > 0 %}
+      {% if has_coprs %}
+      <div class="row">
+        <div class="col-sm-12">
+          {% include "event_partials/event_copr_table.html" %}
+        </div>
+      </div>
+      {% elif oprs|length > 0 %}
       <div class="row">
         <div class="col-sm-12">
           {% include "event_partials/event_opr_table.html" %}

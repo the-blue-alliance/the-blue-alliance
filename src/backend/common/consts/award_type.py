@@ -104,6 +104,7 @@ class AwardType(enum.IntEnum):
     CONCEPT = 79
     GAME_DESIGN_CHALLENGE_WINNER = 80
     GAME_DESIGN_CHALLENGE_FINALIST = 81
+    SUSTAINABILITY = 82
 
 
 AWARD_TYPES: Set[AwardType] = {a for a in AwardType}
@@ -149,6 +150,11 @@ NORMALIZED_NAMES = {
         None: "Woodie Flowers Finalist Award",
         EventType.CMP_FINALS: "Woodie Flowers Award",
     },
+}
+
+NORMALIZED_NAMES_2023 = {
+    AwardType.CHAIRMANS: "FIRST Impact Award",
+    AwardType.CHAIRMANS_FINALIST: "FIRST Impact Award Finalist",
 }
 
 

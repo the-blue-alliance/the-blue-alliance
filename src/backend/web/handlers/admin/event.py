@@ -179,6 +179,32 @@ def event_delete(event_key: EventKey) -> Response:
         return render_template("admin/event_delete.html", template_values)
 
 
+def event_delete_matches(event_key: EventKey, comp_level, to_delete) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    _, organized_matches = MatchHelper.organized_matches(event.matches)
+    if comp_level not in organized_matches:
+        abort(400)
+
+    matches_to_delete = []
+    if to_delete == "all":
+        matches_to_delete = [m for m in organized_matches[comp_level]]
+    elif to_delete == "unplayed":
+        matches_to_delete = [
+            m for m in organized_matches[comp_level] if not m.has_been_played
+        ]
+
+    if matches_to_delete:
+        MatchManipulator.delete(matches_to_delete)
+
+    return redirect(url_for("admin.event_detail", event_key=event.key_name))
+
+
 def event_create() -> Response:
     template_values = {
         "event_types": EVENT_TYPE_NAMES,

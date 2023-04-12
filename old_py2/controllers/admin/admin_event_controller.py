@@ -319,32 +319,3 @@ class AdminEventCreateTest(LoggedInHandler):
             logging.error("{} tried to create test events in prod! No can do.".format(
                 self.user_bundle.user.email()))
             self.redirect("/admin/")
-
-
-class AdminEventDeleteMatches(LoggedInHandler):
-    """
-    Remove a comp level's matches
-    """
-    def get(self, event_key, comp_level, to_delete):
-        self._require_admin()
-
-        event = Event.get_by_id(event_key)
-        if not event:
-            self.abort(404)
-
-        organized_matches = MatchHelper.organized_matches(event.matches)
-        if comp_level not in organized_matches:
-            self.abort(400)
-            return
-
-        matches_to_delete = []
-        if to_delete == 'all':
-            matches_to_delete = [m for m in organized_matches[comp_level]]
-        elif to_delete == 'unplayed':
-            matches_to_delete = [m for m in organized_matches[comp_level] if not m.has_been_played]
-
-        delete_count = len(matches_to_delete)
-        if matches_to_delete:
-            MatchManipulator.delete(matches_to_delete)
-
-        self.redirect("/admin/event/{}?deleted={}#matches".format(event_key, delete_count))

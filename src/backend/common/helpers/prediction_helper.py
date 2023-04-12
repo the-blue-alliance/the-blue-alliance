@@ -363,6 +363,19 @@ class ContributionCalculator:
                                 "teleopCargo{}{}".format(goal, exit)
                             ]
                     means[color] = count
+                elif self._stat == "game_piece_scored":
+                    count = 0
+                    for mode in ["auto", "teleop"]:
+                        count += score_breakdown[color]["{}GamePieceCount".format(mode)]
+                    means[color] = count
+                elif self._stat == "links":
+                    count = 0
+                    count = math.floor((score_breakdown[color]["linkPoints"]) / 5)
+                    means[color] = count
+                elif self._stat == "charge_station_points":
+                    count = 0
+                    count = score_breakdown[color]["totalChargeStationPoints"]
+                    means[color] = count
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -450,6 +463,7 @@ class PredictionHelper:
             "red": defaultdict(lambda: defaultdict(float)),
             "blue": defaultdict(lambda: defaultdict(float)),
         }
+
         for color in ALLIANCE_COLORS:
             for team in match.alliances[color]["teams"]:
                 for stat, mean_var in stat_mean_vars.items():
@@ -628,6 +642,23 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
                     prediction[color]["prob_hangar_bonus"] = prob
+                # 2023
+                if stat == "links":
+                    required_points = 5
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_sustainability_bonus"] = prob
+                if stat == "charge_station_points":
+                    required_points = 26
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_activation_bonus"] = prob
 
         # Prob win
         red_score = prediction["red"]["score"]
@@ -662,6 +693,7 @@ class PredictionHelper:
         Optional[TMatchPredictionStats],
         Optional[TEventStatMeanVars],
     ]:
+
         if not matches:
             return None, None, None
         predictions: TMatchPredictions = {
@@ -712,6 +744,12 @@ class PredictionHelper:
                 ("score", 0, 20**2),
                 ("cargo_scored", 0, 10**2),
                 ("endgame_points", 0, 10**2),
+            ]
+        elif event.year == 2023:
+            relevant_stats = [
+                ("score", 0, 20**2),
+                ("links", 0, 3**2),
+                ("charge_station_points", 0, 10**2),
             ]
         else:
             relevant_stats = []
@@ -958,6 +996,16 @@ class PredictionHelper:
                             sampled_tiebreaker[alliance_color] = score_breakdown[
                                 alliance_color
                             ]["totalPoints"]
+                        elif match.year == 2023:
+                            sampled_rp1[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["sustainabilityBonusAchieved"]
+                            sampled_rp2[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["activationBonusAchieved"]
+                            sampled_tiebreaker[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["totalPoints"]
                 else:
                     prediction = qual_predictions[none_throws(match.key.string_id())]
                     if np.random.uniform(high=1) < prediction["prob"]:
@@ -1035,6 +1083,18 @@ class PredictionHelper:
                             sampled_rp2[alliance_color] = (
                                 np.random.uniform(high=1)
                                 < color_prediction["prob_hangar_bonus"]
+                            )
+                            sampled_tiebreaker[alliance_color] = color_prediction[
+                                "score"
+                            ]
+                        elif match.year == 2023:
+                            sampled_rp1[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_sustainability_bonus"]
+                            )
+                            sampled_rp2[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_activation_bonus"]
                             )
                             sampled_tiebreaker[alliance_color] = color_prediction[
                                 "score"

@@ -1,42 +1,71 @@
-{% macro bracket_match(match, red_alliance_placeholder, blue_alliance_placeholder) %}
-  <table class="match-table">
-    {% if match %}
-      <tr>
-        <td>
-          <span class="alliance-name" rel="tooltip" data-placement="top" title="{{ match.red_alliance|join(', ') }}">
-            {{ match.red_name if match.red_name else 'Unknown' }}
-          </span>
-        </td>
-        <td class="redScore {% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_record.wins }}</td>
-      </tr>
-      <tr>
-        <td>
-          <span class="alliance-name" rel="tooltip" data-placement="bottom" title="{{ match.blue_alliance|join(', ') }}">
-            {{ match.blue_name if match.blue_name else 'Unknown' }}
-          </span>
-        </td>
-        <td class="blueScore {% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_record.wins }}</td>
-      </tr>
-    {% else %}
-      <tr>
-        <td class="team-placeholder">{{ red_alliance_placeholder }}</td>
-      </tr>
-      <tr>
-        <td class="team-placeholder">{{ blue_alliance_placeholder }}</td>
-      </tr>
-    {% endif %}
-  </table>
+{% macro bracket_match(match_name, match, red_alliance_placeholder, blue_alliance_placeholder) %}
+  <div class="match-table-wrapper">
+    <div style="position: relative;">
+      <span class="match-label">{{ match_name }}</span>
+      <table class="match-table">
+        {% if match %}
+          {% if match.red_alliance and ('0' not in match.red_alliance) %}
+            <tr>
+              {% if match.red_name %}
+                <td class="{% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_name[-1] }}</td>
+              {% endif %}
+              <td>
+                <span class="alliance-name {% if match.winning_alliance == 'red' %}winner{% endif %}">
+                  {% set delim = joiner("-") %}
+                  {% for team in match.red_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
+                </span>
+              </td>
+              {% if match.red_record.wins + match.red_record.losses + match.red_record.ties > 0 %}
+                <td class="redScore {% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_record.wins }}</td>
+              {% endif %}
+            </tr>
+          {% else %}
+            <tr>
+              <td class="team-placeholder" colspan="2">{{ red_alliance_placeholder }}</td>
+            </tr>
+          {% endif %}
+
+          {% if match.blue_alliance and ('0' not in match.blue_alliance) %}
+            <tr>
+              {% if match.blue_name %}
+                <td class="{% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_name[-1] }}</td>
+              {% endif %}
+              <td>
+                <span class="alliance-name {% if match.winning_alliance == 'blue' %}winner{% endif %}">
+                  {% set delim = joiner("-") %}
+                  {% for team in match.blue_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
+                </span>
+              </td>
+              {% if match.blue_record.wins + match.blue_record.losses + match.blue_record.ties > 0 %}
+                <td class="blueScore {% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_record.wins }}</td>
+              {% endif %}
+            </tr>
+          {% else %}
+            <tr>
+              <td class="team-placeholder" colspan="2">{{ blue_alliance_placeholder }}</td>
+            </tr>
+          {% endif %}
+        {% else %}
+          <tr>
+            <td class="team-placeholder">{{ red_alliance_placeholder }}</td>
+          </tr>
+          <tr>
+            <td class="team-placeholder">{{ blue_alliance_placeholder }}</td>
+          </tr>
+        {% endif %}
+      </table>
+    </div>
+  </div>
 {% endmacro %}
 
 <div id="double-elim-bracket-wrapper">
   <table id="double-elim-bracket-table">
     <tr class="gap-row"></tr>
 
-    <!--    Upper Bracket -->
+    <!-- Upper Bracket -->
     <tr>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 1</span>
-        {{ bracket_match(bracket_table.ef.get('ef1'), 'Alliance 1', 'Alliance 8') }}
+        {{ bracket_match('Match 1', bracket_table.sf.get('sf1'), 'Alliance 1', 'Alliance 8') }}
       </td>
     </tr>
 
@@ -50,8 +79,7 @@
       <td></td>
       <td class="dash"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 7</span>
-        {{ bracket_match(bracket_table.qf.get('qf1'), 'Winner of M1', 'Winner of M2') }}
+        {{ bracket_match('Match 7', bracket_table.sf.get('sf7'), 'Winner of M1', 'Winner of M2') }}
       </td>
     </tr>
 
@@ -64,8 +92,7 @@
 
     <tr>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 2</span>
-        {{ bracket_match(bracket_table.ef.get('ef2'), 'Alliance 4', 'Alliance 5') }}
+        {{ bracket_match('Match 2', bracket_table.sf.get('sf2'), 'Alliance 4', 'Alliance 5') }}
       </td>
     </tr>
 
@@ -77,8 +104,7 @@
       <td colspan="4"></td>
       <td class="dash" colspan="2"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 12</span>
-        {{ bracket_match(bracket_table.sf.get('sf2'), 'Winner of M7', 'Winner of M8') }}
+        {{ bracket_match('Match 11', bracket_table.sf.get('sf11'), 'Winner of M7', 'Winner of M8') }}
       </td>
     </tr>
 
@@ -94,8 +120,7 @@
 
     <tr>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 3</span>
-        {{ bracket_match(bracket_table.ef.get('ef3'), 'Alliance 3', 'Alliance 6') }}
+        {{ bracket_match('Match 3', bracket_table.sf.get('sf3'), 'Alliance 3', 'Alliance 6') }}
       </td>
     </tr>
 
@@ -109,8 +134,7 @@
       <td></td>
       <td class="dash"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 8</span>
-        {{ bracket_match(bracket_table.qf.get('qf2'), 'Winner of M3', 'Winner of M4') }}
+        {{ bracket_match('Match 8', bracket_table.sf.get('sf8'), 'Winner of M3', 'Winner of M4') }}
       </td>
     </tr>
 
@@ -119,15 +143,13 @@
       <td colspan="10"></td>
       <td class="dash" colspan="1"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Finals</span>
-        {{ bracket_match(bracket_table.f.get('f2'), 'Winner of M12', 'Winner of M13') }}
+        {{ bracket_match('Finals', bracket_table.f.get('f1'), 'Winner of M11', 'Winner of M13') }}
       </td>
     </tr>
 
     <tr>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 4</span>
-        {{ bracket_match(bracket_table.ef.get('ef4'), 'Alliance 2', 'Alliance 7') }}
+        {{ bracket_match('Match 4', bracket_table.sf.get('sf4'), 'Alliance 2', 'Alliance 7') }}
       </td>
     </tr>
 
@@ -144,8 +166,7 @@
       <td colspan="11"></td>
       <td class="dash"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 13</span>
-        {{ bracket_match(bracket_table.f.get('f1'), 'Loser of M12', 'Winner of M11') }}
+        {{ bracket_match('Match 13', bracket_table.sf.get('sf13'), 'Loser of M11', 'Winner of M12') }}
       </td>
     </tr>
 
@@ -154,8 +175,7 @@
       <td class="dash" colspan="1"></td>
 
       <td rowspan="2" class="match">
-        <span class="match-label">Match 10</span>
-        {{ bracket_match(bracket_table.qf.get('qf4'), 'Loser of M8', 'Winner of M5') }}
+        {{ bracket_match('Match 10', bracket_table.sf.get('sf10'), 'Loser of M8', 'Winner of M5') }}
       </td>
       <td colspan="3"></td>
       <td rowspan="3">
@@ -177,14 +197,12 @@
     <tr>
       <td colspan="3"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 5</span>
-        {{ bracket_match(bracket_table.ef.get('ef5'), 'Loser of M1', 'Loser of M2') }}
+        {{ bracket_match('Match 5', bracket_table.sf.get('sf5'), 'Loser of M1', 'Loser of M2') }}
       </td>
       <td colspan="3"></td>
       <td class="dash"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 11</span>
-        {{ bracket_match(bracket_table.sf.get('sf1'), 'Winner of M10', 'Winner of M9') }}
+        {{ bracket_match('Match 12', bracket_table.sf.get('sf12'), 'Winner of M10', 'Winner of M9') }}
       </td>
     </tr>
 
@@ -196,8 +214,7 @@
       <td colspan="5"></td>
       <td class="dash" colspan="1"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 9</span>
-        {{ bracket_match(bracket_table.qf.get('qf3'), 'Loser of M7', 'Winner of M6') }}
+        {{ bracket_match('Match 9', bracket_table.sf.get('sf9'), 'Loser of M7', 'Winner of M6') }}
       </td>
     </tr>
 
@@ -211,8 +228,7 @@
     <tr>
       <td colspan="3"></td>
       <td rowspan="2" class="match">
-        <span class="match-label">Match 6</span>
-        {{ bracket_match(bracket_table.ef.get('ef6'), 'Loser of M3', 'Loser of M4') }}
+        {{ bracket_match( 'Match 6', bracket_table.sf.get('sf6'), 'Loser of M3', 'Loser of M4') }}
       </td>
     </tr>
 

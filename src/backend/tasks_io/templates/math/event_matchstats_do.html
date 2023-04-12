@@ -1,3 +1,4 @@
+{% if matchstats_dict %}
 {% for matchstat, stats in matchstats_dict.items() %}
     <h2>Got {{stats|length}} {{matchstat}}</h2>
     {% for team, value in stats.items() %}
@@ -7,3 +8,16 @@
         </ul>
     {% endfor %}
 {% endfor %}
+{% endif %}
+{% if coprs_dict %}
+{% for matchstat, stats in coprs_dict.items() %}
+    <h2>Got {{stats|length}} {{matchstat}}</h2>
+    {% for team, value in stats.items() %}
+        <ul>
+            <li>{{team}}</li>
+            <li>{{value}}</li>
+        </ul>
+    {% endfor %}
+{% endfor %}
+{% endif %}
+{{ event_insights }}

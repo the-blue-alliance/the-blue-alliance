@@ -232,13 +232,19 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
         abort(404)
 
     matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, event.year)
+    print(matchstats_dict)
     if not any([v != {} for v in matchstats_dict.values()]):
         logging.warning("Matchstat calculation for {} failed!".format(event_key))
         matchstats_dict = None
 
+    coprs_dict = MatchstatsHelper.calculate_coprs(event.matches, event.year)
+    if len(coprs_dict.keys()) == 0:
+        logging.warning(f"COPR calculation for {event_key} failed!")
+        coprs_dict = None
+
     predictions_dict = None
     if (
-        event.year in {2016, 2017, 2018, 2019, 2020, 2022}
+        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023}
         and event.event_type_enum in SEASON_EVENT_TYPES
     ) or event.enable_predictions:
         sorted_matches = MatchHelper.play_order_sorted_matches(event.matches)
@@ -269,11 +275,14 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
         matchstats=matchstats_dict,
         predictions=predictions_dict,
         insights=event_insights,
+        coprs=coprs_dict,
     )
     EventDetailsManipulator.createOrUpdate(event_details)
 
     template_values = {
         "matchstats_dict": matchstats_dict,
+        "coprs_dict": coprs_dict,
+        "event_insights": event_insights,
     }
 
     if (

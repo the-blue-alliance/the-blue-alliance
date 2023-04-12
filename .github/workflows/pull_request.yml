@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -64,7 +64,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -77,18 +77,18 @@ jobs:
       - name: Run Tests
         run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.2
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Node
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -103,11 +103,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Node
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -117,7 +117,7 @@ jobs:
       - name: Run Tests
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.2
         with:
           directory: ./.node_coverage/
   bash-lint:
@@ -130,7 +130,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -158,11 +158,11 @@ jobs:
         with:
           python-version: '3.10'
       - name: Set up Node
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -187,7 +187,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache pip
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -197,11 +197,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Set up Node
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: "14"
       - name: Cache node modules
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -222,7 +222,7 @@ jobs:
         with:
           driver-opts: network=host
       - name: Build Docker Image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v4.0.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker

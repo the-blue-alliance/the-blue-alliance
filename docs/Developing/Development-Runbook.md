@@ -74,3 +74,7 @@ Changes can then be applied via `git patch`.  After generating new stubs for a l
 ```
 $ git apply stubs/patch/*.patch
 ```
+
+## `web` development
+
+If you are working on web (front-end), you should make sure to read the [[web|web]] documentation.

@@ -24,12 +24,14 @@ from backend.common.models.keys import EventKey
 
 def setup_event(
     event_type: EventType = EventType.OFFSEASON,
+    official: bool = False,
 ) -> None:
     Event(
         id="2019nyny",
         year=2019,
         event_short="nyny",
         event_type_enum=event_type,
+        official=official,
     ).put()
 
 
@@ -52,18 +54,20 @@ def setup_user(
 
 
 def setup_api_auth(
-    event_key: EventKey,
+    event_key: Optional[EventKey],
     auth_types: List[AuthType] = [],
     expiration: Optional[datetime.datetime] = None,
     owner: Optional[ndb.Key] = None,
+    all_official_events: bool = False,
 ) -> Tuple[str, str]:
     auth = ApiAuthAccess(
         id="".join(random.choices(string.ascii_letters + string.digits, k=10)),
         secret="".join(random.choices(string.ascii_letters + string.digits, k=10)),
-        event_list=[ndb.Key(Event, event_key)],
+        event_list=[ndb.Key(Event, event_key)] if event_key else [],
         auth_types_enum=auth_types,
         expiration=expiration,
         owner=owner,
+        all_official_events=all_official_events,
     )
     auth.put()
 
@@ -520,3 +524,73 @@ def test_explicit_auth_not_expired(
 
     assert resp.status_code == 200, resp.data
     assert "Success" in resp.json
+
+
+@freeze_time("2019-06-01")
+def test_explicit_auth_all_official_events(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
+    Here, we can allow all "official" events to pass the key, a technique we use with FIRST HQ
+    """
+    setup_event(event_type=EventType.OFFSEASON, official=True)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        None,
+        auth_types=[AuthType.EVENT_TEAMS],
+        expiration=None,
+        all_official_events=True,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 200, resp.data
+    assert "Success" in resp.json
+
+
+@freeze_time("2020-06-01")
+def test_explicit_auth_all_official_events_not_current_year_fails(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
+    Here, we can allow all "official" events to pass the key, a technique we use with FIRST HQ
+    """
+    setup_event(event_type=EventType.OFFSEASON, official=True)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        None,
+        auth_types=[AuthType.EVENT_TEAMS],
+        expiration=None,
+        all_official_events=True,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 401, resp.data
+    assert "Error" in resp.json
