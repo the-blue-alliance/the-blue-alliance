@@ -111,7 +111,6 @@ def test_compute_coprs_2023(test_data_importer) -> None:
         expected_coprs = json.load(f)
 
     coprs = MatchstatsHelper.calculate_coprs(matches, 2023)
-    print(json.dumps(coprs))
     assert_coprs_keys_equal(coprs, expected_coprs)
     assert_coprs_values_equal(coprs, expected_coprs)
 
