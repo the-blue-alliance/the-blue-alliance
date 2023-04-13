@@ -6,7 +6,6 @@ from backend.common.tasklets import typed_tasklet
 
 
 class AccountQuery(DatabaseQuery[Optional[Account], None]):
-
     DICT_CONVERTER = None
 
     @typed_tasklet

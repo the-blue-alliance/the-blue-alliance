@@ -22,7 +22,6 @@ from backend.common.sitevars.gameday_special_webcasts import GamedaySpecialWebca
 
 
 class FirebasePusher:
-
     DB_URL = "https://{project}.firebaseio.com/"
 
     @classmethod

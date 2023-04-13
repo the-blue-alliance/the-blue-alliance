@@ -14,7 +14,6 @@ TCompLevel = Literal["qual", "playoff"]
 
 
 class FRCAPI:
-
     STORAGE_BUCKET_PATH = "tbatv-prod-hrd.appspot.com"
     STORAGE_BUCKET_BASE_DIR = "frc-api-response"
 
