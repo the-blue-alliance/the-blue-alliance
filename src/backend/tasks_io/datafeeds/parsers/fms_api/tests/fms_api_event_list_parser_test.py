@@ -532,6 +532,84 @@ def test_parse_division_parent_2018(test_data_importer):
             assert event.divisions == []
 
 
+def test_parse_division_parent_2023(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2023_event_list.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+    events, districts = FMSAPIEventListParser(2023).parse(data)
+    assert len(events) == 178
+    assert len(districts) == 11
+
+    # Test division <-> parent associations
+    for event in events:
+        event_key = event.key.id()
+        if event_key == "2023oncmp":
+            assert event.parent_event is None
+            assert event.divisions == [
+                ndb.Key("Event", "2023oncmp1"),
+                ndb.Key("Event", "2023oncmp2"),
+            ]
+        elif event_key in {"2023oncmp1", "2023oncmp2"}:
+            assert event.parent_event == ndb.Key("Event", "2023oncmp")
+            assert event.divisions == []
+        elif event_key == "2023micmp":
+            assert event.parent_event is None
+            assert event.divisions == [
+                ndb.Key("Event", "2023micmp1"),
+                ndb.Key("Event", "2023micmp2"),
+                ndb.Key("Event", "2023micmp3"),
+                ndb.Key("Event", "2023micmp4"),
+            ]
+        elif event_key in {"2023micmp1", "2023micmp2", "2023micmp3", "2023micmp4"}:
+            assert event.parent_event == ndb.Key("Event", "2023micmp")
+            assert event.divisions == []
+        elif event_key == "2023necmp":
+            assert event.parent_event is None
+            assert event.divisions == [
+                ndb.Key("Event", "2023necmp1"),
+                ndb.Key("Event", "2023necmp2"),
+            ]
+        elif event_key in {"2023necmp1", "2023necmp2"}:
+            assert event.parent_event == ndb.Key("Event", "2023necmp")
+            assert event.divisions == []
+        elif event_key == "2023txcmp":
+            assert event.parent_event is None
+            assert event.divisions == [
+                ndb.Key("Event", "2023txcmp1"),
+                ndb.Key("Event", "2023txcmp2"),
+            ]
+        elif event_key in {"2023txcmp1", "2023txcmp2"}:
+            assert event.parent_event == ndb.Key("Event", "2023txcmp")
+            assert event.divisions == []
+        elif event_key == "2023cmptx":
+            assert event.parent_event is None
+            assert event.divisions == [
+                ndb.Key("Event", "2023carv"),
+                ndb.Key("Event", "2023gal"),
+                ndb.Key("Event", "2023hop"),
+                ndb.Key("Event", "2023john"),
+                ndb.Key("Event", "2023mils"),
+                ndb.Key("Event", "2023new"),
+                ndb.Key("Event", "2023roe"),
+                ndb.Key("Event", "2023tur"),
+            ]
+        elif event_key in {
+            "2023carv",
+            "2023gal",
+            "2023hop",
+            "2023john",
+            "2023mils",
+            "2023new",
+            "2023roe",
+            "2023tur",
+        }:
+            assert event.parent_event == ndb.Key("Event", "2023cmptx")
+            assert event.divisions == []
+        else:
+            assert event.parent_event is None
+            assert event.divisions == []
+
+
 def test_parse_2022_one_day_event(test_data_importer):
     path = test_data_importer._get_path(__file__, "data/2022on305.json")
     with open(path, "r") as f:

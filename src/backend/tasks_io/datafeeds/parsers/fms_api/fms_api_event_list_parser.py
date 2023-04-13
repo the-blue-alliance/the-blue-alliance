@@ -59,6 +59,8 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         "darwin": ("dar", "Darwin"),
         "galileo": ("gal", "Galileo"),
         "hopper": ("hop", "Hopper"),
+        "johnson": ("john", "Johnson"),
+        "milstein": ("mils", "Milstein"),
         "newton": ("new", "Newton"),
         "roebling": ("roe", "Roebling"),
         "tesla": ("tes", "Tesla"),
