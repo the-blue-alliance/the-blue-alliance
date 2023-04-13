@@ -693,7 +693,6 @@ class PredictionHelper:
         Optional[TMatchPredictionStats],
         Optional[TEventStatMeanVars],
     ]:
-
         if not matches:
             return None, None, None
         predictions: TMatchPredictions = {

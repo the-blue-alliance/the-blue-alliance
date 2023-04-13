@@ -63,7 +63,6 @@ from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedRe
 
 
 class DatafeedFMSAPI:
-
     EVENT_SHORT_EXCEPTIONS = {
         "arc": "archimedes",
         "cars": "carson",

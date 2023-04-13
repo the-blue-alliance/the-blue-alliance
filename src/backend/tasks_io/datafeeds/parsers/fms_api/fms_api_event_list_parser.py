@@ -17,7 +17,6 @@ from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
 class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
-
     DATE_FORMAT_STR = "%Y-%m-%dT%H:%M:%S"
 
     EVENT_TYPES = {
