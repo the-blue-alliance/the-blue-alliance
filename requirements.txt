@@ -3,7 +3,7 @@ black==23.3.0
 flake8==6.0.0
 flake8-import-order
 flake8-tidy-imports
-blinker==1.6.1
+blinker==1.6.2
 freezegun==1.2.2
 pre-commit
 pyre-check==0.9.18
