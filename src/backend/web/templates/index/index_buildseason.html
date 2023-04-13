@@ -23,7 +23,7 @@
       <div class="btn-group game-manual">
         <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-file"></span> {{game_name}} Game Manual and Materials</a>
       </div>
-      {% if build_handler_show_password != 'False' %}
+      {% if build_handler_show_password %}
       <p>Encrypted Manual Password: {{ manual_password }}</p>
       {% endif %}
 
@@ -34,19 +34,13 @@
         <a class="btn btn-default" href="https://www.firstinspires.org/robotics/frc/game-and-season" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-info-sign"></span> <i>FIRST</i> 2023 Game and Season Resources</a>
       </div>
 
-      {% if build_handler_show_ri3d != 'False' %}
+      {% if build_handler_show_ri3d %}
       <p>
         <a class="btn btn-lg btn-success btn-block" href="/watch/ri3d"><span class="glyphicon glyphicon-play"></span> Watch Ri3D Live</a>
       </p>
       {% endif %}
 
-      {% if build_handler_show_teameventsearch %}
-      <div>
-        <a class="btn btn-lg btn-block btn-primary" href="/advanced_team_search"><span class="glyphicon glyphicon-search"></span> Search for Previous Successful Robots</a>
-      </div>
-      <br>
-      {% endif %}
-      {% if build_handler_show_avatars and seasonstart_datetime_utc %}
+      {% if build_handler_show_avatars and year %}
       <div>
         <a class="btn btn-lg btn-block btn-primary" href="/avatars/{{ year }}"><span class="glyphicon glyphicon-user"></span> View All {{ year }} Team Avatars</a>
       </div>
