@@ -40,17 +40,17 @@ def test_init(ndb_stub):
 def test_get_event_short_event_first_code_none(event_code, expected):
     event = Mock(spec=Event)
     event.first_code = None
-    assert DatafeedFMSAPI._get_event_short(event_code, event) == expected
+    assert DatafeedFMSAPI._get_event_short(event_code, event) == event.first_api_code
 
 
 def test_get_event_short_event_first_code():
     event = Mock(spec=Event)
     event.first_code = "MIKET"
-    assert DatafeedFMSAPI._get_event_short("2020miket", event) == event.first_code
+    assert DatafeedFMSAPI._get_event_short("2020miket", event) == event.first_api_code
 
 
 def test_get_event_short_event_cmp():
-    assert DatafeedFMSAPI._get_event_short("arc", None) == "archimedes"
+    assert DatafeedFMSAPI._get_event_short("arc", None) == "arc"
 
 
 def test_get_root(fms_api_secrets):

@@ -383,16 +383,9 @@ class DatafeedFMSAPI:
 
     @classmethod
     def _get_event_short(self, event_short: str, event: Optional[Event]) -> str:
-        # First, check if we've manually set the FRC API key
-        if event and event.first_code:
-            return event.first_code
-
-        # Second, use the first_api_code if the event exists
-        if event and event.first_api_code:
+        if event:
             return event.first_api_code
-
-        # Otherwise, check hard-coded exceptions
-        return Event.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
+        return event_short
 
     def _parse(
         self, response: requests.Response, parser: ParserBase[TParsedResponse]
