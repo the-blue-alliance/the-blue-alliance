@@ -34,7 +34,7 @@ def get_qual_bluezone_score(prediction):
 
 @require_login
 def match_suggestion() -> Response:
-    current_events = filter(lambda e: e.now, EventHelper.events_within_a_day())
+    current_events = list(filter(lambda e: e.now, EventHelper.events_within_a_day()))
     popular_teams_events = TeamHelper.getPopularTeamsEvents(current_events)
 
     popular_team_keys = set()
@@ -54,7 +54,7 @@ def match_suggestion() -> Response:
         if not event.details:
             continue
         finished_matches += MatchHelper.recent_matches(event.matches, num=1)
-        for i, match in enumerate(MatchHelper.upcomingMatches(event.matches, num=3)):
+        for i, match in enumerate(MatchHelper.upcoming_matches(event.matches, num=3)):
             if not match.time:
                 continue
 
