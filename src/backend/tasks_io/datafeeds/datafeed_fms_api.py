@@ -72,8 +72,6 @@ class DatafeedFMSAPI:
         "dar": "darwin",
         "gal": "galileo",
         "hop": "hopper",
-        "joh": "johnson",
-        "mil": "milstein",
         "new": "newton",
         "roe": "roebling",
         "tes": "tesla",
