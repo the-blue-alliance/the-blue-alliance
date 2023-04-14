@@ -387,11 +387,9 @@ class DatafeedFMSAPI:
         if event and event.first_code:
             return event.first_code
 
-        # Second, check if it is a new 2023 division event code
-        if event and event.year == 2023:
-            return Event.EVENT_SHORT_EXCEPTIONS_2023.get(
-                event_short, event_short
-            )
+        # Second, use the first_api_code if the event exists
+        if event and event.first_api_code:
+            return event.first_api_code
 
         # Otherwise, check hard-coded exceptions
         return Event.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
