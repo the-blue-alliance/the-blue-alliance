@@ -63,32 +63,6 @@ from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedRe
 
 
 class DatafeedFMSAPI:
-    EVENT_SHORT_EXCEPTIONS = {
-        "arc": "archimedes",
-        "cars": "carson",
-        "carv": "carver",
-        "cur": "curie",
-        "dal": "daly",
-        "dar": "darwin",
-        "gal": "galileo",
-        "hop": "hopper",
-        "new": "newton",
-        "roe": "roebling",
-        "tes": "tesla",
-        "tur": "turing",
-    }
-
-    EVENT_SHORT_EXCEPTIONS_2023 = {
-        "arc": "arpky",
-        "cur": "cpra",
-        "dal": "dcmp",
-        "gal": "gcmp",
-        "hop": "hcmp",
-        "joh": "jcmp",
-        "mil": "mpcia",
-        "new": "npfcmp",
-    }
-
     SUBDIV_TO_DIV = {  # 2015, 2016
         "arc": "arte",
         "cars": "gaca",
@@ -415,12 +389,12 @@ class DatafeedFMSAPI:
 
         # Second, check if it is a new 2023 division event code
         if event and event.year == 2023:
-            return DatafeedFMSAPI.EVENT_SHORT_EXCEPTIONS_2023.get(
+            return Event.EVENT_SHORT_EXCEPTIONS_2023.get(
                 event_short, event_short
             )
 
         # Otherwise, check hard-coded exceptions
-        return DatafeedFMSAPI.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
+        return Event.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
 
     def _parse(
         self, response: requests.Response, parser: ParserBase[TParsedResponse]

@@ -36,6 +36,32 @@ class Event(CachedModel):
     key_name is like '2010ct'
     """
 
+    EVENT_SHORT_EXCEPTIONS = {
+        "arc": "archimedes",
+        "cars": "carson",
+        "carv": "carver",
+        "cur": "curie",
+        "dal": "daly",
+        "dar": "darwin",
+        "gal": "galileo",
+        "hop": "hopper",
+        "new": "newton",
+        "roe": "roebling",
+        "tes": "tesla",
+        "tur": "turing",
+    }
+
+    EVENT_SHORT_EXCEPTIONS_2023 = {
+        "arc": "arpky",
+        "cur": "cpra",
+        "dal": "dcmp",
+        "gal": "gcmp",
+        "hop": "hcmp",
+        "joh": "jcmp",
+        "mil": "mpcia",
+        "new": "npfcmp",
+    }
+
     name = ndb.StringProperty()
     event_type_enum = ndb.IntegerProperty(required=True, choices=list(EventType))
 
@@ -720,7 +746,15 @@ class Event(CachedModel):
     @property
     def first_api_code(self) -> str:
         if self.first_code is None:
-            return self.event_short.upper()
+            if self.year == 2023:
+                return self.EVENT_SHORT_EXCEPTIONS_2023.get(
+                    self.event_short, self.event_short
+                ).upper()
+
+            return self.EVENT_SHORT_EXCEPTIONS.get(
+                self.event_short, self.event_short
+            ).upper()
+
         return self.first_code.upper()
 
     @property

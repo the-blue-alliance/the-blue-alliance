@@ -35,7 +35,7 @@ def test_init(ndb_stub):
 
 @pytest.mark.parametrize(
     "event_code, expected",
-    list(DatafeedFMSAPI.EVENT_SHORT_EXCEPTIONS.items()) + [("miket", "miket")],
+    list(Event.EVENT_SHORT_EXCEPTIONS.items()) + [("miket", "miket")],
 )
 def test_get_event_short_event_first_code_none(event_code, expected):
     event = Mock(spec=Event)
