@@ -32,6 +32,7 @@ from backend.web.handlers.hall_of_fame import hall_of_fame_overview
 from backend.web.handlers.index import about, avatar_list, index
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
+from backend.web.handlers.match_suggestion import match_suggestion
 from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.static import (
     add_data,
@@ -125,6 +126,8 @@ app.add_url_rule("/insights/<int:year>", view_func=insights_detail)
 app.add_url_rule("/hall-of-fame", view_func=hall_of_fame_overview)
 
 app.add_url_rule("/mytba", view_func=mytba_live)
+
+app.add_url_rule("/match_suggestion", view_func=match_suggestion)
 
 app.add_url_rule("/webcasts", view_func=webcast_list)
 # Static pages
