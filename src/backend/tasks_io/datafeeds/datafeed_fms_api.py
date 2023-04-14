@@ -80,6 +80,17 @@ class DatafeedFMSAPI:
         "tur": "turing",
     }
 
+    EVENT_SHORT_EXCEPTIONS_2023 = {
+        "arc": "arpky",
+        "cur": "cpra",
+        "dal": "dcmp",
+        "gal": "gcmp",
+        "hop": "hcmp",
+        "joh": "jcmp",
+        "mil": "mpcia",
+        "new": "npfcmp",
+    }
+
     SUBDIV_TO_DIV = {  # 2015, 2016
         "arc": "arte",
         "cars": "gaca",
@@ -403,6 +414,10 @@ class DatafeedFMSAPI:
         # First, check if we've manually set the FRC API key
         if event and event.first_code:
             return event.first_code
+
+        # Second, check if it is a new 2023 division event code
+        if event.year == 2023:
+            return DatafeedFMSAPI.EVENT_SHORT_EXCEPTIONS_2023.get(event_short, event_short)
 
         # Otherwise, check hard-coded exceptions
         return DatafeedFMSAPI.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)

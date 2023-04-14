@@ -537,7 +537,7 @@ def test_parse_division_parent_2023(test_data_importer):
     with open(path, "r") as f:
         data = json.load(f)
     events, districts = FMSAPIEventListParser(2023).parse(data)
-    assert len(events) == 178
+    assert len(events) == 186
     assert len(districts) == 11
 
     # Test division <-> parent associations
@@ -584,24 +584,24 @@ def test_parse_division_parent_2023(test_data_importer):
         elif event_key == "2023cmptx":
             assert event.parent_event is None
             assert event.divisions == [
-                ndb.Key("Event", "2023carv"),
+                ndb.Key("Event", "2023arc"),
+                ndb.Key("Event", "2023cur"),
+                ndb.Key("Event", "2023dal"),
                 ndb.Key("Event", "2023gal"),
                 ndb.Key("Event", "2023hop"),
                 ndb.Key("Event", "2023joh"),
                 ndb.Key("Event", "2023mil"),
                 ndb.Key("Event", "2023new"),
-                ndb.Key("Event", "2023roe"),
-                ndb.Key("Event", "2023tur"),
             ]
         elif event_key in {
-            "2023carv",
+            "2023arc",
+            "2023cur",
+            "2023dal",
             "2023gal",
             "2023hop",
             "2023joh",
             "2023mil",
             "2023new",
-            "2023roe",
-            "2023tur",
         }:
             assert event.parent_event == ndb.Key("Event", "2023cmptx")
             assert event.divisions == []
