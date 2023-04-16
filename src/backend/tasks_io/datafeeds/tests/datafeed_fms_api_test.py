@@ -60,16 +60,20 @@ def test_get_event_short_2023_event_first_code_none(event_code, expected):
 def test_get_event_short_event_first_code():
     event = Event(
         year=2020,
-        event_short="2020miket",
+        event_short="miket",
         first_code="MIKET",
     )
-    assert (
-        DatafeedFMSAPI._get_event_short("2020miket", event) == event.first_code.upper()
-    )
+    assert DatafeedFMSAPI._get_event_short("miket", event) == event.first_code.upper()
 
 
 def test_get_event_short_event_cmp():
-    assert DatafeedFMSAPI._get_event_short("arc", None) == "arc"
+    event = Event(year=2022, event_short="arc")
+    assert DatafeedFMSAPI._get_event_short("arc", event) == "ARCHIMEDES"
+
+
+def test_get_event_short_event_cmp_2023():
+    event = Event(year=2023, event_short="arc")
+    assert DatafeedFMSAPI._get_event_short("arc", event) == "ARPKY"
 
 
 def test_get_root(fms_api_secrets):
