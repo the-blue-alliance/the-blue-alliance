@@ -747,14 +747,12 @@ class Event(CachedModel):
     def first_api_code(self) -> str:
         if self.first_code is None:
             return self.compute_first_api_code(self.year, self.event_short)
-
         return self.first_code
 
     @classmethod
     def compute_first_api_code(cls, year: int, event_short: str) -> str:
         if year == 2023:
             return cls.EVENT_SHORT_EXCEPTIONS_2023.get(event_short, event_short)
-
         return cls.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
 
     @property

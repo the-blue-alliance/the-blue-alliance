@@ -370,19 +370,19 @@ def test_details() -> None:
 def test_first_api_code() -> None:
     # Pre-2023 regular event
     event = Event(id="2019ingre", year=2019, event_short="ingre")
-    assert event.first_api_code == "INGRE"
+    assert event.first_api_code == "ingre"
 
     # 2023 regular event
     event = Event(id="2023ingre", year=2023, event_short="ingre")
-    assert event.first_api_code == "INGRE"
+    assert event.first_api_code == "ingre"
 
     # Pre-2023 championship div
     event = Event(id="2022hop", year=2022, event_short="hop")
-    assert event.first_api_code == "HOPPER"
+    assert event.first_api_code == "hopper"
 
     # 2023 championship div
     event = Event(id="2023hop", year=2023, event_short="hop")
-    assert event.first_api_code == "HCMP"
+    assert event.first_api_code == "hcmp"
 
 
 def test_get_alliances() -> None:
