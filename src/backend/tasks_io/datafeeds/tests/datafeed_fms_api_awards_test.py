@@ -25,11 +25,12 @@ def fms_api_secrets(ndb_stub):
 
 @pytest.mark.parametrize("first_code, event_short", [("miket", None), (None, "miket")])
 def test_get_awards_event(first_code, event_short):
-    event = Mock(spec=Event)
-    event.event_type_enum = EventType.DISTRICT
-    event.first_code = first_code
-    event.event_short = event_short
-    event.year = 2020
+    event = Event(
+        event_type_enum=EventType.DISTRICT,
+        first_code=first_code,
+        event_short=event_short,
+        year=2020,
+    )
 
     response = Mock(spec=Response)
     response.status_code = 200
@@ -52,11 +53,12 @@ def test_get_awards_event(first_code, event_short):
 
 @pytest.mark.parametrize("first_code, event_short", [("galileo", None), (None, "gal")])
 def test_get_awards_event_cmp(first_code, event_short):
-    event = Mock(spec=Event)
-    event.event_type_enum = EventType.CMP_DIVISION
-    event.first_code = first_code
-    event.event_short = event_short
-    event.year = 2014
+    event = Event(
+        event_type_enum=EventType.CMP_DIVISION,
+        first_code=first_code,
+        event_short=event_short,
+        year=2014,
+    )
 
     response = Mock(spec=Response)
     response.status_code = 200
