@@ -140,7 +140,7 @@ class DatafeedFMSAPI:
         event_short = event_key[4:]
 
         event = Event.get_by_id(event_key)
-        api_event_short = self._get_event_short(event_short, event)
+        api_event_short = self._get_event_short(year, event_short, event)
         event_info_response = self.api.event_info(year, api_event_short)
         result = self._parse(
             event_info_response, FMSAPIEventListParser(year, short=event_short)
@@ -154,7 +154,7 @@ class DatafeedFMSAPI:
         year = int(event_key[:4])
         event_short = event_key[4:]
         event = Event.get_by_id(event_key)
-        event_code = self._get_event_short(event_short, event)
+        event_code = self._get_event_short(year, event_short, event)
 
         parser = FMSAPITeamDetailsParser(year)
         models: List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]] = []
@@ -178,8 +178,12 @@ class DatafeedFMSAPI:
     def get_awards(self, event: Event) -> List[Award]:
         awards = []
 
-        # 8 subdivisions from 2015+ have awards listed under 4 divisions
-        if event.event_type_enum == EventType.CMP_DIVISION and event.year >= 2015:
+        # 8 subdivisions from 2015-2021 have awards listed under 4 divisions
+        if (
+            event.event_type_enum == EventType.CMP_DIVISION
+            and event.year >= 2015
+            and event.year < 2022
+        ):
             event_team_keys = EventTeam.query(EventTeam.event == event.key).fetch(
                 keys_only=True
             )
@@ -192,9 +196,7 @@ class DatafeedFMSAPI:
             else:
                 division = self.SUBDIV_TO_DIV[event.event_short]
 
-            api_awards_response = self.api.awards(
-                event.year, event_code=DatafeedFMSAPI._get_event_short(division, event)
-            )
+            api_awards_response = self.api.awards(event.year, event_code=division)
             awards += (
                 self._parse(
                     api_awards_response, FMSAPIAwardsParser(event, valid_team_nums)
@@ -204,7 +206,9 @@ class DatafeedFMSAPI:
 
         api_awards_response = self.api.awards(
             event.year,
-            event_code=DatafeedFMSAPI._get_event_short(event.event_short, event),
+            event_code=DatafeedFMSAPI._get_event_short(
+                event.year, event.event_short, event
+            ),
         )
         awards += self._parse(api_awards_response, FMSAPIAwardsParser(event)) or []
 
@@ -215,7 +219,7 @@ class DatafeedFMSAPI:
         event_short = event_key[4:]
 
         event = Event.get_by_id(event_key)
-        api_event_short = self._get_event_short(event_short, event)
+        api_event_short = self._get_event_short(year, event_short, event)
         api_response = self.api.alliances(year, api_event_short)
         alliances = self._parse(api_response, FMSAPIEventAlliancesParser())
         return alliances or []
@@ -225,7 +229,7 @@ class DatafeedFMSAPI:
         event_short = event_key[4:]
 
         event = Event.get_by_id(event_key)
-        api_event_short = self._get_event_short(event_short, event)
+        api_event_short = self._get_event_short(year, event_short, event)
         api_response = self.api.rankings(year, api_event_short)
         result = self._parse(api_response, FMSAPIEventRankingsParser(year))
         return result or []
@@ -239,7 +243,7 @@ class DatafeedFMSAPI:
         hs_parser = FMSAPIHybridScheduleParser(year, event_short)
         detail_parser = FMSAPIMatchDetailsParser(year, event_short)
 
-        api_event_short = DatafeedFMSAPI._get_event_short(event_short, event)
+        api_event_short = DatafeedFMSAPI._get_event_short(year, event_short, event)
 
         # TODO do we make all these sequentually, or go back to GAE urlfetch
         # we can run in parallel?
@@ -332,7 +336,7 @@ class DatafeedFMSAPI:
 
         event = Event.get_by_id(event_key)
         parser = FMSAPITeamAvatarParser(year)
-        api_event_short = DatafeedFMSAPI._get_event_short(event_short, event)
+        api_event_short = DatafeedFMSAPI._get_event_short(year, event_short, event)
         avatars: List[Media] = []
         keys_to_delete: Set[ndb.Key] = set()
 
@@ -382,10 +386,12 @@ class DatafeedFMSAPI:
         return advancement
 
     @classmethod
-    def _get_event_short(self, event_short: str, event: Optional[Event]) -> str:
+    def _get_event_short(
+        self, year: int, event_short: str, event: Optional[Event]
+    ) -> str:
         if event:
             return event.first_api_code
-        return event_short
+        return Event.compute_first_api_code(year, event_short)
 
     def _parse(
         self, response: requests.Response, parser: ParserBase[TParsedResponse]

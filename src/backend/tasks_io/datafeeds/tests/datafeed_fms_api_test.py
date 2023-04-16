@@ -42,7 +42,7 @@ def test_get_event_short_event_first_code_none(event_code, expected):
         year=2022,
         event_short=event_code,
     )
-    assert DatafeedFMSAPI._get_event_short(event_code, event) == expected.upper()
+    assert DatafeedFMSAPI._get_event_short(event.year, event_code, event) == expected
 
 
 @pytest.mark.parametrize(
@@ -54,26 +54,28 @@ def test_get_event_short_2023_event_first_code_none(event_code, expected):
         year=2023,
         event_short=event_code,
     )
-    assert DatafeedFMSAPI._get_event_short(event_code, event) == expected.upper()
+    assert DatafeedFMSAPI._get_event_short(event.year, event_code, event) == expected
 
 
 def test_get_event_short_event_first_code():
     event = Event(
         year=2020,
         event_short="miket",
-        first_code="MIKET",
+        first_code="miket",
     )
-    assert DatafeedFMSAPI._get_event_short("miket", event) == event.first_code.upper()
+    assert (
+        DatafeedFMSAPI._get_event_short(event.year, "miket", event) == event.first_code
+    )
 
 
 def test_get_event_short_event_cmp():
     event = Event(year=2022, event_short="arc")
-    assert DatafeedFMSAPI._get_event_short("arc", event) == "ARCHIMEDES"
+    assert DatafeedFMSAPI._get_event_short(event.year, "arc", event) == "archimedes"
 
 
 def test_get_event_short_event_cmp_2023():
     event = Event(year=2023, event_short="arc")
-    assert DatafeedFMSAPI._get_event_short("arc", event) == "ARPKY"
+    assert DatafeedFMSAPI._get_event_short(event.year, "arc", event) == "arpky"
 
 
 def test_get_root(fms_api_secrets):

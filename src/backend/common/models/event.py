@@ -746,16 +746,16 @@ class Event(CachedModel):
     @property
     def first_api_code(self) -> str:
         if self.first_code is None:
-            if self.year == 2023:
-                return self.EVENT_SHORT_EXCEPTIONS_2023.get(
-                    self.event_short, self.event_short
-                ).upper()
+            return self.compute_first_api_code(self.year, self.event_short)
 
-            return self.EVENT_SHORT_EXCEPTIONS.get(
-                self.event_short, self.event_short
-            ).upper()
+        return self.first_code
 
-        return self.first_code.upper()
+    @classmethod
+    def compute_first_api_code(cls, year: int, event_short: str) -> str:
+        if year == 2023:
+            return cls.EVENT_SHORT_EXCEPTIONS_2023.get(event_short, event_short)
+
+        return cls.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
 
     @property
     def is_in_season(self) -> bool:
