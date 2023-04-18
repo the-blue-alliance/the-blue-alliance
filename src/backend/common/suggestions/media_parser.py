@@ -16,7 +16,6 @@ from backend.common.models.suggestion_dict import SuggestionDict
 
 
 class MediaParser:
-
     # Add MediaTypes to this list to indicate that they case case-sensitive (shouldn't be normalized to lower case)
     CASE_SENSITIVE_FOREIGN_KEYS: Set[MediaType] = {
         MediaType.YOUTUBE_VIDEO,

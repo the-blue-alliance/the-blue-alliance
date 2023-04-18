@@ -22,6 +22,9 @@ from backend.web.handlers.admin.event import (
     event_list,
     event_remap_teams_post,
 )
+from backend.web.handlers.admin.landing import (
+    landing_edit,
+)
 from backend.web.handlers.admin.match import (
     match_add,
     match_dashboard,
@@ -171,6 +174,9 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/main_landing", view_func=landing_edit, methods=["GET", "POST"]
 )
 admin_routes.add_url_rule("/teams", view_func=team_list)
 admin_routes.add_url_rule("/teams/<int:page_num>", view_func=team_list)

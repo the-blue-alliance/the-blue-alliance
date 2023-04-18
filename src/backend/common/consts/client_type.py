@@ -6,7 +6,6 @@ from typing import Dict, Set
 
 @enum.unique
 class ClientType(enum.IntEnum):
-
     # Operating System types for MobileClient.client_type
     OS_ANDROID = 0
     OS_IOS = 1

@@ -35,22 +35,47 @@ def test_init(ndb_stub):
 
 @pytest.mark.parametrize(
     "event_code, expected",
-    list(DatafeedFMSAPI.EVENT_SHORT_EXCEPTIONS.items()) + [("miket", "miket")],
+    list(Event.EVENT_SHORT_EXCEPTIONS.items()) + [("miket", "miket")],
 )
 def test_get_event_short_event_first_code_none(event_code, expected):
-    event = Mock(spec=Event)
-    event.first_code = None
-    assert DatafeedFMSAPI._get_event_short(event_code, event) == expected
+    event = Event(
+        year=2022,
+        event_short=event_code,
+    )
+    assert DatafeedFMSAPI._get_event_short(event.year, event_code, event) == expected
+
+
+@pytest.mark.parametrize(
+    "event_code, expected",
+    list(Event.EVENT_SHORT_EXCEPTIONS_2023.items()),
+)
+def test_get_event_short_2023_event_first_code_none(event_code, expected):
+    event = Event(
+        year=2023,
+        event_short=event_code,
+    )
+    assert DatafeedFMSAPI._get_event_short(event.year, event_code, event) == expected
 
 
 def test_get_event_short_event_first_code():
-    event = Mock(spec=Event)
-    event.first_code = "MIKET"
-    assert DatafeedFMSAPI._get_event_short("2020miket", event) == event.first_code
+    event = Event(
+        year=2020,
+        event_short="miket",
+        first_code="miket",
+    )
+    assert (
+        DatafeedFMSAPI._get_event_short(event.year, "miket", event) == event.first_code
+    )
 
 
 def test_get_event_short_event_cmp():
-    assert DatafeedFMSAPI._get_event_short("arc", None) == "archimedes"
+    event = Event(year=2022, event_short="arc")
+    assert DatafeedFMSAPI._get_event_short(event.year, "arc", event) == "archimedes"
+
+
+def test_get_event_short_event_cmp_2023():
+    event = Event(year=2023, event_short="arc")
+    assert DatafeedFMSAPI._get_event_short(event.year, "arc", event) == "arpky"
 
 
 def test_get_root(fms_api_secrets):

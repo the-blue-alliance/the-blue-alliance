@@ -17,7 +17,6 @@ from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
 class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
-
     DATE_FORMAT_STR = "%Y-%m-%dT%H:%M:%S"
 
     EVENT_TYPES = {
@@ -45,21 +44,31 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
     }
 
     DOUBLE_ELIM_PLAYOFF_TYPES = {
+        "FourAlliance": PlayoffType.DOUBLE_ELIM_4_TEAM,
         "EightAlliance": PlayoffType.DOUBLE_ELIM_8_TEAM,
     }
 
     NON_OFFICIAL_EVENT_TYPES = ["offseason"]
 
+    # event_key (code, short_name)
     EVENT_CODE_EXCEPTIONS = {
-        "archimedes": ("arc", "Archimedes"),  # (code, short_name)
+        "archimedes": ("arc", "Archimedes"),
+        "arpky": ("arc", "Archimedes"),
         "carson": ("cars", "Carson"),
         "carver": ("carv", "Carver"),
         "curie": ("cur", "Curie"),
+        "cpra": ("cur", "Curie"),
         "daly": ("dal", "Daly"),
+        "dcmp": ("dal", "Daly"),
         "darwin": ("dar", "Darwin"),
         "galileo": ("gal", "Galileo"),
+        "gcmp": ("gal", "Galileo"),
         "hopper": ("hop", "Hopper"),
+        "hcmp": ("hop", "Hopper"),
+        "jcmp": ("joh", "Johnson"),
+        "mpcia": ("mil", "Milstein"),
         "newton": ("new", "Newton"),
+        "npfcmp": ("new", "Newton"),
         "roebling": ("roe", "Roebling"),
         "tesla": ("tes", "Tesla"),
         "turing": ("tur", "Turing"),
@@ -114,8 +123,8 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 if code == "week0"
                 else self.EVENT_TYPES.get(api_event_type, None)
             )
-            if api_event_type == "championshipdivision" and self.season != 2022:
-                # 2022 only has one championship and the API uses ChampionshipSubdivision
+            if api_event_type == "championshipdivision" and self.season < 2022:
+                # 2022 onward has one championship and the API uses ChampionshipSubdivision
                 # for some reason. This didn't come up before because pre-2champs divisions
                 # also reproted as ChampionshipSubDivision. Weird.
                 logging.warning(

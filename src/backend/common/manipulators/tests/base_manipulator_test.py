@@ -71,7 +71,6 @@ class DummyConverter(ConverterBase):
 
 
 class DummyCachedQuery(CachedDatabaseQuery[DummyModel, None]):
-
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "dummy_query_{model_key}"
     CACHE_WRITES_ENABLED = True
@@ -84,7 +83,6 @@ class DummyCachedQuery(CachedDatabaseQuery[DummyModel, None]):
 
 
 class DummyManipulator(ManipulatorBase[DummyModel]):
-
     delete_calls = 0
     delete_hook_extra = None
 

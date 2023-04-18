@@ -7,7 +7,6 @@ from google.appengine.api import memcache
 
 
 class MemcacheFlaskResponseCache(BaseCache):
-
     memcache_client: memcache.Client
 
     def __init__(self, memcache_client: memcache.Client) -> None:

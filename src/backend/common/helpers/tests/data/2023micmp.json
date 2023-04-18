@@ -1,0 +1,64 @@
+{
+  "address": "7400 Bay Rd, University Center, MI 48710, USA",
+  "city": "University Center",
+  "country": "USA",
+  "district": {
+    "abbreviation": "fim",
+    "display_name": "FIRST In Michigan",
+    "key": "2023fim",
+    "year": 2023
+  },
+  "division_keys": [
+    "2023micmp1",
+    "2023micmp2",
+    "2023micmp3",
+    "2023micmp4"
+  ],
+  "end_date": "2023-04-08",
+  "event_code": "micmp",
+  "event_type": 2,
+  "event_type_string": "District Championship",
+  "first_event_code": "MICMP",
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJB7CrvKrdI4gRKJhPHrr--ec",
+  "gmaps_url": "https://maps.google.com/?cid=16715671567288211496",
+  "key": "2023micmp",
+  "lat": 43.5122069,
+  "lng": -83.9577029,
+  "location_name": "Ryder Center for Health and Physical Education at Saginaw Valley State University",
+  "name": "FIRST in Michigan State Championship presented by DTE Foundation",
+  "parent_event_key": null,
+  "playoff_type": 11,
+  "playoff_type_string": "Double Elimination Bracket (4 Alliances)",
+  "postal_code": "48710",
+  "short_name": "in Michigan",
+  "start_date": "2023-04-06",
+  "state_prov": "MI",
+  "timezone": "America/Detroit",
+  "webcasts": [
+    {
+      "channel": "firstinspires31",
+      "type": "twitch"
+    },
+    {
+      "channel": "firstinspires32",
+      "type": "twitch"
+    },
+    {
+      "channel": "firstinspires33",
+      "type": "twitch"
+    },
+    {
+      "channel": "firstinspires34",
+      "type": "twitch"
+    },
+    {
+      "channel": "firstinspires38",
+      "date": "2023-04-08",
+      "type": "twitch"
+    }
+  ],
+  "website": "https://www.firstinmichigan.org/",
+  "week": 5,
+  "year": 2023
+}

@@ -32,6 +32,7 @@ from backend.web.handlers.hall_of_fame import hall_of_fame_overview
 from backend.web.handlers.index import about, avatar_list, index
 from backend.web.handlers.insights import insights_detail, insights_overview
 from backend.web.handlers.match import match_detail
+from backend.web.handlers.match_suggestion import match_suggestion
 from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.static import (
     add_data,
@@ -59,6 +60,9 @@ from backend.web.handlers.team_admin import (
     blueprint as team_admin,
 )
 from backend.web.handlers.webcasts import webcast_list
+from backend.web.handlers.webhooks import (
+    blueprint as webhooks,
+)
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
@@ -123,6 +127,8 @@ app.add_url_rule("/hall-of-fame", view_func=hall_of_fame_overview)
 
 app.add_url_rule("/mytba", view_func=mytba_live)
 
+app.add_url_rule("/match_suggestion", view_func=match_suggestion)
+
 app.add_url_rule("/webcasts", view_func=webcast_list)
 # Static pages
 app.add_url_rule("/add-data", view_func=add_data)
@@ -153,6 +159,7 @@ app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)
 app.register_blueprint(suggestion_review_blueprint)
 app.register_blueprint(team_admin)
+app.register_blueprint(webhooks)
 
 app.register_error_handler(404, handle_404)
 app.register_error_handler(500, handle_500)

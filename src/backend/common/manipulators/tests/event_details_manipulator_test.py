@@ -18,7 +18,6 @@ from backend.common.models.event_details import EventDetails
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestEventDetailsManipulator(unittest.TestCase):
-
     taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
 
     @pytest.fixture(autouse=True)

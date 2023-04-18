@@ -77,7 +77,7 @@ jobs:
       - name: Run Tests
         run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.2
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
@@ -117,7 +117,7 @@ jobs:
       - name: Run Tests
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.2
         with:
           directory: ./.node_coverage/
   bash-lint:

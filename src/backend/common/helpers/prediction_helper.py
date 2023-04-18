@@ -366,13 +366,11 @@ class ContributionCalculator:
                 elif self._stat == "game_piece_scored":
                     count = 0
                     for mode in ["auto", "teleop"]:
-                        count += score_breakdown[color][
-                            "{}GamePieceCount".format(mode)
-                        ]
+                        count += score_breakdown[color]["{}GamePieceCount".format(mode)]
                     means[color] = count
                 elif self._stat == "links":
                     count = 0
-                    count = math.floor((score_breakdown[color]["linkPoints"])/5)
+                    count = math.floor((score_breakdown[color]["linkPoints"]) / 5)
                     means[color] = count
                 elif self._stat == "charge_station_points":
                     count = 0
@@ -652,7 +650,7 @@ class PredictionHelper:
                     prob = 1 - cls._normcdf(
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
-                    prediction[color]["prob_sustainability_bonus"] = prob                    
+                    prediction[color]["prob_sustainability_bonus"] = prob
                 if stat == "charge_station_points":
                     required_points = 26
 
@@ -660,8 +658,7 @@ class PredictionHelper:
                     prob = 1 - cls._normcdf(
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
-                    prediction[color]["prob_activation_bonus"] = prob                    
-
+                    prediction[color]["prob_activation_bonus"] = prob
 
         # Prob win
         red_score = prediction["red"]["score"]
@@ -750,8 +747,8 @@ class PredictionHelper:
             ]
         elif event.year == 2023:
             relevant_stats = [
-                ("score", 0, 20**2),  #random number in v idk what to put
-                ("links", 0, 10**2),
+                ("score", 0, 20**2),
+                ("links", 0, 3**2),
                 ("charge_station_points", 0, 10**2),
             ]
         else:
@@ -1002,13 +999,13 @@ class PredictionHelper:
                         elif match.year == 2023:
                             sampled_rp1[alliance_color] = score_breakdown[
                                 alliance_color
-                                ]["sustainabilityBonusAchieved"]
+                            ]["sustainabilityBonusAchieved"]
                             sampled_rp2[alliance_color] = score_breakdown[
                                 alliance_color
-                                ]["activationBonusAchieved"]
+                            ]["activationBonusAchieved"]
                             sampled_tiebreaker[alliance_color] = score_breakdown[
                                 alliance_color
-                                ]["totalPoints"]
+                            ]["totalPoints"]
                 else:
                     prediction = qual_predictions[none_throws(match.key.string_id())]
                     if np.random.uniform(high=1) < prediction["prob"]:
