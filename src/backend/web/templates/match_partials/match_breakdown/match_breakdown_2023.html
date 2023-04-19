@@ -212,6 +212,17 @@
         </td>
     </tr>
     {% endif %}
+    {% if "extraGamePieceCount" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{match.score_breakdown.red.extraGamePieceCount}}
+      </td>
+      <td>Supercharged Node Count</td>
+      <td class="blue" colspan="2">
+        {{match.score_breakdown.blue.extraGamePieceCount}}
+      </td>
+    </tr>
+    {% endif %}
     <!-- Game Piece Points -->
     {% if "teleopGamePiecePoints" in match.score_breakdown.red %}
     <tr class="key">
