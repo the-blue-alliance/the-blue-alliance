@@ -6928,6 +6928,9 @@
           "endGameParkPoints": {
             "type": "integer"
           },
+          "extraGamePieceCount": {
+            "type": "integer"
+          },
           "foulCount": {
             "type": "integer"
           },

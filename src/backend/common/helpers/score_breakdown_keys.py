@@ -329,6 +329,7 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "autoGamePiecePoints",
             "autoChargeStationPoints",
             "teleopGamePieceCount",
+            "extraGamePieceCount",
             "teleopPoints",
             "teleopGamePiecePoints",
             "endGameChargeStationPoints",

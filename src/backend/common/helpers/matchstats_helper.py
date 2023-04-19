@@ -57,6 +57,7 @@ MANUAL_COMPONENTS = {
     2023: {
         "Total Game Piece Count": lambda match, color: (
             match.score_breakdown[color].get("teleopGamePieceCount", 0)
+            + match.score_breakdown[color].get("extraGamePieceCount", 0)
         ),
         "Total Game Piece Points": lambda match, color: (
             match.score_breakdown[color].get("autoGamePiecePoints", 0)
