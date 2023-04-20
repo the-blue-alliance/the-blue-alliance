@@ -62,28 +62,28 @@
         <td>
           <div class="progress" style="margin: 0px;">
             <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{match.prediction.red.links/9*100}}%; color: black;">
-              {{(match.prediction.red.power_cells_scored|round(1))}}
+              {{(match.prediction.red.links|round(1) * 3)}}
             </div>
           </div>
         </td>
         <td>
           <div class="progress" style="margin: 0px;">
             <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{match.prediction.blue.links/9*100}}%; color: black;">
-              {{(match.prediction.blue.power_cells_scored|round(1))}}
+              {{(match.prediction.blue.links|round(1) * 3)}}
             </div>
           </div>
         </td>
         <td>
           <div class="progress" style="margin: 0px;">
             <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.red.charge_station_points/42*100)}}%; color: black;">
-              {{(match.prediction.red.endgame_points|round(1))}}
+              {{(match.prediction.red.charge_station_points|round(1))}}
             </div>
           </div>
         </td>
         <td>
           <div class="progress" style="margin: 0px;">
             <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{(match.prediction.blue.charge_station_points/42*100)}}%; color: black;">
-              {{(match.prediction.blue.endgame_points|round(1))}}
+              {{(match.prediction.blue.charge_station_points|round(1))}}
             </div>
           </div>
         </td>
