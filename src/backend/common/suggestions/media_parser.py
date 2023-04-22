@@ -49,6 +49,7 @@ class MediaParser:
         MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)],
         MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)\/e\/", 1)],
         MediaType.INSTAGRAM_IMAGE: [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
+        MediaType.GITLAB_PROFILE: [(r".*gitlab.com\/(.*)(\/(.*))?", 1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -70,6 +71,7 @@ class MediaParser:
         # Keep these last, so they don't greedy match over other more specific urls
         ("youtube.com/", MediaType.YOUTUBE_CHANNEL),
         ("instagram.com/", MediaType.INSTAGRAM_PROFILE),
+        ("gitlab.com/", MediaType.GITLAB_PROFILE),
     ]
 
     # The default is to strip out all urlparams, but this is a white-list for exceptions
