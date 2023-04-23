@@ -12,7 +12,7 @@
     "heatmap.js": "^2.0.5",
     "less-loader": "^11.1.0",
     "material-ui": "^0.20.2",
-    "prettier": "^2.8.7",
+    "prettier": "^2.8.8",
     "prop-types": "^15.8.1",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
