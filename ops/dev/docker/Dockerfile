@@ -18,11 +18,10 @@ RUN apt-get update && apt-get install -y \
 # Needed for Python 3.11
 RUN apt-get install software-properties-common -y
 RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN apt-get update
 
 # Setup python environment
 ENV PYTHON_VERSION python3.11
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     "$PYTHON_VERSION" \
     "$PYTHON_VERSION-venv" \
     "$PYTHON_VERSION-dev" \
