@@ -48,7 +48,7 @@ SLUG_NAMES: Dict[MediaType, str] = {
     MediaType.INSTAGRAM_IMAGE: "instagram-image",
     MediaType.EXTERNAL_LINK: "external-link",
     MediaType.AVATAR: "avatar",
-    MediaType.GITLAB_PROFILE: "GitLab Profile",
+    MediaType.GITLAB_PROFILE: "gitlab-profile",
 }
 
 SLUG_NAME_TO_TYPE: Dict[str, MediaType] = {
