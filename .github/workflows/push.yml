@@ -17,12 +17,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          cache: 'pip'
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -40,12 +35,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          cache: 'pip'
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -63,12 +53,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          cache: 'pip'
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -134,12 +119,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          cache: 'pip'
       - name: Install Shellcheck
         run: |
           python -m pip install --upgrade pip
