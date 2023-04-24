@@ -1,9 +1,11 @@
 import enum
 from typing import Dict, List
 
+from backend.common.consts.string_enum import StrEnum
+
 
 @enum.unique
-class CompLevel(str, enum.Enum):
+class CompLevel(StrEnum):
     QM = "qm"
     EF = "ef"
     QF = "qf"
