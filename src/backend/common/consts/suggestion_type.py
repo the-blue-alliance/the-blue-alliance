@@ -1,9 +1,11 @@
 import enum
 from typing import List
 
+from backend.common.consts.string_enum import StrEnum
+
 
 @enum.unique
-class SuggestionType(str, enum.Enum):
+class SuggestionType(StrEnum):
     EVENT = "event"
     MATCH = "match"
     MEDIA = "media"

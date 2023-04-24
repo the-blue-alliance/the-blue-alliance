@@ -2,19 +2,20 @@ import enum
 from typing import List, Optional, TypedDict
 
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.string_enum import StrEnum
 from backend.common.models.alliance import EventAllianceBackup
 from backend.common.models.keys import TeamKey
 
 
 @enum.unique
-class EventTeamLevelStatus(str, enum.Enum):
+class EventTeamLevelStatus(StrEnum):
     NOT_STARTED = "not_started"
     PLAYING = "playing"
     COMPLETED = "completed"
 
 
 @enum.unique
-class EventTeamPlayoffStatus(str, enum.Enum):
+class EventTeamPlayoffStatus(StrEnum):
     WON = "won"
     ELIMINATED = "eliminated"
     PLAYING = "playing"

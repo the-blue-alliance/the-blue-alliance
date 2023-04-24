@@ -4,16 +4,17 @@ import enum
 from typing import Dict, Set, Tuple
 
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.string_enum import StrEnum
 
 
 @enum.unique
-class LegacyDoubleElimBracket(str, enum.Enum):
+class LegacyDoubleElimBracket(StrEnum):
     WINNER = "winner"
     LOSER = "loser"
 
 
 @enum.unique
-class DoubleElimRound(str, enum.Enum):
+class DoubleElimRound(StrEnum):
     ROUND1 = "Round 1"
     ROUND2 = "Round 2"
     ROUND3 = "Round 3"
