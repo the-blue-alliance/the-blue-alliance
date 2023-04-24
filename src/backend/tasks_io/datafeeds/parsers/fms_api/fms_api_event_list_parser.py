@@ -88,8 +88,8 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         self.event_short = short
 
     def get_code_and_short_name(self, season, code):
-        # Even though 2022 Einstein is listed as "cmptx", we don't want it to say "(Houston)".
-        if season == 2022 and code == "cmptx":
+        # Even though 2022/2023 Einstein is listed as "cmptx", we don't want it to say "(Houston)".
+        if season >= 2022 and code == "cmptx":
             return (code, "{}")
         return self.EVENT_CODE_EXCEPTIONS[code]
 

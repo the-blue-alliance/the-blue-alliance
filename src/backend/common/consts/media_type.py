@@ -1,9 +1,11 @@
 import enum
 from typing import Dict, Set
 
+from backend.common.consts.string_enum import StrEnum
+
 
 @enum.unique
-class VideoType(str, enum.Enum):
+class VideoType(StrEnum):
     YOUTUBE = "youtube"
     TBA = "tba"
 

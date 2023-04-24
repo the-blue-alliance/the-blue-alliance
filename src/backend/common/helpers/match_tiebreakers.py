@@ -84,7 +84,7 @@ class MatchTiebreakers(object):
         # Since tech foul points are not provided, we use the count instead.
         if "techFoulCount" in red_breakdown and "techFoulCount" in blue_breakdown:
             tiebreakers.append(
-                (red_breakdown["techFoulCount"], blue_breakdown["techFoulCount"])
+                (blue_breakdown["techFoulCount"], red_breakdown["techFoulCount"])
             )
         else:
             tiebreakers.append(None)
