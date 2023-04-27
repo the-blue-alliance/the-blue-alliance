@@ -2,6 +2,8 @@ from flask import Blueprint, make_response, url_for
 from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
+from backend.common.models.keys import Year
+
 
 blueprint = Blueprint("insights", __name__)
 

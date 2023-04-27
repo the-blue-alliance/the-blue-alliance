@@ -4,7 +4,7 @@ from google.appengine.api import wrap_wsgi_app
 from backend.common.deferred import install_defer_routes
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
-from backend.tasks_io.handlers.insights import blueprint as insights_blueprint
+from backend.tasks_cpu.handlers.insights import blueprint as insights_blueprint
 
 
 configure_logging()
