@@ -7,7 +7,8 @@ from typing import Dict, List, NamedTuple
 
 from google.appengine.ext import ndb
 
-from backend.common.consts.comp_level import ELIM_LEVELS
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
 from backend.common.consts.event_type import EventType, CMP_EVENT_TYPES
 from backend.common.helpers.event_helper import (
@@ -146,7 +147,11 @@ class InsightsHelper(object):
                 if "match_predictions" in predictions:
                     for match in event.matches:
                         if match.has_been_played:
-                            level = "qual" if match.comp_level == "qm" else "playoff"
+                            level = (
+                                "qual"
+                                if match.comp_level == CompLevel.QM
+                                else "playoff"
+                            )
 
                             total_matches_count[level] += 1
                             if is_cmp:
@@ -281,8 +286,8 @@ class InsightsHelper(object):
             highscore = 0
             for event, matches in week_events:
                 for match in matches:
-                    redScore = int(match.alliances["red"]["score"])
-                    blueScore = int(match.alliances["blue"]["score"])
+                    redScore = int(match.alliances[AllianceColor.RED]["score"])
+                    blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
                     maxScore = max(redScore, blueScore)
                     if maxScore >= highscore:
                         if maxScore > highscore:
@@ -325,11 +330,13 @@ class InsightsHelper(object):
         for _, week_events in week_event_matches:
             for event, matches in week_events:
                 for match in matches:
-                    comp_level = "qual" if match.comp_level == "qm" else "playoff"
+                    comp_level = (
+                        "qual" if match.comp_level == CompLevel.QM else "playoff"
+                    )
                     match_data = self._generateMatchData(match, event)
 
-                    redScore = int(match.alliances["red"]["score"])
-                    blueScore = int(match.alliances["blue"]["score"])
+                    redScore = int(match.alliances[AllianceColor.RED]["score"])
+                    blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
 
                     # Overall, including penalties
                     maxScore = max(redScore, blueScore)
@@ -342,10 +349,10 @@ class InsightsHelper(object):
                     # Penalty free, if possible
                     if year >= 2017:
                         if match.score_breakdown:
-                            redScore -= match.score_breakdown["red"].get(
+                            redScore -= match.score_breakdown[AllianceColor.RED].get(
                                 "foulPoints", 0
                             )
-                            blueScore -= match.score_breakdown["blue"].get(
+                            blueScore -= match.score_breakdown[AllianceColor.BLUE].get(
                                 "foulPoints", 0
                             )
 
@@ -386,8 +393,8 @@ class InsightsHelper(object):
                 for match in matches:
                     if not match.has_been_played:
                         continue
-                    redScore = int(match.alliances["red"]["score"])
-                    blueScore = int(match.alliances["blue"]["score"])
+                    redScore = int(match.alliances[AllianceColor.RED]["score"])
+                    blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
                     week_match_sum += redScore + blueScore
                     num_matches_by_week += 1
                     if match.comp_level in ELIM_LEVELS:
@@ -443,8 +450,8 @@ class InsightsHelper(object):
                 for match in matches:
                     if not match.has_been_played:
                         continue
-                    redScore = int(match.alliances["red"]["score"])
-                    blueScore = int(match.alliances["blue"]["score"])
+                    redScore = int(match.alliances[AllianceColor.RED]["score"])
+                    blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
                     week_match_margin_sum += abs(redScore - blueScore)
                     num_matches_by_week += 1
                     if match.comp_level in ELIM_LEVELS:
@@ -497,8 +504,8 @@ class InsightsHelper(object):
                 for match in matches:
                     if not match.has_been_played:
                         continue
-                    redScore = int(match.alliances["red"]["score"])
-                    blueScore = int(match.alliances["blue"]["score"])
+                    redScore = int(match.alliances[AllianceColor.RED]["score"])
+                    blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
 
                     overall_highscore = max(overall_highscore, redScore, blueScore)
 
@@ -569,8 +576,8 @@ class InsightsHelper(object):
                 for match in matches:
                     if not match.has_been_played:
                         continue
-                    redScore = int(match.alliances["red"]["score"])
-                    blueScore = int(match.alliances["blue"]["score"])
+                    redScore = int(match.alliances[AllianceColor.RED]["score"])
+                    blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
 
                     winning_margin = abs(redScore - blueScore)
 
