@@ -1,4 +1,5 @@
-from flask import abort, Blueprint, escape, make_response, redirect
+from flask import abort, Blueprint, make_response, redirect
+from markupsafe import escape
 from werkzeug.wrappers import Response
 
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
