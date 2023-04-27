@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, url_for
+from flask import Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
@@ -21,7 +21,15 @@ def enqueue_year_insights(kind: str, year: Year) -> Response:
         target="py3-tasks-cpu",
         queue_name="default",
     )
-    return make_response(f"Enqueued calculation of {kind} insights for {year}.")
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("math/year_insights_enqueue.html", kind=kind, year=year)
+        )
+
+    return make_response("")
 
 
 @blueprint.route("/backend-tasks-b2/math/do/insights/<kind>/<int:year>")
@@ -40,7 +48,14 @@ def do_year_insights(kind: str, year: Year) -> Response:
     if insights is not None:
         InsightManipulator.createOrUpdate(insights)
 
-    return make_response(f"Computed {kind} insights: {insights}")
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("math/year_insights_do.html", kind=kind, insights=insights)
+        )
+
+    return make_response("")
 
 
 @blueprint.route("/backend-tasks-b2/math/enqueue/overallinsights/<kind>")
@@ -54,7 +69,15 @@ def enqueue_overall_insights(kind: str) -> Response:
         target="py3-tasks-cpu",
         queue_name="default",
     )
-    return make_response(f"Enqueued calculation of {kind} overall insights.")
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("math/overall_insights_enqueue.html", kind=kind)
+        )
+
+    return make_response("")
 
 
 @blueprint.route("/backend-tasks-b2/math/do/overallinsights/<kind>")
@@ -71,4 +94,13 @@ def do_overall_insights(kind: str) -> Response:
     if insights is not None:
         InsightManipulator.createOrUpdate(insights)
 
-    return make_response(f"Computed {kind} insights: {insights}")
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "math/overall_insights_do.html", kind=kind, insights=insights
+            )
+        )
+
+    return make_response("")
