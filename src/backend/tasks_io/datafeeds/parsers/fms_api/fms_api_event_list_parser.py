@@ -144,7 +144,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
             name = event["name"]
             short_name = EventShortNameHelper.get_short_name(
-                name, district_code=event["districtCode"]
+                name, district_code=event["districtCode"], event_type=event_type
             )
             district_key = (
                 District.render_key_name(self.season, event["districtCode"].lower())
@@ -165,14 +165,6 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             ]
 
             # TODO read timezone from API
-
-            # Special cases for district championship divisions
-            if event_type == EventType.DISTRICT_CMP_DIVISION:
-                split_name = name.split("-")
-                short_name = "{} - {}".format(
-                    "".join(item[0].upper() for item in split_name[0].split()),
-                    split_name[-1].replace("Division", "").strip(),
-                )
 
             # Special cases for champs
             if code in self.EVENT_CODE_EXCEPTIONS:
