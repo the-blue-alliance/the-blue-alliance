@@ -1,4 +1,4 @@
-from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
+from backend.common.manipulators.manipulator_base import ManipulatorBase
 from backend.common.models.insight import Insight
 
 

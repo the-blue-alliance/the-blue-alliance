@@ -1,16 +1,16 @@
-from collections import defaultdict
 import itertools
 import json
 import math
-import numpy as np
+from collections import defaultdict
 from typing import Dict, List, NamedTuple
 
+import numpy as np
 from google.appengine.ext import ndb
 
 from backend.common.consts.alliance_color import AllianceColor
-from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
-from backend.common.consts.event_type import EventType, CMP_EVENT_TYPES
+from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
+from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
 from backend.common.helpers.event_helper import (
     EventHelper,
     OFFSEASON_EVENTS_LABEL,

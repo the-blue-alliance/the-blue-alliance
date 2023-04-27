@@ -37,7 +37,7 @@ def do_year_insights(kind: str, year: Year) -> Response:
     elif kind == "predictions":
         insights = InsightsHelper.doPredictionInsights(year)
 
-    if insights != None:
+    if insights is not None:
         InsightManipulator.createOrUpdate(insights)
 
     return make_response(f"Computed {kind} insights: {insights}")
@@ -68,7 +68,7 @@ def do_overall_insights(kind: str) -> Response:
     elif kind == "awards":
         insights = InsightsHelper.doOverallAwardInsights()
 
-    if insights != None:
+    if insights is not None:
         InsightManipulator.createOrUpdate(insights)
 
     return make_response(f"Computed {kind} insights: {insights}")
