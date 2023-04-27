@@ -16,9 +16,7 @@ def enqueue_year_insights(kind: str, year: Year) -> Response:
     Enqueues Insights calculation of a given kind for a given year
     """
     taskqueue.add(
-        url=url_for(
-            "insights.do_year_insights", kind=kind, year=year
-        ),
+        url=url_for("insights.do_year_insights", kind=kind, year=year),
         method="GET",
         target="py3-tasks-cpu",
         queue_name="default",
@@ -32,11 +30,11 @@ def do_year_insights(kind: str, year: Year) -> Response:
     Calculates insights of a given kind for a given year.
     """
     insights = None
-    if kind == 'matches':
+    if kind == "matches":
         insights = InsightsHelper.doMatchInsights(year)
-    elif kind == 'awards':
+    elif kind == "awards":
         insights = InsightsHelper.doAwardInsights(year)
-    elif kind == 'predictions':
+    elif kind == "predictions":
         insights = InsightsHelper.doPredictionInsights(year)
 
     if insights != None:
@@ -51,9 +49,7 @@ def enqueue_overall_insights(kind: str) -> Response:
     Enqueues Overall Insights calculation for a given kind.
     """
     taskqueue.add(
-        url=url_for(
-            "insights.do_overall_insights", kind=kind
-        ),
+        url=url_for("insights.do_overall_insights", kind=kind),
         method="GET",
         target="py3-tasks-cpu",
         queue_name="default",
@@ -67,9 +63,9 @@ def do_overall_insights(kind: str) -> Response:
     Calculates overall insights of a given kind.
     """
     insights = None
-    if kind == 'matches':
+    if kind == "matches":
         insights = InsightsHelper.doOverallMatchInsights()
-    elif kind == 'awards':
+    elif kind == "awards":
         insights = InsightsHelper.doOverallAwardInsights()
 
     if insights != None:

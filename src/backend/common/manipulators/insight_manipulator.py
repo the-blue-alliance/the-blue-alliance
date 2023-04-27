@@ -8,7 +8,9 @@ class InsightManipulator(ManipulatorBase[Insight]):
     """
 
     @classmethod
-    def updateMerge(cls, new_model: Insight, old_model: Insight, auto_union: bool=True) -> Insight:
+    def updateMerge(
+        cls, new_model: Insight, old_model: Insight, auto_union: bool = True
+    ) -> Insight:
         """
         Given an "old" and a "new" Insight object, replace the fields in the
         "old" Insight that are present in the "new" Insight, but keep fields from
