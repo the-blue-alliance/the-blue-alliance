@@ -4,7 +4,6 @@ from typing import List, Optional, Set
 
 from flask import (
     Blueprint,
-    escape,
     make_response,
     render_template,
     request,
@@ -13,6 +12,7 @@ from flask import (
 )
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+from markupsafe import escape
 from pyre_extensions import none_throws, safe_cast
 
 from backend.common.environment import Environment
