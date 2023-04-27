@@ -129,7 +129,7 @@ def test_parse_district_cmp(test_data_importer):
     assert (
         event.name == "NE FIRST District Championship presented by United Technologies"
     )
-    assert event.short_name == "NE FIRST"
+    assert event.short_name == "NE"
     assert event.event_short == "necmp"
     assert event.official is True
     assert event.start_date == datetime.datetime(
