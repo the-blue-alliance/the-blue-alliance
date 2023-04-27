@@ -1,22 +1,29 @@
+from collections import defaultdict
+import json
+import math
 import numpy as np
 from typing import Dict, List, NamedTuple
 
+from backend.common.consts.comp_level import ELIM_LEVELS
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.event_helper import EventHelper, OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL
+from backend.common.helpers.event_insights_helper import EventInsightsHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.insight import Insight
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
-
-
-class WeekEventMatches(NamedTuple):
-    week: str
-    event_matches: List[EventMatches]
+from backend.common.models.team import Team
 
 
 class EventMatches(NamedTuple):
     event: Event
     matches: List[Match]
+
+
+class WeekEventMatches(NamedTuple):
+    week: str
+    event_matches: List[EventMatches]
 
 
 class InsightsHelper(object):
@@ -315,7 +322,7 @@ class InsightsHelper(object):
                     blueScore = int(match.alliances['blue']['score'])
                     week_match_sum += redScore + blueScore
                     num_matches_by_week += 1
-                    if match.comp_level in Match.ELIM_LEVELS:
+                    if match.comp_level in ELIM_LEVELS:
                         elim_week_match_sum += redScore + blueScore
                         elim_num_matches_by_week += 1
 
@@ -356,7 +363,7 @@ class InsightsHelper(object):
                     blueScore = int(match.alliances['blue']['score'])
                     week_match_margin_sum += abs(redScore - blueScore)
                     num_matches_by_week += 1
-                    if match.comp_level in Match.ELIM_LEVELS:
+                    if match.comp_level in ELIM_LEVELS:
                         elim_week_match_margin_sum += abs(redScore - blueScore)
                         elim_num_matches_by_week += 1
 
@@ -410,7 +417,7 @@ class InsightsHelper(object):
                     score_distribution[redScore] += 1
                     score_distribution[blueScore] += 1
 
-                    if match.comp_level in Match.ELIM_LEVELS:
+                    if match.comp_level in ELIM_LEVELS:
                         elim_score_distribution[redScore] += 1
                         elim_score_distribution[blueScore] += 1
 
@@ -467,7 +474,7 @@ class InsightsHelper(object):
 
                     winning_margin_distribution[winning_margin] += 1
 
-                    if match.comp_level in Match.ELIM_LEVELS:
+                    if match.comp_level in ELIM_LEVELS:
                         elim_winning_margin_distribution[winning_margin] += 1
 
         insights = []

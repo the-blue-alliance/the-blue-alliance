@@ -1,7 +1,8 @@
-from helpers.manipulator_base import ManipulatorBase
+from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
+from backend.common.models.insgiht import Insight
 
 
-class InsightManipulator(ManipulatorBase):
+class InsightManipulator(ManipulatorBase[Insight]):
     """
     Handle Insight database writes.
     """

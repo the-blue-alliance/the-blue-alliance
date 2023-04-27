@@ -2,6 +2,7 @@ from flask import Blueprint, make_response, url_for
 from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
+from backend.common.helpers.insights_helper import InsightsHelper
 from backend.common.models.keys import Year
 
 
@@ -29,7 +30,18 @@ def do_year_insights(kind: str, year: Year) -> Response:
     """
     Calculates insights of a given kind for a given year.
     """
-    return make_response("")
+    insights = None
+    if kind == 'matches':
+        insights = InsightsHelper.doMatchInsights(year)
+    elif kind == 'awards':
+        insights = InsightsHelper.doAwardInsights(year)
+    elif kind == 'predictions':
+        insights = InsightsHelper.doPredictionInsights(year)
+
+    if insights != None:
+        InsightManipulator.createOrUpdate(insights)
+
+    return make_response(f"Computed {kind} insights: {insights}")
 
 
 @blueprint.route("/backend-tasks-b2/math/enqueue/overallinsights/<kind>/<int:year>")
