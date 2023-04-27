@@ -2,15 +2,21 @@ import itertools
 import json
 import math
 from collections import defaultdict
-from typing import Dict, List, NamedTuple
+from typing import Any, Dict, List, NamedTuple
 
 import numpy as np
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
 from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
-from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
+from backend.common.consts.event_type import (
+    CMP_EVENT_TYPES,
+    EventType,
+    SEASON_EVENT_TYPES,
+)
+from backend.common.futures import TypedFuture
 from backend.common.helpers.event_helper import (
     EventHelper,
     OFFSEASON_EVENTS_LABEL,
@@ -84,7 +90,7 @@ class InsightsHelper(object):
         # Get all Blue Banner, Division Finalist, and Championship Finalist awards
         blue_banner_award_keys_future = Award.query(
             Award.year == year,
-            Award.award_type_enum.IN(BLUE_BANNER_AWARDS),
+            Award.award_type_enum.IN(BLUE_BANNER_AWARDS),  # pyre-ignore[16]
             Award.event_type_enum.IN(
                 {
                     EventType.REGIONAL,
@@ -125,7 +131,7 @@ class InsightsHelper(object):
         """
 
         events = Event.query(
-            Event.event_type_enum.IN(EventType.SEASON_EVENT_TYPES),
+            Event.event_type_enum.IN(SEASON_EVENT_TYPES),
             Event.year == (int(year)),
         ).fetch()
         for event in events:
@@ -187,12 +193,16 @@ class InsightsHelper(object):
         data = defaultdict(dict)
         for level in ["qual", "playoff"]:
             data[level]["mean_brier_score"] = (
-                np.mean(brier_scores[level]) if brier_scores[level] else None
+                np.mean(np.asarray(brier_scores[level]))
+                if brier_scores[level]
+                else None
             )
             data[level]["correct_matches_count"] = correct_matches_count[level]
             data[level]["total_matches_count"] = total_matches_count[level]
             data[level]["mean_brier_score_cmp"] = (
-                np.mean(brier_scores_cmp[level]) if brier_scores_cmp[level] else None
+                np.mean(np.asarray(brier_scores_cmp[level]))
+                if brier_scores_cmp[level]
+                else None
             )
             data[level]["correct_matches_count_cmp"] = correct_matches_count_cmp[level]
             data[level]["total_matches_count_cmp"] = total_matches_count_cmp[level]
@@ -204,7 +214,7 @@ class InsightsHelper(object):
         ]
 
     @classmethod
-    def _createInsight(self, data: Dict, name: str, year: Year) -> Insight:
+    def _createInsight(self, data: Any, name: str, year: Year) -> Insight:
         """
         Create Insight object given data, name, and year
         """
@@ -349,12 +359,12 @@ class InsightsHelper(object):
                     # Penalty free, if possible
                     if year >= 2017:
                         if match.score_breakdown:
-                            redScore -= match.score_breakdown[AllianceColor.RED].get(
-                                "foulPoints", 0
-                            )
-                            blueScore -= match.score_breakdown[AllianceColor.BLUE].get(
-                                "foulPoints", 0
-                            )
+                            redScore -= none_throws(match.score_breakdown)[
+                                AllianceColor.RED
+                            ].get("foulPoints", 0)
+                            blueScore -= none_throws(match.score_breakdown)[
+                                AllianceColor.BLUE
+                            ].get("foulPoints", 0)
 
                     maxScore = max(redScore, blueScore)
                     if maxScore >= highscore[comp_level]:
@@ -517,6 +527,7 @@ class InsightsHelper(object):
                         elim_score_distribution[blueScore] += 1
 
         insights = []
+        binAmount = None
         if score_distribution != {}:
             binAmount = math.ceil(float(overall_highscore) / 20)
             totalCount = float(sum(score_distribution.values()))
@@ -589,6 +600,7 @@ class InsightsHelper(object):
                         elim_winning_margin_distribution[winning_margin] += 1
 
         insights = []
+        binAmount = None
         if winning_margin_distribution != {}:
             binAmount = math.ceil(float(overall_high_margin) / 20)
             totalCount = float(sum(winning_margin_distribution.values()))
@@ -697,7 +709,9 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateBlueBanners(self, award_futures: Award, year: Year) -> List[Insight]:
+    def _calculateBlueBanners(
+        self, award_futures: List[TypedFuture[Award]], year: Year
+    ) -> List[Insight]:
         """
         Returns an Insight where the data is a dict:
         Key: number of blue banners, Value: list of teams with that number of blue banners
@@ -723,7 +737,7 @@ class InsightsHelper(object):
 
     @classmethod
     def _calculateChampionshipStats(
-        self, award_futures: Award, year: Year
+        self, award_futures: List[TypedFuture[Award]], year: Year
     ) -> List[Insight]:
         """
         Returns a list of Insights where, depending on the Insight, the data
@@ -799,7 +813,7 @@ class InsightsHelper(object):
 
     @classmethod
     def _calculateRegionalStats(
-        self, award_futures: Award, year: Year
+        self, award_futures: List[TypedFuture[Award]], year: Year
     ) -> List[Insight]:
         """
         Returns a list of Insights where, depending on the Insight, the data
@@ -846,7 +860,7 @@ class InsightsHelper(object):
 
     @classmethod
     def _calculateSuccessfulElimTeamups(
-        self, award_futures: Award, year: Year
+        self, award_futures: List[TypedFuture[Award]], year: Year
     ) -> List[Insight]:
         """
         Returns an Insight where the data is a list of list of teams that won an event together
