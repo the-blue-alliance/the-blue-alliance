@@ -1,23 +1,7 @@
-import itertools
-import json
-import math
-
-from collections import defaultdict
-
-from google.appengine.ext import ndb
-
-from consts.award_type import AwardType
-from consts.event_type import EventType
-
-from models.insight import Insight
-from models.event import Event
-from models.event_details import EventDetails
-from models.award import Award
-from models.match import Match
-
-from helpers.event_helper import EventHelper
-from helpers.event_helper import OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL
-from helpers.event_insights_helper import EventInsightsHelper
+from backend.common.helpers.event_helper import EventHelper
+from backend.common.models.event import Event
+from backend.common.models.keys import Year
+from backend.common.models.match import Match
 
 
 class InsightsHelper(object):
@@ -26,7 +10,7 @@ class InsightsHelper(object):
     """
 
     @classmethod
-    def doMatchInsights(self, year):
+    def doMatchInsights(self, year: Year):
         """
         Calculate match insights for a given year. Returns a list of Insights.
         """
@@ -57,7 +41,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def doAwardInsights(self, year):
+    def doAwardInsights(self, year: Year):
         """
         Calculate award insights for a given year. Returns a list of Insights.
         """
@@ -95,7 +79,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def doPredictionInsights(self, year):
+    def doPredictionInsights(self, year: Year):
         """
         Calculate aggregate prediction stats for all season events for a year.
         """
@@ -158,7 +142,7 @@ class InsightsHelper(object):
         return [self._createInsight(data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year)]
 
     @classmethod
-    def _createInsight(self, data, name, year):
+    def _createInsight(self, data, name, year: Year):
         """
         Create Insight object given data, name, and year
         """
@@ -168,7 +152,7 @@ class InsightsHelper(object):
                        data_json=json.dumps(data))
 
     @classmethod
-    def _generateMatchData(self, match, event):
+    def _generateMatchData(self, match: Match, event: Event):
         """
         A dict of any data needed for front-end rendering
         """
@@ -214,7 +198,7 @@ class InsightsHelper(object):
         return sorted(team_list, key=lambda team: int(team[3:]))  # Sort by team number
 
     @classmethod
-    def _calculateHighscoreMatchesByWeek(self, week_event_matches, year):
+    def _calculateHighscoreMatchesByWeek(self, week_event_matches, year: Year):
         """
         Returns an Insight where the data is a list of tuples:
         (week string, list of highest scoring matches)
@@ -244,7 +228,7 @@ class InsightsHelper(object):
             return []
 
     @classmethod
-    def _calculateHighscoreMatches(self, week_event_matches, year):
+    def _calculateHighscoreMatches(self, week_event_matches, year: Year):
         """
         Returns an Insight where the data is list of highest scoring matches
         """
@@ -297,7 +281,7 @@ class InsightsHelper(object):
             return []
 
     @classmethod
-    def _calculateMatchAveragesByWeek(self, week_event_matches, year):
+    def _calculateMatchAveragesByWeek(self, week_event_matches, year: Year):
         """
         Returns a list of Insights, one for all data and one for elim data
         The data for each Insight is a list of tuples:
@@ -338,7 +322,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateMatchWinningMarginByWeek(self, week_event_matches, year):
+    def _calculateMatchWinningMarginByWeek(self, week_event_matches, year: Year):
         """
         Returns a list of Insights, one for all data and one for elim data
         The data for each Insight is a list of tuples:
@@ -391,7 +375,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateScoreDistribution(self, week_event_matches, year):
+    def _calculateScoreDistribution(self, week_event_matches, year: Year):
         """
         Returns a list of Insights, one for all data and one for elim data
         The data for each Insight is a dict:
@@ -447,7 +431,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateWinningMarginDistribution(self, week_event_matches, year):
+    def _calculateWinningMarginDistribution(self, week_event_matches, year: Year):
         """
         Returns a list of Insights, one for all data and one for elim data
         The data for each Insight is a dict:
@@ -518,7 +502,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateNumMatches(self, week_event_matches, year):
+    def _calculateNumMatches(self, week_event_matches, year: Year):
         """
         Returns an Insight where the data is the number of matches
         """
@@ -530,7 +514,7 @@ class InsightsHelper(object):
         return [self._createInsight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)]
 
     @classmethod
-    def _calculateYearSpecific(self, week_event_matches, year):
+    def _calculateYearSpecific(self, week_event_matches, year: Year):
         """
         Returns an Insight where the data contains year specific insights
         """
@@ -556,7 +540,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateBlueBanners(self, award_futures, year):
+    def _calculateBlueBanners(self, award_futures, year: Year):
         """
         Returns an Insight where the data is a dict:
         Key: number of blue banners, Value: list of teams with that number of blue banners
@@ -579,7 +563,7 @@ class InsightsHelper(object):
             return []
 
     @classmethod
-    def _calculateChampionshipStats(self, award_futures, year):
+    def _calculateChampionshipStats(self, award_futures, year: Year):
         """
         Returns a list of Insights where, depending on the Insight, the data
         is either a team or a list of teams
@@ -625,7 +609,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateRegionalStats(self, award_futures, year):
+    def _calculateRegionalStats(self, award_futures, year: Year):
         """
         Returns a list of Insights where, depending on the Insight, the data
         is either a list of teams or a dict:
@@ -656,7 +640,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateSuccessfulElimTeamups(self, award_futures, year):
+    def _calculateSuccessfulElimTeamups(self, award_futures, year: Year):
         """
         Returns an Insight where the data is a list of list of teams that won an event together
         """

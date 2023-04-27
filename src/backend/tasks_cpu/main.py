@@ -4,7 +4,7 @@ from google.appengine.api import wrap_wsgi_app
 from backend.common.deferred import install_defer_routes
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
-from backend.tasks_io.handlers.math import blueprint as math_blueprint
+from backend.tasks_io.handlers.insights import blueprint as insights_blueprint
 
 
 configure_logging()
@@ -14,4 +14,4 @@ app.wsgi_app = wrap_wsgi_app(app.wsgi_app, use_deferred=True)
 install_middleware(app)
 install_defer_routes(app)
 
-app.register_blueprint(math_blueprint)
+app.register_blueprint(insights_blueprint)
