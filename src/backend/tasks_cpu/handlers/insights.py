@@ -45,14 +45,14 @@ def do_year_insights(kind: str, year: Year) -> Response:
     return make_response(f"Computed {kind} insights: {insights}")
 
 
-@blueprint.route("/backend-tasks-b2/math/enqueue/overallinsights/<kind>/<int:year>")
-def enqueue_overall_insights(kind: str, year: Year) -> Response:
+@blueprint.route("/backend-tasks-b2/math/enqueue/overallinsights/<kind>")
+def enqueue_overall_insights(kind: str) -> Response:
     """
     Enqueues Overall Insights calculation for a given kind.
     """
     taskqueue.add(
         url=url_for(
-            "insights.do_overall_insights", kind=kind, year=year
+            "insights.do_overall_insights", kind=kind
         ),
         method="GET",
         target="py3-tasks-cpu",
@@ -61,9 +61,18 @@ def enqueue_overall_insights(kind: str, year: Year) -> Response:
     return make_response(f"Enqueued calculation of {kind} overall insights.")
 
 
-@blueprint.route("/backend-tasks-b2/math/do/overallinsights/<kind>/<int:year>")
-def do_overall_insights(kind: str, year: Year) -> Response:
+@blueprint.route("/backend-tasks-b2/math/do/overallinsights/<kind>")
+def do_overall_insights(kind: str) -> Response:
     """
     Calculates overall insights of a given kind.
     """
-    return make_response("")
+    insights = None
+    if kind == 'matches':
+        insights = InsightsHelper.doOverallMatchInsights()
+    elif kind == 'awards':
+        insights = InsightsHelper.doOverallAwardInsights()
+
+    if insights != None:
+        InsightManipulator.createOrUpdate(insights)
+
+    return make_response(f"Computed {kind} insights: {insights}")

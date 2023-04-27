@@ -1,4 +1,5 @@
 from collections import defaultdict
+import itertools
 import json
 import math
 import numpy as np
