@@ -1,9 +1,12 @@
 import json
+from typing import Set
 
 from google.appengine.ext import ndb
 
+from backend.common.models.cached_model import CachedModel
 
-class Insight(ndb.Model):
+
+class Insight(CachedModel):
     """
     Insights are the end result of analyzing a batch of data, such as the
     average score for all matches in a year.
@@ -71,6 +74,10 @@ class Insight(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+    _json_attrs: Set[str] = {
+        "data_json",
+    }
 
     def __init__(self, *args, **kw):
         self._data = None

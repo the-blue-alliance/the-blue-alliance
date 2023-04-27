@@ -1,5 +1,5 @@
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
-from backend.common.models.insgiht import Insight
+from backend.common.models.insight import Insight
 
 
 class InsightManipulator(ManipulatorBase[Insight]):
@@ -8,26 +8,11 @@ class InsightManipulator(ManipulatorBase[Insight]):
     """
 
     @classmethod
-    def updateMerge(self, new_insight, old_insight, auto_union=True):
+    def updateMerge(cls, new_model: Insight, old_model: Insight, auto_union: bool=True) -> Insight:
         """
         Given an "old" and a "new" Insight object, replace the fields in the
         "old" Insight that are present in the "new" Insight, but keep fields from
         the "old" Insight that are null in the "new" insight.
         """
-        attrs = [
-            'name',
-            'year',
-            'data_json',
-        ]
-
-        for attr in attrs:
-            if getattr(new_insight, attr) is not None:
-                if getattr(new_insight, attr) != getattr(old_insight, attr):
-                    setattr(old_insight, attr, getattr(new_insight, attr))
-                    old_insight.dirty = True
-            if getattr(new_insight, attr) == "None":
-                if getattr(old_insight, attr, None) != None:
-                    setattr(old_insight, attr, None)
-                    old_insight.dirty = True
-
-        return old_insight
+        cls._update_attrs(new_model, old_model, auto_union)
+        return old_model

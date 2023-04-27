@@ -3,6 +3,7 @@ from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
 from backend.common.helpers.insights_helper import InsightsHelper
+from backend.common.manipulators.insight_manipulator import InsightManipulator
 from backend.common.models.keys import Year
 
 
