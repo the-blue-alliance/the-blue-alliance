@@ -1,0 +1,13 @@
+service: py3-tasks-cpu
+runtime: python311
+entrypoint: gunicorn -b :$PORT backend.tasks_io.main:app
+app_engine_apis: true
+
+instance_class: B4_1G
+automatic_scaling:
+  max_idle_instances: 1
+
+handlers:
+  - url: .*
+    script: auto
+    login: admin
