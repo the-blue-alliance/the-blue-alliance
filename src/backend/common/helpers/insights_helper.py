@@ -4,8 +4,11 @@ import math
 import numpy as np
 from typing import Dict, List, NamedTuple
 
+from google.appengine.ext import ndb
+
 from backend.common.consts.comp_level import ELIM_LEVELS
-from backend.common.consts.event_type import EventType
+from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
+from backend.common.consts.event_type import EventType, CMP_EVENT_TYPES
 from backend.common.helpers.event_helper import EventHelper, OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
 from backend.common.models.award import Award
@@ -69,7 +72,7 @@ class InsightsHelper(object):
         # Get all Blue Banner, Division Finalist, and Championship Finalist awards
         blue_banner_award_keys_future = Award.query(
             Award.year == year,
-            Award.award_type_enum.IN(AwardType.BLUE_BANNER_AWARDS),
+            Award.award_type_enum.IN(BLUE_BANNER_AWARDS),
             Award.event_type_enum.IN({
                 EventType.REGIONAL,
                 EventType.DISTRICT,
@@ -123,7 +126,7 @@ class InsightsHelper(object):
             predictions = event.details.predictions if event.details else None
             if predictions:
                 has_insights = True
-                is_cmp = event.event_type_enum in EventType.CMP_EVENT_TYPES
+                is_cmp = event.event_type_enum in CMP_EVENT_TYPES
                 if 'match_predictions' in predictions:
                     for match in event.matches:
                         if match.has_been_played:
@@ -568,7 +571,7 @@ class InsightsHelper(object):
         blue_banner_winners = defaultdict(int)
         for award_future in award_futures:
             award = award_future.get_result()
-            if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS and award.count_banner:
+            if award.award_type_enum in BLUE_BANNER_AWARDS and award.count_banner:
                 for team_key in award.team_list:
                     team_key_name = team_key.id()
                     blue_banner_winners[team_key_name] += 1
@@ -639,7 +642,7 @@ class InsightsHelper(object):
         regional_winners = defaultdict(int)
         for award_future in award_futures:
             award = award_future.get_result()
-            if award.event_type_enum in EventType.CMP_EVENT_TYPES:
+            if award.event_type_enum in CMP_EVENT_TYPES:
                 continue
             for team_key in award.team_list:
                 team_key_name = team_key.id()
