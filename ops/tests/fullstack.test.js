@@ -15,7 +15,9 @@ describe("Homepage", () => {
   });
 
   it("should render tagline", async () => {
-    await expect(page).toMatchTextContent("The Blue Alliance is the best way to scout");
+    await expect(page).toMatchTextContent(
+      "The Blue Alliance is the best way to scout"
+    );
   });
 });
 
