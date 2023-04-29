@@ -34,6 +34,7 @@ class Insight(CachedModel):
     ELIM_MATCH_AVERAGE_MARGINS_BY_WEEK = 18
     WINNING_MARGIN_DISTRIBUTION = 19
     ELIM_WINNING_MARGIN_DISTRIBUTION = 20
+    EINSTEIN_STREAK = 21
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -60,6 +61,7 @@ class Insight(CachedModel):
         ELIM_MATCH_AVERAGE_MARGINS_BY_WEEK: "elim_match_average_margins_by_week",
         WINNING_MARGIN_DISTRIBUTION: "winning_margin_distribution",
         ELIM_WINNING_MARGIN_DISTRIBUTION: "elim_winning_margin_distribution",
+        EINSTEIN_STREAK: "einstein_streak",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
     }

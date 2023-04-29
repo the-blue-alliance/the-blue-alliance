@@ -963,6 +963,19 @@ class InsightsHelper(object):
             for team in insight.data:
                 division_winners[team].append(insight.year)
 
+        einstein_streak = defaultdict(int)
+        for team, years in division_winners.items():
+            streak = 1
+            last_year = years[0]
+            for year in years[1:]:
+                if year == last_year + 1:
+                    streak += 1
+                else:
+                    streak = 1
+                # There was no championship in 2020 and 2021
+                last_year = 2021 if year == 2019 else year
+            einstein_streak[team] = streak
+
         year_successful_elim_teamups = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
             Insight.year != 0,
@@ -986,6 +999,7 @@ class InsightsHelper(object):
         rca_winners = self._sortTeamWinsDict(rca_winners)
         world_champions = self._sortTeamYearWinsDict(world_champions)
         division_winners = self._sortTeamYearWinsDict(division_winners)
+        einstein_streak = self._sortTeamWinsDict(einstein_streak)
 
         # Creating Insights
         if regional_winners:
@@ -1022,6 +1036,13 @@ class InsightsHelper(object):
             insights.append(
                 self._createInsight(
                     division_winners, Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS], 0
+                )
+            )
+
+        if einstein_streak:
+            insights.append(
+                self._createInsight(
+                    einstein_streak, Insight.INSIGHT_NAMES[Insight.EINSTEIN_STREAK], 0
                 )
             )
 
