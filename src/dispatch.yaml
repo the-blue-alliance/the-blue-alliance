@@ -1,6 +1,9 @@
 dispatch:
   - url: "*/api/*"
     service: py3-api
+  
+  - url: "*/clientapi/*"
+    service: py3-api
 
   - url: "*/tasks/*"
     service: py3-tasks-io

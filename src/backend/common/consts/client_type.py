@@ -29,3 +29,10 @@ NAMES: Dict[ClientType, str] = {
     ClientType.WEBHOOK: "Webhook",
     ClientType.WEB: "Web",
 }
+
+ENUMS: Dict[str, ClientType] = {
+    "android": ClientType.OS_ANDROID,
+    "ios": ClientType.OS_IOS,
+    "webhook": ClientType.WEBHOOK,
+    "web": ClientType.WEB,
+}

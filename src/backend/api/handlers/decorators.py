@@ -1,7 +1,8 @@
+import json
 from functools import wraps
-from typing import Set
+from typing import Callable, Set, Type, TypeVar
 
-from flask import g, request
+from flask import g, jsonify, request, Response
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
@@ -66,6 +67,30 @@ def require_write_auth(auth_types: Set[AuthType]):
                 # This will abort the request on failure
                 TrustedApiAuthHelper.do_trusted_api_auth(event_key, auth_types)
             return func(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator
+
+
+T = TypeVar("T")
+R = TypeVar("R")
+
+
+def client_api_method(
+    req_type: Type[T], resp_type: Type[R]
+) -> Callable[[Callable[[T], R]], Callable[..., Response]]:
+    """
+    This is a decorator to apply JSON request/response models
+    to the API methods
+    """
+
+    def decorator(func: Callable[[T], R]) -> Callable[..., Response]:
+        @wraps(func)
+        def decorated_function(*args, **kwargs) -> Response:
+            req = json.loads(request.get_data())
+            resp = func(req)
+            return jsonify(resp)
 
         return decorated_function
 

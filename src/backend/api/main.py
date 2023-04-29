@@ -5,6 +5,10 @@ from flask_cors import CORS
 from google.appengine.api import wrap_wsgi_app
 from werkzeug.routing import BaseConverter
 
+from backend.api.handlers.client_api import (
+    register_mobile_client,
+    unregister_mobile_client,
+)
 from backend.api.handlers.district import (
     district_events,
     district_list_year,
@@ -327,6 +331,27 @@ def handle_bad_input(e: Exception) -> Response:
     return make_response(profiled_jsonify({"Error": f"{e}"}), 400)
 
 
+# This is a port of the cloud endpoints API service, used by mobile apps
+client_api = Blueprint("client_api", __name__, url_prefix="/clientapi/tbaClient/v9/")
+CORS(
+    client_api,
+    origins="*",
+    methods=["OPTIONS", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
+)
+client_api.add_url_rule(
+    "/register",
+    methods=["POST"],
+    view_func=register_mobile_client,
+)
+client_api.add_url_rule(
+    "/unregister",
+    methods=["POST"],
+    view_func=unregister_mobile_client,
+)
+
+
 app.register_blueprint(api_v3)
 app.register_blueprint(trusted_api)
+app.register_blueprint(client_api)
 app.register_error_handler(404, handle_404)
