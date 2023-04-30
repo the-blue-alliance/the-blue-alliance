@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Create District{% endblock %}
 
@@ -9,16 +9,21 @@
     <table class="table table-striped table-hover table-condensed">
         <tr>
             <td>Year</td>
-            <td><input type="text" name="year" value="{{district.year}}"/></td>
+            <td><input type="text" name="year"/></td>
         </tr>
         <tr>
             <td>Abbreviation</td>
-            <td><input type="text" name="abbreviation" value="{{district.abbreviation}}"/></td>
+            <td><input type="text" name="abbreviation"/></td>
+        </tr>
+        <tr>
+            <td>Display Name</td>
+            <td><input type="text" name="display_name"/></td>
         </tr>
     </table>
 
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save District</button>
-    <a href="/admin/districts/{{district.year}}" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>
+    <a href="/admin/districts/" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>
 </form>
 
 {% endblock %}
