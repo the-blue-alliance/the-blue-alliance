@@ -53,6 +53,15 @@ from backend.web.handlers.admin.team_media_mod import (
     team_media_mod_edit_post,
     team_media_mod_list,
 )
+from backend.web.handlers.admin.users import (
+    user_detail,
+    user_edit,
+    user_edit_post,
+    user_list,
+    user_lookup,
+    user_lookup_post,
+    user_permissions_list,
+)
 from backend.web.profiled_render import render_template
 
 
@@ -207,3 +216,13 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/team/set_robot_name", view_func=team_robot_name_update, methods=["POST"]
 )
+admin_routes.add_url_rule("/user/<user_id>", view_func=user_detail)
+admin_routes.add_url_rule("/user/edit/<user_id>", methods=["GET"], view_func=user_edit)
+admin_routes.add_url_rule(
+    "/user/edit/<user_id>", methods=["POST"], view_func=user_edit_post
+)
+admin_routes.add_url_rule("/user/lookup", methods=["GET"], view_func=user_lookup)
+admin_routes.add_url_rule("/user/lookup", methods=["POST"], view_func=user_lookup_post)
+admin_routes.add_url_rule("/users", view_func=user_list, defaults={"page_num": 0})
+admin_routes.add_url_rule("/users/<int:page_num>", view_func=user_list)
+admin_routes.add_url_rule("/users/permissions", view_func=user_permissions_list)
