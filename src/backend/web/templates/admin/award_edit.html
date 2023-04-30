@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}{{award.key_name}} - Edit{% endblock %}
 
@@ -23,8 +23,8 @@
         <tr>
             <td>Event</td>
             <td>
-                <input type="text" name="disabled_event_key_name" value="{{award.event.id}}" disabled="disabled" />
-                <input type="hidden" name="event_key_name" value="{{award.event.id}}" />
+                <input type="text" name="disabled_event_key_name" value="{{award.event.id()}}" disabled="disabled" />
+                <input type="hidden" name="event_key_name" value="{{award.event.id()}}" />
                 <input type="hidden" name="event_type_enum" value="{{award.event_type_enum}}" />
             </td>
         </tr>
@@ -38,8 +38,9 @@
         </tr>
     </table>
 
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save Award</button>
-    <a href="/admin/event/{{award.event.id}}" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>
+    <a href="/admin/event/{{award.event.id()}}" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>
 </form>
 
 {% endblock %}

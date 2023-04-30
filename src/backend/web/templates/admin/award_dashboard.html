@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Awards{% endblock %}
 
@@ -22,6 +22,7 @@
     <div class="input-group">
         <input class="form-control" size="16" name="award_key" type="text" placeholder="award_key">
         <span class="input-group-btn">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </span>
     </div>
@@ -35,6 +36,7 @@
 </div>
 <form action="/admin/award/add" method="post">
   <textarea class="form-control" name="awards_csv"></textarea><br>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add awards</button>
 </form>
 
