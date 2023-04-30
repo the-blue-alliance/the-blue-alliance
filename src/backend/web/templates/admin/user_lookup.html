@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}User Lookup{% endblock %}
 
@@ -9,6 +9,7 @@
     <div class="form-group"
     <label for="email">User Email: </label>
     <input class="form-control" name="email" />
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Submit</button>
     </div>
   </form>

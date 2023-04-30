@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}User Permissions List{% endblock %}
 
@@ -14,13 +14,16 @@
 
     {% for user in users %}
     <tr>
-        <td><a href="/admin/user/{{ user.key.id }}">{{ user.display_name }}</a></td>
+        <td><a href="/admin/user/{{ user.key.id() }}">{{ user.display_name }}</a></td>
         <td>{{ user.email }}</td>
         <td>
-            {% for permission in user.permissions %}
-                <strong>{{permissions|get_item:permission|get_item:"name"}}</strong> – {{permissions|get_item:permission|get_item:"description"}}
-                {% if not forloop.last %}<br>{% endif %}
+            <ul>
+            {% for enum, permission in permissions.items() %}
+                {% if enum in user.permissions %}
+                    <li><strong>{{permission.name}}</strong> – {{permission.description}}</li>
+                {% endif %}
             {% endfor %}
+            </ul>
         </td>
     </tr>
     {% endfor %}
