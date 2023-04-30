@@ -11,6 +11,14 @@ from backend.web.handlers.admin.api_auth import (
     api_auth_manage,
 )
 from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
+from backend.web.handlers.admin.districts import (
+    district_create,
+    district_delete,
+    district_delete_post,
+    district_edit,
+    district_edit_post,
+    district_list,
+)
 from backend.web.handlers.admin.event import (
     event_create,
     event_delete,
@@ -139,6 +147,30 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_get, methods=["GET"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_post, methods=["POST"])
+
+admin_routes.add_url_rule(
+    "/districts", view_func=district_list, defaults={"year": None}
+)
+admin_routes.add_url_rule("/districts/<int:year>", view_func=district_list)
+admin_routes.add_url_rule("/district/create", view_func=district_create)
+admin_routes.add_url_rule(
+    "/district/delete/<district_key>", methods=["GET"], view_func=district_delete
+)
+admin_routes.add_url_rule(
+    "/district/delete/<district_key>", methods=["POST"], view_func=district_delete_post
+)
+admin_routes.add_url_rule(
+    "/district/edit/",
+    methods=["POST"],
+    view_func=district_edit_post,
+    defaults={"district_key": None},
+)
+admin_routes.add_url_rule(
+    "/district/edit/<district_key>", methods=["POST"], view_func=district_edit_post
+)
+admin_routes.add_url_rule(
+    "/district/edit/<district_key>", methods=["GET"], view_func=district_edit
+)
 admin_routes.add_url_rule("/event/create", view_func=event_create, methods=["GET"])
 admin_routes.add_url_rule(
     "/event/<event_key>/delete", view_func=event_delete, methods=["GET", "POST"]
