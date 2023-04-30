@@ -281,6 +281,7 @@ def test_update_special_webcast(
                 type=WebcastType.TWITCH,
                 channel="tbagameday",
                 name="TBA Gameday",
+                key_name="tbagameday",
             )
         ],
         "aliases": {},
@@ -295,6 +296,7 @@ def test_update_special_webcast(
             type=WebcastType.TWITCH,
             channel="tbagameday",
             name="TBA Gameday",
+            key_name="tbagameday",
             status=WebcastStatus.UNKNOWN,
             stream_title=None,
             viewer_count=None,

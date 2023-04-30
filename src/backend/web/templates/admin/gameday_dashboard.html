@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}GameDay{% endblock %}
 
@@ -28,6 +28,7 @@
         <input type="hidden" name="action" value="delete" />
         <input type="hidden" name="item" value="webcast" />
         <input type="hidden" name="webcast_key" value="{{ webcast.key_name }}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
     </form></td>
 </tr>
@@ -38,9 +39,10 @@
     <td><input type="text" class="form-control" name="webcast_name" form="add_webcast" placeholder="Display Name"/></td>
     <td>
         <form method="post" action="/admin/gameday" id="add_webcast">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <input type="hidden" name="action" value="add" />
         <input type="hidden" name="item" value="webcast" />
-        {% include "partials/webcast_type_select.html" %}
+        {% include "suggestions/partials/webcast_type_select.html" %}
         </form>
     </td>
     <td><input type="text" class="form-control" name="webcast_channel" form="add_webcast" placeholder="Channel"/></td>
@@ -59,7 +61,7 @@
     <th>Alias</th>
     <th>URL Params</th>
 </thead>
-{% for name, args in aliases.items %}
+{% for name, args in aliases.items() %}
 <tr>
     <td><a href="/gameday/{{name}}" target="_blank">{{name}}</a></td>
     <td><a href="/gameday{{args}}" target="_blank">{{args}}</a></td>
@@ -67,6 +69,7 @@
         <input type="hidden" name="action" value="delete" />
         <input type="hidden" name="item" value="alias" />
         <input type="hidden" name="alias_key" value="{{ name }}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
     </form></td>
 </tr>
@@ -79,6 +82,7 @@
     <td><form method="post" action="/admin/gameday" id="add_alias">
         <input type="hidden" name="action" value="add" />
         <input type="hidden" name="item" value="alias" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"> Add</span></button>
     </form></td>
 </tr>
@@ -96,6 +100,7 @@
   {% endfor %}
 </select>
   <input type="hidden" name="action" value="defaultChat"/>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"> Update</span></button>
 </form>
 
