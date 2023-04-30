@@ -22,6 +22,7 @@ from backend.web.handlers.admin.event import (
     event_list,
     event_remap_teams_post,
 )
+from backend.web.handlers.admin.gameday import gameday_dashboard, gameday_dashboard_post
 from backend.web.handlers.admin.landing import (
     landing_edit,
 )
@@ -190,6 +191,10 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit_post, methods=["POST"]
+)
+admin_routes.add_url_rule("/gameday", methods=["GET"], view_func=gameday_dashboard)
+admin_routes.add_url_rule(
+    "/gameday", methods=["POST"], view_func=gameday_dashboard_post
 )
 admin_routes.add_url_rule(
     "/main_landing", view_func=landing_edit, methods=["GET", "POST"]

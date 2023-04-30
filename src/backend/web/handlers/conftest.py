@@ -26,6 +26,7 @@ def web_client(gae_testbed) -> FlaskClient:
 
     # Disable CSRF protection for unit testing
     app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+    app.secret_key = "testsecret"
 
     return app.test_client()
 
