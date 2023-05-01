@@ -11,7 +11,7 @@ USER_PAGE_SIZE = 1000
 
 def user_list(page_num: int) -> str:
     num_users = Account.query().count()
-    max_page = num_users // USER_PAGE_SIZE
+    max_page = (num_users // USER_PAGE_SIZE) + 1
 
     if page_num <= max_page:
         offset = USER_PAGE_SIZE * page_num
