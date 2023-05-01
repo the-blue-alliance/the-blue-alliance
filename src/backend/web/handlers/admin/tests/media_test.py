@@ -202,4 +202,30 @@ def test_media_add_with_year(
     assert len(medias) == 1
 
     media = medias[0]
+    assert media.year == 2010
+    assert media.references == [media_reference]
+
+
+def test_media_add_without_year(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    resp = web_client.post(
+        "/admin/media/add_media",
+        data={
+            "media_url": "http://imgur.com/aF8T5ZE",
+            "year": "",
+            "reference_type": "team",
+            "reference_key": "frc1124",
+            "originating_url": "/admin/team/1124",
+        },
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/team/1124"
+
+    media_reference = Media.create_reference("team", "frc1124")
+    medias = Media.query(Media.references == media_reference).fetch()
+    assert len(medias) == 1
+
+    media = medias[0]
+    assert media.year is None
     assert media.references == [media_reference]

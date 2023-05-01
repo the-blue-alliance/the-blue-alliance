@@ -33,8 +33,14 @@ def test_district_list_none_for_year(web_client: Client, login_gae_admin) -> Non
 
 
 def test_district_edit_bad_event(web_client: Client, login_gae_admin) -> None:
-    resp = web_client.get("/admin/district/2021asdf")
+    resp = web_client.get("/admin/district/edit/2021asdf")
     assert resp.status_code == 404
+
+
+def test_district_edit(web_client: Client, login_gae_admin) -> None:
+    helpers.preseed_district("2020ne")
+    resp = web_client.get("/admin/district/edit/2020ne")
+    assert resp.status_code == 200
 
 
 def test_edit_district(
@@ -55,6 +61,11 @@ def test_edit_district(
     district = District.get_by_id("2020ne")
     assert district is not None
     assert district.display_name == "New England"
+
+
+def test_district_create(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.get("/admin/district/create")
+    assert resp.status_code == 200
 
 
 def test_create_district(
@@ -90,6 +101,17 @@ def test_create_district_invalid_key(
     assert resp.status_code == 400
 
     assert District.query().count() == 0
+
+
+def test_district_delete(web_client: Client, login_gae_admin) -> None:
+    helpers.preseed_district("2020ne")
+    resp = web_client.get("/admin/district/delete/2020ne")
+    assert resp.status_code == 200
+
+
+def test_district_delete_bad_key(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.get("/admin/district/delete/2020asdf")
+    assert resp.status_code == 404
 
 
 def test_delete_district(

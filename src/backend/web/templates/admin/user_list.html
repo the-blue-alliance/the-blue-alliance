@@ -6,7 +6,7 @@
 
 <h1>{{ num_users }} Users</h1>
 
-<ul class="pagination pagination-small">
+<ul class="pagination pagination-small" id="page-selector">
     {% for page_label in page_labels %}
     <li{% if loop.index0 == page_num %} class="active"{% endif %}><a href="/admin/users{% if not loop.index0 == 0%}/{{loop.index0}}{% endif %}">{{page_label}}</a></li>
     {% endfor %}
