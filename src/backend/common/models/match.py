@@ -338,18 +338,26 @@ class Match(CachedModel):
 
         event = self.event.get()
         if (
-            self.comp_level != "qm"
+            self.comp_level != CompLevel.QM
             and event
             and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM
         ):
-            if self.comp_level == "f":
+            if self.comp_level == CompLevel.F:
                 return f"Finals {self.match_number}"
+
+            # hard-code the match number to 1 for non-finals,
+            # so we can render this correctly for replays
             match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
-                (self.comp_level, self.set_number, self.match_number)
+                (self.comp_level, self.set_number, 1)
             )
             if match_num is None:
                 match_num = "?"
-            return f"Match {match_num}"
+
+            replay_suffix = ""
+            if self.match_number > 1:
+                replay_suffix = f" (Play {self.match_number})"
+            return f"Match {match_num}{replay_suffix}"
+
         elif (
             self.comp_level != "qm"
             and event

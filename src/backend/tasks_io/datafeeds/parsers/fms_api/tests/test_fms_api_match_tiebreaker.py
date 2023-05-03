@@ -7,6 +7,8 @@ from google.auth.credentials import AnonymousCredentials
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
@@ -678,3 +680,61 @@ def test_2017ncwin(ndb_stub, taskqueue_stub) -> None:
     assert breakdown is not None
     assert breakdown[AllianceColor.RED]["totalPoints"] == 180
     assert breakdown[AllianceColor.BLUE]["totalPoints"] == 305
+
+
+def test_2023ncash_double_elim(ndb_stub, taskqueue_stub) -> None:
+    event = Event(
+        id="2023ncash",
+        event_short="ncash",
+        year=2023,
+        event_type_enum=EventType.DISTRICT,
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+        timezone_id="America/New_York",
+    )
+    event.put()
+
+    # The first play for this match is a tie
+    MatchManipulator.createOrUpdate(
+        DatafeedFMSAPI(
+            sim_time=datetime.datetime(2023, 3, 5, 20, 58), sim_api_version="v3.0"
+        ).get_event_matches(event.key_name)
+    )
+    _, keys_to_delete = MatchHelper.delete_invalid_matches(event.matches, event)
+    MatchManipulator.delete_keys(keys_to_delete)
+
+    sf_matches = Match.query(
+        Match.event == event.key, Match.comp_level == CompLevel.SF
+    ).fetch()
+    played_sf_matches = [m for m in sf_matches if m.has_been_played]
+    assert len(played_sf_matches) == 12
+
+    match = Match.get_by_id("2023ncash_sf12m1")
+    assert match is not None
+    assert match.winning_alliance == ""
+
+    # The second play for this match had a winner
+    MatchManipulator.createOrUpdate(
+        DatafeedFMSAPI(
+            sim_time=datetime.datetime(2023, 3, 5, 21, 19), sim_api_version="v3.0"
+        ).get_event_matches(event.key_name)
+    )
+    _, keys_to_delete = MatchHelper.delete_invalid_matches(event.matches, event)
+    MatchManipulator.delete_keys(keys_to_delete)
+
+    sf_matches = Match.query(
+        Match.event == event.key, Match.comp_level == CompLevel.SF
+    ).fetch()
+    played_sf_matches = [m for m in sf_matches if m.has_been_played]
+    assert len(played_sf_matches) == 13
+
+    # The first play for this match remains a tie
+    match = Match.get_by_id("2023ncash_sf12m1")
+    assert match is not None
+    assert match.winning_alliance == ""
+    assert match.verbose_name == "Match 12"
+
+    # The second play gets added afterwards
+    match = Match.get_by_id("2023ncash_sf12m2")
+    assert match is not None
+    assert match.winning_alliance == AllianceColor.RED
+    assert match.verbose_name == "Match 12 (Play 2)"

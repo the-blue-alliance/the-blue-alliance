@@ -9,6 +9,7 @@ from pyre_extensions import none_throws
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.media_type import MediaType
+from backend.common.consts.playoff_type import DOUBLE_ELIM_TYPES
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
@@ -238,8 +239,15 @@ class FMSAPIHybridScheduleParser(
                     if match_key.startswith("{}{}".format(comp_level, set_number)):
                         match_count += 1
 
-                # Sanity check: Tiebreakers must be played after at least 3 matches if not finals
-                if match_count < 3 and comp_level != "f":
+                # Sanity check:
+                # In a classic bracket, tiebreakers must be played after at least 3 matches
+                # if not finals
+                # But in a double elim bracket, we can play them immediately
+                if (
+                    event.playoff_type not in DOUBLE_ELIM_TYPES
+                    and match_count < 3
+                    and comp_level != CompLevel.F
+                ):
                     logging.warning(
                         "Match supposedly tied, but existing count is {}! Skipping match.".format(
                             match_count
