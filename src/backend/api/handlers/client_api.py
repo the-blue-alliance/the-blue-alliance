@@ -2,9 +2,18 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.api.client_api_auth_helper import ClientApiAuthHelper
-from backend.api.client_api_types import BaseResponse, RegistrationRequest
+from backend.api.client_api_types import (
+    BaseResponse,
+    ListDevicesResponse,
+    RegisteredMobileClient,
+    RegistrationRequest,
+    VoidRequest,
+)
 from backend.api.handlers.decorators import client_api_method
-from backend.common.consts.client_type import ENUMS as CLIENT_TYPE_MAP
+from backend.common.consts.client_type import (
+    ENUMS as CLIENT_TYPE_MAP,
+    NAMES as CLIENT_TYPE_NAMES,
+)
 from backend.common.models.mobile_client import MobileClient
 
 
@@ -27,6 +36,7 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         MobileClient.user_id == user_id,
         MobileClient.device_uuid == uuid,
         MobileClient.client_type == os,
+        ancestor=account_key,
     )
 
     # trying to figure out an elusive dupe bug
@@ -48,6 +58,33 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         client.display_name = name
         client.put()
         return BaseResponse(code=304, message="Client already exists")
+
+
+@client_api_method(VoidRequest, ListDevicesResponse)
+def list_mobile_clients(req: VoidRequest) -> ListDevicesResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return ListDevicesResponse(
+            code=401,
+            message="Unauthorized to list devices",
+            devices=[],
+        )
+
+    account_key = none_throws(current_user.account_key)
+    mobile_clients = MobileClient.query(ancestor=account_key).fetch(1000)
+    return ListDevicesResponse(
+        code=200,
+        message="",
+        devices=[
+            RegisteredMobileClient(
+                name=d.display_name,
+                operating_system=CLIENT_TYPE_NAMES[d.client_type].lower(),
+                mobile_id=d.messaging_id,
+                device_uuid=d.device_uuid,
+            )
+            for d in mobile_clients
+        ],
+    )
 
 
 @client_api_method(RegistrationRequest, BaseResponse)

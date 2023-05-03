@@ -1,4 +1,8 @@
-from typing import TypedDict
+from typing import List, TypedDict
+
+
+class VoidRequest(TypedDict):
+    pass
 
 
 class BaseResponse(TypedDict):
@@ -14,3 +18,14 @@ class RegistrationRequest(_RegistrationRequestNotRequired):
     operating_system: str
     mobile_id: str
     device_uuid: str
+
+
+class RegisteredMobileClient(TypedDict):
+    name: str
+    operating_system: str
+    mobile_id: str
+    device_uuid: str
+
+
+class ListDevicesResponse(BaseResponse):
+    devices: List[RegisteredMobileClient]

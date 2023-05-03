@@ -6,6 +6,7 @@ from google.appengine.api import wrap_wsgi_app
 from werkzeug.routing import BaseConverter
 
 from backend.api.handlers.client_api import (
+    list_mobile_clients,
     register_mobile_client,
     unregister_mobile_client,
 )
@@ -343,6 +344,11 @@ client_api.add_url_rule(
     "/register",
     methods=["POST"],
     view_func=register_mobile_client,
+)
+client_api.add_url_rule(
+    "/list_clients",
+    methods=["POST"],
+    view_func=list_mobile_clients,
 )
 client_api.add_url_rule(
     "/unregister",
