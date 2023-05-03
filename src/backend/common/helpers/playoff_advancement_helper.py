@@ -321,7 +321,10 @@ class PlayoffAdvancementHelper(object):
                 n = 2
                 if event.playoff_type == PlayoffType.BO5_FINALS:
                     n = 3
-                elif event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
+                elif event.playoff_type in (
+                    PlayoffType.DOUBLE_ELIM_8_TEAM,
+                    PlayoffType.DOUBLE_ELIM_4_TEAM,
+                ):
                     # only the final is a BO3
                     if not (
                         comp_level == CompLevel.F
