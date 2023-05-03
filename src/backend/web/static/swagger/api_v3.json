@@ -204,8 +204,7 @@
             "apiKey": []
           }
         ]
-      },
-      "x-comment": "Simple (non-full) responses need a separate path definition. See also https://github.com/OAI/OpenAPI-Specification/issues/270"
+      }
     },
     "/teams/{page_num}/keys": {
       "get": {
