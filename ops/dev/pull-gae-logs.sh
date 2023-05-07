@@ -13,4 +13,4 @@ host=$(echo -e "${config}" | grep HostName | cut -d " " -f 4)
 port=$(echo -e "${config}" | grep Port | cut -d " " -f 4)
 keyfile=$(echo -e "${config}" | grep IdentityFile | cut -d " " -f 4)
 
-scp -v -P "$port" -i "$keyfile" -oStrictHostKeyChecking=no "root@$host:/var/log/tba.log" "/tmp/tba.log"
+scp -P "$port" -i "$keyfile" -oStrictHostKeyChecking=no "root@$host:/var/log/tba.log" "/tmp/tba.log"
