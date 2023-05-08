@@ -1,7 +1,7 @@
-import React, { Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
 import AddRemoveSingleTeam from "./AddRemoveSingleTeam";
 import AddMultipleTeams from "./AddMultipleTeams";
@@ -41,11 +41,11 @@ class TeamListTab extends Component {
   }
 
   showError(errorMessage) {
-    this.setState({showErrorDialog: true, errorMessage: errorMessage});
+    this.setState({ showErrorDialog: true, errorMessage: errorMessage });
   }
 
   clearError() {
-    this.setState({showErrorDialog: false, errorMessage: ""});
+    this.setState({ showErrorDialog: false, errorMessage: "" });
   }
 
   updateTeams(teams) {
@@ -59,8 +59,8 @@ class TeamListTab extends Component {
   render() {
     return (
       <div className="tab-pane" id="teams">
-        <Modal 
-          show={this.state.showErrorDialog} 
+        <Modal
+          show={this.state.showErrorDialog}
           onHide={this.clearError}
           backdrop={false}
           animation={false}
