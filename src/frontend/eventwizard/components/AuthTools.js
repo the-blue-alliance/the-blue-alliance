@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Dialog from "react-bootstrap-dialog";
 
 class AuthTools extends Component {
   constructor(props) {
@@ -55,11 +54,11 @@ class AuthTools extends Component {
 
     return (
       <div className="form-group" id="auth-tools">
-        <Dialog
+        {/*<Dialog
           ref={(dialog) => {
             this.dialog = dialog;
           }}
-        />
+        />*/}
         <label className="col-sm-2 control-label" htmlFor="load_auth">
           Auth Tools
         </label>

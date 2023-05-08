@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 // import FileInput from "react-file-input";
-import Dialog from "react-bootstrap-dialog";
 import TeamList from "./TeamList";
 
 class AddTeamsFMSReport extends Component {
@@ -124,7 +123,7 @@ class AddTeamsFMSReport extends Component {
           onChange={this.onFileChange}
           disabled={!this.props.selectedEvent}
         /> */}
-        <Dialog ref={(dialog) => (this.reportConfirmDialog = dialog)} />
+        {/*<Dialog ref={(dialog) => (this.reportConfirmDialog = dialog)} />*/}
       </div>
     );
   }
