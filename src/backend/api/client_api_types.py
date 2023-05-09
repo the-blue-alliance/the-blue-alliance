@@ -29,3 +29,7 @@ class RegisteredMobileClient(TypedDict):
 
 class ListDevicesResponse(BaseResponse):
     devices: List[RegisteredMobileClient]
+
+
+class PingRequest(TypedDict):
+    mobile_id: str
