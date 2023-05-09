@@ -325,6 +325,30 @@ class TBANSHelper:
             if users:
                 cls._send(users, MatchVideoNotification(match))
 
+    @classmethod
+    def update_favorites(
+        cls, user_id: str, initiating_device_key: Optional[str] = None
+    ) -> None:
+        from backend.common.models.notifications.mytba import (
+            FavoritesUpdatedNotification,
+        )
+
+        # TODO: support skipping a specific device
+        # TODO: we shouldn't send to webhooks unless opted in
+        cls._send([user_id], FavoritesUpdatedNotification(user_id=user_id))
+
+    @classmethod
+    def update_subscriptions(
+        cls, user_id: str, initiating_device_key: Optional[str] = None
+    ) -> None:
+        from backend.common.models.notifications.mytba import (
+            SubscriptionsUpdatedNotification,
+        )
+
+        # TODO: support skipping a specific device
+        # TODO: we shouldn't send to webhooks unless opted in
+        cls._send([user_id], SubscriptionsUpdatedNotification(user_id=user_id))
+
     @staticmethod
     def ping(client: MobileClient) -> bool:
         """Immediately dispatch a Ping to either FCM or a webhook"""

@@ -59,6 +59,10 @@ from backend.common.models.notifications.match_upcoming import (
 from backend.common.models.notifications.match_video import (
     MatchVideoNotification,
 )
+from backend.common.models.notifications.mytba import (
+    FavoritesUpdatedNotification,
+    SubscriptionsUpdatedNotification,
+)
 from backend.common.models.notifications.requests.fcm_request import FCMRequest
 from backend.common.models.notifications.requests.webhook_request import (
     WebhookRequest,
@@ -657,6 +661,30 @@ class TestTBANSHelper(unittest.TestCase):
             # Check frc7332 notification
             notification = notifications[1]
             assert notification.team == self.team
+
+    def test_update_favorites(self):
+        user_id = "user_id_1"
+        device_id = "device_id"
+
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.update_favorites(user_id, device_id)
+            assert mock_send.call_count == 1
+            call_args = mock_send.call_args[0]
+            assert call_args[0] == [user_id]
+            assert isinstance(call_args[1], FavoritesUpdatedNotification)
+            assert call_args[1].user_id == user_id
+
+    def test_update_subscriptions(self):
+        user_id = "user_id_1"
+        device_id = "device_id"
+
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.update_subscriptions(user_id, device_id)
+            assert mock_send.call_count == 1
+            call_args = mock_send.call_args[0]
+            assert call_args[0] == [user_id]
+            assert isinstance(call_args[1], SubscriptionsUpdatedNotification)
+            assert call_args[1].user_id == user_id
 
     def test_ping_client(self):
         client = MobileClient(

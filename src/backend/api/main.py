@@ -6,11 +6,14 @@ from google.appengine.api import wrap_wsgi_app
 from werkzeug.routing import BaseConverter
 
 from backend.api.handlers.client_api import (
+    list_favorites,
     list_mobile_clients,
+    list_subscriptions,
     ping_mobile_client,
     register_mobile_client,
     suggest_team_media,
     unregister_mobile_client,
+    update_model_preferences,
 )
 from backend.api.handlers.district import (
     district_events,
@@ -343,6 +346,11 @@ CORS(
     allow_headers=["Content-Type", "Authorization"],
 )
 client_api.add_url_rule(
+    "/favorites/list",
+    methods=["POST"],
+    view_func=list_favorites,
+)
+client_api.add_url_rule(
     "/register",
     methods=["POST"],
     view_func=register_mobile_client,
@@ -353,9 +361,19 @@ client_api.add_url_rule(
     view_func=list_mobile_clients,
 )
 client_api.add_url_rule(
+    "/model/setPreferences",
+    methods=["POST"],
+    view_func=update_model_preferences,
+)
+client_api.add_url_rule(
     "/ping",
     methods=["POST"],
     view_func=ping_mobile_client,
+)
+client_api.add_url_rule(
+    "/subscriptions/list",
+    methods=["POST"],
+    view_func=list_subscriptions,
 )
 client_api.add_url_rule(
     "/team/media/suggest",
