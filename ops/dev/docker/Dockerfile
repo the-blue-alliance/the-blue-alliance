@@ -15,14 +15,13 @@ RUN apt-get update && apt-get install -y \
     vim \
     openssh-server
 
-# Needed for Python 3.10
+# Needed for Python 3.11
 RUN apt-get install software-properties-common -y
 RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN apt-get update
 
 # Setup python environment
-ENV PYTHON_VERSION python3.10
-RUN apt-get install -y \
+ENV PYTHON_VERSION python3.11
+RUN apt-get update && apt-get install -y \
     "$PYTHON_VERSION" \
     "$PYTHON_VERSION-venv" \
     "$PYTHON_VERSION-dev" \
@@ -50,7 +49,7 @@ RUN echo 1 | update-alternatives --config python2
 
 # Set up nvm and nodejs
 ENV NVM_DIR /nvm
-ENV NODE_VERSION 14
+ENV NODE_VERSION 18
 RUN mkdir -p $NVM_DIR  \
     && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
     && . $NVM_DIR/nvm.sh \

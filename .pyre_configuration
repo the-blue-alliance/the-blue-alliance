@@ -16,6 +16,7 @@
     {"site-package": "google/auth"},
     {"site-package": "google/cloud/storage"},
     {"site-package": "jinja2"},
+    {"site-package": "markupsafe"},
     {"site-package": "numpy"},
     {"site-package": "pytest"},
     {"site-package": "_pytest"},

@@ -6,7 +6,6 @@ from backend.common.storage.clients.storage_client import StorageClient
 
 
 class InMemoryClient(StorageClient):
-
     CLIENT: Optional["InMemoryClient"] = None
 
     data: Dict[str, str]

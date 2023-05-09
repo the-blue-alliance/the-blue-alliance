@@ -64,13 +64,7 @@ class DistrictPointValues:
     }
     DE_F_WIN = 10
     # Double elimination bracket points for four-alliance events (2023 onwards)
-    DE_4_SF_WIN = {
-        1: 0,
-        2: 0,
-        3: 10,
-        4: 0,
-        5: 10
-    }
+    DE_4_SF_WIN = {1: 0, 2: 0, 3: 10, 4: 0, 5: 10}
 
     # Chairman's Award
     CHAIRMANS_DEFAULT = 10

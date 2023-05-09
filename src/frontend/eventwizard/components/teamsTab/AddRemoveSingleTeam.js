@@ -117,6 +117,7 @@ class AddRemoveSingleTeam extends Component {
           ref={(typeahead) => {
             this.teamTypeahead = typeahead;
           }}
+          id="teamTypeahead"
           placeholder="Enter team name or number..."
           options={this.state.teamTypeaheadOptions}
           onChange={this.onTeamSelectionChanged}

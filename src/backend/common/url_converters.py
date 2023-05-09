@@ -3,7 +3,6 @@ from werkzeug.routing import BaseConverter
 
 
 class RegexConverter(BaseConverter):
-
     key: str = "regex"
 
     def __init__(self, url_map, *items) -> None:

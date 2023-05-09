@@ -204,8 +204,7 @@
             "apiKey": []
           }
         ]
-      },
-      "x-comment": "Simple (non-full) responses need a separate path definition. See also https://github.com/OAI/OpenAPI-Specification/issues/270"
+      }
     },
     "/teams/{page_num}/keys": {
       "get": {
@@ -6928,6 +6927,9 @@
           "endGameParkPoints": {
             "type": "integer"
           },
+          "extraGamePieceCount": {
+            "type": "integer"
+          },
           "foulCount": {
             "type": "integer"
           },
@@ -7048,6 +7050,7 @@
               "github-profile",
               "instagram-profile",
               "periscope-profile",
+              "gitlab-profile",
               "grabcad",
               "instagram-image",
               "external-link",

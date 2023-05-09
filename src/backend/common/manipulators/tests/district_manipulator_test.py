@@ -12,7 +12,6 @@ from backend.common.models.district import District
 
 @pytest.mark.usefixtures("ndb_context")
 class TestDistrictManipulator(unittest.TestCase):
-
     taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
 
     @pytest.fixture(autouse=True)

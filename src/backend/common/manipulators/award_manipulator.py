@@ -47,6 +47,7 @@ class AwardManipulator(ManipulatorBase[Award]):
                 old_list = getattr(old_model, attr)
                 new_list = getattr(new_model, attr)
 
+            is_changed = old_list != new_list
             if auto_union:
                 for item in new_list:
                     if item not in old_list:
@@ -62,6 +63,7 @@ class AwardManipulator(ManipulatorBase[Award]):
                 merged_list = old_list
 
             setattr(old_model, attr, merged_list)
+            old_model._dirty |= is_changed
 
         return old_model
 

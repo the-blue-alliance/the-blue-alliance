@@ -7,7 +7,6 @@ from backend.common.tasklets import typed_tasklet
 
 
 class ApiAuthAccessQuery(DatabaseQuery[List[ApiAuthAccess], None]):
-
     DICT_CONVERTER = None
 
     def __init__(self, owner: Account) -> None:

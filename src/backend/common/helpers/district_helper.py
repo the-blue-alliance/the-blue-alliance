@@ -412,9 +412,9 @@ class DistrictHelper:
                 elim_team_wins[team] += 1
 
             if match.comp_level == CompLevel.SF:
-                elim_alliance_pts[
-                    winning_alliance_number
-                ] += sf_points[match.set_number]
+                elim_alliance_pts[winning_alliance_number] += sf_points[
+                    match.set_number
+                ]
             elif (
                 match.comp_level == CompLevel.F
                 and elim_num_wins[match_set_key][winning_alliance] >= 2
@@ -693,7 +693,11 @@ class DistrictHelper:
                     CompLevel.SF, []
                 ) + organized_matches.get(CompLevel.F, [])
                 cls._calc_elim_match_points(
-                    district_points, elim_matches, elim_alliances, event.playoff_type, POINTS_MULTIPLIER
+                    district_points,
+                    elim_matches,
+                    elim_alliances,
+                    event.playoff_type,
+                    POINTS_MULTIPLIER,
                 )
 
     @classmethod

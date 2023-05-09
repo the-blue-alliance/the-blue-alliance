@@ -56,8 +56,8 @@ MANUAL_COMPONENTS = {
     },
     2023: {
         "Total Game Piece Count": lambda match, color: (
-            match.score_breakdown[color].get("autoGamePieceCount", 0)
-            + match.score_breakdown[color].get("teleopGamePieceCount", 0)
+            match.score_breakdown[color].get("teleopGamePieceCount", 0)
+            + match.score_breakdown[color].get("extraGamePieceCount", 0)
         ),
         "Total Game Piece Points": lambda match, color: (
             match.score_breakdown[color].get("autoGamePiecePoints", 0)
@@ -76,9 +76,6 @@ MANUAL_COMPONENTS = {
         "Total Cones Scored": lambda match, color: (
             sum(
                 [
-                    match.score_breakdown[color]["autoCommunity"]["B"].count("Cone"),
-                    match.score_breakdown[color]["autoCommunity"]["M"].count("Cone"),
-                    match.score_breakdown[color]["autoCommunity"]["T"].count("Cone"),
                     match.score_breakdown[color]["teleopCommunity"]["B"].count("Cone"),
                     match.score_breakdown[color]["teleopCommunity"]["M"].count("Cone"),
                     match.score_breakdown[color]["teleopCommunity"]["T"].count("Cone"),
@@ -88,9 +85,6 @@ MANUAL_COMPONENTS = {
         "Total Cubes Scored": lambda match, color: (
             sum(
                 [
-                    match.score_breakdown[color]["autoCommunity"]["B"].count("Cube"),
-                    match.score_breakdown[color]["autoCommunity"]["M"].count("Cube"),
-                    match.score_breakdown[color]["autoCommunity"]["T"].count("Cube"),
                     match.score_breakdown[color]["teleopCommunity"]["B"].count("Cube"),
                     match.score_breakdown[color]["teleopCommunity"]["M"].count("Cube"),
                     match.score_breakdown[color]["teleopCommunity"]["T"].count("Cube"),

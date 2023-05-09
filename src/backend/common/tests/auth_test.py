@@ -11,8 +11,25 @@ from backend.common.auth import (
     create_session_cookie,
     current_user,
     revoke_session_cookie,
+    verify_id_token,
 )
 from backend.common.models.user import User
+
+
+def test_validate_id_token() -> None:
+    with patch.object(auth, "verify_id_token") as mock_verify_id_token:
+        mock_verify_id_token.return_value = {}
+        decoded_token = verify_id_token("abc123")
+        assert decoded_token == {}
+
+
+def test_expired_id_token() -> None:
+    with patch.object(auth, "verify_id_token") as mock_verify_id_token:
+        mock_verify_id_token.side_effect = auth.ExpiredIdTokenError(
+            "expired token", None
+        )
+        decoded_token = verify_id_token("abc123")
+        assert decoded_token is None
 
 
 def test_create_session_cookie(secret_app: Flask) -> None:

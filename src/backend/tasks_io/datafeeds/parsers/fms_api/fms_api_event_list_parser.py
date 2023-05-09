@@ -17,7 +17,6 @@ from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
 class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
-
     DATE_FORMAT_STR = "%Y-%m-%dT%H:%M:%S"
 
     EVENT_TYPES = {
@@ -51,16 +50,25 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
     NON_OFFICIAL_EVENT_TYPES = ["offseason"]
 
+    # event_key (code, short_name)
     EVENT_CODE_EXCEPTIONS = {
-        "archimedes": ("arc", "Archimedes"),  # (code, short_name)
+        "archimedes": ("arc", "Archimedes"),
+        "arpky": ("arc", "Archimedes"),
         "carson": ("cars", "Carson"),
         "carver": ("carv", "Carver"),
         "curie": ("cur", "Curie"),
+        "cpra": ("cur", "Curie"),
         "daly": ("dal", "Daly"),
+        "dcmp": ("dal", "Daly"),
         "darwin": ("dar", "Darwin"),
         "galileo": ("gal", "Galileo"),
+        "gcmp": ("gal", "Galileo"),
         "hopper": ("hop", "Hopper"),
+        "hcmp": ("hop", "Hopper"),
+        "jcmp": ("joh", "Johnson"),
+        "mpcia": ("mil", "Milstein"),
         "newton": ("new", "Newton"),
+        "npfcmp": ("new", "Newton"),
         "roebling": ("roe", "Roebling"),
         "tesla": ("tes", "Tesla"),
         "turing": ("tur", "Turing"),
@@ -80,8 +88,8 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         self.event_short = short
 
     def get_code_and_short_name(self, season, code):
-        # Even though 2022 Einstein is listed as "cmptx", we don't want it to say "(Houston)".
-        if season == 2022 and code == "cmptx":
+        # Even though 2022/2023 Einstein is listed as "cmptx", we don't want it to say "(Houston)".
+        if season >= 2022 and code == "cmptx":
             return (code, "{}")
         return self.EVENT_CODE_EXCEPTIONS[code]
 
@@ -115,8 +123,8 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 if code == "week0"
                 else self.EVENT_TYPES.get(api_event_type, None)
             )
-            if api_event_type == "championshipdivision" and self.season != 2022:
-                # 2022 only has one championship and the API uses ChampionshipSubdivision
+            if api_event_type == "championshipdivision" and self.season < 2022:
+                # 2022 onward has one championship and the API uses ChampionshipSubdivision
                 # for some reason. This didn't come up before because pre-2champs divisions
                 # also reproted as ChampionshipSubDivision. Weird.
                 logging.warning(
@@ -136,7 +144,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
             name = event["name"]
             short_name = EventShortNameHelper.get_short_name(
-                name, district_code=event["districtCode"]
+                name, district_code=event["districtCode"], event_type=event_type
             )
             district_key = (
                 District.render_key_name(self.season, event["districtCode"].lower())
@@ -157,14 +165,6 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             ]
 
             # TODO read timezone from API
-
-            # Special cases for district championship divisions
-            if event_type == EventType.DISTRICT_CMP_DIVISION:
-                split_name = name.split("-")
-                short_name = "{} - {}".format(
-                    "".join(item[0].upper() for item in split_name[0].split()),
-                    split_name[-1].replace("Division", "").strip(),
-                )
 
             # Special cases for champs
             if code in self.EVENT_CODE_EXCEPTIONS:

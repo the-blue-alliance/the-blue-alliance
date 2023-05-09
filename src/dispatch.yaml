@@ -1,6 +1,9 @@
 dispatch:
   - url: "*/api/*"
     service: py3-api
+  
+  - url: "*/clientapi/*"
+    service: py3-api
 
   - url: "*/tasks/*"
     service: py3-tasks-io
@@ -10,6 +13,9 @@ dispatch:
 
   - url: "*/_ah/queue/deferred*"
     service: py3-tasks-io
+
+  - url: "*/backend-tasks-b2/*"
+    service: py3-tasks-cpu
 
   - url: "*/*"
     service: py3-web

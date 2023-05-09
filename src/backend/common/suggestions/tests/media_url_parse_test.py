@@ -134,6 +134,15 @@ class TestMediaUrlParser(unittest.TestCase):
         self.assertEqual(result["site_name"], TYPE_NAMES[MediaType.GITHUB_PROFILE])
         self.assertEqual(result["profile_url"], "https://github.com/frc1124")
 
+    def test_gitlab_profile_parse(self) -> None:
+        result = MediaParser.partial_media_dict_from_url("https://gitlab.com/frc1124")
+        self.assertIsNotNone(result)
+        self.assertEqual(result["media_type_enum"], MediaType.GITLAB_PROFILE)
+        self.assertEqual(result["is_social"], True)
+        self.assertEqual(result["foreign_key"], "frc1124")
+        self.assertEqual(result["site_name"], TYPE_NAMES[MediaType.GITLAB_PROFILE])
+        self.assertEqual(result["profile_url"], "https://www.gitlab.com/frc1124")
+
     @pytest.mark.skip(
         reason="TODO: need to migrate off legacy IG oembed https://developers.facebook.com/docs/instagram/oembed"
     )

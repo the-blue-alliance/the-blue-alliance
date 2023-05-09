@@ -20,7 +20,6 @@ from backend.common.models.team import Team
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestAwardManipulator(unittest.TestCase):
-
     taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
 
     @pytest.fixture(autouse=True)
