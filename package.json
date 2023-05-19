@@ -39,7 +39,7 @@
     "@babel/preset-react": "^7.18.6",
     "babel-loader": "^9.1.2",
     "cross-env": "^7.0.3",
-    "css-loader": "^6.7.3",
+    "css-loader": "^6.7.4",
     "css-minimizer-webpack-plugin": "^4.2.2",
     "eslint": "^8.40.0",
     "eslint-config-prettier": "^8.8.0",
