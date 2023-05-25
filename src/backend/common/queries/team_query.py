@@ -14,6 +14,7 @@ from backend.common.queries.dict_converters.team_converter import (
     TeamDict,
 )
 from backend.common.tasklets import typed_tasklet
+import re
 
 
 def get_team_page_num(team_key: str) -> int:
@@ -94,10 +95,13 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     def _query_async(
         self, district_key: DistrictKey
     ) -> Generator[Any, Any, List[Team]]:
+        year = int(re.match(r"\d{4,}", district_key).group(0))
         district_teams = yield DistrictTeam.query(
             DistrictTeam.district_key == ndb.Key(District, district_key)
         ).fetch_async()
         team_keys = map(lambda district_team: district_team.team, district_teams)
+        event_teams = EventTeam.query(EventTeam.year == year).fetch()
+        team_keys = filter(lambda team_key: any(team_key == event_team.team for event_team in event_teams), team_keys)
         teams = yield ndb.get_multi_async(team_keys)
         return list(teams)
 
