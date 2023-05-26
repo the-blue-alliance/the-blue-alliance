@@ -1,3 +1,4 @@
+import re
 from typing import Any, Generator, List, Optional, Set
 
 from google.appengine.ext import ndb
@@ -14,7 +15,6 @@ from backend.common.queries.dict_converters.team_converter import (
     TeamDict,
 )
 from backend.common.tasklets import typed_tasklet
-import re
 
 
 def get_team_page_num(team_key: str) -> int:
