@@ -95,7 +95,6 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     def _query_async(
         self, district_key: DistrictKey
     ) -> Generator[Any, Any, List[Team]]:
-
         district_teams = yield DistrictTeam.query(
             DistrictTeam.district_key == ndb.Key(District, district_key)
         ).fetch_async()
