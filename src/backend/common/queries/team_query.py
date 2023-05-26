@@ -84,7 +84,7 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
 
 
 class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "district_teams_{district_key}"
     DICT_CONVERTER = TeamConverter
 
@@ -103,10 +103,10 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         matches = re.match(r"\d{4,}", district_key)
         if matches is not None:
             year = int(matches.group(0))
-            event_teams = EventTeam.query(EventTeam.year == year).fetch()
+            event_teams = EventTeam.query(EventTeam.year == year).fetch(keys_only=True)
             team_keys = filter(
                 lambda team_key: any(
-                    team_key == event_team.team for event_team in event_teams
+                    (event_team_key.id().split("_")[1] == team_key.id()) for event_team_key in event_teams
                 ),
                 team_keys,
             )
