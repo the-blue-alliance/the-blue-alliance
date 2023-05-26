@@ -2,6 +2,7 @@ import re
 from typing import Any, Generator, List, Optional, Set
 
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
@@ -95,21 +96,22 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     def _query_async(
         self, district_key: DistrictKey
     ) -> Generator[Any, Any, List[Team]]:
-        district_teams = yield DistrictTeam.query(
-            DistrictTeam.district_key == ndb.Key(District, district_key)
-        ).fetch_async()
-        team_keys = map(lambda district_team: district_team.team, district_teams)
+        year = int(none_throws(re.match(r"\d{4,}", district_key)).group(0))
 
-        matches = re.match(r"\d{4,}", district_key)
-        if matches is not None:
-            year = int(matches.group(0))
-            event_teams = EventTeam.query(EventTeam.year == year).fetch(keys_only=True)
-            team_keys = filter(
-                lambda team_key: any(
-                    (event_team_key.id().split("_")[1] == team_key.id()) for event_team_key in event_teams
-                ),
-                team_keys,
-            )
+        district_teams, event_teams = yield DistrictTeam.query(
+            DistrictTeam.district_key == ndb.Key(District, district_key)
+        ).fetch_async(), EventTeam.query(EventTeam.year == year).fetch_async(
+            keys_only=True
+        )
+
+        team_keys = map(lambda district_team: district_team.team, district_teams)
+        team_keys = filter(
+            lambda team_key: any(
+                (event_team_key.id().split("_")[1] == team_key.id())
+                for event_team_key in event_teams
+            ),
+            team_keys,
+        )
 
         teams = yield ndb.get_multi_async(team_keys)
         return list(teams)
