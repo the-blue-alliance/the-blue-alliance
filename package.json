@@ -10,7 +10,7 @@
     "firebase": "^9.22.1",
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
-    "less-loader": "^11.1.1",
+    "less-loader": "^11.1.2",
     "material-ui": "^0.20.2",
     "prettier": "^2.8.8",
     "prop-types": "^15.8.1",
