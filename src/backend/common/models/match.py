@@ -520,7 +520,7 @@ class Match(CachedModel):
     @classmethod
     def validate_key_name(cls, match_key: str) -> bool:
         key_name_regex = re.compile(
-            r"^[1-9]\d{3}[a-z]+[0-9]*\_(?:qm|ef\dm|qf\dm|sf\d{1,2}m|f\dm)\d+$"
+            r"^[1-9]\d{3}[a-z]+[0-9]*\_(?:qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$"
         )
         match = re.match(key_name_regex, match_key)
         return True if match else False
