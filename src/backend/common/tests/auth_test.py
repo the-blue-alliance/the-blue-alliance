@@ -10,6 +10,7 @@ from backend.common.auth import (
     _user_context_processor,
     create_session_cookie,
     current_user,
+    delete_user,
     revoke_session_cookie,
     verify_id_token,
 )
@@ -122,6 +123,13 @@ def test_current_user() -> None:
     with patch.object(backend_auth, "_decoded_claims", return_value={"abc": "abc"}):
         user = current_user()
     assert user is not None
+
+
+def test_delete_user() -> None:
+    with patch.object(auth, "delete_user") as mock_delete_user:
+        delete_user("test_uid")
+
+    mock_delete_user.assert_called_once_with("test_uid", app=ANY)
 
 
 def test_user_context_processor_no_claims() -> None:
