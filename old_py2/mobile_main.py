@@ -138,30 +138,6 @@ class MobileAPI(remote.Service):
             ndb.delete_multi(query)
             return BaseResponse(code=200, message="User deleted")
 
-    @endpoints.method(PingRequest, BaseResponse,
-                      path='ping', http_method='POST',
-                      name='ping')
-    def ping_client(self, request):
-        current_user = endpoints.get_current_user()
-        if current_user is None:
-            return BaseResponse(code=401, message="Unauthorized to ping client")
-
-        user_id = PushHelper.user_email_to_id(current_user.email())
-        gcm_id = request.mobile_id
-
-        # Find a Client for the current user with the passed GCM ID
-        clients = MobileClient.query(MobileClient.messaging_id == gcm_id, ancestor=ndb.Key(Account, user_id)).fetch(1)
-        if len(clients) == 0:
-            # No Client for user with that push token - bailing
-            return BaseResponse(code=404, message="Invalid push token for user")
-        else:
-            client = clients[0]
-            from helpers.tbans_helper import TBANSHelper
-            success = TBANSHelper.ping(client)
-            if success:
-                return BaseResponse(code=200, message="Ping sent")
-            else:
-                return BaseResponse(code=500, message="Failed to ping client")
 
     @endpoints.method(message_types.VoidMessage, FavoriteCollection,
                       path='favorites/list', http_method='POST',

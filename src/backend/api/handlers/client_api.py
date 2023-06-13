@@ -5,6 +5,7 @@ from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import (
     BaseResponse,
     ListDevicesResponse,
+    PingRequest,
     RegisteredMobileClient,
     RegistrationRequest,
     VoidRequest,
@@ -14,6 +15,7 @@ from backend.common.consts.client_type import (
     ENUMS as CLIENT_TYPE_MAP,
     NAMES as CLIENT_TYPE_NAMES,
 )
+from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.mobile_client import MobileClient
 
 
@@ -106,3 +108,29 @@ def unregister_mobile_client(req: RegistrationRequest) -> BaseResponse:
     else:
         ndb.delete_multi(query)
         return BaseResponse(code=200, message="User deleted")
+
+
+@client_api_method(PingRequest, BaseResponse)
+def ping_mobile_client(req: PingRequest) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to ping client")
+
+    account_key = none_throws(current_user.account_key)
+    gcm_id = req["mobile_id"]
+
+    clients = MobileClient.query(
+        MobileClient.messaging_id == gcm_id, ancestor=account_key
+    ).fetch(1)
+    if len(clients) == 0:
+        return BaseResponse(
+            code=404,
+            message="Invalid push token for user",
+        )
+    else:
+        client: MobileClient = clients[0]
+        success = TBANSHelper.ping(client)
+        if success:
+            return BaseResponse(code=200, message="Ping sent")
+        else:
+            return BaseResponse(code=500, message="Failed to ping client")

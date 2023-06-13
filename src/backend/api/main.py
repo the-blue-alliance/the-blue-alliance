@@ -7,6 +7,7 @@ from werkzeug.routing import BaseConverter
 
 from backend.api.handlers.client_api import (
     list_mobile_clients,
+    ping_mobile_client,
     register_mobile_client,
     unregister_mobile_client,
 )
@@ -349,6 +350,11 @@ client_api.add_url_rule(
     "/list_clients",
     methods=["POST"],
     view_func=list_mobile_clients,
+)
+client_api.add_url_rule(
+    "/ping",
+    methods=["POST"],
+    view_func=ping_mobile_client,
 )
 client_api.add_url_rule(
     "/unregister",
