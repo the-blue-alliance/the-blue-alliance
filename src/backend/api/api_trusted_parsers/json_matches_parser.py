@@ -154,7 +154,7 @@ class JSONMatchesParser:
                             )
                             if is_valid is not True:
                                 raise ParserInputException(
-                                    f"Valid score breakdowns for {year} are: {is_valid}"
+                                    f"Invalid score breakdown field for {year}: {k}"
                                 )
 
             datetime_utc = None
