@@ -359,9 +359,9 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
 
 class ScoreBreakdownKeys:
     @staticmethod
-    def is_valid_score_breakdown_key(key: str, year: Year):
+    def get_valid_score_breakdown_keys(year: Year) -> set[str]:
         """
-        If valid, returns True. Otherwise, returns the set of valid breakdowns.
+        Return all valid score breakdown keys for the given year.
         """
-        valid_breakdowns = VALID_BREAKDOWNS.get(year, set())
-        return key in valid_breakdowns
+        # return a copy
+        return set(VALID_BREAKDOWNS.get(year, set()))
