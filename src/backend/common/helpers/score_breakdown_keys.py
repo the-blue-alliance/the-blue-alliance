@@ -312,40 +312,45 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
     ),
     2023: set(
         [
-            "mobilityRobot1",
-            "mobilityRobot2",
-            "mobilityRobot3",
+            "activationBonusAchieved",
+            "adjustPoints",
+            "autoBridgeState",
+            "autoChargeStationPoints",
             "autoChargeStationRobot1",
             "autoChargeStationRobot2",
             "autoChargeStationRobot3",
+            "autoCommunity",
+            "autoDocked",
+            "autoGamePieceCount",
+            "autoGamePiecePoints",
+            "autoMobilityPoints",
+            "autoPoints",
+            "coopertitionCriteriaMet",
+            "coopGamePieceCount",
+            "endGameBridgeState",
+            "endGameChargeStationPoints",
             "endGameChargeStationRobot1",
             "endGameChargeStationRobot2",
             "endGameChargeStationRobot3",
-            "autoGamePieceCount",
-            "autoMobilityPoints",
-            "autoPoints",
-            "autoDocked",
-            "autoBridgeState",
-            "autoGamePiecePoints",
-            "autoChargeStationPoints",
-            "teleopGamePieceCount",
-            "extraGamePieceCount",
-            "teleopPoints",
-            "teleopGamePiecePoints",
-            "endGameChargeStationPoints",
             "endGameParkPoints",
-            "endGameBridgeState",
-            "linkPoints",
-            "activationBonusAchieved",
-            "sustainabilityBonusAchieved",
-            "coopertitionCriteriaMet",
-            "coopGamePieceCount",
-            "totalChargeStationPoints",
+            "extraGamePieceCount",
             "foulCount",
-            "techFoulCount",
-            "adjustPoints",
             "foulPoints",
+            "g405Penalty",
+            "h111Penalty",
+            "linkPoints",
+            "links",
+            "mobilityRobot1",
+            "mobilityRobot2",
+            "mobilityRobot3",
             "rp",
+            "sustainabilityBonusAchieved",
+            "techFoulCount",
+            "teleopCommunity",
+            "teleopGamePieceCount",
+            "teleopGamePiecePoints",
+            "teleopPoints",
+            "totalChargeStationPoints",
             "totalPoints",
         ]
     ),
@@ -354,9 +359,9 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
 
 class ScoreBreakdownKeys:
     @staticmethod
-    def is_valid_score_breakdown_key(key: str, year: Year):
+    def get_valid_score_breakdown_keys(year: Year) -> set[str]:
         """
-        If valid, returns True. Otherwise, returns the set of valid breakdowns.
+        Return all valid score breakdown keys for the given year.
         """
-        valid_breakdowns = VALID_BREAKDOWNS.get(year, set())
-        return key in valid_breakdowns
+        # return a copy
+        return set(VALID_BREAKDOWNS.get(year, set()))
