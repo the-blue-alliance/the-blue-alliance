@@ -327,27 +327,27 @@ class TBANSHelper:
 
     @classmethod
     def update_favorites(
-        cls, user_id: str, initiating_device_key: Optional[str] = None
+        cls, user_id: str, initiating_device_id: Optional[str] = None
     ) -> None:
         from backend.common.models.notifications.mytba import (
             FavoritesUpdatedNotification,
         )
 
-        # TODO: support skipping a specific device
-        # TODO: we shouldn't send to webhooks unless opted in
-        cls._send([user_id], FavoritesUpdatedNotification(user_id=user_id))
+        cls._send(
+            [user_id], FavoritesUpdatedNotification(user_id, initiating_device_id)
+        )
 
     @classmethod
     def update_subscriptions(
-        cls, user_id: str, initiating_device_key: Optional[str] = None
+        cls, user_id: str, initiating_device_id: Optional[str] = None
     ) -> None:
         from backend.common.models.notifications.mytba import (
             SubscriptionsUpdatedNotification,
         )
 
-        # TODO: support skipping a specific device
-        # TODO: we shouldn't send to webhooks unless opted in
-        cls._send([user_id], SubscriptionsUpdatedNotification(user_id=user_id))
+        cls._send(
+            [user_id], SubscriptionsUpdatedNotification(user_id, initiating_device_id)
+        )
 
     @staticmethod
     def ping(client: MobileClient) -> bool:
@@ -550,6 +550,7 @@ class TBANSHelper:
             client
             for client in clients
             if client.client_type in (FCM_CLIENTS | FCM_LEGACY_CLIENTS)
+            and notification.should_send_to_client(client)
         ]
 
         from backend.common.models.notifications.requests.fcm_request import (
@@ -660,10 +661,12 @@ class TBANSHelper:
 
         # Make sure we're only sending to webhook clients
         clients = [
-            client for client in clients if client.client_type == ClientType.WEBHOOK
+            client
+            for client in clients
+            if client.client_type == ClientType.WEBHOOK
+            and client.verified
+            and notification.should_send_to_client(client)
         ]
-        # Only send to verified webhooks
-        clients = [client for client in clients if client.verified]
 
         from backend.common.models.notifications.requests.webhook_request import (
             WebhookRequest,

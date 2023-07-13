@@ -1059,6 +1059,24 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper._send_fcm(clients, MockNotification())
             mock_init.assert_called_once_with(ANY, ANY, expected, False)
 
+    def test_send_fcm_filter_from_notification(self):
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="client_type_{}".format(client_type),
+                client_type=client_type,
+            )
+            for client_type in CLIENT_TYPE_NAMES.keys()
+        ]
+
+        with patch(
+            "backend.common.models.notifications.requests.fcm_request.FCMRequest",
+            autospec=True,
+        ) as mock_init:
+            TBANSHelper._send_fcm(clients, MockNotification(should_send=False))
+            mock_init.assert_not_called()
+
     def test_send_fcm_batch(self):
         clients = [
             MobileClient(
@@ -1426,6 +1444,31 @@ class TestTBANSHelper(unittest.TestCase):
         ) as mock_init:
             TBANSHelper._send_webhook(clients, MockNotification())
             mock_init.assert_called_once_with(ANY, "verified", ANY)
+
+    def test_send_webhook_filter_webhook_clients_from_notification(self):
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="unverified",
+                client_type=ClientType.WEBHOOK,
+                verified=False,
+            ),
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="verified",
+                client_type=ClientType.WEBHOOK,
+                verified=True,
+            ),
+        ]
+
+        with patch(
+            "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
+            autospec=True,
+        ) as mock_init:
+            TBANSHelper._send_webhook(clients, MockNotification(should_send=False))
+            mock_init.assert_not_called()
 
     def test_send_webhook_multiple(self):
         clients = [
