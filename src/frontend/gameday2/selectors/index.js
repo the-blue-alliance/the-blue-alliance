@@ -8,7 +8,7 @@ export const getWebcastIds = createSelector(
   (webcastsById) => {
     const webcastIds = [];
     Object.keys(webcastsById)
-      .filter((key) => ({}.hasOwnProperty.call(webcastsById, key)))
+      .filter((key) => ({}).hasOwnProperty.call(webcastsById, key))
       .forEach((key) => webcastIds.push(key));
     return webcastIds;
   }
@@ -22,7 +22,7 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     // Flatten the map of id->webcast to an array of webcast objects
     const webcastsArray = [];
     Object.keys(webcastsById)
-      .filter((key) => ({}.hasOwnProperty.call(webcastsById, key)))
+      .filter((key) => ({}).hasOwnProperty.call(webcastsById, key))
       .forEach((key) => webcastsArray.push(webcastsById[key]));
 
     // First, select all webcasts that have a designated sort order
@@ -30,7 +30,7 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     // the order the server provides them in
 
     const orderedWebcasts = webcastsArray.filter((webcast) =>
-      ({}.hasOwnProperty.call(webcast, "sortOrder"))
+      ({}).hasOwnProperty.call(webcast, "sortOrder")
     );
     const sortedOrderedWebcasts = orderedWebcasts.sort((a, b) =>
       a.sortOrder > b.sortOrder ? 1 : -1
@@ -61,7 +61,7 @@ export const getChats = (state) => state.chats;
 export const getChatsInDisplayOrder = createSelector([getChats], (chats) => {
   const displayOrderChats = [];
   Object.keys(chats.chats)
-    .filter((key) => ({}.hasOwnProperty.call(chats.chats, key)))
+    .filter((key) => ({}).hasOwnProperty.call(chats.chats, key))
     .forEach((key) => displayOrderChats.push(chats.chats[key]));
 
   return displayOrderChats.sort((a, b) => a.name.localeCompare(b.name));
