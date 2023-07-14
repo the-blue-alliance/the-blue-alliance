@@ -258,42 +258,4 @@ class MobileAPI(remote.Service):
                     model_type=subscription.model_type))
         return SubscriptionCollection(subscriptions=output)
 
-    @endpoints.method(MediaSuggestionMessage, BaseResponse,
-                      path='team/media/suggest', http_method='POST',
-                      name='team.media.suggestion')
-    def suggest_team_media(self, request):
-        current_user = endpoints.get_current_user()
-        if current_user is None:
-            return BaseResponse(code=401, message="Unauthorized to make suggestions")
-        user_id = PushHelper.user_email_to_id(current_user.email())
-
-        # For now, only allow team media suggestions
-        if request.reference_type != "team":
-            # Trying to suggest a media for an invalid model type
-            return BaseResponse(code=400, message="Bad model type")
-
-        # Need to split deletehash out into its own private dict. Don't want that to be exposed via API...
-        private_details_json = None
-        if request.details_json:
-            incoming_details = json.loads(request.details_json)
-            private_details = None
-            if 'deletehash' in incoming_details:
-                private_details = {'deletehash': incoming_details.pop('deletehash')}
-            private_details_json = json.dumps(private_details) if private_details else None
-
-        status = SuggestionCreator.createTeamMediaSuggestion(
-            author_account_key=ndb.Key(Account, user_id),
-            media_url=request.media_url,
-            team_key=request.reference_key,
-            year_str=str(request.year),
-            private_details_json=private_details_json)
-
-        if status != 'bad_url':
-            if status == 'success':
-                return BaseResponse(code=200, message="Suggestion added")
-            else:
-                return BaseResponse(code=304, message="Suggestion already exists")
-        else:
-            return BaseResponse(code=400, message="Bad suggestion url")
-
 app = endpoints.api_server([MobileAPI])

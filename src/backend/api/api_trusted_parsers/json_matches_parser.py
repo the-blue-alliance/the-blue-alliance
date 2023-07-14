@@ -58,7 +58,9 @@ class JSONMatchesParser:
         time_string: String in the format "(H)H:MM AM/PM" for when the match will be played in the event's local timezone. ex: "9:15 AM"
         time: UTC time of the match as a string in ISO 8601 format (YYYY-MM-DDTHH:MM:SS).
         """
-        VALID_BREAKDOWN_KEYS: set[str] = ScoreBreakdownKeys.get_valid_score_breakdown_keys(year)
+        VALID_BREAKDOWN_KEYS: set[
+            str
+        ] = ScoreBreakdownKeys.get_valid_score_breakdown_keys(year)
         matches = safe_json.loads(matches_json, Sequence[MatchInput], validate=False)
         if not isinstance(matches, list):
             raise ParserInputException("Invalid JSON. Please check input.")
@@ -149,7 +151,9 @@ class JSONMatchesParser:
                             raise ParserInputException(
                                 f"Alliance color '{color}' not recognized"
                             )
-                        invalid_breakdown_keys: set[str] = set(breakdown.keys()) - VALID_BREAKDOWN_KEYS
+                        invalid_breakdown_keys: set[str] = (
+                            set(breakdown.keys()) - VALID_BREAKDOWN_KEYS
+                        )
                         if invalid_breakdown_keys:
                             raise ParserInputException(
                                 f"Invalid score breakdown fields for {year}: {sorted(list(invalid_breakdown_keys))}. "
