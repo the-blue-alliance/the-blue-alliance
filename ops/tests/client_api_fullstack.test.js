@@ -144,3 +144,164 @@ describe("webhook ping", () => {
     });
   });
 });
+
+describe("mytba favorites", () => {
+  let idToken = null;
+  it("can fetch an auth token", async () => {
+    idToken = await getIdToken();
+  });
+
+  it("should return no favorites initially", async () => {
+    const listRes = await postToClientAPI("favorites/list", idToken, {});
+    expect([200, 304]).toContainEqual(listRes.status);
+
+    const respBody = await listRes.json();
+    expect(respBody.code).toEqual(200);
+    expect(respBody.favorites.length).toEqual(0);
+  });
+
+  it("should add a favorite", async () => {
+    const updateReq = {
+      model_key: "2023test",
+      model_type: 0, // EVENT
+      device_key: "test",
+      notifications: [],
+      favorite: true,
+    };
+    const updateRes = await postToClientAPI(
+      "model/setPreferences",
+      idToken,
+      updateReq
+    );
+    expect(updateRes.status).toEqual(200);
+
+    const respBody = await updateRes.json();
+    expect(respBody.code).not.toBeNull();
+    const respMessage = JSON.parse(respBody.message);
+    expect([200, 304]).toContainEqual(respMessage.favorite.code);
+  });
+
+  it("should return the favorite", async () => {
+    const listRes = await postToClientAPI("favorites/list", idToken, {});
+    expect([200, 304]).toContainEqual(listRes.status);
+
+    const respBody = await listRes.json();
+    expect(respBody.code).toEqual(200);
+    expect(respBody.favorites.length).toEqual(1);
+    expect(respBody.favorites[0]).toEqual({
+      model_key: "2023test",
+      model_type: 0,
+    });
+  });
+
+  it("should remove a favorite", async () => {
+    const updateReq = {
+      model_key: "2023test",
+      model_type: 0, // EVENT
+      device_key: "test",
+      notifications: [],
+      favorite: false,
+    };
+    const updateRes = await postToClientAPI(
+      "model/setPreferences",
+      idToken,
+      updateReq
+    );
+    expect(updateRes.status).toEqual(200);
+
+    const respBody = await updateRes.json();
+    expect(respBody.code).not.toBeNull();
+    const respMessage = JSON.parse(respBody.message);
+    expect([200, 304]).toContainEqual(respMessage.favorite.code);
+  });
+
+  it("should no longer return favorites", async () => {
+    const listRes = await postToClientAPI("favorites/list", idToken, {});
+    expect([200, 304]).toContainEqual(listRes.status);
+
+    const respBody = await listRes.json();
+    expect(respBody.code).toEqual(200);
+    expect(respBody.favorites.length).toEqual(0);
+  });
+});
+
+describe("mytba subscriptions", () => {
+  let idToken = null;
+  it("can fetch an auth token", async () => {
+    idToken = await getIdToken();
+  });
+
+  it("should return no subscriptions initially", async () => {
+    const listRes = await postToClientAPI("subscriptions/list", idToken, {});
+    expect([200, 304]).toContainEqual(listRes.status);
+
+    const respBody = await listRes.json();
+    expect(respBody.code).toEqual(200);
+    expect(respBody.subscriptions.length).toEqual(0);
+  });
+
+  it("should add a subscription", async () => {
+    const updateReq = {
+      model_key: "2023test",
+      model_type: 0, // EVENT
+      device_key: "test",
+      notifications: ["upcoming_match"],
+      favorite: false,
+    };
+    const updateRes = await postToClientAPI(
+      "model/setPreferences",
+      idToken,
+      updateReq
+    );
+    expect(updateRes.status).toEqual(200);
+
+    const respBody = await updateRes.json();
+    expect(respBody.code).not.toBeNull();
+    const respMessage = JSON.parse(respBody.message);
+    expect([200, 304]).toContainEqual(respMessage.subscription.code);
+  });
+
+  it("should return the subscription", async () => {
+    const listRes = await postToClientAPI("subscriptions/list", idToken, {});
+    expect([200, 304]).toContainEqual(listRes.status);
+
+    const respBody = await listRes.json();
+    expect(respBody.code).toEqual(200);
+    expect(respBody.subscriptions.length).toEqual(1);
+    expect(respBody.subscriptions[0]).toEqual({
+      model_key: "2023test",
+      model_type: 0,
+      notifications: ["upcoming_match"],
+    });
+  });
+
+  it("should remove subscription", async () => {
+    const updateReq = {
+      model_key: "2023test",
+      model_type: 0, // EVENT
+      device_key: "test",
+      notifications: [],
+      favorite: false,
+    };
+    const updateRes = await postToClientAPI(
+      "model/setPreferences",
+      idToken,
+      updateReq
+    );
+    expect(updateRes.status).toEqual(200);
+
+    const respBody = await updateRes.json();
+    expect(respBody.code).not.toBeNull();
+    const respMessage = JSON.parse(respBody.message);
+    expect([200, 304]).toContainEqual(respMessage.subscription.code);
+  });
+
+  it("should no longer return the subscription", async () => {
+    const listRes = await postToClientAPI("subscriptions/list", idToken, {});
+    expect([200, 304]).toContainEqual(listRes.status);
+
+    const respBody = await listRes.json();
+    expect(respBody.code).toEqual(200);
+    expect(respBody.subscriptions.length).toEqual(0);
+  });
+});

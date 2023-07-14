@@ -59,6 +59,10 @@ from backend.common.models.notifications.match_upcoming import (
 from backend.common.models.notifications.match_video import (
     MatchVideoNotification,
 )
+from backend.common.models.notifications.mytba import (
+    FavoritesUpdatedNotification,
+    SubscriptionsUpdatedNotification,
+)
 from backend.common.models.notifications.requests.fcm_request import FCMRequest
 from backend.common.models.notifications.requests.webhook_request import (
     WebhookRequest,
@@ -658,6 +662,30 @@ class TestTBANSHelper(unittest.TestCase):
             notification = notifications[1]
             assert notification.team == self.team
 
+    def test_update_favorites(self):
+        user_id = "user_id_1"
+        device_id = "device_id"
+
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.update_favorites(user_id, device_id)
+            assert mock_send.call_count == 1
+            call_args = mock_send.call_args[0]
+            assert call_args[0] == [user_id]
+            assert isinstance(call_args[1], FavoritesUpdatedNotification)
+            assert call_args[1].user_id == user_id
+
+    def test_update_subscriptions(self):
+        user_id = "user_id_1"
+        device_id = "device_id"
+
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.update_subscriptions(user_id, device_id)
+            assert mock_send.call_count == 1
+            call_args = mock_send.call_args[0]
+            assert call_args[0] == [user_id]
+            assert isinstance(call_args[1], SubscriptionsUpdatedNotification)
+            assert call_args[1].user_id == user_id
+
     def test_ping_client(self):
         client = MobileClient(
             parent=ndb.Key(Account, "user_id"),
@@ -1031,6 +1059,24 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper._send_fcm(clients, MockNotification())
             mock_init.assert_called_once_with(ANY, ANY, expected, False)
 
+    def test_send_fcm_filter_from_notification(self):
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="client_type_{}".format(client_type),
+                client_type=client_type,
+            )
+            for client_type in CLIENT_TYPE_NAMES.keys()
+        ]
+
+        with patch(
+            "backend.common.models.notifications.requests.fcm_request.FCMRequest",
+            autospec=True,
+        ) as mock_init:
+            TBANSHelper._send_fcm(clients, MockNotification(should_send=False))
+            mock_init.assert_not_called()
+
     def test_send_fcm_batch(self):
         clients = [
             MobileClient(
@@ -1398,6 +1444,31 @@ class TestTBANSHelper(unittest.TestCase):
         ) as mock_init:
             TBANSHelper._send_webhook(clients, MockNotification())
             mock_init.assert_called_once_with(ANY, "verified", ANY)
+
+    def test_send_webhook_filter_webhook_clients_from_notification(self):
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="unverified",
+                client_type=ClientType.WEBHOOK,
+                verified=False,
+            ),
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="verified",
+                client_type=ClientType.WEBHOOK,
+                verified=True,
+            ),
+        ]
+
+        with patch(
+            "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
+            autospec=True,
+        ) as mock_init:
+            TBANSHelper._send_webhook(clients, MockNotification(should_send=False))
+            mock_init.assert_not_called()
 
     def test_send_webhook_multiple(self):
         clients = [

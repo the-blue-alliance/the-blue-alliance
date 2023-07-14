@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.notification_type import NotificationType
 from backend.common.models.fcm.platform_config import PlatformConfig
+from backend.common.models.mobile_client import MobileClient
 
 
 class Notification(object):
@@ -46,6 +47,16 @@ class Notification(object):
             NotificationType constant
         """
         raise NotImplementedError("Notification subclass must implement type")
+
+    def should_send_to_client(self, client: MobileClient) -> bool:
+        """
+        Provide a way to filter out a given notification from being sent to certain
+        recipients
+
+        Returns:
+            boolean indicating if we should attempt to send the notification or not
+        """
+        return True
 
     @property
     def fcm_notification(self) -> Optional[Any]:

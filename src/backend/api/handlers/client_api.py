@@ -6,11 +6,17 @@ from pyre_extensions import none_throws
 from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import (
     BaseResponse,
+    FavoriteCollection,
+    FavoriteMessage,
     ListDevicesResponse,
     MediaSuggestionMessage,
+    ModelPreferenceMessage,
     PingRequest,
     RegisteredMobileClient,
     RegistrationRequest,
+    SubscriptionCollection,
+    SubscriptionMessage,
+    UpdatePreferencesInternalResponse,
     VoidRequest,
 )
 from backend.api.handlers.decorators import client_api_method
@@ -18,9 +24,16 @@ from backend.common.consts.client_type import (
     ENUMS as CLIENT_TYPE_MAP,
     NAMES as CLIENT_TYPE_NAMES,
 )
+from backend.common.consts.notification_type import (
+    TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
+    TYPES as NOTIFICATION_NAME_TO_TYPE,
+)
+from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
+from backend.common.models.favorite import Favorite
 from backend.common.models.mobile_client import MobileClient
+from backend.common.models.subscription import Subscription
 from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
@@ -183,3 +196,133 @@ def suggest_team_media(request: MediaSuggestionMessage) -> BaseResponse:
         return BaseResponse(code=200, message="Suggestion added")
     else:
         return BaseResponse(code=304, message="Suggestion already exists")
+
+
+@client_api_method(VoidRequest, FavoriteCollection)
+def list_favorites(req: VoidRequest) -> FavoriteCollection:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return FavoriteCollection(
+            code=401,
+            message="Unauthorized to list favorites",
+            favorites=[],
+        )
+
+    account_key = none_throws(current_user.account_key)
+    favorites = Favorite.query(ancestor=account_key).fetch()
+    output = [
+        FavoriteMessage(model_key=f.model_key, model_type=f.model_type)
+        for f in favorites
+    ]
+    return FavoriteCollection(
+        code=200,
+        message="",
+        favorites=output,
+    )
+
+
+@client_api_method(VoidRequest, SubscriptionCollection)
+def list_subscriptions(req: VoidRequest) -> SubscriptionCollection:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return SubscriptionCollection(
+            code=401,
+            message="Unauthorized to list subscriptions",
+            subscriptions=[],
+        )
+
+    account_key = none_throws(current_user.account_key)
+    subscriptions = Subscription.query(ancestor=account_key).fetch()
+    output = [
+        SubscriptionMessage(
+            model_key=s.model_key,
+            model_type=s.model_type,
+            notifications=[NOTIFICATION_TYPE_NAMES[n] for n in s.notification_types],
+        )
+        for s in subscriptions
+    ]
+    return SubscriptionCollection(
+        code=200,
+        message="",
+        subscriptions=output,
+    )
+
+
+@client_api_method(ModelPreferenceMessage, BaseResponse)
+def update_model_preferences(req: ModelPreferenceMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(
+            code=401,
+            message="Unauthorized to update model preferences",
+        )
+
+    account_key = none_throws(current_user.account_key)
+    user_id = str(account_key.id())
+    model_key = req["model_key"]
+    model_type = req["model_type"]
+
+    favorite_response: BaseResponse
+    subscription_response: BaseResponse
+
+    if req["favorite"]:
+        fav = Favorite(
+            parent=account_key,
+            user_id=user_id,
+            model_key=model_key,
+            model_type=model_type,
+        )
+        result = MyTBAHelper.add_favorite(fav, req["device_key"])
+        if result:
+            favorite_response = BaseResponse(code=200, message="Favorite added")
+        else:
+            favorite_response = BaseResponse(
+                code=304, message="Favorite already exists"
+            )
+    else:
+        result = MyTBAHelper.remove_favorite(
+            account_key, model_key, model_type, req["device_key"]
+        )
+        if result:
+            favorite_response = BaseResponse(code=200, message="Favorite deleted")
+        else:
+            favorite_response = BaseResponse(code=404, message="Favorite not found")
+
+    if req["notifications"]:
+        sub = Subscription(
+            parent=account_key,
+            user_id=user_id,
+            model_key=model_key,
+            model_type=req["model_type"],
+            notification_types=[
+                NOTIFICATION_NAME_TO_TYPE[t] for t in req["notifications"]
+            ],
+        )
+        result = MyTBAHelper.add_subscription(sub, req["device_key"])
+        if result:
+            subscription_response = BaseResponse(
+                code=200, message="Subscription updated"
+            )
+        else:
+            subscription_response = BaseResponse(
+                code=304,
+                message="Subscription already exists",
+            )
+    else:
+        result = MyTBAHelper.remove_subscription(
+            account_key, model_key, model_type, req["device_key"]
+        )
+        if result:
+            subscription_response = BaseResponse(
+                code=200, message="Subscription removed"
+            )
+        else:
+            subscription_response = BaseResponse(
+                code=404, message="Subscription not found"
+            )
+
+    output = UpdatePreferencesInternalResponse(
+        favorite=favorite_response,
+        subscription=subscription_response,
+    )
+    return BaseResponse(code=0, message=json.dumps(output))
