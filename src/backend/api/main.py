@@ -9,6 +9,7 @@ from backend.api.handlers.client_api import (
     list_mobile_clients,
     ping_mobile_client,
     register_mobile_client,
+    suggest_team_media,
     unregister_mobile_client,
 )
 from backend.api.handlers.district import (
@@ -355,6 +356,11 @@ client_api.add_url_rule(
     "/ping",
     methods=["POST"],
     view_func=ping_mobile_client,
+)
+client_api.add_url_rule(
+    "/team/media/suggest",
+    methods=["POST"],
+    view_func=suggest_team_media,
 )
 client_api.add_url_rule(
     "/unregister",

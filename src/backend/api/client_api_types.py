@@ -33,3 +33,11 @@ class ListDevicesResponse(BaseResponse):
 
 class PingRequest(TypedDict):
     mobile_id: str
+
+
+class MediaSuggestionMessage(TypedDict):
+    reference_key: str
+    reference_type: str
+    year: int
+    media_url: str
+    details_json: str

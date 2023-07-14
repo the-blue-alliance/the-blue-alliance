@@ -1,3 +1,5 @@
+import json
+
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -5,6 +7,7 @@ from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import (
     BaseResponse,
     ListDevicesResponse,
+    MediaSuggestionMessage,
     PingRequest,
     RegisteredMobileClient,
     RegistrationRequest,
@@ -15,8 +18,13 @@ from backend.common.consts.client_type import (
     ENUMS as CLIENT_TYPE_MAP,
     NAMES as CLIENT_TYPE_NAMES,
 )
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.mobile_client import MobileClient
+from backend.common.suggestions.suggestion_creator import (
+    SuggestionCreationStatus,
+    SuggestionCreator,
+)
 
 
 @client_api_method(RegistrationRequest, BaseResponse)
@@ -134,3 +142,44 @@ def ping_mobile_client(req: PingRequest) -> BaseResponse:
             return BaseResponse(code=200, message="Ping sent")
         else:
             return BaseResponse(code=500, message="Failed to ping client")
+
+
+@client_api_method(MediaSuggestionMessage, BaseResponse)
+def suggest_team_media(request: MediaSuggestionMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to make suggestions")
+
+    account_key = none_throws(current_user.account_key)
+
+    # For now, only allow team media suggestions
+    if request["reference_type"] != "team":
+        # Trying to suggest a media for an invalid model type
+        return BaseResponse(code=400, message="Bad model type")
+
+    if request["year"] not in SeasonHelper.get_valid_years():
+        return BaseResponse(code=400, message="Bad year")
+
+    # Need to split deletehash out into its own private dict. Don't want that to be exposed via API...
+    private_details_json = None
+    if request["details_json"]:
+        incoming_details = json.loads(request["details_json"])
+        private_details = None
+        if "deletehash" in incoming_details:
+            private_details = {"deletehash": incoming_details.pop("deletehash")}
+        private_details_json = json.dumps(private_details) if private_details else None
+
+    (status, _) = SuggestionCreator.createTeamMediaSuggestion(
+        author_account_key=account_key,
+        media_url=request["media_url"],
+        team_key=request["reference_key"],
+        year_str=str(request["year"]),
+        private_details_json=private_details_json,
+    )
+
+    if status == SuggestionCreationStatus.BAD_URL:
+        return BaseResponse(code=400, message="Bad suggestion url")
+    elif status == SuggestionCreationStatus.SUCCESS:
+        return BaseResponse(code=200, message="Suggestion added")
+    else:
+        return BaseResponse(code=304, message="Suggestion already exists")
