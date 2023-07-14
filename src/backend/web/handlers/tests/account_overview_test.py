@@ -34,6 +34,7 @@ def test_blueprint() -> None:
     assert rules_map == {
         "/account/api/read_key_add": "account.read_key_add",
         "/account/api/read_key_delete": "account.read_key_delete",
+        "/account/delete": "account.delete",
         "/account/register": "account.register",
         "/account/logout": "account.logout",
         "/account/login": "account.login",

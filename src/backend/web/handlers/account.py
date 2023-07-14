@@ -17,6 +17,7 @@ from werkzeug.wrappers import Response
 from backend.common.auth import (
     create_session_cookie,
     current_user,
+    delete_user,
     revoke_session_cookie,
 )
 from backend.common.consts.auth_type import (
@@ -28,6 +29,7 @@ from backend.common.consts.notification_type import (
     RENDER_NAMES as NOTIFICATION_RENDER_NAMES,
 )
 from backend.common.environment import Environment
+from backend.common.helpers.account_deletion import AccountDeletionHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -115,6 +117,25 @@ def edit() -> Response:
             "account_edit.html", status=session.pop("account_edit_status", None)
         )
     )
+
+
+@blueprint.route("/delete", methods=["GET", "POST"])
+@require_login
+def delete() -> Response:
+    if request.method == "POST":
+        user = none_throws(current_user())
+
+        # delete data in the TBA db for this user
+        AccountDeletionHelper.delete_account(none_throws(user.account_key))
+
+        # log out the current session
+        revoke_session_cookie()
+
+        # delete the user in firebase
+        delete_user(str(user.uid))
+        return redirect(url_for("index"))
+    else:
+        return make_response(render_template("account_delete.html"))
 
 
 @blueprint.route("/login", methods=["GET", "POST"])

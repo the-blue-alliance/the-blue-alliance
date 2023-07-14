@@ -106,7 +106,10 @@
           </tr>
         </tbody>
       </table>
-      <p><a class="btn btn-primary" href="{{ url_for('account.edit') }}"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a></p>
+      <div class="row">
+        <a class="btn btn-primary" href="{{ url_for('account.edit') }}"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a>
+        <a class="btn btn-danger" href="{{ url_for('account.delete') }}"><span class="glyphicon glyphicon-remove"></span> Delete Account</a>
+      </div>
     </div>
   </div>
   <hr>

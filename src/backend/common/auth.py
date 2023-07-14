@@ -67,5 +67,13 @@ def current_user() -> Optional[User]:
     return _current_user()
 
 
+def _delete_user(uid: str) -> None:
+    auth.delete_user(uid, app=app())
+
+
+def delete_user(uid: str) -> None:
+    _delete_user(uid)
+
+
 def _user_context_processor() -> Dict[str, Optional[User]]:
     return dict(user=current_user())
