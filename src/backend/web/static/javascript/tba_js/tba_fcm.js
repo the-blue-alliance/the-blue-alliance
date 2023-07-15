@@ -1,7 +1,7 @@
 const messaging = firebase.messaging();
 
 // Setup messaging if logged in and permission granted, or if logged in and forced
-function setupMessaging(forceRequestPermission) {
+function setupMessaging(forceRequestPermission, csrfToken) {
   $(".notifications-enabled-visible").hide();
   $(".notifications-disabled-visible").show();
   if (Notification.permission == 'denied' && forceRequestPermission) {
@@ -24,7 +24,7 @@ function setupMessaging(forceRequestPermission) {
             messaging.deleteToken(token)
             .then(function() {
               console.log('[TBA FCM] Token successfully deleted!')
-              setupMessagingHelper(accountInfo);
+              setupMessagingHelper(accountInfo, csrfToken);
             })
             .catch(function(err) {
               console.log('[TBA FCM] Unable to delete token token. Cannot continue with FCM setup.', err);
@@ -34,22 +34,25 @@ function setupMessaging(forceRequestPermission) {
             console.log('[TBA FCM] Unable to get permission to delete token. Cannot continue with FCM setup.', err);
           });
         } else {
-          setupMessagingHelper(accountInfo);
+          setupMessagingHelper(accountInfo, csrfToken);
         }
       }
     });
   }
 }
-setupMessaging(false);  // Always attempt to setup messaging without forcing
 
-function setupMessagingHelper(accountInfo) {
+// Always attempt to setup messaging without forcing
+// TODO: need to plumb CSRF token
+setupMessaging(false, "");
+
+function setupMessagingHelper(accountInfo, csrfToken) {
   messaging.requestPermission()
   .then(function() {
     return messaging.getToken();
   })
   .then(function(token) {
     console.log('[TBA FCM] Token:', token);
-    sendTokenToServer(accountInfo, token);
+    sendTokenToServer(accountInfo, token, csrfToken);
     $(".notifications-enabled-visible").show();
     $(".notifications-disabled-visible").hide();
     window.localStorage.setItem('TBA_notificationsPermission', 'enabled');
@@ -62,7 +65,7 @@ function setupMessagingHelper(accountInfo) {
     messaging.getToken()
     .then(function(refreshedToken) {
       console.log('[TBA FCM] Token refreshed:', refreshedToken);
-      sendTokenToServer(accountInfo, refreshedToken);
+      sendTokenToServer(accountInfo, refreshedToken, csrfToken);
     })
     .catch(function(err) {
       console.log('[TBA FCM] Unable to retrieve refreshed token. ', err);
@@ -113,7 +116,7 @@ function getUUID() {
   return uuid
 }
 
-function sendTokenToServer(accountInfo, token) {
+function sendTokenToServer(accountInfo, token, csrfToken) {
   window.localStorage.setItem('TBA_lastFCMTokenUserId', accountInfo.user_id);
   if (token != window.localStorage.getItem('TBA_FCMTokenSentToServer')) {
     console.log('[TBA FCM] Sending token to server...');
@@ -128,7 +131,10 @@ function sendTokenToServer(accountInfo, token) {
         'fcm_token': token,
         'uuid': getUUID(),
         'display_name': display_name,
-      }
+      },
+      headers: {
+        'X-CSRFToken': csrfToken
+      },
     }).done(function() {
       window.localStorage.setItem('TBA_FCMTokenSentToServer', token);
       console.log("[TBA FCM] Token sent to server!")

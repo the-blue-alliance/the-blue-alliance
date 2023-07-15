@@ -5,8 +5,6 @@
 
 dispatch:
 # Pin these pages to py2
-- url: "www.thebluealliance.com/_/account/*"
-  service: default
 - url: "www.thebluealliance.com/search*"
   service: default
 # match py2 css and javascript (py3 is prefixed with py3_)

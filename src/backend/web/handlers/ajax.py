@@ -1,11 +1,14 @@
-from flask import abort, jsonify, make_response, Response
+from flask import abort, jsonify, make_response, request, Response
 from pyre_extensions import none_throws
 
 from backend.common.auth import current_user
+from backend.common.consts.client_type import ClientType
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.playoff_type import TYPE_NAMES as PLAYOFF_TYPE_NAMES
 from backend.common.decorators import cached_public
+from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.models.favorite import Favorite
+from backend.common.models.mobile_client import MobileClient
 from backend.common.models.typeahead_entry import TypeaheadEntry
 from backend.web.decorators import enforce_login
 
@@ -51,3 +54,75 @@ def account_favorites_handler(model_type: int) -> Response:
         Favorite.model_type == model_type, ancestor=user.account_key
     ).fetch()
     return jsonify([m.to_json() for m in favorites])
+
+
+@enforce_login
+def account_favorites_add_handler() -> Response:
+    user = none_throws(current_user())
+
+    model_type = ModelType(int(request.form["model_type"]))
+    model_key = request.form["model_key"]
+    user_id = str(user.uid)
+
+    fav = Favorite(
+        parent=none_throws(user.account_key),
+        user_id=user_id,
+        model_type=model_type,
+        model_key=model_key,
+    )
+    MyTBAHelper.add_favorite(fav)
+    return jsonify({})
+
+
+@enforce_login
+def account_favorites_delete_handler() -> Response:
+    user = none_throws(current_user())
+
+    model_type = ModelType(int(request.form["model_type"]))
+    model_key = request.form["model_key"]
+
+    MyTBAHelper.remove_favorite(none_throws(user.account_key), model_key, model_type)
+    return jsonify({})
+
+
+def account_info_handler() -> Response:
+    user = current_user()
+    return jsonify(
+        {
+            "logged_in": (user is not None),
+            "user_id": str(user.uid) if user else None,
+        }
+    )
+
+
+@enforce_login
+def account_register_fcm_token() -> Response:
+    user = none_throws(current_user())
+    user_id = str(user.uid)
+    fcm_token = request.form.get("fcm_token")
+    uuid = request.form.get("uuid")
+    display_name = request.form.get("display_name")
+    client_type = ClientType.WEB
+
+    query = MobileClient.query(
+        MobileClient.user_id == user_id,
+        MobileClient.device_uuid == uuid,
+        MobileClient.client_type == client_type,
+    )
+    if query.count() == 0:
+        # Record doesn't exist yet, so add it
+        MobileClient(
+            parent=none_throws(user.account_key),
+            user_id=user_id,
+            messaging_id=fcm_token,
+            client_type=client_type,
+            device_uuid=uuid,
+            display_name=display_name,
+        ).put()
+    else:
+        client = query.fetch(1)[0]
+        client.messaging_id = fcm_token
+        client.display_name = display_name
+        client.put()
+
+    return jsonify({})
