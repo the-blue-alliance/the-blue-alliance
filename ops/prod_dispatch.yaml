@@ -1,0 +1,60 @@
+# This dispatch file applies to prod, not local dev
+# CI will renme this file appropriately and deploy it
+# The "default" module means "py2"
+# Cleaning this up is tracked in https://github.com/the-blue-alliance/the-blue-alliance/issues/5388
+
+dispatch:
+# Pin these pages to py2
+- url: "www.thebluealliance.com/_/account/*"
+  service: default
+- url: "www.thebluealliance.com/search*"
+  service: default
+# match py2 css and javascript (py3 is prefixed with py3_)
+- url: "www.thebluealliance.com/css/*"
+  service: default
+- url: "www.thebluealliance.com/js/*"
+  service: default
+  
+# APIs on py3 (both apiv3 and trusted api)
+- url: "www.thebluealliance.com/api/*"
+  service: py3-api
+
+# Send low-frequency long-running tasks to backend module
+# Uses B2 instance for higher CPU/memory limits
+- url: "*/backend-tasks-b2/*"
+  service: py3-tasks-cpu
+
+# Send low-frequency long-running tasks to backend module
+- url: "*/backend-tasks/*"
+  service: py3-tasks-io
+
+# Handles latency-insensive tasks
+- url: "*/tasks/*"
+  service: py3-tasks-io
+
+# API docs (swagger)
+- url: "*/swagger/*"
+  service: py3-web
+
+# mobile client API to py3
+- url: "*/clientapi/*"
+  service: py3-api
+  
+# Default catch-all to py3
+- url: "www.thebluealliance.com/*"
+  service: py3-web
+
+# Explicitly choose py2 or py3 based on host
+- url: "py3.thebluealliance.com/*"
+  service: py3-web
+  
+- url: "py2.thebluealliance.com/*"
+  service: default
+
+# Beta PWA
+# - url: "beta.thebluealliance.com/*"
+#   service: pwa-ssr
+
+# Send everything else to default module
+- url: "*/"
+  service: default
