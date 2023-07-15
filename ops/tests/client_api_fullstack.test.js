@@ -51,6 +51,8 @@ async function getIdToken() {
   }
 }
 
+jest.setTimeout(10000);
+
 describe("Mobile device registration", () => {
   let idToken = null;
   it("can fetch an auth token", async () => {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-npm run testops -- --runInBand --testTimeout=10000 --silent=false
+npm run testops -- --runInBand --silent=false
 ret=$?
 
 if [ -n "$CI" ]; then
