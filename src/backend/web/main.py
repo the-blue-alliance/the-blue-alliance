@@ -12,7 +12,11 @@ from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
 from backend.web.handlers.ajax import (
     account_apiwrite_events_handler,
+    account_favorites_add_handler,
+    account_favorites_delete_handler,
     account_favorites_handler,
+    account_info_handler,
+    account_register_fcm_token,
     playoff_types_handler,
     typeahead_handler,
 )
@@ -147,7 +151,26 @@ app.add_url_rule(
     "/_/account/apiwrite_events", view_func=account_apiwrite_events_handler
 )
 app.add_url_rule(
+    "/_/account/favorites/add",
+    view_func=account_favorites_add_handler,
+    methods=["POST"],
+)
+app.add_url_rule(
+    "/_/account/favorites/delete",
+    view_func=account_favorites_delete_handler,
+    methods=["POST"],
+)
+app.add_url_rule(
     "/_/account/favorites/<int:model_type>", view_func=account_favorites_handler
+)
+app.add_url_rule(
+    "/_/account/info",
+    view_func=account_info_handler,
+)
+app.add_url_rule(
+    "/_/account/register_fcm_token",
+    view_func=account_register_fcm_token,
+    methods=["POST"],
 )
 app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)
 app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
