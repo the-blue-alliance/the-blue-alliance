@@ -4,14 +4,15 @@
 # Cleaning this up is tracked in https://github.com/the-blue-alliance/the-blue-alliance/issues/5388
 
 dispatch:
-# match py2 css and javascript (py3 is prefixed with py3_)
-- url: "www.thebluealliance.com/css/*"
-  service: default
-- url: "www.thebluealliance.com/js/*"
-  service: default
+# Explicitly choose py2 or py3 based on host
+- url: "py3.thebluealliance.com/*"
+  service: py3-web
   
+- url: "py2.thebluealliance.com/*"
+  service: default
+
 # APIs on py3 (both apiv3 and trusted api)
-- url: "www.thebluealliance.com/api/*"
+- url: "*/api/*"
   service: py3-api
 
 # Send low-frequency long-running tasks to backend module
@@ -39,17 +40,10 @@ dispatch:
 - url: "www.thebluealliance.com/*"
   service: py3-web
 
-# Explicitly choose py2 or py3 based on host
-- url: "py3.thebluealliance.com/*"
-  service: py3-web
-  
-- url: "py2.thebluealliance.com/*"
-  service: default
-
 # Beta PWA
 # - url: "beta.thebluealliance.com/*"
 #   service: pwa-ssr
 
-# Send everything else to default module
+# Send everything else to py3
 - url: "*/"
-  service: default
+  service: py3-web
