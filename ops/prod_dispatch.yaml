@@ -4,9 +4,6 @@
 # Cleaning this up is tracked in https://github.com/the-blue-alliance/the-blue-alliance/issues/5388
 
 dispatch:
-# Pin these pages to py2
-- url: "www.thebluealliance.com/search*"
-  service: default
 # match py2 css and javascript (py3 is prefixed with py3_)
 - url: "www.thebluealliance.com/css/*"
   service: default
