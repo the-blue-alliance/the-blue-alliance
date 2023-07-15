@@ -276,7 +276,7 @@ jobs:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
-        run: /ops/deploy/deploy_module.sh src/default.yaml
+        run: ./ops/deploy/deploy_module.sh src/default.yaml
   deploy-web:
     name: Deploy Web Service
     runs-on: ubuntu-latest
