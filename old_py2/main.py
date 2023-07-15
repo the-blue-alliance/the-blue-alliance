@@ -109,7 +109,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/predictions', PredictionsHandler, 'predictions', strict_slash=True),
       RedirectRoute(r'/privacy', PrivacyHandler, 'privacy', strict_slash=True),
       RedirectRoute(r'/request/apiwrite', SuggestApiWriteController, 'request-apiwrite', strict_slash=True),
-      RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/apiwrite/review', SuggestApiWriteReviewController, 'request-apiwrite-review', strict_slash=True),
       RedirectRoute(r'/suggest/cad/review', SuggestDesignsReviewController, 'suggest-designs-review', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),
