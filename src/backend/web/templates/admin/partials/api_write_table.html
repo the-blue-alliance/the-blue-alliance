@@ -25,7 +25,7 @@
     <td>{{auth.secret}}</td>
     <td>
       {% for event_key in auth.event_list %}
-        <a href="/admin/event/{{event_key.id}}">{{event_key.id()}}</a>
+        <a href="/admin/event/{{event_key.id()}}">{{event_key.id()}}</a>
       {% endfor %}
     </td>
     <td>{% if auth.all_official_events%}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
