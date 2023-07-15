@@ -525,7 +525,7 @@
     {% for match in event.matches|sort_by("play_order") %}
     <tr>
         <td><a href="/admin/match/{{match.key_name}}">{{ match.verbose_name }}</a></td>
-        <td><time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time></td>
+        <td>{% if match.time %}<time class="tba-match-time-utc" datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% endif %}</td>
         <td>{% if match.predicted_time %}<time class="tba-match-time-utc" datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% endif %}
             {% if match.prediction_error_str %}<br>({{ match.prediction_error_str}}){% endif %}</td>
         <td>{% if match.actual_time %}<time class="tba-match-time-utc" datetime="{{match.actual_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% endif %}
