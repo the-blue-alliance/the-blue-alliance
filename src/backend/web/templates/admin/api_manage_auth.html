@@ -38,7 +38,7 @@
   <tr>
     <td><a href="/admin/api_auth/edit/{{auth.key.id() }}">{{ auth.description }}</a></td>
     <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id() }}">{{ auth.owner.id() }} {% endif %}</a></td>
-    <td>{{auth.key.id}}</td>
+    <td>{{auth.key.id()}}</td>
   </tr>
   {% endfor %}
 </table>
