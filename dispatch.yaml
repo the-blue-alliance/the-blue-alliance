@@ -4,8 +4,6 @@ dispatch:
   service: default
 - url: "www.thebluealliance.com/search*"
   service: default
-- url: "www.thebluealliance.com/clientapi/*"
-  service: default
 # match py2 css and javascript (py3 is prefixed with py3_)
 - url: "www.thebluealliance.com/css/*"
   service: default
@@ -32,6 +30,10 @@ dispatch:
 # API docs (swagger)
 - url: "*/swagger/*"
   service: py3-web
+
+# mobile client API to py3
+- url: "*/clientapi/*"
+  service: py3-api
   
 # Default catch-all to py3
 - url: "www.thebluealliance.com/*"
