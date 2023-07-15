@@ -1,3 +1,7 @@
+# WARNING: this dispatch file only applies to the local devserver currently
+# The dispatch rules for prod can be found in ops/prod_dispatch.yaml
+# Cleaning this up is tracked in https://github.com/the-blue-alliance/the-blue-alliance/issues/5388
+
 dispatch:
   - url: "*/api/*"
     service: py3-api
