@@ -16,6 +16,7 @@ from backend.common.helpers.event_team_updater import EventTeamUpdater
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
 from backend.common.helpers.prediction_helper import PredictionHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -36,10 +37,14 @@ blueprint = Blueprint("math", __name__)
 
 
 @blueprint.route("/tasks/math/enqueue/district_points_calc/<int:year>")
-def enqueue_event_district_points_calc(year: Year) -> Response:
+@blueprint.route("/tasks/math/enqueue/district_points_calc", defaults={"year": None})
+def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
     """
     Enqueues calculation of district points for all season events for a given year
     """
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
     event_keys: List[ndb.Key] = Event.query(
         Event.year == year, Event.event_type_enum.IN(SEASON_EVENT_TYPES)
     ).fetch(None, keys_only=True)
