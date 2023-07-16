@@ -72,12 +72,7 @@ jobs:
         uses: actions/setup-node@v3.7.0
         with:
           node-version: "18"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          cache: "npm"
       - name: Install Dependencies
         run: npm ci
       - name: Run Format & Lint
@@ -91,12 +86,7 @@ jobs:
         uses: actions/setup-node@v3.7.0
         with:
           node-version: "18"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          cache: "npm"
       - name: Install Dependencies
         run: npm ci
       - name: Run Tests
@@ -141,12 +131,7 @@ jobs:
         uses: actions/setup-node@v3.7.0
         with:
           node-version: "18"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          cache: "npm"
       - name: Install Node Dependencies
         run: npm ci
       - name: Run Build
@@ -175,12 +160,7 @@ jobs:
         uses: actions/setup-node@v3.7.0
         with:
           node-version: "18"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          cache: "npm"
       - name: Install Node Dependencies
         run: |
           npm ci
