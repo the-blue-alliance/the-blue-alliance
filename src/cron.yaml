@@ -40,17 +40,17 @@ cron:
   timezone: America/Los_Angeles
 
 - description: Match Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/matches/2022
+  url: /backend-tasks-b2/math/enqueue/insights/matches
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Award Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/awards/2022
+  url: /backend-tasks-b2/math/enqueue/insights/awards
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Prediction Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/predictions/2022
+  url: /backend-tasks-b2/math/enqueue/insights/predictions
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
@@ -65,7 +65,7 @@ cron:
   timezone: America/Los_Angeles
 
 - description: District Rankings Calculation
-  url: /tasks/math/enqueue/district_rankings_calc/2022
+  url: /tasks/math/enqueue/district_rankings_calc
   schedule: every tuesday 1:00
   timezone: America/Los_Angeles
 

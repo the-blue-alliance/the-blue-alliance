@@ -1,8 +1,13 @@
-from flask import Blueprint, make_response, render_template, request, url_for
+import logging
+from typing import Optional
+
+from flask import abort, Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
+from backend.common.consts.insight_type import InsightType
 from backend.common.helpers.insights_helper import InsightsHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.insight_manipulator import InsightManipulator
 from backend.common.models.keys import Year
 
@@ -11,16 +16,27 @@ blueprint = Blueprint("insights", __name__)
 
 
 @blueprint.route("/backend-tasks-b2/math/enqueue/insights/<kind>/<int:year>")
-def enqueue_year_insights(kind: str, year: Year) -> Response:
+@blueprint.route(
+    "/backend-tasks-b2/math/enqueue/insights/<kind>", defaults={"year": None}
+)
+def enqueue_year_insights(kind: str, year: Optional[Year] = None) -> Response:
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
     """
     Enqueues Insights calculation of a given kind for a given year
     """
-    taskqueue.add(
-        url=url_for("insights.do_year_insights", kind=kind, year=year),
-        method="GET",
-        target="py3-tasks-cpu",
-        queue_name="default",
-    )
+    try:
+        insight_type = InsightType(kind)
+        taskqueue.add(
+            url=url_for("insights.do_year_insights", kind=insight_type, year=year),
+            method="GET",
+            target="py3-tasks-cpu",
+            queue_name="default",
+        )
+    except ValueError:
+        logging.warning(f"Unknown insight kind {kind}")
+        abort(404)
 
     if (
         "X-Appengine-Taskname" not in request.headers
@@ -38,11 +54,19 @@ def do_year_insights(kind: str, year: Year) -> Response:
     Calculates insights of a given kind for a given year.
     """
     insights = None
-    if kind == "matches":
+    insight_kind = None
+
+    try:
+        insight_kind = InsightType(kind)
+    except ValueError:
+        logging.warning(f"Unknown insight kind {kind}")
+        abort(404)
+
+    if insight_kind == InsightType.MATCHES:
         insights = InsightsHelper.doMatchInsights(year)
-    elif kind == "awards":
+    elif insight_kind == InsightType.AWARDS:
         insights = InsightsHelper.doAwardInsights(year)
-    elif kind == "predictions":
+    elif insight_kind == InsightType.PREDICTIONS:
         insights = InsightsHelper.doPredictionInsights(year)
 
     if insights is not None:
