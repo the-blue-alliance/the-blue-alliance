@@ -1,6 +1,6 @@
 service: py3-tasks-cpu
 runtime: python311
-entrypoint: gunicorn -b :$PORT backend.tasks_cpu.main:app
+entrypoint: gunicorn -b :$PORT backend.tasks_cpu.main:app --timeout 300
 app_engine_apis: true
 
 instance_class: B4_1G
