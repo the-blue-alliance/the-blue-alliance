@@ -4,31 +4,26 @@ cron:
   schedule: every day 02:00
   timezone: America/Los_Angeles
 
-# - description: FIRST event detail scraping
-#   url: /tasks/enqueue/usfirst_event_details/2014
-#   schedule: every thursday 02:00
-#   timezone: America/Los_Angeles
+- description: FIRST team detail scraping
+  url: /tasks/enqueue/fmsapi_team_details_rolling
+  schedule: every day 02:30
+  timezone: America/Los_Angeles
 
-# - description: FIRST team detail scraping
-#   url: /tasks/enqueue/fmsapi_team_details_rolling
-#   schedule: every day 02:00
-#   timezone: America/Los_Angeles
+- description: FIRST match scraping for current events
+  url: /tasks/enqueue/fmsapi_matches/now
+  schedule: every 1 minutes
 
-#- description: FIRST match scraping for current events
-#  url: /tasks/enqueue/fmsapi_matches/now
-#  schedule: every 1 minutes
+- description: FIRST event ranking scraping for current events
+  url: /tasks/enqueue/fmsapi_event_rankings/now
+  schedule: every 1 minutes
 
-#- description: FIRST event ranking scraping for current events
-#  url: /tasks/enqueue/fmsapi_event_rankings/now
-#  schedule: every 1 minutes
+- description: FIRST event alliance scraping for current events
+  url: /tasks/enqueue/fmsapi_event_alliances/now
+  schedule: every 30 minutes
 
-#- description: FIRST event alliance scraping for current events
-#  url: /tasks/enqueue/fmsapi_event_alliances/now
-#  schedule: every 30 minutes
-
-#- description: FIRST event alliance scraping for current events on their last day
-#  url: /tasks/enqueue/fmsapi_event_alliances/last_day_only
-#  schedule: every 5 minutes
+- description: FIRST event alliance scraping for current events on their last day
+  url: /tasks/enqueue/fmsapi_event_alliances/last_day_only
+  schedule: every 5 minutes
 
 - description: FIRST award scraping for current events
   url: /tasks/enqueue/fmsapi_awards/now
@@ -45,17 +40,17 @@ cron:
   timezone: America/Los_Angeles
 
 - description: Match Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/matches/2020
+  url: /backend-tasks-b2/math/enqueue/insights/matches/2022
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Award Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/awards/2020
+  url: /backend-tasks-b2/math/enqueue/insights/awards/2022
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Prediction Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/predictions/2020
+  url: /backend-tasks-b2/math/enqueue/insights/predictions/2022
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
@@ -70,7 +65,7 @@ cron:
   timezone: America/Los_Angeles
 
 - description: District Rankings Calculation
-  url: /tasks/math/enqueue/district_rankings_calc/2020
+  url: /tasks/math/enqueue/district_rankings_calc/2022
   schedule: every tuesday 1:00
   timezone: America/Los_Angeles
 
@@ -82,9 +77,9 @@ cron:
   url: /tasks/do/update_live_events
   schedule: every 5 minutes
 
-#- description: Predict Match Times
-#  url: /tasks/math/enqueue/predict_match_times
-#  schedule: every 1 minutes
+- description: Predict Match Times
+  url: /tasks/math/enqueue/predict_match_times
+  schedule: every 1 minutes
 
 - description: Suggestion Queue Nag
   url: /tasks/do/nag_suggestions
