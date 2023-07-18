@@ -129,6 +129,33 @@ def test_lazy_load_alliances_fill_props() -> None:
     assert expected_dict == match.alliances
 
 
+def test_alliances_setter() -> None:
+    alliance_dict = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"],
+            score=-1,
+            dqs=["frc1"],
+            surrogates=[],
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=-1, dqs=[], surrogates=["frc5"]
+        ),
+    }
+    match = get_base_qual_match(alliances_json=json.dumps(alliance_dict))
+    assert match._alliances is None
+
+    expected_dict = alliance_dict
+    assert expected_dict == match.alliances
+    assert expected_dict == match._alliances
+
+    alliance_dict[AllianceColor.RED]["score"] = 10
+    alliance_dict[AllianceColor.BLUE]["score"] = 5
+    match.alliances = alliance_dict
+    assert match.alliances == alliance_dict
+    assert match._alliances == alliance_dict
+    assert match.alliances_json == json.dumps(alliance_dict)
+
+
 def test_correct_bad_alliance_scores() -> None:
     alliance_dict = {
         AllianceColor.RED: {"teams": ["frc1", "frc2", "frc3"], "score": None},

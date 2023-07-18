@@ -403,6 +403,24 @@ def test_get_alliances() -> None:
     assert event.alliance_teams == teams
 
 
+def test_get_alliances_with_backup() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.alliance_selections is None
+
+    teams = ["frc1", "frc2", "frc3"]
+    alliances = [
+        EventAlliance(picks=teams, backup={"in": "frc4", "out": "frc3"}),
+    ]
+    EventDetails(
+        id="2019ct",
+        alliance_selections=alliances,
+    ).put()
+
+    event._details = None
+    assert event.alliance_selections == alliances
+    assert event.alliance_teams == (teams + ["frc4"])
+
+
 def test_district_points() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
     assert event.district_points is None

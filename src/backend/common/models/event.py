@@ -203,6 +203,10 @@ class Event(CachedModel):
         for alliance in alliances:
             for pick in alliance["picks"]:
                 teams.append(pick)
+
+            backup = alliance.get("backup")
+            if backup is not None:
+                teams.append(backup["in"])
         return teams
 
     @property

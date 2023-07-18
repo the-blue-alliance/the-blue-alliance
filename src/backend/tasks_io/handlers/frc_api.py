@@ -1,4 +1,5 @@
 import datetime
+import logging
 import re
 from typing import List, Optional, Set
 
@@ -355,9 +356,7 @@ def event_details(event_key: EventKey) -> Response:
         teams = [teams]
 
     # Build EventTeams
-    cmp_hack_sitevar = ChampsRegistrationHacks.get()
-    events_without_eventteams = cmp_hack_sitevar["skip_eventteams"]
-    skip_eventteams = event_key in events_without_eventteams
+    skip_eventteams = ChampsRegistrationHacks.should_skip_eventteams(event)
     event_teams = (
         [
             EventTeam(
@@ -392,6 +391,19 @@ def event_details(event_key: EventKey) -> Response:
             event_team_keys.union(award_event_teams)
         )
         EventTeamManipulator.delete_keys(et_keys_to_delete)
+
+    if skip_eventteams:
+        # If we're skipping team registrations from upstream,
+        # enqueue a recalculation using local data
+        logging.info(
+            f"SKipping eventteams, enqueueing local computation for {event_key}"
+        )
+        taskqueue.add(
+            url=url_for("math.update_eventteams", event_key=event_key),
+            method="GET",
+            target="py3-tasks-io",
+            params={"allow_deletes": True},
+        )
 
     event_teams = EventTeamManipulator.createOrUpdate(event_teams)
     if type(event_teams) is not list:
