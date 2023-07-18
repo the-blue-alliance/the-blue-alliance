@@ -16,6 +16,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
+from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
@@ -168,6 +169,40 @@ def test_get_event_details_clears_eventteams(
     # Make sure we clear eventteams, except for those who also won an award
     ets = EventTeam.query(EventTeam.event == ndb.Key(Event, "2019casj")).fetch()
     assert {"frc254", "frc9000"} == {et.team.string_id() for et in ets}
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(ChampsRegistrationHacks, "should_skip_eventteams", return_value=True)
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars", return_value=([], []))
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_skip_eventteams(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    sv_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    event_mock.return_value = ([create_event()], [])
+    teams_mock.return_value = [
+        (
+            Team(id="frc254", team_number=254),
+            None,
+            None,
+        ),
+    ]
+    resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
+    assert resp.status_code == 200
+
+    # Make sure we don't write any EventTeams
+    assert EventTeam.query(EventTeam.event == ndb.Key(Event, "2019casj")).count() == 0
+
+    # but make sure we enqueue a task to compute them using local data
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+    assert tasks[0].url == "/tasks/math/do/eventteam_update/2019casj?allow_deletes=True"
 
 
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")

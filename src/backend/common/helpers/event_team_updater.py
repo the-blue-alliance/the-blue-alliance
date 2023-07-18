@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional, Set, Tuple
+from typing import List, Set, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -18,8 +18,8 @@ from backend.common.models.team import Team
 class EventTeamUpdater:
     @classmethod
     def update(
-        self, event_key: EventKey
-    ) -> Tuple[List[Team], Optional[List[EventTeam]], Set[ndb.Key]]:
+        self, event_key: EventKey, allow_deletes: bool = False
+    ) -> Tuple[List[Team], List[EventTeam], Set[ndb.Key]]:
         """
         Updates EventTeams for an event.
         Returns a tuple of (teams, event_teams, event_team_keys_to_delete)
@@ -48,14 +48,10 @@ class EventTeamUpdater:
         division_futures = (
             ndb.get_multi_async(event.divisions) if event.divisions else []
         )
-        division_matches_futures = (
-            [
-                Match.query(Match.event == division).fetch_async(1000)
-                for division in event.divisions
-            ]
-            if event.divisions
-            else []
-        )
+        division_matches_futures = [
+            Match.query(Match.event == division).fetch_async(1000)
+            for division in (event.divisions or [])
+        ]
 
         for match_future in match_futures:
             match = match_future.get_result()
@@ -71,7 +67,7 @@ class EventTeamUpdater:
             team_ids.add(team)
 
         # Add teams from division winners
-        if division_futures and division_matches_futures:
+        if event.divisions:
             for division_future, matches_future in zip(
                 division_futures, division_matches_futures
             ):
@@ -98,7 +94,7 @@ class EventTeamUpdater:
                 for team in teams
             ]
         else:
-            event_teams = None
+            event_teams = []
 
         # Delete EventTeams for teams who did not participate in the event
         # Only runs if event is over
@@ -111,11 +107,7 @@ class EventTeamUpdater:
             existing_team_ids.add(et.team.id())
 
         et_keys_to_delete: Set[ndb.Key] = set()
-        if (
-            event.year == cur_year
-            and event.end_date is not None
-            and event.end_date < datetime.datetime.now()
-        ):
+        if allow_deletes or (event.year == cur_year and event.past):
             for team_id in existing_team_ids.difference(
                 [team.key.id() for team in teams]
             ):
@@ -130,13 +122,22 @@ class EventTeamUpdater:
         First alliance to win two finals matches is the winner
         """
         _, matches_by_type = MatchHelper.organized_matches(matches)
-        if "f" not in matches_by_type or not matches_by_type[CompLevel.F]:
+        if CompLevel.F not in matches_by_type or not matches_by_type[CompLevel.F]:
             return set()
+
         finals_matches: List[Match] = matches_by_type[CompLevel.F]
         red_wins = 0
         blue_wins = 0
+
+        red_teams = set()
+        blue_teams = set()
         for match in finals_matches:
             if match.has_been_played:
+                red_teams = red_teams.union(match.alliances[AllianceColor.RED]["teams"])
+                blue_teams = blue_teams.union(
+                    match.alliances[AllianceColor.BLUE]["teams"]
+                )
+
                 if match.winning_alliance == AllianceColor.RED:
                     red_wins += 1
                 elif match.winning_alliance == AllianceColor.BLUE:
@@ -144,11 +145,9 @@ class EventTeamUpdater:
 
         winning_teams = set()
         if red_wins >= 2:
-            winning_teams = set(finals_matches[0].alliances[AllianceColor.RED]["teams"])
+            winning_teams = red_teams
         elif blue_wins >= 2:
-            winning_teams = set(
-                finals_matches[0].alliances[AllianceColor.BLUE]["teams"]
-            )
+            winning_teams = blue_teams
 
         # Return the entire alliance
         alliance_selections = event.alliance_selections

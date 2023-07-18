@@ -197,6 +197,11 @@ class Match(CachedModel):
 
         return none_throws(self._alliances)
 
+    @alliances.setter
+    def alliances(self, alliances: Dict[AllianceColor, MatchAlliance]):
+        self._alliances = alliances
+        self.alliances_json = json.dumps(alliances)
+
     @property
     def score_breakdown(self) -> Optional[MatchScoreBreakdown]:
         """

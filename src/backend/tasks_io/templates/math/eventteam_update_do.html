@@ -9,13 +9,13 @@
     <h3>EventTeams deleted:</h3>
     <ul>
         {% for deleted_event_team_key in deleted_event_teams_keys %}
-        <li>{{deleted_event_team_key.id}}</li>
+        <li>{{deleted_event_team_key.id()}}</li>
         {% endfor %}
     </ul>
     <h3>EventTeams written:</h3>
     <ul>
         {% for event_team in event_teams %}
-        <li>{{event_team.key.id}}</li>
+        <li>{{event_team.key.id()}}</li>
         {% endfor %}
     </ul>
 </div>
