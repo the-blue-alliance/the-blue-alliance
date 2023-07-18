@@ -136,6 +136,7 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "foulPoints",
             "rp",
             "totalPoints",
+            # fields added by TBA:
             "tba_gameData",
         ]
     ),
@@ -352,6 +353,9 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "teleopPoints",
             "totalChargeStationPoints",
             "totalPoints",
+            # fields added by TBA:
+            "tba_extraRp1",
+            "tba_extraRp2",
         ]
     ),
 }
