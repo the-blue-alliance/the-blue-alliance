@@ -1,7 +1,7 @@
 ## Install Tools
 Local development for The Blue Alliance uses a [Vagrant](https://www.vagrantup.com/) + [Docker](https://www.docker.com/) container setup. This allows for isolation of all dependencies and tools required to run The Blue Alliance locally to be installed in a self-contained instance.
 
-If you would like to use the beta `docker-compose` setup instead of `vagrant`, see the [docker-compose setup guide](Setup-Guide-Beta.md).
+If you would like to use the beta `docker-compose` setup instead of `vagrant`, see the [docker-compose setup guide](Setup-Guide-Beta).
 
 1. Install [Vagrant](https://www.vagrantup.com/downloads)
 2. Install [Docker](https://docs.docker.com/get-docker/)
