@@ -1,4 +1,6 @@
-<?PHP
+<?php
+
+include __DIR__ . '/config.php';
 
 include("tba_gd_lib.php");
 error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
@@ -9,17 +11,65 @@ function sanatizeGet($value) {
 }
 
 function eventSort($event_a, $event_b) {
-    $a_start = strtotime($event_a["start_time"]);
-    $b_start = strtotime($event_b["start_time"]);
+    $a_start = $event_a["start_date"];
+    $b_start = $event_b["start_date"];
     if ($a_start == $b_start) {
         return 0;
     }
     return ($a_start < $b_start) ? -1 : 1;
 }
 
+function mergeWLT($a, $b) {
+	$a['losses'] += $b['losses'];
+	$a['ties'] += $b['ties'];
+	$a['wins'] += $b['wins'];
+	return $a;
+}
+
+function stringWLT($wlt) {
+	return "({$wlt['wins']}-{$wlt['losses']}-{$wlt['ties']})";
+}
+
 function getTeamDetails($teamnumber, $year) {
-    $json = file_get_contents("http://www.thebluealliance.com/api/v1/team/details?events=1&team=frc".$teamnumber."&year=".$year);
-    return json_decode($json, TRUE);
+	$data = tba_api_request("team/frc$teamnumber/simple");
+    // TODO: International teams?
+    $data['location'] = "{$data['city']}, {$data['state_prov']}";
+    $data['events'] = tba_api_request("team/frc$teamnumber/events/$year");
+    foreach ($data['events'] as &$event) {
+    	$start = strtotime($event['start_date']);
+    	if (time() < $start) {
+    		// Hasn't started yet
+			continue;
+		}
+		$event['status'] = $status = tba_api_request("team/frc$teamnumber/event/{$event['key']}/status");
+    	if (isset($status['playoff'])) {
+    		$event['wlt'] = mergeWLT($status['playoff']['record'], $status['qual']['ranking']['record']);
+    		if ($status['playoff']['status'] == 'won') {
+    			$event['finish'] = 'Champions';
+			} else {
+    			switch ($status['playoff']['level']) {
+					case 'f':
+						$event['finish'] = 'Finalists';
+						break;
+					case 'sf':
+						$event['finish'] = 'Semifinalists';
+						break;
+					case 'qf':
+						$event['finish'] = 'Quarterfinalists';
+						break;
+					default:
+						// ???
+						$event['finish'] = '';
+						break;
+				}
+			}
+		} else {
+    		$event['wlt'] = $status['qual']['record'];
+    		$event['finish'] = '';
+		}
+
+	}
+	return $data;
 }
 
 if ($_REQUEST['debug'] == 1) {
@@ -36,6 +86,9 @@ if (!is_numeric($teamnumber)) die('team number non numeric. Team number was \''.
 //if the gradient background doesn't exist, make it.
 if (!file_exists("gradients/from" . $start_color . "to" . $stop_color . ".png")) {
 	$grad = imageCreateTrueColor(470,70);
+	if (!$grad) {
+		throw new RuntimeException('imageCreateTrueColor failed');
+	}
 	imageAlphaBlending($grad, TRUE);
 	
 	// Step 2. Set background gradient up
@@ -47,7 +100,10 @@ if (!file_exists("gradients/from" . $start_color . "to" . $stop_color . ".png"))
 	imageDestroy($baseline);
 	
 	//save it
-	imagePNG($grad,"gradients/from" . $start_color . "to" . $stop_color . ".png");
+	$saved = imagePNG($grad,"gradients/from" . $start_color . "to" . $stop_color . ".png");
+	if (!$saved) {
+		throw new RuntimeException('imagepng failed');
+	}
 	//kill it
 	imageDestroy($grad);
 }
@@ -75,9 +131,9 @@ if ($regen_overlay == 1) {
 	$black = imagecolorallocate($teamoverlay,0,0,0);
 	$negblack = 0 - $black;
 	
-	$year = date('Y');	
+	$year = date('Y');
 	$team = getTeamDetails($teamnumber, $year);
-	
+
 	$teamstring = "Team $teamnumber";
 	if ($team["nickname"] != "") {
 		$teamstring = $teamstring . " - {$team["nickname"]}";
@@ -85,41 +141,59 @@ if ($regen_overlay == 1) {
 	
 	$location_offset = imageFontWidth(3) * strlen($teamstring) + 15;
 	
-	$yearWLT = ""; //TODO: Reimplement WLT
+	$yearWLT = array('losses' => 0, 'ties' => 0, 'wins' => 0);
 	
 	imageStringoutline($teamoverlay,3,8,5,$white,$black,$teamstring,1);
-	imagettftextoutline($teamoverlay,6,0,$location_offset,16,$negwhite,$negblack,'slkscr.ttf',$team["location"],1);
+	imagettftextoutline($teamoverlay,6,0,$location_offset,16,$negwhite,$negblack,__DIR__ . '/slkscr.ttf',$team["location"],1);
 	
 	if (count($team["events"]) > 4) {
 		$event_text_offset = 27;
 	} else {
 		$event_text_offset = 30; //18 for imageStringOutline, 30 for TTF
 	}
-	
 	if ($team["events"]) {
-	    usort($events = $team["events"], "eventSort");
-	    foreach($events as $event) {
-	    //if ($eventWLT != "(0-0-0)") {
-		//	$highestmatch = getHighestMatch($eventid, "string", $teamnumber);
-		//	$eventranking = "";
-		//	if ($highestmatch != "Participants" AND $highestmatch != "") {
-		//		$eventranking = " - $highestmatch";
-		//	}
-		//	// TTF processing is not doing "silkscreen" N and M correctly in GD 2.0.28. Fixed in 2.0.35. Waiting for PHP to incorporate updated library.
-		//	imagettftextoutline($teamoverlay,6,0,18,$event_text_offset,$negwhite,$negblack,'slkscr.ttf',"$eventshort:",1);
-		            //imagettftextoutline($teamoverlay,6,0,90,$event_text_offset,$negwhite,$negblack,'slkscr.ttf',"{$eventWLT}{$eventranking}",1);
-		//} else {
-		//event happens in future, or team didn't really play at event
-		imagettftextoutline($teamoverlay,6,0,18,$event_text_offset,$negwhite,$negblack,'slkscr.ttf',"{$event["short_name"]}:",1);
-		   $start_date = strtotime($event["start_date"]);
-		   $pretty_start_date = date("F j, Y", $start_date);
-		    imagettftextoutline($teamoverlay,6,0,90,$event_text_offset,$negwhite,$negblack,'slkscr.ttf',$pretty_start_date,1);
-		//}
+	    usort($team["events"], "eventSort");
+	    $events = $team['events'];
+		$firstColEventLen = 0;
+		$secondColEventLen = 0;
+		$eventsCounted = 0;
+		foreach($events as $event) {
+			$eventsCounted++;
+			if ($eventsCounted > 5) {
+				$secondColEventLen = max($secondColEventLen, strlen($event['short_name']));
+			} else {
+				$firstColEventLen = max($firstColEventLen, strlen($event['short_name']));
+			}
+		}
+		$secondPx = intval($firstColEventLen * 7);
+		$firstPx = 18;
+		$eventsDone = 0;
+		foreach($events as $event) {
+			$eventsDone++;
+			if (isset($event['status'])) {
+				$eventWLT = stringWLT($event['wlt']);
+				imagettftextoutline($teamoverlay,6,0,$firstPx,$event_text_offset,$negwhite,$negblack,__DIR__ . '/slkscr.ttf',"{$event['short_name']}:",1);
+				imagettftextoutline($teamoverlay,6,0,$secondPx,$event_text_offset,$negwhite,$negblack,__DIR__ . '/slkscr.ttf',"{$eventWLT} {$event['finish']}",1);
+			} else {
+				//event happens in future, or team didn't really play at event
+				imagettftextoutline($teamoverlay,6,0,$firstPx,$event_text_offset,$negwhite,$negblack,__DIR__ . '/slkscr.ttf',"{$event['short_name']}:",1);
+				$start_date = strtotime($event["start_date"]);
+				$pretty_start_date = date("F j, Y", $start_date);
+				imagettftextoutline($teamoverlay,6,0,$secondPx,$event_text_offset,$negwhite,$negblack,__DIR__ . '/slkscr.ttf',$pretty_start_date,1);
+			}
 		    $event_text_offset = $event_text_offset + 10; //+12 for imageStringOutline, 10 for TTF
+			$yearWLT = mergeWLT($yearWLT, $event['wlt']);
+			if ( $eventsDone == 5 ) {
+				// Second column
+				$firstPx = $secondPx + 100;
+				$secondPx = $firstPx + intval($secondColEventLen * 5.2);
+				$event_text_offset = 27;
+			}
 	    }
 	}
-	
-	//imageStringoutline($teamoverlay,3,295,53,$white,$black,"$year Record: $yearWLT",1);
+
+	$yearWLTstr = stringWLT($yearWLT);
+	imageStringoutline($teamoverlay,3,295,53,$white,$black,"$year Record: $yearWLTstr",1);
 	
 	//save it
 	imagePNG($teamoverlay,"teamoverlays/team" . $teamnumber . ".png");
@@ -163,6 +237,3 @@ imagePNG($im);
 
 // Step 5. Delete the image from memory
 imageDestroy($im);
-
-
-?>
