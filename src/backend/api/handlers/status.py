@@ -41,7 +41,7 @@ def season() -> Response:
 
     season = dict()
     season.update(cast(dict, ApiStatus.status()))
-    season.update({"kickoff_time_utc": SeasonHelper.kickoff_datetime_utc})
+    season.update({"kickoff_time_utc": SeasonHelper.kickoff_datetime_utc(2023)})
 
     down_events_sitevar = down_events_sitevar_future.get_result()
     down_events_list = down_events_sitevar.contents if down_events_sitevar else None
