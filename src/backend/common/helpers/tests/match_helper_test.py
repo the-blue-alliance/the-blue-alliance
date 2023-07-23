@@ -360,6 +360,33 @@ def test_add_match_times_dst(test_data_importer):
     assert matches[-1].time == datetime.datetime(2014, 3, 9, 16, 5) - PDT_DELTA
 
 
+def test_add_match_times_with_weekdays(test_data_importer):
+    event = Event(
+        id="2023mibb",
+        event_short="mibb",
+        event_type_enum=EventType.OFFSEASON,
+        name="Big Bang!",
+        start_date=datetime.datetime(2023, 6, 29, 0, 0),
+        end_date=datetime.datetime(2023, 7, 1, 0, 0),
+        year=2023,
+        timezone_id="America/Detroit",
+    )
+
+    matches = _parse_match_schedule_csv(
+        event,
+        test_data_importer._get_path(__file__, "data/2023mibb_matches_quals.csv"),
+    )
+    assert len(matches) == 60
+
+    MatchHelper.add_match_times(event, matches)
+
+    EDT_DELTA = datetime.timedelta(hours=-4)
+    assert matches[0].time == datetime.datetime(2023, 6, 30, 9, 30) - EDT_DELTA
+    assert matches[49].time == datetime.datetime(2023, 6, 30, 17, 51) - EDT_DELTA
+    assert matches[50].time == datetime.datetime(2023, 7, 1, 9, 30) - EDT_DELTA
+    assert matches[59].time == datetime.datetime(2023, 7, 1, 10, 51) - EDT_DELTA
+
+
 def test_add_match_times_with_weekdays_early_end(test_data_importer):
     event = Event(
         id="2023mirr",
