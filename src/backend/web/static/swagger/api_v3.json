@@ -7367,7 +7367,7 @@
               "properties": {
                 "Error": {
                   "type": "string",
-                  "description": "Authorization error description.",
+                  "description": "Authorization error description."
                 }
               }  
             }
