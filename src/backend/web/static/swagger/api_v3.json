@@ -7358,8 +7358,21 @@
     },
     "responses": {
       "Unauthorized": {
-        "$ref": "#/components/responses/Unauthorized"
-
+        "description": "Authorization information is missing or invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["Error"],
+              "properties": {
+                "Error": {
+                  "type": "string",
+                  "description": "Authorization error description."
+                }
+              }  
+            }
+          }
+        }
       },
       "NotModified": {
         "description": "Not Modified - Use Local Cached Value"
