@@ -7363,9 +7363,13 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "items": {
-                "Error": "string"
-              }
+              "required": ["Error"],
+              "properties": {
+                "Error": {
+                  "type": "string",
+                  "description": "Authorization error description."
+                }
+              }  
             }
           }
         }
