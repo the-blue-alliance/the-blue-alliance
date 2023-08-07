@@ -7363,11 +7363,11 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "required": ["Error"],
               "properties": {
                 "Error": {
                   "type": "string",
-                  "description": "Authorization error description."
+                  "description": "Authorization error description.",
+                  "required": true
                 }
               }  
             }
