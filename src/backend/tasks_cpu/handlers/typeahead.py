@@ -20,7 +20,7 @@ def enqueue_typeahead() -> Response:
     Enqueues typeahead calculation
     """
     taskqueue.add(
-        url=url_for("blueprint.enqueue_typeahead"),
+        url=url_for("blueprint.do_typeahead"),
         method="GET",
         target="py3-tasks-cpu",
         queue_name="default",
@@ -34,11 +34,10 @@ def enqueue_typeahead() -> Response:
 
 
 @blueprint.route("/backend-tasks-b2/math/do/typeaheadcalc")
-def enqueue_typeahead() -> Response:
+def do_typeahead() -> Response:
     """
     Calculates typeahead entries
     """
-
     @ndb.tasklet
     def get_events_async():
         event_keys = (
