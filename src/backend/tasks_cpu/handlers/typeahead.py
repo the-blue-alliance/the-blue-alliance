@@ -20,7 +20,7 @@ def enqueue_typeahead() -> Response:
     Enqueues typeahead calculation
     """
     taskqueue.add(
-        url=url_for("blueprint.do_typeahead"),
+        url=url_for("typeahead.do_typeahead"),
         method="GET",
         target="py3-tasks-cpu",
         queue_name="default",
