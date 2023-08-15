@@ -29,37 +29,50 @@ def enqueue_typeahead() -> Response:
     if (
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
-        return make_response(
-            render_template("math/typeaheadcalc_enqueue.html")
-        )
+        return make_response(render_template("math/typeaheadcalc_enqueue.html"))
     return make_response("")
+
 
 @blueprint.route("/backend-tasks-b2/math/do/typeaheadcalc")
 def enqueue_typeahead() -> Response:
     """
     Calculates typeahead entries
     """
+
     @ndb.tasklet
     def get_events_async():
-        event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
+        event_keys = (
+            yield Event.query()
+            .order(-Event.year)
+            .order(Event.name)
+            .fetch_async(keys_only=True)
+        )
         events = yield ndb.get_multi_async(event_keys)
         raise ndb.Return(events)
 
     @ndb.tasklet
     def get_teams_async():
-        team_keys = yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
+        team_keys = (
+            yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
+        )
         teams = yield ndb.get_multi_async(team_keys)
         raise ndb.Return(teams)
 
     @ndb.tasklet
     def get_districts_async():
-        district_keys = yield District.query().order(-District.year).fetch_async(keys_only=True)
+        district_keys = (
+            yield District.query().order(-District.year).fetch_async(keys_only=True)
+        )
         districts = yield ndb.get_multi_async(district_keys)
         raise ndb.Return(districts)
 
     @ndb.toplevel
     def get_events_teams_districts():
-        events, teams, districts = yield get_events_async(), get_teams_async(), get_districts_async()
+        events, teams, districts = (
+            yield get_events_async(),
+            get_teams_async(),
+            get_districts_async(),
+        )
         raise ndb.Return((events, teams, districts))
 
     events, teams, districts = get_events_teams_districts()
@@ -70,14 +83,17 @@ def enqueue_typeahead() -> Response:
             nickname = "Team %s" % team.team_number
         else:
             nickname = team.nickname
-        data = '%s | %s' % (team.team_number, nickname)
+        data = "%s | %s" % (team.team_number, nickname)
         if TypeaheadEntry.ALL_TEAMS_KEY in results:
             results[TypeaheadEntry.ALL_TEAMS_KEY].append(data)
         else:
             results[TypeaheadEntry.ALL_TEAMS_KEY] = [data]
 
     for district in districts:
-        data = '%s District [%s]' % (district.display_name, district.abbreviation.upper())
+        data = "%s District [%s]" % (
+            district.display_name,
+            district.abbreviation.upper(),
+        )
         # all districts
         if TypeaheadEntry.ALL_DISTRICTS_KEY in results:
             if data not in results[TypeaheadEntry.ALL_DISTRICTS_KEY]:
@@ -86,7 +102,7 @@ def enqueue_typeahead() -> Response:
             results[TypeaheadEntry.ALL_DISTRICTS_KEY] = [data]
 
     for event in events:
-        data = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
+        data = "%s %s [%s]" % (event.year, event.name, event.event_short.upper())
         # all events
         if TypeaheadEntry.ALL_EVENTS_KEY in results:
             results[TypeaheadEntry.ALL_EVENTS_KEY].append(data)
@@ -109,9 +125,15 @@ def enqueue_typeahead() -> Response:
 
     # Remove old entries
     old_entry_keys = set(old_entry_keys_future.get_result())
-    new_entry_keys = set([ndb.Key(TypeaheadEntry, key_name) for key_name in results.keys()])
+    new_entry_keys = set(
+        [ndb.Key(TypeaheadEntry, key_name) for key_name in results.keys()]
+    )
     keys_to_delete = old_entry_keys.difference(new_entry_keys)
-    logging.info("Removing the following unused TypeaheadEntries: {}".format([key.id() for key in keys_to_delete]))
+    logging.info(
+        "Removing the following unused TypeaheadEntries: {}".format(
+            [key.id() for key in keys_to_delete]
+        )
+    )
     ndb.delete_multi(keys_to_delete)
 
     if (
