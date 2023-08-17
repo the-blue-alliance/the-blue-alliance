@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Node
-        uses: actions/setup-node@v3.8.0
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: "18"
           cache: "npm"
@@ -83,7 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Node
-        uses: actions/setup-node@v3.8.0
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: "18"
           cache: "npm"
@@ -128,7 +128,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Set up Node
-        uses: actions/setup-node@v3.8.0
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: "18"
           cache: "npm"
@@ -157,7 +157,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Set up Node
-        uses: actions/setup-node@v3.8.0
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: "18"
           cache: "npm"
