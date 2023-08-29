@@ -1,6 +1,6 @@
 import json
-from backend.common.consts.award_type import AwardType
 
+from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
@@ -165,6 +165,7 @@ def test_parse_awards_duplicate_teams2(test_data_importer, ndb_stub) -> None:
         data = json.load(f)
 
     awards = FMSAPIAwardsParser(event).parse(data)
+    assert awards is not None
 
     for award in awards:
         if award.award_type_enum == AwardType.DEANS_LIST:

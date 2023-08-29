@@ -38,6 +38,7 @@ def do_typeahead() -> Response:
     """
     Calculates typeahead entries
     """
+
     @ndb.tasklet
     def get_events_async():
         event_keys = (
