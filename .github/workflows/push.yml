@@ -195,7 +195,7 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       - name: Build Docker Image
