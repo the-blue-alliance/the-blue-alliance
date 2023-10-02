@@ -41,12 +41,16 @@ class SuggestMatchVideoController(LoggedInHandler):
     def post(self):
         self._require_registration()
 
+        action = self.request.get('action')
         match_key = self.request.get("match_key")
-        youtube_url = self.request.get("youtube_url")
-        youtube_id = YouTubeVideoHelper.parse_id_from_url(youtube_url)
-
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
-
+        if action == 'add':
+            youtube_url = self.request.get("youtube_url")
+            youtube_id = YouTubeVideoHelper.parse_id_from_url(youtube_url)
+            status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
+        elif action == 'remove':
+            youtube_id = self.request.get("youtube_id")
+            reason = self.request.get("reason")
+            status = SuggestionCreator.createMatchVideoYouTubeRemoveSuggestion(self.user_bundle.account.key, youtube_id, match_key, reason)
         self.redirect('/suggest/match/video?match_key={}&status={}'.format(match_key, status))
 
 
