@@ -8,12 +8,10 @@ import thunk from "redux-thunk";
 import EventWizardFrame from "./components/EventWizardFrame";
 import eventwizardReducer from "./reducers";
 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
   eventwizardReducer,
-  compose(
-    applyMiddleware(thunk),
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-  )
+  composeEnhancers(applyMiddleware(thunk))
 );
 
 ReactDOM.render(
