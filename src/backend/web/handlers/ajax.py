@@ -37,8 +37,10 @@ def account_apiwrite_events_handler() -> Response:
     user = none_throws(current_user())
 
     now = datetime.datetime.now()
-    auth_tokens = ApiAuthAccess.query(ApiAuthAccess.owner == user.account_key,
-                                      ndb.OR(ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now)).fetch()
+    auth_tokens = ApiAuthAccess.query(
+        ApiAuthAccess.owner == user.account_key,
+        ndb.OR(ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now),
+    ).fetch()
     event_keys = []
     for token in auth_tokens:
         event_keys.extend(token.event_list)
@@ -46,7 +48,9 @@ def account_apiwrite_events_handler() -> Response:
     events = ndb.get_multi(event_keys)
     details = []
     for event in events:
-        details.append({'value': event.key_name, 'label': "{} {}".format(event.year, event.name)})
+        details.append(
+            {"value": event.key_name, "label": "{} {}".format(event.year, event.name)}
+        )
     return jsonify(details)
 
 
