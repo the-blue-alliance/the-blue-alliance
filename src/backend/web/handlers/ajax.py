@@ -11,6 +11,7 @@ from backend.common.consts.playoff_type import TYPE_NAMES as PLAYOFF_TYPE_NAMES
 from backend.common.decorators import cached_public
 from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.mobile_client import MobileClient
 from backend.common.models.typeahead_entry import TypeaheadEntry
@@ -52,6 +53,18 @@ def account_apiwrite_events_handler() -> Response:
             {"value": event.key_name, "label": "{} {}".format(event.year, event.name)}
         )
     return jsonify(details)
+
+	
+@cached_public
+def event_remap_teams_handler() -> Response:
+    """
+    Returns the current team remapping for an event
+    """
+    event = Event.get_by_id(event_key)
+    if not event:
+        return jsonify(None)
+
+    return jsonify(event.remap_teams)
 
 
 @cached_public
