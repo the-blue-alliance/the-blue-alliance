@@ -55,6 +55,7 @@ def account_apiwrite_events_handler() -> Response:
         )
     return jsonify(details)
 
+
 @cached_public
 def event_remap_teams_handler(event_key: EventKey) -> Response:
     """
