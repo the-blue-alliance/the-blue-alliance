@@ -47,7 +47,7 @@ def account_apiwrite_events_handler() -> Response:
     details = []
     for event in events:
         details.append({'value': event.key_name, 'label': "{} {}".format(event.year, event.name)})
-   return jsonify(details)
+    return jsonify(details)
 
 
 @cached_public
