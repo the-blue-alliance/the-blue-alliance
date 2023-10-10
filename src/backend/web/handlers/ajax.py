@@ -41,7 +41,9 @@ def account_apiwrite_events_handler() -> Response:
     now = datetime.datetime.now()
     auth_tokens = ApiAuthAccess.query(
         ApiAuthAccess.owner == user.account_key,
-        ndb.OR(ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now),  # pyre-ignore[58] # noqa: E711
+        ndb.OR(
+            ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now
+        ),  # pyre-ignore[58] # noqa: E711
     ).fetch()
     event_keys = []
     for token in auth_tokens:
