@@ -31,12 +31,10 @@ def typeahead_handler(search_key: str) -> Response:
     return response
 
 
-# @enforce_login
 def account_apiwrite_events_handler() -> Response:
     """
     Get the events the current user is allowed to edit via the trusted API.
     """
-    return jsonify([])
     user = none_throws(current_user())
 
     now = datetime.datetime.now()

@@ -19,7 +19,6 @@ from backend.common.profiler import Span
 def api_authenticated(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        return func(*args, **kwargs)
         with Span("api_authenticated"):
             auth_key = request.headers.get(
                 "X-TBA-Auth-Key", request.args.get("X-TBA-Auth-Key")
