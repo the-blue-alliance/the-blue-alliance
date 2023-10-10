@@ -5,7 +5,6 @@ const getAwardKey = (type_enum, name_str, team_key, awardee) => {
 }
 
 function AwardsTab({selectedEvent, makeTrustedRequest}) {
-  selectedEvent = "2023casj"
   const [updating, setUpdating] = useState(false);
   const [awards, setAwards] = useState([]);
   const [awardsFetched, setAwardsFetched] = useState(false);
