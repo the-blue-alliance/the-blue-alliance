@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-const getAwardKey = (type_enum, team_key, awardee) => {
-  return `${type_enum}_${team_key}_${awardee}`;
+const getAwardKey = (type_enum, name_str, team_key, awardee) => {
+  return `${type_enum}_${name_str}_${team_key}_${awardee}`;
 }
 
-function AwardsTab({selectedEvent}) {
+function AwardsTab({selectedEvent, makeTrustedRequest}) {
   selectedEvent = "2023casj"
   const [updating, setUpdating] = useState(false);
   const [awards, setAwards] = useState([]);
@@ -64,7 +64,20 @@ function AwardsTab({selectedEvent}) {
   }
   
   const saveEdits = async () => {
-
+    setUpdating(true);
+    const awardsToSave = awards.filter(award => !awardsToDelete.has(getAwardKey(award.type_enum, award.name_str, award.team_key, award.awardee)));
+    
+    makeTrustedRequest(
+      `/api/trusted/v1/event/${selectedEvent}/awards/update`,
+      JSON.stringify(awardsToSave),
+      () => {
+        setUpdating(false)
+      },
+      (error) => {
+        alert(`There was an error: ${error}`)
+        setUpdating(false)
+      }
+    )
   }
 
   const sortedAwards = awards.sort((a, b) => a.type_enum - b.type_enum);
@@ -154,7 +167,7 @@ function AwardsTab({selectedEvent}) {
       </thead>
       <tbody>
         {sortedAwards.map(({type_enum, name_str, team_key, awardee}) => {
-          const awardKey = getAwardKey(type_enum, team_key, awardee);
+          const awardKey = getAwardKey(type_enum, name_str, team_key, awardee);
           const toDelete = awardsToDelete.has(awardKey);
           return (
             <tr key={awardKey}>
