@@ -3,7 +3,7 @@ from typing import AnyStr, Dict, List, TypedDict
 
 from pyre_extensions import safe_json
 
-from backend.common.consts.award_type import AwardType, AWARD_TYPES
+from backend.common.consts.award_type import AWARD_TYPES, AwardType
 from backend.common.datafeed_parsers.exceptions import ParserInputException
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.models.award import Award
