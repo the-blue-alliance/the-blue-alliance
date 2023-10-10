@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
       ".git/",
       "node_modules/",
       "src/build/*",
-      "*__pycache__*",
+      "__pycache__",
       "venv/*",
       ".pyre/*",
     ],

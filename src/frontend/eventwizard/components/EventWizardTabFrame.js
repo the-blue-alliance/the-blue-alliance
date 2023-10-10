@@ -1,6 +1,7 @@
 import React from "react";
 import EventInfoContainer from "../containers/EventInfoContainer";
 import TeamListContainer from "../containers/TeamListContainer";
+import AwardsTabContainer from "../containers/AwardsTabContainer";
 
 const EventWizardTabFrame = () => (
   <div>
@@ -15,6 +16,11 @@ const EventWizardTabFrame = () => (
           <li>
             <a href="#teams" data-toggle="tab">
               Teams
+            </a>
+          </li>
+          <li>
+            <a href="#awards" data-toggle="tab">
+              Awards
             </a>
           </li>
           <li>
@@ -48,6 +54,7 @@ const EventWizardTabFrame = () => (
     <div className="tab-content row">
       <EventInfoContainer />
       <TeamListContainer />
+      <AwardsTabContainer />
       <div className="tab-pane" id="schedule">
         <h3>FMS Schedule</h3>
       </div>
