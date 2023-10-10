@@ -43,10 +43,10 @@ function AwardsTab({selectedEvent, makeTrustedRequest}) {
 
   const addAward = () => {
     const newAward = {
-      type_enum: Number(newAwardType),
+      type_enum: newAwardType != '' ? Number(newAwardType) : null,
       name_str: newAwardName,
-      team_key: `frc${newAwardTeamNumber}`,
-      awardee: newAwardAwardee,
+      team_key: newAwardTeamNumber != '' ? `frc${newAwardTeamNumber}` : null,
+      awardee: newAwardAwardee != '' ? newAwardAwardee : null,
     };
     setAwards(prevAwards => [...prevAwards, newAward]);
   }
@@ -94,10 +94,10 @@ function AwardsTab({selectedEvent, makeTrustedRequest}) {
     <p>For a list of award type enums, see <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/award_type.py" target="_blank">here</a>.</p>
 
     <div className="form-group">
-      <label htmlFor="award_type" className="col-sm-2 control-label">
+      <label htmlFor="award_type" className="col-sm-4 control-label">
         Award Type
       </label>
-      <div className="col-sm-10">
+      <div className="col-sm-8">
         <input
           type="text"
           className="form-control"
@@ -108,10 +108,10 @@ function AwardsTab({selectedEvent, makeTrustedRequest}) {
         />
       </div>
 
-      <label htmlFor="award_name" className="col-sm-2 control-label">
+      <label htmlFor="award_name" className="col-sm-4 control-label">
         Award Name (Required)
       </label>
-      <div className="col-sm-10">
+      <div className="col-sm-8">
         <input
           type="text"
           className="form-control"
@@ -122,10 +122,10 @@ function AwardsTab({selectedEvent, makeTrustedRequest}) {
         />
       </div>
 
-      <label htmlFor="award_team" className="col-sm-2 control-label">
+      <label htmlFor="award_team" className="col-sm-4 control-label">
         Team Number
       </label>
-      <div className="col-sm-10">
+      <div className="col-sm-8">
         <input
           type="text"
           className="form-control"
@@ -136,10 +136,10 @@ function AwardsTab({selectedEvent, makeTrustedRequest}) {
         />
       </div>
 
-      <label htmlFor="award_awardee" className="col-sm-2 control-label">
+      <label htmlFor="award_awardee" className="col-sm-4 control-label">
         Awardee
       </label>
-      <div className="col-sm-10">
+      <div className="col-sm-8">
         <input
           type="text"
           className="form-control"

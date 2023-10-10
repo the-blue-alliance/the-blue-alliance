@@ -496,6 +496,11 @@
           "name_str"
         ],
         "properties": {
+          "type_enum": {
+            "type": "integer",
+            "description": "Type enum of the award. If null, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/award_type.py",
+            "example": "1"
+          },
           "name_str": {
             "type": "string",
             "description": "Name of the award",
