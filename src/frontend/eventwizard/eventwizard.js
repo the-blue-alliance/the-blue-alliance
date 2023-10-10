@@ -1,7 +1,7 @@
 import "./eventwizard.less";
 
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk";
@@ -14,9 +14,9 @@ const store = createStore(
   composeEnhancers(applyMiddleware(thunk))
 );
 
-ReactDOM.render(
-  <Provider store={store}>
-    <EventWizardFrame />
-  </Provider>,
-  document.getElementById("content")
-);
+
+const container = document.getElementById('content');
+const root = createRoot(container);
+root.render(<Provider store={store}>
+  <EventWizardFrame />
+</Provider>);
