@@ -302,11 +302,11 @@
     {% if "links" in match.score_breakdown.red and "linkPoints" in match.score_breakdown.red %}
     <tr>
         <td class="red" colspan="2">
-            {{match.score_breakdown.red.links|length}} (+{{match.score_breakdown.red.linkPoints}})
+            {% if match.score_breakdown.red.links %}{{match.score_breakdown.red.links|length}}{% else %}0{% endif %} (+{{match.score_breakdown.red.linkPoints}})
         </td>
         <td>Links</td>
         <td class="blue" colspan="2">
-            {{match.score_breakdown.blue.links|length}} (+{{match.score_breakdown.blue.linkPoints}})
+            {% if match.score_breakdown.blue.links %}{{match.score_breakdown.blue.links|length}}{% else %}0{% endif %} (+{{match.score_breakdown.blue.linkPoints}})
         </td>
     </tr>
     {% endif %}
