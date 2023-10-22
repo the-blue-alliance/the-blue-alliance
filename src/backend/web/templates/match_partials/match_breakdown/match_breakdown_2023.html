@@ -81,18 +81,20 @@
   </g>
   {% endfor %}
 
-  {% for link in breakdown.links %}
-    {% if (row == 'T' and link.row == 'Top') or 
-          (row == 'M' and link.row == 'Mid') or 
-          (row == 'B' and link.row == 'Bottom') %}
-          {{link.nodes}}
-      {% set start_offset =
-        (192 - 24 * link.nodes|max)
-        if is_red else
-        (24 * link.nodes|min) %}
-      {{ drawLink(start_offset) }}
-    {% endif %}
-  {% endfor %}
+  {% if breakdown.links %}
+    {% for link in breakdown.links %}
+      {% if (row == 'T' and link.row == 'Top') or 
+            (row == 'M' and link.row == 'Mid') or 
+            (row == 'B' and link.row == 'Bottom') %}
+            {{link.nodes}}
+        {% set start_offset =
+          (192 - 24 * link.nodes|max)
+          if is_red else
+          (24 * link.nodes|min) %}
+        {{ drawLink(start_offset) }}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 </svg>
 {% endmacro %}
 
