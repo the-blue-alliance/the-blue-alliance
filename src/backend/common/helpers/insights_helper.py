@@ -2,7 +2,7 @@ import itertools
 import json
 import math
 from collections import defaultdict
-from typing import Any, Dict, List, NamedTuple
+from typing import Any, Dict, List, NamedTuple, Tuple
 
 import numpy as np
 from google.appengine.ext import ndb
@@ -26,7 +26,7 @@ from backend.common.helpers.event_insights_helper import EventInsightsHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.insight import Insight
-from backend.common.models.keys import Year
+from backend.common.models.keys import TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 
@@ -80,6 +80,7 @@ class InsightsHelper(object):
         insights += self._calculateWinningMarginDistribution(week_event_matches, year)
         insights += self._calculateNumMatches(week_event_matches, year)
         insights += self._calculateYearSpecific(week_event_matches, year)
+        insights += self._calculateMatchesByTeam(week_event_matches, year)
         return insights
 
     @classmethod
@@ -242,10 +243,19 @@ class InsightsHelper(object):
         }
 
     @classmethod
-    def _sortTeamWinsDict(self, wins_dict):
+    def _sortTeamWinsDict(
+        self, wins_dict: Dict[TeamKey, int]
+    ) -> List[Tuple[int, List[TeamKey]]]:
         """
         Sorts dicts with key: number of wins, value: list of teams
         by number of wins and by team number
+
+        Returns teams grouped by win count, like such:
+        [
+            [5, ["frc123", "frc1234"]],
+            [4, ["frc12"]],
+            [1, [ "frc0", "frc1", "frc12345"]],
+        ]
         """
         wins_dict = sorted(
             wins_dict.items(), key=lambda pair: int(pair[0][3:])
@@ -382,6 +392,28 @@ class InsightsHelper(object):
             return [insight]
         else:
             return []
+
+    @classmethod
+    def _calculateMatchesByTeam(
+        self, week_event_matches: List[WeekEventMatches], year: Year
+    ) -> List[Insight]:
+        counter = defaultdict(lambda: 0)
+        for _, week_events in week_event_matches:
+            for _, matches in week_events:
+                for match in matches:
+                    for alliance in match.alliances.values():
+                        for tk in alliance["teams"]:
+                            counter[tk] += 1
+
+        grouped_by_win_count = self._sortTeamWinsDict(counter)
+
+        return [
+            self._createInsight(
+                data=grouped_by_win_count,
+                name=Insight.INSIGHT_NAMES[Insight.MATCHES_BY_TEAM],
+                year=year,
+            )
+        ]
 
     @classmethod
     def _calculateMatchAveragesByWeek(
