@@ -410,7 +410,7 @@ class InsightsHelper(object):
         return [
             self._createInsight(
                 data=grouped_by_win_count,
-                name=Insight.INSIGHT_NAMES[Insight.MATCHES_BY_TEAM],
+                name=Insight.INSIGHT_NAMES[Insight.MATCHES_PLAYED],
                 year=year,
             )
         ]

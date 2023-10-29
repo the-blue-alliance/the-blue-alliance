@@ -35,7 +35,7 @@ class Insight(CachedModel):
     WINNING_MARGIN_DISTRIBUTION = 19
     ELIM_WINNING_MARGIN_DISTRIBUTION = 20
     EINSTEIN_STREAK = 21
-    MATCHES_BY_TEAM = 22
+    MATCHES_PLAYED = 22
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -63,7 +63,7 @@ class Insight(CachedModel):
         WINNING_MARGIN_DISTRIBUTION: "winning_margin_distribution",
         ELIM_WINNING_MARGIN_DISTRIBUTION: "elim_winning_margin_distribution",
         EINSTEIN_STREAK: "einstein_streak",
-        MATCHES_BY_TEAM: "matches_by_team",
+        MATCHES_PLAYED: "matches_played",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
     }

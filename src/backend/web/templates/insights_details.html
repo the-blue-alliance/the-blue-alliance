@@ -282,7 +282,7 @@
   </div>
   {% endif %}
 
-  {% if matches_by_team %}
+  {% if matches_played %}
   <div class="row">
     <div class="col-xs-12">
       <h3>Most Matches Played</h3>
@@ -291,7 +291,7 @@
           <tr><th>Number</th><th>Teams</th></tr>
         </thead>
         <tbody>
-          {% for number, team_list in matches_by_team.data[:10] %}
+          {% for number, team_list in matches_played.data[:10] %}
             {% if team_list|length < 50 %}
             <tr>
               <td>{{number}}</td>
