@@ -257,11 +257,11 @@ class InsightsHelper(object):
             [1, [ "frc0", "frc1", "frc12345"]],
         ]
         """
-        wins_dict = sorted(
+        sorted_wins_tuples = sorted(
             wins_dict.items(), key=lambda pair: int(pair[0][3:])
         )  # Sort by team number
         temp = defaultdict(list)
-        for team, numWins in wins_dict:
+        for team, numWins in sorted_wins_tuples:
             temp[numWins].append(team)
         return sorted(
             temp.items(), key=lambda pair: int(pair[0]), reverse=True
