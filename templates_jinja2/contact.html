@@ -10,36 +10,239 @@
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
 
       <h1 class="end_header">Contact Us</h1>
-      <p>We'd love to hear from you. Here's how to get in touch about different issues or questions.</p>
+      <p>We'd love to hear from you. </p>
       <hr>
-
-      <h2>Is your team's information wrong?</h2>
-      <h3>Team Information</h3>
-      <p>Most team data - like names, websites, sponsors, etc - are updated directly from FIRST. If your team's information is incorrect on The Blue Alliance, please check that it is correct on <em>FIRST</em>'s website. We update our records from <a href="https://my.firstinspires.org/Dashboard/"><em>FIRST</em>'s Team Information Management System</a> daily, and are unable to change your team information to anything other than what is listed there. You can ask your team's Lead Mentor to update the information in FIRST TIMS and it will update on The Blue Alliance within a day or two.</p>
-      <h3>Photos, Social Media, and Robot Names</h3>
-      <p>Some team data - like photos, CAD models, social media, and robot names - are provided to The Blue Alliance through crowdsourcing or by teams directly. Teams can use the Team Moderator codes in the FIRST Digital Kit of Parts to change robot names and approve or change media on your own team page. You can get the code for your team from the FIRST Digital Kit of Parts, and redeem it at the <a href="https://thebluealliance.com/mod">TBA Team Mod dashboard</a>. Only one TBA account may be the "team mod" each year, so please choose carefully.</p>
-      <hr>
-
-      <h2>Have match videos or data to add to The Blue Alliance?</h2>
-      <p>Learn how you can help add match video, offseason results, report bad data, and more <a href="/add-data">here</a>.</p>
-      <hr>
-
-      <h2>Want to help keep our data up to date?</h2>
-      <p>Join <a href="https://www.facebook.com/groups/moardata/">our Facebook group</a> to help add offseason results, report bad data, give us feedback, and more!</p>
-      <hr>
-
-      <h2>Need API access?</h2>
-      <p>You can review the <a href="/apidocs">documentation for our APIs</a> on our website.</p>
-      <hr>
-
-      <h2>Want to help improve The Blue Alliance?</h2>
-      <p>Check out our <a href="https://github.com/the-blue-alliance/the-blue-alliance" target="_blank">GitHub repository</a> if you'd like to help improve The Blue Alliance website or APIs.</p>
-      <hr>
-
-      <h2>Everything else</h2>
-      <p>Drop us a line!</p>
-      <p><a class="btn btn-primary" href="mailto:contact@thebluealliance.com" target="_blank"><span class="glyphicon glyphicon-envelope"></span> Email us</a></p>
+      <div id="step1-block">
+        <label for="step1">What is this about?</label>
+        <select id="step1">
+          <option id="step1-nothing"></option>
+          <option id="step1-add-data">Adding data</option>
+          <option id="step1-incorrect-data">Incorrect data</option>
+          <option id="step1-webcasts">Webcast quality</option>
+          <option id="step1-api-access">API access</option>
+          <option id="step1-bug">Software bug</option>
+          <option id="step1-other">Other</option>
+        </select>
+      </div>
+      <div class="display-none step2" id="step2-webcasts-block">
+        <p>Sorry to hear that.  Unfortuantely, we just link to webcasts suggested by the community; we don't manage them ourselves.  Please reach out to the event organizers if you have feedback on webcast quality.</p>
+      </div>
+      <div class="display-none step2" id="step2-add-data-block">
+        <label for="step2-add-data">Awesome!  We love more data.  What would you like to add?</label>
+        <select id="step2-add-data">
+          <option id="step2-add-data-nothing"></option>
+          <option id="step2-add-data-match-video">Match video</option>
+          <option id="step2-add-data-event-webcasts">Event webcasts</option>
+          <option id="step2-add-data-team-media">Team media</option>
+          <option id="step2-add-data-offseason">New offseason event</option>
+        </select>
+      </div>
+      <div class="display-none step3" id="step3-add-data-match-video-block">
+        <p>To suggest that we add a video, check out our docs <a href="/add-data#match-videos">here</a>.</p>
+      </div>
+      <div class="display-none step3" id="step3-add-data-event-webcasts-block">
+        <p>To suggest that we add a webcast for an event, check out our docs <a href="/add-data#webcasts">here</a>.</p>
+      </div>
+      <div class="display-none step3" id="step3-add-data-team-media-block">
+        <p>To suggest that we add media for a team, check out our docs <a href="/add-data#team-media">here</a>.</p>
+        <p>You might also want to check out the Team Moderator codes we distributed in the digital Kit of Parts.</p>
+      </div>
+      <div class="display-none step3" id="step3-add-data-offseason-block">
+        <p>If you have data from an offseason event, check out our docs <a href="/add-data#offseason">on adding a new offseason event</a> and <a href="/add-data#results">adding data from an offseason event</a>.</p>
+      </div>
+      <div class="display-none step2" id="step2-incorrect-data-block">
+        <label for="step2-incorrect-data">OK.  Let's get more specific on what is incorrect:</label>
+        <select id="step2-incorrect-data">
+          <option id="step2-incorrect-data-nothing"></option>
+          <option id="step2-incorrect-data-official">Official event</option>
+          <option id="step2-incorrect-data-offseason">Offseason event</option>
+          <option id="step2-incorrect-data-team">Team information</option>
+        </select>
+      </div>
+      <div class="display-none step3" id="step3-incorrect-data-official">
+        <p>We get our data on official events directly from <em>FIRST</em> and are unable to change event information to anything other than what is listed <a href="https://frc-events.firstinspires.org/">on their system</a>. If the event was in a previous season, fixing it can take a while.  Mention the problem on <a href="https://www.facebook.com/groups/moardata/">our Facebook group</a> and we'll do our best to help!</p>
+      </div>
+      <div class="display-none step3" id="step3-incorrect-data-offseason">
+        <p>Mention the problem on <a href="https://www.facebook.com/groups/moardata/">our Facebook group</a> and we'll do our best to help!</p>
+      </div>
+      <div class="display-none step3" id="step3-incorrect-data-team">
+        <p>Most team data - like names, websites, sponsors, etc. - are updated directly from <em>FIRST</em>. If your team's information is incorrect on The Blue Alliance, please check that it is correct on <em>FIRST</em>'s website. We update our records from <a href="https://my.firstinspires.org/Dashboard/"><em>FIRST</em>'s Team Information Management System</a> daily, and are unable to change your team information to anything other than what is listed there. You can ask your team's Lead Mentor to update the information in <em>FIRST</em> TIMS and it will update on The Blue Alliance within a day or two.</p>
+        <p>Some team data - like photos, CAD models, social media, and robot names - are provided to The Blue Alliance through crowdsourcing or by teams directly. Teams can use the Team Moderator codes in the <em>FIRST</em> Digital Kit of Parts to change robot names and approve or change media on your own team page. You can get the code for your team from the <em>FIRST</em> Digital Kit of Parts, and redeem it at the <a href="https://thebluealliance.com/mod">TBA Team Mod dashboard</a>. Only one TBA account may be the "team mod" each year, so please choose carefully.</p>
+      </div>
+      <div class="display-none step2" id="step2-api-access-block">
+        <label for="step2-api-access">What kind of API access do you need?</label>
+        <select id="step2-api-access">
+          <option id="step2-api-access-nothing"></option>
+          <option id="step2-api-access-write">Write access for offseason events</option>
+          <option id="step2-api-access-read">Read access</option>
+        </select>
+      </div>
+      <div class="display-none step3" id="step3-api-access-read">
+         <p>The documentation for our API is available <a href="/apidocs">here</a>.  You'll need to <a href="/account">generate an API key</a>.</p>
+      </div>
+      <div class="display-none step3" id="step3-api-access-write">
+         <p>You'll want to <a href="request/apiwrite/">request access tokens</a> and read up on the <a href="/apidocs/trusted">API documentation</a>.</p>
+      </div>
+      <div class="display-none step2" id="step2-bug-block">
+        <label for="step2-bug">Whoops.  Sometimes we make mistakes.  Where did you see the bug?</label>
+        <select id="step2-bug">
+          <option id="step2-bug-nothing"></option>
+          <option id="step2-bug-web">Website</option>
+          <option id="step2-bug-ios">iOS app</option>
+          <option id="step2-bug-android">Android app</option>
+          <option id="step2-bug-api">API</option>
+        </select>
+      </div>
+      <div class="display-none step3" id="step3-bug-web-block">
+        <p>The best way to report this would be to <a href="https://github.com/the-blue-alliance/the-blue-alliance/issues">search the issue tracker on GitHub</a> to see if anybody has reported it already.  If an issue exists for your problem, feel free to comment and add any relevant details.  If not, <a href="https://github.com/the-blue-alliance/the-blue-alliance/issues/new">open a new issue</a>.</p>
+      </div>
+      <div class="display-none step3" id="step3-bug-ios-block">
+        <p>To report an issue with the iOS (iPhone/iPad) app, please <a href="https://github.com/the-blue-alliance/the-blue-alliance-ios/issues">search the issue tracker on the iOS GitHub page</a> to see if anybody has reported it already.  If an issue exists for your problem, feel free to comment and add any relevant details.  If not, <a href="https://github.com/the-blue-alliance/the-blue-alliance-ios/issues/new">open a new issue for iOS</a>.</p>
+      </div>
+      <div class="display-none step3" id="step3-bug-android-block">
+        <p>To report an issue with the Android (non-Apple smartphones/tablets) app, please <a href="https://github.com/the-blue-alliance/the-blue-alliance-android/issues">search the issue tracker on the Android GitHub page</a> to see if anybody has reported it already.  If an issue exists for your problem, feel free to comment and add any relevant details.  If not, <a href="https://github.com/the-blue-alliance/the-blue-alliance-android/issues/new">open a new issue for Android</a>.</p>
+      </div>
+      <div class="display-none step3" id="step3-bug-api-block">
+         <p>The documentation for our API is available <a href="https://www.thebluealliance.com/apidocs">here</a>.</p>
+         <p>Please <a href="https://github.com/the-blue-alliance/the-blue-alliance/issues/new">search the issue tracker on GitHub</a> to see if anybody has reported it already.  If an issue exists for your problem, feel free to comment and add any relevant details. If an issue does not exist for your problem, go ahead and <a href="https://github.com/the-blue-alliance/the-blue-alliance/issues/new">open a new one</a>.</p>
+      </div>
+      <div class="display-none step2" id="step2-other-block">
+        <p>For things that don't fit into one of the categories, we recommend sending us an email.</p>
+        <a class="btn btn-primary" href="mailto:contact@thebluealliance.com"><span class="glyphicon glyphicon-envelope"></span> Email us</a>
+      </div>
+      <div class="display-none step2 step3" id="email-block">
+         <p>Need more help?  Drop us a line:</p>
+         <a class="btn btn-primary" href="mailto:contact@thebluealliance.com"><span class="glyphicon glyphicon-envelope"></span> Email us</a>
+      </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+$(document).ready(function(){
+  $('#step1').change(function(){
+    switch($(this).children(":selected").attr("id")){
+      case 'step1-add-data':
+        $('.step2, .step3').not('#step2-add-data-block').addClass('display-none');
+        $('#step2-add-data-block').removeClass('display-none');
+        break;
+      case 'step1-incorrect-data':
+        $('.step2, .step3').not('#step2-incorrect-data-block').addClass('display-none');
+        $('#step2-incorrect-data-block').removeClass('display-none');
+        break;
+      case 'step1-webcasts':
+        $('.step2, .step3').not('#step2-webcasts-block, #email-block').addClass('display-none');
+        $('#step2-webcasts-block, #email-block').removeClass('display-none');
+        break;
+      case 'step1-api-access':
+        $('.step2, .step3').not('#step2-api-access-block').addClass('display-none');
+        $('#step2-api-access-block').removeClass('display-none');
+        break;
+      case 'step1-bug':
+        $('.step2, .step3').not('#step2-bug-block').addClass('display-none');
+        $('#step2-bug-block').removeClass('display-none');
+        break;
+      case 'step1-other':
+        $('.step2, .step3').not('#step2-other-block').addClass('display-none');
+        $('#step2-other-block').removeClass('display-none');
+        break;
+      case 'step1-nothing':
+      default:
+        $('.step2, .step3').addClass('display-none');
+        break;
+    }
+  });
+
+  $('#step2-add-data').change(function(){
+    switch($(this).children(":selected").attr("id")){
+      case 'step2-add-data-match-video':
+        $('.step3').not('#step3-add-data-match-video-block, #email-block').addClass('display-none');
+        $('#step3-add-data-match-video-block, #email-block').removeClass('display-none');
+        break;
+      case 'step2-add-data-event-webcasts':
+        $('.step3').not('#step3-add-data-event-webcasts-block, #email-block').addClass('display-none');
+        $('#step3-add-data-event-webcasts-block, #email-block').removeClass('display-none');
+        break;
+      case 'step2-add-data-team-media':
+        $('.step3').not('#step3-add-data-team-media-block, #email-block').addClass('display-none');
+        $('#step3-add-data-team-media-block, #email-block').removeClass('display-none');
+        break;
+      case 'step2-add-data-offseason':
+        $('.step3').not('#step3-add-data-offseason-block, #email-block').addClass('display-none');
+        $('#step3-add-data-offseason-block, #email-block').removeClass('display-none');
+        break;
+      case 'step2-add-data-nothing':
+      default:
+        $('.step3').addClass('display-none');
+        break;
+    }
+  });
+
+  $('#step2-incorrect-data').change(function(){
+    switch($(this).children(":selected").attr("id")){
+      case 'step2-incorrect-data-official':
+        $('.step3').not('#step3-incorrect-data-official, #email-block').addClass('display-none');
+        $('#step3-incorrect-data-official, #email-block').removeClass('display-none');
+        break;
+      case 'step2-incorrect-data-offseason':
+        $('.step3').not('#step3-incorrect-data-offseason, #email-block').addClass('display-none');
+        $('#step3-incorrect-data-offseason, #email-block').removeClass('display-none');
+        break;
+      case 'step2-incorrect-data-team':
+        $('.step3').not('#step3-incorrect-data-team, #email-block').addClass('display-none');
+        $('#step3-incorrect-data-team, #email-block').removeClass('display-none');
+        break;
+      case 'step2-incorrect-data-nothing':
+      default:
+        $('.step3').addClass('display-none');
+        break;
+    }
+  });
+
+  $('#step2-api-access').change(function(){
+    switch($(this).children(":selected").attr("id")){
+      case 'step2-api-access-write':
+        $('.step3').not('#step3-api-access-write, #email-block').addClass('display-none');
+        $('#step3-api-access-write, #email-block').removeClass('display-none');
+        break;
+      case 'step2-api-access-read':
+        $('.step3').not('#step3-api-access-read, #email-block').addClass('display-none');
+        $('#step3-api-access-read, #email-block').removeClass('display-none');
+        break;
+      case 'step2-api-access-nothing':
+      default:
+        $('.step3').addClass('display-none');
+        break;
+    }
+  });
+
+  $('#step2-bug').change(function(){
+    switch($(this).children(":selected").attr("id")){
+      case 'step2-bug-web':
+        $('.step3').not('#step3-bug-web-block, #email-block').addClass('display-none');
+        $('#step3-bug-web-block, #email-block').removeClass('display-none');
+        break;
+      case 'step2-bug-ios':
+        $('.step3').not('#step3-bug-ios-block, #email-block').addClass('display-none');
+        $('#step3-bug-ios-block, #email-block').removeClass('display-none');
+        break;
+      case 'step2-bug-android':
+        $('.step3').not('#step3-bug-android-block, #email-block').addClass('display-none');
+        $('#step3-bug-android-block, #email-block').removeClass('display-none');
+        break;
+      case 'step2-bug-api':
+        $('.step3').not('#step3-bug-api-block, #email-block').addClass('display-none');
+        $('#step3-bug-api-block, #email-block').removeClass('display-none');
+        break;
+      case 'step2-bug-nothing':
+      default:
+        $('.step3').addClass('display-none');
+        break;
+    }
+  });
+
+});
+</script>
 {% endblock %}
