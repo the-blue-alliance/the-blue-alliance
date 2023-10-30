@@ -8,7 +8,7 @@ from consts.landing_type import LandingType
 from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, \
 AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, \
 MyTBAMatchController, MyTBATeamController, AccountAPIReadKeyAdd, AccountAPIReadKeyDelete
-from controllers.advanced_search_controller import AdvancedSearchController
+from controllers.advanced_search_controller import AdvancedTeamSearchController, AdvancedMatchSearchController
 from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMToken, AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
       YouTubePlaylistHandler, AllowedApiWriteEventsHandler, PlayoffTypeGetHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, EventRemapTeamsHandler, WebcastHandler
@@ -88,7 +88,8 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/mytba/match/<match_key>', MyTBAMatchController, 'account-mytba-match', strict_slash=True),
       RedirectRoute(r'/account/mytba/team/<team_number:[0-9]+>', MyTBATeamController, 'account-mytba-team', strict_slash=True),
       RedirectRoute(r'/add-data', AddDataHandler, 'add-data', strict_slash=True),
-      RedirectRoute(r'/advanced_team_search', AdvancedSearchController, 'advanced_team_search', strict_slash=True),
+      RedirectRoute(r'/advanced_team_search', AdvancedTeamSearchController, 'advanced_team_search', strict_slash=True),
+      RedirectRoute(r'/advanced_match_search', AdvancedMatchSearchController, 'advanced_match_search', strict_slash=True),
       RedirectRoute(r'/apidocs/v2', ApiV2DocumentationHandler, 'api-documentation-v2', strict_slash=True),
       RedirectRoute(r'/apidocs/v3', ApiV3DocumentationHandler, 'api-documentation-v3', strict_slash=True),
       RedirectRoute(r'/apidocs/trusted/v1', ApiTrustedDocumentationHandler, 'api-docs-trusted-v1', strict_slash=True),

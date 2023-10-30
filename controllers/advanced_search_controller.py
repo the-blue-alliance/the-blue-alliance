@@ -9,6 +9,7 @@ from helpers.search_helper import SearchHelper
 from models.event_team import EventTeam
 from template_engine import jinja2_engine
 import tba_config
+from models.match import Match
 
 
 SORT_ORDER = {
@@ -18,7 +19,7 @@ SORT_ORDER = {
 }
 
 
-class AdvancedSearchController(CacheableHandler):
+class AdvancedTeamSearchController(CacheableHandler):
     VALID_YEARS = list(reversed(tba_config.VALID_YEARS))
 
     VALID_AWARD_TYPES = [kv for kv in AwardType.SEARCHABLE.items()]
@@ -41,7 +42,7 @@ class AdvancedSearchController(CacheableHandler):
     CACHE_KEY_FORMAT = "advanced_search_{}_{}_{}_{}_{}_{}"  # (year, award_types, seed, playoff_level, cad_model, page)
 
     def __init__(self, *args, **kw):
-        super(AdvancedSearchController, self).__init__(*args, **kw)
+        super(AdvancedTeamSearchController, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
 
     def _sanitize_int_param(self, param_name, min_val, max_val):
@@ -96,10 +97,10 @@ class AdvancedSearchController(CacheableHandler):
             self._sort_field = 'team'
 
     def get(self):
-        self._get_params();
+        self._get_params()
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
             self._year, self._award_types, self._seed, self._playoff_level, self._cad_model, self._page)
-        super(AdvancedSearchController, self).get()
+        super(AdvancedTeamSearchController, self).get()
 
     def _render(self):
         new_search = not self._year or (not self._award_types and not self._seed and not self._playoff_level and not self._cad_model)
@@ -204,4 +205,151 @@ class AdvancedSearchController(CacheableHandler):
             'sort_field': self._sort_field,
         })
 
-        return jinja2_engine.render('advanced_search.html', self.template_values)
+        return jinja2_engine.render('advanced_team_search.html', self.template_values)
+
+
+class AdvancedMatchSearchController(CacheableHandler):
+    VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
+
+    VALID_COMP_LEVELS = [
+        ('qm', 'Qualifications'),
+        ('ef', 'Octofinals'),
+        ('qf', 'Quarterfinals'),
+        ('sf', 'Semifinals'),
+        ('f', 'Finals')
+    ]
+
+    PAGE_SIZE = 50
+    MAX_RESULTS = 1000
+    VALID_SORT_FIELDS = {'event', 'match'}
+
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "advanced_match_search_{}_{}_{}_{}_{}_{}_{}"  # (year, own_alliance, opp_alliance, event_key, comp_levels, video, page)
+
+    def __init__(self, *args, **kw):
+        super(AdvancedMatchSearchController, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+
+    def _sanitize_int_param(self, param_name, min_val, max_val):
+        """
+        Restricts a parameter to be within min_val and max_val
+        Returns 0 otherwise
+        """
+        param = self.request.get(param_name)
+        if not param or not param.isdigit():
+            param = 0
+        param = int(param)
+        if param < min_val or param > max_val:
+            param = 0
+        return param
+
+    def _parse_alliance(self, param_name):
+        """
+        Return a list of teams generated from an alliance string, such as
+        "2521, 254, 997"
+        """
+        param = self.request.get(param_name)
+        teams = filter(None, [team.strip() for team in param.split(',')])
+        return teams
+
+    def _get_params(self):
+        # Parse and sanitize inputs
+        self._year = self._sanitize_int_param('year', 1992, tba_config.MAX_YEAR)
+
+        self._own_alliance = self._parse_alliance('own_alliance')
+        self._opp_alliance = self._parse_alliance('opp_alliance')
+        self._event_key = self.request.get('event_key')
+        self._comp_levels = self.request.get_all('comp_level')
+
+        self._video = True if self.request.get('video') else False
+
+        self._page = self.request.get('page', 0)
+        if not self._page or not self._page.isdigit():
+            self._page = 0
+        self._page = int(self._page)
+        self._page = min(self._page, self.MAX_RESULTS / self.PAGE_SIZE - 1)
+
+        self._sort_field = self.request.get('sort_field')
+        if self._sort_field not in self.VALID_SORT_FIELDS:
+            self._sort_field = 'match'
+
+    def get(self):
+        self._get_params()
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
+            self._year, ','.join(self._own_alliance), ','.join(self._opp_alliance), self._event_key,
+            ','.join(self._comp_levels), self._video, self._page)
+        super(AdvancedMatchSearchController, self).get()
+
+    def _render(self):
+        new_search = len(self._own_alliance) == 0
+        if new_search:
+            match_results = []
+            num_results = 0
+        else:
+            # Construct query string
+            partial_queries = []
+
+            search_1 = []
+            search_2 = []
+
+            for team in self._own_alliance:
+                search_1.append(Match.blue_alliance_team == 'frc{}'.format(team))
+                search_2.append(Match.red_alliance_team == 'frc{}'.format(team))
+
+            for team in self._opp_alliance:
+                search_1.append(Match.red_alliance_team == 'frc{}'.format(team))
+                search_2.append(Match.blue_alliance_team == 'frc{}'.format(team))
+
+            if len(search_1) > 0:
+                partial_queries.append(ndb.OR(ndb.AND(*search_1), ndb.AND(*search_2)))
+
+            if self._year > 0:
+                partial_queries.append(Match.year == self._year)
+
+            if self._event_key:
+                partial_queries.append(Match.event == ndb.Key('Event', self._event_key))
+
+            if len(self._comp_levels) > 0:
+                partial_queries.append(Match.comp_level.IN(self._comp_levels))
+
+            if self._video:
+                partial_queries.append(Match.has_video == True)
+
+            matches, _, _ = Match.query(*partial_queries).order(Match.play_order_sort).order(Match._key).fetch_page(self.PAGE_SIZE, offset=self.PAGE_SIZE * self._page)
+
+            num_results = len(matches)
+            event_model_keys = []
+            for match in matches:
+                event_model_keys.append(match.event)
+
+            event_model_futures = ndb.get_multi_async(event_model_keys)
+            event_result_models = [model_future.get_result() for model_future in event_model_futures]
+
+            match_results = []
+            for n, model in enumerate(matches):
+                model.match_key = model.key.id()
+                model.event_model = event_result_models[n]
+                match_results.append(model)
+
+        self.template_values.update({
+            'valid_years': self.VALID_YEARS,
+            'valid_comp_levels': self.VALID_COMP_LEVELS,
+            'num_special_awards': len(SORT_ORDER),
+            'page_size': self.PAGE_SIZE,
+            'max_results': self.MAX_RESULTS,
+            'page': self._page,
+            'year': self._year,
+            'own_alliance': ', '.join(self._own_alliance),
+            'opp_alliance': ', '.join(self._opp_alliance),
+            'event_key': self._event_key,
+            'comp_levels': self._comp_levels,
+            'video': self._video,
+            'searched_teams': self._own_alliance + self._opp_alliance,
+            'new_search': new_search,
+            'num_results': num_results,
+            'capped_num_results': min(self.MAX_RESULTS, num_results),
+            'result_models': match_results,
+            'sort_field': self._sort_field,
+        })
+
+        return jinja2_engine.render('advanced_match_search.html', self.template_values)

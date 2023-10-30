@@ -94,6 +94,12 @@ class Match(ndb.Model):
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
     tiebreak_match_key = ndb.KeyProperty(kind='Match')  # Points to a match that was played to tiebreak this one
 
+    play_order_sort = ndb.ComputedProperty(lambda self: self.play_order)
+    has_video = ndb.ComputedProperty(lambda self: (len(self.youtube_videos) + len(self.tba_videos)) > 0)
+
+    red_alliance_team = ndb.ComputedProperty(lambda self: self.alliances['red']['teams'], repeated=True)
+    blue_alliance_team = ndb.ComputedProperty(lambda self: self.alliances['blue']['teams'], repeated=True)
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
 
@@ -260,10 +266,6 @@ class Match(ndb.Model):
             return "%s%s-%s" % (self.comp_level.upper(), self.set_number, self.match_number)
 
     @property
-    def has_video(self):
-        return (len(self.youtube_videos) + len(self.tba_videos)) > 0
-
-    @property
     def details_url(self):
         return "/match/%s" % self.key_name
 
@@ -316,6 +318,10 @@ class Match(ndb.Model):
             if tba_path is not None:
                 videos.append({"type": "tba", "key": tba_path})
         return videos
+
+    @property
+    def num_videos(self):
+        return len(self.videos)
 
     @property
     def prediction_error_str(self):
