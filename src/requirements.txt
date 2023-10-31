@@ -7,7 +7,7 @@ Flask-WTF==1.2.1
 google-api-core==1.34.0
 google-api-python-client==2.105.0
 google-cloud-storage==2.12.0
-grpcio==1.59.0
+grpcio==1.59.2
 Jinja2==3.1.2
 MarkupSafe==2.1.3
 numpy==1.26.1
