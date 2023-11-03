@@ -63,7 +63,7 @@ class JSONAwardsParser:
                 raise ParserInputException("One of team_key or awardee must be set!")
 
             recipient = AwardRecipient(
-                team_number=int(team_key[3:]) if team_key else None,
+                team_number=(int(team_key[3:]) if team_key[3:].isdigit() else team_key[3:]) if team_key else None,
                 awardee=awardee,
             )
 
