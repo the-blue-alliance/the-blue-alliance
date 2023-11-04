@@ -143,7 +143,7 @@ def update_event_info(event_key: EventKey) -> Response:
     if "playoff_type" in parsed_info:
         event.playoff_type = parsed_info["playoff_type"]
 
-    EventManipulator.createOrUpdate(event)
+    EventManipulator.createOrUpdate(event, auto_union=False)
     return profiled_jsonify({"Success": f"Event {event_key} updated"})
 
 
