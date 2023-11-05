@@ -47,6 +47,7 @@ class EventInfoTab extends Component {
     const currentInfo = this.state.eventInfo;
     if (currentInfo !== null) {
       currentInfo.playoff_type = newType.value;
+      currentInfo.playoff_type_string = newType.label;
       this.setState({ eventInfo: currentInfo });
     }
   }
