@@ -17,7 +17,7 @@ class EventSelector extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      eventSelectValue: "",
+      eventSelectLabel: "",
     };
     this.onEventSelected = this.onEventSelected.bind(this);
     this.onManualEventChange = this.onManualEventChange.bind(this);
@@ -25,7 +25,7 @@ class EventSelector extends Component {
 
   onEventSelected(newEvent) {
     this.props.clearAuth();
-    this.setState({ eventSelectValue: newEvent.value });
+    this.setState({ eventSelectLabel: newEvent.label });
 
     if (newEvent.value === "_other") {
       this.props.setManualEvent(true);
@@ -66,7 +66,11 @@ class EventSelector extends Component {
             loadingPlaceholder="Loading Events..."
             clearable={false}
             searchable={false}
-            value={this.state.eventSelectValue}
+            value={
+              this.state.eventSelectLabel && {
+                label: this.state.eventSelectLabel,
+              }
+            }
             loadOptions={EventSelector.loadEvents}
             onChange={this.onEventSelected}
             defaultOptions
