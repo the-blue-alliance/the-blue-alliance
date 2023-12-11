@@ -236,7 +236,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -258,7 +258,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -285,7 +285,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -307,7 +307,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -329,7 +329,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -351,7 +351,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -373,7 +373,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -395,7 +395,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
