@@ -196,7 +196,7 @@ jobs:
       - name: Capture screenshots
         run: ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle
