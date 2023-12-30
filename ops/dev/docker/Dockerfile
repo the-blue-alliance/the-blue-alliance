@@ -15,12 +15,12 @@ RUN apt-get update && apt-get install -y \
     vim \
     openssh-server
 
-# Needed for Python 3.11
+# Needed for Python 3.12
 RUN apt-get install software-properties-common -y
 RUN add-apt-repository ppa:deadsnakes/ppa -y
 
 # Setup python environment
-ENV PYTHON_VERSION python3.11
+ENV PYTHON_VERSION python3.12
 RUN apt-get update && apt-get install -y \
     "$PYTHON_VERSION" \
     "$PYTHON_VERSION-venv" \
