@@ -811,11 +811,11 @@ class TestSuggestMatchVideoYouTube(unittest2.TestCase):
         self.testbed.deactivate()
 
     def test_bad_match(self):
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016necmp_f1m2")
+        status, _ = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016necmp_f1m2")
         self.assertEqual(status, 'bad_match')
 
     def test_create_suggestion(self):
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
+        status, _ = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'success')
 
         suggestion_id = "media_2016_match_2016test_f1m1_youtube_37F5tbrFqJQ"
@@ -831,7 +831,7 @@ class TestSuggestMatchVideoYouTube(unittest2.TestCase):
         self.assertEqual(suggestion.contents.get('youtube_videos')[0], "37F5tbrFqJQ")
 
     def test_create_suggestion_banned(self):
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account_banned.key, "37F5tbrFqJQ", "2016test_f1m1")
+        status, _ = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account_banned.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'success')
 
         suggestion_id = "media_2016_match_2016test_f1m1_youtube_37F5tbrFqJQ"
@@ -851,16 +851,16 @@ class TestSuggestMatchVideoYouTube(unittest2.TestCase):
         self.match.youtube_videos = ["37F5tbrFqJQ"]
         self.match.put()
 
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
+        status, _ = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'video_exists')
 
     def test_existing_suggestion(self):
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
+        status, _ = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'success')
 
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
+        status, _ = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
         self.assertEqual(status, 'suggestion_exists')
 
     def test_bad_youtube_key(self):
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "", "2016test_f1m1")
+        status, _ = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "", "2016test_f1m1")
         self.assertEqual(status, 'bad_url')

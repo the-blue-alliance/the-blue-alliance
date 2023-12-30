@@ -15,6 +15,12 @@
         <h4>Thanks!</h4>
         <p>We'll review your suggestion and get it added to the site soon!</p>
       </div>
+      {% elif status == 'approved' %}
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>You suggestion has been added!</p>
+      </div>
       {% elif status == 'video_exists' %}
       <div class="alert alert-info">
         <button type="button" class="close" data-dismiss="alert">&times;</button>

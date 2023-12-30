@@ -82,7 +82,7 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
                     "teams": [\
                     "frc254",\
                     "frc1678",\
-                    "frc973"]}}',
+                    "frc973"]}}'                                ,
             score_breakdown_json='{\
                 "blue": {\
                     "auto": 70,\
@@ -120,7 +120,7 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
                     "teams": [\
                     "frc254",\
                     "frc1678",\
-                    "frc973"]}}',
+                    "frc973"]}}'                                ,
             score_breakdown_json='{\
                 "blue": {\
                     "auto": 70,\
@@ -157,11 +157,10 @@ class TestSuggestMatchVideoReviewController(unittest2.TestCase):
         self.account.put()
 
     def createSuggestion(self):
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key,
-                                                                     "H-54KMwMKY0",
-                                                                     "2016necmp_f1m1")
+        status, suggestion = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+            self.account.key, "H-54KMwMKY0", "2016necmp_f1m1")
         self.assertEqual(status, 'success')
-        return Suggestion.render_media_key_name(2016, 'match', '2016necmp_f1m1', 'youtube', 'H-54KMwMKY0')
+        return suggestion.key.id()
 
     def getSuggestionForm(self):
         response = self.testapp.get('/suggest/match/video/review')

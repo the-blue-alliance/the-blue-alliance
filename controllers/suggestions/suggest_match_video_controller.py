@@ -2,6 +2,7 @@ import logging
 import os
 
 from controllers.base_controller import LoggedInHandler
+from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event
@@ -41,11 +42,25 @@ class SuggestMatchVideoController(LoggedInHandler):
     def post(self):
         self._require_registration()
 
+
         match_key = self.request.get("match_key")
         youtube_url = self.request.get("youtube_url")
         youtube_id = YouTubeVideoHelper.parse_id_from_url(youtube_url)
 
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
+        match = Match.get_by_id(match_key)
+        if not match:
+            self.abort(404)
+
+        status, suggestion = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match.key_name)
+
+        # If the user has the correct eventwizard permission, we can directly
+        # invoke the review code to immediately accept it
+        review_handler = SuggestMatchVideoReviewController(request=self.request, response=self.response)
+        if status == 'success' and suggestion:
+            review_handler._load_auth()
+            if review_handler.verify_write_permissions(suggestion, redirect=None):
+                review_handler._process_accepted(suggestion.key.id())
+                status = 'approved'
 
         self.redirect('/suggest/match/video?match_key={}&status={}'.format(match_key, status))
 
@@ -101,7 +116,8 @@ class SuggestMatchVideoPlaylistController(LoggedInHandler):
             if match_key not in valid_match_keys:
                 continue
 
-            status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, yt_id, match_key)
+            status, _ = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+                self.user_bundle.account.key, yt_id, match_key)
             if status == 'success':
                 suggestions_added += 1
 

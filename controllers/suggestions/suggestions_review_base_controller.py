@@ -1,7 +1,10 @@
 import datetime
 from google.appengine.ext import ndb
 
+from google.appengine.ext import ndb
 from controllers.base_controller import LoggedInHandler
+from models.api_auth_access import ApiAuthAccess
+from models.event import Event
 from models.suggestion import Suggestion
 from models.team_admin_access import TeamAdminAccess
 
@@ -12,34 +15,58 @@ class SuggestionsReviewBaseController(LoggedInHandler):
     """
 
     REQUIRED_PERMISSIONS = []
+
+    # Allow users with Team Admin access to accept suggestions
     ALLOW_TEAM_ADMIN_ACCESS = False
+
+    # Allow users with the correct eventwizard permissions to invoke suggestion
+    # review code (used to skip mod queue for users with match video permissions)
+    REQUIRED_APIWRITE_TYPES = []
 
     def __init__(self, *args, **kw):
         super(SuggestionsReviewBaseController, self).__init__(*args, **kw)
-        self.existing_access = []
-        if not self.ALLOW_TEAM_ADMIN_ACCESS:
+        self.existing_access_future = ndb.Future()
+        self.existing_access_future.set_result([])
+        self.apiwrite_future = ndb.Future()
+        self.apiwrite_future.set_result([])
+        if not self.ALLOW_TEAM_ADMIN_ACCESS and not self.REQUIRED_APIWRITE_TYPES:
             # For suggestion types that are enabled for delegated mod tools
             # they'll make their own call where they know the team id
             # (verify_permissions only checks the account-level permission)
             self.verify_permissions()
 
-    def verify_write_permissions(self, suggestion):
+    def verify_write_permissions(self, suggestion, redirect="/"):
         # Allow users who have the global permissions
         if all([
                 p in self.user_bundle.account.permissions
                 for p in self.REQUIRED_PERMISSIONS
         ]):
-            return
+            return True
 
         # For other team suggestions, make sure the user has a valid access
         if self.ALLOW_TEAM_ADMIN_ACCESS:
             if any([
                     "frc{}".format(a.team_number) == suggestion.target_key
-                    for a in self.existing_access
+                    for a in self.existing_access_future.get_result()
             ]):
-                return
+                return True
 
-        return self.redirect("/", abort=True)
+        # Also allow users with apiwrite access review suggestions
+        if self.REQUIRED_APIWRITE_TYPES and suggestion.target_model == 'match':
+            event_key = suggestion.target_key.split("_")[0]
+            if any([
+                    ndb.Key(Event,
+                            event_key) in apiwrite_key.event_list
+                    and all([
+                        t in apiwrite_key.auth_types_enum
+                        for t in self.REQUIRED_APIWRITE_TYPES
+                    ]) for apiwrite_key in self.apiwrite_future.get_result()
+            ]):
+                return True
+
+        if redirect:
+            self.redirect(redirect, abort=True)
+        return False
 
     def verify_permissions(self):
         for permission in self.REQUIRED_PERMISSIONS:
@@ -50,10 +77,19 @@ class SuggestionsReviewBaseController(LoggedInHandler):
 
     def post(self):
         self._require_login()
+        self._load_auth()
+
+    def _load_auth(self):
         now = datetime.datetime.now()
-        self.existing_access = TeamAdminAccess.query(
+        self.existing_access_future = TeamAdminAccess.query(
             TeamAdminAccess.account == self.user_bundle.account.key,
-            TeamAdminAccess.expiration > now).fetch()
+            TeamAdminAccess.expiration > now).fetch_async()
+        self.apiwrite_future = ApiAuthAccess.query(
+            ApiAuthAccess.owner == self.user_bundle.account.key,
+            ndb.OR(ApiAuthAccess.expiration == None,
+                   ApiAuthAccess.expiration >= now)).fetch_async()
+
+        all_apiwrite = ApiAuthAccess.query().fetch()
 
     def create_target_model(self, suggestion):
         """
