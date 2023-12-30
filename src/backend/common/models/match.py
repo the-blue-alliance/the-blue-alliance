@@ -4,7 +4,7 @@ import re
 from typing import cast, Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import (
@@ -75,7 +75,7 @@ class Match(CachedModel):
     #     "teleop_goal+foul": 40,
     # }}
 
-    comp_level: CompLevel = safe_cast(
+    comp_level: CompLevel = cast(
         CompLevel,
         ndb.StringProperty(
             required=True,

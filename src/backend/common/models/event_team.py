@@ -1,7 +1,7 @@
-from typing import Set
+from typing import cast, Set
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.models.cached_model import CachedModel
@@ -25,7 +25,7 @@ class EventTeam(CachedModel):
     team: ndb.Key = ndb.KeyProperty(kind=Team, required=True)
     year: Year = ndb.IntegerProperty(required=True)
 
-    status: EventTeamStatus = safe_cast(EventTeamStatus, ndb.JsonProperty())
+    status: EventTeamStatus = cast(EventTeamStatus, ndb.JsonProperty())
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)

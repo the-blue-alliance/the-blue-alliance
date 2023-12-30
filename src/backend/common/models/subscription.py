@@ -1,7 +1,6 @@
-from typing import List
+from typing import cast, List
 
 from google.appengine.ext import ndb
-from pyre_extensions import safe_cast
 
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import NotificationType
@@ -17,7 +16,7 @@ class Subscription(MyTBAModel):
     should be created with a parent that is the associated Account key.
     """
 
-    notification_types: List[NotificationType] = safe_cast(
+    notification_types: List[NotificationType] = cast(
         List[NotificationType],
         ndb.IntegerProperty(choices=list(NotificationType), repeated=True),
     )

@@ -10,11 +10,10 @@ from typing import (
     MutableMapping,
     Optional,
     Tuple,
-    TypedDict,
 )
 
 import numpy as np
-from pyre_extensions.refinement import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
@@ -34,6 +33,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_predictions import (
     MatchPrediction,
     MatchPredictionStatsLevel,
+    TComputedMatchInfo,
     TEventStatMeanVars,
     TMatchPredictions,
     TMatchPredictionStats,
@@ -46,11 +46,6 @@ from backend.common.models.keys import TeamKey
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.queries.event_query import TeamYearEventsQuery
-
-
-class TComputedMatchInfo(TypedDict):
-    mean: Dict[TeamKey, float]
-    var: Dict[TeamKey, float]
 
 
 class ContributionCalculator:
@@ -1117,7 +1112,7 @@ class PredictionHelper:
                                 continue
                             team_ranking_points[team] += 1
                 else:
-                    sampled_winner = safe_cast(AllianceColor, sampled_winner)
+                    sampled_winner = cast(AllianceColor, sampled_winner)
                     for team in match.alliances[sampled_winner]["teams"]:
                         if team in surrogate_teams and num_played[team] == 3:
                             continue
