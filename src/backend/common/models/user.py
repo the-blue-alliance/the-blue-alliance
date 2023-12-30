@@ -1,9 +1,9 @@
 import random
 import string
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, cast, Dict, List, Optional, Union
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
@@ -103,7 +103,7 @@ class User:
 
     @property
     def myTBA(self) -> MyTBA:
-        models = safe_cast(List[MyTBAModel], self.favorites) + safe_cast(
+        models = cast(List[MyTBAModel], self.favorites) + cast(
             List[MyTBAModel], self.subscriptions
         )
         return MyTBA(models)

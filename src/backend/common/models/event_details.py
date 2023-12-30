@@ -1,7 +1,7 @@
-from typing import List, Optional, Set, TypedDict
+from typing import cast, List, Optional, Set, TypedDict
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts.ranking_sort_orders import (
     SORT_ORDER_INFO as RANKING_SORT_ORDERS,
@@ -36,21 +36,17 @@ class EventDetails(CachedModel):
     ] = (
         ndb.JsonProperty()
     )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
-    district_points: EventDistrictPoints = safe_cast(
-        EventDistrictPoints, ndb.JsonProperty()
-    )
-    matchstats: EventMatchstats = safe_cast(
+    district_points: EventDistrictPoints = cast(EventDistrictPoints, ndb.JsonProperty())
+    matchstats: EventMatchstats = cast(
         EventMatchstats, ndb.JsonProperty()
     )  # for OPR, DPR, CCWM, etc.
-    coprs: EventComponentOPRs = safe_cast(EventComponentOPRs, ndb.JsonProperty())
-    insights: EventInsights = safe_cast(EventInsights, ndb.JsonProperty())
-    predictions: Optional[EventPredictions] = safe_cast(
-        EventPredictions, ndb.JsonProperty()
-    )
+    coprs: EventComponentOPRs = cast(EventComponentOPRs, ndb.JsonProperty())
+    insights: EventInsights = cast(EventInsights, ndb.JsonProperty())
+    predictions: Optional[EventPredictions] = cast(EventPredictions, ndb.JsonProperty())
     rankings = ndb.JsonProperty()  # deprecated
     rankings2: List[EventRanking] = ndb.JsonProperty()
 
-    playoff_advancement: EventPlayoffAdvancement = safe_cast(
+    playoff_advancement: EventPlayoffAdvancement = cast(
         EventPlayoffAdvancement, ndb.JsonProperty()
     )
 

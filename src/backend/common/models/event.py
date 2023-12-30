@@ -4,10 +4,10 @@ import datetime
 import json
 import re
 import typing
-from typing import Any, Dict, Generator, List, Optional, Set, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts import event_type
 from backend.common.consts.event_type import EventType
@@ -77,7 +77,7 @@ class Event(CachedModel):
     district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
-    playoff_type: PlayoffType = safe_cast(
+    playoff_type: PlayoffType = cast(
         PlayoffType, ndb.IntegerProperty(choices=list(PlayoffType))
     )
 
@@ -93,9 +93,7 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
-    normalized_location: Location = safe_cast(
-        Location, ndb.StructuredProperty(Location)
-    )
+    normalized_location: Location = cast(Location, ndb.StructuredProperty(Location))
 
     timezone_id = (
         ndb.StringProperty()

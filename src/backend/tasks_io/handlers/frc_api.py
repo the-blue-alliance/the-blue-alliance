@@ -14,7 +14,7 @@ from flask import (
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from markupsafe import Markup
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
@@ -317,8 +317,7 @@ def event_details(event_key: EventKey) -> Response:
 
     # Update event
     fmsapi_events, fmsapi_districts = df.get_event_details(event_key)
-    new_events = EventManipulator.createOrUpdate(fmsapi_events)
-    event = safe_cast(Event, none_throws(new_events))
+    event = EventManipulator.createOrUpdate(fmsapi_events[0])
 
     DistrictManipulator.createOrUpdate(fmsapi_districts)
 

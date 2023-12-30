@@ -332,7 +332,7 @@ class SuggestionCreator:
                 state=event.state_prov,
                 country=event.country,
                 first_code=event.event_short.upper(),
-                suggestion_id=key.id(),
+                suggestion_id=key.string_id(),
             )
             if status != "success":
                 logging.warning("Failed to create suggestion: {}".format(failures))
