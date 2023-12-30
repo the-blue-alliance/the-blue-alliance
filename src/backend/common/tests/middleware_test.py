@@ -34,7 +34,7 @@ def test_TraceRequestMiddleware_callable(app: Flask) -> None:
     with app.test_request_context("/"):
         middleware(flask.request.environ, start_response)
 
-    assert type(trace_context.request) == Request
+    assert isinstance(trace_context.request, Request)
 
 
 def test_AfterResponseMiddleware_init(app: Flask) -> None:

@@ -274,11 +274,11 @@ class DistrictHelper:
         # adding in rookie bonus
         # save valid team keys
         valid_team_keys: Set[TeamKey] = set()
-        if type(teams) == ndb.tasklets.Future:
+        if isinstance(teams, ndb.tasklets.Future):
             teams = teams.get_result()
 
         for team in teams:
-            if type(team) == ndb.tasklets.Future:
+            if isinstance(teams, ndb.tasklets.Future):
                 team = team.get_result()
             bonus = cls._get_rookie_bonus(year, team.rookie_year)
 

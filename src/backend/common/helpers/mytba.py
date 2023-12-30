@@ -104,7 +104,7 @@ class MyTBA:
                 [
                     model
                     for model in self.models
-                    if type(model) == mytba_model_type
+                    if isinstance(model, mytba_model_type)
                     if model.model_type == model_type and model.model_key == model_key
                 ]
             ),
