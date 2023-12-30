@@ -103,4 +103,4 @@ def test_get_files():
         files = client.get_files()
 
     assert files == [file_name]
-    assert mock_list_blobs.called_once_with(mock_bucket)
+    mock_list_blobs.assert_called_once_with(mock_bucket, prefix=None, delimiter=None)

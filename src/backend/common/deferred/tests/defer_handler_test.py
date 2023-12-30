@@ -56,4 +56,4 @@ def test_handle_defer():
         environ = request_context.request.environ
         handle_defer("/some/path")
 
-    assert mock_post.called_with(environ)
+    mock_post.assert_called_with(environ)

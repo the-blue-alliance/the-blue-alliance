@@ -162,7 +162,7 @@ def test_update_no_output_in_taskqueue(mock_update, tasks_client: Client) -> Non
     assert b"Got [ 1 ] EventTeams written!" in resp.data
     assert b"2023test_frc1124" in resp.data
 
-    assert mock_update.called_once_with("2023test", False)
+    mock_update.assert_called_once_with("2023test", False)
 
     eventteams_written = EventTeam.query(EventTeam.event == event.key).fetch()
     assert eventteams_written == [expected_eventteam]
@@ -192,7 +192,7 @@ def test_update_skips_teams_which_dont_exist(mock_update, tasks_client: Client) 
     resp = tasks_client.get("/tasks/math/do/eventteam_update/2023test")
     assert resp.status_code == 200
 
-    assert mock_update.called_once_with("2023test", False)
+    mock_update.assert_called_once_with("2023test", False)
 
     eventteams_written = EventTeam.query(EventTeam.event == event.key).fetch()
     assert eventteams_written == []
@@ -221,7 +221,7 @@ def test_update_force_delete_param(mock_update, tasks_client: Client) -> None:
     )
     assert resp.status_code == 200
 
-    assert mock_update.called_once_with("2023test", True)
+    mock_update.assert_called_once_with("2023test", True)
 
 
 @mock.patch.object(EventTeamUpdater, "update")
@@ -254,10 +254,12 @@ def test_update_deletes_eventteams(mock_update, tasks_client: Client) -> None:
         {eventteam.key},
     )
 
-    resp = tasks_client.get("/tasks/math/do/eventteam_update/2023test")
+    resp = tasks_client.get(
+        "/tasks/math/do/eventteam_update/2023test", query_string={"allow_deletes": True}
+    )
     assert resp.status_code == 200
 
-    assert mock_update.called_once_with("2023test", True)
+    mock_update.assert_called_once_with("2023test", True)
 
     eventteams = EventTeam.query(EventTeam.event == event.key).fetch()
     assert eventteams == []
