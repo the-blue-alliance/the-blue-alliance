@@ -276,7 +276,7 @@ jobs:
         with:
           python-version: '3.8'
       - name: Download production artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-build
           path: src/build
