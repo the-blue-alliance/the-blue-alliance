@@ -1,6 +1,6 @@
 gunicorn==21.2.0
 firebase_admin==6.3.0
-Flask==2.3.3
+Flask==3.0.0
 Flask-Caching==2.1.0
 Flask-Cors==4.0.0
 Flask-WTF==1.2.1
@@ -16,5 +16,5 @@ protobuf==3.20.2
 pyre-extensions==0.0.30
 requests==2.31.0
 typing-extensions==4.9.0
-Werkzeug==2.3.7
+Werkzeug==3.0.1
 appengine-python-standard-tbafork==0.4.0dev2
