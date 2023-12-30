@@ -673,7 +673,7 @@ class PlayoffAdvancementHelper(object):
             if (
                 len(set(picks).intersection(set(team_keys))) >= 2
             ):  # if >= 2 teams are the same, then the alliance is the same
-                return alliance_selection.get("name", f"Alliance {n+1}")
+                return alliance_selection.get("name", f"Alliance {n + 1}")
         return None
 
     @classmethod
