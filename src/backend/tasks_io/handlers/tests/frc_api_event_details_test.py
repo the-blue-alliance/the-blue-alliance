@@ -82,9 +82,16 @@ def test_get_bad_key(tasks_client: Client) -> None:
     assert resp.status_code == 400
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
-def test_get_event_details(event_mock, tasks_client: Client) -> None:
+def test_get_event_details(
+    event_mock, teams_mock, avatars_mock, tasks_client: Client
+) -> None:
     event_mock.return_value = ([create_event()], [create_district()])
+    teams_mock.return_value = []
+    avatars_mock.return_value = ([], [])
+
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
     assert len(resp.data) > 0
@@ -126,12 +133,14 @@ def test_get_event_details_writes_teams(
 
 
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_clears_eventteams(
-    event_mock, teams_mock, max_year_mock, tasks_client: Client
+    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
 ) -> None:
     event_mock.return_value = ([create_event()], [create_district()])
+    avatars_mock.return_value = ([], [])
     teams_mock.return_value = [
         (
             Team(id="frc254", team_number=254),
@@ -205,11 +214,16 @@ def test_get_event_details_skip_eventteams(
     assert tasks[0].url == "/tasks/math/do/eventteam_update/2019casj?allow_deletes=True"
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_no_output_in_taskqueue(
-    event_mock, tasks_client: Client
+    event_mock, teams_mock, avatars_mock, tasks_client: Client
 ) -> None:
     event_mock.return_value = ([create_event()], [])
+    teams_mock.return_value = []
+    avatars_mock.return_value = ([], [])
+
     resp = tasks_client.get(
         "/backend-tasks/get/event_details/2019casj",
         headers={"X-Appengine-Taskname": "test"},

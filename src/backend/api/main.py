@@ -95,7 +95,7 @@ install_middleware(app)
 install_url_converters(app)
 configure_flask_cache(app)
 
-app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
+app.json.compact = False  # pyre-ignore[16]
 app.url_map.converters["simple_model_type"] = SimpleModelTypeConverter
 app.url_map.converters["model_type"] = ModelTypeConverter
 app.url_map.converters["event_detail_type"] = EventDetailTypeConverter

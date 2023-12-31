@@ -20,6 +20,9 @@ from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 from backend.common.storage.clients.gcloud_client import GCloudStorageClient
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
+# these are coming from within the NDB library
+pytestmark = pytest.mark.filterwarnings("ignore::ResourceWarning")
+
 
 @pytest.fixture(autouse=True)
 def fms_api_secrets(ndb_stub) -> None:

@@ -14,6 +14,7 @@ from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import TeamAtEventDistrictPoints
+from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
 def test_enqueue_bad_year(tasks_client: Client) -> None:
@@ -50,11 +51,14 @@ def test_enqueue_no_output_in_taskqueue(
     assert len(tasks) == 0
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
 def test_enqueue_event(
+    district_rankings_mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
     ndb_stub,
 ) -> None:
+    district_rankings_mock.return_value = {}
     District(
         id="2020test",
         year=2020,
@@ -68,6 +72,8 @@ def test_enqueue_event(
     for task in tasks:
         task_resp = tasks_client.get(task.url)
         assert task_resp.status_code == 200
+
+    taskqueue_stub.Clear()
 
 
 def test_calc_no_district(tasks_client: Client) -> None:

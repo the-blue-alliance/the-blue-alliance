@@ -1,7 +1,9 @@
 import itertools
+from typing import Generator
 from unittest.mock import patch
 
 import pytest
+from flask import Flask
 
 from backend.common.google_analytics import GoogleAnalytics
 from backend.common.run_after_response import execute_callbacks
@@ -10,6 +12,12 @@ from backend.common.run_after_response import execute_callbacks
 @pytest.fixture(autouse=True)
 def auto_add_ndb_stub(ndb_stub) -> None:
     pass
+
+
+@pytest.fixture(autouse=True)
+def run_with_werkzeug_context(app: Flask) -> Generator:
+    with app.test_request_context("/"):
+        yield
 
 
 def test_GoogleAnalytics_track_event_missing_sitevar() -> None:

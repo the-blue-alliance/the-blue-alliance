@@ -13,9 +13,14 @@ from backend.common.models.team import Team
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
 def test_enqueue_rolling(
-    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+    team_details_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
+    team_details_mock.return_value = (None, None, None)
+
     # Create 10 teams
     [
         Team(

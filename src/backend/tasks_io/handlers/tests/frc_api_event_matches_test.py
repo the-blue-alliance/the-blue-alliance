@@ -3,6 +3,7 @@ import json
 from typing import Dict, Optional
 from unittest import mock
 
+import pytest
 from freezegun import freeze_time
 from google.appengine.ext import ndb, testbed
 from werkzeug.test import Client
@@ -106,6 +107,7 @@ def test_get_bad_key(tasks_client: Client) -> None:
     assert resp.status_code == 404
 
 
+@pytest.mark.filterwarnings("ignore::ResourceWarning")
 def test_get_no_event(tasks_client: Client) -> None:
     resp = tasks_client.get("/tasks/get/fmsapi_matches/2020nyny")
     assert resp.status_code == 404
@@ -164,6 +166,7 @@ def test_get(
     assert Match.get_by_id("2020nyny_qm1") is not None
 
 
+@pytest.mark.filterwarnings("ignore:divide by zero")
 @mock.patch.object(DatafeedFMSAPI, "get_event_matches")
 def test_get_remap_teams(
     fmsapi_matches_mock,
