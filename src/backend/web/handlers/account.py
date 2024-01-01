@@ -277,7 +277,7 @@ def mytba() -> str:
             )
             for (event, matches) in event_matches
         ],
-        "status": request.args.get('status'),
+        "status": request.args.get("status"),
         "year": SeasonHelper.effective_season_year(),
     }
     return render_template("mytba.html", **template_values)
@@ -329,28 +329,34 @@ def mytba_team_post(team_number: TeamNumber) -> str:
     user = none_throws(current_user())
 
     if request.form.get("favorite"):
-        MyTBAHelper.add_favorite(Favorite(
-            parent=user.account_key,
-            user_id=user.account_key.id(),
-            model_type=ModelType.TEAM,
-            model_key=team_key
-        ))
+        MyTBAHelper.add_favorite(
+            Favorite(
+                parent=user.account_key,
+                user_id=user.account_key.id(),
+                model_type=ModelType.TEAM,
+                model_key=team_key,
+            )
+        )
     else:
         MyTBAHelper.remove_favorite(user.account_key, team_key, ModelType.TEAM)
 
     subs = request.form.getlist("notification_types")
     if subs:
-        MyTBAHelper.add_subscription(Subscription(
-            parent=user.account_key,
-            user_id=user.account_key.id(),
-            model_type=ModelType.TEAM,
-            model_key=team_key,
-            notification_types=[int(s) for s in subs]
-        ))
+        MyTBAHelper.add_subscription(
+            Subscription(
+                parent=user.account_key,
+                user_id=user.account_key.id(),
+                model_type=ModelType.TEAM,
+                model_key=team_key,
+                notification_types=[int(s) for s in subs],
+            )
+        )
     else:
         MyTBAHelper.remove_subscription(user.account_key, team_key, ModelType.TEAM)
 
-    return safe_next_redirect(url_for("account.mytba", _anchor="my-teams", status="team_updated"))
+    return safe_next_redirect(
+        url_for("account.mytba", _anchor="my-teams", status="team_updated")
+    )
 
 
 @blueprint.get("/mytba/event/<string:event_key>")
@@ -363,8 +369,9 @@ def mytba_event_get(event_key: EventKey) -> str:
     if event_key.endswith("*"):
         try:
             year = int(event_key[:-1])
-        except:
+        except ValueError:
             year = None
+
         if year and year in SeasonHelper.get_valid_years():
             event = Event(  # fake event for rendering
                 name="ALL {} EVENTS".format(year),
@@ -414,28 +421,34 @@ def mytba_event_post(event_key: EventKey) -> str:
     user = none_throws(current_user())
 
     if request.form.get("favorite"):
-        MyTBAHelper.add_favorite(Favorite(
-            parent=user.account_key,
-            user_id=user.account_key.id(),
-            model_type=ModelType.EVENT,
-            model_key=event_key
-        ))
+        MyTBAHelper.add_favorite(
+            Favorite(
+                parent=user.account_key,
+                user_id=user.account_key.id(),
+                model_type=ModelType.EVENT,
+                model_key=event_key,
+            )
+        )
     else:
         MyTBAHelper.remove_favorite(user.account_key, event_key, ModelType.EVENT)
 
     subs = request.form.getlist("notification_types")
     if subs:
-        MyTBAHelper.add_subscription(Subscription(
-            parent=user.account_key,
-            user_id=user.account_key.id(),
-            model_type=ModelType.EVENT,
-            model_key=event_key,
-            notification_types=[int(s) for s in subs]
-        ))
+        MyTBAHelper.add_subscription(
+            Subscription(
+                parent=user.account_key,
+                user_id=user.account_key.id(),
+                model_type=ModelType.EVENT,
+                model_key=event_key,
+                notification_types=[int(s) for s in subs],
+            )
+        )
     else:
         MyTBAHelper.remove_subscription(user.account_key, event_key, ModelType.EVENT)
 
-    return safe_next_redirect(url_for("account.mytba", _anchor="my-events", status="event_updated"))
+    return safe_next_redirect(
+        url_for("account.mytba", _anchor="my-events", status="event_updated")
+    )
 
 
 @blueprint.route("/ping", methods=["POST"])
