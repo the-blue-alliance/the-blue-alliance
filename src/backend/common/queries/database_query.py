@@ -124,14 +124,17 @@ class CachedDatabaseQuery(
             result = yield self._query_async(*args, **kwargs)
             return result
 
-        cache_key = self.cache_key
-        cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
-        if cached_query_result is None:
-            query_result = yield self._query_async(*args, **kwargs)
-            if self.CACHE_WRITES_ENABLED:
-                yield CachedQueryResult(id=cache_key, result=query_result).put_async()
-            return query_result
-        return cached_query_result.result
+        with Span("{}._do_query".format(self.__class__.__name__)):
+            cache_key = self.cache_key
+            cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
+            if cached_query_result is None:
+                query_result = yield self._query_async(*args, **kwargs)
+                if self.CACHE_WRITES_ENABLED:
+                    yield CachedQueryResult(
+                        id=cache_key, result=query_result
+                    ).put_async()
+                return query_result
+            return cached_query_result.result
 
     @ndb.tasklet
     def _do_dict_query(
@@ -141,19 +144,20 @@ class CachedDatabaseQuery(
             result = yield self._query_async(*args, **kwargs)
             return result
 
-        cache_key = self.dict_cache_key(_dict_version)
-        cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
-        if cached_query_result is None:
-            query_result = yield self._query_async(*args, **kwargs)
+        with Span("{}._do_query".format(self.__class__.__name__)):
+            cache_key = self.dict_cache_key(_dict_version)
+            cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
+            if cached_query_result is None:
+                query_result = yield self._query_async(*args, **kwargs)
 
-            # See https://github.com/facebook/pyre-check/issues/267
-            converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
-                query_result
-            ).convert(_dict_version)
+                # See https://github.com/facebook/pyre-check/issues/267
+                converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
+                    query_result
+                ).convert(_dict_version)
 
-            if self.CACHE_WRITES_ENABLED:
-                yield CachedQueryResult(
-                    id=cache_key, result_dict=converted_result
-                ).put_async()
-            return converted_result
-        return cached_query_result.result_dict
+                if self.CACHE_WRITES_ENABLED:
+                    yield CachedQueryResult(
+                        id=cache_key, result_dict=converted_result
+                    ).put_async()
+                return converted_result
+            return cached_query_result.result_dict
