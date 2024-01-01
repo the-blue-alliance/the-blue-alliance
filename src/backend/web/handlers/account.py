@@ -296,12 +296,12 @@ def mytba_team_get(team_number: TeamNumber) -> str:
     favorite = Favorite.query(
         Favorite.model_key == team_key,
         Favorite.model_type == ModelType.TEAM,
-        ancestor=user.account_key,
+        ancestor=none_throws(user.account_key),
     ).get()
     subscription = Subscription.query(
         Favorite.model_key == team_key,
         Favorite.model_type == ModelType.TEAM,
-        ancestor=user.account_key,
+        ancestor=none_throws(user.account_key),
     ).get()
 
     if not favorite and not subscription:  # New entry; default to being a favorite
@@ -324,35 +324,39 @@ def mytba_team_get(team_number: TeamNumber) -> str:
 
 @blueprint.post("/mytba/team/<int:team_number>")
 @require_login
-def mytba_team_post(team_number: TeamNumber) -> str:
+def mytba_team_post(team_number: TeamNumber) -> Response:
     team_key = f"frc{team_number}"
     user = none_throws(current_user())
 
     if request.form.get("favorite"):
         MyTBAHelper.add_favorite(
             Favorite(
-                parent=user.account_key,
-                user_id=user.account_key.id(),
+                parent=none_throws(user.account_key),
+                user_id=none_throws(user.account_key).id(),
                 model_type=ModelType.TEAM,
                 model_key=team_key,
             )
         )
     else:
-        MyTBAHelper.remove_favorite(user.account_key, team_key, ModelType.TEAM)
+        MyTBAHelper.remove_favorite(
+            none_throws(user.account_key), team_key, ModelType.TEAM
+        )
 
     subs = request.form.getlist("notification_types")
     if subs:
         MyTBAHelper.add_subscription(
             Subscription(
-                parent=user.account_key,
-                user_id=user.account_key.id(),
+                parent=none_throws(user.account_key),
+                user_id=none_throws(user.account_key).id(),
                 model_type=ModelType.TEAM,
                 model_key=team_key,
                 notification_types=[int(s) for s in subs],
             )
         )
     else:
-        MyTBAHelper.remove_subscription(user.account_key, team_key, ModelType.TEAM)
+        MyTBAHelper.remove_subscription(
+            none_throws(user.account_key), team_key, ModelType.TEAM
+        )
 
     return safe_next_redirect(
         url_for("account.mytba", _anchor="my-teams", status="team_updated")
@@ -388,12 +392,12 @@ def mytba_event_get(event_key: EventKey) -> str:
     favorite = Favorite.query(
         Favorite.model_key == event_key,
         Favorite.model_type == ModelType.EVENT,
-        ancestor=user.account_key,
+        ancestor=none_throws(user.account_key),
     ).get()
     subscription = Subscription.query(
         Favorite.model_key == event_key,
         Favorite.model_type == ModelType.EVENT,
-        ancestor=user.account_key,
+        ancestor=none_throws(user.account_key),
     ).get()
 
     if not favorite and not subscription:  # New entry; default to being a favorite
@@ -417,34 +421,38 @@ def mytba_event_get(event_key: EventKey) -> str:
 
 @blueprint.post("/mytba/event/<string:event_key>")
 @require_login
-def mytba_event_post(event_key: EventKey) -> str:
+def mytba_event_post(event_key: EventKey) -> Response:
     user = none_throws(current_user())
 
     if request.form.get("favorite"):
         MyTBAHelper.add_favorite(
             Favorite(
-                parent=user.account_key,
-                user_id=user.account_key.id(),
+                parent=none_throws(user.account_key),
+                user_id=none_throws(user.account_key).id(),
                 model_type=ModelType.EVENT,
                 model_key=event_key,
             )
         )
     else:
-        MyTBAHelper.remove_favorite(user.account_key, event_key, ModelType.EVENT)
+        MyTBAHelper.remove_favorite(
+            none_throws(user.account_key), event_key, ModelType.EVENT
+        )
 
     subs = request.form.getlist("notification_types")
     if subs:
         MyTBAHelper.add_subscription(
             Subscription(
-                parent=user.account_key,
-                user_id=user.account_key.id(),
+                parent=none_throws(user.account_key),
+                user_id=none_throws(user.account_key).id(),
                 model_type=ModelType.EVENT,
                 model_key=event_key,
                 notification_types=[int(s) for s in subs],
             )
         )
     else:
-        MyTBAHelper.remove_subscription(user.account_key, event_key, ModelType.EVENT)
+        MyTBAHelper.remove_subscription(
+            none_throws(user.account_key), event_key, ModelType.EVENT
+        )
 
     return safe_next_redirect(
         url_for("account.mytba", _anchor="my-events", status="event_updated")
