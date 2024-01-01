@@ -23,6 +23,7 @@ from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
+from backend.common.profiler import Span
 from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
     FMSAPIAwardsParser,
@@ -398,8 +399,12 @@ class DatafeedFMSAPI:
     ) -> Optional[TParsedResponse]:
         if response.status_code == 200:
             ApiStatusFMSApiDown.set_down(False)
-            self._maybe_save_response(response.url, response.content.decode())
-            return parser.parse(response.json())
+            with Span(f"maybe_save_fmsapi_response:{response.url}"):
+                self._maybe_save_response(response.url, response.content.decode())
+
+            with Span(f"datafeed_fmsapi_parser:{type(parser).__name__}"):
+                return parser.parse(response.json())
+
         elif response.status_code // 100 == 5:
             # 5XX error - something is wrong with the server
             ApiStatusFMSApiDown.set_down(True)
