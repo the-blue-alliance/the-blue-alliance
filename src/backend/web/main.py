@@ -45,6 +45,7 @@ from backend.web.handlers.static import (
     bigquery,
     brand,
     contact,
+    donate,
     opr,
     privacy,
     swag,
@@ -87,6 +88,7 @@ app.url_map.strict_slashes = False
 
 app.add_url_rule("/", view_func=index)
 app.add_url_rule("/about", view_func=about)
+app.add_url_rule("/donate", view_func=donate)
 
 app.add_url_rule("/watch/<alias>", view_func=gameday_redirect)
 app.add_url_rule("/gameday/<alias>", view_func=gameday_redirect)
