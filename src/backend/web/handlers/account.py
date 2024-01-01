@@ -32,6 +32,7 @@ from backend.common.environment import Environment
 from backend.common.helpers.account_deletion import AccountDeletionHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
+from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.favorite import Favorite
 from backend.common.models.keys import TeamNumber
@@ -274,15 +275,15 @@ def mytba() -> str:
             )
             for (event, matches) in event_matches
         ],
-        # "status": request.get('status'),
+        "status": request.args.get('status'),
         "year": SeasonHelper.effective_season_year(),
     }
     return render_template("mytba.html", **template_values)
 
 
-@blueprint.route("/mytba/team/<int:team_number>")
+@blueprint.get("/mytba/team/<int:team_number>")
 @require_login
-def mytba_team(team_number: TeamNumber) -> str:
+def mytba_team_get(team_number: TeamNumber) -> str:
     team_key = f"frc{team_number}"
     team = Team.get_by_id(team_key)
 
@@ -317,6 +318,37 @@ def mytba_team(team_number: TeamNumber) -> str:
         "enabled_notifications": enabled_notifications,
     }
     return render_template("mytba_team.html", **template_values)
+
+
+@blueprint.post("/mytba/team/<int:team_number>")
+@require_login
+def mytba_team_post(team_number: TeamNumber) -> str:
+    team_key = f"frc{team_number}"
+    user = none_throws(current_user())
+
+    if request.form.get("favorite"):
+        MyTBAHelper.add_favorite(Favorite(
+            parent=user.account_key,
+            user_id=user.account_key.id(),
+            model_type=ModelType.TEAM,
+            model_key=team_key
+        ))
+    else:
+        MyTBAHelper.remove_favorite(user.account_key, team_key, ModelType.TEAM)
+
+    subs = request.form.getlist("notification_types")
+    if subs:
+        MyTBAHelper.add_subscription(Subscription(
+            parent=user.account_key,
+            user_id=user.account_key.id(),
+            model_type=ModelType.TEAM,
+            model_key=team_key,
+            notification_types=[int(s) for s in subs]
+        ))
+    else:
+        MyTBAHelper.remove_subscription(user.account_key, team_key, ModelType.TEAM)
+
+    return safe_next_redirect(url_for("account.mytba", status="team_updated"))
 
 
 @blueprint.route("/ping", methods=["POST"])
