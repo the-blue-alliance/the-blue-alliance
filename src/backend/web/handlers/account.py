@@ -25,6 +25,7 @@ from backend.common.consts.auth_type import (
 )
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import (
+    ENABLED_EVENT_NOTIFICATIONS,
     ENABLED_TEAM_NOTIFICATIONS,
     RENDER_NAMES as NOTIFICATION_RENDER_NAMES,
 )
@@ -34,8 +35,9 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
-from backend.common.models.keys import TeamNumber
+from backend.common.models.keys import EventKey, TeamNumber
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
 from backend.common.sitevars.notifications_enable import NotificationsEnable
@@ -348,7 +350,92 @@ def mytba_team_post(team_number: TeamNumber) -> str:
     else:
         MyTBAHelper.remove_subscription(user.account_key, team_key, ModelType.TEAM)
 
-    return safe_next_redirect(url_for("account.mytba", status="team_updated"))
+    return safe_next_redirect(url_for("account.mytba", _anchor="my-teams", status="team_updated"))
+
+
+@blueprint.get("/mytba/event/<string:event_key>")
+@require_login
+def mytba_event_get(event_key: EventKey) -> str:
+    event = None
+    is_wildcard = False
+
+    # Handle wildcard for all events in a year
+    if event_key.endswith("*"):
+        try:
+            year = int(event_key[:-1])
+        except:
+            year = None
+        if year and year in SeasonHelper.get_valid_years():
+            event = Event(  # fake event for rendering
+                name="ALL {} EVENTS".format(year),
+                year=year,
+            )
+            is_wildcard = True
+    else:
+        event = Event.get_by_id(event_key)
+
+    if not event:
+        abort(404)
+
+    user = none_throws(current_user())
+    favorite = Favorite.query(
+        Favorite.model_key == event_key,
+        Favorite.model_type == ModelType.EVENT,
+        ancestor=user.account_key,
+    ).get()
+    subscription = Subscription.query(
+        Favorite.model_key == event_key,
+        Favorite.model_type == ModelType.EVENT,
+        ancestor=user.account_key,
+    ).get()
+
+    if not favorite and not subscription:  # New entry; default to being a favorite
+        is_favorite = True
+    else:
+        is_favorite = favorite is not None
+
+    enabled_notifications = [
+        (en, NOTIFICATION_RENDER_NAMES[en]) for en in ENABLED_EVENT_NOTIFICATIONS
+    ]
+
+    template_values = {
+        "event": event,
+        "is_wildcard": is_wildcard,
+        "is_favorite": is_favorite,
+        "subscription": subscription,
+        "enabled_notifications": enabled_notifications,
+    }
+    return render_template("mytba_event.html", **template_values)
+
+
+@blueprint.post("/mytba/event/<string:event_key>")
+@require_login
+def mytba_event_post(event_key: EventKey) -> str:
+    user = none_throws(current_user())
+
+    if request.form.get("favorite"):
+        MyTBAHelper.add_favorite(Favorite(
+            parent=user.account_key,
+            user_id=user.account_key.id(),
+            model_type=ModelType.EVENT,
+            model_key=event_key
+        ))
+    else:
+        MyTBAHelper.remove_favorite(user.account_key, event_key, ModelType.EVENT)
+
+    subs = request.form.getlist("notification_types")
+    if subs:
+        MyTBAHelper.add_subscription(Subscription(
+            parent=user.account_key,
+            user_id=user.account_key.id(),
+            model_type=ModelType.EVENT,
+            model_key=event_key,
+            notification_types=[int(s) for s in subs]
+        ))
+    else:
+        MyTBAHelper.remove_subscription(user.account_key, event_key, ModelType.EVENT)
+
+    return safe_next_redirect(url_for("account.mytba", _anchor="my-events", status="event_updated"))
 
 
 @blueprint.route("/ping", methods=["POST"])
