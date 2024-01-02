@@ -1,11 +1,17 @@
 import { setDefaultOptions } from "expect-puppeteer";
+import puppeteer from "puppeteer";
 import "regenerator-runtime/runtime";
 
 jest.setTimeout(10000);
 setDefaultOptions({ timeout: 10000 });
 
 describe("Homepage", () => {
+  var page;
+
   beforeAll(async () => {
+    const browser = await puppeteer.launch({ headless: "new" });
+    page = await browser.newPage();
+
     await page.goto("http://localhost:8080");
     await page.waitForSelector(".navbar");
   });
@@ -21,9 +27,13 @@ describe("Homepage", () => {
   });
 });
 
-/* TODO: reenable
 describe("GameDay", () => {
+  var page;
+
   beforeAll(async () => {
+    const browser = await puppeteer.launch({ headless: "new" });
+    page = await browser.newPage();
+
     await page.goto("http://localhost:8080/gameday");
     await page.waitForSelector(".gameday");
   });
@@ -36,10 +46,14 @@ describe("GameDay", () => {
     await expect(page).toMatchTextContent("Select a layout");
   });
 });
-*/
 
 describe("APIv3 Docs", () => {
+  var page;
+
   beforeAll(async () => {
+    const browser = await puppeteer.launch({ headless: "new" });
+    page = await browser.newPage();
+
     await page.goto("http://localhost:8080/apidocs/v3");
     await page.waitForSelector("#swagger_url");
   });
@@ -55,9 +69,13 @@ describe("APIv3 Docs", () => {
   });
 });
 
-/* TODO: reenable
 describe("EventWizard2", () => {
+  var page;
+
   beforeAll(async () => {
+    const browser = await puppeteer.launch({ headless: "new" });
+    page = await browser.newPage();
+
     await page.goto("http://localhost:8080/eventwizard2");
     await page.waitForSelector("#eventwizard");
   });
@@ -72,4 +90,3 @@ describe("EventWizard2", () => {
     await expect(page).toMatchTextContent("Select Event");
   });
 });
-*/
