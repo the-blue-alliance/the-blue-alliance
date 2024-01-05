@@ -176,7 +176,7 @@
     <a href="/tasks/get/fmsapi_event_alliances/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Alliances</a>
     <a href="/tasks/get/fmsapi_event_rankings/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Rankings</a>
     <a href="/tasks/get/fmsapi_awards/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Awards</a>
-    <a href="/admin/event/update_loaction/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-map-marker"></span> Geocode Location</a>
+    <a href="/admin/event/update_location/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-map-marker"></span> Geocode Location</a>
   </div>
   <h2>Math Tasks</h2>
   <div class="btn-group">
@@ -289,7 +289,8 @@
 
 <h2>Override Event Place ID</h2>
 <p>Link a specific Google Maps Place ID to an event. Use <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" rel="noopener noreferrer">this tool</a> to look up, if needed.</p>
-<form action="/admin/event/update_loaction/{{ event.key_name }}" method="post">
+<form action="/admin/event/update_location/{{ event.key_name }}" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <input type="text" class="form-control" name="place_id"></input><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-map-marker"></span> Set Place ID</button>
 </form>
