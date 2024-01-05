@@ -93,7 +93,7 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
-    normalized_location: Location = cast(Location, ndb.StructuredProperty(Location))
+    normalized_location: Optional[Location] = cast(Location, ndb.StructuredProperty(Location))
 
     timezone_id = (
         ndb.StringProperty()
@@ -529,7 +529,7 @@ class Event(CachedModel):
         return self._city_state_country
 
     @property
-    def nl(self) -> Location:
+    def nl(self) -> Optional[Location]:
         return self.normalized_location
 
     @property
