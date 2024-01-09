@@ -21,10 +21,10 @@ def test_add_team_media_mod_deferred(
     )
     assert resp.status_code == 302
 
-    tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
-    assert len(tasks) == 2
-    for task in tasks:
-        deferred.run(task.payload)
+    for i in range(2):
+        tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+        for task in tasks:
+            deferred.run(task.payload)
 
     access1 = TeamAdminAccess.get_by_id("frc254_2023")
     assert access1 is not None
@@ -39,6 +39,29 @@ def test_add_team_media_mod_deferred(
     assert access2.year == 2023
     assert access2.access_code == "def456"
     assert access2.expiration == datetime(2023, 7, 1)
+
+
+def test_add_team_media_mod_batched(
+    login_gae_admin,
+    web_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    resp = web_client.post(
+        "/admin/media/modcodes/add",
+        data={
+            "year": 2023,
+            "auth_codes_csv": "\n".join([f"{i},abc123" for i in range(1, 10000)]),
+        },
+    )
+    assert resp.status_code == 302
+
+    for i in range(2):
+        tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+        for task in tasks:
+            deferred.run(task.payload)
+
+    modcodes = TeamAdminAccess.query().fetch()
+    assert len(modcodes) == 9999
 
 
 def test_edit_team_media_mod_doest_exist(login_gae_admin, web_client: Client) -> None:
