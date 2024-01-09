@@ -1,4 +1,5 @@
 import csv
+import itertools
 from datetime import datetime
 from io import StringIO
 from typing import List, Optional
@@ -72,15 +73,20 @@ def team_media_add_single(year: Year, csv_row: List[str]) -> None:
     access.put()
 
 
+def team_media_add_group(year: Year, csv_rows: List[List[str]]) -> None:
+    for row in csv_rows:
+        deferred.defer(team_media_add_single, year, row, _queue="admin")
+
+
 def team_media_mod_add_post():
     year = int(request.form.get("year"))
     auth_codes_csv = request.form.get("auth_codes_csv")
 
     csv_data = list(csv.reader(StringIO(auth_codes_csv), delimiter=","))
-    for row in csv_data:
+    for row in itertools.batched(csv_data, 100):
         # defer the actual datastore write, because with a large number
         # of teams to add, we don't want to OOM the original request
-        deferred.defer(team_media_add_single, year, row, _queue="admin")
+        deferred.defer(team_media_add_group, year, row, _queue="admin")
 
     return redirect(url_for("admin.team_media_mod_list", year=year))
 
