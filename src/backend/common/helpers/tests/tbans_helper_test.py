@@ -733,8 +733,44 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse({"name": "abc"}, None)]
         )
-        with patch.object(FCMRequest, "send", return_value=batch_response) as mock_send:
+        with patch.object(
+            FCMRequest, "__init__", mock.MagicMock(spec=FCMRequest, return_value=None)
+        ) as mock_fcm_request_constructor, patch.object(
+            FCMRequest, "send", return_value=batch_response
+        ) as mock_send:
             success = TBANSHelper._ping_client(client)
+
+            mock_fcm_request_constructor.assert_called_once()
+            assert (
+                mock_fcm_request_constructor.call_args[1]["legacy_data_format"] is False
+            )
+            mock_send.assert_called_once()
+            assert success
+
+    def test_ping_fcm_legacy(self):
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="token",
+            client_type=ClientType.OS_ANDROID,
+            device_uuid="uuid",
+            display_name="Phone",
+        )
+
+        batch_response = messaging.BatchResponse(
+            [messaging.SendResponse({"name": "abc"}, None)]
+        )
+        with patch.object(
+            FCMRequest, "__init__", mock.MagicMock(spec=FCMRequest, return_value=None)
+        ) as mock_fcm_request_constructor, patch.object(
+            FCMRequest, "send", return_value=batch_response
+        ) as mock_send:
+            success = TBANSHelper._ping_client(client)
+
+            mock_fcm_request_constructor.assert_called_once()
+            assert (
+                mock_fcm_request_constructor.call_args[1]["legacy_data_format"] is True
+            )
             mock_send.assert_called_once()
             assert success
 
