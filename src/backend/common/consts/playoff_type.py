@@ -86,6 +86,21 @@ TYPE_NAMES: Dict[PlayoffType, str] = {
     PlayoffType.CUSTOM: "Custom",
 }
 
+API_TYPE_NAMES: Dict[PlayoffType, str] = {
+    PlayoffType.BRACKET_16_TEAM: "best_of_3",
+    PlayoffType.BRACKET_8_TEAM: "best_of_3",
+    PlayoffType.BRACKET_4_TEAM: "best_of_3",
+    PlayoffType.BRACKET_2_TEAM: "best_of_3",
+    PlayoffType.BO3_FINALS: "best_of_3",
+    PlayoffType.BO5_FINALS: "best_of_5",
+    PlayoffType.AVG_SCORE_8_TEAM: "avg_score",
+    PlayoffType.ROUND_ROBIN_6_TEAM: "round_robin",
+    PlayoffType.DOUBLE_ELIM_8_TEAM: "double_elim",
+    PlayoffType.DOUBLE_ELIM_4_TEAM: "double_elim",
+    PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM: "double_elim",
+    PlayoffType.CUSTOM: "custom",
+}
+
 
 BRACKET_ELIM_MAPPING: Dict[int, Tuple[int, int]] = {
     1: (1, 1),  # (set, match)
