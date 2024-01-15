@@ -360,11 +360,12 @@ class TBANSHelper:
     @staticmethod
     def _ping_client(client: MobileClient) -> bool:
         client_type = client.client_type
-        if client_type in FCM_CLIENTS:
+        if client_type in FCM_CLIENTS or client_type in FCM_LEGACY_CLIENTS:
             from backend.common.models.notifications.ping import (
                 PingNotification,
             )
 
+            is_legacy_format = client_type in FCM_LEGACY_CLIENTS
             notification = PingNotification()
 
             from backend.common.models.notifications.requests.fcm_request import (
@@ -372,7 +373,10 @@ class TBANSHelper:
             )
 
             fcm_request = FCMRequest(
-                firebase_app, notification, tokens=[client.messaging_id]
+                firebase_app,
+                notification,
+                tokens=[client.messaging_id],
+                legacy_data_format=is_legacy_format,
             )
 
             batch_response = fcm_request.send()
