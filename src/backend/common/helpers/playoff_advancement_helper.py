@@ -1,21 +1,22 @@
 import copy
 from collections import defaultdict
 from typing import (
-    Any,
     cast,
     DefaultDict,
     Dict,
     List,
-    Mapping,
     NamedTuple,
     Optional,
-    TypedDict,
     Union,
 )
 
 from pyre_extensions import none_throws
 
-from backend.common.consts.alliance_color import AllianceColor, OPPONENT, TMatchWinner
+from backend.common.consts.alliance_color import (
+    ALLIANCE_COLORS,
+    AllianceColor,
+    OPPONENT,
+)
 from backend.common.consts.comp_level import (
     COMP_LEVELS_PLAY_ORDER,
     COMP_LEVELS_VERBOSE,
@@ -32,6 +33,17 @@ from backend.common.helpers.match_helper import (
 )
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.event import Event
+from backend.common.models.event_playoff_advancement import (
+    ApiPlayoffAdvancement,
+    ApiPlayoffAdvancementAllianceRank,
+    BracketItem,
+    PlayoffAdvancement2015,
+    PlayoffAdvancementRoundRobin,
+    PlayoffAdvancementRoundRobinLevels,
+    TBracketTable,
+    TPlayoffAdvancement,
+    TPlayoffAdvancement2015Levels,
+)
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import TeamKey, TeamNumber, Year
 
@@ -41,51 +53,15 @@ class PlayoffAdvancement(NamedTuple):
     This is the output of this file's computation
     """
 
-    bracket_table: Any
-    playoff_advancement: Any
+    bracket_table: TBracketTable
+    playoff_advancement: Optional[TPlayoffAdvancement]
     double_elim_matches: Optional[
         Union[TOrganizedDoubleElimMatches, TOrganizedLegacyDoubleElimMatches]
     ]
     playoff_template: Optional[str]
 
 
-class PlayoffAdvancement2015(NamedTuple):
-    complete_alliance: List[TeamNumber]
-    scores: List[int]
-    average_score: float
-    num_played: int
-
-
-class PlayoffAdvancementRoundRobin(NamedTuple):
-    complete_alliance: List[TeamNumber]
-    champ_points: List[int]
-    sum_champ_points: int
-    tiebreaker1: List[int]
-    sum_tiebreaker1: int
-    tiebreaker2: List[int]
-    sum_tiebreaker2: int
-    alliance_name: str
-    record: WLTRecord
-
-
-class PlayoffAdvancementRoundRobinLevels(TypedDict):
-    sf: List[PlayoffAdvancementRoundRobin]
-    sf_complete: bool
-
-
-class BracketItem(TypedDict):
-    red_alliance: List[TeamNumber]
-    blue_alliance: List[TeamNumber]
-    winning_alliance: Optional[TMatchWinner]
-    red_wins: int
-    blue_wins: int
-    red_record: WLTRecord
-    blue_record: WLTRecord
-    red_name: Optional[str]
-    blue_name: Optional[str]
-
-
-class PlayoffAdvancementHelper(object):
+class PlayoffAdvancementHelper:
     ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS: Dict[Year, List[str]] = {
         2017: ["totalPoints"],
         2018: ["endgamePoints", "autoPoints"],
@@ -175,10 +151,10 @@ class PlayoffAdvancementHelper(object):
                     del bracket_table[comp_level]
 
         return PlayoffAdvancement(
-            bracket_table,
-            playoff_advancement,
-            double_elim_matches,
-            playoff_template,
+            bracket_table=bracket_table,
+            playoff_advancement=playoff_advancement,
+            double_elim_matches=double_elim_matches,
+            playoff_template=playoff_template,
         )
 
     """
@@ -231,7 +207,7 @@ class PlayoffAdvancementHelper(object):
         matches: TOrganizedMatches,
         event: Event,
         alliance_selections: Optional[List[EventAlliance]] = None,
-    ) -> Mapping[CompLevel, Mapping[str, BracketItem]]:
+    ) -> TBracketTable:
         complete_alliances = []
         bracket_table = defaultdict(lambda: defaultdict(dict))
         for comp_level in [CompLevel.EF, CompLevel.QF, CompLevel.SF, CompLevel.F]:
@@ -347,7 +323,7 @@ class PlayoffAdvancementHelper(object):
         cls,
         matches: TOrganizedMatches,
         alliance_selections: Optional[List[EventAlliance]] = None,
-    ) -> Mapping[CompLevel, List[PlayoffAdvancement2015]]:
+    ) -> TPlayoffAdvancement2015Levels:
         complete_alliances: List[List[TeamNumber]] = []
         advancement: DefaultDict[CompLevel, List[PlayoffAdvancement2015]] = defaultdict(
             list
@@ -678,19 +654,27 @@ class PlayoffAdvancementHelper(object):
 
     @classmethod
     def create_playoff_advancement_response_for_apiv3(
-        cls, event, playoff_advancement, bracket_table
-    ):
-        output = []
+        cls,
+        event: Event,
+        playoff_advancement: Optional[TPlayoffAdvancement],
+        bracket_table: TBracketTable,
+    ) -> List[ApiPlayoffAdvancement]:
+        output: List[ApiPlayoffAdvancement] = []
+
         for level in ELIM_LEVELS:
-            level_ranks = []
-            if playoff_advancement and playoff_advancement.get(level):
+            level_ranks: List[ApiPlayoffAdvancement] = []
+            if playoff_advancement and playoff_advancement.get(level):  # pyre-ignore[6]
                 if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
                     level_ranks = PlayoffAdvancementHelper.transform_2015_advancement_level_for_apiv3(
-                        event, playoff_advancement, level
+                        event,
+                        cast(TPlayoffAdvancement2015Levels, playoff_advancement),
+                        level,
                     )
-                else:
+                elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
                     level_ranks = PlayoffAdvancementHelper.transform_round_robin_advancement_level_for_apiv3(
-                        event, playoff_advancement, level
+                        event,
+                        cast(PlayoffAdvancementRoundRobinLevels, playoff_advancement),
+                        level,
                     )
             elif bracket_table and bracket_table.get(level):
                 level_ranks = (
@@ -702,7 +686,9 @@ class PlayoffAdvancementHelper(object):
         return output
 
     @classmethod
-    def transform_bracket_level_for_apiv3(cls, event, bracket_table, comp_level):
+    def transform_bracket_level_for_apiv3(
+        cls, event: Event, bracket_table: TBracketTable, comp_level: CompLevel
+    ) -> List[ApiPlayoffAdvancement]:
         level_ranks = []
         for series_level, set_bracket in bracket_table[comp_level].items():
             series = int("".join(c for c in series_level if c.isdigit()))
@@ -711,14 +697,14 @@ class PlayoffAdvancementHelper(object):
                 "level_name": COMP_LEVELS_VERBOSE_FULL[comp_level]
                 + (" %d" % series if comp_level != "f" else ""),
                 "rankings": None,
-                "type": "best_of_3",  # TODO handle other playoff types
+                "type": "best_of_3",
                 "sort_order_info": [{"name": "Wins", "type": "int", "precision": 0}],
                 "extra_stats_info": [],
             }
 
             alliances = [
                 cls._make_alliance_rank_row_for_apiv3(c, set_bracket)
-                for c in ["red", "blue"]
+                for c in ALLIANCE_COLORS
             ]
             data["rankings"] = sorted(
                 alliances, key=lambda a: a["record"]["wins"], reverse=True
@@ -729,50 +715,55 @@ class PlayoffAdvancementHelper(object):
         return level_ranks
 
     @classmethod
-    def _make_alliance_rank_row_for_apiv3(cls, color, bracket_set):
-        record = bracket_set["{}_record".format(color)]
-        return {
-            "team_keys": list(
+    def _make_alliance_rank_row_for_apiv3(
+        cls, color: AllianceColor, bracket_set: BracketItem
+    ) -> ApiPlayoffAdvancementAllianceRank:
+        record: WLTRecord = bracket_set["{}_record".format(color)]  # pyre-ignore[26, 9]
+        return ApiPlayoffAdvancementAllianceRank(
+            team_keys=list(
                 map(
                     lambda t: "frc{}".format(t),
-                    bracket_set["{}_alliance".format(color)],
+                    bracket_set["{}_alliance".format(color)],  # pyre-ignore[26]
                 )
             ),
-            "alliance_name": bracket_set["{}_name".format(color)],
-            "alliance_color": color,
-            "record": record,
-            "matches_played": record["wins"] + record["losses"] + record["ties"],
-            "sort_orders": [bracket_set["{}_wins".format(color)]],
-            "extra_stats": [],
-        }
+            alliance_name=bracket_set["{}_name".format(color)],  # pyre-ignore[26, 6]
+            alliance_color=color,
+            record=record,
+            matches_played=record["wins"] + record["losses"] + record["ties"],
+            sort_orders=[bracket_set["{}_wins".format(color)]],  # pyre-ignore[26]
+            extra_stats=[],
+        )
 
     @classmethod
     def transform_2015_advancement_level_for_apiv3(
-        cls, event, playoff_advancement, comp_level
-    ):
+        cls,
+        event: Event,
+        playoff_advancement: TPlayoffAdvancement2015Levels,
+        comp_level: CompLevel,
+    ) -> List[ApiPlayoffAdvancement]:
         level_order = COMP_LEVELS_PLAY_ORDER[comp_level]
         next_level = list(COMP_LEVELS_PLAY_ORDER.keys())[
             list(COMP_LEVELS_PLAY_ORDER.values()).index(level_order + 1)
         ]
-        data = {
-            "level": comp_level,
-            "level_name": COMP_LEVELS_VERBOSE_FULL[comp_level],
-            "rankings": [],
-            "type": "average_score",
-            "sort_order_info": [
+        data = ApiPlayoffAdvancement(
+            level=comp_level,
+            level_name=COMP_LEVELS_VERBOSE_FULL[comp_level],
+            rankings=[],
+            type="average_score",
+            sort_order_info=[
                 {"name": "Average Score", "type": "int", "precision": 2},
             ],
-            "extra_stats_info": [
+            extra_stats_info=[
                 {
                     "name": "Advance to {}".format(COMP_LEVELS_VERBOSE[next_level]),
                     "type": "bool",
                     "precision": 0,
                 },
             ],
-        }
+        )
         for i, alliance in enumerate(playoff_advancement[comp_level]):
             rank = i + 1
-            data["rankings"].append(
+            none_throws(data["rankings"]).append(
                 cls._make_2015_alliance_advancement_row_for_apiv3(
                     event, alliance, rank, comp_level
                 )
@@ -781,60 +772,71 @@ class PlayoffAdvancementHelper(object):
 
     @classmethod
     def transform_round_robin_advancement_level_for_apiv3(
-        cls, event, playoff_advancement, comp_level
-    ):
-        data = {
-            "level": comp_level,
-            "level_name": "Round Robin " + COMP_LEVELS_VERBOSE_FULL[comp_level],
-            "rankings": [],
-            "type": "round_robin",
-            "sort_order_info": [
+        cls,
+        event: Event,
+        playoff_advancement: PlayoffAdvancementRoundRobinLevels,
+        comp_level: CompLevel,
+    ) -> List[ApiPlayoffAdvancement]:
+        data = ApiPlayoffAdvancement(
+            level=comp_level,
+            level_name="Round Robin " + COMP_LEVELS_VERBOSE_FULL[comp_level],
+            rankings=[],
+            type="round_robin",
+            sort_order_info=[
                 {"name": "Champ Points", "type": "int", "precision": 0},
             ],
-            "extra_stats_info": [
+            extra_stats_info=[
                 {"name": "Advance to Finals", "type": "bool", "precision": 0},
             ],
-        }
+        )
 
         for tiebreaker in cls.ROUND_ROBIN_TIEBREAKERS[event.year]:
             data["sort_order_info"].append(
                 {"name": tiebreaker, "type": "int", "precision": 0}
             )
 
-        for i, alliance in enumerate(playoff_advancement[comp_level]):
+        for i, alliance in enumerate(playoff_advancement[comp_level]):  # pyre-ignore[6]
             rank = i + 1
-            data["rankings"].append(
+            none_throws(data["rankings"]).append(
                 cls._make_alliance_advancement_row_for_apiv3(event, alliance, rank)
             )
         return [data]
 
     @classmethod
-    def _make_alliance_advancement_row_for_apiv3(cls, event, alliance, rank):
+    def _make_alliance_advancement_row_for_apiv3(
+        cls, event: Event, alliance: PlayoffAdvancementRoundRobin, rank: int
+    ) -> ApiPlayoffAdvancementAllianceRank:
         record = alliance[8]
-        row = {
-            "team_keys": list(map(lambda t: "frc{}".format(t), alliance[0])),
-            "alliance_name": alliance[7],  # alliance name
-            "record": record,
-            "matches_played": record["wins"] + record["losses"] + record["ties"],
-            "rank": rank,
-            "sort_orders": [alliance[2], alliance[4], alliance[6]],
-            "extra_stats": [int(rank <= 2)],  # top 2 teams advance
-        }
+        row = ApiPlayoffAdvancementAllianceRank(
+            team_keys=list(map(lambda t: "frc{}".format(t), alliance[0])),
+            alliance_name=alliance[7],  # alliance name
+            record=record,
+            matches_played=record["wins"] + record["losses"] + record["ties"],
+            rank=rank,
+            sort_orders=[alliance[2], alliance[4], alliance[6]],
+            extra_stats=[int(rank <= 2)],  # top 2 teams advance
+        )
 
         return row
 
     @classmethod
     def _make_2015_alliance_advancement_row_for_apiv3(
-        cls, event, alliance, rank, comp_level
-    ):
+        cls,
+        event: Event,
+        alliance: PlayoffAdvancement2015,
+        rank: int,
+        comp_level: CompLevel,
+    ) -> ApiPlayoffAdvancementAllianceRank:
         team_keys = list(map(lambda t: "frc{}".format(t), alliance[0]))
-        row = {
-            "team_keys": team_keys,
-            "alliance_name": cls._alliance_name(team_keys, event.alliance_selections),
-            "rank": rank,
-            "matches_played": alliance[3],
-            "sort_orders": [alliance[2]],
-            "extra_stats": [int(rank <= cls.ADVANCEMENT_COUNT_2015[comp_level])],
-        }
+        row = ApiPlayoffAdvancementAllianceRank(
+            team_keys=team_keys,
+            alliance_name=none_throws(
+                cls._alliance_name(team_keys, event.alliance_selections)
+            ),
+            rank=rank,
+            matches_played=alliance[3],
+            sort_orders=[alliance[2]],
+            extra_stats=[int(rank <= cls.ADVANCEMENT_COUNT_2015[comp_level])],
+        )
 
         return row

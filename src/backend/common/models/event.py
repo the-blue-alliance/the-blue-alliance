@@ -18,6 +18,10 @@ from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_playoff_advancement import (
+    TBracketTable,
+    TPlayoffAdvancement,
+)
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.location import Location
@@ -235,7 +239,7 @@ class Event(CachedModel):
             return self.details.district_points
 
     @property
-    def playoff_advancement(self) -> Optional[Dict]:  # TODO type this
+    def playoff_advancement(self) -> Optional[TPlayoffAdvancement]:
         if self.details is None:
             return None
         else:
@@ -246,7 +250,7 @@ class Event(CachedModel):
             )
 
     @property
-    def playoff_bracket(self) -> Optional[Dict]:  # TODO type this
+    def playoff_bracket(self) -> Optional[TBracketTable]:
         if self.details is None:
             return None
         else:
