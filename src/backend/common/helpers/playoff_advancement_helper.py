@@ -24,7 +24,11 @@ from backend.common.consts.comp_level import (
     CompLevel,
     ELIM_LEVELS,
 )
-from backend.common.consts.playoff_type import PlayoffType
+from backend.common.consts.playoff_type import (
+    DoubleElimRound,
+    ORDERED_DOUBLE_ELIM_ROUNDS,
+    PlayoffType,
+)
 from backend.common.helpers.match_helper import (
     MatchHelper,
     TOrganizedDoubleElimMatches,
@@ -38,6 +42,9 @@ from backend.common.models.event_playoff_advancement import (
     ApiPlayoffAdvancementAllianceRank,
     BracketItem,
     PlayoffAdvancement2015,
+    PlayoffAdvancementDoubleElimAlliance,
+    PlayoffAdvancementDoubleElimLevels,
+    PlayoffAdvancementDoubleElimRound,
     PlayoffAdvancementRoundRobin,
     PlayoffAdvancementRoundRobinLevels,
     TBracketTable,
@@ -141,6 +148,15 @@ class PlayoffAdvancementHelper:
             for comp_level in comp_levels:
                 if comp_level != CompLevel.F:
                     del bracket_table[comp_level]
+        elif event.playoff_type in [
+            PlayoffType.DOUBLE_ELIM_4_TEAM,
+            PlayoffType.DOUBLE_ELIM_8_TEAM,
+        ]:
+            playoff_advancement = cls.generate_playoff_advancement_double_elim(
+                cast(TOrganizedDoubleElimMatches, double_elim_matches),
+                event.alliance_selections,
+            )
+            # double elim needs the whole bracket, do not remove anything
         elif (
             event.playoff_type == PlayoffType.BO3_FINALS
             or event.playoff_type == PlayoffType.BO5_FINALS
@@ -325,6 +341,7 @@ class PlayoffAdvancementHelper:
         alliance_selections: Optional[List[EventAlliance]] = None,
     ) -> TPlayoffAdvancement2015Levels:
         complete_alliances: List[List[TeamNumber]] = []
+        alliance_names: List[str] = []
         advancement: DefaultDict[CompLevel, List[PlayoffAdvancement2015]] = defaultdict(
             list
         )  # key: comp level; value: list of [complete_alliance, [scores], average_score, num_played]
@@ -336,24 +353,15 @@ class PlayoffAdvancementHelper:
                     alliance = cls.ordered_alliance(
                         match.alliances[color]["teams"], alliance_selections
                     )
-                    alliance_index = None
-                    for i, complete_alliance in enumerate(
-                        complete_alliances
-                    ):  # search for alliance. could be more efficient
-                        if (
-                            len(set(alliance).intersection(set(complete_alliance))) >= 2
-                        ):  # if >= 2 teams are the same, then the alliance is the same
-                            backups = list(
-                                set(alliance).difference(set(complete_alliance))
-                            )
-                            complete_alliances[
-                                i
-                            ] += backups  # ensures that backup robots are listed last
-                            alliance_index = i
-                            break
-                    else:
-                        complete_alliances.append(alliance)
-
+                    alliance_name: str = (
+                        cls._alliance_name(
+                            match.alliances[color]["teams"], alliance_selections
+                        )
+                        or ""
+                    )
+                    alliance_index = cls._update_complete_alliance(
+                        complete_alliances, alliance_names, alliance, alliance_name
+                    )
                     is_new = False
                     if alliance_index is not None:
                         for j, (complete_alliance, scores, _, _) in enumerate(
@@ -427,26 +435,10 @@ class PlayoffAdvancementHelper:
                         )
                         or ""
                     )
-                    i: Optional[int] = None
-                    for i, complete_alliance in enumerate(
-                        complete_alliances
-                    ):  # search for alliance. could be more efficient
-                        if (
-                            len(set(alliance).intersection(set(complete_alliance))) >= 2
-                        ):  # if >= 2 teams are the same, then the alliance is the same
-                            backups = list(
-                                set(alliance).difference(set(complete_alliance))
-                            )
-                            complete_alliances[
-                                i
-                            ] += backups  # ensures that backup robots are listed last
-                            alliance_names[i] = alliance_name
-                            break
-                    else:
-                        i = None
-                        complete_alliances.append(alliance)
-                        alliance_names.append(alliance_name)
 
+                    i = cls._update_complete_alliance(
+                        complete_alliances, alliance_names, alliance, alliance_name
+                    )
                     is_new = False
                     if i is not None:
                         for (
@@ -611,6 +603,92 @@ class PlayoffAdvancementHelper:
         return cast(PlayoffAdvancementRoundRobinLevels, advancement)
 
     @classmethod
+    def generate_playoff_advancement_double_elim(
+        cls,
+        organized_matches: TOrganizedDoubleElimMatches,
+        alliance_selections: Optional[List[EventAlliance]] = None,
+    ) -> PlayoffAdvancementDoubleElimLevels:
+        rounds: defaultdict[  # pyre-ignore[9]
+            DoubleElimRound, PlayoffAdvancementDoubleElimRound
+        ] = defaultdict(list)
+
+        complete_alliances: List[List[TeamNumber]] = []
+        alliance_names: List[str] = []
+
+        # key is the index into "complete_alliances"
+        cumulative_record_per_alliance: defaultdict[int, WLTRecord] = defaultdict(
+            lambda: WLTRecord(wins=0, losses=0, ties=0)
+        )
+        per_round_record_per_alliance: defaultdict[
+            DoubleElimRound, defaultdict[int, WLTRecord]
+        ] = defaultdict(
+            lambda: defaultdict(lambda: WLTRecord(wins=0, losses=0, ties=0))
+        )
+
+        for round in ORDERED_DOUBLE_ELIM_ROUNDS:
+            matches = organized_matches.get(round)
+            if not matches:
+                continue
+
+            round_alliances: List[PlayoffAdvancementDoubleElimAlliance] = []
+            any_unplayed = False
+            for match in matches:
+                if not match.has_been_played:
+                    any_unplayed = True
+
+                for color in [AllianceColor.RED, AllianceColor.BLUE]:
+                    alliance = cls.ordered_alliance(
+                        match.alliances[color]["teams"], alliance_selections
+                    )
+                    alliance_name: str = (
+                        cls._alliance_name(
+                            match.alliances[color]["teams"], alliance_selections
+                        )
+                        or ""
+                    )
+
+                    alliance_index = cls._update_complete_alliance(
+                        complete_alliances, alliance_names, alliance, alliance_name
+                    )
+
+                    if match.winning_alliance == "":
+                        cumulative_record_per_alliance[alliance_index]["ties"] += 1
+                        per_round_record_per_alliance[round][alliance_index][
+                            "ties"
+                        ] += 1
+                    elif match.winning_alliance == color:
+                        cumulative_record_per_alliance[alliance_index]["wins"] += 1
+                        per_round_record_per_alliance[round][alliance_index][
+                            "wins"
+                        ] += 1
+                    else:
+                        cumulative_record_per_alliance[alliance_index]["losses"] += 1
+                        per_round_record_per_alliance[round][alliance_index][
+                            "losses"
+                        ] += 1
+
+                    round_alliances.append(
+                        PlayoffAdvancementDoubleElimAlliance(
+                            complete_alliance=complete_alliances[alliance_index],
+                            alliance_name=alliance_names[alliance_index],
+                            record=per_round_record_per_alliance[round][alliance_index],
+                            eliminated=(
+                                cumulative_record_per_alliance[alliance_index]["losses"]
+                                >= 2
+                            ),
+                        )
+                    )
+
+            rounds[round] = PlayoffAdvancementDoubleElimRound(
+                competing_alliances=round_alliances,
+                complete=(not any_unplayed),
+            )
+
+        return PlayoffAdvancementDoubleElimLevels(
+            rounds=rounds,
+        )
+
+    @classmethod
     def ordered_alliance(
         cls,
         team_keys: List[TeamKey],
@@ -653,6 +731,31 @@ class PlayoffAdvancementHelper:
         return None
 
     @classmethod
+    def _update_complete_alliance(
+        cls,
+        complete_alliances: List[List[TeamNumber]],
+        alliance_names: List[str],
+        alliance: List[TeamNumber],
+        alliance_name: str,
+    ) -> int:
+        for i, complete_alliance in enumerate(
+            complete_alliances
+        ):  # search for alliance. could be more efficient
+            if (
+                len(set(alliance).intersection(set(complete_alliance))) >= 2
+            ):  # if >= 2 teams are the same, then the alliance is the same
+                backups = list(set(alliance).difference(set(complete_alliance)))
+                complete_alliances[
+                    i
+                ] += backups  # ensures that backup robots are listed last
+                alliance_names[i] = alliance_name
+                return i
+
+        complete_alliances.append(alliance)
+        alliance_names.append(alliance_name)
+        return len(complete_alliances) - 1
+
+    @classmethod
     def create_playoff_advancement_response_for_apiv3(
         cls,
         event: Event,
@@ -661,27 +764,57 @@ class PlayoffAdvancementHelper:
     ) -> List[ApiPlayoffAdvancement]:
         output: List[ApiPlayoffAdvancement] = []
 
-        for level in ELIM_LEVELS:
-            level_ranks: List[ApiPlayoffAdvancement] = []
-            if playoff_advancement and playoff_advancement.get(level):  # pyre-ignore[6]
-                if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
-                    level_ranks = PlayoffAdvancementHelper.transform_2015_advancement_level_for_apiv3(
+        if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
+            bracket_levels_to_include = [CompLevel.F]
+            advancement2015 = cast(TPlayoffAdvancement2015Levels, playoff_advancement)
+            for level in ELIM_LEVELS:
+                if not advancement2015.get(level):
+                    continue
+                output.extend(
+                    cls.transform_2015_advancement_level_for_apiv3(
                         event,
-                        cast(TPlayoffAdvancement2015Levels, playoff_advancement),
+                        advancement2015,
                         level,
-                    )
-                elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
-                    level_ranks = PlayoffAdvancementHelper.transform_round_robin_advancement_level_for_apiv3(
-                        event,
-                        cast(PlayoffAdvancementRoundRobinLevels, playoff_advancement),
-                        level,
-                    )
-            elif bracket_table and bracket_table.get(level):
-                level_ranks = (
-                    PlayoffAdvancementHelper.transform_bracket_level_for_apiv3(
-                        event, bracket_table, level
                     )
                 )
+        elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
+            bracket_levels_to_include = [CompLevel.F]
+            output.extend(
+                cls.transform_round_robin_advancement_level_for_apiv3(
+                    event,
+                    cast(PlayoffAdvancementRoundRobinLevels, playoff_advancement),
+                )
+            )
+        elif event.playoff_type in [
+            PlayoffType.DOUBLE_ELIM_4_TEAM,
+            PlayoffType.DOUBLE_ELIM_8_TEAM,
+        ]:
+            bracket_levels_to_include = [CompLevel.F]
+            double_elim_advancement = cast(
+                PlayoffAdvancementDoubleElimLevels, playoff_advancement
+            )
+            for round in ORDERED_DOUBLE_ELIM_ROUNDS:
+                if round not in double_elim_advancement["rounds"]:
+                    continue
+
+                output.extend(
+                    cls.transform_double_elim_advancement_level_for_apiv3(
+                        event,
+                        double_elim_advancement,
+                        round,
+                    )
+                )
+        else:
+            bracket_levels_to_include = ELIM_LEVELS
+
+        for level in bracket_levels_to_include:
+            if not bracket_table.get(level):
+                continue
+
+            level_ranks: List[ApiPlayoffAdvancement] = []
+            level_ranks = PlayoffAdvancementHelper.transform_bracket_level_for_apiv3(
+                event, bracket_table, level
+            )
             output.extend(level_ranks)
         return output
 
@@ -775,11 +908,10 @@ class PlayoffAdvancementHelper:
         cls,
         event: Event,
         playoff_advancement: PlayoffAdvancementRoundRobinLevels,
-        comp_level: CompLevel,
     ) -> List[ApiPlayoffAdvancement]:
         data = ApiPlayoffAdvancement(
-            level=comp_level,
-            level_name="Round Robin " + COMP_LEVELS_VERBOSE_FULL[comp_level],
+            level=str(CompLevel.SF),
+            level_name="Round Robin " + COMP_LEVELS_VERBOSE_FULL[CompLevel.SF],
             rankings=[],
             type="round_robin",
             sort_order_info=[
@@ -795,15 +927,42 @@ class PlayoffAdvancementHelper:
                 {"name": tiebreaker, "type": "int", "precision": 0}
             )
 
-        for i, alliance in enumerate(playoff_advancement[comp_level]):  # pyre-ignore[6]
+        for i, alliance in enumerate(playoff_advancement["sf"]):
             rank = i + 1
             none_throws(data["rankings"]).append(
-                cls._make_alliance_advancement_row_for_apiv3(event, alliance, rank)
+                cls._make_round_robin_alliance_advancement_row_for_apiv3(
+                    event, alliance, rank
+                )
             )
         return [data]
 
     @classmethod
-    def _make_alliance_advancement_row_for_apiv3(
+    def transform_double_elim_advancement_level_for_apiv3(
+        cls,
+        event: Event,
+        playoff_advancement: PlayoffAdvancementDoubleElimLevels,
+        round: DoubleElimRound,
+    ) -> List[ApiPlayoffAdvancement]:
+        data = ApiPlayoffAdvancement(
+            level=round.name.lower(),
+            level_name=round.value,
+            rankings=[],
+            type="double_elim",
+            sort_order_info=[],
+            extra_stats_info=[
+                {"name": "Eliminated", "type": "bool", "precision": 0},
+            ],
+        )
+
+        for alliance in playoff_advancement["rounds"][round][0]:
+            none_throws(data["rankings"]).append(
+                cls._make_double_elim_alliance_advancement_row_for_apiv3(alliance)
+            )
+
+        return [data]
+
+    @classmethod
+    def _make_round_robin_alliance_advancement_row_for_apiv3(
         cls, event: Event, alliance: PlayoffAdvancementRoundRobin, rank: int
     ) -> ApiPlayoffAdvancementAllianceRank:
         record = alliance[8]
@@ -840,3 +999,22 @@ class PlayoffAdvancementHelper:
         )
 
         return row
+
+    @classmethod
+    def _make_double_elim_alliance_advancement_row_for_apiv3(
+        cls, alliance: PlayoffAdvancementDoubleElimAlliance
+    ) -> ApiPlayoffAdvancementAllianceRank:
+        return ApiPlayoffAdvancementAllianceRank(
+            team_keys=list(
+                map(lambda t: "frc{}".format(t), alliance["complete_alliance"])
+            ),
+            alliance_name=alliance["alliance_name"],
+            record=alliance["record"],
+            matches_played=alliance["record"]["wins"]
+            + alliance["record"]["losses"]
+            + alliance["record"]["ties"],
+            sort_orders=[],
+            extra_stats=[
+                int(alliance["eliminated"]),
+            ],
+        )

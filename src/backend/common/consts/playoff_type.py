@@ -23,6 +23,16 @@ class DoubleElimRound(StrEnum):
     FINALS = "Finals"
 
 
+ORDERED_DOUBLE_ELIM_ROUNDS = [
+    DoubleElimRound.ROUND1,
+    DoubleElimRound.ROUND2,
+    DoubleElimRound.ROUND3,
+    DoubleElimRound.ROUND4,
+    DoubleElimRound.ROUND5,
+    DoubleElimRound.FINALS,
+]
+
+
 @enum.unique
 class PlayoffType(enum.IntEnum):
     # Standard Brackets

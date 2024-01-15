@@ -2,6 +2,7 @@ from typing import List, Literal, Mapping, NamedTuple, Optional, TypedDict, Unio
 
 from backend.common.consts.alliance_color import AllianceColor, TMatchWinner
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.playoff_type import DoubleElimRound
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import TeamKey, TeamNumber
 
@@ -37,6 +38,18 @@ class PlayoffAdvancementRoundRobin(NamedTuple):
     record: WLTRecord
 
 
+class PlayoffAdvancementDoubleElimAlliance(TypedDict):
+    complete_alliance: List[TeamNumber]
+    alliance_name: str
+    record: WLTRecord
+    eliminated: bool
+
+
+class PlayoffAdvancementDoubleElimRound(NamedTuple):
+    competing_alliances: List[PlayoffAdvancementDoubleElimAlliance]
+    complete: bool
+
+
 class PlayoffAdvancementRoundRobinLevels(TypedDict):
     sf: List[PlayoffAdvancementRoundRobin]
     sf_complete: bool
@@ -45,10 +58,16 @@ class PlayoffAdvancementRoundRobinLevels(TypedDict):
 TPlayoffAdvancement2015Levels = Mapping[CompLevel, List[PlayoffAdvancement2015]]
 
 
+class PlayoffAdvancementDoubleElimLevels(TypedDict):
+    rounds: Mapping[DoubleElimRound, PlayoffAdvancementDoubleElimRound]
+
+
 TBracketTable = Mapping[CompLevel, Mapping[str, BracketItem]]
 
 TPlayoffAdvancement = Union[
-    TPlayoffAdvancement2015Levels, PlayoffAdvancementRoundRobinLevels
+    TPlayoffAdvancement2015Levels,
+    PlayoffAdvancementRoundRobinLevels,
+    PlayoffAdvancementDoubleElimLevels,
 ]
 
 
