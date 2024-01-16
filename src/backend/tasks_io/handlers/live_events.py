@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import List
+from typing import List, Optional
 
 import pytz
 from flask import abort, Blueprint, request, url_for
@@ -16,6 +16,7 @@ from backend.common.helpers.match_time_prediction_helper import (
     MatchTimePredictionHelper,
 )
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
@@ -85,6 +86,42 @@ def update_event_team_status(event_key: EventKey) -> Response:
             f"Finished calculating event team statuses for: {event_key}"
         )
     return make_response("")
+
+
+@blueprint.route(
+    "/tasks/math/enqueue/playoff_advancement_update/all", defaults={"year": None}
+)
+@blueprint.route("/tasks/math/enqueue/playoff_advancement_update/<int:year>")
+def enqueue_playoff_advancement_year(year: Optional[Year]) -> Response:
+    if year is None:
+        for season_year in SeasonHelper.get_valid_years():
+            taskqueue.add(
+                url=url_for(
+                    "live_events.enqueue_playoff_advancement_year", year=season_year
+                ),
+                method="GET",
+            )
+        return make_response(
+            f"enqueued playoff advancement computation for {SeasonHelper.get_valid_years()}"
+        )
+    else:
+        event_keys = Event.query(Event.year == year).fetch(1000, keys_only=True)
+        for event_key in event_keys:
+            taskqueue.add(
+                url=url_for(
+                    "live_events.update_playoff_advancement",
+                    event_key=event_key.string_id(),
+                ),
+                method="GET",
+            )
+        if (
+            "X-Appengine-Taskname" not in request.headers
+        ):  # Only write out if not in taskqueue
+            return make_response(
+                f"enqueued playoff advancement computation for {event_keys}"
+            )
+        else:
+            return make_response("")
 
 
 @blueprint.route("/tasks/math/enqueue/playoff_advancement_update/<event_key>")
