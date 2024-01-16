@@ -2,7 +2,6 @@ import copy
 from collections import defaultdict
 from typing import (
     cast,
-    DefaultDict,
     Dict,
     List,
     NamedTuple,
@@ -53,6 +52,7 @@ from backend.common.models.event_playoff_advancement import (
 )
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import TeamKey, TeamNumber, Year
+from backend.common.models.match import Match
 
 
 class PlayoffAdvancement(NamedTuple):
@@ -342,13 +342,25 @@ class PlayoffAdvancementHelper:
     ) -> TPlayoffAdvancement2015Levels:
         complete_alliances: List[List[TeamNumber]] = []
         alliance_names: List[str] = []
-        advancement: DefaultDict[CompLevel, List[PlayoffAdvancement2015]] = defaultdict(
-            list
-        )  # key: comp level; value: list of [complete_alliance, [scores], average_score, num_played]
+        per_alliance_advancement: defaultdict[
+            CompLevel, defaultdict[int, PlayoffAdvancement2015]
+        ] = defaultdict(
+            lambda: defaultdict(
+                lambda: PlayoffAdvancement2015(
+                    complete_alliance=[],
+                    scores=[],
+                    average_score=0,
+                    num_played=0,
+                )
+            )
+        )
+        advancement: Dict[CompLevel, List[PlayoffAdvancement2015]] = {}
+
         for comp_level in [CompLevel.EF, CompLevel.QF, CompLevel.SF]:
             for match in matches.get(comp_level, []):
                 if not match.has_been_played:
                     continue
+
                 for color in [AllianceColor.RED, AllianceColor.BLUE]:
                     alliance = cls.ordered_alliance(
                         match.alliances[color]["teams"], alliance_selections
@@ -362,47 +374,28 @@ class PlayoffAdvancementHelper:
                     alliance_index = cls._update_complete_alliance(
                         complete_alliances, alliance_names, alliance, alliance_name
                     )
-                    is_new = False
-                    if alliance_index is not None:
-                        for j, (complete_alliance, scores, _, _) in enumerate(
-                            advancement[comp_level]
-                        ):  # search for alliance. could be more efficient
-                            if (
-                                len(
-                                    set(
-                                        complete_alliances[alliance_index]
-                                    ).intersection(set(complete_alliance))
-                                )
-                                >= 2
-                            ):  # if >= 2 teams are the same, then the alliance is the same
-                                complete_alliance = complete_alliances[alliance_index]
-                                scores.append(match.alliances[color]["score"])
-                                advancement[comp_level][j] = advancement[comp_level][
-                                    j
-                                ]._replace(
-                                    scores=scores,
-                                    average_score=float(sum(scores)) / len(scores),
-                                    num_played=len(scores),
-                                )
-                                break
-                        else:
-                            is_new = True
 
-                    score = match.alliances[color]["score"]
-                    if alliance_index is None:
-                        advancement[comp_level].append(
-                            PlayoffAdvancement2015(alliance, [score], score, 1)
-                        )
-                    elif is_new:
-                        advancement[comp_level].append(
-                            PlayoffAdvancement2015(
-                                complete_alliances[alliance_index], [score], score, 1
-                            )
-                        )
+                    (_, scores, _, _) = per_alliance_advancement[comp_level][
+                        alliance_index
+                    ]
+                    scores.append(match.alliances[color]["score"])
 
-            advancement[comp_level] = sorted(
-                advancement[comp_level], key=lambda x: -x.average_score
+                    per_alliance_advancement[comp_level][
+                        alliance_index
+                    ] = PlayoffAdvancement2015(
+                        complete_alliance=complete_alliances[alliance_index],
+                        scores=scores,
+                        average_score=float(sum(scores)) / len(scores),
+                        num_played=len(scores),
+                    )
+
+            sorted_advancements: List[PlayoffAdvancement2015] = list(
+                per_alliance_advancement.get(comp_level, {}).values()
+            )
+            sorted_advancements = sorted(
+                sorted_advancements, key=lambda x: -x.average_score
             )  # sort by descending average score
+            advancement[comp_level] = sorted_advancements
 
         return advancement
 
@@ -415,111 +408,62 @@ class PlayoffAdvancementHelper:
     ) -> PlayoffAdvancementRoundRobinLevels:
         complete_alliances: List[List[TeamNumber]] = []
         alliance_names: List[str] = []
-        advancement: DefaultDict[
-            CompLevel, List[PlayoffAdvancementRoundRobin]
+
+        # key is the index into complete_alliances
+        per_alliance_advancement: defaultdict[
+            CompLevel, defaultdict[int, PlayoffAdvancementRoundRobin]
         ] = defaultdict(
-            list
-        )  # key: comp level; value: list of [complete_alliance, [champ_points], sum_champ_points, [tiebreaker1], sum_tiebreaker1, [tiebreaker2], sum_tiebreaker2
-        for comp_level in [CompLevel.SF]:  # In case this needs to scale to more levels
-            any_unplayed = False
-            for match in matches.get(comp_level, []):
-                if not match.has_been_played:
-                    any_unplayed = True
-                for color in [AllianceColor.RED, AllianceColor.BLUE]:
-                    alliance = cls.ordered_alliance(
+            lambda: defaultdict(
+                lambda: PlayoffAdvancementRoundRobin(
+                    complete_alliance=[],
+                    champ_points=[],
+                    sum_champ_points=0,
+                    tiebreaker1=[],
+                    sum_tiebreaker1=0,
+                    tiebreaker2=[],
+                    sum_tiebreaker2=0,
+                    alliance_name="",
+                    record=WLTRecord(wins=0, losses=0, ties=0),
+                )
+            )
+        )
+
+        advancement: Dict[CompLevel, List[PlayoffAdvancementRoundRobin]] = {}
+        comp_level = CompLevel.SF
+        any_unplayed = False
+        for match in matches.get(comp_level, []):
+            if not match.has_been_played:
+                any_unplayed = True
+            for color in [AllianceColor.RED, AllianceColor.BLUE]:
+                alliance = cls.ordered_alliance(
+                    match.alliances[color]["teams"], alliance_selections
+                )
+                alliance_name: str = (
+                    cls._alliance_name(
                         match.alliances[color]["teams"], alliance_selections
                     )
-                    alliance_name: str = (
-                        cls._alliance_name(
-                            match.alliances[color]["teams"], alliance_selections
-                        )
-                        or ""
-                    )
+                    or ""
+                )
 
-                    i = cls._update_complete_alliance(
-                        complete_alliances, alliance_names, alliance, alliance_name
-                    )
-                    is_new = False
-                    if i is not None:
-                        for (
-                            j,
-                            (
-                                complete_alliance,
-                                champ_points,
-                                _,
-                                tiebreaker1,
-                                _,
-                                tiebreaker2,
-                                _,
-                                _,
-                                record,
-                            ),
-                        ) in enumerate(
-                            advancement[comp_level]
-                        ):  # search for alliance. could be more efficient
-                            if (
-                                len(
-                                    set(complete_alliances[i]).intersection(
-                                        set(complete_alliance)
-                                    )
-                                )
-                                >= 2
-                            ):  # if >= 2 teams are the same, then the alliance is the same
-                                if not match.has_been_played:
-                                    cp = 0
-                                elif match.winning_alliance == color:
-                                    cp = 2
-                                    record["wins"] += 1
-                                elif match.winning_alliance == "":
-                                    cp = 1
-                                    record["ties"] += 1
-                                else:
-                                    cp = 0
-                                    record["losses"] += 1
-                                if match.has_been_played:
-                                    champ_points.append(cp)
+                i = cls._update_complete_alliance(
+                    complete_alliances, alliance_names, alliance, alliance_name
+                )
 
-                                    if (
-                                        year in cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS
-                                        and match.score_breakdown is not None
-                                    ):
-                                        breakdown = none_throws(match.score_breakdown)
-                                        tiebreak_keys = (
-                                            cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS[year]
-                                        )
-
-                                        key1 = (
-                                            tiebreak_keys[0]
-                                            if len(tiebreak_keys) > 0
-                                            else None
-                                        )
-                                        tiebreaker1.append(
-                                            breakdown[color][key1] if key1 else 0
-                                        )
-
-                                        key2 = (
-                                            tiebreak_keys[1]
-                                            if len(tiebreak_keys) > 1
-                                            else None
-                                        )
-                                        tiebreaker2.append(
-                                            breakdown[color][key2] if key2 else 0
-                                        )
-
-                                    advancement[comp_level][j] = advancement[
-                                        comp_level
-                                    ][j]._replace(
-                                        champ_points=champ_points,
-                                        sum_champ_points=sum(champ_points),
-                                        tiebreaker1=tiebreaker1,
-                                        sum_tiebreaker1=sum(tiebreaker1),
-                                        tiebreaker2=tiebreaker2,
-                                        sum_tiebreaker2=sum(tiebreaker2),
-                                        record=record,
-                                    )
-                                break
-                        else:
-                            is_new = True
+                (
+                    _,
+                    champ_points,
+                    _,
+                    tiebreaker1,
+                    _,
+                    tiebreaker2,
+                    _,
+                    _,
+                    record,
+                ) = per_alliance_advancement[comp_level][i]
+                cls.update_wlt(match, color, record)
+                cp = cls.round_robin_champ_points_earned(match, color)
+                if match.has_been_played:
+                    champ_points.append(cp)
 
                     if (
                         year in cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS
@@ -529,78 +473,52 @@ class PlayoffAdvancementHelper:
                         tiebreak_keys = cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS[year]
 
                         key1 = tiebreak_keys[0] if len(tiebreak_keys) > 0 else None
-                        tiebreaker1 = (
-                            breakdown[color][key1]
-                            if key1 and match.has_been_played
-                            else 0
-                        )
+                        tiebreaker1.append(breakdown[color][key1] if key1 else 0)
 
                         key2 = tiebreak_keys[1] if len(tiebreak_keys) > 1 else None
-                        tiebreaker2 = (
-                            breakdown[color][key2]
-                            if key2 and match.has_been_played
-                            else 0
-                        )
-                    else:
-                        tiebreaker1 = 0
-                        tiebreaker2 = 0
+                        tiebreaker2.append(breakdown[color][key2] if key2 else 0)
 
-                    record: WLTRecord = {"wins": 0, "losses": 0, "ties": 0}
-                    if not match.has_been_played:
-                        cp = 0
-                    elif match.winning_alliance == color:
-                        cp = 2
-                        record["wins"] += 1
-                    elif match.winning_alliance == "":
-                        cp = 1
-                        record["ties"] += 1
-                    else:
-                        cp = 0
-                        record["losses"] += 1
-                    if i is None:
-                        advancement[comp_level].append(
-                            PlayoffAdvancementRoundRobin(
-                                alliance,
-                                [cp],
-                                cp,
-                                [tiebreaker1],
-                                tiebreaker1,
-                                [tiebreaker2],
-                                tiebreaker2,
-                                alliance_name,
-                                record,
-                            )
-                        )
-                    elif is_new:
-                        advancement[comp_level].append(
-                            PlayoffAdvancementRoundRobin(
-                                complete_alliances[i],
-                                [cp],
-                                cp,
-                                [tiebreaker1],
-                                tiebreaker1,
-                                [tiebreaker2],
-                                tiebreaker2,
-                                alliance_names[i],
-                                record,
-                            )
-                        )
+                per_alliance_advancement[comp_level][i] = PlayoffAdvancementRoundRobin(
+                    complete_alliance=complete_alliances[i],
+                    alliance_name=alliance_names[i],
+                    champ_points=champ_points,
+                    sum_champ_points=sum(champ_points),
+                    tiebreaker1=tiebreaker1,
+                    sum_tiebreaker1=sum(tiebreaker1),
+                    tiebreaker2=tiebreaker2,
+                    sum_tiebreaker2=sum(tiebreaker2),
+                    record=record,
+                )
 
-            advancement[comp_level] = sorted(
-                advancement[comp_level], key=lambda x: -x.sum_tiebreaker2
-            )  # sort by tiebreaker2
-            advancement[comp_level] = sorted(
-                advancement[comp_level], key=lambda x: -x.sum_tiebreaker1
-            )  # sort by tiebreaker1
-            advancement[comp_level] = sorted(
-                advancement[comp_level], key=lambda x: -x.sum_champ_points
-            )  # sort by championship points
+        alliance_advancements: List[PlayoffAdvancementRoundRobin] = list(
+            per_alliance_advancement[comp_level].values()
+        )
+        alliance_advancements = sorted(
+            alliance_advancements, key=lambda x: -x.sum_tiebreaker2
+        )  # sort by tiebreaker2
+        alliance_advancements = sorted(
+            alliance_advancements, key=lambda x: -x.sum_tiebreaker1
+        )  # sort by tiebreaker1
+        alliance_advancements = sorted(
+            alliance_advancements, key=lambda x: -x.sum_champ_points
+        )  # sort by championship points
+        advancement[comp_level] = alliance_advancements
 
-            advancement[
-                "{}_complete".format(comp_level)  # pyre-ignore
-            ] = not any_unplayed  # pyre-ignore[6]
+        return PlayoffAdvancementRoundRobinLevels(
+            sf=advancement[CompLevel.SF],
+            sf_complete=(not any_unplayed),
+        )
 
-        return cast(PlayoffAdvancementRoundRobinLevels, advancement)
+    @classmethod
+    def round_robin_champ_points_earned(cls, match: Match, color: AllianceColor) -> int:
+        if not match.has_been_played:
+            return 0
+        elif match.winning_alliance == color:
+            return 2
+        elif match.winning_alliance == "":
+            return 1
+        else:
+            return 0
 
     @classmethod
     def generate_playoff_advancement_double_elim(
@@ -608,9 +526,14 @@ class PlayoffAdvancementHelper:
         organized_matches: TOrganizedDoubleElimMatches,
         alliance_selections: Optional[List[EventAlliance]] = None,
     ) -> PlayoffAdvancementDoubleElimLevels:
-        rounds: defaultdict[  # pyre-ignore[9]
+        rounds: defaultdict[
             DoubleElimRound, PlayoffAdvancementDoubleElimRound
-        ] = defaultdict(list)
+        ] = defaultdict(
+            lambda: PlayoffAdvancementDoubleElimRound(
+                competing_alliances=[],
+                complete=False,
+            )
+        )
 
         complete_alliances: List[List[TeamNumber]] = []
         alliance_names: List[str] = []
@@ -651,21 +574,14 @@ class PlayoffAdvancementHelper:
                         complete_alliances, alliance_names, alliance, alliance_name
                     )
 
-                    if match.winning_alliance == "":
-                        cumulative_record_per_alliance[alliance_index]["ties"] += 1
-                        per_round_record_per_alliance[round][alliance_index][
-                            "ties"
-                        ] += 1
-                    elif match.winning_alliance == color:
-                        cumulative_record_per_alliance[alliance_index]["wins"] += 1
-                        per_round_record_per_alliance[round][alliance_index][
-                            "wins"
-                        ] += 1
-                    else:
-                        cumulative_record_per_alliance[alliance_index]["losses"] += 1
-                        per_round_record_per_alliance[round][alliance_index][
-                            "losses"
-                        ] += 1
+                    cls.update_wlt(
+                        match,
+                        color,
+                        per_round_record_per_alliance[round][alliance_index],
+                    )
+                    cls.update_wlt(
+                        match, color, cumulative_record_per_alliance[alliance_index]
+                    )
 
                     round_alliances.append(
                         PlayoffAdvancementDoubleElimAlliance(
@@ -713,6 +629,16 @@ class PlayoffAdvancementHelper:
         return team_nums
 
     @classmethod
+    def update_wlt(cls, match: Match, color: AllianceColor, record: WLTRecord) -> None:
+        if match.has_been_played:
+            if match.winning_alliance == "":
+                record["ties"] += 1
+            elif match.winning_alliance == color:
+                record["wins"] += 1
+            elif match.winning_alliance != color:
+                record["losses"] += 1
+
+    @classmethod
     def _alliance_name(
         cls,
         team_keys: List[TeamKey],
@@ -738,6 +664,7 @@ class PlayoffAdvancementHelper:
         alliance: List[TeamNumber],
         alliance_name: str,
     ) -> int:
+        # return alliance_index
         for i, complete_alliance in enumerate(
             complete_alliances
         ):  # search for alliance. could be more efficient

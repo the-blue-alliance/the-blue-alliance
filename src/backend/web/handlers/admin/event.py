@@ -65,7 +65,9 @@ def event_detail(event_key: EventKey) -> str:
     api_keys = ApiAuthAccess.query(
         ApiAuthAccess.event_list == ndb.Key(Event, event_key)
     ).fetch()
-    event_medias = Media.query(Media.references == event.key).fetch(500)
+    event_medias = Media.query(Media.references == event.key).fetch_async(500)
+    event_eventteams = EventTeam.query(EventTeam.event == event.key).fetch_async()
+
     playoff_template = PlayoffAdvancementHelper.playoff_template(event)
     elim_bracket_html = render_template(
         "bracket_partials/bracket_table.html",
@@ -107,7 +109,13 @@ def event_detail(event_key: EventKey) -> str:
 
     template_values = {
         "event": event,
-        "medias": event_medias,
+        "medias": event_medias.get_result(),
+        "eventteams": list(
+            sorted(
+                event_eventteams.get_result(),
+                key=lambda et: int(et.team.string_id()[3:]),
+            )
+        ),
         "flushed": request.args.get("flushed"),
         "playoff_types": PLAYOFF_TYPE_NAMES,
         "write_auths": api_keys,

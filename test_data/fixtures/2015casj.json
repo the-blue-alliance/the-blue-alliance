@@ -27,7 +27,8 @@
     "official": true,
     "venue": "San Jose State University - The Event Center",
     "webcast_json": "[{\"type\": \"livestream\", \"file\": \"3938197\", \"channel\": \"12224997\"}]",
-    "district_key": null
+    "district_key": null,
+    "playoff_type": 3
   },
   {
     "comp_level": "f",

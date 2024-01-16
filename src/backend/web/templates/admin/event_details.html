@@ -31,6 +31,7 @@
     <li><a href="#tasks" data-toggle="tab">Tasks</a></li>
     <li><a href="#api" data-toggle="tab">API</a></li>
     <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
+    <li><a href="#teams" data-toggle="tab">Teams</a></li>
     <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
     <li><a href="#alliances" data-toggle="tab">Alliances</a></li>
     <li><a href="#advancement" data-toggle="tab">Playoff Advancement</a></li>
@@ -371,6 +372,21 @@
     {% include "suggestions/partials/webcast_add_form_partial.html" %}
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
 </form>
+</div>
+</div>
+
+<div class="tab-pane" id="teams">
+<div class="row">
+<h2>Teams</h2>
+<table class="table table-striped table-condensed table-center">
+  <tr><td>Team</td><td>Event Status</td></tr>
+  {% for et in eventteams %}
+    <tr>
+      <td><a href="/admin/team/{{et.team.string_id()|strip_frc}}">{{et.team.string_id()|strip_frc}}</a></td>
+      <td><pre class="text-left">{{et.status|pprint_json}}</pre></td>
+    </tr>
+  {% endfor %}
+</table>
 </div>
 </div>
 

@@ -296,6 +296,29 @@
         </script>
     </div>
 </div>
+
+<h3>Calculate Team@Event Status</h3>
+<div class="row">
+    <div class="col-sm-6">
+        <a class="btn btn-warning" href="/tasks/math/enqueue/event_team_status/all">Recompute <b>ALL</b> Team@Event Statuses</b></a>
+    </div>
+    <div class="col-sm-6">
+        <form class="form-inline">
+            <div class="input-group">
+                <input class="form-control" id="enqueue_event_team_status_year" type="text" placeholder="2017">
+                <span class="input-group-btn" id="enqueue_event_team_status_year_submit">
+                    <button class="btn btn-warning" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+                </span>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_event_team_status_year_submit").click(function() {
+            window.location = "/tasks/math/enqueue/event_team_status/" + $("#enqueue_event_team_status_year").val();
+        });
+        </script>
+    </div>
+</div>
+
 <hr>
 
 <h2>Special Tasks<h2>
