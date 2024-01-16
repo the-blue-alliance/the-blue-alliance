@@ -1,5 +1,6 @@
 # import math
 import email
+import json
 import re
 import time
 from datetime import datetime, timezone
@@ -141,6 +142,10 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 
+def pprint_json(value):
+    return json.dumps(value, indent=2)
+
+
 _filters = {
     "strftime": strftime,
     "utc_timezone_datetime": utc_timezone_datetime,
@@ -156,6 +161,7 @@ _filters = {
     "match_short": match_short,
     "sort_by": sort_by,
     "get_item": get_item,
+    "pprint_json": pprint_json,
 }
 
 

@@ -416,10 +416,15 @@
   {{elim_bracket_html}}
 {% endautoescape %}
 
-<h3>Playoff Advancement</h3>
+<h3>Rendered Playoff Advancement</h3>
 {% autoescape off %}
   {{advancement_html}}
 {% endautoescape %}
+
+<h3>Raw Advancement</h3>
+<pre>
+{{event.details.playoff_advancement|pprint_json}}
+</pre>
 {% else %}
   <p>No advancement details yet</p>
 {% endif %}
