@@ -198,18 +198,6 @@ def event_detail(event_key: EventKey) -> Response:
     double_elim_matches = PlayoffAdvancementHelper.double_elim_matches(event, matches)
     playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
-    # Lazy handle the case when we haven't backfilled the event details
-    # TODO: Unify with API handler
-    if not bracket_table or not playoff_advancement:
-        (
-            bracket_table2,
-            playoff_advancement2,
-            _,
-            _,
-        ) = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
-        bracket_table = bracket_table or bracket_table2
-        playoff_advancement = playoff_advancement or playoff_advancement2
-
     district_points_sorted = None
     if event.district_key and event.district_points:
         district_points_sorted = sorted(
