@@ -76,6 +76,23 @@ def test_enqueue_eventteam_status(
     assert len(tasks) == 1
 
 
+def test_enqueue_eventteam_status_all(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/event_team_status/all")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == len(SeasonHelper.get_valid_years())
+
+    task_urls = {t.url for t in tasks}
+    expected_urls = {
+        f"/tasks/math/enqueue/event_team_status/{y}"
+        for y in SeasonHelper.get_valid_years()
+    }
+    assert task_urls == expected_urls
+
+
 def test_do_eventteam_status_not_found(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:

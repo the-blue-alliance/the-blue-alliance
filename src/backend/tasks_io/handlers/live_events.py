@@ -39,26 +39,43 @@ def update_live_events() -> str:
     return ""
 
 
+@blueprint.route("/tasks/math/enqueue/event_team_status/all", defaults={"year": None})
 @blueprint.route("/tasks/math/enqueue/event_team_status/<int:year>")
-def enqueue_eventteam_status(year: Year) -> Response:
+def enqueue_eventteam_status(year: Optional[Year]) -> Response:
     """
     Enqueues calculation of event team status for a year
     """
-    event_keys = [e.id() for e in Event.query(Event.year == year).fetch(keys_only=True)]
-    for event_key in event_keys:
-        taskqueue.add(
-            url=url_for("live_events.update_event_team_status", event_key=event_key),
-            method="GET",
-            queue_name="default",
-            target="py3-tasks-io",
+    if year is None:
+        for season_year in SeasonHelper.get_valid_years():
+            taskqueue.add(
+                url=url_for("live_events.enqueue_eventteam_status", year=season_year),
+                method="GET",
+                queue_name="default",
+                target="py3-tasks-io",
+            )
+        return make_response(
+            f"enqueued team@event status computation for {SeasonHelper.get_valid_years()}"
         )
+    else:
+        event_keys = [
+            e.id() for e in Event.query(Event.year == year).fetch(keys_only=True)
+        ]
+        for event_key in event_keys:
+            taskqueue.add(
+                url=url_for(
+                    "live_events.update_event_team_status", event_key=event_key
+                ),
+                method="GET",
+                queue_name="default",
+                target="py3-tasks-io",
+            )
 
-    if (
-        "X-Appengine-Taskname" not in request.headers
-    ):  # Only write out if not in taskqueue
-        return make_response(f"Enqueued for: {event_keys}")
+        if (
+            "X-Appengine-Taskname" not in request.headers
+        ):  # Only write out if not in taskqueue
+            return make_response(f"Enqueued for: {event_keys}")
 
-    return make_response("")
+        return make_response("")
 
 
 @blueprint.route("/tasks/math/do/event_team_status/<event_key>")
