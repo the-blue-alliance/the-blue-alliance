@@ -74,3 +74,9 @@ def test_2022_tiebreakers(test_data_importer) -> None:
     test_data_importer.import_match(__file__, "data/2022wasam_qf2m2.json")
     match: Match = none_throws(Match.get_by_id("2022wasam_qf2m2"))
     assert match.winning_alliance == AllianceColor.BLUE
+
+
+def test_2023_tiebreakers(test_data_importer) -> None:
+    test_data_importer.import_match(__file__, "data/2023cmptx_sf12m1.json")
+    match: Match = none_throws(Match.get_by_id("2023cmptx_sf12m1"))
+    assert match.winning_alliance == AllianceColor.RED

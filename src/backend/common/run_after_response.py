@@ -1,10 +1,7 @@
 import logging
 from typing import Callable
 
-from werkzeug.local import Local
-
-
-local_context = Local()
+from flask import g
 
 
 def run_after_response(callback: Callable[[], None]) -> None:
@@ -22,16 +19,16 @@ def run_after_response(callback: Callable[[], None]) -> None:
     def function_to_run():
         ...
     """
-    if not hasattr(local_context.request, "callbacks"):
-        local_context.request.callbacks = []
-    local_context.request.callbacks.append(callback)
+    if "after_response_callbacks" not in g:
+        g.after_response_callbacks = []
+    g.after_response_callbacks.append(callback)
 
 
 def execute_callbacks() -> None:
-    if not hasattr(local_context.request, "callbacks"):
+    if not g or "after_response_callbacks" not in g:
         return
 
-    for callback in local_context.request.callbacks:
+    for callback in g.after_response_callbacks:
         logging.info(
             f"Running callback after response: {callback.__name__ if hasattr(callback, '__name__') else None}"
         )

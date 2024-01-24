@@ -4,7 +4,7 @@ import re
 from typing import cast, Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import (
@@ -75,7 +75,7 @@ class Match(CachedModel):
     #     "teleop_goal+foul": 40,
     # }}
 
-    comp_level: CompLevel = safe_cast(
+    comp_level: CompLevel = cast(
         CompLevel,
         ndb.StringProperty(
             required=True,
@@ -196,6 +196,11 @@ class Match(CachedModel):
             self._alliances = alliances
 
         return none_throws(self._alliances)
+
+    @alliances.setter
+    def alliances(self, alliances: Dict[AllianceColor, MatchAlliance]):
+        self._alliances = alliances
+        self.alliances_json = json.dumps(alliances)
 
     @property
     def score_breakdown(self) -> Optional[MatchScoreBreakdown]:
@@ -338,18 +343,26 @@ class Match(CachedModel):
 
         event = self.event.get()
         if (
-            self.comp_level != "qm"
+            self.comp_level != CompLevel.QM
             and event
             and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM
         ):
-            if self.comp_level == "f":
+            if self.comp_level == CompLevel.F:
                 return f"Finals {self.match_number}"
+
+            # hard-code the match number to 1 for non-finals,
+            # so we can render this correctly for replays
             match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
-                (self.comp_level, self.set_number, self.match_number)
+                (self.comp_level, self.set_number, 1)
             )
             if match_num is None:
                 match_num = "?"
-            return f"Match {match_num}"
+
+            replay_suffix = ""
+            if self.match_number > 1:
+                replay_suffix = f" (Play {self.match_number})"
+            return f"Match {match_num}{replay_suffix}"
+
         elif (
             self.comp_level != "qm"
             and event
@@ -512,7 +525,7 @@ class Match(CachedModel):
     @classmethod
     def validate_key_name(cls, match_key: str) -> bool:
         key_name_regex = re.compile(
-            r"^[1-9]\d{3}[a-z]+[0-9]*\_(?:qm|ef\dm|qf\dm|sf\d{1,2}m|f\dm)\d+$"
+            r"^[1-9]\d{3}[a-z]+[0-9]*\_(?:qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$"
         )
         match = re.match(key_name_regex, match_key)
         return True if match else False

@@ -2,19 +2,21 @@ import enum
 from typing import List, Optional, TypedDict
 
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.playoff_type import DoubleElimRound, PlayoffType
+from backend.common.consts.string_enum import StrEnum
 from backend.common.models.alliance import EventAllianceBackup
 from backend.common.models.keys import TeamKey
 
 
 @enum.unique
-class EventTeamLevelStatus(str, enum.Enum):
+class EventTeamLevelStatus(StrEnum):
     NOT_STARTED = "not_started"
     PLAYING = "playing"
     COMPLETED = "completed"
 
 
 @enum.unique
-class EventTeamPlayoffStatus(str, enum.Enum):
+class EventTeamPlayoffStatus(StrEnum):
     WON = "won"
     ELIMINATED = "eliminated"
     PLAYING = "playing"
@@ -48,12 +50,25 @@ class EventTeamStatusQual(TypedDict):
     sort_order_info: Optional[List[RankingSortOrderInfo]]
 
 
-class EventTeamStatusPlayoff(TypedDict):
+class _EventTeamStatusPlayoffOptional(TypedDict, total=False):
+    playoff_type: PlayoffType
+
+    # Relevant for double elim tournaments
+    double_elim_round: Optional[DoubleElimRound]
+
+    # Relevant for round robin tournaments
+    round_robin_rank: Optional[int]
+    advanced_to_round_robin_finals: Optional[bool]
+
+    # Relevant for 2015 tournaments
+    playoff_average: Optional[float]
+
+
+class EventTeamStatusPlayoff(_EventTeamStatusPlayoffOptional, total=True):
     level: CompLevel
     current_level_record: Optional[WLTRecord]
     record: Optional[WLTRecord]
     status: EventTeamPlayoffStatus
-    playoff_average: Optional[float]
 
 
 class EventTeamStatusAlliance(TypedDict):

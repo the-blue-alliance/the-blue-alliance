@@ -71,6 +71,28 @@ def test_enqueue_event(
         assert task_resp.status_code == 200
 
 
+@freeze_time("2020-4-1")
+def test_enqueue_event_defaults_to_current_year(
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    ndb_stub,
+) -> None:
+    Event(
+        id="2020event",
+        year=2020,
+        event_short="event",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+    for task in tasks:
+        task_resp = tasks_client.get(task.url)
+        assert task_resp.status_code == 200
+
+
 def test_enqueue_event_skips_offseason(
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,

@@ -13,9 +13,11 @@ from backend.common.helpers.district_helper import DistrictHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
 from backend.common.helpers.event_team_updater import EventTeamUpdater
+from backend.common.helpers.listify import listify
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
 from backend.common.helpers.prediction_helper import PredictionHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -36,10 +38,14 @@ blueprint = Blueprint("math", __name__)
 
 
 @blueprint.route("/tasks/math/enqueue/district_points_calc/<int:year>")
-def enqueue_event_district_points_calc(year: Year) -> Response:
+@blueprint.route("/tasks/math/enqueue/district_points_calc", defaults={"year": None})
+def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
     """
     Enqueues calculation of district points for all season events for a given year
     """
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
     event_keys: List[ndb.Key] = Event.query(
         Event.year == year, Event.event_type_enum.IN(SEASON_EVENT_TYPES)
     ).fetch(None, keys_only=True)
@@ -296,43 +302,72 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
 
 
 @blueprint.route("/tasks/math/enqueue/eventteam_update/<when>")
-def enqueue_eventteam_update(when: str) -> str:
-    if when == "all":
-        event_keys = Event.query().fetch(10000, keys_only=True)
+def enqueue_eventteam_update(when: str) -> Response:
+    event_keys: List[ndb.Key] = []
+    if when == "current":
+        event_keys = Event.query(Event.year == SeasonHelper.get_current_season()).fetch(
+            1000, keys_only=True
+        )
+    elif not when.isdigit() or int(when) not in SeasonHelper.get_valid_years():
+        abort(404)
     else:
-        event_keys = Event.query(Event.year == int(when)).fetch(10000, keys_only=True)
+        event_keys = Event.query(Event.year == int(when)).fetch(1000, keys_only=True)
 
     for event_key in event_keys:
         taskqueue.add(
-            url="/tasks/math/do/eventteam_update/" + event_key.id(), method="GET"
+            url=url_for("math.update_eventteams", event_key=event_key.string_id()),
+            method="GET",
         )
 
-    template_values = {
-        "event_keys": event_keys,
-    }
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        template_values = {
+            "event_keys": event_keys,
+        }
+        return make_response(
+            render_template("math/eventteam_update_enqueue.html", **template_values)
+        )
 
-    return render_template("math/eventteam_update_enqueue.html", **template_values)
+    return make_response("")
 
 
 @blueprint.route("/tasks/math/do/eventteam_update/<event_key>")
-def update_eventteams(event_key: EventKey) -> str:
+def update_eventteams(event_key: EventKey) -> Response:
     """
     Task that updates the EventTeam index for an Event.
     Can only update or delete EventTeams for unregistered teams.
     ^^^ Does it actually do this? Eugene -- 2013/07/30
     """
-    _, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    allow_deletes = request.args.get(
+        "allow_deletes", False, type=lambda v: v.lower() == "true"
+    )
+    _, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key, allow_deletes)
 
     if event_teams:
         event_teams = list(filter(lambda et: et.team.get() is not None, event_teams))
-        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+        event_teams = listify(EventTeamManipulator.createOrUpdate(event_teams))
 
     if et_keys_to_del:
         EventTeamManipulator.delete_keys(et_keys_to_del)
 
-    template_values = {
-        "event_teams": event_teams,
-        "deleted_event_teams_keys": et_keys_to_del,
-    }
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        template_values = {
+            "event_teams": event_teams,
+            "deleted_event_teams_keys": et_keys_to_del,
+        }
 
-    return render_template("math/eventteam_update_do.html", **template_values)
+        return make_response(
+            render_template("math/eventteam_update_do.html", **template_values)
+        )
+
+    return make_response("")

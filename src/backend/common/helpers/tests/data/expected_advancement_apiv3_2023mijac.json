@@ -1,0 +1,696 @@
+[
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "round1",
+    "level_name": "Round 1",
+    "rankings": [
+      {
+        "alliance_name": "Alliance 1",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc302",
+          "frc4381",
+          "frc4453",
+          "frc9210"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 8",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7501",
+          "frc9312",
+          "frc3322"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 4",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc4216",
+          "frc6861",
+          "frc5084"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 5",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc5066",
+          "frc2611",
+          "frc7221",
+          "frc8297"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 2",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc4422",
+          "frc1023",
+          "frc8423"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 7",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7166",
+          "frc2834",
+          "frc7660"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 3",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc3656",
+          "frc2832",
+          "frc5090"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 6",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7197",
+          "frc5676",
+          "frc5144"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "round2",
+    "level_name": "Round 2",
+    "rankings": [
+      {
+        "alliance_name": "Alliance 1",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc302",
+          "frc4381",
+          "frc4453",
+          "frc9210"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 5",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc5066",
+          "frc2611",
+          "frc7221",
+          "frc8297"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 7",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7166",
+          "frc2834",
+          "frc7660"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 6",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7197",
+          "frc5676",
+          "frc5144"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 8",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7501",
+          "frc9312",
+          "frc3322"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 4",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc4216",
+          "frc6861",
+          "frc5084"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 2",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc4422",
+          "frc1023",
+          "frc8423"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 3",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc3656",
+          "frc2832",
+          "frc5090"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "round3",
+    "level_name": "Round 3",
+    "rankings": [
+      {
+        "alliance_name": "Alliance 4",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc4216",
+          "frc6861",
+          "frc5084"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 6",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7197",
+          "frc5676",
+          "frc5144"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 3",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc3656",
+          "frc2832",
+          "frc5090"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 1",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc302",
+          "frc4381",
+          "frc4453",
+          "frc9210"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "round4",
+    "level_name": "Round 4",
+    "rankings": [
+      {
+        "alliance_name": "Alliance 8",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7501",
+          "frc9312",
+          "frc3322"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 2",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc4422",
+          "frc1023",
+          "frc8423"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 1",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc302",
+          "frc4381",
+          "frc4453",
+          "frc9210"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 4",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc4216",
+          "frc6861",
+          "frc5084"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "round5",
+    "level_name": "Round 5",
+    "rankings": [
+      {
+        "alliance_name": "Alliance 2",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc4422",
+          "frc1023",
+          "frc8423"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 1",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc302",
+          "frc4381",
+          "frc4453",
+          "frc9210"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "finals",
+    "level_name": "Finals",
+    "rankings": [
+      {
+        "alliance_name": "Alliance 8",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 2,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7501",
+          "frc9312",
+          "frc3322"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 1",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 2,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc302",
+          "frc4381",
+          "frc4453",
+          "frc9210"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 8",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 2,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7501",
+          "frc9312",
+          "frc3322"
+        ]
+      },
+      {
+        "alliance_name": "Alliance 1",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 2,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc302",
+          "frc4381",
+          "frc4453",
+          "frc9210"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [],
+    "level": "f1",
+    "level_name": "Finals",
+    "rankings": [
+      {
+        "alliance_color": "blue",
+        "alliance_name": "Alliance 1",
+        "extra_stats": [],
+        "matches_played": 2,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [
+          2
+        ],
+        "team_keys": [
+          "frc302",
+          "frc4381",
+          "frc4453",
+          "frc9210"
+        ]
+      },
+      {
+        "alliance_color": "red",
+        "alliance_name": "Alliance 8",
+        "extra_stats": [],
+        "matches_played": 2,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          0
+        ],
+        "team_keys": [
+          "frc7501",
+          "frc9312",
+          "frc3322"
+        ]
+      }
+    ],
+    "sort_order_info": [
+      {
+        "name": "Wins",
+        "precision": 0,
+        "type": "int"
+      }
+    ],
+    "type": "best_of_3"
+  }
+]
+

@@ -1,5 +1,6 @@
 import json
 
+from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
@@ -150,3 +151,22 @@ def test_parse_awards_duplicate_teams(test_data_importer, ndb_stub) -> None:
     assert award.name_str == "Regional Chairman's Award"
     assert award.award_type_enum == 0
     assert award.recipient_list == [{"awardee": None, "team_number": 503}]
+
+
+def test_parse_awards_duplicate_teams2(test_data_importer, ndb_stub) -> None:
+    event = Event(
+        event_short="mnmi2",
+        event_type_enum=EventType.REGIONAL,
+        year=2022,
+    )
+
+    path = test_data_importer._get_path(__file__, "data/2022mnmi2_awards.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    awards = FMSAPIAwardsParser(event).parse(data)
+    assert awards is not None
+
+    for award in awards:
+        if award.award_type_enum == AwardType.DEANS_LIST:
+            assert len(award.recipient_list) == 2

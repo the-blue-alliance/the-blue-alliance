@@ -6,7 +6,7 @@
 
 <h1>Delete auth for: {{ auth.description }}?</h1>
 
-<form action="/admin/api_auth/delete/{{auth.key.id}}" method="post">
+<form action="/admin/api_auth/delete/{{auth.key.id()}}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <a href="/admin/api_auth/manage" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-ban-circle"></span> Cancel Delete</a>
 

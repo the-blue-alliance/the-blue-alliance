@@ -1,10 +1,10 @@
 import datetime
+import logging
 import re
 from typing import List, Optional, Set
 
 from flask import (
     Blueprint,
-    escape,
     make_response,
     render_template,
     request,
@@ -13,7 +13,8 @@ from flask import (
 )
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from markupsafe import Markup
+from pyre_extensions import none_throws
 
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
@@ -106,7 +107,7 @@ def enqueue_rolling_team_details() -> Response:
 @blueprint.route("/backend-tasks/get/team_details/<team_key>")
 def team_details(team_key: TeamKey) -> Response:
     if not Team.validate_key_name(team_key):
-        return make_response(f"Bad team key: {escape(team_key)}", 400)
+        return make_response(f"Bad team key: {Markup.escape(team_key)}", 400)
 
     fms_df = DatafeedFMSAPI(save_response=True)
     year = datetime.date.today().year
@@ -158,7 +159,7 @@ def team_details(team_key: TeamKey) -> Response:
 @blueprint.route("/backend-tasks/get/team_avatar/<team_key>")
 def team_avatar(team_key: TeamKey) -> Response:
     if not Team.validate_key_name(team_key):
-        return make_response(f"Bad team key: {escape(team_key)}", 400)
+        return make_response(f"Bad team key: {Markup.escape(team_key)}", 400)
     team = Team.get_by_id(team_key)
 
     fms_df = DatafeedFMSAPI(save_response=True)
@@ -284,7 +285,7 @@ def event_list(year: Year) -> Response:
 @blueprint.route("/backend-tasks/enqueue/event_details/<event_key>")
 def enqueue_event_details(event_key: EventKey) -> Response:
     if not Event.validate_key_name(event_key):
-        return make_response(f"Bad event key: {escape(event_key)}", 400)
+        return make_response(f"Bad event key: {Markup.escape(event_key)}", 400)
 
     taskqueue.add(
         queue_name="datafeed",
@@ -310,14 +311,13 @@ def enqueue_event_details(event_key: EventKey) -> Response:
 @blueprint.route("/backend-tasks/get/event_details/<event_key>")
 def event_details(event_key: EventKey) -> Response:
     if not Event.validate_key_name(event_key):
-        return make_response(f"Bad event key: {escape(event_key)}", 400)
+        return make_response(f"Bad event key: {Markup.escape(event_key)}", 400)
 
     df = DatafeedFMSAPI(save_response=True)
 
     # Update event
     fmsapi_events, fmsapi_districts = df.get_event_details(event_key)
-    new_events = EventManipulator.createOrUpdate(fmsapi_events)
-    event = safe_cast(Event, none_throws(new_events))
+    event = EventManipulator.createOrUpdate(fmsapi_events[0])
 
     DistrictManipulator.createOrUpdate(fmsapi_districts)
 
@@ -355,9 +355,7 @@ def event_details(event_key: EventKey) -> Response:
         teams = [teams]
 
     # Build EventTeams
-    cmp_hack_sitevar = ChampsRegistrationHacks.get()
-    events_without_eventteams = cmp_hack_sitevar["skip_eventteams"]
-    skip_eventteams = event_key in events_without_eventteams
+    skip_eventteams = ChampsRegistrationHacks.should_skip_eventteams(event)
     event_teams = (
         [
             EventTeam(
@@ -392,6 +390,19 @@ def event_details(event_key: EventKey) -> Response:
             event_team_keys.union(award_event_teams)
         )
         EventTeamManipulator.delete_keys(et_keys_to_delete)
+
+    if skip_eventteams:
+        # If we're skipping team registrations from upstream,
+        # enqueue a recalculation using local data
+        logging.info(
+            f"SKipping eventteams, enqueueing local computation for {event_key}"
+        )
+        taskqueue.add(
+            url=url_for("math.update_eventteams", event_key=event_key),
+            method="GET",
+            target="py3-tasks-io",
+            params={"allow_deletes": True},
+        )
 
     event_teams = EventTeamManipulator.createOrUpdate(event_teams)
     if type(event_teams) is not list:
@@ -473,7 +484,7 @@ def event_alliances(event_key: EventKey) -> Response:
     df = DatafeedFMSAPI(save_response=True)
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if not event:
-        return make_response(f"No Event for key: {escape(event_key)}", 404)
+        return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
     alliance_selections = df.get_event_alliances(event_key)
 
@@ -545,7 +556,7 @@ def event_rankings(event_key: EventKey) -> Response:
     df = DatafeedFMSAPI(save_response=True)
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if event is None:
-        return make_response(f"No Event for key: {escape(event_key)}", 404)
+        return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
     rankings2 = df.get_event_rankings(event_key)
 
@@ -610,7 +621,7 @@ def enqueue_event_matches(year: Optional[Year]) -> Response:
 def event_matches(event_key: EventKey) -> Response:
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if event is None:
-        return make_response(f"No Event for key: {escape(event_key)}", 404)
+        return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
     df = DatafeedFMSAPI(save_response=True)
     matches = df.get_event_matches(event_key)
@@ -681,7 +692,7 @@ def awards_year(year: Optional[int]) -> Response:
 def awards_event(event_key: EventKey) -> Response:
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if event is None:
-        return make_response(f"No Event for key: {escape(event_key)}", 404)
+        return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
     datafeed = DatafeedFMSAPI(save_response=True)
     awards = datafeed.get_awards(event)
@@ -758,7 +769,7 @@ def district_rankings(district_key: DistrictKey) -> Response:
         else None
     )
     if district is None:
-        return make_response(f"No District for key: {escape(district_key)}", 404)
+        return make_response(f"No District for key: {Markup.escape(district_key)}", 404)
 
     df = DatafeedFMSAPI()
     advancement = df.get_district_rankings(district_key)

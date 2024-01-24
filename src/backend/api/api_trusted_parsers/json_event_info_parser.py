@@ -40,7 +40,7 @@ class JSONEventInfoParser:
         info_dict = safe_json.loads(info_json, EventInfoInput, validate=False)
 
         parsed_info: EventInfoParsed = {}
-        if "webcasts" in info_dict:
+        if info_dict.get("webcasts"):
             webcast_list: List[Webcast] = []
             for webcast in info_dict["webcasts"]:
                 if "url" in webcast:
@@ -59,7 +59,7 @@ class JSONEventInfoParser:
                     )
             parsed_info["webcasts"] = webcast_list
 
-        if "remap_teams" in info_dict:
+        if info_dict.get("remap_teams"):
             for temp_team, remapped_team in info_dict["remap_teams"].items():
                 temp_match = re.match(r"frc\d+", str(temp_team))
                 remapped_match = re.match(r"frc\d+[B-Z]?", str(remapped_team))

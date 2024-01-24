@@ -1,5 +1,5 @@
 service: py3-api
-runtime: python310
+runtime: python312
 entrypoint: gunicorn -b :$PORT backend.api.main:app
 app_engine_apis: true
 

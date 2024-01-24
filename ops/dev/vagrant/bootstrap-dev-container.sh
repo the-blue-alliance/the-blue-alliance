@@ -8,7 +8,8 @@ mkdir -p /datastore
 apt-get update && apt-get upgrade -y
 
 # The datastore emulator requires grpcio
-python -m pip install --upgrade pip
+python -m ensurepip --upgrade
+pip install --upgrade setuptools
 pip install --ignore-installed -r requirements.txt
 pip install --ignore-installed -r src/requirements.txt
 
@@ -26,6 +27,8 @@ nvm use default
 if [ "$(uname -m)" = "aarch64" ]; then
     export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 fi
+
+echo "Running npm install... this may take a while..."
 npm install
 
 # Install the Firebase tools for the Firebase emulator

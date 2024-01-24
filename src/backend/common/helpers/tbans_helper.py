@@ -325,6 +325,30 @@ class TBANSHelper:
             if users:
                 cls._send(users, MatchVideoNotification(match))
 
+    @classmethod
+    def update_favorites(
+        cls, user_id: str, initiating_device_id: Optional[str] = None
+    ) -> None:
+        from backend.common.models.notifications.mytba import (
+            FavoritesUpdatedNotification,
+        )
+
+        cls._send(
+            [user_id], FavoritesUpdatedNotification(user_id, initiating_device_id)
+        )
+
+    @classmethod
+    def update_subscriptions(
+        cls, user_id: str, initiating_device_id: Optional[str] = None
+    ) -> None:
+        from backend.common.models.notifications.mytba import (
+            SubscriptionsUpdatedNotification,
+        )
+
+        cls._send(
+            [user_id], SubscriptionsUpdatedNotification(user_id, initiating_device_id)
+        )
+
     @staticmethod
     def ping(client: MobileClient) -> bool:
         """Immediately dispatch a Ping to either FCM or a webhook"""
@@ -336,11 +360,12 @@ class TBANSHelper:
     @staticmethod
     def _ping_client(client: MobileClient) -> bool:
         client_type = client.client_type
-        if client_type in FCM_CLIENTS:
+        if client_type in FCM_CLIENTS or client_type in FCM_LEGACY_CLIENTS:
             from backend.common.models.notifications.ping import (
                 PingNotification,
             )
 
+            is_legacy_format = client_type in FCM_LEGACY_CLIENTS
             notification = PingNotification()
 
             from backend.common.models.notifications.requests.fcm_request import (
@@ -348,7 +373,10 @@ class TBANSHelper:
             )
 
             fcm_request = FCMRequest(
-                firebase_app, notification, tokens=[client.messaging_id]
+                firebase_app,
+                notification,
+                tokens=[client.messaging_id],
+                legacy_data_format=is_legacy_format,
             )
 
             batch_response = fcm_request.send()
@@ -387,7 +415,9 @@ class TBANSHelper:
         # Cancel any previously-scheduled `match_upcoming` notifications for this match
         queue.delete_tasks(taskqueue.Task(name=task_name))
 
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc).replace(  # pyre-ignore[16]
+            tzinfo=None
+        )
         # If we know when our match is starting, schedule to send Xmins before start of match.
         # Otherwise, send immediately.
         if match.time is None or match.time + MATCH_UPCOMING_MINUTES <= now:
@@ -526,6 +556,7 @@ class TBANSHelper:
             client
             for client in clients
             if client.client_type in (FCM_CLIENTS | FCM_LEGACY_CLIENTS)
+            and notification.should_send_to_client(client)
         ]
 
         from backend.common.models.notifications.requests.fcm_request import (
@@ -636,10 +667,12 @@ class TBANSHelper:
 
         # Make sure we're only sending to webhook clients
         clients = [
-            client for client in clients if client.client_type == ClientType.WEBHOOK
+            client
+            for client in clients
+            if client.client_type == ClientType.WEBHOOK
+            and client.verified
+            and notification.should_send_to_client(client)
         ]
-        # Only send to verified webhooks
-        clients = [client for client in clients if client.verified]
 
         from backend.common.models.notifications.requests.webhook_request import (
             WebhookRequest,

@@ -7,6 +7,7 @@ from typing import Literal, Optional
 import requests
 
 from backend.common.models.keys import Year
+from backend.common.profiler import Span
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 
 
@@ -152,7 +153,8 @@ class FRCAPI:
             "Pragma": "no-cache",
         }
 
-        return self.session.get(url, headers=headers)
+        with Span(f"frc_api_fetch:{endpoint}"):
+            return self.session.get(url, headers=headers)
 
     def _get_simulated(self, endpoint: str, version: str) -> requests.Response:
         from unittest.mock import Mock

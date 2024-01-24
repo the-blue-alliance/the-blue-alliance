@@ -34,7 +34,7 @@ def test_blacklist_website_team(tasks_client: Client):
         resp = tasks_client.get("/backend-tasks/do/team_blacklist_website/frc7332")
 
     assert resp.status_code == 302
-    assert mock_blacklist.called_with(website)
+    mock_blacklist.assert_called_with(website)
 
     redirect_url = urllib.parse.urlparse(resp.location)
     assert redirect_url.path == "/backend-tasks/get/team_details/frc7332"

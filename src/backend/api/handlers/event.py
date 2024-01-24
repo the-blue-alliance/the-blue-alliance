@@ -198,20 +198,8 @@ def event_playoff_advancement(event_key: EventKey) -> Response:
     cleaned_matches, _ = MatchHelper.delete_invalid_matches(matches, event)
     _, matches = MatchHelper.organized_matches(cleaned_matches)
 
-    # Lazy handle the case when we haven't backfilled the event details
-    # TODO: Unify with web handler
     bracket_table = event.playoff_bracket
     playoff_advancement = event.playoff_advancement
-    if not bracket_table or not playoff_advancement:
-        (
-            bracket_table2,
-            playoff_advancement2,
-            _,
-            _,
-        ) = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
-        bracket_table = bracket_table or bracket_table2
-        playoff_advancement = playoff_advancement or playoff_advancement2
-
     output = PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
         event, playoff_advancement, bracket_table
     )

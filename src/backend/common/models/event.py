@@ -4,10 +4,10 @@ import datetime
 import json
 import re
 import typing
-from typing import Any, Dict, Generator, List, Optional, Set, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts import event_type
 from backend.common.consts.event_type import EventType
@@ -18,6 +18,10 @@ from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_playoff_advancement import (
+    TBracketTable,
+    TPlayoffAdvancement,
+)
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.location import Location
@@ -77,7 +81,7 @@ class Event(CachedModel):
     district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
-    playoff_type: PlayoffType = safe_cast(
+    playoff_type: PlayoffType = cast(
         PlayoffType, ndb.IntegerProperty(choices=list(PlayoffType))
     )
 
@@ -93,7 +97,7 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
-    normalized_location: Location = safe_cast(
+    normalized_location: Optional[Location] = cast(
         Location, ndb.StructuredProperty(Location)
     )
 
@@ -203,6 +207,10 @@ class Event(CachedModel):
         for alliance in alliances:
             for pick in alliance["picks"]:
                 teams.append(pick)
+
+            backup = alliance.get("backup")
+            if backup is not None:
+                teams.append(backup["in"])
         return teams
 
     @property
@@ -231,7 +239,7 @@ class Event(CachedModel):
             return self.details.district_points
 
     @property
-    def playoff_advancement(self) -> Optional[Dict]:  # TODO type this
+    def playoff_advancement(self) -> Optional[TPlayoffAdvancement]:
         if self.details is None:
             return None
         else:
@@ -242,7 +250,7 @@ class Event(CachedModel):
             )
 
     @property
-    def playoff_bracket(self) -> Optional[Dict]:  # TODO type this
+    def playoff_bracket(self) -> Optional[TBracketTable]:
         if self.details is None:
             return None
         else:
@@ -527,7 +535,7 @@ class Event(CachedModel):
         return self._city_state_country
 
     @property
-    def nl(self) -> Location:
+    def nl(self) -> Optional[Location]:
         return self.normalized_location
 
     @property

@@ -1,4 +1,5 @@
-from flask import abort, Blueprint, escape, make_response, redirect
+from flask import abort, Blueprint, make_response, redirect
+from markupsafe import Markup
 from werkzeug.wrappers import Response
 
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
@@ -20,7 +21,7 @@ blueprint = Blueprint("tasks", __name__)
 @blueprint.route("/backend-tasks/do/team_blacklist_website/<team_key>")
 def blacklist_website(team_key: TeamKey) -> Response:
     if not Team.validate_key_name(team_key):
-        return make_response(f"Bad team key: {escape(team_key)}", 400)
+        return make_response(f"Bad team key: {Markup.escape(team_key)}", 400)
 
     team = Team.get_by_id(team_key)
 

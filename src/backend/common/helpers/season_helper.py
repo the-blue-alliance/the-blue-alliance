@@ -14,6 +14,7 @@ class SeasonHelper(object):
     """General season-information helper methods"""
 
     MIN_YEAR: Year = 1992
+    MIN_DISTRICT_YEAR: Year = 2009
 
     @staticmethod
     def get_max_year() -> Year:
@@ -29,6 +30,11 @@ class SeasonHelper(object):
     def get_valid_years(cls) -> Sequence[Year]:
         max_year = cls.get_max_year()
         return range(cls.MIN_YEAR, max_year + 1)
+
+    @classmethod
+    def get_valid_district_years(cls) -> Sequence[Year]:
+        max_year = cls.get_max_year()
+        return range(cls.MIN_DISTRICT_YEAR, max_year + 1)
 
     @staticmethod
     def effective_season_year(date=datetime.now()) -> Year:

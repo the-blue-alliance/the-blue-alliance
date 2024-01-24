@@ -4,22 +4,33 @@ import enum
 from typing import Dict, Set, Tuple
 
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.string_enum import StrEnum
 
 
 @enum.unique
-class LegacyDoubleElimBracket(str, enum.Enum):
+class LegacyDoubleElimBracket(StrEnum):
     WINNER = "winner"
     LOSER = "loser"
 
 
 @enum.unique
-class DoubleElimRound(str, enum.Enum):
+class DoubleElimRound(StrEnum):
     ROUND1 = "Round 1"
     ROUND2 = "Round 2"
     ROUND3 = "Round 3"
     ROUND4 = "Round 4"
     ROUND5 = "Round 5"
     FINALS = "Finals"
+
+
+ORDERED_DOUBLE_ELIM_ROUNDS = [
+    DoubleElimRound.ROUND1,
+    DoubleElimRound.ROUND2,
+    DoubleElimRound.ROUND3,
+    DoubleElimRound.ROUND4,
+    DoubleElimRound.ROUND5,
+    DoubleElimRound.FINALS,
+]
 
 
 @enum.unique
@@ -83,6 +94,21 @@ TYPE_NAMES: Dict[PlayoffType, str] = {
     PlayoffType.BO3_FINALS: "Best of 3 Finals",
     PlayoffType.BO5_FINALS: "Best of 5 Finals",
     PlayoffType.CUSTOM: "Custom",
+}
+
+API_TYPE_NAMES: Dict[PlayoffType, str] = {
+    PlayoffType.BRACKET_16_TEAM: "best_of_3",
+    PlayoffType.BRACKET_8_TEAM: "best_of_3",
+    PlayoffType.BRACKET_4_TEAM: "best_of_3",
+    PlayoffType.BRACKET_2_TEAM: "best_of_3",
+    PlayoffType.BO3_FINALS: "best_of_3",
+    PlayoffType.BO5_FINALS: "best_of_5",
+    PlayoffType.AVG_SCORE_8_TEAM: "avg_score",
+    PlayoffType.ROUND_ROBIN_6_TEAM: "round_robin",
+    PlayoffType.DOUBLE_ELIM_8_TEAM: "double_elim",
+    PlayoffType.DOUBLE_ELIM_4_TEAM: "double_elim",
+    PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM: "double_elim",
+    PlayoffType.CUSTOM: "custom",
 }
 
 

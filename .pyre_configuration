@@ -6,7 +6,6 @@
   "search_path": [
     "ops/pr_screenshots",
     "stubs",
-    {"site-package": "fakeredis"},
     {"site-package": "firebase_admin"},
     {"site-package": "flask"},
     {"site-package": "flask_caching"},
@@ -16,13 +15,12 @@
     {"site-package": "google/auth"},
     {"site-package": "google/cloud/storage"},
     {"site-package": "jinja2"},
+    {"site-package": "markupsafe"},
     {"site-package": "numpy"},
     {"site-package": "pytest"},
     {"site-package": "_pytest"},
     {"site-package": "pyre_extensions"},
-    {"site-package": "redis"},
     {"site-package": "requests_mock"},
-    {"site-package": "rq"},
     {"site-package": "werkzeug"}
   ]
 }

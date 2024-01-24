@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.consts.media_type import MediaType, ROBOT_TYPES, SLUG_NAMES
+from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
@@ -22,7 +23,7 @@ from backend.common.suggestions.media_parser import MediaParser
 
 
 @enum.unique
-class SuggestionCreationStatus(str, enum.Enum):
+class SuggestionCreationStatus(StrEnum):
     SUCCESS = "success"
     SUGGESTION_EXISTS = "suggestion_exists"
     BAD_URL = "bad_url"
@@ -331,7 +332,7 @@ class SuggestionCreator:
                 state=event.state_prov,
                 country=event.country,
                 first_code=event.event_short.upper(),
-                suggestion_id=key.id(),
+                suggestion_id=key.string_id(),
             )
             if status != "success":
                 logging.warning("Failed to create suggestion: {}".format(failures))

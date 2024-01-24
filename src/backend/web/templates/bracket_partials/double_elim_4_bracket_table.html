@@ -7,7 +7,7 @@
             {% if match.red_alliance and ('0' not in match.red_alliance) %}
             <tr>
                 {% if match.red_name %}
-                <td class="{% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_name[-1] }}</td>
+                <td class="{% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_name.replace("Alliance", "") }}</td>
                 {% endif %}
                 <td>
                     <span class="alliance-name {% if match.winning_alliance == 'red' %}winner{% endif %}">
@@ -30,7 +30,7 @@
             {% if match.blue_alliance and ('0' not in match.blue_alliance) %}
             <tr>
                 {% if match.blue_name %}
-                <td class="{% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_name[-1] }}</td>
+                <td class="{% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_name.replace("Alliance", "") }}</td>
                 {% endif %}
                 <td>
                     <span class="alliance-name {% if match.winning_alliance == 'blue' %}winner{% endif %}">

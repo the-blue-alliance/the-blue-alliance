@@ -231,10 +231,13 @@ def test_legacy_double_elim(test_data_importer) -> None:
     assert advancement.playoff_template is None
 
 
-def test_double_elim(test_data_importer) -> None:
-    event = create_event("2022cctets", PlayoffType.DOUBLE_ELIM_8_TEAM)
+def test_double_elim_8(test_data_importer) -> None:
+    event = create_event("2023mijac", PlayoffType.DOUBLE_ELIM_8_TEAM)
+    test_data_importer.import_event_alliances(
+        __file__, "data/2023mijac_alliances.json", "2023mijac"
+    )
     matches = test_data_importer.parse_match_list(
-        __file__, "data/2022cctest_matches.json"
+        __file__, "data/2023mijac_matches.json"
     )
     organized_matches = MatchHelper.organized_matches(matches)[1]
     advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
@@ -242,11 +245,67 @@ def test_double_elim(test_data_importer) -> None:
     )
 
     with open(
-        f"{os.path.dirname(__file__)}/data/expected_advancement_2022cctest.json", "r"
+        f"{os.path.dirname(__file__)}/data/expected_advancement_2023mijac.json", "r"
     ) as f:
         expected_advancement = json.load(f)
 
-    assert json.loads(json.dumps(advancement.bracket_table)) == expected_advancement[0]
-    assert advancement.playoff_advancement is None
-    assert advancement.double_elim_matches is not None
-    assert advancement.playoff_template is None
+    assert (
+        json.loads(json.dumps(advancement.bracket_table))
+        == expected_advancement["bracket"]
+    )
+    assert (
+        json.loads(json.dumps(advancement.playoff_advancement))
+        == expected_advancement["advancement"]
+    )
+
+    apiv3_response = (
+        PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
+            event, advancement.playoff_advancement, advancement.bracket_table
+        )
+    )
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_apiv3_2023mijac.json",
+        "r",
+    ) as f:
+        expected_advancement_apiv3 = json.load(f)
+    assert json.loads(json.dumps(apiv3_response)) == expected_advancement_apiv3
+
+
+def test_double_elim_4(test_data_importer) -> None:
+    event = create_event("2023micmp", PlayoffType.DOUBLE_ELIM_4_TEAM)
+    test_data_importer.import_event_alliances(
+        __file__, "data/2023micmp_alliances.json", "2023micmp"
+    )
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2023micmp_matches.json"
+    )
+    organized_matches = MatchHelper.organized_matches(matches)[1]
+    advancement = PlayoffAdvancementHelper.generate_playoff_advancement(
+        event, organized_matches
+    )
+
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_2023micmp.json", "r"
+    ) as f:
+        expected_advancement = json.load(f)
+
+    assert (
+        json.loads(json.dumps(advancement.bracket_table))
+        == expected_advancement["bracket"]
+    )
+    assert (
+        json.loads(json.dumps(advancement.playoff_advancement))
+        == expected_advancement["advancement"]
+    )
+
+    apiv3_response = (
+        PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
+            event, advancement.playoff_advancement, advancement.bracket_table
+        )
+    )
+    with open(
+        f"{os.path.dirname(__file__)}/data/expected_advancement_apiv3_2023micmp.json",
+        "r",
+    ) as f:
+        expected_advancement_apiv3 = json.load(f)
+    assert json.loads(json.dumps(apiv3_response)) == expected_advancement_apiv3

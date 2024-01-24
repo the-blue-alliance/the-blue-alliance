@@ -1,4 +1,5 @@
 import datetime
+import logging
 from typing import Any, Dict, Optional
 
 from firebase_admin import auth
@@ -13,6 +14,18 @@ _SESSION_KEY = "session"
 
 
 # Code from https://firebase.google.com/docs/auth/admin/manage-cookies
+
+
+def _verify_id_token(id_token: str) -> Optional[dict]:
+    try:
+        return auth.verify_id_token(id_token, check_revoked=True, app=app())
+    except (exceptions.DefaultCredentialsError, auth.ExpiredIdTokenError):
+        logging.warning("Error validing clientapi token", exc_info=True)
+        return None
+
+
+def verify_id_token(id_token: str) -> Optional[dict]:
+    return _verify_id_token(id_token)
 
 
 def create_session_cookie(id_token: str, expires_in: datetime.timedelta) -> None:
@@ -52,6 +65,14 @@ def _current_user() -> Optional[User]:
 
 def current_user() -> Optional[User]:
     return _current_user()
+
+
+def _delete_user(uid: str) -> None:
+    auth.delete_user(uid, app=app())
+
+
+def delete_user(uid: str) -> None:
+    _delete_user(uid)
 
 
 def _user_context_processor() -> Dict[str, Optional[User]]:

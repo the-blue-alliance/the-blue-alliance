@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Dialog from "react-bootstrap-dialog";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
 import AddRemoveSingleTeam from "./AddRemoveSingleTeam";
 import AddMultipleTeams from "./AddMultipleTeams";
@@ -14,8 +15,11 @@ class TeamListTab extends Component {
       teams: [],
       hasFetchedTeams: false,
       addMultipleButtonStatus: "btn-primary",
+      showErrorDialog: false,
+      errorMessage: "",
     };
     this.showError = this.showError.bind(this);
+    this.clearError = this.clearError.bind(this);
     this.updateTeams = this.updateTeams.bind(this);
     this.clearTeams = this.clearTeams.bind(this);
     this.updateTeamList = this.updateTeamList.bind(this);
@@ -37,7 +41,11 @@ class TeamListTab extends Component {
   }
 
   showError(errorMessage) {
-    this.dialog.showAlert(errorMessage);
+    this.setState({ showErrorDialog: true, errorMessage: errorMessage });
+  }
+
+  clearError() {
+    this.setState({ showErrorDialog: false, errorMessage: "" });
   }
 
   updateTeams(teams) {
@@ -51,7 +59,24 @@ class TeamListTab extends Component {
   render() {
     return (
       <div className="tab-pane" id="teams">
-        <Dialog ref={(dialog) => (this.dialog = dialog)} />
+        <Modal
+          show={this.state.showErrorDialog}
+          onHide={this.clearError}
+          backdrop={false}
+          animation={false}
+          centered={true}
+        >
+          <Modal.Header>
+            <Modal.Title>Error!</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{this.state.errorMessage}</Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={this.clearError}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
         <h3>Team List</h3>
         <div className="row">
           <div className="col-sm-6">

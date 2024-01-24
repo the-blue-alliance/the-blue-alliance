@@ -51,7 +51,15 @@ def get_base_qual_match(**kwargs) -> Match:
 
 
 @pytest.mark.parametrize(
-    "key", ["2019nyny_qm1", "2010ct_sf1m3", "2022on306_qm15", "2023week0_sf13m1"]
+    "key",
+    [
+        "2019nyny_qm1",
+        "2010ct_sf1m3",
+        "2022on306_qm15",
+        "2023week0_sf13m1",
+        "2023bc_ef10m1",
+        "2023bc_qf10m1",
+    ],
 )
 def test_valid_key_names(key: str) -> None:
     assert Match.validate_key_name(key) is True
@@ -66,6 +74,9 @@ def test_valid_key_names(key: str) -> None:
         "2010ct_f1",
         "2022on_306_qm15",
         "2023week0_sf130m1",
+        "2023bc_f10m1",
+        "2023bc_ef123m1",
+        "2023bc_qf123m1",
     ],
 )
 def test_invalid_key_names(key: str) -> None:
@@ -116,6 +127,33 @@ def test_lazy_load_alliances_fill_props() -> None:
     expected_dict[AllianceColor.BLUE]["surrogates"] = []
     expected_dict[AllianceColor.BLUE]["dqs"] = []
     assert expected_dict == match.alliances
+
+
+def test_alliances_setter() -> None:
+    alliance_dict = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"],
+            score=-1,
+            dqs=["frc1"],
+            surrogates=[],
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=-1, dqs=[], surrogates=["frc5"]
+        ),
+    }
+    match = get_base_qual_match(alliances_json=json.dumps(alliance_dict))
+    assert match._alliances is None
+
+    expected_dict = alliance_dict
+    assert expected_dict == match.alliances
+    assert expected_dict == match._alliances
+
+    alliance_dict[AllianceColor.RED]["score"] = 10
+    alliance_dict[AllianceColor.BLUE]["score"] = 5
+    match.alliances = alliance_dict
+    assert match.alliances == alliance_dict
+    assert match._alliances == alliance_dict
+    assert match.alliances_json == json.dumps(alliance_dict)
 
 
 def test_correct_bad_alliance_scores() -> None:

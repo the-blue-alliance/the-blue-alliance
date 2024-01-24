@@ -14,6 +14,7 @@ from backend.common.consts.playoff_type import (
     PlayoffType,
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
 )
+from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -64,7 +65,9 @@ def event_detail(event_key: EventKey) -> str:
     api_keys = ApiAuthAccess.query(
         ApiAuthAccess.event_list == ndb.Key(Event, event_key)
     ).fetch()
-    event_medias = Media.query(Media.references == event.key).fetch(500)
+    event_medias = Media.query(Media.references == event.key).fetch_async(500)
+    event_eventteams = EventTeam.query(EventTeam.event == event.key).fetch_async()
+
     playoff_template = PlayoffAdvancementHelper.playoff_template(event)
     elim_bracket_html = render_template(
         "bracket_partials/bracket_table.html",
@@ -106,7 +109,13 @@ def event_detail(event_key: EventKey) -> str:
 
     template_values = {
         "event": event,
-        "medias": event_medias,
+        "medias": event_medias.get_result(),
+        "eventteams": list(
+            sorted(
+                event_eventteams.get_result(),
+                key=lambda et: int(et.team.string_id()[3:]),
+            )
+        ),
         "flushed": request.args.get("flushed"),
         "playoff_types": PLAYOFF_TYPE_NAMES,
         "write_auths": api_keys,
@@ -379,4 +388,44 @@ def event_remap_teams_post(event_key: EventKey) -> Response:
         url=f"/tasks/do/remap_teams/{event.key_name}",
         method="GET",
     )
+    return redirect(url_for("admin.event_detail", event_key=event.key_name))
+
+
+def event_update_location_get(event_key: EventKey) -> str:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    event.normalized_location = None
+    LocationHelper.update_event_location(event)
+    event = EventManipulator.createOrUpdate(event)
+
+    return f"New location: {event.normalized_location}"
+
+
+def event_update_location_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    place_id = request.form.get("place_id")
+    if not place_id:
+        abort(400)
+
+    # Construct a mostly empty input struct that'll get filled in
+    location_input = {
+        "place_id": place_id,
+        "geometry": {
+            "location": {
+                "lat": "",
+                "lng": "",
+            },
+        },
+        "name": "",
+        "types": [],
+    }
+    location_info = LocationHelper.construct_location_info(location_input)
+    event.normalized_location = LocationHelper.build_normalized_location(location_info)
+    EventManipulator.createOrUpdate(event)
+
     return redirect(url_for("admin.event_detail", event_key=event.key_name))
