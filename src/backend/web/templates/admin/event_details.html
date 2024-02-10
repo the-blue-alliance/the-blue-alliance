@@ -15,6 +15,7 @@
 <form action="/admin/memcache" method="post" id="event_cache_clear">
   <input name="event_key" value="{{event.key_name}}" type="hidden" />
   <input name="return_url" value="/admin/event/{{ event.key_name }}" type="hidden" />
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 {% if flushed %}
@@ -208,6 +209,7 @@
 <form action="/admin/event/add_teams/{{event.key_name}}" method="post">
   <textarea class="form-control" name="teams_csv"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Teams</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 <h2>Remove Teams</h2>
@@ -217,6 +219,7 @@
 <form action="/admin/event/delete_teams/{{event.key_name}}" method="post">
   <textarea class="form-control" name="teams_csv"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-delete"></span> Delete Teams</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 <h2>Add Alliance Selections</h2>
@@ -235,6 +238,7 @@
 <form action="/admin/event/add_alliance_selections/{{event.key_name}}" method="post">
   <textarea class="form-control" name="alliance_selections_csv"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Alliance Selections</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 <h2>Add Backup Teams</h2>
@@ -243,6 +247,7 @@
   <p>Incoming Backup Team: <input name="backup_in" placeholder="123"/></p>
   <p>Outgoing team that was replaced: <input name="backup_out" placeholder="456"/></p>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Backup Team</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 <h2>Add Matches</h2>
@@ -258,6 +263,7 @@
   <input name="event_key" type="hidden" value="{{ event.key_name }}"><br>
   <textarea class="form-control" name="matches_csv"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Matches</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 {% if event.playoff_type == 4 %}
@@ -274,6 +280,7 @@
   <p>Number of Round Robin matches per team: <input name="num_matches" value="5" /></p>
   <p><textarea class="form-control" name="advancement_csv"></textarea></p>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Advancement</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 {% endif %}
 
@@ -286,6 +293,7 @@
 <form action="/admin/award/add/{{ event.key_name }}" method="post">
   <textarea class="form-control" name="awards_csv"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add awards</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 <h2>Override Event Place ID</h2>
@@ -362,6 +370,7 @@
           <input type="hidden" name="channel" value="{{ webcast.channel }}" />
           <input type="hidden" name="file" value="{{ webcast.file }}" />
           <input type="hidden" name="index" value="{{ loop.index }}" />
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         </form>
   {% else %}
     <p>No webcasts found</p>
@@ -371,6 +380,7 @@
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
     {% include "suggestions/partials/webcast_add_form_partial.html" %}
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 </div>
 </div>
@@ -425,6 +435,7 @@
 
 <form action="/admin/playoff_advancement/purge/{{event.key_name}}" method="post">
   <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Purge Advancement</button>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 </form>
 
 <h3>Elim Bracket</h3>
@@ -596,6 +607,7 @@
 
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-delete"></span> Remove reference</button>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 </form>
             </div>
         </div>
