@@ -575,6 +575,18 @@
     </tr>
     {% endfor %}
 </table>
+
+<h2>Override Score Breakdown</h2>
+<form action="/admin/match/override_breakdown" id="override_score_breakdown", method="post">
+    <p><label for="match_key">Match Key: </label><input type="text" name="match_key" /></p>
+    <p><label for="new_breakdown">New Breakdown: </label><textarea class="form-control" name="new_breakdown"></textarea></p>
+    <p>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <button class="btn btn-submit" type="submit"><span class="glyphicon glyphicon-save"></span> Override</button>
+    </p>
+
+</form>
+
 </div>
 </div>
 
