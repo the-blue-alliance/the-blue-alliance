@@ -420,10 +420,11 @@ class DistrictHelper:
 
         for team in finals_team_wins:
             if finals_alliance_wins[elim_alliances[team]] >= 2:
-                finals_team_pts[team] += finals_team_wins[
-                    team
-                ] * DistrictPointValues.F_WIN.get(
-                    match.year, DistrictPointValues.F_WIN_DEFAULT
+                finals_team_pts[team] += int(
+                    finals_team_wins[team]
+                    * DistrictPointValues.F_WIN.get(
+                        match.year, DistrictPointValues.F_WIN_DEFAULT
+                    )
                 )
 
         for team in elim_alliances:
@@ -494,10 +495,11 @@ class DistrictHelper:
                 match.comp_level == CompLevel.F
                 and elim_num_wins[match_set_key][winning_alliance] >= 2
             ):
-                elim_alliance_pts[
-                    winning_alliance_number
-                ] += 2 * DistrictPointValues.F_WIN.get(
-                    match.year, DistrictPointValues.F_WIN_DEFAULT
+                elim_alliance_pts[winning_alliance_number] += int(
+                    2
+                    * DistrictPointValues.F_WIN.get(
+                        match.year, DistrictPointValues.F_WIN_DEFAULT
+                    )
                 )
 
         for team in elim_alliances:
