@@ -84,7 +84,7 @@ class ModelTypeConverter(BaseConverter):
 
 
 class EventDetailTypeConverter(BaseConverter):
-    regex = r"alliances|district_points|insights|oprs|predictions|rankings"
+    regex = r"alliances|district_points|insights|oprs|coprs|predictions|rankings"
 
 
 configure_logging()

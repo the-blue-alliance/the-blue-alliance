@@ -99,9 +99,9 @@ class FMSAPIHybridScheduleParser(
         )
 
         parsed_matches: List[Match] = []
-        remapped_matches: Dict[
-            MatchKey, MatchKey
-        ] = {}  # If a key changes due to a tiebreaker
+        remapped_matches: Dict[MatchKey, MatchKey] = (
+            {}
+        )  # If a key changes due to a tiebreaker
         for match, (key_name, comp_level, set_number, match_number) in zip(
             matches, match_identifiers
         ):
@@ -380,6 +380,20 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
                     "L" if scale_red else "R",
                     "L" if left_switch_red else "R",
                 )
+
+            elif self.year == 2024:
+                # Bonus thresholds and coop status are in the top level Match object,
+                # duplicate them into each alliance breakdown
+                for key in [
+                    "coopertitionBonusAchieved",
+                    "melodyBonusThresholdCoop",
+                    "melodyBonusThresholdNonCoop",
+                    "melodyBonusThreshold",
+                    "ensembleBonusStagePointsThreshold",
+                    "ensembleBonusOnStageRobotsThreshold",
+                ]:
+                    for color in ALLIANCE_COLORS:
+                        breakdown[color][key] = match[key]
 
             for alliance in match.get("alliances", match.get("Alliances", [])):
                 color = alliance["alliance"].lower()

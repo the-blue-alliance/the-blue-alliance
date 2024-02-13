@@ -62,14 +62,14 @@ jobs:
       - name: Run Tests
         run: ./ops/test_py3.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v4.0.1
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.1
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: "18"
           cache: "npm"
@@ -83,7 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.1
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: "18"
           cache: "npm"
@@ -92,7 +92,7 @@ jobs:
       - name: Run Tests
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v4.0.1
         with:
           directory: ./.node_coverage/
   bash-lint:
@@ -128,7 +128,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Set up Node
-        uses: actions/setup-node@v4.0.1
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: "18"
           cache: "npm"
@@ -157,7 +157,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Set up Node
-        uses: actions/setup-node@v4.0.1
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: "18"
           cache: "npm"
