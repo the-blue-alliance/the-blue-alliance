@@ -392,16 +392,21 @@ class ContributionCalculator:
                 elif self._stat == "robot_on_stage":
                     count = 0
                     for i in range(1, 4):
-                        if (score_breakdown[color]["endGameRobot{}".format(i)] == "StageLeft" or 
-                            score_breakdown[color]["endGameRobot{}".format(i)] == "StageRight" or
-                            score_breakdown[color]["endGameRobot{}".format(i)] == "CenterStage"):
+                        if (
+                            score_breakdown[color]["endGameRobot{}".format(i)]
+                            == "StageLeft"
+                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            == "StageRight"
+                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            == "CenterStage"
+                        ):
                             count += 1
                     means[color] = count
                 elif self._stat == "2024_coopertition_criteria":
                     count = 0
                     if score_breakdown[color]["coopertitionCriteriaMet"]:
                         count = 1
-                    means[color] = count 
+                    means[color] = count
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -696,7 +701,8 @@ class PredictionHelper:
 
                     mu2 = mean_vars[color]["2024_coopertition_criteria"]["mean"] - 1
                     prob2 = 1 - cls._normcdf(
-                        -mu2 / np.sqrt(mean_vars[color]["2024_coopertition_criteria"]["var"])
+                        -mu2
+                        / np.sqrt(mean_vars[color]["2024_coopertition_criteria"]["var"])
                     )
 
                     mu3 = mean_vars[color][stat]["mean"] - 15
@@ -752,7 +758,6 @@ class PredictionHelper:
         Optional[TMatchPredictionStats],
         Optional[TEventStatMeanVars],
     ]:
-     
         if not matches:
             return None, None, None
         predictions: TMatchPredictions = {

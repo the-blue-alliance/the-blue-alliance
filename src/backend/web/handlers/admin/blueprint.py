@@ -234,7 +234,11 @@ admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": Non
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)
 admin_routes.add_url_rule("/matches", view_func=match_dashboard, methods=["GET"])
 admin_routes.add_url_rule("/match/add", view_func=match_add, methods=["POST"])
-admin_routes.add_url_rule("/match/override_breakdown", view_func=match_override_score_breakdown, methods=["POST"])
+admin_routes.add_url_rule(
+    "/match/override_breakdown",
+    view_func=match_override_score_breakdown,
+    methods=["POST"],
+)
 admin_routes.add_url_rule("/match/<match_key>", view_func=match_detail, methods=["GET"])
 admin_routes.add_url_rule(
     "/match/edit/<match_key>", view_func=match_edit, methods=["GET"]

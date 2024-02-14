@@ -404,9 +404,9 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "adjustPoints",
             "foulPoints",
             "rp",
-            "totalPoints"
+            "totalPoints",
         ]
-    )
+    ),
 }
 
 

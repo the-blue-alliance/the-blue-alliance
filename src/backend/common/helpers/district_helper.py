@@ -373,7 +373,6 @@ class DistrictHelper:
         playoff_type: PlayoffType,
         POINTS_MULTIPLIER: int,
     ):
-
         double_elim_alliance_pts: DefaultDict[int, int] = defaultdict(int)
         double_elim_alliance_wins: DefaultDict[int, int] = defaultdict(int)
         double_elim_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
