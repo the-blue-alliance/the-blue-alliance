@@ -159,7 +159,7 @@ class MatchPostUpdateHooks:
     @staticmethod
     def enqueue_stats(model: TUpdatedModel[Match]) -> None:
         # Enqueue task to calculate district points
-        event_key = model.model.key_name
+        event_key = model.model.event_key_name
         try:
             taskqueue.add(
                 url=f"/tasks/math/do/district_points_calc/{event_key}",
