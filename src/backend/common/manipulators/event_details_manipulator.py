@@ -63,9 +63,6 @@ def event_details_post_update_hook(
         except Exception:
             logging.exception(f"Error enqueuing event_team_status for {event_key}")
 
-        print(event_key)
-        print(updated_model.updated_attrs)
-
         event = Event.get_by_id(event_key)
         if (
             event
