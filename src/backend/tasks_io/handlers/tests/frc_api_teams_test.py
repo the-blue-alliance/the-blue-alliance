@@ -5,8 +5,12 @@ from freezegun import freeze_time
 from google.appengine.ext import ndb, testbed
 from werkzeug.test import Client
 
+from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
+from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
+from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -79,6 +83,12 @@ def test_fetch_team_details_bad_key(tasks_client: Client) -> None:
 
 @mock.patch.object(DatafeedFMSAPI, "get_team_details")
 def test_fetch_team_details(api_mock, tasks_client: Client) -> None:
+    EventTeam(
+        id="2019fim_frc254",
+        event=ndb.Key("Event", "2019fim"),
+        team=ndb.Key("Team", "frc254"),
+        year=2019,
+    ).put()
     api_mock.return_value = (
         Team(id="frc254", team_number=254),
         DistrictTeam(id="2019fim_frc254", team=ndb.Key(Team, "frc254"), year=2019),
@@ -98,6 +108,12 @@ def test_fetch_team_details(api_mock, tasks_client: Client) -> None:
 def test_fetch_team_details_no_output_in_taskqueue(
     api_mock, tasks_client: Client
 ) -> None:
+    EventTeam(
+        id="2019fim_frc254",
+        event=ndb.Key("Event", "2019fim"),
+        team=ndb.Key("Team", "frc254"),
+        year=2019,
+    ).put()
     api_mock.return_value = (
         Team(id="frc254", team_number=254),
         DistrictTeam(id="2019fim_frc254", team=ndb.Key(Team, "frc254"), year=2019),
@@ -153,8 +169,14 @@ def test_fetch_team_clears_districtteams(api_mock, tasks_client: Client) -> None
 
 @freeze_time("2019-04-01")
 @mock.patch.object(DatafeedFMSAPI, "get_team_details")
-def test_fetch_team_fixes_districtteams(api_mock, tasks_client: Client) -> None:
+def test_fetch_team_fixes_district_teams(api_mock, tasks_client: Client) -> None:
     DistrictTeam(id="2019ne_frc254", team=ndb.Key(Team, "frc254"), year=2019).put()
+    EventTeam(
+        id="2019ne_frc254",
+        event=ndb.Key("Event", "2019ne"),
+        team=ndb.Key("Team", "frc254"),
+        year=2019,
+    ).put()
     api_mock.return_value = (
         Team(id="frc254", team_number=254),
         DistrictTeam(id="2019fim_frc254", team=ndb.Key(Team, "frc254"), year=2019),
@@ -166,6 +188,39 @@ def test_fetch_team_fixes_districtteams(api_mock, tasks_client: Client) -> None:
 
     # Make sure we wrote no models
     assert Team.get_by_id("frc254") is not None
+    assert DistrictTeam.get_by_id("2019fim_frc254") is not None
+    assert DistrictTeam.get_by_id("2019ne_frc254") is None
+    assert Robot.query().fetch() == []
+
+
+@freeze_time("2019-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_removes_bad_district_teams(api_mock, tasks_client: Client) -> None:
+    # Create a bad DistrictTeam, from a previous year, with no events for that team
+    DistrictTeam(
+        id="2018in_frc254",
+        district_key=ndb.Key(District, "2018in"),
+        team=ndb.Key(Team, "frc254"),
+        year=2018,
+    ).put()
+    EventTeam(
+        id="2019fim_frc254",
+        event=ndb.Key("Event", "2019fim"),
+        team=ndb.Key("Team", "frc254"),
+        year=2019,
+    ).put()
+    api_mock.return_value = (
+        Team(id="frc254", team_number=254),
+        DistrictTeam(id="2019fim_frc254", team=ndb.Key(Team, "frc254"), year=2019),
+        None,
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc254")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we wrote no models
+    assert Team.get_by_id("frc254") is not None
+    assert DistrictTeam.get_by_id("2018in_frc254") is None
     assert DistrictTeam.get_by_id("2019fim_frc254") is not None
     assert DistrictTeam.get_by_id("2019ne_frc254") is None
     assert Robot.query().fetch() == []
