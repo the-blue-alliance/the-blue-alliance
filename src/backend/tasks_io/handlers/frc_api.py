@@ -117,7 +117,8 @@ def team_details(team_key: TeamKey) -> Response:
     # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
     if team:
         keys_to_delete = set()
-        # Delete all DistrictTeam that are not valid in the current year
+        # Delete all DistrictTeams that are not valid in the current
+        # year, since each team can only be in one district per year
         dt_keys = DistrictTeam.query(
             DistrictTeam.team == team.key, DistrictTeam.year == year
         ).fetch(keys_only=True)
@@ -125,7 +126,8 @@ def team_details(team_key: TeamKey) -> Response:
             if not district_team or dt_key.id() != district_team.key.id():
                 keys_to_delete.add(dt_key)
 
-        # Delete all DistrictTeam that are for any year that the team is not have an event in
+        # Delete all DistrictTeam that are for any year that the team
+        # does not have an event
         dt_keys = DistrictTeam.query(DistrictTeam.team == team.key).fetch()
         et_keys = EventTeam.query(
             EventTeam.team == team.key,
