@@ -3,7 +3,7 @@ import logging
 import re
 from typing import List, Optional, Set
 
-from flask import Blueprint, Response, make_response, render_template, request, url_for
+from flask import Blueprint, make_response, render_template, request, Response, url_for
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from markupsafe import Markup
