@@ -5,11 +5,9 @@ from freezegun import freeze_time
 from google.appengine.ext import ndb, testbed
 from werkzeug.test import Client
 
-from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
-from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
