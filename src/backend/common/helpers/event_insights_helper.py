@@ -3,11 +3,8 @@ import traceback
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
-from backend.common.consts.alliance_color import (
-    ALLIANCE_COLORS,
-    AllianceColor,
-    OPPONENT,
-)
+from backend.common.consts.alliance_color import (ALLIANCE_COLORS, OPPONENT,
+                                                  AllianceColor)
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.models.event_insights import EventInsights
@@ -47,24 +44,6 @@ class EventInsightsHelper:
 
         qual_insights = cls._calculate_event_insights_2023_helper(qual_matches)
         playoff_insights = cls._calculate_event_insights_2023_helper(playoff_matches)
-
-        return {
-            "qual": qual_insights,
-            "playoff": playoff_insights,
-        }
-
-    @classmethod
-    def calculate_event_insights_2022(cls, matches: List[Match]) -> EventInsights:
-        qual_matches = []
-        playoff_matches = []
-        for match in matches:
-            if match.comp_level == CompLevel.QM:
-                qual_matches.append(match)
-            else:
-                playoff_matches.append(match)
-
-        qual_insights = cls._calculate_event_insights_2022_helper(qual_matches)
-        playoff_insights = cls._calculate_event_insights_2022_helper(playoff_matches)
 
         return {
             "qual": qual_insights,
@@ -292,6 +271,24 @@ class EventInsightsHelper:
             "high_score": list(high_score),
         }
         return event_insights
+
+    @classmethod
+    def calculate_event_insights_2022(cls, matches: List[Match]) -> EventInsights:
+        qual_matches = []
+        playoff_matches = []
+        for match in matches:
+            if match.comp_level == CompLevel.QM:
+                qual_matches.append(match)
+            else:
+                playoff_matches.append(match)
+
+        qual_insights = cls._calculate_event_insights_2022_helper(qual_matches)
+        playoff_insights = cls._calculate_event_insights_2022_helper(playoff_matches)
+
+        return {
+            "qual": qual_insights,
+            "playoff": playoff_insights,
+        }
 
     @classmethod
     def _calculate_event_insights_2022_helper(
