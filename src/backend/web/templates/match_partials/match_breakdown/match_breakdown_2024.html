@@ -43,8 +43,8 @@
 {% endmacro %}
 
 {% macro fouls(alliance_breakdown) %}
-{%if alliance_breakdown.foulCount%}{{alliance_breakdown.foulCount}} (+{{alliance_breakdown.foulCount * 5}}){%else%}0{%endif%} /
-{%if alliance_breakdown.techFoulCount%}{{alliance_breakdown.techFoulCount}} (+{{alliance_breakdown.techFoulCount * 12}}){%else%}0{%endif%}
+{%if alliance_breakdown.foulCount%}{{alliance_breakdown.foulCount}} (+{{alliance_breakdown.foulCount * 2}}){%else%}0{%endif%} /
+{%if alliance_breakdown.techFoulCount%}{{alliance_breakdown.techFoulCount}} (+{{alliance_breakdown.techFoulCount * 5}}){%else%}0{%endif%}
 {% endmacro %}
 
 <table class="match-table">
