@@ -262,6 +262,11 @@ def test_updateHook_enqueueStats(ndb_context, taskqueue_stub) -> None:
     stats_tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(stats_tasks) > 0
 
+    tasks_urls = [t.url for t in stats_tasks]
+    assert "/tasks/math/do/playoff_advancement_update/2012ct" in tasks_urls
+    assert "/tasks/math/do/event_team_status/2012ct" in tasks_urls
+    assert "/tasks/math/do/district_points_calc/2012ct" in tasks_urls
+
 
 @mock.patch.object(FirebasePusher, "delete_match")
 def test_deleteHook(mock_firebase, ndb_context, taskqueue_stub) -> None:
