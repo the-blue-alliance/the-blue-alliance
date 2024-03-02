@@ -14,6 +14,8 @@ from backend.common.consts.playoff_type import (
     PlayoffType,
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
 )
+from backend.common.consts.webcast_type import WebcastType
+from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
@@ -33,6 +35,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
+from backend.common.models.webcast import Webcast
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.web.profiled_render import render_template
 
@@ -261,9 +264,11 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         event_short=request.form.get("event_short"),
         first_code=first_code if first_code and first_code != "None" else None,
         event_type_enum=int(request.form.get("event_type", EventType.UNLABLED)),
-        district_key=ndb.Key(District, request.form.get("event_district_key"))
-        if district_key and district_key != "None"
-        else None,
+        district_key=(
+            ndb.Key(District, request.form.get("event_district_key"))
+            if district_key and district_key != "None"
+            else None
+        ),
         venue=request.form.get("venue"),
         venue_address=request.form.get("venue_address"),
         city=request.form.get("city"),
@@ -286,12 +291,14 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         custom_hashtag=request.form.get("custom_hashtag"),
         webcast_json=request.form.get("webcast_json"),
         playoff_type=int(request.form.get("playoff_type", PlayoffType.BRACKET_8_TEAM)),
-        parent_event=ndb.Key(Event, parent_key)
-        if parent_key and parent_key.lower() != "none"
-        else None,
+        parent_event=(
+            ndb.Key(Event, parent_key)
+            if parent_key and parent_key.lower() != "none"
+            else None
+        ),
         divisions=division_keys,
     )
-    event = EventManipulator.createOrUpdate(event)
+    event = EventManipulator.createOrUpdate(event, auto_union=False)
 
     if request.form.get("alliance_selections_json") or request.form.get(
         "rankings_json"
@@ -429,3 +436,46 @@ def event_update_location_post(event_key: EventKey) -> Response:
     EventManipulator.createOrUpdate(event)
 
     return redirect(url_for("admin.event_detail", event_key=event.key_name))
+
+
+def event_add_webcast_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcast = Webcast(
+        type=WebcastType(request.form.get("webcast_type")),
+        channel=request.form.get("webcast_channel"),
+    )
+    if request.form.get("webcast_file"):
+        webcast["file"] = request.form.get("webcast_file")
+    if request.form.get("webcast_date"):
+        webcast["date"] = request.form.get("webcast_date")
+
+    EventWebcastAdder.add_webcast(event, webcast)
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )
+
+
+def event_remove_webcast_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcast_type = request.form.get("type")
+    webcast_channel = request.form.get("channel")
+    webcast_index = int(request.form.get("index")) - 1
+    if request.form.get("file"):
+        webcast_file = request.form.get("file")
+    else:
+        webcast_file = None
+
+    EventWebcastAdder.remove_webcast(
+        event, webcast_index, webcast_type, webcast_channel, webcast_file
+    )
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )
