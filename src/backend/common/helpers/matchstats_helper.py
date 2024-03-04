@@ -111,6 +111,7 @@ MANUAL_COMPONENTS = {
             [
                 match.score_breakdown[color].get("teleopAmpNoteCount", 0),
                 match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
             ]
         ),
         "Total Auto Game Pieces": lambda match, color: sum(
