@@ -375,7 +375,7 @@ class ContributionCalculator:
                     count = 0
                     for mode in ["auto", "teleop"]:
                         for position in ["Amp", "Speaker"]:
-                            if position == "Speaker":
+                            if position == "Speaker" and mode == "teleop":
                                 for type in ["NoteCount", "NoteAmplifiedCount"]:
                                     count += score_breakdown[color][
                                         "{}{}{}".format(mode, position, type)
