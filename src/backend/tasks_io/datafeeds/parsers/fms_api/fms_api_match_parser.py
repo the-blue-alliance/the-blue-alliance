@@ -99,9 +99,9 @@ class FMSAPIHybridScheduleParser(
         )
 
         parsed_matches: List[Match] = []
-        remapped_matches: Dict[MatchKey, MatchKey] = (
-            {}
-        )  # If a key changes due to a tiebreaker
+        remapped_matches: Dict[
+            MatchKey, MatchKey
+        ] = {}  # If a key changes due to a tiebreaker
         for match, (key_name, comp_level, set_number, match_number) in zip(
             matches, match_identifiers
         ):
