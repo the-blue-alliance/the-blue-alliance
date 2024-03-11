@@ -1,5 +1,5 @@
 gunicorn==21.2.0
-firebase_admin==6.4.0
+firebase_admin==6.5.0
 Flask==3.0.2
 Flask-Caching==2.1.0
 Flask-Cors==4.0.0
