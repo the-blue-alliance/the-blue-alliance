@@ -65,10 +65,6 @@ Details on using the `defer` method to enqueue tasks to be executed asynchronous
 
 Details on how to read/write files locally and upstream.
 
-### [[Redis|Redis]]
-
-Details on how to cache data using `redis`.
-
 ## Services
 
 ### [[web|web]]
