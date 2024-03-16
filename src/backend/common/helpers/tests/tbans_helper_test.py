@@ -436,6 +436,18 @@ class TestTBANSHelper(unittest.TestCase):
             assert isinstance(notification, EventScheduleNotification)
             assert notification.event == self.event
 
+    def test_match_score_push_sent(self):
+        self.match.push_sent = True
+
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.match_score(self.match, "user_id")
+            mock_send.assert_not_called()
+
+    def test_match_score_set_push_sent(self):
+        assert not self.match.push_sent
+        TBANSHelper.match_score(self.match)
+        assert self.match.push_sent
+
     def test_match_score_no_users(self):
         # Test send not called with no subscribed users
         with patch.object(TBANSHelper, "_send") as mock_send:
