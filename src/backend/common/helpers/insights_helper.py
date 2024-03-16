@@ -401,9 +401,10 @@ class InsightsHelper(object):
         for _, week_events in week_event_matches:
             for _, matches in week_events:
                 for match in matches:
-                    for alliance in match.alliances.values():
-                        for tk in alliance["teams"]:
-                            counter[tk] += 1
+                    if match.has_been_played:
+                        for alliance in match.alliances.values():
+                            for tk in alliance["teams"]:
+                                counter[tk] += 1
 
         grouped_by_win_count = self._sortTeamWinsDict(counter)
 
