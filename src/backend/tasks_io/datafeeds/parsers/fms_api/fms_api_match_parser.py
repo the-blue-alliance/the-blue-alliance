@@ -128,15 +128,15 @@ class FMSAPIHybridScheduleParser(
                 team_key_names.append(team_key)
                 if "Red" in team["station"]:
                     red_teams.append(team_key)
-                    if team["surrogate"]:
+                    if team.get("surrogate", None):
                         red_surrogates.append(team_key)
-                    if team["dq"]:
+                    if team.get("dq", None):
                         red_dqs.append(team_key)
                 elif "Blue" in team["station"]:
                     blue_teams.append(team_key)
-                    if team["surrogate"]:
+                    if team.get("surrogate", None):
                         blue_surrogates.append(team_key)
-                    if team["dq"]:
+                    if team.get("dq", None):
                         blue_dqs.append(team_key)
 
             if (
