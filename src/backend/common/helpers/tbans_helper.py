@@ -193,9 +193,6 @@ class TBANSHelper:
 
     @classmethod
     def match_score(cls, match: Match, user_id: Optional[str] = None) -> None:
-        if match.push_sent:
-            return
-
         event = match.event.get()
 
         from backend.common.models.notifications.match_score import (
