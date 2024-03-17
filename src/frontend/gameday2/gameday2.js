@@ -3,7 +3,7 @@ import "./gameday2.less";
 import React from "react";
 import ReactGA from "react-ga";
 import { Provider } from "react-redux";
-import thunk from "redux-thunk";
+import { thunk } from "redux-thunk";
 import { createStore, applyMiddleware, compose } from "redux";
 import ReactDOM from "react-dom";
 import queryString from "query-string";
