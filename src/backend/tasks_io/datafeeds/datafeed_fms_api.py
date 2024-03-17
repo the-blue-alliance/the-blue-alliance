@@ -324,7 +324,19 @@ class DatafeedFMSAPI:
         for field, value in result.items():
             if field == "teams":
                 for i, team in enumerate(value):
-                    scheduled["teams"][i].update(team)
+                    schedule_team = next(
+                        filter(
+                            lambda t: t["teamNumber"] == team["teamNumber"],
+                            scheduled["teams"],
+                        ),
+                        None,
+                    )
+                    if schedule_team is None:
+                        # 2024, Week 3: Upstream FMS sync issues leading to schedules returned with no teams
+                        # Some match results have been sync'd, so patch around this where we can
+                        scheduled["teams"].append(team)
+                    else:
+                        scheduled["teams"][i].update(team)
             else:
                 scheduled[field] = value
         return scheduled
