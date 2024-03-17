@@ -57,14 +57,19 @@ const VideoCellToolbar = (props) => {
       }
     });
 
-    tickerMatches.push(
-      <TickerMatch
-        key={match.key}
-        match={match}
-        hasFavorite={hasFavorite}
-        isBlueZone={props.isBlueZone}
-      />
-    );
+    if (match.rt.length > 0 && match.bt.length > 0) {
+      // 2024 Week 3, FMS Sync issues result in schedules
+      // being posted without teams, so skip those matcheskj
+
+      tickerMatches.push(
+        <TickerMatch
+          key={match.key}
+          match={match}
+          hasFavorite={hasFavorite}
+          isBlueZone={props.isBlueZone}
+        />
+      );
+    }
   });
 
   let swapButton;
