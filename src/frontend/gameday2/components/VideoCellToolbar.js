@@ -57,7 +57,7 @@ const VideoCellToolbar = (props) => {
       }
     });
 
-    if (match.rt.length > 0 && match.bt.length > 0) {
+    if (match.rt && match.rt.length > 0 && match.bt && match.bt.length > 0) {
       // 2024 Week 3, FMS Sync issues result in schedules
       // being posted without teams, so skip those matcheskj
 
