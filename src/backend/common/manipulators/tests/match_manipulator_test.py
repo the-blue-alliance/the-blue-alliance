@@ -323,6 +323,7 @@ def test_postUpdateHook_notifications(ndb_context, taskqueue_stub) -> None:
         year=2012,
         set_number=1,
         match_number=1,
+        push_sent=False
     )
     MatchManipulator.createOrUpdate(test_match)
 
@@ -335,4 +336,36 @@ def test_postUpdateHook_notifications(ndb_context, taskqueue_stub) -> None:
             deferred.run(task.payload)
 
     # Test that a bunch of notifications are sent
-    mock_match_score.assert_called_once_with(test_match)
+    mock_match_score.assert_called_once()
+
+    test_match = none_throws(Match.get_by_id("2012ct_qm1"))
+    assert test_match.push_sent
+
+
+def test_postUpdateHook_notification_pushSent(ndb_context, taskqueue_stub) -> None:
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+        push_sent=True,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        with patch.object(Event, "now", return_value=True), patch.object(
+            TBANSHelper, "match_score"
+        ) as mock_match_score:
+            deferred.run(task.payload)
+
+    mock_match_score.assert_not_called()

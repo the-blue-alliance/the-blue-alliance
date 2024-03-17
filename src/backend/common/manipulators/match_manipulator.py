@@ -84,13 +84,16 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
         event = match.event.get()
         # Only continue if the event is currently happening
         if event and event.now:
-            if match.has_been_played:
+            if match.has_been_played and not match.push_sent:
                 if (
                     updated_match.is_new
                     or "alliances_json" in updated_match.updated_attrs
                 ):
                     try:
                         TBANSHelper.match_score(match)
+                        # Update score sent boolean on Match object to make sure we only send a notification once
+                        match.push_sent = True
+                        MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
                     except Exception as exception:
                         logging.error(
                             "Error sending match {} updates: {}".format(
