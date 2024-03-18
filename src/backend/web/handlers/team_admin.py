@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
+from urllib.parse import urlparse
 
 from flask import abort, Blueprint, redirect, request, url_for
 from google.appengine.ext import ndb
@@ -9,6 +10,7 @@ from backend.common.auth import current_user
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.robot_manipulator import RobotManipulator
+from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.suggestion import Suggestion
@@ -176,6 +178,16 @@ def team_mod_post():
             media.preferred_references.append(team_ref)
         MediaManipulator.createOrUpdate(media, auto_union=False)
     elif action == "set_team_info":
+        website = request.form.get("website").strip()
+        if website:
+            sanitized_website = sanitize_team_website(website)
+            if validate_team_website(sanitized_website):
+                team.website = sanitized_website
+                TeamManipulator.createOrUpdate(team)
+        else:
+            team.website = ""
+            TeamManipulator.createOrUpdate(team)
+
         robot_name = request.form.get("robot_name").strip()
         current_year = datetime.now().year
         robot_key = Robot.render_key_name(team.key_name, current_year)
@@ -193,6 +205,27 @@ def team_mod_post():
         return abort(400)
 
     return redirect(url_for(".team_mod"))
+
+
+def validate_team_website(website: str) -> bool:
+    parsed_website = urlparse(website)
+    # Valid websites need at least a scheme (http or https) and a location
+    has_components = all([parsed_website.scheme, parsed_website.netloc])
+    valid_scheme = parsed_website.scheme in ["http", "https"]
+    # Check that a TLD exists
+    has_tld = "." in parsed_website.netloc
+    return has_components and valid_scheme and has_tld
+
+
+def sanitize_team_website(website: str) -> str:
+    parsed_website = urlparse(website)
+
+    # Default to https if no scheme set
+    if not parsed_website.scheme:
+        parsed_website = parsed_website._replace(scheme="https")
+
+    # Only allow for basic URLs
+    return "{}://{}{}".format(parsed_website.scheme, parsed_website.netloc, parsed_website.path)
 
 
 def get_media_and_team_ref(media_key_name, team_number):
