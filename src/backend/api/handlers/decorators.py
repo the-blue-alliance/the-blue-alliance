@@ -4,6 +4,7 @@ from typing import Callable, Set, Type, TypeVar
 
 from flask import g, jsonify, request, Response
 
+from backend.api.client_api_types import VoidRequest
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
 from backend.common.consts.auth_type import AuthType
@@ -88,7 +89,12 @@ def client_api_method(
     def decorator(func: Callable[[T], R]) -> Callable[..., Response]:
         @wraps(func)
         def decorated_function(*args, **kwargs) -> Response:
-            req = json.loads(request.get_data())
+            data = request.get_data()
+            if data:
+                req = json.loads(data)
+            else:
+                req = VoidRequest()
+
             resp = func(req)
             return jsonify(resp)
 
