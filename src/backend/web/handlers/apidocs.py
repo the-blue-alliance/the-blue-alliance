@@ -13,7 +13,7 @@ from backend.common.consts.notification_type import (
 from backend.common.consts.notification_type import TYPES as NOTIFICATION_TYPES
 from backend.common.decorators import cached_public
 from backend.common.helpers.tbans_helper import TBANSHelper
-from backend.web.decorators import enforce_login
+from backend.web.decorators import enforce_login, require_login
 from backend.web.profiled_render import render_template
 
 
@@ -54,7 +54,13 @@ def apidocs_v3() -> str:
 @blueprint.route("/webhooks")
 @cached_public(ttl=timedelta(weeks=1))
 def apidocs_webhooks() -> str:
-    template_values = {"enabled": ENABLED_NOTIFICATIONS, "types": NOTIFICATION_TYPES}
+    template_values = {"enabled": ENABLED_NOTIFICATIONS, "types": NOTIFICATION_TYPES, "testing_enabled": False}
+    return render_template("apidocs_webhooks.html", template_values)
+
+@blueprint.route("/webhooks/authenticated")
+@require_login
+def apidocs_webhooks_testing() -> str:
+    template_values = {"enabled": ENABLED_NOTIFICATIONS, "types": NOTIFICATION_TYPES, "testing_enabled": True}
     return render_template("apidocs_webhooks.html", template_values)
 
 
