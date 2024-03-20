@@ -641,10 +641,7 @@ $( document ).ready(function() {
             $(this.form).find('.webhook-alert')
                 .addClass(data === 'ok' ? 'alert-success' : 'alert-danger')
                 .css('display', 'block')
-                .text(data === 'ok' ? 'Sent webhook!' : 
-                    (data.responseJSON && data.responseJSON.Error) ? data.responseJSON.Error : 
-                    'Something went horribly wrong. Refresh the page and try again.'
-                );
+                .text(responseText);
 
             $(this).attr('disabled', false)
                 .removeClass('disabled');
