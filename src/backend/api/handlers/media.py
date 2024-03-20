@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated
@@ -8,7 +10,7 @@ from backend.common.decorators import cached_public
 
 
 @api_authenticated
-@cached_public
+@cached_public(ttl=timedelta(days=1))
 def media_tags() -> Response:
     """
     Returns a list of media tag names and codes.
