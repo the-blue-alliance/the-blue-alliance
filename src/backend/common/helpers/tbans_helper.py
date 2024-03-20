@@ -65,7 +65,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_event(
                     event, NotificationType.ALLIANCE_SELECTION
-                )
+                ).get_result()
             if users:
                 cls._send(users, AllianceSelectionNotification(event))
 
@@ -81,7 +81,7 @@ class TBANSHelper:
                 if not users:
                     users = Subscription.users_subscribed_to_team(
                         team, NotificationType.ALLIANCE_SELECTION
-                    )
+                    ).get_result()
                 if users:
                     cls._send(users, AllianceSelectionNotification(event, team))
 
@@ -108,7 +108,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_event(
                     event, NotificationType.AWARDS
-                )
+                ).get_result()
             if users:
                 cls._send(users, AwardsNotification(event))
 
@@ -123,7 +123,7 @@ class TBANSHelper:
                 if not users:
                     users = Subscription.users_subscribed_to_team(
                         team, NotificationType.AWARDS
-                    )
+                    ).get_result()
                 if users:
                     cls._send(users, AwardsNotification(event, team))
 
@@ -171,7 +171,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_event(
                     match.event.get(), NotificationType.LEVEL_STARTING
-                )
+                ).get_result()
             if users:
                 cls._send(users, EventLevelNotification(match))
 
@@ -187,7 +187,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_event(
                     event, NotificationType.SCHEDULE_UPDATED
-                )
+                ).get_result()
             if users:
                 cls._send(users, EventScheduleNotification(event))
 
@@ -205,7 +205,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_event(
                     event, NotificationType.MATCH_SCORE
-                )
+                ).get_result()
             if users:
                 cls._send(users, MatchScoreNotification(match))
 
@@ -216,7 +216,7 @@ class TBANSHelper:
                 if not users:
                     users = Subscription.users_subscribed_to_team(
                         team_key.get(), NotificationType.MATCH_SCORE
-                    )
+                    ).get_result()
                 if users:
                     cls._send(users, MatchScoreNotification(match, team_key.get()))
 
@@ -226,7 +226,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_match(
                     match, NotificationType.MATCH_SCORE
-                )
+                ).get_result()
             if users:
                 cls._send(users, MatchScoreNotification(match))
 
@@ -263,7 +263,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_event(
                     match.event.get(), NotificationType.UPCOMING_MATCH
-                )
+                ).get_result()
             if users:
                 cls._send(users, MatchUpcomingNotification(match))
 
@@ -274,7 +274,7 @@ class TBANSHelper:
                 if not users:
                     users = Subscription.users_subscribed_to_team(
                         team_key.get(), NotificationType.UPCOMING_MATCH
-                    )
+                    ).get_result()
                 if users:
                     cls._send(users, MatchUpcomingNotification(match, team_key.get()))
 
@@ -284,7 +284,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_match(
                     match, NotificationType.UPCOMING_MATCH
-                )
+                ).get_result()
             if users:
                 cls._send(users, MatchUpcomingNotification(match))
 
@@ -304,7 +304,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_event(
                     match.event.get(), NotificationType.MATCH_VIDEO
-                )
+                ).get_result()
             if users:
                 cls._send(users, MatchVideoNotification(match))
 
@@ -315,7 +315,7 @@ class TBANSHelper:
                 if not users:
                     users = Subscription.users_subscribed_to_team(
                         team_key.get(), NotificationType.MATCH_VIDEO
-                    )
+                    ).get_result()
                 if users:
                     cls._send(users, MatchVideoNotification(match, team_key.get()))
 
@@ -325,7 +325,7 @@ class TBANSHelper:
             if not users:
                 users = Subscription.users_subscribed_to_match(
                     match, NotificationType.MATCH_VIDEO
-                )
+                ).get_result()
             if users:
                 cls._send(users, MatchVideoNotification(match))
 
