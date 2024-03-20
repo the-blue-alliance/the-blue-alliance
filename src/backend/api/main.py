@@ -37,6 +37,8 @@ from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.match import match, zebra_motionworks
 from backend.api.handlers.media import media_tags
 from backend.api.handlers.status import status
+from backend.api.handlers.status import season
+
 from backend.api.handlers.team import (
     team,
     team_awards,
@@ -110,6 +112,7 @@ CORS(
 
 # Overall Status
 api_v3.add_url_rule("/status", view_func=status)
+api_v3.add_url_rule("/status/season", view_func=season)
 
 # District
 api_v3.add_url_rule("/district/<string:district_key>/events", view_func=district_events)
