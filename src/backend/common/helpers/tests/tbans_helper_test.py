@@ -177,7 +177,16 @@ class TestTBANSHelper(unittest.TestCase):
             alliance_selections=[{"declines": [], "picks": ["frc7332"]}],
         ).put()
 
+        TBANSHelper.alliance_selection(self.event)
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 2
+
         with patch.object(TBANSHelper, "_send") as mock_send:
+            for task in tasks:
+                deferred.run(task.payload)
+
             TBANSHelper.alliance_selection(self.event)
             # Two calls total - First to the Event, second to frc7332, no call for frc1
             mock_send.assert_called()
@@ -259,8 +268,16 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.AWARDS],
         ).put()
 
+        TBANSHelper.awards(self.event)
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 3
+
         with patch.object(TBANSHelper, "_send") as mock_send:
-            TBANSHelper.awards(self.event)
+            for task in tasks:
+                deferred.run(task.payload)
+
             # Three calls total - First to the Event, second to frc7332 (two awards), third to frc1 (one award)
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -390,8 +407,16 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.LEVEL_STARTING],
         ).put()
 
+        TBANSHelper.event_level(self.match)
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 1
+
         with patch.object(TBANSHelper, "_send") as mock_send:
-            TBANSHelper.event_level(self.match)
+            for task in tasks:
+                deferred.run(task.payload)
+
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 1
             user_ids = mock_send.call_args[0][0]
@@ -426,8 +451,16 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.SCHEDULE_UPDATED],
         ).put()
 
+        TBANSHelper.event_schedule(self.event)
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 1
+
         with patch.object(TBANSHelper, "_send") as mock_send:
-            TBANSHelper.event_schedule(self.event)
+            for task in tasks:
+                deferred.run(task.payload)
+
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 1
             user_ids = mock_send.call_args[0][0]
@@ -490,8 +523,16 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.MATCH_SCORE],
         ).put()
 
+        TBANSHelper.match_score(self.match)
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 3
+
         with patch.object(TBANSHelper, "_send") as mock_send:
-            TBANSHelper.match_score(self.match)
+            for task in tasks:
+                deferred.run(task.payload)
+
             # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -579,8 +620,16 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.UPCOMING_MATCH],
         ).put()
 
+        TBANSHelper.match_upcoming(self.match)
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 3
+
         with patch.object(TBANSHelper, "_send") as mock_send:
-            TBANSHelper.match_upcoming(self.match)
+            for task in tasks:
+                deferred.run(task.payload)
+
             # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -646,8 +695,16 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.MATCH_VIDEO],
         ).put()
 
+        TBANSHelper.match_video(self.match)
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 3
+
         with patch.object(TBANSHelper, "_send") as mock_send:
-            TBANSHelper.match_video(self.match)
+            for task in tasks:
+                deferred.run(task.payload)
+
             # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -1556,10 +1613,11 @@ class TestTBANSHelper(unittest.TestCase):
             for i in range(750)
         ]
         notification = MockNotification()
-        with patch.object(TBANSHelper, "_send_subscriptions") as mock_send:
-            TBANSHelper._batch_send_subscriptions(subscriptions, notification)
-
-        assert len(mock_send.mock_calls) == 2
+        TBANSHelper._batch_send_subscriptions(subscriptions, notification)
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 2
 
     def test_send_subscriptions(self):
         subscription = Subscription(

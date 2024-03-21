@@ -614,7 +614,14 @@ class TBANSHelper:
         BATCH_SIZE = 500
 
         for batch in batch(subscriptions, BATCH_SIZE):
-            cls._send_subscriptions(batch, notification)
+            deferred.defer(
+                cls._send_subscriptions,
+                batch,
+                notification,
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
+            )
 
     @classmethod
     def _send_subscriptions(
