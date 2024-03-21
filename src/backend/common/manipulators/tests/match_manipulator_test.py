@@ -11,7 +11,6 @@ from pyre_extensions import none_throws
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.firebase_pusher import FirebasePusher
-from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -330,13 +329,13 @@ def test_postUpdateHook_notifications(ndb_context, taskqueue_stub) -> None:
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
     assert len(tasks) == 1
     for task in tasks:
-        with patch.object(Event, "now", return_value=True), patch.object(
-            TBANSHelper, "match_score"
-        ) as mock_match_score:
+        with patch.object(Event, "now", return_value=True):
             deferred.run(task.payload)
 
-    # Test that a bunch of notifications are sent
-    mock_match_score.assert_called_once()
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    assert len(tasks) == 1
+    task = tasks[0]
+    assert task.name == "2012ct_qm1_match_score"
 
     test_match = none_throws(Match.get_by_id("2012ct_qm1"))
     assert test_match.push_sent
@@ -363,9 +362,8 @@ def test_postUpdateHook_notification_pushSent(ndb_context, taskqueue_stub) -> No
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
     assert len(tasks) == 1
     for task in tasks:
-        with patch.object(Event, "now", return_value=True), patch.object(
-            TBANSHelper, "match_score"
-        ) as mock_match_score:
+        with patch.object(Event, "now", return_value=True):
             deferred.run(task.payload)
 
-    mock_match_score.assert_not_called()
+    tasks = taskqueue_stub.get_filtered_tasks(name="2012ct_qm1_match_score", queue_names="push-notifications")
+    assert len(tasks) == 0

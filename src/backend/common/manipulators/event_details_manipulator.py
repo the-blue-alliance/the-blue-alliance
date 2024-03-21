@@ -1,8 +1,8 @@
 import logging
-import traceback
 from typing import List
 
 from google.appengine.api import taskqueue
+from google.appengine.ext import deferred
 
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.helpers.tbans_helper import TBANSHelper
@@ -69,15 +69,14 @@ def event_details_post_update_hook(
             and event.within_a_day
             and "alliance_selections" in updated_model.updated_attrs
         ):
-            try:
-                TBANSHelper.alliance_selection(event)
-            except Exception:
-                logging.error(
-                    "Error sending alliance update notification for {}".format(
-                        event.key_name
-                    )
-                )
-                logging.error(traceback.format_exc())
+            deferred.defer(
+                TBANSHelper.alliance_selection,
+                event,
+                _name=f"{event.key_name}_alliance_selection",
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
+            )
 
 
 """ndb

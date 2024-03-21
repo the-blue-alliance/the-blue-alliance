@@ -1,8 +1,8 @@
 import logging
-import traceback
 from typing import List
 
 from google.appengine.api import taskqueue
+from google.appengine.ext import deferred
 
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.helpers.firebase_pusher import FirebasePusher
@@ -89,18 +89,17 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     updated_match.is_new
                     or "alliances_json" in updated_match.updated_attrs
                 ):
-                    try:
-                        TBANSHelper.match_score(match)
-                        # Update score sent boolean on Match object to make sure we only send a notification once
-                        match.push_sent = True
-                        MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
-                    except Exception as exception:
-                        logging.error(
-                            "Error sending match {} updates: {}".format(
-                                match.key_name, exception
-                            )
-                        )
-                        logging.error(traceback.format_exc())
+                    deferred.defer(
+                        TBANSHelper.match_score,
+                        match,
+                        _name=f"{match.key_name}_match_score",
+                        _target="py3-tasks-io",
+                        _queue="push-notifications",
+                        _url="/_ah/queue/deferred_notification_send",
+                    )
+                    # Update score sent boolean on Match object to make sure we only send a notification once
+                    match.push_sent = True
+                    MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
             else:
                 if updated_match.is_new or (
                     set(["alliances_json", "time", "time_string"]).intersection(
@@ -113,34 +112,37 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     if event not in unplayed_match_events:
                         unplayed_match_events.append(event)
 
-        print(updated_match.updated_attrs)
         # Try to send video notifications
         if "_video_added" in updated_match.updated_attrs:
-            try:
-                TBANSHelper.match_video(match)
-            except Exception as exception:
-                logging.error("Error sending match video updates: {}".format(exception))
-                logging.error(traceback.format_exc())
+            deferred.defer(
+                TBANSHelper.match_video,
+                match,
+                _name=f"{match.key_name}_match_video",
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
+            )
 
     """
     If we have an unplayed match during an event within a day, send out a schedule update notification
     """
     for event in unplayed_match_events:
-        try:
-            TBANSHelper.event_schedule(event)
-        except Exception:
-            logging.error(
-                "Eror sending schedule updates for: {}".format(event.key_name)
-            )
-            logging.error(traceback.format_exc())
-        try:
-            # When an event gets a new schedule, we should schedule `match_upcoming` notifications for the first matches for the event
-            TBANSHelper.schedule_upcoming_matches(event)
-        except Exception:
-            logging.error(
-                "Eror scheduling match_upcoming for: {}".format(event.key_name)
-            )
-            logging.error(traceback.format_exc())
+        deferred.defer(
+            TBANSHelper.event_schedule,
+            event,
+            _name=f"{event.key_name}_event_schedule",
+            _target="py3-tasks-io",
+            _queue="push-notifications",
+            _url="/_ah/queue/deferred_notification_send",
+        )
+        deferred.defer(
+            TBANSHelper.schedule_upcoming_matches,
+            event,
+            _name=f"{event.key_name}_schedule_upcoming_matches",
+            _target="py3-tasks-io",
+            _queue="push-notifications",
+            _url="/_ah/queue/deferred_notification_send",
+        )
 
 
 class MatchPostUpdateHooks:
