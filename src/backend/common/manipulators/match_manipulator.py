@@ -89,17 +89,21 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     updated_match.is_new
                     or "alliances_json" in updated_match.updated_attrs
                 ):
-                    deferred.defer(
-                        TBANSHelper.match_score,
-                        match,
-                        _name=f"{match.key_name}_match_score",
-                        _target="py3-tasks-io",
-                        _queue="push-notifications",
-                        _url="/_ah/queue/deferred_notification_send",
-                    )
-                    # Update score sent boolean on Match object to make sure we only send a notification once
-                    match.push_sent = True
-                    MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
+                    # Catch TaskAlreadyExistsError + TombstonedTaskError
+                    try:
+                        deferred.defer(
+                            TBANSHelper.match_score,
+                            match,
+                            _name=f"{match.key_name}_match_score",
+                            _target="py3-tasks-io",
+                            _queue="push-notifications",
+                            _url="/_ah/queue/deferred_notification_send",
+                        )
+                        # Update score sent boolean on Match object to make sure we only send a notification once
+                        match.push_sent = True
+                        MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
+                    except Exception:
+                        pass
             else:
                 if updated_match.is_new or (
                     set(["alliances_json", "time", "time_string"]).intersection(
@@ -114,35 +118,48 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
 
         # Try to send video notifications
         if "_video_added" in updated_match.updated_attrs:
-            deferred.defer(
-                TBANSHelper.match_video,
-                match,
-                _name=f"{match.key_name}_match_video",
-                _target="py3-tasks-io",
-                _queue="push-notifications",
-                _url="/_ah/queue/deferred_notification_send",
-            )
+            # Catch TaskAlreadyExistsError + TombstonedTaskError
+            try:
+                deferred.defer(
+                    TBANSHelper.match_video,
+                    match,
+                    _name=f"{match.key_name}_match_video",
+                    _target="py3-tasks-io",
+                    _queue="push-notifications",
+                    _url="/_ah/queue/deferred_notification_send",
+                )
+            except Exception:
+                pass
 
     """
     If we have an unplayed match during an event within a day, send out a schedule update notification
     """
     for event in unplayed_match_events:
-        deferred.defer(
-            TBANSHelper.event_schedule,
-            event,
-            _name=f"{event.key_name}_event_schedule",
-            _target="py3-tasks-io",
-            _queue="push-notifications",
-            _url="/_ah/queue/deferred_notification_send",
-        )
-        deferred.defer(
-            TBANSHelper.schedule_upcoming_matches,
-            event,
-            _name=f"{event.key_name}_schedule_upcoming_matches",
-            _target="py3-tasks-io",
-            _queue="push-notifications",
-            _url="/_ah/queue/deferred_notification_send",
-        )
+        # Catch TaskAlreadyExistsError + TombstonedTaskError
+        try:
+            deferred.defer(
+                TBANSHelper.event_schedule,
+                event,
+                _name=f"{event.key_name}_event_schedule",
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
+            )
+        except Exception:
+            pass
+
+        # Catch TaskAlreadyExistsError + TombstonedTaskError
+        try:
+            deferred.defer(
+                TBANSHelper.schedule_upcoming_matches,
+                event,
+                _name=f"{event.key_name}_schedule_upcoming_matches",
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
+            )
+        except Exception:
+            pass
 
 
 class MatchPostUpdateHooks:

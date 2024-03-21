@@ -69,14 +69,18 @@ def event_details_post_update_hook(
             and event.within_a_day
             and "alliance_selections" in updated_model.updated_attrs
         ):
-            deferred.defer(
-                TBANSHelper.alliance_selection,
-                event,
-                _name=f"{event.key_name}_alliance_selection",
-                _target="py3-tasks-io",
-                _queue="push-notifications",
-                _url="/_ah/queue/deferred_notification_send",
-            )
+            # Catch TaskAlreadyExistsError + TombstonedTaskError
+            try:
+                deferred.defer(
+                    TBANSHelper.alliance_selection,
+                    event,
+                    _name=f"{event.key_name}_alliance_selection",
+                    _target="py3-tasks-io",
+                    _queue="push-notifications",
+                    _url="/_ah/queue/deferred_notification_send",
+                )
+            except Exception:
+                pass
 
 
 """ndb

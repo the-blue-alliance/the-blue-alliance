@@ -86,11 +86,15 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
         # Send push notifications if the awards post was within +/- 1 day of the Event
         event = event_key.get()
         if event and event.within_a_day:
-            deferred.defer(
-                TBANSHelper.awards,
-                event,
-                _name=f"{event.key_name}_awards",
-                _target="py3-tasks-io",
-                _queue="push-notifications",
-                _url="/_ah/queue/deferred_notification_send",
-            )
+            # Catch TaskAlreadyExistsError + TombstonedTaskError
+            try:
+                deferred.defer(
+                    TBANSHelper.awards,
+                    event,
+                    _name=f"{event.key_name}_awards",
+                    _target="py3-tasks-io",
+                    _queue="push-notifications",
+                    _url="/_ah/queue/deferred_notification_send",
+                )
+            except Exception:
+                pass
