@@ -1543,3 +1543,33 @@ class TestTBANSHelper(unittest.TestCase):
         assert (
             TBANSHelper._debug_string(exception) == 'code / message / {"mock": "mock"}'
         )
+
+    def test_batch_send_subscriptions(self):
+        subscriptions = [
+            Subscription(
+                parent=ndb.Key(Account, f"user_id_{i}"),
+                user_id=f"user_id_{i}",
+                model_key="frc1",
+                model_type=ModelType.TEAM,
+                notification_types=[NotificationType.MATCH_SCORE],
+            )
+            for i in range(750)
+        ]
+        notification = MockNotification()
+        with patch.object(TBANSHelper, "_send_subscriptions") as mock_send:
+            TBANSHelper._batch_send_subscriptions(subscriptions, notification)
+
+        assert len(mock_send.mock_calls) == 2
+
+    def test_send_subscriptions(self):
+        subscription = Subscription(
+            parent=ndb.Key(Account, "user_id_1"),
+            user_id="user_id_1",
+            model_key="frc1",
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.MATCH_SCORE],
+        )
+        notification = MockNotification()
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper._send_subscriptions([subscription], notification)
+            mock_send.assert_called_once_with(["user_id_1"], notification)

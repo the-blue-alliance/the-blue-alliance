@@ -184,11 +184,14 @@ class TestAwardManipulator(unittest.TestCase):
         assert len(tasks) == 1
 
         for task in tasks:
-            with patch.object(TBANSHelper, "awards") as mock_awards:
-                deferred.run(task.payload)
+            deferred.run(task.payload)
 
-        # Make sure we attempted to dispatch push notifications
-        mock_awards.assert_called_with(self.event)
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 1
+        task = tasks[0]
+        assert task.name == "2013casj_awards"
 
     def test_postUpdateHook_notifications_notWithinADay(self):
         AwardManipulator.createOrUpdate(self.new_award)
