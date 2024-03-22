@@ -549,16 +549,19 @@ class TBANSHelper:
         if match.time is None or match.time + MATCH_UPCOMING_MINUTES <= now:
             cls.match_upcoming(match, user_id)
         else:
-            deferred.defer(
-                cls.match_upcoming,
-                match,
-                user_id,
-                _name=task_name,
-                _target="py3-tasks-io",
-                _queue="push-notifications",
-                _url="/_ah/queue/deferred_notification_send",
-                _eta=match.time + MATCH_UPCOMING_MINUTES,
-            )
+            try:
+                deferred.defer(
+                    cls.match_upcoming,
+                    match,
+                    user_id,
+                    _name=task_name,
+                    _target="py3-tasks-io",
+                    _queue="push-notifications",
+                    _url="/_ah/queue/deferred_notification_send",
+                    _eta=match.time + MATCH_UPCOMING_MINUTES,
+                )
+            except Exception:
+                pass
 
     @classmethod
     def schedule_upcoming_matches(
