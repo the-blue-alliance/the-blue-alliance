@@ -208,61 +208,6 @@ class LocationHelper:
         return score
 
     @classmethod
-    def update_team_location(cls, team: Team) -> None:
-        if not team.location:
-            return
-
-        # # Try with and without textsearch, pick best
-        # location_info, score = cls.get_team_location_info(team)
-        # if score < 0.7:
-        #     logging.warning("Using textsearch for {}".format(team.key.id()))
-        #     location_info2, score2 = cls.get_team_location_info(team, textsearch=True)
-        #     if score2 > score:
-        #         location_info = location_info2
-        #         score = score2
-
-        # # Log performance
-        # text = "Team {} location score: {}".format(team.key.id(), score)
-        # if score < 0.8:
-        #     logging.warning(text)
-        # else:
-        #     logging.info(text)
-
-        # # Don't trust anything below a certain threshold Super strict for now.
-        # if score < 0.9:
-        #     logging.warning("Location score too low for team {}".format(team.key.id()))
-        #     location_info = {}
-        location_info: LocationInfo = {}  # Force imprecise locations
-
-        # Fallback to location only
-        if not location_info:
-            # logging.warning("Falling back to location only for team {}".format(team.key.id()))
-            geocode_result = cls.google_maps_geocode(team.location)
-            if geocode_result:
-                location_info = cls.construct_location_info(
-                    geocode_result[0], auto_fill=False
-                )
-
-        # Fallback to city, country
-        if not location_info:
-            logging.warning(
-                "Falling back to city/country only for team {}".format(team.key.id())
-            )
-            city_country = "{} {}".format(
-                team.city if team.city else "", team.country if team.country else ""
-            )
-            geocode_result = cls.google_maps_geocode(city_country)
-            if geocode_result:
-                location_info = cls.construct_location_info(
-                    geocode_result[0], auto_fill=False
-                )
-            else:
-                logging.warning("Team {} location failed!".format(team.key.id()))
-
-        # Update team
-        team.normalized_location = cls.build_normalized_location(location_info)
-
-    @classmethod
     def build_normalized_location(cls, location_info: LocationInfo) -> Location:
         lat_lng = None
         if "lat" in location_info and "lng" in location_info:
@@ -283,75 +228,6 @@ class LocationHelper:
             place_id=location_info.get("place_id"),
             place_details=location_info.get("place_details"),
         )
-
-    @classmethod
-    def get_team_location_info(
-        cls, team: Team, textsearch: bool = False
-    ) -> Tuple[LocationInfo, float]:
-        """
-        Search for different combinations of team name (which should include
-        high school or title sponsor) with city, state_prov, postalcode, and country
-        in attempt to find the correct location associated with the team.
-        """
-        # Find possible schools/title sponsors
-        possible_names = []
-        MAX_SPLIT = 3  # Filters out long names that are unlikely
-        if team.name:
-            # Guessing sponsors/school by splitting name by '/' or '&'
-            split1 = re.split("&", team.name)
-            split2 = re.split("/", team.name)
-
-            if (
-                split1
-                and split1[-1].count("&") < MAX_SPLIT
-                and split1[-1].count("/") < MAX_SPLIT
-            ):
-                possible_names.append(split1[-1])
-            if (
-                split2
-                and split2[-1] not in possible_names
-                and split2[-1].count("&") < MAX_SPLIT
-                and split2[-1].count("/") < MAX_SPLIT
-            ):
-                possible_names.append(split2[-1])
-            if (
-                split1
-                and split1[0] not in possible_names
-                and split1[0].count("&") < MAX_SPLIT
-                and split1[0].count("/") < MAX_SPLIT
-            ):
-                possible_names.append(split1[0])
-            if (
-                split2
-                and split2[0] not in possible_names
-                and split2[0].count("&") < MAX_SPLIT
-                and split2[0].count("/") < MAX_SPLIT
-            ):
-                possible_names.append(split2[0])
-
-        # Geocode for lat/lng
-        lat_lng = cls.get_lat_lng(team.location)
-        if not lat_lng:
-            return {}, 0
-
-        # Try to find place based on possible queries
-        best_score = 0
-        best_location_info: LocationInfo = {}
-        for j, name in enumerate(possible_names):
-            places = cls.google_maps_placesearch(name, lat_lng, textsearch=textsearch)
-            for i, place in enumerate(places[:5]):
-                location_info = cls.construct_location_info(place)
-                score = cls.compute_team_location_score(name, location_info, lat_lng)
-                score *= pow(0.9, 0 if j < 2 else 1) * pow(
-                    0.9, i
-                )  # discount by ranking
-                if score == 1:
-                    return location_info, score
-                elif score > best_score:
-                    best_location_info = location_info
-                    best_score = score
-
-        return best_location_info, best_score
 
     @classmethod
     def compute_team_location_score(
