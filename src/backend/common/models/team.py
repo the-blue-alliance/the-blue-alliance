@@ -98,9 +98,6 @@ class Team(CachedModel):
 
     @property
     def city_state_country(self):
-        if not self._city_state_country and self.nl:
-            self._city_state_country = self.nl.city_state_country
-
         if not self._city_state_country:
             location_parts = []
             if self.city:
@@ -117,10 +114,8 @@ class Team(CachedModel):
 
     @property
     def nl(self):
+        # 2023-03-22 Removed. ~zorr
         return None  # 2017-03-25 Normalized location too inconsistent. Completely disable for now. -fangeugene
-        # if self.normalized_location and self.normalized_location.country not in {'United States', 'Canada'}:
-        #     return False
-        # return self.normalized_location
 
     @property
     def details_url(self):

@@ -26,16 +26,10 @@ class TeamManipulator(ManipulatorBase[Team]):
 
     @classmethod
     def postUpdateHook(cls, teams, updated_attr_list, is_new_list):
+        location_attrs = {'city', 'state_prov', 'country', 'postalcode'}
         # To run after models have been updated
         for (team, updated_attrs) in zip(teams, updated_attr_list):
-            if 'city' in updated_attrs or 'state_prov' in updated_attrs or \
-                    'country' in updated_attrs or 'postalcode' in updated_attrs:
-                try:
-                    LocationHelper.update_team_location(team)
-                except Exception, e:
-                    logging.error("update_team_location for {} errored!".format(team.key.id()))
-                    logging.exception(e)
-
+            if any(set(updated_attrs).intersection(location_attrs)):
                 try:
                     SearchHelper.update_team_location_index(team)
                 except Exception, e:
