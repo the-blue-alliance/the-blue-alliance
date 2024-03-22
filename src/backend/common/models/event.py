@@ -517,9 +517,6 @@ class Event(CachedModel):
 
     @property
     def city_state_country(self) -> Optional[str]:
-        if not self._city_state_country and self.nl:
-            self._city_state_country = self.nl.city_state_country
-
         if not self._city_state_country:
             location_parts = []
             if self.city:
