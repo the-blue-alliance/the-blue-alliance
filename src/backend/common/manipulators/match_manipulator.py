@@ -177,7 +177,7 @@ class MatchPostUpdateHooks:
             taskqueue.add(
                 url=f"/tasks/math/do/district_points_calc/{event_key}",
                 method="GET",
-                target="py3-tasks-io",
+                target="py3-tasks-cpu",
                 queue_name="stats",
                 countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
             )
@@ -189,7 +189,7 @@ class MatchPostUpdateHooks:
             taskqueue.add(
                 url=f"/tasks/math/do/event_team_status/{event_key}",
                 method="GET",
-                target="py3-tasks-io",
+                target="py3-tasks-cpu",
                 queue_name="stats",
             )
         except Exception:
@@ -200,7 +200,7 @@ class MatchPostUpdateHooks:
             taskqueue.add(
                 url=f"/tasks/math/do/playoff_advancement_update/{event_key}",
                 method="GET",
-                target="py3-tasks-io",
+                target="py3-tasks-cpu",
                 queue_name="stats",
             )
         except Exception:
@@ -211,7 +211,7 @@ class MatchPostUpdateHooks:
             taskqueue.add(
                 url=f"/tasks/math/do/event_matchstats/{event_key}",
                 method="GET",
-                target="py3-tasks-io",
+                target="py3-tasks-cpu",
                 queue_name="stats",
             )
         except Exception:

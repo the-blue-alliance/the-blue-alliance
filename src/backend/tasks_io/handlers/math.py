@@ -55,8 +55,8 @@ def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
                 "math.event_district_points_calc", event_key=event_key.string_id()
             ),
             method="GET",
-            target="py3-tasks-io",
-            queue_name="default",
+            target="py3-tasks-cpu",
+            queue_name="stats",
         )
 
     if (
@@ -98,8 +98,8 @@ def event_district_points_calc(event_key: EventKey) -> Response:
                 district_key=event.district_key.string_id(),
             ),
             method="GET",
-            target="py3-tasks-io",
-            queue_name="default",
+            target="py3-tasks-cpu",
+            queue_name="stats",
         )
 
     if (
@@ -122,14 +122,14 @@ def enqueue_district_rankings_calc(year: Year) -> Response:
         taskqueue.add(
             url=url_for("math.district_rankings_calc", district_key=district_key),
             method="GET",
-            target="py3-tasks-io",
-            queue_name="default",
+            target="py3-tasks-cpu",
+            queue_name="stats",
         )
         taskqueue.add(
             url=url_for("frc_api.district_rankings", district_key=district_key),
             method="GET",
             target="py3-tasks-io",
-            queue_name="default",
+            queue_name="datafeed",
         )
 
     if (
@@ -214,7 +214,7 @@ def enqueue_event_matchstats(year: Optional[Year]) -> str:
         taskqueue.add(
             url="/tasks/math/do/event_matchstats/" + event.key_name,
             method="GET",
-            target="py3-tasks-io",
+            target="py3-tasks-cpu",
             queue_name="run-in-order",  # Because predictions depend on past events
         )
 
