@@ -52,7 +52,6 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     affected_stats_event_keys = set()
     for updated_model in updated_models:
         MatchPostUpdateHooks.firebase_update(updated_model)
-        MatchPostUpdateHooks.enqueue_stats(updated_model)
 
         # Only attrs that affect stats
         if (
@@ -66,16 +65,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
 
     # Enqueue statistics
     for event_key in affected_stats_event_keys:
-        # Enqueue task to calculate matchstats
-        try:
-            taskqueue.add(
-                url=f"/tasks/math/do/event_matchstats/{event_key}",
-                method="GET",
-                target="py3-tasks-io",
-                queue_name="default",
-            )
-        except Exception:
-            logging.exception(f"Error enqueuing event_matchstats for {event_key}")
+        MatchPostUpdateHooks.enqueue_stats(event_key)
 
     # Dispatch push notifications
     unplayed_match_events = []
@@ -101,7 +91,9 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                         )
                         # Update score sent boolean on Match object to make sure we only send a notification once
                         match.push_sent = True
-                        MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
+                        MatchManipulator.createOrUpdate(
+                            match, run_post_update_hook=False
+                        )
                     except Exception:
                         pass
             else:
@@ -179,15 +171,14 @@ class MatchPostUpdateHooks:
             logging.exception("Firebase update_match failed!")
 
     @staticmethod
-    def enqueue_stats(model: TUpdatedModel[Match]) -> None:
+    def enqueue_stats(event_key: str) -> None:
         # Enqueue task to calculate district points
-        event_key = model.model.event_key_name
         try:
             taskqueue.add(
                 url=f"/tasks/math/do/district_points_calc/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
-                queue_name="default",
+                queue_name="stats",
                 countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
             )
         except Exception:
@@ -199,7 +190,7 @@ class MatchPostUpdateHooks:
                 url=f"/tasks/math/do/event_team_status/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
-                queue_name="default",
+                queue_name="stats",
             )
         except Exception:
             logging.exception(f"Error enqueuing event_team_status for {event_key}")
@@ -210,7 +201,18 @@ class MatchPostUpdateHooks:
                 url=f"/tasks/math/do/playoff_advancement_update/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
-                queue_name="default",
+                queue_name="stats",
             )
         except Exception:
             logging.exception(f"Error enqueuing advancement update for {event_key}")
+
+        # Enqueue task to calculate matchstats
+        try:
+            taskqueue.add(
+                url=f"/tasks/math/do/event_matchstats/{event_key}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="stats",
+            )
+        except Exception:
+            logging.exception(f"Error enqueuing event_matchstats for {event_key}")

@@ -17,6 +17,9 @@ queue:
   retry_parameters:
     task_age_limit: 1h
 
+- name: stats
+  rate: 10/s
+
 - name: firebase
   rate: 50/s
 

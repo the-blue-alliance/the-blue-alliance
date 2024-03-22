@@ -251,6 +251,7 @@ def test_updateHook_enqueueStats(ndb_context, taskqueue_stub) -> None:
         set_number=1,
         match_number=1,
     )
+    test_match._updated_attrs = ["alliances_json"]
     MatchManipulator._run_post_update_hook([test_match])
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
@@ -258,7 +259,7 @@ def test_updateHook_enqueueStats(ndb_context, taskqueue_stub) -> None:
     for task in tasks:
         deferred.run(task.payload)
 
-    stats_tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    stats_tasks = taskqueue_stub.get_filtered_tasks(queue_names="stats")
     assert len(stats_tasks) > 0
 
     tasks_urls = [t.url for t in stats_tasks]
@@ -322,7 +323,7 @@ def test_postUpdateHook_notifications(ndb_context, taskqueue_stub) -> None:
         year=2012,
         set_number=1,
         match_number=1,
-        push_sent=False
+        push_sent=False,
     )
     MatchManipulator.createOrUpdate(test_match)
 
@@ -365,5 +366,7 @@ def test_postUpdateHook_notification_pushSent(ndb_context, taskqueue_stub) -> No
         with patch.object(Event, "now", return_value=True):
             deferred.run(task.payload)
 
-    tasks = taskqueue_stub.get_filtered_tasks(name="2012ct_qm1_match_score", queue_names="push-notifications")
+    tasks = taskqueue_stub.get_filtered_tasks(
+        name="2012ct_qm1_match_score", queue_names="push-notifications"
+    )
     assert len(tasks) == 0
