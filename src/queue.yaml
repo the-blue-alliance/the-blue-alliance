@@ -19,6 +19,8 @@ queue:
 
 - name: stats
   rate: 10/s
+  retry_parameters:
+    task_retry_limit: 0
 
 - name: firebase
   rate: 50/s
