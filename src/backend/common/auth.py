@@ -1,5 +1,4 @@
 import datetime
-import logging
 from typing import Any, Dict, Optional
 
 from firebase_admin import auth
@@ -19,8 +18,7 @@ _SESSION_KEY = "session"
 def _verify_id_token(id_token: str) -> Optional[dict]:
     try:
         return auth.verify_id_token(id_token, check_revoked=True, app=app())
-    except (exceptions.DefaultCredentialsError, auth.ExpiredIdTokenError):
-        logging.warning("Error validing clientapi token", exc_info=True)
+    except Exception:
         return None
 
 
