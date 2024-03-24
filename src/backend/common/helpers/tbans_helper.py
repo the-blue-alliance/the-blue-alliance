@@ -138,10 +138,12 @@ class TBANSHelper:
             team_awards = event.team_awards()
             for team_key in team_awards.keys():
                 team = team_key.get()
+                if not team:
+                    continue
 
                 if user_id:
                     cls._send([user_id], AwardsNotification(event, team))
-                else:
+                elif team.key_name:
                     team_subscriptions_futures[team.key_name] = (
                         Subscription.subscriptions_for_team(
                             team, NotificationType.AWARDS
@@ -262,9 +264,12 @@ class TBANSHelper:
         if NotificationType.MATCH_SCORE in ENABLED_TEAM_NOTIFICATIONS:
             for team_key in match.team_keys:
                 team = team_key.get()
+                if not team:
+                    continue
+
                 if user_id:
                     cls._send([user_id], MatchScoreNotification(match, team))
-                else:
+                elif team.key_name:
                     team_subscriptions_futures[team.key_name] = (
                         Subscription.subscriptions_for_team(
                             team, NotificationType.MATCH_SCORE
@@ -341,10 +346,12 @@ class TBANSHelper:
         if NotificationType.UPCOMING_MATCH in ENABLED_TEAM_NOTIFICATIONS:
             for team_key in match.team_keys:
                 team = team_key.get()
+                if not team:
+                    continue
 
                 if user_id:
                     cls._send([user_id], MatchUpcomingNotification(match, team))
-                else:
+                elif team.key_name:
                     team_subscriptions_futures[team.key_name] = (
                         Subscription.subscriptions_for_team(
                             team, NotificationType.UPCOMING_MATCH
@@ -410,10 +417,12 @@ class TBANSHelper:
         if NotificationType.MATCH_VIDEO in ENABLED_TEAM_NOTIFICATIONS:
             for team_key in match.team_keys:
                 team = team_key.get()
+                if not team:
+                    continue
 
                 if user_id:
                     cls._send([user_id], MatchVideoNotification(match, team))
-                else:
+                elif team.key_name:
                     team_subscriptions_futures[team.key_name] = (
                         Subscription.subscriptions_for_team(
                             team, NotificationType.MATCH_VIDEO
@@ -536,6 +545,9 @@ class TBANSHelper:
         from google.appengine.api import taskqueue
 
         queue = taskqueue.Queue("push-notifications")
+
+        if not match.key_name:
+            return
 
         task_name = "{}_match_upcoming".format(match.key_name)
         # Cancel any previously-scheduled `match_upcoming` notifications for this match
