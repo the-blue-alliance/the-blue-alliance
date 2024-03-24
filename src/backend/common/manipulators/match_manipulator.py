@@ -179,7 +179,7 @@ class MatchPostUpdateHooks:
                 method="GET",
                 target="py3-tasks-io",
                 queue_name="stats",
-                countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
+                countdown=90,  # Wait ~1.5m so cache clearing can run before we attempt to recalculate district points
             )
         except Exception:
             logging.exception(f"Error enqueuing district_points_calc for {event_key}")
@@ -191,6 +191,7 @@ class MatchPostUpdateHooks:
                 method="GET",
                 target="py3-tasks-io",
                 queue_name="stats",
+                countdown=90,
             )
         except Exception:
             logging.exception(f"Error enqueuing event_team_status for {event_key}")
@@ -202,6 +203,7 @@ class MatchPostUpdateHooks:
                 method="GET",
                 target="py3-tasks-io",
                 queue_name="stats",
+                countdown=90,
             )
         except Exception:
             logging.exception(f"Error enqueuing advancement update for {event_key}")
@@ -213,6 +215,7 @@ class MatchPostUpdateHooks:
                 method="GET",
                 target="py3-tasks-io",
                 queue_name="stats",
+                countdown=90,  # Wait ~1.5m so cache clearing can run before we attempt to recalculate matchstats
             )
         except Exception:
             logging.exception(f"Error enqueuing event_matchstats for {event_key}")
