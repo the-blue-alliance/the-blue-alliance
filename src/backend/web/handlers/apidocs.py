@@ -1,10 +1,9 @@
 from datetime import timedelta
 
-from flask import Blueprint, make_response, redirect, request, Response, url_for
+from flask import Blueprint, jsonify, make_response, redirect, request, Response, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response as WerkzeugResponse
 
-from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.auth import current_user
 from backend.common.consts.notification_type import (
     ENABLED_NOTIFICATIONS,
@@ -54,13 +53,22 @@ def apidocs_v3() -> str:
 @blueprint.route("/webhooks")
 @cached_public(ttl=timedelta(weeks=1))
 def apidocs_webhooks() -> str:
-    template_values = {"enabled": ENABLED_NOTIFICATIONS, "types": NOTIFICATION_TYPES, "testing_enabled": False}
+    template_values = {
+        "enabled": ENABLED_NOTIFICATIONS,
+        "types": NOTIFICATION_TYPES,
+        "testing_enabled": False,
+    }
     return render_template("apidocs_webhooks.html", template_values)
+
 
 @blueprint.route("/webhooks/authenticated")
 @require_login
 def apidocs_webhooks_testing() -> str:
-    template_values = {"enabled": ENABLED_NOTIFICATIONS, "types": NOTIFICATION_TYPES, "testing_enabled": True}
+    template_values = {
+        "enabled": ENABLED_NOTIFICATIONS,
+        "types": NOTIFICATION_TYPES,
+        "testing_enabled": True,
+    }
     return render_template("apidocs_webhooks.html", template_values)
 
 
@@ -75,11 +83,9 @@ def apidocs_webhooks_notification(type: int) -> Response:
     user_id = str(user.uid)
 
     success_response = make_response("ok", 200)
+
     def error_response(message: str):
-        return make_response(
-            profiled_jsonify({"Error": message}),
-            400
-        )
+        return make_response(jsonify({"Error": message}), 400)
 
     try:
         notification_type = NotificationType(type)
