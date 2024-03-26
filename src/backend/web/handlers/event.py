@@ -254,7 +254,7 @@ def event_detail(event_key: EventKey) -> Response:
         "teams_b": teams_b,
         "num_teams": num_teams,
         "oprs": oprs,
-        "bracket_table": bracket_table,
+        "bracket_table": bracket_table or {},
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
         "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
