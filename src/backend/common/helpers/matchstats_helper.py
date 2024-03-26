@@ -120,6 +120,23 @@ MANUAL_COMPONENTS = {
                 match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
             ]
         ),
+        "Total Overall Game Pieces": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoAmpNoteCount", 0),
+                match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopAmpNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
+            ]
+        ),
+        "Amplification Rate": lambda match, color: match.score_breakdown[color].get(
+            "teleopSpeakerNoteAmplifiedCount", 0
+        )
+        / max(
+            1,
+            match.score_breakdown[color].get("teleopSpeakerNoteCount", 0)
+            + match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
+        ),
     },
 }
 
