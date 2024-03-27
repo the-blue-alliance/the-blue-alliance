@@ -425,11 +425,11 @@ class Event(CachedModel):
             # Group 2021 Events by their type - depends on both
             if week == 0:
                 return "Participation"
-            elif week == 2:
+            elif week == 6:
                 return "FIRST Innovation Challenge"
-            elif week == 3:
+            elif week == 7:
                 return "INFINITE RECHARGE At Home Challenge"
-            elif week == 4:
+            elif week == 8:
                 return "Game Design Challenge"
             else:
                 return "Awards"
