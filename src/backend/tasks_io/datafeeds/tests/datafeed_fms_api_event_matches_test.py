@@ -1,13 +1,14 @@
-from unittest.mock import call, Mock, patch
+from unittest.mock import call, patch
 
 import pytest
-from requests import Response
 
 from backend.common.frc_api import FRCAPI
+from backend.common.futures import InstantFuture
 from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
 )
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
+from backend.common.urlfetch import URLFetchResult
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_match_parser import (
     FMSAPIHybridScheduleParser,
@@ -24,17 +25,15 @@ def fms_api_secrets(ndb_stub):
 
 
 def test_get_event_matches() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = ""
+    response = URLFetchResult.mock_for_content("", 200, "")
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "match_schedule", return_value=response
+        FRCAPI, "match_schedule", return_value=InstantFuture(response)
     ) as mock_schedule_api, patch.object(
-        FRCAPI, "matches", return_value=response
+        FRCAPI, "matches", return_value=InstantFuture(response)
     ) as mock_matches_api, patch.object(
-        FRCAPI, "match_scores", return_value=response
+        FRCAPI, "match_scores", return_value=InstantFuture(response)
     ) as mock_match_scores_api, patch.object(
         FMSAPIHybridScheduleParser, "parse"
     ) as mock_schedule_parse, patch.object(
@@ -62,17 +61,15 @@ def test_get_event_matches() -> None:
 
 
 def test_get_event_matches_cmp() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = ""
+    response = URLFetchResult.mock_for_content("", 200, "")
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "match_schedule", return_value=response
+        FRCAPI, "match_schedule", return_value=InstantFuture(response)
     ) as mock_schedule_api, patch.object(
-        FRCAPI, "matches", return_value=response
+        FRCAPI, "matches", return_value=InstantFuture(response)
     ) as mock_matches_api, patch.object(
-        FRCAPI, "match_scores", return_value=response
+        FRCAPI, "match_scores", return_value=InstantFuture(response)
     ) as mock_match_scores_api, patch.object(
         FMSAPIHybridScheduleParser, "parse"
     ) as mock_schedule_parse, patch.object(

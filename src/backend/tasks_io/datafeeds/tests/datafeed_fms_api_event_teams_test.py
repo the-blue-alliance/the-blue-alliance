@@ -1,13 +1,14 @@
-from unittest.mock import call, Mock, patch
+from unittest.mock import call, patch
 
 import pytest
-from requests import Response
 
 from backend.common.frc_api import FRCAPI
+from backend.common.futures import InstantFuture
 from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
 )
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
+from backend.common.urlfetch import URLFetchResult
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
     FMSAPITeamDetailsParser,
@@ -20,15 +21,15 @@ def fms_api_secrets(ndb_stub):
 
 
 def test_get_event_teams() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = (
-        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1",
+        200,
+        "",
     )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "event_teams", return_value=response
+        FRCAPI, "event_teams", return_value=InstantFuture(response)
     ) as mock_api, patch.object(
         FMSAPITeamDetailsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
@@ -43,15 +44,15 @@ def test_get_event_teams() -> None:
 
 
 def test_get_event_teams_paginated() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = (
-        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1",
+        200,
+        "",
     )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "event_teams", return_value=response
+        FRCAPI, "event_teams", return_value=InstantFuture(response)
     ) as mock_api, patch.object(
         FMSAPITeamDetailsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
@@ -66,15 +67,15 @@ def test_get_event_teams_paginated() -> None:
 
 
 def test_get_event_teams_cmp() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = (
-        "https://frc-api.firstinspires.org/v3.0/2014/teams?eventCode=GALILEO&page=1"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2014/teams?eventCode=GALILEO&page=1",
+        200,
+        "",
     )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "event_teams", return_value=response
+        FRCAPI, "event_teams", return_value=InstantFuture(response)
     ) as mock_api, patch.object(
         FMSAPITeamDetailsParser, "__init__", return_value=None
     ) as mock_init, patch.object(

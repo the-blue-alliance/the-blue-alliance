@@ -1,15 +1,17 @@
 import datetime
-import json
 import logging
 import os
 import re
-from typing import Literal, Optional
+from typing import Any, Generator, Literal, Optional
 
-import requests
+from google.appengine.ext import ndb
 
+from backend.common.futures import TypedFuture
 from backend.common.models.keys import Year
 from backend.common.profiler import Span
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
+from backend.common.tasklets import typed_tasklet
+from backend.common.urlfetch import URLFetchResult
 
 
 TCompLevel = Literal["qual", "playoff"]
@@ -42,54 +44,60 @@ class FRCAPI:
                 f"Missing FRC API auth token. Setup {FMSApiSecrets.key()} sitevar."
             )
 
-        self.session = requests.Session()
-        self.session.headers.update({"Authorization": f"Basic {auth_token}"})
+        self.ndb_context = ndb.get_context()
+        self.auth_token = auth_token
         self._sim_time = sim_time
         self._sim_api_version = sim_api_version
 
-    def root(self) -> requests.Response:
+    def root(self) -> TypedFuture[URLFetchResult]:
         return self._get("/")
 
-    def team_details(self, year: Year, team_number: int) -> requests.Response:
+    def team_details(self, year: Year, team_number: int) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/teams?teamNumber={team_number}"
         return self._get(endpoint)
 
-    def team_avatar(self, year: Year, team_number: int) -> requests.Response:
+    def team_avatar(self, year: Year, team_number: int) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/avatars?teamNumber={team_number}"
         return self._get(endpoint)
 
-    def event_list(self, year: Year) -> requests.Response:
+    def event_list(self, year: Year) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/events"
         return self._get(endpoint)
 
-    def event_info(self, year: Year, event_short: str) -> requests.Response:
+    def event_info(self, year: Year, event_short: str) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/events?eventCode={event_short}"
         return self._get(endpoint)
 
-    def event_teams(self, year: Year, event_short: str, page: int) -> requests.Response:
+    def event_teams(
+        self, year: Year, event_short: str, page: int
+    ) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/teams?eventCode={event_short}&page={page}"
         return self._get(endpoint)
 
     def event_team_avatars(
         self, year: Year, event_short: str, page: int
-    ) -> requests.Response:
+    ) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/avatars?eventCode={event_short}&page={page}"
         return self._get(endpoint)
 
-    def alliances(self, year: Year, event_short: str) -> requests.Response:
+    def alliances(self, year: Year, event_short: str) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/alliances/{event_short}"
         return self._get(endpoint)
 
-    def rankings(self, year: Year, event_short: str) -> requests.Response:
+    def rankings(self, year: Year, event_short: str) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/rankings/{event_short}"
         return self._get(endpoint)
 
-    def match_schedule(self, year: Year, event_short: str, level: TCompLevel):
+    def match_schedule(
+        self, year: Year, event_short: str, level: TCompLevel
+    ) -> TypedFuture[URLFetchResult]:
         # This does not include results
         endpoint = f"/{year}/schedule/{event_short}?tournamentLevel={level}"
         return self._get(endpoint)
 
-    def matches(self, year: Year, event_short: str, level: TCompLevel):
+    def matches(
+        self, year: Year, event_short: str, level: TCompLevel
+    ) -> TypedFuture[URLFetchResult]:
         # This includes both played/unplayed matches at the event
         # but doesn't include full results
         endpoint = f"/{year}/matches/{event_short}?tournamentLevel={level}"
@@ -97,7 +105,7 @@ class FRCAPI:
 
     def match_scores(
         self, year: Year, event_short: str, level: TCompLevel
-    ) -> requests.Response:
+    ) -> TypedFuture[URLFetchResult]:
         # technically "qual"/"playoff" are invalid tournament levels as per the docs,
         # but they seem to work?
         endpoint = f"/{year}/scores/{event_short}/{level}"
@@ -108,7 +116,7 @@ class FRCAPI:
         year: Year,
         event_code: Optional[str] = None,
         team_number: Optional[int] = None,
-    ) -> requests.Response:
+    ) -> TypedFuture[URLFetchResult]:
         if not event_code and not team_number:
             raise FRCAPI.ValidationError(
                 "awards expects either an event_code, team_number, or both"
@@ -123,13 +131,13 @@ class FRCAPI:
 
         return self._get(endpoint)
 
-    def district_list(self, year: Year) -> requests.Response:
+    def district_list(self, year: Year) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/districts"
         return self._get(endpoint)
 
     def district_rankings(
         self, year: Year, district_short: str, page: int
-    ) -> requests.Response:
+    ) -> TypedFuture[URLFetchResult]:
         endpoint = (
             f"/{year}/rankings/district?districtCode={district_short}&page={page}"
         )
@@ -141,7 +149,10 @@ class FRCAPI:
             The Flask response object - should be used by the consumer.
     """
 
-    def _get(self, endpoint: str, version: str = "v3.0") -> requests.Response:
+    @typed_tasklet
+    def _get(
+        self, endpoint: str, version: str = "v3.0"
+    ) -> Generator[Any, Any, URLFetchResult]:
         # Remove any leading / - we'll add it later (safer then adding a slash)
         versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
         if self._sim_time is not None:
@@ -152,11 +163,12 @@ class FRCAPI:
             "Accept": "application/json",
             "Cache-Control": "no-cache, max-age=10",
             "Pragma": "no-cache",
+            "Authorization": f"Basic {self.auth_token}",
         }
 
         with Span(f"frc_api_fetch:{endpoint}"):
-            # TODO: Reenable SSL verification. Disabled on 2024-08-31 due to FIRST SSL issues.
-            return self.session.get(url, headers=headers, verify=False)
+            resp = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
+            return URLFetchResult(url, resp)
 
     @staticmethod
     def get_cached_gcs_files(gcs_dir_name: str):
@@ -189,9 +201,7 @@ class FRCAPI:
                     files.append(f"{safe_dir_name}/{safe_file_name}")
         return sorted(files)
 
-    def _get_simulated(self, endpoint: str, version: str) -> requests.Response:
-        from unittest.mock import Mock
-
+    def _get_simulated(self, endpoint: str, version: str) -> URLFetchResult:
         if version == "v2.0" and "/schedule" in endpoint and "hybrid" not in endpoint:
             # The hybrid schedule endpoint doesn't exist in newer versions,
             # so hack the URLs to make things work with older data
@@ -200,6 +210,9 @@ class FRCAPI:
             regex = re.search(r"/(\d+)/schedule/(\w+)\?tournamentLevel=(\w+)", endpoint)
             if regex:
                 endpoint = f"/{regex.group(1)}/schedule/{regex.group(2)}/{regex.group(3)}/hybrid"
+
+        versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
+        url = f"https://frc-api.firstinspires.org/{versioned_endpoint}"
 
         # Get list of responses
         try:
@@ -231,20 +244,9 @@ class FRCAPI:
                     content = f.read()
 
             if content is None:
-                empty_response = Mock(spec=requests.Response)
-                empty_response.status_code = 200
-                empty_response.json.return_value = {}
-                empty_response.url = ""
-                return empty_response
+                return URLFetchResult.mock_for_content(url, 200, "{}")
 
-            full_response = Mock(spec=requests.Response)
-            full_response.status_code = 200
-            full_response.json.return_value = json.loads(content)
-            full_response.url = ""
-            return full_response
+            return URLFetchResult.mock_for_content(url, 200, content)
         except Exception:
             logging.exception("Error fetching sim frc api")
-            error_response = Mock(spec=requests.Response)
-            error_response.status_code = 500
-            error_response.url = ""
-            return error_response
+            return URLFetchResult.mock_for_content(url, 500, "")
