@@ -72,6 +72,8 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         "roebling": ("roe", "Roebling"),
         "tesla": ("tes", "Tesla"),
         "turing": ("tur", "Turing"),
+        "johnson": ("joh", "Johnson"),
+        "milstein": ("mil", "Milstein"),
         # For Einstein, format with the name "Einstein" or "FIRST Championship" or whatever
         "cmp": ("cmp", "{}"),
         "cmpmi": ("cmpmi", "{} (Detroit)"),
