@@ -53,6 +53,8 @@ class Event(CachedModel):
         "roe": "roebling",
         "tes": "tesla",
         "tur": "turing",
+        "joh": "johnson",
+        "mil": "milstein",
     }
 
     EVENT_SHORT_EXCEPTIONS_2023 = {
