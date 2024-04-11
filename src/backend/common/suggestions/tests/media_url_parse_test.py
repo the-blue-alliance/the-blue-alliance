@@ -172,6 +172,7 @@ class TestMediaUrlParser(unittest.TestCase):
             result["profile_url"], "https://www.periscope.tv/evolution2626"
         )
 
+    @unittest.skip("Hitting grabcad rate limits")
     def test_grabcad_link(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "https://grabcad.com/library/2016-148-robowranglers-1"
