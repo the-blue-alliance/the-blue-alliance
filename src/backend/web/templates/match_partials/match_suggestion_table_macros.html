@@ -1,5 +1,5 @@
 {% macro team_summary(team_details) %}
-  <div class="panel panel-default" style="padding: 16px; text-align: left;">
+  <div class="panel panel-default" style="margin: 0; padding: 16px; text-align: left;">
     <h4>Team {{team_details.team.team_number}} - {{team_details.team.nickname}}</h4>
     <p>{{team_details.team.city_state_country}}</p>
     <p>Past Einstein: {% if team_details.past_einstein %}{% for year in team_details.past_einstein %}{{year}}{% if not loop.last%}, {% endif %}{% endfor %}{% else %}--{% endif %}</p>
