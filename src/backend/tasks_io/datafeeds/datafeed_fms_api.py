@@ -330,7 +330,9 @@ class DatafeedFMSAPI:
         # the team numbers in each station to None
         schedule_team_numbers = [t["teamNumber"] for t in scheduled.get(teams_key)]
         if set(schedule_team_numbers) == {1, 2, 3}:
-            scheduled["teams"] = [{**t, "teamNumber": None} for t in scheduled.get(teams_key)]
+            scheduled["teams"] = [
+                {**t, "teamNumber": None} for t in scheduled.get(teams_key)
+            ]
 
         for field, value in result.items():
             if field == teams_key:
