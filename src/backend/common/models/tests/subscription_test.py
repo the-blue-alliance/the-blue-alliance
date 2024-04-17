@@ -32,23 +32,25 @@ def test_subscriptions_for_event_year():
     event = EventTestCreator.create_future_event()
     # Make sure we match year*
     one = Subscription(
-        parent=ndb.Key(Account, 'user_id_1'),
-        user_id='user_id_1',
+        parent=ndb.Key(Account, "user_id_1"),
+        user_id="user_id_1",
         model_key=f"{event.year}*",
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     one.put()
     two = Subscription(
-        parent=ndb.Key(Account, 'user_id_2'),
-        user_id='user_id_2',
+        parent=ndb.Key(Account, "user_id_2"),
+        user_id="user_id_2",
         model_key=f"{event.year}*",
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.MATCH_SCORE]
+        notification_types=[NotificationType.MATCH_SCORE],
     )
     two.put()
 
-    subscriptions_future = Subscription.subscriptions_for_event(event, NotificationType.UPCOMING_MATCH)
+    subscriptions_future = Subscription.subscriptions_for_event(
+        event, NotificationType.UPCOMING_MATCH
+    )
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 1
     assert subscriptions[0].user_id == "user_id_1"
@@ -58,23 +60,25 @@ def test_subscriptions_for_event_key():
     event = EventTestCreator.create_future_event()
     # Make sure we match an event key
     one = Subscription(
-        parent=ndb.Key(Account, 'user_id_1'),
-        user_id='user_id_1',
+        parent=ndb.Key(Account, "user_id_1"),
+        user_id="user_id_1",
         model_key=event.key_name,
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     one.put()
     two = Subscription(
-        parent=ndb.Key(Account, 'user_id_2'),
-        user_id='user_id_2',
-        model_key='2020mike2',
+        parent=ndb.Key(Account, "user_id_2"),
+        user_id="user_id_2",
+        model_key="2020mike2",
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     two.put()
 
-    subscriptions_future = Subscription.subscriptions_for_event(event, NotificationType.UPCOMING_MATCH)
+    subscriptions_future = Subscription.subscriptions_for_event(
+        event, NotificationType.UPCOMING_MATCH
+    )
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 1
     assert subscriptions[0].user_id == "user_id_1"
@@ -84,23 +88,25 @@ def test_subscriptions_for_event_year_key():
     event = EventTestCreator.create_future_event()
     # Make sure we fetch both key and year together
     one = Subscription(
-        parent=ndb.Key(Account, 'user_id_1'),
-        user_id='user_id_1',
+        parent=ndb.Key(Account, "user_id_1"),
+        user_id="user_id_1",
         model_key=event.key_name,
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     one.put()
     two = Subscription(
-        parent=ndb.Key(Account, 'user_id_2'),
-        user_id='user_id_2',
+        parent=ndb.Key(Account, "user_id_2"),
+        user_id="user_id_2",
         model_key=f"{event.year}*",
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     two.put()
 
-    subscriptions_future = Subscription.subscriptions_for_event(event, NotificationType.UPCOMING_MATCH)
+    subscriptions_future = Subscription.subscriptions_for_event(
+        event, NotificationType.UPCOMING_MATCH
+    )
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 2
     assert one in subscriptions
@@ -108,31 +114,30 @@ def test_subscriptions_for_event_year_key():
 
 
 def test_subscriptions_for_event_model_type():
-    Team(
-        id="frc7332",
-        team_number=7332
-    ).put()
+    Team(id="frc7332", team_number=7332).put()
     event = EventTestCreator.create_future_event()
 
     # Make sure we filter for model types
     one = Subscription(
-        parent=ndb.Key(Account, 'user_id_1'),
-        user_id='user_id_1',
+        parent=ndb.Key(Account, "user_id_1"),
+        user_id="user_id_1",
         model_key=event.key_name,
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     one.put()
     two = Subscription(
-        parent=ndb.Key(Account, 'user_id_2'),
-        user_id='user_id_2',
+        parent=ndb.Key(Account, "user_id_2"),
+        user_id="user_id_2",
         model_key=event.teams[0].key_name,
         model_type=ModelType.TEAM,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     two.put()
 
-    subscriptions_future = Subscription.subscriptions_for_event(event, NotificationType.UPCOMING_MATCH)
+    subscriptions_future = Subscription.subscriptions_for_event(
+        event, NotificationType.UPCOMING_MATCH
+    )
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 1
     assert subscriptions[0].user_id == "user_id_1"
@@ -165,31 +170,30 @@ def test_subscriptions_for_event_model_type():
 
 
 def test_subscriptions_for_team_key():
-    team = Team(
-        id="frc7332",
-        team_number=7332
-    )
+    team = Team(id="frc7332", team_number=7332)
     team.put()
 
     # Make sure we match a team key
     one = Subscription(
-        parent=ndb.Key(Account, 'user_id_1'),
-        user_id='user_id_1',
+        parent=ndb.Key(Account, "user_id_1"),
+        user_id="user_id_1",
         model_key=team.key_name,
         model_type=ModelType.TEAM,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     one.put()
     two = Subscription(
-        parent=ndb.Key(Account, 'user_id_2'),
-        user_id='user_id_2',
+        parent=ndb.Key(Account, "user_id_2"),
+        user_id="user_id_2",
         model_key=team.key_name,
         model_type=ModelType.TEAM,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     two.put()
 
-    subscriptions_future = Subscription.subscriptions_for_team(team, NotificationType.UPCOMING_MATCH)
+    subscriptions_future = Subscription.subscriptions_for_team(
+        team, NotificationType.UPCOMING_MATCH
+    )
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 2
     assert one in subscriptions
@@ -197,33 +201,32 @@ def test_subscriptions_for_team_key():
 
 
 def test_subscriptions_for_team_model_type():
-    team = Team(
-        id="frc7332",
-        team_number=7332
-    )
+    team = Team(id="frc7332", team_number=7332)
     team.put()
 
     event = EventTestCreator.create_future_event()
 
     # Make sure we filter for model types
     one = Subscription(
-        parent=ndb.Key(Account, 'user_id_1'),
-        user_id='user_id_1',
+        parent=ndb.Key(Account, "user_id_1"),
+        user_id="user_id_1",
         model_key=event.key_name,
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     one.put()
     two = Subscription(
-        parent=ndb.Key(Account, 'user_id_2'),
-        user_id='user_id_2',
+        parent=ndb.Key(Account, "user_id_2"),
+        user_id="user_id_2",
         model_key=team.key_name,
         model_type=ModelType.TEAM,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     two.put()
 
-    subscriptions = Subscription.subscriptions_for_team(team, NotificationType.UPCOMING_MATCH)
+    subscriptions = Subscription.subscriptions_for_team(
+        team, NotificationType.UPCOMING_MATCH
+    )
     assert subscriptions.get_result() == [two]
 
 
@@ -269,23 +272,25 @@ def test_subscriptions_for_match_key():
     match = setup_matches()
     # Make sure we match a match key
     one = Subscription(
-        parent=ndb.Key(Account, 'user_id_1'),
-        user_id='user_id_1',
+        parent=ndb.Key(Account, "user_id_1"),
+        user_id="user_id_1",
         model_key=match.key_name,
         model_type=ModelType.MATCH,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     one.put()
     two = Subscription(
-        parent=ndb.Key(Account, 'user_id_2'),
-        user_id='user_id_2',
+        parent=ndb.Key(Account, "user_id_2"),
+        user_id="user_id_2",
         model_key=match.key_name,
         model_type=ModelType.MATCH,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     two.put()
 
-    subscriptions_future = Subscription.subscriptions_for_match(match, NotificationType.UPCOMING_MATCH)
+    subscriptions_future = Subscription.subscriptions_for_match(
+        match, NotificationType.UPCOMING_MATCH
+    )
     subscriptions = subscriptions_future.get_result()
     assert len(subscriptions) == 2
     assert one in subscriptions
@@ -296,23 +301,25 @@ def test_subscriptions_for_match_model_type():
     match = setup_matches()
     # Make sure we filter for model types
     one = Subscription(
-        parent=ndb.Key(Account, 'user_id_1'),
-        user_id='user_id_1',
+        parent=ndb.Key(Account, "user_id_1"),
+        user_id="user_id_1",
         model_key=match.key_name,
         model_type=ModelType.MATCH,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     one.put()
     two = Subscription(
-        parent=ndb.Key(Account, 'user_id_2'),
-        user_id='user_id_2',
+        parent=ndb.Key(Account, "user_id_2"),
+        user_id="user_id_2",
         model_key=match.key_name,
         model_type=ModelType.EVENT,
-        notification_types=[NotificationType.UPCOMING_MATCH]
+        notification_types=[NotificationType.UPCOMING_MATCH],
     )
     two.put()
 
-    subscriptions = Subscription.subscriptions_for_match(match, NotificationType.UPCOMING_MATCH)
+    subscriptions = Subscription.subscriptions_for_match(
+        match, NotificationType.UPCOMING_MATCH
+    )
     assert subscriptions.get_result() == [one]
 
 
