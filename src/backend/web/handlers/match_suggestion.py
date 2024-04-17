@@ -4,6 +4,7 @@ from collections import defaultdict
 from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
+from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.event_helper import EventHelper
@@ -57,34 +58,39 @@ def fetch_team_details_async(team_key: TeamKey):
     ).fetch_async()
 
     events_details = []
-    for event_team in event_teams:
-        event_key = event_team.key.id().split("_")[0]
-        event = yield Event.get_by_id_async(event_key)
-        event_details = yield EventDetailsQuery(event_key).fetch_async()
+    if event_teams is not None:
+        for event_team in event_teams:
+            event_key = event_team.key.id().split("_")[0]
+            event = yield Event.get_by_id_async(event_key)
+            event_details = yield EventDetailsQuery(event_key).fetch_async()
 
-        alliance = event_team.status["alliance"]["number"]
-        pick = event_team.status["alliance"]["pick"]
-        events_details.append(
-            {
-                "event_short": event.event_short,
-                "name": event.name,
-                "alliance": f"A{alliance}P{'C' if pick == 0 else pick}",
-                "finish": f"{event_team.status['playoff']['double_elim_round']} ({event_team.status['playoff']['status']})",
-                "auto_note_copr": event_details.coprs.get(
-                    "Total Auto Game Pieces", {}
-                ).get(team_key[3:]),
-                "teleop_note_copr": event_details.coprs.get(
-                    "Total Teleop Game Pieces", {}
-                ).get(team_key[3:]),
-                "trap_copr": event_details.coprs.get("Total Trap", {}).get(
-                    team_key[3:]
-                ),
-            }
-        )
+            if event is None or event_details is None:
+                continue
+
+            alliance = event_team.status["alliance"]["number"]
+            pick = event_team.status["alliance"]["pick"]
+            events_details.append(
+                {
+                    "event_short": event.event_short,
+                    "name": event.name,
+                    "alliance": f"A{alliance}P{'C' if pick == 0 else pick}",
+                    "finish": f"{event_team.status['playoff']['double_elim_round']} ({event_team.status['playoff']['status']})",
+                    "auto_note_copr": event_details.coprs.get(
+                        "Total Auto Game Pieces", {}
+                    ).get(team_key[3:]),
+                    "teleop_note_copr": event_details.coprs.get(
+                        "Total Teleop Game Pieces", {}
+                    ).get(team_key[3:]),
+                    "trap_copr": event_details.coprs.get("Total Trap", {}).get(
+                        team_key[3:]
+                    ),
+                }
+            )
 
     past_einstein = []
-    for division_win_award in division_win_awards:
-        past_einstein.append(division_win_award.year)
+    if division_win_awards is not None:
+        for division_win_award in division_win_awards:
+            past_einstein.append(division_win_award.year)
 
     return {
         "team": team,
@@ -121,7 +127,8 @@ def match_suggestion() -> Response:
                 continue
 
             for team_key in (
-                match.alliances["red"]["teams"] + match.alliances["blue"]["teams"]
+                match.alliances[AllianceColor.RED]["teams"]
+                + match.alliances[AllianceColor.BLUE]["teams"]
             ):
                 team_keys.add(team_key)
 
