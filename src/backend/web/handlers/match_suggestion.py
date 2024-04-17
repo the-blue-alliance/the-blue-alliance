@@ -14,7 +14,10 @@ from backend.common.models.event import Event
 from backend.common.models.team import Team
 from backend.common.queries.award_query import TeamEventTypeAwardsQuery
 from backend.common.queries.event_details_query import EventDetailsQuery
-from backend.common.queries.event_query import TeamYearEventTeamsQuery, TeamYearEventsQuery
+from backend.common.queries.event_query import (
+    TeamYearEventTeamsQuery,
+    TeamYearEventsQuery,
+)
 from backend.web.decorators import require_login
 from backend.web.profiled_render import render_template
 
@@ -62,26 +65,34 @@ def fetch_team_details_async(team_key: TeamKey):
         event = yield Event.get_by_id_async(event_key)
         event_details = yield EventDetailsQuery(event_key).fetch_async()
 
-        alliance = event_team.status['alliance']['number']
-        pick = event_team.status['alliance']['pick']
-        events_details.append({
-            'event_short': event.event_short,
-            'name': event.name,
-            'alliance': f"A{alliance}P{'C' if pick == 0 else pick}",
-            'finish': f"{event_team.status['playoff']['double_elim_round']} ({event_team.status['playoff']['status']})",
-            'auto_note_copr': event_details.coprs.get("Total Auto Game Pieces", {}).get(team_key[3:]),
-            'teleop_note_copr': event_details.coprs.get("Total Teleop Game Pieces", {}).get(team_key[3:]),
-            'trap_copr': event_details.coprs.get("Total Trap", {}).get(team_key[3:]),
-        })
+        alliance = event_team.status["alliance"]["number"]
+        pick = event_team.status["alliance"]["pick"]
+        events_details.append(
+            {
+                "event_short": event.event_short,
+                "name": event.name,
+                "alliance": f"A{alliance}P{'C' if pick == 0 else pick}",
+                "finish": f"{event_team.status['playoff']['double_elim_round']} ({event_team.status['playoff']['status']})",
+                "auto_note_copr": event_details.coprs.get(
+                    "Total Auto Game Pieces", {}
+                ).get(team_key[3:]),
+                "teleop_note_copr": event_details.coprs.get(
+                    "Total Teleop Game Pieces", {}
+                ).get(team_key[3:]),
+                "trap_copr": event_details.coprs.get("Total Trap", {}).get(
+                    team_key[3:]
+                ),
+            }
+        )
 
     past_einstein = []
     for division_win_award in division_win_awards:
         past_einstein.append(division_win_award.year)
 
     return {
-        'team': team,
-        'past_einstein': past_einstein,
-        'events': events_details,
+        "team": team,
+        "past_einstein": past_einstein,
+        "events": events_details,
     }
 
 
@@ -112,7 +123,9 @@ def match_suggestion() -> Response:
             if not match.time:
                 continue
 
-            for team_key in match.alliances['red']['teams'] + match.alliances['blue']['teams']:
+            for team_key in (
+                match.alliances["red"]["teams"] + match.alliances["blue"]["teams"]
+            ):
                 team_keys.add(team_key)
 
             if (
@@ -157,7 +170,7 @@ def match_suggestion() -> Response:
     team_details = {}
     for detail_future in team_detail_futures:
         detail = detail_future.get_result()
-        team_details[detail['team'].key.id()] = detail
+        team_details[detail["team"].key.id()] = detail
 
     template_values = {
         "finished_matches": finished_matches,
