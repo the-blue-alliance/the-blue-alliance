@@ -19,10 +19,10 @@ def get_qual_bluezone_score(prediction):
     )  # High score ~200, up to 50 BlueZone points
     skillPower = min(
         (
-            min(prediction["red"]["links"] / 9, 1)
-            + min(prediction["blue"]["links"] / 9, 1)
-            + min(prediction["red"]["charge_station_points"] / 42, 1)
-            + min(prediction["blue"]["charge_station_points"] / 42, 1)
+            min(prediction["red"]["note_scored"] / 21, 1)
+            + min(prediction["blue"]["note_scored"] / 21, 1)
+            + min(prediction["red"]["stage_points"] / 10, 1)
+            + min(prediction["blue"]["stage_points"] / 10, 1)
         )
         * 50
         / 4,
