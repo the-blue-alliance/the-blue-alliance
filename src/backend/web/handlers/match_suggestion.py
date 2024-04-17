@@ -1,23 +1,20 @@
-from collections import defaultdict
 import datetime
+from collections import defaultdict
 
-from werkzeug.wrappers import Response
 from google.appengine.ext import ndb
+from werkzeug.wrappers import Response
+
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
-
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.team_helper import TeamHelper
-from backend.common.models.keys import TeamKey
 from backend.common.models.event import Event
+from backend.common.models.keys import TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.award_query import TeamEventTypeAwardsQuery
 from backend.common.queries.event_details_query import EventDetailsQuery
-from backend.common.queries.event_query import (
-    TeamYearEventTeamsQuery,
-    TeamYearEventsQuery,
-)
+from backend.common.queries.event_query import TeamYearEventTeamsQuery
 from backend.web.decorators import require_login
 from backend.web.profiled_render import render_template
 
