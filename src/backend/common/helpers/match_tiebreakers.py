@@ -95,10 +95,7 @@ class MatchTiebreakers(object):
             tiebreakers.append(None)
 
         # ALLIANCE AUTO points
-        if (
-            "autoPoints" in red_breakdown
-            and "autoPoints" in blue_breakdown
-        ):
+        if "autoPoints" in red_breakdown and "autoPoints" in blue_breakdown:
             tiebreakers.append(
                 (
                     red_breakdown["autoPoints"],
@@ -109,9 +106,15 @@ class MatchTiebreakers(object):
             tiebreakers.append(None)
 
         # ALLIANCE STAGE points
-        if "endGameTotalStagePoints" in red_breakdown and "endGameTotalStagePoints" in blue_breakdown:
+        if (
+            "endGameTotalStagePoints" in red_breakdown
+            and "endGameTotalStagePoints" in blue_breakdown
+        ):
             tiebreakers.append(
-                (red_breakdown["endGameTotalStagePoints"], blue_breakdown["endGameTotalStagePoints"])
+                (
+                    red_breakdown["endGameTotalStagePoints"],
+                    blue_breakdown["endGameTotalStagePoints"],
+                )
             )
         else:
             tiebreakers.append(None)

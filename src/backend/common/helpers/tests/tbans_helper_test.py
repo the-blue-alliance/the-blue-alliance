@@ -178,9 +178,7 @@ class TestTBANSHelper(unittest.TestCase):
         ).put()
 
         TBANSHelper.alliance_selection(self.event)
-        tasks = self.taskqueue_stub.get_filtered_tasks(
-            queue_names="push-notifications"
-        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 2
 
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -269,9 +267,7 @@ class TestTBANSHelper(unittest.TestCase):
         ).put()
 
         TBANSHelper.awards(self.event)
-        tasks = self.taskqueue_stub.get_filtered_tasks(
-            queue_names="push-notifications"
-        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 3
 
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -408,9 +404,7 @@ class TestTBANSHelper(unittest.TestCase):
         ).put()
 
         TBANSHelper.event_level(self.match)
-        tasks = self.taskqueue_stub.get_filtered_tasks(
-            queue_names="push-notifications"
-        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 1
 
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -452,9 +446,7 @@ class TestTBANSHelper(unittest.TestCase):
         ).put()
 
         TBANSHelper.event_schedule(self.event)
-        tasks = self.taskqueue_stub.get_filtered_tasks(
-            queue_names="push-notifications"
-        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 1
 
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -524,9 +516,7 @@ class TestTBANSHelper(unittest.TestCase):
         ).put()
 
         TBANSHelper.match_score(self.match)
-        tasks = self.taskqueue_stub.get_filtered_tasks(
-            queue_names="push-notifications"
-        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 3
 
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -621,9 +611,7 @@ class TestTBANSHelper(unittest.TestCase):
         ).put()
 
         TBANSHelper.match_upcoming(self.match)
-        tasks = self.taskqueue_stub.get_filtered_tasks(
-            queue_names="push-notifications"
-        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 3
 
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -696,9 +684,7 @@ class TestTBANSHelper(unittest.TestCase):
         ).put()
 
         TBANSHelper.match_video(self.match)
-        tasks = self.taskqueue_stub.get_filtered_tasks(
-            queue_names="push-notifications"
-        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 3
 
         with patch.object(TBANSHelper, "_send") as mock_send:
@@ -1614,9 +1600,7 @@ class TestTBANSHelper(unittest.TestCase):
         ]
         notification = MockNotification()
         TBANSHelper._batch_send_subscriptions(subscriptions, notification)
-        tasks = self.taskqueue_stub.get_filtered_tasks(
-            queue_names="push-notifications"
-        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 2
 
     def test_send_subscriptions(self):

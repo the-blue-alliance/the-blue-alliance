@@ -48,7 +48,7 @@ class Subscription(MyTBAModel):
         subscriptions = yield Subscription.query(
             Subscription.model_key.IN([event.key_name, "{}*".format(event.year)]),
             Subscription.notification_types == notification_type,
-            Subscription.model_type == ModelType.EVENT
+            Subscription.model_type == ModelType.EVENT,
         ).fetch_async()
         return subscriptions
 
@@ -70,7 +70,7 @@ class Subscription(MyTBAModel):
         subscription = yield Subscription.query(
             Subscription.model_key == team.key_name,
             Subscription.notification_types == notification_type,
-            Subscription.model_type == ModelType.TEAM
+            Subscription.model_type == ModelType.TEAM,
         ).fetch_async()
         return subscription
 
@@ -91,6 +91,6 @@ class Subscription(MyTBAModel):
         subscriptions = yield Subscription.query(
             Subscription.model_key == match.key_name,
             Subscription.notification_types == notification_type,
-            Subscription.model_type == ModelType.MATCH
+            Subscription.model_type == ModelType.MATCH,
         ).fetch_async()
         return subscriptions
