@@ -94,16 +94,16 @@ def fetch_team_details_async(team_key: TeamKey):
                         else "N/A",
                         "auto_note_copr": event_details.coprs.get(
                             "Total Auto Game Pieces", {}
-                        ).get(team_key[3:])
+                        ).get(team_key[3:], 0)
                         if event_details.coprs
                         else 0,
                         "teleop_note_copr": event_details.coprs.get(
                             "Total Teleop Game Pieces", {}
-                        ).get(team_key[3:])
+                        ).get(team_key[3:], 0)
                         if event_details.coprs
                         else 0,
                         "trap_copr": event_details.coprs.get("Total Trap", {}).get(
-                            team_key[3:]
+                            team_key[3:], 0
                         )
                         if event_details.coprs
                         else 0,
