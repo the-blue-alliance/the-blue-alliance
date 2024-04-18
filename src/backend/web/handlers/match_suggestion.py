@@ -64,6 +64,8 @@ def fetch_team_details_async(team_key: TeamKey):
             try:
                 event_key = event_team.key.id().split("_")[0]
                 event = yield Event.get_by_id_async(event_key)
+                if event.now():
+                    continue
                 event_details = yield EventDetailsQuery(event_key).fetch_async()
 
                 if event is None or event_details is None:
@@ -83,6 +85,7 @@ def fetch_team_details_async(team_key: TeamKey):
                     {
                         "event_short": event.event_short,
                         "name": event.name,
+                        "start_date": event.start_date,
                         "alliance": f"A{alliance}P{'C' if pick == 0 else pick}"
                         if event_team.status["alliance"]
                         else "N/A",
@@ -118,7 +121,7 @@ def fetch_team_details_async(team_key: TeamKey):
     return {
         "team": team,
         "past_einstein": past_einstein,
-        "events": events_details,
+        "events": sorted(events_details, key=lambda x: x["start_date"]),
     }
 
 
