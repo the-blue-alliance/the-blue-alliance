@@ -64,7 +64,7 @@ def fetch_team_details_async(team_key: TeamKey):
             try:
                 event_key = event_team.key.id().split("_")[0]
                 event = yield Event.get_by_id_async(event_key)
-                if event.now():
+                if event.now:
                     continue
                 event_details = yield EventDetailsQuery(event_key).fetch_async()
 
