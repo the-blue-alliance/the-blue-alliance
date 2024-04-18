@@ -85,6 +85,7 @@ def fetch_team_details_async(team_key: TeamKey):
                     {
                         "event_short": event.event_short,
                         "name": event.name,
+                        "start_date": event.start_date,
                         "alliance": f"A{alliance}P{'C' if pick == 0 else pick}"
                         if event_team.status["alliance"]
                         else "N/A",
@@ -120,7 +121,7 @@ def fetch_team_details_async(team_key: TeamKey):
     return {
         "team": team,
         "past_einstein": past_einstein,
-        "events": events_details,
+        "events": sorted(events_details, key=lambda x: x["start_date"]),
     }
 
 
