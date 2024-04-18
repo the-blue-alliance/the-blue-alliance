@@ -11,6 +11,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.team_helper import TeamHelper
+from backend.common.memcache import MemcacheClient
 from backend.common.models.event import Event
 from backend.common.models.keys import TeamKey
 from backend.common.models.team import Team
@@ -46,6 +47,12 @@ def get_qual_bluezone_score(prediction):
 
 @ndb.tasklet
 def fetch_team_details_async(team_key: TeamKey):
+    memcache = MemcacheClient.get()
+    cache_key = f"match_suggestion_fetch_team_details{team_key}"
+    cached = memcache.get(cache_key)
+    if cached is not None:
+        return cached
+
     team = yield Team.get_by_id_async(team_key)
 
     current_year = datetime.datetime.now().year
@@ -118,11 +125,13 @@ def fetch_team_details_async(team_key: TeamKey):
         for division_win_award in division_win_awards:
             past_einstein.append(division_win_award.year)
 
-    return {
+    details = {
         "team": team,
         "past_einstein": past_einstein,
         "events": sorted(events_details, key=lambda x: x["start_date"]),
     }
+    memcache.set(cache_key, details, 60 * 60 * 24)
+    return details
 
 
 @require_login
