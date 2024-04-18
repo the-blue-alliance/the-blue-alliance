@@ -3,9 +3,9 @@
     <h4>Team {{team_details.team.team_number}} - {{team_details.team.nickname}}</h4>
     <p>{{team_details.team.city_state_country}}</p>
     <p>Past Einstein: {% if team_details.past_einstein %}{% for year in team_details.past_einstein %}{{year}}{% if not loop.last%}, {% endif %}{% endfor %}{% else %}--{% endif %}</p>
-    <p>Auto Note cOPR: {{team_details.events[-1].auto_note_copr|round(2)}}</p>
-    <p>Teleop Note cOPR: {{team_details.events[-1].teleop_note_copr|round(2)}}</p>
-    <p>Trap cOPR: {{team_details.events[-1].trap_copr|round(2)}}</p>
+    <p>Auto Note cOPR: {% if team_details.events|length > 0 %}{{team_details.events[-1].auto_note_copr|round(2)}}{% else %}--{% endif %}</p>
+    <p>Teleop Note cOPR: {% if team_details.events|length > 0 %}{{team_details.events[-1].teleop_note_copr|round(2)}}{% else %}--{% endif %}</p>
+    <p>Trap cOPR: {% if team_details.events|length > 0 %}{{team_details.events[-1].trap_copr|round(2)}}{% else %}--{% endif %}</p>
     {% for event in team_details.events %}
         <p data-toggle="tooltip" data-placement="top" title="{{event.name}}">[{{event.event_short|upper}}]: {{event.alliance}} | {{event.finish}}</p>
     {% endfor %}

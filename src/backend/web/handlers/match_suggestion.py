@@ -67,23 +67,41 @@ def fetch_team_details_async(team_key: TeamKey):
             if event is None or event_details is None:
                 continue
 
-            alliance = event_team.status["alliance"]["number"]
-            pick = event_team.status["alliance"]["pick"]
+            alliance = (
+                event_team.status["alliance"]["number"]
+                if event_team.status["alliance"]
+                else None
+            )
+            pick = (
+                event_team.status["alliance"]["pick"]
+                if event_team.status["alliance"]
+                else None
+            )
             events_details.append(
                 {
                     "event_short": event.event_short,
                     "name": event.name,
-                    "alliance": f"A{alliance}P{'C' if pick == 0 else pick}",
-                    "finish": f"{event_team.status['playoff']['double_elim_round']} ({event_team.status['playoff']['status']})",
+                    "alliance": f"A{alliance}P{'C' if pick == 0 else pick}"
+                    if event_team.status["alliance"]
+                    else "N/A",
+                    "finish": f"{event_team.status['playoff']['double_elim_round']} ({event_team.status['playoff']['status']})"
+                    if event_team.status["playoff"]
+                    else "N/A",
                     "auto_note_copr": event_details.coprs.get(
                         "Total Auto Game Pieces", {}
-                    ).get(team_key[3:]),
+                    ).get(team_key[3:])
+                    if event_details.coprs
+                    else 0,
                     "teleop_note_copr": event_details.coprs.get(
                         "Total Teleop Game Pieces", {}
-                    ).get(team_key[3:]),
+                    ).get(team_key[3:])
+                    if event_details.coprs
+                    else 0,
                     "trap_copr": event_details.coprs.get("Total Trap", {}).get(
                         team_key[3:]
-                    ),
+                    )
+                    if event_details.coprs
+                    else 0,
                 }
             )
 
