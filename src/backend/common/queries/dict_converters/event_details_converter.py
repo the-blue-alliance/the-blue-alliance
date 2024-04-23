@@ -57,9 +57,9 @@ class EventDetailsConverter(ConverterBase):
         event_details_dict = {
             "alliances": event_details.alliance_selections if event_details else [],
             "district_points": event_details.district_points if event_details else {},
-            "insights": event_details.insights
-            if event_details
-            else {"qual": {}, "playoff": {}},
+            "insights": (
+                event_details.insights if event_details else {"qual": {}, "playoff": {}}
+            ),
             "oprs": normalized_oprs if normalized_oprs else {},  # OPRs, DPRs, CCWMs
             "predictions": event_details.predictions if event_details else {},
             "rankings": rankings,

@@ -286,9 +286,9 @@ class EventSimulator:
                                         if match.key.id() == key:
                                             for color in ALLIANCE_COLORS:
                                                 match.alliances[color]["score"] = -1
-                                                match.alliances[color][
-                                                    "teams"
-                                                ] = alliances.get(color, [])
+                                                match.alliances[color]["teams"] = (
+                                                    alliances.get(color, [])
+                                                )
                                             match.alliances_json = json.dumps(
                                                 match.alliances
                                             )
@@ -338,9 +338,11 @@ class EventSimulator:
                 for alliance, wins in win_counts.items():
                     if wins == 2:
                         self._advancement_alliances["f1"][
-                            AllianceColor.RED
-                            if new_match.set_number == 1
-                            else AllianceColor.BLUE
+                            (
+                                AllianceColor.RED
+                                if new_match.set_number == 1
+                                else AllianceColor.BLUE
+                            )
                         ] = new_match.alliances[alliance]["teams"]
 
                         for match_set, alliances in self._advancement_alliances.items():
@@ -353,9 +355,9 @@ class EventSimulator:
                                         if match.key.id() == key:
                                             for color in ALLIANCE_COLORS:
                                                 match.alliances[color]["score"] = -1
-                                                match.alliances[color][
-                                                    "teams"
-                                                ] = alliances.get(color, [])
+                                                match.alliances[color]["teams"] = (
+                                                    alliances.get(color, [])
+                                                )
                                             match.alliances_json = json.dumps(
                                                 match.alliances
                                             )

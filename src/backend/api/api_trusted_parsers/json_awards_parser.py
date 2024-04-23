@@ -64,10 +64,10 @@ class JSONAwardsParser:
 
             recipient = AwardRecipient(
                 team_number=(
-                    int(team_key[3:]) if team_key[3:].isdigit() else team_key[3:]
-                )
-                if team_key
-                else None,
+                    (int(team_key[3:]) if team_key[3:].isdigit() else team_key[3:])
+                    if team_key
+                    else None
+                ),
                 awardee=awardee,
             )
 
