@@ -246,9 +246,9 @@ class PlayoffAdvancementHelper:
                     }
                 for color in [AllianceColor.RED, AllianceColor.BLUE]:
                     alliance = copy.copy(match.alliances[color]["teams"])
-                    bracket_table[comp_level][set_key][
-                        f"{color}_name"
-                    ] = cls._alliance_name(alliance, alliance_selections)
+                    bracket_table[comp_level][set_key][f"{color}_name"] = (
+                        cls._alliance_name(alliance, alliance_selections)
+                    )
                     for i, complete_alliance in enumerate(
                         complete_alliances
                     ):  # search for alliance. could be more efficient
@@ -380,13 +380,13 @@ class PlayoffAdvancementHelper:
                     ]
                     scores.append(match.alliances[color]["score"])
 
-                    per_alliance_advancement[comp_level][
-                        alliance_index
-                    ] = PlayoffAdvancement2015(
-                        complete_alliance=complete_alliances[alliance_index],
-                        scores=scores,
-                        average_score=float(sum(scores)) / len(scores),
-                        num_played=len(scores),
+                    per_alliance_advancement[comp_level][alliance_index] = (
+                        PlayoffAdvancement2015(
+                            complete_alliance=complete_alliances[alliance_index],
+                            scores=scores,
+                            average_score=float(sum(scores)) / len(scores),
+                            num_played=len(scores),
+                        )
                     )
 
             sorted_advancements: List[PlayoffAdvancement2015] = list(
@@ -526,12 +526,12 @@ class PlayoffAdvancementHelper:
         organized_matches: TOrganizedDoubleElimMatches,
         alliance_selections: Optional[List[EventAlliance]] = None,
     ) -> PlayoffAdvancementDoubleElimLevels:
-        rounds: defaultdict[
-            DoubleElimRound, PlayoffAdvancementDoubleElimRound
-        ] = defaultdict(
-            lambda: PlayoffAdvancementDoubleElimRound(
-                competing_alliances=[],
-                complete=False,
+        rounds: defaultdict[DoubleElimRound, PlayoffAdvancementDoubleElimRound] = (
+            defaultdict(
+                lambda: PlayoffAdvancementDoubleElimRound(
+                    competing_alliances=[],
+                    complete=False,
+                )
             )
         )
 

@@ -45,9 +45,9 @@ class FMSAPITeamDetailsParser(
                 name=teamData["nameFull"].strip(),
                 nickname=teamData["nameShort"].strip(),
                 school_name=teamData.get("schoolName"),
-                home_cmp=teamData.get("homeCMP").lower()
-                if teamData.get("homeCMP")
-                else None,
+                home_cmp=(
+                    teamData.get("homeCMP").lower() if teamData.get("homeCMP") else None
+                ),
                 city=teamData["city"],
                 state_prov=teamData["stateProv"],
                 country=teamData["country"],

@@ -81,10 +81,10 @@ class TBANSHelper:
                 if user_id:
                     cls._send([user_id], AllianceSelectionNotification(event, team))
                 else:
-                    team_subscriptions_futures[
-                        team_key
-                    ] = Subscription.subscriptions_for_team(
-                        team, NotificationType.ALLIANCE_SELECTION
+                    team_subscriptions_futures[team_key] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.ALLIANCE_SELECTION
+                        )
                     )
 
         if event_subscriptions_future:
@@ -144,10 +144,10 @@ class TBANSHelper:
                 if user_id:
                     cls._send([user_id], AwardsNotification(event, team))
                 elif team.key_name:
-                    team_subscriptions_futures[
-                        team.key_name
-                    ] = Subscription.subscriptions_for_team(
-                        team, NotificationType.AWARDS
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.AWARDS
+                        )
                     )
 
         if event_subscriptions_future:
@@ -270,10 +270,10 @@ class TBANSHelper:
                 if user_id:
                     cls._send([user_id], MatchScoreNotification(match, team))
                 elif team.key_name:
-                    team_subscriptions_futures[
-                        team.key_name
-                    ] = Subscription.subscriptions_for_team(
-                        team, NotificationType.MATCH_SCORE
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.MATCH_SCORE
+                        )
                     )
 
         # Send to Match subscribers
@@ -352,10 +352,10 @@ class TBANSHelper:
                 if user_id:
                     cls._send([user_id], MatchUpcomingNotification(match, team))
                 elif team.key_name:
-                    team_subscriptions_futures[
-                        team.key_name
-                    ] = Subscription.subscriptions_for_team(
-                        team, NotificationType.UPCOMING_MATCH
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.UPCOMING_MATCH
+                        )
                     )
 
         # Send to Match subscribers
@@ -423,10 +423,10 @@ class TBANSHelper:
                 if user_id:
                     cls._send([user_id], MatchVideoNotification(match, team))
                 elif team.key_name:
-                    team_subscriptions_futures[
-                        team.key_name
-                    ] = Subscription.subscriptions_for_team(
-                        team, NotificationType.MATCH_VIDEO
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.MATCH_VIDEO
+                        )
                     )
 
         # Send to Match subscribers

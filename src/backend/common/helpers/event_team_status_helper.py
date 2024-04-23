@@ -438,13 +438,15 @@ class EventTeamStatusHelper:
                         "rank": None,
                         "matches_played": matches_played,
                         "dq": None,
-                        "record": WLTRecord(
-                            wins=wins,
-                            losses=losses,
-                            ties=ties,
-                        )
-                        if year != 2015
-                        else None,
+                        "record": (
+                            WLTRecord(
+                                wins=wins,
+                                losses=losses,
+                                ties=ties,
+                            )
+                            if year != 2015
+                            else None
+                        ),
                         "qual_average": qual_average if year == 2015 else None,
                         "sort_orders": None,
                         "team_key": team_key,
@@ -829,9 +831,9 @@ class EventTeamStatusHelper:
                 "playoff_type": playoff_type,
                 "status": EventTeamPlayoffStatus.PLAYING,
                 "level": CompLevel.F if has_finals_match else CompLevel.SF,
-                "current_level_record": finals_record
-                if has_finals_match
-                else round_robin_record,
+                "current_level_record": (
+                    finals_record if has_finals_match else round_robin_record
+                ),
                 "record": overall_record,
                 "round_robin_rank": round_robin_rank,
                 "advanced_to_round_robin_finals": has_finals_match,

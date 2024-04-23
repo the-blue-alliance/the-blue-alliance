@@ -751,9 +751,7 @@ class PredictionHelper:
         )
 
     @classmethod
-    def get_match_predictions(
-        cls, matches: List[Match]
-    ) -> Tuple[
+    def get_match_predictions(cls, matches: List[Match]) -> Tuple[
         Optional[TMatchPredictions],
         Optional[TMatchPredictionStats],
         Optional[TEventStatMeanVars],
@@ -927,18 +925,26 @@ class PredictionHelper:
                     brier_scores[stat] = brier_sum / (2 * played_matches)
 
             prediction_stats[level] = MatchPredictionStatsLevel(
-                wl_accuracy=None
-                if played_matches == 0
-                else 100 * float(correct_predictions) / played_matches,
-                wl_accuracy_75=None
-                if played_matches_75 == 0
-                else 100 * float(correct_predictions_75) / played_matches_75,
-                err_mean=float(np.mean(np.asarray(score_differences)))
-                if score_differences
-                else None,
-                err_var=float(np.var(np.asarray(score_differences)))
-                if score_differences
-                else None,
+                wl_accuracy=(
+                    None
+                    if played_matches == 0
+                    else 100 * float(correct_predictions) / played_matches
+                ),
+                wl_accuracy_75=(
+                    None
+                    if played_matches_75 == 0
+                    else 100 * float(correct_predictions_75) / played_matches_75
+                ),
+                err_mean=(
+                    float(np.mean(np.asarray(score_differences)))
+                    if score_differences
+                    else None
+                ),
+                err_var=(
+                    float(np.var(np.asarray(score_differences)))
+                    if score_differences
+                    else None
+                ),
                 brier_scores=brier_scores,
             )
 
