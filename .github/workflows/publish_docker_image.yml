@@ -8,7 +8,7 @@ concurrency: docker-publish-${{ github.ref }}
 
 jobs:
   build_and_push:
-    name: Build and Push 
+    name: Build and Push
     runs-on: ubuntu-latest
     if: contains(github.event.commits[0].message, '[dockerpublish]') == true
     steps:
@@ -27,6 +27,7 @@ jobs:
       with:
         builder: ${{ steps.buildx.outputs.name }}
         context: ./ops/dev/docker
+        platforms: linux/amd64,linux/arm64
         push: true
         tags: ghcr.io/${{ github.repository }}/tba-py3-dev:latest
         cache-from: |
