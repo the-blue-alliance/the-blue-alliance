@@ -49,7 +49,7 @@ def get_qual_bluezone_score(prediction):
 def fetch_team_details_async(team_key: TeamKey):
     memcache = MemcacheClient.get()
     cache_key = f"match_suggestion_fetch_team_details{team_key}"
-    cached = memcache.get(cache_key)
+    cached = memcache.get(cache_key.encode())
     if cached is not None:
         return cached
 
@@ -130,7 +130,7 @@ def fetch_team_details_async(team_key: TeamKey):
         "past_einstein": past_einstein,
         "events": sorted(events_details, key=lambda x: x["start_date"]),
     }
-    memcache.set(cache_key, details, 60 * 60 * 24)
+    memcache.set(cache_key.encode(), details, 60 * 60 * 24)
     return details
 
 
