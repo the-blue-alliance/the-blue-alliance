@@ -57,7 +57,7 @@
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack --watch",
+    "dev": "cross-env NODE_ENV=development webpack --watch --progress",
     "build": "cross-env NODE_ENV=production webpack",
     "test": "jest -- ./src/",
     "testops": "jest -- ./ops/",

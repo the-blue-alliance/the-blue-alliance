@@ -7,7 +7,7 @@ services:
       context: ./
       dockerfile: ./ops/dev/docker/Dockerfile
     volumes:
-      - ./:/tba:delegated
+      - ./:/tba
     tty: true
     stdin_open: true
     ports:
@@ -39,3 +39,4 @@ services:
     hostname: tba
     environment:
       - PUPPETEER_SKIP_DOWNLOAD=true
+      - WATCHPACK_POLLING=true
