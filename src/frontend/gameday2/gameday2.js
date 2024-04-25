@@ -1,11 +1,14 @@
 import "./gameday2.less";
 
 import { indigo } from "@mui/material/colors";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import queryString from "query-string";
 import React from "react";
 import ReactDOM from "react-dom";
+import ReactGA from "react-ga";
 import { Provider } from "react-redux";
+import { applyMiddleware, compose, createStore } from "redux";
+import thunk from "redux-thunk";
 import {
   addWebcastAtPosition,
   setChatSidebarVisibility,
@@ -18,7 +21,7 @@ import {
 } from "./actions";
 import GamedayFrame from "./components/GamedayFrame";
 import { MAX_SUPPORTED_VIEWS } from "./constants/LayoutConstants";
-import { firedux } from "./reducers";
+import gamedayReducer, { firedux } from "./reducers";
 
 ReactGA.initialize("UA-1090782-9");
 
