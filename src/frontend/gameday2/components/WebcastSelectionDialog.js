@@ -1,7 +1,7 @@
-import GradeIcon from '@mui/icons-material/Grade';
-import HelpIcon from '@mui/icons-material/Help';
-import VideoCamIcon from '@mui/icons-material/VideoCam';
-import VideocamOffIcon from '@mui/icons-material/VideocamOff';
+import GradeIcon from "@mui/icons-material/Grade";
+import HelpIcon from "@mui/icons-material/Help";
+import VideoCamIcon from "@mui/icons-material/VideoCam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import { Dialog, Divider, List, ListItem, ListSubheader } from "@mui/material";
 import Button from "@mui/material/Button";
 import { green, indigo } from "@mui/material/colors";
@@ -159,7 +159,10 @@ export default class WebcastSelectionDialog extends React.Component {
         allWebcastItems.push(<Divider key="offlineSpecialWebcastsDivider" />);
       }
       allWebcastItems.push(
-        <ListSubheader key="offlineSpecialWebcastsHeader" style={subheaderStyle}>
+        <ListSubheader
+          key="offlineSpecialWebcastsHeader"
+          style={subheaderStyle}
+        >
           Offline Special Webcasts
         </ListSubheader>
       );
@@ -178,11 +181,7 @@ export default class WebcastSelectionDialog extends React.Component {
     }
 
     const actions = [
-      <Button
-        label="Cancel"
-        onClick={() => this.onRequestClose()}
-        primary
-      />,
+      <Button label="Cancel" onClick={() => this.onRequestClose()} primary />,
     ];
 
     const titleStyle = {

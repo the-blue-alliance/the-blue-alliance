@@ -67,11 +67,7 @@ export default class SwapPositionDialog extends React.Component {
     }
 
     const actions = [
-      <Button
-        label="Cancel"
-        primary
-        onClick={() => this.onRequestClose()}
-      />,
+      <Button label="Cancel" primary onClick={() => this.onRequestClose()} />,
     ];
 
     const bodyStyle = {
@@ -84,9 +80,9 @@ export default class SwapPositionDialog extends React.Component {
     };
 
     useEffect(() => {
-      window.addEventListener('resize', this.updateSizing);
+      window.addEventListener("resize", this.updateSizing);
       return () => {
-        window.removeEventListener('resize', this.updateSizing);
+        window.removeEventListener("resize", this.updateSizing);
       };
     }, []);
 

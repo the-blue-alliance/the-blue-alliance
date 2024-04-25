@@ -83,9 +83,9 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
     };
 
     useEffect(() => {
-      window.addEventListener('resize', this.updateSizing);
+      window.addEventListener("resize", this.updateSizing);
       return () => {
-        window.removeEventListener('resize', this.updateSizing);
+        window.removeEventListener("resize", this.updateSizing);
       };
     }, []);
 
