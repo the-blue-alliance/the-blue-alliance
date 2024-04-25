@@ -1,14 +1,12 @@
-import React from "react";
+import { List, ListItem, Paper } from "@mui/material";
 import PropTypes from "prop-types";
-import Paper from "material-ui/Paper";
-import { List, ListItem } from "material-ui/List";
-import EventListener from "react-event-listener";
-import { getLayoutSvgIcon } from "../utils/layoutUtils";
+import React from "react";
 import {
-  NUM_LAYOUTS,
   LAYOUT_DISPLAY_ORDER,
   NAME_FOR_LAYOUT,
+  NUM_LAYOUTS,
 } from "../constants/LayoutConstants";
+import { getLayoutSvgIcon } from "../utils/layoutUtils";
 
 export default class LayoutSelectionPanelMaterial extends React.Component {
   static propTypes = {
@@ -84,6 +82,13 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
       borderBottom: "1px solid rgb(224, 224, 224)",
     };
 
+    useEffect(() => {
+      window.addEventListener('resize', this.updateSizing);
+      return () => {
+        window.removeEventListener('resize', this.updateSizing);
+      };
+    }, []);
+
     return (
       <div
         style={componentStyle}
@@ -92,7 +97,6 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
         }}
       >
         <Paper style={containerStyles}>
-          <EventListener target="window" onResize={() => this.updateSizing()} />
           <h3 style={titleStyle}>Select a layout</h3>
           <div
             ref={(e) => {

@@ -1,8 +1,8 @@
+import SvgIcon from "@mui/material/SvgIcon";
 import React from "react";
-import SvgIcon from "material-ui/SvgIcon";
 import {
-  NUM_VIEWS_FOR_LAYOUT,
   LAYOUT_SVG_PATHS,
+  NUM_VIEWS_FOR_LAYOUT,
 } from "../constants/LayoutConstants";
 
 // Convenience wrapper around NUM_VIEWS_FOR_LAYOUT that has bounds checking and

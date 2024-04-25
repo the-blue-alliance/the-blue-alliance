@@ -1,6 +1,6 @@
-import React from "react";
+import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
-import muiThemeable from "material-ui/styles/muiThemeable";
+import React from "react";
 import VideoGridContainer from "../containers/VideoGridContainer";
 import LayoutSelectionPanel from "./LayoutSelectionPanel";
 import NoWebcasts from "./NoWebcasts";
@@ -18,6 +18,8 @@ import NoWebcasts from "./NoWebcasts";
  * If webcasts are present and a layout is set, this displays the video grid.
  */
 const MainContent = (props) => {
+  const theme = useTheme();
+
   let child = null;
 
   if (props.webcasts.length === 0) {
@@ -33,16 +35,12 @@ const MainContent = (props) => {
 
   const contentStyles = {
     position: "absolute",
-    top: props.muiTheme.layout.appBarHeight,
+    top: theme.layout.appBarHeight,
     left: 0,
     right: 0,
     bottom: 0,
-    marginRight: props.chatSidebarVisible
-      ? props.muiTheme.layout.chatPanelWidth
-      : 0,
-    marginLeft: props.hashtagSidebarVisible
-      ? props.muiTheme.layout.socialPanelWidth
-      : 0,
+    marginRight: props.chatSidebarVisible ? theme.layout.chatPanelWidth : 0,
+    marginLeft: props.hashtagSidebarVisible ? theme.layout.socialPanelWidth : 0,
   };
 
   return <div style={contentStyles}>{child}</div>;
@@ -57,4 +55,4 @@ MainContent.propTypes = {
   muiTheme: PropTypes.object.isRequired,
 };
 
-export default muiThemeable()(MainContent);
+export default MainContent;

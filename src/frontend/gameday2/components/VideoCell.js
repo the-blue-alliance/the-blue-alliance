@@ -1,17 +1,17 @@
-import React from "react";
+import Button from "@mui/material/Button";
 import PropTypes from "prop-types";
-import RaisedButton from "material-ui/RaisedButton";
-import WebcastEmbed from "./WebcastEmbed";
-import VideoCellAnalyticsTracker from "./VideoCellAnalyticsTracker";
-import LivescoreDisplayContainer from "../containers/LivescoreDisplayContainer";
-import VideoCellToolbarContainer from "../containers/VideoCellToolbarContainer";
-import WebcastSelectionDialogContainer from "../containers/WebcastSelectionDialogContainer";
-import SwapPositionDialogContainer from "../containers/SwapPositionDialogContainer";
-import { webcastPropType } from "../utils/webcastUtils";
+import React from "react";
 import {
   LAYOUT_STYLES,
   NUM_VIEWS_FOR_LAYOUT,
 } from "../constants/LayoutConstants";
+import LivescoreDisplayContainer from "../containers/LivescoreDisplayContainer";
+import SwapPositionDialogContainer from "../containers/SwapPositionDialogContainer";
+import VideoCellToolbarContainer from "../containers/VideoCellToolbarContainer";
+import WebcastSelectionDialogContainer from "../containers/WebcastSelectionDialogContainer";
+import { webcastPropType } from "../utils/webcastUtils";
+import VideoCellAnalyticsTracker from "./VideoCellAnalyticsTracker";
+import WebcastEmbed from "./WebcastEmbed";
 
 export default class VideoCell extends React.Component {
   static propTypes = {
@@ -149,11 +149,12 @@ export default class VideoCell extends React.Component {
     return (
       <div style={cellStyle}>
         <div style={emptyContainerStyle}>
-          <RaisedButton
+          <Button
             label={buttonLabel}
             style={centerButtonStyle}
             disabled={!webcastsAreAvailable}
             onClick={() => this.onRequestOpenWebcastSelectionDialog()}
+            variant="contained"
           />
         </div>
         <WebcastSelectionDialogContainer

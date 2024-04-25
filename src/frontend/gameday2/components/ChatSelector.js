@@ -1,10 +1,9 @@
-import React from "react";
+import CheckIcon from "@mui/icons-material/Check";
+import HomeIcon from "@mui/icons-material/Home";
+import { List, ListItem, Paper } from "@mui/material";
 import PropTypes from "prop-types";
-import ReactTransitionGroup from "react-addons-transition-group";
-import { List, ListItem } from "material-ui/List";
-import Paper from "material-ui/Paper";
-import ActionHome from "material-ui/svg-icons/action/home";
-import CheckmarkIcon from "material-ui/svg-icons/navigation/check";
+import React from "react";
+import { TransitionGroup } from "react-transition-group";
 import { chatPropType } from "../utils/PropTypes";
 import AnimatableContainer from "./AnimatableContainer";
 
@@ -28,7 +27,7 @@ export default class ChatSelector extends React.Component {
     this.props.chats.forEach((chat) => {
       const isSelected = chat.channel === this.props.currentChat;
       const isDefault = chat.channel === this.props.defaultChat;
-      const icon = isSelected ? <CheckmarkIcon /> : null;
+      const icon = isSelected ? <CheckIcon /> : null;
 
       let chatName = chat.name;
       if (chat.channel === "firstupdatesnow" && isDefault) {
@@ -40,7 +39,7 @@ export default class ChatSelector extends React.Component {
       chatItems.push(
         <ListItem
           primaryText={chatName}
-          leftIcon={isDefault ? <ActionHome /> : null}
+          leftIcon={isDefault ? <HomeIcon /> : null}
           rightIcon={icon}
           onClick={(e) => this.setTwitchChat(e, chat.channel)}
           key={chat.channel}
@@ -68,7 +67,7 @@ export default class ChatSelector extends React.Component {
     };
 
     return (
-      <ReactTransitionGroup component="div">
+      <TransitionGroup component="div">
         {this.props.open && (
           <AnimatableContainer
             key="overlay"
@@ -100,7 +99,7 @@ export default class ChatSelector extends React.Component {
             </Paper>
           </AnimatableContainer>
         )}
-      </ReactTransitionGroup>
+      </TransitionGroup>
     );
   }
 }

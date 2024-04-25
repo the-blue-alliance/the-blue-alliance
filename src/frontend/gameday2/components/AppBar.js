@@ -1,42 +1,42 @@
-import React from "react";
+import { Button, IconButton, Toolbar } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
-import { Toolbar, ToolbarTitle, ToolbarGroup } from "material-ui/Toolbar";
-import FlatButton from "material-ui/FlatButton";
-import IconButton from "material-ui/IconButton";
-import muiThemeable from "material-ui/styles/muiThemeable";
-import LayoutDrawer from "./LayoutDrawer";
+import React from "react";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import LampIcon from "./LampIcon";
+import LayoutDrawer from "./LayoutDrawer";
 
 const AppBar = (props) => {
+  const theme = useTheme();
+
   const tbaBrandingButtonStyle = {
     padding: 0,
     marginLeft: 8,
     marginRight: 8,
-    width: props.muiTheme.layout.appBarHeight,
-    height: props.muiTheme.layout.appBarHeight,
+    width: theme.layout.appBarHeight,
+    height: theme.layout.appBarHeight,
   };
 
   const configureLayoutButtonStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: theme.appBar.textColor,
   };
 
   const appBarStyle = {
-    height: props.muiTheme.layout.appBarHeight,
-    backgroundColor: props.muiTheme.palette.primary1Color,
+    height: theme.layout.appBarHeight,
+    backgroundColor: theme.palette.primary1Color,
     position: "relative",
-    zIndex: props.muiTheme.zIndex.appBar,
+    zIndex: theme.zIndex.appBar,
     paddingRight: 0,
   };
 
   const appBarTitleStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: theme.appBar.textColor,
     fontSize: "24px",
     overflow: "visible",
   };
 
   const appBarSubtitleStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: theme.appBar.textColor,
     textDecoration: "none",
     fontSize: 12,
   };
@@ -49,14 +49,14 @@ const AppBar = (props) => {
       href="https://www.thebluealliance.com"
     >
       <LampIcon
-        width={props.muiTheme.layout.appBarHeight}
-        height={props.muiTheme.layout.appBarHeight}
+        width={theme.layout.appBarHeight}
+        height={theme.layout.appBarHeight}
       />
     </IconButton>
   );
 
   const configureLayoutButton = (
-    <FlatButton
+    <Button
       label="Configure Layout"
       labelPosition="before"
       style={configureLayoutButtonStyle}
@@ -118,4 +118,4 @@ AppBar.propTypes = {
   muiTheme: PropTypes.object.isRequired,
 };
 
-export default muiThemeable()(AppBar);
+export default AppBar;

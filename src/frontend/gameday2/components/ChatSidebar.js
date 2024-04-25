@@ -1,14 +1,13 @@
-import React from "react";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import { IconButton, Toolbar } from "@mui/material";
+import white from "@mui/material/colors/common";
+import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
-import muiThemeable from "material-ui/styles/muiThemeable";
-import IconButton from "material-ui/IconButton";
-import ArrowDropUp from "material-ui/svg-icons/navigation/arrow-drop-up";
-import { Toolbar, ToolbarGroup, ToolbarTitle } from "material-ui/Toolbar";
-import { white } from "material-ui/styles/colors";
-import ChatAnalyticsTracker from "./ChatAnalyticsTracker";
-import TwitchChatEmbed from "./TwitchChatEmbed";
-import ChatSelector from "./ChatSelector";
+import React from "react";
 import { chatPropType } from "../utils/PropTypes";
+import ChatAnalyticsTracker from "./ChatAnalyticsTracker";
+import ChatSelector from "./ChatSelector";
+import TwitchChatEmbed from "./TwitchChatEmbed";
 
 class ChatSidebar extends React.Component {
   static propTypes = {
@@ -60,16 +59,18 @@ class ChatSidebar extends React.Component {
   }
 
   render() {
+    const theme = useTheme();
+
     const metrics = {
       switcherHeight: 36,
     };
 
     const panelContainerStyle = {
       position: "absolute",
-      top: this.props.muiTheme.layout.appBarHeight,
+      top: theme.layout.appBarHeight,
       right: 0,
       bottom: 0,
-      width: this.props.muiTheme.layout.chatPanelWidth,
+      width: theme.layout.chatPanelWidth,
       background: "#EFEEF1",
       display: this.props.enabled ? null : "none",
       zIndex: 1000,
@@ -87,7 +88,7 @@ class ChatSidebar extends React.Component {
       bottom: 0,
       height: metrics.switcherHeight,
       width: "100%",
-      background: this.props.muiTheme.palette.primary1Color,
+      background: theme.palette.primary1Color,
       cursor: "pointer",
     };
 
@@ -132,7 +133,8 @@ class ChatSidebar extends React.Component {
       }
     }
 
-    let content;
+    let content = <div />;
+
     if (this.props.hasBeenVisible) {
       content = (
         <div style={panelContainerStyle}>
@@ -149,7 +151,7 @@ class ChatSidebar extends React.Component {
                 style={toolbarButtonStyle}
                 iconStyle={toolbarButtonIconStyle}
               >
-                <ArrowDropUp color={white} />
+                <ArrowDropUpIcon color={white} />
               </IconButton>
             </ToolbarGroup>
           </Toolbar>
@@ -166,12 +168,10 @@ class ChatSidebar extends React.Component {
           )}
         </div>
       );
-    } else {
-      content = <div />;
     }
 
     return content;
   }
 }
 
-export default muiThemeable()(ChatSidebar);
+export default ChatSidebar;

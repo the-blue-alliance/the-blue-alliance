@@ -1,13 +1,11 @@
-import React from "react";
+import { Button, Dialog } from "@mui/material";
 import PropTypes from "prop-types";
-import Dialog from "material-ui/Dialog";
-import FlatButton from "material-ui/FlatButton";
-import EventListener from "react-event-listener";
-import SwapPositionPreviewCell from "./SwapPositionPreviewCell";
+import React from "react";
 import {
-  NUM_VIEWS_FOR_LAYOUT,
   LAYOUT_STYLES,
+  NUM_VIEWS_FOR_LAYOUT,
 } from "../constants/LayoutConstants";
+import SwapPositionPreviewCell from "./SwapPositionPreviewCell";
 
 export default class SwapPositionDialog extends React.Component {
   static propTypes = {
@@ -69,7 +67,7 @@ export default class SwapPositionDialog extends React.Component {
     }
 
     const actions = [
-      <FlatButton
+      <Button
         label="Cancel"
         primary
         onClick={() => this.onRequestClose()}
@@ -85,6 +83,13 @@ export default class SwapPositionDialog extends React.Component {
       position: "relative",
     };
 
+    useEffect(() => {
+      window.addEventListener('resize', this.updateSizing);
+      return () => {
+        window.removeEventListener('resize', this.updateSizing);
+      };
+    }, []);
+
     return (
       <Dialog
         title="Select a position to swap with"
@@ -95,7 +100,6 @@ export default class SwapPositionDialog extends React.Component {
         onRequestClose={() => this.onRequestClose()}
         autoScrollBodyContent
       >
-        <EventListener target="window" onResize={() => this.updateSizing()} />
         <div
           style={previewContainerStyle}
           ref={(e) => {

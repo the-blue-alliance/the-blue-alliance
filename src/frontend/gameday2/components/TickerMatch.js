@@ -1,6 +1,9 @@
-import React from "react";
+import {
+  default as black,
+  default as white,
+} from "@mui/material/colors/common";
 import PropTypes from "prop-types";
-import { black, white } from "material-ui/styles/colors";
+import React from "react";
 
 const TickerMatch = (props) => {
   const matchStyle = {
