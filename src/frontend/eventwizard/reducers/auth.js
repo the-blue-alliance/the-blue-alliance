@@ -1,8 +1,8 @@
 import {
-  UPDATE_AUTH,
   CLEAR_AUTH,
   SET_EVENT,
   SET_MANUAL_EVENT,
+  UPDATE_AUTH,
 } from "../constants/ActionTypes";
 
 const defaultState = {

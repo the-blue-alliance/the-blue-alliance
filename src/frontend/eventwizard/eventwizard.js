@@ -1,18 +1,15 @@
 import "./eventwizard.less";
 
+import { configureStore } from "@reduxjs/toolkit";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { applyMiddleware, compose, createStore } from "redux";
-import { thunk } from "redux-thunk";
 import EventWizardFrame from "./components/EventWizardFrame";
 import eventwizardReducer from "./reducers";
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(
-  eventwizardReducer,
-  composeEnhancers(applyMiddleware(thunk))
-);
+const store = configureStore({
+  reducer: eventwizardReducer,
+});
 
 const container = document.getElementById("content");
 const root = createRoot(container);
