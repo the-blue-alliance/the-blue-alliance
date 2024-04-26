@@ -2,13 +2,12 @@ import "./gameday2.less";
 
 import { indigo } from "@mui/material/colors";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { configureStore } from "@reduxjs/toolkit";
 import queryString from "query-string";
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import ReactGA from "react-ga";
 import { Provider } from "react-redux";
-import { applyMiddleware, compose, createStore } from "redux";
-import thunk from "redux-thunk";
 import {
   addWebcastAtPosition,
   setChatSidebarVisibility,
@@ -30,14 +29,12 @@ const webcastData = JSON.parse(
 );
 const defaultChat = document.getElementById("default_chat").innerHTML;
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(
-  gamedayReducer,
-  composeEnhancers(applyMiddleware(thunk))
-);
+const store = configureStore({
+  reducer: gamedayReducer,
+});
 firedux.dispatch = store.dispatch;
 
-const muiTheme = createTheme({
+const theme = createTheme({
   palette: {
     primary1Color: indigo[500],
     primary2Color: indigo[700],
@@ -47,15 +44,19 @@ const muiTheme = createTheme({
     socialPanelWidth: 300,
     chatPanelWidth: 300,
   },
+  appBar: {
+    textColor: "white",
+  },
 });
 
-ReactDOM.render(
-  <ThemeProvider muiTheme={muiTheme}>
+const container = document.getElementById("content");
+const root = createRoot(container);
+root.render(
+  <ThemeProvider theme={theme}>
     <Provider store={store}>
       <GamedayFrame />
     </Provider>
-  </ThemeProvider>,
-  document.getElementById("content")
+  </ThemeProvider>
 );
 
 // Subscribe to changes in state.videoGrid.displayed to watch the correct Firebase paths

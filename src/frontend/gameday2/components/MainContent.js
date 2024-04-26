@@ -52,7 +52,6 @@ MainContent.propTypes = {
   chatSidebarVisible: PropTypes.bool.isRequired,
   layoutSet: PropTypes.bool.isRequired,
   setLayout: PropTypes.func.isRequired,
-  muiTheme: PropTypes.object.isRequired,
 };
 
 export default MainContent;

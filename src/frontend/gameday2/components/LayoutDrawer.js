@@ -33,7 +33,6 @@ class LayoutDrawer extends React.Component {
     toggleChatSidebarVisibility: PropTypes.func.isRequired,
     toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
     resetWebcasts: PropTypes.func.isRequired,
-    muiTheme: PropTypes.object.isRequired,
   };
 
   handleResetWebcasts() {

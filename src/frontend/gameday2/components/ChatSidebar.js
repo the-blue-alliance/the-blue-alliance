@@ -19,9 +19,8 @@ class ChatSidebar extends React.Component {
     currentChat: PropTypes.string.isRequired,
     defaultChat: PropTypes.string.isRequired,
     setTwitchChat: PropTypes.func.isRequired,
-    muiTheme: PropTypes.object.isRequired,
-    setChatSidebarVisibility: PropTypes.object.isRequired,
-    setHashtagSidebarVisibility: PropTypes.object.isRequired,
+    setChatSidebarVisibility: PropTypes.func.isRequired,
+    setHashtagSidebarVisibility: PropTypes.func.isRequired,
   };
 
   constructor(props) {

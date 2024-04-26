@@ -1,6 +1,5 @@
-import { Button, IconButton, Toolbar } from "@mui/material";
+import { Button, IconButton, Toolbar, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import PropTypes from "prop-types";
 import React from "react";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import LampIcon from "./LampIcon";
@@ -27,6 +26,7 @@ const AppBar = (props) => {
     position: "relative",
     zIndex: theme.zIndex.appBar,
     paddingRight: 0,
+    justifyContent: "space-between",
   };
 
   const appBarTitleStyle = {
@@ -42,25 +42,24 @@ const AppBar = (props) => {
   };
 
   const tbaBrandingButton = (
-    <IconButton
-      style={tbaBrandingButtonStyle}
-      tooltip="Go to The Blue Alliance"
-      tooltipPosition="bottom-right"
-      href="https://www.thebluealliance.com"
-    >
-      <LampIcon
-        width={theme.layout.appBarHeight}
-        height={theme.layout.appBarHeight}
-      />
-    </IconButton>
+    <Tooltip title="Go to The Blue Alliance" placement="bottom-end">
+      <IconButton
+        style={tbaBrandingButtonStyle}
+        href="https://www.thebluealliance.com"
+      >
+        <LampIcon
+          width={theme.layout.appBarHeight}
+          height={theme.layout.appBarHeight}
+        />
+      </IconButton>
+    </Tooltip>
   );
 
   const configureLayoutButton = (
     <Button
       label="Configure Layout"
-      labelPosition="before"
       style={configureLayoutButtonStyle}
-      icon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
+      endIcon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
       onClick={() => props.setLayoutDrawerVisibility(true)}
     />
   );
@@ -68,9 +67,9 @@ const AppBar = (props) => {
   return (
     <div>
       <Toolbar style={appBarStyle}>
-        <ToolbarGroup firstChild>
+        <div>
           {tbaBrandingButton}
-          <ToolbarTitle text="GameDay" style={appBarTitleStyle} />
+          <div style={appBarTitleStyle}>GameDay</div>
           <a style={appBarSubtitleStyle} href="/">
             by The Blue Alliance
           </a>
@@ -83,8 +82,8 @@ const AppBar = (props) => {
             data-show-faces="false"
             data-share="false"
           />
-        </ToolbarGroup>
-        <ToolbarGroup lastChild>{configureLayoutButton}</ToolbarGroup>
+        </div>
+        <div>{configureLayoutButton}</div>
       </Toolbar>
       <LayoutDrawer
         setLayout={props.setLayout}
@@ -101,21 +100,6 @@ const AppBar = (props) => {
       />
     </div>
   );
-};
-
-AppBar.propTypes = {
-  webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
-  hashtagSidebarVisible: PropTypes.bool.isRequired,
-  chatSidebarVisible: PropTypes.bool.isRequired,
-  resetWebcasts: PropTypes.func.isRequired,
-  toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
-  toggleChatSidebarVisibility: PropTypes.func.isRequired,
-  setLayout: PropTypes.func.isRequired,
-  layoutId: PropTypes.number.isRequired,
-  layoutSet: PropTypes.bool.isRequired,
-  layoutDrawerVisible: PropTypes.bool.isRequired,
-  setLayoutDrawerVisibility: PropTypes.func.isRequired,
-  muiTheme: PropTypes.object.isRequired,
 };
 
 export default AppBar;
