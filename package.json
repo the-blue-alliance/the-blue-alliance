@@ -9,6 +9,7 @@
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
+    "@reduxjs/toolkit": "^2.2.3",
     "classnames": "^2.5.1",
     "element-resize-event": "^3.0.6",
     "firebase": "^10.11.0",
