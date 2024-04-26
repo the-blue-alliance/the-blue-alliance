@@ -28,9 +28,6 @@
     "react-redux": "^9.1.1",
     "react-select": "^5.8.0",
     "react-transition-group": "^4.4.5",
-    "redux": "^5.0.1",
-    "redux-thunk": "^3.1.0",
-    "reselect": "^5.1.0",
     "swagger-ui": "4.17.1"
   },
   "devDependencies": {
