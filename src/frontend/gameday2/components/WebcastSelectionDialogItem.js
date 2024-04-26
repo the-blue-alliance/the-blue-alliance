@@ -1,6 +1,6 @@
-import React from "react";
+import { ListItem } from "@mui/material";
 import PropTypes from "prop-types";
-import { ListItem } from "material-ui/List";
+import React from "react";
 
 export default class WebcastSelectionDialogItem extends React.Component {
   static propTypes = {

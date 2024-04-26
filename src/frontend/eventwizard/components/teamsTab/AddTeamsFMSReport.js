@@ -1,6 +1,5 @@
-import React, { Component } from "react";
 import PropTypes from "prop-types";
-// import FileInput from "react-file-input";
+import React, { Component } from "react";
 import TeamList from "./TeamList";
 
 class AddTeamsFMSReport extends Component {

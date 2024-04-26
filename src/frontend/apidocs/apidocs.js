@@ -1,11 +1,10 @@
 import "./apidocs.less";
 
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import ApiDocsFrame from "./ApiDocsFrame";
 
 const swaggerUrl = document.getElementById("swagger_url").innerHTML;
-ReactDOM.render(
-  <ApiDocsFrame url={swaggerUrl} />,
-  document.getElementById("content")
-);
+const container = document.getElementById("content");
+const root = createRoot(container);
+root.render(<ApiDocsFrame url={swaggerUrl} />);

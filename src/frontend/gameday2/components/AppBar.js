@@ -1,66 +1,65 @@
+import { Button, IconButton, Toolbar, Tooltip } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import React from "react";
-import PropTypes from "prop-types";
-import { Toolbar, ToolbarTitle, ToolbarGroup } from "material-ui/Toolbar";
-import FlatButton from "material-ui/FlatButton";
-import IconButton from "material-ui/IconButton";
-import muiThemeable from "material-ui/styles/muiThemeable";
-import LayoutDrawer from "./LayoutDrawer";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import LampIcon from "./LampIcon";
+import LayoutDrawer from "./LayoutDrawer";
 
 const AppBar = (props) => {
+  const theme = useTheme();
+
   const tbaBrandingButtonStyle = {
     padding: 0,
     marginLeft: 8,
     marginRight: 8,
-    width: props.muiTheme.layout.appBarHeight,
-    height: props.muiTheme.layout.appBarHeight,
+    width: theme.layout.appBarHeight,
+    height: theme.layout.appBarHeight,
   };
 
   const configureLayoutButtonStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: theme.appBar.textColor,
   };
 
   const appBarStyle = {
-    height: props.muiTheme.layout.appBarHeight,
-    backgroundColor: props.muiTheme.palette.primary1Color,
+    height: theme.layout.appBarHeight,
+    backgroundColor: theme.palette.primary1Color,
     position: "relative",
-    zIndex: props.muiTheme.zIndex.appBar,
+    zIndex: theme.zIndex.appBar,
     paddingRight: 0,
+    justifyContent: "space-between",
   };
 
   const appBarTitleStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: theme.appBar.textColor,
     fontSize: "24px",
     overflow: "visible",
   };
 
   const appBarSubtitleStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: theme.appBar.textColor,
     textDecoration: "none",
     fontSize: 12,
   };
 
   const tbaBrandingButton = (
-    <IconButton
-      style={tbaBrandingButtonStyle}
-      tooltip="Go to The Blue Alliance"
-      tooltipPosition="bottom-right"
-      href="https://www.thebluealliance.com"
-    >
-      <LampIcon
-        width={props.muiTheme.layout.appBarHeight}
-        height={props.muiTheme.layout.appBarHeight}
-      />
-    </IconButton>
+    <Tooltip title="Go to The Blue Alliance" placement="bottom-end">
+      <IconButton
+        style={tbaBrandingButtonStyle}
+        href="https://www.thebluealliance.com"
+      >
+        <LampIcon
+          width={theme.layout.appBarHeight}
+          height={theme.layout.appBarHeight}
+        />
+      </IconButton>
+    </Tooltip>
   );
 
   const configureLayoutButton = (
-    <FlatButton
+    <Button
       label="Configure Layout"
-      labelPosition="before"
       style={configureLayoutButtonStyle}
-      icon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
+      endIcon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
       onClick={() => props.setLayoutDrawerVisibility(true)}
     />
   );
@@ -68,9 +67,9 @@ const AppBar = (props) => {
   return (
     <div>
       <Toolbar style={appBarStyle}>
-        <ToolbarGroup firstChild>
+        <div>
           {tbaBrandingButton}
-          <ToolbarTitle text="GameDay" style={appBarTitleStyle} />
+          <div style={appBarTitleStyle}>GameDay</div>
           <a style={appBarSubtitleStyle} href="/">
             by The Blue Alliance
           </a>
@@ -83,8 +82,8 @@ const AppBar = (props) => {
             data-show-faces="false"
             data-share="false"
           />
-        </ToolbarGroup>
-        <ToolbarGroup lastChild>{configureLayoutButton}</ToolbarGroup>
+        </div>
+        <div>{configureLayoutButton}</div>
       </Toolbar>
       <LayoutDrawer
         setLayout={props.setLayout}
@@ -103,19 +102,4 @@ const AppBar = (props) => {
   );
 };
 
-AppBar.propTypes = {
-  webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
-  hashtagSidebarVisible: PropTypes.bool.isRequired,
-  chatSidebarVisible: PropTypes.bool.isRequired,
-  resetWebcasts: PropTypes.func.isRequired,
-  toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
-  toggleChatSidebarVisibility: PropTypes.func.isRequired,
-  setLayout: PropTypes.func.isRequired,
-  layoutId: PropTypes.number.isRequired,
-  layoutSet: PropTypes.bool.isRequired,
-  layoutDrawerVisible: PropTypes.bool.isRequired,
-  setLayoutDrawerVisibility: PropTypes.func.isRequired,
-  muiTheme: PropTypes.object.isRequired,
-};
-
-export default muiThemeable()(AppBar);
+export default AppBar;

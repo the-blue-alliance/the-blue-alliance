@@ -3,11 +3,11 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/database";
 import Firedux from "firedux";
 import { combineReducers } from "redux";
-import { webcastsById, specialWebcastIds } from "./webcastsById";
-import visibility from "./visibility";
-import videoGrid from "./videoGrid";
 import chats from "./chats";
 import favoriteTeams from "./favorites";
+import videoGrid from "./videoGrid";
+import visibility from "./visibility";
+import { specialWebcastIds, webcastsById } from "./webcastsById";
 
 // Firebase
 const firebaseApp = firebase.initializeApp({

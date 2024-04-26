@@ -1,5 +1,5 @@
+import Button from "@mui/material/Button";
 import React from "react";
-import RaisedButton from "material-ui/RaisedButton";
 
 export default () => (
   <div className="no-webcasts-container">
@@ -8,9 +8,10 @@ export default () => (
       Looks like there aren&apos;t any events with webcasts this week. Check on
       The Blue Alliance for upcoming events!
     </p>
-    <RaisedButton
+    <Button
       href="https://www.thebluealliance.com"
       label="Go to The Blue Alliance"
+      variant="contained"
     />
   </div>
 );

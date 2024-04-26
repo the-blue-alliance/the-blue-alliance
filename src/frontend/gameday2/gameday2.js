@@ -1,28 +1,26 @@
 import "./gameday2.less";
 
+import { indigo } from "@mui/material/colors";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { configureStore } from "@reduxjs/toolkit";
+import queryString from "query-string";
 import React from "react";
+import { createRoot } from "react-dom/client";
 import ReactGA from "react-ga";
 import { Provider } from "react-redux";
-import thunk from "redux-thunk";
-import { createStore, applyMiddleware, compose } from "redux";
-import ReactDOM from "react-dom";
-import queryString from "query-string";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import { indigo500, indigo700 } from "material-ui/styles/colors";
-import getMuiTheme from "material-ui/styles/getMuiTheme";
-import GamedayFrame from "./components/GamedayFrame";
-import gamedayReducer, { firedux } from "./reducers";
 import {
-  setWebcastsRaw,
-  setLayout,
   addWebcastAtPosition,
-  setTwitchChat,
-  setDefaultTwitchChat,
   setChatSidebarVisibility,
+  setDefaultTwitchChat,
   setFavoriteTeams,
+  setLayout,
+  setTwitchChat,
+  setWebcastsRaw,
   togglePositionLivescore,
 } from "./actions";
+import GamedayFrame from "./components/GamedayFrame";
 import { MAX_SUPPORTED_VIEWS } from "./constants/LayoutConstants";
+import gamedayReducer, { firedux } from "./reducers";
 
 ReactGA.initialize("UA-1090782-9");
 
@@ -31,32 +29,34 @@ const webcastData = JSON.parse(
 );
 const defaultChat = document.getElementById("default_chat").innerHTML;
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(
-  gamedayReducer,
-  composeEnhancers(applyMiddleware(thunk))
-);
+const store = configureStore({
+  reducer: gamedayReducer,
+});
 firedux.dispatch = store.dispatch;
 
-const muiTheme = getMuiTheme({
+const theme = createTheme({
   palette: {
-    primary1Color: indigo500,
-    primary2Color: indigo700,
+    primary1Color: indigo[500],
+    primary2Color: indigo[700],
   },
   layout: {
     appBarHeight: 36,
     socialPanelWidth: 300,
     chatPanelWidth: 300,
   },
+  appBar: {
+    textColor: "white",
+  },
 });
 
-ReactDOM.render(
-  <MuiThemeProvider muiTheme={muiTheme}>
+const container = document.getElementById("content");
+const root = createRoot(container);
+root.render(
+  <ThemeProvider theme={theme}>
     <Provider store={store}>
       <GamedayFrame />
     </Provider>
-  </MuiThemeProvider>,
-  document.getElementById("content")
+  </ThemeProvider>
 );
 
 // Subscribe to changes in state.videoGrid.displayed to watch the correct Firebase paths

@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
     jq \
     tmux \
     vim \
-    openssh-server
+    openssh-server \
+    inotify-tools
 
 # Needed for Python 3.12
 RUN apt-get install software-properties-common -y
