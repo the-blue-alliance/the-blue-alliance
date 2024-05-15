@@ -182,8 +182,48 @@ class TeamRenderer:
                     None,
                 )
 
+            alliance = None
+            alliance_pick = None
+            if event.details and event.details.alliance_selections:
+                for alliance_check in event.details.alliance_selections:
+                    print(alliance_check)
+                    if team.key_name in alliance_check["picks"]:
+                        alliance = alliance_check
+                        if team.key_name == alliance_check["picks"][0]:
+                            alliance_pick = "Captain"
+                        else:
+                            index = alliance_check["picks"].index(team.key_name)
+                            alliance_pick = f"Pick {index}"
+
+                    if "backup" in alliance_check and alliance_check["backup"] and alliance_check["backup"]["in"] == team.key_name:
+                        alliance = alliance_check
+                        alliance_pick = "the backup"
+            
+            alliance_status = None 
+            if alliance and "status" in alliance:
+                status = alliance["status"]
+                if "status" in status:
+                    if status["status"] == "won":
+                        alliance_status = "won the event"
+                    elif "double_elim_round" in status:
+                        alliance_status = f"were eliminated in {status["double_elim_round"]}"
+                    elif "level" in status:
+                        level = {
+                            "sf": "semifinals",
+                            "f": "finals",
+                            "qf": "quarterfinals"
+                        }
+                        level_achieved = level.get(status["level"])
+                        if level_achieved:
+                            alliance_status = f"were eliminated in {level_achieved}"
+                    
+
+
             participation.append(
                 {
+                    "alliance": alliance,
+                    "alliance_pick": alliance_pick,
+                    "alliance_status": alliance_status,
                     "event": event,
                     "matches": matches_organized,
                     "match_count": match_count,
