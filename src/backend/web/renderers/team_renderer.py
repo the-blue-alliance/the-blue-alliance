@@ -195,29 +195,33 @@ class TeamRenderer:
                             index = alliance_check["picks"].index(team.key_name)
                             alliance_pick = f"Pick {index}"
 
-                    if "backup" in alliance_check and alliance_check["backup"] and alliance_check["backup"]["in"] == team.key_name:
+                    if (
+                        "backup" in alliance_check
+                        and alliance_check["backup"]
+                        and alliance_check["backup"]["in"] == team.key_name
+                    ):
                         alliance = alliance_check
                         alliance_pick = "the backup"
-            
-            alliance_status = None 
+
+            alliance_status = None
             if alliance and "status" in alliance:
                 status = alliance["status"]
                 if "status" in status:
                     if status["status"] == "won":
                         alliance_status = "won the event"
                     elif "double_elim_round" in status:
-                        alliance_status = f"were eliminated in {status["double_elim_round"]}"
+                        alliance_status = (
+                            f"were eliminated in {status['double_elim_round']}"
+                        )
                     elif "level" in status:
                         level = {
                             "sf": "semifinals",
                             "f": "finals",
-                            "qf": "quarterfinals"
+                            "qf": "quarterfinals",
                         }
                         level_achieved = level.get(status["level"])
                         if level_achieved:
                             alliance_status = f"were eliminated in {level_achieved}"
-                    
-
 
             participation.append(
                 {
