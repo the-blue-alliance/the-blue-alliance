@@ -42,7 +42,8 @@ class FMSAPITeamDetailsParser(
             team = Team(
                 id="frc{}".format(teamData["teamNumber"]),
                 team_number=teamData["teamNumber"],
-                name=teamData["nameFull"].strip(),
+                # Off-season Demo Team has None as nameFull
+                name=teamData["nameFull"].strip() if teamData["nameFull"] else None,
                 nickname=teamData["nameShort"].strip(),
                 school_name=teamData.get("schoolName"),
                 home_cmp=teamData.get("homeCMP").lower()
