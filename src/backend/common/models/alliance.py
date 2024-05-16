@@ -1,5 +1,6 @@
 from typing import List, TypedDict
 
+from backend.common.models.event_team_status import EventTeamStatusPlayoff
 from backend.common.models.keys import TeamKey
 
 
@@ -10,6 +11,7 @@ class _EventAllianceOptional(TypedDict, total=False):
     declines: List[TeamKey]
     name: str
     backup: EventAllianceBackup
+    status: EventTeamStatusPlayoff
 
 
 class EventAlliance(_EventAllianceOptional, total=True):

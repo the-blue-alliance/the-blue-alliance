@@ -84,3 +84,12 @@ SEASON_EVENT_TYPES: Set[EventType] = {
     EventType.FOC,
     EventType.REMOTE,
 }
+
+KNOWN_EVENT_TYPE_ALLIANCE_SIZES: Dict[EventType, int] = {
+    EventType.REGIONAL: 3,
+    EventType.DISTRICT: 3,
+    EventType.DISTRICT_CMP: 3,
+    EventType.DISTRICT_CMP_DIVISION: 3,
+    EventType.CMP_DIVISION: 4,
+    EventType.CMP_FINALS: 4,
+}

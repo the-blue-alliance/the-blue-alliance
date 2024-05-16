@@ -3,9 +3,10 @@ from typing import cast, Dict, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
-from backend.common.consts import comp_level, event_type
+from backend.common.consts import event_type
 from backend.common.consts.award_type import AwardType
-from backend.common.consts.event_type import EventType
+from backend.common.consts.comp_level import COMP_LEVELS, COMP_LEVELS_VERBOSE_FULL
+from backend.common.consts.event_type import EventType, KNOWN_EVENT_TYPE_ALLIANCE_SIZES
 from backend.common.consts.media_tag import MediaTag
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
@@ -167,7 +168,7 @@ class TeamRenderer:
             playlist = PlaylistHelper.generate_playlist_link(
                 matches_organized=matches_organized,
                 title="{} (Team {})".format(event.name, team.team_number),
-                allow_levels=comp_level.COMP_LEVELS,
+                allow_levels=COMP_LEVELS,
             )
 
             district_points = None
@@ -182,6 +183,10 @@ class TeamRenderer:
                     None,
                 )
 
+            alliance_size = KNOWN_EVENT_TYPE_ALLIANCE_SIZES.get(
+                event.event_type_enum, 99
+            )
+
             alliance = None
             alliance_pick = None
             if event.details and event.details.alliance_selections:
@@ -193,7 +198,10 @@ class TeamRenderer:
                             alliance_pick = "Captain"
                         else:
                             index = alliance_check["picks"].index(team.key_name)
-                            alliance_pick = f"Pick {index}"
+                            if index >= alliance_size:
+                                alliance_pick = "the backup"
+                            else:
+                                alliance_pick = f"Pick {index}"
 
                     if (
                         "backup" in alliance_check
@@ -214,12 +222,7 @@ class TeamRenderer:
                             f"were eliminated in {status['double_elim_round']}"
                         )
                     elif "level" in status:
-                        level = {
-                            "sf": "semifinals",
-                            "f": "finals",
-                            "qf": "quarterfinals",
-                        }
-                        level_achieved = level.get(status["level"])
+                        level_achieved = COMP_LEVELS_VERBOSE_FULL.get(status["level"])
                         if level_achieved:
                             alliance_status = f"were eliminated in {level_achieved}"
 
@@ -228,6 +231,7 @@ class TeamRenderer:
                     "alliance": alliance,
                     "alliance_pick": alliance_pick,
                     "alliance_status": alliance_status,
+                    "alliance_size": alliance_size,
                     "event": event,
                     "matches": matches_organized,
                     "match_count": match_count,

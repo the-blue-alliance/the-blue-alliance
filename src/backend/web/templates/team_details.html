@@ -160,7 +160,11 @@
                         {% if loop.first %}
                           Captain
                         {% else %}
+                        {% if loop.index0 >= comp.alliance_size %}
+                          Backup
+                        {% else%}
                           Pick {{loop.index0}}
+                        {% endif %}
                         {% endif %}
                         {% if pick == team.key_name %}</strong>{% endif %}
                       </td>
