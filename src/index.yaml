@@ -91,6 +91,11 @@ indexes:
     properties:
       - name: team
       - name: year
+
+  - kind: EventTeam
+    properties:
+      - name: team
+      - name: year
       - name: event
 
   - kind: Insight
