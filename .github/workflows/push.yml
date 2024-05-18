@@ -49,6 +49,9 @@ jobs:
   py3-test:
     name: "[py3] Test"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        group: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.12
@@ -64,7 +67,7 @@ jobs:
           pip install -r src/requirements.txt
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/test_py3.sh
+        run: ./ops/test_py3.sh --splits 3 --group ${{ matrix.group }}
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         uses: codecov/codecov-action@v4.4.0
