@@ -360,6 +360,7 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
     ),
     2024: set(
         [
+            "autoLineRobot1",
             "endGameRobot1",
             "autoLineRobot2",
             "endGameRobot2",
