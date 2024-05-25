@@ -53,9 +53,9 @@ class FMSAPIAwardsParser(ParserJSON[List[Award]]):
                 awards_by_type[award_type_enum] = {
                     "name_str": award["name"],
                     "award_type_enum": award_type_enum,
-                    "team_number_list": [team_number]
-                    if team_number is not None
-                    else [],
+                    "team_number_list": (
+                        [team_number] if team_number is not None else []
+                    ),
                     "recipient_list": [recipient],
                 }
 

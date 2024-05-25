@@ -74,7 +74,7 @@
         <tr>
             <td></td>
             <td rowspan="2" class="match">
-                {{ bracket_match('Match 1', bracket_table.sf.get('sf1'), 'Alliance 1', 'Alliance 4') }}
+                {{ bracket_match('Match 1', bracket_table.get('sf', {}).get('sf1'), 'Alliance 1', 'Alliance 4') }}
             </td>
         </tr>
 
@@ -97,7 +97,7 @@
             <td colspan="4"></td>
             <td class="dash" colspan="2"></td>
             <td rowspan="2" class="match">
-                {{ bracket_match('Match 3', bracket_table.sf.get('sf3'), 'Winner of M1', 'Winner of M2') }}
+                {{ bracket_match('Match 3', bracket_table.get('sf', {}).get('sf3'), 'Winner of M1', 'Winner of M2') }}
             </td>
         </tr>
 
@@ -122,7 +122,7 @@
         <tr>
             <td></td>
             <td rowspan="2" class="match">
-                {{ bracket_match('Match 2', bracket_table.sf.get('sf2'), 'Alliance 2', 'Alliance 3') }}
+                {{ bracket_match('Match 2', bracket_table.get('sf', {}).get('sf2'), 'Alliance 2', 'Alliance 3') }}
             </td>
         </tr>
 
@@ -131,7 +131,7 @@
             <td colspan="10"></td>
             <td class="dash" colspan="1"></td>
             <td rowspan="2" class="match">
-                {{ bracket_match('Finals', bracket_table.f.get('f1'), 'Winner of M4', 'Winner of M5') }}
+                {{ bracket_match('Finals', bracket_table.get('f', {}).get('f1'), 'Winner of M4', 'Winner of M5') }}
             </td>
         </tr>
 
@@ -152,7 +152,7 @@
             <td colspan="10"></td>
             <td class="dash"></td>
             <td rowspan="2" class="match">
-                {{ bracket_match('Match 5', bracket_table.sf.get('sf5'), 'Loser of M3', 'Winner of M4') }}
+                {{ bracket_match('Match 5', bracket_table.get('sf', {}).get('sf5'), 'Loser of M3', 'Winner of M4') }}
             </td>
         </tr>
 
@@ -178,7 +178,7 @@
             <td rowspan="2"></td>
             <td colspan="3"></td>
             <td rowspan="2" class="match">
-                {{ bracket_match('Match 4', bracket_table.sf.get('sf4'), 'Loser of M1', 'Loser of M2') }}
+                {{ bracket_match('Match 4', bracket_table.get('sf', {}).get('sf4'), 'Loser of M1', 'Loser of M2') }}
             </td>
         </tr>
 

@@ -1,9 +1,8 @@
 import json
-import logging
-import traceback
 from typing import List, Set
 
 from google.appengine.api import taskqueue
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -87,10 +86,15 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
         # Send push notifications if the awards post was within +/- 1 day of the Event
         event = event_key.get()
         if event and event.within_a_day:
+            # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:
-                TBANSHelper.awards(event)
-            except Exception as exception:
-                logging.error(
-                    "Error sending {} award updates: {}".format(event.id(), exception)
+                deferred.defer(
+                    TBANSHelper.awards,
+                    event,
+                    _name=f"{event.key_name}_awards",
+                    _target="py3-tasks-io",
+                    _queue="push-notifications",
+                    _url="/_ah/queue/deferred_notification_send",
                 )
-                logging.error(traceback.format_exc())
+            except Exception:
+                pass

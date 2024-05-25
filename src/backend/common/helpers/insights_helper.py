@@ -669,9 +669,9 @@ class InsightsHelper(object):
                         roundedScore
                     ] += contribution
                 else:
-                    elim_winning_margin_distribution_normalized[
-                        roundedScore
-                    ] = contribution
+                    elim_winning_margin_distribution_normalized[roundedScore] = (
+                        contribution
+                    )
 
             insights.append(
                 self._createInsight(

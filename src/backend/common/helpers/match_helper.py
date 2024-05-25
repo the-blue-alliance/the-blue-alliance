@@ -30,7 +30,6 @@ TOrganizedKeys = Dict[CompLevel, List[MatchKey]]
 
 
 class MatchHelper(object):
-
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
     Allows us to sort matches by key name.

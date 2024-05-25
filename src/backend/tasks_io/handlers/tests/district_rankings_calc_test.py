@@ -10,6 +10,7 @@ from backend.common.helpers.district_helper import (
     DistrictHelper,
     DistrictRankingTeamTotal,
 )
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
@@ -65,6 +66,34 @@ def test_enqueue_event(
         abbreviation="test",
     ).put()
     resp = tasks_client.get("/tasks/math/enqueue/district_rankings_calc/2020")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 2
+    for task in tasks:
+        task_resp = tasks_client.get(task.url)
+        assert task_resp.status_code == 200
+
+    taskqueue_stub.Clear()
+
+
+@mock.patch.object(SeasonHelper, "get_current_season")
+@mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
+def test_enqueue_default_year(
+    district_rankings_mock,
+    season_helper_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    ndb_stub,
+) -> None:
+    season_helper_mock.return_value = 2020
+    district_rankings_mock.return_value = {}
+    District(
+        id="2020test",
+        year=2020,
+        abbreviation="test",
+    ).put()
+    resp = tasks_client.get("/tasks/math/enqueue/district_rankings_calc")
     assert resp.status_code == 200
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")

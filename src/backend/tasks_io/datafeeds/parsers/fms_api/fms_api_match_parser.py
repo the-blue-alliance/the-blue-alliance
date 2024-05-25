@@ -99,9 +99,9 @@ class FMSAPIHybridScheduleParser(
         )
 
         parsed_matches: List[Match] = []
-        remapped_matches: Dict[
-            MatchKey, MatchKey
-        ] = {}  # If a key changes due to a tiebreaker
+        remapped_matches: Dict[MatchKey, MatchKey] = (
+            {}
+        )  # If a key changes due to a tiebreaker
         for match, (key_name, comp_level, set_number, match_number) in zip(
             matches, match_identifiers
         ):
@@ -112,7 +112,6 @@ class FMSAPIHybridScheduleParser(
             red_dqs: List[TeamKey] = []
             blue_dqs: List[TeamKey] = []
             team_key_names: List[TeamKey] = []
-            null_team = False
 
             # Sort by station to ensure correct ordering. Kind of hacky.
             sorted_teams = list(
@@ -121,9 +120,19 @@ class FMSAPIHybridScheduleParser(
                     key=lambda team: team["station"],
                 )
             )
+
+            null_team = any(t["teamNumber"] is None for t in sorted_teams)
+            if (
+                null_team
+                and match["scoreRedFinal"] is None
+                and match["scoreBlueFinal"] is None
+            ):
+                continue
+
             for team in sorted_teams:
                 if team["teamNumber"] is None:
-                    null_team = True
+                    continue
+
                 team_key = "frc{}".format(team["teamNumber"])
                 team_key_names.append(team_key)
                 if "Red" in team["station"]:
@@ -138,13 +147,6 @@ class FMSAPIHybridScheduleParser(
                         blue_surrogates.append(team_key)
                     if team.get("dq", None):
                         blue_dqs.append(team_key)
-
-            if (
-                null_team
-                and match["scoreRedFinal"] is None
-                and match["scoreBlueFinal"] is None
-            ):
-                continue
 
             alliances = {
                 "red": {
