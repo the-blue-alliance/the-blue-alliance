@@ -215,6 +215,12 @@ jobs:
             type=gha
             ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
           cache-to: type=gha,mode=max
+      - name: Cache Vagrant boxes
+        uses: actions/cache@v4
+        with:
+          path: ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
+          restore-keys: ${{ runner.os }}-vagrant-
       - name: Start Container
         run: vagrant up
       - name: Test Vagrant Startup
