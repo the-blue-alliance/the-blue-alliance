@@ -42,7 +42,7 @@ SCRIPTS_EVENTWIZARD_OUT = "src/build/javascript/tba_combined_js.eventwizard.min.
 
 
 def compress_js(in_files, out_file):
-    os.system("npx uglify-js {} --compress -o {}".format(" ".join(in_files), out_file))
+    os.system("npx --yes uglify-js {} --compress -o {}".format(" ".join(in_files), out_file))
     print("=> %s" % out_file)
     print("")
 
