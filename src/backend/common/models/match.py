@@ -256,12 +256,14 @@ class Match(CachedModel):
                         )
                         score_breakdown[color]["tba_numRobotsHanging"] = sum(
                             [
-                                1
-                                if score_breakdown[color].get(
-                                    "endgameRobot{}".format(i)
+                                (
+                                    1
+                                    if score_breakdown[color].get(
+                                        "endgameRobot{}".format(i)
+                                    )
+                                    == "Hang"
+                                    else 0
                                 )
-                                == "Hang"
-                                else 0
                                 for i in range(1, 4)
                             ]
                         )

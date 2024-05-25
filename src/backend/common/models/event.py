@@ -53,6 +53,8 @@ class Event(CachedModel):
         "roe": "roebling",
         "tes": "tesla",
         "tur": "turing",
+        "joh": "johnson",
+        "mil": "milstein",
     }
 
     EVENT_SHORT_EXCEPTIONS_2023 = {
@@ -106,9 +108,9 @@ class Event(CachedModel):
     )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official: bool = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
-    parent_event: Optional[
-        ndb.Key
-    ] = ndb.KeyProperty()  # This is the division -> event champs relationship
+    parent_event: Optional[ndb.Key] = (
+        ndb.KeyProperty()
+    )  # This is the division -> event champs relationship
     # event champs -> all divisions
     divisions: List[ndb.Key] = ndb.KeyProperty(repeated=True)  # pyre-ignore[8]
     facebook_eid = ndb.TextProperty(indexed=False)  # from Facebook
@@ -118,9 +120,7 @@ class Event(CachedModel):
         indexed=False
     )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
-    remap_teams: Dict[
-        str, str
-    ] = (
+    remap_teams: Dict[str, str] = (
         ndb.JsonProperty()
     )  # Map of temporary team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
 
@@ -517,9 +517,6 @@ class Event(CachedModel):
 
     @property
     def city_state_country(self) -> Optional[str]:
-        if not self._city_state_country and self.nl:
-            self._city_state_country = self.nl.city_state_country
-
         if not self._city_state_country:
             location_parts = []
             if self.city:
@@ -577,12 +574,14 @@ class Event(CachedModel):
                 # Sort firstinspires channels to the front, keep the order of the rest
                 self._webcast = sorted(
                     self._webcast or [],
-                    key=lambda w: 0
-                    if (
-                        w["type"] == "twitch"
-                        and w["channel"].startswith("firstinspires")
-                    )
-                    else 1,
+                    key=lambda w: (
+                        0
+                        if (
+                            w["type"] == "twitch"
+                            and w["channel"].startswith("firstinspires")
+                        )
+                        else 1
+                    ),
                 )
             except Exception:
                 self._webcast = None

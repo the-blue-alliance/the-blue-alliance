@@ -150,13 +150,14 @@ class TestEventDetailsManipulator(unittest.TestCase):
         assert len(tasks) == 1
 
         for task in tasks:
-            with patch.object(
-                TBANSHelper, "alliance_selection"
-            ) as mock_alliance_selection:
-                deferred.run(task.payload)
+            deferred.run(task.payload)
 
-        # Make sure we attempted to dispatch push notifications
-        mock_alliance_selection.assert_called_with(self.event)
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 1
+        task = tasks[0]
+        assert task.name == "2011ct_alliance_selection"
 
     def test_postUpdateHook_notifications_notWithinADay(self):
         self.old_event_details.put()

@@ -91,8 +91,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         new_models: TModel,
         auto_union: bool = True,
         run_post_update_hook: bool = True,
-    ) -> TModel:
-        ...
+    ) -> TModel: ...
 
     @overload
     @classmethod
@@ -101,8 +100,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         new_models: List[TModel],
         auto_union: bool = True,
         run_post_update_hook: bool = True,
-    ) -> List[TModel]:
-        ...
+    ) -> List[TModel]: ...
 
     @classmethod
     def createOrUpdate(
@@ -133,13 +131,11 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @overload
     @classmethod
-    def delete(self, models: TModel, run_post_delete_hook=True) -> None:
-        ...
+    def delete(self, models: TModel, run_post_delete_hook=True) -> None: ...
 
     @overload
     @classmethod
-    def delete(self, models: List[TModel], run_post_delete_hook=True) -> None:
-        ...
+    def delete(self, models: List[TModel], run_post_delete_hook=True) -> None: ...
 
     @classmethod
     def delete(self, models, run_post_delete_hook=True) -> None:
@@ -160,15 +156,13 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @overload
     @classmethod
-    def findOrSpawn(cls, new_models: TModel, auto_union: bool = True) -> TModel:
-        ...
+    def findOrSpawn(cls, new_models: TModel, auto_union: bool = True) -> TModel: ...
 
     @overload
     @classmethod
     def findOrSpawn(
         cls, new_models: List[TModel], auto_union: bool = True
-    ) -> List[TModel]:
-        ...
+    ) -> List[TModel]: ...
 
     @classmethod
     def findOrSpawn(cls, new_models, auto_union=True) -> Any:

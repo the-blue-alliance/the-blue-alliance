@@ -3,14 +3,7 @@ import logging
 import re
 from typing import List, Optional, Set
 
-from flask import (
-    Blueprint,
-    make_response,
-    render_template,
-    request,
-    Response,
-    url_for,
-)
+from flask import Blueprint, make_response, render_template, request, Response, url_for
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from markupsafe import Markup
@@ -49,7 +42,6 @@ from backend.common.sitevars.apistatus import ApiStatus
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
-
 
 blueprint = Blueprint("frc_api", __name__)
 
@@ -124,13 +116,29 @@ def team_details(team_key: TeamKey) -> Response:
     # Clean up junk district teams
     # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
     if team:
+        keys_to_delete = set()
+        # Delete all DistrictTeams that are not valid in the current
+        # year, since each team can only be in one district per year
         dt_keys = DistrictTeam.query(
             DistrictTeam.team == team.key, DistrictTeam.year == year
         ).fetch(keys_only=True)
-        keys_to_delete = set()
         for dt_key in dt_keys:
             if not district_team or dt_key.id() != district_team.key.id():
                 keys_to_delete.add(dt_key)
+
+        # Delete all DistrictTeam that are for any year that the team
+        # does not have an event
+        dt_keys = DistrictTeam.query(DistrictTeam.team == team.key).fetch()
+        et_keys = EventTeam.query(
+            EventTeam.team == team.key,
+            projection=[EventTeam.year],
+            group_by=[EventTeam.year],
+        ).fetch()
+        et_years = {et_key.year for et_key in et_keys}
+
+        for dt_key in dt_keys:
+            if dt_key.year not in et_years:
+                keys_to_delete.add(dt_key.key)
         DistrictTeamManipulator.delete_keys(keys_to_delete)
 
     if robot:

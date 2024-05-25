@@ -38,7 +38,7 @@ class WebhookRequest(Request):
         """Attempt to send the notification."""
         # Build the request
         headers = {
-            "Content-Type": 'application/json; charset="utf-8"',
+            "Content-Type": "application/json; charset=utf-8",
             "X-TBA-Version": "{}".format(WEBHOOK_VERSION),
         }
         payload = self._json_string()

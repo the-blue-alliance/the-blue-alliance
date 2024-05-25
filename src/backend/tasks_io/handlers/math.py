@@ -111,10 +111,14 @@ def event_district_points_calc(event_key: EventKey) -> Response:
 
 
 @blueprint.route("/tasks/math/enqueue/district_rankings_calc/<int:year>")
-def enqueue_district_rankings_calc(year: Year) -> Response:
+@blueprint.route("/tasks/math/enqueue/district_rankings_calc", defaults={"year": None})
+def enqueue_district_rankings_calc(year: Optional[Year]) -> Response:
     """
     Enqueues calculation of rankings for all districts for a given year
     """
+
+    if year is None:
+        year = SeasonHelper.get_current_season()
 
     districts = DistrictsInYearQuery(int(year)).fetch()
     district_keys = [district.key.id() for district in districts]
@@ -250,7 +254,7 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
 
     predictions_dict = None
     if (
-        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023}
+        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024}
         and event.event_type_enum in SEASON_EVENT_TYPES
     ) or event.enable_predictions:
         sorted_matches = MatchHelper.play_order_sorted_matches(event.matches)
