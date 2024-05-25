@@ -216,7 +216,7 @@ jobs:
       - name: Start Container
         run: |
           docker-compose pull
-          docker-compose up
+          docker-compose up -d
       - name: Test Startup
         run: ./ops/test_startup.py
       - name: Test Ops Fullstack
