@@ -29,7 +29,7 @@ if [ "$(uname -m)" = "aarch64" ]; then
 fi
 
 echo "Running npm install... this may take a while..."
-npm install
+npm ci
 
 # Install the Firebase tools for the Firebase emulator
 npm install -g firebase-tools
