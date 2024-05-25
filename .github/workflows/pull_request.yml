@@ -195,7 +195,6 @@ jobs:
           cache: "npm"
       - name: Install Node Dependencies
         run: |
-          npm ci
           npm install -g capture-website-cli
       - name: Install Vagrant
         run: |
