@@ -197,32 +197,28 @@ jobs:
         run: |
           npm ci
           npm install -g capture-website-cli
-      - name: Install Vagrant
-        run: |
-          sudo apt-get update
-          sudo apt-get install vagrant
       - name: Create keys file
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: network=host
-      - name: Build Docker Image
-        uses: docker/build-push-action@v5.1.0
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: ./ops/dev/docker
-          push: true
-          tags: localhost:5000/tba-py3-dev:latest
-          cache-from: |
-            type=gha
-            ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
-          cache-to: type=gha,mode=max
+      # - name: Set up Docker Buildx
+      #   id: buildx
+      #   uses: docker/setup-buildx-action@v3
+      #   with:
+      #     driver-opts: network=host
+      # - name: Build Docker Image
+      #   uses: docker/build-push-action@v5.1.0
+      #   with:
+      #     builder: ${{ steps.buildx.outputs.name }}
+      #     context: ./ops/dev/docker
+      #     push: true
+      #     tags: localhost:5000/tba-py3-dev:latest
+      #     cache-from: |
+      #       type=gha
+      #       ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+      #     cache-to: type=gha,mode=max
       - name: Start Container
-        run: vagrant up
-      - name: Test Vagrant Startup
-        run: ./ops/test_vagrant_startup.py
+        run: docker-compose up
+      - name: Test Startup
+        run: ./ops/test_startup.py
       - name: Test Ops Fullstack
         run: ./ops/test_ops.sh
       - name: Capture screenshots

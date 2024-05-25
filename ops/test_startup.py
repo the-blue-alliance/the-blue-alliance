@@ -14,7 +14,7 @@ start_time = time.time()
 while time.time() - start_time < TIME_LIMIT:
     # Check for started modules
     result = subprocess.run(
-        ["vagrant", "ssh", "--", "-t", "cat /var/log/tba.log"], stdout=subprocess.PIPE
+        ["docker-compose", "exec", "tba", "cat", "/var/log/tba.log"], stdout=subprocess.PIPE
     )
     started = set(
         re.findall(r"Starting module \"(.*)\"", result.stdout.decode("utf-8"))
@@ -28,7 +28,7 @@ while time.time() - start_time < TIME_LIMIT:
 
     # Check for webpack build
     result = subprocess.run(
-        ["vagrant", "ssh", "--", "-t", "cat /var/log/webpack.log"],
+        ["docker-compose", "exec", "tba", "cat", "/var/log/webpack.log"],
         stdout=subprocess.PIPE,
     )
     m = re.search(
