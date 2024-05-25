@@ -219,9 +219,9 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                     country=country,
                     venue_address=address,
                     year=self.season,
-                    district_key=ndb.Key(District, district_key)
-                    if district_key
-                    else None,
+                    district_key=(
+                        ndb.Key(District, district_key) if district_key else None
+                    ),
                     website=website,
                     webcast_json=json.dumps(webcasts) if webcasts else None,
                 )

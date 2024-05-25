@@ -251,12 +251,16 @@ def get_team_info(resp_data: str) -> TeamInfo:
         )
         current_event = TeamCurrentEvent(
             event_key=current_soup["data-event-key"],
-            webcast=(current_webcast["href"], "".join(current_webcast.stripped_strings))
-            if current_webcast
-            else None,
-            currently_competing="".join(currently_competing.stripped_strings)
-            if currently_competing
-            else None,
+            webcast=(
+                (current_webcast["href"], "".join(current_webcast.stripped_strings))
+                if current_webcast
+                else None
+            ),
+            currently_competing=(
+                "".join(currently_competing.stripped_strings)
+                if currently_competing
+                else None
+            ),
             upcoming_matches=upcoming_match_table is not None,
         )
 
