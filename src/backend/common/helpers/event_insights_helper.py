@@ -3,8 +3,11 @@ import traceback
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
-from backend.common.consts.alliance_color import (ALLIANCE_COLORS, OPPONENT,
-                                                  AllianceColor)
+from backend.common.consts.alliance_color import (
+    ALLIANCE_COLORS,
+    OPPONENT,
+    AllianceColor,
+)
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.models.event_insights import EventInsights
@@ -33,7 +36,7 @@ class EventInsightsHelper:
         else:
             return None
 
-     @classmethod
+    @classmethod
     def calculate_event_insights_2024(cls, matches: List[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
