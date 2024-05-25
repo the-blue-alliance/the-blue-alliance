@@ -215,8 +215,8 @@ jobs:
       #     cache-to: type=gha,mode=max
       - name: Start Container
         run: |
-        docker-compose pull
-        docker-compose up
+          docker-compose pull
+          docker-compose up
       - name: Test Startup
         run: ./ops/test_startup.py
       - name: Test Ops Fullstack
