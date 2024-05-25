@@ -73,9 +73,11 @@ class TeamRenderer:
             "years": [award.year for award in hof_awards],
             "media": {
                 "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
-                "presentation": hof_presentation[0].youtube_url_link
-                if len(hof_presentation) > 0
-                else None,
+                "presentation": (
+                    hof_presentation[0].youtube_url_link
+                    if len(hof_presentation) > 0
+                    else None
+                ),
                 "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
         }
@@ -329,9 +331,11 @@ class TeamRenderer:
             "years": [award.year for award in hof_awards],
             "media": {
                 "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
-                "presentation": hof_presentation[0].youtube_url_link
-                if len(hof_presentation) > 0
-                else None,
+                "presentation": (
+                    hof_presentation[0].youtube_url_link
+                    if len(hof_presentation) > 0
+                    else None
+                ),
                 "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
         }
@@ -369,9 +373,11 @@ class TeamRenderer:
             event_awards.append((event, sorted_awards))
         event_awards = sorted(
             event_awards,
-            key=lambda e_a: e_a[0].start_date
-            if e_a[0].start_date
-            else datetime.datetime(e_a[0].year, 12, 31),
+            key=lambda e_a: (
+                e_a[0].start_date
+                if e_a[0].start_date
+                else datetime.datetime(e_a[0].year, 12, 31)
+            ),
         )
 
         last_competed = None
@@ -431,9 +437,9 @@ class TeamRenderer:
 
         events_sorted = sorted(
             events_future.get_result(),
-            key=lambda e: e.start_date
-            if e.start_date
-            else datetime.datetime(year, 12, 31),
+            key=lambda e: (
+                e.start_date if e.start_date else datetime.datetime(year, 12, 31)
+            ),
         )  # unknown goes last
 
         matches_by_event_key: Dict[ndb.Key, List[Match]] = {}

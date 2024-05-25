@@ -521,9 +521,9 @@ class DistrictHelper:
         )
 
         # match_set_key -> alliance -> list of list of teams
-        elim_alliances: DefaultDict[
-            str, DefaultDict[AllianceColor, List[TeamKey]]
-        ] = defaultdict(lambda: defaultdict(list))
+        elim_alliances: DefaultDict[str, DefaultDict[AllianceColor, List[TeamKey]]] = (
+            defaultdict(lambda: defaultdict(list))
+        )
         for match in matches:
             if not match.has_been_played or match.winning_alliance == "":
                 # Skip unplayed matches
@@ -679,12 +679,14 @@ class DistrictHelper:
                 for color in ALLIANCE_COLORS:
                     for team in match.alliances[color]["teams"]:
                         score = match.alliances[color]["score"]
-                        district_points["tiebreakers"][team][
-                            "highest_qual_scores"
-                        ] = heapq.nlargest(
-                            3,
-                            district_points["tiebreakers"][team]["highest_qual_scores"]
-                            + [score],
+                        district_points["tiebreakers"][team]["highest_qual_scores"] = (
+                            heapq.nlargest(
+                                3,
+                                district_points["tiebreakers"][team][
+                                    "highest_qual_scores"
+                                ]
+                                + [score],
+                            )
                         )
                         # Make sure that teams without wins don't get dropped from 'points'
                         district_points["points"][team]["qual_points"] += 0
@@ -742,12 +744,12 @@ class DistrictHelper:
             for color in ALLIANCE_COLORS:
                 for team in match.alliances[color]["teams"]:
                     score = match.alliances[color]["score"]
-                    district_points["tiebreakers"][team][
-                        "highest_qual_scores"
-                    ] = heapq.nlargest(
-                        3,
-                        district_points["tiebreakers"][team]["highest_qual_scores"]
-                        + [score],
+                    district_points["tiebreakers"][team]["highest_qual_scores"] = (
+                        heapq.nlargest(
+                            3,
+                            district_points["tiebreakers"][team]["highest_qual_scores"]
+                            + [score],
+                        )
                     )
 
         # elim match point calculations

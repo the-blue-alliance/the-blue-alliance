@@ -49,7 +49,7 @@ def get_qual_bluezone_score(prediction):
 def fetch_team_details_async(team_key: TeamKey):
     memcache = MemcacheClient.get()
     cache_key = f"match_suggestion_fetch_team_details{team_key}"
-    cached = memcache.get(cache_key)
+    cached = memcache.get(cache_key.encode())
     if cached is not None:
         return cached
 
@@ -93,27 +93,37 @@ def fetch_team_details_async(team_key: TeamKey):
                         "event_short": event.event_short,
                         "name": event.name,
                         "start_date": event.start_date,
-                        "alliance": f"A{alliance}P{'C' if pick == 0 else pick}"
-                        if event_team.status["alliance"]
-                        else "N/A",
-                        "finish": f"{event_team.status['playoff']['double_elim_round']} ({event_team.status['playoff']['status']})"
-                        if event_team.status["playoff"]
-                        else "N/A",
-                        "auto_note_copr": event_details.coprs.get(
-                            "Total Auto Game Pieces", {}
-                        ).get(team_key[3:], 0)
-                        if event_details.coprs
-                        else 0,
-                        "teleop_note_copr": event_details.coprs.get(
-                            "Total Teleop Game Pieces", {}
-                        ).get(team_key[3:], 0)
-                        if event_details.coprs
-                        else 0,
-                        "trap_copr": event_details.coprs.get("Total Trap", {}).get(
-                            team_key[3:], 0
-                        )
-                        if event_details.coprs
-                        else 0,
+                        "alliance": (
+                            f"A{alliance}P{'C' if pick == 0 else pick}"
+                            if event_team.status["alliance"]
+                            else "N/A"
+                        ),
+                        "finish": (
+                            f"{event_team.status['playoff']['double_elim_round']} ({event_team.status['playoff']['status']})"
+                            if event_team.status["playoff"]
+                            else "N/A"
+                        ),
+                        "auto_note_copr": (
+                            event_details.coprs.get("Total Auto Game Pieces", {}).get(
+                                team_key[3:], 0
+                            )
+                            if event_details.coprs
+                            else 0
+                        ),
+                        "teleop_note_copr": (
+                            event_details.coprs.get("Total Teleop Game Pieces", {}).get(
+                                team_key[3:], 0
+                            )
+                            if event_details.coprs
+                            else 0
+                        ),
+                        "trap_copr": (
+                            event_details.coprs.get("Total Trap", {}).get(
+                                team_key[3:], 0
+                            )
+                            if event_details.coprs
+                            else 0
+                        ),
                     }
                 )
             except Exception as e:
@@ -130,7 +140,7 @@ def fetch_team_details_async(team_key: TeamKey):
         "past_einstein": past_einstein,
         "events": sorted(events_details, key=lambda x: x["start_date"]),
     }
-    memcache.set(cache_key, details, 60 * 60 * 24)
+    memcache.set(cache_key.encode(), details, 60 * 60 * 24)
     return details
 
 

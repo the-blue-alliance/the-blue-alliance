@@ -40,9 +40,11 @@ class MatchConverter(ConverterBase):
                 "team_keys": match.alliances[alliance]["teams"],
                 "score": match.alliances[alliance]["score"],
                 "surrogate_team_keys": match.alliances[alliance]["surrogates"],
-                "dq_team_keys": match.alliances[alliance]["dqs"]
-                if "dqs" in match.alliances[alliance]
-                else [],
+                "dq_team_keys": (
+                    match.alliances[alliance]["dqs"]
+                    if "dqs" in match.alliances[alliance]
+                    else []
+                ),
             }
 
         match_dict = {
