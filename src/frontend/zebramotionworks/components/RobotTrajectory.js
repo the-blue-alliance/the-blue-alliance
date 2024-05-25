@@ -31,13 +31,8 @@ class RobotTrajectory extends React.PureComponent {
   };
 
   render() {
-    const {
-      teamData,
-      startTime,
-      endTime,
-      color,
-      indicatorAtStart,
-    } = this.props;
+    const { teamData, startTime, endTime, color, indicatorAtStart } =
+      this.props;
     const startTimeCeil = Math.ceil(startTime);
     const endTimeFloor = Math.floor(endTime);
 

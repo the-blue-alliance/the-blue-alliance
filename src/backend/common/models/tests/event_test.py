@@ -4,7 +4,7 @@ from typing import Optional
 
 import pytest
 from freezegun import freeze_time
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
@@ -16,6 +16,7 @@ from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
@@ -24,9 +25,10 @@ from backend.common.models.tests.util import (
     CITY_STATE_COUNTRY_PARAMETERS,
     LOCATION_PARAMETERS,
 )
+from backend.conftest import clear_cached_queries  # noqa: ETBA0
 
 
-@pytest.mark.parametrize("key", ["2010ct", "2014onto2"])
+@pytest.mark.parametrize("key", ["2010ct", "2014onto2", "202121fim", "2022dc305"])
 def test_valid_key_names(key: str) -> None:
     assert Event.validate_key_name(key) is True
 
@@ -192,6 +194,12 @@ def test_past_future_start_end_today(
         (2016, EventType.REGIONAL, True, 1, 1, "Week 1"),
         (2020, EventType.OFFSEASON, False, 2, None, None),
         (2020, EventType.REGIONAL, False, 2, None, None),
+        (2021, EventType.REGIONAL, True, 0, 0, "Participation"),
+        (2021, EventType.DISTRICT, True, 0, 0, "Participation"),
+        (2021, EventType.REMOTE, True, 2, 2, "FIRST Innovation Challenge"),
+        (2021, EventType.REMOTE, True, 3, 3, "INFINITE RECHARGE At Home Challenge"),
+        (2021, EventType.REMOTE, True, 4, 4, "Game Design Challenge"),
+        (2021, EventType.REMOTE, True, 5, 5, "Awards"),
     ],
 )
 def test_week(
@@ -226,9 +234,9 @@ def test_week_stored_in_context_cache() -> None:
 
     assert e.week == 0
 
-    context_cache = ndb.get_context().cache
-    assert "2019_season_start" in context_cache
-    assert context_cache["2019_season_start"] == datetime(2019, 3, 4, 0, 0)
+    from backend.common.context_cache import context_cache
+
+    assert context_cache.get("2019_season_start") == datetime(2019, 3, 4, 0, 0)
 
 
 @pytest.mark.parametrize(LOCATION_PARAMETERS[0], LOCATION_PARAMETERS[1])
@@ -293,6 +301,8 @@ def test_linked_district() -> None:
     District(
         id="2019ne",
         display_name="New England",
+        year=2019,
+        abbreviation="ne",
     ).put()
     event = Event(
         district_key=ndb.Key(District, "2019ne"),
@@ -333,11 +343,13 @@ def test_get_awards() -> None:
     a.put()
 
     event._awards = None
+    clear_cached_queries()
     future = event.get_awards_async()
     assert future.get_result() == [a]
     assert event.awards == [a]
 
     event._awards = None
+    clear_cached_queries()
     assert event.awards == [a]
 
 
@@ -353,6 +365,24 @@ def test_details() -> None:
 
     event._details = None
     assert event.details == d
+
+
+def test_first_api_code() -> None:
+    # Pre-2023 regular event
+    event = Event(id="2019ingre", year=2019, event_short="ingre")
+    assert event.first_api_code == "ingre"
+
+    # 2023 regular event
+    event = Event(id="2023ingre", year=2023, event_short="ingre")
+    assert event.first_api_code == "ingre"
+
+    # Pre-2023 championship div
+    event = Event(id="2022hop", year=2022, event_short="hop")
+    assert event.first_api_code == "hopper"
+
+    # 2023 championship div
+    event = Event(id="2023hop", year=2023, event_short="hop")
+    assert event.first_api_code == "hcmp"
 
 
 def test_get_alliances() -> None:
@@ -371,6 +401,24 @@ def test_get_alliances() -> None:
     event._details = None
     assert event.alliance_selections == alliances
     assert event.alliance_teams == teams
+
+
+def test_get_alliances_with_backup() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.alliance_selections is None
+
+    teams = ["frc1", "frc2", "frc3"]
+    alliances = [
+        EventAlliance(picks=teams, backup={"in": "frc4", "out": "frc3"}),
+    ]
+    EventDetails(
+        id="2019ct",
+        alliance_selections=alliances,
+    ).put()
+
+    event._details = None
+    assert event.alliance_selections == alliances
+    assert event.alliance_teams == (teams + ["frc4"])
 
 
 def test_district_points() -> None:
@@ -409,10 +457,12 @@ def test_matches() -> None:
     m.put()
 
     event._matches = None
+    clear_cached_queries()
     assert event.matches == [m]
     assert event.get_matches_async().get_result() == [m]
 
     event._matches = None
+    clear_cached_queries()
     event.prep_matches()
     assert event.get_matches_async().get_result() == [m]
     assert event.matches == [m]
@@ -435,5 +485,28 @@ def test_teams() -> None:
     t.put()
 
     event._teams = None
+    clear_cached_queries()
     assert event.teams == [t]
     assert event.get_teams_async().get_result() == [t]
+
+
+def test_rankings() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.rankings is None
+
+    rankings = [
+        EventRanking(
+            rank=1,
+            team_key="frc1",
+            record=None,
+            qual_average=None,
+            matches_played=1,
+            dq=0,
+            sort_orders=[],
+        )
+    ]
+
+    EventDetails(id="2019ct", rankings2=rankings).put()
+
+    event._details = None
+    assert event.rankings == rankings

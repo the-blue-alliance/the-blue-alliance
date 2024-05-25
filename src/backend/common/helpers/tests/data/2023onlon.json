@@ -1,0 +1,52 @@
+{
+  "address": "1151 Richmond St, London, ON N6A 3K7, Canada",
+  "city": "London",
+  "country": "Canada",
+  "district": {
+    "abbreviation": "ont",
+    "display_name": "Ontario",
+    "key": "2023ont",
+    "year": 2023
+  },
+  "division_keys": [],
+  "end_date": "2023-03-19",
+  "event_code": "onlon",
+  "event_type": 1,
+  "event_type_string": "District",
+  "first_event_code": "onlon",
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJ0SvEag7uLogRm3m5qlPzh6o",
+  "gmaps_url": "https://maps.google.com/?cid=12288057648975804827",
+  "key": "2023onlon",
+  "lat": 43.00959710000001,
+  "lng": -81.2737336,
+  "location_name": "Western University",
+  "name": "ONT District Western University Engineering Event",
+  "parent_event_key": null,
+  "playoff_type": 10,
+  "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+  "postal_code": "N6A 3K7",
+  "short_name": "Western University Engineering",
+  "start_date": "2023-03-17",
+  "state_prov": "ON",
+  "timezone": "America/Toronto",
+  "webcasts": [
+    {
+      "channel": "FIRSTcanada",
+      "date": "2023-03-19",
+      "type": "twitch"
+    },
+    {
+      "channel": "FIRSTontario1",
+      "date": "2023-03-18",
+      "type": "twitch"
+    },
+    {
+      "channel": "FIRSTontario2",
+      "type": "twitch"
+    }
+  ],
+  "website": null,
+  "week": 2,
+  "year": 2023
+}

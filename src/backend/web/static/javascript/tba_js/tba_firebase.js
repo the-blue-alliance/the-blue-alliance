@@ -9,3 +9,8 @@ var config = {
   appId: firebaseAppId
 };
 firebase.initializeApp(config);
+
+const perf = firebase.performance();
+
+const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.NONE);

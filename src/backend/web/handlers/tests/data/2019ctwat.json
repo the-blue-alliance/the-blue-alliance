@@ -1,0 +1,42 @@
+{
+  "address": "568 Bucks Hill Rd, Waterbury, CT 06704, USA", 
+  "city": "Waterbury", 
+  "country": "USA", 
+  "district": {
+    "abbreviation": "ne", 
+    "display_name": "New England", 
+    "key": "2019ne", 
+    "year": 2019
+  }, 
+  "division_keys": [], 
+  "end_date": "2019-03-10", 
+  "event_code": "ctwat", 
+  "event_type": 1, 
+  "event_type_string": "District", 
+  "first_event_code": "CTWAT", 
+  "first_event_id": "37474", 
+  "gmaps_place_id": "ChIJh-MgNHC_54kR8ehj394xybM", 
+  "gmaps_url": "https://maps.google.com/?cid=12954940636408310001", 
+  "key": "2019ctwat", 
+  "lat": 41.604199, 
+  "lng": -73.0265679, 
+  "location_name": "Wilby High School", 
+  "name": "NE District Waterbury Event", 
+  "parent_event_key": null, 
+  "playoff_type": null, 
+  "playoff_type_string": null, 
+  "postal_code": "06704", 
+  "short_name": "Waterbury", 
+  "start_date": "2019-03-08", 
+  "state_prov": "CT", 
+  "timezone": "America/New_York", 
+  "webcasts": [
+    {
+      "channel": "nefirst_red", 
+      "type": "twitch"
+    }
+  ], 
+  "website": "http://www.nefirst.org/", 
+  "week": 1, 
+  "year": 2019
+}

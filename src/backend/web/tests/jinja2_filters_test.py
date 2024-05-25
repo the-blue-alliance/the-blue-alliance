@@ -1,10 +1,23 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, List, NamedTuple, Optional
 
 import pytest
 from flask import Flask
 
 from backend.web import jinja2_filters as filters
+from backend.web.jinja2_filters import defense_render_names_2016
+
+
+@pytest.mark.parametrize(
+    "key, name", [(k, v) for k, v in defense_render_names_2016.items()]
+)
+def test_defense_name(key: str, name: str) -> None:
+    assert filters.defense_name(key) == name
+
+
+def test_defense_name_invalid() -> None:
+    invalid_defense_name = "Z_NoDefenseName"
+    assert filters.defense_name(invalid_defense_name) == invalid_defense_name
 
 
 @pytest.mark.parametrize(
@@ -63,6 +76,66 @@ def test_limit_prob(input: float, output: int) -> None:
 )
 def test_slugify(input: str, output: str) -> None:
     assert filters.slugify(input) == output
+
+
+@pytest.mark.parametrize(
+    "input, output",
+    [
+        ("blah", "blah"),
+        ("blah?t=30s", "blah?start=30"),
+        ("blah#t=30s", "blah?start=30"),
+    ],
+)
+def test_yt_start(input: str, output: str) -> None:
+    assert filters.yt_start(input) == output
+
+
+@pytest.mark.parametrize(
+    "input, output",
+    [
+        ("blah", ""),
+        ("2019nyny_qm12", "Q12"),
+        ("2019nyny_sf1m2", "SF1-2"),
+    ],
+)
+def test_match_short(input: str, output: str) -> None:
+    assert filters.match_short(input) == output
+
+
+class ExampleObject(NamedTuple):
+    field1: int
+    field2: str
+
+
+@pytest.mark.parametrize(
+    "input, field, output",
+    [
+        (
+            [
+                ExampleObject(field1=10, field2="foo"),
+                ExampleObject(field1=5, field2="zzz"),
+            ],
+            "field1",
+            [
+                ExampleObject(field1=5, field2="zzz"),
+                ExampleObject(field1=10, field2="foo"),
+            ],
+        ),
+        (
+            [
+                ExampleObject(field1=10, field2="foo"),
+                ExampleObject(field1=20, field2="bar"),
+            ],
+            "field2",
+            [
+                ExampleObject(field1=20, field2="bar"),
+                ExampleObject(field1=10, field2="foo"),
+            ],
+        ),
+    ],
+)
+def test_sort_by(input: List, field: str, output: List) -> None:
+    assert filters.sort_by(input, field) == output
 
 
 def test_register_template_filters(empty_app: Flask) -> None:

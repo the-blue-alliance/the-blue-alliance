@@ -1,4 +1,4 @@
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts import client_type
 from backend.common.consts.client_type import ClientType

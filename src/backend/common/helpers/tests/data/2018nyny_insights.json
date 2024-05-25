@@ -1,0 +1,160 @@
+{
+  "playoff": {
+    "auto_quest_achieved": [
+      27, 
+      34, 
+      79.41176470588235
+    ], 
+    "average_boost_played": 2.16, 
+    "average_endgame_points": 42.205882352941174, 
+    "average_force_played": 2.217391304347826, 
+    "average_foul_score": 23.970588235294116, 
+    "average_points_auto": 32.529411764705884, 
+    "average_points_teleop": 256.20588235294116, 
+    "average_run_points_auto": 13.823529411764707, 
+    "average_scale_ownership_points": 66.94117647058823, 
+    "average_scale_ownership_points_auto": 3.235294117647059, 
+    "average_scale_ownership_points_teleop": 63.705882352941174, 
+    "average_score": 312.70588235294116, 
+    "average_switch_ownership_points": 128.11764705882354, 
+    "average_switch_ownership_points_auto": 15.470588235294118, 
+    "average_switch_ownership_points_teleop": 112.6470588235294, 
+    "average_vault_points": 28.823529411764707, 
+    "average_win_margin": 166.8235294117647, 
+    "average_win_score": 396.11764705882354, 
+    "boost_played_counts": [
+      25, 
+      34, 
+      73.52941176470588
+    ], 
+    "climb_counts": [
+      15, 
+      102, 
+      14.705882352941176
+    ], 
+    "face_the_boss_achieved": [
+      1, 
+      34, 
+      2.9411764705882355
+    ], 
+    "force_played_counts": [
+      23, 
+      34, 
+      67.6470588235294
+    ], 
+    "high_score": [
+      492, 
+      "2018nyny_qf1m2", 
+      "QF1-2"
+    ], 
+    "levitate_played_counts": [
+      26, 
+      34, 
+      76.47058823529412
+    ], 
+    "run_counts_auto": [
+      94, 
+      102, 
+      92.15686274509804
+    ], 
+    "scale_neutral_percentage": 12.901960784313722, 
+    "scale_neutral_percentage_auto": 78.43137254901961, 
+    "scale_neutral_percentage_teleop": 5.620915032679738, 
+    "switch_owned_counts_auto": [
+      33, 
+      34, 
+      97.05882352941177
+    ], 
+    "unicorn_matches": [
+      0, 
+      34, 
+      0.0
+    ], 
+    "winning_opp_switch_denial_percentage_teleop": 8.540305010893249, 
+    "winning_own_switch_ownership_percentage": 90.43137254901963, 
+    "winning_own_switch_ownership_percentage_auto": 54.90196078431372, 
+    "winning_own_switch_ownership_percentage_teleop": 94.37908496732025, 
+    "winning_scale_ownership_percentage": 72.90196078431372, 
+    "winning_scale_ownership_percentage_auto": 19.215686274509807, 
+    "winning_scale_ownership_percentage_teleop": 78.86710239651417
+  }, 
+  "qual": {
+    "auto_quest_achieved": [
+      69, 
+      170, 
+      40.588235294117645
+    ], 
+    "average_boost_played": 2.0930232558139537, 
+    "average_endgame_points": 34.55882352941177, 
+    "average_force_played": 1.7903225806451613, 
+    "average_foul_score": 26.852941176470587, 
+    "average_points_auto": 22.029411764705884, 
+    "average_points_teleop": 213.2058823529412, 
+    "average_run_points_auto": 12.794117647058824, 
+    "average_scale_ownership_points": 51.64705882352941, 
+    "average_scale_ownership_points_auto": 0.5176470588235295, 
+    "average_scale_ownership_points_teleop": 51.129411764705885, 
+    "average_score": 262.0882352941176, 
+    "average_switch_ownership_points": 109.25882352941177, 
+    "average_switch_ownership_points_auto": 8.717647058823529, 
+    "average_switch_ownership_points_teleop": 100.54117647058824, 
+    "average_vault_points": 21.38235294117647, 
+    "average_win_margin": 177.25882352941176, 
+    "average_win_score": 350.7176470588235, 
+    "boost_played_counts": [
+      86, 
+      170, 
+      50.588235294117645
+    ], 
+    "climb_counts": [
+      54, 
+      510, 
+      10.588235294117647
+    ], 
+    "face_the_boss_achieved": [
+      1, 
+      170, 
+      0.5882352941176471
+    ], 
+    "force_played_counts": [
+      62, 
+      170, 
+      36.470588235294116
+    ], 
+    "high_score": [
+      492, 
+      "2018nyny_qm67", 
+      "Q67"
+    ], 
+    "levitate_played_counts": [
+      109, 
+      170, 
+      64.11764705882354
+    ], 
+    "run_counts_auto": [
+      435, 
+      510, 
+      85.29411764705883
+    ], 
+    "scale_neutral_percentage": 31.48235294117647, 
+    "scale_neutral_percentage_auto": 96.5490196078431, 
+    "scale_neutral_percentage_teleop": 24.252723311546838, 
+    "switch_owned_counts_auto": [
+      89, 
+      170, 
+      52.35294117647059
+    ], 
+    "unicorn_matches": [
+      1, 
+      170, 
+      0.5882352941176471
+    ], 
+    "winning_opp_switch_denial_percentage_teleop": 20.71459694989107, 
+    "winning_own_switch_ownership_percentage": 85.92156862745098, 
+    "winning_own_switch_ownership_percentage_auto": 38.74509803921571, 
+    "winning_own_switch_ownership_percentage_teleop": 91.16339869281045, 
+    "winning_scale_ownership_percentage": 60.49411764705879, 
+    "winning_scale_ownership_percentage_auto": 3.058823529411764, 
+    "winning_scale_ownership_percentage_teleop": 66.87581699346406
+  }
+}

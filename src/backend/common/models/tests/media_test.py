@@ -1,5 +1,5 @@
 import pytest
-from google.cloud import ndb
+from google.appengine.api import datastore_errors
 
 from backend.common.consts.media_type import MediaType
 from backend.common.models.media import Media
@@ -25,7 +25,7 @@ def test_key_name() -> None:
 
 
 def test_media_type_validation() -> None:
-    with pytest.raises(ndb.exceptions.BadValueError):
+    with pytest.raises(datastore_errors.BadValueError):
         Media(
             id="youtube_abc",
             media_type_enum=1337,
@@ -34,7 +34,7 @@ def test_media_type_validation() -> None:
 
 
 def test_media_tag_validation() -> None:
-    with pytest.raises(ndb.exceptions.BadValueError):
+    with pytest.raises(datastore_errors.BadValueError):
         Media(
             id="youtube_abc",
             media_type_enum=MediaType.YOUTUBE_VIDEO,

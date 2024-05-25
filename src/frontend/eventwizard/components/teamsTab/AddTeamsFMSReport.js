@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import FileInput from "react-file-input";
-import Dialog from "react-bootstrap-dialog";
+// import FileInput from "react-file-input";
 import TeamList from "./TeamList";
 
 class AddTeamsFMSReport extends Component {
@@ -117,14 +116,14 @@ class AddTeamsFMSReport extends Component {
           This will <em>overwrite</em> all existing teams for this event.
         </p>
         {this.state.message && <p>{this.state.message}</p>}
-        <FileInput
+        {/* <FileInput
           name="fmsTeamsReport"
           accept=".xlsx,.xls,.csv"
           placeholder="Click to choose file"
           onChange={this.onFileChange}
           disabled={!this.props.selectedEvent}
-        />
-        <Dialog ref={(dialog) => (this.reportConfirmDialog = dialog)} />
+        /> */}
+        {/*<Dialog ref={(dialog) => (this.reportConfirmDialog = dialog)} />*/}
       </div>
     );
   }

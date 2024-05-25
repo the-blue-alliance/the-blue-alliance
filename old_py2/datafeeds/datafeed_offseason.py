@@ -1,7 +1,7 @@
 import logging
 
 from datafeeds.datafeed_base import DatafeedBase
-from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+from datafeeds.parsers.csv.csv_offseason_matches_parser import CSVOffseasonMatchesParser
 
 from models.match import Match
 
@@ -11,11 +11,11 @@ class DatafeedOffseason(DatafeedBase):
         super(DatafeedOffseason, self).__init__(*args, **kw)
 
     def getMatches(self, event, url):
-        matches, _ = self.parse(url, OffseasonMatchesParser)
+        matches, _ = self.parse(url, CSVOffseasonMatchesParser)
         logging.info(matches)
 
         return [Match(
-            id=Match.renderKeyName(
+            id=Match.render_key_name(
                 event.key.id(),
                 match.get("comp_level", None),
                 match.get("set_number", 0),

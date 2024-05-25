@@ -3,6 +3,33 @@ from typing import Dict, List
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 SORT_ORDER_INFO: Dict[int, List[RankingSortOrderInfo]] = {
+    2024: [
+        {"name": "Ranking Score", "precision": 2},
+        {"name": "Avg Coop", "precision": 2},
+        {"name": "Avg Match", "precision": 2},
+        {"name": "Avg Auto", "precision": 2},
+        {"name": "Avg Stage", "precision": 2},
+    ],
+    2023: [
+        {"name": "Ranking Score", "precision": 2},
+        {"name": "Avg Match", "precision": 2},
+        {"name": "Avg Charge Station", "precision": 2},
+        {"name": "Avg Auto", "precision": 2},
+    ],
+    2022: [
+        {"name": "Ranking Score", "precision": 2},
+        {"name": "Avg Match", "precision": 2},
+        {"name": "Avg Hangar", "precision": 2},
+        {"name": "Avg Taxi + Auto Cargo", "precision": 2},
+    ],
+    2021: [
+        {"name": "Overall Score", "precision": 2},
+        {"name": "Galactic Search", "precision": 2},
+        {"name": "Auto-Nav", "precision": 2},
+        {"name": "Hyperdrive", "precision": 2},
+        {"name": "Interstellar Accuracy", "precision": 2},
+        {"name": "Power Port", "precision": 2},
+    ],
     2020: [
         {"name": "Ranking Score", "precision": 2},
         {"name": "Auto", "precision": 0},

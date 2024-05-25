@@ -17,7 +17,7 @@ class TeamHelper(object):
     Helper to sort teams and stuff
     """
     @classmethod
-    def sortTeams(self, team_list):
+    def sort_teams(self, team_list):
         """
         Takes a list of Teams (not a Query object).
         """

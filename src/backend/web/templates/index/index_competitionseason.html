@@ -11,10 +11,8 @@
       {% include "index_partials/index_lhc.html" %}
     </div>
     <div class="col-sm-8">
-<div class="alert alert-dismissible alert-danger ">
-<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>Due to COVID-19 (Coronavirus), FIRST has decided to suspend all season play across all Programs worldwide, effective immediately, including the cancellation of both FIRST Championship events. Refer to <a href="https://www.firstinspires.org/covid-19" title="firstinspires.org/covid-19">firstinspires.org/covid-19</a> for more information.</div>
       {% include "media_partials/live_special_webcast_partial.html" %}
-      <!-- {% if events %}
+      {% if events %}
         {% with first_event = events|first %}
         {% with last_event = events|last %}
         {% if first_event.week != None and last_event.week != None %}
@@ -73,12 +71,12 @@
                         {% if event.webcast %}
                           {% if event.now %}
                             {% if event.webcast_status == 'offline' %}
-                              <a class="btn btn-default btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
+                              <a class="btn btn-default btn-small" href="{{event.gameday_url}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-facetime-video"></span> Offline</a>
                             {% else %}
                               {% if event.webcast_status == 'online' %}
-                                <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                                <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
                               {% else %}
-                                <a class="btn btn-info btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-question-sign"></span> Watch Now</a>
+                                <a class="btn btn-info btn-small" href="{{event.gameday_url}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-question-sign"></span> Watch Now</a>
                               {% endif %}
                             {% endif %}
                           {% else %}
@@ -86,7 +84,7 @@
                           {% endif %}
                         {% else %}
                           {% if event.future or event.within_a_day %}
-                            <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
+                            <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank" rel="noopener noreferrer">Add webcast</a>
                           {% endif %}
                         {% endif %}
                       </td>
@@ -101,14 +99,14 @@
       {% else %}
         <h2>Build season has ended. Competitions start soon!</h2>
         <div class="btn-group game-manual">
-          <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> {{game_name}} Game Manual and Materials</a>
+          <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-file"></span> {{game_name}} Game Manual and Materials</a>
         </div>
         <br><br>
         <div class="fitvids">
           <iframe width="420" height="315" src="https://www.youtube.com/embed/{{game_animation_youtube_id}}" frameborder="0" allowfullscreen></iframe>
         </div>
       {% endif %}
-    </div> -->
+    </div>
   </div>
 </div>
 

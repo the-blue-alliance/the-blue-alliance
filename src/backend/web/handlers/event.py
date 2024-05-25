@@ -1,25 +1,58 @@
 import collections
-from typing import List, Optional
+import json
+import re
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Tuple
 
 from flask import abort, redirect, request
-from google.cloud import ndb
-from pyre_extensions import none_throws, safe_cast
+from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
-from backend.common.consts import playoff_type
+from backend.common.consts import comp_level, playoff_type
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import COMP_LEVELS, CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, Year
-from backend.common.models.team import Team
+from backend.common.models.event_matchstats import Component, TeamStatMap
+from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
+from backend.common.models.match import Match
 from backend.common.queries import district_query, event_query, media_query
 from backend.web.profiled_render import render_template
+
+
+def convert_component_name(component_name: str) -> str:
+    """
+    Converts a camelCase componentName to a human readable title case name.
+
+    e.g. foulCount -> Foul Count, totalPoints -> Total Points, OPR -> OPR, rp -> RP
+    """
+    # for things like OPR that should stay all uppercase
+    if component_name.isupper():
+        return component_name
+
+    # for things like "rp" that should be totally uppercased
+    if component_name in ["rp"]:
+        return component_name.upper()
+
+    with_spaces = re.sub("([A-Z])", r" \1", component_name)
+    return with_spaces.title()
+
+
+def sort_and_limit_stats(
+    stats_dict: TeamStatMap, num_matchstats: Optional[int] = None
+) -> List[Tuple[TeamKey, float]]:
+    return sorted(stats_dict.items(), key=lambda t: -t[1])[:num_matchstats]
 
 
 @cached_public
@@ -28,7 +61,7 @@ def event_list(year: Optional[Year] = None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 
-    valid_years = SeasonHelper.get_valid_years()
+    valid_years = list(reversed(SeasonHelper.get_valid_years()))
     if year not in valid_years:
         abort(404)
 
@@ -44,18 +77,20 @@ def event_list(year: Optional[Year] = None) -> Response:
     else:
         events_future = all_events_future
 
-    events = events_future.get_result()
+    events = EventHelper.sorted_events(events_future.get_result())
     if state_prov == "" or (state_prov and not events):
         return redirect(request.path)
 
-    EventHelper.sort_events(events)
-
-    week_events = EventHelper.groupByWeek(events)
+    week_events = EventHelper.group_by_week(events)
 
     districts = []  # a tuple of (district abbrev, district name)
     for district in districts_future.get_result():
         districts.append((district.abbreviation, district.display_name))
     districts = sorted(districts, key=lambda d: d[1])
+
+    # Special case to display a list of regionals
+    if any(map(lambda e: e.event_type_enum == EventType.REGIONAL, events)):
+        districts.insert(0, ("regional", "Regional Events"))
 
     valid_state_provs = set()
     for event in all_events_future.get_result():
@@ -73,22 +108,26 @@ def event_list(year: Optional[Year] = None) -> Response:
         "state_prov": state_prov,
         "valid_state_provs": valid_state_provs,
     }
-    return render_template("event_list.html", template_values)
+    return make_cached_response(
+        render_template("event_list.html", template_values),
+        ttl=timedelta(minutes=5) if year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @cached_public
 def event_detail(event_key: EventKey) -> Response:
-    event = event_query.EventQuery(event_key).fetch()
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
 
     if not event:
         abort(404)
 
-    event = none_throws(event)  # for pyre
-    event.prepAwardsMatchesTeams()
+    event.prep_awards_matches_teams()
     event.prep_details()
     medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
     district_future = (
-        district_query.DistrictQuery(none_throws(event.district_key).id()).fetch_async()
+        district_query.DistrictQuery(
+            none_throws(none_throws(event.district_key).string_id())
+        ).fetch_async()
         if event.district_key
         else None
     )
@@ -103,14 +142,14 @@ def event_detail(event_key: EventKey) -> Response:
     elif event.parent_event:
         parent_event_future = none_throws(event.parent_event).get_async()
         event_codivisions_future = event_query.EventDivisionsQuery(
-            none_throws(event.parent_event).id()
+            none_throws(none_throws(event.parent_event).string_id())
         ).fetch_async()
 
-    awards = AwardHelper.organizeAwards(event.awards)
+    awards = AwardHelper.organize_awards(event.awards)
     cleaned_matches = event.matches
-    # MatchHelper.deleteInvalidMatches(event.matches, event)
-    match_count, matches = MatchHelper.organizeMatches(cleaned_matches)
-    teams = TeamHelper.sortTeams(safe_cast(List[Optional[Team]], event.teams))
+    # MatchHelper.delete_invalid_matches(event.matches, event)
+    match_count, matches = MatchHelper.organized_matches(cleaned_matches)
+    teams = TeamHelper.sort_teams(event.teams)  # pyre-ignore[6]
 
     # Organize medias by team
     image_medias = MediaHelper.get_images(
@@ -130,36 +169,34 @@ def event_detail(event_key: EventKey) -> Response:
         middle_value += 1
     teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
 
-    oprs = (
-        [i for i in event.matchstats["oprs"].items()]
-        if (event.matchstats is not None and "oprs" in event.matchstats)
-        else []
-    )
-    oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
-    oprs = oprs[:15]  # get the top 15 OPRs
+    oprs = []
+    copr_leaders: Dict[Component, List[Tuple[TeamId, float]]] = {}
+
+    if event.matchstats is not None:
+        oprs = sort_and_limit_stats(event.matchstats.get("oprs") or {})
+        copr_leaders["OPR"] = oprs
+
+    if event.coprs is not None:
+        for component, tsm in event.coprs.items():
+            copr_leaders[component] = sort_and_limit_stats(tsm)
+
+    # Container for (component, componentValidHtmlId, and componentHumanReadableName) elements
+    copr_items: List[Tuple[Component, str, str]] = [
+        (k, re.sub("[^0-9a-zA-Z]+", "_", k), convert_component_name(k))
+        for k in copr_leaders.keys()
+    ]
 
     if event.now:
-        matches_recent = MatchHelper.recentMatches(cleaned_matches)
-        matches_upcoming = MatchHelper.upcomingMatches(cleaned_matches)
+        matches_recent = MatchHelper.recent_matches(cleaned_matches)
+        matches_upcoming = MatchHelper.upcoming_matches(cleaned_matches)
     else:
         matches_recent = None
         matches_upcoming = None
 
     bracket_table = event.playoff_bracket
     playoff_advancement = event.playoff_advancement
-    double_elim_matches = PlayoffAdvancementHelper.getDoubleElimMatches(event, matches)
-    playoff_template = PlayoffAdvancementHelper.getPlayoffTemplate(event)
-
-    # Lazy handle the case when we haven't backfilled the event details
-    if not bracket_table or not playoff_advancement:
-        (
-            bracket_table2,
-            playoff_advancement2,
-            _,
-            _,
-        ) = PlayoffAdvancementHelper.generatePlayoffAdvancement(event, matches)
-        bracket_table = bracket_table or bracket_table2
-        playoff_advancement = playoff_advancement or playoff_advancement2
+    double_elim_matches = PlayoffAdvancementHelper.double_elim_matches(event, matches)
+    playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
     district_points_sorted = None
     if event.district_key and event.district_points:
@@ -190,7 +227,17 @@ def event_detail(event_key: EventKey) -> Response:
     )
 
     # status_sitevar = status_sitevar_future.get_result()
-    print(f"{event.details}")
+
+    qual_playlist = PlaylistHelper.generate_playlist_link(
+        matches_organized=matches,
+        title=f"{event.year} {event.name} Qualifications",
+        allow_levels=[comp_level.CompLevel.QM],
+    )
+    elim_playlist = PlaylistHelper.generate_playlist_link(
+        matches_organized=matches,
+        title=f"{event.year} {event.name} Playoffs",
+        allow_levels=comp_level.ELIM_LEVELS,
+    )
 
     template_values = {
         "event": event,
@@ -207,21 +254,161 @@ def event_detail(event_key: EventKey) -> Response:
         "teams_b": teams_b,
         "num_teams": num_teams,
         "oprs": oprs,
-        "bracket_table": bracket_table,
+        "bracket_table": bracket_table or {},
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
-        "playoff_advancement_tiebreakers": None,  # PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(event.year),
+        "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
+            event.year, []
+        ),
         "district_points_sorted": district_points_sorted,
         "event_insights_qual": event_insights["qual"] if event_insights else None,
         "event_insights_playoff": event_insights["playoff"] if event_insights else None,
         "event_insights_template": event_insights_template,
         "medias_by_slugname": medias_by_slugname,
         "event_divisions": event_divisions,
-        "parent_event": parent_event_future.get_result()
-        if parent_event_future
-        else None,
+        "parent_event": (
+            parent_event_future.get_result() if parent_event_future else None
+        ),
+        "double_elim_rounds": playoff_type.DoubleElimRound.__members__.values(),
         "double_elim_matches": double_elim_matches,
         "double_elim_playoff_types": playoff_type.DOUBLE_ELIM_TYPES,
+        "qual_playlist": qual_playlist,
+        "elim_playlist": elim_playlist,
+        "has_coprs": event.coprs is not None,
+        "coprs_json": json.dumps(copr_leaders),
+        "copr_items": copr_items,
     }
 
-    return render_template("event_details.html", template_values)
+    return make_cached_response(
+        render_template("event_details.html", template_values),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+    )
+
+
+@cached_public
+def event_insights(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+
+    if not event or event.year < 2016:
+        abort(404)
+
+    event.get_matches_async()
+
+    event_details = event.details
+    event_predictions = event_details.predictions if event_details else None
+    if not event_details or not event_predictions:
+        abort(404)
+
+    match_predictions = event_predictions.get("match_predictions", None)
+    match_prediction_stats = event_predictions.get("match_prediction_stats", None)
+
+    ranking_predictions = event_predictions.get("ranking_predictions", None)
+    ranking_prediction_stats = event_predictions.get("ranking_prediction_stats", None)
+
+    # TODO: Unify with API handler
+    cleaned_matches, _keys_to_delete = MatchHelper.delete_invalid_matches(
+        event.matches, event
+    )
+    _count, matches = MatchHelper.organized_matches(cleaned_matches)
+
+    # If no matches but there are match predictions, create fake matches
+    # For cases where FIRST doesn't allow posting of match schedule
+    fake_matches = False
+    if match_predictions and (not matches[CompLevel.QM] and match_predictions["qual"]):
+        fake_matches = True
+        for i in range(len(match_predictions["qual"].keys())):
+            match_number = i + 1
+            alliances = {
+                "red": {"score": -1, "teams": ["frc?", "frc?", "frc?"]},
+                "blue": {"score": -1, "teams": ["frc?", "frc?", "frc?"]},
+            }
+            matches[CompLevel.QM].append(
+                Match(
+                    id=Match.render_key_name(event_key, CompLevel.QM, 1, match_number),
+                    event=event.key,
+                    year=event.year,
+                    set_number=1,
+                    match_number=match_number,
+                    comp_level=CompLevel.QM,
+                    alliances_json=json.dumps(alliances),
+                )
+            )
+
+    # Add actual scores to predictions
+    distribution_info = {}
+    for cmp_level in COMP_LEVELS:
+        level = "qual" if cmp_level == CompLevel.QM else "playoff"
+        for match in matches[cmp_level]:
+            distribution_info[match.key_name] = {
+                "level": level,
+                "red_actual_score": match.alliances[AllianceColor.RED]["score"],
+                "blue_actual_score": match.alliances[AllianceColor.BLUE]["score"],
+                "red_mean": (
+                    match_predictions[level][match.key_name]["red"]["score"]
+                    if match_predictions
+                    else 0
+                ),
+                "blue_mean": (
+                    match_predictions[level][match.key_name]["blue"]["score"]
+                    if match_predictions
+                    else 0
+                ),
+                "red_var": (
+                    match_predictions[level][match.key_name]["red"]["score_var"]
+                    if match_predictions
+                    else 0
+                ),
+                "blue_var": (
+                    match_predictions[level][match.key_name]["blue"]["score_var"]
+                    if match_predictions
+                    else 0
+                ),
+            }
+
+    last_played_match_num = None
+    if ranking_prediction_stats:
+        last_played_match_key = ranking_prediction_stats.get("last_played_match", None)
+        if last_played_match_key:
+            last_played_match_num = last_played_match_key.split("_qm")[1]
+
+    template_values = {
+        "event": event,
+        "matches": matches,
+        "fake_matches": fake_matches,
+        "match_predictions": match_predictions,
+        "distribution_info_json": json.dumps(distribution_info),
+        "match_prediction_stats": match_prediction_stats,
+        "ranking_predictions": ranking_predictions,
+        "ranking_prediction_stats": ranking_prediction_stats,
+        "last_played_match_num": last_played_match_num,
+    }
+
+    return make_cached_response(
+        render_template("event_insights.html", template_values),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+    )
+
+
+@cached_public
+def event_rss(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+
+    if not event:
+        return redirect("/events")
+
+    cleaned_matches = event.matches
+    _, matches = MatchHelper.organized_matches(cleaned_matches)
+
+    template_values = {
+        "event": event,
+        "matches": matches,
+        "datetime": datetime.now(),
+    }
+
+    response = make_cached_response(
+        render_template("event_rss.xml", template_values),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+    )
+    response.headers["content-type"] = "application/xml; charset=UTF-8"
+
+    return response

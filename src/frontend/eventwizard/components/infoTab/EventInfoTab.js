@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Dialog from "react-bootstrap-dialog";
 
 import PlayoffTypeDropdown from "./PlayoffTypeDropdown";
 import SyncCodeInput from "./SyncCodeInput";
@@ -27,7 +26,7 @@ class EventInfoTab extends Component {
     this.removeTeamMap = this.removeTeamMap.bind(this);
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.selectedEvent === null) {
       this.setState({ eventInfo: null, buttonClass: "btn-primary" });
     } else if (newProps.selectedEvent !== this.props.selectedEvent) {
@@ -48,6 +47,7 @@ class EventInfoTab extends Component {
     const currentInfo = this.state.eventInfo;
     if (currentInfo !== null) {
       currentInfo.playoff_type = newType.value;
+      currentInfo.playoff_type_string = newType.label;
       this.setState({ eventInfo: currentInfo });
     }
   }
@@ -59,17 +59,18 @@ class EventInfoTab extends Component {
     })
       .then(ensureRequestSuccess)
       .then((response) => response.json())
-      .then((
-        data1 // Merge in remap_teams
-      ) =>
-        fetch(`/_/remap_teams/${newEventKey}`)
-          .then(ensureRequestSuccess)
-          .then((response) => response.json())
-          .then((data2) => {
-            const data = Object.assign({}, data1);
-            data.remap_teams = data2;
-            return data;
-          })
+      .then(
+        (
+          data1 // Merge in remap_teams
+        ) =>
+          fetch(`/_/remap_teams/${newEventKey}`)
+            .then(ensureRequestSuccess)
+            .then((response) => response.json())
+            .then((data2) => {
+              const data = Object.assign({}, data1);
+              data.remap_teams = data2;
+              return data;
+            })
       )
       .then((data) => this.setState({ eventInfo: data, status: "" }));
   }
@@ -126,7 +127,7 @@ class EventInfoTab extends Component {
     return (
       <div className="tab-pane" id="info">
         <h3>Event Info</h3>
-        <Dialog ref={(dialog) => (this.dialog = dialog)} />
+        {/*<Dialog ref={(dialog) => (this.dialog = dialog)} />*/}
         {this.state.status && <p>{this.state.status}</p>}
         <div className="row">
           <PlayoffTypeDropdown

@@ -5,22 +5,21 @@ on:
     branches:
       - py3
 
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   py3-type:
     name: "[py3] Type Check"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -32,17 +31,12 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -53,96 +47,184 @@ jobs:
   py3-test:
     name: "[py3] Test"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        group: [1, 2, 3]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Tests
-        run: ./ops/test_py3.sh
+        run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
+      - name: Save coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage${{ matrix.group }}
+          path: .coverage
+  py3-coverage:
+    name: "[py3] Coverage"
+    runs-on: ubuntu-latest
+    needs: [py3-test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      - name: Combine coverage
+        run: |
+          coverage combine coverage*/.coverage*
+          coverage xml
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1.0.13
+        uses: codecov/codecov-action@v4.4.1
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v2.1.1
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: "10.x"
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Format & Lint
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v2.1.1
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: "10.x"
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Tests
         run: ./ops/test_node.sh
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4.4.1
+        with:
+          directory: ./.node_coverage/
+  bash-lint:
+    name: "[bash] Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install Shellcheck
+        run: |
+          python -m pip install --upgrade pip
+          pip install shellcheck-py
+      - name: Install shfmt
+        run: |
+          mkdir -p $HOME/.local/bin
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          wget "https://github.com/mvdan/sh/releases/download/v3.2.2/shfmt_v3.2.2_linux_amd64" -O $HOME/.local/bin/shfmt
+          chmod +x $HOME/.local/bin/shfmt
+      - name: Run Lint
+        run: ./ops/lint_bash.sh
+
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: "3.12"
       - name: Set up Node
-        uses: actions/setup-node@v2.1.1
+        uses: actions/setup-node@v4.0.2
         with:
-          node-version: "10.x"
-      - name: Cache pip
-        uses: actions/cache@v2
+          node-version: "18"
+          cache: "npm"
+      - name: Install Node Dependencies
+        run: npm ci
+      - name: Run Build
+        run: ./ops/build/run_buildweb.sh --env
+
+  ops-test:
+    name: Ops Fullstack Test
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install -r src/requirements.txt
+      - name: Set up Node
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: "18"
+          cache: "npm"
       - name: Install Node Dependencies
-        run: npm install
-      - name: Run Build
-        run: ./ops/build/run_buildweb.sh
+        run: |
+          npm ci
+          npm install -g capture-website-cli
+      - name: Install Vagrant
+        run: |
+          sudo apt-get update
+          sudo apt-get install vagrant
+      - name: Create keys file
+        run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5.1.0
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: ./ops/dev/docker
+          push: true
+          tags: localhost:5000/tba-py3-dev:latest
+          cache-from: |
+            type=gha
+            ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+          cache-to: type=gha,mode=max
+      - name: Start Container
+        run: vagrant up
+      - name: Test Vagrant Startup
+        run: ./ops/test_vagrant_startup.py
+      - name: Test Ops Fullstack
+        run: ./ops/test_ops.sh
+      - name: Capture screenshots
+        run: ./ops/pr_screenshots/capture_screenshots.py
+      - name: Upload screenshots artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci_screenshots
+          path: ci_screenshots.pickle

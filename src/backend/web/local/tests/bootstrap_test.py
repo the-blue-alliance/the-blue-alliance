@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import cast, Dict, List
 
-from google.cloud import ndb
+from google.appengine.ext import deferred, ndb
 from requests_mock.mocker import Mocker as RequestsMocker
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -10,16 +10,19 @@ from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.alliance import EventAlliance, MatchAlliance
 from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.event_predictions import EventPredictions
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, MatchKey, TeamKey, TeamNumber
+from backend.common.models.keys import EventKey, MatchKey, TeamKey, TeamNumber, Year
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.award_converter import AwardConverter
 from backend.common.queries.dict_converters.event_converter import EventConverter
@@ -27,6 +30,7 @@ from backend.common.queries.dict_converters.event_details_converter import (
     EventDetailsConverter,
 )
 from backend.common.queries.dict_converters.match_converter import MatchConverter
+from backend.common.queries.dict_converters.media_converter import MediaConverter
 from backend.common.queries.dict_converters.team_converter import TeamConverter
 from backend.web.local.bootstrap import LocalDataBootstrap
 
@@ -49,6 +53,29 @@ def make_team(team_num: TeamNumber) -> Team:
         name=f"Team {team_num}",
         website="https://www.thebluealliance.com",
     )
+
+
+def make_media(team_num: TeamNumber, year: int) -> List[Media]:
+    return [
+        Media(
+            id="imgur_HSHpnyg",
+            media_type_enum=MediaType.IMGUR,
+            foreign_key="HSHpnyg",
+            details_json=json.dumps({}),
+            references=[ndb.Key(Team, f"frc{team_num}")],
+            preferred_references=[ndb.Key(Team, f"frc{team_num}")],
+            year=year,
+        ),
+        Media(
+            id="imgur_MdhOTCR",
+            media_type_enum=MediaType.IMGUR,
+            foreign_key="MdhOTCR",
+            details_json=json.dumps({}),
+            references=[ndb.Key(Team, f"frc{team_num}")],
+            preferred_references=[ndb.Key(Team, f"frc{team_num}")],
+            year=year,
+        ),
+    ]
 
 
 def make_event(event_key: EventKey) -> Event:
@@ -113,7 +140,20 @@ def mock_team_detail_url(m: RequestsMocker, team: Team) -> None:
         "GET",
         f"https://www.thebluealliance.com/api/v3/team/{team.key_name}",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=TeamConverter(team).convert(ApiMajorVersion.API_V3),
+    )
+
+
+def mock_team_media_url(
+    m: RequestsMocker, team: Team, media: List[Media], year: int
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/team/{team.key_name}/media/{year}",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json=MediaConverter(media).convert(ApiMajorVersion.API_V3),
     )
 
 
@@ -122,7 +162,18 @@ def mock_match_detail_url(m: RequestsMocker, match: Match) -> None:
         "GET",
         f"https://www.thebluealliance.com/api/v3/match/{match.key_name}",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=MatchConverter(match).convert(ApiMajorVersion.API_V3),
+    )
+
+
+def mock_match_zebra_url(m: RequestsMocker, match: Match) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/match/{match.key_name}/zebra_motionworks",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json={"key": match.key_name},
     )
 
 
@@ -131,6 +182,7 @@ def mock_event_detail_url(m: RequestsMocker, event: Event) -> None:
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event.key_name}",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=EventConverter(event).convert(ApiMajorVersion.API_V3),
     )
 
@@ -142,6 +194,7 @@ def mock_event_teams_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=TeamConverter(teams).convert(ApiMajorVersion.API_V3),
     )
 
@@ -153,6 +206,7 @@ def mock_event_matches_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/matches",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=MatchConverter(matches).convert(ApiMajorVersion.API_V3),
     )
 
@@ -167,6 +221,7 @@ def mock_event_rankings_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/rankings",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=cast(Dict, details)["rankings"] if details else {},
     )
 
@@ -181,6 +236,7 @@ def mock_event_alliances_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/alliances",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=cast(Dict, details)["alliances"],
     )
 
@@ -192,7 +248,31 @@ def mock_event_awards_url(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/awards",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
         json=AwardConverter(awards).convert(ApiMajorVersion.API_V3),
+    )
+
+
+def mock_events_url(m: RequestsMocker, year: Year, events: List[Event]) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/events/{year}",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        json=[
+            EventConverter(event).convert(ApiMajorVersion.API_V3) for event in events
+        ],
+    )
+
+
+def mock_event_predictions_url(
+    m: RequestsMocker, event_key: EventKey, predictions: EventPredictions
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/event/{event_key}/predictions",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json=predictions,
     )
 
 
@@ -201,9 +281,15 @@ def test_bootstrap_unknown_key() -> None:
     assert resp is None
 
 
-def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker) -> None:
+def test_bootstrap_team(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     team = make_team(254)
     mock_team_detail_url(requests_mock, team)
+
+    year = datetime.now().year
+    media = make_media(254, year)
+    mock_team_media_url(requests_mock, team, media, year)
 
     resp = LocalDataBootstrap.bootstrap_key("frc254", "test_apiv3")
     assert resp == "/team/254"
@@ -211,10 +297,18 @@ def test_bootstrap_team(ndb_context, requests_mock: RequestsMocker) -> None:
     stored_team = Team.get_by_id("frc254")
     assert team == remove_auto_add_properties(stored_team)
 
+    stored_media1 = Media.get_by_id("imgur_HSHpnyg")
+    assert media[0] == remove_auto_add_properties(stored_media1)
+    stored_media2 = Media.get_by_id("imgur_MdhOTCR")
+    assert media[1] == remove_auto_add_properties(stored_media2)
 
-def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker) -> None:
+
+def test_bootstrap_match(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     match = make_match("2020nyny_qm1")
     mock_match_detail_url(requests_mock, match)
+    mock_match_zebra_url(requests_mock, match)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny_qm1", "test_apiv3")
     assert resp == "/match/2020nyny_qm1"
@@ -223,7 +317,9 @@ def test_bootstrap_match(ndb_context, requests_mock: RequestsMocker) -> None:
     assert match == remove_auto_add_properties(stored_match)
 
 
-def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
+def test_bootstrap_event(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
     event = make_event("2020nyny")
     team1 = make_team(254)
     team2 = make_team(255)
@@ -255,6 +351,17 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
     mock_event_rankings_url(requests_mock, event.key_name, rankings)
     mock_event_alliances_url(requests_mock, event.key_name, alliances)
     mock_event_awards_url(requests_mock, event.key_name, [award])
+    mock_event_predictions_url(
+        requests_mock,
+        event.key_name,
+        {
+            "match_predictions": None,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
+    )
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -285,6 +392,13 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
         id="2020nyny",
         rankings2=rankings,
         alliance_selections=alliances,
+        predictions={
+            "match_predictions": None,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
     )
     assert expected_details == remove_auto_add_properties(stored_details)
 
@@ -292,11 +406,58 @@ def test_bootstrap_event(ndb_context, requests_mock: RequestsMocker) -> None:
     assert award == remove_auto_add_properties(stored_award)
 
 
+def test_bootstrap_year(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
+    # Assert no tasks in the queue
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+    e1 = make_event("2020miket")
+    e2 = make_event("2020mike2")
+    mock_events_url(requests_mock, 2020, [e1, e2])
+
+    for event in [e1, e2]:
+        mock_event_detail_url(requests_mock, event)
+        mock_event_teams_url(requests_mock, event.key_name, [])
+        mock_event_matches_url(requests_mock, event.key_name, [])
+        mock_event_rankings_url(requests_mock, event.key_name, [])
+        mock_event_alliances_url(requests_mock, event.key_name, [])
+        mock_event_awards_url(requests_mock, event.key_name, [])
+        mock_event_predictions_url(
+            requests_mock,
+            event.key_name,
+            {
+                "match_predictions": None,
+                "match_prediction_stats": None,
+                "stat_mean_vars": None,
+                "ranking_predictions": None,
+                "ranking_prediction_stats": None,
+            },
+        )
+
+    resp = LocalDataBootstrap.bootstrap_key("2020", "test_apiv3")
+    assert resp == "/events/2020"
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 2
+
+    for task in tasks:
+        deferred.run(task.payload)
+
+    stored_e1 = Event.get_by_id("2020miket")
+    assert e1 == remove_auto_add_properties(stored_e1)
+
+    stored_e2 = Event.get_by_id("2020mike2")
+    assert e2 == remove_auto_add_properties(stored_e2)
+
+
 def test_bootstrap_event_with_district(
-    ndb_context, requests_mock: RequestsMocker
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
 ) -> None:
     district = District(
         id="2020ne",
+        year=2020,
         abbreviation="ne",
     )
     district.put()
@@ -309,6 +470,17 @@ def test_bootstrap_event_with_district(
     mock_event_rankings_url(requests_mock, event.key_name, [])
     mock_event_alliances_url(requests_mock, event.key_name, [])
     mock_event_awards_url(requests_mock, event.key_name, [])
+    mock_event_predictions_url(
+        requests_mock,
+        event.key_name,
+        {
+            "match_predictions": None,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
+    )
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"

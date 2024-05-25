@@ -1,0 +1,43 @@
+{
+  "Awards": [
+    {
+      "awardId": 397,
+      "teamId": 1173220,
+      "eventId": 53454,
+      "eventDivisionId": null,
+      "eventCode": "FIMAW",
+      "name": "Regional Chairman's Award",
+      "series": 4,
+      "teamNumber": 503,
+      "schoolName": "Novi High School",
+      "fullTeamName": "Magna Seating Systems (Primary Sponsor) / Denso / The Nissan Foundation / Tata Technologies / Ford Motor Company / Novi Community School District / NGK Sparkplugs / ASCO Numatics Inc. / Autodesk / Michigan Department of Education & Novi High School",
+      "person": null
+    },
+    {
+      "awardId": 397,
+      "teamId": 1173220,
+      "eventId": 53454,
+      "eventDivisionId": null,
+      "eventCode": "FIMAW",
+      "name": "Regional Chairman's Award",
+      "series": 4,
+      "teamNumber": 503,
+      "schoolName": "Novi High School",
+      "fullTeamName": "Magna Seating Systems (Primary Sponsor) / Denso / The Nissan Foundation / Tata Technologies / Ford Motor Company / Novi Community School District / NGK Sparkplugs / ASCO Numatics Inc. / Autodesk / Michigan Department of Education & Novi High School",
+      "person": null
+    },
+    {
+      "awardId": 233,
+      "teamId": 1173220,
+      "eventId": 53454,
+      "eventDivisionId": null,
+      "eventCode": "FIMAW",
+      "name": "FIRST Dean's List Finalist Award",
+      "series": 5,
+      "teamNumber": 503,
+      "schoolName": "Novi High School",
+      "fullTeamName": "Magna Seating Systems (Primary Sponsor) / Denso / The Nissan Foundation / Tata Technologies / Ford Motor Company / Novi Community School District / NGK Sparkplugs / ASCO Numatics Inc. / Autodesk / Michigan Department of Education & Novi High School",
+      "person": "Arseniy Ilinich"
+    }
+  ]
+}

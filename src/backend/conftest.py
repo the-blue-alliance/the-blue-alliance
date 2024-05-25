@@ -1,52 +1,109 @@
-import pytest
-from _pytest.monkeypatch import MonkeyPatch
-from google.cloud import ndb
-from google.cloud.datastore_v1.proto import datastore_pb2_grpc
-from google.cloud.ndb import _datastore_api
-from InMemoryCloudDatastoreStub import datastore_stub
+from concurrent import futures
+from typing import Generator
 
+import pytest
+from freezegun import api as freezegun_api
+from google.appengine.api import apiproxy_rpc
+from google.appengine.api import datastore_types
+from google.appengine.ext import ndb, testbed
+
+from backend.common.context_cache import context_cache
+from backend.common.models.cached_query_result import CachedQueryResult
 from backend.tests.json_data_importer import JsonDataImporter
 
 
 @pytest.fixture(autouse=True)
-def init_test_marker_env(monkeypatch: MonkeyPatch) -> None:
+def drain_gae_rpc_thread_pool(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> Generator:
+    max_concurrent = apiproxy_rpc._MAX_CONCURRENT_API_CALLS  # pyre-ignore[16]
+    thread_pool = futures.ThreadPoolExecutor(
+        max_concurrent, thread_name_prefix=f"ApiProxyThreadPool:{request.node.name}"
+    )
+    monkeypatch.setattr(apiproxy_rpc, "_THREAD_POOL", thread_pool)
+    yield
+
+    # This thread pool can leave work dangling after the test session
+    # is done, which can cause pytest to hang.
+    # So we add this fixture to manually shut it down
+    thread_pool.shutdown()
+
+
+@pytest.fixture(autouse=True)
+def init_test_marker_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("TBA_UNIT_TEST", "true")
 
 
 @pytest.fixture(autouse=True)
-def init_ndb_env_vars(monkeypatch: MonkeyPatch) -> None:
-    """
-    Initializing an ndb Client in a test env requires some environment variables to be set
-    For now, these are just garbage values intended to give the library _something_
-    (we don't expect them to actually work yet)
-    """
-
-    monkeypatch.setenv("DATASTORE_EMULATOR_HOST", "localhost:8432")
-    monkeypatch.setenv("DATASTORE_DATASET", "tba-unit-test")
+def clear_context_cache(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(context_cache, "CACHE_DATA", {})
 
 
 @pytest.fixture()
-def ndb_stub(monkeypatch: MonkeyPatch) -> datastore_stub.LocalDatastoreStub:
-    stub = datastore_stub.LocalDatastoreStub()
+def gae_testbed() -> Generator[testbed.Testbed, None, None]:
+    tb = testbed.Testbed()
+    tb.activate()
+    yield tb
+    tb.deactivate()
 
-    def mock_stub() -> datastore_pb2_grpc.DatastoreStub:
-        return stub
 
-    monkeypatch.setattr(_datastore_api, "stub", mock_stub)
+@pytest.fixture()
+def ndb_stub(
+    gae_testbed: testbed.Testbed,
+    memcache_stub,
+    monkeypatch: pytest.MonkeyPatch,
+) -> testbed.datastore_file_stub.DatastoreFileStub:
+    gae_testbed.init_datastore_v3_stub()
+
+    # monkeypatch the ndb library to work with freezegun
+    fake_datetime = getattr(freezegun_api, "FakeDatetime")  # pyre-ignore[16]
+    v = getattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", {})  # pyre-ignore[16]
+    v[fake_datetime] = datastore_types.ValidatePropertyNothing
+    monkeypatch.setattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", v)
+
+    p = getattr(datastore_types, "_PACK_PROPERTY_VALUES", {})  # pyre-ignore[16]
+    p[fake_datetime] = datastore_types.PackDatetime
+    monkeypatch.setattr(datastore_types, "_PACK_PROPERTY_VALUES", p)
+
+    stub = gae_testbed.get_stub(testbed.DATASTORE_SERVICE_NAME)
     return stub
 
 
 @pytest.fixture()
-def ndb_client(init_ndb_env_vars, ndb_stub) -> ndb.Client:
-    return ndb.Client()
+def taskqueue_stub(
+    gae_testbed: testbed.Testbed,
+) -> testbed.taskqueue_stub.TaskQueueServiceStub:
+    gae_testbed.init_taskqueue_stub(root_path="src/")
+    return gae_testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
 
 @pytest.fixture()
-def ndb_context(ndb_client: ndb.Client):
-    with ndb_client.context() as context:
-        yield context
+def urlfetch_stub(
+    gae_testbed: testbed.Testbed,
+) -> testbed.urlfetch_stub.URLFetchServiceStub:
+    gae_testbed.init_urlfetch_stub()
+    return gae_testbed.get_stub(testbed.URLFETCH_SERVICE_NAME)
 
 
 @pytest.fixture()
-def test_data_importer(ndb_client) -> JsonDataImporter:
-    return JsonDataImporter(ndb_client)
+def memcache_stub(
+    gae_testbed: testbed.Testbed,
+    monkeypatch: pytest.MonkeyPatch,
+) -> testbed.memcache_stub.MemcacheServiceStub:
+    gae_testbed.init_memcache_stub()
+    stub = gae_testbed.get_stub(testbed.MEMCACHE_SERVICE_NAME)
+    return stub
+
+
+@pytest.fixture()
+def ndb_context(ndb_stub):
+    pass
+
+
+@pytest.fixture()
+def test_data_importer(ndb_stub) -> JsonDataImporter:
+    return JsonDataImporter()
+
+
+def clear_cached_queries() -> None:
+    ndb.delete_multi(CachedQueryResult.query().fetch(keys_only=True))

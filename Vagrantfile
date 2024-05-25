@@ -14,15 +14,30 @@ Vagrant.configure("2") do |config|
       ".git/",
       "node_modules/",
       "src/build/*",
-      "*__pycache__*",
+      "__pycache__",
       "venv/*",
       ".pyre/*",
     ],
     rsync__auto: true
 
-  # Forward GAE modules
   ports = []
-  for i in 8080..8089
+
+  # Forward Firebase ports
+  for i in [4000, 4400, 4500, 9005, 9000, 9099]
+    ports.push("#{i}:#{i}")
+    config.vm.network "forwarded_port", guest: i, host: i
+  end
+
+  # Forward GAE modules
+  # Only forward 8080 on CI since some others conflict with GH Actions
+  # and are not needed for testing.
+  if ENV['CI'] != nil
+    gae_module_ports = [8080]
+  else
+    gae_module_ports = 8080..8089
+  end
+
+  for i in gae_module_ports
     ports.push("#{i}:#{i}")
     config.vm.network "forwarded_port", guest: i, host: i
   end
@@ -31,6 +46,10 @@ Vagrant.configure("2") do |config|
   ports.push("8000:8000")
   config.vm.network "forwarded_port", guest: 8000, host: 8000
 
+  # Forward RQ Dashboard
+  ports.push("9181:9181")
+  config.vm.network "forwarded_port", guest: 9181, host: 9181
+
   # Provision with docker
   config.vm.hostname = "tba-py3-docker"
   config.vm.provider "docker" do |d|
@@ -38,11 +57,20 @@ Vagrant.configure("2") do |config|
     d.ports = ports
     d.has_ssh = true
 
-    # By deafult, run with a prebuilt container image
-    d.image = "gcr.io/tbatv-prod-hrd/tba-py3-dev:latest"
+    if ENV['CI'] != nil
+      # On CI, we use the locally prebuilt image
+      d.image = "localhost:5000/tba-py3-dev:latest"
+    else
+      if ENV['TBA_LOCAL_DOCKERFILE'] != nil
+        # We can build the docker container from the local Dockerfile
+        d.build_dir = "ops/dev/docker"
+      else
+        # But by deafult, run with a prebuilt container image because it's faster
+        d.image = "ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest"
+      end
+    end
 
-    # Or built it from the local checkout
-    # d.build_dir = "ops/dev/docker"
+
   end
 
   # Configure ssh into container

@@ -1,0 +1,48 @@
+{
+  "address": "18 Corey Rd, Flanders, NJ 07836, USA",
+  "city": "Mount Olive",
+  "country": "USA",
+  "district": {
+    "abbreviation": "fma",
+    "display_name": "FIRST Mid-Atlantic",
+    "key": "2023fma",
+    "year": 2023
+  },
+  "division_keys": [],
+  "end_date": "2023-03-12",
+  "event_code": "njfla",
+  "event_type": 1,
+  "event_type_string": "District",
+  "first_event_code": "NJFLA",
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJ93rT9rSdw4kRelcNKT9Gpuw",
+  "gmaps_url": "https://maps.google.com/?q=18+Corey+Rd,+Flanders,+NJ+07836,+USA&ftid=0x89c39db4f6d37af7:0xeca6463f290d577a",
+  "key": "2023njfla",
+  "lat": 40.85874200000001,
+  "lng": -74.7141369,
+  "location_name": "18 Corey Rd",
+  "name": "FMA District Mount Olive Event",
+  "parent_event_key": null,
+  "playoff_type": 10,
+  "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+  "postal_code": "07836",
+  "short_name": "Mount Olive",
+  "start_date": "2023-03-10",
+  "state_prov": "NJ",
+  "timezone": "America/New_York",
+  "webcasts": [
+    {
+      "channel": "tBmmzfrSEfw",
+      "date": "2023-03-11",
+      "type": "youtube"
+    },
+    {
+      "channel": "tHPPzGQP03Y",
+      "date": "2023-03-12",
+      "type": "youtube"
+    }
+  ],
+  "website": "http://www.midatlanticrobotics.com/",
+  "week": 1,
+  "year": 2023
+}

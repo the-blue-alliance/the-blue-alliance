@@ -1,0 +1,3 @@
+BaseException = Exception
+
+class DeadlineExceededError(BaseException): ...

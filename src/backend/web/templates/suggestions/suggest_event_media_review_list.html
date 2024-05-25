@@ -49,7 +49,7 @@
           </div><br>
 
           {% for suggestion, reference in suggestions_and_references %}
-          <div class="row">
+          <div class="row" class="suggestion-item">
               <div class="well">
                   <div class="col-xs-2">
                     <label class="radio text-success">
@@ -60,7 +60,7 @@
                     </label>
                   </div>
                   <div class="col-xs-5 fitvids">
-                      <p><strong><a href="/event/{{reference.key_name}}" target="_blank">{{ reference.year }} {{ reference.name }}</a></strong></p>
+                      <p><strong><a href="/event/{{reference.key_name}}" target="_blank" rel="noopener noreferrer">{{ reference.year }} {{ reference.name }}</a></strong></p>
                       {% set media = suggestion.candidate_media -%}
                       {% include "media_partials/media_display_partial.html" %}
                   </div>

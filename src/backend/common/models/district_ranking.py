@@ -1,14 +1,16 @@
-from typing import List
-
-from typing_extensions import TypedDict
+from typing import List, TypedDict
 
 from backend.common.models.event_district_points import TeamAtEventDistrictPoints
 from backend.common.models.keys import TeamKey
 
 
-class DistrictRanking(TypedDict):
+class _DistrictRankingOptional(TypedDict, total=False):
+    other_bonus: int
+
+
+class DistrictRanking(_DistrictRankingOptional):
     rank: int
     team_key: TeamKey
-    point_toal: int
+    point_total: int
     rookie_bonus: int
     event_points: List[TeamAtEventDistrictPoints]

@@ -1,0 +1,44 @@
+{
+  "address": "901 N Broadway, St. Louis, MO 63101, USA", 
+  "city": "St. Louis", 
+  "country": "USA", 
+  "district": null, 
+  "division_keys": [
+    "2017arc", 
+    "2017cars", 
+    "2017cur", 
+    "2017dal", 
+    "2017dar", 
+    "2017tes"
+  ], 
+  "end_date": "2017-04-29", 
+  "event_code": "cmpmo", 
+  "event_type": 4, 
+  "event_type_string": "Championship Finals", 
+  "first_event_code": "CMPMO", 
+  "first_event_id": null, 
+  "gmaps_place_id": "ChIJwcWeSx-z2IcR7shA7mBLmOA", 
+  "gmaps_url": "https://maps.google.com/?cid=16183768140642044142", 
+  "key": "2017cmpmo", 
+  "lat": 38.6328287, 
+  "lng": -90.1885095, 
+  "location_name": "The Dome at America's Center", 
+  "name": "Einstein Field (St. Louis)", 
+  "parent_event_key": null, 
+  "playoff_type": 4, 
+  "playoff_type_string": "Round Robin (6 Alliances)", 
+  "postal_code": "63101", 
+  "short_name": "Einstein (St. Louis)", 
+  "start_date": "2017-04-29", 
+  "state_prov": "MO", 
+  "timezone": "America/Chicago", 
+  "webcasts": [
+    {
+      "channel": "firstinspires", 
+      "type": "twitch"
+    }
+  ], 
+  "website": null, 
+  "week": null, 
+  "year": 2017
+}

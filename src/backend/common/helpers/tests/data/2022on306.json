@@ -1,0 +1,46 @@
+{
+  "address": "205 Humber College Blvd, Etobicoke, ON M9W 5L7, Canada", 
+  "city": "Toronto", 
+  "country": "Canada", 
+  "district": {
+    "abbreviation": "ont", 
+    "display_name": "Ontario", 
+    "key": "2022ont", 
+    "year": 2022
+  }, 
+  "division_keys": [], 
+  "end_date": "2022-03-06", 
+  "event_code": "on306", 
+  "event_type": 1, 
+  "event_type_string": "District", 
+  "first_event_code": "ON306", 
+  "first_event_id": null, 
+  "gmaps_place_id": "ChIJLRxZPa07K4gRRZkWA-zk0Vk", 
+  "gmaps_url": "https://maps.google.com/?q=205+Humber+College+Blvd,+Etobicoke,+ON+M9W+5L7,+Canada&ftid=0x882b3bad3d591c2d:0x59d1e4ec03169945", 
+  "key": "2022on306", 
+  "lat": 43.7284351, 
+  "lng": -79.6067803, 
+  "location_name": "205 Humber College Blvd", 
+  "name": "ONT District Humber College Event Day 2", 
+  "parent_event_key": null, 
+  "playoff_type": null, 
+  "playoff_type_string": null, 
+  "postal_code": "M9W 5L7", 
+  "short_name": "Humber College", 
+  "start_date": "2022-03-06", 
+  "state_prov": "ON", 
+  "timezone": "America/Toronto", 
+  "webcasts": [
+    {
+      "channel": "firstontario1", 
+      "type": "twitch"
+    }, 
+    {
+      "channel": "firstontario2", 
+      "type": "twitch"
+    }
+  ], 
+  "website": "http://www.firstroboticscanada.org/events/category/frc/list/", 
+  "week": 0, 
+  "year": 2022
+}

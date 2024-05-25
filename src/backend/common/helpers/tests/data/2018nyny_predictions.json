@@ -1,0 +1,3747 @@
+{
+  "match_prediction_stats": {
+    "playoff": {
+      "brier_scores": {
+        "win_loss": 0.22426869604013874
+      }, 
+      "err_mean": 92.42362213411282, 
+      "err_var": 4944.651246217158, 
+      "wl_accuracy": 76.47058823529412, 
+      "wl_accuracy_75": 76.47058823529412
+    }, 
+    "qual": {
+      "brier_scores": {
+        "win_loss": 0.21809473283996622
+      }, 
+      "err_mean": 77.30211813008741, 
+      "err_var": 3321.6536565798474, 
+      "wl_accuracy": 72.94117647058823, 
+      "wl_accuracy_75": 75.86206896551724
+    }
+  }, 
+  "match_predictions": {
+    "playoff": {
+      "2018nyny_f1m1": {
+        "blue": {
+          "auto_points": 34.225527511915395, 
+          "auto_points_var": 44.45768758133096, 
+          "endgame_points": 45.91621538837998, 
+          "endgame_points_var": 370.4552230829924, 
+          "prob_auto_quest": 0.9167630394275106, 
+          "prob_face_boss": 0.2321663552747295, 
+          "score": 411.8893263315722, 
+          "score_var": 756.4924342851617
+        }, 
+        "prob": 0.9695411541717313, 
+        "red": {
+          "auto_points": 41.26721075925344, 
+          "auto_points_var": 97.82231801994266, 
+          "endgame_points": 60.046875181843575, 
+          "endgame_points_var": 446.5164887511767, 
+          "prob_auto_quest": 0.9499870547929623, 
+          "prob_face_boss": 0.5008849809549702, 
+          "score": 469.5816596278511, 
+          "score_var": 191.17119289899222
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_f1m2": {
+        "blue": {
+          "auto_points": 33.50510751469682, 
+          "auto_points_var": 45.246736328775874, 
+          "endgame_points": 44.8477346697609, 
+          "endgame_points_var": 345.44985221475144, 
+          "prob_auto_quest": 0.8969576368550947, 
+          "prob_face_boss": 0.20746769806560883, 
+          "score": 390.4080809369762, 
+          "score_var": 681.5160684273392
+        }, 
+        "prob": 0.987190700704117, 
+        "red": {
+          "auto_points": 41.353688380371395, 
+          "auto_points_var": 96.48015808319205, 
+          "endgame_points": 57.87751603083511, 
+          "endgame_points_var": 441.91311318255373, 
+          "prob_auto_quest": 0.9520369204092165, 
+          "prob_face_boss": 0.4597886491712514, 
+          "score": 455.5881231068506, 
+          "score_var": 171.31359841370016
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf1m1": {
+        "blue": {
+          "auto_points": 26.029223530089954, 
+          "auto_points_var": 98.73195758246392, 
+          "endgame_points": 27.31747876240098, 
+          "endgame_points_var": 674.2501277694146, 
+          "prob_auto_quest": 0.5412491361968877, 
+          "prob_face_boss": 0.10407836147312621, 
+          "score": 363.7464443318997, 
+          "score_var": 459.5422919065471
+        }, 
+        "prob": 0.9999997834010335, 
+        "red": {
+          "auto_points": 41.0882202140626, 
+          "auto_points_var": 88.97730603545915, 
+          "endgame_points": 67.37832592463843, 
+          "endgame_points_var": 216.21092224104058, 
+          "prob_auto_quest": 0.9559554865787221, 
+          "prob_face_boss": 0.6920911643076386, 
+          "score": 497.21420339558773, 
+          "score_var": 237.9247066033796
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf1m2": {
+        "blue": {
+          "auto_points": 27.442979584367762, 
+          "auto_points_var": 99.07408442597813, 
+          "endgame_points": 21.708732277911736, 
+          "endgame_points_var": 692.3735865632153, 
+          "prob_auto_quest": 0.5969409081404278, 
+          "prob_face_boss": 0.07280379140930482, 
+          "score": 329.9656834418802, 
+          "score_var": 362.8885204991638
+        }, 
+        "prob": 0.9999999999323195, 
+        "red": {
+          "auto_points": 42.27106241195655, 
+          "auto_points_var": 91.17785816131196, 
+          "endgame_points": 71.83827660702701, 
+          "endgame_points_var": 259.7082586661353, 
+          "prob_auto_quest": 0.9647537202709479, 
+          "prob_face_boss": 0.7687056895423201, 
+          "score": 495.3473816461584, 
+          "score_var": 300.4975425637906
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf2m1": {
+        "blue": {
+          "auto_points": 21.311596772782472, 
+          "auto_points_var": 88.65641791261058, 
+          "endgame_points": 54.835257936694774, 
+          "endgame_points_var": 401.66412023900705, 
+          "prob_auto_quest": 0.34763003678387117, 
+          "prob_face_boss": 0.39831860501808924, 
+          "score": 341.25645681580954, 
+          "score_var": 667.5236363001987
+        }, 
+        "prob": 0.9163222471098473, 
+        "red": {
+          "auto_points": 28.4886244224177, 
+          "auto_points_var": 109.61188119666933, 
+          "endgame_points": 41.27723624762015, 
+          "endgame_points_var": 453.60720385046636, 
+          "prob_auto_quest": 0.6305142502943543, 
+          "prob_face_boss": 0.1896780800856427, 
+          "score": 384.80595580425984, 
+          "score_var": 327.2758101438764
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf2m2": {
+        "blue": {
+          "auto_points": 22.38601598425064, 
+          "auto_points_var": 78.25786332772051, 
+          "endgame_points": 57.20523997173898, 
+          "endgame_points_var": 367.498791585858, 
+          "prob_auto_quest": 0.38381079647342153, 
+          "prob_face_boss": 0.44204506534304266, 
+          "score": 353.8440266343621, 
+          "score_var": 664.9300593005521
+        }, 
+        "prob": 0.7611294009119305, 
+        "red": {
+          "auto_points": 28.795083849626028, 
+          "auto_points_var": 89.92032347750431, 
+          "endgame_points": 38.72064615624301, 
+          "endgame_points_var": 463.1270618734349, 
+          "prob_auto_quest": 0.6555006053070989, 
+          "prob_face_boss": 0.16138055832456977, 
+          "score": 376.3258842066345, 
+          "score_var": 337.8848997028018
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf2m3": {
+        "blue": {
+          "auto_points": 23.80162422456811, 
+          "auto_points_var": 78.15786215154736, 
+          "endgame_points": 58.20725673397384, 
+          "endgame_points_var": 359.29819464658704, 
+          "prob_auto_quest": 0.44608763351962233, 
+          "prob_face_boss": 0.4623249729976999, 
+          "score": 340.8556914676359, 
+          "score_var": 659.1663724914549
+        }, 
+        "prob": 0.8921462317853894, 
+        "red": {
+          "auto_points": 29.768357078310096, 
+          "auto_points_var": 82.77139645352563, 
+          "endgame_points": 38.76691578327144, 
+          "endgame_points_var": 455.4763852449232, 
+          "prob_auto_quest": 0.6999015778886609, 
+          "prob_face_boss": 0.15989205098892123, 
+          "score": 380.14879136184214, 
+          "score_var": 348.17150753453166
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf3m1": {
+        "blue": {
+          "auto_points": 23.106648443145303, 
+          "auto_points_var": 58.6277289083147, 
+          "endgame_points": 44.07394801922878, 
+          "endgame_points_var": 521.4169337302698, 
+          "prob_auto_quest": 0.40234780945662574, 
+          "prob_face_boss": 0.24275936181822066, 
+          "score": 330.1002578088281, 
+          "score_var": 921.4278918300427
+        }, 
+        "prob": 0.9390498448173195, 
+        "red": {
+          "auto_points": 35.76070226061975, 
+          "auto_points_var": 84.6980316428821, 
+          "endgame_points": 33.251725633078216, 
+          "endgame_points_var": 345.0796762943065, 
+          "prob_auto_quest": 0.8788466835911126, 
+          "prob_face_boss": 0.07494608912560263, 
+          "score": 392.60653544001013, 
+          "score_var": 711.4471174702684
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf3m2": {
+        "blue": {
+          "auto_points": 24.933332624101357, 
+          "auto_points_var": 63.81840744994399, 
+          "endgame_points": 42.81217246525267, 
+          "endgame_points_var": 430.5399543523188, 
+          "prob_auto_quest": 0.49667075769349933, 
+          "prob_face_boss": 0.20373595163338354, 
+          "score": 302.8369514879919, 
+          "score_var": 783.5716035863051
+        }, 
+        "prob": 0.9817950882992065, 
+        "red": {
+          "auto_points": 34.83471073989698, 
+          "auto_points_var": 68.8615428096376, 
+          "endgame_points": 35.23424749133575, 
+          "endgame_points_var": 287.9492817891065, 
+          "prob_auto_quest": 0.8820208712926789, 
+          "prob_face_boss": 0.07221865548985151, 
+          "score": 388.1218124137522, 
+          "score_var": 877.8785785329959
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf4m1": {
+        "blue": {
+          "auto_points": 33.119824859465865, 
+          "auto_points_var": 159.09003405007076, 
+          "endgame_points": 39.06857161321015, 
+          "endgame_points_var": 527.1059425745415, 
+          "prob_auto_quest": 0.740135032276975, 
+          "prob_face_boss": 0.18096446219073625, 
+          "score": 271.836125161631, 
+          "score_var": 151.46933492966573
+        }, 
+        "prob": 0.9987681615473385, 
+        "red": {
+          "auto_points": 26.2603651574067, 
+          "auto_points_var": 22.795017356775684, 
+          "endgame_points": 53.61222816907399, 
+          "endgame_points_var": 287.6360253341343, 
+          "prob_auto_quest": 0.6041035997631456, 
+          "prob_face_boss": 0.35322015515036675, 
+          "score": 363.27321465167836, 
+          "score_var": 760.5410601799723
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf4m2": {
+        "blue": {
+          "auto_points": 35.33721897493073, 
+          "auto_points_var": 122.4732534212975, 
+          "endgame_points": 42.10155663080494, 
+          "endgame_points_var": 369.9494860084669, 
+          "prob_auto_quest": 0.8248681399775184, 
+          "prob_face_boss": 0.17604079133717088, 
+          "score": 275.35526413110813, 
+          "score_var": 316.48880607011154
+        }, 
+        "prob": 0.9941048490702801, 
+        "red": {
+          "auto_points": 27.4875464488598, 
+          "auto_points_var": 19.674276434599445, 
+          "endgame_points": 49.26297058380718, 
+          "endgame_points_var": 303.6719368688068, 
+          "prob_auto_quest": 0.7125391354656285, 
+          "prob_face_boss": 0.2688999343470134, 
+          "score": 351.5339112172453, 
+          "score_var": 598.5324177122477
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qf4m3": {
+        "blue": {
+          "auto_points": 34.872086643305956, 
+          "auto_points_var": 113.33428933458872, 
+          "endgame_points": 41.70460445867184, 
+          "endgame_points_var": 352.3366464635419, 
+          "prob_auto_quest": 0.8231190557820098, 
+          "prob_face_boss": 0.16485904041082622, 
+          "score": 290.9184794551726, 
+          "score_var": 295.927626470046
+        }, 
+        "prob": 0.9589753790002555, 
+        "red": {
+          "auto_points": 27.015512830101535, 
+          "auto_points_var": 19.251047940114983, 
+          "endgame_points": 52.20306828712499, 
+          "endgame_points_var": 292.05299920807965, 
+          "prob_auto_quest": 0.6770141422766359, 
+          "prob_face_boss": 0.3241088771770826, 
+          "score": 338.88313378897374, 
+          "score_var": 464.8970438985159
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_sf1m1": {
+        "blue": {
+          "auto_points": 29.937399530472682, 
+          "auto_points_var": 71.75355258366339, 
+          "endgame_points": 38.195568989860014, 
+          "endgame_points_var": 445.8252682382539, 
+          "prob_auto_quest": 0.7200117888202754, 
+          "prob_face_boss": 0.15087870126267688, 
+          "score": 369.413424376542, 
+          "score_var": 350.0423700450232
+        }, 
+        "prob": 0.999999816533234, 
+        "red": {
+          "auto_points": 41.970897816719756, 
+          "auto_points_var": 90.98332192634984, 
+          "endgame_points": 66.69718794683948, 
+          "endgame_points_var": 382.9521032209436, 
+          "prob_auto_quest": 0.9623962267660687, 
+          "prob_face_boss": 0.6339117413625599, 
+          "score": 494.65145785242646, 
+          "score_var": 256.45572049883054
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_sf1m2": {
+        "blue": {
+          "auto_points": 30.106825770987673, 
+          "auto_points_var": 63.872847008737736, 
+          "endgame_points": 33.423559735524485, 
+          "endgame_points_var": 497.3506126592306, 
+          "prob_auto_quest": 0.7385847273759345, 
+          "prob_face_boss": 0.11669023383392763, 
+          "score": 334.8552665314485, 
+          "score_var": 348.63585472312025
+        }, 
+        "prob": 0.9999999994658899, 
+        "red": {
+          "auto_points": 42.82090122543416, 
+          "auto_points_var": 91.9710657539926, 
+          "endgame_points": 62.83396555732541, 
+          "endgame_points_var": 436.64680460456265, 
+          "prob_auto_quest": 0.9684332129922606, 
+          "prob_face_boss": 0.5539398547919158, 
+          "score": 480.64247808841816, 
+          "score_var": 222.7642886035397
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_sf2m1": {
+        "blue": {
+          "auto_points": 34.540358631042615, 
+          "auto_points_var": 109.30476268137909, 
+          "endgame_points": 45.716944362242884, 
+          "endgame_points_var": 364.60583592242017, 
+          "prob_auto_quest": 0.8192540058837998, 
+          "prob_face_boss": 0.22722606756222352, 
+          "score": 309.71202002135067, 
+          "score_var": 285.8735481600909
+        }, 
+        "prob": 0.9955405541922835, 
+        "red": {
+          "auto_points": 33.86411588347425, 
+          "auto_points_var": 64.62459111972665, 
+          "endgame_points": 40.6341291078115, 
+          "endgame_points_var": 377.4922603849891, 
+          "prob_auto_quest": 0.8649097658133518, 
+          "prob_face_boss": 0.1594447407898658, 
+          "score": 402.55778690892816, 
+          "score_var": 974.5944376294947
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_sf2m2": {
+        "blue": {
+          "auto_points": 34.353688204140425, 
+          "auto_points_var": 105.97252173475954, 
+          "endgame_points": 44.267225714972625, 
+          "endgame_points_var": 353.9174374881675, 
+          "prob_auto_quest": 0.8182268159480394, 
+          "prob_face_boss": 0.2014972816045979, 
+          "score": 323.77736939940075, 
+          "score_var": 276.80007846220326
+        }, 
+        "prob": 0.9895553133290448, 
+        "red": {
+          "auto_points": 33.71980633533638, 
+          "auto_points_var": 55.554979804529395, 
+          "endgame_points": 40.51020116243328, 
+          "endgame_points_var": 325.71695974498607, 
+          "prob_auto_quest": 0.8789775507313595, 
+          "prob_face_boss": 0.14009134713678972, 
+          "score": 401.7595314894091, 
+          "score_var": 862.8587646146677
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_sf2m3": {
+        "blue": {
+          "auto_points": 34.43723213967781, 
+          "auto_points_var": 103.25472108880447, 
+          "endgame_points": 43.15348999400654, 
+          "endgame_points_var": 348.71798751527047, 
+          "prob_auto_quest": 0.8234855987634665, 
+          "prob_face_boss": 0.18349189680197608, 
+          "score": 304.6036431626182, 
+          "score_var": 268.98169825935037
+        }, 
+        "prob": 0.9986652259552047, 
+        "red": {
+          "auto_points": 34.12859995047765, 
+          "auto_points_var": 49.928831586260515, 
+          "endgame_points": 43.5456540792357, 
+          "endgame_points_var": 359.58911697240933, 
+          "prob_auto_quest": 0.901803892367514, 
+          "prob_face_boss": 0.1927750501261204, 
+          "score": 404.96473264688086, 
+          "score_var": 847.6132486484846
+        }, 
+        "winning_alliance": "red"
+      }
+    }, 
+    "qual": {
+      "2018nyny_qm1": {
+        "blue": {
+          "auto_points": 16.250172812699716, 
+          "auto_points_var": 2.0468486180872296, 
+          "endgame_points": 47.89937182484691, 
+          "endgame_points_var": 87.44248412253542, 
+          "prob_auto_quest": 4.802271913462164e-10, 
+          "prob_face_boss": 0.09782633135203289, 
+          "score": 221.18629501943798, 
+          "score_var": 2071.6178060898505
+        }, 
+        "prob": 0.7969059033336349, 
+        "red": {
+          "auto_points": 22.33263127790956, 
+          "auto_points_var": 3.0, 
+          "endgame_points": 39.14974073787361, 
+          "endgame_points_var": 3.0, 
+          "prob_auto_quest": 0.061779439389431756, 
+          "prob_face_boss": 0.0, 
+          "score": 278.56296488458065, 
+          "score_var": 2700.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm10": {
+        "blue": {
+          "auto_points": 17.180058716489754, 
+          "auto_points_var": 77.3255252303188, 
+          "endgame_points": 30.616598521107917, 
+          "endgame_points_var": 185.25958597957745, 
+          "prob_auto_quest": 0.18692436809109614, 
+          "prob_face_boss": 0.015432975358214085, 
+          "score": 254.34426075314747, 
+          "score_var": 1455.7303656516915
+        }, 
+        "prob": 0.8946008737760591, 
+        "red": {
+          "auto_points": 23.352155010853227, 
+          "auto_points_var": 118.8448135639749, 
+          "endgame_points": 26.43462192051388, 
+          "endgame_points_var": 603.7955592009578, 
+          "prob_auto_quest": 0.4399262127391065, 
+          "prob_face_boss": 0.08597151203970854, 
+          "score": 309.81518114207535, 
+          "score_var": 509.24385970450015
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm11": {
+        "blue": {
+          "auto_points": 16.751067324502056, 
+          "auto_points_var": 39.930637870137915, 
+          "endgame_points": 40.68790013332233, 
+          "endgame_points_var": 333.214543495959, 
+          "prob_auto_quest": 0.0958778140068689, 
+          "prob_face_boss": 0.1450377965995866, 
+          "score": 205.13711216018797, 
+          "score_var": 1696.4983571404819
+        }, 
+        "prob": 0.8713231893982054, 
+        "red": {
+          "auto_points": 20.28568867866275, 
+          "auto_points_var": 103.68507417322456, 
+          "endgame_points": 26.66945973120869, 
+          "endgame_points_var": 517.2619737852563, 
+          "prob_auto_quest": 0.3216901511600906, 
+          "prob_face_boss": 0.07139169923463284, 
+          "score": 264.307838485746, 
+          "score_var": 1032.5321681857365
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm12": {
+        "blue": {
+          "auto_points": 24.577925780821353, 
+          "auto_points_var": 23.321459460162494, 
+          "endgame_points": 28.275196333513207, 
+          "endgame_points_var": 326.0139457046456, 
+          "prob_auto_quest": 0.4651768222397781, 
+          "prob_face_boss": 0.03945576964958697, 
+          "score": 236.75111595320342, 
+          "score_var": 1684.7062665743815
+        }, 
+        "prob": 0.5139662604503217, 
+        "red": {
+          "auto_points": 16.652633679811764, 
+          "auto_points_var": 65.20636511807473, 
+          "endgame_points": 29.892229927369478, 
+          "endgame_points_var": 612.5492276060434, 
+          "prob_auto_quest": 0.1506326730853671, 
+          "prob_face_boss": 0.111899399407967, 
+          "score": 238.650800419591, 
+          "score_var": 1258.66687756314
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm13": {
+        "blue": {
+          "auto_points": 21.19697828829487, 
+          "auto_points_var": 43.19030606391385, 
+          "endgame_points": 35.367138387829776, 
+          "endgame_points_var": 319.1449197284421, 
+          "prob_auto_quest": 0.2814038196012525, 
+          "prob_face_boss": 0.08396860609684587, 
+          "score": 249.42169714979553, 
+          "score_var": 1313.9664448268975
+        }, 
+        "prob": 0.5027976987642799, 
+        "red": {
+          "auto_points": 18.247115713768686, 
+          "auto_points_var": 33.91032737657449, 
+          "endgame_points": 41.487263139363506, 
+          "endgame_points_var": 155.2295450111284, 
+          "prob_auto_quest": 0.1230976336820988, 
+          "prob_face_boss": 0.06865556864596645, 
+          "score": 249.0241291744149, 
+          "score_var": 1899.9449423021279
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm14": {
+        "blue": {
+          "auto_points": 15.562224828636745, 
+          "auto_points_var": 53.98190692695516, 
+          "endgame_points": 39.97343919280303, 
+          "endgame_points_var": 320.7870758673446, 
+          "prob_auto_quest": 0.09947763287873457, 
+          "prob_face_boss": 0.13175263601620468, 
+          "score": 199.2480868712696, 
+          "score_var": 1149.1261679967374
+        }, 
+        "prob": 0.8673371206906397, 
+        "red": {
+          "auto_points": 18.64019007556513, 
+          "auto_points_var": 98.7853972164843, 
+          "endgame_points": 40.53489098607214, 
+          "endgame_points_var": 135.44107067694648, 
+          "prob_auto_quest": 0.2611256800075099, 
+          "prob_face_boss": 0.04720699432983322, 
+          "score": 259.22495910350517, 
+          "score_var": 1750.0986128511552
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm15": {
+        "blue": {
+          "auto_points": 22.021675167591077, 
+          "auto_points_var": 23.22453386952049, 
+          "endgame_points": 34.90920663142138, 
+          "endgame_points_var": 201.9599916511881, 
+          "prob_auto_quest": 0.2682829396334584, 
+          "prob_face_boss": 0.03873510697209703, 
+          "score": 284.97416417186975, 
+          "score_var": 2039.8471897104564
+        }, 
+        "prob": 0.6457522367028734, 
+        "red": {
+          "auto_points": 15.731830269936268, 
+          "auto_points_var": 104.48174442734401, 
+          "endgame_points": 26.02300682242445, 
+          "endgame_points_var": 318.07126498111586, 
+          "prob_auto_quest": 0.18227712426667875, 
+          "prob_face_boss": 0.028382126306423672, 
+          "score": 263.59602323107435, 
+          "score_var": 1229.6534708877496
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm16": {
+        "blue": {
+          "auto_points": 19.12923796895492, 
+          "auto_points_var": 71.85632338505432, 
+          "endgame_points": 36.45001491863783, 
+          "endgame_points_var": 224.70820383038227, 
+          "prob_auto_quest": 0.244290569506598, 
+          "prob_face_boss": 0.058089229205321224, 
+          "score": 260.35075150525705, 
+          "score_var": 1325.09216492158
+        }, 
+        "prob": 0.9802628064769756, 
+        "red": {
+          "auto_points": 32.685006536731464, 
+          "auto_points_var": 118.26141002767936, 
+          "endgame_points": 44.52482008874509, 
+          "endgame_points_var": 200.17701714698228, 
+          "prob_auto_quest": 0.7601172762072184, 
+          "prob_face_boss": 0.13702650010316875, 
+          "score": 366.27090009457686, 
+          "score_var": 1320.7079870108682
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm17": {
+        "blue": {
+          "auto_points": 34.23231139310644, 
+          "auto_points_var": 124.67258759932243, 
+          "endgame_points": 38.097083526864, 
+          "endgame_points_var": 329.6828466889969, 
+          "prob_auto_quest": 0.7958380000398529, 
+          "prob_face_boss": 0.11385175208330711, 
+          "score": 358.3515144333544, 
+          "score_var": 900.8863214147505
+        }, 
+        "prob": 0.9960097399412365, 
+        "red": {
+          "auto_points": 16.88331536584328, 
+          "auto_points_var": 97.93269074520883, 
+          "endgame_points": 16.941191358315056, 
+          "endgame_points_var": 469.5509913415988, 
+          "prob_auto_quest": 0.20605370782670107, 
+          "prob_face_boss": 0.023455428669471257, 
+          "score": 246.8009132508696, 
+          "score_var": 867.2038636183032
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm18": {
+        "blue": {
+          "auto_points": 21.12575498677164, 
+          "auto_points_var": 157.04997388667164, 
+          "endgame_points": 30.26078284887656, 
+          "endgame_points_var": 385.96373598526066, 
+          "prob_auto_quest": 0.3786040115786301, 
+          "prob_face_boss": 0.06504368947065053, 
+          "score": 323.279171738953, 
+          "score_var": 739.6344254832443
+        }, 
+        "prob": 0.9975671539469992, 
+        "red": {
+          "auto_points": 21.26748753295871, 
+          "auto_points_var": 57.306746756225806, 
+          "endgame_points": 19.808046228586374, 
+          "endgame_points_var": 664.2937239734991, 
+          "prob_auto_quest": 0.3109856507119251, 
+          "prob_face_boss": 0.05945022538685807, 
+          "score": 218.82132661697048, 
+          "score_var": 636.5622420118827
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm19": {
+        "blue": {
+          "auto_points": 12.696480494254814, 
+          "auto_points_var": 102.54718169944374, 
+          "endgame_points": 22.407989368590933, 
+          "endgame_points_var": 446.33649333615205, 
+          "prob_auto_quest": 0.11218773016156747, 
+          "prob_face_boss": 0.03759020109735567, 
+          "score": 153.51998269488732, 
+          "score_var": 935.609637069546
+        }, 
+        "prob": 0.9802269080228949, 
+        "red": {
+          "auto_points": 18.30441655062024, 
+          "auto_points_var": 120.22127842034044, 
+          "endgame_points": 26.721042452916016, 
+          "endgame_points_var": 302.87882735523635, 
+          "prob_auto_quest": 0.270713145498819, 
+          "prob_face_boss": 0.02792472483605546, 
+          "score": 242.1560802751444, 
+          "score_var": 918.507683885194
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm2": {
+        "blue": {
+          "auto_points": 44.056132730338746, 
+          "auto_points_var": 107.55523214121058, 
+          "endgame_points": 72.27699751882051, 
+          "endgame_points_var": 172.8793715936462, 
+          "prob_auto_quest": 0.966929336493252, 
+          "prob_face_boss": 0.8247780009929673, 
+          "score": 441.05353947104317, 
+          "score_var": 860.4597426522166
+        }, 
+        "prob": 0.9969451643262923, 
+        "red": {
+          "auto_points": 29.83878909525099, 
+          "auto_points_var": 135.5084648450135, 
+          "endgame_points": 42.6151238860542, 
+          "endgame_points_var": 31.79305959873478, 
+          "prob_auto_quest": 0.6611759325443749, 
+          "prob_face_boss": 0.0010238459873165295, 
+          "score": 293.2708623033932, 
+          "score_var": 2044.6590719092828
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm20": {
+        "blue": {
+          "auto_points": 15.29437720492647, 
+          "auto_points_var": 74.23798151006739, 
+          "endgame_points": 42.42075271119327, 
+          "endgame_points_var": 181.03884799532793, 
+          "prob_auto_quest": 0.12998841797893967, 
+          "prob_face_boss": 0.0956887475721071, 
+          "score": 270.146547006627, 
+          "score_var": 1190.127272497315
+        }, 
+        "prob": 0.5885608481561637, 
+        "red": {
+          "auto_points": 19.712275107066425, 
+          "auto_points_var": 76.51653584085328, 
+          "endgame_points": 32.177163460130615, 
+          "endgame_points_var": 260.4761029758519, 
+          "prob_auto_quest": 0.2727579952034027, 
+          "prob_face_boss": 0.042361016537316054, 
+          "score": 259.11397136818425, 
+          "score_var": 1239.0598916969498
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm21": {
+        "blue": {
+          "auto_points": 23.21494533030082, 
+          "auto_points_var": 88.5418592397811, 
+          "endgame_points": 23.55915557299588, 
+          "endgame_points_var": 624.5795387126014, 
+          "prob_auto_quest": 0.42477042078680527, 
+          "prob_face_boss": 0.07240313848545266, 
+          "score": 289.7306383215089, 
+          "score_var": 817.4157039326376
+        }, 
+        "prob": 0.8153896794509274, 
+        "red": {
+          "auto_points": 23.071971738154648, 
+          "auto_points_var": 86.07862338610784, 
+          "endgame_points": 54.126730619001435, 
+          "endgame_points_var": 407.97214621783144, 
+          "prob_auto_quest": 0.41768879345441623, 
+          "prob_face_boss": 0.38560975749549486, 
+          "score": 326.57417523859897, 
+          "score_var": 866.163775254245
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm22": {
+        "blue": {
+          "auto_points": 11.418519529760314, 
+          "auto_points_var": 92.36873751446632, 
+          "endgame_points": 28.89511735308188, 
+          "endgame_points_var": 997.258314484142, 
+          "prob_auto_quest": 0.07880755944496765, 
+          "prob_face_boss": 0.16231843926616807, 
+          "score": 112.1264447660402, 
+          "score_var": 571.2345168686602
+        }, 
+        "prob": 0.9861207903359618, 
+        "red": {
+          "auto_points": 13.493422439373164, 
+          "auto_points_var": 97.18160511642427, 
+          "endgame_points": 25.90626881080661, 
+          "endgame_points_var": 231.59970289437905, 
+          "prob_auto_quest": 0.12156000045934445, 
+          "prob_face_boss": 0.01253583458965346, 
+          "score": 199.39915839490288, 
+          "score_var": 1001.4502603471603
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm23": {
+        "blue": {
+          "auto_points": 32.69509148544942, 
+          "auto_points_var": 50.49785839261808, 
+          "endgame_points": 43.65106950540911, 
+          "endgame_points_var": 337.9560478022486, 
+          "prob_auto_quest": 0.8605674805361351, 
+          "prob_face_boss": 0.18691491552406758, 
+          "score": 345.24614595350926, 
+          "score_var": 955.5155928872492
+        }, 
+        "prob": 0.7136975157723878, 
+        "red": {
+          "auto_points": 24.185105570883398, 
+          "auto_points_var": 161.08659232792613, 
+          "endgame_points": 43.57756136067293, 
+          "endgame_points_var": 220.87922959211434, 
+          "prob_auto_quest": 0.4744033332156341, 
+          "prob_face_boss": 0.13458093542400396, 
+          "score": 319.1472610312039, 
+          "score_var": 1184.1612993223837
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm24": {
+        "blue": {
+          "auto_points": 14.946885694468005, 
+          "auto_points_var": 102.42793869537695, 
+          "endgame_points": 30.437355872297168, 
+          "endgame_points_var": 190.2223759350269, 
+          "prob_auto_quest": 0.16027577776587343, 
+          "prob_face_boss": 0.01603866568820478, 
+          "score": 228.49817943191385, 
+          "score_var": 1743.211379894382
+        }, 
+        "prob": 0.8159078180581619, 
+        "red": {
+          "auto_points": 24.564785963578863, 
+          "auto_points_var": 121.9292197761797, 
+          "endgame_points": 36.47582711751011, 
+          "endgame_points_var": 168.52864344776793, 
+          "prob_auto_quest": 0.4842802139418647, 
+          "prob_face_boss": 0.034986875270369255, 
+          "score": 274.04971874012017, 
+          "score_var": 819.1322282819964
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm25": {
+        "blue": {
+          "auto_points": 19.521923135321316, 
+          "auto_points_var": 70.26501610956866, 
+          "endgame_points": 39.451342903693046, 
+          "endgame_points_var": 166.43821461095013, 
+          "prob_auto_quest": 0.2567107131629154, 
+          "prob_face_boss": 0.055604312902825415, 
+          "score": 270.0549813445569, 
+          "score_var": 1221.673874003383
+        }, 
+        "prob": 0.7117919386732788, 
+        "red": {
+          "auto_points": 30.706170449959487, 
+          "auto_points_var": 93.70353624097359, 
+          "endgame_points": 36.137940986757144, 
+          "endgame_points_var": 569.3471750058375, 
+          "prob_auto_quest": 0.7222292795174451, 
+          "prob_face_boss": 0.15864448385613028, 
+          "score": 296.73221571813986, 
+          "score_var": 1058.8642589306664
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm26": {
+        "blue": {
+          "auto_points": 10.283013386872025, 
+          "auto_points_var": 53.873369311831475, 
+          "endgame_points": 33.859623630329914, 
+          "endgame_points_var": 505.2651150622288, 
+          "prob_auto_quest": 0.022477217785141668, 
+          "prob_face_boss": 0.12242971008020431, 
+          "score": 172.2522265213145, 
+          "score_var": 838.5541535689749
+        }, 
+        "prob": 0.9999979357861701, 
+        "red": {
+          "auto_points": 38.37696621955496, 
+          "auto_points_var": 77.0799185789302, 
+          "endgame_points": 55.34479544909208, 
+          "endgame_points_var": 301.5463150491344, 
+          "prob_auto_quest": 0.936202702189563, 
+          "prob_face_boss": 0.39431950179057507, 
+          "score": 384.18105493734345, 
+          "score_var": 1279.5955849364661
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm27": {
+        "blue": {
+          "auto_points": 35.733670519660116, 
+          "auto_points_var": 89.91811042726741, 
+          "endgame_points": 40.96727868768084, 
+          "endgame_points_var": 264.34570631977056, 
+          "prob_auto_quest": 0.8711708640249045, 
+          "prob_face_boss": 0.1208764176741679, 
+          "score": 351.38947822107525, 
+          "score_var": 733.4931248921152
+        }, 
+        "prob": 0.9950746257301702, 
+        "red": {
+          "auto_points": 19.167137544064346, 
+          "auto_points_var": 50.13893105887407, 
+          "endgame_points": 17.76243210227335, 
+          "endgame_points_var": 472.4950591906193, 
+          "prob_auto_quest": 0.20504147305316978, 
+          "prob_face_boss": 0.02600065615166436, 
+          "score": 233.9232941011246, 
+          "score_var": 1337.7989514968735
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm28": {
+        "blue": {
+          "auto_points": 22.535760839713113, 
+          "auto_points_var": 83.82331388570194, 
+          "endgame_points": 31.16540005079492, 
+          "endgame_points_var": 311.02964254439576, 
+          "prob_auto_quest": 0.3939056831412141, 
+          "prob_face_boss": 0.05102638525808523, 
+          "score": 343.09954136272574, 
+          "score_var": 487.2959216049071
+        }, 
+        "prob": 0.9878299353379485, 
+        "red": {
+          "auto_points": 21.257624874250403, 
+          "auto_points_var": 79.49964630912633, 
+          "endgame_points": 26.98456881349687, 
+          "endgame_points_var": 305.890408270475, 
+          "prob_auto_quest": 0.3373432215992672, 
+          "prob_face_boss": 0.029532806352035812, 
+          "score": 259.4514605056346, 
+          "score_var": 892.7201751632269
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm29": {
+        "blue": {
+          "auto_points": 18.387204050308007, 
+          "auto_points_var": 23.11715349805678, 
+          "endgame_points": 39.1796833768624, 
+          "endgame_points_var": 761.4677162616882, 
+          "prob_auto_quest": 0.08450916921134188, 
+          "prob_face_boss": 0.2252733037029312, 
+          "score": 213.77547609797807, 
+          "score_var": 684.2556237319845
+        }, 
+        "prob": 0.9847346794968784, 
+        "red": {
+          "auto_points": 26.059297484321714, 
+          "auto_points_var": 61.998217983127816, 
+          "endgame_points": 26.471013550460434, 
+          "endgame_points_var": 371.90407845965007, 
+          "prob_auto_quest": 0.5535093810592494, 
+          "prob_face_boss": 0.04105071317533926, 
+          "score": 288.70034358819623, 
+          "score_var": 515.4754276904366
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm3": {
+        "blue": {
+          "auto_points": 22.33263127790956, 
+          "auto_points_var": 3.0, 
+          "endgame_points": 39.14974073787361, 
+          "endgame_points_var": 3.0, 
+          "prob_auto_quest": 0.061779439389431756, 
+          "prob_face_boss": 0.0, 
+          "score": 278.56296488458065, 
+          "score_var": 2700.0
+        }, 
+        "prob": 0.5428845168747753, 
+        "red": {
+          "auto_points": 24.433485518260966, 
+          "auto_points_var": 95.98658539755873, 
+          "endgame_points": 26.317819557647297, 
+          "endgame_points_var": 271.2876545813102, 
+          "prob_auto_quest": 0.4769445369854771, 
+          "prob_face_boss": 0.02042931612607357, 
+          "score": 285.77630534691247, 
+          "score_var": 1785.5321373113495
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm30": {
+        "blue": {
+          "auto_points": 31.137853129956753, 
+          "auto_points_var": 123.77436312488837, 
+          "endgame_points": 56.06650145381721, 
+          "endgame_points_var": 516.8075680844545, 
+          "prob_auto_quest": 0.7094222433068932, 
+          "prob_face_boss": 0.4313149953316716, 
+          "score": 376.761715863804, 
+          "score_var": 961.3175113533912
+        }, 
+        "prob": 0.9963659351843486, 
+        "red": {
+          "auto_points": 14.398242015688163, 
+          "auto_points_var": 132.17873601486815, 
+          "endgame_points": 30.2897263333008, 
+          "endgame_points_var": 302.47342979969113, 
+          "prob_auto_quest": 0.17822765132743434, 
+          "prob_face_boss": 0.043790748393605305, 
+          "score": 261.3778642297439, 
+          "score_var": 886.3640714228527
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm31": {
+        "blue": {
+          "auto_points": 21.59535193485477, 
+          "auto_points_var": 151.16580849987395, 
+          "endgame_points": 36.76987997327679, 
+          "endgame_points_var": 341.6852913987167, 
+          "prob_auto_quest": 0.3909229420738889, 
+          "prob_face_boss": 0.10442763433883262, 
+          "score": 371.36111491681993, 
+          "score_var": 1195.5289773595887
+        }, 
+        "prob": 0.987980138024507, 
+        "red": {
+          "auto_points": 18.53411107485303, 
+          "auto_points_var": 76.43407672280057, 
+          "endgame_points": 51.402904644794035, 
+          "endgame_points_var": 204.78261701160008, 
+          "prob_auto_quest": 0.22977766294506485, 
+          "prob_face_boss": 0.2739979939467778, 
+          "score": 266.38165596846846, 
+          "score_var": 968.8852299448195
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm32": {
+        "blue": {
+          "auto_points": 29.727933388995282, 
+          "auto_points_var": 84.82827074535786, 
+          "endgame_points": 30.818603192999998, 
+          "endgame_points_var": 247.82897510638531, 
+          "prob_auto_quest": 0.6961415661017917, 
+          "prob_face_boss": 0.03189392192885743, 
+          "score": 302.48063449218216, 
+          "score_var": 929.9128247590326
+        }, 
+        "prob": 0.9196617188033892, 
+        "red": {
+          "auto_points": 25.056885062367108, 
+          "auto_points_var": 106.67486918179746, 
+          "endgame_points": 22.23731593730641, 
+          "endgame_points_var": 459.9205073664609, 
+          "prob_auto_quest": 0.5021972276180695, 
+          "prob_face_boss": 0.03913220406839191, 
+          "score": 243.74949231577259, 
+          "score_var": 822.9403349142945
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm33": {
+        "blue": {
+          "auto_points": 18.70924536078231, 
+          "auto_points_var": 136.05496432943934, 
+          "endgame_points": 26.45821995532986, 
+          "endgame_points_var": 497.2087773697183, 
+          "prob_auto_quest": 0.2948334534434738, 
+          "prob_face_boss": 0.06625997802484762, 
+          "score": 248.5042557546848, 
+          "score_var": 1149.7206535557425
+        }, 
+        "prob": 0.9679339132432339, 
+        "red": {
+          "auto_points": 18.238769151294882, 
+          "auto_points_var": 80.0415257805314, 
+          "endgame_points": 23.528527302957492, 
+          "endgame_points_var": 310.81078774995376, 
+          "prob_auto_quest": 0.22490480458771112, 
+          "prob_face_boss": 0.019285391896816106, 
+          "score": 158.48321309256642, 
+          "score_var": 1214.8554399588086
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm34": {
+        "blue": {
+          "auto_points": 18.507240927008166, 
+          "auto_points_var": 114.6662124650624, 
+          "endgame_points": 20.294293337398685, 
+          "endgame_points_var": 556.9666143523704, 
+          "prob_auto_quest": 0.2721466632403724, 
+          "prob_face_boss": 0.04624223953110218, 
+          "score": 185.25668238063048, 
+          "score_var": 1061.3823875046571
+        }, 
+        "prob": 0.5429275859113927, 
+        "red": {
+          "auto_points": 15.870723762057679, 
+          "auto_points_var": 103.02570596246863, 
+          "endgame_points": 33.356801349079966, 
+          "endgame_points_var": 586.6822565353955, 
+          "prob_auto_quest": 0.18421393917228113, 
+          "prob_face_boss": 0.1356703644074917, 
+          "score": 190.11796253095326, 
+          "score_var": 971.756930629736
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm35": {
+        "blue": {
+          "auto_points": 26.638326795918147, 
+          "auto_points_var": 121.79200359314065, 
+          "endgame_points": 45.0167577072054, 
+          "endgame_points_var": 309.74549961226205, 
+          "prob_auto_quest": 0.5590076547563386, 
+          "prob_face_boss": 0.1972901135471331, 
+          "score": 388.043299042332, 
+          "score_var": 1163.3872617181532
+        }, 
+        "prob": 0.9814205954340938, 
+        "red": {
+          "auto_points": 16.981809112923003, 
+          "auto_points_var": 60.64054706750064, 
+          "endgame_points": 29.678947555585317, 
+          "endgame_points_var": 842.7605276627917, 
+          "prob_auto_quest": 0.1515842660125164, 
+          "prob_face_boss": 0.14813610463228533, 
+          "score": 293.61006878041167, 
+          "score_var": 889.8920871881946
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm36": {
+        "blue": {
+          "auto_points": 15.951883550038026, 
+          "auto_points_var": 128.16560052590748, 
+          "endgame_points": 24.96855791103874, 
+          "endgame_points_var": 410.2824657545139, 
+          "prob_auto_quest": 0.2120781746512862, 
+          "prob_face_boss": 0.04186125787445194, 
+          "score": 185.10082925702812, 
+          "score_var": 889.7463376400794
+        }, 
+        "prob": 0.9999757721429645, 
+        "red": {
+          "auto_points": 28.10284744815567, 
+          "auto_points_var": 132.13392827484313, 
+          "endgame_points": 42.978793821758615, 
+          "endgame_points_var": 504.12888068687016, 
+          "prob_auto_quest": 0.6063934476857689, 
+          "prob_face_boss": 0.22419919270152056, 
+          "score": 326.6415819615788, 
+          "score_var": 323.86416917639394
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm37": {
+        "blue": {
+          "auto_points": 19.296779592082352, 
+          "auto_points_var": 71.09028344925105, 
+          "endgame_points": 25.434308272122806, 
+          "endgame_points_var": 516.6209792792852, 
+          "prob_auto_quest": 0.2493877069370245, 
+          "prob_face_boss": 0.06416067414259641, 
+          "score": 212.79786483216594, 
+          "score_var": 1463.2204001187506
+        }, 
+        "prob": 0.7295145225528938, 
+        "red": {
+          "auto_points": 15.40602917406919, 
+          "auto_points_var": 25.365458972599754, 
+          "endgame_points": 40.776055235370364, 
+          "endgame_points_var": 413.7793537329225, 
+          "prob_auto_quest": 0.028395152987924943, 
+          "prob_face_boss": 0.1723148337166721, 
+          "score": 184.95580058317242, 
+          "score_var": 610.8791389905455
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm38": {
+        "blue": {
+          "auto_points": 30.45189605477004, 
+          "auto_points_var": 154.55598454108667, 
+          "endgame_points": 26.76479399179658, 
+          "endgame_points_var": 241.76697239405223, 
+          "prob_auto_quest": 0.6695008918471521, 
+          "prob_face_boss": 0.016279919391962383, 
+          "score": 254.76363311034032, 
+          "score_var": 937.4151474478008
+        }, 
+        "prob": 0.6051864066265997, 
+        "red": {
+          "auto_points": 16.182952812375078, 
+          "auto_points_var": 81.84172150716954, 
+          "endgame_points": 24.76654828037279, 
+          "endgame_points_var": 365.17732732043135, 
+          "prob_auto_quest": 0.16487413404964324, 
+          "prob_face_boss": 0.03260940265988144, 
+          "score": 242.35407115361488, 
+          "score_var": 1226.091843153898
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm39": {
+        "blue": {
+          "auto_points": 20.85291007362023, 
+          "auto_points_var": 86.19142775405565, 
+          "endgame_points": 38.09387405204006, 
+          "endgame_points_var": 314.34532728155153, 
+          "prob_auto_quest": 0.3275475258706443, 
+          "prob_face_boss": 0.10831201377602673, 
+          "score": 292.6854966769007, 
+          "score_var": 735.3969098653552
+        }, 
+        "prob": 0.9707006628179471, 
+        "red": {
+          "auto_points": 13.478544622250721, 
+          "auto_points_var": 82.70639403173394, 
+          "endgame_points": 40.686634836234006, 
+          "endgame_points_var": 424.05221776732856, 
+          "prob_auto_quest": 0.10259789091651794, 
+          "prob_face_boss": 0.1741524819545679, 
+          "score": 222.3316412689435, 
+          "score_var": 648.5021246670395
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm4": {
+        "blue": {
+          "auto_points": 20.01254560949551, 
+          "auto_points_var": 29.047183712661454, 
+          "endgame_points": 34.03562466424612, 
+          "endgame_points_var": 236.91920283641122, 
+          "prob_auto_quest": 0.17738036522915546, 
+          "prob_face_boss": 0.04581562042686915, 
+          "score": 296.6549779899532, 
+          "score_var": 1833.4485362218707
+        }, 
+        "prob": 0.6059208864589565, 
+        "red": {
+          "auto_points": 22.33263127790956, 
+          "auto_points_var": 3.0, 
+          "endgame_points": 39.14974073787361, 
+          "endgame_points_var": 3.0, 
+          "prob_auto_quest": 0.061779439389431756, 
+          "prob_face_boss": 0.0, 
+          "score": 278.56296488458065, 
+          "score_var": 2700.0
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm40": {
+        "blue": {
+          "auto_points": 25.97791662057933, 
+          "auto_points_var": 61.4021565262074, 
+          "endgame_points": 31.224968258565276, 
+          "endgame_points_var": 260.3656303646203, 
+          "prob_auto_quest": 0.5496585364453732, 
+          "prob_face_boss": 0.037268882826539285, 
+          "score": 263.58514292563126, 
+          "score_var": 990.1120130174522
+        }, 
+        "prob": 0.9889495137513904, 
+        "red": {
+          "auto_points": 38.769773142684755, 
+          "auto_points_var": 45.993937087961555, 
+          "endgame_points": 52.49280648339251, 
+          "endgame_points_var": 377.8591075260088, 
+          "prob_auto_quest": 0.978840837760164, 
+          "prob_face_boss": 0.3496741470231499, 
+          "score": 365.6913873325592, 
+          "score_var": 1000.3512707666326
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm41": {
+        "blue": {
+          "auto_points": 18.393281076694297, 
+          "auto_points_var": 72.4473710774812, 
+          "endgame_points": 38.17286160739633, 
+          "endgame_points_var": 273.3104322641591, 
+          "prob_auto_quest": 0.21881499048789288, 
+          "prob_face_boss": 0.09336942935549974, 
+          "score": 317.39660172021445, 
+          "score_var": 1135.475015793285
+        }, 
+        "prob": 0.6622653111847204, 
+        "red": {
+          "auto_points": 26.969771780079014, 
+          "auto_points_var": 134.54695143697438, 
+          "endgame_points": 46.59346141949116, 
+          "endgame_points_var": 368.63139012825025, 
+          "prob_auto_quest": 0.5674226356521284, 
+          "prob_face_boss": 0.24250562532898745, 
+          "score": 296.85168146079013, 
+          "score_var": 1272.7632304571466
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm42": {
+        "blue": {
+          "auto_points": 10.930168868839772, 
+          "auto_points_var": 21.955059695889734, 
+          "endgame_points": 18.46063457119932, 
+          "endgame_points_var": 519.2134137959455, 
+          "prob_auto_quest": 0.001337687719376257, 
+          "prob_face_boss": 0.034151620041089625, 
+          "score": 178.145819052573, 
+          "score_var": 911.0210849146513
+        }, 
+        "prob": 0.9671121798227793, 
+        "red": {
+          "auto_points": 22.31683136035989, 
+          "auto_points_var": 155.10066520221847, 
+          "endgame_points": 22.89335225716441, 
+          "endgame_points_var": 469.9690884237298, 
+          "prob_auto_quest": 0.4147092817423418, 
+          "prob_face_boss": 0.04347982726643185, 
+          "score": 247.6934640250079, 
+          "score_var": 517.7182896152418
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm43": {
+        "blue": {
+          "auto_points": 18.141767171687626, 
+          "auto_points_var": 68.8192266044538, 
+          "endgame_points": 27.182784207109588, 
+          "endgame_points_var": 467.5497025606685, 
+          "prob_auto_quest": 0.20419849208224972, 
+          "prob_face_boss": 0.0645441820206254, 
+          "score": 177.4474434574771, 
+          "score_var": 772.6149699002738
+        }, 
+        "prob": 0.9996028492834379, 
+        "red": {
+          "auto_points": 18.874982244405203, 
+          "auto_points_var": 75.28768804522883, 
+          "endgame_points": 4.46256054291221, 
+          "endgame_points_var": 869.6187758501654, 
+          "prob_auto_quest": 0.24012405705894846, 
+          "prob_face_boss": 0.029829305970134, 
+          "score": 49.648117134377685, 
+          "score_var": 678.5970222605888
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm44": {
+        "blue": {
+          "auto_points": 24.139614147514596, 
+          "auto_points_var": 50.74582724911576, 
+          "endgame_points": 32.03138983473055, 
+          "endgame_points_var": 135.80424625071242, 
+          "prob_auto_quest": 0.45193285881243817, 
+          "prob_face_boss": 0.008197168468258687, 
+          "score": 260.4160354960672, 
+          "score_var": 700.3895976880742
+        }, 
+        "prob": 0.9990299244212723, 
+        "red": {
+          "auto_points": 35.05774963403147, 
+          "auto_points_var": 85.38426167653506, 
+          "endgame_points": 42.32211003107474, 
+          "endgame_points_var": 482.1628510783149, 
+          "prob_auto_quest": 0.8618036436722672, 
+          "prob_face_boss": 0.21038969154491682, 
+          "score": 390.2489567200624, 
+          "score_var": 1054.5335334167253
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm45": {
+        "blue": {
+          "auto_points": 20.797818402255803, 
+          "auto_points_var": 58.78033515654505, 
+          "endgame_points": 29.624471092215654, 
+          "endgame_points_var": 436.1704561798854, 
+          "prob_auto_quest": 0.29181205985237924, 
+          "prob_face_boss": 0.07291221741842824, 
+          "score": 242.8221253602544, 
+          "score_var": 1782.1470227319062
+        }, 
+        "prob": 0.9351712736233184, 
+        "red": {
+          "auto_points": 20.246267006164047, 
+          "auto_points_var": 178.08393864508514, 
+          "endgame_points": 34.102832956010296, 
+          "endgame_points_var": 297.19439166521886, 
+          "prob_auto_quest": 0.3608366456013187, 
+          "prob_face_boss": 0.06652085899715388, 
+          "score": 315.37618693145953, 
+          "score_var": 509.97587766899585
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm46": {
+        "blue": {
+          "auto_points": 20.45256003099465, 
+          "auto_points_var": 66.39269706448268, 
+          "endgame_points": 43.495483111363924, 
+          "endgame_points_var": 212.70588064825026, 
+          "prob_auto_quest": 0.288390333272562, 
+          "prob_face_boss": 0.128890289927442, 
+          "score": 280.4024404211807, 
+          "score_var": 1048.3806402980265
+        }, 
+        "prob": 0.7528488814596415, 
+        "red": {
+          "auto_points": 19.480282040704793, 
+          "auto_points_var": 52.063712142751505, 
+          "endgame_points": 27.98248427265939, 
+          "endgame_points_var": 546.4525470161284, 
+          "prob_auto_quest": 0.2221421249913793, 
+          "prob_face_boss": 0.08539720417966123, 
+          "score": 249.5785360649211, 
+          "score_var": 985.478942171708
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm47": {
+        "blue": {
+          "auto_points": 22.323390713462047, 
+          "auto_points_var": 153.926650859325, 
+          "endgame_points": 31.096011163324786, 
+          "endgame_points_var": 280.6677679209929, 
+          "prob_auto_quest": 0.4145957141163943, 
+          "prob_face_boss": 0.042237824365119137, 
+          "score": 258.04128350880467, 
+          "score_var": 808.978746639357
+        }, 
+        "prob": 0.5579008806648409, 
+        "red": {
+          "auto_points": 21.64470586293528, 
+          "auto_points_var": 78.05565349209175, 
+          "endgame_points": 38.99111385765456, 
+          "endgame_points_var": 344.2726788728976, 
+          "prob_auto_quest": 0.3520555574551828, 
+          "prob_face_boss": 0.12875951198935165, 
+          "score": 253.2335855226286, 
+          "score_var": 280.5971527791976
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm48": {
+        "blue": {
+          "auto_points": 24.28951509371153, 
+          "auto_points_var": 14.932808494407773, 
+          "endgame_points": 21.4086906460647, 
+          "endgame_points_var": 196.79594124263187, 
+          "prob_auto_quest": 0.4270621652545249, 
+          "prob_face_boss": 0.002971207536090037, 
+          "score": 232.41506253342857, 
+          "score_var": 1580.7767519564984
+        }, 
+        "prob": 0.992329885859913, 
+        "red": {
+          "auto_points": 23.656525588078253, 
+          "auto_points_var": 113.65956905877657, 
+          "endgame_points": 36.29469588186315, 
+          "endgame_points_var": 472.02636392904776, 
+          "prob_auto_quest": 0.44985954854638566, 
+          "prob_face_boss": 0.13761563100755736, 
+          "score": 331.8494919860577, 
+          "score_var": 101.5887348120722
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm49": {
+        "blue": {
+          "auto_points": 14.000585820672903, 
+          "auto_points_var": 156.75175710451578, 
+          "endgame_points": 30.837390011683844, 
+          "endgame_points_var": 377.5733157681208, 
+          "prob_auto_quest": 0.18982437882373293, 
+          "prob_face_boss": 0.06670234318233836, 
+          "score": 287.31680921217895, 
+          "score_var": 907.6825635130527
+        }, 
+        "prob": 0.9995947032820679, 
+        "red": {
+          "auto_points": 12.799338614298758, 
+          "auto_points_var": 36.762220376185226, 
+          "endgame_points": 22.281625148837186, 
+          "endgame_points_var": 234.74377428372296, 
+          "prob_auto_quest": 0.02209665577015696, 
+          "prob_face_boss": 0.006911740980469316, 
+          "score": 154.18824962157598, 
+          "score_var": 672.3745189019996
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm5": {
+        "blue": {
+          "auto_points": 22.509229176151695, 
+          "auto_points_var": 60.05810486437793, 
+          "endgame_points": 35.39393429379951, 
+          "endgame_points_var": 143.93701592088485, 
+          "prob_auto_quest": 0.3739530568330989, 
+          "prob_face_boss": 0.020135710518989547, 
+          "score": 300.1522995814913, 
+          "score_var": 2077.6486973936303
+        }, 
+        "prob": 0.6226101705189144, 
+        "red": {
+          "auto_points": 22.33263127790956, 
+          "auto_points_var": 3.0, 
+          "endgame_points": 39.14974073787361, 
+          "endgame_points_var": 3.0, 
+          "prob_auto_quest": 0.061779439389431756, 
+          "prob_face_boss": 0.0, 
+          "score": 278.56296488458065, 
+          "score_var": 2700.0
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm50": {
+        "blue": {
+          "auto_points": 21.479933492025452, 
+          "auto_points_var": 129.61632542123053, 
+          "endgame_points": 20.820486126339105, 
+          "endgame_points_var": 286.8830313529936, 
+          "prob_auto_quest": 0.37858969768789463, 
+          "prob_face_boss": 0.010356784535897057, 
+          "score": 206.7047535906046, 
+          "score_var": 475.2868291293679
+        }, 
+        "prob": 0.549885887534073, 
+        "red": {
+          "auto_points": 14.778955129302766, 
+          "auto_points_var": 51.65219447205928, 
+          "endgame_points": 26.29153918935376, 
+          "endgame_points_var": 548.8808786462419, 
+          "prob_auto_quest": 0.07748874125477634, 
+          "prob_face_boss": 0.07510385997992941, 
+          "score": 201.803906972174, 
+          "score_var": 1052.7501272317968
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm51": {
+        "blue": {
+          "auto_points": 14.112313932705836, 
+          "auto_points_var": 53.430219346120225, 
+          "endgame_points": 24.381864435861623, 
+          "endgame_points_var": 305.6665127871989, 
+          "prob_auto_quest": 0.06817715291839721, 
+          "prob_face_boss": 0.020811810683767584, 
+          "score": 222.6634523674878, 
+          "score_var": 988.7862420432559
+        }, 
+        "prob": 0.9999964874854441, 
+        "red": {
+          "auto_points": 34.24008995243884, 
+          "auto_points_var": 102.46499619031275, 
+          "endgame_points": 43.16323462216034, 
+          "endgame_points_var": 188.11775857685478, 
+          "prob_auto_quest": 0.8193332087549823, 
+          "prob_face_boss": 0.1098055439057255, 
+          "score": 395.93086692953716, 
+          "score_var": 498.4320748371549
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm52": {
+        "blue": {
+          "auto_points": 19.840343418802327, 
+          "auto_points_var": 85.79981778129927, 
+          "endgame_points": 24.1029022845502, 
+          "endgame_points_var": 692.5660446203058, 
+          "prob_auto_quest": 0.2887538919340703, 
+          "prob_face_boss": 0.08627668098113306, 
+          "score": 163.53653095915138, 
+          "score_var": 616.7091400505435
+        }, 
+        "prob": 0.9999999735522654, 
+        "red": {
+          "auto_points": 27.165971247768674, 
+          "auto_points_var": 86.0085068276881, 
+          "endgame_points": 36.75361969192261, 
+          "endgame_points_var": 150.49832947148366, 
+          "prob_auto_quest": 0.5923332666263639, 
+          "prob_face_boss": 0.02905189966075583, 
+          "score": 357.2345719748238, 
+          "score_var": 650.4943490965882
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm53": {
+        "blue": {
+          "auto_points": 22.41497935897827, 
+          "auto_points_var": 106.45837925853402, 
+          "endgame_points": 38.61697577943962, 
+          "endgame_points_var": 392.54457478734804, 
+          "prob_auto_quest": 0.40108555292984005, 
+          "prob_face_boss": 0.14023671871500842, 
+          "score": 274.10689781632766, 
+          "score_var": 811.9489632195994
+        }, 
+        "prob": 0.9787599320838025, 
+        "red": {
+          "auto_points": 24.586350212131705, 
+          "auto_points_var": 34.55743272872392, 
+          "endgame_points": 23.75123821508818, 
+          "endgame_points_var": 668.4514801292407, 
+          "prob_auto_quest": 0.47195122728238237, 
+          "prob_face_boss": 0.08045269835862756, 
+          "score": 176.9953315530882, 
+          "score_var": 1479.285977413928
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm54": {
+        "blue": {
+          "auto_points": 12.722582776011027, 
+          "auto_points_var": 98.76479389243283, 
+          "endgame_points": 40.13681499213635, 
+          "endgame_points_var": 675.7763648833588, 
+          "prob_auto_quest": 0.10834171633691192, 
+          "prob_face_boss": 0.22240529976415657, 
+          "score": 219.2403034844835, 
+          "score_var": 358.32682442755674
+        }, 
+        "prob": 0.5832800184408629, 
+        "red": {
+          "auto_points": 13.690622631097984, 
+          "auto_points_var": 42.33654566687686, 
+          "endgame_points": 19.32623374667029, 
+          "endgame_points_var": 571.916478101019, 
+          "prob_auto_quest": 0.04109440256184782, 
+          "prob_face_boss": 0.04449217390625915, 
+          "score": 211.2014524915653, 
+          "score_var": 1102.9867892903203
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm55": {
+        "blue": {
+          "auto_points": 16.89373010866541, 
+          "auto_points_var": 85.46415346799759, 
+          "endgame_points": 41.723945374653326, 
+          "endgame_points_var": 320.88025916851706, 
+          "prob_auto_quest": 0.19028199921116806, 
+          "prob_face_boss": 0.153802535560859, 
+          "score": 312.57650141139544, 
+          "score_var": 829.2073143955274
+        }, 
+        "prob": 0.9219400622548136, 
+        "red": {
+          "auto_points": 27.5900639008574, 
+          "auto_points_var": 54.45547350213994, 
+          "endgame_points": 57.78585307198399, 
+          "endgame_points_var": 460.40909610701635, 
+          "prob_auto_quest": 0.6372005487238295, 
+          "prob_face_boss": 0.4589063826809433, 
+          "score": 361.8680335510233, 
+          "score_var": 378.7273085972304
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm56": {
+        "blue": {
+          "auto_points": 27.245123722824392, 
+          "auto_points_var": 160.01825575159938, 
+          "endgame_points": 41.24860830863123, 
+          "endgame_points_var": 615.8542157607146, 
+          "prob_auto_quest": 0.5704352910255981, 
+          "prob_face_boss": 0.22494317296750965, 
+          "score": 246.46683842391903, 
+          "score_var": 932.1364134582348
+        }, 
+        "prob": 0.967115841613073, 
+        "red": {
+          "auto_points": 16.374117945613335, 
+          "auto_points_var": 123.38813098162983, 
+          "endgame_points": 20.75129505294373, 
+          "endgame_points_var": 310.5435697820967, 
+          "prob_auto_quest": 0.21871352793983223, 
+          "prob_face_boss": 0.012966125529751071, 
+          "score": 182.8976545481079, 
+          "score_var": 261.46103332304256
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm57": {
+        "blue": {
+          "auto_points": 19.183209943035145, 
+          "auto_points_var": 62.009751801162324, 
+          "endgame_points": 30.957554928925035, 
+          "endgame_points_var": 272.8765667781844, 
+          "prob_auto_quest": 0.23005218917232262, 
+          "prob_face_boss": 0.0393630160843087, 
+          "score": 249.7351278596766, 
+          "score_var": 549.0719788050905
+        }, 
+        "prob": 0.968036452647951, 
+        "red": {
+          "auto_points": 21.6480702957299, 
+          "auto_points_var": 64.15423249516952, 
+          "endgame_points": 18.574963450563423, 
+          "endgame_points_var": 149.70784500780525, 
+          "prob_auto_quest": 0.3377954482538208, 
+          "prob_face_boss": 0.0003550639568153935, 
+          "score": 175.3793291335707, 
+          "score_var": 1061.6668253425519
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm58": {
+        "blue": {
+          "auto_points": 18.093647136002097, 
+          "auto_points_var": 54.23512194606189, 
+          "endgame_points": 32.79510465486353, 
+          "endgame_points_var": 504.38293530642414, 
+          "prob_auto_quest": 0.1741745856379886, 
+          "prob_face_boss": 0.11288213012853898, 
+          "score": 240.1564926187655, 
+          "score_var": 563.1694763864139
+        }, 
+        "prob": 0.8648408241580567, 
+        "red": {
+          "auto_points": 14.629384576729045, 
+          "auto_points_var": 91.68561779989307, 
+          "endgame_points": 11.809302978816682, 
+          "endgame_points_var": 275.197993583428, 
+          "prob_auto_quest": 0.1393901184336892, 
+          "prob_face_boss": 0.0018364837189381866, 
+          "score": 205.508724056752, 
+          "score_var": 424.76354880181077
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm59": {
+        "blue": {
+          "auto_points": 21.103901036844356, 
+          "auto_points_var": 88.50589584814907, 
+          "endgame_points": 43.28819279636319, 
+          "endgame_points_var": 466.09080942764217, 
+          "prob_auto_quest": 0.3393869424883329, 
+          "prob_face_boss": 0.21944052968692573, 
+          "score": 326.3232047715278, 
+          "score_var": 327.4162687014575
+        }, 
+        "prob": 0.9794241995656642, 
+        "red": {
+          "auto_points": 20.607968964338426, 
+          "auto_points_var": 25.512669155774255, 
+          "endgame_points": 41.52509165168522, 
+          "endgame_points_var": 193.49847115592502, 
+          "prob_auto_quest": 0.19227707625940815, 
+          "prob_face_boss": 0.09206609887991812, 
+          "score": 248.83536481118762, 
+          "score_var": 1112.5619805216752
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm6": {
+        "blue": {
+          "auto_points": 20.109107292915276, 
+          "auto_points_var": 37.11751810798441, 
+          "endgame_points": 33.421468627121605, 
+          "endgame_points_var": 465.9578163314088, 
+          "prob_auto_quest": 0.21104981555697178, 
+          "prob_face_boss": 0.10910862709683, 
+          "score": 245.17340150831353, 
+          "score_var": 1394.3579742619174
+        }, 
+        "prob": 0.5262245376542967, 
+        "red": {
+          "auto_points": 18.586939180504586, 
+          "auto_points_var": 70.5819821702834, 
+          "endgame_points": 37.142276288211576, 
+          "endgame_points_var": 74.78002790155551, 
+          "prob_auto_quest": 0.2226301100485082, 
+          "prob_face_boss": 0.004105576819875223, 
+          "score": 248.9592743236252, 
+          "score_var": 1917.7937588348993
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm60": {
+        "blue": {
+          "auto_points": 27.283007658192357, 
+          "auto_points_var": 110.61611757812909, 
+          "endgame_points": 28.7338495331324, 
+          "endgame_points_var": 413.79911810993565, 
+          "prob_auto_quest": 0.5859227833418036, 
+          "prob_face_boss": 0.062144156265273365, 
+          "score": 332.0349640726654, 
+          "score_var": 311.39269944981083
+        }, 
+        "prob": 0.807873290631003, 
+        "red": {
+          "auto_points": 32.10903917560529, 
+          "auto_points_var": 82.02036208082141, 
+          "endgame_points": 33.71112622339527, 
+          "endgame_points_var": 462.76669771141167, 
+          "prob_auto_quest": 0.7837628351148711, 
+          "prob_face_boss": 0.11084331869286346, 
+          "score": 302.09619063870116, 
+          "score_var": 872.5853904790021
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm61": {
+        "blue": {
+          "auto_points": 21.923667436224896, 
+          "auto_points_var": 58.559383220499015, 
+          "endgame_points": 22.17867254231323, 
+          "endgame_points_var": 353.47425043600873, 
+          "prob_auto_quest": 0.34383895352314975, 
+          "prob_face_boss": 0.022127089685241796, 
+          "score": 181.21184190649294, 
+          "score_var": 664.9458464541829
+        }, 
+        "prob": 0.9985785128352673, 
+        "red": {
+          "auto_points": 16.157605090555684, 
+          "auto_points_var": 63.03373607251804, 
+          "endgame_points": 46.12751929641014, 
+          "endgame_points_var": 574.3469038703261, 
+          "prob_auto_quest": 0.13269561133074825, 
+          "prob_face_boss": 0.28134476803431296, 
+          "score": 318.4966759464533, 
+          "score_var": 1451.3770762451682
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm62": {
+        "blue": {
+          "auto_points": 38.71597309403099, 
+          "auto_points_var": 114.67627134143615, 
+          "endgame_points": 56.20972338234879, 
+          "endgame_points_var": 286.4314524044271, 
+          "prob_auto_quest": 0.8998724538729854, 
+          "prob_face_boss": 0.4113962012895296, 
+          "score": 448.9461056680818, 
+          "score_var": 262.8981430364049
+        }, 
+        "prob": 0.99999999999951, 
+        "red": {
+          "auto_points": 19.37924060257309, 
+          "auto_points_var": 117.33302542208698, 
+          "endgame_points": 36.12195723436338, 
+          "endgame_points_var": 373.6646398449526, 
+          "prob_auto_quest": 0.3019147430992525, 
+          "prob_face_boss": 0.10836722363730145, 
+          "score": 254.5311639231308, 
+          "score_var": 479.9165462068978
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm63": {
+        "blue": {
+          "auto_points": 16.178331958199735, 
+          "auto_points_var": 74.35311094722228, 
+          "endgame_points": 41.260579797505684, 
+          "endgame_points_var": 405.43726089430254, 
+          "prob_auto_quest": 0.15313971978996033, 
+          "prob_face_boss": 0.1760129195195137, 
+          "score": 292.9998164424228, 
+          "score_var": 642.1324679084285
+        }, 
+        "prob": 0.9749705023835581, 
+        "red": {
+          "auto_points": 20.151712889124525, 
+          "auto_points_var": 92.45102889532308, 
+          "endgame_points": 33.3592906264133, 
+          "endgame_points_var": 426.25960967537856, 
+          "prob_auto_quest": 0.3070483408581467, 
+          "prob_face_boss": 0.09846398022334224, 
+          "score": 230.01750557743688, 
+          "score_var": 391.02040392867985
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm64": {
+        "blue": {
+          "auto_points": 33.498408137464246, 
+          "auto_points_var": 105.56346096836407, 
+          "endgame_points": 27.204444364267644, 
+          "endgame_points_var": 249.83378149363216, 
+          "prob_auto_quest": 0.7959220874320971, 
+          "prob_face_boss": 0.018999619886079344, 
+          "score": 384.2007702123145, 
+          "score_var": 478.99504225362733
+        }, 
+        "prob": 0.995544006934624, 
+        "red": {
+          "auto_points": 14.38766895974764, 
+          "auto_points_var": 116.3682327723773, 
+          "endgame_points": 52.08677643878448, 
+          "endgame_points_var": 799.8288110419276, 
+          "prob_auto_quest": 0.16261430941565025, 
+          "prob_face_boss": 0.38981369550167555, 
+          "score": 302.97993107423844, 
+          "score_var": 485.3993862455586
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm65": {
+        "blue": {
+          "auto_points": 13.197767526654271, 
+          "auto_points_var": 114.10047254455974, 
+          "endgame_points": 33.21724695659153, 
+          "endgame_points_var": 412.66514132435543, 
+          "prob_auto_quest": 0.13460285603025524, 
+          "prob_face_boss": 0.09368025373695277, 
+          "score": 189.03326078061866, 
+          "score_var": 447.78400861921835
+        }, 
+        "prob": 0.9999957833481639, 
+        "red": {
+          "auto_points": 38.268018216985595, 
+          "auto_points_var": 71.80975390798571, 
+          "endgame_points": 55.005778455926794, 
+          "endgame_points_var": 49.0552149869641, 
+          "prob_auto_quest": 0.9412930106624146, 
+          "prob_face_boss": 0.23790475326470795, 
+          "score": 340.5358578192716, 
+          "score_var": 709.2963564756972
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm66": {
+        "blue": {
+          "auto_points": 18.882663851749136, 
+          "auto_points_var": 114.17178828819026, 
+          "endgame_points": 16.05166370642556, 
+          "endgame_points_var": 811.3791150007517, 
+          "prob_auto_quest": 0.2834883158831436, 
+          "prob_face_boss": 0.061430646620844076, 
+          "score": 182.45301679695896, 
+          "score_var": 301.67654299442734
+        }, 
+        "prob": 0.6963594604685298, 
+        "red": {
+          "auto_points": 13.310556397326227, 
+          "auto_points_var": 32.01106183955551, 
+          "endgame_points": 27.65578338729312, 
+          "endgame_points_var": 453.34086392509096, 
+          "prob_auto_quest": 0.019411211858908706, 
+          "prob_face_boss": 0.0643696144875846, 
+          "score": 164.01231782203706, 
+          "score_var": 985.6799517506919
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm67": {
+        "blue": {
+          "auto_points": 22.08671312598966, 
+          "auto_points_var": 78.31930752980895, 
+          "endgame_points": 30.322402411392716, 
+          "endgame_points_var": 527.6116303844269, 
+          "prob_auto_quest": 0.37100541066460335, 
+          "prob_face_boss": 0.09817391152177635, 
+          "score": 265.73462877285374, 
+          "score_var": 862.6227714146282
+        }, 
+        "prob": 0.7278531383252301, 
+        "red": {
+          "auto_points": 22.166360977764068, 
+          "auto_points_var": 48.9704659002219, 
+          "endgame_points": 30.53200998096657, 
+          "endgame_points_var": 374.2644849999602, 
+          "prob_auto_quest": 0.3427653556895759, 
+          "prob_face_boss": 0.06385246338400119, 
+          "score": 238.13643744113926, 
+          "score_var": 1209.1350671641399
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm68": {
+        "blue": {
+          "auto_points": 13.89182566298303, 
+          "auto_points_var": 59.41098167659947, 
+          "endgame_points": 31.249939788992474, 
+          "endgame_points_var": 666.8230789351348, 
+          "prob_auto_quest": 0.07477109110797953, 
+          "prob_face_boss": 0.13277811592829436, 
+          "score": 282.608109991313, 
+          "score_var": 441.36680143073494
+        }, 
+        "prob": 0.999160142932175, 
+        "red": {
+          "auto_points": 25.534113021030144, 
+          "auto_points_var": 136.36286361896285, 
+          "endgame_points": 27.986233150777306, 
+          "endgame_points_var": 358.7291119197924, 
+          "prob_auto_quest": 0.5182407952803796, 
+          "prob_face_boss": 0.04548912968507424, 
+          "score": 182.33630504011023, 
+          "score_var": 577.2923717065535
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm69": {
+        "blue": {
+          "auto_points": 29.570140751603144, 
+          "auto_points_var": 138.94912799434073, 
+          "endgame_points": 44.9024386167316, 
+          "endgame_points_var": 376.1280345632957, 
+          "prob_auto_quest": 0.6508829086305776, 
+          "prob_face_boss": 0.21814753992485225, 
+          "score": 276.39694041264516, 
+          "score_var": 235.03273647962286
+        }, 
+        "prob": 0.6473925841857181, 
+        "red": {
+          "auto_points": 27.031303541484817, 
+          "auto_points_var": 63.964131442219845, 
+          "endgame_points": 25.08549884608582, 
+          "endgame_points_var": 484.9116803241177, 
+          "prob_auto_quest": 0.6002460887200033, 
+          "prob_face_boss": 0.05642296040565031, 
+          "score": 262.9221134948269, 
+          "score_var": 1033.7744002009733
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm7": {
+        "blue": {
+          "auto_points": 19.779059526048535, 
+          "auto_points_var": 10.930385587861169, 
+          "endgame_points": 40.210301196345696, 
+          "endgame_points_var": 268.15374356879954, 
+          "prob_auto_quest": 0.05714765265593669, 
+          "prob_face_boss": 0.11342717834626181, 
+          "score": 264.5243628598645, 
+          "score_var": 1816.145065813746
+        }, 
+        "prob": 0.6438361071019686, 
+        "red": {
+          "auto_points": 21.776824514196115, 
+          "auto_points_var": 89.35620359141527, 
+          "endgame_points": 36.418234317163005, 
+          "endgame_points_var": 78.0665734734073, 
+          "prob_auto_quest": 0.3665614792903046, 
+          "prob_face_boss": 0.003804207499767509, 
+          "score": 287.8335096374316, 
+          "score_var": 2179.9150793736253
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm70": {
+        "blue": {
+          "auto_points": 18.63290699885706, 
+          "auto_points_var": 102.06480555124438, 
+          "endgame_points": 27.188023357608607, 
+          "endgame_points_var": 527.935732468548, 
+          "prob_auto_quest": 0.2642701039135845, 
+          "prob_face_boss": 0.07663946653472364, 
+          "score": 241.96178602755663, 
+          "score_var": 703.6180670524586
+        }, 
+        "prob": 0.5015038882346363, 
+        "red": {
+          "auto_points": 19.001556986348483, 
+          "auto_points_var": 87.90236244727004, 
+          "endgame_points": 33.43088592466191, 
+          "endgame_points_var": 532.3368663885151, 
+          "prob_auto_quest": 0.2611541765510905, 
+          "prob_face_boss": 0.12475247274962808, 
+          "score": 241.83650977303844, 
+          "score_var": 400.7770350622803
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm71": {
+        "blue": {
+          "auto_points": 17.550667165603986, 
+          "auto_points_var": 62.60447221175692, 
+          "endgame_points": 35.459620478919064, 
+          "endgame_points_var": 591.1165070781672, 
+          "prob_auto_quest": 0.17322746758466523, 
+          "prob_face_boss": 0.15640176428759578, 
+          "score": 184.79044534414393, 
+          "score_var": 863.8806508718662
+        }, 
+        "prob": 0.868334536922099, 
+        "red": {
+          "auto_points": 23.78851278467164, 
+          "auto_points_var": 50.51085797915523, 
+          "endgame_points": 25.951470467818993, 
+          "endgame_points_var": 449.4784191483169, 
+          "prob_auto_quest": 0.43232358065664966, 
+          "prob_face_boss": 0.05413760608916651, 
+          "score": 225.15062469973145, 
+          "score_var": 438.0657879065381
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm72": {
+        "blue": {
+          "auto_points": 21.52847944113406, 
+          "auto_points_var": 125.12981587776, 
+          "endgame_points": 33.699019519286104, 
+          "endgame_points_var": 341.64833553481895, 
+          "prob_auto_quest": 0.3781507779701756, 
+          "prob_face_boss": 0.07737881863993756, 
+          "score": 277.274231485898, 
+          "score_var": 497.6810549820496
+        }, 
+        "prob": 0.9854059030842142, 
+        "red": {
+          "auto_points": 15.18929140518383, 
+          "auto_points_var": 125.46810463334464, 
+          "endgame_points": 37.19990596279008, 
+          "endgame_points_var": 633.7231779988266, 
+          "prob_auto_quest": 0.19055361383063985, 
+          "prob_face_boss": 0.18254596504755904, 
+          "score": 220.2498655707831, 
+          "score_var": 185.9713094179986
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm73": {
+        "blue": {
+          "auto_points": 39.512965621072595, 
+          "auto_points_var": 140.07397266591494, 
+          "endgame_points": 57.40137612750651, 
+          "endgame_points_var": 373.1844065623076, 
+          "prob_auto_quest": 0.889946857132606, 
+          "prob_face_boss": 0.44649633276637246, 
+          "score": 400.4435712627421, 
+          "score_var": 158.33578616926258
+        }, 
+        "prob": 0.999609679857407, 
+        "red": {
+          "auto_points": 26.949363019708407, 
+          "auto_points_var": 91.53501592155143, 
+          "endgame_points": 27.44129229836512, 
+          "endgame_points_var": 311.9625530219665, 
+          "prob_auto_quest": 0.5807258367233228, 
+          "prob_face_boss": 0.03263644747191097, 
+          "score": 327.9965888938227, 
+          "score_var": 306.6860593034529
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm74": {
+        "blue": {
+          "auto_points": 30.515677963117625, 
+          "auto_points_var": 44.313810182386604, 
+          "endgame_points": 37.99311641602738, 
+          "endgame_points_var": 604.0099799759488, 
+          "prob_auto_quest": 0.7963261963843318, 
+          "prob_face_boss": 0.1852759641385726, 
+          "score": 353.09709767638986, 
+          "score_var": 487.4452407895816
+        }, 
+        "prob": 0.9999313482640897, 
+        "red": {
+          "auto_points": 12.357596340779542, 
+          "auto_points_var": 42.93996534373307, 
+          "endgame_points": 28.549960034705506, 
+          "endgame_points_var": 332.06194826998234, 
+          "prob_auto_quest": 0.02684707842305789, 
+          "prob_face_boss": 0.04218412641177216, 
+          "score": 213.00658876606735, 
+          "score_var": 862.4165097958748
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm75": {
+        "blue": {
+          "auto_points": 24.096344293620575, 
+          "auto_points_var": 55.55448290218321, 
+          "endgame_points": 35.843119896925685, 
+          "endgame_points_var": 470.91914635865214, 
+          "prob_auto_quest": 0.45175074613953337, 
+          "prob_face_boss": 0.1328143134112857, 
+          "score": 251.4490249077675, 
+          "score_var": 1267.1551294161807
+        }, 
+        "prob": 0.951957061074838, 
+        "red": {
+          "auto_points": 12.45350188240167, 
+          "auto_points_var": 44.100365569131256, 
+          "endgame_points": 21.678061076172725, 
+          "endgame_points_var": 475.25830250246696, 
+          "prob_auto_quest": 0.02942567325837875, 
+          "prob_face_boss": 0.03938624039987482, 
+          "score": 172.1050447875579, 
+          "score_var": 1006.1197974089164
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm76": {
+        "blue": {
+          "auto_points": 17.919887222791896, 
+          "auto_points_var": 81.74040043301333, 
+          "endgame_points": 41.673606489366165, 
+          "endgame_points_var": 553.4607848516175, 
+          "prob_auto_quest": 0.2167817756869026, 
+          "prob_face_boss": 0.21799190580701677, 
+          "score": 244.32709644652917, 
+          "score_var": 983.2631946208639
+        }, 
+        "prob": 0.9255989348557594, 
+        "red": {
+          "auto_points": 21.21607984404998, 
+          "auto_points_var": 100.5177389705386, 
+          "endgame_points": 28.39898732197617, 
+          "endgame_points_var": 764.8112841960051, 
+          "prob_auto_quest": 0.3529321420338699, 
+          "prob_face_boss": 0.12658615874023038, 
+          "score": 301.1963209655154, 
+          "score_var": 568.2492553455469
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm77": {
+        "blue": {
+          "auto_points": 17.593507877753396, 
+          "auto_points_var": 70.01713921527451, 
+          "endgame_points": 17.211768002990894, 
+          "endgame_points_var": 162.43361738855208, 
+          "prob_auto_quest": 0.18804143401079487, 
+          "prob_face_boss": 0.0003935797622045545, 
+          "score": 164.88442229206754, 
+          "score_var": 327.25846970994303
+        }, 
+        "prob": 0.8976803511654279, 
+        "red": {
+          "auto_points": 9.816998120579882, 
+          "auto_points_var": 74.4298970965638, 
+          "endgame_points": 25.86193009488732, 
+          "endgame_points_var": 216.90968418348152, 
+          "prob_auto_quest": 0.039213774911621924, 
+          "prob_face_boss": 0.010226682386685226, 
+          "score": 202.81159541480795, 
+          "score_var": 566.7838642651051
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm78": {
+        "blue": {
+          "auto_points": 27.829241750695253, 
+          "auto_points_var": 134.18029162163464, 
+          "endgame_points": 35.50276940764415, 
+          "endgame_points_var": 358.9916897295741, 
+          "prob_auto_quest": 0.5964794637083397, 
+          "prob_face_boss": 0.09801774851159806, 
+          "score": 321.8694944990291, 
+          "score_var": 315.11337105639666
+        }, 
+        "prob": 0.9999999998229199, 
+        "red": {
+          "auto_points": 17.710328177646797, 
+          "auto_points_var": 111.42601378770536, 
+          "endgame_points": 32.685152917727464, 
+          "endgame_points_var": 271.8761474312238, 
+          "prob_auto_quest": 0.2449144182386438, 
+          "prob_face_boss": 0.04880189826112036, 
+          "score": 185.0684326133303, 
+          "score_var": 160.47208484343898
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm79": {
+        "blue": {
+          "auto_points": 30.133523434142276, 
+          "auto_points_var": 84.28778183431035, 
+          "endgame_points": 31.412812025433674, 
+          "endgame_points_var": 630.2241956123179, 
+          "prob_auto_quest": 0.7119724790246271, 
+          "prob_face_boss": 0.12740617617890215, 
+          "score": 199.03379743612896, 
+          "score_var": 814.9133702559321
+        }, 
+        "prob": 0.6340546947574811, 
+        "red": {
+          "auto_points": 13.974336587066887, 
+          "auto_points_var": 48.53974426214011, 
+          "endgame_points": 21.591390641608807, 
+          "endgame_points_var": 474.1773820241051, 
+          "prob_auto_quest": 0.05676263706545659, 
+          "prob_face_boss": 0.03887980973525318, 
+          "score": 186.79737770763126, 
+          "score_var": 460.6569054587115
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm8": {
+        "blue": {
+          "auto_points": 17.064408869775093, 
+          "auto_points_var": 31.111536310310278, 
+          "endgame_points": 41.01560761533815, 
+          "endgame_points_var": 229.75888611973338, 
+          "prob_auto_quest": 0.0774090892194218, 
+          "prob_face_boss": 0.1052028916983746, 
+          "score": 234.36607708282764, 
+          "score_var": 2182.935103418092
+        }, 
+        "prob": 0.5884750935100318, 
+        "red": {
+          "auto_points": 17.4568437127945, 
+          "auto_points_var": 38.15888592261567, 
+          "endgame_points": 32.359711036060965, 
+          "endgame_points_var": 110.91354097119046, 
+          "prob_auto_quest": 0.11102193425682505, 
+          "prob_face_boss": 0.004338528475506753, 
+          "score": 248.71966047526786, 
+          "score_var": 1936.9345890713432
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm80": {
+        "blue": {
+          "auto_points": 27.74821594769977, 
+          "auto_points_var": 46.654988083236276, 
+          "endgame_points": 30.559264840753357, 
+          "endgame_points_var": 568.5419647911335, 
+          "prob_auto_quest": 0.6562860219834031, 
+          "prob_face_boss": 0.10846794465074105, 
+          "score": 306.6905300621554, 
+          "score_var": 1021.7480973522948
+        }, 
+        "prob": 0.6153640999766666, 
+        "red": {
+          "auto_points": 29.820200501445427, 
+          "auto_points_var": 138.77741152823202, 
+          "endgame_points": 30.686153830885438, 
+          "endgame_points_var": 175.371265538849, 
+          "prob_auto_quest": 0.6587932121753826, 
+          "prob_face_boss": 0.013429129233302861, 
+          "score": 319.4757021690355, 
+          "score_var": 878.050040412272
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm81": {
+        "blue": {
+          "auto_points": 19.36967484767849, 
+          "auto_points_var": 54.991077034226315, 
+          "endgame_points": 56.342543901233384, 
+          "endgame_points_var": 360.47978499745244, 
+          "prob_auto_quest": 0.22385017082755332, 
+          "prob_face_boss": 0.42362181390068887, 
+          "score": 326.12584606716734, 
+          "score_var": 539.1092383949649
+        }, 
+        "prob": 0.6017030518537098, 
+        "red": {
+          "auto_points": 28.314503704940304, 
+          "auto_points_var": 130.73895829260954, 
+          "endgame_points": 45.83323671380528, 
+          "endgame_points_var": 421.54837740028904, 
+          "prob_auto_quest": 0.6140454031542839, 
+          "prob_face_boss": 0.24509817494415542, 
+          "score": 335.4955619495899, 
+          "score_var": 782.2760869229908
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm82": {
+        "blue": {
+          "auto_points": 15.278974331914052, 
+          "auto_points_var": 52.30333916717731, 
+          "endgame_points": 14.517006976399148, 
+          "endgame_points_var": 694.007906936599, 
+          "prob_auto_quest": 0.08945012057291346, 
+          "prob_face_boss": 0.042128662504743564, 
+          "score": 128.68005863997345, 
+          "score_var": 638.3843810315275
+        }, 
+        "prob": 0.9999876093554265, 
+        "red": {
+          "auto_points": 19.6074517094669, 
+          "auto_points_var": 175.98463392704664, 
+          "endgame_points": 26.138941207711333, 
+          "endgame_points_var": 460.41844339731233, 
+          "prob_auto_quest": 0.3421889629606696, 
+          "prob_face_boss": 0.057275635239147915, 
+          "score": 258.64244478412917, 
+          "score_var": 311.5048663070468
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm83": {
+        "blue": {
+          "auto_points": 10.52160434734378, 
+          "auto_points_var": 82.48177684274785, 
+          "endgame_points": 24.857091088196537, 
+          "endgame_points_var": 652.2707030605536, 
+          "prob_auto_quest": 0.055446185599623776, 
+          "prob_face_boss": 0.08440819921335141, 
+          "score": 203.09898690055968, 
+          "score_var": 1009.8303261605579
+        }, 
+        "prob": 0.9999996591203041, 
+        "red": {
+          "auto_points": 29.046229301583374, 
+          "auto_points_var": 44.00496884749466, 
+          "endgame_points": 54.97327491597906, 
+          "endgame_points_var": 300.7821005270817, 
+          "prob_auto_quest": 0.7290550455160894, 
+          "prob_face_boss": 0.3859691134795121, 
+          "score": 404.97655539622104, 
+          "score_var": 642.4250933994538
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm84": {
+        "blue": {
+          "auto_points": 23.837311069818615, 
+          "auto_points_var": 89.18576221485407, 
+          "endgame_points": 48.608016732385344, 
+          "endgame_points_var": 1024.556071335806, 
+          "prob_auto_quest": 0.4510074774753886, 
+          "prob_face_boss": 0.36095665853040604, 
+          "score": 321.17607601113946, 
+          "score_var": 475.9610335308309
+        }, 
+        "prob": 0.9311247984757969, 
+        "red": {
+          "auto_points": 19.590125700571974, 
+          "auto_points_var": 132.14043541308743, 
+          "endgame_points": 46.0926100990254, 
+          "endgame_points_var": 371.575447943861, 
+          "prob_auto_quest": 0.3189564762305477, 
+          "prob_face_boss": 0.2353082299248328, 
+          "score": 264.0231048216887, 
+          "score_var": 1006.83258415583
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2018nyny_qm85": {
+        "blue": {
+          "auto_points": 20.132580127126182, 
+          "auto_points_var": 99.91997263740896, 
+          "endgame_points": 19.969692277545345, 
+          "endgame_points_var": 463.42703047496104, 
+          "prob_auto_quest": 0.3131515355825042, 
+          "prob_face_boss": 0.03147752352174504, 
+          "score": 203.4180294106854, 
+          "score_var": 632.2891295861782
+        }, 
+        "prob": 0.9932601556737696, 
+        "red": {
+          "auto_points": 31.74104904419465, 
+          "auto_points_var": 64.11213726174029, 
+          "endgame_points": 30.503539570775654, 
+          "endgame_points_var": 222.32149087502916, 
+          "prob_auto_quest": 0.8000763255965686, 
+          "prob_face_boss": 0.023950767309263377, 
+          "score": 296.9767179525563, 
+          "score_var": 801.4816495667255
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2018nyny_qm9": {
+        "blue": {
+          "auto_points": 31.92900842303191, 
+          "auto_points_var": 165.424054309398, 
+          "endgame_points": 29.56078728918058, 
+          "endgame_points_var": 337.92797767482574, 
+          "prob_auto_quest": 0.7049636709855106, 
+          "prob_face_boss": 0.04887596508417247, 
+          "score": 271.17694570333333, 
+          "score_var": 1183.8538063879537
+        }, 
+        "prob": 0.6631299311685257, 
+        "red": {
+          "auto_points": 16.60661257634492, 
+          "auto_points_var": 18.909772015057815, 
+          "endgame_points": 34.06010515947623, 
+          "endgame_points_var": 310.4989763308182, 
+          "prob_auto_quest": 0.02679328445530993, 
+          "prob_face_boss": 0.07049656614766275, 
+          "score": 249.1062010179134, 
+          "score_var": 1564.2147290643154
+        }, 
+        "winning_alliance": "blue"
+      }
+    }
+  }, 
+  "ranking_prediction_stats": {
+    "last_played_match": "2018nyny_qm85"
+  }, 
+  "ranking_predictions": [
+    [
+      "frc694", 
+      [
+        1.0, 
+        1, 
+        1.0, 
+        1, 
+        29.0, 
+        29, 
+        29
+      ]
+    ], 
+    [
+      "frc1796", 
+      [
+        2.0, 
+        2, 
+        2.0, 
+        2, 
+        29.0, 
+        29, 
+        29
+      ]
+    ], 
+    [
+      "frc333", 
+      [
+        3.0, 
+        3, 
+        3.0, 
+        3, 
+        24.0, 
+        24, 
+        24
+      ]
+    ], 
+    [
+      "frc1880", 
+      [
+        4.0, 
+        4, 
+        4.0, 
+        4, 
+        23.0, 
+        23, 
+        23
+      ]
+    ], 
+    [
+      "frc354", 
+      [
+        5.0, 
+        5, 
+        5.0, 
+        5, 
+        22.0, 
+        22, 
+        22
+      ]
+    ], 
+    [
+      "frc3419", 
+      [
+        6.0, 
+        6, 
+        6.0, 
+        6, 
+        21.0, 
+        21, 
+        21
+      ]
+    ], 
+    [
+      "frc6593", 
+      [
+        7.0, 
+        7, 
+        7.0, 
+        7, 
+        20.0, 
+        20, 
+        20
+      ]
+    ], 
+    [
+      "frc2579", 
+      [
+        8.0, 
+        8, 
+        8.0, 
+        8, 
+        19.0, 
+        19, 
+        19
+      ]
+    ], 
+    [
+      "frc6353", 
+      [
+        9.0, 
+        9, 
+        9.0, 
+        9, 
+        19.0, 
+        19, 
+        19
+      ]
+    ], 
+    [
+      "frc334", 
+      [
+        10.0, 
+        10, 
+        10.0, 
+        10, 
+        19.0, 
+        19, 
+        19
+      ]
+    ], 
+    [
+      "frc395", 
+      [
+        11.0, 
+        11, 
+        11.0, 
+        11, 
+        18.0, 
+        18, 
+        18
+      ]
+    ], 
+    [
+      "frc369", 
+      [
+        12.0, 
+        12, 
+        12.0, 
+        12, 
+        17.0, 
+        17, 
+        17
+      ]
+    ], 
+    [
+      "frc5421", 
+      [
+        13.0, 
+        13, 
+        13.0, 
+        13, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc1155", 
+      [
+        14.0, 
+        14, 
+        14.0, 
+        14, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc4263", 
+      [
+        15.0, 
+        15, 
+        15.0, 
+        15, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc1660", 
+      [
+        16.0, 
+        16, 
+        16.0, 
+        16, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc5781", 
+      [
+        17.0, 
+        17, 
+        17.0, 
+        17, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc1230", 
+      [
+        18.0, 
+        18, 
+        18.0, 
+        18, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc2344", 
+      [
+        19.0, 
+        19, 
+        19.0, 
+        19, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc6590", 
+      [
+        20.0, 
+        20, 
+        20.0, 
+        20, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc4012", 
+      [
+        21.0, 
+        21, 
+        21.0, 
+        21, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc5665", 
+      [
+        22.0, 
+        22, 
+        22.0, 
+        22, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc640", 
+      [
+        23.0, 
+        23, 
+        23.0, 
+        23, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc5806", 
+      [
+        24.0, 
+        24, 
+        24.0, 
+        24, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc3760", 
+      [
+        25.0, 
+        25, 
+        25.0, 
+        25, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc3204", 
+      [
+        26.0, 
+        26, 
+        26.0, 
+        26, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc5800", 
+      [
+        27.0, 
+        27, 
+        27.0, 
+        27, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc5599", 
+      [
+        28.0, 
+        28, 
+        28.0, 
+        28, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc4299", 
+      [
+        29.0, 
+        29, 
+        29.0, 
+        29, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc1600", 
+      [
+        30.0, 
+        30, 
+        30.0, 
+        30, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc3004", 
+      [
+        31.0, 
+        31, 
+        31.0, 
+        31, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc6988", 
+      [
+        32.0, 
+        32, 
+        32.0, 
+        32, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc4571", 
+      [
+        33.0, 
+        33, 
+        33.0, 
+        33, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc7036", 
+      [
+        34.0, 
+        34, 
+        34.0, 
+        34, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc5298", 
+      [
+        35.0, 
+        35, 
+        35.0, 
+        35, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc4640", 
+      [
+        36.0, 
+        36, 
+        36.0, 
+        36, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc5891", 
+      [
+        37.0, 
+        37, 
+        37.0, 
+        37, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc4383", 
+      [
+        38.0, 
+        38, 
+        38.0, 
+        38, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc2895", 
+      [
+        39.0, 
+        39, 
+        39.0, 
+        39, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc335", 
+      [
+        40.0, 
+        40, 
+        40.0, 
+        40, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc6416", 
+      [
+        41.0, 
+        41, 
+        41.0, 
+        41, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc7272", 
+      [
+        42.0, 
+        42, 
+        42.0, 
+        42, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc4773", 
+      [
+        43.0, 
+        43, 
+        43.0, 
+        43, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc6648", 
+      [
+        44.0, 
+        44, 
+        44.0, 
+        44, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc371", 
+      [
+        45.0, 
+        45, 
+        45.0, 
+        45, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc2265", 
+      [
+        46.0, 
+        46, 
+        46.0, 
+        46, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc4856", 
+      [
+        47.0, 
+        47, 
+        47.0, 
+        47, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc7268", 
+      [
+        48.0, 
+        48, 
+        48.0, 
+        48, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc743", 
+      [
+        49.0, 
+        49, 
+        49.0, 
+        49, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc6195", 
+      [
+        50.0, 
+        50, 
+        50.0, 
+        50, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc6873", 
+      [
+        51.0, 
+        51, 
+        51.0, 
+        51, 
+        6.0, 
+        6, 
+        6
+      ]
+    ]
+  ], 
+  "stat_mean_vars": {
+    "playoff": {
+      "auto_points": {
+        "mean": {
+          "frc1155": 6.62677373143098, 
+          "frc1230": 3.643222482396893, 
+          "frc1600": 8.356855321299342, 
+          "frc1660": 14.427876370636588, 
+          "frc1796": 22.437995394966034, 
+          "frc1880": 7.174382423173568, 
+          "frc2265": 6.328754848756021, 
+          "frc2344": 8.413370356986746, 
+          "frc2579": 12.236771215975166, 
+          "frc2895": 3.1958955518792753, 
+          "frc3004": 2.9859524351035693, 
+          "frc3204": 7.223767186242888, 
+          "frc333": 17.089228686156943, 
+          "frc334": 7.532304324927428, 
+          "frc335": 3.6940468806011415, 
+          "frc3419": 11.20967695309425, 
+          "frc354": 14.165610879426547, 
+          "frc369": 7.1475151056009985, 
+          "frc371": 4.611309887386956, 
+          "frc3760": 6.077090431046202, 
+          "frc395": 10.865544519995552, 
+          "frc4012": 7.220602721803232, 
+          "frc4263": 9.193554647929963, 
+          "frc4299": 3.475577945472703, 
+          "frc4383": 4.453849528133241, 
+          "frc4571": 6.683341721297289, 
+          "frc4640": 6.592640311295551, 
+          "frc4773": 6.794497407398412, 
+          "frc4856": 5.995653246652081, 
+          "frc5298": 3.164380016262887, 
+          "frc5421": 5.969219850915181, 
+          "frc5599": 3.9603051914294713, 
+          "frc5665": 7.264411514136625, 
+          "frc5781": 10.870841540622838, 
+          "frc5800": 5.908855744715565, 
+          "frc5806": 12.621102602816054, 
+          "frc5891": 3.038283480473967, 
+          "frc6195": 4.95935248708414, 
+          "frc6353": 11.610253736700418, 
+          "frc640": 4.183040380512296, 
+          "frc6416": 3.328889309058594, 
+          "frc6590": 9.268363722938874, 
+          "frc6593": 8.920970242948147, 
+          "frc6648": 3.168437712645846, 
+          "frc6873": 2.661323215510534, 
+          "frc694": 17.316902428081335, 
+          "frc6988": 5.571031598431357, 
+          "frc7036": 7.058614694637772, 
+          "frc7268": 4.556122680471086, 
+          "frc7272": 3.645220329718814, 
+          "frc743": 1.598790557324022
+        }, 
+        "var": {
+          "frc1155": 18.13421523231227, 
+          "frc1230": 54.05387268139276, 
+          "frc1600": 63.924852922081406, 
+          "frc1660": 52.839195470431754, 
+          "frc1796": 29.870942765404216, 
+          "frc1880": 11.896613235897046, 
+          "frc2265": 69.42005915664616, 
+          "frc2344": 0.5794931251119191, 
+          "frc2579": 82.50701111678917, 
+          "frc2895": 45.001394487824896, 
+          "frc3004": 34.00571345673015, 
+          "frc3204": 5.98265632972646, 
+          "frc333": 8.131399642796927, 
+          "frc334": 55.241758107646525, 
+          "frc335": 27.903782768888007, 
+          "frc3419": 39.62061002485698, 
+          "frc354": 0.2705525839003673, 
+          "frc369": 11.575679415942501, 
+          "frc371": 23.408817783616254, 
+          "frc3760": 6.537683595653798, 
+          "frc395": 52.14228139693134, 
+          "frc4012": 61.20026052017081, 
+          "frc4263": 25.970470980156918, 
+          "frc4299": 32.335725807941884, 
+          "frc4383": 79.23875622156932, 
+          "frc4571": 14.311777790706437, 
+          "frc4640": 17.248049158739832, 
+          "frc4773": 4.126314157600639, 
+          "frc4856": 21.235907217466128, 
+          "frc5298": 24.857873106445282, 
+          "frc5421": 15.674130508421623, 
+          "frc5599": 10.832885442343969, 
+          "frc5665": 5.685453172017669, 
+          "frc5781": 22.22172526343595, 
+          "frc5800": 61.00457639574609, 
+          "frc5806": 1.15168907969356, 
+          "frc5891": 38.378286540976646, 
+          "frc6195": 11.556998722394965, 
+          "frc6353": 44.78992337325009, 
+          "frc640": 12.624293781441747, 
+          "frc6416": 54.88927368957059, 
+          "frc6590": 25.539657270036447, 
+          "frc6593": 8.536579470922536, 
+          "frc6648": 2.8316513969474317, 
+          "frc6873": 23.877425976560193, 
+          "frc694": 25.487497139350257, 
+          "frc6988": 8.779556909537709, 
+          "frc7036": 24.038097939902194, 
+          "frc7268": 26.815839553362803, 
+          "frc7272": 6.304700581995509, 
+          "frc743": 41.121718178437575
+        }
+      }, 
+      "endgame_points": {
+        "mean": {
+          "frc1155": 19.594736912476087, 
+          "frc1230": 10.003443076836364, 
+          "frc1600": 14.844912953506796, 
+          "frc1660": 15.066915369575367, 
+          "frc1796": 26.13345905476811, 
+          "frc1880": 17.737284048747995, 
+          "frc2265": 7.292267962471138, 
+          "frc2344": 18.551772208009073, 
+          "frc2579": 7.141188987672408, 
+          "frc2895": 13.374475876988638, 
+          "frc3004": 2.0957216743866853, 
+          "frc3204": 4.740632435893325, 
+          "frc333": 14.828211992902926, 
+          "frc334": 5.444910842954638, 
+          "frc335": 10.35201425404594, 
+          "frc3419": 16.39972602809292, 
+          "frc354": 13.11509892539427, 
+          "frc369": 13.502660422885675, 
+          "frc371": 7.077062596941626, 
+          "frc3760": 12.078970592615514, 
+          "frc395": 11.252956403857217, 
+          "frc4012": 6.656286832036224, 
+          "frc4263": 15.14355607225186, 
+          "frc4299": 17.39390547107984, 
+          "frc4383": 10.630922557998238, 
+          "frc4571": 19.193486582483285, 
+          "frc4640": -1.3444107839660056, 
+          "frc4773": 6.509679720662596, 
+          "frc4856": 8.646774399595271, 
+          "frc5298": 5.411021288610575, 
+          "frc5421": 11.935882712504897, 
+          "frc5599": 6.807223894324818, 
+          "frc5665": 18.309082740019868, 
+          "frc5781": 12.648599456411837, 
+          "frc5800": 2.238810644171012, 
+          "frc5806": 13.947137466092622, 
+          "frc5891": 10.16883415930015, 
+          "frc6195": 12.721633079084793, 
+          "frc6353": 11.278329654653684, 
+          "frc640": 17.70859887963275, 
+          "frc6416": 12.352030157645192, 
+          "frc6590": 16.516862253972295, 
+          "frc6593": 10.138925919165079, 
+          "frc6648": 13.693893860405478, 
+          "frc6873": 8.606148270781466, 
+          "frc694": 25.83656026274968, 
+          "frc6988": 9.38718630510785, 
+          "frc7036": 4.181897034623409, 
+          "frc7268": 5.377342221659538, 
+          "frc7272": 8.702444726840886, 
+          "frc743": 5.907496713317322
+        }, 
+        "var": {
+          "frc1155": 207.10645505874413, 
+          "frc1230": 367.7632638690873, 
+          "frc1600": 125.68751438833351, 
+          "frc1660": 20.72001115608996, 
+          "frc1796": 66.45970268319346, 
+          "frc1880": 213.17490152022893, 
+          "frc2265": 72.77742418290573, 
+          "frc2344": 266.85350869588723, 
+          "frc2579": 46.78949856719866, 
+          "frc2895": 176.03895727553814, 
+          "frc3004": 15.513149616845318, 
+          "frc3204": 304.0252255353922, 
+          "frc333": 41.73862075468318, 
+          "frc334": 189.87647725000508, 
+          "frc335": 90.77263371966441, 
+          "frc3419": 136.96038156168316, 
+          "frc354": 100.06401388935382, 
+          "frc369": 262.05476317622487, 
+          "frc371": 254.96609695383424, 
+          "frc3760": 243.2494047623135, 
+          "frc395": 136.66569387078908, 
+          "frc4012": 83.23266973629065, 
+          "frc4263": 270.0641287088726, 
+          "frc4299": 9.286930093525333, 
+          "frc4383": 303.4054987469355, 
+          "frc4571": 17.641409332693346, 
+          "frc4640": 63.45361098838419, 
+          "frc4773": 245.96578275228188, 
+          "frc4856": 7.1152139139528146, 
+          "frc5298": 446.1284370565312, 
+          "frc5421": 46.6333766280855, 
+          "frc5599": 359.5050648040385, 
+          "frc5665": 2.4547038584198297, 
+          "frc5781": 49.23294678825779, 
+          "frc5800": 28.73790461882348, 
+          "frc5806": 66.21204257691706, 
+          "frc5891": 97.70251922999839, 
+          "frc6195": 186.4619124997213, 
+          "frc6353": 69.86769154420814, 
+          "frc640": 22.08936288951138, 
+          "frc6416": 189.83204542919415, 
+          "frc6590": 41.65646828384342, 
+          "frc6593": 67.90900132224614, 
+          "frc6648": 177.29120464647332, 
+          "frc6873": 151.82927655457968, 
+          "frc694": 249.8036691615742, 
+          "frc6988": 254.37161132702516, 
+          "frc7036": 26.442920288950493, 
+          "frc7268": 289.68730451038886, 
+          "frc7272": 140.00707211965394, 
+          "frc743": 125.64974133778608
+        }
+      }, 
+      "score": {
+        "mean": {
+          "frc1155": 117.63689600409839, 
+          "frc1230": 63.26056020826515, 
+          "frc1600": 81.94345041417098, 
+          "frc1660": 103.73912166324625, 
+          "frc1796": 202.0419059949234, 
+          "frc1880": 113.25128888083573, 
+          "frc2265": 42.536918711214575, 
+          "frc2344": 96.95057947691191, 
+          "frc2579": 126.54491528848712, 
+          "frc2895": 82.23119574590663, 
+          "frc3004": 42.75650808590672, 
+          "frc3204": 66.40778349413722, 
+          "frc333": 178.2094006122767, 
+          "frc334": 78.2825300323874, 
+          "frc335": 50.39305329462101, 
+          "frc3419": 145.03137973103654, 
+          "frc354": 128.65560119326997, 
+          "frc369": 122.66261291340729, 
+          "frc371": 39.07415123381965, 
+          "frc3760": 92.86922035838971, 
+          "frc395": 113.18530717367422, 
+          "frc4012": 65.62735436785417, 
+          "frc4263": 113.5230950675285, 
+          "frc4299": 90.55521477691161, 
+          "frc4383": 86.66219283780892, 
+          "frc4571": 73.38950747640538, 
+          "frc4640": 20.28386413374427, 
+          "frc4773": 75.63692843721185, 
+          "frc4856": 60.57703629909109, 
+          "frc5298": 20.567278556296646, 
+          "frc5421": 104.71483883253453, 
+          "frc5599": 89.55751560515604, 
+          "frc5665": 88.7096858799872, 
+          "frc5781": 81.71109741884013, 
+          "frc5800": 49.062002232882485, 
+          "frc5806": 110.93111181330241, 
+          "frc5891": 99.52946466584243, 
+          "frc6195": 40.5925087426009, 
+          "frc6353": 103.7850628284849, 
+          "frc640": 111.82675711185429, 
+          "frc6416": 82.34619408486225, 
+          "frc6590": 89.53606741129222, 
+          "frc6593": 68.70267760937291, 
+          "frc6648": 51.46446794933141, 
+          "frc6873": 46.64636349035831, 
+          "frc694": 206.07520508956702, 
+          "frc6988": 81.45585753496742, 
+          "frc7036": 44.97652898230973, 
+          "frc7268": 19.80397228875004, 
+          "frc7272": 60.00077714592619, 
+          "frc743": 47.47101202236021
+        }, 
+        "var": {
+          "frc1155": 225.01964987213486, 
+          "frc1230": 125.7947579239826, 
+          "frc1600": 203.65116035045352, 
+          "frc1660": 34.75852963992984, 
+          "frc1796": 4.0453868892567115, 
+          "frc1880": 8.48384945779192, 
+          "frc2265": 31.773898672461033, 
+          "frc2344": 541.8227425351655, 
+          "frc2579": 75.29447970890536, 
+          "frc2895": 145.01116055090017, 
+          "frc3004": 250.90110138927116, 
+          "frc3204": 569.5169579039463, 
+          "frc333": 242.2799482269827, 
+          "frc334": 176.20410630777258, 
+          "frc335": 362.8307906163483, 
+          "frc3419": 168.62200166299564, 
+          "frc354": 125.83567027282476, 
+          "frc369": 32.036746784628725, 
+          "frc371": 208.63522367921445, 
+          "frc3760": 100.32693276646297, 
+          "frc395": 196.4330398363727, 
+          "frc4012": 145.59315260406856, 
+          "frc4263": 203.44031968938364, 
+          "frc4299": 418.4544260148709, 
+          "frc4383": 211.59417833735563, 
+          "frc4571": 415.49534993680606, 
+          "frc4640": 169.14126985238408, 
+          "frc4773": 252.00343447038682, 
+          "frc4856": 249.52801709660244, 
+          "frc5298": 10.62116139080375, 
+          "frc5421": 233.78458898179713, 
+          "frc5599": 64.84406691761562, 
+          "frc5665": 8.133331686786098, 
+          "frc5781": 206.41250734405904, 
+          "frc5800": 213.77847310281678, 
+          "frc5806": 404.25649824185507, 
+          "frc5891": 62.39966784976445, 
+          "frc6195": 134.16733510145855, 
+          "frc6353": 13.637984622396644, 
+          "frc640": 478.73955620970776, 
+          "frc6416": 28.069372566904995, 
+          "frc6590": 407.1993734157278, 
+          "frc6593": 21.54892798162815, 
+          "frc6648": 336.00411900625824, 
+          "frc6873": 337.37014387088175, 
+          "frc694": 4.918437408729204, 
+          "frc6988": 8.996251078628532, 
+          "frc7036": 57.132791315669095, 
+          "frc7268": 50.418035710899055, 
+          "frc7272": 377.41323950985435, 
+          "frc743": 162.34977411571424
+        }
+      }
+    }, 
+    "qual": {
+      "auto_points": {
+        "mean": {
+          "frc1155": 5.590706242360206, 
+          "frc1230": 3.699593544644191, 
+          "frc1600": 8.439107646837721, 
+          "frc1660": 14.814812739956421, 
+          "frc1796": 22.282434931130087, 
+          "frc1880": 6.8498828396884806, 
+          "frc2265": 6.292131643026231, 
+          "frc2344": 7.550711106185686, 
+          "frc2579": 13.122936758829322, 
+          "frc2895": 3.1819251839459834, 
+          "frc3004": 3.120220564500005, 
+          "frc3204": 7.390941174769283, 
+          "frc333": 17.70901037911005, 
+          "frc334": 8.14181740993453, 
+          "frc335": 3.6310819472640166, 
+          "frc3419": 10.189222426571439, 
+          "frc354": 13.438309640953776, 
+          "frc369": 7.866062788910402, 
+          "frc371": 4.769548077867133, 
+          "frc3760": 6.09807683241416, 
+          "frc395": 10.010059837975174, 
+          "frc4012": 7.870332347949943, 
+          "frc4263": 9.605063959404763, 
+          "frc4299": 3.4062077364065564, 
+          "frc4383": 4.521350749452832, 
+          "frc4571": 5.457142582848494, 
+          "frc4640": 6.314388447522689, 
+          "frc4773": 6.683967766162459, 
+          "frc4856": 6.694003098299818, 
+          "frc5298": 3.3087656242586694, 
+          "frc5421": 5.006847698226735, 
+          "frc5599": 5.56824468087642, 
+          "frc5665": 6.974631066262471, 
+          "frc5781": 11.189259398467193, 
+          "frc5800": 5.941700304001709, 
+          "frc5806": 12.84474375666111, 
+          "frc5891": 2.928121340454719, 
+          "frc6195": 4.762514713852115, 
+          "frc6353": 11.153878533873614, 
+          "frc640": 3.9896591742344922, 
+          "frc6416": 3.399668908083148, 
+          "frc6590": 10.228798815386126, 
+          "frc6593": 8.816277044792876, 
+          "frc6648": 3.1547596856542293, 
+          "frc6873": 2.7457125458687828, 
+          "frc694": 17.25422567991446, 
+          "frc6988": 4.773479291408125, 
+          "frc7036": 7.742426753659926, 
+          "frc7268": 4.60095165511381, 
+          "frc7272": 3.7568185224742185, 
+          "frc743": 1.5131973560366432
+        }, 
+        "var": {
+          "frc1155": 23.091941001917554, 
+          "frc1230": 49.667245945315166, 
+          "frc1600": 66.4757713915159, 
+          "frc1660": 87.07057841900033, 
+          "frc1796": 33.916766713208425, 
+          "frc1880": 12.70784696764761, 
+          "frc2265": 70.66720046190865, 
+          "frc2344": 9.787389810333162, 
+          "frc2579": 59.38865709329353, 
+          "frc2895": 42.645588143354, 
+          "frc3004": 34.13351329246274, 
+          "frc3204": 2.502627806728583, 
+          "frc333": 19.185994630056825, 
+          "frc334": 28.050629773375192, 
+          "frc335": 22.432645505642654, 
+          "frc3419": 47.858557641750046, 
+          "frc354": 17.512873824855678, 
+          "frc369": 26.172306830527706, 
+          "frc371": 28.08622432061876, 
+          "frc3760": 4.5933683076050364, 
+          "frc395": 70.05469424557835, 
+          "frc4012": 48.761308264748116, 
+          "frc4263": 60.218752538056115, 
+          "frc4299": 32.788757896005464, 
+          "frc4383": 76.2958903533918, 
+          "frc4571": 16.972807469774395, 
+          "frc4640": 15.49481381324488, 
+          "frc4773": 2.832345586731997, 
+          "frc4856": 32.01321612536986, 
+          "frc5298": 27.053493420319402, 
+          "frc5421": 11.31919018786129, 
+          "frc5599": 19.145448247290993, 
+          "frc5665": 7.9472344142821685, 
+          "frc5781": 2.275821439208967, 
+          "frc5800": 55.91165372950473, 
+          "frc5806": 1.2500998547299123, 
+          "frc5891": 34.476007490234316, 
+          "frc6195": 10.35694756473116, 
+          "frc6353": 41.081928563396765, 
+          "frc640": 15.376459315147706, 
+          "frc6416": 54.85992096908911, 
+          "frc6590": 37.017844384509445, 
+          "frc6593": 14.865296008935106, 
+          "frc6648": 1.1477831147319186, 
+          "frc6873": 22.907759985563292, 
+          "frc694": 15.608931985161169, 
+          "frc6988": 22.126793508920933, 
+          "frc7036": 21.780108843613615, 
+          "frc7268": 25.10010553448378, 
+          "frc7272": 0.7200571347874241, 
+          "frc743": 38.54645212908374
+        }
+      }, 
+      "endgame_points": {
+        "mean": {
+          "frc1155": 19.52516111505103, 
+          "frc1230": 9.111196099800766, 
+          "frc1600": 14.731848644082811, 
+          "frc1660": 14.376115367337837, 
+          "frc1796": 29.498725878586594, 
+          "frc1880": 18.81982720339442, 
+          "frc2265": 7.0668796844075965, 
+          "frc2344": 19.0468860857983, 
+          "frc2579": 9.848606606792945, 
+          "frc2895": 12.78915210841929, 
+          "frc3004": 1.349246902600077, 
+          "frc3204": 4.048907144647483, 
+          "frc333": 10.935317603921497, 
+          "frc334": 8.358146027801276, 
+          "frc335": 10.000133704505108, 
+          "frc3419": 15.432179033497865, 
+          "frc354": 15.773640503850666, 
+          "frc369": 9.36312298981329, 
+          "frc371": 6.250218409278926, 
+          "frc3760": 11.430127665252757, 
+          "frc395": 13.421725920193905, 
+          "frc4012": 5.198357592485346, 
+          "frc4263": 14.507835553765918, 
+          "frc4299": 16.25141861329307, 
+          "frc4383": 10.287098444852154, 
+          "frc4571": 19.897758234435244, 
+          "frc4640": -1.2599370590611032, 
+          "frc4773": 5.907464496344424, 
+          "frc4856": 7.203179253446491, 
+          "frc5298": 5.2250725332459, 
+          "frc5421": 13.356507011764975, 
+          "frc5599": 7.5681554316135085, 
+          "frc5665": 19.587242241320443, 
+          "frc5781": 12.520916144632405, 
+          "frc5800": 2.2670182990170424, 
+          "frc5806": 15.144997230141442, 
+          "frc5891": 10.529417952842136, 
+          "frc6195": 13.082493301810558, 
+          "frc6353": 11.658402700264938, 
+          "frc640": 17.611715836541787, 
+          "frc6416": 12.404713059908456, 
+          "frc6590": 12.631548980701748, 
+          "frc6593": 10.573334131691054, 
+          "frc6648": 13.2230656261738, 
+          "frc6873": 8.147698585091035, 
+          "frc694": 28.433152606934964, 
+          "frc6988": 12.021727537463173, 
+          "frc7036": 3.700139640369275, 
+          "frc7268": 5.400559561531493, 
+          "frc7272": 8.672940925196857, 
+          "frc743": 9.424420369115605
+        }, 
+        "var": {
+          "frc1155": 215.259495360812, 
+          "frc1230": 377.88499669604965, 
+          "frc1600": 117.1054462808774, 
+          "frc1660": 80.81380810015396, 
+          "frc1796": 16.215104522486097, 
+          "frc1880": 215.4918234960074, 
+          "frc2265": 82.41917532586334, 
+          "frc2344": 309.6430404725742, 
+          "frc2579": 80.14418627687326, 
+          "frc2895": 160.85725944485597, 
+          "frc3004": 11.363233303398559, 
+          "frc3204": 306.7509855699511, 
+          "frc333": 43.25930969394579, 
+          "frc334": 207.28733901253835, 
+          "frc335": 90.4521504149887, 
+          "frc3419": 177.79923174919404, 
+          "frc354": 122.25775662744996, 
+          "frc369": 264.9363230399974, 
+          "frc371": 259.6668074331312, 
+          "frc3760": 247.03956270795783, 
+          "frc395": 100.30334545008907, 
+          "frc4012": 66.53970113903718, 
+          "frc4263": 336.751101252629, 
+          "frc4299": 10.318116255093173, 
+          "frc4383": 309.76589779890026, 
+          "frc4571": 12.407038472460023, 
+          "frc4640": 40.465031708852614, 
+          "frc4773": 242.5518596675194, 
+          "frc4856": 4.101787680005742, 
+          "frc5298": 440.3828553620801, 
+          "frc5421": 90.70501876174474, 
+          "frc5599": 392.7855416559181, 
+          "frc5665": 8.759285026795812, 
+          "frc5781": 7.9445560144548395, 
+          "frc5800": 21.67185573414669, 
+          "frc5806": 72.64505289072316, 
+          "frc5891": 92.7532963211234, 
+          "frc6195": 206.9169411107861, 
+          "frc6353": 141.22168313366186, 
+          "frc640": 6.572277001645869, 
+          "frc6416": 193.77520269792734, 
+          "frc6590": 34.63554873296307, 
+          "frc6593": 101.04078082400791, 
+          "frc6648": 184.89760942818523, 
+          "frc6873": 147.01852962798247, 
+          "frc694": 157.99861963592696, 
+          "frc6988": 227.99340164507956, 
+          "frc7036": 8.454754850644143, 
+          "frc7268": 297.54947488599373, 
+          "frc7272": 136.96703926096072, 
+          "frc743": 40.63535470343498
+        }
+      }, 
+      "score": {
+        "mean": {
+          "frc1155": 120.71448143947698, 
+          "frc1230": 53.292023057292354, 
+          "frc1600": 77.93182072077202, 
+          "frc1660": 94.4647880469206, 
+          "frc1796": 216.18346087344827, 
+          "frc1880": 125.79792307660284, 
+          "frc2265": 40.947365691488386, 
+          "frc2344": 101.07688670290523, 
+          "frc2579": 147.824752872128, 
+          "frc2895": 78.1687391225919, 
+          "frc3004": 34.40320185321364, 
+          "frc3204": 63.34851076226133, 
+          "frc333": 179.50564219846487, 
+          "frc334": 104.32054124040707, 
+          "frc335": 47.0214997257862, 
+          "frc3419": 142.5539429422319, 
+          "frc354": 149.86991726124552, 
+          "frc369": 121.43704001680601, 
+          "frc371": 35.57906020132742, 
+          "frc3760": 85.6625262645725, 
+          "frc395": 132.23701038302391, 
+          "frc4012": 52.70311194900355, 
+          "frc4263": 104.72085644872787, 
+          "frc4299": 80.44811409583737, 
+          "frc4383": 84.6177401889405, 
+          "frc4571": 75.84808292450305, 
+          "frc4640": 16.941763092600354, 
+          "frc4773": 70.41173773958286, 
+          "frc4856": 48.42980654781924, 
+          "frc5298": 15.214319796119756, 
+          "frc5421": 116.67762601976851, 
+          "frc5599": 102.28511091386262, 
+          "frc5665": 104.95600071995759, 
+          "frc5781": 72.34782248432147, 
+          "frc5800": 47.69894475109816, 
+          "frc5806": 135.22511583335233, 
+          "frc5891": 96.29724019032366, 
+          "frc6195": 39.28211690296233, 
+          "frc6353": 117.02811054265202, 
+          "frc640": 107.41073935260967, 
+          "frc6416": 82.51446345584435, 
+          "frc6590": 87.96348042320804, 
+          "frc6593": 72.4375355235411, 
+          "frc6648": 43.12924347309566, 
+          "frc6873": 43.77508854937772, 
+          "frc694": 219.5104711417128, 
+          "frc6988": 103.56559621769183, 
+          "frc7036": 44.72349157655194, 
+          "frc7268": 17.44386553025526, 
+          "frc7272": 58.87997290162839, 
+          "frc743": 59.97728442832744
+        }, 
+        "var": {
+          "frc1155": 377.5165053142915, 
+          "frc1230": 95.5922156564673, 
+          "frc1600": 201.50140133531272, 
+          "frc1660": 30.095400258709745, 
+          "frc1796": 19.815940093408884, 
+          "frc1880": 111.33137393460633, 
+          "frc2265": 21.96119161106466, 
+          "frc2344": 586.4930986457002, 
+          "frc2579": 129.80749263722944, 
+          "frc2895": 142.61965491285355, 
+          "frc3004": 226.66558409298125, 
+          "frc3204": 605.2113855688988, 
+          "frc333": 249.8780623047524, 
+          "frc334": 235.3311740646585, 
+          "frc335": 356.85391326395995, 
+          "frc3419": 16.493903270983942, 
+          "frc354": 155.797030623087, 
+          "frc369": 24.598592158789003, 
+          "frc371": 220.7339832103568, 
+          "frc3760": 71.04015437005151, 
+          "frc395": 164.5926016185032, 
+          "frc4012": 203.93819434491076, 
+          "frc4263": 111.0332527116104, 
+          "frc4299": 401.0635687991767, 
+          "frc4383": 234.7636486779314, 
+          "frc4571": 265.2750979836336, 
+          "frc4640": 118.794156385988, 
+          "frc4773": 232.3148574319862, 
+          "frc4856": 280.9569973603862, 
+          "frc5298": 3.014761285541997, 
+          "frc5421": 307.41472805405374, 
+          "frc5599": 147.39393788088134, 
+          "frc5665": 121.69762648015156, 
+          "frc5781": 152.91189771046828, 
+          "frc5800": 243.0560955348484, 
+          "frc5806": 579.5744071248588, 
+          "frc5891": 69.38526958256168, 
+          "frc6195": 132.85911807116247, 
+          "frc6353": 96.7769014781509, 
+          "frc640": 471.42034548892406, 
+          "frc6416": 24.134166785909855, 
+          "frc6590": 416.47672119373846, 
+          "frc6593": 31.080873011062486, 
+          "frc6648": 324.870457822106, 
+          "frc6873": 294.94562341620616, 
+          "frc694": 34.492945195649654, 
+          "frc6988": 13.56491158889144, 
+          "frc7036": 125.13034096371582, 
+          "frc7268": 45.807352725837326, 
+          "frc7272": 411.91578450290774, 
+          "frc743": 174.9120710709027
+        }
+      }
+    }
+  }
+}

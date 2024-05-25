@@ -43,7 +43,7 @@ class TestAddMatchTimes(unittest2.TestCase):
         )
 
     def matchDictToMatches(self, match_dicts):
-        return [Match(id=Match.renderKeyName(self.event.key.id(),
+        return [Match(id=Match.render_key_name(self.event.key.id(),
                                              match_dict.get("comp_level", None),
                                              match_dict.get("set_number", 0),
                                              match_dict.get("match_number", 0)),

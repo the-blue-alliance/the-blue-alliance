@@ -15,7 +15,7 @@ class AttendingTeamList extends Component {
     this.updateAttendingTeams = this.updateAttendingTeams.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!nextProps.hasFetchedTeams) {
       this.setState({ buttonClass: "btn-info" });
     }

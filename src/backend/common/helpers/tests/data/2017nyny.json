@@ -1,0 +1,37 @@
+{
+  "address": "The Armory, 216 Fort Washington Ave, New York, NY 10032, USA", 
+  "city": "New York", 
+  "country": "USA", 
+  "district": null, 
+  "division_keys": [], 
+  "end_date": "2017-04-09", 
+  "event_code": "nyny", 
+  "event_type": 0, 
+  "event_type_string": "Regional", 
+  "first_event_code": "NYNY", 
+  "first_event_id": "22503", 
+  "gmaps_place_id": "ChIJi3eY95v2wokR4cL4GcqwiWM", 
+  "gmaps_url": "https://maps.google.com/?cid=7172458263629841121", 
+  "key": "2017nyny", 
+  "lat": 40.8421049, 
+  "lng": -73.941251, 
+  "location_name": "Armory Track", 
+  "name": "New York City Regional", 
+  "parent_event_key": null, 
+  "playoff_type": null, 
+  "playoff_type_string": null, 
+  "postal_code": "10032", 
+  "short_name": "New York City", 
+  "start_date": "2017-04-06", 
+  "state_prov": "NY", 
+  "timezone": "America/New_York", 
+  "webcasts": [
+    {
+      "channel": "nycfirst", 
+      "type": "twitch"
+    }
+  ], 
+  "website": "http://www.nycfirst.org", 
+  "week": 5, 
+  "year": 2017
+}

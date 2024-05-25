@@ -4,8 +4,11 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.playoff_type import (
     BRACKET_ELIM_MAPPING,
     BRACKET_OCTO_ELIM_MAPPING,
+    DOUBLE_ELIM_4_MAPPING,
     DOUBLE_ELIM_MAPPING,
-    DoubleElimBracket,
+    DoubleElimRound,
+    LEGACY_DOUBLE_ELIM_MAPPING,
+    LegacyDoubleElimBracket,
     PlayoffType,
 )
 
@@ -31,6 +34,12 @@ class PlayoffTypeHelper:
             elif playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
                 level, _, _ = DOUBLE_ELIM_MAPPING[match_number]
                 return level
+            elif playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+                level, _, _ = DOUBLE_ELIM_4_MAPPING[match_number]
+                return level
+            elif playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
+                level, _, _ = LEGACY_DOUBLE_ELIM_MAPPING[match_number]
+                return level
             elif (
                 playoff_type == PlayoffType.BO3_FINALS
                 or playoff_type == PlayoffType.BO5_FINALS
@@ -42,6 +51,10 @@ class PlayoffTypeHelper:
                 elif playoff_type == PlayoffType.BRACKET_4_TEAM and match_number <= 12:
                     # Account for a 4 team bracket where numbering starts at 1
                     match_number += 12
+                elif playoff_type == PlayoffType.BRACKET_2_TEAM and match_number <= 18:
+                    # Account for a 2 team bracket where numbering starts at 1
+                    match_number += 18
+
                 if match_number <= 12:
                     return CompLevel.QF
                 elif match_number <= 18:
@@ -51,7 +64,7 @@ class PlayoffTypeHelper:
 
     @classmethod
     def get_comp_level_octo(cls, match_number: int) -> CompLevel:
-        """ No 2015 support """
+        """No 2015 support"""
         if match_number <= 24:
             return CompLevel.EF
         elif match_number <= 36:
@@ -83,7 +96,13 @@ class PlayoffTypeHelper:
             else:
                 return 1, match_number
         elif playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-            level, set, match = DOUBLE_ELIM_MAPPING[match_number]
+            _, set, match = DOUBLE_ELIM_MAPPING[match_number]
+            return set, match
+        elif playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+            _, set, match = DOUBLE_ELIM_4_MAPPING[match_number]
+            return set, match
+        elif playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
+            _, set, match = LEGACY_DOUBLE_ELIM_MAPPING[match_number]
             return set, match
         elif (
             playoff_type == PlayoffType.BO3_FINALS
@@ -93,6 +112,9 @@ class PlayoffTypeHelper:
         else:
             if playoff_type == PlayoffType.BRACKET_4_TEAM and match_number <= 12:
                 match_number += 12
+            elif playoff_type == PlayoffType.BRACKET_2_TEAM and match_number <= 18:
+                match_number += 18
+
             return (
                 BRACKET_OCTO_ELIM_MAPPING[match_number]
                 if playoff_type == PlayoffType.BRACKET_16_TEAM
@@ -101,13 +123,79 @@ class PlayoffTypeHelper:
 
     # Determine if a match is in the winner or loser bracket
     @classmethod
-    def get_double_elim_bracket(cls, level: CompLevel, set: int) -> DoubleElimBracket:
+    def get_double_elim_bracket(
+        cls, level: CompLevel, set: int
+    ) -> LegacyDoubleElimBracket:
         if level == CompLevel.EF:
-            return DoubleElimBracket.WINNER if set <= 4 else DoubleElimBracket.LOSER
+            return (
+                LegacyDoubleElimBracket.WINNER
+                if set <= 4
+                else LegacyDoubleElimBracket.LOSER
+            )
         elif level == CompLevel.QF:
-            return DoubleElimBracket.WINNER if set <= 2 else DoubleElimBracket.LOSER
+            return (
+                LegacyDoubleElimBracket.WINNER
+                if set <= 2
+                else LegacyDoubleElimBracket.LOSER
+            )
         elif level == CompLevel.SF:
-            return DoubleElimBracket.WINNER if set == 1 else DoubleElimBracket.LOSER
+            return (
+                LegacyDoubleElimBracket.WINNER
+                if set == 1
+                else LegacyDoubleElimBracket.LOSER
+            )
         elif level == CompLevel.F:
-            return DoubleElimBracket.LOSER if set == 1 else DoubleElimBracket.WINNER
+            return (
+                LegacyDoubleElimBracket.LOSER
+                if set == 1
+                else LegacyDoubleElimBracket.WINNER
+            )
         raise ValueError(f"Bad CompLevel {level}")
+
+    @classmethod
+    def get_double_elim_round_pre_2023(
+        cls, level: CompLevel, set: int
+    ) -> DoubleElimRound:
+        if level == CompLevel.EF and set <= 4:
+            return DoubleElimRound.ROUND1
+        elif (level == CompLevel.EF and set <= 6) or (
+            level == CompLevel.QF and set <= 2
+        ):
+            return DoubleElimRound.ROUND2
+        elif level == CompLevel.QF and set <= 4:
+            return DoubleElimRound.ROUND3
+        elif level == CompLevel.SF:
+            return DoubleElimRound.ROUND4
+        elif level == CompLevel.F and set == 1:
+            return DoubleElimRound.ROUND5
+        elif level == CompLevel.F and set == 2:
+            return DoubleElimRound.FINALS
+        raise ValueError(f"Bad CompLevel/set: {level} {set}")
+
+    @classmethod
+    def get_double_elim_round(cls, level: CompLevel, set: int) -> DoubleElimRound:
+        if level == CompLevel.SF and set <= 4:
+            return DoubleElimRound.ROUND1
+        elif level == CompLevel.SF and set <= 8:
+            return DoubleElimRound.ROUND2
+        elif level == CompLevel.SF and set <= 10:
+            return DoubleElimRound.ROUND3
+        elif level == CompLevel.SF and set <= 12:
+            return DoubleElimRound.ROUND4
+        elif level == CompLevel.SF and set <= 13:
+            return DoubleElimRound.ROUND5
+        elif level == CompLevel.F:
+            return DoubleElimRound.FINALS
+        raise ValueError(f"Bad CompLevel/set: {level} {set}")
+
+    @classmethod
+    def get_double_elim_4_round(cls, level: CompLevel, set: int) -> DoubleElimRound:
+        if level == CompLevel.SF and set <= 2:
+            return DoubleElimRound.ROUND1
+        elif level == CompLevel.SF and set <= 4:
+            return DoubleElimRound.ROUND2
+        elif level == CompLevel.SF and set <= 5:
+            return DoubleElimRound.ROUND3
+        elif level == CompLevel.F:
+            return DoubleElimRound.FINALS
+        raise ValueError(f"Bad CompLevel/set: {level} {set}")

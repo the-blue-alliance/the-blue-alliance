@@ -1,4 +1,6 @@
-import Firebase from "firebase";
+// TODO(eugene): Don't use compatibility package.
+import firebase from "firebase/compat/app";
+import "firebase/compat/database";
 import Firedux from "firedux";
 import { combineReducers } from "redux";
 import { webcastsById, specialWebcastIds } from "./webcastsById";
@@ -8,7 +10,7 @@ import chats from "./chats";
 import favoriteTeams from "./favorites";
 
 // Firebase
-const firebaseApp = Firebase.initializeApp({
+const firebaseApp = firebase.initializeApp({
   apiKey: "AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs",
   authDomain: "tbatv-prod-hrd.firebaseapp.com",
   databaseURL: "https://tbatv-prod-hrd.firebaseio.com",

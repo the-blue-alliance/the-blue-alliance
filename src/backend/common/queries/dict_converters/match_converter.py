@@ -1,9 +1,9 @@
 import datetime
 import json
 import time
-from typing import Dict, List
+from typing import Dict, List, NewType
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
 from backend.common.consts.api_version import ApiMajorVersion
@@ -11,37 +11,40 @@ from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
+MatchDict = NewType("MatchDict", Dict)
+
 
 class MatchConverter(ConverterBase):
-    # SUBVERSIONS = {  # Increment every time a change to the dict is made
-    #     3: 6,
-    # }
-    # TODO: use for cache clearing
+    SUBVERSIONS = {  # Increment every time a change to the dict is made
+        ApiMajorVersion.API_V3: 6,
+    }
 
     @classmethod
     def _convert_list(
-        cls, matches: List[Match], version: ApiMajorVersion
-    ) -> List[Dict]:
+        cls, model_list: List[Match], version: ApiMajorVersion
+    ) -> List[MatchDict]:
         CONVERTERS = {
             ApiMajorVersion.API_V3: cls.matchesConverter_v3,
         }
-        return CONVERTERS[version](matches)
+        return CONVERTERS[version](model_list)
 
     @classmethod
-    def matchesConverter_v3(cls, matches: List[Match]) -> List[Dict]:
+    def matchesConverter_v3(cls, matches: List[Match]) -> List[MatchDict]:
         return list(map(cls.matchConverter_v3, matches))
 
     @classmethod
-    def matchConverter_v3(cls, match: Match) -> Dict:
+    def matchConverter_v3(cls, match: Match) -> MatchDict:
         alliances = {}
         for alliance in ALLIANCE_COLORS:
             alliances[alliance] = {
                 "team_keys": match.alliances[alliance]["teams"],
                 "score": match.alliances[alliance]["score"],
                 "surrogate_team_keys": match.alliances[alliance]["surrogates"],
-                "dq_team_keys": match.alliances[alliance]["dqs"]
-                if "dqs" in match.alliances[alliance]
-                else [],
+                "dq_team_keys": (
+                    match.alliances[alliance]["dqs"]
+                    if "dqs" in match.alliances[alliance]
+                    else []
+                ),
             }
 
         match_dict = {
@@ -76,7 +79,7 @@ class MatchConverter(ConverterBase):
         else:
             match_dict["post_result_time"] = None
 
-        return match_dict
+        return MatchDict(match_dict)
 
     @staticmethod
     def dictToModel_v3(data: Dict) -> Match:

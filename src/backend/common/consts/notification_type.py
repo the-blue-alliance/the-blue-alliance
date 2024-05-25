@@ -89,6 +89,7 @@ TYPES: Dict[str, NotificationType] = {
 ENABLED_NOTIFICATIONS: Dict[NotificationType, str] = {
     NotificationType.UPCOMING_MATCH: RENDER_NAMES[NotificationType.UPCOMING_MATCH],
     NotificationType.MATCH_SCORE: RENDER_NAMES[NotificationType.MATCH_SCORE],
+    NotificationType.MATCH_VIDEO: RENDER_NAMES[NotificationType.MATCH_VIDEO],
     NotificationType.LEVEL_STARTING: RENDER_NAMES[NotificationType.LEVEL_STARTING],
     NotificationType.ALLIANCE_SELECTION: RENDER_NAMES[
         NotificationType.ALLIANCE_SELECTION

@@ -16,7 +16,6 @@ from backend.common.models.suggestion_dict import SuggestionDict
 
 
 class MediaParser:
-
     # Add MediaTypes to this list to indicate that they case case-sensitive (shouldn't be normalized to lower case)
     CASE_SENSITIVE_FOREIGN_KEYS: Set[MediaType] = {
         MediaType.YOUTUBE_VIDEO,
@@ -25,7 +24,7 @@ class MediaParser:
         MediaType.INSTAGRAM_IMAGE,
     }
 
-    OEMBED_PROVIDERS: Set[MediaType] = {MediaType.INSTAGRAM_IMAGE}
+    OEMBED_PROVIDERS: Set[MediaType] = set()
 
     # Dict that maps media types -> list of tuple of regex pattern and group # of foreign key
     FOREIGN_KEY_PATTERNS: Dict[MediaType, List[Tuple[str, int]]] = {
@@ -50,6 +49,7 @@ class MediaParser:
         MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)],
         MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)\/e\/", 1)],
         MediaType.INSTAGRAM_IMAGE: [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
+        MediaType.GITLAB_PROFILE: [(r".*gitlab.com\/(.*)(\/(.*))?", 1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -71,6 +71,7 @@ class MediaParser:
         # Keep these last, so they don't greedy match over other more specific urls
         ("youtube.com/", MediaType.YOUTUBE_CHANNEL),
         ("instagram.com/", MediaType.INSTAGRAM_PROFILE),
+        ("gitlab.com/", MediaType.GITLAB_PROFILE),
     ]
 
     # The default is to strip out all urlparams, but this is a white-list for exceptions
@@ -85,9 +86,7 @@ class MediaParser:
         "https://cad.onshape.com/api/documents/{}"  # Format w/ stripped foreign key
     )
 
-    OEMBED_DETAIL_URL: Dict[MediaType, str] = {
-        MediaType.INSTAGRAM_IMAGE: "https://api.instagram.com/oembed/?url=http://instagram.com/p/{}"
-    }
+    OEMBED_DETAIL_URL: Dict[MediaType, str] = {}
 
     @classmethod
     def partial_media_dict_from_url(cls, url: str) -> Optional[SuggestionDict]:

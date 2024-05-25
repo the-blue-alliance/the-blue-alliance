@@ -1,7 +1,7 @@
 import types
-from typing import Callable, Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 
 T = TypeVar("T")
@@ -10,9 +10,6 @@ T = TypeVar("T")
 class TypedFuture(ndb.Future, Generic[T]):
     def done(self) -> bool:
         return super().done()
-
-    def running(self) -> bool:
-        return super().running()
 
     def wait(self) -> None:
         super().wait()
@@ -23,32 +20,17 @@ class TypedFuture(ndb.Future, Generic[T]):
     def set_result(self, result: T) -> None:
         super().set_result(result)
 
-    def set_exception(self, exception: Exception) -> None:
-        super().set_exception(exception)
-
-    def result(self) -> T:
-        return super().result()
+    def set_exception(self, exc: Exception, tb=None) -> None:
+        super().set_exception(exc, tb)
 
     def get_result(self) -> T:
         return super().get_result()
-
-    def exception(self) -> Exception:
-        return super().exception()
 
     def get_exception(self) -> Exception:
         return super().get_exception()
 
     def get_traceback(self) -> Optional[types.TracebackType]:
         return super().get_traceback()
-
-    def add_done_callback(self, callback: Callable[[], None]) -> None:
-        super().add_done_callback(callback)
-
-    def cancel(self) -> None:
-        super().cancel()
-
-    def cancelled(self) -> bool:
-        return super().cancelled()
 
 
 class InstantFuture(TypedFuture[T], Generic[T]):

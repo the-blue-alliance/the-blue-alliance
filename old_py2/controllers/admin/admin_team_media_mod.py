@@ -83,7 +83,7 @@ class AdminTeamMediaModCodeAdd(LoggedInHandler):
             team_number = int(row[0])
             auth_codes.append(
                 TeamAdminAccess(
-                    id=TeamAdminAccess.renderKeyName(team_number, year),
+                    id=TeamAdminAccess.render_key_name(team_number, year),
                     team_number=team_number,
                     year=year,
                     access_code=row[1],

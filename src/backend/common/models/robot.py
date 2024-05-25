@@ -1,6 +1,6 @@
 from typing import Set
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import RobotKey, TeamKey, Year
@@ -13,8 +13,8 @@ class Robot(CachedModel):
     key_name is like <team_key>_<year> (e.g. frc1124_2015)
     """
 
-    team = ndb.KeyProperty(kind=Team)
-    year = ndb.IntegerProperty()
+    team = ndb.KeyProperty(kind=Team, required=True)
+    year = ndb.IntegerProperty(required=True)
     robot_name = ndb.StringProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
@@ -35,11 +35,11 @@ class Robot(CachedModel):
 
     @property
     def key_name(self) -> RobotKey:
-        return self.renderKeyName(self.team.id(), self.year)
+        return self.render_key_name(self.team.id(), self.year)
 
     @classmethod
-    def renderKeyName(cls, teamKey: TeamKey, year: Year) -> RobotKey:
-        return "{}_{}".format(teamKey, year)
+    def render_key_name(cls, team_key: TeamKey, year: Year) -> RobotKey:
+        return "{}_{}".format(team_key, year)
 
     @classmethod
     def validate_key_name(cls, key: str) -> bool:

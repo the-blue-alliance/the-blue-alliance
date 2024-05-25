@@ -13,7 +13,7 @@ from helpers.event_helper import EventHelper, CHAMPIONSHIP_EVENTS_LABEL,\
 from models.event import Event
 
 
-class TestEventGroupByWeek(unittest2.TestCase):
+class TestEventgroup_by_week(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -203,8 +203,8 @@ class TestEventGroupByWeek(unittest2.TestCase):
         ndb.put_multi(events)
 
         # Begin testing
-        events.sort(key=EventHelper.distantFutureIfNoStartDate)
-        week_events = EventHelper.groupByWeek(events)
+        events.sort(key=EventHelper.start_date_or_distant_future)
+        week_events = EventHelper.group_by_week(events)
 
         for key in events_by_week.keys():
             try:

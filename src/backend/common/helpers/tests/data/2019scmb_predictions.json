@@ -1,0 +1,4323 @@
+{
+  "match_prediction_stats": {
+    "playoff": {
+      "brier_scores": {
+        "win_loss": 0.22186034183527426
+      }, 
+      "err_mean": 11.675243247627558, 
+      "err_var": 40.6633269678452, 
+      "wl_accuracy": 70.58823529411765, 
+      "wl_accuracy_75": null
+    }, 
+    "qual": {
+      "brier_scores": {
+        "win_loss": 0.1985789032623275
+      }, 
+      "err_mean": 11.120375491654002, 
+      "err_var": 77.14916812507828, 
+      "wl_accuracy": 70.83333333333333, 
+      "wl_accuracy_75": 100.0
+    }
+  }, 
+  "match_predictions": {
+    "playoff": {
+      "2019scmb_f1m1": {
+        "blue": {
+          "hab_climb_points": 16.29411356171146, 
+          "hab_climb_points_var": 55.8634090010773, 
+          "prob_complete_rocket": 0.0027035640175043785, 
+          "prob_hab_docking": 0.5687310717944603, 
+          "rocket_pieces_scored": 3.544096767218098, 
+          "rocket_pieces_scored_var": 9.240435823453872, 
+          "score": 63.56807731211783, 
+          "score_var": 282.0229995097546
+        }, 
+        "prob": 0.5742975379355485, 
+        "red": {
+          "hab_climb_points": 16.899921908022012, 
+          "hab_climb_points_var": 47.77393523868036, 
+          "prob_complete_rocket": 0.1799106741029125, 
+          "prob_hab_docking": 0.6082950783599613, 
+          "rocket_pieces_scored": 7.962321891927086, 
+          "rocket_pieces_scored_var": 19.44248104758719, 
+          "score": 68.54893941894328, 
+          "score_var": 424.9653222701617
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_f1m2": {
+        "blue": {
+          "hab_climb_points": 16.45350841945752, 
+          "hab_climb_points_var": 54.170915120956096, 
+          "prob_complete_rocket": 0.0022460707155136372, 
+          "prob_hab_docking": 0.5782760532162018, 
+          "rocket_pieces_scored": 3.6785385502588706, 
+          "rocket_pieces_scored_var": 8.577216000645347, 
+          "score": 63.890620594990025, 
+          "score_var": 257.2932420384009
+        }, 
+        "prob": 0.5864739834114984, 
+        "red": {
+          "hab_climb_points": 17.02869803514868, 
+          "hab_climb_points_var": 46.303348606391985, 
+          "prob_complete_rocket": 0.19904665045448722, 
+          "prob_hab_docking": 0.6171994755597869, 
+          "rocket_pieces_scored": 8.313504344426484, 
+          "rocket_pieces_scored_var": 19.031882445490282, 
+          "score": 69.41753639940156, 
+          "score_var": 382.62791789798854
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_f1m3": {
+        "blue": {
+          "hab_climb_points": 16.334767715280883, 
+          "hab_climb_points_var": 52.984951438243, 
+          "prob_complete_rocket": 0.0014768736768312474, 
+          "prob_hab_docking": 0.5727463319057371, 
+          "rocket_pieces_scored": 3.621742015030579, 
+          "rocket_pieces_scored_var": 7.9443899005745795, 
+          "score": 63.74117039626656, 
+          "score_var": 236.00342572104563
+        }, 
+        "prob": 0.5752007564337588, 
+        "red": {
+          "hab_climb_points": 16.20057723312698, 
+          "hab_climb_points_var": 47.460098087583845, 
+          "prob_complete_rocket": 0.1997936208101403, 
+          "prob_hab_docking": 0.5691738602030147, 
+          "rocket_pieces_scored": 8.385870439939303, 
+          "rocket_pieces_scored_var": 18.408286882924727, 
+          "score": 68.34920971215327, 
+          "score_var": 354.4896551356131
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qf1m1": {
+        "blue": {
+          "hab_climb_points": 11.979479282652514, 
+          "hab_climb_points_var": 43.59131046909976, 
+          "prob_complete_rocket": 6.566081012238101e-12, 
+          "prob_hab_docking": 0.3236593492869755, 
+          "rocket_pieces_scored": -0.1883741772384598, 
+          "rocket_pieces_scored_var": 3.2439692062238215, 
+          "score": 45.85210591414169, 
+          "score_var": 217.38543316526622
+        }, 
+        "prob": 0.7053753540279327, 
+        "red": {
+          "hab_climb_points": 16.877480479553252, 
+          "hab_climb_points_var": 68.09421583754872, 
+          "prob_complete_rocket": 0.10321240414316013, 
+          "prob_hab_docking": 0.5899904410360428, 
+          "rocket_pieces_scored": 5.905668657960233, 
+          "rocket_pieces_scored_var": 23.26648862240726, 
+          "score": 62.419569145828675, 
+          "score_var": 724.1711120008413
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qf1m2": {
+        "blue": {
+          "hab_climb_points": 11.81077173720777, 
+          "hab_climb_points_var": 40.86124389319784, 
+          "prob_complete_rocket": 2.040323709984193e-08, 
+          "prob_hab_docking": 0.3089183174930594, 
+          "rocket_pieces_scored": 0.3963414867348617, 
+          "rocket_pieces_scored_var": 4.471656450140211, 
+          "score": 48.580167468949014, 
+          "score_var": 226.07333347765018
+        }, 
+        "prob": 0.7121625925774873, 
+        "red": {
+          "hab_climb_points": 16.963613848830686, 
+          "hab_climb_points_var": 55.28914012643059, 
+          "prob_complete_rocket": 0.16681890098984464, 
+          "prob_hab_docking": 0.6041410166173241, 
+          "rocket_pieces_scored": 7.079235462800891, 
+          "rocket_pieces_scored_var": 25.90482746926207, 
+          "score": 64.88972931982386, 
+          "score_var": 623.0150372715088
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qf2m1": {
+        "blue": {
+          "hab_climb_points": 13.698175292134358, 
+          "hab_climb_points_var": 40.80387783005999, 
+          "prob_complete_rocket": 6.219636187831945e-05, 
+          "prob_hab_docking": 0.4192553344773823, 
+          "rocket_pieces_scored": 2.517167200974674, 
+          "rocket_pieces_scored_var": 6.106943441795213, 
+          "score": 55.642988706491195, 
+          "score_var": 447.1101530761364
+        }, 
+        "prob": 0.5437454089003966, 
+        "red": {
+          "hab_climb_points": 16.479310496423484, 
+          "hab_climb_points_var": 43.36680021614285, 
+          "prob_complete_rocket": 0.09269234370422041, 
+          "prob_hab_docking": 0.5888690316573817, 
+          "rocket_pieces_scored": 6.867365395061663, 
+          "rocket_pieces_scored_var": 15.020033679181038, 
+          "score": 52.541418006587435, 
+          "score_var": 349.7319974444772
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qf2m2": {
+        "blue": {
+          "hab_climb_points": 15.847785251607146, 
+          "hab_climb_points_var": 46.34029613901656, 
+          "prob_complete_rocket": 1.5320933395290837e-05, 
+          "prob_hab_docking": 0.5495558610663023, 
+          "rocket_pieces_scored": 2.6062099602754962, 
+          "rocket_pieces_scored_var": 5.077995567551176, 
+          "score": 54.695548690881765, 
+          "score_var": 320.2804134806924
+        }, 
+        "prob": 0.5356107837381018, 
+        "red": {
+          "hab_climb_points": 17.34587208668605, 
+          "hab_climb_points_var": 43.17071285594707, 
+          "prob_complete_rocket": 0.11599786430393078, 
+          "prob_hab_docking": 0.639466867434795, 
+          "rocket_pieces_scored": 7.5032008466111755, 
+          "rocket_pieces_scored_var": 14.154720861840865, 
+          "score": 57.09463038282369, 
+          "score_var": 400.14863100975197
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qf3m1": {
+        "blue": {
+          "hab_climb_points": 14.42038216908496, 
+          "hab_climb_points_var": 38.02698962058538, 
+          "prob_complete_rocket": 0.028148027899852046, 
+          "prob_hab_docking": 0.4625573369148689, 
+          "rocket_pieces_scored": 5.43822656788735, 
+          "rocket_pieces_scored_var": 11.818173916631054, 
+          "score": 60.85456799295082, 
+          "score_var": 536.2972375474751
+        }, 
+        "prob": 0.5228045863814161, 
+        "red": {
+          "hab_climb_points": 12.994726010289263, 
+          "hab_climb_points_var": 88.51657769338043, 
+          "prob_complete_rocket": 0.20460084347068863, 
+          "prob_hab_docking": 0.4156095620160094, 
+          "rocket_pieces_scored": 8.209735617241346, 
+          "rocket_pieces_scored_var": 21.09191688272056, 
+          "score": 62.8226926867182, 
+          "score_var": 647.8549237777613
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qf3m2": {
+        "blue": {
+          "hab_climb_points": 15.051261297723991, 
+          "hab_climb_points_var": 37.6929407177951, 
+          "prob_complete_rocket": 0.08361627185109477, 
+          "prob_hab_docking": 0.503330923093932, 
+          "rocket_pieces_scored": 6.444731444974207, 
+          "rocket_pieces_scored_var": 16.178110821024543, 
+          "score": 63.34646357289049, 
+          "score_var": 489.79150826532515
+        }, 
+        "prob": 0.525326329875482, 
+        "red": {
+          "hab_climb_points": 14.666207655246687, 
+          "hab_climb_points_var": 85.01983302230876, 
+          "prob_complete_rocket": 0.2389805384756989, 
+          "prob_hab_docking": 0.48556118784502444, 
+          "rocket_pieces_scored": 8.877321357355275, 
+          "rocket_pieces_scored_var": 19.366219539595512, 
+          "score": 65.41597034467573, 
+          "score_var": 571.4769590425399
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qf4m1": {
+        "blue": {
+          "hab_climb_points": 10.872987559984296, 
+          "hab_climb_points_var": 40.70304280996919, 
+          "prob_complete_rocket": 0.0394303615917313, 
+          "prob_hab_docking": 0.2588554727244877, 
+          "rocket_pieces_scored": 5.499672977823063, 
+          "rocket_pieces_scored_var": 13.682368659007743, 
+          "score": 48.873818295252725, 
+          "score_var": 391.8738617117854
+        }, 
+        "prob": 0.529042723352728, 
+        "red": {
+          "hab_climb_points": 14.34861728870839, 
+          "hab_climb_points_var": 63.08948856746728, 
+          "prob_complete_rocket": 0.0002447765758912812, 
+          "prob_hab_docking": 0.46732006301298123, 
+          "rocket_pieces_scored": 2.29576208387203, 
+          "rocket_pieces_scored_var": 7.747585402449147, 
+          "score": 50.863038641401474, 
+          "score_var": 353.4464184788703
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qf4m2": {
+        "blue": {
+          "hab_climb_points": 11.051044444271163, 
+          "hab_climb_points_var": 33.88532964461943, 
+          "prob_complete_rocket": 0.020863287825335863, 
+          "prob_hab_docking": 0.24876373341554003, 
+          "rocket_pieces_scored": 5.079852955344613, 
+          "rocket_pieces_scored_var": 11.549789043594686, 
+          "score": 50.4903060410026, 
+          "score_var": 342.60105511639983
+        }, 
+        "prob": 0.5801672281390691, 
+        "red": {
+          "hab_climb_points": 15.706304241161563, 
+          "hab_climb_points_var": 61.36688156612975, 
+          "prob_complete_rocket": 0.0040385964958917775, 
+          "prob_hab_docking": 0.5359208626542239, 
+          "rocket_pieces_scored": 3.2452176208077868, 
+          "rocket_pieces_scored_var": 10.924055100665925, 
+          "score": 56.10680513468846, 
+          "score_var": 428.032902219229
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qf4m3": {
+        "blue": {
+          "hab_climb_points": 12.263882424432538, 
+          "hab_climb_points_var": 36.34473275513399, 
+          "prob_complete_rocket": 0.011483960069012422, 
+          "prob_hab_docking": 0.3249677661916547, 
+          "rocket_pieces_scored": 4.718590799230251, 
+          "rocket_pieces_scored_var": 10.25326635294622, 
+          "score": 53.52600520083723, 
+          "score_var": 336.85108026808325
+        }, 
+        "prob": 0.563821613311092, 
+        "red": {
+          "hab_climb_points": 14.547714702827296, 
+          "hab_climb_points_var": 60.47066358317788, 
+          "prob_complete_rocket": 0.0031554993937293885, 
+          "prob_hab_docking": 0.47680975342445164, 
+          "rocket_pieces_scored": 3.5499899580849426, 
+          "rocket_pieces_scored_var": 9.572317940919497, 
+          "score": 57.801758266630216, 
+          "score_var": 371.3871304741988
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_sf1m1": {
+        "blue": {
+          "hab_climb_points": 17.86617392220715, 
+          "hab_climb_points_var": 42.59292659907722, 
+          "prob_complete_rocket": 0.149701550987147, 
+          "prob_hab_docking": 0.6697312348910536, 
+          "rocket_pieces_scored": 8.114603386562008, 
+          "rocket_pieces_scored_var": 14.018938850600218, 
+          "score": 59.64960261741975, 
+          "score_var": 384.31570513644294
+        }, 
+        "prob": 0.5769909208335138, 
+        "red": {
+          "hab_climb_points": 16.531079154732133, 
+          "hab_climb_points_var": 52.01281424654847, 
+          "prob_complete_rocket": 0.19245475305740112, 
+          "prob_hab_docking": 0.5840620671423566, 
+          "rocket_pieces_scored": 7.726655418783874, 
+          "rocket_pieces_scored_var": 24.18857374085496, 
+          "score": 65.50766726625915, 
+          "score_var": 525.604786398672
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_sf1m2": {
+        "blue": {
+          "hab_climb_points": 18.32125519930155, 
+          "hab_climb_points_var": 42.43864950416649, 
+          "prob_complete_rocket": 0.1197383949822004, 
+          "prob_hab_docking": 0.6949131058472984, 
+          "rocket_pieces_scored": 7.50631565345675, 
+          "rocket_pieces_scored_var": 14.593928388092586, 
+          "score": 59.94328598491467, 
+          "score_var": 331.0793462587125
+        }, 
+        "prob": 0.6070160223601269, 
+        "red": {
+          "hab_climb_points": 16.73642966812703, 
+          "hab_climb_points_var": 49.51823048475127, 
+          "prob_complete_rocket": 0.19836723223669783, 
+          "prob_hab_docking": 0.5974529887014668, 
+          "rocket_pieces_scored": 8.087970963812685, 
+          "rocket_pieces_scored_var": 21.30874121895199, 
+          "score": 67.67974222805003, 
+          "score_var": 480.59933930951865
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_sf2m1": {
+        "blue": {
+          "hab_climb_points": 14.176431592113357, 
+          "hab_climb_points_var": 57.407782534771805, 
+          "prob_complete_rocket": 0.0014521358739036927, 
+          "prob_hab_docking": 0.45672173480084755, 
+          "rocket_pieces_scored": 3.321016492514701, 
+          "rocket_pieces_scored_var": 8.495286379055406, 
+          "score": 60.325256887639384, 
+          "score_var": 360.5541672358425
+        }, 
+        "prob": 0.6048892758918651, 
+        "red": {
+          "hab_climb_points": 15.703349193114903, 
+          "hab_climb_points_var": 77.71626318907698, 
+          "prob_complete_rocket": 0.23490448344871484, 
+          "prob_hab_docking": 0.5317954189668516, 
+          "rocket_pieces_scored": 9.073593031188189, 
+          "rocket_pieces_scored_var": 16.392503362672297, 
+          "score": 68.33171627919845, 
+          "score_var": 545.2669393982774
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_sf2m2": {
+        "blue": {
+          "hab_climb_points": 15.039163380874339, 
+          "hab_climb_points_var": 57.23584152296767, 
+          "prob_complete_rocket": 0.003532276256471123, 
+          "prob_hab_docking": 0.502065162670349, 
+          "rocket_pieces_scored": 3.7989032220536467, 
+          "rocket_pieces_scored_var": 9.268676369226027, 
+          "score": 62.18567081321963, 
+          "score_var": 343.75129622709017
+        }, 
+        "prob": 0.6058657626472217, 
+        "red": {
+          "hab_climb_points": 16.47273804907783, 
+          "hab_climb_points_var": 70.38177081292736, 
+          "prob_complete_rocket": 0.2055448475904632, 
+          "prob_hab_docking": 0.5696753959307974, 
+          "rocket_pieces_scored": 8.912029665115416, 
+          "rocket_pieces_scored_var": 14.113228265305384, 
+          "score": 69.90573642034163, 
+          "score_var": 482.59117039340117
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_sf2m3": {
+        "blue": {
+          "hab_climb_points": 15.744361417091417, 
+          "hab_climb_points_var": 56.59074547371758, 
+          "prob_complete_rocket": 0.0028121404906116254, 
+          "prob_hab_docking": 0.5394105945168216, 
+          "rocket_pieces_scored": 3.9365142950313743, 
+          "rocket_pieces_scored_var": 8.480578731392493, 
+          "score": 63.11789422796021, 
+          "score_var": 312.4941429287825
+        }, 
+        "prob": 0.5716562088387924, 
+        "red": {
+          "hab_climb_points": 15.099214717403445, 
+          "hab_climb_points_var": 75.55715329699402, 
+          "prob_complete_rocket": 0.1913560498924367, 
+          "prob_hab_docking": 0.5045534329105725, 
+          "rocket_pieces_scored": 8.922225602448943, 
+          "rocket_pieces_scored_var": 12.431815698016813, 
+          "score": 68.09086332700794, 
+          "score_var": 445.7917095272868
+        }, 
+        "winning_alliance": "red"
+      }
+    }, 
+    "qual": {
+      "2019scmb_qm1": {
+        "blue": {
+          "hab_climb_points": 6.0, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.04163225833177531, 
+          "prob_hab_docking": 0.04163225833177531, 
+          "rocket_pieces_scored": 3.0, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 30.0, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 6.0, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.04163225833177531, 
+          "prob_hab_docking": 0.04163225833177531, 
+          "rocket_pieces_scored": 3.0, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 30.0, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm10": {
+        "blue": {
+          "hab_climb_points": 5.833333333333332, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.04163225833177531, 
+          "prob_hab_docking": 0.038855398911516126, 
+          "rocket_pieces_scored": 3.0, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.333333333333325, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 5.833333333333332, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.04163225833177531, 
+          "prob_hab_docking": 0.038855398911516126, 
+          "rocket_pieces_scored": 3.0, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.333333333333325, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm11": {
+        "blue": {
+          "hab_climb_points": 5.375, 
+          "hab_climb_points_var": 24.0, 
+          "prob_complete_rocket": 0.024701807509381224, 
+          "prob_hab_docking": 0.024724780417582082, 
+          "rocket_pieces_scored": 2.5416666666666665, 
+          "rocket_pieces_scored_var": 23.166666666666664, 
+          "score": 26.458333333333332, 
+          "score_var": 1000.1666666666667
+        }, 
+        "prob": 0.5252309110674658, 
+        "red": {
+          "hab_climb_points": 5.375, 
+          "hab_climb_points_var": 22.833333333333332, 
+          "prob_complete_rocket": 0.021606035400743795, 
+          "prob_hab_docking": 0.021990987433159193, 
+          "rocket_pieces_scored": 2.375, 
+          "rocket_pieces_scored_var": 22.666666666666668, 
+          "score": 23.624999999999996, 
+          "score_var": 1004.1666666666666
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm12": {
+        "blue": {
+          "hab_climb_points": 5.90909090909091, 
+          "hab_climb_points_var": 17.166666666666668, 
+          "prob_complete_rocket": 0.026898157269422462, 
+          "prob_hab_docking": 0.014112674507503309, 
+          "rocket_pieces_scored": 3.8181818181818183, 
+          "rocket_pieces_scored_var": 18.000000000000004, 
+          "score": 24.84848484848485, 
+          "score_var": 624.8333333333334
+        }, 
+        "prob": 0.5582173487951965, 
+        "red": {
+          "hab_climb_points": 6.40909090909091, 
+          "hab_climb_points_var": 19.833333333333336, 
+          "prob_complete_rocket": 0.04043830635518697, 
+          "prob_hab_docking": 0.026862938757974186, 
+          "rocket_pieces_scored": 2.818181818181819, 
+          "rocket_pieces_scored_var": 27.66666666666667, 
+          "score": 30.515151515151516, 
+          "score_var": 872.3333333333335
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm13": {
+        "blue": {
+          "hab_climb_points": 9.259469696969697, 
+          "hab_climb_points_var": 49.59090909090909, 
+          "prob_complete_rocket": 0.061083374471026075, 
+          "prob_hab_docking": 0.20748600483234725, 
+          "rocket_pieces_scored": 4.028409090909091, 
+          "rocket_pieces_scored_var": 26.59595959595959, 
+          "score": 33.412247474747474, 
+          "score_var": 879.2020202020203
+        }, 
+        "prob": 0.6059607198975732, 
+        "red": {
+          "hab_climb_points": 4.8352272727272725, 
+          "hab_climb_points_var": 16.13131313131313, 
+          "prob_complete_rocket": 0.01700134989341162, 
+          "prob_hab_docking": 0.00568966459750575, 
+          "rocket_pieces_scored": 3.46780303030303, 
+          "rocket_pieces_scored_var": 16.1969696969697, 
+          "score": 22.80113636363636, 
+          "score_var": 679.0656565656566
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm14": {
+        "blue": {
+          "hab_climb_points": 5.2978327816625725, 
+          "hab_climb_points_var": 11.51670460594049, 
+          "prob_complete_rocket": 0.008364461370748866, 
+          "prob_hab_docking": 0.0021253134780321314, 
+          "rocket_pieces_scored": 1.749750696285815, 
+          "rocket_pieces_scored_var": 18.35372895640127, 
+          "score": 23.057627091660077, 
+          "score_var": 773.0201606066989
+        }, 
+        "prob": 0.5620293094612224, 
+        "red": {
+          "hab_climb_points": 7.892161994557426, 
+          "hab_climb_points_var": 48.057513581161814, 
+          "prob_complete_rocket": 0.038487787309179455, 
+          "prob_hab_docking": 0.15260753429084417, 
+          "rocket_pieces_scored": 3.45289834938497, 
+          "rocket_pieces_scored_var": 23.357286232188198, 
+          "score": 29.362613612253462, 
+          "score_var": 858.0477444149848
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm15": {
+        "blue": {
+          "hab_climb_points": 6.803571428571429, 
+          "hab_climb_points_var": 15.166666666666668, 
+          "prob_complete_rocket": 0.009150348373857087, 
+          "prob_hab_docking": 0.017660955422254876, 
+          "rocket_pieces_scored": 2.4642857142857144, 
+          "rocket_pieces_scored_var": 16.333333333333332, 
+          "score": 26.434523809523817, 
+          "score_var": 638.6666666666667
+        }, 
+        "prob": 0.559656605975116, 
+        "red": {
+          "hab_climb_points": 6.427915513051771, 
+          "hab_climb_points_var": 15.569249681843724, 
+          "prob_complete_rocket": 0.09113799947515444, 
+          "prob_hab_docking": 0.014910338710616866, 
+          "rocket_pieces_scored": 4.810843108365163, 
+          "rocket_pieces_scored_var": 29.052772533156297, 
+          "score": 32.33596893922433, 
+          "score_var": 907.1685483730553
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm16": {
+        "blue": {
+          "hab_climb_points": 5.457446662827551, 
+          "hab_climb_points_var": 13.295517394530144, 
+          "prob_complete_rocket": 0.0147872301740537, 
+          "prob_hab_docking": 0.00443467096625727, 
+          "rocket_pieces_scored": 2.8053160347402777, 
+          "rocket_pieces_scored_var": 17.85904791412785, 
+          "score": 20.657379998581312, 
+          "score_var": 773.295315225439
+        }, 
+        "prob": 0.5619270176678305, 
+        "red": {
+          "hab_climb_points": 6.2326014407356505, 
+          "hab_climb_points_var": 15.289972139244632, 
+          "prob_complete_rocket": 0.01657022541857156, 
+          "prob_hab_docking": 0.012475382884216013, 
+          "rocket_pieces_scored": 2.913542392561036, 
+          "rocket_pieces_scored_var": 18.191815033246016, 
+          "score": 26.575371665582658, 
+          "score_var": 668.4802523811643
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm17": {
+        "blue": {
+          "hab_climb_points": 5.06016438161601, 
+          "hab_climb_points_var": 16.93216743951264, 
+          "prob_complete_rocket": 0.008655471717940566, 
+          "prob_hab_docking": 0.007854905540083612, 
+          "rocket_pieces_scored": 1.95050665258605, 
+          "rocket_pieces_scored_var": 17.828764803289936, 
+          "score": 24.024328868510427, 
+          "score_var": 735.9257083982486
+        }, 
+        "prob": 0.501599216728833, 
+        "red": {
+          "hab_climb_points": 6.929529802687405, 
+          "hab_climb_points_var": 17.893798940143043, 
+          "prob_complete_rocket": 0.007045428827084477, 
+          "prob_hab_docking": 0.02820435603947724, 
+          "rocket_pieces_scored": 1.4572413463725093, 
+          "rocket_pieces_scored_var": 18.442814190168697, 
+          "score": 24.1763012797293, 
+          "score_var": 701.3254433092693
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm18": {
+        "blue": {
+          "hab_climb_points": 8.084164177066333, 
+          "hab_climb_points_var": 38.53161112084145, 
+          "prob_complete_rocket": 0.007879911638399961, 
+          "prob_hab_docking": 0.13261158792354144, 
+          "rocket_pieces_scored": 2.1143928862974772, 
+          "rocket_pieces_scored_var": 16.763983517052694, 
+          "score": 24.880098462088522, 
+          "score_var": 743.1382614770052
+        }, 
+        "prob": 0.5116887951128046, 
+        "red": {
+          "hab_climb_points": 8.851373266619195, 
+          "hab_climb_points_var": 40.927514465887285, 
+          "prob_complete_rocket": 0.015840843044946373, 
+          "prob_hab_docking": 0.16824990656216932, 
+          "rocket_pieces_scored": 2.5768106072366983, 
+          "rocket_pieces_scored_var": 19.23818027976424, 
+          "score": 25.980617825279868, 
+          "score_var": 667.2923092834455
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm19": {
+        "blue": {
+          "hab_climb_points": 6.366167742946671, 
+          "hab_climb_points_var": 14.698101724249529, 
+          "prob_complete_rocket": 0.00997813492185684, 
+          "prob_hab_docking": 0.012160382976347694, 
+          "rocket_pieces_scored": 2.622732554831611, 
+          "rocket_pieces_scored_var": 16.236661699135997, 
+          "score": 27.221673664572055, 
+          "score_var": 676.285591534496
+        }, 
+        "prob": 0.5575770837059542, 
+        "red": {
+          "hab_climb_points": 8.020186537305987, 
+          "hab_climb_points_var": 25.664718919334792, 
+          "prob_complete_rocket": 0.016301830196056022, 
+          "prob_hab_docking": 0.08413772584040691, 
+          "rocket_pieces_scored": 2.668949449423718, 
+          "rocket_pieces_scored_var": 19.066912199426053, 
+          "score": 32.663450399291754, 
+          "score_var": 735.5040058872831
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm2": {
+        "blue": {
+          "hab_climb_points": 4.5, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.013442755926704075, 
+          "prob_hab_docking": 0.02165407140539588, 
+          "rocket_pieces_scored": 0.5, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 18.0, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 4.5, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.013442755926704075, 
+          "prob_hab_docking": 0.02165407140539588, 
+          "rocket_pieces_scored": 0.5, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 18.0, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm20": {
+        "blue": {
+          "hab_climb_points": 7.699781459614916, 
+          "hab_climb_points_var": 44.22836562018859, 
+          "prob_complete_rocket": 0.03764400250186317, 
+          "prob_hab_docking": 0.13616678792473003, 
+          "rocket_pieces_scored": 3.3111379972170933, 
+          "rocket_pieces_scored_var": 23.862588318972165, 
+          "score": 30.93522843534423, 
+          "score_var": 907.0167863730343
+        }, 
+        "prob": 0.5137518886197465, 
+        "red": {
+          "hab_climb_points": 8.515687647826423, 
+          "hab_climb_points_var": 19.628467355303794, 
+          "prob_complete_rocket": 0.013595093460475383, 
+          "prob_hab_docking": 0.0716524051412597, 
+          "rocket_pieces_scored": 2.2554062825513883, 
+          "rocket_pieces_scored_var": 19.463633036678946, 
+          "score": 29.559593763604987, 
+          "score_var": 684.9338459701594
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm21": {
+        "blue": {
+          "hab_climb_points": 5.712966614785055, 
+          "hab_climb_points_var": 2.057653694663292, 
+          "prob_complete_rocket": 0.053991228674437064, 
+          "prob_hab_docking": 4.763545113917189e-11, 
+          "rocket_pieces_scored": 3.0010868713120424, 
+          "rocket_pieces_scored_var": 31.345207765631976, 
+          "score": 27.59996609635176, 
+          "score_var": 937.557802361149
+        }, 
+        "prob": 0.5236284839505799, 
+        "red": {
+          "hab_climb_points": 7.89149558586155, 
+          "hab_climb_points_var": 18.87500188595014, 
+          "prob_complete_rocket": 0.014013301107180576, 
+          "prob_hab_docking": 0.05089951959980765, 
+          "rocket_pieces_scored": 2.4537493723917176, 
+          "rocket_pieces_scored_var": 18.881636203072937, 
+          "score": 30.003532746078484, 
+          "score_var": 707.3912612103506
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm22": {
+        "blue": {
+          "hab_climb_points": 7.948052626545121, 
+          "hab_climb_points_var": 36.00490618059912, 
+          "prob_complete_rocket": 0.0023831104750685617, 
+          "prob_hab_docking": 0.11994845935077425, 
+          "rocket_pieces_scored": 1.5256451244653386, 
+          "rocket_pieces_scored_var": 13.772419606892061, 
+          "score": 25.910231371682748, 
+          "score_var": 778.1002448581296
+        }, 
+        "prob": 0.5746184219450063, 
+        "red": {
+          "hab_climb_points": 8.449673525620732, 
+          "hab_climb_points_var": 13.374739411565344, 
+          "prob_complete_rocket": 0.00931413210786658, 
+          "prob_hab_docking": 0.03663847646182816, 
+          "rocket_pieces_scored": 2.5566726300016693, 
+          "rocket_pieces_scored_var": 16.10822660559326, 
+          "score": 33.34633956409457, 
+          "score_var": 783.9933040643978
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm23": {
+        "blue": {
+          "hab_climb_points": 9.498770794328099, 
+          "hab_climb_points_var": 56.132964936978524, 
+          "prob_complete_rocket": 0.0030452925272377307, 
+          "prob_hab_docking": 0.23139469306874594, 
+          "rocket_pieces_scored": 2.533762243360771, 
+          "rocket_pieces_scored_var": 11.910943779623919, 
+          "score": 31.364390778197237, 
+          "score_var": 621.0484904986183
+        }, 
+        "prob": 0.5319495581873799, 
+        "red": {
+          "hab_climb_points": 9.524528516462919, 
+          "hab_climb_points_var": 53.87746647332692, 
+          "prob_complete_rocket": 0.00038609833502567525, 
+          "prob_hab_docking": 0.22784454490380834, 
+          "rocket_pieces_scored": 1.7123352053495844, 
+          "rocket_pieces_scored_var": 9.360307821664524, 
+          "score": 28.791275971004886, 
+          "score_var": 409.04981717588225
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm24": {
+        "blue": {
+          "hab_climb_points": 8.57075202852414, 
+          "hab_climb_points_var": 35.22865734805378, 
+          "prob_complete_rocket": 0.003158714861148715, 
+          "prob_hab_docking": 0.13935790429906314, 
+          "rocket_pieces_scored": 1.5557791669925936, 
+          "rocket_pieces_scored_var": 14.627210542698247, 
+          "score": 28.382667316632222, 
+          "score_var": 712.6590729174197
+        }, 
+        "prob": 0.5983270374355756, 
+        "red": {
+          "hab_climb_points": 11.080488145505674, 
+          "hab_climb_points_var": 68.17742883737067, 
+          "prob_complete_rocket": 0.03933944306820747, 
+          "prob_hab_docking": 0.3175033538131182, 
+          "rocket_pieces_scored": 4.203395229696062, 
+          "rocket_pieces_scored_var": 19.65956857360034, 
+          "score": 38.08128947452461, 
+          "score_var": 804.231990829424
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm25": {
+        "blue": {
+          "hab_climb_points": 10.699628145353866, 
+          "hab_climb_points_var": 47.007131373239964, 
+          "prob_complete_rocket": 0.004555894014237616, 
+          "prob_hab_docking": 0.2652555116285227, 
+          "rocket_pieces_scored": 2.685534926635115, 
+          "rocket_pieces_scored_var": 12.757244818163034, 
+          "score": 33.63705360602833, 
+          "score_var": 540.5050836398466
+        }, 
+        "prob": 0.5416777817025974, 
+        "red": {
+          "hab_climb_points": 4.883550003572973, 
+          "hab_climb_points_var": 13.830887449067305, 
+          "prob_complete_rocket": 0.003839828791406097, 
+          "prob_hab_docking": 0.003261981272982606, 
+          "rocket_pieces_scored": 3.3827421614676503, 
+          "rocket_pieces_scored_var": 10.448898357680699, 
+          "score": 30.235491210832244, 
+          "score_var": 515.7850521087119
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm26": {
+        "blue": {
+          "hab_climb_points": 7.202546431982466, 
+          "hab_climb_points_var": 42.034776196379745, 
+          "prob_complete_rocket": 0.011923210218342417, 
+          "prob_hab_docking": 0.11455097867177044, 
+          "rocket_pieces_scored": 2.712604476714472, 
+          "rocket_pieces_scored_var": 16.893779055786233, 
+          "score": 30.29881568324012, 
+          "score_var": 605.482186844192
+        }, 
+        "prob": 0.5310717264165346, 
+        "red": {
+          "hab_climb_points": 8.237289439938522, 
+          "hab_climb_points_var": 36.943671612541095, 
+          "prob_complete_rocket": 0.0036674320872089883, 
+          "prob_hab_docking": 0.13293368140501438, 
+          "rocket_pieces_scored": 2.70079485063495, 
+          "rocket_pieces_scored_var": 12.028692836546378, 
+          "score": 27.765043429539197, 
+          "score_var": 450.714816983424
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm27": {
+        "blue": {
+          "hab_climb_points": 10.47592438042705, 
+          "hab_climb_points_var": 50.14730070681061, 
+          "prob_complete_rocket": 0.00945281102638651, 
+          "prob_hab_docking": 0.2614568250124929, 
+          "rocket_pieces_scored": 2.433191231996307, 
+          "rocket_pieces_scored_var": 16.609819264270936, 
+          "score": 30.94538672712867, 
+          "score_var": 686.6502630968045
+        }, 
+        "prob": 0.5565372530301023, 
+        "red": {
+          "hab_climb_points": 5.837439713667646, 
+          "hab_climb_points_var": 10.757655917943957, 
+          "prob_complete_rocket": 0.08503552490304189, 
+          "prob_hab_docking": 0.00260656697356898, 
+          "rocket_pieces_scored": 5.315241753682102, 
+          "rocket_pieces_scored_var": 23.739888154269202, 
+          "score": 36.24052768174414, 
+          "score_var": 700.0501093626873
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm28": {
+        "blue": {
+          "hab_climb_points": 8.839164154471746, 
+          "hab_climb_points_var": 39.060174417997686, 
+          "prob_complete_rocket": 0.0018463324665141112, 
+          "prob_hab_docking": 0.16212469361153325, 
+          "rocket_pieces_scored": 2.4055506672551497, 
+          "rocket_pieces_scored_var": 10.920933686734365, 
+          "score": 29.1880829074333, 
+          "score_var": 448.3898274621984
+        }, 
+        "prob": 0.5828629411061645, 
+        "red": {
+          "hab_climb_points": 7.927553712571228, 
+          "hab_climb_points_var": 48.09645812904662, 
+          "prob_complete_rocket": 0.0005968163546790084, 
+          "prob_hab_docking": 0.15391271846932542, 
+          "rocket_pieces_scored": 1.5353228582257554, 
+          "rocket_pieces_scored_var": 10.429299780842708, 
+          "score": 22.951913730734177, 
+          "score_var": 440.0268671783351
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm29": {
+        "blue": {
+          "hab_climb_points": 9.261326093614436, 
+          "hab_climb_points_var": 35.10138488151959, 
+          "prob_complete_rocket": 0.023093142777999898, 
+          "prob_hab_docking": 0.16636964273003807, 
+          "rocket_pieces_scored": 2.130717479536036, 
+          "rocket_pieces_scored_var": 24.505144450874884, 
+          "score": 33.18687204712359, 
+          "score_var": 818.4663484835045
+        }, 
+        "prob": 0.6286115587883232, 
+        "red": {
+          "hab_climb_points": 12.59208146124093, 
+          "hab_climb_points_var": 50.100547546681234, 
+          "prob_complete_rocket": 0.10253579226497567, 
+          "prob_hab_docking": 0.3668570158877048, 
+          "rocket_pieces_scored": 5.080588466298652, 
+          "rocket_pieces_scored_var": 29.814298709122248, 
+          "score": 47.348328898302356, 
+          "score_var": 1043.6046830952544
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm3": {
+        "blue": {
+          "hab_climb_points": 4.5, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.033754081003739, 
+          "prob_hab_docking": 0.02165407140539588, 
+          "rocket_pieces_scored": 2.5, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.0, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 4.5, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.033754081003739, 
+          "prob_hab_docking": 0.02165407140539588, 
+          "rocket_pieces_scored": 2.5, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.0, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm30": {
+        "blue": {
+          "hab_climb_points": 6.9842030197488105, 
+          "hab_climb_points_var": 22.350649257136013, 
+          "prob_complete_rocket": 0.016067268960816783, 
+          "prob_hab_docking": 0.04498888316638028, 
+          "rocket_pieces_scored": 3.0547378029551684, 
+          "rocket_pieces_scored_var": 17.42809837950356, 
+          "score": 32.90700169492517, 
+          "score_var": 806.1391972740605
+        }, 
+        "prob": 0.553196387496399, 
+        "red": {
+          "hab_climb_points": 6.464900949788358, 
+          "hab_climb_points_var": 20.731238556113343, 
+          "prob_complete_rocket": 0.006906122215837973, 
+          "prob_hab_docking": 0.030427651941419942, 
+          "rocket_pieces_scored": 2.8391107811233054, 
+          "rocket_pieces_scored_var": 13.843965003860712, 
+          "score": 28.18128344240535, 
+          "score_var": 442.40873681172855
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm31": {
+        "blue": {
+          "hab_climb_points": 10.026357214581953, 
+          "hab_climb_points_var": 52.90546336787619, 
+          "prob_complete_rocket": 0.03885966050362699, 
+          "prob_hab_docking": 0.24705310355341237, 
+          "rocket_pieces_scored": 4.160818535195552, 
+          "rocket_pieces_scored_var": 19.747278527134863, 
+          "score": 33.523048170580836, 
+          "score_var": 721.3100909503794
+        }, 
+        "prob": 0.5031436584588117, 
+        "red": {
+          "hab_climb_points": 8.503734922374008, 
+          "hab_climb_points_var": 14.040886546821902, 
+          "prob_complete_rocket": 0.014987045622777417, 
+          "prob_hab_docking": 0.04148831250064955, 
+          "rocket_pieces_scored": 3.587252726050509, 
+          "rocket_pieces_scored_var": 15.02391393192607, 
+          "score": 33.81074631986714, 
+          "score_var": 611.6420799651985
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm32": {
+        "blue": {
+          "hab_climb_points": 5.379675826874191, 
+          "hab_climb_points_var": 6.249250298066862, 
+          "prob_complete_rocket": 0.02263452884199124, 
+          "prob_hab_docking": 5.945549295383046e-05, 
+          "rocket_pieces_scored": 3.394299709599193, 
+          "rocket_pieces_scored_var": 18.474855578118312, 
+          "score": 24.378700035710377, 
+          "score_var": 465.8813469389071
+        }, 
+        "prob": 0.5678376271003296, 
+        "red": {
+          "hab_climb_points": 9.328177972736318, 
+          "hab_climb_points_var": 29.912305016082254, 
+          "prob_complete_rocket": 0.008897865474935318, 
+          "prob_hab_docking": 0.14985741354470716, 
+          "rocket_pieces_scored": 2.487942754424861, 
+          "rocket_pieces_scored_var": 16.110553135810108, 
+          "score": 29.994213074154217, 
+          "score_var": 614.1571156764377
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm33": {
+        "blue": {
+          "hab_climb_points": 8.77726321524992, 
+          "hab_climb_points_var": 58.56728709807206, 
+          "prob_complete_rocket": 2.4798991129504344e-06, 
+          "prob_hab_docking": 0.2080750414054755, 
+          "rocket_pieces_scored": 1.5965363332355962, 
+          "rocket_pieces_scored_var": 5.190301515766986, 
+          "score": 29.317293518706524, 
+          "score_var": 468.556483237447
+        }, 
+        "prob": 0.5986425747465558, 
+        "red": {
+          "hab_climb_points": 9.576395833134733, 
+          "hab_climb_points_var": 12.09469407267338, 
+          "prob_complete_rocket": 0.006004593580782425, 
+          "prob_hab_docking": 0.05943685007450339, 
+          "rocket_pieces_scored": 1.9168808576185727, 
+          "rocket_pieces_scored_var": 16.1136530492376, 
+          "score": 37.90642638489227, 
+          "score_var": 713.3731664008664
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm34": {
+        "blue": {
+          "hab_climb_points": 12.274111458162633, 
+          "hab_climb_points_var": 63.2625194801477, 
+          "prob_complete_rocket": 0.06776168103773528, 
+          "prob_hab_docking": 0.3659059222863723, 
+          "rocket_pieces_scored": 5.911553958729911, 
+          "rocket_pieces_scored_var": 16.637375088038635, 
+          "score": 44.25415170848592, 
+          "score_var": 787.6090955753433
+        }, 
+        "prob": 0.714414868035782, 
+        "red": {
+          "hab_climb_points": 6.618905118817208, 
+          "hab_climb_points_var": 34.30373525234165, 
+          "prob_complete_rocket": 1.3535340074755098e-05, 
+          "prob_hab_docking": 0.0762196321773031, 
+          "rocket_pieces_scored": 2.3828755743526564, 
+          "rocket_pieces_scored_var": 5.251131393579072, 
+          "score": 25.753473582913173, 
+          "score_var": 279.5715730321038
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm35": {
+        "blue": {
+          "hab_climb_points": 8.990996623254748, 
+          "hab_climb_points_var": 26.098628718487255, 
+          "prob_complete_rocket": 0.0011318905398629564, 
+          "prob_hab_docking": 0.11975075853352113, 
+          "rocket_pieces_scored": 2.1223271293703228, 
+          "rocket_pieces_scored_var": 10.466099689409377, 
+          "score": 35.73587063018293, 
+          "score_var": 482.1450919314745
+        }, 
+        "prob": 0.6020464842844724, 
+        "red": {
+          "hab_climb_points": 5.039653055097464, 
+          "hab_climb_points_var": 13.478250043725986, 
+          "prob_complete_rocket": 0.00043116685222210904, 
+          "prob_hab_docking": 0.00333335772399046, 
+          "rocket_pieces_scored": 2.074079883699445, 
+          "rocket_pieces_scored_var": 8.87440478146899, 
+          "score": 28.345609504621848, 
+          "score_var": 334.2532848143894
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm36": {
+        "blue": {
+          "hab_climb_points": 10.022866489165512, 
+          "hab_climb_points_var": 25.895849596105336, 
+          "prob_complete_rocket": 0.001753653742103456, 
+          "prob_hab_docking": 0.16402304272653567, 
+          "rocket_pieces_scored": 2.309644346266831, 
+          "rocket_pieces_scored_var": 11.017899280264, 
+          "score": 31.172375603304992, 
+          "score_var": 368.36695438835125
+        }, 
+        "prob": 0.5694172060258498, 
+        "red": {
+          "hab_climb_points": 10.595660465588043, 
+          "hab_climb_points_var": 58.52317189779448, 
+          "prob_complete_rocket": 7.422602446016668e-07, 
+          "prob_hab_docking": 0.28239974187627603, 
+          "rocket_pieces_scored": 1.3948720001741375, 
+          "rocket_pieces_scored_var": 4.854499731103608, 
+          "score": 36.18658290940891, 
+          "score_var": 453.6325977678019
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm37": {
+        "blue": {
+          "hab_climb_points": 10.43433264135315, 
+          "hab_climb_points_var": 20.28516690087512, 
+          "prob_complete_rocket": 0.008888902536067445, 
+          "prob_hab_docking": 0.15535988280534996, 
+          "rocket_pieces_scored": 2.703056057138541, 
+          "rocket_pieces_scored_var": 15.385280039924861, 
+          "score": 36.5361796022444, 
+          "score_var": 431.63194551653856
+        }, 
+        "prob": 0.6195354416410609, 
+        "red": {
+          "hab_climb_points": 5.513433477941759, 
+          "hab_climb_points_var": 8.818104582223281, 
+          "prob_complete_rocket": 0.007082126292961455, 
+          "prob_hab_docking": 0.0007000355736209718, 
+          "rocket_pieces_scored": 2.849788929360725, 
+          "rocket_pieces_scored_var": 13.91368350712164, 
+          "score": 27.341934305213975, 
+          "score_var": 481.513226818579
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm38": {
+        "blue": {
+          "hab_climb_points": 10.020041583938589, 
+          "hab_climb_points_var": 57.9529932728863, 
+          "prob_complete_rocket": 0.002531945735345209, 
+          "prob_hab_docking": 0.2565025231013228, 
+          "rocket_pieces_scored": 1.176496979753096, 
+          "rocket_pieces_scored_var": 14.911033240649283, 
+          "score": 27.5543111869608, 
+          "score_var": 429.6372654153305
+        }, 
+        "prob": 0.6146560137632388, 
+        "red": {
+          "hab_climb_points": 6.586616859571162, 
+          "hab_climb_points_var": 8.358092218838364, 
+          "prob_complete_rocket": 0.00151479225905371, 
+          "prob_hab_docking": 0.0018062103207668878, 
+          "rocket_pieces_scored": 3.3181522347479824, 
+          "rocket_pieces_scored_var": 8.575450442676829, 
+          "score": 36.143261481675374, 
+          "score_var": 438.6775490194471
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm39": {
+        "blue": {
+          "hab_climb_points": 5.929274356560568, 
+          "hab_climb_points_var": 12.363756573758263, 
+          "prob_complete_rocket": 0.017651881354190047, 
+          "prob_hab_docking": 0.004944512641838483, 
+          "rocket_pieces_scored": 3.1884525279368896, 
+          "rocket_pieces_scored_var": 17.525047442643732, 
+          "score": 27.266655939344176, 
+          "score_var": 628.1156255947535
+        }, 
+        "prob": 0.5317487640593621, 
+        "red": {
+          "hab_climb_points": 8.617585189404183, 
+          "hab_climb_points_var": 38.311779419217366, 
+          "prob_complete_rocket": 0.002177917505795879, 
+          "prob_hab_docking": 0.15123690119041266, 
+          "rocket_pieces_scored": 2.540401304501744, 
+          "rocket_pieces_scored_var": 11.00774801313986, 
+          "score": 29.791908653762665, 
+          "score_var": 376.6338297811577
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm4": {
+        "blue": {
+          "hab_climb_points": 4.0, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.031417950581459575, 
+          "prob_hab_docking": 0.01713200386743452, 
+          "rocket_pieces_scored": 2.3333333333333335, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 23.33333333333333, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 4.0, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.031417950581459575, 
+          "prob_hab_docking": 0.01713200386743452, 
+          "rocket_pieces_scored": 2.3333333333333335, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 23.33333333333333, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm40": {
+        "blue": {
+          "hab_climb_points": 8.600701896383757, 
+          "hab_climb_points_var": 35.36891942565981, 
+          "prob_complete_rocket": 0.001577839553971061, 
+          "prob_hab_docking": 0.1409585452601807, 
+          "rocket_pieces_scored": 2.3242661014815775, 
+          "rocket_pieces_scored_var": 10.742132541732811, 
+          "score": 27.549480601014885, 
+          "score_var": 560.1622855047626
+        }, 
+        "prob": 0.5659320928443774, 
+        "red": {
+          "hab_climb_points": 10.709729436256701, 
+          "hab_climb_points_var": 31.61208328443647, 
+          "prob_complete_rocket": 0.00742329975699918, 
+          "prob_hab_docking": 0.22271410308839212, 
+          "rocket_pieces_scored": 3.6451327256804813, 
+          "rocket_pieces_scored_var": 11.762213558471034, 
+          "score": 32.79531825569419, 
+          "score_var": 438.16512863609626
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm41": {
+        "blue": {
+          "hab_climb_points": 8.36892810846059, 
+          "hab_climb_points_var": 36.77692102219564, 
+          "prob_complete_rocket": 0.09681128655741422, 
+          "prob_hab_docking": 0.13709972424600947, 
+          "rocket_pieces_scored": 5.222635495136239, 
+          "rocket_pieces_scored_var": 27.18173022497821, 
+          "score": 37.71118740705383, 
+          "score_var": 737.2568349211892
+        }, 
+        "prob": 0.7037412312077016, 
+        "red": {
+          "hab_climb_points": 6.826653159826684, 
+          "hab_climb_points_var": 23.145926335500267, 
+          "prob_complete_rocket": 0.0027841902259401197, 
+          "prob_hab_docking": 0.04467091947666968, 
+          "rocket_pieces_scored": 2.111875620802929, 
+          "rocket_pieces_scored_var": 12.722951182198193, 
+          "score": 21.045648757945084, 
+          "score_var": 232.40547855564293
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm42": {
+        "blue": {
+          "hab_climb_points": 7.1473933429281455, 
+          "hab_climb_points_var": 30.901213211911468, 
+          "prob_complete_rocket": 0.025629532852847303, 
+          "prob_hab_docking": 0.07888339438833625, 
+          "rocket_pieces_scored": 3.120619866808661, 
+          "rocket_pieces_scored_var": 20.749417313605633, 
+          "score": 35.38462580392387, 
+          "score_var": 627.4174116707181
+        }, 
+        "prob": 0.5620439846389574, 
+        "red": {
+          "hab_climb_points": 7.808267020587492, 
+          "hab_climb_points_var": 32.19907795098759, 
+          "prob_complete_rocket": 0.01988262512449368, 
+          "prob_hab_docking": 0.10250712316007071, 
+          "rocket_pieces_scored": 3.525648320163817, 
+          "rocket_pieces_scored_var": 16.985997647897932, 
+          "score": 30.144554063798317, 
+          "score_var": 498.6672280515661
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm43": {
+        "blue": {
+          "hab_climb_points": 9.443041304447803, 
+          "hab_climb_points_var": 40.654871123745245, 
+          "prob_complete_rocket": 0.00043332603329304664, 
+          "prob_hab_docking": 0.19173321958893785, 
+          "rocket_pieces_scored": 2.260342250623578, 
+          "rocket_pieces_scored_var": 8.551604573733472, 
+          "score": 31.889884493509186, 
+          "score_var": 409.76655212772084
+        }, 
+        "prob": 0.6526551560640788, 
+        "red": {
+          "hab_climb_points": 9.866642226704554, 
+          "hab_climb_points_var": 37.165141714107584, 
+          "prob_complete_rocket": 0.08018281487375023, 
+          "prob_hab_docking": 0.19988228570111144, 
+          "rocket_pieces_scored": 6.11172490435444, 
+          "rocket_pieces_scored_var": 17.592969535355948, 
+          "score": 45.17048675605537, 
+          "score_var": 735.1104834645997
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm44": {
+        "blue": {
+          "hab_climb_points": 7.192118606622715, 
+          "hab_climb_points_var": 42.90645656777628, 
+          "prob_complete_rocket": 5.595603271846272e-07, 
+          "prob_hab_docking": 0.11663297565110708, 
+          "rocket_pieces_scored": 1.4267051052001245, 
+          "rocket_pieces_scored_var": 4.714783350020726, 
+          "score": 25.94626439813988, 
+          "score_var": 221.06192491600507
+        }, 
+        "prob": 0.7231202746057679, 
+        "red": {
+          "hab_climb_points": 9.127109842045664, 
+          "hab_climb_points_var": 34.22761038626033, 
+          "prob_complete_rocket": 0.007188418186970358, 
+          "prob_hab_docking": 0.15772837662375017, 
+          "rocket_pieces_scored": 3.205226680367793, 
+          "rocket_pieces_scored_var": 12.910120803376486, 
+          "score": 42.9012286390364, 
+          "score_var": 598.8187870264256
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm45": {
+        "blue": {
+          "hab_climb_points": 9.087370704604105, 
+          "hab_climb_points_var": 9.844962822040754, 
+          "prob_complete_rocket": 0.00018208730798774386, 
+          "prob_hab_docking": 0.029755293885601386, 
+          "rocket_pieces_scored": 1.8562639204907418, 
+          "rocket_pieces_scored_var": 8.097159923586183, 
+          "score": 32.29284297873937, 
+          "score_var": 375.6320421136063
+        }, 
+        "prob": 0.6824718974531696, 
+        "red": {
+          "hab_climb_points": 4.115285294397916, 
+          "hab_climb_points_var": 10.333619130563218, 
+          "prob_complete_rocket": 0.0001106215852796355, 
+          "prob_hab_docking": 0.00035455791818184146, 
+          "rocket_pieces_scored": 0.4266663247535453, 
+          "rocket_pieces_scored_var": 9.818734396606576, 
+          "score": 20.23728693479954, 
+          "score_var": 269.54395895237656
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm46": {
+        "blue": {
+          "hab_climb_points": 11.8262436351914, 
+          "hab_climb_points_var": 55.04407071875569, 
+          "prob_complete_rocket": 0.00026843976741364184, 
+          "prob_hab_docking": 0.3344064254226219, 
+          "rocket_pieces_scored": 0.7525388584680686, 
+          "rocket_pieces_scored_var": 10.557067099034818, 
+          "score": 30.17597779652194, 
+          "score_var": 379.2816909192721
+        }, 
+        "prob": 0.5412326078639254, 
+        "red": {
+          "hab_climb_points": 7.527445870440868, 
+          "hab_climb_points_var": 27.2154504135004, 
+          "prob_complete_rocket": 1.1404726373287488e-05, 
+          "prob_hab_docking": 0.07601610708450934, 
+          "rocket_pieces_scored": 1.922634776419976, 
+          "rocket_pieces_scored_var": 5.661022659018896, 
+          "score": 32.77475721948149, 
+          "score_var": 250.69797254078622
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm47": {
+        "blue": {
+          "hab_climb_points": 9.258410770791095, 
+          "hab_climb_points_var": 27.672041141421268, 
+          "prob_complete_rocket": 0.021674050619957086, 
+          "prob_hab_docking": 0.1375332186581829, 
+          "rocket_pieces_scored": 3.481692521556446, 
+          "rocket_pieces_scored_var": 17.776963092934164, 
+          "score": 48.329242226375634, 
+          "score_var": 710.3263008046189
+        }, 
+        "prob": 0.7515843719337822, 
+        "red": {
+          "hab_climb_points": 9.680940415266406, 
+          "hab_climb_points_var": 45.95810733577137, 
+          "prob_complete_rocket": 6.327287182195107e-06, 
+          "prob_hab_docking": 0.2163411596777416, 
+          "rocket_pieces_scored": 1.4556863384056868, 
+          "rocket_pieces_scored_var": 5.8327087604223795, 
+          "score": 28.706186118365963, 
+          "score_var": 123.69059747156238
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm48": {
+        "blue": {
+          "hab_climb_points": 9.548587105539957, 
+          "hab_climb_points_var": 42.67940097115604, 
+          "prob_complete_rocket": 0.011587250260364446, 
+          "prob_hab_docking": 0.20201394206421175, 
+          "rocket_pieces_scored": 3.363756716742359, 
+          "rocket_pieces_scored_var": 14.467359831195045, 
+          "score": 29.032271930546727, 
+          "score_var": 367.79211001208216
+        }, 
+        "prob": 0.7323766569647544, 
+        "red": {
+          "hab_climb_points": 11.415254037375872, 
+          "hab_climb_points_var": 71.63128902375847, 
+          "prob_complete_rocket": 0.02400839111370201, 
+          "prob_hab_docking": 0.33594618985499325, 
+          "rocket_pieces_scored": 3.2948767152165046, 
+          "rocket_pieces_scored_var": 19.38384456068241, 
+          "score": 50.94458879527056, 
+          "score_var": 881.2284818694986
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm49": {
+        "blue": {
+          "hab_climb_points": 9.320138475547925, 
+          "hab_climb_points_var": 35.55899687680049, 
+          "prob_complete_rocket": 0.00019863388826180106, 
+          "prob_hab_docking": 0.1704228375810659, 
+          "rocket_pieces_scored": 1.5942925667911327, 
+          "rocket_pieces_scored_var": 8.631227064002015, 
+          "score": 30.196643085696394, 
+          "score_var": 396.110939702065
+        }, 
+        "prob": 0.6464982888247195, 
+        "red": {
+          "hab_climb_points": 10.1209491985747, 
+          "hab_climb_points_var": 25.822914324363225, 
+          "prob_complete_rocket": 0.04748597190307158, 
+          "prob_hab_docking": 0.1684934087796548, 
+          "rocket_pieces_scored": 5.0486900535947985, 
+          "rocket_pieces_scored_var": 17.331596446819034, 
+          "score": 40.64815161956892, 
+          "score_var": 377.01664657928313
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm5": {
+        "blue": {
+          "hab_climb_points": 6.375, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.03953506418438968, 
+          "prob_hab_docking": 0.04846909421419954, 
+          "rocket_pieces_scored": 2.875, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 29.124999999999996, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 6.375, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.03953506418438968, 
+          "prob_hab_docking": 0.04846909421419954, 
+          "rocket_pieces_scored": 2.875, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 29.124999999999996, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm50": {
+        "blue": {
+          "hab_climb_points": 8.071839452779406, 
+          "hab_climb_points_var": 39.06305735488553, 
+          "prob_complete_rocket": 0.008756701531391409, 
+          "prob_hab_docking": 0.1338234488100376, 
+          "rocket_pieces_scored": 3.0125145391501102, 
+          "rocket_pieces_scored_var": 14.311182968632624, 
+          "score": 38.49408156260114, 
+          "score_var": 594.9759306420169
+        }, 
+        "prob": 0.7086141140015592, 
+        "red": {
+          "hab_climb_points": 6.865424652228961, 
+          "hab_climb_points_var": 31.10309728993276, 
+          "prob_complete_rocket": 0.00025653267380820743, 
+          "prob_hab_docking": 0.07233907006723284, 
+          "rocket_pieces_scored": 0.47388056550958235, 
+          "rocket_pieces_scored_var": 11.008962883761086, 
+          "score": 20.86699340513057, 
+          "score_var": 434.6461674816437
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm51": {
+        "blue": {
+          "hab_climb_points": 18.734656315851346, 
+          "hab_climb_points_var": 106.85562397238652, 
+          "prob_complete_rocket": 5.0708496119988844e-05, 
+          "prob_hab_docking": 0.6410574247359603, 
+          "rocket_pieces_scored": 2.9588978504012826, 
+          "rocket_pieces_scored_var": 5.409712933660218, 
+          "score": 45.12907081914564, 
+          "score_var": 475.2101175125242
+        }, 
+        "prob": 0.7334360180469579, 
+        "red": {
+          "hab_climb_points": 6.677527667647958, 
+          "hab_climb_points_var": 32.134927701888586, 
+          "prob_complete_rocket": 0.03619538921437415, 
+          "prob_hab_docking": 0.07103483190717041, 
+          "rocket_pieces_scored": 3.871297378044858, 
+          "rocket_pieces_scored_var": 20.46982929504533, 
+          "score": 25.886180684172913, 
+          "score_var": 478.0960218217281
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm52": {
+        "blue": {
+          "hab_climb_points": 11.19861611943558, 
+          "hab_climb_points_var": 48.1081545812708, 
+          "prob_complete_rocket": 0.0017541350948923062, 
+          "prob_hab_docking": 0.29182350104261157, 
+          "rocket_pieces_scored": 2.3362105113450875, 
+          "rocket_pieces_scored_var": 10.958213018348978, 
+          "score": 31.69056320886611, 
+          "score_var": 491.69016981967013
+        }, 
+        "prob": 0.5995367592303467, 
+        "red": {
+          "hab_climb_points": 14.977312794477498, 
+          "hab_climb_points_var": 74.81987504229092, 
+          "prob_complete_rocket": 0.02380112427132175, 
+          "prob_hab_docking": 0.49895363769971535, 
+          "rocket_pieces_scored": 3.7900200677477454, 
+          "rocket_pieces_scored_var": 17.177428392884558, 
+          "score": 40.37798971802714, 
+          "score_var": 695.3636058751445
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm53": {
+        "blue": {
+          "hab_climb_points": 5.620706666755813, 
+          "hab_climb_points_var": 30.95209257852669, 
+          "prob_complete_rocket": 2.2121119960250013e-06, 
+          "prob_hab_docking": 0.04591003624649692, 
+          "rocket_pieces_scored": 1.5212118464933058, 
+          "rocket_pieces_scored_var": 5.211026636213639, 
+          "score": 23.701105538652733, 
+          "score_var": 252.95474092706883
+        }, 
+        "prob": 0.6941982064108871, 
+        "red": {
+          "hab_climb_points": 5.674065127047109, 
+          "hab_climb_points_var": 16.989601039056474, 
+          "prob_complete_rocket": 0.12435598895072619, 
+          "prob_hab_docking": 0.011831303337624055, 
+          "rocket_pieces_scored": 6.276219784982112, 
+          "rocket_pieces_scored_var": 24.623121606789724, 
+          "score": 37.64038818496644, 
+          "score_var": 500.60864470330506
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm54": {
+        "blue": {
+          "hab_climb_points": 5.556174285976246, 
+          "hab_climb_points_var": 17.466301099557114, 
+          "prob_complete_rocket": 3.2446074372027844e-05, 
+          "prob_hab_docking": 0.011920470282630768, 
+          "rocket_pieces_scored": 1.8164834829345613, 
+          "rocket_pieces_scored_var": 6.500089433650207, 
+          "score": 32.588519778105244, 
+          "score_var": 392.1583398594437
+        }, 
+        "prob": 0.6007107580711301, 
+        "red": {
+          "hab_climb_points": 8.270261979675904, 
+          "hab_climb_points_var": 16.220455949830928, 
+          "prob_complete_rocket": 0.00542523739648515, 
+          "prob_hab_docking": 0.047364570801019745, 
+          "rocket_pieces_scored": 3.540202728588555, 
+          "rocket_pieces_scored_var": 11.028059129774054, 
+          "score": 39.23931979500547, 
+          "score_var": 287.09199291973187
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm55": {
+        "blue": {
+          "hab_climb_points": 9.458160260142549, 
+          "hab_climb_points_var": 28.23197124555214, 
+          "prob_complete_rocket": 0.0033883148378608396, 
+          "prob_hab_docking": 0.14847467323243158, 
+          "rocket_pieces_scored": 3.3181862474168726, 
+          "rocket_pieces_scored_var": 10.281192903681973, 
+          "score": 38.09241194089726, 
+          "score_var": 571.5102549951212
+        }, 
+        "prob": 0.558044455181882, 
+        "red": {
+          "hab_climb_points": 10.589802855038325, 
+          "hab_climb_points_var": 59.264090257191434, 
+          "prob_complete_rocket": 0.0005062699465774312, 
+          "prob_hab_docking": 0.28336362920395874, 
+          "rocket_pieces_scored": 2.1416982414803036, 
+          "rocket_pieces_scored_var": 8.994971198421776, 
+          "score": 33.45576853189288, 
+          "score_var": 436.86939387064035
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm56": {
+        "blue": {
+          "hab_climb_points": 8.745143257540791, 
+          "hab_climb_points_var": 51.20282041687299, 
+          "prob_complete_rocket": 0.004952014827642737, 
+          "prob_hab_docking": 0.19102679960961588, 
+          "rocket_pieces_scored": 2.6517760653334976, 
+          "rocket_pieces_scored_var": 13.137143216269987, 
+          "score": 35.50844517589559, 
+          "score_var": 472.2548007254214
+        }, 
+        "prob": 0.5306513327243982, 
+        "red": {
+          "hab_climb_points": 10.400013273680658, 
+          "hab_climb_points_var": 11.862911938864197, 
+          "prob_complete_rocket": 0.007085135164528689, 
+          "prob_hab_docking": 0.09084781208776582, 
+          "rocket_pieces_scored": 3.0002733602973906, 
+          "rocket_pieces_scored_var": 13.461474596119674, 
+          "score": 37.80832867500757, 
+          "score_var": 422.0327292230352
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm57": {
+        "blue": {
+          "hab_climb_points": 11.259653278762048, 
+          "hab_climb_points_var": 55.690955876774254, 
+          "prob_complete_rocket": 0.0017255322998197542, 
+          "prob_hab_docking": 0.3081117503556139, 
+          "rocket_pieces_scored": 1.213878419223548, 
+          "rocket_pieces_scored_var": 13.603579259338709, 
+          "score": 39.24454873029273, 
+          "score_var": 517.8906835999592
+        }, 
+        "prob": 0.5279961885861472, 
+        "red": {
+          "hab_climb_points": 9.056394706365374, 
+          "hab_climb_points_var": 47.466287620583614, 
+          "prob_complete_rocket": 0.0027127484615496744, 
+          "prob_hab_docking": 0.19415256562875194, 
+          "rocket_pieces_scored": 3.2965219589269825, 
+          "rocket_pieces_scored_var": 9.79719953534797, 
+          "score": 37.05820258051061, 
+          "score_var": 451.1595646954336
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm58": {
+        "blue": {
+          "hab_climb_points": 11.748452905473739, 
+          "hab_climb_points_var": 53.24270695851622, 
+          "prob_complete_rocket": 0.017079048378091155, 
+          "prob_hab_docking": 0.32793761876223626, 
+          "rocket_pieces_scored": 2.6725275165065057, 
+          "rocket_pieces_scored_var": 19.39071615528378, 
+          "score": 40.53797134242103, 
+          "score_var": 408.2414378728188
+        }, 
+        "prob": 0.5211975217026681, 
+        "red": {
+          "hab_climb_points": 8.68407360892257, 
+          "hab_climb_points_var": 38.985313386169665, 
+          "prob_complete_rocket": 0.0026758706726757175, 
+          "prob_hab_docking": 0.1558770823451503, 
+          "rocket_pieces_scored": 2.298636470116017, 
+          "rocket_pieces_scored_var": 12.133767794610236, 
+          "score": 38.954083600909385, 
+          "score_var": 479.50662574697867
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm59": {
+        "blue": {
+          "hab_climb_points": 11.82210203828982, 
+          "hab_climb_points_var": 36.7109012864272, 
+          "prob_complete_rocket": 6.1239178725802645e-06, 
+          "prob_hab_docking": 0.29996669793722197, 
+          "rocket_pieces_scored": 1.8937179932593888, 
+          "rocket_pieces_scored_var": 5.3407010427303945, 
+          "score": 40.53796520513194, 
+          "score_var": 322.0931512883335
+        }, 
+        "prob": 0.5950364352646725, 
+        "red": {
+          "hab_climb_points": 6.427046532303915, 
+          "hab_climb_points_var": 23.091697136762782, 
+          "prob_complete_rocket": 6.990902794279386e-05, 
+          "prob_hab_docking": 0.037209266115398876, 
+          "rocket_pieces_scored": 2.295801652631471, 
+          "rocket_pieces_scored_var": 6.492526228449307, 
+          "score": 34.94925171800753, 
+          "score_var": 217.81658108652977
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm6": {
+        "blue": {
+          "hab_climb_points": 6.300000000000001, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.032335843751181814, 
+          "prob_hab_docking": 0.04703427735519061, 
+          "rocket_pieces_scored": 2.4, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 27.9, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 6.300000000000001, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.032335843751181814, 
+          "prob_hab_docking": 0.04703427735519061, 
+          "rocket_pieces_scored": 2.4, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 27.9, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm60": {
+        "blue": {
+          "hab_climb_points": 8.619004987230678, 
+          "hab_climb_points_var": 12.152782632433127, 
+          "prob_complete_rocket": 7.639682837234929e-06, 
+          "prob_hab_docking": 0.03359364649924168, 
+          "rocket_pieces_scored": 1.1870988941994463, 
+          "rocket_pieces_scored_var": 6.251556546056298, 
+          "score": 38.42405555053139, 
+          "score_var": 316.5873768464347
+        }, 
+        "prob": 0.5250375778356177, 
+        "red": {
+          "hab_climb_points": 12.527927102736836, 
+          "hab_climb_points_var": 53.20311573395714, 
+          "prob_complete_rocket": 3.7749701398137603e-07, 
+          "prob_hab_docking": 0.36733630908444614, 
+          "rocket_pieces_scored": 3.9823326691109053, 
+          "rocket_pieces_scored_var": 2.627076537426839, 
+          "score": 36.83179635362532, 
+          "score_var": 326.23685371643876
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm61": {
+        "blue": {
+          "hab_climb_points": 6.862056578815562, 
+          "hab_climb_points_var": 9.925298588405372, 
+          "prob_complete_rocket": 0.14478154422973766, 
+          "prob_hab_docking": 0.004895707056803533, 
+          "rocket_pieces_scored": 6.692884915115899, 
+          "rocket_pieces_scored_var": 25.110711054410785, 
+          "score": 40.50756366690801, 
+          "score_var": 458.7753807280079
+        }, 
+        "prob": 0.5290526295003855, 
+        "red": {
+          "hab_climb_points": 11.641683682914243, 
+          "hab_climb_points_var": 41.211006176611534, 
+          "prob_complete_rocket": 0.0022263314353176966, 
+          "prob_hab_docking": 0.3004396468253213, 
+          "rocket_pieces_scored": 1.976756716737538, 
+          "rocket_pieces_scored_var": 12.419497078134944, 
+          "score": 38.38958515009346, 
+          "score_var": 385.57657598693174
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm62": {
+        "blue": {
+          "hab_climb_points": 10.603081271358457, 
+          "hab_climb_points_var": 61.40829800488543, 
+          "prob_complete_rocket": 0.012532659900428955, 
+          "prob_hab_docking": 0.2873670446667018, 
+          "rocket_pieces_scored": 3.7304558965590275, 
+          "rocket_pieces_scored_var": 13.624297567629291, 
+          "score": 34.51288019560178, 
+          "score_var": 600.0258752056301
+        }, 
+        "prob": 0.5602002630853199, 
+        "red": {
+          "hab_climb_points": 9.151121324058469, 
+          "hab_climb_points_var": 32.29429591205555, 
+          "prob_complete_rocket": 0.0009158476562189932, 
+          "prob_hab_docking": 0.15168732598585044, 
+          "rocket_pieces_scored": 1.9303157487740297, 
+          "rocket_pieces_scored_var": 10.441629911023234, 
+          "score": 29.865989965677713, 
+          "score_var": 341.0650579015962
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm63": {
+        "blue": {
+          "hab_climb_points": 5.989107965489284, 
+          "hab_climb_points_var": 35.06499068078786, 
+          "prob_complete_rocket": 2.0272714618130294e-09, 
+          "prob_hab_docking": 0.06404130745518555, 
+          "rocket_pieces_scored": 1.2484555459227717, 
+          "rocket_pieces_scored_var": 3.3411706479611825, 
+          "score": 23.40317846480558, 
+          "score_var": 113.39305993410355
+        }, 
+        "prob": 0.6196616034327722, 
+        "red": {
+          "hab_climb_points": 6.764077151016899, 
+          "hab_climb_points_var": 39.676956454699265, 
+          "prob_complete_rocket": 0.00048063851166846305, 
+          "prob_hab_docking": 0.09552076387437536, 
+          "rocket_pieces_scored": 2.4795092256413227, 
+          "rocket_pieces_scored_var": 8.315035607951287, 
+          "score": 30.088795201653895, 
+          "score_var": 368.3833333886405
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm64": {
+        "blue": {
+          "hab_climb_points": 5.586664593453844, 
+          "hab_climb_points_var": 33.66656879569951, 
+          "prob_complete_rocket": 0.0018228515697916725, 
+          "prob_hab_docking": 0.05236439335200116, 
+          "rocket_pieces_scored": 2.1814029371596684, 
+          "rocket_pieces_scored_var": 11.405674024703245, 
+          "score": 23.591840126303595, 
+          "score_var": 383.10990622527004
+        }, 
+        "prob": 0.5293764992433672, 
+        "red": {
+          "hab_climb_points": 5.1218646774749415, 
+          "hab_climb_points_var": 6.478984318374021, 
+          "prob_complete_rocket": 0.00012423311816867066, 
+          "prob_hab_docking": 5.2056247071829986e-05, 
+          "rocket_pieces_scored": 1.5865172350782943, 
+          "rocket_pieces_scored_var": 8.078301057836008, 
+          "score": 25.717894379351005, 
+          "score_var": 449.0037459976764
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm65": {
+        "blue": {
+          "hab_climb_points": 9.7858897958111, 
+          "hab_climb_points_var": 14.570856514750774, 
+          "prob_complete_rocket": 0.0005780330864701977, 
+          "prob_hab_docking": 0.08597591558966144, 
+          "rocket_pieces_scored": 2.7148073659931446, 
+          "rocket_pieces_scored_var": 8.16484215150642, 
+          "score": 36.12530984901557, 
+          "score_var": 219.33355320010924
+        }, 
+        "prob": 0.5318555613059417, 
+        "red": {
+          "hab_climb_points": 6.758562026678375, 
+          "hab_climb_points_var": 22.75760230578306, 
+          "prob_complete_rocket": 5.197557055303115e-06, 
+          "prob_hab_docking": 0.04203121353345973, 
+          "rocket_pieces_scored": 0.9651005169629442, 
+          "rocket_pieces_scored_var": 6.264674410110396, 
+          "score": 34.398498724329095, 
+          "score_var": 247.34160712761627
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm66": {
+        "blue": {
+          "hab_climb_points": 7.952928339398918, 
+          "hab_climb_points_var": 17.57004609986115, 
+          "prob_complete_rocket": 0.0025598204389716273, 
+          "prob_hab_docking": 0.046360963406883116, 
+          "rocket_pieces_scored": 2.9407663093987804, 
+          "rocket_pieces_scored_var": 10.472504065617722, 
+          "score": 32.49221584345693, 
+          "score_var": 121.26459232703108
+        }, 
+        "prob": 0.5643360634838572, 
+        "red": {
+          "hab_climb_points": 8.206542550402512, 
+          "hab_climb_points_var": 31.44770438120286, 
+          "prob_complete_rocket": 6.706802890832364e-09, 
+          "prob_hab_docking": 0.11286635964403513, 
+          "rocket_pieces_scored": 0.296837147755897, 
+          "rocket_pieces_scored_var": 4.2442516345970525, 
+          "score": 29.089298065585258, 
+          "score_var": 320.12573793971853
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm67": {
+        "blue": {
+          "hab_climb_points": 16.082196283606827, 
+          "hab_climb_points_var": 71.55306256807997, 
+          "prob_complete_rocket": 0.0021601277106776395, 
+          "prob_hab_docking": 0.5509000910699386, 
+          "rocket_pieces_scored": 3.631979492996962, 
+          "rocket_pieces_scored_var": 8.598144747841543, 
+          "score": 39.06856169859307, 
+          "score_var": 299.04531090824577
+        }, 
+        "prob": 0.6233797553296913, 
+        "red": {
+          "hab_climb_points": 11.304775390139866, 
+          "hab_climb_points_var": 58.25537263823215, 
+          "prob_complete_rocket": 0.036889201649558334, 
+          "prob_hab_docking": 0.31414251256783265, 
+          "rocket_pieces_scored": 4.708306601663149, 
+          "rocket_pieces_scored_var": 16.631406633751883, 
+          "score": 48.35959718162309, 
+          "score_var": 574.4240736613266
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm68": {
+        "blue": {
+          "hab_climb_points": 10.790180507307193, 
+          "hab_climb_points_var": 27.401357291817394, 
+          "prob_complete_rocket": 1.1696728574595028e-07, 
+          "prob_hab_docking": 0.2106335923746805, 
+          "rocket_pieces_scored": 2.643228130428707, 
+          "rocket_pieces_scored_var": 3.2752888534778823, 
+          "score": 32.54177805535687, 
+          "score_var": 278.78846479767697
+        }, 
+        "prob": 0.5055573115986622, 
+        "red": {
+          "hab_climb_points": 5.645206512944141, 
+          "hab_climb_points_var": 50.04995090921552, 
+          "prob_complete_rocket": 0.011203330915387832, 
+          "prob_hab_docking": 0.09303293099724907, 
+          "rocket_pieces_scored": 4.404784317387735, 
+          "rocket_pieces_scored_var": 11.064077878793416, 
+          "score": 32.19476163148822, 
+          "score_var": 341.74127698390134
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm69": {
+        "blue": {
+          "hab_climb_points": 10.596949516334693, 
+          "hab_climb_points_var": 40.6538739218671, 
+          "prob_complete_rocket": 0.0010762295790001097, 
+          "prob_hab_docking": 0.24492040711315965, 
+          "rocket_pieces_scored": 3.875150957129837, 
+          "rocket_pieces_scored_var": 7.011669215835458, 
+          "score": 38.38432165383793, 
+          "score_var": 316.1724925813309
+        }, 
+        "prob": 0.7182148590174569, 
+        "red": {
+          "hab_climb_points": 8.03039089513058, 
+          "hab_climb_points_var": 41.62269109970093, 
+          "prob_complete_rocket": 1.3950938781981392e-07, 
+          "prob_hab_docking": 0.1400048767812152, 
+          "rocket_pieces_scored": 0.8856035042097541, 
+          "rocket_pieces_scored_var": 4.680978796723293, 
+          "score": 24.9858276929122, 
+          "score_var": 222.02037368490608
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm7": {
+        "blue": {
+          "hab_climb_points": 6.0, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.031417950581459575, 
+          "prob_hab_docking": 0.04163225833177531, 
+          "rocket_pieces_scored": 2.3333333333333335, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.499999999999996, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 6.0, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.031417950581459575, 
+          "prob_hab_docking": 0.04163225833177531, 
+          "rocket_pieces_scored": 2.3333333333333335, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.499999999999996, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm70": {
+        "blue": {
+          "hab_climb_points": 11.123314054530203, 
+          "hab_climb_points_var": 40.62911262455586, 
+          "prob_complete_rocket": 0.017335827693070738, 
+          "prob_hab_docking": 0.2715294904397285, 
+          "rocket_pieces_scored": 4.716589315476844, 
+          "rocket_pieces_scored_var": 11.890793182218761, 
+          "score": 55.83290789811119, 
+          "score_var": 601.766911115222
+        }, 
+        "prob": 0.8448338732000871, 
+        "red": {
+          "hab_climb_points": 9.343227939225963, 
+          "hab_climb_points_var": 54.60736446086603, 
+          "prob_complete_rocket": 3.186333263904828e-07, 
+          "prob_hab_docking": 0.22198804749279633, 
+          "rocket_pieces_scored": 2.210055255811584, 
+          "rocket_pieces_scored_var": 3.8652475033440465, 
+          "score": 28.620450388847857, 
+          "score_var": 117.69851063280308
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm71": {
+        "blue": {
+          "hab_climb_points": 14.961216363159126, 
+          "hab_climb_points_var": 68.29337610473826, 
+          "prob_complete_rocket": 0.014686834785029634, 
+          "prob_hab_docking": 0.49812773330542337, 
+          "rocket_pieces_scored": 3.2087477538267937, 
+          "rocket_pieces_scored_var": 16.28591962225597, 
+          "score": 40.91950630219687, 
+          "score_var": 649.4905916095663
+        }, 
+        "prob": 0.6567499081131429, 
+        "red": {
+          "hab_climb_points": 4.064713089264719, 
+          "hab_climb_points_var": 19.56788507043403, 
+          "prob_complete_rocket": 1.7449171992867107e-06, 
+          "prob_hab_docking": 0.006716930707802327, 
+          "rocket_pieces_scored": 0.40030065436682305, 
+          "rocket_pieces_scored_var": 6.250592955864697, 
+          "score": 28.322065158317564, 
+          "score_var": 324.69735149976185
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm72": {
+        "blue": {
+          "hab_climb_points": 9.684360865920285, 
+          "hab_climb_points_var": 43.196340465383486, 
+          "prob_complete_rocket": 0.005120132457953397, 
+          "prob_hab_docking": 0.20931998915369554, 
+          "rocket_pieces_scored": 1.928820588648486, 
+          "rocket_pieces_scored_var": 15.38519324225437, 
+          "score": 44.5019557628893, 
+          "score_var": 551.3054803806284
+        }, 
+        "prob": 0.6646671305879854, 
+        "red": {
+          "hab_climb_points": 9.873283557846996, 
+          "hab_climb_points_var": 16.875559595651826, 
+          "prob_complete_rocket": 2.395392995069301e-09, 
+          "prob_hab_docking": 0.10601783299929735, 
+          "rocket_pieces_scored": 1.3864634391183894, 
+          "rocket_pieces_scored_var": 3.286798962839501, 
+          "score": 32.1089005701014, 
+          "score_var": 298.07013617262226
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm73": {
+        "blue": {
+          "hab_climb_points": 9.064878163072894, 
+          "hab_climb_points_var": 33.582536476673866, 
+          "prob_complete_rocket": 0.12434496225738845, 
+          "prob_hab_docking": 0.15287702482587784, 
+          "rocket_pieces_scored": 6.40686136636379, 
+          "rocket_pieces_scored_var": 23.50974388150517, 
+          "score": 46.930758053095786, 
+          "score_var": 528.6674615013031
+        }, 
+        "prob": 0.6036333049157654, 
+        "red": {
+          "hab_climb_points": 9.137553218692657, 
+          "hab_climb_points_var": 18.595664716835472, 
+          "prob_complete_rocket": 0.0015961695732231718, 
+          "prob_hab_docking": 0.08699715055147994, 
+          "rocket_pieces_scored": 1.8558803392250858, 
+          "rocket_pieces_scored_var": 11.835915964211635, 
+          "score": 38.44188875200939, 
+          "score_var": 515.0233232850071
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm74": {
+        "blue": {
+          "hab_climb_points": 11.864382946260704, 
+          "hab_climb_points_var": 62.41697111881299, 
+          "prob_complete_rocket": 5.053061689519467e-06, 
+          "prob_hab_docking": 0.3457237784586904, 
+          "rocket_pieces_scored": 0.6026767671673339, 
+          "rocket_pieces_scored_var": 6.664474341957492, 
+          "score": 35.3137245833482, 
+          "score_var": 327.3267957067372
+        }, 
+        "prob": 0.5911977823422032, 
+        "red": {
+          "hab_climb_points": 7.927674429147697, 
+          "hab_climb_points_var": 17.035118436565675, 
+          "prob_complete_rocket": 0.00023078980653234993, 
+          "prob_hab_docking": 0.04330828144495669, 
+          "rocket_pieces_scored": 1.7903573714107142, 
+          "rocket_pieces_scored_var": 8.498850126757807, 
+          "score": 30.052087775005234, 
+          "score_var": 193.17314527511724
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm75": {
+        "blue": {
+          "hab_climb_points": 7.705220476351427, 
+          "hab_climb_points_var": 44.198234607437314, 
+          "prob_complete_rocket": 0.0022266496845870787, 
+          "prob_hab_docking": 0.13626378649879856, 
+          "rocket_pieces_scored": 2.859849107169463, 
+          "rocket_pieces_scored_var": 10.327806806272143, 
+          "score": 36.83009814852994, 
+          "score_var": 398.85731206333895
+        }, 
+        "prob": 0.5729357717401994, 
+        "red": {
+          "hab_climb_points": 13.800241352537084, 
+          "hab_climb_points_var": 79.70440045557274, 
+          "prob_complete_rocket": 1.0825855767393477e-09, 
+          "prob_hab_docking": 0.4465488333860427, 
+          "rocket_pieces_scored": 0.18694643024038587, 
+          "rocket_pieces_scored_var": 3.8959190676881494, 
+          "score": 41.83589353643496, 
+          "score_var": 342.4577386570291
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm76": {
+        "blue": {
+          "hab_climb_points": 12.169465812699855, 
+          "hab_climb_points_var": 47.596636473876444, 
+          "prob_complete_rocket": 0.0013702554531315192, 
+          "prob_hab_docking": 0.3408003063918372, 
+          "rocket_pieces_scored": 2.3890891194606394, 
+          "rocket_pieces_scored_var": 10.294575835504189, 
+          "score": 40.221397840333836, 
+          "score_var": 369.1358960908282
+        }, 
+        "prob": 0.67916998508636, 
+        "red": {
+          "hab_climb_points": 7.042965490148313, 
+          "hab_climb_points_var": 39.48630843664705, 
+          "prob_complete_rocket": 7.985962060064189e-05, 
+          "prob_hab_docking": 0.10270735228960226, 
+          "rocket_pieces_scored": 1.5289798825452183, 
+          "rocket_pieces_scored_var": 7.692023571619458, 
+          "score": 29.995655743190927, 
+          "score_var": 113.6738202144704
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm77": {
+        "blue": {
+          "hab_climb_points": 9.161154482920075, 
+          "hab_climb_points_var": 45.98753678404589, 
+          "prob_complete_rocket": 3.00379276060303e-05, 
+          "prob_hab_docking": 0.19461696910083193, 
+          "rocket_pieces_scored": 2.2337184374085157, 
+          "rocket_pieces_scored_var": 5.924144589075725, 
+          "score": 38.70667509125194, 
+          "score_var": 447.6457311382487
+        }, 
+        "prob": 0.5264679712551283, 
+        "red": {
+          "hab_climb_points": 9.187745236943297, 
+          "hab_climb_points_var": 25.13568489951664, 
+          "prob_complete_rocket": 3.580919912260505e-06, 
+          "prob_hab_docking": 0.12316508759382216, 
+          "rocket_pieces_scored": 2.4011317179361287, 
+          "rocket_pieces_scored_var": 4.572728995500368, 
+          "score": 36.8549793348146, 
+          "score_var": 330.17609215042296
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm78": {
+        "blue": {
+          "hab_climb_points": 7.253797727700524, 
+          "hab_climb_points_var": 22.501318324458587, 
+          "prob_complete_rocket": 0.10205531895986852, 
+          "prob_hab_docking": 0.05123502552167891, 
+          "rocket_pieces_scored": 6.308904595678161, 
+          "rocket_pieces_scored_var": 20.08326066073171, 
+          "score": 40.47703794327393, 
+          "score_var": 409.8879047803697
+        }, 
+        "prob": 0.5619491264220415, 
+        "red": {
+          "hab_climb_points": 6.759411179558265, 
+          "hab_climb_points_var": 24.286118503699882, 
+          "prob_complete_rocket": 0.014934780218807564, 
+          "prob_hab_docking": 0.04724587194685448, 
+          "rocket_pieces_scored": 4.788235064898044, 
+          "rocket_pieces_scored_var": 11.02648659641342, 
+          "score": 45.19671865366604, 
+          "score_var": 506.4626261765539
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm79": {
+        "blue": {
+          "hab_climb_points": 8.584278676604448, 
+          "hab_climb_points_var": 19.122728703322355, 
+          "prob_complete_rocket": 0.0008402843170807195, 
+          "prob_hab_docking": 0.07116944597684194, 
+          "rocket_pieces_scored": 1.8886222890841682, 
+          "rocket_pieces_scored_var": 10.359363624666381, 
+          "score": 28.926870972159072, 
+          "score_var": 181.4187074236551
+        }, 
+        "prob": 0.7656574247043186, 
+        "red": {
+          "hab_climb_points": 12.106594692515387, 
+          "hab_climb_points_var": 29.95458386055094, 
+          "prob_complete_rocket": 0.0015410551095318414, 
+          "prob_hab_docking": 0.2985201680241454, 
+          "rocket_pieces_scored": 3.13217663404222, 
+          "rocket_pieces_scored_var": 8.978806276762246, 
+          "score": 43.97388926561519, 
+          "score_var": 249.7827258798864
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm8": {
+        "blue": {
+          "hab_climb_points": 6.214285714285715, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.03924260418350267, 
+          "prob_hab_docking": 0.045436404793883, 
+          "rocket_pieces_scored": 2.8571428571428568, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.857142857142858, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 6.214285714285715, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.03924260418350267, 
+          "prob_hab_docking": 0.045436404793883, 
+          "rocket_pieces_scored": 2.8571428571428568, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.857142857142858, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm80": {
+        "blue": {
+          "hab_climb_points": 15.02438713478487, 
+          "hab_climb_points_var": 73.85492033278499, 
+          "prob_complete_rocket": 0.005713856907377801, 
+          "prob_hab_docking": 0.5011320889320903, 
+          "rocket_pieces_scored": 2.638568529632433, 
+          "rocket_pieces_scored_var": 13.698403893549994, 
+          "score": 43.761318343784254, 
+          "score_var": 484.53973502377323
+        }, 
+        "prob": 0.8019807192622892, 
+        "red": {
+          "hab_climb_points": 6.842946247708582, 
+          "hab_climb_points_var": 17.172202318084405, 
+          "prob_complete_rocket": 3.269013162388035e-07, 
+          "prob_hab_docking": 0.024509200127892816, 
+          "rocket_pieces_scored": 0.8783102025949572, 
+          "rocket_pieces_scored_var": 4.998320083676378, 
+          "score": 22.56742251327378, 
+          "score_var": 139.04486079989374
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm81": {
+        "blue": {
+          "hab_climb_points": 5.792156483475772, 
+          "hab_climb_points_var": 19.298840024849124, 
+          "prob_complete_rocket": 1.3361984740889454e-08, 
+          "prob_hab_docking": 0.01804087099277929, 
+          "rocket_pieces_scored": 0.6490532008029469, 
+          "rocket_pieces_scored_var": 4.165405247401179, 
+          "score": 22.787189776779968, 
+          "score_var": 209.94970964980132
+        }, 
+        "prob": 0.5477281396650051, 
+        "red": {
+          "hab_climb_points": 7.423432089983431, 
+          "hab_climb_points_var": 21.24540688090132, 
+          "prob_complete_rocket": 7.42320871438551e-10, 
+          "prob_hab_docking": 0.05011227323209222, 
+          "rocket_pieces_scored": 0.9645363347204686, 
+          "rocket_pieces_scored_var": 3.3315126509054007, 
+          "score": 20.348519966048084, 
+          "score_var": 203.5708999734753
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm82": {
+        "blue": {
+          "hab_climb_points": 18.40290362071598, 
+          "hab_climb_points_var": 85.21030561206513, 
+          "prob_complete_rocket": 1.7265020284096266e-05, 
+          "prob_hab_docking": 0.6438023192686013, 
+          "rocket_pieces_scored": 3.462553718019678, 
+          "rocket_pieces_scored_var": 4.249879942135259, 
+          "score": 51.81853865140768, 
+          "score_var": 407.4215620434527
+        }, 
+        "prob": 0.5830655093456926, 
+        "red": {
+          "hab_climb_points": 12.200916598867895, 
+          "hab_climb_points_var": 54.40555273352854, 
+          "prob_complete_rocket": 0.001950461878168941, 
+          "prob_hab_docking": 0.35216399660448217, 
+          "rocket_pieces_scored": 2.6580511742971833, 
+          "rocket_pieces_scored_var": 10.477627252749336, 
+          "score": 45.46018838397342, 
+          "score_var": 511.5831928216272
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm83": {
+        "blue": {
+          "hab_climb_points": 8.27630037968934, 
+          "hab_climb_points_var": 10.896715245887867, 
+          "prob_complete_rocket": 3.90610486508125e-05, 
+          "prob_hab_docking": 0.020832196008756965, 
+          "rocket_pieces_scored": 2.286686947049085, 
+          "rocket_pieces_scored_var": 6.046735645154702, 
+          "score": 42.46192195136035, 
+          "score_var": 291.54377783805444
+        }, 
+        "prob": 0.7310191851798447, 
+        "red": {
+          "hab_climb_points": 9.4876533868248, 
+          "hab_climb_points_var": 61.4001280529519, 
+          "prob_complete_rocket": 1.2755252820628726e-07, 
+          "prob_hab_docking": 0.24087827031998543, 
+          "rocket_pieces_scored": 0.41728049468457845, 
+          "rocket_pieces_scored_var": 5.050643957444548, 
+          "score": 28.483161936380927, 
+          "score_var": 223.58908615119802
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm84": {
+        "blue": {
+          "hab_climb_points": 8.842605379217, 
+          "hab_climb_points_var": 31.00500133058829, 
+          "prob_complete_rocket": 3.531573233850338e-08, 
+          "prob_hab_docking": 0.13440405342366457, 
+          "rocket_pieces_scored": 1.0466428843257256, 
+          "rocket_pieces_scored_var": 4.130363844639243, 
+          "score": 25.37411356008476, 
+          "score_var": 313.38916457772746
+        }, 
+        "prob": 0.7314057856421238, 
+        "red": {
+          "hab_climb_points": 8.368372005946364, 
+          "hab_climb_points_var": 34.85802435296445, 
+          "prob_complete_rocket": 0.046210409991958024, 
+          "prob_hab_docking": 0.13066986979013118, 
+          "rocket_pieces_scored": 4.767720857493183, 
+          "rocket_pieces_scored_var": 18.47157910779814, 
+          "score": 42.835290166832046, 
+          "score_var": 487.3256684128196
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm85": {
+        "blue": {
+          "hab_climb_points": 14.68372846292252, 
+          "hab_climb_points_var": 47.11623776154388, 
+          "prob_complete_rocket": 0.011415902049427329, 
+          "prob_hab_docking": 0.48162483587910054, 
+          "rocket_pieces_scored": 3.3654532643625332, 
+          "rocket_pieces_scored_var": 14.389442776441621, 
+          "score": 50.23300607011182, 
+          "score_var": 607.1980644087026
+        }, 
+        "prob": 0.5525427770870337, 
+        "red": {
+          "hab_climb_points": 9.801653761309584, 
+          "hab_climb_points_var": 22.629455654781868, 
+          "prob_complete_rocket": 0.0021743067998277743, 
+          "prob_hab_docking": 0.13724773798860257, 
+          "rocket_pieces_scored": 3.068308465342101, 
+          "rocket_pieces_scored_var": 9.809791918034676, 
+          "score": 45.863003042104715, 
+          "score_var": 487.3497521396062
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm86": {
+        "blue": {
+          "hab_climb_points": 8.959805640387113, 
+          "hab_climb_points_var": 17.3877869891993, 
+          "prob_complete_rocket": 2.527044092981434e-06, 
+          "prob_hab_docking": 0.07373385212447159, 
+          "rocket_pieces_scored": 0.1278896086192568, 
+          "rocket_pieces_scored_var": 6.770868764746338, 
+          "score": 24.96647677605403, 
+          "score_var": 146.61689618664565
+        }, 
+        "prob": 0.682343403240327, 
+        "red": {
+          "hab_climb_points": 12.686467865978184, 
+          "hab_climb_points_var": 60.01875047158667, 
+          "prob_complete_rocket": 0.004194026327182576, 
+          "prob_hab_docking": 0.38261154656674157, 
+          "rocket_pieces_scored": 4.021846833628984, 
+          "rocket_pieces_scored_var": 9.160130447503, 
+          "score": 34.34637331427943, 
+          "score_var": 244.5478580233863
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm87": {
+        "blue": {
+          "hab_climb_points": 10.938065554589425, 
+          "hab_climb_points_var": 35.12225155886829, 
+          "prob_complete_rocket": 0.005995265453243248, 
+          "prob_hab_docking": 0.2465469490983183, 
+          "rocket_pieces_scored": 3.776401952711746, 
+          "rocket_pieces_scored_var": 10.71367010794192, 
+          "score": 35.04625660866921, 
+          "score_var": 319.76576102892443
+        }, 
+        "prob": 0.6175901650976452, 
+        "red": {
+          "hab_climb_points": 9.870323703100999, 
+          "hab_climb_points_var": 39.892483602990694, 
+          "prob_complete_rocket": 0.0017987993073345088, 
+          "prob_hab_docking": 0.20834839787998938, 
+          "rocket_pieces_scored": 3.1638261142565116, 
+          "rocket_pieces_scored_var": 9.211088819452339, 
+          "score": 42.49761987930427, 
+          "score_var": 300.6329705506374
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm88": {
+        "blue": {
+          "hab_climb_points": 6.081751529970467, 
+          "hab_climb_points_var": 35.91392145915658, 
+          "prob_complete_rocket": 3.340661081097096e-12, 
+          "prob_hab_docking": 0.06835501717826631, 
+          "rocket_pieces_scored": 0.8938401361570861, 
+          "rocket_pieces_scored_var": 2.6177877467122856, 
+          "score": 26.47889497686309, 
+          "score_var": 142.23130461176518
+        }, 
+        "prob": 0.5538494499363603, 
+        "red": {
+          "hab_climb_points": 8.858674732584298, 
+          "hab_climb_points_var": 52.4493892303813, 
+          "prob_complete_rocket": 1.2421352835190191e-10, 
+          "prob_hab_docking": 0.19822114392220058, 
+          "rocket_pieces_scored": -0.8179849691767974, 
+          "rocket_pieces_scored_var": 4.103102625848731, 
+          "score": 23.98694513551956, 
+          "score_var": 196.52368264580247
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm89": {
+        "blue": {
+          "hab_climb_points": 8.525915585841092, 
+          "hab_climb_points_var": 43.63664562610981, 
+          "prob_complete_rocket": 0.000215955610259555, 
+          "prob_hab_docking": 0.1635282433577543, 
+          "rocket_pieces_scored": 2.42847448688424, 
+          "rocket_pieces_scored_var": 7.394898954423771, 
+          "score": 31.63489078156921, 
+          "score_var": 353.36335551614957
+        }, 
+        "prob": 0.6521845907559984, 
+        "red": {
+          "hab_climb_points": 12.682424247944425, 
+          "hab_climb_points_var": 31.78535803894841, 
+          "prob_complete_rocket": 0.0040134009940413495, 
+          "prob_hab_docking": 0.3405090067633738, 
+          "rocket_pieces_scored": 3.072377710368561, 
+          "rocket_pieces_scored_var": 11.341531661418129, 
+          "score": 41.597278499885945, 
+          "score_var": 295.0819402309051
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm9": {
+        "blue": {
+          "hab_climb_points": 5.8125, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.04163225833177531, 
+          "prob_hab_docking": 0.03851915207947876, 
+          "rocket_pieces_scored": 3.0, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.5625, 
+          "score_var": 1200.0
+        }, 
+        "prob": 0.5, 
+        "red": {
+          "hab_climb_points": 5.8125, 
+          "hab_climb_points_var": 27.0, 
+          "prob_complete_rocket": 0.04163225833177531, 
+          "prob_hab_docking": 0.03851915207947876, 
+          "rocket_pieces_scored": 3.0, 
+          "rocket_pieces_scored_var": 27.0, 
+          "score": 26.5625, 
+          "score_var": 1200.0
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm90": {
+        "blue": {
+          "hab_climb_points": 10.920191538955718, 
+          "hab_climb_points_var": 53.13995625798239, 
+          "prob_complete_rocket": 0.0007657616281828705, 
+          "prob_hab_docking": 0.2878535271782062, 
+          "rocket_pieces_scored": 2.5458342760117976, 
+          "rocket_pieces_scored_var": 8.902249598068071, 
+          "score": 45.2225084732495, 
+          "score_var": 334.3302574501839
+        }, 
+        "prob": 0.576408743192189, 
+        "red": {
+          "hab_climb_points": 9.820095992703207, 
+          "hab_climb_points_var": 37.23140074043296, 
+          "prob_complete_rocket": 1.4386765797569367e-05, 
+          "prob_hab_docking": 0.19796276410866342, 
+          "rocket_pieces_scored": 1.995317371767018, 
+          "rocket_pieces_scored_var": 5.720562882038883, 
+          "score": 40.27240971506552, 
+          "score_var": 325.44896520745374
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm91": {
+        "blue": {
+          "hab_climb_points": 7.589719823360925, 
+          "hab_climb_points_var": 27.71031652828972, 
+          "prob_complete_rocket": 9.325733364451416e-05, 
+          "prob_hab_docking": 0.0796081487021626, 
+          "rocket_pieces_scored": 2.0615958557016034, 
+          "rocket_pieces_scored_var": 7.074190615180993, 
+          "score": 37.405044990223615, 
+          "score_var": 300.3262158761518
+        }, 
+        "prob": 0.5991184840668464, 
+        "red": {
+          "hab_climb_points": 12.161845315728227, 
+          "hab_climb_points_var": 59.144161840911835, 
+          "prob_complete_rocket": 0.03929461955893998, 
+          "prob_hab_docking": 0.3560468398599168, 
+          "rocket_pieces_scored": 5.402122994885121, 
+          "rocket_pieces_scored_var": 14.070542873038669, 
+          "score": 44.68866863576536, 
+          "score_var": 541.2994327240029
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm92": {
+        "blue": {
+          "hab_climb_points": 6.500486556437129, 
+          "hab_climb_points_var": 24.234812195060684, 
+          "prob_complete_rocket": 0.0061251091531868695, 
+          "prob_hab_docking": 0.04212601531010407, 
+          "rocket_pieces_scored": 3.244120166671747, 
+          "rocket_pieces_scored_var": 12.21898087903576, 
+          "score": 47.14255836635358, 
+          "score_var": 466.08716708960895
+        }, 
+        "prob": 0.6514167085576259, 
+        "red": {
+          "hab_climb_points": 7.640012207528558, 
+          "hab_climb_points_var": 14.295533789685905, 
+          "prob_complete_rocket": 0.00034938680609308825, 
+          "prob_hab_docking": 0.025791304087722233, 
+          "rocket_pieces_scored": 2.1516953634547376, 
+          "rocket_pieces_scored_var": 8.439334719187986, 
+          "score": 36.88700048239868, 
+          "score_var": 228.43917041799682
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm93": {
+        "blue": {
+          "hab_climb_points": 8.422806061008114, 
+          "hab_climb_points_var": 50.05555727767566, 
+          "prob_complete_rocket": 0.03273252111103564, 
+          "prob_hab_docking": 0.17627892364664755, 
+          "rocket_pieces_scored": 4.590083580444441, 
+          "rocket_pieces_scored_var": 16.18135110247259, 
+          "score": 31.640470572921657, 
+          "score_var": 263.1628182225984
+        }, 
+        "prob": 0.7779960012764597, 
+        "red": {
+          "hab_climb_points": 16.538516024993548, 
+          "hab_climb_points_var": 94.02424064349626, 
+          "prob_complete_rocket": 0.0038052174427274377, 
+          "prob_hab_docking": 0.5630337323435671, 
+          "rocket_pieces_scored": 4.219771940897599, 
+          "rocket_pieces_scored_var": 8.498184375751919, 
+          "score": 53.9150402032528, 
+          "score_var": 583.6614898311939
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm94": {
+        "blue": {
+          "hab_climb_points": 8.896767765732895, 
+          "hab_climb_points_var": 9.04913214544195, 
+          "prob_complete_rocket": 0.01779645868952917, 
+          "prob_hab_docking": 0.02123524063729476, 
+          "rocket_pieces_scored": 4.831375842541496, 
+          "rocket_pieces_scored_var": 11.635716428127099, 
+          "score": 49.741840932806184, 
+          "score_var": 494.11853324559695
+        }, 
+        "prob": 0.7674140213063099, 
+        "red": {
+          "hab_climb_points": 10.350330086001733, 
+          "hab_climb_points_var": 12.502183992736098, 
+          "prob_complete_rocket": 1.354472090042691e-14, 
+          "prob_hab_docking": 0.09425320754885846, 
+          "rocket_pieces_scored": 0.744976143815405, 
+          "rocket_pieces_scored_var": 2.1865231944419126, 
+          "score": 29.68497256526251, 
+          "score_var": 260.0280765809338
+        }, 
+        "winning_alliance": "blue"
+      }, 
+      "2019scmb_qm95": {
+        "blue": {
+          "hab_climb_points": 6.387590563287252, 
+          "hab_climb_points_var": 34.307396695884975, 
+          "prob_complete_rocket": 0.0001899171286875445, 
+          "prob_hab_docking": 0.0707288830178947, 
+          "rocket_pieces_scored": 2.614913292531739, 
+          "rocket_pieces_scored_var": 6.9744828239029735, 
+          "score": 35.076694247705554, 
+          "score_var": 177.42984713420648
+        }, 
+        "prob": 0.6904495699478987, 
+        "red": {
+          "hab_climb_points": 13.51383956676679, 
+          "hab_climb_points_var": 63.86697386939453, 
+          "prob_complete_rocket": 0.0006297632547778154, 
+          "prob_hab_docking": 0.4262367236531711, 
+          "rocket_pieces_scored": 2.4032649463477505, 
+          "rocket_pieces_scored_var": 8.854729907180422, 
+          "score": 47.26362933827817, 
+          "score_var": 423.54690777405835
+        }, 
+        "winning_alliance": "red"
+      }, 
+      "2019scmb_qm96": {
+        "blue": {
+          "hab_climb_points": 9.101637814409603, 
+          "hab_climb_points_var": 29.982868864135288, 
+          "prob_complete_rocket": 1.540381444620209e-08, 
+          "prob_hab_docking": 0.1406962939496521, 
+          "rocket_pieces_scored": -0.0914778376054898, 
+          "rocket_pieces_scored_var": 4.769178992599106, 
+          "score": 34.836132613608775, 
+          "score_var": 333.1355880087967
+        }, 
+        "prob": 0.6077533156683245, 
+        "red": {
+          "hab_climb_points": 13.537004772134198, 
+          "hab_climb_points_var": 26.98455734836172, 
+          "prob_complete_rocket": 0.0013650484149531072, 
+          "prob_hab_docking": 0.3891120394218701, 
+          "rocket_pieces_scored": 3.0005699712089893, 
+          "rocket_pieces_scored_var": 9.019298984371183, 
+          "score": 41.93703087624093, 
+          "score_var": 341.1021563015858
+        }, 
+        "winning_alliance": "red"
+      }
+    }
+  }, 
+  "ranking_prediction_stats": {
+    "last_played_match": "2019scmb_qm96"
+  }, 
+  "ranking_predictions": [
+    [
+      "frc4020", 
+      [
+        1.0, 
+        1, 
+        1.0, 
+        1, 
+        24.0, 
+        24, 
+        24
+      ]
+    ], 
+    [
+      "frc1051", 
+      [
+        2.0, 
+        2, 
+        2.0, 
+        2, 
+        23.0, 
+        23, 
+        23
+      ]
+    ], 
+    [
+      "frc342", 
+      [
+        3.0, 
+        3, 
+        3.0, 
+        3, 
+        22.0, 
+        22, 
+        22
+      ]
+    ], 
+    [
+      "frc4451", 
+      [
+        4.0, 
+        4, 
+        4.0, 
+        4, 
+        22.0, 
+        22, 
+        22
+      ]
+    ], 
+    [
+      "frc379", 
+      [
+        5.0, 
+        5, 
+        5.0, 
+        5, 
+        22.0, 
+        22, 
+        22
+      ]
+    ], 
+    [
+      "frc86", 
+      [
+        6.0, 
+        6, 
+        6.0, 
+        6, 
+        20.0, 
+        20, 
+        20
+      ]
+    ], 
+    [
+      "frc5472", 
+      [
+        7.0, 
+        7, 
+        7.0, 
+        7, 
+        19.0, 
+        19, 
+        19
+      ]
+    ], 
+    [
+      "frc1287", 
+      [
+        8.0, 
+        8, 
+        8.0, 
+        8, 
+        18.0, 
+        18, 
+        18
+      ]
+    ], 
+    [
+      "frc3490", 
+      [
+        9.0, 
+        9, 
+        9.0, 
+        9, 
+        17.0, 
+        17, 
+        17
+      ]
+    ], 
+    [
+      "frc1293", 
+      [
+        10.0, 
+        10, 
+        10.0, 
+        10, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc2393", 
+      [
+        11.0, 
+        11, 
+        11.0, 
+        11, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc108", 
+      [
+        12.0, 
+        12, 
+        12.0, 
+        12, 
+        16.0, 
+        16, 
+        16
+      ]
+    ], 
+    [
+      "frc4965", 
+      [
+        13.0, 
+        13, 
+        13.0, 
+        13, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc21", 
+      [
+        14.0, 
+        14, 
+        14.0, 
+        14, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc281", 
+      [
+        15.0, 
+        15, 
+        15.0, 
+        15, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc1369", 
+      [
+        16.0, 
+        16, 
+        16.0, 
+        16, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc3976", 
+      [
+        17.0, 
+        17, 
+        17.0, 
+        17, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc4504", 
+      [
+        18.0, 
+        18, 
+        18.0, 
+        18, 
+        15.0, 
+        15, 
+        15
+      ]
+    ], 
+    [
+      "frc5022", 
+      [
+        19.0, 
+        19, 
+        19.0, 
+        19, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc7072", 
+      [
+        20.0, 
+        20, 
+        20.0, 
+        20, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc7107", 
+      [
+        21.0, 
+        21, 
+        21.0, 
+        21, 
+        14.0, 
+        14, 
+        14
+      ]
+    ], 
+    [
+      "frc4005", 
+      [
+        22.0, 
+        22, 
+        22.0, 
+        22, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc7152", 
+      [
+        23.0, 
+        23, 
+        23.0, 
+        23, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc3140", 
+      [
+        24.0, 
+        24, 
+        24.0, 
+        24, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc1398", 
+      [
+        25.0, 
+        25, 
+        25.0, 
+        25, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc4073", 
+      [
+        26.0, 
+        26, 
+        26.0, 
+        26, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc4748", 
+      [
+        27.0, 
+        27, 
+        27.0, 
+        27, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc7085", 
+      [
+        28.0, 
+        28, 
+        28.0, 
+        28, 
+        13.0, 
+        13, 
+        13
+      ]
+    ], 
+    [
+      "frc1902", 
+      [
+        29.0, 
+        29, 
+        29.0, 
+        29, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc4582", 
+      [
+        30.0, 
+        30, 
+        30.0, 
+        30, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc283", 
+      [
+        31.0, 
+        31, 
+        31.0, 
+        31, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc6222", 
+      [
+        32.0, 
+        32, 
+        32.0, 
+        32, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc2815", 
+      [
+        33.0, 
+        33, 
+        33.0, 
+        33, 
+        12.0, 
+        12, 
+        12
+      ]
+    ], 
+    [
+      "frc6366", 
+      [
+        34.0, 
+        34, 
+        34.0, 
+        34, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc2187", 
+      [
+        35.0, 
+        35, 
+        35.0, 
+        35, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc1539", 
+      [
+        36.0, 
+        36, 
+        36.0, 
+        36, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc5130", 
+      [
+        37.0, 
+        37, 
+        37.0, 
+        37, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc4083", 
+      [
+        38.0, 
+        38, 
+        38.0, 
+        38, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc4267", 
+      [
+        39.0, 
+        39, 
+        39.0, 
+        39, 
+        11.0, 
+        11, 
+        11
+      ]
+    ], 
+    [
+      "frc263", 
+      [
+        40.0, 
+        40, 
+        40.0, 
+        40, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc3824", 
+      [
+        41.0, 
+        41, 
+        41.0, 
+        41, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc4075", 
+      [
+        42.0, 
+        42, 
+        42.0, 
+        42, 
+        10.0, 
+        10, 
+        10
+      ]
+    ], 
+    [
+      "frc1553", 
+      [
+        43.0, 
+        43, 
+        43.0, 
+        43, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc7489", 
+      [
+        44.0, 
+        44, 
+        44.0, 
+        44, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc3489", 
+      [
+        45.0, 
+        45, 
+        45.0, 
+        45, 
+        9.0, 
+        9, 
+        9
+      ]
+    ], 
+    [
+      "frc5949", 
+      [
+        46.0, 
+        46, 
+        46.0, 
+        46, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc3651", 
+      [
+        47.0, 
+        47, 
+        47.0, 
+        47, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc4243", 
+      [
+        48.0, 
+        48, 
+        48.0, 
+        48, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc4187", 
+      [
+        49.0, 
+        49, 
+        49.0, 
+        49, 
+        8.0, 
+        8, 
+        8
+      ]
+    ], 
+    [
+      "frc2614", 
+      [
+        50.0, 
+        50, 
+        50.0, 
+        50, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc6626", 
+      [
+        51.0, 
+        51, 
+        51.0, 
+        51, 
+        7.0, 
+        7, 
+        7
+      ]
+    ], 
+    [
+      "frc900", 
+      [
+        52.0, 
+        52, 
+        52.0, 
+        52, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc4074", 
+      [
+        53.0, 
+        53, 
+        53.0, 
+        53, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc7409", 
+      [
+        54.0, 
+        54, 
+        54.0, 
+        54, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc4823", 
+      [
+        55.0, 
+        55, 
+        55.0, 
+        55, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc1758", 
+      [
+        56.0, 
+        56, 
+        56.0, 
+        56, 
+        6.0, 
+        6, 
+        6
+      ]
+    ], 
+    [
+      "frc6167", 
+      [
+        57.0, 
+        57, 
+        57.0, 
+        57, 
+        5.0, 
+        5, 
+        5
+      ]
+    ], 
+    [
+      "frc5327", 
+      [
+        58.0, 
+        58, 
+        58.0, 
+        58, 
+        5.0, 
+        5, 
+        5
+      ]
+    ], 
+    [
+      "frc5777", 
+      [
+        59.0, 
+        59, 
+        59.0, 
+        59, 
+        5.0, 
+        5, 
+        5
+      ]
+    ], 
+    [
+      "frc5317", 
+      [
+        60.0, 
+        60, 
+        60.0, 
+        60, 
+        4.0, 
+        4, 
+        4
+      ]
+    ], 
+    [
+      "frc5410", 
+      [
+        61.0, 
+        61, 
+        61.0, 
+        61, 
+        4.0, 
+        4, 
+        4
+      ]
+    ], 
+    [
+      "frc5063", 
+      [
+        62.0, 
+        62, 
+        62.0, 
+        62, 
+        4.0, 
+        4, 
+        4
+      ]
+    ], 
+    [
+      "frc6961", 
+      [
+        63.0, 
+        63, 
+        63.0, 
+        63, 
+        3.0, 
+        3, 
+        3
+      ]
+    ], 
+    [
+      "frc4847", 
+      [
+        64.0, 
+        64, 
+        64.0, 
+        64, 
+        3.0, 
+        3, 
+        3
+      ]
+    ]
+  ], 
+  "stat_mean_vars": {
+    "playoff": {
+      "hab_climb_points": {
+        "mean": {
+          "frc1051": 7.48953536548573, 
+          "frc108": 5.416489497833893, 
+          "frc1287": 4.654751369341303, 
+          "frc1293": 3.6942842475198274, 
+          "frc1369": 5.26239869037902, 
+          "frc1398": 3.8890529882874754, 
+          "frc1539": 1.7067538869133203, 
+          "frc1553": 1.4921334303727505, 
+          "frc1758": 2.264654268460676, 
+          "frc1902": 2.2355912835133442, 
+          "frc21": 5.980169682195882, 
+          "frc2187": 2.959538052199519, 
+          "frc2393": 7.724530721603288, 
+          "frc2614": 3.814713210847043, 
+          "frc263": 3.0779801123378894, 
+          "frc281": 5.588483899459879, 
+          "frc2815": 2.9595912294565387, 
+          "frc283": 2.764967885918163, 
+          "frc3140": 3.006179142261582, 
+          "frc342": 7.025297756939533, 
+          "frc3489": 1.5673484114925575, 
+          "frc3490": 7.90132222269468, 
+          "frc3651": 2.011063718333592, 
+          "frc379": 8.519395235983605, 
+          "frc3824": 4.000659268450236, 
+          "frc3976": 2.8049840887601323, 
+          "frc4005": 4.112929838569918, 
+          "frc4020": 7.398233382776053, 
+          "frc4073": 4.9773495687588545, 
+          "frc4074": 3.238383222249645, 
+          "frc4075": 0.25796724612311317, 
+          "frc4083": 1.6788226771497983, 
+          "frc4187": 0.23840212695723773, 
+          "frc4243": 0.33367309651163, 
+          "frc4267": 3.7356855943232214, 
+          "frc4451": 7.188586444819793, 
+          "frc4504": 2.0629107821842183, 
+          "frc4582": 2.2316737708568883, 
+          "frc4748": 2.108818386516462, 
+          "frc4823": 2.5241728991176675, 
+          "frc4847": 0.1099391241630725, 
+          "frc4965": 2.5553534287586865, 
+          "frc5022": 1.613757405531134, 
+          "frc5063": 3.6967474604243495, 
+          "frc5130": 3.0379288057928053, 
+          "frc5317": 1.545945664753766, 
+          "frc5327": 0.2797117537751415, 
+          "frc5410": 3.307734128316133, 
+          "frc5472": 3.8759774981145867, 
+          "frc5777": 3.9620415956535675, 
+          "frc5949": 1.6788362029777641, 
+          "frc6167": 1.408401604024247, 
+          "frc6222": 5.15913579977585, 
+          "frc6366": 3.803261149749022, 
+          "frc6626": 3.1429994955610225, 
+          "frc6961": 2.9597636868389037, 
+          "frc7072": 3.5380630183145665, 
+          "frc7085": 3.5445696741093498, 
+          "frc7107": 0.8375892980712532, 
+          "frc7152": 5.502281743456994, 
+          "frc7409": 3.6799099782334395, 
+          "frc7489": 2.932996067243489, 
+          "frc86": 4.669892480068666, 
+          "frc900": 1.6034101776019403
+        }, 
+        "var": {
+          "frc1051": 40.27232539044998, 
+          "frc108": 8.095958561062542, 
+          "frc1287": 14.836253945208894, 
+          "frc1293": 9.956644307877685, 
+          "frc1369": 18.10411005216663, 
+          "frc1398": 13.008028903866213, 
+          "frc1539": 5.253289386815159, 
+          "frc1553": 9.566274071756045, 
+          "frc1758": 7.585039526316632, 
+          "frc1902": 9.83787310067765, 
+          "frc21": 24.68219769014316, 
+          "frc2187": 29.286759384632767, 
+          "frc2393": 25.138125879516537, 
+          "frc2614": 14.356906879477416, 
+          "frc263": 13.872086184981793, 
+          "frc281": 17.03285604422412, 
+          "frc2815": 12.626258766047798, 
+          "frc283": 10.872365769820231, 
+          "frc3140": 5.951955240752649, 
+          "frc342": 1.7675358906958876, 
+          "frc3489": 2.1710277812040295, 
+          "frc3490": 30.71218200242271, 
+          "frc3651": 1.193308740149646, 
+          "frc379": 31.29437989197533, 
+          "frc3824": 7.333664666790257, 
+          "frc3976": 14.5723897574956, 
+          "frc4005": 3.2473692609227527, 
+          "frc4020": 23.305690179202056, 
+          "frc4073": 32.05739597139512, 
+          "frc4074": 10.392253683319934, 
+          "frc4075": 1.6442921095618512, 
+          "frc4083": 3.0600570040432107, 
+          "frc4187": 10.904197729724913, 
+          "frc4243": 4.094405184038719, 
+          "frc4267": 4.734579520315773, 
+          "frc4451": 17.748424604572083, 
+          "frc4504": 27.38105711675111, 
+          "frc4582": 7.870338087777543, 
+          "frc4748": 3.591233024597547, 
+          "frc4823": 34.547888878527715, 
+          "frc4847": 6.471132219174018, 
+          "frc4965": 4.201966145574585, 
+          "frc5022": 6.405983303809705, 
+          "frc5063": 9.992559229453397, 
+          "frc5130": 9.986592512726151, 
+          "frc5317": 7.88947643307852, 
+          "frc5327": 2.7551498152787204, 
+          "frc5410": 2.4004092828455663, 
+          "frc5472": 6.020800130937458, 
+          "frc5777": 1.2942220701701086, 
+          "frc5949": 3.3691970124651336, 
+          "frc6167": 14.651345542505302, 
+          "frc6222": 29.490210759240597, 
+          "frc6366": 9.785751771751743, 
+          "frc6626": 17.55783020384123, 
+          "frc6961": 11.453845510585637, 
+          "frc7072": 4.374601654404637, 
+          "frc7085": 10.410268222335167, 
+          "frc7107": 6.960503181593998, 
+          "frc7152": 18.333592313055462, 
+          "frc7409": 17.091084093531226, 
+          "frc7489": 3.185961686091271, 
+          "frc86": 21.21897222326735, 
+          "frc900": 1.5436578450265075
+        }
+      }, 
+      "rocket_pieces_scored": {
+        "mean": {
+          "frc1051": 1.1023169582228782, 
+          "frc108": 1.7111511718101187, 
+          "frc1287": 0.8034739247209224, 
+          "frc1293": 1.1183251441471271, 
+          "frc1369": 0.03197766119757853, 
+          "frc1398": 0.07771528561785448, 
+          "frc1539": 0.9996431420164318, 
+          "frc1553": 0.25567933582627866, 
+          "frc1758": -0.6209725029501076, 
+          "frc1902": 2.58184728205193, 
+          "frc21": -0.017394494470402568, 
+          "frc2187": 0.169188955001133, 
+          "frc2393": 3.0854738795197854, 
+          "frc2614": 1.6913912026755302, 
+          "frc263": 2.1605642869992705, 
+          "frc281": 0.9127009023897537, 
+          "frc2815": 0.6812271008092212, 
+          "frc283": 0.3134353386119876, 
+          "frc3140": 0.9145219979785737, 
+          "frc342": 2.5942081447819945, 
+          "frc3489": 1.3847119715327771, 
+          "frc3490": 2.500377835133187, 
+          "frc3651": -0.36137942745343615, 
+          "frc379": 0.9351578465547137, 
+          "frc3824": 0.9951929658003353, 
+          "frc3976": 0.29972444008189325, 
+          "frc4005": 2.8938278285168293, 
+          "frc4020": 4.145869466176969, 
+          "frc4073": 0.6075097477878688, 
+          "frc4074": -0.008055236483286047, 
+          "frc4075": 0.5476333316239483, 
+          "frc4083": 0.01228513895158579, 
+          "frc4187": 0.15293625773002228, 
+          "frc4243": -0.021468799840900055, 
+          "frc4267": 0.8297674699069536, 
+          "frc4451": 2.381439267065752, 
+          "frc4504": 1.0854426057253341, 
+          "frc4582": 0.3470819373875773, 
+          "frc4748": -0.2697286558073892, 
+          "frc4823": -0.5635628284392923, 
+          "frc4847": 0.11488161181806877, 
+          "frc4965": 0.578861660679338, 
+          "frc5022": 1.8585617066965814, 
+          "frc5063": 0.10006605693172654, 
+          "frc5130": 0.621259120322131, 
+          "frc5317": 0.6933450255595786, 
+          "frc5327": -0.2153848661850401, 
+          "frc5410": 0.29787209268424303, 
+          "frc5472": 1.33178269740772, 
+          "frc5777": 0.22859979250998297, 
+          "frc5949": 1.4670283610064985, 
+          "frc6167": 0.6287601868954179, 
+          "frc6222": 0.10540862154936503, 
+          "frc6366": 2.095830248628088, 
+          "frc6626": 1.5410444030924133, 
+          "frc6961": -0.07524329794785986, 
+          "frc7072": -0.21769379487444382, 
+          "frc7085": 1.0517083894828025, 
+          "frc7107": 0.772809853992551, 
+          "frc7152": 0.7237847485167239, 
+          "frc7409": 0.14426547808658782, 
+          "frc7489": -0.10876101755892364, 
+          "frc86": 4.796150520486406, 
+          "frc900": 0.3280821354906535
+        }, 
+        "var": {
+          "frc1051": 3.050652633256883, 
+          "frc108": 1.9237745236403756, 
+          "frc1287": 2.0381675864974342, 
+          "frc1293": 6.725970226456232, 
+          "frc1369": 2.3418907159342006, 
+          "frc1398": 0.9902447358098969, 
+          "frc1539": 2.160028733029699, 
+          "frc1553": 0.7528595961316704, 
+          "frc1758": 1.1038951869811464, 
+          "frc1902": 1.0719145006646822, 
+          "frc21": 1.2244342888296857, 
+          "frc2187": 0.7961801032532236, 
+          "frc2393": 3.2939680300066385, 
+          "frc2614": 6.075888353888653, 
+          "frc263": 5.3540053241034125, 
+          "frc281": 0.8521923315456772, 
+          "frc2815": 1.3625043044613099, 
+          "frc283": 1.518716917863022, 
+          "frc3140": 3.868695165156543, 
+          "frc342": 7.161651744686154, 
+          "frc3489": 3.521921571873998, 
+          "frc3490": 0.39127712072834003, 
+          "frc3651": 0.4347549468173132, 
+          "frc379": 0.7164709216906419, 
+          "frc3824": 1.1520306249952845, 
+          "frc3976": 3.203973209617824, 
+          "frc4005": 6.901568010195887, 
+          "frc4020": 4.3298619898379345, 
+          "frc4073": 1.7359418528847634, 
+          "frc4074": 0.47180298337669735, 
+          "frc4075": 3.8783721015731305, 
+          "frc4083": 1.657302142620222, 
+          "frc4187": 1.2819558517163812, 
+          "frc4243": 0.6118831530578241, 
+          "frc4267": 7.579774429810703, 
+          "frc4451": 12.813882075410904, 
+          "frc4504": 7.2403948565786225, 
+          "frc4582": 4.408820263072329, 
+          "frc4748": 1.2094280408914813, 
+          "frc4823": 1.6529112554513072, 
+          "frc4847": 0.24312607279940202, 
+          "frc4965": 3.8124600727482374, 
+          "frc5022": 1.2645428176758873, 
+          "frc5063": 1.9421274995178202, 
+          "frc5130": 0.7459944657584668, 
+          "frc5317": 2.646864610806857, 
+          "frc5327": 0.7477273183492075, 
+          "frc5410": 4.190401644647663, 
+          "frc5472": 4.430243109501163, 
+          "frc5777": 1.8625716703295474, 
+          "frc5949": 1.1710577461123326, 
+          "frc6167": 0.42361478082018567, 
+          "frc6222": 0.4042178598828867, 
+          "frc6366": 6.102577769204778, 
+          "frc6626": 0.9422223661769794, 
+          "frc6961": 0.9588481497196475, 
+          "frc7072": 0.39956885103903217, 
+          "frc7085": 2.0662479816443726, 
+          "frc7107": 3.6409136764888173, 
+          "frc7152": 0.09912143053707523, 
+          "frc7409": 0.7704590092859114, 
+          "frc7489": 6.127606391233022, 
+          "frc86": 8.627152224802769, 
+          "frc900": 1.7988362316951372
+        }
+      }, 
+      "score": {
+        "mean": {
+          "frc1051": 20.556829642863836, 
+          "frc108": 19.609412203204563, 
+          "frc1287": 19.284785416211196, 
+          "frc1293": 22.042725273408156, 
+          "frc1369": 15.872465524691798, 
+          "frc1398": 11.763534891077494, 
+          "frc1539": 12.374812988735897, 
+          "frc1553": 9.858477337396941, 
+          "frc1758": 4.935561018890121, 
+          "frc1902": 21.569192554522267, 
+          "frc21": 17.869895313539768, 
+          "frc2187": 10.601107072154013, 
+          "frc2393": 19.795867017286625, 
+          "frc2614": 17.933628585406822, 
+          "frc263": 17.321689994012782, 
+          "frc281": 17.374902203992576, 
+          "frc2815": 10.945003461193355, 
+          "frc283": 8.26834887360124, 
+          "frc3140": 13.393258311305006, 
+          "frc342": 22.15350689913179, 
+          "frc3489": 9.201856316147701, 
+          "frc3490": 21.02587587176051, 
+          "frc3651": 7.283147173289066, 
+          "frc379": 27.086801869643278, 
+          "frc3824": 18.720739941216458, 
+          "frc3976": 11.293729194044506, 
+          "frc4005": 23.883129503227938, 
+          "frc4020": 25.936393448267427, 
+          "frc4073": 9.989743667018457, 
+          "frc4074": 7.246804107489819, 
+          "frc4075": 6.309603095367713, 
+          "frc4083": 6.6419499667562025, 
+          "frc4187": 6.061465682375227, 
+          "frc4243": 4.560146498354084, 
+          "frc4267": 6.728863554915008, 
+          "frc4451": 25.000660673585667, 
+          "frc4504": 12.771871703993927, 
+          "frc4582": 13.500651000683467, 
+          "frc4748": 11.543887768226337, 
+          "frc4823": 5.351866230072629, 
+          "frc4847": 3.7421416688141163, 
+          "frc4965": 18.07399842003268, 
+          "frc5022": 17.412155590300173, 
+          "frc5063": 6.120527804372288, 
+          "frc5130": 9.196590578559114, 
+          "frc5317": 13.248205306791247, 
+          "frc5327": 7.755133708174586, 
+          "frc5410": 8.833323604571158, 
+          "frc5472": 19.53911993248178, 
+          "frc5777": 4.800816262808745, 
+          "frc5949": 17.92060264175534, 
+          "frc6167": 9.653237372522955, 
+          "frc6222": 11.862824406134601, 
+          "frc6366": 16.627352537123677, 
+          "frc6626": 12.555850651085002, 
+          "frc6961": 5.6312632930474305, 
+          "frc7072": 18.05793077784238, 
+          "frc7085": 12.28103589765249, 
+          "frc7107": 9.229382969143254, 
+          "frc7152": 18.500708516170246, 
+          "frc7409": 10.403737739738789, 
+          "frc7489": 8.300701135314451, 
+          "frc86": 23.328810685551442, 
+          "frc900": 8.090829639565795
+        }, 
+        "var": {
+          "frc1051": 169.04133227118842, 
+          "frc108": 69.36124896621219, 
+          "frc1287": 132.9209155469968, 
+          "frc1293": 201.63215130993595, 
+          "frc1369": 170.36750923760317, 
+          "frc1398": 177.70178200800947, 
+          "frc1539": 13.79035592495138, 
+          "frc1553": 35.933308039121165, 
+          "frc1758": 47.03245971971357, 
+          "frc1902": 85.59898269955855, 
+          "frc21": 168.02656176134676, 
+          "frc2187": 94.75649287487096, 
+          "frc2393": 93.01952882698863, 
+          "frc2614": 68.00542724036147, 
+          "frc263": 143.95701887615343, 
+          "frc281": 88.48447433808872, 
+          "frc2815": 17.665426166061884, 
+          "frc283": 76.92816034864141, 
+          "frc3140": 190.64351817714237, 
+          "frc342": 129.8499191314626, 
+          "frc3489": 13.118548822611196, 
+          "frc3490": 108.07309426781377, 
+          "frc3651": 54.30910882247743, 
+          "frc379": 131.22243720913988, 
+          "frc3824": 36.77556127154429, 
+          "frc3976": 72.42227001500865, 
+          "frc4005": 190.25661984045166, 
+          "frc4020": 185.3638610664329, 
+          "frc4073": 176.79945987671968, 
+          "frc4074": 25.241223063496204, 
+          "frc4075": 48.47671486736043, 
+          "frc4083": 15.29645463751859, 
+          "frc4187": 34.40973394158713, 
+          "frc4243": 16.969311410517964, 
+          "frc4267": 9.395147275325442, 
+          "frc4451": 86.02802336853692, 
+          "frc4504": 93.22170077232872, 
+          "frc4582": 123.60272369891092, 
+          "frc4748": 115.45838556457001, 
+          "frc4823": 92.01262239738514, 
+          "frc4847": 98.44971483907969, 
+          "frc4965": 87.57788520879727, 
+          "frc5022": 83.09777070064325, 
+          "frc5063": 82.67146417204893, 
+          "frc5130": 112.30099163122824, 
+          "frc5317": 36.557813548938505, 
+          "frc5327": 59.83027120869082, 
+          "frc5410": 25.34742939372073, 
+          "frc5472": 78.32830339170567, 
+          "frc5777": 57.2869975286965, 
+          "frc5949": 96.59201903609326, 
+          "frc6167": 126.94418908750193, 
+          "frc6222": 63.29248885384597, 
+          "frc6366": 54.68923151806107, 
+          "frc6626": 103.68592016269386, 
+          "frc6961": 57.81186889341906, 
+          "frc7072": 62.938630669604876, 
+          "frc7085": 43.755880027538154, 
+          "frc7107": 53.655926852016606, 
+          "frc7152": 106.5191304135811, 
+          "frc7409": 142.70312604002478, 
+          "frc7489": 83.34465158904948, 
+          "frc86": 203.08054106107434, 
+          "frc900": 119.70778129806902
+        }
+      }
+    }, 
+    "qual": {
+      "hab_climb_points": {
+        "mean": {
+          "frc1051": 7.19843164865079, 
+          "frc108": 4.799549454556031, 
+          "frc1287": 3.9488721471112713, 
+          "frc1293": 3.518655145433971, 
+          "frc1369": 4.680915559072815, 
+          "frc1398": 3.7658993144349604, 
+          "frc1539": 1.5929324103345845, 
+          "frc1553": 1.6574150662847853, 
+          "frc1758": 2.3900817634420934, 
+          "frc1902": 1.7795515082201152, 
+          "frc21": 5.7953523970759155, 
+          "frc2187": 3.070049171553319, 
+          "frc2393": 8.008387118635612, 
+          "frc2614": 3.2800353593021576, 
+          "frc263": 2.3474896844326927, 
+          "frc281": 6.016375132889771, 
+          "frc2815": 3.0153395420615583, 
+          "frc283": 2.8076234167442444, 
+          "frc3140": 3.0530159277138735, 
+          "frc342": 6.2360979620619625, 
+          "frc3489": 1.5434545542248066, 
+          "frc3490": 7.233966496512061, 
+          "frc3651": 2.56991858288777, 
+          "frc379": 7.7086488516226765, 
+          "frc3824": 3.2535954478673, 
+          "frc3976": 2.964917379279197, 
+          "frc4005": 3.5669639885499196, 
+          "frc4020": 7.615294958285336, 
+          "frc4073": 5.297732016190136, 
+          "frc4074": 3.373639847376392, 
+          "frc4075": 0.3566801177816057, 
+          "frc4083": 1.4605312075137078, 
+          "frc4187": 0.18851481492961744, 
+          "frc4243": 0.3181608866866438, 
+          "frc4267": 3.7622229437214716, 
+          "frc4451": 7.293738070383113, 
+          "frc4504": 2.108798051116179, 
+          "frc4582": 2.9586990706108165, 
+          "frc4748": 1.8457542098199797, 
+          "frc4823": 2.582136262049574, 
+          "frc4847": 0.2779974057671165, 
+          "frc4965": 2.8613699012136213, 
+          "frc5022": 1.9121865697273597, 
+          "frc5063": 3.6536875595912144, 
+          "frc5130": 3.0130268727668645, 
+          "frc5317": 1.535623971935639, 
+          "frc5327": 0.2754347514409089, 
+          "frc5410": 3.2389016993928363, 
+          "frc5472": 3.707909334619161, 
+          "frc5777": 4.175081650628295, 
+          "frc5949": 1.720126692095153, 
+          "frc6167": 1.362912757554316, 
+          "frc6222": 5.2611700078950365, 
+          "frc6366": 3.012470319851007, 
+          "frc6626": 3.2751421378567938, 
+          "frc6961": 3.1091390333427507, 
+          "frc7072": 3.8096848272746544, 
+          "frc7085": 3.513464410393219, 
+          "frc7107": 0.8632023513699533, 
+          "frc7152": 5.2648806375508395, 
+          "frc7409": 3.547906753845841, 
+          "frc7489": 3.04203687139279, 
+          "frc86": 4.203681894397428, 
+          "frc900": 1.5519146751201804
+        }, 
+        "var": {
+          "frc1051": 43.10165427666171, 
+          "frc108": 11.360794301752518, 
+          "frc1287": 13.37488716670992, 
+          "frc1293": 10.201853846542866, 
+          "frc1369": 15.664190650220918, 
+          "frc1398": 11.755677368856295, 
+          "frc1539": 6.744663483110662, 
+          "frc1553": 12.180276711883383, 
+          "frc1758": 6.991372133078838, 
+          "frc1902": 16.356510166264325, 
+          "frc21": 23.621696201727694, 
+          "frc2187": 27.962374315103283, 
+          "frc2393": 23.031197901104374, 
+          "frc2614": 23.341054208602557, 
+          "frc263": 14.702667933572728, 
+          "frc281": 18.820337656577447, 
+          "frc2815": 12.232762481657256, 
+          "frc283": 9.749446810598638, 
+          "frc3140": 7.686982754948972, 
+          "frc342": 1.715852852483779, 
+          "frc3489": 2.7354219511838274, 
+          "frc3490": 34.217608708809344, 
+          "frc3651": 2.4483032099691777, 
+          "frc379": 38.71448654459318, 
+          "frc3824": 0.9056472692628688, 
+          "frc3976": 10.946017546304406, 
+          "frc4005": 1.60863343969352, 
+          "frc4020": 34.660126292331526, 
+          "frc4073": 29.79696928366907, 
+          "frc4074": 8.898226575964278, 
+          "frc4075": 3.7566714572196567, 
+          "frc4083": 1.8087909356230887, 
+          "frc4187": 10.086777549405843, 
+          "frc4243": 4.655380111558481, 
+          "frc4267": 2.7504779679095024, 
+          "frc4451": 29.19811975654308, 
+          "frc4504": 25.239919543075153, 
+          "frc4582": 1.5050562372881666, 
+          "frc4748": 4.552381726784505, 
+          "frc4823": 33.439773914218634, 
+          "frc4847": 4.376205389787362, 
+          "frc4965": 2.5253971053153315, 
+          "frc5022": 4.399854479694373, 
+          "frc5063": 10.724495128363424, 
+          "frc5130": 8.728433088049272, 
+          "frc5317": 7.343165269487936, 
+          "frc5327": 2.8982334129675906, 
+          "frc5410": 2.994646094632002, 
+          "frc5472": 5.807015220022272, 
+          "frc5777": 2.7113357294239986, 
+          "frc5949": 3.5426532156153416, 
+          "frc6167": 13.727946902561007, 
+          "frc6222": 32.54945483800438, 
+          "frc6366": 6.387534783209651, 
+          "frc6626": 17.777609736426694, 
+          "frc6961": 10.411650448647647, 
+          "frc7072": 8.758073312132355, 
+          "frc7085": 9.767834622073755, 
+          "frc7107": 6.129542893613674, 
+          "frc7152": 18.681838877656034, 
+          "frc7409": 17.81441509456826, 
+          "frc7489": 2.1625824951617743, 
+          "frc86": 28.872728466104235, 
+          "frc900": 0.9126435164606009
+        }
+      }, 
+      "rocket_pieces_scored": {
+        "mean": {
+          "frc1051": 1.1687448492493884, 
+          "frc108": 1.9131288871557646, 
+          "frc1287": 1.2602445911221474, 
+          "frc1293": 0.6165853670361776, 
+          "frc1369": 0.23798627851980858, 
+          "frc1398": 0.19148867679423454, 
+          "frc1539": 1.1263259465309654, 
+          "frc1553": 0.3340249502150336, 
+          "frc1758": -0.7174201621864146, 
+          "frc1902": 2.464868370151337, 
+          "frc21": 0.11093308399889813, 
+          "frc2187": 0.3254528716682104, 
+          "frc2393": 2.691671589181839, 
+          "frc2614": 1.1768240402738408, 
+          "frc263": 2.523605767386763, 
+          "frc281": 0.7779187258485202, 
+          "frc2815": 0.6580740756636938, 
+          "frc283": 0.4093830253459473, 
+          "frc3140": 0.9765959670334022, 
+          "frc342": 2.6416864975606824, 
+          "frc3489": 1.3863276174854664, 
+          "frc3490": 2.3328918178410603, 
+          "frc3651": -0.31849586178407685, 
+          "frc379": 0.5845003119718596, 
+          "frc3824": 0.6660970104166198, 
+          "frc3976": 0.4180182204179419, 
+          "frc4005": 2.364124630274877, 
+          "frc4020": 3.2772654953136238, 
+          "frc4073": 0.6233573477289843, 
+          "frc4074": 0.05777956254151015, 
+          "frc4075": 0.6223979572561857, 
+          "frc4083": 0.057147883158251894, 
+          "frc4187": 0.06221816814093271, 
+          "frc4243": 0.017468345706413563, 
+          "frc4267": 0.910121577182875, 
+          "frc4451": 1.5286876018912012, 
+          "frc4504": 1.1923885902290041, 
+          "frc4582": 0.6273942438112275, 
+          "frc4748": -0.2595588047626398, 
+          "frc4823": -0.49129972888802687, 
+          "frc4847": 0.17144844218613653, 
+          "frc4965": 0.4029757911273225, 
+          "frc5022": 1.0876489120202752, 
+          "frc5063": 0.022841810020626116, 
+          "frc5130": 0.625664793185435, 
+          "frc5317": 0.5695004541302241, 
+          "frc5327": -0.18409132877883688, 
+          "frc5410": 0.3274317212697476, 
+          "frc5472": 1.4627636146468783, 
+          "frc5777": 0.3520394684291911, 
+          "frc5949": 1.4050337465787173, 
+          "frc6167": 0.7098238525724107, 
+          "frc6222": -0.06282503036845376, 
+          "frc6366": 1.9814231321962907, 
+          "frc6626": 1.4456708998958363, 
+          "frc6961": -0.07621034465234547, 
+          "frc7072": -0.5323423420311828, 
+          "frc7085": 1.0264251176313774, 
+          "frc7107": 0.8040098943552685, 
+          "frc7152": 0.8770919897718372, 
+          "frc7409": 0.045178266703999534, 
+          "frc7489": -0.11690121918699883, 
+          "frc86": 4.566990911810496, 
+          "frc900": 0.4442910999239691
+        }, 
+        "var": {
+          "frc1051": 5.651144004700822, 
+          "frc108": 3.982150451326933, 
+          "frc1287": 3.0699021978591405, 
+          "frc1293": 4.827708535859333, 
+          "frc1369": 2.079585139333112, 
+          "frc1398": 1.0953984613123513, 
+          "frc1539": 1.921258121614639, 
+          "frc1553": 0.060362088777952294, 
+          "frc1758": 0.642345985779443, 
+          "frc1902": 3.942088428084549, 
+          "frc21": 0.9051354292126405, 
+          "frc2187": 0.8992603000835168, 
+          "frc2393": 2.543761709151487, 
+          "frc2614": 6.3004982769860485, 
+          "frc263": 6.775457989278061, 
+          "frc281": 0.8012734056240169, 
+          "frc2815": 1.6732631754307694, 
+          "frc283": 1.9380288154988516, 
+          "frc3140": 3.2823575436817682, 
+          "frc342": 6.874575087713215, 
+          "frc3489": 3.490641890896584, 
+          "frc3490": 1.3941603212470493, 
+          "frc3651": 1.715041518799973, 
+          "frc379": 0.6264715340705058, 
+          "frc3824": 0.9184100096618797, 
+          "frc3976": 2.100568378582428, 
+          "frc4005": 5.32937972849215, 
+          "frc4020": 6.809452064582935, 
+          "frc4073": 1.5769367873423867, 
+          "frc4074": 0.5215913436509613, 
+          "frc4075": 3.5877729435053975, 
+          "frc4083": 2.2186630169242845, 
+          "frc4187": 1.2280222197404105, 
+          "frc4243": 0.8611607805329324, 
+          "frc4267": 7.04759554994659, 
+          "frc4451": 15.268753987864137, 
+          "frc4504": 6.57751304273562, 
+          "frc4582": 4.760495756419724, 
+          "frc4748": 1.6453805464621813, 
+          "frc4823": 1.831280454720749, 
+          "frc4847": 0.18476048425347624, 
+          "frc4965": 3.073360796041858, 
+          "frc5022": 0.985864382062614, 
+          "frc5063": 2.0522597110169007, 
+          "frc5130": 0.3427708681265389, 
+          "frc5317": 2.2469675803566953, 
+          "frc5327": 0.8797755394419241, 
+          "frc5410": 4.222089623398098, 
+          "frc5472": 3.9696869572269744, 
+          "frc5777": 0.9156870487196405, 
+          "frc5949": 1.056346129359534, 
+          "frc6167": 0.10529000346942652, 
+          "frc6222": 0.006469264514921802, 
+          "frc6366": 6.8903057030793295, 
+          "frc6626": 0.8545565737522746, 
+          "frc6961": 0.868863048666142, 
+          "frc7072": 0.1490554732363233, 
+          "frc7085": 1.835095997388398, 
+          "frc7107": 3.7473321808990865, 
+          "frc7152": 0.08231478107272516, 
+          "frc7409": 0.7809142724086494, 
+          "frc7489": 5.8141503789713385, 
+          "frc86": 11.603040217391397, 
+          "frc900": 1.3178824489555818
+        }
+      }, 
+      "score": {
+        "mean": {
+          "frc1051": 20.738536785174134, 
+          "frc108": 17.0250115481036, 
+          "frc1287": 17.61221932834667, 
+          "frc1293": 21.064299043137645, 
+          "frc1369": 16.801756382610453, 
+          "frc1398": 12.010662964246805, 
+          "frc1539": 12.460213745083243, 
+          "frc1553": 10.744172410312324, 
+          "frc1758": 5.389173517017304, 
+          "frc1902": 20.411994946626066, 
+          "frc21": 17.726064354945652, 
+          "frc2187": 11.177814991661474, 
+          "frc2393": 19.301355945800033, 
+          "frc2614": 13.54649922892524, 
+          "frc263": 15.00418387828451, 
+          "frc281": 17.34476715451953, 
+          "frc2815": 11.040100952194907, 
+          "frc283": 8.664890770173038, 
+          "frc3140": 13.739263078585566, 
+          "frc342": 20.295070754172556, 
+          "frc3489": 9.081315890213396, 
+          "frc3490": 18.55034265615, 
+          "frc3651": 7.234063944751513, 
+          "frc379": 22.71461377598451, 
+          "frc3824": 14.942412722524386, 
+          "frc3976": 12.112429974744549, 
+          "frc4005": 21.54047591189695, 
+          "frc4020": 23.992708812587136, 
+          "frc4073": 11.336544489072386, 
+          "frc4074": 7.704150998387884, 
+          "frc4075": 7.12109471399436, 
+          "frc4083": 6.105850314486348, 
+          "frc4187": 5.8474448766204805, 
+          "frc4243": 4.718216348800331, 
+          "frc4267": 6.716235724782615, 
+          "frc4451": 22.801523737764466, 
+          "frc4504": 13.232676036999969, 
+          "frc4582": 15.401610985689386, 
+          "frc4748": 11.004217944176775, 
+          "frc4823": 5.8238410773632365, 
+          "frc4847": 4.525643459132995, 
+          "frc4965": 17.60047932675626, 
+          "frc5022": 15.666059220263932, 
+          "frc5063": 5.871142770193991, 
+          "frc5130": 9.329788065373833, 
+          "frc5317": 13.251306874878177, 
+          "frc5327": 7.855479121466917, 
+          "frc5410": 8.8347914746903, 
+          "frc5472": 20.189850687446608, 
+          "frc5777": 6.030730543047035, 
+          "frc5949": 17.5190294956292, 
+          "frc6167": 10.095926369635286, 
+          "frc6222": 10.921014825858848, 
+          "frc6366": 14.002303510302067, 
+          "frc6626": 12.594804171957293, 
+          "frc6961": 6.259450431209899, 
+          "frc7072": 17.271490541651303, 
+          "frc7085": 12.22757698100742, 
+          "frc7107": 9.196387211468453, 
+          "frc7152": 18.859056925930588, 
+          "frc7409": 9.953218243956062, 
+          "frc7489": 8.53126582576046, 
+          "frc86": 21.688674644806905, 
+          "frc900": 8.860970278070782
+        }, 
+        "var": {
+          "frc1051": 214.60500983282836, 
+          "frc108": 97.5156624323207, 
+          "frc1287": 121.56305113213652, 
+          "frc1293": 207.92608814308488, 
+          "frc1369": 184.03427231138323, 
+          "frc1398": 165.57761142105198, 
+          "frc1539": 6.158924866439843, 
+          "frc1553": 8.06475230003811, 
+          "frc1758": 40.90159827392101, 
+          "frc1902": 149.53109305214957, 
+          "frc21": 162.650103445024, 
+          "frc2187": 82.63166901101619, 
+          "frc2393": 130.62094144604018, 
+          "frc2614": 114.8041180087255, 
+          "frc263": 155.68180887589818, 
+          "frc281": 101.57291165613186, 
+          "frc2815": 18.766389983278756, 
+          "frc283": 44.16563483420926, 
+          "frc3140": 165.57257883793628, 
+          "frc342": 122.27592859662118, 
+          "frc3489": 13.471871050566664, 
+          "frc3490": 144.46301962976378, 
+          "frc3651": 88.27253593862933, 
+          "frc379": 158.85266167019728, 
+          "frc3824": 61.73418521446278, 
+          "frc3976": 28.893535131190163, 
+          "frc4005": 205.1355765291607, 
+          "frc4020": 314.76812825166456, 
+          "frc4073": 166.40327773150796, 
+          "frc4074": 32.298866373330085, 
+          "frc4075": 33.53079664176272, 
+          "frc4083": 36.10073479726639, 
+          "frc4187": 40.38765300970802, 
+          "frc4243": 32.9028648705241, 
+          "frc4267": 35.797831119067304, 
+          "frc4451": 211.59931276545979, 
+          "frc4504": 70.49929523489423, 
+          "frc4582": 122.2086789169163, 
+          "frc4748": 134.38474976650627, 
+          "frc4823": 90.32279121059639, 
+          "frc4847": 84.23033387789275, 
+          "frc4965": 74.0449173514259, 
+          "frc5022": 187.42715859057492, 
+          "frc5063": 84.0747337735178, 
+          "frc5130": 95.76087102870652, 
+          "frc5317": 37.0560186203665, 
+          "frc5327": 52.608576342623095, 
+          "frc5410": 26.94039853904526, 
+          "frc5472": 101.53002418472644, 
+          "frc5777": 25.16932302276524, 
+          "frc5949": 91.07833878760565, 
+          "frc6167": 102.32336732975185, 
+          "frc6222": 63.258578010164705, 
+          "frc6366": 73.37865639766363, 
+          "frc6626": 103.90379478348486, 
+          "frc6961": 59.011429980908304, 
+          "frc7072": 79.55168228007422, 
+          "frc7085": 41.165095222392, 
+          "frc7107": 40.27855873173989, 
+          "frc7152": 152.0754110885327, 
+          "frc7409": 144.6123817985019, 
+          "frc7489": 64.62798831271314, 
+          "frc86": 284.73562200317014, 
+          "frc900": 98.64897451800309
+        }
+      }
+    }
+  }
+}

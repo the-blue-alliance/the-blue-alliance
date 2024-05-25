@@ -20,18 +20,20 @@ def test_organize_awards() -> None:
         award_type_enum=AwardType.WINNER,
         name_str="Winner",
     )
-    assert AwardHelper.organizeAwards([a1, a2, a3]) == [a2, a3, a1]
+    assert AwardHelper.organize_awards([a1, a2, a3]) == [a2, a3, a1]
 
 
 @pytest.mark.parametrize(
     "name,award_type",
     [
         ("Chairman's", AwardType.CHAIRMANS),
+        ("FIRST Impact Award", AwardType.CHAIRMANS),
         ("Chairman", AwardType.CHAIRMANS),
         ("Chairman's Award Finalist", AwardType.CHAIRMANS_FINALIST),
         ("Winner #1", AwardType.WINNER),
         ("Division Winner #2", AwardType.WINNER),
         ("Newton - Division Champion #3", AwardType.WINNER),
+        ("Championship Division Winner", AwardType.WINNER),
         ("Championship Winner #3", AwardType.WINNER),
         ("Championship Champion #4", AwardType.WINNER),
         ("Championship Champion", AwardType.WINNER),
@@ -86,6 +88,7 @@ def test_organize_awards() -> None:
             "Autodesk Award for Visualization - Rising Star",
             AwardType.VISUALIZATION_RISING_STAR,
         ),
+        ("Team Sustainability Award", AwardType.SUSTAINABILITY),
         ("Some Random Award Winner", None),
         ("Random Champion", None),
         ("An Award", None),

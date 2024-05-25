@@ -23,6 +23,7 @@ const EmbedDirectLink = (props) => {
         <RaisedButton
           href={directLink}
           target="_blank"
+          rel="noopener noreferrer"
           label="Open in new tab"
         />
       </CardActions>

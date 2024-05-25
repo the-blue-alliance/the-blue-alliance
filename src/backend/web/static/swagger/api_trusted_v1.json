@@ -1,0 +1,665 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "The Blue Alliance Trusted APIv1",
+    "description": "# Overview\nImport FIRST Robotics Competition Data to The Blue Alliance. The API is accessed through POST requests made to the endpoints described below. To simplify the removal of incorrect data, most endpoints must be called with the full dataset. For example, there is no endpoint to add a single award-- only to update all awards. It must be called with all awards, and the ones that are no longer present will be deleted. **The exception to this is the matches endpoint**, where there are separate endpoints to update and delete matches. Also, the **match videos endpoint** only allows the addition (and not the removal) of videos.\n# Authentication\nThe X-TBA-Auth-Id and X-TBA-Auth-Sig must be included as request headers in all requests.\n\n*auth_id*: ``  *auth_secret*: ``\n\n*X-TBA-Auth-Id*: `auth_id`  *X-TBA-Auth-Sig*: `md5_hexdigest()`\n\nFor example, an X-TBA-Auth-Sig may look like `md5_hexdigest(ExqeZK3Gbo9v95YnqmsiADzESo9HNgyhIOYSMyRpqJqYv13EazNRaDIPPJuOXrQp/api/trusted/v1/event/2014casj/matches/delete[\"qm1\"])`\n\nWhich, after hashing, becomes: `ca5c3e5c1b0e7132e4af13f805eca0be`",
+    "version": "3.1"
+  },
+  "security": [
+    {
+      "authId": []
+    },
+    {
+      "authSig": []
+    }
+  ],
+  "paths": {
+    "/event/{eventKey}/info/update": {
+      "post": {
+        "tags": [
+          "Event Details"
+        ],
+        "summary": "Update top-level properties for the event",
+        "description": "An endpoint to overwrite certain event fields",
+        "operationId": "updateEventInfo",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventInfo"
+              }
+            }
+          },
+          "description": "A JSON dictionary, mapping property name to the new value.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/alliance_selections/update": {
+      "post": {
+        "tags": [
+          "Event Alliances"
+        ],
+        "summary": "Update the alliance selections at an event",
+        "description": "Overwrite the event's alliance selections.",
+        "operationId": "updateAlliances",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AllianceList"
+              }
+            }
+          },
+          "description": "A list of alliances, in order of alliance number. An alliance is a list of team keys, in order of selection. An alliance can have an arbitrary number of teams (provided that all alliances have the same number of teams).",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/awards/update": {
+      "post": {
+        "tags": [
+          "Event Awards"
+        ],
+        "summary": "Update the award listing at an event",
+        "description": "Overwrite the event's award listing.",
+        "operationId": "updateAwards",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Award"
+                }
+              }
+            }
+          },
+          "description": "List of awards. An award is a dict of:\n\n*name_str*: String of award name. ex: \"Tournament Winner\" or \"Dean's List Finalist\"  *team_key*: String in the format `frcXXX` for the team that won the award. Can be null.  *awardee*: String corresponding to the name of an individual that won the award. Can be null.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/matches/update": {
+      "post": {
+        "tags": [
+          "Event Matches"
+        ],
+        "summary": "Update matches at an event",
+        "description": "Add/Update one or more matches under an event.",
+        "operationId": "updateMatches",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Match"
+                }
+              }
+            }
+          },
+          "description": "List of matches",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/matches/delete": {
+      "post": {
+        "tags": [
+          "Event Matches"
+        ],
+        "summary": "Delete matches at an event",
+        "description": "Delete one or more matches under an event.",
+        "operationId": "deleteMatches",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Partial key (not including the event portion) of the match to delete",
+                  "example": "qm1"
+                }
+              }
+            }
+          },
+          "description": "List of match keys",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/rankings/update": {
+      "post": {
+        "tags": [
+          "Event Rankings"
+        ],
+        "summary": "Update team rankings at an event",
+        "description": "Update rankings at an event",
+        "operationId": "updateRankings",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "breakdowns",
+                  "rankings"
+                ],
+                "properties": {
+                  "breakdowns": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "A ranking breakdown title. Breakdowns will be shown in the order given",
+                      "example": "Qual Score"
+                    }
+                  },
+                  "rankings": {
+                    "type": "array",
+                    "description": "List of dicts describing ranking data. In addition to the properties given, there should be one K/V pair for each item in the `breakdown` section (to pass game-specific ranking elements)",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "team_key": {
+                          "type": "string",
+                          "description": "Team key, like `frcXXXX` where `XXXX` is the team number",
+                          "example": "frc254"
+                        },
+                        "rank": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "Integer rank of this team",
+                          "example": 1
+                        },
+                        "wins": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "Number of non-surrogate wins",
+                          "example": 4
+                        },
+                        "losses": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "Number of non-surrogate losses",
+                          "example": 1
+                        },
+                        "ties": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "Number of non-surrogate ties",
+                          "example": 0
+                        },
+                        "played": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "Number of matches played",
+                          "example": 5
+                        },
+                        "dqs": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "Number of non-surrogate DQ'd matches",
+                          "example": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": "A dict of `breakdowns` and `rankings",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/team_list/update": {
+      "post": {
+        "tags": [
+          "Team List"
+        ],
+        "summary": "Update the list of teams attending an event",
+        "description": "Replaces the list of teams attending",
+        "operationId": "updateTeamList",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Team key, like `frcXXXX` where `XXXX` is the team number",
+                  "example": "frc254"
+                }
+              }
+            }
+          },
+          "description": "List of team keys",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/match_videos/add": {
+      "post": {
+        "tags": [
+          "Match Videos"
+        ],
+        "summary": "Add match videos",
+        "description": "Link YouTube videos to a match",
+        "operationId": "updateMatchVideos",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "example": {
+                  "qm1": "aFZy8iibMD0",
+                  "sf1m1": "RpSgUrsghv4"
+                }
+              }
+            }
+          },
+          "description": "Dict of {key: partial match key, value: youtube video id}",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/media/add": {
+      "post": {
+        "tags": [
+          "Event Media"
+        ],
+        "summary": "Add event videos",
+        "description": "Link YouTube videos to an event",
+        "operationId": "updateEventMedia",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "aFZy8iibMD0"
+                }
+              }
+            }
+          },
+          "description": "List of YouTube video IDs to add",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://www.thebluealliance.com/api/trusted/v1"
+    }
+  ],
+  "components": {
+    "parameters": {
+      "eventKeyParam": {
+        "name": "eventKey",
+        "in": "path",
+        "description": "TBA event key to update. For example, 2017cthar",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "successResponse": {
+        "description": "The operation completed successfully"
+      },
+      "invalidHeadersResponse": {
+        "description": "One or both of `X-TBA-Auth-ID` `X-TBA-Auth-Sig` were missing"
+      },
+      "invalidSigResponse": {
+        "description": "One or both of `X-TBA-Auth-ID` `X-TBA-Auth-Sig` were invalid"
+      }
+    },
+    "securitySchemes": {
+      "authId": {
+        "type": "apiKey",
+        "description": "An identifier given to you by the TBA Admins",
+        "in": "header",
+        "name": "X-TBA-Auth-Id"
+      },
+      "authSig": {
+        "type": "apiKey",
+        "in": "header",
+        "description": "The MD5 digest computed from the concatenation of",
+        "name": "X-TBA-Auth-Sig"
+      }
+    },
+    "schemas": {
+      "AllianceList": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "A team key, in the format `frcXXXX` where `XXXX` is the team number. For example, team 254's key would be `frc254`.",
+            "example": "frc254"
+          }
+        }
+      },
+      "Award": {
+        "type": "object",
+        "required": [
+          "name_str"
+        ],
+        "properties": {
+          "type_enum": {
+            "type": "integer",
+            "description": "Type enum of the award. If null, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/award_type.py",
+            "example": "1"
+          },
+          "name_str": {
+            "type": "string",
+            "description": "Name of the award",
+            "example": "Regional Winner"
+          },
+          "team_key": {
+            "type": "string",
+            "description": "Key of the team winning this award. Formatted like `frcXXXX` where `XXXX` is the team number. Can be null",
+            "example": "frc254"
+          },
+          "awardee": {
+            "type": "string",
+            "description": "Name of the individual winning this award. Can be null",
+            "example": "Bob Bobby"
+          }
+        }
+      },
+      "EventInfo": {
+        "type": "object",
+        "properties": {
+          "first_code": {
+            "type": "string",
+            "description": "Event code used to sync data with FIRST",
+            "example": "IRI"
+          },
+          "playoff_type": {
+            "type": "integer",
+            "description": "Integer constant representing the playoff format. References constants here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py",
+            "example": "0"
+          },
+          "webcasts": {
+            "type": "array",
+            "description": "A list of webcast URLs to set for this event. This will overwrite the existing webcast list",
+            "items": {
+              "type": "object",
+              "description": "A webcast object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "A webcast url",
+                  "example": "https://youtu.be/abc123"
+                }
+              }
+            }
+          }
+        }
+      },
+      "MatchAlliance": {
+        "type": "object",
+        "required": [
+          "teams",
+          "score"
+        ],
+        "properties": {
+          "teams": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Key of a team on the alliance, in the format `frcXXXX` where `XXXX` is the team number",
+              "example": "frc254"
+            }
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Score of the match. Null means the match has not been played",
+            "example": 10
+          },
+          "surrogates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Key of a surrogate team on the alliance, in the format `frcXXXX` where `XXXX` is the team number",
+              "example": "frc254"
+            }
+          },
+          "dqs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Key of a disqualified team on the alliance, in the format `frcXXXX` where `XXXX` is the team number",
+              "example": "frc254"
+            }
+          }
+        }
+      },
+      "Match": {
+        "type": "object",
+        "required": [
+          "comp_level",
+          "match_number",
+          "set_number",
+          "alliances"
+        ],
+        "properties": {
+          "comp_level": {
+            "type": "string",
+            "enum": [
+              "qm",
+              "ef",
+              "qf",
+              "sf",
+              "f"
+            ],
+            "description": "Competition level of the match",
+            "example": "qm"
+          },
+          "set_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "description": "Set number of the match",
+            "example": 1
+          },
+          "match_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "description": "Number of the match in the current set",
+            "example": 1
+          },
+          "alliances": {
+            "type": "object",
+            "description": "Competing teams and score info for this match",
+            "required": [
+              "red",
+              "blue"
+            ],
+            "properties": {
+              "red": {
+                "$ref": "#/components/schemas/MatchAlliance"
+              },
+              "blue": {
+                "$ref": "#/components/schemas/MatchAlliance"
+              }
+            }
+          },
+          "score_breakdown": {
+            "type": "string",
+            "description": "Dict of {'red': {K1: V1, K2: V2, ...}, 'blue': {...}}. Where Kn are keys and Vn are values for those keys. Valid keys Kn vary by year. For 2014, valid keys are: 'auto', 'assist', 'truss+catch', 'teleop_goal+foul'.",
+            "example": "{ \"red\": { \"auto\": 20, \"assist\": 40, \"truss+catch\": 20, \"teleop_goal+foul\": 20 }, \"blue\": { \"auto\": 40, \"assist\": 60, \"truss+catch\": 10, \"teleop_goal+foul\": 40 } }"
+          },
+          "time_str": {
+            "type": "string",
+            "description": "String in the format \"(H)H:MM AM/PM\" for when the match will be played in the event's local timezone",
+            "example": "9:15 AM"
+          },
+          "time_utc": {
+            "type": "string",
+            "description": "UTC time of match in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
+            "example": "2008-01-02T10:30:00.000Z"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "The name for the match, to be shown on the event page",
+            "example": "Quals 10"
+          }
+        }
+      }
+    }
+  }
+}

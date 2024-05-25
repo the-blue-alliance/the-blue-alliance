@@ -1,0 +1,37 @@
+{
+  "address": "457 Bound Line Rd, Wolcott, CT 06716, USA",
+  "city": "Wolcott",
+  "country": "USA",
+  "district": null,
+  "division_keys": [],
+  "end_date": "2017-06-10",
+  "event_code": "wiwi",
+  "event_type": 99,
+  "event_type_string": "Offseason",
+  "first_event_code": null,
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJ9Wmdlsa454kRREq84_MfAAM",
+  "gmaps_url": "https://maps.google.com/?cid=216207914472065604",
+  "key": "2017wiwi",
+  "lat": 41.60704190000001,
+  "lng": -72.9795493,
+  "location_name": "Wolcott High School",
+  "name": "Where is Wolcott Invitational",
+  "parent_event_key": null,
+  "playoff_type": 5,
+  "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+  "postal_code": "06716",
+  "short_name": "Where is Wolcott",
+  "start_date": "2017-06-10",
+  "state_prov": "CT",
+  "timezone": "America/New_York",
+  "webcasts": [
+    {
+      "channel": "teammax1071",
+      "type": "twitch"
+    }
+  ],
+  "website": "http://max1071.com/wiwi/",
+  "week": null,
+  "year": 2017
+}

@@ -1,22 +1,23 @@
+import "./eventwizard.less";
+
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk";
 import EventWizardFrame from "./components/EventWizardFrame";
 import eventwizardReducer from "./reducers";
 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
   eventwizardReducer,
-  compose(
-    applyMiddleware(thunk),
-    window.devToolsExtension ? window.devToolsExtension() : (f) => f
-  )
+  composeEnhancers(applyMiddleware(thunk))
 );
 
-ReactDOM.render(
+const container = document.getElementById("content");
+const root = createRoot(container);
+root.render(
   <Provider store={store}>
     <EventWizardFrame />
-  </Provider>,
-  document.getElementById("content")
+  </Provider>
 );

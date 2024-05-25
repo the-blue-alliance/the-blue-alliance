@@ -1,9 +1,9 @@
-from typing import Dict, Optional, Set
+from typing import Any, Dict, Optional, Set
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 
-TAffectedReferences = Dict[str, Set[ndb.Key]]
+TAffectedReferences = Dict[str, Set[Any]]
 
 
 class CachedModel(ndb.Model):

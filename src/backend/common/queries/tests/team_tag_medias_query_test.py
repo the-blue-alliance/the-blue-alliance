@@ -1,4 +1,4 @@
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.media_tag import MediaTag
 from backend.common.consts.media_type import MediaType

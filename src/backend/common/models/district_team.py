@@ -1,6 +1,6 @@
 from typing import Set
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
@@ -12,15 +12,10 @@ class DistrictTeam(CachedModel):
     """
     DistrictTeam represents the "home district" for a team in a year
     key_name is like <year><district_short>_<team_key> (e.g. 2015ne_frc1124)
-    district_short is one of DistrictType.type_abbrevs
     """
 
     team = ndb.KeyProperty(kind=Team)
     year: Year = ndb.IntegerProperty()
-    # One of DistrictType constants, DEPRECATED, use district_key
-    # district = (
-    #    ndb.IntegerProperty()
-    # )
     district_key = ndb.KeyProperty(kind=District)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
@@ -42,7 +37,7 @@ class DistrictTeam(CachedModel):
 
     @property
     def key_name(self) -> DistrictTeamKey:
-        return self.renderKeyName(self.district_key.id(), self.team.id())
+        return self.render_key_name(self.district_key.id(), self.team.id())
 
     @classmethod
     def validate_key_name(cls, key: str) -> bool:
@@ -54,5 +49,5 @@ class DistrictTeam(CachedModel):
         )
 
     @classmethod
-    def renderKeyName(self, districtKey: DistrictKey, teamKey: TeamKey):
-        return "{}_{}".format(districtKey, teamKey)
+    def render_key_name(self, district_key: DistrictKey, team_key: TeamKey):
+        return "{}_{}".format(district_key, team_key)

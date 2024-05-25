@@ -1,4 +1,4 @@
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
@@ -11,6 +11,7 @@ def preseed_district_team(team_number: TeamNumber, district_key: DistrictKey) ->
     District(
         id=district_key,
         year=int(district_key[:4]),
+        abbreviation=district_key[4:],
     ).put()
 
     DistrictTeam(

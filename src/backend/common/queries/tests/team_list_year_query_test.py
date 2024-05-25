@@ -1,12 +1,12 @@
 from typing import List, Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import Year
 from backend.common.models.team import Team
-from backend.common.queries.team_query import TeamListQuery, TeamListYearQuery
+from backend.common.queries.team_query import TeamListYearQuery
 
 
 def preseed_teams(start_team: int, end_team: Optional[int] = None) -> List[ndb.Key]:
@@ -70,20 +70,3 @@ def test_with_event_teams_wrong_page() -> None:
 
     teams = TeamListYearQuery(year=2020, page=10).fetch()
     assert teams == []
-
-
-def test_affected_queries() -> None:
-    stored_teams = preseed_teams(1, 10)
-    preseed_event_teams(stored_teams, 2020)
-
-    for team_key in stored_teams:
-        assert {
-            q.cache_key
-            for q in TeamListYearQuery._eventteam_affected_queries(
-                event_key="2020test", team_key=team_key.id(), year=2020
-            )
-        } == {TeamListYearQuery(year=2020, page=0).cache_key}
-        assert {
-            q.cache_key
-            for q in TeamListYearQuery._team_affected_queries(team_key=team_key.id())
-        } == {TeamListQuery(page=0).cache_key}

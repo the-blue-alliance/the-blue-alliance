@@ -1,11 +1,19 @@
-from typing import Dict, List
+from typing import Dict, List, TypedDict
 
-from typing_extensions import TypedDict
-
-from backend.common.models.keys import TeamKey
+from backend.common.models.keys import EventKey, TeamKey
 
 
-class TeamAtEventDistrictPoints(TypedDict):
+class _TeamAtEventDistrictPointsOptional(TypedDict, total=False):
+    """
+    DistrictHelper's calulation code does not set these, they're added
+    in elsewhere.
+    """
+
+    event_key: EventKey
+    district_cmp: bool
+
+
+class TeamAtEventDistrictPoints(_TeamAtEventDistrictPointsOptional):
     qual_points: int
     elim_points: int
     alliance_points: int

@@ -11,7 +11,7 @@ class CountWrapper extends React.PureComponent {
     };
   }
 
-  componentWillUpdate(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps) {
     this.setState({
       start: this.state.end,
       end: nextProps.number,

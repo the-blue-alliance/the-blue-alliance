@@ -1,15 +1,26 @@
 {
   "source_directories": [
+    "ops",
     "src"
   ],
   "search_path": [
+    "ops/pr_screenshots",
     "stubs",
-    {"site-package": "InMemoryCloudDatastoreStub"},
-    {"site-package": "google/cloud/datastore_v1"},
-    {"site-package": "numpy"},
+    {"site-package": "firebase_admin"},
+    {"site-package": "flask"},
+    {"site-package": "flask_caching"},
+    {"site-package": "flask_cors"},
     {"site-package": "freezegun"},
-    {"site-package": "requests_mock"},
+    {"site-package": "google/appengine"},
+    {"site-package": "google/auth"},
+    {"site-package": "google/cloud/storage"},
+    {"site-package": "jinja2"},
+    {"site-package": "markupsafe"},
+    {"site-package": "numpy"},
     {"site-package": "pytest"},
-    {"site-package": "_pytest"}
+    {"site-package": "_pytest"},
+    {"site-package": "pyre_extensions"},
+    {"site-package": "requests_mock"},
+    {"site-package": "werkzeug"}
   ]
 }

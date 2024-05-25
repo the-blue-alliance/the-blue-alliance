@@ -1,7 +1,7 @@
 import re
 from typing import List, Set
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
 
 from backend.common.models.cached_model import CachedModel
@@ -16,8 +16,8 @@ class District(CachedModel):
     (like district rankings)
     """
 
-    year: Year = ndb.IntegerProperty()
-    abbreviation = ndb.StringProperty()
+    year: Year = ndb.IntegerProperty(required=True)
+    abbreviation = ndb.StringProperty(required=True)
     # This is what we'll show on the TBA site
     display_name = ndb.StringProperty()
     # These names are in the event's name as returned by FRC Elasticsearch
@@ -67,7 +67,7 @@ class District(CachedModel):
         return True if match else False
 
     @classmethod
-    def renderKeyName(
+    def render_key_name(
         cls, year: Year, district_abbrev: DistrictAbbreviation
     ) -> DistrictKey:
         # Like 2016ne or 2016fim

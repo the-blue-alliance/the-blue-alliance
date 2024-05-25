@@ -4,20 +4,42 @@ import enum
 from typing import Dict, Set, Tuple
 
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.string_enum import StrEnum
 
 
 @enum.unique
-class DoubleElimBracket(str, enum.Enum):
+class LegacyDoubleElimBracket(StrEnum):
     WINNER = "winner"
     LOSER = "loser"
 
 
 @enum.unique
+class DoubleElimRound(StrEnum):
+    ROUND1 = "Round 1"
+    ROUND2 = "Round 2"
+    ROUND3 = "Round 3"
+    ROUND4 = "Round 4"
+    ROUND5 = "Round 5"
+    FINALS = "Finals"
+
+
+ORDERED_DOUBLE_ELIM_ROUNDS = [
+    DoubleElimRound.ROUND1,
+    DoubleElimRound.ROUND2,
+    DoubleElimRound.ROUND3,
+    DoubleElimRound.ROUND4,
+    DoubleElimRound.ROUND5,
+    DoubleElimRound.FINALS,
+]
+
+
+@enum.unique
 class PlayoffType(enum.IntEnum):
     # Standard Brackets
-    BRACKET_8_TEAM = 0
     BRACKET_16_TEAM = 1
+    BRACKET_8_TEAM = 0
     BRACKET_4_TEAM = 2
+    BRACKET_2_TEAM = 9
 
     # 2015 is special
     AVG_SCORE_8_TEAM = 3
@@ -26,7 +48,14 @@ class PlayoffType(enum.IntEnum):
     ROUND_ROBIN_6_TEAM = 4
 
     # Double Elimination Bracket
-    DOUBLE_ELIM_8_TEAM = 5
+    # The legacy style is just a basic internet bracket
+    # https://www.printyourbrackets.com/fillable-brackets/8-seeded-double-fillable.pdf
+    LEGACY_DOUBLE_ELIM_8_TEAM = 5
+    # The "regular" style is the one that FIRST plans to trial for the 2023 season
+    # https://www.firstinspires.org/robotics/frc/blog/2022-timeout-and-playoff-tournament-updates
+    DOUBLE_ELIM_8_TEAM = 10
+    # The bracket used for districts with four divisions
+    DOUBLE_ELIM_4_TEAM = 11
 
     # Festival of Champions
     BO5_FINALS = 6
@@ -37,28 +66,49 @@ class PlayoffType(enum.IntEnum):
 
 
 BRACKET_TYPES: Set[PlayoffType] = {
+    PlayoffType.BRACKET_2_TEAM,
+    PlayoffType.BRACKET_4_TEAM,
     PlayoffType.BRACKET_8_TEAM,
     PlayoffType.BRACKET_16_TEAM,
-    PlayoffType.BRACKET_4_TEAM,
 }
 
 
 DOUBLE_ELIM_TYPES: Set[PlayoffType] = {
     PlayoffType.DOUBLE_ELIM_8_TEAM,
+    PlayoffType.DOUBLE_ELIM_4_TEAM,
+    PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM,
 }
 
 
 # Names for Rendering
 TYPE_NAMES: Dict[PlayoffType, str] = {
+    PlayoffType.BRACKET_16_TEAM: "Elimination Bracket (16 Alliances)",
     PlayoffType.BRACKET_8_TEAM: "Elimination Bracket (8 Alliances)",
     PlayoffType.BRACKET_4_TEAM: "Elimination Bracket (4 Alliances)",
-    PlayoffType.BRACKET_16_TEAM: "Elimination Bracket (16 Alliances)",
+    PlayoffType.BRACKET_2_TEAM: "Elimination Bracket (2 Alliances)",
     PlayoffType.AVG_SCORE_8_TEAM: "Average Score (8 Alliances)",
     PlayoffType.ROUND_ROBIN_6_TEAM: "Round Robin (6 Alliances)",
     PlayoffType.DOUBLE_ELIM_8_TEAM: "Double Elimination Bracket (8 Alliances)",
+    PlayoffType.DOUBLE_ELIM_4_TEAM: "Double Elimination Bracket (4 Alliances)",
+    PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM: "Legacy Double Elimination Bracket (8 Alliances)",
     PlayoffType.BO3_FINALS: "Best of 3 Finals",
     PlayoffType.BO5_FINALS: "Best of 5 Finals",
     PlayoffType.CUSTOM: "Custom",
+}
+
+API_TYPE_NAMES: Dict[PlayoffType, str] = {
+    PlayoffType.BRACKET_16_TEAM: "best_of_3",
+    PlayoffType.BRACKET_8_TEAM: "best_of_3",
+    PlayoffType.BRACKET_4_TEAM: "best_of_3",
+    PlayoffType.BRACKET_2_TEAM: "best_of_3",
+    PlayoffType.BO3_FINALS: "best_of_3",
+    PlayoffType.BO5_FINALS: "best_of_5",
+    PlayoffType.AVG_SCORE_8_TEAM: "avg_score",
+    PlayoffType.ROUND_ROBIN_6_TEAM: "round_robin",
+    PlayoffType.DOUBLE_ELIM_8_TEAM: "double_elim",
+    PlayoffType.DOUBLE_ELIM_4_TEAM: "double_elim",
+    PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM: "double_elim",
+    PlayoffType.CUSTOM: "custom",
 }
 
 
@@ -148,7 +198,7 @@ BRACKET_OCTO_ELIM_MAPPING: Dict[int, Tuple[int, int]] = {
 # Map match number -> set/match for a 8 alliance double elim bracket
 # Based off: https://www.printyourbrackets.com/fillable-brackets/8-seeded-double-fillable.pdf
 # Matches 1-6 are ef, 7-10 are qf, 11/12 are sf, 13 is f1, and 14/15 are f2
-DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+LEGACY_DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     # octofinals (winners bracket)
     1: (CompLevel.EF, 1, 1),
     2: (CompLevel.EF, 2, 1),
@@ -172,4 +222,63 @@ DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     # overall finals (winners bracket)
     14: (CompLevel.F, 2, 1),
     15: (CompLevel.F, 2, 2),
+}
+
+
+# Map a match number -> set/match for FIRST's 8 alliance double elim bracket
+# Based off: https://firstfrc.blob.core.windows.net/frc2023/Manual/2023FRCGameManual.pdf
+# We consider everything before finals as "semi-finals" to match FIRST's match numbering.
+DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+    # round 1
+    1: (CompLevel.SF, 1, 1),
+    2: (CompLevel.SF, 2, 1),
+    3: (CompLevel.SF, 3, 1),
+    4: (CompLevel.SF, 4, 1),
+    # round 2
+    5: (CompLevel.SF, 5, 1),
+    6: (CompLevel.SF, 6, 1),
+    7: (CompLevel.SF, 7, 1),
+    8: (CompLevel.SF, 8, 1),
+    # round 3
+    9: (CompLevel.SF, 9, 1),
+    10: (CompLevel.SF, 10, 1),
+    # round 4
+    11: (CompLevel.SF, 11, 1),
+    12: (CompLevel.SF, 12, 1),
+    # round 5
+    13: (CompLevel.SF, 13, 1),
+    # finals
+    14: (CompLevel.F, 1, 1),
+    15: (CompLevel.F, 1, 2),
+    16: (CompLevel.F, 1, 3),
+    17: (CompLevel.F, 1, 4),  # Overtime 1
+    18: (CompLevel.F, 1, 5),  # Overtime 2
+    19: (CompLevel.F, 1, 6),  # Overtime 3
+}
+
+DOUBLE_ELIM_4_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+    # round 1
+    1: (CompLevel.SF, 1, 1),
+    2: (CompLevel.SF, 2, 1),
+    # round 2
+    3: (CompLevel.SF, 3, 1),
+    4: (CompLevel.SF, 4, 1),
+    # round 3
+    5: (CompLevel.SF, 5, 1),
+    # finals
+    6: (CompLevel.F, 1, 1),
+    7: (CompLevel.F, 1, 2),
+    8: (CompLevel.F, 1, 3),
+    9: (CompLevel.F, 1, 4),  # Overtime 1
+    10: (CompLevel.F, 1, 5),  # Overtime 2
+    11: (CompLevel.F, 1, 6),  # Overtime 3
+}
+
+DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
+    v: k for k, v in DOUBLE_ELIM_MAPPING.items()
+}
+
+
+DOUBLE_ELIM_4_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
+    v: k for k, v in DOUBLE_ELIM_4_MAPPING.items()
 }

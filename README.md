@@ -11,7 +11,7 @@ The Blue Alliance is a community-driven website, so there are many ways you can 
 
 ### Contribute Code
 
-First off, be sure to read through the project [contributing guidelines](docs/CONTRIBUTING.md) to understand what is expected of project contributors. Follow [these instructions](docs/dev-container.md) to get your environment up and running. Once you have made your changes, submit a pull request to get it reviewed and merged!
+First off, be sure to read through the project [contributing guidelines](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Contributing) to understand what is expected of project contributors. Follow [these instructions](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Setup-Guide) to get your environment up and running. Once you have made your changes, submit a pull request to get it reviewed and merged!
 
 ### Add Data
 

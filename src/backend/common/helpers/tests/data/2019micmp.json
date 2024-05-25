@@ -1,0 +1,48 @@
+{
+  "address": "7400 Bay Rd, University Center, MI 48710, USA", 
+  "city": "University Center", 
+  "country": "USA", 
+  "district": {
+    "abbreviation": "fim", 
+    "display_name": "FIRST In Michigan", 
+    "key": "2019fim", 
+    "year": 2019
+  }, 
+  "division_keys": [
+    "2019micmp1", 
+    "2019micmp2", 
+    "2019micmp3", 
+    "2019micmp4"
+  ], 
+  "end_date": "2019-04-13", 
+  "event_code": "micmp", 
+  "event_type": 2, 
+  "event_type_string": "District Championship", 
+  "first_event_code": "MICMP", 
+  "first_event_id": null, 
+  "gmaps_place_id": "ChIJP-WmCAbdI4gRDHBqkqY4ycc", 
+  "gmaps_url": "https://maps.google.com/?cid=14396099971938676748", 
+  "key": "2019micmp", 
+  "lat": 43.51427329999999, 
+  "lng": -83.9623559, 
+  "location_name": "Saginaw Valley State University", 
+  "name": "Michigan State Championship", 
+  "parent_event_key": null, 
+  "playoff_type": 2, 
+  "playoff_type_string": "Elimination Bracket (4 Alliances)", 
+  "postal_code": "48710", 
+  "short_name": "Michigan", 
+  "start_date": "2019-04-13", 
+  "state_prov": "MI", 
+  "timezone": "America/Detroit", 
+  "webcasts": [
+    {
+      "channel": "http://www.espn.com/watch/_/id/3507722/first-in-michigan-robotics-district-event-playoff", 
+      "date": "2019-04-13", 
+      "type": "direct_link"
+    }
+  ], 
+  "website": "http://www.firstinmichigan.org", 
+  "week": 6, 
+  "year": 2019
+}

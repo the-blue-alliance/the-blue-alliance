@@ -1,0 +1,7 @@
+# flask-caching
+
+A forked version of [`flask-caching`](https://github.com/pallets-eco/flask-caching) which support dynamic cache timeouts.
+
+The wheel is built from: https://github.com/phil-lopreiato/flask-caching/tree/dynamic-timeouts
+
+And this can be removed once https://github.com/pallets-eco/flask-caching/pull/296 is merged and releated

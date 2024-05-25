@@ -4,10 +4,10 @@ import datetime
 import json
 import re
 import typing
-from typing import Dict, Generator, List, Optional, Set, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Set, Tuple
 
-from google.cloud import ndb
-from pyre_extensions import none_throws, safe_cast
+from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts import event_type
 from backend.common.consts.event_type import EventType
@@ -18,6 +18,11 @@ from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_playoff_advancement import (
+    TBracketTable,
+    TPlayoffAdvancement,
+)
+from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast
@@ -35,6 +40,34 @@ class Event(CachedModel):
     key_name is like '2010ct'
     """
 
+    EVENT_SHORT_EXCEPTIONS = {
+        "arc": "archimedes",
+        "cars": "carson",
+        "carv": "carver",
+        "cur": "curie",
+        "dal": "daly",
+        "dar": "darwin",
+        "gal": "galileo",
+        "hop": "hopper",
+        "new": "newton",
+        "roe": "roebling",
+        "tes": "tesla",
+        "tur": "turing",
+        "joh": "johnson",
+        "mil": "milstein",
+    }
+
+    EVENT_SHORT_EXCEPTIONS_2023 = {
+        "arc": "arpky",
+        "cur": "cpra",
+        "dal": "dcmp",
+        "gal": "gcmp",
+        "hop": "hcmp",
+        "joh": "jcmp",
+        "mil": "mpcia",
+        "new": "npfcmp",
+    }
+
     name = ndb.StringProperty()
     event_type_enum = ndb.IntegerProperty(required=True, choices=list(EventType))
 
@@ -47,11 +80,10 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # Event code used in FIRST's API, if different from event_short
     year: Year = ndb.IntegerProperty(required=True)
-    # event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
     district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
-    playoff_type: PlayoffType = safe_cast(
+    playoff_type: PlayoffType = cast(
         PlayoffType, ndb.IntegerProperty(choices=list(PlayoffType))
     )
 
@@ -67,7 +99,7 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
-    normalized_location: Location = safe_cast(
+    normalized_location: Optional[Location] = cast(
         Location, ndb.StructuredProperty(Location)
     )
 
@@ -76,9 +108,9 @@ class Event(CachedModel):
     )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official: bool = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
-    parent_event: Optional[
-        ndb.Key
-    ] = ndb.KeyProperty()  # This is the division -> event champs relationship
+    parent_event: Optional[ndb.Key] = (
+        ndb.KeyProperty()
+    )  # This is the division -> event champs relationship
     # event champs -> all divisions
     divisions: List[ndb.Key] = ndb.KeyProperty(repeated=True)  # pyre-ignore[8]
     facebook_eid = ndb.TextProperty(indexed=False)  # from Facebook
@@ -88,9 +120,9 @@ class Event(CachedModel):
         indexed=False
     )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
-    remap_teams: Dict[
-        str, str
-    ] = ndb.JsonProperty()  # Map of temporary team numbers to pre-rookie and B teams
+    remap_teams: Dict[str, str] = (
+        ndb.JsonProperty()
+    )  # Map of temporary team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -99,7 +131,6 @@ class Event(CachedModel):
         "end_date",
         "event_short",
         "event_type_enum",
-        "event_district_enum",
         "district_key",
         "custom_hashtag",
         "enable_predictions",
@@ -150,7 +181,7 @@ class Event(CachedModel):
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
-    def get_awards_async(self) -> TypedFuture[List["Award"]]:
+    def get_awards_async(self) -> Generator[Any, Any, List["Award"]]:
         if self._awards is None:
             from backend.common.queries import award_query
 
@@ -176,6 +207,10 @@ class Event(CachedModel):
         for alliance in alliances:
             for pick in alliance["picks"]:
                 teams.append(pick)
+
+            backup = alliance.get("backup")
+            if backup is not None:
+                teams.append(backup["in"])
         return teams
 
     @property
@@ -190,7 +225,7 @@ class Event(CachedModel):
             self.prep_details()
         if not none_throws(self._details).done():
             none_throws(self._details).wait()
-        return none_throws(self._details).result()
+        return none_throws(self._details).get_result()
 
     def prep_details(self) -> None:
         if self._details is None:
@@ -204,7 +239,7 @@ class Event(CachedModel):
             return self.details.district_points
 
     @property
-    def playoff_advancement(self) -> Optional[Dict]:  # TODO type this
+    def playoff_advancement(self) -> Optional[TPlayoffAdvancement]:
         if self.details is None:
             return None
         else:
@@ -215,7 +250,7 @@ class Event(CachedModel):
             )
 
     @property
-    def playoff_bracket(self) -> Optional[Dict]:  # TODO type this
+    def playoff_bracket(self) -> Optional[TBracketTable]:
         if self.details is None:
             return None
         else:
@@ -226,7 +261,7 @@ class Event(CachedModel):
             )
 
     @ndb.tasklet
-    def get_matches_async(self) -> TypedFuture[List["Match"]]:
+    def get_matches_async(self) -> Generator[Any, Any, List["Match"]]:
         if self._matches is None:
             from backend.common.queries import match_query
 
@@ -335,8 +370,8 @@ class Event(CachedModel):
             return self._week
 
         # Cache week_start for the same context
-        ndb_context = ndb.get_context()
-        context_cache = ndb_context.cache
+        from backend.common.context_cache import context_cache
+
         cache_key = "{}_season_start".format(self.year)
         season_start = context_cache.get(cache_key)
         if season_start is None:
@@ -369,7 +404,7 @@ class Event(CachedModel):
                 )
             else:
                 season_start = None
-            context_cache[cache_key] = season_start
+            context_cache.set(cache_key, season_start)
 
         if self._week is None and season_start is not None:
             # Round events that occur just before the official start-of-season to the closest week
@@ -382,16 +417,26 @@ class Event(CachedModel):
     def week_str(self) -> Optional[str]:
         if self.week is None:
             return None
-        if self.year == 2016:
-            return "Week {}".format(0.5 if self.week == 0 else self.week)
-        return "Week {}".format(none_throws(self.week) + 1)
 
-    @property
-    def is_season_event(self) -> bool:
-        return self.event_type_enum in event_type.SEASON_EVENT_TYPES
+        week = none_throws(self.week)
+        if self.year == 2016:
+            return "Week {}".format(0.5 if week == 0 else week)
+        elif self.year == 2021:
+            # Group 2021 Events by their type - depends on both
+            if week == 0:
+                return "Participation"
+            elif week == 2:
+                return "FIRST Innovation Challenge"
+            elif week == 3:
+                return "INFINITE RECHARGE At Home Challenge"
+            elif week == 4:
+                return "Game Design Challenge"
+            else:
+                return "Awards"
+        return "Week {}".format(week + 1)
 
     @ndb.tasklet
-    def get_teams_async(self) -> TypedFuture[List["Team"]]:
+    def get_teams_async(self) -> Generator[Any, Any, TypedFuture[List["Team"]]]:
         from backend.common.queries import team_query
 
         self._teams = yield team_query.EventTeamsQuery(
@@ -406,7 +451,7 @@ class Event(CachedModel):
         return none_throws(self._teams)
 
     @ndb.toplevel
-    def prepAwardsMatchesTeams(
+    def prep_awards_matches_teams(
         self,
     ) -> Generator[
         Tuple[
@@ -441,11 +486,18 @@ class Event(CachedModel):
             return self.details.matchstats
 
     @property
-    def rankings(self):
+    def coprs(self):
         if self.details is None:
             return None
         else:
-            return self.details.rankings
+            return self.details.coprs
+
+    @property
+    def rankings(self) -> Optional[List[EventRanking]]:
+        if self.details is None:
+            return None
+        else:
+            return self.details.rankings2
 
     @property
     def location(self) -> Optional[str]:
@@ -465,9 +517,6 @@ class Event(CachedModel):
 
     @property
     def city_state_country(self) -> Optional[str]:
-        if not self._city_state_country and self.nl:
-            self._city_state_country = self.nl.city_state_country
-
         if not self._city_state_country:
             location_parts = []
             if self.city:
@@ -483,7 +532,7 @@ class Event(CachedModel):
         return self._city_state_country
 
     @property
-    def nl(self) -> Location:
+    def nl(self) -> Optional[Location]:
         return self.normalized_location
 
     @property
@@ -525,33 +574,34 @@ class Event(CachedModel):
                 # Sort firstinspires channels to the front, keep the order of the rest
                 self._webcast = sorted(
                     self._webcast or [],
-                    key=lambda w: 0
-                    if (
-                        w["type"] == "twitch"
-                        and w["channel"].startswith("firstinspires")
-                    )
-                    else 1,
+                    key=lambda w: (
+                        0
+                        if (
+                            w["type"] == "twitch"
+                            and w["channel"].startswith("firstinspires")
+                        )
+                        else 1
+                    ),
                 )
             except Exception:
                 self._webcast = None
         return self._webcast or []
 
-    """
     @property
     def webcast_status(self):
-        from helpers.webcast_online_helper import WebcastOnlineHelper
+        from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
+
         WebcastOnlineHelper.add_online_status(self.current_webcasts)
 
-        overall_status = 'offline'
+        overall_status = "offline"
         for webcast in self.current_webcasts:
-            status = webcast.get('status')
-            if status == 'online':
-                overall_status = 'online'
+            status = webcast.get("status")
+            if status == "online":
+                overall_status = "online"
                 break
-            elif status == 'unknown':
-                overall_status = 'unknown'
+            elif status == "unknown":
+                overall_status = "unknown"
         return overall_status
-    """
 
     @property
     def current_webcasts(self) -> List[Webcast]:
@@ -571,16 +621,20 @@ class Event(CachedModel):
                 current_webcasts.append(webcast)
         return current_webcasts
 
-    """
     @property
     def online_webcasts(self):
         current_webcasts = self.current_webcasts
 
-        from helpers.webcast_online_helper import WebcastOnlineHelper
+        from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
+
         WebcastOnlineHelper.add_online_status(current_webcasts)
 
-        return filter(lambda x: x.get('status', '') != 'offline', current_webcasts if current_webcasts else [])
-    """
+        return list(
+            filter(
+                lambda x: x.get("status", "") != "offline",
+                current_webcasts if current_webcasts else [],
+            )
+        )
 
     @property
     def has_first_official_webcast(self) -> bool:
@@ -641,7 +695,7 @@ class Event(CachedModel):
 
     @classmethod
     def validate_key_name(cls, event_key: str) -> bool:
-        key_name_regex = re.compile(r"^[1-9]\d{3}[a-z]+[0-9]{0,2}$")
+        key_name_regex = re.compile(r"^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,3}$")
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
@@ -652,7 +706,7 @@ class Event(CachedModel):
         if self.district_key is None:
             return None
         district = DistrictQuery(
-            district_key=none_throws(self.district_key).id()
+            district_key=none_throws(none_throws(self.district_key).string_id())
         ).fetch()
         return district.display_name if district else None
 
@@ -661,14 +715,14 @@ class Event(CachedModel):
         if self.district_key is None:
             return None
         else:
-            return none_throws(self.district_key).id()[4:]
+            return none_throws(none_throws(self.district_key).string_id())[4:]
 
     @property
     def event_district_key(self) -> Optional[str]:
         if self.district_key is None:
             return None
         else:
-            return none_throws(self.district_key).id()
+            return none_throws(none_throws(self.district_key).string_id())
 
     @property
     def event_type_str(self) -> str:
@@ -699,8 +753,14 @@ class Event(CachedModel):
     @property
     def first_api_code(self) -> str:
         if self.first_code is None:
-            return self.event_short.upper()
-        return self.first_code.upper()
+            return self.compute_first_api_code(self.year, self.event_short)
+        return self.first_code
+
+    @classmethod
+    def compute_first_api_code(cls, year: int, event_short: str) -> str:
+        if year == 2023:
+            return cls.EVENT_SHORT_EXCEPTIONS_2023.get(event_short, event_short)
+        return cls.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
 
     @property
     def is_in_season(self) -> bool:
@@ -720,7 +780,7 @@ class Event(CachedModel):
     @property
     def next_match(self):
         from helpers.match_helper import MatchHelper
-        upcoming_matches = MatchHelper.upcomingMatches(self.matches, 1)
+        upcoming_matches = MatchHelper.upcoming_matches(self.matches, 1)
         if upcoming_matches:
             return upcoming_matches[0]
         else:
@@ -729,11 +789,12 @@ class Event(CachedModel):
     @property
     def previous_match(self):
         from helpers.match_helper import MatchHelper
-        recent_matches = MatchHelper.recentMatches(self.matches, 1)[0]
+        recent_matches = MatchHelper.recent_matches(self.matches, 1)[0]
         if recent_matches:
             return recent_matches[0]
         else:
             return None
+    """
 
     def team_awards(self):
         # Returns a dictionary of awards for teams
@@ -744,4 +805,3 @@ class Event(CachedModel):
                 a.append(award)
                 team_awards[team_key] = a
         return team_awards
-    """

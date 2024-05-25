@@ -14,12 +14,34 @@ from flask import (
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
+from backend.common.auth import (
+    create_session_cookie,
+    current_user,
+    delete_user,
+    revoke_session_cookie,
+)
 from backend.common.consts.auth_type import (
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
 )
+from backend.common.consts.model_type import ModelType
+from backend.common.consts.notification_type import (
+    ENABLED_EVENT_NOTIFICATIONS,
+    ENABLED_TEAM_NOTIFICATIONS,
+    RENDER_NAMES as NOTIFICATION_RENDER_NAMES,
+)
+from backend.common.environment import Environment
+from backend.common.helpers.account_deletion import AccountDeletionHelper
+from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.match_helper import MatchHelper
+from backend.common.helpers.mytba_helper import MyTBAHelper
+from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.models.event import Event
+from backend.common.models.favorite import Favorite
+from backend.common.models.keys import EventKey, TeamNumber
+from backend.common.models.subscription import Subscription
+from backend.common.models.team import Team
 from backend.common.sitevars.notifications_enable import NotificationsEnable
-from backend.web.auth import create_session_cookie, current_user, revoke_session_cookie
-from backend.web.handlers.decorators import require_login, require_login_only
+from backend.web.decorators import enforce_login, require_login, require_login_only
 from backend.web.redirect import is_safe_url, safe_next_redirect
 
 
@@ -29,24 +51,13 @@ blueprint = Blueprint("account", __name__, url_prefix="/account")
 @blueprint.route("")
 @require_login
 def overview() -> str:
-    user = none_throws(current_user())
     template_values = {
-        "status": request.args.get("status"),
+        "status": session.pop("account_status", None),
         "webhook_verification_success": request.args.get(
             "webhook_verification_success"
         ),
-        "ping_sent": request.args.get("ping_sent"),
-        "ping_enabled": "disabled"
-        if not NotificationsEnable.notifications_enabled()
-        else "",
-        "num_favorites": user.favorites_count,
-        "num_subscriptions": user.subscriptions_count,
-        "submissions_pending": user.submissions_pending_count,
-        "submissions_accepted": user.submissions_accepted_count,
-        "submissions_reviewed": user.submissions_reviewed_count,
-        "review_permissions": user.has_review_permissions,
-        "api_read_keys": user.api_read_keys,
-        "api_write_keys": user.api_write_keys,
+        "ping_sent": session.pop("ping_sent", None),
+        "ping_enabled": NotificationsEnable.notifications_enabled(),
         "auth_write_type_names": AUTH_TYPE_WRITE_TYPE_NAMES,
     }
     return render_template("account_overview.html", **template_values)
@@ -66,14 +77,11 @@ def register() -> Response:
         error_response = redirect("/")
 
         account_id = request.form.get("account_id")
-        if not account_id:
+        if not account_id or not account_id == user.uid:
             return error_response
 
         display_name = request.form.get("display_name")
         if not display_name:
-            return error_response
-
-        if not account_id == user.uid:
             return error_response
 
         user.register(display_name)
@@ -81,7 +89,7 @@ def register() -> Response:
     else:
         next = request.args.get("next")
         # Make sure `next` is safe - otherwise drop it
-        next = next if is_safe_url(next) else None
+        next = next if next and is_safe_url(next) else None
         return make_response(render_template("account_register.html", next=next))
 
 
@@ -104,12 +112,33 @@ def edit() -> Response:
 
         user.update_display_name(display_name)
 
+        _set_account_status("account_edit_success")
         return redirect(url_for("account.overview"))
+
     return make_response(
         render_template(
             "account_edit.html", status=session.pop("account_edit_status", None)
         )
     )
+
+
+@blueprint.route("/delete", methods=["GET", "POST"])
+@require_login
+def delete() -> Response:
+    if request.method == "POST":
+        user = none_throws(current_user())
+
+        # delete data in the TBA db for this user
+        AccountDeletionHelper.delete_account(none_throws(user.account_key))
+
+        # log out the current session
+        revoke_session_cookie()
+
+        # delete the user in firebase
+        delete_user(str(user.uid))
+        return redirect(url_for("index"))
+    else:
+        return make_response(render_template("account_delete.html"))
 
 
 @blueprint.route("/login", methods=["GET", "POST"])
@@ -127,7 +156,15 @@ def login() -> Response:
     else:
         if current_user():
             return redirect(url_for("account.overview"))
-        return make_response(render_template("account_login_required.html", next=next))
+
+        auth_emulator_host = Environment.auth_emulator_host()
+        return make_response(
+            render_template(
+                "account_login_required.html",
+                next=next,
+                auth_emulator_host=auth_emulator_host,
+            )
+        )
 
 
 @blueprint.route("/logout")
@@ -137,142 +174,326 @@ def logout() -> Response:
     return safe_next_redirect("/")
 
 
-# class AccountAPIReadKeyAdd(LoggedInHandler):
-#     def post(self):
-#         self._require_registration()
-#
-#         description = self.request.get('description')
-#         if description:
-#             ApiAuthAccess(
-#                 id=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
-#                 owner=self.user_bundle.account.key,
-#                 auth_types_enum=[AuthType.READ_API],
-#                 description=description,
-#             ).put()
-#             self.redirect('/account?status=read_key_add_success')
-#         else:
-#             self.redirect('/account?status=read_key_add_no_description')
-#
-#
-# class AccountAPIReadKeyDelete(LoggedInHandler):
-#     def post(self):
-#         self._require_registration()
-#
-#         key_id = self.request.get('key_id')
-#         auth = ApiAuthAccess.get_by_id(key_id)
-#
-#         if auth and auth.owner == self.user_bundle.account.key:
-#             auth.key.delete()
-#             self.redirect('/account?status=read_key_delete_success')
-#         else:
-#             self.redirect('/account?status=read_key_delete_failure')
-#
-#
-# class MyTBAController(LoggedInHandler):
-#     def get(self):
-#         self._require_registration()
-#
-#         user = self.user_bundle.account.key
-#         favorites = Favorite.query(ancestor=user).fetch()
-#         subscriptions = Subscription.query(ancestor=user).fetch()
-#
-#         team_keys = set()
-#         team_fav = {}
-#         team_subs = {}
-#         event_keys = set()
-#         event_fav = {}
-#         event_subs = {}
-#         events = []
-#         match_keys = set()
-#         match_event_keys = set()
-#         match_fav = {}
-#         match_subs = {}
-#         for item in favorites + subscriptions:
-#             if item.model_type == ModelType.TEAM:
-#                 team_keys.add(ndb.Key(Team, item.model_key))
-#                 if type(item) == Favorite:
-#                     team_fav[item.model_key] = item
-#                 elif type(item) == Subscription:
-#                     team_subs[item.model_key] = item
-#             elif item.model_type == ModelType.MATCH:
-#                 match_keys.add(ndb.Key(Match, item.model_key))
-#                 match_event_keys.add(ndb.Key(Event, item.model_key.split('_')[0]))
-#                 if type(item) == Favorite:
-#                     match_fav[item.model_key] = item
-#                 elif type(item) == Subscription:
-#                     match_subs[item.model_key] = item
-#             elif item.model_type == ModelType.EVENT:
-#                 if item.model_key.endswith('*'):  # All year events wildcard
-#                     event_year = int(item.model_key[:-1])
-#                     events.append(Event(  # add fake event for rendering
-#                         id=item.model_key,
-#                         short_name='ALL EVENTS',
-#                         event_short=item.model_key,
-#                         year=event_year,
-#                         start_date=datetime.datetime(event_year, 1, 1),
-#                         end_date=datetime.datetime(event_year, 1, 1)
-#                     ))
-#                 else:
-#                     event_keys.add(ndb.Key(Event, item.model_key))
-#                 if type(item) == Favorite:
-#                     event_fav[item.model_key] = item
-#                 elif type(item) == Subscription:
-#                     event_subs[item.model_key] = item
-#
-#         team_futures = ndb.get_multi_async(team_keys)
-#         event_futures = ndb.get_multi_async(event_keys)
-#         match_futures = ndb.get_multi_async(match_keys)
-#         match_event_futures = ndb.get_multi_async(match_event_keys)
-#
-#         teams = sorted([team_future.get_result() for team_future in team_futures], key=lambda x: x.team_number)
-#         team_fav_subs = []
-#         for team in teams:
-#             fav = team_fav.get(team.key.id(), None)
-#             subs = team_subs.get(team.key.id(), None)
-#             team_fav_subs.append((team, fav, subs))
-#
-#         events += [event_future.get_result() for event_future in event_futures]
-#         EventHelper.sort_events(events)
-#
-#         event_fav_subs = []
-#         for event in events:
-#             fav = event_fav.get(event.key.id(), None)
-#             subs = event_subs.get(event.key.id(), None)
-#             event_fav_subs.append((event, fav, subs))
-#
-#         matches = [match_future.get_result() for match_future in match_futures]
-#         match_events = [match_event_future.get_result() for match_event_future in match_event_futures]
-#         MatchHelper.natural_sort_matches(matches)
-#
-#         match_fav_subs_by_event = {}
-#         for event in match_events:
-#             match_fav_subs_by_event[event.key.id()] = (event, [])
-#
-#         for match in matches:
-#             event_key = match.key.id().split('_')[0]
-#             fav = match_fav.get(match.key.id(), None)
-#             subs = match_subs.get(match.key.id(), None)
-#             match_fav_subs_by_event[event_key][1].append((match, fav, subs))
-#
-#         event_match_fav_subs = sorted(match_fav_subs_by_event.values(), key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
-#         event_match_fav_subs = sorted(event_match_fav_subs, key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
-#
-#         self.template_values['team_fav_subs'] = team_fav_subs
-#         self.template_values['event_fav_subs'] = event_fav_subs
-#         self.template_values['event_match_fav_subs'] = event_match_fav_subs
-#         self.template_values['status'] = self.request.get('status')
-#         self.template_values['year'] = datetime.datetime.now().year
-#
-#         self.response.out.write(jinja2_engine.render('mytba.html', self.template_values))
-#
-#
+@blueprint.route("/api/read_key_add", methods=["POST"])
+@enforce_login
+def read_key_add() -> Response:
+    response = redirect(url_for("account.overview"))
+
+    description = request.form.get("description")
+    if not description:
+        _set_account_status("read_key_add_no_description")
+        return response
+
+    user = none_throws(current_user())
+    try:
+        user.add_api_read_key(description)
+    except Exception:
+        _set_account_status("read_key_add_failure")
+        return response
+
+    _set_account_status("read_key_add_success")
+    return response
+
+
+@blueprint.route("/api/read_key_delete", methods=["POST"])
+@enforce_login
+def read_key_delete() -> Response:
+    response = redirect(url_for("account.overview"))
+
+    def _set_read_key_failure():
+        _set_account_status("read_key_delete_failure")
+
+    key_id = request.form.get("key_id")
+    if not key_id:
+        _set_read_key_failure()
+        return response
+
+    user = none_throws(current_user())
+    api_key = user.api_read_key(key_id)
+    if not api_key:
+        _set_read_key_failure()
+        return response
+
+    user.delete_api_key(api_key)
+
+    _set_account_status("read_key_delete_success")
+    return response
+
+
+def _set_account_status(status: str) -> None:
+    session["account_status"] = status
+
+
+@blueprint.route("/mytba")
+@require_login
+def mytba() -> str:
+    user = none_throws(current_user())
+    mytba = user.myTBA
+
+    mytba_events = EventHelper.sorted_events(mytba.events)
+    mytba_teams = sorted(mytba.teams, key=lambda team: team.team_number)
+
+    mytba_event_matches = mytba.event_matches
+    mytba_event_matches_events = EventHelper.sorted_events(
+        [event_key.get() for event_key in mytba_event_matches.keys()]
+    )
+    event_matches = [
+        (event, MatchHelper.natural_sorted_matches(mytba_event_matches[event.key]))
+        for event in mytba_event_matches_events
+    ]
+
+    template_values = {
+        "event_fav_sub": [
+            (
+                event,
+                mytba.favorite(ModelType.EVENT, none_throws(event.key.string_id())),
+                mytba.subscription(ModelType.EVENT, none_throws(event.key.string_id())),
+            )
+            for event in mytba_events
+        ],
+        "team_fav_sub": [
+            (
+                team,
+                mytba.favorite(ModelType.TEAM, none_throws(team.key.string_id())),
+                mytba.subscription(ModelType.TEAM, none_throws(team.key.string_id())),
+            )
+            for team in mytba_teams
+        ],
+        "event_match_fav_sub": [
+            (
+                event,
+                [
+                    (
+                        match,
+                        mytba.favorite(
+                            ModelType.MATCH, none_throws(match.key.string_id())
+                        ),
+                        mytba.subscription(
+                            ModelType.MATCH, none_throws(match.key.string_id())
+                        ),
+                    )
+                    for match in matches
+                ],
+            )
+            for (event, matches) in event_matches
+        ],
+        "status": request.args.get("status"),
+        "year": SeasonHelper.effective_season_year(),
+    }
+    return render_template("mytba.html", **template_values)
+
+
+@blueprint.get("/mytba/team/<int:team_number>")
+@require_login
+def mytba_team_get(team_number: TeamNumber) -> str:
+    team_key = f"frc{team_number}"
+    team = Team.get_by_id(team_key)
+
+    if not team:
+        abort(404)
+
+    user = none_throws(current_user())
+    favorite = Favorite.query(
+        Favorite.model_key == team_key,
+        Favorite.model_type == ModelType.TEAM,
+        ancestor=none_throws(user.account_key),
+    ).get()
+    subscription = Subscription.query(
+        Favorite.model_key == team_key,
+        Favorite.model_type == ModelType.TEAM,
+        ancestor=none_throws(user.account_key),
+    ).get()
+
+    if not favorite and not subscription:  # New entry; default to being a favorite
+        is_favorite = True
+    else:
+        is_favorite = favorite is not None
+
+    enabled_notifications = [
+        (en, NOTIFICATION_RENDER_NAMES[en]) for en in ENABLED_TEAM_NOTIFICATIONS
+    ]
+
+    template_values = {
+        "team": team,
+        "is_favorite": is_favorite,
+        "subscription": subscription,
+        "enabled_notifications": enabled_notifications,
+    }
+    return render_template("mytba_team.html", **template_values)
+
+
+@blueprint.post("/mytba/team/<int:team_number>")
+@require_login
+def mytba_team_post(team_number: TeamNumber) -> Response:
+    team_key = f"frc{team_number}"
+    user = none_throws(current_user())
+
+    if request.form.get("favorite"):
+        MyTBAHelper.add_favorite(
+            Favorite(
+                parent=none_throws(user.account_key),
+                user_id=none_throws(user.account_key).id(),
+                model_type=ModelType.TEAM,
+                model_key=team_key,
+            )
+        )
+    else:
+        MyTBAHelper.remove_favorite(
+            none_throws(user.account_key), team_key, ModelType.TEAM
+        )
+
+    subs = request.form.getlist("notification_types")
+    if subs:
+        MyTBAHelper.add_subscription(
+            Subscription(
+                parent=none_throws(user.account_key),
+                user_id=none_throws(user.account_key).id(),
+                model_type=ModelType.TEAM,
+                model_key=team_key,
+                notification_types=[int(s) for s in subs],
+            )
+        )
+    else:
+        MyTBAHelper.remove_subscription(
+            none_throws(user.account_key), team_key, ModelType.TEAM
+        )
+
+    return safe_next_redirect(
+        url_for("account.mytba", _anchor="my-teams", status="team_updated")
+    )
+
+
+@blueprint.get("/mytba/event/<string:event_key>")
+@require_login
+def mytba_event_get(event_key: EventKey) -> str:
+    event = None
+    is_wildcard = False
+
+    # Handle wildcard for all events in a year
+    if event_key.endswith("*"):
+        try:
+            year = int(event_key[:-1])
+        except ValueError:
+            year = None
+
+        if year and year in SeasonHelper.get_valid_years():
+            event = Event(  # fake event for rendering
+                name="ALL {} EVENTS".format(year),
+                year=year,
+            )
+            is_wildcard = True
+    else:
+        event = Event.get_by_id(event_key)
+
+    if not event:
+        abort(404)
+
+    user = none_throws(current_user())
+    favorite = Favorite.query(
+        Favorite.model_key == event_key,
+        Favorite.model_type == ModelType.EVENT,
+        ancestor=none_throws(user.account_key),
+    ).get()
+    subscription = Subscription.query(
+        Favorite.model_key == event_key,
+        Favorite.model_type == ModelType.EVENT,
+        ancestor=none_throws(user.account_key),
+    ).get()
+
+    if not favorite and not subscription:  # New entry; default to being a favorite
+        is_favorite = True
+    else:
+        is_favorite = favorite is not None
+
+    enabled_notifications = [
+        (en, NOTIFICATION_RENDER_NAMES[en]) for en in ENABLED_EVENT_NOTIFICATIONS
+    ]
+
+    template_values = {
+        "event": event,
+        "is_wildcard": is_wildcard,
+        "is_favorite": is_favorite,
+        "subscription": subscription,
+        "enabled_notifications": enabled_notifications,
+    }
+    return render_template("mytba_event.html", **template_values)
+
+
+@blueprint.post("/mytba/event/<string:event_key>")
+@require_login
+def mytba_event_post(event_key: EventKey) -> Response:
+    user = none_throws(current_user())
+
+    if request.form.get("favorite"):
+        MyTBAHelper.add_favorite(
+            Favorite(
+                parent=none_throws(user.account_key),
+                user_id=none_throws(user.account_key).id(),
+                model_type=ModelType.EVENT,
+                model_key=event_key,
+            )
+        )
+    else:
+        MyTBAHelper.remove_favorite(
+            none_throws(user.account_key), event_key, ModelType.EVENT
+        )
+
+    subs = request.form.getlist("notification_types")
+    if subs:
+        MyTBAHelper.add_subscription(
+            Subscription(
+                parent=none_throws(user.account_key),
+                user_id=none_throws(user.account_key).id(),
+                model_type=ModelType.EVENT,
+                model_key=event_key,
+                notification_types=[int(s) for s in subs],
+            )
+        )
+    else:
+        MyTBAHelper.remove_subscription(
+            none_throws(user.account_key), event_key, ModelType.EVENT
+        )
+
+    return safe_next_redirect(
+        url_for("account.mytba", _anchor="my-events", status="event_updated")
+    )
+
+
+@blueprint.route("/ping", methods=["POST"])
+@enforce_login
+def ping():
+    user = none_throws(current_user())
+    response = redirect(url_for("account.overview"))
+
+    mobile_client_id = request.form.get("mobile_client_id")
+
+    from backend.common.models.mobile_client import MobileClient
+
+    client = MobileClient.get_by_id(
+        int(mobile_client_id), parent=none_throws(user.account_key)
+    )
+    if client is None:
+        session["ping_sent"] = "0"
+        return response
+
+    from backend.common.helpers.tbans_helper import TBANSHelper
+
+    success = TBANSHelper.ping(client)
+    if success:
+        session["ping_sent"] = "1"
+    else:
+        session["ping_sent"] = "0"
+
+    return response
+
+
 # class myTBAAddHotMatchesController(LoggedInHandler):
 #     def get(self, event_key=None):
 #         self._require_registration()
 #
 #         if event_key is None:
 #             events = EventHelper.getEventsWithinADay()
-#             EventHelper.sort_events(events)
+#             EventHelper.sorted_events(events)
 #             self.template_values['events'] = events
 #             self.response.out.write(jinja2_engine.render('mytba_add_hot_matches_base.html', self.template_values))
 #             return
@@ -355,81 +576,6 @@ def logout() -> Response:
 #         self.redirect('/account/mytba?status=match_updated#my-matches'.format(event_key))
 #
 #
-# class MyTBAEventController(LoggedInHandler):
-#     def get(self, event_key):
-#         self._require_registration()
-#
-#         # Handle wildcard for all events in a year
-#         event = None
-#         is_wildcard = False
-#         if event_key.endswith('*'):
-#             try:
-#                 year = int(event_key[:-1])
-#             except:
-#                 year = None
-#             if year and year in tba_config.VALID_YEARS:
-#                 event = Event(  # fake event for rendering
-#                     name="ALL {} EVENTS".format(year),
-#                     year=year,
-#                 )
-#                 is_wildcard = True
-#         else:
-#             event = Event.get_by_id(event_key)
-#
-#         if not event:
-#             self.abort(404)
-#
-#         user = self.user_bundle.account.key
-#         favorite = Favorite.query(Favorite.model_key==event_key, Favorite.model_type==ModelType.EVENT, ancestor=user).get()
-#         subscription = Subscription.query(Favorite.model_key==event_key, Favorite.model_type==ModelType.EVENT, ancestor=user).get()
-#
-#         if not favorite and not subscription:  # New entry; default to being a favorite
-#             is_favorite = True
-#         else:
-#             is_favorite = favorite is not None
-#
-#         enabled_notifications = [(en, NotificationType.render_names[en]) for en in NotificationType.enabled_event_notifications]
-#
-#         self.template_values['event'] = event
-#         self.template_values['is_wildcard'] = is_wildcard
-#         self.template_values['is_favorite'] = is_favorite
-#         self.template_values['subscription'] = subscription
-#         self.template_values['enabled_notifications'] = enabled_notifications
-#
-#         self.response.out.write(jinja2_engine.render('mytba_event.html', self.template_values))
-#
-#     def post(self, event_key):
-#         self._require_registration()
-#
-#         current_user_id = self.user_bundle.account.key.id()
-#
-#         if self.request.get('favorite'):
-#             favorite = Favorite(
-#                 parent=ndb.Key(Account, current_user_id),
-#                 user_id=current_user_id,
-#                 model_type=ModelType.EVENT,
-#                 model_key=event_key
-#             )
-#             MyTBAHelper.add_favorite(favorite)
-#         else:
-#             MyTBAHelper.remove_favorite(current_user_id, event_key, ModelType.EVENT)
-#
-#         subs = self.request.get_all('notification_types')
-#         if subs:
-#             subscription = Subscription(
-#                 parent=ndb.Key(Account, current_user_id),
-#                 user_id=current_user_id,
-#                 model_type=ModelType.EVENT,
-#                 model_key=event_key,
-#                 notification_types=[int(s) for s in subs]
-#             )
-#             MyTBAHelper.add_subscription(subscription)
-#         else:
-#             MyTBAHelper.remove_subscription(current_user_id, event_key, ModelType.EVENT)
-#
-#         self.redirect('/account/mytba?status=event_updated#my-events')
-#
-#
 # class MyTBAMatchController(LoggedInHandler):
 #     def get(self, match_key):
 #         self._require_registration()
@@ -488,64 +634,3 @@ def logout() -> Response:
 #             MyTBAHelper.remove_subscription(current_user_id, match_key, ModelType.MATCH)
 #
 #         self.redirect('/account/mytba?status=match_updated#my-matches')
-#
-#
-# class MyTBATeamController(LoggedInHandler):
-#     def get(self, team_number):
-#         self._require_registration()
-#
-#         team_key = 'frc{}'.format(team_number)
-#         team = Team.get_by_id(team_key)
-#
-#         if not team:
-#             self.abort(404)
-#
-#         user = self.user_bundle.account.key
-#         favorite = Favorite.query(Favorite.model_key==team_key, Favorite.model_type==ModelType.TEAM, ancestor=user).get()
-#         subscription = Subscription.query(Favorite.model_key==team_key, Favorite.model_type==ModelType.TEAM, ancestor=user).get()
-#
-#         if not favorite and not subscription:  # New entry; default to being a favorite
-#             is_favorite = True
-#         else:
-#             is_favorite = favorite is not None
-#
-#         enabled_notifications = [(en, NotificationType.render_names[en]) for en in NotificationType.enabled_team_notifications]
-#
-#         self.template_values['team'] = team
-#         self.template_values['is_favorite'] = is_favorite
-#         self.template_values['subscription'] = subscription
-#         self.template_values['enabled_notifications'] = enabled_notifications
-#
-#         self.response.out.write(jinja2_engine.render('mytba_team.html', self.template_values))
-#
-#     def post(self, team_number):
-#         self._require_registration()
-#
-#         current_user_id = self.user_bundle.account.key.id()
-#         team_key = 'frc{}'.format(team_number)
-#
-#         if self.request.get('favorite'):
-#             favorite = Favorite(
-#                 parent=ndb.Key(Account, current_user_id),
-#                 user_id=current_user_id,
-#                 model_type=ModelType.TEAM,
-#                 model_key=team_key
-#             )
-#             MyTBAHelper.add_favorite(favorite)
-#         else:
-#             MyTBAHelper.remove_favorite(current_user_id, team_key, ModelType.TEAM)
-#
-#         subs = self.request.get_all('notification_types')
-#         if subs:
-#             subscription = Subscription(
-#                 parent=ndb.Key(Account, current_user_id),
-#                 user_id=current_user_id,
-#                 model_type=ModelType.TEAM,
-#                 model_key=team_key,
-#                 notification_types=[int(s) for s in subs]
-#             )
-#             MyTBAHelper.add_subscription(subscription)
-#         else:
-#             MyTBAHelper.remove_subscription(current_user_id, team_key, ModelType.TEAM)
-#
-#         self.redirect('/account/mytba?status=team_updated#my-teams')

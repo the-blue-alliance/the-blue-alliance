@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Select from "react-select";
+import AsyncSelect from "react-select/async";
 
 class EventSelector extends Component {
   static loadEvents() {
@@ -10,14 +10,14 @@ class EventSelector extends Component {
       .then((response) => response.json())
       .then((events) => {
         events.push({ value: "_other", label: "Other" });
-        return { options: events };
+        return events;
       });
   }
 
   constructor(props) {
     super(props);
     this.state = {
-      eventSelectValue: "",
+      eventSelectLabel: "",
     };
     this.onEventSelected = this.onEventSelected.bind(this);
     this.onManualEventChange = this.onManualEventChange.bind(this);
@@ -25,7 +25,7 @@ class EventSelector extends Component {
 
   onEventSelected(newEvent) {
     this.props.clearAuth();
-    this.setState({ eventSelectValue: newEvent.value });
+    this.setState({ eventSelectLabel: newEvent.label });
 
     if (newEvent.value === "_other") {
       this.props.setManualEvent(true);
@@ -60,15 +60,20 @@ class EventSelector extends Component {
           Select Event
         </label>
         <div className="col-sm-10">
-          <Select.Async
+          <AsyncSelect
             name="selectEvent"
             placeholder="Select an Event..."
             loadingPlaceholder="Loading Events..."
             clearable={false}
             searchable={false}
-            value={this.state.eventSelectValue}
+            value={
+              this.state.eventSelectLabel && {
+                label: this.state.eventSelectLabel,
+              }
+            }
             loadOptions={EventSelector.loadEvents}
             onChange={this.onEventSelected}
+            defaultOptions
           />
           {eventKeyBox}
         </div>

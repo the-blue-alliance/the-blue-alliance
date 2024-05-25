@@ -1,0 +1,35 @@
+from typing import Any
+
+DESCRIPTOR: Any
+Error: Any
+EntityResult: Any
+Query: Any
+KindExpression: Any
+PropertyReference: Any
+PropertyExpression: Any
+PropertyOrder: Any
+Filter: Any
+CompositeFilter: Any
+PropertyFilter: Any
+GqlQuery: Any
+GqlQueryArg: Any
+QueryResultBatch: Any
+Mutation: Any
+MutationResult: Any
+DeprecatedMutation: Any
+DeprecatedMutationResult: Any
+ReadOptions: Any
+LookupRequest: Any
+LookupResponse: Any
+RunQueryRequest: Any
+RunQueryResponse: Any
+ContinueQueryRequest: Any
+ContinueQueryResponse: Any
+BeginTransactionRequest: Any
+BeginTransactionResponse: Any
+RollbackRequest: Any
+RollbackResponse: Any
+CommitRequest: Any
+CommitResponse: Any
+AllocateIdsRequest: Any
+AllocateIdsResponse: Any

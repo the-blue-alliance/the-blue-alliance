@@ -1,6 +1,17 @@
 from backend.common.sitevars.website_blacklist import WebsiteBlacklist
 
 
+def test_key():
+    assert WebsiteBlacklist.key() == "website_blacklist"
+
+
+def test_description():
+    assert (
+        WebsiteBlacklist.description()
+        == "For blacklisting sketchy websites from team pages"
+    )
+
+
 def test_default_sitevar():
     default_sitevar = WebsiteBlacklist._fetch_sitevar()
     assert default_sitevar is not None

@@ -1,8 +1,8 @@
 import json
-from typing import Dict, List, Optional
+from typing import cast, Dict, List, Optional
 
-from google.cloud import ndb
-from pyre_extensions import none_throws, safe_cast
+from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts import award_type, event_type
 from backend.common.consts.award_type import AwardType
@@ -25,7 +25,7 @@ class Award(CachedModel):
     name_str = ndb.TextProperty(
         required=True, indexed=False
     )  # award name that shows up on USFIRST Pages. May vary for the same award type.
-    award_type_enum: AwardType = safe_cast(
+    award_type_enum: AwardType = cast(
         AwardType, ndb.IntegerProperty(required=True, choices=award_type.AWARD_TYPES)
     )
     year: Year = ndb.IntegerProperty(required=True)  # year the award was awarded
@@ -93,6 +93,12 @@ class Award(CachedModel):
 
     @property
     def normalized_name(self) -> str:
+        if (
+            self.year >= 2023
+            and self.award_type_enum in award_type.NORMALIZED_NAMES_2023
+        ):
+            return award_type.NORMALIZED_NAMES_2023[self.award_type_enum]
+
         if self.award_type_enum in award_type.NORMALIZED_NAMES:
             if (
                 self.event_type_enum
@@ -145,7 +151,9 @@ class Award(CachedModel):
 
     @property
     def key_name(self) -> AwardKey:
-        return self.render_key_name(self.event.id(), self.award_type_enum)
+        return self.render_key_name(
+            none_throws(self.event.string_id()), self.award_type_enum
+        )
 
     @classmethod
     def render_key_name(

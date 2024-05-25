@@ -2,5 +2,11 @@
     "datastore_mode": "local",
     "log_level": "info",
     "tba_log_level": "debug",
-    "ndb_log_level": "warning"
+    "ndb_log_level": "warning",
+    "flask_response_cache_enabled": "false",
+    "cache_control_header_enabled": "false",
+    "storage_mode": "local",
+    "storage_path": "ops/dev/storage",
+    "save_frc_api_response": "false",
+    "min_gcloud_sdk_version": "380.0.0"
 }

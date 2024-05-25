@@ -2,7 +2,6 @@ from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
-from google.cloud import ndb
 from werkzeug.test import Client
 
 from backend.common.sitevars import apiv3_key
@@ -13,11 +12,8 @@ def test_load_page(local_client: Client) -> None:
     assert resp.status_code == 200
 
 
-def test_preload_apiv3_key_from_sitevar(
-    ndb_client: ndb.Client, local_client: Client
-) -> None:
-    with ndb_client.context():
-        apiv3_key.Apiv3Key.put(apiv3_key.ContentType(apiv3_key="test_apiv3_key"))
+def test_preload_apiv3_key_from_sitevar(ndb_stub, local_client: Client) -> None:
+    apiv3_key.Apiv3Key.put(apiv3_key.ContentType(apiv3_key="test_apiv3_key"))
 
     resp = local_client.get("/local/bootstrap")
     assert resp.status_code == 200

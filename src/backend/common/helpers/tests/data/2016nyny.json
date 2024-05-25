@@ -1,0 +1,37 @@
+{
+  "address": "655 W 34th St, New York, NY 10001, USA", 
+  "city": "New York", 
+  "country": "USA", 
+  "district": null, 
+  "division_keys": [], 
+  "end_date": "2016-03-13", 
+  "event_code": "nyny", 
+  "event_type": 0, 
+  "event_type_string": "Regional", 
+  "first_event_code": "NYNY", 
+  "first_event_id": "17335", 
+  "gmaps_place_id": "ChIJBdPBg2P2wokRg96tvVaRWLE", 
+  "gmaps_url": "https://maps.google.com/?cid=12779123744399285891", 
+  "key": "2016nyny", 
+  "lat": 40.757777, 
+  "lng": -74.002591, 
+  "location_name": "Jacob K. Javits Convention Center", 
+  "name": "New York City Regional", 
+  "parent_event_key": null, 
+  "playoff_type": null, 
+  "playoff_type_string": null, 
+  "postal_code": "10001", 
+  "short_name": "New York City", 
+  "start_date": "2016-03-10", 
+  "state_prov": "NY", 
+  "timezone": "America/New_York", 
+  "webcasts": [
+    {
+      "channel": "17439314", 
+      "type": "ustream"
+    }
+  ], 
+  "website": "http://www.nycfirst.org", 
+  "week": 2, 
+  "year": 2016
+}

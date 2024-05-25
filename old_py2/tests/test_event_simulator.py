@@ -55,7 +55,7 @@ class TestEventSimulator(unittest2.TestCase):
             self.assertEqual(event.details.alliance_selections, None)
             self.assertEqual(len(event.matches), 72)
 
-            matches = MatchHelper.play_order_sort_matches(event.matches)
+            matches = MatchHelper.play_order_sorted_matches(event.matches)
             for j, match in enumerate(matches):
                 if j <= i:
                     self.assertTrue(match.has_been_played)
@@ -103,7 +103,7 @@ class TestEventSimulator(unittest2.TestCase):
             else:
                 self.assertEqual(len(event.matches), 88)  # 1 match removed, 3 added
 
-            matches = MatchHelper.play_order_sort_matches(event.matches)
+            matches = MatchHelper.play_order_sorted_matches(event.matches)
             for j, match in enumerate(matches):
                 if match.key.id() in {'2016nytr_qf1m3', '2016nytr_qf3m3'}:
                     # Unneeded tiebreak matches
@@ -144,7 +144,7 @@ class TestEventSimulator(unittest2.TestCase):
             else:
                 self.assertEqual(len(event.matches), 90)  # 1 match removed, 3 added
 
-            matches = MatchHelper.play_order_sort_matches(event.matches)
+            matches = MatchHelper.play_order_sorted_matches(event.matches)
             for j, match in enumerate(matches):
                 if match.key.id() == '2016nytr_sf1m3':
                     # Unneeded tiebreak matches
@@ -177,7 +177,7 @@ class TestEventSimulator(unittest2.TestCase):
             self.assertEqual(event.details.alliance_selections, self._alliance_selections_with_backup)
             self.assertEqual(len(event.matches), 90)
 
-            matches = MatchHelper.play_order_sort_matches(event.matches)
+            matches = MatchHelper.play_order_sorted_matches(event.matches)
             for j, match in enumerate(matches):
                 if j <= i:
                     self.assertTrue(match.has_been_played)
@@ -216,7 +216,7 @@ class TestEventSimulator(unittest2.TestCase):
             self.assertEqual(event.details.alliance_selections, None)
             self.assertEqual(len(event.matches), 72)
 
-            matches = MatchHelper.play_order_sort_matches(event.matches)
+            matches = MatchHelper.play_order_sorted_matches(event.matches)
             for j, match in enumerate(matches):
                 if j <= i:
                     self.assertTrue(match.has_been_played)
@@ -263,7 +263,7 @@ class TestEventSimulator(unittest2.TestCase):
             else:
                 self.assertEqual(len(event.matches), 82)
 
-            matches = MatchHelper.play_order_sort_matches(event.matches)
+            matches = MatchHelper.play_order_sorted_matches(event.matches)
             for j, match in enumerate(matches):
                 if match.key.id() in {'2016nytr_qf1m3', '2016nytr_qf3m3'}:
                     # Unneeded tiebreak matches
@@ -305,7 +305,7 @@ class TestEventSimulator(unittest2.TestCase):
             else:
                 self.assertEqual(len(event.matches), 87)
 
-            matches = MatchHelper.play_order_sort_matches(event.matches)
+            matches = MatchHelper.play_order_sorted_matches(event.matches)
             for j, match in enumerate(matches):
                 if match.key.id() == '2016nytr_sf1m3':
                     # Unneeded tiebreak matches
@@ -339,7 +339,7 @@ class TestEventSimulator(unittest2.TestCase):
             self.assertEqual(event.details.alliance_selections, self._alliance_selections_with_backup)
             self.assertEqual(len(event.matches), 90)
 
-            matches = MatchHelper.play_order_sort_matches(event.matches)
+            matches = MatchHelper.play_order_sorted_matches(event.matches)
             for j, match in enumerate(matches):
                 if j <= i:
                     self.assertTrue(match.has_been_played)

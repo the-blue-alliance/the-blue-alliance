@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import Paper from "material-ui/Paper";
 import { List, ListItem } from "material-ui/List";
 import EventListener from "react-event-listener";
@@ -56,7 +57,7 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
       layouts.push(
         <ListItem
           primaryText={NAME_FOR_LAYOUT[layoutNum]}
-          onTouchTap={() => this.props.setLayout(layoutNum)}
+          onClick={() => this.props.setLayout(layoutNum)}
           key={i.toString()}
           rightIcon={getLayoutSvgIcon(layoutNum)}
         />

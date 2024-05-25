@@ -3,18 +3,25 @@
 # https://black.readthedocs.io/en/stable/the_black_code_style.html
 max-line-length = 88
 select = C,E,F,W,B,B950,I
-ignore = E203, E501, W503
+ignore = E203, E501, E704, W503
 exclude =
   ./old_py2/
   ./stubs/
   ./subtrees/
   ./venv/
   ./node_modules/
+  ./.pyre
+
 application_import_names = backend
 import-order-style = edited
+banned-modules =
+    google.cloud.datastore = Use google.appengine.api.datastore
+    google.cloud.ndb = Use google.appengine.ext.ndb
+    redis = Use google.appengine.api.memcache
 
 [flake8:local-plugins]
 extension =
   E = service_import_checker:ServiceImportChecker
+  E = api_authenticated_decorator_checker:APIAuthenticatedDecoratorCheker
 paths =
   ./flake8_plugins

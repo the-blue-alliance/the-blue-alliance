@@ -94,6 +94,17 @@ class AwardType(enum.IntEnum):
     CHAIRMANS_FINALIST = 69
     OTHER = 70
     AUTONOMOUS = 71
+    INNOVATION_CHALLENGE_SEMI_FINALIST = 72
+    ROOKIE_GAME_CHANGER = 73
+    SKILLS_COMPETITION_WINNER = 74
+    SKILLS_COMPETITION_FINALIST = 75
+    ROOKIE_DESIGN = 76
+    ENGINEERING_DESIGN = 77
+    DESIGNERS = 78
+    CONCEPT = 79
+    GAME_DESIGN_CHALLENGE_WINNER = 80
+    GAME_DESIGN_CHALLENGE_FINALIST = 81
+    SUSTAINABILITY = 82
 
 
 AWARD_TYPES: Set[AwardType] = {a for a in AwardType}
@@ -104,6 +115,8 @@ BLUE_BANNER_AWARDS: Set[AwardType] = {
     AwardType.CHAIRMANS_FINALIST,
     AwardType.WINNER,
     AwardType.WOODIE_FLOWERS,
+    AwardType.SKILLS_COMPETITION_WINNER,
+    AwardType.GAME_DESIGN_CHALLENGE_WINNER,
 }
 
 
@@ -137,6 +150,11 @@ NORMALIZED_NAMES = {
         None: "Woodie Flowers Finalist Award",
         EventType.CMP_FINALS: "Woodie Flowers Award",
     },
+}
+
+NORMALIZED_NAMES_2023 = {
+    AwardType.CHAIRMANS: "FIRST Impact Award",
+    AwardType.CHAIRMANS_FINALIST: "FIRST Impact Award Finalist",
 }
 
 

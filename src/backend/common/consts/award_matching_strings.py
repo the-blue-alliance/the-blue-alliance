@@ -9,13 +9,17 @@ list of the tuple.
 """
 AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
     (AwardType.CHAIRMANS, (["chairman"], ["hon", "finalist"])),
+    (AwardType.CHAIRMANS, (["first impact"], ["hon", "finalist"])),
     (AwardType.CHAIRMANS_HONORABLE_MENTION, (["chairman", "hon", "mention"], [])),
+    (AwardType.CHAIRMANS_HONORABLE_MENTION, (["first impact", "hon", "mention"], [])),
     (AwardType.CHAIRMANS_FINALIST, (["chairman", "finalist"], ["hon", "mention"])),
+    (AwardType.CHAIRMANS_FINALIST, (["first impact", "finalist"], ["hon", "mention"])),
     (AwardType.ENGINEERING_INSPIRATION, (["engineering inspiration"], [])),
     (AwardType.WINNER, (["regional winner"], [])),
     (AwardType.WINNER, (["championship winner"], [])),
     (AwardType.WINNER, (["championship champion"], [])),
     (AwardType.WINNER, (["division champion"], [])),
+    (AwardType.WINNER, (["division winner"], [])),
     (AwardType.WINNER, (["championship subdivision winner"], [])),
     (AwardType.WINNER, (["district event winner"], [])),
     (AwardType.WINNER, (["winner", "1"], [])),
@@ -136,5 +140,25 @@ AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
     (AwardType.MOST_IMPROVED_TEAM, (["most improved team"], [])),
     (AwardType.WILDCARD, (["wildcard"], [])),
     (AwardType.AUTONOMOUS, (["autonomous"], [])),
+    (
+        AwardType.INNOVATION_CHALLENGE_SEMI_FINALIST,
+        (["innovation challenge semi-finalist"], []),
+    ),
+    (AwardType.ROOKIE_GAME_CHANGER, (["rookie game changer"], [])),
+    (
+        AwardType.SKILLS_COMPETITION_WINNER,
+        (["skills competition", "winner"], ["finalist"]),
+    ),
+    (AwardType.SKILLS_COMPETITION_FINALIST, (["skills competition", "finalist"], [])),
+    (AwardType.ROOKIE_DESIGN, (["rookie design"], [])),
+    (AwardType.ENGINEERING_DESIGN, (["engineering design"], [])),
+    (AwardType.DESIGNERS, (["designer's"], [])),
+    (AwardType.CONCEPT, (["concept"], [])),
+    (AwardType.GAME_DESIGN_CHALLENGE_WINNER, (["game design challenge winner"], [])),
+    (
+        AwardType.GAME_DESIGN_CHALLENGE_FINALIST,
+        (["game design challenge finalist"], []),
+    ),
+    (AwardType.SUSTAINABILITY, (["team sustainability"], [])),
     (AwardType.OTHER, (["other", "offseason award", "offseason event award"], [])),
 ]

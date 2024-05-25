@@ -1,6 +1,6 @@
 from typing import Optional
 
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
@@ -40,7 +40,6 @@ def test_no_events() -> None:
 def test_no_events_with_districts() -> None:
     preseed_events(2019, 3, district_abbrev=None)
     events = DistrictEventsQuery(district_key="2019ne").fetch()
-    print(f"{events}")
     assert events == []
 
 

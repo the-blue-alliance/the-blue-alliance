@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 MAINTAINER The Blue Alliance
 
 # Set debconf to run non-interactively
@@ -6,27 +6,35 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # Get base system dependencies
 RUN apt-get update && apt-get install -y \
-  wget \
-  curl \
-  unzip \
-  sudo \
-  jq \
-  tmux \
-  vim \
-  openssh-server
+    wget \
+    curl \
+    unzip \
+    sudo \
+    jq \
+    tmux \
+    vim \
+    openssh-server
 
-# Setup python environmenets
-# python3 should be the default, but gcloud currently depends on python2
-RUN apt-get install -y \
-    python3-pip \
-    python3-venv \
-    python2
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+# Needed for Python 3.12
+RUN apt-get install software-properties-common -y
+RUN add-apt-repository ppa:deadsnakes/ppa -y
+
+# Setup python environment
+ENV PYTHON_VERSION python3.12
+RUN apt-get update && apt-get install -y \
+    "$PYTHON_VERSION" \
+    "$PYTHON_VERSION-venv" \
+    "$PYTHON_VERSION-dev" \
+    "$PYTHON_VERSION-distutils" \
+    python3-pip
+RUN update-alternatives --install /usr/bin/python python "/usr/bin/$PYTHON_VERSION" 1
+RUN update-alternatives --install /usr/bin/python3 python3 "/usr/bin/$PYTHON_VERSION" 1
 RUN echo 1 | update-alternatives --config python
+RUN echo 1 | update-alternatives --config python3
 
 # Add gcloud repository and Cloud SDK dependencies
 RUN apt-get update && apt-get install -y apt-transport-https curl
-RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk-xenial main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 RUN apt-get update && apt-get install -y \
     google-cloud-sdk \
@@ -35,11 +43,22 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk-datastore-emulator \
     google-cloud-sdk-pubsub-emulator
 
-# Install nodejs
-RUN apt-get install -y nodejs npm
+# Install JDK 11 for firebase-tools
+RUN apt-get install default-jre -y
 
-# Install pip2 for gcloud dependencies
-RUN curl https://bootstrap.pypa.io/get-pip.py | python2
+# dev_appserver expects `python2` to exist
+RUN update-alternatives --install /usr/bin/python2 python2 /usr/bin/python2.7 1
+RUN echo 1 | update-alternatives --config python2
+
+# Set up nvm and nodejs
+ENV NVM_DIR /nvm
+ENV NODE_VERSION 18
+RUN mkdir -p $NVM_DIR  \
+    && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION --silent \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default --silent
 
 # Configure ssh server
 RUN mkdir /var/run/sshd
@@ -50,9 +69,18 @@ ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
 
+# Expose Firebase emulator
+EXPOSE 4000
+EXPOSE 4400
+EXPOSE 4500
+EXPOSE 9005
+EXPOSE 9000
+EXPOSE 9099
+
 # Expose ports for TBA
 EXPOSE 8000
 EXPOSE 8080-8089
+EXPOSE 9181
 
 # Start SSH server
 CMD ["/usr/sbin/sshd", "-D"]

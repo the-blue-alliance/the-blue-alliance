@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import ReactTransitionGroup from "react-addons-transition-group";
 import { List, ListItem } from "material-ui/List";
 import Paper from "material-ui/Paper";
@@ -41,7 +42,7 @@ export default class ChatSelector extends React.Component {
           primaryText={chatName}
           leftIcon={isDefault ? <ActionHome /> : null}
           rightIcon={icon}
-          onTouchTap={(e) => this.setTwitchChat(e, chat.channel)}
+          onClick={(e) => this.setTwitchChat(e, chat.channel)}
           key={chat.channel}
         />
       );
@@ -72,7 +73,7 @@ export default class ChatSelector extends React.Component {
           <AnimatableContainer
             key="overlay"
             style={overlayStyle}
-            onTouchTap={() => this.props.onRequestClose()}
+            onClick={() => this.props.onRequestClose()}
             beginStyle={{
               opacity: 0,
             }}
@@ -95,7 +96,7 @@ export default class ChatSelector extends React.Component {
             }}
           >
             <Paper zDepth={4}>
-              <List onTouchTap={(e) => e.stopPropagation()}>{chatItems}</List>
+              <List onClick={(e) => e.stopPropagation()}>{chatItems}</List>
             </Paper>
           </AnimatableContainer>
         )}

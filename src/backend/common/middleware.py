@@ -1,33 +1,16 @@
 from typing import Any, Callable
 
 from flask import Flask
-from google.cloud import ndb
+from google.appengine.ext import ndb
 from werkzeug.wrappers import Request
 from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
+from backend.common.run_after_response import execute_callbacks
 
 
-class NdbMiddleware(object):
-
-    """
-    A middleware that gives each request access to an ndb context
-    """
-
-    app: Callable[[Any, Any], Any]
-    ndb_client: ndb.Client
-
-    def __init__(self, app: Callable[[Any, Any], Any]):
-        self.app = app
-        self.ndb_client = ndb.Client()
-
-    def __call__(self, environ: Any, start_response: Any):
-        with self.ndb_client.context():
-            return self.app(environ, start_response)
-
-
-class TraceRequestMiddleware(object):
+class TraceRequestMiddleware:
     """
     A middleware that gives trace_context access to the request
     """
@@ -38,13 +21,13 @@ class TraceRequestMiddleware(object):
         self.app = app
 
     def __call__(self, environ: Any, start_response: Any):
-        trace_context.request = Request(environ)  # pyre-ignore[16]
+        trace_context.request = Request(environ)
         return self.app(environ, start_response)
 
 
 class AfterResponseMiddleware:
     """
-    A middleware that handles tasks after handling the response
+    A middleware that handles tasks after handling the response.
     """
 
     app: Callable[[Any, Any], Any]
@@ -52,31 +35,41 @@ class AfterResponseMiddleware:
     def __init__(self, app: Callable[[Any, Any], Any]):
         self.app = app
 
+    @ndb.toplevel
     def __call__(self, environ: Any, start_response: Any):
-        return ClosingIterator(self.app(environ, start_response), self._run)
+        return ClosingIterator(self.app(environ, start_response), self._run_after)
 
-    def _run(self):
+    def _run_after(self):
         with Span("Running AfterResponseMiddleware"):
             pass
         send_traces()
+        execute_callbacks()
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
-    @app.before_first_request
+    @app.before_request
     def _app_before():
-        if configure_secret_key:
+        if configure_secret_key and not app.secret_key:
             _set_secret_key(app)
 
-    app.wsgi_app = NdbMiddleware(TraceRequestMiddleware(AfterResponseMiddleware(app.wsgi_app)))  # type: ignore[override]
+    # The middlewares get added in order of this last, and each wraps the previous
+    # This means, the last one in this list is the "outermost" middleware that runs
+    # _first_ for a given request, for the cases when order matters
+    middlewares = [
+        AfterResponseMiddleware,
+        TraceRequestMiddleware,
+    ]
+    for middleware in middlewares:
+        app.wsgi_app = middleware(app.wsgi_app)  # type: ignore[override]
 
 
 def _set_secret_key(app: Flask) -> None:
-    from backend.common.sitevars.secrets import Secrets
+    from backend.common.sitevars.flask_secrets import FlaskSecrets
 
-    secret_key = Secrets.secret_key()
+    secret_key = FlaskSecrets.secret_key()
     if Environment.is_prod():
         if not secret_key:
             raise Exception("Secret key not set in production!")
-        if secret_key == Secrets.DEFAULT_SECRET_KEY:
+        if secret_key == FlaskSecrets.DEFAULT_SECRET_KEY:
             raise Exception("Secret key may not be default in production!")
     app.secret_key = secret_key

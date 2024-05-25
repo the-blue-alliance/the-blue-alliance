@@ -1,4 +1,4 @@
-from google.cloud import ndb
+from google.appengine.ext import ndb
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.models.event import Event

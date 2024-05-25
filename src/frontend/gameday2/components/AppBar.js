@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import { Toolbar, ToolbarTitle, ToolbarGroup } from "material-ui/Toolbar";
 import FlatButton from "material-ui/FlatButton";
 import IconButton from "material-ui/IconButton";
@@ -40,16 +41,6 @@ const AppBar = (props) => {
     fontSize: 12,
   };
 
-  const vexProStyle = {
-    color: props.muiTheme.appBar.textColor,
-    textDecoration: "none",
-    marginLeft: 32,
-    marginRight: 64,
-    fontSize: 12,
-    display: "flex",
-    alignItems: "center",
-  };
-
   const tbaBrandingButton = (
     <IconButton
       style={tbaBrandingButtonStyle}
@@ -70,7 +61,7 @@ const AppBar = (props) => {
       labelPosition="before"
       style={configureLayoutButtonStyle}
       icon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
-      onTouchTap={() => props.setLayoutDrawerVisibility(true)}
+      onClick={() => props.setLayoutDrawerVisibility(true)}
     />
   );
 
@@ -82,10 +73,6 @@ const AppBar = (props) => {
           <ToolbarTitle text="GameDay" style={appBarTitleStyle} />
           <a style={appBarSubtitleStyle} href="/">
             by The Blue Alliance
-          </a>
-          <a style={vexProStyle} href="https://www.vexrobotics.com/vexpro/">
-            <span style={{ marginRight: "4px" }}>POWERED BY</span>
-            <img src="/images/vexpro_horiz.png" alt="vexPRO" height={16} />
           </a>
           <div
             className="fb-like"

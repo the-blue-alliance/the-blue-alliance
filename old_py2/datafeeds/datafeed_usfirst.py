@@ -233,7 +233,7 @@ class DatafeedUsfirst(DatafeedBase):
                 match_dicts += elim_match_dicts
 
         matches = [Match(
-            id=Match.renderKeyName(
+            id=Match.render_key_name(
                 event.key.id(),
                 match_dict.get("comp_level", None),
                 match_dict.get("set_number", 0),

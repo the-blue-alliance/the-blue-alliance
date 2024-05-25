@@ -1,0 +1,16 @@
+from google.appengine.api import apiproxy_stub_map as apiproxy_stub_map
+from google.appengine.api.capabilities import capability_service_pb2 as capability_service_pb2
+from google.appengine.base import capabilities_pb2 as capabilities_pb2
+from typing import Any
+
+IsEnabledRequest: Any
+IsEnabledResponse: Any
+CapabilityConfig: Any
+
+class UnknownCapabilityError(Exception): ...
+
+class CapabilitySet:
+    def __init__(self, package, capabilities: Any | None = ..., methods: Any | None = ..., stub_map=...) -> None: ...
+    def is_enabled(self): ...
+    def will_remain_enabled_for(self, time: int = ...): ...
+    def admin_message(self): ...

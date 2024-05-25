@@ -1,0 +1,15 @@
+cron:
+- description: FIRST team detail scraping
+  url: /tasks/enqueue/fmsapi_team_details_rolling
+  schedule: every day 02:00
+  timezone: America/Los_Angeles
+
+- description: Suggestion Queue Nag
+  url: /tasks/do/nag_suggestions
+  schedule: every day 12:00
+  timezone: America/Los_Angeles
+
+- description: Backup Cron job
+  url: /backend-tasks/backup/enqueue
+  schedule: every monday 03:00
+  timezone: America/Los_Angeles

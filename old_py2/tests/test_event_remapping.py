@@ -37,13 +37,3 @@ class TestEventRemapping(unittest2.TestCase):
         EventHelper.remapteams_alliances(alliances, self.remap_teams)
         self.assertEqual(alliances[0]['picks'], ['frc1B', 'frc649', 'frc840'])
         self.assertEqual(alliances[3]['picks'], ['frc604', 'frc200', 'frc7308'])
-
-    def test_remap_awards(self):
-        awards = [
-            Award(
-                recipient_json_list=["""{"team_number": 2, "awardee": null}"""]
-            ),
-        ]
-        EventHelper.remapteams_awards(awards, self.remap_teams)
-        self.assertEqual(awards[0].recipient_list[0]['team_number'], '200')
-        self.assertEqual(awards[0].team_list, [ndb.Key('Team', 'frc200')])

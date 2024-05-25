@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import { Toolbar, ToolbarGroup } from "material-ui/Toolbar";
 import FlatButton from "material-ui/FlatButton";
 import IconButton from "material-ui/IconButton";
@@ -47,23 +48,28 @@ const VideoCellToolbar = (props) => {
   // Create tickerMatches
   const tickerMatches = [];
   props.matches.forEach((match) => {
-    // See if match has a favorite team
-    let hasFavorite = false;
-    const teamKeys = match.rt.concat(match.bt);
-    teamKeys.forEach((teamKey) => {
-      if (props.favoriteTeams.has(teamKey)) {
-        hasFavorite = true;
-      }
-    });
+    if (match.rt && match.rt.length > 0 && match.bt && match.bt.length > 0) {
+      // 2024 Week 3, FMS Sync issues result in schedules
+      // being posted without teams, so skip those matchesk
 
-    tickerMatches.push(
-      <TickerMatch
-        key={match.key}
-        match={match}
-        hasFavorite={hasFavorite}
-        isBlueZone={props.isBlueZone}
-      />
-    );
+      // See if match has a favorite team
+      let hasFavorite = false;
+      const teamKeys = match.rt.concat(match.bt);
+      teamKeys.forEach((teamKey) => {
+        if (props.favoriteTeams.has(teamKey)) {
+          hasFavorite = true;
+        }
+      });
+
+      tickerMatches.push(
+        <TickerMatch
+          key={match.key}
+          match={match}
+          hasFavorite={hasFavorite}
+          isBlueZone={props.isBlueZone}
+        />
+      );
+    }
   });
 
   let swapButton;
@@ -74,7 +80,7 @@ const VideoCellToolbar = (props) => {
       <IconButton
         tooltip="Swap position"
         tooltipPosition="top-center"
-        onTouchTap={() => props.onRequestSwapPosition()}
+        onClick={() => props.onRequestSwapPosition()}
         touch
       >
         <SwapIcon color={white} />
@@ -90,6 +96,7 @@ const VideoCellToolbar = (props) => {
           style={titleStyle}
           href={`/event/${props.webcast.key}`}
           target="_blank"
+          rel="noopener noreferrer"
           disabled={props.specialWebcastIds.has(props.webcast.id)}
         />
       </ToolbarGroup>
@@ -101,7 +108,7 @@ const VideoCellToolbar = (props) => {
         <IconButton
           tooltip="Change webcast"
           tooltipPosition="top-center"
-          onTouchTap={() => props.onRequestSelectWebcast()}
+          onClick={() => props.onRequestSelectWebcast()}
           touch
         >
           <VideocamIcon color={white} />
@@ -113,13 +120,13 @@ const VideoCellToolbar = (props) => {
               : "Switch to live scores view"
           }
           tooltipPosition="top-center"
-          onTouchTap={() => props.onRequestLiveScoresToggle()}
+          onClick={() => props.onRequestLiveScoresToggle()}
           touch
         >
           <EqualizerIcon color={props.livescoreOn ? green500 : white} />
         </IconButton>
         <IconButton
-          onTouchTap={() => props.removeWebcast(props.webcast.id)}
+          onClick={() => props.removeWebcast(props.webcast.id)}
           tooltip="Close webcast"
           tooltipPosition="top-left"
           touch

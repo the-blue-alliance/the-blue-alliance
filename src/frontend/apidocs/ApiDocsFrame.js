@@ -1,13 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import SwaggerUi, { presets } from "swagger-ui";
+import SwaggerUi from "swagger-ui";
 
 class ApiDocsFrame extends Component {
   componentDidMount() {
     SwaggerUi({
       dom_id: "#swaggerContainer",
       url: this.props.url,
-      presets: [presets.apis],
     });
   }
 

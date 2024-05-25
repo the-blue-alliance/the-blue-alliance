@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Account Deletion - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Delete your TBA account.{% endblock %}
+
+{% block content %}
+<div class="container">
+<h1>Delete Your Account</h1>  
+
+<form action="/account/delete" method="post">
+    <legend>Delete data for {{user.email}}</legend>
+    <p>This will delete your myTBA favorites and subscriptions, as well as linked devices for push notifications and API keys.</p>
+    <div class="alert alert-danger">
+        <p>This action can not be undone! Are you sure you want to proceed?</p>
+    </div>
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <a href="/account" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-ban-circle"></span> Cancel Delete</a>
+    <button type="submit" class="btn btn-danger btn-lg pull-right"><span class="glyphicon glyphicon-trash"></span> Delete Account</button>
+</form>
+
+</div>
+{% endblock %}

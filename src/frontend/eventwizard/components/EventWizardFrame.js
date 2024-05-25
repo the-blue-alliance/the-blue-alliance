@@ -3,7 +3,7 @@ import EventWizardTabFrame from "./EventWizardTabFrame";
 import SetupFrame from "./SetupFrame";
 
 const EventWizardFrame = () => (
-  <div className="container">
+  <div id="eventwizard" className="container">
     <div className="row">
       <div className="col-xs-12">
         <h1 className="endheader">TBA Event Wizard</h1>

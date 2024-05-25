@@ -1,0 +1,41 @@
+{
+  "address": "2101 N Oak St, Myrtle Beach, SC 29579, USA", 
+  "city": "Myrtle Beach", 
+  "country": "USA", 
+  "district": null, 
+  "division_keys": [], 
+  "end_date": "2020-02-29", 
+  "event_code": "scmb", 
+  "event_type": 0, 
+  "event_type_string": "Regional", 
+  "first_event_code": "SCMB", 
+  "first_event_id": "43964", 
+  "gmaps_place_id": "ChIJlVnSF-VoAIkRbFvg2tC7PDw", 
+  "gmaps_url": "https://maps.google.com/?cid=4340550646578043756", 
+  "key": "2020scmb", 
+  "lat": 33.7065801, 
+  "lng": -78.8741921, 
+  "location_name": "Myrtle Beach Convention Center", 
+  "name": "Palmetto Regional", 
+  "parent_event_key": null, 
+  "playoff_type": null, 
+  "playoff_type_string": null, 
+  "postal_code": "29579", 
+  "short_name": "Palmetto", 
+  "start_date": "2020-02-26", 
+  "state_prov": "SC", 
+  "timezone": "America/New_York", 
+  "webcasts": [
+    {
+      "channel": "firstinspires3", 
+      "type": "twitch"
+    }, 
+    {
+      "channel": "firstinspires4", 
+      "type": "twitch"
+    }
+  ], 
+  "website": "http://www.firstroboticsmyrtlebeach.com/", 
+  "week": 0, 
+  "year": 2020
+}

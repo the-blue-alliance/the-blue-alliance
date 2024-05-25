@@ -1,0 +1,373 @@
+[
+    {
+      "extra_stats_info": [], 
+      "level": "qf1", 
+      "level_name": "Quarterfinals 1", 
+      "rankings": [
+        {
+          "alliance_color": "red", 
+          "alliance_name": "Alliance 1", 
+          "extra_stats": [], 
+          "matches_played": 2, 
+          "record": {
+            "losses": 0, 
+            "ties": 0, 
+            "wins": 2
+          }, 
+          "sort_orders": [
+            2
+          ], 
+          "team_keys": [
+            "frc1796", 
+            "frc694", 
+            "frc2265"
+          ]
+        }, 
+        {
+          "alliance_color": "blue", 
+          "alliance_name": "Alliance 8", 
+          "extra_stats": [], 
+          "matches_played": 2, 
+          "record": {
+            "losses": 2, 
+            "ties": 0, 
+            "wins": 0
+          }, 
+          "sort_orders": [
+            0
+          ], 
+          "team_keys": [
+            "frc5781", 
+            "frc1635", 
+            "frc7458"
+          ]
+        }
+      ], 
+      "sort_order_info": [
+        {
+          "name": "Wins", 
+          "precision": 0, 
+          "type": "int"
+        }
+      ], 
+      "type": "best_of_3"
+    }, 
+    {
+      "extra_stats_info": [], 
+      "level": "qf2", 
+      "level_name": "Quarterfinals 2", 
+      "rankings": [
+        {
+          "alliance_color": "red", 
+          "alliance_name": "Alliance 4", 
+          "extra_stats": [], 
+          "matches_played": 3, 
+          "record": {
+            "losses": 1, 
+            "ties": 0, 
+            "wins": 2
+          }, 
+          "sort_orders": [
+            2
+          ], 
+          "team_keys": [
+            "frc1880", 
+            "frc354", 
+            "frc3419"
+          ]
+        }, 
+        {
+          "alliance_color": "blue", 
+          "alliance_name": "Alliance 5", 
+          "extra_stats": [], 
+          "matches_played": 3, 
+          "record": {
+            "losses": 2, 
+            "ties": 0, 
+            "wins": 1
+          }, 
+          "sort_orders": [
+            1
+          ], 
+          "team_keys": [
+            "frc6401", 
+            "frc7004", 
+            "frc4383"
+          ]
+        }
+      ], 
+      "sort_order_info": [
+        {
+          "name": "Wins", 
+          "precision": 0, 
+          "type": "int"
+        }
+      ], 
+      "type": "best_of_3"
+    }, 
+    {
+      "extra_stats_info": [], 
+      "level": "qf3", 
+      "level_name": "Quarterfinals 3", 
+      "rankings": [
+        {
+          "alliance_color": "red", 
+          "alliance_name": "Alliance 2", 
+          "extra_stats": [], 
+          "matches_played": 3, 
+          "record": {
+            "losses": 1, 
+            "ties": 0, 
+            "wins": 2
+          }, 
+          "sort_orders": [
+            2
+          ], 
+          "team_keys": [
+            "frc4122", 
+            "frc1155", 
+            "frc2869"
+          ]
+        }, 
+        {
+          "alliance_color": "blue", 
+          "alliance_name": "Alliance 7", 
+          "extra_stats": [], 
+          "matches_played": 3, 
+          "record": {
+            "losses": 2, 
+            "ties": 0, 
+            "wins": 1
+          }, 
+          "sort_orders": [
+            1
+          ], 
+          "team_keys": [
+            "frc1660", 
+            "frc2344", 
+            "frc395"
+          ]
+        }
+      ], 
+      "sort_order_info": [
+        {
+          "name": "Wins", 
+          "precision": 0, 
+          "type": "int"
+        }
+      ], 
+      "type": "best_of_3"
+    }, 
+    {
+      "extra_stats_info": [], 
+      "level": "qf4", 
+      "level_name": "Quarterfinals 4", 
+      "rankings": [
+        {
+          "alliance_color": "blue", 
+          "alliance_name": "Alliance 6", 
+          "extra_stats": [], 
+          "matches_played": 3, 
+          "record": {
+            "losses": 1, 
+            "ties": 0, 
+            "wins": 2
+          }, 
+          "sort_orders": [
+            2
+          ], 
+          "team_keys": [
+            "frc2579", 
+            "frc333", 
+            "frc334"
+          ]
+        }, 
+        {
+          "alliance_color": "red", 
+          "alliance_name": "Alliance 3", 
+          "extra_stats": [], 
+          "matches_played": 3, 
+          "record": {
+            "losses": 2, 
+            "ties": 0, 
+            "wins": 1
+          }, 
+          "sort_orders": [
+            1
+          ], 
+          "team_keys": [
+            "frc7522", 
+            "frc4571", 
+            "frc5806"
+          ]
+        }
+      ], 
+      "sort_order_info": [
+        {
+          "name": "Wins", 
+          "precision": 0, 
+          "type": "int"
+        }
+      ], 
+      "type": "best_of_3"
+    }, 
+    {
+      "extra_stats_info": [], 
+      "level": "sf1", 
+      "level_name": "Semifinals 1", 
+      "rankings": [
+        {
+          "alliance_color": "red", 
+          "alliance_name": "Alliance 1", 
+          "extra_stats": [], 
+          "matches_played": 2, 
+          "record": {
+            "losses": 0, 
+            "ties": 0, 
+            "wins": 2
+          }, 
+          "sort_orders": [
+            2
+          ], 
+          "team_keys": [
+            "frc1796", 
+            "frc694", 
+            "frc2265"
+          ]
+        }, 
+        {
+          "alliance_color": "blue", 
+          "alliance_name": "Alliance 4", 
+          "extra_stats": [], 
+          "matches_played": 2, 
+          "record": {
+            "losses": 2, 
+            "ties": 0, 
+            "wins": 0
+          }, 
+          "sort_orders": [
+            0
+          ], 
+          "team_keys": [
+            "frc1880", 
+            "frc354", 
+            "frc3419"
+          ]
+        }
+      ], 
+      "sort_order_info": [
+        {
+          "name": "Wins", 
+          "precision": 0, 
+          "type": "int"
+        }
+      ], 
+      "type": "best_of_3"
+    }, 
+    {
+        "extra_stats_info": [], 
+        "level": "sf2", 
+        "level_name": "Semifinals 2", 
+        "rankings": [
+          {
+            "alliance_color": "red", 
+            "alliance_name": "Alliance 2", 
+            "extra_stats": [], 
+            "matches_played": 2, 
+            "record": {
+              "losses": 0, 
+              "ties": 0, 
+              "wins": 2
+            }, 
+            "sort_orders": [
+              2
+            ], 
+            "team_keys": [
+              "frc4122", 
+              "frc1155", 
+              "frc2869"
+            ]
+          }, 
+          {
+            "alliance_color": "blue", 
+            "alliance_name": "Alliance 6", 
+            "extra_stats": [], 
+            "matches_played": 2, 
+            "record": {
+              "losses": 2, 
+              "ties": 0, 
+              "wins": 0
+            }, 
+            "sort_orders": [
+              0
+            ], 
+            "team_keys": [
+              "frc2579", 
+              "frc333", 
+              "frc334"
+            ]
+          }
+        ], 
+        "sort_order_info": [
+          {
+            "name": "Wins", 
+            "precision": 0, 
+            "type": "int"
+          }
+        ], 
+        "type": "best_of_3"
+      }, 
+      {
+      "extra_stats_info": [], 
+      "level": "f1", 
+      "level_name": "Finals", 
+      "rankings": [
+        {
+          "alliance_color": "red", 
+          "alliance_name": "Alliance 1", 
+          "extra_stats": [], 
+          "matches_played": 2, 
+          "record": {
+            "losses": 0, 
+            "ties": 0, 
+            "wins": 2
+          }, 
+          "sort_orders": [
+            2
+          ], 
+          "team_keys": [
+            "frc1796", 
+            "frc694", 
+            "frc2265"
+          ]
+        }, 
+        {
+          "alliance_color": "blue", 
+          "alliance_name": "Alliance 2", 
+          "extra_stats": [], 
+          "matches_played": 2, 
+          "record": {
+            "losses": 2, 
+            "ties": 0, 
+            "wins": 0
+          }, 
+          "sort_orders": [
+            0
+          ], 
+          "team_keys": [
+            "frc4122", 
+            "frc1155", 
+            "frc2869"
+          ]
+        }
+      ], 
+      "sort_order_info": [
+        {
+          "name": "Wins", 
+          "precision": 0, 
+          "type": "int"
+        }
+      ], 
+      "type": "best_of_3"
+    }
+  ]

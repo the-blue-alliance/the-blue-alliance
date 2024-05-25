@@ -1,14 +1,23 @@
+import itertools
+from typing import Generator
 from unittest.mock import patch
 
 import pytest
-from google.cloud import ndb
+from flask import Flask
 
 from backend.common.google_analytics import GoogleAnalytics
+from backend.common.run_after_response import execute_callbacks
 
 
 @pytest.fixture(autouse=True)
-def auto_add_ndb_context(ndb_context: ndb.Context) -> None:
+def auto_add_ndb_stub(ndb_stub) -> None:
     pass
+
+
+@pytest.fixture(autouse=True)
+def run_with_werkzeug_context(app: Flask) -> Generator:
+    with app.test_request_context("/"):
+        yield
 
 
 def test_GoogleAnalytics_track_event_missing_sitevar() -> None:
@@ -19,15 +28,27 @@ def test_GoogleAnalytics_track_event_missing_sitevar() -> None:
         )
 
 
-@pytest.mark.parametrize("ev", [(None), (123)])
-def test_GoogleAnalytics_track_event(ev) -> None:
+@pytest.mark.parametrize(
+    "run_after,el,ev", itertools.product([False, True], [None, "test"], [None, 123])
+)
+def test_GoogleAnalytics_track_event(run_after, el, ev) -> None:
     from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
 
     sitevar = GoogleAnalyticsID._fetch_sitevar()
     sitevar.contents["GOOGLE_ANALYTICS_ID"] = "abc"
 
     with patch("requests.get") as mock_get:
-        GoogleAnalytics.track_event("testbed", "test", "test", ev)
+        GoogleAnalytics.track_event(
+            "testbed",
+            "test",
+            "test",
+            event_label=el,
+            event_value=ev,
+            run_after=run_after,
+        )
+        if run_after:
+            mock_get.assert_not_called()
+        execute_callbacks()
 
     mock_get.assert_called()
     args, kwargs = mock_get.call_args
@@ -44,9 +65,12 @@ def test_GoogleAnalytics_track_event(ev) -> None:
         "t": "event",
         "ec": "test",
         "ea": "test",
+        "cd1": "testbed",
         "ni": 1,
         "sc": "end",
     }
+    if el:
+        query_components_expected["el"] = el
     if ev:
         query_components_expected["ev"] = ev
 

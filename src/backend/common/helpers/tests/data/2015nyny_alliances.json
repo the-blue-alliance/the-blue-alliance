@@ -1,0 +1,130 @@
+[
+  {
+    "declines": [], 
+    "picks": [
+      "frc3419", 
+      "frc3171", 
+      "frc4571"
+    ], 
+    "status": {
+      "current_level_record": null, 
+      "level": "sf", 
+      "playoff_average": 94.4, 
+      "record": null, 
+      "status": "eliminated"
+    }
+  }, 
+  {
+    "declines": [], 
+    "picks": [
+      "frc694", 
+      "frc354", 
+      "frc271"
+    ], 
+    "status": {
+      "current_level_record": {
+        "losses": 2, 
+        "ties": 0, 
+        "wins": 0
+      }, 
+      "level": "f", 
+      "playoff_average": 90.14285714285714, 
+      "record": null, 
+      "status": "eliminated"
+    }
+  }, 
+  {
+    "declines": [], 
+    "picks": [
+      "frc1635", 
+      "frc1860", 
+      "frc334"
+    ], 
+    "status": {
+      "current_level_record": null, 
+      "level": "qf", 
+      "playoff_average": 23.0, 
+      "record": null, 
+      "status": "eliminated"
+    }
+  }, 
+  {
+    "declines": [], 
+    "picks": [
+      "frc5308", 
+      "frc1546", 
+      "frc358"
+    ], 
+    "status": {
+      "current_level_record": null, 
+      "level": "qf", 
+      "playoff_average": 40.0, 
+      "record": null, 
+      "status": "eliminated"
+    }
+  }, 
+  {
+    "declines": [], 
+    "picks": [
+      "frc743", 
+      "frc1660", 
+      "frc4856"
+    ], 
+    "status": {
+      "current_level_record": null, 
+      "level": "sf", 
+      "playoff_average": 45.4, 
+      "record": null, 
+      "status": "eliminated"
+    }
+  }, 
+  {
+    "declines": [], 
+    "picks": [
+      "frc1884", 
+      "frc2344", 
+      "frc1796"
+    ], 
+    "status": {
+      "current_level_record": {
+        "losses": 0, 
+        "ties": 0, 
+        "wins": 2
+      }, 
+      "level": "f", 
+      "playoff_average": 93.14285714285714, 
+      "record": null, 
+      "status": "won"
+    }
+  }, 
+  {
+    "declines": [], 
+    "picks": [
+      "frc2579", 
+      "frc806", 
+      "frc4122"
+    ], 
+    "status": {
+      "current_level_record": null, 
+      "level": "qf", 
+      "playoff_average": 50.5, 
+      "record": null, 
+      "status": "eliminated"
+    }
+  }, 
+  {
+    "declines": [], 
+    "picks": [
+      "frc1396", 
+      "frc5773", 
+      "frc229"
+    ], 
+    "status": {
+      "current_level_record": null, 
+      "level": "qf", 
+      "playoff_average": 25.0, 
+      "record": null, 
+      "status": "eliminated"
+    }
+  }
+]
