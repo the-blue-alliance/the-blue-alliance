@@ -2,11 +2,11 @@ from datetime import timedelta
 
 from flask import (
     Blueprint,
+    jsonify,
     make_response,
     redirect,
     request,
     Response,
-    jsonify,
     url_for,
 )
 from pyre_extensions import none_throws
