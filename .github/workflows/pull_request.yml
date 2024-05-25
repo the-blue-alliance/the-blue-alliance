@@ -214,7 +214,7 @@ jobs:
       #       ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
       #     cache-to: type=gha,mode=max
       - name: Start Container
-        run: docker-compose up
+        run: docker-compose up -d
       - name: Test Startup
         run: ./ops/test_startup.py
       - name: Test Ops Fullstack
