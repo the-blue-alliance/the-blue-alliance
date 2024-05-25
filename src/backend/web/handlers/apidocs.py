@@ -1,10 +1,17 @@
 from datetime import timedelta
 
-from flask import Blueprint, make_response, redirect, request, Response, url_for
+from flask import (
+    Blueprint,
+    make_response,
+    redirect,
+    request,
+    Response,
+    jsonify,
+    url_for,
+)
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response as WerkzeugResponse
 
-from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.auth import current_user
 from backend.common.consts.notification_type import (
     ENABLED_NOTIFICATIONS,
@@ -71,7 +78,7 @@ def apidocs_webhooks_notification(type: int) -> Response:
     success_response = make_response("ok", 200)
 
     def error_response(message: str):
-        return make_response(profiled_jsonify({"Error": message}), 400)
+        return make_response(jsonify({"Error": message}), 400)
 
     try:
         notification_type = NotificationType(type)
