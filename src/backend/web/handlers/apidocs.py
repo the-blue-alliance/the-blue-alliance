@@ -69,11 +69,9 @@ def apidocs_webhooks_notification(type: int) -> Response:
     user_id = str(user.uid)
 
     success_response = make_response("ok", 200)
+
     def error_response(message: str):
-        return make_response(
-            profiled_jsonify({"Error": message}),
-            400
-        )
+        return make_response(profiled_jsonify({"Error": message}), 400)
 
     try:
         notification_type = NotificationType(type)
