@@ -99,9 +99,9 @@ class FMSAPIHybridScheduleParser(
         )
 
         parsed_matches: List[Match] = []
-        remapped_matches: Dict[
-            MatchKey, MatchKey
-        ] = {}  # If a key changes due to a tiebreaker
+        remapped_matches: Dict[MatchKey, MatchKey] = (
+            {}
+        )  # If a key changes due to a tiebreaker
         for match, (key_name, comp_level, set_number, match_number) in zip(
             matches, match_identifiers
         ):
@@ -112,7 +112,6 @@ class FMSAPIHybridScheduleParser(
             red_dqs: List[TeamKey] = []
             blue_dqs: List[TeamKey] = []
             team_key_names: List[TeamKey] = []
-            null_team = False
 
             # Sort by station to ensure correct ordering. Kind of hacky.
             sorted_teams = list(
@@ -121,30 +120,33 @@ class FMSAPIHybridScheduleParser(
                     key=lambda team: team["station"],
                 )
             )
-            for team in sorted_teams:
-                if team["teamNumber"] is None:
-                    null_team = True
-                team_key = "frc{}".format(team["teamNumber"])
-                team_key_names.append(team_key)
-                if "Red" in team["station"]:
-                    red_teams.append(team_key)
-                    if team["surrogate"]:
-                        red_surrogates.append(team_key)
-                    if team["dq"]:
-                        red_dqs.append(team_key)
-                elif "Blue" in team["station"]:
-                    blue_teams.append(team_key)
-                    if team["surrogate"]:
-                        blue_surrogates.append(team_key)
-                    if team["dq"]:
-                        blue_dqs.append(team_key)
 
+            null_team = any(t["teamNumber"] is None for t in sorted_teams)
             if (
                 null_team
                 and match["scoreRedFinal"] is None
                 and match["scoreBlueFinal"] is None
             ):
                 continue
+
+            for team in sorted_teams:
+                if team["teamNumber"] is None:
+                    continue
+
+                team_key = "frc{}".format(team["teamNumber"])
+                team_key_names.append(team_key)
+                if "Red" in team["station"]:
+                    red_teams.append(team_key)
+                    if team.get("surrogate", None):
+                        red_surrogates.append(team_key)
+                    if team.get("dq", None):
+                        red_dqs.append(team_key)
+                elif "Blue" in team["station"]:
+                    blue_teams.append(team_key)
+                    if team.get("surrogate", None):
+                        blue_surrogates.append(team_key)
+                    if team.get("dq", None):
+                        blue_dqs.append(team_key)
 
             alliances = {
                 "red": {
@@ -380,6 +382,20 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
                     "L" if scale_red else "R",
                     "L" if left_switch_red else "R",
                 )
+
+            elif self.year == 2024:
+                # Bonus thresholds and coop status are in the top level Match object,
+                # duplicate them into each alliance breakdown
+                for key in [
+                    "coopertitionBonusAchieved",
+                    "melodyBonusThresholdCoop",
+                    "melodyBonusThresholdNonCoop",
+                    "melodyBonusThreshold",
+                    "ensembleBonusStagePointsThreshold",
+                    "ensembleBonusOnStageRobotsThreshold",
+                ]:
+                    for color in ALLIANCE_COLORS:
+                        breakdown[color][key] = match[key]
 
             for alliance in match.get("alliances", match.get("Alliances", [])):
                 color = alliance["alliance"].lower()

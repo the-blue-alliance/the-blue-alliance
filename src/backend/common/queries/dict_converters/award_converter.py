@@ -37,9 +37,11 @@ class AwardConverter(ConverterBase):
             recipient_list_fixed.append(
                 {
                     "awardee": recipient["awardee"],
-                    "team_key": "frc{}".format(recipient["team_number"])
-                    if recipient["team_number"]
-                    else None,
+                    "team_key": (
+                        "frc{}".format(recipient["team_number"])
+                        if recipient["team_number"]
+                        else None
+                    ),
                 }
             )
         return AwardDict(
@@ -70,9 +72,9 @@ class AwardConverter(ConverterBase):
                 json.dumps(
                     {
                         "awardee": recipient["awardee"],
-                        "team_number": recipient["team_key"][3:]
-                        if recipient["team_key"]
-                        else None,
+                        "team_number": (
+                            recipient["team_key"][3:] if recipient["team_key"] else None
+                        ),
                     }
                 )
             )

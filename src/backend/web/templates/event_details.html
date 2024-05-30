@@ -66,16 +66,7 @@
           <span class="glyphicon glyphicon-circle-arrow-right"></span> Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a><br />
         {% endif %}
         {{ em.showEventDates(event) }}
-        {% if event.nl and event.nl.name and event.nl.city_state_country %}
-          <br><span class="glyphicon glyphicon-map-marker"></span>
-          <span itemprop="location">
-          {% if event.nl and event.nl.name %}
-            <a href="{{event.nl.place_details.url}}" target="_blank" rel="noopener noreferrer">{{event.nl.name}}</a> in {{event.nl.city_state_country}}
-          {% else %}
-            <a href="//maps.google.com/maps?q={{ event.city_state_country|urlencode }}" target="_blank" rel="noopener noreferrer">{{event.city_state_country}}</a>
-          {% endif %}
-          </span>
-        {% elif event.location or event.venue_address_safe %}
+        {% if event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
           <span itemprop="location">
           {% if event.venue_address_safe %}

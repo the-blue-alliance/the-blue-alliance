@@ -196,9 +196,9 @@ def test_past_future_start_end_today(
         (2020, EventType.REGIONAL, False, 2, None, None),
         (2021, EventType.REGIONAL, True, 0, 0, "Participation"),
         (2021, EventType.DISTRICT, True, 0, 0, "Participation"),
-        (2021, EventType.REMOTE, True, 2, 2, "FIRST Innovation Challenge"),
-        (2021, EventType.REMOTE, True, 3, 3, "INFINITE RECHARGE At Home Challenge"),
-        (2021, EventType.REMOTE, True, 4, 4, "Game Design Challenge"),
+        (2021, EventType.REMOTE, True, 6, 6, "FIRST Innovation Challenge"),
+        (2021, EventType.REMOTE, True, 7, 7, "INFINITE RECHARGE At Home Challenge"),
+        (2021, EventType.REMOTE, True, 8, 8, "Game Design Challenge"),
         (2021, EventType.REMOTE, True, 5, 5, "Awards"),
     ],
 )

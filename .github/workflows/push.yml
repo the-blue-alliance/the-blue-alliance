@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - py3
-      
+
 concurrency: deploy-${{ github.ref }}
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
@@ -35,8 +35,8 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
@@ -49,13 +49,16 @@ jobs:
   py3-test:
     name: "[py3] Test"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        group: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
@@ -64,17 +67,47 @@ jobs:
           pip install -r src/requirements.txt
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/test_py3.sh
+        run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
+      - name: Save coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage${{ matrix.group }}
+          path: .coverage
+  py3-coverage:
+    name: "[py3] Coverage"
+    runs-on: ubuntu-latest
+    needs: [py3-test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      - name: Combine coverage
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: |
+          coverage combine coverage*/.coverage*
+          coverage xml
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v4.4.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.xml
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.1
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: "18"
           cache: "npm"
@@ -90,7 +123,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.1
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: "18"
           cache: "npm"
@@ -102,8 +135,9 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v3.1.4
+        uses: codecov/codecov-action@v4.4.1
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
   bash-lint:
     name: "[bash] Lint"
@@ -113,8 +147,8 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Shellcheck
         run: |
           python -m pip install --upgrade pip
@@ -136,9 +170,9 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       - name: Set up Node
-        uses: actions/setup-node@v4.0.1
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: "18"
           cache: "npm"
@@ -170,14 +204,14 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       - name: Install Python Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
           python -m pip install --upgrade pip
           pip install requests
       - name: Set up Node
-        uses: actions/setup-node@v4.0.1
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: "18"
           cache: "npm"
@@ -230,7 +264,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -242,6 +276,28 @@ jobs:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: gcloud app deploy src/queue.yaml
+  deploy-index:
+    name: Deploy Index
+    runs-on: ubuntu-latest
+    needs: [py3-type, py3-lint, py3-test]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Deploy
+        run: gcloud app deploy src/index.yaml
   deploy-default:
     name: Deploy Default Service
     runs-on: ubuntu-latest
@@ -252,7 +308,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -267,14 +323,25 @@ jobs:
   deploy-web:
     name: Deploy Web Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, ops-test, deploy-queues]
+    needs:
+      [
+        py3-type,
+        py3-lint,
+        py3-test,
+        node-lint,
+        node-test,
+        build-web,
+        ops-test,
+        deploy-queues,
+        deploy-index,
+      ]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Download production artifacts
         uses: actions/download-artifact@v4
         with:
@@ -294,14 +361,14 @@ jobs:
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
+    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -316,14 +383,14 @@ jobs:
   deploy-tasks-io:
     name: Deploy Tasks IO Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
+    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -338,14 +405,14 @@ jobs:
   deploy-tasks-cpu:
     name: Deploy Tasks CPU Service
     runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
+    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -367,7 +434,7 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -382,14 +449,22 @@ jobs:
   deploy-dispatch:
     name: Deploy Dispatch
     runs-on: ubuntu-latest
-    needs: [deploy-queues, deploy-web, deploy-api, deploy-tasks-io, deploy-tasks-cpu]
+    needs:
+      [
+        deploy-queues,
+        deploy-index,
+        deploy-web,
+        deploy-api,
+        deploy-tasks-io,
+        deploy-tasks-cpu,
+      ]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:

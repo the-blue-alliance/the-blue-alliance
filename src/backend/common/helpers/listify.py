@@ -4,13 +4,11 @@ TThing = TypeVar("TThing")
 
 
 @overload
-def listify(thing: List[TThing]) -> List[TThing]:
-    ...
+def listify(thing: List[TThing]) -> List[TThing]: ...
 
 
 @overload
-def listify(thing: TThing) -> List[TThing]:
-    ...
+def listify(thing: TThing) -> List[TThing]: ...
 
 
 def listify(thing: Union[TThing, List[TThing]]) -> List[TThing]:

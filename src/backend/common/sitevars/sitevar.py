@@ -10,18 +10,15 @@ SVType = TypeVar("SVType")
 class Sitevar(abc.ABC, Generic[SVType]):
     @staticmethod
     @abc.abstractmethod
-    def key() -> str:
-        ...
+    def key() -> str: ...
 
     @staticmethod
     @abc.abstractmethod
-    def default_value() -> SVType:
-        ...
+    def default_value() -> SVType: ...
 
     @staticmethod
     @abc.abstractmethod
-    def description() -> str:
-        ...
+    def description() -> str: ...
 
     @classmethod
     def _fetch_sitevar(cls) -> sitevar.Sitevar:

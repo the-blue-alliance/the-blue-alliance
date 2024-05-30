@@ -1,0 +1,339 @@
+{% macro mobility(team, did_mobility) %}
+{% if did_mobility %}
+<span class="glyphicon glyphicon-ok" rel="tooltip" title="{{team|digits}}"></span>
+{% else %}
+<span class="glyphicon glyphicon-remove" rel="tooltip" title="{{team|digits}}"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro speaker(regular, regular_points, amplified, amplified_points) %}
+<span><span class="glyphicon glyphicon-volume-down" rel="tooltip" title="Not Amplified (+{{regular_points}})">{{regular}}</span> / <span class="glyphicon glyphicon-volume-up" rel="tooltip" title="Amplified (+{{amplified_points}})">{{amplified}}</span></span>
+{% endmacro %}
+
+{% macro endgame(team, stage_result, full_breakdown) %}
+{% if "Stage" in stage_result %}
+    <!-- one of StageLeft, CenterStage, StageRight -->
+    {% set spotlight_result = full_breakdown["mic" + stage_result] %}
+    {% if spotlight_result %}
+        <span rel="tooltip" title="{{team|digits}}">Spotlit (+4)</span>
+    {% else %} 
+        <span rel="tooltip" title="{{team|digits}}">Onstage (+3)</span>
+    {% endif %}
+{% elif stage_result == 'Parked' %}
+<span rel="tooltip" title="{{team|digits}}">Park (+1)</span>
+{% else %}
+<span rel="tooltip" title="{{team|digits}}" class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro coopertition_criteria(earned) %}
+{% if earned %}
+<span class="glyphicon glyphicon-ok"></span>
+{% else %}
+<span class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro rp_bonus(earned) %}
+{% if earned %}
+<span class="glyphicon glyphicon-ok"></span> (+1 RP)
+{% else %}
+<span class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro fouls(alliance_breakdown) %}
+{%if alliance_breakdown.foulCount%}{{alliance_breakdown.foulCount}} (+{{alliance_breakdown.foulCount * 2}}){%else%}0{%endif%} /
+{%if alliance_breakdown.techFoulCount%}{{alliance_breakdown.techFoulCount}} (+{{alliance_breakdown.techFoulCount * 5}}){%else%}0{%endif%}
+{% endmacro %}
+
+<table class="match-table">
+  <tbody>
+    <!-- Autonomous -->
+    <!-- Mobility -->
+    {% if "autoLineRobot1" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{mobility(match.alliances.red.teams.0, match.score_breakdown.red.autoLineRobot1 == 'Yes')}}
+        {{mobility(match.alliances.red.teams.1, match.score_breakdown.red.autoLineRobot2 == 'Yes')}}
+        {{mobility(match.alliances.red.teams.2, match.score_breakdown.red.autoLineRobot3 == 'Yes')}}
+        (+{{match.score_breakdown.red.autoLeavePoints}})
+      </td>
+      <td>Auto Leave</td>
+      <td class="blueScore" colspan="2">
+        {{mobility(match.alliances.blue.teams.0, match.score_breakdown.blue.autoLineRobot1 == 'Yes')}}
+        {{mobility(match.alliances.blue.teams.1, match.score_breakdown.blue.autoLineRobot2 == 'Yes')}}
+        {{mobility(match.alliances.blue.teams.2, match.score_breakdown.blue.autoLineRobot3 == 'Yes')}}
+        (+{{match.score_breakdown.blue.autoLeavePoints}})
+      </td>
+    </tr>
+    {% endif %}
+
+    <!--Auto Game Pieces-->
+    {% if "autoAmpNoteCount" in match.score_breakdown.red %}
+    <tr>
+    <td class="red" colspan="2">
+        {{match.score_breakdown.red.autoAmpNoteCount}}
+    </td>
+    <td>Auto Amp Note Count</td>
+    <td class="blue" colspan="2">
+        {{match.score_breakdown.blue.autoAmpNoteCount}}
+    </td>
+    </tr>
+    {% endif %}
+
+    {% if "autoSpeakerNoteCount" in match.score_breakdown.red %}
+    <tr>
+    <td class="red" colspan="2">
+        {{match.score_breakdown.red.autoSpeakerNoteCount}}
+    </td>
+    <td>Auto Speaker Note Count</td>
+    <td class="blue" colspan="2">
+        {{match.score_breakdown.blue.autoSpeakerNoteCount}}
+    </td>
+    </tr>
+    {% endif %}
+
+    {% if "autoTotalNotePoints" in match.score_breakdown.red %}
+    <tr class="key">
+    <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.autoTotalNotePoints}}
+    </td>
+    <td>Auto Note Points</td>
+    <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.autoTotalNotePoints}}
+    </td>
+    </tr>
+    {% endif %}
+
+    {% if "autoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+    <td class="redScore" colspan="2">
+        <b>{{match.score_breakdown.red.autoPoints}}</b>
+    </td>
+    <th>Total Auto</th>
+    <td class="blueScore" colspan="2">
+        <b>{{match.score_breakdown.blue.autoPoints}}</b>
+    </td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop --> 
+    <!-- Game Piece Points -->
+    {% if "teleopAmpNoteCount" in match.score_breakdown.red %}
+    <tr>
+    <td class="red" colspan="2">
+        {{match.score_breakdown.red.teleopAmpNoteCount}}
+    </td>
+    <td>Teleop Amp Note Count</td>
+    <td class="blue" colspan="2">
+        {{match.score_breakdown.blue.teleopAmpNoteCount}}
+    </td>
+    </tr>
+    {% endif %}
+
+    {% if "teleopSpeakerNoteCount" in match.score_breakdown.red %}
+    <tr>
+    <td class="red" colspan="2">
+        {{speaker(
+          match.score_breakdown.red.teleopSpeakerNoteCount,
+          match.score_breakdown.red.teleopSpeakerNotePoints,
+          match.score_breakdown.red.teleopSpeakerNoteAmplifiedCount,
+          match.score_breakdown.red.teleopSpeakerNoteAmplifiedPoints,
+        )}}
+    </td>
+    <td>Teleop Speaker Note Count</td>
+    <td class="blue" colspan="2">
+        {{speaker(
+          match.score_breakdown.blue.teleopSpeakerNoteCount,
+          match.score_breakdown.blue.teleopSpeakerNotePoints,
+          match.score_breakdown.blue.teleopSpeakerNoteAmplifiedCount,
+          match.score_breakdown.blue.teleopSpeakerNoteAmplifiedPoints,
+        )}}
+    </td>
+    </tr>
+    {% endif %}
+
+    {% if "teleopTotalNotePoints" in match.score_breakdown.red %}
+    <tr class="key">
+    <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.teleopTotalNotePoints}}
+    </td>
+    <td>Teleop Note Points</td>
+    <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.teleopTotalNotePoints}}
+    </td>
+    </tr>
+    {% endif %}
+
+    <!-- Endgame -->
+    {% if  "endGameRobot1" in match.score_breakdown.red %}
+    <tr>
+    <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.0, match.score_breakdown.red.endGameRobot1, match.score_breakdown.red)}}
+    </td>
+    <td>Robot 1 Endgame</td>
+    <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.0, match.score_breakdown.blue.endGameRobot1, match.score_breakdown.blue)}}
+    </td>
+    </tr>
+    {% endif %}
+
+    {% if  "endGameRobot2" in match.score_breakdown.red %}
+    <tr>
+    <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.1, match.score_breakdown.red.endGameRobot2, match.score_breakdown.red)}}
+    </td>
+    <td>Robot 2 Endgame</td>
+    <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.1, match.score_breakdown.blue.endGameRobot2, match.score_breakdown.blue)}}
+    </td>
+    </tr>
+    {% endif %}
+
+    {% if  "endGameRobot3" in match.score_breakdown.red %}
+    <tr>
+    <td class="red" colspan="2">
+        {{endgame(match.alliances.red.teams.2, match.score_breakdown.red.endGameRobot3, match.score_breakdown.red)}}
+    </td>
+    <td>Robot 3 Endgame</td>
+    <td class="blue" colspan="2">
+        {{endgame(match.alliances.blue.teams.2, match.score_breakdown.blue.endGameRobot3, match.score_breakdown.blue)}}
+    </td>
+    </tr>
+    {% endif %}
+
+    <!-- Harmony Points -->
+    {% if "endGameHarmonyPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.endGameHarmonyPoints}}
+      </td>
+      <td>Harmony Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.endGameHarmonyPoints}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Trap Points -->
+    {% if "endGameNoteInTrapPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        {{match.score_breakdown.red.endGameNoteInTrapPoints}}
+      </td>
+      <td>Trap Points</td>
+      <td class="blueScore" colspan="2">
+        {{match.score_breakdown.blue.endGameNoteInTrapPoints}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop Score -->
+    {% if "teleopPoints" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore" colspan="2">
+        <b>{% if match.score_breakdown.red.teleopPoints %}{{match.score_breakdown.red.teleopPoints}}{%else%}0{%endif%}</b>
+      </td>
+      <th>Total Teleop</th>
+      <td class="blueScore" colspan="2">
+        <b>{% if match.score_breakdown.blue.teleopPoints %}{{match.score_breakdown.blue.teleopPoints}}{%else%}0{%endif%}</b>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Coop Note -->
+    {% if "coopertitionCriteriaMet" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{coopertition_criteria(match.score_breakdown.red.coopertitionCriteriaMet)}}
+        </td>
+        <td>Coopertition Criteria Met</td>
+        <td class="blue" colspan="2">
+            {{coopertition_criteria(match.score_breakdown.blue.coopertitionCriteriaMet)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Bonus RP -->
+    {% if "melodyBonusAchieved" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{rp_bonus(match.score_breakdown.red.melodyBonusAchieved)}}
+      </td>
+      <td>Melody Bonus</td>
+      <td class="blue" colspan="2">
+        {{rp_bonus(match.score_breakdown.blue.melodyBonusAchieved)}}
+      </td>
+    </tr>
+    {% endif %}
+
+    {% if "ensembleBonusAchieved" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{rp_bonus(match.score_breakdown.red.ensembleBonusAchieved)}}
+      </td>
+      <td>Ensemble Bonus</td>
+      <td class="blue" colspan="2">
+        {{rp_bonus(match.score_breakdown.blue.ensembleBonusAchieved)}}
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Fouls & Adjustments -->
+    {% if "foulCount" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{fouls(match.score_breakdown.blue)}}
+      </td>
+      <td>Fouls / Tech Fouls</td>
+      <td class="blue" colspan="2">
+        {{fouls(match.score_breakdown.red)}}
+      </td>
+    </tr>
+    {% endif %}
+    {% if "adjustPoints" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">{% if match.score_breakdown.red.adjustPoints%}{{match.score_breakdown.red.adjustPoints}}{%else%}0{%endif%}</td>
+      <td>Adjustments</td>
+      <td class="blue" colspan="2">{%if match.score_breakdown.blue.adjustPoints%}{{match.score_breakdown.blue.adjustPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{%if match.score_breakdown.red.totalPoints%}{{match.score_breakdown.red.totalPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Score</th>
+      <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.melodyBonusAchieved %}
+        <svg class="top-left-dot" rel="tooltip" title="Melody Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.red.ensembleBonusAchieved %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Ensemble Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.red.rp}} RP
+      </td>
+      <td>Ranking Points</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.melodyBonusAchieved %}
+        <svg class="top-left-dot" rel="tooltip" title="Melody Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.blue.ensembleBonusAchieved %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Ensemble Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.blue.rp}} RP
+      </td>
+    </tr>
+  </tbody>
+</table>

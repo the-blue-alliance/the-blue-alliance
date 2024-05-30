@@ -48,7 +48,6 @@ firebase_app = _firebase_app()
 
 
 class TBANSHelper:
-
     """
     Helper class for sending push notifications via the FCM HTTPv1 API and sending data payloads to webhooks
     """
@@ -60,16 +59,18 @@ class TBANSHelper:
         )
 
         # Send to Event subscribers
+        event_subscriptions_future = None
         if NotificationType.ALLIANCE_SELECTION in ENABLED_EVENT_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_event(
+            if user_id:
+                cls._send([user_id], AllianceSelectionNotification(event))
+            else:
+                event_subscriptions_future = Subscription.subscriptions_for_event(
                     event, NotificationType.ALLIANCE_SELECTION
                 )
-            if users:
-                cls._send(users, AllianceSelectionNotification(event))
 
         # Send to Team subscribers
+        # Key is a team key, value is a future
+        team_subscriptions_futures = {}
         if NotificationType.ALLIANCE_SELECTION in ENABLED_TEAM_NOTIFICATIONS:
             for team_key in event.alliance_teams:
                 try:
@@ -77,13 +78,31 @@ class TBANSHelper:
                 except Exception:
                     continue
 
-                users = [user_id] if user_id else []
-                if not users:
-                    users = Subscription.users_subscribed_to_team(
-                        team, NotificationType.ALLIANCE_SELECTION
+                if user_id:
+                    cls._send([user_id], AllianceSelectionNotification(event, team))
+                else:
+                    team_subscriptions_futures[team_key] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.ALLIANCE_SELECTION
+                        )
                     )
-                if users:
-                    cls._send(users, AllianceSelectionNotification(event, team))
+
+        if event_subscriptions_future:
+            cls._batch_send_subscriptions(
+                event_subscriptions_future.get_result(),
+                AllianceSelectionNotification(event),
+            )
+
+        for team_key, team_subscriptions_future in team_subscriptions_futures.items():
+            try:
+                team = Team.get_by_id(team_key)
+            except Exception:
+                continue
+
+            cls._batch_send_subscriptions(
+                team_subscriptions_future.get_result(),
+                AllianceSelectionNotification(event, team),
+            )
 
     """
     Dispatch Awards notifications to users subscribed to Event or Team Award notifications.
@@ -103,29 +122,48 @@ class TBANSHelper:
         )
 
         # Send to Event subscribers
+        event_subscriptions_future = None
         if NotificationType.AWARDS in ENABLED_EVENT_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_event(
+            if user_id:
+                cls._send([user_id], AwardsNotification(event))
+            else:
+                event_subscriptions_future = Subscription.subscriptions_for_event(
                     event, NotificationType.AWARDS
                 )
-            if users:
-                cls._send(users, AwardsNotification(event))
-
         # Send to Team subscribers
+        # Key is a team key, value is a future
+        team_subscriptions_futures = {}
         if NotificationType.AWARDS in ENABLED_TEAM_NOTIFICATIONS:
             # Map all Teams to their Awards so we can populate our Awards notification with more specific info
             team_awards = event.team_awards()
             for team_key in team_awards.keys():
                 team = team_key.get()
+                if not team:
+                    continue
 
-                users = [user_id] if user_id else []
-                if not users:
-                    users = Subscription.users_subscribed_to_team(
-                        team, NotificationType.AWARDS
+                if user_id:
+                    cls._send([user_id], AwardsNotification(event, team))
+                elif team.key_name:
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.AWARDS
+                        )
                     )
-                if users:
-                    cls._send(users, AwardsNotification(event, team))
+
+        if event_subscriptions_future:
+            cls._batch_send_subscriptions(
+                event_subscriptions_future.get_result(), AwardsNotification(event)
+            )
+
+        for team_key, team_subscriptions_future in team_subscriptions_futures.items():
+            try:
+                team = Team.get_by_id(team_key)
+            except Exception:
+                continue
+
+            cls._batch_send_subscriptions(
+                team_subscriptions_future.get_result(), AwardsNotification(event, team)
+            )
 
     @classmethod
     def broadcast(
@@ -166,14 +204,19 @@ class TBANSHelper:
         )
 
         # Send to Event subscribers
+        event_subscriptions_future = None
         if NotificationType.LEVEL_STARTING in ENABLED_EVENT_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_event(
+            if user_id:
+                cls._send([user_id], EventLevelNotification(match))
+            else:
+                event_subscriptions_future = Subscription.subscriptions_for_event(
                     match.event.get(), NotificationType.LEVEL_STARTING
                 )
-            if users:
-                cls._send(users, EventLevelNotification(match))
+
+        if event_subscriptions_future:
+            cls._batch_send_subscriptions(
+                event_subscriptions_future.get_result(), EventLevelNotification(match)
+            )
 
     @classmethod
     def event_schedule(cls, event: Event, user_id: Optional[str] = None) -> None:
@@ -182,14 +225,20 @@ class TBANSHelper:
         )
 
         # Send to Event subscribers
+        event_subscriptions_future = None
         if NotificationType.SCHEDULE_UPDATED in ENABLED_EVENT_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_event(
+            if user_id:
+                cls._send([user_id], EventScheduleNotification(event))
+            else:
+                event_subscriptions_future = Subscription.subscriptions_for_event(
                     event, NotificationType.SCHEDULE_UPDATED
                 )
-            if users:
-                cls._send(users, EventScheduleNotification(event))
+
+        if event_subscriptions_future:
+            cls._batch_send_subscriptions(
+                event_subscriptions_future.get_result(),
+                EventScheduleNotification(event),
+            )
 
     @classmethod
     def match_score(cls, match: Match, user_id: Optional[str] = None) -> None:
@@ -200,35 +249,63 @@ class TBANSHelper:
         )
 
         # Send to Event subscribers
+        event_subscriptions_future = None
         if NotificationType.MATCH_SCORE in ENABLED_EVENT_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_event(
+            if user_id:
+                cls._send([user_id], MatchScoreNotification(match))
+            else:
+                event_subscriptions_future = Subscription.subscriptions_for_event(
                     event, NotificationType.MATCH_SCORE
                 )
-            if users:
-                cls._send(users, MatchScoreNotification(match))
 
         # Send to Team subscribers
+        # Key is a team key, value is a future
+        team_subscriptions_futures = {}
         if NotificationType.MATCH_SCORE in ENABLED_TEAM_NOTIFICATIONS:
             for team_key in match.team_keys:
-                users = [user_id] if user_id else []
-                if not users:
-                    users = Subscription.users_subscribed_to_team(
-                        team_key.get(), NotificationType.MATCH_SCORE
+                team = team_key.get()
+                if not team:
+                    continue
+
+                if user_id:
+                    cls._send([user_id], MatchScoreNotification(match, team))
+                elif team.key_name:
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.MATCH_SCORE
+                        )
                     )
-                if users:
-                    cls._send(users, MatchScoreNotification(match, team_key.get()))
 
         # Send to Match subscribers
+        match_subscriptions_future = None
         if NotificationType.MATCH_SCORE in ENABLED_MATCH_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_match(
+            if user_id:
+                cls._send([user_id], MatchScoreNotification(match))
+            else:
+                match_subscriptions_future = Subscription.subscriptions_for_match(
                     match, NotificationType.MATCH_SCORE
                 )
-            if users:
-                cls._send(users, MatchScoreNotification(match))
+
+        if event_subscriptions_future:
+            cls._batch_send_subscriptions(
+                event_subscriptions_future.get_result(), MatchScoreNotification(match)
+            )
+
+        for team_key, team_subscriptions_future in team_subscriptions_futures.items():
+            try:
+                team = Team.get_by_id(team_key)
+            except Exception:
+                continue
+
+            cls._batch_send_subscriptions(
+                team_subscriptions_future.get_result(),
+                MatchScoreNotification(match, team),
+            )
+
+        if match_subscriptions_future:
+            cls._batch_send_subscriptions(
+                match_subscriptions_future.get_result(), MatchScoreNotification(match)
+            )
 
         # Send UPCOMING_MATCH for the N + 2 match after this one
         if not event.matches:
@@ -254,35 +331,65 @@ class TBANSHelper:
         )
 
         # Send to Event subscribers
+        event_subscriptions_future = None
         if NotificationType.UPCOMING_MATCH in ENABLED_EVENT_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_event(
+            if user_id:
+                cls._send([user_id], MatchUpcomingNotification(match))
+            else:
+                event_subscriptions_future = Subscription.subscriptions_for_event(
                     match.event.get(), NotificationType.UPCOMING_MATCH
                 )
-            if users:
-                cls._send(users, MatchUpcomingNotification(match))
 
         # Send to Team subscribers
+        # Key is a team key, value is a future
+        team_subscriptions_futures = {}
         if NotificationType.UPCOMING_MATCH in ENABLED_TEAM_NOTIFICATIONS:
             for team_key in match.team_keys:
-                users = [user_id] if user_id else []
-                if not users:
-                    users = Subscription.users_subscribed_to_team(
-                        team_key.get(), NotificationType.UPCOMING_MATCH
+                team = team_key.get()
+                if not team:
+                    continue
+
+                if user_id:
+                    cls._send([user_id], MatchUpcomingNotification(match, team))
+                elif team.key_name:
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.UPCOMING_MATCH
+                        )
                     )
-                if users:
-                    cls._send(users, MatchUpcomingNotification(match, team_key.get()))
 
         # Send to Match subscribers
+        match_subscriptions_future = None
         if NotificationType.UPCOMING_MATCH in ENABLED_MATCH_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_match(
+            if user_id:
+                cls._send([user_id], MatchUpcomingNotification(match))
+            else:
+                match_subscriptions_future = Subscription.subscriptions_for_match(
                     match, NotificationType.UPCOMING_MATCH
                 )
-            if users:
-                cls._send(users, MatchUpcomingNotification(match))
+
+        if event_subscriptions_future:
+            cls._batch_send_subscriptions(
+                event_subscriptions_future.get_result(),
+                MatchUpcomingNotification(match),
+            )
+
+        for team_key, team_subscriptions_future in team_subscriptions_futures.items():
+            try:
+                team = Team.get_by_id(team_key)
+            except Exception:
+                continue
+
+            cls._batch_send_subscriptions(
+                team_subscriptions_future.get_result(),
+                MatchUpcomingNotification(match, team),
+            )
+
+        if match_subscriptions_future:
+            cls._batch_send_subscriptions(
+                match_subscriptions_future.get_result(),
+                MatchUpcomingNotification(match),
+            )
 
         # Send LEVEL_STARTING for the first match of a new type
         if match.set_number == 1 and match.match_number == 1:
@@ -295,35 +402,63 @@ class TBANSHelper:
         )
 
         # Send to Event subscribers
+        event_subscriptions_future = None
         if NotificationType.MATCH_VIDEO in ENABLED_EVENT_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_event(
+            if user_id:
+                cls._send([user_id], MatchVideoNotification(match))
+            else:
+                event_subscriptions_future = Subscription.subscriptions_for_event(
                     match.event.get(), NotificationType.MATCH_VIDEO
                 )
-            if users:
-                cls._send(users, MatchVideoNotification(match))
 
         # Send to Team subscribers
+        # Key is a team key, value is a future
+        team_subscriptions_futures = {}
         if NotificationType.MATCH_VIDEO in ENABLED_TEAM_NOTIFICATIONS:
             for team_key in match.team_keys:
-                users = [user_id] if user_id else []
-                if not users:
-                    users = Subscription.users_subscribed_to_team(
-                        team_key.get(), NotificationType.MATCH_VIDEO
+                team = team_key.get()
+                if not team:
+                    continue
+
+                if user_id:
+                    cls._send([user_id], MatchVideoNotification(match, team))
+                elif team.key_name:
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.MATCH_VIDEO
+                        )
                     )
-                if users:
-                    cls._send(users, MatchVideoNotification(match, team_key.get()))
 
         # Send to Match subscribers
+        match_subscriptions_future = None
         if NotificationType.MATCH_VIDEO in ENABLED_MATCH_NOTIFICATIONS:
-            users = [user_id] if user_id else []
-            if not users:
-                users = Subscription.users_subscribed_to_match(
+            if user_id:
+                cls._send([user_id], MatchVideoNotification(match))
+            else:
+                match_subscriptions_future = Subscription.subscriptions_for_match(
                     match, NotificationType.MATCH_VIDEO
                 )
-            if users:
-                cls._send(users, MatchVideoNotification(match))
+
+        if event_subscriptions_future:
+            cls._batch_send_subscriptions(
+                event_subscriptions_future.get_result(), MatchVideoNotification(match)
+            )
+
+        for team_key, team_subscriptions_future in team_subscriptions_futures.items():
+            try:
+                team = Team.get_by_id(team_key)
+            except Exception:
+                continue
+
+            cls._batch_send_subscriptions(
+                team_subscriptions_future.get_result(),
+                MatchVideoNotification(match, team),
+            )
+
+        if match_subscriptions_future:
+            cls._batch_send_subscriptions(
+                match_subscriptions_future.get_result(), MatchVideoNotification(match)
+            )
 
     @classmethod
     def update_favorites(
@@ -411,6 +546,9 @@ class TBANSHelper:
 
         queue = taskqueue.Queue("push-notifications")
 
+        if not match.key_name:
+            return
+
         task_name = "{}_match_upcoming".format(match.key_name)
         # Cancel any previously-scheduled `match_upcoming` notifications for this match
         queue.delete_tasks(taskqueue.Task(name=task_name))
@@ -423,16 +561,19 @@ class TBANSHelper:
         if match.time is None or match.time + MATCH_UPCOMING_MINUTES <= now:
             cls.match_upcoming(match, user_id)
         else:
-            deferred.defer(
-                cls.match_upcoming,
-                match,
-                user_id,
-                _name=task_name,
-                _target="py3-tasks-io",
-                _queue="push-notifications",
-                _url="/_ah/queue/deferred_notification_send",
-                _eta=match.time + MATCH_UPCOMING_MINUTES,
-            )
+            try:
+                deferred.defer(
+                    cls.match_upcoming,
+                    match,
+                    user_id,
+                    _name=task_name,
+                    _target="py3-tasks-io",
+                    _queue="push-notifications",
+                    _url="/_ah/queue/deferred_notification_send",
+                    _eta=match.time + MATCH_UPCOMING_MINUTES,
+                )
+            except Exception:
+                pass
 
     @classmethod
     def schedule_upcoming_matches(
@@ -475,6 +616,36 @@ class TBANSHelper:
         webhook_request.send()
 
         return notification.verification_key
+
+    @classmethod
+    def _batch_send_subscriptions(
+        cls, subscriptions: List[Subscription], notification: Notification
+    ) -> None:
+        def batch(iterable, n=1):
+            la = len(iterable)
+            for ndx in range(0, la, n):
+                yield iterable[ndx : min(ndx + n, la)]
+
+        BATCH_SIZE = 500
+
+        for batch in batch(subscriptions, BATCH_SIZE):
+            deferred.defer(
+                cls._send_subscriptions,
+                batch,
+                notification,
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
+            )
+
+    @classmethod
+    def _send_subscriptions(
+        cls, subscriptions: List[Subscription], notification: Notification
+    ) -> None:
+        # Convert subscriptions -> user IDs
+        # Allows us to send in batches
+        users = list(set([sub.user_id for sub in subscriptions]))
+        cls._send(users, notification)
 
     @classmethod
     def _send(cls, user_ids: List[str], notification: Notification) -> None:

@@ -3,7 +3,7 @@
 # https://black.readthedocs.io/en/stable/the_black_code_style.html
 max-line-length = 88
 select = C,E,F,W,B,B950,I
-ignore = E203, E501, W503
+ignore = E203, E501, E704, W503
 exclude =
   ./old_py2/
   ./stubs/

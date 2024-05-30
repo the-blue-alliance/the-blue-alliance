@@ -631,31 +631,25 @@ $( document ).ready(function() {
         $(this.form).find('.webhook-alert').removeClass('alert-success');
         $(this.form).find('.webhook-alert').removeClass('alert-danger');
 
-        $.post(this.form.action, $(this.form).serialize()).done(function (data) {
-            if (data === "ok") {
-                $(this.form).find('.webhook-alert').addClass('alert-success');
-            } else {
-                $(this.form).find('.webhook-alert').addClass('alert-danger');
-            }
+        $.post(this.form.action, $(this.form).serialize()).always(function (data) {
+            let responseText;
+            if (data === 'ok') responseText = 'Sent webhook!';
+            else if (data.responseJSON && data.responseJSON.Error) responseText = data.responseJSON.Error;
+            else if (data.status === 401) responseText = 'Please log in before sending test notifications.';
+            else responseText = 'Something went horribly wrong. Refresh the page and try again.';
+            
+            $(this.form).find('.webhook-alert')
+                .addClass(data === 'ok' ? 'alert-success' : 'alert-danger')
+                .css('display', 'block')
+                .text(responseText);
 
-            $(this.form).find('.webhook-alert').css('display', 'block');
-            $(this.form).find('.webhook-alert').text(data === "ok" ? "Sent webhook!" : data);
-
-            $(this).attr('disabled', false);
-            $(this).removeClass('disabled');
+            $(this).attr('disabled', false)
+                .removeClass('disabled');
 
             setTimeout(function() {
                 $(this.form).find('.webhook-alert').css('display', 'none');
             }.bind(this), 5000)
-        }.bind(this)).fail(function (error) {
-            if (error.status == 401) {
-              alert('Please login before sending test notifications.');
-            } else {
-              alert('Something went horribly wrong. Try again.');
-            }
-            $(this).attr('disabled', false);
-            $(this).removeClass('disabled');
-        });
+        }.bind(this));
     });
 
     $('.webhook-alert').hide();

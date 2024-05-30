@@ -72,9 +72,9 @@ class PlatformConfig:
             headers = {}
 
             if self.collapse_key:
-                headers[
-                    PlatformType.collapse_key_key(platform_type)
-                ] = self.collapse_key
+                headers[PlatformType.collapse_key_key(platform_type)] = (
+                    self.collapse_key
+                )
 
             priority = None
             if self.priority is not None:

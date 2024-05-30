@@ -92,6 +92,52 @@ MANUAL_COMPONENTS = {
             )
         ),
     },
+    2024: {
+        "Total Mic": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("micCenterStage", 0),
+                match.score_breakdown[color].get("micStageLeft", 0),
+                match.score_breakdown[color].get("micStageRight", 0),
+            ]
+        ),
+        "Total Trap": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("trapCenterStage", 0),
+                match.score_breakdown[color].get("trapStageLeft", 0),
+                match.score_breakdown[color].get("trapStageRight", 0),
+            ]
+        ),
+        "Total Teleop Game Pieces": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("teleopAmpNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
+            ]
+        ),
+        "Total Auto Game Pieces": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoAmpNoteCount", 0),
+                match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
+            ]
+        ),
+        "Total Overall Game Pieces": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoAmpNoteCount", 0),
+                match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopAmpNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
+            ]
+        ),
+        "Amplification Rate": lambda match, color: match.score_breakdown[color].get(
+            "teleopSpeakerNoteAmplifiedCount", 0
+        )
+        / max(
+            1,
+            match.score_breakdown[color].get("teleopSpeakerNoteCount", 0)
+            + match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
+        ),
+    },
 }
 
 

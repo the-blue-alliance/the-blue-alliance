@@ -48,23 +48,28 @@ const VideoCellToolbar = (props) => {
   // Create tickerMatches
   const tickerMatches = [];
   props.matches.forEach((match) => {
-    // See if match has a favorite team
-    let hasFavorite = false;
-    const teamKeys = match.rt.concat(match.bt);
-    teamKeys.forEach((teamKey) => {
-      if (props.favoriteTeams.has(teamKey)) {
-        hasFavorite = true;
-      }
-    });
+    if (match.rt && match.rt.length > 0 && match.bt && match.bt.length > 0) {
+      // 2024 Week 3, FMS Sync issues result in schedules
+      // being posted without teams, so skip those matchesk
 
-    tickerMatches.push(
-      <TickerMatch
-        key={match.key}
-        match={match}
-        hasFavorite={hasFavorite}
-        isBlueZone={props.isBlueZone}
-      />
-    );
+      // See if match has a favorite team
+      let hasFavorite = false;
+      const teamKeys = match.rt.concat(match.bt);
+      teamKeys.forEach((teamKey) => {
+        if (props.favoriteTeams.has(teamKey)) {
+          hasFavorite = true;
+        }
+      });
+
+      tickerMatches.push(
+        <TickerMatch
+          key={match.key}
+          match={match}
+          hasFavorite={hasFavorite}
+          isBlueZone={props.isBlueZone}
+        />
+      );
+    }
   });
 
   let swapButton;

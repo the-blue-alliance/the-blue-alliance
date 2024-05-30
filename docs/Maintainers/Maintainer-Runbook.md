@@ -15,4 +15,4 @@ Images are published to `ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev
 
 ## Running One-Off Data Migrations/Cleanups
 
-See the [[Local Shell|Local-Shell]] documentation for running one-off cleanup or migration scripts against the production database. You will need a production service account key to run scripts against the production database. **Be extremely careful before running scripts against the production database.** After modifying the database, be sure to clear the Redis cache to remove any stale cached data.
+See the [[Local Shell|Local-Shell]] documentation for running one-off cleanup or migration scripts against the production database. You will need a production service account key to run scripts against the production database. **Be extremely careful before running scripts against the production database.**

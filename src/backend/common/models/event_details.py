@@ -31,9 +31,7 @@ class EventDetails(CachedModel):
     key_name is the event key, like '2010ct'
     """
 
-    alliance_selections: List[
-        EventAlliance
-    ] = (
+    alliance_selections: List[EventAlliance] = (
         ndb.JsonProperty()
     )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points: EventDistrictPoints = cast(EventDistrictPoints, ndb.JsonProperty())
@@ -114,16 +112,19 @@ class EventDetails(CachedModel):
                 if game_year == 2021:
                     # 2021 did not have matches played for rankings
                     continue
-                elif game_year in {2017, 2018, 2019, 2020, 2021, 2022, 2023}:
+
+                elif game_year >= 2017:
                     rank["extra_stats"] = [
                         int(round(rank["sort_orders"][0] * rank["matches_played"])),
                     ]
                     has_extra_stats = True
                 elif rank["qual_average"] is None:
                     rank["extra_stats"] = [
-                        rank["sort_orders"][0] / rank["matches_played"]
-                        if rank["matches_played"] > 0
-                        else 0,
+                        (
+                            rank["sort_orders"][0] / rank["matches_played"]
+                            if rank["matches_played"] > 0
+                            else 0
+                        ),
                     ]
                     has_extra_stats = True
 
@@ -134,7 +135,8 @@ class EventDetails(CachedModel):
             if game_year == 2021:
                 # 2021 did not have matches played for rankings
                 pass
-            elif game_year in {2017, 2018, 2019, 2020, 2021, 2022, 2023}:
+
+            elif game_year >= 2017:
                 extra_stats_info = [{"name": "Total Ranking Points", "precision": 0}]
             elif sort_order_info is not None:
                 extra_stats_info = [

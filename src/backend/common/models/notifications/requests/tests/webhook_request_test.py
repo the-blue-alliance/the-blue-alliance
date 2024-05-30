@@ -87,7 +87,7 @@ def test_send_headers():
     )
 
     headers = {
-        "Content-Type": 'application/json; charset="utf-8"',
+        "Content-Type": "application/json; charset=utf-8",
         "X-TBA-Version": "1",
         "X-TBA-Checksum": "82bb620ceffa9ee31480e60b98f1881251fb68c3",
         "X-TBA-HMAC": "a143b493f9a31077f7ff742dc3f59c8d73e6e2c2f09dde5f1a73c33059b77151",

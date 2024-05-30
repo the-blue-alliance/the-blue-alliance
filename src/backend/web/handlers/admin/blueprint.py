@@ -26,6 +26,7 @@ from backend.web.handlers.admin.districts import (
     district_list,
 )
 from backend.web.handlers.admin.event import (
+    event_add_webcast_post,
     event_create,
     event_delete,
     event_delete_matches,
@@ -35,6 +36,7 @@ from backend.web.handlers.admin.event import (
     event_edit_post,
     event_list,
     event_remap_teams_post,
+    event_remove_webcast_post,
     event_update_location_get,
     event_update_location_post,
 )
@@ -50,6 +52,7 @@ from backend.web.handlers.admin.match import (
     match_detail,
     match_edit,
     match_edit_post,
+    match_override_score_breakdown,
 )
 from backend.web.handlers.admin.media import (
     media_add,
@@ -212,7 +215,15 @@ admin_routes.add_url_rule(
     "/event/<event_key>", view_func=event_detail_post, methods=["POST"]
 )
 admin_routes.add_url_rule(
+    "/event/add_webcast/<event_key>", view_func=event_add_webcast_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
     "/event/remap_teams/<event_key>", view_func=event_remap_teams_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/event/remove_webcast/<event_key>",
+    view_func=event_remove_webcast_post,
+    methods=["POST"],
 )
 admin_routes.add_url_rule(
     "/event/delete_matches/<event_key>/<comp_level>/<to_delete>",
@@ -233,6 +244,11 @@ admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": Non
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)
 admin_routes.add_url_rule("/matches", view_func=match_dashboard, methods=["GET"])
 admin_routes.add_url_rule("/match/add", view_func=match_add, methods=["POST"])
+admin_routes.add_url_rule(
+    "/match/override_breakdown",
+    view_func=match_override_score_breakdown,
+    methods=["POST"],
+)
 admin_routes.add_url_rule("/match/<match_key>", view_func=match_detail, methods=["GET"])
 admin_routes.add_url_rule(
     "/match/edit/<match_key>", view_func=match_edit, methods=["GET"]

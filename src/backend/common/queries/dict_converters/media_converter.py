@@ -63,9 +63,9 @@ class MediaConverter(ConverterBase):
             foreign_key=foreign_key,
             details_json=json.dumps(data["details"]),
             references=[ndb.Key(Team, team_key)] if team_key else [],
-            preferred_references=[ndb.Key(Team, team_key)]
-            if team_key and data["preferred"]
-            else [],
+            preferred_references=(
+                [ndb.Key(Team, team_key)] if team_key and data["preferred"] else []
+            ),
             year=year,
         )
         return media

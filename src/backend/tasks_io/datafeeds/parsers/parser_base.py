@@ -7,5 +7,4 @@ TParsedResponse = TypeVar("TParsedResponse")
 
 class ParserBase(abc.ABC, Generic[TParsedResponse]):
     @abc.abstractmethod
-    def parse(self, response: Any) -> TParsedResponse:
-        ...
+    def parse(self, response: Any) -> TParsedResponse: ...
