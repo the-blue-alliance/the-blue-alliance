@@ -108,7 +108,7 @@ PROFILE_URLS: Dict[MediaType, str] = {
     MediaType.INSTAGRAM_PROFILE: "https://www.instagram.com/{}",
     MediaType.PERISCOPE_PROFILE: "https://www.periscope.tv/{}",
     MediaType.GITLAB_PROFILE: "https://www.gitlab.com/{}",
-    MediaType.TIKTOK_PROFILE: "https://www.tiktok.com/{}",
+    MediaType.TIKTOK_PROFILE: "https://www.tiktok.com/@{}",
 }
 
 SOCIAL_SORT_ORDER: Dict[MediaType, int] = {
