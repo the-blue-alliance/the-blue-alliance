@@ -50,6 +50,7 @@ class MediaParser:
         MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)\/e\/", 1)],
         MediaType.INSTAGRAM_IMAGE: [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
         MediaType.GITLAB_PROFILE: [(r".*gitlab.com\/(.*)(\/(.*))?", 1)],
+        MediaType.TIKTOK_PROFILE: [(r".*tiktok.com\/@(.*)(\/(.*))?", 1)]
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -68,6 +69,7 @@ class MediaParser:
         ("grabcad.com/library/", MediaType.GRABCAD),
         ("cad.onshape.com/documents/", MediaType.ONSHAPE),
         ("instagram.com/p/", MediaType.INSTAGRAM_IMAGE),
+        ("tiktok.com/@", MediaType.TIKTOK_PROFILE),
         # Keep these last, so they don't greedy match over other more specific urls
         ("youtube.com/", MediaType.YOUTUBE_CHANNEL),
         ("instagram.com/", MediaType.INSTAGRAM_PROFILE),
