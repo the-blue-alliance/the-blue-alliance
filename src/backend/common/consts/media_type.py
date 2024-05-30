@@ -73,7 +73,7 @@ TYPE_NAMES: Dict[MediaType, str] = {
     MediaType.AVATAR: "Avatar",
     MediaType.ONSHAPE: "Onshape",
     MediaType.GITLAB_PROFILE: "GitLab Profile",
-    MediaType.TIKTOK_PROFILE: "Tiktok Profile",
+    MediaType.TIKTOK_PROFILE: "TikTok Profile",
 }
 
 IMAGE_TYPES: Set[MediaType] = {
