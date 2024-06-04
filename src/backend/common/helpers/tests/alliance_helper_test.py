@@ -1,11 +1,11 @@
 import unittest
 
 import pytest
+from pyre_extensions import none_throws
 
 from backend.common.helpers.alliance_helper import AllianceHelper
-from backend.common.models.alliance import EventAlliance
 from backend.common.models.event import Event
-from backend.tests.json_data_importer import JsonDataImporter
+from backend.tests.json_data_importer import JsonDataImporter  # noqa
 
 
 @pytest.mark.usefixtures("ndb_context")
@@ -43,7 +43,7 @@ class Test2023njflaAllianceHelper(unittest.TestCase):
             __file__, "data/2023njfla_alliances.json", "2023njfla"
         )
 
-        self.event: Event = Event.get_by_id("2023njfla")
+        self.event: Event = none_throws(Event.get_by_id("2023njfla"))
 
     def test_alliance_size(self):
         self.assertEqual(

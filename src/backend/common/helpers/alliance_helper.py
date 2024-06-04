@@ -125,9 +125,7 @@ class AllianceHelper:
         playoff_average = playoff.get("playoff_average")
         playoff_type = playoff.get("playoff_type")
 
-        level_str = cls.generate_playoff_level_status_string(
-            playoff_type, playoff
-        )
+        level_str = cls.generate_playoff_level_status_string(playoff_type, playoff)
 
         if status == PlayoffOutcome.PLAYING:
             level_record = none_throws(playoff["current_level_record"])

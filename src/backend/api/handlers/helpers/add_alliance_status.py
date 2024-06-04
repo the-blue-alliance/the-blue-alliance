@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.event_team import EventTeam
 
+
 # Adds the alliance captain's EventTeamStatusPlayoff to the alliance status.
 def add_alliance_status(
     event_key: str, alliances: List[EventAlliance]

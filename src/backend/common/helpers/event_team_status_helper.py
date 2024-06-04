@@ -225,9 +225,11 @@ class EventTeamStatusHelper:
                     playoff, pick, alliance_name
                 )
             else:
-                components.extend(AllianceHelper.generate_playoff_status_string(
-                    playoff, pick, alliance_name
-                ))
+                components.extend(
+                    AllianceHelper.generate_playoff_status_string(
+                        playoff, pick, alliance_name
+                    )
+                )
 
         if not components:
             return default_msg
