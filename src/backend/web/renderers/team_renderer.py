@@ -5,9 +5,10 @@ from google.appengine.ext import ndb
 
 from backend.common.consts import event_type
 from backend.common.consts.award_type import AwardType
-from backend.common.consts.comp_level import COMP_LEVELS, COMP_LEVELS_VERBOSE_FULL
-from backend.common.consts.event_type import EventType, KNOWN_EVENT_TYPE_ALLIANCE_SIZES
+from backend.common.consts.comp_level import COMP_LEVELS
+from backend.common.consts.event_type import EventType
 from backend.common.consts.media_tag import MediaTag
+from backend.common.helpers.alliance_helper import AllianceHelper
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
@@ -183,53 +184,30 @@ class TeamRenderer:
                     None,
                 )
 
-            alliance_size = KNOWN_EVENT_TYPE_ALLIANCE_SIZES.get(
-                event.event_type_enum, 99
+            alliance_size = AllianceHelper.get_known_alliance_size(
+                event.event_type_enum, event.year
             )
 
-            alliance = None
-            alliance_pick = None
-            if event.details and event.details.alliance_selections:
-                for alliance_check in event.details.alliance_selections:
-                    print(alliance_check)
-                    if team.key_name in alliance_check["picks"]:
-                        alliance = alliance_check
-                        if team.key_name == alliance_check["picks"][0]:
-                            alliance_pick = "Captain"
-                        else:
-                            index = alliance_check["picks"].index(team.key_name)
-                            if index >= alliance_size:
-                                alliance_pick = "the backup"
-                            else:
-                                alliance_pick = f"Pick {index}"
+            alliance, alliance_pick = AllianceHelper.get_alliance_details_and_pick_name(
+                event, team.key_name
+            )
 
-                    if (
-                        "backup" in alliance_check
-                        and alliance_check["backup"]
-                        and alliance_check["backup"]["in"] == team.key_name
-                    ):
-                        alliance = alliance_check
-                        alliance_pick = "the backup"
-
-            alliance_status = None
-            if alliance and "status" in alliance:
-                status = alliance["status"]
-                if "status" in status:
-                    if status["status"] == "won":
-                        alliance_status = "won the event"
-                    elif "double_elim_round" in status:
-                        alliance_status = (
-                            f"were eliminated in {status['double_elim_round']}"
-                        )
-                    elif "level" in status:
-                        level_achieved = COMP_LEVELS_VERBOSE_FULL.get(status["level"])
-                        if level_achieved:
-                            alliance_status = f"were eliminated in {level_achieved}"
+            if alliance:
+                alliance_status = " and ".join(
+                    AllianceHelper.generate_playoff_status_string(
+                        alliance["status"],
+                        alliance_pick,
+                        alliance["name"],
+                        plural=True,
+                        include_record=False,
+                    )
+                )
+            else:
+                alliance_status = None
 
             participation.append(
                 {
                     "alliance": alliance,
-                    "alliance_pick": alliance_pick,
                     "alliance_status": alliance_status,
                     "alliance_size": alliance_size,
                     "event": event,

@@ -144,11 +144,7 @@
 
                 {% if comp.alliance %}
                 <p>
-                They were <strong>{{comp.alliance_pick}}</strong> 
-                of <strong>{{comp.alliance.name}}</strong>
-                {% if comp.alliance_status%}
-                and {{comp.alliance_status}}
-                {% endif %}
+                They {{comp.alliance_status|safe}}.
                 </p>
 
                 <table class="table table-condensed table-striped">
@@ -156,7 +152,7 @@
                     {% for pick in comp.alliance.picks %}
                     <tr>
                       <td>
-                        {% if pick == team.key_name %}<strong>{% endif %}
+                        {% if pick == team.key_name %}<b>{% endif %}
                         {% if loop.first %}
                           Captain
                         {% else %}
@@ -166,12 +162,12 @@
                           Pick {{loop.index0}}
                         {% endif %}
                         {% endif %}
-                        {% if pick == team.key_name %}</strong>{% endif %}
+                        {% if pick == team.key_name %}</b>{% endif %}
                       </td>
                       <td>                 
-                        {% if pick == team.key_name %}<strong>{% endif %}
+                        {% if pick == team.key_name %}<b>{% endif %}
                         <a href="/team/{{ pick|digits }}/{{year}}">{{ pick|strip_frc }}</a>
-                        {% if pick == team.key_name %}</strong>{% endif %}
+                        {% if pick == team.key_name %}</b>{% endif %}
                       </td>
                     </tr>
                     {% endfor %}
