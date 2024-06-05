@@ -54,36 +54,35 @@ class AllianceHelper:
     @classmethod
     def get_alliance_details_and_pick_name(
         cls, event: Event, team: TeamKey
-    ) -> Tuple[Optional[EventAlliance], Optional[str]]:
-        alliance = None
-        alliance_pick = None
-
-        if event.alliance_selections is None:
-            return (None, None)
-
+    ) -> Tuple[Optional[EventAlliance], Optional[str], int]:
         alliance_size = cls.get_known_alliance_size(event.event_type_enum, event.year)
 
-        for alliance_check in none_throws(event.alliance_selections):
-            if team in alliance_check["picks"]:
-                alliance = alliance_check
-                if team == alliance_check["picks"][0]:
-                    alliance_pick = "Captain"
+        if event.alliance_selections is None:
+            return (None, None, alliance_size)
+
+        for alliance in none_throws(event.alliance_selections):
+            if team in alliance["picks"]:
+                if team == alliance["picks"][0]:
+                    return (alliance, "Captain", alliance_size)
                 else:
-                    index = alliance_check["picks"].index(team)
+                    index = alliance["picks"].index(team)
                     if index >= alliance_size:
-                        alliance_pick = "Backup"
+                        return (alliance, "Backup", alliance_size)
                     else:
-                        alliance_pick = cls.get_ordinal_pick_from_number(index)
+                        return (
+                            alliance,
+                            cls.get_ordinal_pick_from_number(index),
+                            alliance_size,
+                        )
 
             if (
-                "backup" in alliance_check
-                and alliance_check["backup"]
-                and alliance_check["backup"]["in"] == team
+                "backup" in alliance
+                and alliance["backup"]
+                and alliance["backup"]["in"] == team
             ):
-                alliance = alliance_check
-                alliance_pick = "Backup"
+                return (alliance, "Backup", alliance_size)
 
-        return (alliance, alliance_pick)
+        return (None, None, alliance_size)
 
     @classmethod
     def generate_playoff_level_status_string(

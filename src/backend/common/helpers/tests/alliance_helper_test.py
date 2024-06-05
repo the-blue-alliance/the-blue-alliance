@@ -56,32 +56,32 @@ class Test2023njflaAllianceHelper(unittest.TestCase):
     def test_alliance_and_pick_names(self):
         self.assertEqual(
             AllianceHelper.get_alliance_details_and_pick_name(self.event, "frc11"),
-            (self.alliance_one, "Captain"),
+            (self.alliance_one, "Captain", 3),
         )
         self.assertEqual(
             AllianceHelper.get_alliance_details_and_pick_name(self.event, "frc1676"),
-            (self.alliance_one, "1st Pick"),
+            (self.alliance_one, "1st Pick", 3),
         )
         self.assertEqual(
             AllianceHelper.get_alliance_details_and_pick_name(self.event, "frc4573"),
-            (self.alliance_one, "2nd Pick"),
+            (self.alliance_one, "2nd Pick", 3),
         )
 
         self.assertEqual(
             AllianceHelper.get_alliance_details_and_pick_name(self.event, "frc3142"),
-            (self.alliance_four, "Captain"),
+            (self.alliance_four, "Captain", 3),
         )
         self.assertEqual(
             AllianceHelper.get_alliance_details_and_pick_name(self.event, "frc1279"),
-            (self.alliance_four, "1st Pick"),
+            (self.alliance_four, "1st Pick", 3),
         )
         self.assertEqual(
             AllianceHelper.get_alliance_details_and_pick_name(self.event, "frc1672"),
-            (self.alliance_four, "2nd Pick"),
+            (self.alliance_four, "2nd Pick", 3),
         )
         self.assertEqual(
             AllianceHelper.get_alliance_details_and_pick_name(self.event, "frc5732"),
-            (self.alliance_four, "Backup"),
+            (self.alliance_four, "Backup", 3),
         )
 
     def test_alliance_status_string(self):

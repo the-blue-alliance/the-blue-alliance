@@ -184,12 +184,8 @@ class TeamRenderer:
                     None,
                 )
 
-            alliance_size = AllianceHelper.get_known_alliance_size(
-                event.event_type_enum, event.year
-            )
-
-            alliance, alliance_pick = AllianceHelper.get_alliance_details_and_pick_name(
-                event, team.key_name
+            alliance, alliance_pick, alliance_size = (
+                AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
             )
 
             if alliance:
