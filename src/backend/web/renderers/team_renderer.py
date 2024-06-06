@@ -192,7 +192,7 @@ class TeamRenderer:
             alliance_status = EventTeamStatusHelper._build_playoff_info(
                 team.key_name,
                 event.details,
-                event_matches,
+                matches_organized,
                 event.year,
                 event.playoff_type,
             )
