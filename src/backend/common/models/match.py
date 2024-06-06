@@ -213,6 +213,10 @@ class Match(CachedModel):
             except json.decoder.JSONDecodeError:
                 return None
 
+            if 'red' not in score_breakdown or 'blue' not in score_breakdown:
+                # Handle some old matches with empty score breakdowns instead of None
+                return None
+
             if self.has_been_played:
                 # Add in RP calculations
                 if self.year in {2016, 2017}:
