@@ -1,4 +1,4 @@
-from typing import cast, List
+from typing import List
 
 from google.appengine.ext import ndb
 
@@ -6,14 +6,10 @@ from backend.common.models.alliance import EventAlliance
 from backend.common.models.event_team import EventTeam
 
 
-class EventAllianceWithStatus(EventAlliance):
-    status: str
-
-
 # Adds the alliance captain's EventTeamStatusPlayoff to the alliance status.
 def add_alliance_status(
     event_key: str, alliances: List[EventAlliance]
-) -> List[EventAllianceWithStatus]:
+) -> List[EventAlliance]:
     captain_team_keys = []
     for alliance in alliances:
         if alliance["picks"]:
@@ -27,17 +23,14 @@ def add_alliance_status(
     with_status = []
     for captain_future, alliance in zip(captain_eventteams_future, alliances):
         captain = captain_future.get_result()
-        new_alliance = cast(EventAllianceWithStatus, alliance)
         if (
             captain
             and captain.status
             and captain.status.get("alliance")
             and captain.status.get("playoff")
         ):
-            new_alliance["status"] = captain.status.get("playoff")
-        else:
-            new_alliance["status"] = "unknown"
+            alliance["status"] = captain.status.get("playoff")
 
-        with_status.append(new_alliance)
+        with_status.append(alliance)
 
     return with_status

@@ -6,7 +6,6 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS
 from backend.common.consts.comp_level import (
-    COMP_LEVELS_VERBOSE_FULL,
     CompLevel,
     ELIM_LEVELS,
 )
@@ -15,19 +14,22 @@ from backend.common.consts.playoff_type import (
     ORDERED_DOUBLE_ELIM_ROUNDS,
     PlayoffType,
 )
+from backend.common.helpers.alliance_helper import AllianceHelper
 from backend.common.helpers.match_helper import MatchHelper, TOrganizedMatches
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.rankings_helper import RankingsHelper
-from backend.common.models.alliance import EventAlliance
+from backend.common.models.alliance import (
+    EventAlliance,
+    PlayoffAllianceStatus,
+    PlayoffOutcome,
+)
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team_status import (
     EventTeamLevelStatus,
-    EventTeamPlayoffStatus,
     EventTeamRanking,
     EventTeamStatus,
     EventTeamStatusAlliance,
-    EventTeamStatusPlayoff,
     EventTeamStatusQual,
     WLTRecord,
 )
@@ -80,11 +82,11 @@ class EventTeamStatusHelper:
             playoff_average = playoff.get("playoff_average")
             playoff_type = playoff.get("playoff_type")
 
-            level_str = cls._generate_playoff_level_status_string(
-                playoff_type, playoff, level
+            level_str = AllianceHelper.generate_playoff_level_status_string(
+                playoff_type, playoff
             )
 
-            if status == EventTeamPlayoffStatus.PLAYING:
+            if status == PlayoffOutcome.PLAYING:
                 level_record = none_throws(playoff["current_level_record"])
                 record_str = "{}-{}-{}".format(
                     level_record["wins"], level_record["losses"], level_record["ties"]
@@ -93,12 +95,12 @@ class EventTeamStatusHelper:
                     record_str, level_str
                 )
             else:
-                if status == EventTeamPlayoffStatus.WON:
+                if status == PlayoffOutcome.WON:
                     if level == CompLevel.F:
                         playoff_str = "<b>Won the event</b>"
                     else:
                         playoff_str = "<b>Won the {}</b>".format(level_str)
-                elif status == EventTeamPlayoffStatus.ELIMINATED:
+                elif status == PlayoffOutcome.ELIMINATED:
                     playoff_str = "<b>Eliminated in the {}</b>".format(level_str)
                 else:
                     raise Exception("Unknown playoff status: {}".format(status))
@@ -205,16 +207,7 @@ class EventTeamStatusHelper:
             if pick == 0:
                 pick = "Captain"
             else:
-                # Convert to ordinal number http://stackoverflow.com/questions/9647202/ordinal-numbers-replacement
-                pick = "{} Pick".format(
-                    "%d%s"
-                    % (
-                        pick,
-                        "tsnrhtdd"[
-                            (pick / 10 % 10 != 1) * (pick % 10 < 4) * pick % 10 :: 4
-                        ],
-                    )
-                )
+                pick = AllianceHelper.get_ordinal_pick_from_number(pick)
             backup = alliance["backup"]
             if backup and team_key == backup["in"]:
                 pick = "Backup"
@@ -226,60 +219,17 @@ class EventTeamStatusHelper:
                 components.append(alliance_str)
 
         if playoff:
-            level = playoff["level"]
-            status = playoff.get("status")
-            record = playoff.get("record")
-            playoff_average = playoff.get("playoff_average")
-            playoff_type = playoff.get("playoff_type")
-
-            level_str = cls._generate_playoff_level_status_string(
-                playoff_type, playoff, level
-            )
-
-            if status == EventTeamPlayoffStatus.PLAYING:
-                level_record = none_throws(playoff["current_level_record"])
-                if verbose:
-                    record_str = cls._build_verbose_record(level_record)
-                else:
-                    record_str = "{}-{}-{}".format(
-                        level_record["wins"],
-                        level_record["losses"],
-                        level_record["ties"],
-                    )
-                playoff_str = "is <b>{}</b> in the <b>{}</b>".format(
-                    record_str, level_str
+            alliance_name = alliance.get("name") if alliance else None
+            if playoff["status"] == PlayoffOutcome.PLAYING:
+                components = AllianceHelper.generate_playoff_status_string(
+                    playoff, pick, alliance_name
                 )
-                if alliance:
-                    playoff_str += " as the <b>{}</b> of <b>{}</b>".format(
-                        pick, alliance["name"]
-                    )
-                components = [playoff_str]
             else:
-                if alliance:
-                    components.append(
-                        "competed in the playoffs as the <b>{}</b> of <b>{}</b>".format(
-                            pick, alliance["name"]
-                        )
+                components.extend(
+                    AllianceHelper.generate_playoff_status_string(
+                        playoff, pick, alliance_name
                     )
-
-                if status == EventTeamPlayoffStatus.WON:
-                    if level == CompLevel.F:
-                        playoff_str = "<b>won the event</b>"
-                    else:
-                        playoff_str = "<b>won the {}</b>".format(level_str)
-                elif status == EventTeamPlayoffStatus.ELIMINATED:
-                    playoff_str = "was <b>eliminated in the {}</b>".format(level_str)
-                else:
-                    raise Exception("Unknown playoff status: {}".format(status))
-                if record:
-                    playoff_str += " with a playoff record of <b>{}-{}-{}</b>".format(
-                        record["wins"], record["losses"], record["ties"]
-                    )
-                if playoff_average:
-                    playoff_str += " with a playoff average of <b>{:.1f}</b>".format(
-                        playoff_average
-                    )
-                components.append(playoff_str)
+                )
 
         if not components:
             return default_msg
@@ -334,32 +284,6 @@ class EventTeamStatusHelper:
 
         # TODO: Results are getting mixed unless copied. 2017-02-03 -fangeugene
         return copy.deepcopy(status)
-
-    @classmethod
-    def _generate_playoff_level_status_string(
-        cls,
-        playoff_type: Optional[PlayoffType],
-        playoff_status: EventTeamStatusPlayoff,
-        level: CompLevel,
-    ) -> str:
-        if playoff_type in [
-            PlayoffType.DOUBLE_ELIM_4_TEAM,
-            PlayoffType.DOUBLE_ELIM_8_TEAM,
-        ]:
-            double_elim_round = playoff_status["double_elim_round"]
-            if double_elim_round == DoubleElimRound.FINALS:
-                return COMP_LEVELS_VERBOSE_FULL[CompLevel.F]
-            else:
-                return f"Double Elimination Bracket ({double_elim_round})"
-        elif playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
-            if playoff_status["advanced_to_round_robin_finals"]:
-                return COMP_LEVELS_VERBOSE_FULL[CompLevel.F]
-            else:
-                return (
-                    f"Round Robin Bracket (Rank {playoff_status['round_robin_rank']})"
-                )
-        else:
-            return COMP_LEVELS_VERBOSE_FULL[level]
 
     @classmethod
     def _build_qual_info(
@@ -490,7 +414,7 @@ class EventTeamStatusHelper:
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
-    ) -> Optional[EventTeamStatusPlayoff]:
+    ) -> Optional[PlayoffAllianceStatus]:
         alliance, _ = cls._get_alliance(team_key, event_details, matches)
         complete_alliance = set(alliance["picks"]) if alliance else set()
         if alliance and alliance.get("backup"):
@@ -534,7 +458,7 @@ class EventTeamStatusHelper:
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
-    ) -> Optional[EventTeamStatusPlayoff]:
+    ) -> Optional[PlayoffAllianceStatus]:
         # Matches needs to be all playoff matches at the event, to properly account for backups
         import numpy as np
 
@@ -544,7 +468,7 @@ class EventTeamStatusHelper:
         all_losses = 0
         all_ties = 0
         playoff_scores = []
-        status: Optional[EventTeamStatusPlayoff] = None
+        status: Optional[PlayoffAllianceStatus] = None
         for comp_level in reversed(ELIM_LEVELS):  # playoffs
             if matches[comp_level]:
                 level_wins = 0
@@ -577,7 +501,7 @@ class EventTeamStatusHelper:
                     if level_wins == (3 if is_bo5 else 2):
                         status = {
                             "playoff_type": playoff_type,
-                            "status": EventTeamPlayoffStatus.WON,
+                            "status": PlayoffOutcome.WON,
                             "level": comp_level,
                             "current_level_record": None,
                             "record": None,
@@ -586,7 +510,7 @@ class EventTeamStatusHelper:
                     elif level_losses == (3 if is_bo5 else 2):
                         status = {
                             "playoff_type": playoff_type,
-                            "status": EventTeamPlayoffStatus.ELIMINATED,
+                            "status": PlayoffOutcome.ELIMINATED,
                             "level": comp_level,
                             "current_level_record": None,
                             "record": None,
@@ -597,7 +521,7 @@ class EventTeamStatusHelper:
                             # This only works for past events, but 2015 is in the past so this works
                             status = {
                                 "playoff_type": playoff_type,
-                                "status": EventTeamPlayoffStatus.ELIMINATED,
+                                "status": PlayoffOutcome.ELIMINATED,
                                 "level": comp_level,
                                 "current_level_record": None,
                                 "record": None,
@@ -606,7 +530,7 @@ class EventTeamStatusHelper:
                         else:
                             status = {
                                 "playoff_type": playoff_type,
-                                "status": EventTeamPlayoffStatus.PLAYING,
+                                "status": PlayoffOutcome.PLAYING,
                                 "level": comp_level,
                                 "current_level_record": None,
                                 "record": None,
@@ -641,7 +565,7 @@ class EventTeamStatusHelper:
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
-    ) -> Optional[EventTeamStatusPlayoff]:
+    ) -> Optional[PlayoffAllianceStatus]:
         if playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
             double_elim_matches = MatchHelper.organized_double_elim_matches(
                 matches, year
@@ -699,7 +623,7 @@ class EventTeamStatusHelper:
             # Event winner -- won two finals matches
             return {
                 "playoff_type": playoff_type,
-                "status": EventTeamPlayoffStatus.WON,
+                "status": PlayoffOutcome.WON,
                 "level": latest_level,
                 "double_elim_round": latest_round,
                 "current_level_record": current_record,
@@ -710,7 +634,7 @@ class EventTeamStatusHelper:
             # Eliminated if two double elim or finals losses
             return {
                 "playoff_type": playoff_type,
-                "status": EventTeamPlayoffStatus.ELIMINATED,
+                "status": PlayoffOutcome.ELIMINATED,
                 "level": latest_level,
                 "double_elim_round": latest_round,
                 "current_level_record": current_record,
@@ -722,7 +646,7 @@ class EventTeamStatusHelper:
             # at least one match on the schedule
             return {
                 "playoff_type": playoff_type,
-                "status": EventTeamPlayoffStatus.PLAYING,
+                "status": PlayoffOutcome.PLAYING,
                 "level": latest_level,
                 "double_elim_round": latest_round,
                 "current_level_record": current_record,
@@ -742,7 +666,7 @@ class EventTeamStatusHelper:
         year: Year,
         playoff_type: PlayoffType,
         alliance_selections: List[EventAlliance],
-    ) -> Optional[EventTeamStatusPlayoff]:
+    ) -> Optional[PlayoffAllianceStatus]:
         round_robin_rank = None
         round_robin_record = WLTRecord(wins=0, losses=0, ties=0)
         finals_record = WLTRecord(wins=0, losses=0, ties=0)
@@ -789,7 +713,7 @@ class EventTeamStatusHelper:
             # Event winners (2+ wins in the final best-of-3)
             return {
                 "playoff_type": playoff_type,
-                "status": EventTeamPlayoffStatus.WON,
+                "status": PlayoffOutcome.WON,
                 "level": CompLevel.F,
                 "current_level_record": finals_record,
                 "record": overall_record,
@@ -801,7 +725,7 @@ class EventTeamStatusHelper:
             # Event finalist (2+ losses in the final best-of-3)
             return {
                 "playoff_type": playoff_type,
-                "status": EventTeamPlayoffStatus.ELIMINATED,
+                "status": PlayoffOutcome.ELIMINATED,
                 "level": CompLevel.F,
                 "current_level_record": finals_record,
                 "record": overall_record,
@@ -817,7 +741,7 @@ class EventTeamStatusHelper:
             # Eliminated in the round robin tournament
             return {
                 "playoff_type": playoff_type,
-                "status": EventTeamPlayoffStatus.ELIMINATED,
+                "status": PlayoffOutcome.ELIMINATED,
                 "level": CompLevel.SF,
                 "current_level_record": round_robin_record,
                 "record": overall_record,
@@ -829,7 +753,7 @@ class EventTeamStatusHelper:
             # Still playing, if we found round robin data for them
             return {
                 "playoff_type": playoff_type,
-                "status": EventTeamPlayoffStatus.PLAYING,
+                "status": PlayoffOutcome.PLAYING,
                 "level": CompLevel.F if has_finals_match else CompLevel.SF,
                 "current_level_record": (
                     finals_record if has_finals_match else round_robin_record
