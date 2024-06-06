@@ -6,8 +6,10 @@ from backend.common.environment import Environment
 
 
 def configure_logging() -> None:
-    client = google.cloud.logging.Client()
-    client.setup_logging()
+    if Environment.is_prod():
+        # Setting this up only needs to be done in prod to ensure logs are grouped properly with the request.
+        client = google.cloud.logging.Client()
+        client.setup_logging()
 
     log_level = Environment.log_level() or "INFO"
     logging.basicConfig(
