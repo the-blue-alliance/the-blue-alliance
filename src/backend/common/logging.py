@@ -28,8 +28,3 @@ def configure_logging() -> None:
         ]
         for logger in ndb_loggers:
             logger.setLevel(ndb_log_level.upper())
-
-    # Intentional test to ensure logging is working
-    # TODO(eugene): remove this
-    logging.info("INFO")
-    logging.warning("WARN")
