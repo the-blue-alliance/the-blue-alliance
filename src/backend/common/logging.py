@@ -10,6 +10,7 @@ def configure_logging() -> None:
         # Setting this up only needs to be done in prod to ensure logs are grouped properly with the request.
         client = google.cloud.logging.Client()
         client.setup_logging()
+        logging.info("SETUP LOGGING")
 
     log_level = Environment.log_level() or "INFO"
     logging.basicConfig(
