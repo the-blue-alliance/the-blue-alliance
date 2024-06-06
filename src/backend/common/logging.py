@@ -1,9 +1,14 @@
 import logging
 
+import google.cloud.logging
+
 from backend.common.environment import Environment
 
 
 def configure_logging() -> None:
+    client = google.cloud.logging.Client()
+    client.setup_logging()
+
     log_level = Environment.log_level() or "INFO"
     logging.basicConfig(
         level=logging.getLevelName(log_level.upper()),
@@ -21,3 +26,8 @@ def configure_logging() -> None:
         ]
         for logger in ndb_loggers:
             logger.setLevel(ndb_log_level.upper())
+
+    # Intentional test to ensure logging is working
+    # TODO(eugene): remove this
+    logging.info("INFO")
+    logging.warning("WARN")
