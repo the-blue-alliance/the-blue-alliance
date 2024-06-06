@@ -197,16 +197,18 @@ class TeamRenderer:
                     event.year,
                     event.playoff_type,
                 )
-
-                alliance_status = " and ".join(
-                    AllianceHelper.generate_playoff_status_string(
-                        alliance_status,
-                        alliance_pick,
-                        alliance["name"],
-                        plural=True,
-                        include_record=False,
+                if alliance_status:
+                    alliance_status = " and ".join(
+                        AllianceHelper.generate_playoff_status_string(
+                            alliance_status,
+                            alliance_pick,
+                            alliance["name"],
+                            plural=True,
+                            include_record=False,
+                        )
                     )
-                )
+                else:
+                    alliance_status = None
             else:
                 alliance_status = None
 
