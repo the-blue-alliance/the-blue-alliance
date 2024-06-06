@@ -189,15 +189,15 @@ class TeamRenderer:
                 AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
             )
 
-            alliance_status = EventTeamStatusHelper._build_playoff_info(
-                team.key_name,
-                event.details,
-                matches_organized,
-                event.year,
-                event.playoff_type,
-            )
+            if alliance and "name" in alliance:
+                alliance_status = EventTeamStatusHelper._build_playoff_info(
+                    team.key_name,
+                    event.details,
+                    MatchHelper.organized_matches(event.matches)[1],
+                    event.year,
+                    event.playoff_type,
+                )
 
-            if alliance and alliance_status and "name" in alliance:
                 alliance_status = " and ".join(
                     AllianceHelper.generate_playoff_status_string(
                         alliance_status,
