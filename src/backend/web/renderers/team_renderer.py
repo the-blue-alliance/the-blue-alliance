@@ -11,6 +11,7 @@ from backend.common.consts.media_tag import MediaTag
 from backend.common.helpers.alliance_helper import AllianceHelper
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.playlist_helper import PlaylistHelper
@@ -188,10 +189,18 @@ class TeamRenderer:
                 AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
             )
 
-            if alliance and "status" in alliance and "name" in alliance:
+            alliance_status = EventTeamStatusHelper._build_playoff_info(
+                team.key_name,
+                event.details,
+                event_matches,
+                event.year,
+                event.playoff_type,
+            )
+
+            if alliance and alliance_status and "name" in alliance:
                 alliance_status = " and ".join(
                     AllianceHelper.generate_playoff_status_string(
-                        alliance["status"],
+                        alliance_status,
                         alliance_pick,
                         alliance["name"],
                         plural=True,
