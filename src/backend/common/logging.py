@@ -6,7 +6,7 @@ from backend.common.environment import Environment
 
 
 def configure_logging() -> None:
-    if Environment.is_prod():
+    if Environment.is_prod() and not Environment.is_unit_test():
         # Setting this up only needs to be done in prod to ensure logs are grouped properly with the request.
         client = google.cloud.logging.Client()
         client.setup_logging()
