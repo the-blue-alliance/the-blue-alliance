@@ -142,10 +142,12 @@
                   {% endif %}
                 </p>
 
-                {% if comp.alliance %}
+                {% if comp.alliance %} 
+                {% if comp.alliance_status %}
                 <p>
                 They {{comp.alliance_status|safe}}.
                 </p>
+                {% endif %}
 
                 <table class="table table-condensed table-striped">
                   <tbody>
