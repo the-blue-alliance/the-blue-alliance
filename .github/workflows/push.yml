@@ -347,7 +347,7 @@ jobs:
         with:
           name: web-build
           path: src/build
-      - name: Overwrite env_variables.yaml
+      - name: Update env_variables.yaml
         run: ./ops/deploy/update_env_variables_yaml.sh
         env:
           FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
