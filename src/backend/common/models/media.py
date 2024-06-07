@@ -276,6 +276,14 @@ class Media(CachedModel):
             return ""
 
     @property
-    def avatar_image_source(self) -> str:
+    def avatar_base64_image(self) -> str:
         image = json.loads(self.details_json)
-        return "data:image/png;base64, {}".format(image["base64Image"])
+        return image["base64Image"]
+
+    @property
+    def avatar_image_source(self) -> str:
+        return "data:image/png;base64, {}".format(self.avatar_base64_image)
+
+    @property
+    def avatar_image_url(self) -> str:
+        return f"/avatar/{self.year}/{self.references[0].id()}.png"

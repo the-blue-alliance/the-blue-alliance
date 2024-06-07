@@ -1,15 +1,19 @@
+import base64
+import io
 import logging
 import urllib.parse
 from datetime import timedelta
 
 import requests
-from flask import abort, redirect, request
+from flask import abort, redirect, request, send_file
 
 from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.media_type import MediaType
 from backend.common.decorators import cached_public
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.media import Media
+from backend.common.models.team import Team
 from backend.common.sitevars.instagram_api_secret import InstagramApiSecret
 
 
@@ -50,3 +54,21 @@ def instagram_oembed(media_key: str):
         return abort(500)
 
     return redirect(response.json()["thumbnail_url"])
+
+
+@cached_public(ttl=timedelta(hours=24))
+def avatar_png(year: int, team_key: str):
+    if not Team.validate_key_name(team_key):
+        return abort(404)
+    if year < 2018 or year > SeasonHelper.get_max_year():
+        return abort(404)
+
+    avatar = Media.get_by_id(
+        Media.render_key_name(MediaType.AVATAR, f"avatar_{year}_{team_key}")
+    )
+    if not avatar:
+        return abort(404)
+
+    image_data = base64.b64decode(avatar.avatar_base64_image)
+    image_io = io.BytesIO(image_data)
+    return send_file(image_io, mimetype="image/png")
