@@ -61,9 +61,13 @@ def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
         app.wsgi_app = middleware(app.wsgi_app)  # type: ignore[override]
 
 
+def get_secret_key() -> str:
+    return FLASK_SECRET_KEY
+
+
 def _set_secret_key(app: Flask) -> None:
-    if not FLASK_SECRET_KEY:
+    if not get_secret_key():
         raise Exception("Secret key not set!")
-    if Environment.is_prod() and FLASK_SECRET_KEY == "thebluealliance":
+    if Environment.is_prod() and get_secret_key() == "thebluealliance":
         raise Exception("Secret key may not be default in production!")
-    app.secret_key = FLASK_SECRET_KEY
+    app.secret_key = get_secret_key()

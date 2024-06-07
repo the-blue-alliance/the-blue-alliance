@@ -6,13 +6,16 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from flask import Flask
 
-from backend.common import flask_secret_key
+from backend.common import middleware
 from backend.web.local.blueprint import local_routes, maybe_register
 
 
 @pytest.fixture(autouse=True)
 def setup_secret_key(monkeypatch: MonkeyPatch) -> None:
-    monkeypatch.setattr(flask_secret_key, "FLASK_SECRET_KEY", "thebluealliance-test")
+    def mock_get_secret():
+        return "thebluealliance-test"
+
+    monkeypatch.setattr(middleware, "get_secret_key", mock_get_secret)
 
 
 def test_blueprint_not_installed_by_default() -> None:
