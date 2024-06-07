@@ -16,8 +16,6 @@ from backend.common.middleware import (
 )
 from backend.common.profiler import trace_context
 from backend.common.run_after_response import run_after_response
-from backend.common.sitevars import flask_secrets
-from backend.common.sitevars.flask_secrets import FlaskSecrets
 
 
 def test_TraceRequestMiddleware_init(app: Flask) -> None:
@@ -92,9 +90,7 @@ def test_install_middleware(app: Flask) -> None:
         backend.common.middleware, "_set_secret_key"
     ) as mock_set_secret_key:
         install_middleware(app)
-        assert len(app.before_request_funcs) > 0
-        for func in app.before_request_funcs[None]:
-            func()
+        assert len(app.before_request_funcs) == 0
     mock_set_secret_key.assert_called_once_with(app)
     assert type(app.wsgi_app) is TraceRequestMiddleware
 
@@ -105,26 +101,6 @@ def test_set_secret_key_default(ndb_context, app: Flask) -> None:
     assert app.secret_key == "thebluealliance"
 
 
-def test_set_secret_key_not_default(ndb_context, app: Flask) -> None:
-    secret_key = "some_new_secret_key"
-    FlaskSecrets.put(flask_secrets.ContentType(secret_key=secret_key))
-
-    assert app.secret_key is None
-    _set_secret_key(app)
-    assert app.secret_key == secret_key
-
-
-def test_set_secret_key_empty_prod(ndb_context, app: Flask) -> None:
-    FlaskSecrets.put(flask_secrets.ContentType(secret_key=""))
-
-    assert app.secret_key is None
-    with patch.object(Environment, "is_prod", return_value=True):
-        with pytest.raises(
-            Exception, match="Secret key may not be default in production!"
-        ):
-            _set_secret_key(app)
-
-
 def test_set_secret_key_default_prod(ndb_context, app: Flask) -> None:
     assert app.secret_key is None
     with patch.object(Environment, "is_prod", return_value=True):
@@ -132,13 +108,3 @@ def test_set_secret_key_default_prod(ndb_context, app: Flask) -> None:
             Exception, match="Secret key may not be default in production!"
         ):
             _set_secret_key(app)
-
-
-def test_set_secret_key_prod(ndb_context, app: Flask) -> None:
-    secret_key = "some_new_secret_key"
-    FlaskSecrets.put(flask_secrets.ContentType(secret_key=secret_key))
-
-    assert app.secret_key is None
-    with patch.object(Environment, "is_prod", return_value=True):
-        _set_secret_key(app)
-    assert app.secret_key == secret_key
