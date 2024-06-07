@@ -6,7 +6,7 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from flask import Flask
 
-import backend.common.flask_secret_key as flask_secret_key
+from backend.common import flask_secret_key
 from backend.web.local.blueprint import local_routes, maybe_register
 
 
