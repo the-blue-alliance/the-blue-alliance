@@ -185,7 +185,6 @@ jobs:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
-          FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:

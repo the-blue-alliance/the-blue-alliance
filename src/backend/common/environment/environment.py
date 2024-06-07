@@ -49,6 +49,10 @@ class Environment:
     def ndb_log_level() -> Optional[str]:
         return os.environ.get("NDB_LOG_LEVEL")
 
+    @staticmethod
+    def flask_secret_key() -> Optional[str]:
+        return os.environ.get("FLASK_SECRET_KEY")
+
     @classmethod
     def flask_response_cache_enabled(cls) -> bool:
         return bool(
