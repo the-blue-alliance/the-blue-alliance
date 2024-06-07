@@ -14,6 +14,8 @@ class EnvironmentMode(enum.Enum):
 # Mostly GAE env variables
 # See https://cloud.google.com/appengine/docs/standard/python3/runtime#environment_variables
 class Environment:
+    DEFAULT_FLASK_SECRET_KEY = "thebluealliance"
+
     @staticmethod
     def _strtobool(value: str) -> bool:
         if not value:
@@ -48,6 +50,10 @@ class Environment:
     @staticmethod
     def ndb_log_level() -> Optional[str]:
         return os.environ.get("NDB_LOG_LEVEL")
+
+    @staticmethod
+    def flask_secret_key() -> Optional[str]:
+        return os.environ.get("FLASK_SECRET_KEY", Environment.DEFAULT_FLASK_SECRET_KEY)
 
     @classmethod
     def flask_response_cache_enabled(cls) -> bool:

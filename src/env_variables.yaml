@@ -1,0 +1,3 @@
+# This is for dev, and will get overwritten when deploying to prod
+env_variables:
+  FLASK_SECRET_KEY: "thebluealliance"

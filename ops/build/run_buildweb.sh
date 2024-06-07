@@ -1,7 +1,7 @@
 #! /bin/bash
 set -e
 
-# Create tba_keys.js and flask_secret_key.py from environment secrets if the --env flag is passed
+# Create tba_keys.js from environment secrets if the --env flag is passed
 while test $# -gt 0; do
     echo "$1"
     case "$1" in
@@ -15,10 +15,6 @@ var firebaseDatabaseURL = "https://${GCLOUD_PROJECT_ID}.firebaseio.com";
 var firebaseStorageBucket = "${GCLOUD_PROJECT_ID}.appspot.com";
 var firebaseMessagingSenderId = "${FIREBASE_MESSAGING_SENDER_ID}";
 var firebaseProjectId = "${GCLOUD_PROJECT_ID}";
-EOF
-        touch ./src/backend/common/flask_secret_key.py
-        cat >./src/backend/common/flask_secret_key.py <<EOF
-FLASK_SECRET_KEY = "${FLASK_SECRET_KEY}"
 EOF
         shift
         ;;
