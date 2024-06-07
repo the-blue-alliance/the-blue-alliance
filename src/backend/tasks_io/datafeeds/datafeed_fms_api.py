@@ -5,7 +5,6 @@ from typing import Dict, List, Optional, Set, Tuple
 
 import requests
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
