@@ -99,7 +99,7 @@ def test_install_middleware(app: Flask) -> None:
 def test_set_secret_key_default(app: Flask) -> None:
     assert app.secret_key is None
     _set_secret_key(app)
-    assert app.secret_key == "thebluealliance"
+    assert app.secret_key == Environment.DEFAULT_FLASK_SECRET_KEY
 
 
 def test_set_secret_key_empty(app: Flask, monkeypatch: MonkeyPatch) -> None:
