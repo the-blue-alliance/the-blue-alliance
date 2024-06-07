@@ -90,7 +90,7 @@ def test_install_middleware(app: Flask) -> None:
     with patch.object(
         backend.common.middleware, "_set_secret_key"
     ) as mock_set_secret_key:
-        install_middleware(app)
+        install_middleware(app, configure_secret_key=True)
         assert len(app.before_request_funcs) == 0
     mock_set_secret_key.assert_called_once_with(app)
     assert type(app.wsgi_app) is TraceRequestMiddleware
