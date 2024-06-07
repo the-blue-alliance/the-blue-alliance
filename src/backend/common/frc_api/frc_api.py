@@ -174,8 +174,10 @@ class FRCAPI:
             for gcs_file in gcs_files:
                 filename = os.path.join(path, gcs_file.split("/")[-1])
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
-                with open(filename, "w") as f:
-                    f.write(read(gcs_file))
+                content = read(gcs_file)
+                if content is not None:
+                    with open(filename, "w") as f:
+                        f.write(content)
         return sorted(gcs_files)
 
     def _get_simulated(self, endpoint: str, version: str) -> requests.Response:
