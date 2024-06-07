@@ -96,7 +96,9 @@ def test_install_middleware(app: Flask) -> None:
     assert type(app.wsgi_app) is TraceRequestMiddleware
 
 
-def test_set_secret_key_empty(app: Flask) -> None:
+def test_set_secret_key_empty(app: Flask, monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setattr(Environment, "flask_secret_key", lambda: "")
+
     assert app.secret_key is None
     with pytest.raises(
         Exception, match="Secret key not set!"
@@ -104,9 +106,7 @@ def test_set_secret_key_empty(app: Flask) -> None:
         _set_secret_key(app)
 
 
-def test_set_secret_key_default(app: Flask, monkeypatch: MonkeyPatch) -> None:
-    monkeypatch.setattr(Environment, "flask_secret_key", lambda: "thebluealliance")
-
+def test_set_secret_key_default(app: Flask) -> None:
     assert app.secret_key is None
     _set_secret_key(app)
     assert app.secret_key == "thebluealliance"
