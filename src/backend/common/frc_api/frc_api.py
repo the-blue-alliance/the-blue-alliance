@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import os
 import re
 from typing import Literal, Optional
 
@@ -156,12 +157,29 @@ class FRCAPI:
         with Span(f"frc_api_fetch:{endpoint}"):
             return self.session.get(url, headers=headers)
 
+    def _get_cached_gcs_files(self, gcs_dir_name: str):
+        """
+        Get the locally cached files or from GCS if not cached.
+        If getting from GCS, cache the files locally.
+        """
+        path = os.path.join(
+            os.path.dirname(__file__), f"gcs_test_data_cache/{gcs_dir_name}"
+        )
+        if os.path.exists(path):
+            gcs_files = [f"{gcs_dir_name}{p}" for p in os.listdir(path)]
+        else:
+            from backend.common.storage import get_files, read
+
+            gcs_files = get_files(gcs_dir_name)
+            for gcs_file in gcs_files:
+                filename = os.path.join(path, gcs_file.split("/")[-1])
+                os.makedirs(os.path.dirname(filename), exist_ok=True)
+                with open(filename, "w") as f:
+                    f.write(read(gcs_file))
+        return sorted(gcs_files)
+
     def _get_simulated(self, endpoint: str, version: str) -> requests.Response:
         from unittest.mock import Mock
-        from backend.common.storage import (
-            get_files as cloud_storage_get_files,
-            read as cloud_storage_read,
-        )
 
         if version == "v2.0" and "/schedule" in endpoint and "hybrid" not in endpoint:
             # The hybrid schedule endpoint doesn't exist in newer versions,
@@ -177,7 +195,7 @@ class FRCAPI:
             gcs_dir_name = (
                 f"{self.STORAGE_BUCKET_BASE_DIR}/{version}/{endpoint.lstrip('/')}/"
             )
-            gcs_files = cloud_storage_get_files(gcs_dir_name)
+            gcs_files = self._get_cached_gcs_files(gcs_dir_name)
 
             # Find appropriate timed response
             last_file_name = None
@@ -194,7 +212,14 @@ class FRCAPI:
             # Fetch response
             content: Optional[str] = None
             if last_file_name:
-                content = cloud_storage_read(last_file_name)
+                with open(
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        f"gcs_test_data_cache/{last_file_name}",
+                    ),
+                    "r",
+                ) as f:
+                    content = f.read()
 
             if content is None:
                 empty_response = Mock(spec=requests.Response)
