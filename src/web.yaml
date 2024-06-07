@@ -41,3 +41,6 @@ handlers:
     script: auto
   - url: /.*
     script: auto
+
+includes:
+  - env_variables.yaml
