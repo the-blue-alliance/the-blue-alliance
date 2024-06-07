@@ -6,6 +6,7 @@ from werkzeug.wrappers import Request
 from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
+from backend.common.flask_secret_key import FLASK_SECRET_KEY
 from backend.common.profiler import send_traces, Span, trace_context
 from backend.common.run_after_response import execute_callbacks
 
@@ -47,10 +48,7 @@ class AfterResponseMiddleware:
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
-    @app.before_request
-    def _app_before():
-        if configure_secret_key and not app.secret_key:
-            _set_secret_key(app)
+    _set_secret_key(app)
 
     # The middlewares get added in order of this last, and each wraps the previous
     # This means, the last one in this list is the "outermost" middleware that runs
@@ -64,12 +62,8 @@ def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
 
 
 def _set_secret_key(app: Flask) -> None:
-    from backend.common.sitevars.flask_secrets import FlaskSecrets
-
-    secret_key = FlaskSecrets.secret_key()
-    if Environment.is_prod():
-        if not secret_key:
-            raise Exception("Secret key not set in production!")
-        if secret_key == FlaskSecrets.DEFAULT_SECRET_KEY:
-            raise Exception("Secret key may not be default in production!")
-    app.secret_key = secret_key
+    if not FLASK_SECRET_KEY:
+        raise Exception("Secret key not set!")
+    if Environment.is_prod() and FLASK_SECRET_KEY == "thebluealliance":
+        raise Exception("Secret key may not be default in production!")
+    app.secret_key = FLASK_SECRET_KEY
