@@ -109,11 +109,12 @@ class DatafeedFMSAPI:
         team_number = int(team_key[3:])  # everything after 'frc'
         api_response = self.api.team_details(year, team_number)
         result = self._parse(api_response, FMSAPITeamDetailsParser(year))
-        if result:
-            models, _ = result
-            return next(iter(models), None)
-        else:
+        if not result:
             return None
+        models, _ = result
+        if not models:
+            return None
+        return next(iter(models), None)
 
     def get_team_avatar(
         self, year: Year, team_key: TeamKey
