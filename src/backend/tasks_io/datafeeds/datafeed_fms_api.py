@@ -259,13 +259,19 @@ class DatafeedFMSAPI:
         qual_scores_result = self.api.match_scores(year, api_event_short, "qual")
         playoff_scores_result = self.api.match_scores(year, api_event_short, "playoff")
 
-        qual_schedule = none_throws(self._parse(qual_schedule_result, json_parser))
-        playoff_schedule = none_throws(
-            self._parse(playoff_schedule_result, json_parser)
-        )
+        qual_schedule = self._parse(qual_schedule_result, json_parser)
+        if qual_schedule is None:
+            return []
+        playoff_schedule =  self._parse(playoff_schedule_result, json_parser)
+        if playoff_schedule is None:
+            return []
 
-        qual_matches = none_throws(self._parse(qual_match_result, json_parser))
-        playoff_matches = none_throws(self._parse(playoff_match_result, json_parser))
+        qual_matches = self._parse(qual_match_result, json_parser)
+        if qual_matches is None:
+            return []
+        playoff_matches = self._parse(playoff_match_result, json_parser)
+        if playoff_matches is None:
+            return []
 
         # Because the hybrid score endpoint doesn't exist in the FRC API v3
         # we manually merge the results from the score/schedule endpoints
