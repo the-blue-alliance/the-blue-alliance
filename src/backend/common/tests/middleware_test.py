@@ -106,9 +106,7 @@ def test_set_secret_key_empty(app: Flask, monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setattr(Environment, "flask_secret_key", lambda: "")
 
     assert app.secret_key is None
-    with pytest.raises(
-        Exception, match="Secret key not set!"
-    ):
+    with pytest.raises(Exception, match="Secret key not set!"):
         _set_secret_key(app)
 
 

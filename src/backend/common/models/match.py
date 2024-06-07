@@ -213,7 +213,7 @@ class Match(CachedModel):
             except json.decoder.JSONDecodeError:
                 return None
 
-            if 'red' not in score_breakdown or 'blue' not in score_breakdown:
+            if "red" not in score_breakdown or "blue" not in score_breakdown:
                 # Handle some old matches with empty score breakdowns instead of None
                 return None
 
