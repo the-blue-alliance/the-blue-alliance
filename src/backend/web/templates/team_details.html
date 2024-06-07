@@ -26,7 +26,7 @@
 
         <h2 class="visible-xs end_header">
         {% if avatar %}
-          <img class="team-avatar single blue" src='{{avatar.avatar_image_source}}'/>
+          <img class="team-avatar single blue" src='{{avatar.avatar_image_url}}'/>
         {% endif %}
         Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
         {% if district_name %}<blockquote class="visible-xs"><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
