@@ -194,7 +194,7 @@ def about() -> str:
     return render_template("about.html")
 
 
-@cached_public
+@cached_public(ttl=timedelta(hours=24))
 def avatar_list(year: Optional[Year] = None) -> Response:
     year = year or SeasonHelper.get_current_season()
 
