@@ -89,9 +89,10 @@ def test_nonexistent_avatar(web_client: Client):
 
 def test_nonexistent_avatar(web_client: Client):
     avatar = create_avatar()
+    assert avatar.avatar_image_url == "/avatar/2024/frc604.png"
+
     resp = web_client.get("/avatar/2024/frc604.png")
     assert resp.status_code == 200
     assert resp.content_type == "image/png"
     assert resp.cache_control.public
     assert float(resp.cache_control.max_age) == 24 * 60 * 60
-    assert avatar.avatar_image_url == "/avatar/2024/frc604.png"
