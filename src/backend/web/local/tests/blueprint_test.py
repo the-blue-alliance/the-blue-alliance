@@ -12,10 +12,7 @@ from backend.web.local.blueprint import local_routes, maybe_register
 
 @pytest.fixture(autouse=True)
 def setup_secret_key(monkeypatch: MonkeyPatch) -> None:
-    def mock_get_secret():
-        return "thebluealliance-test"
-
-    monkeypatch.setattr(Environment, "flask_secret_key", mock_get_secret)
+    monkeypatch.setattr(Environment, "flask_secret_key", lambda: "thebluealliance-test")
 
 
 def test_blueprint_not_installed_by_default() -> None:

@@ -2,6 +2,7 @@ from unittest.mock import Mock, patch
 
 import flask
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from flask import Flask
 from werkzeug.test import run_wsgi_app
 from werkzeug.wrappers import Request
@@ -95,13 +96,25 @@ def test_install_middleware(app: Flask) -> None:
     assert type(app.wsgi_app) is TraceRequestMiddleware
 
 
-def test_set_secret_key_default(ndb_context, app: Flask) -> None:
+def test_set_secret_key_empty(app: Flask) -> None:
+    assert app.secret_key is None
+    with pytest.raises(
+        Exception, match="Secret key not set!"
+    ):
+        _set_secret_key(app)
+
+
+def test_set_secret_key_default(app: Flask, monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setattr(Environment, "flask_secret_key", lambda: "thebluealliance")
+
     assert app.secret_key is None
     _set_secret_key(app)
     assert app.secret_key == "thebluealliance"
 
 
-def test_set_secret_key_default_prod(ndb_context, app: Flask) -> None:
+def test_set_secret_key_default_prod(app: Flask, monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setattr(Environment, "flask_secret_key", lambda: "thebluealliance")
+
     assert app.secret_key is None
     with patch.object(Environment, "is_prod", return_value=True):
         with pytest.raises(
