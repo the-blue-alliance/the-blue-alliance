@@ -157,7 +157,8 @@ class FRCAPI:
         with Span(f"frc_api_fetch:{endpoint}"):
             return self.session.get(url, headers=headers)
 
-    def _get_cached_gcs_files(self, gcs_dir_name: str):
+    @staticmethod
+    def get_cached_gcs_files(gcs_dir_name: str):
         """
         Get the locally cached files or from GCS if not cached.
         If getting from GCS, cache the files locally.
@@ -197,7 +198,7 @@ class FRCAPI:
             gcs_dir_name = (
                 f"{self.STORAGE_BUCKET_BASE_DIR}/{version}/{endpoint.lstrip('/')}/"
             )
-            gcs_files = self._get_cached_gcs_files(gcs_dir_name)
+            gcs_files = self.get_cached_gcs_files(gcs_dir_name)
 
             # Find appropriate timed response
             last_file_name = None

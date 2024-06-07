@@ -9,6 +9,7 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.frc_api.frc_api import FRCAPI
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
@@ -42,10 +43,6 @@ def force_prod_gcs_client(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_2017flwp_sequence(ndb_stub, taskqueue_stub) -> None:
-    from backend.common.storage import (
-        get_files as cloud_storage_get_files,
-    )
-
     event = Event(
         id="2017flwp",
         event_short="flwp",
@@ -60,7 +57,7 @@ def test_2017flwp_sequence(ndb_stub, taskqueue_stub) -> None:
     file_prefix = "frc-api-response/v2.0/2017/schedule/{}/playoff/hybrid/".format(
         event_code
     )
-    gcs_files = cloud_storage_get_files(file_prefix)
+    gcs_files = FRCAPI.get_cached_gcs_files(file_prefix)
 
     for filename in gcs_files:
         time_str = filename.replace(file_prefix, "").replace(".json", "").strip()
@@ -258,10 +255,6 @@ def test_2017pahat(ndb_stub, taskqueue_stub) -> None:
 
 
 def test_2017scmb_sequence(ndb_stub, taskqueue_stub) -> None:
-    from backend.common.storage import (
-        get_files as cloud_storage_get_files,
-    )
-
     event = Event(
         id="2017scmb",
         event_short="scmb",
@@ -277,7 +270,7 @@ def test_2017scmb_sequence(ndb_stub, taskqueue_stub) -> None:
         event_code
     )
 
-    gcs_files = cloud_storage_get_files(file_prefix)
+    gcs_files = FRCAPI.get_cached_gcs_files(file_prefix)
     for filename in gcs_files:
         time_str = filename.replace(file_prefix, "").replace(".json", "").strip()
         file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.%f")
