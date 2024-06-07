@@ -5,7 +5,7 @@ import urllib.parse
 from datetime import timedelta
 
 import requests
-from flask import abort, redirect, request, send_file
+from flask import abort, redirect, request, Response
 
 from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
@@ -71,4 +71,4 @@ def avatar_png(year: int, team_key: str):
 
     image_data = base64.b64decode(avatar.avatar_base64_image)
     image_io = io.BytesIO(image_data)
-    return send_file(image_io, mimetype="image/png")
+    return Response(image_io, mimetype="image/png")
