@@ -261,7 +261,7 @@ class DatafeedFMSAPI:
         qual_schedule = self._parse(qual_schedule_result, json_parser)
         if qual_schedule is None:
             return []
-        playoff_schedule =  self._parse(playoff_schedule_result, json_parser)
+        playoff_schedule = self._parse(playoff_schedule_result, json_parser)
         if playoff_schedule is None:
             return []
 
