@@ -46,8 +46,9 @@ class AfterResponseMiddleware:
         execute_callbacks()
 
 
-def install_middleware(app: Flask, configure_secret_key: bool = True) -> None:
-    _set_secret_key(app)
+def install_middleware(app: Flask, configure_secret_key: bool = False) -> None:
+    if configure_secret_key:
+        _set_secret_key(app)
 
     # The middlewares get added in order of this last, and each wraps the previous
     # This means, the last one in this list is the "outermost" middleware that runs
