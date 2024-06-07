@@ -112,9 +112,7 @@ def test_set_secret_key_default(app: Flask) -> None:
     assert app.secret_key == "thebluealliance"
 
 
-def test_set_secret_key_default_prod(app: Flask, monkeypatch: MonkeyPatch) -> None:
-    monkeypatch.setattr(Environment, "flask_secret_key", lambda: "thebluealliance")
-
+def test_set_secret_key_default_prod(app: Flask) -> None:
     assert app.secret_key is None
     with patch.object(Environment, "is_prod", return_value=True):
         with pytest.raises(
