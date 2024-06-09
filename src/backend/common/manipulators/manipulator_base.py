@@ -255,6 +255,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         if not models:
             return
 
+        logging.info(f"{cls.__name__}._run_post_delete_hook models: {len(models)}")
         for hook in cls._post_delete_hooks:
             deferred.defer(
                 hook,
@@ -280,6 +281,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             )
             for model in models
         ]
+        logging.info(f"{cls.__name__}._run_post_update_hook models: {len(updated_models)}")
         for hook in cls._post_update_hooks:
             deferred.defer(
                 hook,
@@ -364,7 +366,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         for model in models:
             if model._dirty and model._affected_references:
                 all_affected_references.append(model._affected_references)
-        logging.info(f"{cls.__name__}._clearCache: {all_affected_references}")
+        logging.info(f"{cls.__name__}._clearCache all_affected_references: {len(all_affected_references)}")
 
         if all_affected_references:
             deferred.defer(
