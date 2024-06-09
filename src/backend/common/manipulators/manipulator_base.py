@@ -1,6 +1,8 @@
 import abc
+import itertools
 import json
 import logging
+import pickle
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import (
@@ -255,7 +257,6 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         if not models:
             return
 
-        logging.info(f"{cls.__name__}._run_post_delete_hook models: {len(models)}")
         for hook in cls._post_delete_hooks:
             deferred.defer(
                 hook,
@@ -281,15 +282,24 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             )
             for model in models
         ]
-        logging.info(f"{cls.__name__}._run_post_update_hook models: {len(updated_models)}")
-        for hook in cls._post_update_hooks:
-            deferred.defer(
-                hook,
-                updated_models,
-                _queue="post-update-hooks",
-                _target="py3-tasks-io",
-                _url=f"/_ah/queue/deferred_{cls.__name__}_runPostUpdateHook",
-            )
+
+        # Split the models into batches to avoid exceeding the task payload limit.
+        BATCH_BYTES_LIMIT = 600000  # Less than 1048487 bytes
+        size_bytes = len(pickle.dumps(updated_models))
+        bytes_per_model = size_bytes / len(updated_models)
+        batch_size = int(BATCH_BYTES_LIMIT / bytes_per_model)
+        logging.info(
+            f"{cls.__name__}._run_post_update_hook() size of {len(updated_models)} updated models: {size_bytes}. Using batch size: {batch_size}"
+        )
+        for batch_models in itertools.batched(updated_models, batch_size):
+            for hook in cls._post_update_hooks:
+                deferred.defer(
+                    hook,
+                    list(batch_models),
+                    _queue="post-update-hooks",
+                    _target="py3-tasks-io",
+                    _url=f"/_ah/queue/deferred_{cls.__name__}_runPostUpdateHook",
+                )
 
     """
     Helpers for subclasses
@@ -366,7 +376,6 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         for model in models:
             if model._dirty and model._affected_references:
                 all_affected_references.append(model._affected_references)
-        logging.info(f"{cls.__name__}._clearCache all_affected_references: {len(all_affected_references)}")
 
         if all_affected_references:
             deferred.defer(
