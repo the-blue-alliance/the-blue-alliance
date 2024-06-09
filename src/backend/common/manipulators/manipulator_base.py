@@ -1,5 +1,6 @@
 import abc
 import json
+import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import (
@@ -363,6 +364,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         for model in models:
             if model._dirty and model._affected_references:
                 all_affected_references.append(model._affected_references)
+        logging.info(f"{cls.__name__}._clearCache: {all_affected_references}")
 
         if all_affected_references:
             deferred.defer(
