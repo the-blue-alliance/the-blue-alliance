@@ -54,6 +54,17 @@ def test_cached_public_timeout(app: Flask) -> None:
     assert resp.headers.get("Cache-Control") == "public, max-age=3600, s-maxage=3600"
 
 
+def test_cached_public_timedelta(app: Flask) -> None:
+    # Test that decimal timedeltas resolve to integers
+    @app.route("/")
+    @cached_public(ttl=timedelta(hours=1, seconds=1.5))
+    def view():
+        return "Hello!"
+
+    resp = app.test_client().get("/")
+    assert resp.headers.get("Cache-Control") == "public, max-age=3601, s-maxage=3601"
+
+
 def test_cached_public_timeout_dynamic(app: Flask) -> None:
     @app.route("/")
     @cached_public(ttl=3600)
