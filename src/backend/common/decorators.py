@@ -13,7 +13,7 @@ def cached_public(
     ttl: Union[int, timedelta] = 61,
     cache_redirects: bool = False,
 ):
-    timeout = ttl if isinstance(ttl, int) else ttl.total_seconds()
+    timeout = ttl if isinstance(ttl, int) else int(ttl.total_seconds())
     if func is None:  # Handle no-argument decorator
         return partial(cached_public, ttl=ttl, cache_redirects=cache_redirects)
 
