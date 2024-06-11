@@ -15,6 +15,7 @@ from backend.common.environment import Environment
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.media import Media
 from backend.common.models.team import Team
+from backend.common.profiler import Span
 from backend.common.sitevars.instagram_api_secret import InstagramApiSecret
 
 
@@ -45,12 +46,13 @@ def instagram_oembed(media_key: str):
 
     width = int(request.args.get("width") or 320)
 
-    response = requests.get(
-        "https://graph.facebook.com/v14.0/instagram_oembed"
-        + f"?url={urllib.parse.quote_plus(instagram_url)}"
-        + f"&maxwidth={width}"
-        + f"&access_token={InstagramApiSecret.get()['api_key']}"
-    )
+    with Span("GET: https://graph.facebook.com/v14.0/instagram_oembed"):
+        response = requests.get(
+            "https://graph.facebook.com/v14.0/instagram_oembed"
+            + f"?url={urllib.parse.quote_plus(instagram_url)}"
+            + f"&maxwidth={width}"
+            + f"&access_token={InstagramApiSecret.get()['api_key']}"
+        )
 
     if response.status_code != 200:
         logging.warning(
