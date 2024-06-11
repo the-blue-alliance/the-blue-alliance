@@ -53,7 +53,7 @@ def instagram_oembed(media_key: str):
     )
 
     if response.status_code != 200:
-        logging.error(
+        logging.warning(
             f"Instagram oembed call failed ({instagram_url}): {response.json()}"
         )
         return redirect("/images/instagram_blank.png")
