@@ -56,7 +56,7 @@ def instagram_oembed(media_key: str):
         logging.error(
             f"Instagram oembed call failed ({instagram_url}): {response.json()}"
         )
-        return abort(500)
+        return redirect("/images/instagram_blank.png")
 
     return redirect(response.json()["thumbnail_url"])
 
