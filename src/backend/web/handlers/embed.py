@@ -11,6 +11,7 @@ from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.media_type import MediaType
 from backend.common.decorators import cached_public
+from backend.common.environment import Environment
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.media import Media
 from backend.common.models.team import Team
@@ -29,7 +30,9 @@ def instagram_oembed(media_key: str):
         # Skip validation for media reviewers
         instagram_url = f"https://www.instagram.com/p/{media_key}/"
     else:
-        if not request.referrer or ("thebluealliance.com" not in request.referrer):
+        if not Environment.is_dev() and (
+            not request.referrer or ("thebluealliance.com" not in request.referrer)
+        ):
             return abort(403)
 
         media = Media.get_by_id(
@@ -60,6 +63,10 @@ def instagram_oembed(media_key: str):
 
 @cached_public(ttl=timedelta(hours=24))
 def avatar_png(year: int, team_key: str):
+    if not Environment.is_dev() and (
+        not request.referrer or ("thebluealliance.com" not in request.referrer)
+    ):
+        return abort(403)
     if not Team.validate_key_name(team_key):
         return abort(404)
     if year < 2018 or year > SeasonHelper.get_max_year():
