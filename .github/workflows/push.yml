@@ -373,6 +373,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
+      - name: Update env_variables.yaml
+        run: ./ops/deploy/update_env_variables_yaml.sh
+        env:
+          FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
