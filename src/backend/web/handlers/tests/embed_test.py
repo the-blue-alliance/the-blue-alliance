@@ -80,14 +80,20 @@ def test_instagram_success_media_reviewer(
         json={"thumbnail_url": THUMBNAIL_URL},
     )
 
-    resp = web_client.get("/instagram_oembed/abc")
+    resp = web_client.get(
+        "/instagram_oembed/abc",
+        headers={"Referer": "thebluealliance.com"},
+    )
 
     assert resp.status_code == 302
     assert urlparse(resp.headers["Location"]).path == THUMBNAIL_URL
 
 
 def test_nonexistent_avatar(web_client: Client):
-    resp = web_client.get("/avatar/2024/frc604.png")
+    resp = web_client.get(
+        "/avatar/2024/frc604.png",
+        headers={"Referer": "thebluealliance.com"},
+    )
     assert resp.status_code == 404
 
 
@@ -95,7 +101,10 @@ def test_avatar(web_client: Client):
     avatar = create_avatar()
     assert avatar.avatar_image_url == "/avatar/2024/frc604.png"
 
-    resp = web_client.get("/avatar/2024/frc604.png")
+    resp = web_client.get(
+        "/avatar/2024/frc604.png",
+        headers={"Referer": "thebluealliance.com"},
+    )
     assert resp.status_code == 200
     assert resp.content_type == "image/png"
     assert resp.cache_control.public
