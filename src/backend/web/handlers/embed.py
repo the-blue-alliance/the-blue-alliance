@@ -50,7 +50,9 @@ def instagram_oembed(media_key: str):
     )
 
     if response.status_code != 200:
-        logging.error(f"Instagram oembed call failed: {response.json()}")
+        logging.error(
+            f"Instagram oembed call failed ({instagram_url}): {response.json()}"
+        )
         return abort(500)
 
     return redirect(response.json()["thumbnail_url"])
