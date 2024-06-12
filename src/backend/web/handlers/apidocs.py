@@ -59,7 +59,8 @@ def apidocs_v3() -> str:
 
 
 @blueprint.route("/webhooks")
-@cached_public(ttl=timedelta(weeks=1))
+# @cached_public(ttl=timedelta(weeks=1))
+# TODO: Figure out how we can cache this despite having a CSRF token in the form
 def apidocs_webhooks() -> str:
     template_values = {"enabled": ENABLED_NOTIFICATIONS, "types": NOTIFICATION_TYPES}
     return render_template("apidocs_webhooks.html", template_values)
