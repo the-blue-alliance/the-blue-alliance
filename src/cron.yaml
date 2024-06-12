@@ -41,27 +41,27 @@ cron:
 
 - description: Match Insights Calculation
   url: /backend-tasks-b2/math/enqueue/insights/matches
-  schedule: every day 01:00
+  schedule: every day 01:02
   timezone: America/Los_Angeles
 
 - description: Award Insights Calculation
   url: /backend-tasks-b2/math/enqueue/insights/awards
-  schedule: every day 01:00
+  schedule: every day 01:04
   timezone: America/Los_Angeles
 
 - description: Prediction Insights Calculation
   url: /backend-tasks-b2/math/enqueue/insights/predictions
-  schedule: every day 01:00
+  schedule: every day 01:06
   timezone: America/Los_Angeles
 
 - description: Match Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/matches
-  schedule: every day 01:01
+  schedule: every day 01:08
   timezone: America/Los_Angeles
 
 - description: Award Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/awards
-  schedule: every day 01:01
+  schedule: every day 01:10
   timezone: America/Los_Angeles
 
 - description: District Rankings Calculation
