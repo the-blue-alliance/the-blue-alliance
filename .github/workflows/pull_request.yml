@@ -90,7 +90,7 @@ jobs:
           coverage combine coverage*/.coverage*
           coverage xml
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.4.1
+        uses: codecov/codecov-action@v4.5.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
@@ -123,7 +123,7 @@ jobs:
       - name: Run Tests
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.4.1
+        uses: codecov/codecov-action@v4.5.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
