@@ -1,0 +1,26 @@
+{
+  "extra_stats_info": [],
+  "rankings": [],
+  "sort_order_info": [
+    {
+      "name": "Ranking Score",
+      "precision": 2
+    },
+    {
+      "name": "Avg Coop",
+      "precision": 2
+    },
+    {
+      "name": "Avg Match",
+      "precision": 2
+    },
+    {
+      "name": "Avg Auto",
+      "precision": 2
+    },
+    {
+      "name": "Avg Stage",
+      "precision": 2
+    }
+  ]
+}

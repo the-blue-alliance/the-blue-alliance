@@ -1,0 +1,52 @@
+[
+  {
+    "declines": [],
+    "name": "Ganson",
+    "picks": [
+      "frc131",
+      "frc6329",
+      "frc1729"
+    ],
+    "status": {
+      "current_level_record": {
+        "losses": 2,
+        "ties": 1,
+        "wins": 1
+      },
+      "level": "f",
+      "playoff_average": null,
+      "playoff_type": 9,
+      "record": {
+        "losses": 2,
+        "ties": 1,
+        "wins": 1
+      },
+      "status": "eliminated"
+    }
+  },
+  {
+    "declines": [],
+    "name": "Richardson",
+    "picks": [
+      "frc8013",
+      "frc195",
+      "frc5112"
+    ],
+    "status": {
+      "current_level_record": {
+        "losses": 1,
+        "ties": 1,
+        "wins": 2
+      },
+      "level": "f",
+      "playoff_average": null,
+      "playoff_type": 9,
+      "record": {
+        "losses": 1,
+        "ties": 1,
+        "wins": 2
+      },
+      "status": "won"
+    }
+  }
+]
