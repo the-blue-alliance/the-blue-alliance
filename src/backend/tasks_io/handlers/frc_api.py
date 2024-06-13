@@ -631,8 +631,20 @@ def event_matches(event_key: EventKey) -> Response:
     if event is None:
         return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
+    # Prefetch exisitng matches to merge with new matches
+    event.prep_matches()
+
     df = DatafeedFMSAPI(save_response=True)
     matches = df.get_event_matches(event_key)
+    existing_matches = event.matches
+
+    # Add existing matches to the new matches if they aren't present.
+    # This is necessary so we can delete matches that are no longer valid.
+    new_match_keys = set([m.key.id() for m in matches])
+    for match in existing_matches:
+        if match.key.id() not in new_match_keys:
+            matches.append(match)
+
     matches, keys_to_delete = MatchHelper.delete_invalid_matches(
         matches,
         event,
@@ -645,9 +657,7 @@ def event_matches(event_key: EventKey) -> Response:
     MatchManipulator.delete_keys(keys_to_delete)
     new_matches = listify(MatchManipulator.createOrUpdate(matches))
 
-    template_values = {
-        "matches": new_matches,
-    }
+    template_values = {"matches": new_matches, "deleted_keys": keys_to_delete}
 
     if (
         "X-Appengine-Taskname" not in request.headers

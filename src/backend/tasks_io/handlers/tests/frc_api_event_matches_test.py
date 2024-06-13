@@ -202,3 +202,108 @@ def test_get_remap_teams(
     m = Match.get_by_id("2020nyny_qm1")
     assert m is not None
     assert m.team_key_names == ["frc9000"]
+
+
+@mock.patch.object(DatafeedFMSAPI, "get_event_matches")
+def test_delete_invalid(
+    fmsapi_matches_mock,
+    tasks_client: Client,
+) -> None:
+    create_event(official=True)
+    # Red wins both matches, the third match is invalid
+    matches = [
+        Match(
+            id="2020nyny_f1m1",
+            event=ndb.Key(Event, "2020nyny"),
+            comp_level=CompLevel.F,
+            set_number=1,
+            match_number=1,
+            year=2020,
+            alliances_json=json.dumps({"red": {"score": 20}, "blue": {"score": 10}}),
+        ),
+        Match(
+            id="2020nyny_f1m2",
+            event=ndb.Key(Event, "2020nyny"),
+            comp_level=CompLevel.F,
+            set_number=1,
+            match_number=2,
+            year=2020,
+            alliances_json=json.dumps({"red": {"score": 20}, "blue": {"score": 10}}),
+        ),
+    ]
+
+    fmsapi_matches_mock.return_value = matches
+
+    # Add existing matches
+    [m.put() for m in matches]
+    Match(
+        id="2020nyny_f1m3",
+        event=ndb.Key(Event, "2020nyny"),
+        comp_level=CompLevel.F,
+        set_number=1,
+        match_number=3,
+        year=2020,
+        alliances_json=json.dumps({"red": {"score": "-1"}, "blue": {"score": -1}}),
+    ).put()
+
+    resp = tasks_client.get("/tasks/get/fmsapi_matches/2020nyny")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we write objects
+    assert Match.get_by_id("2020nyny_f1m1") is not None
+    assert Match.get_by_id("2020nyny_f1m2") is not None
+    # Make sure we delete objects
+    assert Match.get_by_id("2020nyny_f1m3") is None
+
+
+@mock.patch.object(DatafeedFMSAPI, "get_event_matches")
+def test_no_delete_invalid(
+    fmsapi_matches_mock,
+    tasks_client: Client,
+) -> None:
+    create_event(official=True)
+    # Red and blue win one match each, we need to keep the third match
+    matches = [
+        Match(
+            id="2020nyny_f1m1",
+            event=ndb.Key(Event, "2020nyny"),
+            comp_level=CompLevel.F,
+            set_number=1,
+            match_number=1,
+            year=2020,
+            alliances_json=json.dumps({"red": {"score": 20}, "blue": {"score": 10}}),
+        ),
+        Match(
+            id="2020nyny_f1m2",
+            event=ndb.Key(Event, "2020nyny"),
+            comp_level=CompLevel.F,
+            set_number=1,
+            match_number=2,
+            year=2020,
+            alliances_json=json.dumps({"red": {"score": 10}, "blue": {"score": 20}}),
+        ),
+    ]
+
+    fmsapi_matches_mock.return_value = matches
+
+    # Add existing matches
+    [m.put() for m in matches]
+    Match(
+        id="2020nyny_f1m3",
+        event=ndb.Key(Event, "2020nyny"),
+        comp_level=CompLevel.F,
+        set_number=1,
+        match_number=3,
+        year=2020,
+        alliances_json=json.dumps({"red": {"score": "-1"}, "blue": {"score": -1}}),
+    ).put()
+
+    resp = tasks_client.get("/tasks/get/fmsapi_matches/2020nyny")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we write objects
+    assert Match.get_by_id("2020nyny_f1m1") is not None
+    assert Match.get_by_id("2020nyny_f1m2") is not None
+    assert Match.get_by_id("2020nyny_f1m3") is not None
