@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from flask import abort, redirect, request, url_for
 from werkzeug.wrappers import Response
 
@@ -60,15 +62,14 @@ def team_detail(team_number: int) -> str:
     district_teams = DistrictTeam.query(DistrictTeam.team == team.key).fetch()
     years_participated = sorted(TeamParticipationQuery(team.key_name).fetch())
 
-    team_medias_by_year = {}
+    team_medias_by_year = defaultdict(list)
     for media in team_medias:
-        if not media.year:
-            continue
-        if media.year in team_medias_by_year:
-            team_medias_by_year[media.year].append(media)
-        else:
-            team_medias_by_year[media.year] = [media]
-    media_years = sorted(team_medias_by_year.keys(), reverse=True)
+        team_medias_by_year[media.year].append(media)
+    media_years = sorted(
+        team_medias_by_year.keys(),
+        key=lambda m: 0 if media.year is None else media.year,
+        reverse=True,
+    )
 
     template_values = {
         "event_teams": event_teams,
