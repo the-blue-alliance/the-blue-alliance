@@ -428,8 +428,11 @@ class DistrictHelper:
 
         for team in elim_alliances:
             alliance = elim_alliances[team]
+            alliance_wins = double_elim_alliance_wins[alliance]
             multiplier = (
-                double_elim_team_wins[team] / double_elim_alliance_wins[alliance]
+                0.0
+                if alliance_wins == 0
+                else double_elim_team_wins[team] / alliance_wins
             )
             district_points["points"][team]["elim_points"] = int(
                 (
