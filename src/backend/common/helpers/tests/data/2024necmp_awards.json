@@ -1,0 +1,150 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2024necmp",
+    "name": "Regional FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3654"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2370"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1071"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 1,
+    "event_key": "2024necmp",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8013"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc195"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5112"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 10,
+    "event_key": "2024necmp",
+    "name": "District Championship Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9644"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 2,
+    "event_key": "2024necmp",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc131"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6329"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1729"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 3,
+    "event_key": "2024necmp",
+    "name": "Woodie Flowers Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Zachary Fowler",
+        "team_key": "frc509"
+      },
+      {
+        "awardee": "Gary Gabriel",
+        "team_key": "frc78"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 4,
+    "event_key": "2024necmp",
+    "name": "FIRST Dean's List Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Finian S",
+        "team_key": "frc2370"
+      },
+      {
+        "awardee": "Sophie C",
+        "team_key": "frc175"
+      },
+      {
+        "awardee": "Malakhi B",
+        "team_key": "frc999"
+      },
+      {
+        "awardee": "Harshita U",
+        "team_key": "frc230"
+      },
+      {
+        "awardee": "Carter L",
+        "team_key": "frc228"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 5,
+    "event_key": "2024necmp",
+    "name": "Volunteer of the Year",
+    "recipient_list": [
+      {
+        "awardee": "Jamee Luce",
+        "team_key": null
+      },
+      {
+        "awardee": "Kari Karwedsky",
+        "team_key": null
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_key": "2024necmp",
+    "name": "Regional Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2079"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc509"
+      }
+    ],
+    "year": 2024
+  }
+]

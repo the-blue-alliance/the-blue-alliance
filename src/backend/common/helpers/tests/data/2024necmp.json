@@ -1,0 +1,57 @@
+{
+  "address": "Young Building, 1305 Memorial Ave, West Springfield, MA 01089, USA",
+  "city": "West Springfield",
+  "country": "USA",
+  "district": {
+    "abbreviation": "ne",
+    "display_name": "New England",
+    "key": "2024ne",
+    "year": 2024
+  },
+  "division_keys": [
+    "2024necmp1",
+    "2024necmp2"
+  ],
+  "end_date": "2024-04-06",
+  "event_code": "necmp",
+  "event_type": 2,
+  "event_type_string": "District Championship",
+  "first_event_code": "necmp",
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJibX3XTXh5okRs1v504QcyRE",
+  "gmaps_url": "https://maps.google.com/?q=Young+Building&ftid=0x89e6e1355df7b589:0x11c91c84d3f95bb3",
+  "key": "2024necmp",
+  "lat": 42.0912963,
+  "lng": -72.6167213,
+  "location_name": "Young Building",
+  "name": "New England FIRST District Championship",
+  "parent_event_key": null,
+  "playoff_type": 9,
+  "playoff_type_string": "Elimination Bracket (2 Alliances)",
+  "postal_code": "01089",
+  "short_name": "New England",
+  "start_date": "2024-04-03",
+  "state_prov": "MA",
+  "timezone": "America/New_York",
+  "webcasts": [
+    {
+      "channel": "firstinspires18",
+      "type": "twitch"
+    },
+    {
+      "channel": "firstinspires19",
+      "type": "twitch"
+    },
+    {
+      "channel": "nefirst_green",
+      "type": "twitch"
+    },
+    {
+      "channel": "nefirst_orange",
+      "type": "twitch"
+    }
+  ],
+  "website": "https://nefirst.org/",
+  "week": 5,
+  "year": 2024
+}
