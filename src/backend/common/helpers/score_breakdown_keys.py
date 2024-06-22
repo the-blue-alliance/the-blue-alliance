@@ -412,6 +412,9 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "trapCenterStage",
             "trapStageLeft",
             "trapStageRight",
+            # fields added by TBA:
+            "tba_extraRp1",
+            "tba_extraRp2",
         ]
     ),
     # when adding new fields, please keep them sorted alphabetically
