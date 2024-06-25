@@ -1868,7 +1868,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -1932,7 +1931,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -1990,7 +1988,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2049,7 +2046,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2108,7 +2104,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2168,7 +2163,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2223,7 +2217,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2278,7 +2271,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2336,7 +2328,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2391,7 +2382,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2446,7 +2436,60 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/coprs": {
+      "get": {
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a set of Event Component OPRs for the given Event.",
+        "operationId": "getEventCOPRs",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event_COPRs"
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
         },
         "security": [
@@ -2501,7 +2544,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2556,7 +2598,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2612,7 +2653,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2672,7 +2712,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2732,7 +2771,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2793,7 +2831,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2854,7 +2891,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2913,7 +2949,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -2972,7 +3007,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3032,7 +3066,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3092,7 +3125,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3150,7 +3182,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3205,7 +3236,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3260,7 +3290,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3319,7 +3348,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3374,7 +3402,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3432,7 +3459,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3492,7 +3518,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3558,7 +3583,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3619,7 +3643,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3679,7 +3702,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3739,7 +3761,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3800,7 +3821,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -3860,7 +3880,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-
           }
         },
         "security": [
@@ -5361,6 +5380,17 @@
         },
         "description": "OPR, DPR, and CCWM for teams at the event."
       },
+      "Event_COPRs": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "A key-value pair with team key (eg `frc254`) as key and CCWM as value."
+        },
+        "description": "Component OPRs for teams at the event."
+      },
       "Event_Predictions": {
         "type": "object",
         "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change."
@@ -5597,7 +5627,7 @@
               "type": "number",
               "format": "double",
               "example": [
-                0.0,
+                0,
                 0.1,
                 0.2
               ]
@@ -5645,7 +5675,7 @@
               "format": "double",
               "example": [
                 2.73,
-                2.70,
+                2.7,
                 null
               ]
             }
@@ -5658,7 +5688,7 @@
               "format": "double",
               "example": [
                 2.73,
-                2.70,
+                2.7,
                 null
               ]
             }
@@ -7363,13 +7393,15 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "required": ["Error"],
+              "required": [
+                "Error"
+              ],
               "properties": {
                 "Error": {
                   "type": "string",
                   "description": "Authorization error description."
                 }
-              }  
+              }
             }
           }
         }
