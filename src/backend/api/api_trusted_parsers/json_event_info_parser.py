@@ -49,14 +49,18 @@ class JSONEventInfoParser:
                         raise ParserInputException(
                             f"Unknown webcast url {webcast['url']}!"
                         )
-                    webcast_list.append(parsed_webcast)
                 elif "type" in webcast and "channel" in webcast:
-                    webcast_list.append(
-                        Webcast(
-                            type=webcast["type"],
-                            channel=webcast["channel"],
-                        )
+                    parsed_webcast = Webcast(
+                        type=webcast["type"],
+                        channel=webcast["channel"],
                     )
+                else:
+                    raise ParserInputException(f"Invalid webcast: {webcast!r}")
+
+                if "date" not in parsed_webcast and "date" in webcast:
+                    parsed_webcast["date"] = webcast["date"]
+                webcast_list.append(parsed_webcast)
+
             parsed_info["webcasts"] = webcast_list
 
         if info_dict.get("remap_teams"):
