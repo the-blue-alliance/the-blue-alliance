@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import AnyStr, Dict, List, Optional, TypedDict
 
 from pyre_extensions import safe_json
@@ -17,6 +18,7 @@ class _WebcastUrlDict(TypedDict, total=False):
     url: str
     type: WebcastType
     channel: str
+    date: str
 
 
 class EventInfoInput(TypedDict, total=False):
@@ -57,7 +59,13 @@ class JSONEventInfoParser:
                 else:
                     raise ParserInputException(f"Invalid webcast: {webcast!r}")
 
-                if "date" not in parsed_webcast and "date" in webcast:
+                if "date" in webcast:
+                    try:
+                        datetime.strptime(webcast["date"], "%Y-%m-%d")
+                    except ValueError as e:
+                        raise ParserInputException(
+                            f"Invalid webcast date: {webcast['date']!r}: {e}"
+                        )
                     parsed_webcast["date"] = webcast["date"]
                 webcast_list.append(parsed_webcast)
 
