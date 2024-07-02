@@ -56,7 +56,7 @@ def ndb_stub(
     gae_testbed.init_datastore_v3_stub()
 
     # monkeypatch the ndb library to work with freezegun
-    fake_datetime = getattr(freezegun_api, "FakeDatetime")  # pyre-ignore[16]
+    fake_datetime = getattr(freezegun_api, "FakeDatetime")
     v = getattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", {})  # pyre-ignore[16]
     v[fake_datetime] = datastore_types.ValidatePropertyNothing
     monkeypatch.setattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", v)
