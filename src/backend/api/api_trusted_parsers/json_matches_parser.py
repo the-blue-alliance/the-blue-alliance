@@ -61,7 +61,7 @@ class JSONMatchesParser:
         VALID_BREAKDOWN_KEYS: set[str] = (
             ScoreBreakdownKeys.get_valid_score_breakdown_keys(year)
         )
-        matches = safe_json.loads(matches_json, Sequence[MatchInput], validate=False)
+        matches: Sequence[MatchInput] = safe_json.loads(matches_json, Sequence, validate=False)
         if not isinstance(matches, list):
             raise ParserInputException("Invalid JSON. Please check input.")
 
