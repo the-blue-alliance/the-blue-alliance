@@ -1,9 +1,9 @@
 import json
 from typing import List
+from unittest.mock import patch
 from urllib.parse import urlparse
 
 import pytest
-from mock import patch
 from werkzeug.test import Client
 
 from backend.common.consts.alliance_color import AllianceColor

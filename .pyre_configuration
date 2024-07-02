@@ -14,6 +14,7 @@
     {"site-package": "google/appengine"},
     {"site-package": "google/auth"},
     {"site-package": "google/cloud/logging"},
+    {"site-package": "google/cloud/logging_v2"},
     {"site-package": "google/cloud/storage"},
     {"site-package": "jinja2"},
     {"site-package": "markupsafe"},
@@ -21,6 +22,8 @@
     {"site-package": "pytest"},
     {"site-package": "_pytest"},
     {"site-package": "pyre_extensions"},
+    {"site-package": "pkg_resources"},
+    {"site-package": "six", "is_toplevel_module": true},
     {"site-package": "requests_mock"},
     {"site-package": "werkzeug"}
   ]

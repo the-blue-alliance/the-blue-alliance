@@ -1,8 +1,9 @@
 import json
 import unittest
 from datetime import datetime, timedelta, timezone
+from unittest import mock
+from unittest.mock import ANY, patch
 
-import mock
 import pytest
 from firebase_admin import messaging
 from firebase_admin.exceptions import (
@@ -21,7 +22,6 @@ from google.appengine.api.taskqueue import taskqueue
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
-from mock import ANY, patch
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.client_type import (

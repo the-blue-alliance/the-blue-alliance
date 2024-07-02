@@ -4,8 +4,6 @@ from typing import Dict
 
 import pytest
 
-from pytest import approx
-
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
 from backend.common.models.event_matchstats import EventComponentOPRs
 from backend.common.models.keys import TeamKey
@@ -49,7 +47,7 @@ def assert_coprs_values_equal(
     for component, oprs in coprs.items():
         assert oprs.keys() == expected_coprs[component].keys()
         for team_key, opr in oprs.items():
-            assert opr == approx(expected_coprs[component][team_key])  # pyre-ignore[16]
+            assert opr == pytest.approx(expected_coprs[component][team_key])  # pyre-ignore[16]
 
 
 def test_compute_matchstats_no_matches() -> None:
