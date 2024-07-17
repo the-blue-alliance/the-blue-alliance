@@ -4026,10 +4026,8 @@
             "description": "Country of team derived from parsing the address registered with FIRST."
           },
           "address": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Will be NULL, for future development."
           },
           "postal_code": {
@@ -4037,17 +4035,13 @@
             "description": "Postal code from the team address."
           },
           "gmaps_place_id": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Will be NULL, for future development."
           },
           "gmaps_url": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Will be NULL, for future development.",
             "format": "url"
           },
@@ -4062,17 +4056,13 @@
             "format": "double"
           },
           "location_name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Will be NULL, for future development."
           },
           "website": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Official website associated with the team.",
             "format": "url"
           },
@@ -4081,10 +4071,8 @@
             "description": "First year the team officially competed."
           },
           "motto": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Team's motto as provided by FIRST. This field is deprecated and will return null - will be removed at end-of-season in 2019."
           },
           "home_championship": {
@@ -4150,14 +4138,8 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/District_List"
-              }
-            ]
+            "$ref": "#/components/schemas/District_List",
+            "nullable": true
           },
           "city": {
             "type": "string",
@@ -4217,14 +4199,8 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/District_List"
-              }
-            ]
+            "$ref": "#/components/schemas/District_List",
+            "nullable": true
           },
           "city": {
             "type": "string",
@@ -4253,10 +4229,8 @@
             "description": "Year the event data is for."
           },
           "short_name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
           },
           "event_type_string": {
@@ -4307,10 +4281,8 @@
             "description": "The event's website, if any."
           },
           "first_event_id": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
           },
           "first_event_code": {
@@ -4331,10 +4303,8 @@
             }
           },
           "parent_event_key": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`."
           },
           "playoff_type": {
@@ -4454,10 +4424,8 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Alliance name, may be null."
           },
           "number": {
@@ -4474,10 +4442,8 @@
         }
       },
       "Team_Event_Status_alliance_backup": {
-        "type": [
-          "object",
-          "null"
-        ],
+        "type": "object",
+        "nullable": true,
         "properties": {
           "out": {
             "type": "string",
@@ -4491,10 +4457,8 @@
         "description": "Backup status, may be null."
       },
       "Team_Event_Status_playoff": {
-        "type": [
-          "object",
-          "null"
-        ],
+        "type": "object",
+        "nullable": true,
         "properties": {
           "level": {
             "type": "string",
@@ -4523,10 +4487,8 @@
             ]
           },
           "playoff_average": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
+            "nullable": true,
             "description": "The average match score during playoffs. Year specific. May be null if not relevant for a given year."
           }
         },
@@ -4557,10 +4519,8 @@
                   "description": "Number of matches played by this team."
                 },
                 "qual_average": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ],
+                  "type": "integer",
+                  "nullable": true,
                   "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
                 },
                 "extra_stats": {
@@ -4571,10 +4531,8 @@
                   }
                 },
                 "sort_orders": {
-                  "type": [
-                    "array",
-                    "null"
-                  ],
+                  "type": "array",
+                  "nullable": true,
                   "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
                   "items": {
                     "type": "number"
@@ -5635,11 +5593,9 @@
               },
               {
                 "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
-              },
-              {
-                "type": "null"
               }
             ],
+            "nullable": true,
             "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
           },
           "videos": {
@@ -7380,10 +7336,8 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "Alliance name, may be null."
           },
           "backup": {
@@ -7478,17 +7432,13 @@
         "type": "object",
         "properties": {
           "team_key": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "The TBA team key for the team that was given the award. May be null."
           },
           "awardee": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "The name of the individual given the award. May be null."
           }
         },
@@ -7647,17 +7597,13 @@
             "description": "Type specific channel information. May be the YouTube stream, or Twitch channel name. In the case of iframe types, contains HTML to embed the stream in an HTML iframe."
           },
           "date": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "The date for the webcast in `yyyy-mm-dd` format. May be null."
           },
           "file": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
+            "nullable": true,
             "description": "File identification as may be required for some types. May be null."
           }
         }
