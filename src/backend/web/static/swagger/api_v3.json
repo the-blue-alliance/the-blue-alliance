@@ -4026,7 +4026,10 @@
             "description": "Country of team derived from parsing the address registered with FIRST."
           },
           "address": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Will be NULL, for future development."
           },
           "postal_code": {
@@ -4034,11 +4037,17 @@
             "description": "Postal code from the team address."
           },
           "gmaps_place_id": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Will be NULL, for future development."
           },
           "gmaps_url": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Will be NULL, for future development.",
             "format": "url"
           },
@@ -4053,11 +4062,17 @@
             "format": "double"
           },
           "location_name": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Will be NULL, for future development."
           },
           "website": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Official website associated with the team.",
             "format": "url"
           },
@@ -4066,7 +4081,10 @@
             "description": "First year the team officially competed."
           },
           "motto": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Team's motto as provided by FIRST. This field is deprecated and will return null - will be removed at end-of-season in 2019."
           },
           "home_championship": {
@@ -4132,7 +4150,14 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "$ref": "#/components/schemas/District_List"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/District_List"
+              }
+            ]
           },
           "city": {
             "type": "string",
@@ -4192,7 +4217,14 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "$ref": "#/components/schemas/District_List"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/District_List"
+              }
+            ]
           },
           "city": {
             "type": "string",
@@ -4221,7 +4253,10 @@
             "description": "Year the event data is for."
           },
           "short_name": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
           },
           "event_type_string": {
@@ -4272,7 +4307,10 @@
             "description": "The event's website, if any."
           },
           "first_event_id": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
           },
           "first_event_code": {
@@ -4293,7 +4331,10 @@
             }
           },
           "parent_event_key": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`."
           },
           "playoff_type": {
@@ -4413,7 +4454,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Alliance name, may be null."
           },
           "number": {
@@ -4430,7 +4474,10 @@
         }
       },
       "Team_Event_Status_alliance_backup": {
-        "type": "object",
+        "type": [
+          "object",
+          "null"
+        ],
         "properties": {
           "out": {
             "type": "string",
@@ -4444,7 +4491,10 @@
         "description": "Backup status, may be null."
       },
       "Team_Event_Status_playoff": {
-        "type": "object",
+        "type": [
+          "object",
+          "null"
+        ],
         "properties": {
           "level": {
             "type": "string",
@@ -4473,7 +4523,10 @@
             ]
           },
           "playoff_average": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "The average match score during playoffs. Year specific. May be null if not relevant for a given year."
           }
         },
@@ -4504,7 +4557,10 @@
                   "description": "Number of matches played by this team."
                 },
                 "qual_average": {
-                  "type": "integer",
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
                   "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
                 },
                 "extra_stats": {
@@ -4515,7 +4571,10 @@
                   }
                 },
                 "sort_orders": {
-                  "type": "array",
+                  "type": [
+                    "array",
+                    "null"
+                  ],
                   "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
                   "items": {
                     "type": "number"
@@ -5549,8 +5608,38 @@
             "format": "int64"
           },
           "score_breakdown": {
-            "type": "object",
-            "properties": {},
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2015_Alliance"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2016_Alliance"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2017_Alliance"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2018_Alliance"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2019_Alliance"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2020_Alliance"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2022_Alliance"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2023_Alliance"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
           },
           "videos": {
@@ -7060,6 +7149,179 @@
           }
         }
       },
+      "Match_Score_Breakdown_2024": {
+        "type": "object",
+        "properties": {
+          "blue": {
+            "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
+          },
+          "red": {
+            "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
+          }
+        },
+        "description": "See the 2024 FMS API documentation for a description of each value. https://frc-api-docs.firstinspires.org"
+      },
+      "Match_Score_Breakdown_2024_Alliance": {
+        "type": "object",
+        "properties": {
+          "adjustPoints": {
+            "type": "integer"
+          },
+          "autoAmpNoteCount": {
+            "type": "integer"
+          },
+          "autoAmpNotePoints": {
+            "type": "integer"
+          },
+          "autoLeavePoints": {
+            "type": "integer"
+          },
+          "autoLineRobot1": {
+            "type": "string"
+          },
+          "autoLineRobot2": {
+            "type": "string"
+          },
+          "autoLineRobot3": {
+            "type": "string"
+          },
+          "autoPoints": {
+            "type": "integer"
+          },
+          "autoSpeakerNoteCount": {
+            "type": "integer"
+          },
+          "autoSpeakerNotePoints": {
+            "type": "integer"
+          },
+          "autoTotalNotePoints": {
+            "type": "integer"
+          },
+          "coopNotePlayed": {
+            "type": "boolean"
+          },
+          "coopertitionBonusAchieved": {
+            "type": "boolean"
+          },
+          "coopertitionCriteriaMet": {
+            "type": "boolean"
+          },
+          "endGameHarmonyPoints": {
+            "type": "integer"
+          },
+          "endGameNoteInTrapPoints": {
+            "type": "integer"
+          },
+          "endGameOnStagePoints": {
+            "type": "integer"
+          },
+          "endGameParkPoints": {
+            "type": "integer"
+          },
+          "endGameRobot1": {
+            "type": "string"
+          },
+          "endGameRobot2": {
+            "type": "string"
+          },
+          "endGameRobot3": {
+            "type": "string"
+          },
+          "endGameSpotLightBonusPoints": {
+            "type": "integer"
+          },
+          "endGameTotalStagePoints": {
+            "type": "integer"
+          },
+          "ensembleBonusAchieved": {
+            "type": "boolean"
+          },
+          "ensembleBonusOnStageRobotsThreshold": {
+            "type": "integer"
+          },
+          "ensembleBonusStagePointsThreshold": {
+            "type": "integer"
+          },
+          "foulCount": {
+            "type": "integer"
+          },
+          "foulPoints": {
+            "type": "integer"
+          },
+          "g206Penalty": {
+            "type": "boolean"
+          },
+          "g408Penalty": {
+            "type": "boolean"
+          },
+          "g424Penalty": {
+            "type": "boolean"
+          },
+          "melodyBonusAchieved": {
+            "type": "boolean"
+          },
+          "melodyBonusThreshold": {
+            "type": "integer"
+          },
+          "melodyBonusThresholdCoop": {
+            "type": "integer"
+          },
+          "melodyBonusThresholdNonCoop": {
+            "type": "integer"
+          },
+          "micCenterStage": {
+            "type": "boolean"
+          },
+          "micStageLeft": {
+            "type": "boolean"
+          },
+          "micStageRight": {
+            "type": "boolean"
+          },
+          "rp": {
+            "type": "integer"
+          },
+          "techFoulCount": {
+            "type": "integer"
+          },
+          "teleopAmpNoteCount": {
+            "type": "integer"
+          },
+          "teleopAmpNotePoints": {
+            "type": "integer"
+          },
+          "teleopPoints": {
+            "type": "integer"
+          },
+          "teleopSpeakerNoteAmplifiedCount": {
+            "type": "integer"
+          },
+          "teleopSpeakerNoteAmplifiedPoints": {
+            "type": "integer"
+          },
+          "teleopSpeakerNoteCount": {
+            "type": "integer"
+          },
+          "teleopSpeakerNotePoints": {
+            "type": "integer"
+          },
+          "teleopTotalNotePoints": {
+            "type": "integer"
+          },
+          "totalPoints": {
+            "type": "integer"
+          },
+          "trapCenterStage": {
+            "type": "boolean"
+          },
+          "trapStageLeft": {
+            "type": "boolean"
+          },
+          "trapStageRight": {
+            "type": "boolean"
+          }
+        }
+      },
       "Media": {
         "required": [
           "type",
@@ -7118,7 +7380,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Alliance name, may be null."
           },
           "backup": {
@@ -7213,11 +7478,17 @@
         "type": "object",
         "properties": {
           "team_key": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The TBA team key for the team that was given the award. May be null."
           },
           "awardee": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The name of the individual given the award. May be null."
           }
         },
@@ -7376,11 +7647,17 @@
             "description": "Type specific channel information. May be the YouTube stream, or Twitch channel name. In the case of iframe types, contains HTML to embed the stream in an HTML iframe."
           },
           "date": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The date for the webcast in `yyyy-mm-dd` format. May be null."
           },
           "file": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "File identification as may be required for some types. May be null."
           }
         }
