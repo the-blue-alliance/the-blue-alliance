@@ -146,7 +146,10 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
             name = event["name"]
             short_name = EventShortNameHelper.get_short_name(
-                name, district_code=event["districtCode"], event_type=event_type
+                name,
+                district_code=event["districtCode"],
+                event_type=event_type,
+                year=self.season,
             )
             district_key = (
                 District.render_key_name(self.season, event["districtCode"].lower())

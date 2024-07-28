@@ -4,6 +4,7 @@ from typing import Optional, Set
 from backend.common.consts.event_type import EventType
 from backend.common.decorators import memoize
 from backend.common.models.district import District
+from backend.common.models.keys import Year
 
 
 class EventShortNameHelper:
@@ -31,6 +32,7 @@ class EventShortNameHelper:
         name_str: str,
         district_code: Optional[str] = None,
         event_type: Optional[str] = None,
+        year: Optional[Year] = None,
     ) -> str:
         """
         Extracts a short name like "Silicon Valley" from an event name like
@@ -38,6 +40,11 @@ class EventShortNameHelper:
 
         See https://github.com/the-blue-alliance/the-blue-alliance-android/blob/master/android/src/test/java/com/thebluealliance/androidclient/test/helpers/EventHelperTest.java
         """
+
+        # Strip out current year
+        if year is not None:
+            name_str = name_str.replace(str(year), "").strip()
+            print(name_str)
 
         # Special cases for district championship divisions
         if event_type == EventType.DISTRICT_CMP_DIVISION:
