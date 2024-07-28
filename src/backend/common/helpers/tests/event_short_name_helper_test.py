@@ -985,3 +985,8 @@ def test_event_get_short_name():
         EventShortNameHelper.get_short_name("FIRST Indiana State Championship")
         == "Indiana"
     )
+    # 2024 edge cases
+    assert (
+        EventShortNameHelper.get_short_name("2024 FRC Taiwan Playoff", year=2024)
+        == "FRC Taiwan Playoff"
+    )
