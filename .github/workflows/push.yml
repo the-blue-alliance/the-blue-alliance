@@ -432,6 +432,23 @@ jobs:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh src/tasks_cpu.yaml
+  deploy-pwa:
+    name: Deploy PWA Service
+    runs-on: ubuntu-latest
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Deploy
+        run: ./ops/deploy/deploy_module.sh src/pwa/pwa.yaml
   deploy-cron:
     name: Deploy Cron Jobs
     runs-on: ubuntu-latest
@@ -465,6 +482,7 @@ jobs:
         deploy-api,
         deploy-tasks-io,
         deploy-tasks-cpu,
+        deploy-pwa,
       ]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
