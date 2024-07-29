@@ -1,7 +1,11 @@
 dispatch:
+  # Beta PWA
+  - url: "beta.thebluealliance.com/*"
+    service: pwa
+
   - url: "*/api/*"
     service: py3-api
-  
+
   - url: "*/clientapi/*"
     service: py3-api
 
