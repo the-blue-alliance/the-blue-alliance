@@ -448,7 +448,7 @@ jobs:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
-        run: ./ops/deploy/deploy_module.sh src/pwa/pwa.yaml
+        run: ./ops/deploy/deploy_module.sh pwa/pwa.yaml
   deploy-cron:
     name: Deploy Cron Jobs
     runs-on: ubuntu-latest
