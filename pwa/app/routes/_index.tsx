@@ -1,24 +1,24 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from '@remix-run/node'
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "The Blue Alliance" },
+    { title: 'The Blue Alliance' },
     {
-      name: "description",
+      name: 'description',
       content:
-        "Team information and match videos and results from the FIRST Robotics Competition",
+        'Team information and match videos and results from the FIRST Robotics Competition',
     },
-  ];
-};
+  ]
+}
 
 export default function Index() {
   return (
-    <div className="font-sans p-4">
+    <div className="p-4 font-sans">
       <h1 className="text-3xl">The Blue Alliance</h1>
       <p>
-        The Blue Alliance is the best way to scout, watch, and relive the{" "}
+        The Blue Alliance is the best way to scout, watch, and relive the{' '}
         <i>FIRST</i> Robotics Competition.
       </p>
     </div>
-  );
+  )
 }
