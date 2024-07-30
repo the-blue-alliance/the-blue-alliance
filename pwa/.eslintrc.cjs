@@ -23,6 +23,10 @@ module.exports = {
 
   // Base config
   extends: ['eslint:recommended', 'prettier'],
+  rules: {
+    // Fix for eslint not knowing how to resolve unplugin icons
+    'import/no-unresolved': ['error', { ignore: ['^~icons/'] }],
+  },
 
   overrides: [
     // React
