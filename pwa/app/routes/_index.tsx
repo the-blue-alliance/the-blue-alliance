@@ -1,4 +1,4 @@
-import type { MetaFunction } from '@remix-run/node'
+import type { MetaFunction } from '@remix-run/node';
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,8 +8,8 @@ export const meta: MetaFunction = () => {
       content:
         'Team information and match videos and results from the FIRST Robotics Competition',
     },
-  ]
-}
+  ];
+};
 
 export default function Index() {
   return (
@@ -20,5 +20,5 @@ export default function Index() {
         <i>FIRST</i> Robotics Competition.
       </p>
     </div>
-  )
+  );
 }
