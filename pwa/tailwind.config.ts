@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 const config = {
   darkMode: ['class'],
@@ -10,11 +11,16 @@ const config = {
   ],
   prefix: '',
   theme: {
+    fontFamily: {
+      sans: ['Roboto', ...defaultTheme.fontFamily.sans],
+    },
     container: {
       center: true,
-      padding: '2rem',
+      padding: '15px',
       screens: {
-        '2xl': '1400px',
+        sm: '768px',
+        md: '992px',
+        lg: '1200px',
       },
     },
     extend: {
