@@ -5568,31 +5568,31 @@
           "score_breakdown": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2015_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2015"
               },
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2016_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2016"
               },
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2017_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2017"
               },
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2018_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2018"
               },
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2019_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2019"
               },
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2020_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2020"
               },
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2022_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2022"
               },
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2023_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2023"
               },
               {
-                "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2024"
               }
             ],
             "nullable": true,
