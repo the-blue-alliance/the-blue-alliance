@@ -140,7 +140,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
   pwa-lint:
-    name: "[pwa] Lint"
+    name: "[pwa] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -152,6 +152,9 @@ jobs:
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa ci
+      - name: Run Format
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run format:check
       - name: Run Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa run lint

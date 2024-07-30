@@ -128,7 +128,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
   pwa-lint:
-    name: "[pwa] Lint"
+    name: "[pwa] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -139,6 +139,8 @@ jobs:
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
+      - name: Run Format
+        run: npm --prefix pwa run format:check
       - name: Run Lint
         run: npm --prefix pwa run lint
   pwa-type:
