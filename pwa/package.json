@@ -10,9 +10,11 @@
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "start": "remix-serve ./build/server/index.js",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "generate-api": "oazapfts ../src/backend/web/static/swagger/api_v3.json --optimistic --argumentStyle=object > app/api/v3.ts"
   },
   "dependencies": {
+    "@oazapfts/runtime": "^1.0.3",
     "@remix-run/node": "^2.10.3",
     "@remix-run/react": "^2.10.3",
     "@remix-run/serve": "^2.10.3",
@@ -34,6 +36,7 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "oazapfts": "^6.1.0",
     "postcss": "^8.4.38",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.5",

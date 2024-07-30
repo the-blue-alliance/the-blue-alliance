@@ -10,6 +10,12 @@ First install the dependencies:
 npm i
 ```
 
+Make sure you have your TBA APIv3 Read Key set in `.env`:
+
+```sh
+VITE_TBA_API_READ_KEY="myKey"
+```
+
 Run the dev server:
 
 ```shellscript
