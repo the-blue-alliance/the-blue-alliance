@@ -139,6 +139,54 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
+  pwa-lint:
+    name: "[pwa] Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa ci
+      - name: Run Lint
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run lint
+  pwa-type:
+    name: "[pwa] Type Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa ci
+      - name: Run Type Check
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run typecheck
+  pwa-build:
+    name: "[pwa] Build"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa ci
+      - name: Run Build
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run build
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-latest
@@ -435,6 +483,7 @@ jobs:
   deploy-pwa:
     name: Deploy PWA Service
     runs-on: ubuntu-latest
+    needs: [pwa-lint, pwa-type, pwa-build]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v4
