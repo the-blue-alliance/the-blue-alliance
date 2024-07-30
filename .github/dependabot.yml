@@ -22,6 +22,11 @@ updates:
   - dependency-name: "@babel/preset-env"
     versions:
     - 7.13.0
+- package-ecosystem: npm
+  directory: "/pwa"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
