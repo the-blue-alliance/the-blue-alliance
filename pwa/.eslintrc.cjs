@@ -26,6 +26,7 @@ module.exports = {
   rules: {
     // Fix for eslint not knowing how to resolve unplugin icons
     'import/no-unresolved': ['error', { ignore: ['^~icons/'] }],
+    'tailwindcss/no-custom-classname': 'off',
   },
 
   overrides: [
