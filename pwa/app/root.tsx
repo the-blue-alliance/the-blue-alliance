@@ -6,12 +6,12 @@ import {
   ScrollRestoration,
 } from '@remix-run/react';
 import './tailwind.css';
-import * as api from "~/api/v3";
+import * as api from '~/api/v3';
 
-api.defaults.baseUrl = "https://thebluealliance.com/api/v3/"
+api.defaults.baseUrl = 'https://thebluealliance.com/api/v3/';
 api.defaults.headers = {
-  "X-TBA-Auth-Key": import.meta.env.VITE_TBA_API_READ_KEY
-}
+  'X-TBA-Auth-Key': import.meta.env.VITE_TBA_API_READ_KEY,
+};
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
