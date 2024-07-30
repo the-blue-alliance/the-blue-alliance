@@ -21,7 +21,8 @@ export default function InlineIcon({
   return (
     <div
       className={cn(
-        'flex items-center text-center [&>*:first-child]:h-[1em] [&>*:first-child]:w-[1em]',
+        `flex items-center text-center [&>*:first-child]:h-[1em]
+        [&>*:first-child]:w-[1em]`,
         className,
       )}
       {...props}

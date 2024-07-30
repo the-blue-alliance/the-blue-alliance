@@ -3,5 +3,7 @@ export default {
   singleQuote: true,
   trailingComma: 'all',
   tabWidth: 2,
-  plugins: ['prettier-plugin-tailwindcss'],
+  plugins: ['prettier-plugin-tailwindcss', 'prettier-plugin-classnames'],
+  tailwindFunctions: ['clsx', 'cn'],
+  customFunctions: ['clsx', 'cn'],
 };
