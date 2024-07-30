@@ -50,25 +50,25 @@ export type Team = {
   /** Country of team derived from parsing the address registered with FIRST. */
   country?: string;
   /** Will be NULL, for future development. */
-  address?: string;
+  address?: string | null;
   /** Postal code from the team address. */
   postal_code?: string;
   /** Will be NULL, for future development. */
-  gmaps_place_id?: string;
+  gmaps_place_id?: string | null;
   /** Will be NULL, for future development. */
-  gmaps_url?: string;
+  gmaps_url?: string | null;
   /** Will be NULL, for future development. */
   lat?: number;
   /** Will be NULL, for future development. */
   lng?: number;
   /** Will be NULL, for future development. */
-  location_name?: string;
+  location_name?: string | null;
   /** Official website associated with the team. */
-  website?: string;
+  website?: string | null;
   /** First year the team officially competed. */
   rookie_year?: number;
   /** Team's motto as provided by FIRST. This field is deprecated and will return null - will be removed at end-of-season in 2019. */
-  motto?: string;
+  motto?: string | null;
   /** Location of the team's home championship each year as a key-value pair. The year (as a string) is the key, and the city is the value. */
   home_championship?: {};
 };
@@ -126,9 +126,9 @@ export type Webcast = {
   /** Type specific channel information. May be the YouTube stream, or Twitch channel name. In the case of iframe types, contains HTML to embed the stream in an HTML iframe. */
   channel: string;
   /** The date for the webcast in `yyyy-mm-dd` format. May be null. */
-  date?: string;
+  date?: string | null;
   /** File identification as may be required for some types. May be null. */
-  file?: string;
+  file?: string | null;
 };
 export type Event = {
   /** TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event. */
@@ -153,7 +153,7 @@ export type Event = {
   /** Year the event data is for. */
   year: number;
   /** Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null. */
-  short_name?: string;
+  short_name?: string | null;
   /** Event Type, eg Regional, District, or Offseason. */
   event_type_string: string;
   /** Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.) */
@@ -177,14 +177,14 @@ export type Event = {
   /** The event's website, if any. */
   website?: string;
   /** The FIRST internal Event ID, used to link to the event on the FRC webpage. */
-  first_event_id?: string;
+  first_event_id?: string | null;
   /** Public facing event code used by FIRST (on frc-events.firstinspires.org, for example) */
   first_event_code?: string;
   webcasts?: Webcast[];
   /** An array of event keys for the divisions at this event. */
   division_keys?: string[];
   /** The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`. */
-  parent_event_key?: string;
+  parent_event_key?: string | null;
   /** Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null. */
   playoff_type?: number;
   /** String representation of the `playoff_type`, or null. */
@@ -253,10 +253,10 @@ export type TeamEventStatusAllianceBackup = {
   out?: string;
   /** TBA key for the backup team called in. */
   in?: string;
-};
+} | null;
 export type TeamEventStatusAlliance = {
   /** Alliance name, may be null. */
-  name?: string;
+  name?: string | null;
   /** Alliance number. */
   number: number;
   backup?: TeamEventStatusAllianceBackup;
@@ -271,8 +271,8 @@ export type TeamEventStatusPlayoff = {
   /** Current competition status for the playoffs. */
   status?: 'won' | 'eliminated' | 'playing';
   /** The average match score during playoffs. Year specific. May be null if not relevant for a given year. */
-  playoff_average?: number;
-};
+  playoff_average?: number | null;
+} | null;
 export type TeamEventStatus = {
   qual?: TeamEventStatusRank;
   alliance?: TeamEventStatusAlliance;
@@ -296,6 +296,423 @@ export type MatchAlliance = {
   surrogate_team_keys?: string[];
   /** TBA team keys (eg `frc254`) of any disqualified teams. */
   dq_team_keys?: string[];
+};
+export type MatchScoreBreakdown2015Alliance = {
+  auto_points?: number;
+  teleop_points?: number;
+  container_points?: number;
+  tote_points?: number;
+  litter_points?: number;
+  foul_points?: number;
+  adjust_points?: number;
+  total_points?: number;
+  foul_count?: number;
+  tote_count_far?: number;
+  tote_count_near?: number;
+  tote_set?: boolean;
+  tote_stack?: boolean;
+  container_count_level1?: number;
+  container_count_level2?: number;
+  container_count_level3?: number;
+  container_count_level4?: number;
+  container_count_level5?: number;
+  container_count_level6?: number;
+  container_set?: boolean;
+  litter_count_container?: number;
+  litter_count_landfill?: number;
+  litter_count_unprocessed?: number;
+  robot_set?: boolean;
+};
+export type MatchScoreBreakdown2015 = {
+  blue?: MatchScoreBreakdown2015Alliance;
+  red?: MatchScoreBreakdown2015Alliance;
+  coopertition?: 'None' | 'Unknown' | 'Stack';
+  coopertition_points?: number;
+};
+export type MatchScoreBreakdown2016Alliance = {
+  autoPoints?: number;
+  teleopPoints?: number;
+  breachPoints?: number;
+  foulPoints?: number;
+  capturePoints?: number;
+  adjustPoints?: number;
+  totalPoints?: number;
+  robot1Auto?: 'Crossed' | 'Reached' | 'None';
+  robot2Auto?: 'Crossed' | 'Reached' | 'None';
+  robot3Auto?: 'Crossed' | 'Reached' | 'None';
+  autoReachPoints?: number;
+  autoCrossingPoints?: number;
+  autoBouldersLow?: number;
+  autoBouldersHigh?: number;
+  autoBoulderPoints?: number;
+  teleopCrossingPoints?: number;
+  teleopBouldersLow?: number;
+  teleopBouldersHigh?: number;
+  teleopBoulderPoints?: number;
+  teleopDefensesBreached?: boolean;
+  teleopChallengePoints?: number;
+  teleopScalePoints?: number;
+  teleopTowerCaptured?: number;
+  towerFaceA?: string;
+  towerFaceB?: string;
+  towerFaceC?: string;
+  towerEndStrength?: number;
+  techFoulCount?: number;
+  foulCount?: number;
+  position2?: string;
+  position3?: string;
+  position4?: string;
+  position5?: string;
+  position1crossings?: number;
+  position2crossings?: number;
+  position3crossings?: number;
+  position4crossings?: number;
+  position5crossings?: number;
+};
+export type MatchScoreBreakdown2016 = {
+  blue?: MatchScoreBreakdown2016Alliance;
+  red?: MatchScoreBreakdown2016Alliance;
+};
+export type MatchScoreBreakdown2017Alliance = {
+  autoPoints?: number;
+  teleopPoints?: number;
+  foulPoints?: number;
+  adjustPoints?: number;
+  totalPoints?: number;
+  robot1Auto?: 'Unknown' | 'Mobility' | 'None';
+  robot2Auto?: 'Unknown' | 'Mobility' | 'None';
+  robot3Auto?: 'Unknown' | 'Mobility' | 'None';
+  rotor1Auto?: boolean;
+  rotor2Auto?: boolean;
+  autoFuelLow?: number;
+  autoFuelHigh?: number;
+  autoMobilityPoints?: number;
+  autoRotorPoints?: number;
+  autoFuelPoints?: number;
+  teleopFuelPoints?: number;
+  teleopFuelLow?: number;
+  teleopFuelHigh?: number;
+  teleopRotorPoints?: number;
+  kPaRankingPointAchieved?: boolean;
+  teleopTakeoffPoints?: number;
+  kPaBonusPoints?: number;
+  rotorBonusPoints?: number;
+  rotor1Engaged?: boolean;
+  rotor2Engaged?: boolean;
+  rotor3Engaged?: boolean;
+  rotor4Engaged?: boolean;
+  rotorRankingPointAchieved?: boolean;
+  techFoulCount?: number;
+  foulCount?: number;
+  touchpadNear?: string;
+  touchpadMiddle?: string;
+  touchpadFar?: string;
+};
+export type MatchScoreBreakdown2017 = {
+  blue?: MatchScoreBreakdown2017Alliance;
+  red?: MatchScoreBreakdown2017Alliance;
+};
+export type MatchScoreBreakdown2018Alliance = {
+  adjustPoints?: number;
+  autoOwnershipPoints?: number;
+  autoPoints?: number;
+  autoQuestRankingPoint?: boolean;
+  autoRobot1?: string;
+  autoRobot2?: string;
+  autoRobot3?: string;
+  autoRunPoints?: number;
+  autoScaleOwnershipSec?: number;
+  autoSwitchAtZero?: boolean;
+  autoSwitchOwnershipSec?: number;
+  endgamePoints?: number;
+  endgameRobot1?: string;
+  endgameRobot2?: string;
+  endgameRobot3?: string;
+  faceTheBossRankingPoint?: boolean;
+  foulCount?: number;
+  foulPoints?: number;
+  rp?: number;
+  techFoulCount?: number;
+  teleopOwnershipPoints?: number;
+  teleopPoints?: number;
+  teleopScaleBoostSec?: number;
+  teleopScaleForceSec?: number;
+  teleopScaleOwnershipSec?: number;
+  teleopSwitchBoostSec?: number;
+  teleopSwitchForceSec?: number;
+  teleopSwitchOwnershipSec?: number;
+  totalPoints?: number;
+  vaultBoostPlayed?: number;
+  vaultBoostTotal?: number;
+  vaultForcePlayed?: number;
+  vaultForceTotal?: number;
+  vaultLevitatePlayed?: number;
+  vaultLevitateTotal?: number;
+  vaultPoints?: number;
+  /** Unofficial TBA-computed value of the FMS provided GameData given to the alliance teams at the start of the match. 3 Character String containing `L` and `R` only. The first character represents the near switch, the 2nd the scale, and the 3rd the far, opposing, switch from the alliance's perspective. An `L` in a position indicates the platform on the left will be lit for the alliance while an `R` will indicate the right platform will be lit for the alliance. See also [WPI Screen Steps](https://wpilib.screenstepslive.com/s/currentCS/m/getting_started/l/826278-2018-game-data-details). */
+  tba_gameData?: string;
+};
+export type MatchScoreBreakdown2018 = {
+  blue?: MatchScoreBreakdown2018Alliance;
+  red?: MatchScoreBreakdown2018Alliance;
+};
+export type MatchScoreBreakdown2019Alliance = {
+  adjustPoints?: number;
+  autoPoints?: number;
+  bay1?: string;
+  bay2?: string;
+  bay3?: string;
+  bay4?: string;
+  bay5?: string;
+  bay6?: string;
+  bay7?: string;
+  bay8?: string;
+  cargoPoints?: number;
+  completeRocketRankingPoint?: boolean;
+  completedRocketFar?: boolean;
+  completedRocketNear?: boolean;
+  endgameRobot1?: string;
+  endgameRobot2?: string;
+  endgameRobot3?: string;
+  foulCount?: number;
+  foulPoints?: number;
+  habClimbPoints?: number;
+  habDockingRankingPoint?: boolean;
+  habLineRobot1?: string;
+  habLineRobot2?: string;
+  habLineRobot3?: string;
+  hatchPanelPoints?: number;
+  lowLeftRocketFar?: string;
+  lowLeftRocketNear?: string;
+  lowRightRocketFar?: string;
+  lowRightRocketNear?: string;
+  midLeftRocketFar?: string;
+  midLeftRocketNear?: string;
+  midRightRocketFar?: string;
+  midRightRocketNear?: string;
+  preMatchBay1?: string;
+  preMatchBay2?: string;
+  preMatchBay3?: string;
+  preMatchBay6?: string;
+  preMatchBay7?: string;
+  preMatchBay8?: string;
+  preMatchLevelRobot1?: string;
+  preMatchLevelRobot2?: string;
+  preMatchLevelRobot3?: string;
+  rp?: number;
+  sandStormBonusPoints?: number;
+  techFoulCount?: number;
+  teleopPoints?: number;
+  topLeftRocketFar?: string;
+  topLeftRocketNear?: string;
+  topRightRocketFar?: string;
+  topRightRocketNear?: string;
+  totalPoints?: number;
+};
+export type MatchScoreBreakdown2019 = {
+  blue?: MatchScoreBreakdown2019Alliance;
+  red?: MatchScoreBreakdown2019Alliance;
+};
+export type MatchScoreBreakdown2020Alliance = {
+  initLineRobot1?: string;
+  endgameRobot1?: string;
+  initLineRobot2?: string;
+  endgameRobot2?: string;
+  initLineRobot3?: string;
+  endgameRobot3?: string;
+  autoCellsBottom?: number;
+  autoCellsOuter?: number;
+  autoCellsInner?: number;
+  teleopCellsBottom?: number;
+  teleopCellsOuter?: number;
+  teleopCellsInner?: number;
+  stage1Activated?: boolean;
+  stage2Activated?: boolean;
+  stage3Activated?: boolean;
+  stage3TargetColor?: string;
+  endgameRungIsLevel?: string;
+  autoInitLinePoints?: number;
+  autoCellPoints?: number;
+  autoPoints?: number;
+  teleopCellPoints?: number;
+  controlPanelPoints?: number;
+  endgamePoints?: number;
+  teleopPoints?: number;
+  shieldOperationalRankingPoint?: boolean;
+  shieldEnergizedRankingPoint?: boolean;
+  /** Unofficial TBA-computed value that indicates whether the shieldEnergizedRankingPoint was earned normally or awarded due to a foul. */
+  tba_shieldEnergizedRankingPointFromFoul?: boolean;
+  /** Unofficial TBA-computed value that counts the number of robots who were hanging at the end of the match. */
+  tba_numRobotsHanging?: number;
+  foulCount?: number;
+  techFoulCount?: number;
+  adjustPoints?: number;
+  foulPoints?: number;
+  rp?: number;
+  totalPoints?: number;
+};
+export type MatchScoreBreakdown2020 = {
+  blue?: MatchScoreBreakdown2020Alliance;
+  red?: MatchScoreBreakdown2020Alliance;
+};
+export type MatchScoreBreakdown2022Alliance = {
+  taxiRobot1?: 'Yes' | 'No';
+  endgameRobot1?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
+  taxiRobot2?: 'Yes' | 'No';
+  endgameRobot2?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
+  taxiRobot3?: 'Yes' | 'No';
+  endgameRobot3?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
+  autoCargoLowerNear?: number;
+  autoCargoLowerFar?: number;
+  autoCargoLowerBlue?: number;
+  autoCargoLowerRed?: number;
+  autoCargoUpperNear?: number;
+  autoCargoUpperFar?: number;
+  autoCargoUpperBlue?: number;
+  autoCargoUpperRed?: number;
+  autoCargoTotal?: number;
+  teleopCargoLowerNear?: number;
+  teleopCargoLowerFar?: number;
+  teleopCargoLowerBlue?: number;
+  teleopCargoLowerRed?: number;
+  teleopCargoUpperNear?: number;
+  teleopCargoUpperFar?: number;
+  teleopCargoUpperBlue?: number;
+  teleopCargoUpperRed?: number;
+  teleopCargoTotal?: number;
+  matchCargoTotal?: number;
+  autoTaxiPoints?: number;
+  autoCargoPoints?: number;
+  autoPoints?: number;
+  quintetAchieved?: boolean;
+  teleopCargoPoints?: number;
+  endgamePoints?: number;
+  teleopPoints?: number;
+  cargoBonusRankingPoint?: boolean;
+  hangarBonusRankingPoint?: boolean;
+  foulCount?: number;
+  techFoulCount?: number;
+  adjustPoints?: number;
+  foulPoints?: number;
+  rp?: number;
+  totalPoints?: number;
+};
+export type MatchScoreBreakdown2022 = {
+  blue?: MatchScoreBreakdown2022Alliance;
+  red?: MatchScoreBreakdown2022Alliance;
+};
+export type MatchScoreBreakdown2023Alliance = {
+  activationBonusAchieved?: boolean;
+  adjustPoints?: number;
+  autoBridgeState?: 'NotLevel' | 'Level';
+  autoChargeStationPoints?: number;
+  autoChargeStationRobot1?: 'None' | 'Docked';
+  autoChargeStationRobot2?: 'None' | 'Docked';
+  autoChargeStationRobot3?: 'None' | 'Docked';
+  autoDocked?: boolean;
+  autoCommunity?: {
+    B?: ('None' | 'Cone' | 'Cube')[];
+    M?: ('None' | 'Cone' | 'Cube')[];
+    T?: ('None' | 'Cone' | 'Cube')[];
+  };
+  autoGamePieceCount?: number;
+  autoGamePiecePoints?: number;
+  autoMobilityPoints?: number;
+  mobilityRobot1?: 'Yes' | 'No';
+  mobilityRobot2?: 'Yes' | 'No';
+  mobilityRobot3?: 'Yes' | 'No';
+  autoPoints?: number;
+  coopGamePieceCount?: number;
+  coopertitionCriteriaMet?: boolean;
+  endGameBridgeState?: 'NotLevel' | 'Level';
+  endGameChargeStationPoints?: number;
+  endGameChargeStationRobot1?: 'None' | 'Docked';
+  endGameChargeStationRobot2?: 'None' | 'Docked';
+  endGameChargeStationRobot3?: 'None' | 'Docked';
+  endGameParkPoints?: number;
+  extraGamePieceCount?: number;
+  foulCount?: number;
+  foulPoints?: number;
+  techFoulCount?: number;
+  linkPoints?: number;
+  links?: {
+    nodes?: ('None' | 'Cone' | 'Cube')[];
+    row?: 'Bottom' | 'Mid' | 'Top';
+  }[];
+  sustainabilityBonusAchieved?: boolean;
+  teleopCommunity?: {
+    B?: ('None' | 'Cone' | 'Cube')[];
+    M?: ('None' | 'Cone' | 'Cube')[];
+    T?: ('None' | 'Cone' | 'Cube')[];
+  };
+  teleopGamePieceCount?: number;
+  teleopGamePiecePoints?: number;
+  totalChargeStationPoints?: number;
+  teleopPoints?: number;
+  rp?: number;
+  totalPoints?: number;
+};
+export type MatchScoreBreakdown2023 = {
+  blue?: MatchScoreBreakdown2023Alliance;
+  red?: MatchScoreBreakdown2023Alliance;
+};
+export type MatchScoreBreakdown2024Alliance = {
+  adjustPoints?: number;
+  autoAmpNoteCount?: number;
+  autoAmpNotePoints?: number;
+  autoLeavePoints?: number;
+  autoLineRobot1?: string;
+  autoLineRobot2?: string;
+  autoLineRobot3?: string;
+  autoPoints?: number;
+  autoSpeakerNoteCount?: number;
+  autoSpeakerNotePoints?: number;
+  autoTotalNotePoints?: number;
+  coopNotePlayed?: boolean;
+  coopertitionBonusAchieved?: boolean;
+  coopertitionCriteriaMet?: boolean;
+  endGameHarmonyPoints?: number;
+  endGameNoteInTrapPoints?: number;
+  endGameOnStagePoints?: number;
+  endGameParkPoints?: number;
+  endGameRobot1?: string;
+  endGameRobot2?: string;
+  endGameRobot3?: string;
+  endGameSpotLightBonusPoints?: number;
+  endGameTotalStagePoints?: number;
+  ensembleBonusAchieved?: boolean;
+  ensembleBonusOnStageRobotsThreshold?: number;
+  ensembleBonusStagePointsThreshold?: number;
+  foulCount?: number;
+  foulPoints?: number;
+  g206Penalty?: boolean;
+  g408Penalty?: boolean;
+  g424Penalty?: boolean;
+  melodyBonusAchieved?: boolean;
+  melodyBonusThreshold?: number;
+  melodyBonusThresholdCoop?: number;
+  melodyBonusThresholdNonCoop?: number;
+  micCenterStage?: boolean;
+  micStageLeft?: boolean;
+  micStageRight?: boolean;
+  rp?: number;
+  techFoulCount?: number;
+  teleopAmpNoteCount?: number;
+  teleopAmpNotePoints?: number;
+  teleopPoints?: number;
+  teleopSpeakerNoteAmplifiedCount?: number;
+  teleopSpeakerNoteAmplifiedPoints?: number;
+  teleopSpeakerNoteCount?: number;
+  teleopSpeakerNotePoints?: number;
+  teleopTotalNotePoints?: number;
+  totalPoints?: number;
+  trapCenterStage?: boolean;
+  trapStageLeft?: boolean;
+  trapStageRight?: boolean;
+};
+export type MatchScoreBreakdown2024 = {
+  blue?: MatchScoreBreakdown2024Alliance;
+  red?: MatchScoreBreakdown2024Alliance;
 };
 export type Match = {
   /** TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set. */
@@ -324,7 +741,19 @@ export type Match = {
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result was posted. */
   post_result_time?: number;
   /** Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null. */
-  score_breakdown?: {};
+  score_breakdown?:
+    | (
+        | MatchScoreBreakdown2015
+        | MatchScoreBreakdown2016
+        | MatchScoreBreakdown2017
+        | MatchScoreBreakdown2018
+        | MatchScoreBreakdown2019
+        | MatchScoreBreakdown2020
+        | MatchScoreBreakdown2022
+        | MatchScoreBreakdown2023
+        | MatchScoreBreakdown2024
+      )
+    | null;
   /** Array of video objects associated with this match. */
   videos?: {
     /** Can be one of 'youtube' or 'tba' */
@@ -335,9 +764,9 @@ export type Match = {
 };
 export type AwardRecipient = {
   /** The TBA team key for the team that was given the award. May be null. */
-  team_key?: string;
+  team_key?: string | null;
   /** The name of the individual given the award. May be null. */
-  awardee?: string;
+  awardee?: string | null;
 };
 export type Award = {
   /** The name of the award as provided by FIRST. May vary for the same award type. */
@@ -406,7 +835,7 @@ export type Media = {
 };
 export type EliminationAlliance = {
   /** Alliance name, may be null. */
-  name?: string;
+  name?: string | null;
   /** Backup team called in, may be null. */
   backup?: {
     /** Team key that was called in as the backup. */
@@ -458,11 +887,11 @@ export type EventRanking = {
     /** Number of matches played by this team. */
     matches_played: number;
     /** The average match score during qualifications. Year specific. May be null if not relevant for a given year. */
-    qual_average?: number;
+    qual_average?: number | null;
     /** Additional special data on the team's performance calculated by TBA. */
     extra_stats?: number[];
     /** Additional year-specific information, may be null. See parent `sort_order_info` for details. */
-    sort_orders?: number[];
+    sort_orders?: number[] | null;
     record: WltRecord;
     /** The team's rank at the event as provided by FIRST. */
     rank: number;
