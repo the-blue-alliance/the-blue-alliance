@@ -103,7 +103,10 @@ export default function EventPage() {
       </div>
 
       <Tabs defaultValue="results" className="">
-        <TabsList className="flex h-auto flex-wrap items-center justify-evenly [&>*]:basis-1/2 lg:[&>*]:basis-1">
+        <TabsList
+          className="flex h-auto flex-wrap items-center justify-evenly [&>*]:basis-1/2
+            lg:[&>*]:basis-1"
+        >
           <TabsTrigger value="results">
             <InlineIcon>
               <MdiTournament />
