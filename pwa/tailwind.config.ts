@@ -12,7 +12,7 @@ const config = {
   prefix: '',
   theme: {
     fontFamily: {
-      sans: ['Roboto', ...defaultTheme.fontFamily.sans],
+      sans: ['Roboto Flex', ...defaultTheme.fontFamily.sans],
     },
     container: {
       center: true,

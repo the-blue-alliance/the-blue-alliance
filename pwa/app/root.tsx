@@ -7,6 +7,7 @@ import {
 } from '@remix-run/react';
 import './tailwind.css';
 import * as api from '~/api/v3';
+import { Nav } from './components/tba/nav/Nav';
 
 api.defaults.baseUrl = 'https://thebluealliance.com/api/v3/';
 api.defaults.headers = {
@@ -22,14 +23,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Roboto%20Flex:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
           rel="stylesheet"
         />
         <Meta />
         <Links />
       </head>
       <body>
-        <div className="container mx-auto px-4 text-sm">{children}</div>
+        <Nav />
+        <div className="container mx-auto px-4 text-sm pt-14">{children}</div>
         <ScrollRestoration />
         <Scripts />
       </body>
