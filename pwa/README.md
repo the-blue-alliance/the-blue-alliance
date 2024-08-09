@@ -10,6 +10,12 @@ First install the dependencies:
 npm i
 ```
 
+Make sure you have your TBA APIv3 Read Key set in `.env`:
+
+```sh
+VITE_TBA_API_READ_KEY="myKey"
+```
+
 Run the dev server:
 
 ```shellscript
@@ -44,3 +50,19 @@ Make sure to deploy the output of `npm run build`
 ## Styling
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+
+## Icons
+
+Icons are complicated and opinionated. TBA uses `@unplugin/unplugin-icons`, which combines two nice tools:
+
+- `unplugin`, which allows you to write build plugins for any frontend build system
+- `Iconify`, which allows you to use any of the many, many icon packs out there in a shared syntax/format
+
+Unfortunately, Iconify wants you to get the icons from their API, but we'd rather have the SVGs in the project locally. Unplugin makes this easy:
+
+1. Go to the [Iconify sets](https://icon-sets.iconify.design/)
+2. Find an icon; either search a specific set or search a keyword across all sets.
+3. Click the icon to bring up a dialog box.
+4. Click the `Unplugin Icons` tab.
+5. Copy the generated `import ...` string.
+6. Use your imported component as a regular React component (e.g. `<MdiMyIcon />`).

@@ -19,16 +19,22 @@ module.exports = {
     commonjs: true,
     es6: true,
   },
-  ignorePatterns: ['!**/.server', '!**/.client'],
+  ignorePatterns: ['!**/.server', '!**/.client', 'app/api/v3.ts'],
 
   // Base config
-  extends: ['eslint:recommended', 'prettier'],
+  extends: ['eslint:recommended', 'prettier', 'plugin:tailwindcss/recommended'],
+  rules: {
+    // Fix for eslint not knowing how to resolve unplugin icons
+    'import/no-unresolved': ['error', { ignore: ['^~icons/'] }],
+    'tailwindcss/no-custom-classname': 'off',
+  },
 
   overrides: [
     // React
     {
       files: ['**/*.{js,jsx,ts,tsx}'],
       plugins: ['react', 'jsx-a11y'],
+      parser: '@typescript-eslint/parser',
       extends: [
         'plugin:react/recommended',
         'plugin:react/jsx-runtime',
@@ -78,6 +84,15 @@ module.exports = {
       files: ['.eslintrc.cjs'],
       env: {
         node: true,
+      },
+    },
+
+    // Fix for stock shadcn components
+    // https://github.com/shadcn-ui/ui/issues/120
+    {
+      files: ['app/components/ui/*.tsx'],
+      rules: {
+        'react/prop-types': [2, { ignore: ['className'] }],
       },
     },
   ],
