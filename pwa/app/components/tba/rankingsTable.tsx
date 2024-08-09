@@ -16,7 +16,7 @@ export default function RankingsTable({
   winners: string[];
 }) {
   const standardCols: RankingColumnType = [
-    { header: 'Rank', accessorKey: 'rank' },
+    { header: 'Rank', accessorKey: 'rank', sortDescFirst: false },
     {
       header: 'Team',
       cell: ({ row }) => (
@@ -35,6 +35,7 @@ export default function RankingsTable({
         </Link>
       ),
       accessorFn: (row) => Number(row.team_key.substring(3)),
+      sortDescFirst: false,
     },
   ];
 
@@ -42,6 +43,7 @@ export default function RankingsTable({
     (sortOrder, idx) => ({
       header: sortOrder.name,
       accessorFn: (row) => row.sort_orders?.[idx].toFixed(sortOrder.precision),
+      sortDescFirst: true,
     }),
   );
 
@@ -50,6 +52,7 @@ export default function RankingsTable({
   ).map((stat, idx) => ({
     header: stat.name,
     accessorFn: (row) => row.extra_stats?.[idx],
+    sortDescFirst: true,
   }));
 
   return (
