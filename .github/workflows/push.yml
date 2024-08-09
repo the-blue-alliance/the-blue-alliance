@@ -502,6 +502,10 @@ jobs:
         with:
           name: pwa-build
           path: pwa/build
+      - name: Set up Sentry Release
+        run: ./ops/pwa/set_sentry_release.sh
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
