@@ -4,7 +4,13 @@ import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import Icons from 'unplugin-icons/vite';
 
-const commitHash = child.execSync('git rev-parse --short HEAD').toString();
+function getCommitHash(): string {
+  try {
+    return child.execSync('git rev-parse --short HEAD').toString();
+  } catch (error) {
+    return 'unknown';
+  }
+}
 
 export default defineConfig({
   plugins: [
@@ -25,6 +31,6 @@ export default defineConfig({
     sourcemap: true,
   },
   define: {
-    __COMMIT_HASH__: JSON.stringify(commitHash),
+    __COMMIT_HASH__: JSON.stringify(getCommitHash()),
   },
 });
