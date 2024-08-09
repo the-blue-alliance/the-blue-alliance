@@ -162,25 +162,31 @@ class FRCAPI:
         """
         Get the locally cached files or from GCS if not cached.
         If getting from GCS, cache the files locally.
+        To avoid issues with Windows, `:` are replaced with `_` and `?` are replaced with `@` in the filenames.
         """
+        safe_dir_name = gcs_dir_name.replace(":", "_").replace("?", "@")
         path = os.path.join(
-            os.path.dirname(__file__), f"gcs_test_data_cache/{gcs_dir_name}"
+            os.path.dirname(__file__), f"gcs_test_data_cache/{safe_dir_name}"
         )
         if os.path.exists(path):
-            gcs_files = [f"{gcs_dir_name}{p}" for p in os.listdir(path)]
+            files = [f"{safe_dir_name}{p}" for p in os.listdir(path)]
         else:
             from backend.common.storage import get_files, read
 
             gcs_files = get_files(gcs_dir_name)
+            files = []
             for gcs_file in gcs_files:
-                # Replace colons with underscores since Windows doesn't like colons in filenames
-                filename = os.path.join(path, gcs_file.split("/")[-1].replace(":", "_"))
+                safe_file_name = (
+                    gcs_file.split("/")[-1].replace(":", "_").replace("?", "@")
+                )
+                filename = os.path.join(path, safe_file_name)
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
                 content = read(gcs_file)
                 if content is not None:
                     with open(filename, "w") as f:
                         f.write(content)
-        return sorted(gcs_files)
+                    files.append(f"{safe_dir_name}/{safe_file_name}")
+        return sorted(files)
 
     def _get_simulated(self, endpoint: str, version: str) -> requests.Response:
         from unittest.mock import Mock
@@ -204,9 +210,7 @@ class FRCAPI:
             # Find appropriate timed response
             last_file_name = None
             for filename in gcs_files:
-                time_str = (
-                    filename.replace(gcs_dir_name, "").replace(".json", "").strip()
-                )
+                time_str = filename.split("/")[-1].replace(".json", "").strip()
                 file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H_%M_%S.%f")
                 if file_time <= self._sim_time:
                     last_file_name = filename

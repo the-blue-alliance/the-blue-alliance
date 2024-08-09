@@ -60,7 +60,7 @@ def test_2017flwp_sequence(ndb_stub, taskqueue_stub) -> None:
     gcs_files = FRCAPI.get_cached_gcs_files(file_prefix)
 
     for filename in gcs_files:
-        time_str = filename.replace(file_prefix, "").replace(".json", "").strip()
+        time_str = filename.split("/")[-1].replace(".json", "").strip()
         file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H_%M_%S.%f")
         query_time = file_time + datetime.timedelta(seconds=30)
         MatchManipulator.createOrUpdate(
@@ -272,7 +272,7 @@ def test_2017scmb_sequence(ndb_stub, taskqueue_stub) -> None:
 
     gcs_files = FRCAPI.get_cached_gcs_files(file_prefix)
     for filename in gcs_files:
-        time_str = filename.replace(file_prefix, "").replace(".json", "").strip()
+        time_str = filename.split("/")[-1].replace(".json", "").strip()
         file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H_%M_%S.%f")
         query_time = file_time + datetime.timedelta(seconds=30)
         MatchManipulator.createOrUpdate(
