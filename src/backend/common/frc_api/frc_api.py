@@ -173,7 +173,8 @@ class FRCAPI:
 
             gcs_files = get_files(gcs_dir_name)
             for gcs_file in gcs_files:
-                filename = os.path.join(path, gcs_file.split("/")[-1])
+                # Replace colons with underscores since Windows doesn't like colons in filenames
+                filename = os.path.join(path, gcs_file.split("/")[-1].replace(":", "_"))
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
                 content = read(gcs_file)
                 if content is not None:
@@ -206,7 +207,7 @@ class FRCAPI:
                 time_str = (
                     filename.replace(gcs_dir_name, "").replace(".json", "").strip()
                 )
-                file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.%f")
+                file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H_%M_%S.%f")
                 if file_time <= self._sim_time:
                     last_file_name = filename
                 else:
