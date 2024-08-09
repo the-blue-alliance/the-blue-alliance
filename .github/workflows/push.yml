@@ -497,6 +497,8 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 10 # Needed for Sentry release
       - name: Download production artifacts
         uses: actions/download-artifact@v4
         with:
