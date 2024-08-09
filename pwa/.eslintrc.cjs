@@ -80,5 +80,14 @@ module.exports = {
         node: true,
       },
     },
+
+    // Fix for stock shadcn components
+    // https://github.com/shadcn-ui/ui/issues/120
+    {
+      files: ['app/components/ui/*.tsx'],
+      rules: {
+        'react/prop-types': [2, { ignore: ['className'] }],
+      },
+    },
   ],
 };
