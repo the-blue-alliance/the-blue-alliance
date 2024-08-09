@@ -1,6 +1,6 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
-import { getEventsByYear, getStatus } from '~/api/v3';
+import { getEventsByYear } from '~/api/v3';
 
 export async function loader({ params }: LoaderFunctionArgs) {
   // TODO: Handle cases where no year is provided
