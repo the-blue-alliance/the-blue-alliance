@@ -22,7 +22,7 @@ module.exports = {
   ignorePatterns: ['!**/.server', '!**/.client', 'app/api/v3.ts'],
 
   // Base config
-  extends: ['eslint:recommended', 'prettier'],
+  extends: ['eslint:recommended', 'prettier', 'plugin:tailwindcss/recommended'],
   rules: {
     // Fix for eslint not knowing how to resolve unplugin icons
     'import/no-unresolved': ['error', { ignore: ['^~icons/'] }],
@@ -33,6 +33,7 @@ module.exports = {
     {
       files: ['**/*.{js,jsx,ts,tsx}'],
       plugins: ['react', 'jsx-a11y'],
+      parser: '@typescript-eslint/parser',
       extends: [
         'plugin:react/recommended',
         'plugin:react/jsx-runtime',

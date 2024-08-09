@@ -17,7 +17,7 @@ import { cn } from '~/lib/utils';
 const rowVariants = cva('text-center', {
   variants: {
     variant: {
-      winner: 'bg-yellow-100 shadow-inner shadow-yellow-200 font-bold',
+      winner: 'bg-yellow-100 font-bold shadow-inner shadow-yellow-200',
       finalist: 'bg-gray-100 shadow-inner shadow-gray-200',
       default: '',
     },
