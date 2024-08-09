@@ -1,10 +1,16 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
 import { useMemo } from 'react';
-import { getEvent, getEventAlliances, getEventMatches } from '~/api/v3';
+import {
+  getEvent,
+  getEventAlliances,
+  getEventMatches,
+  getEventRankings,
+} from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import InlineIcon from '~/components/tba/inlineIcon';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
+import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { parseDateString } from '~/lib/utils';
@@ -28,12 +34,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const event = await getEvent({ eventKey: params.eventKey });
   const matches = await getEventMatches({ eventKey: params.eventKey });
   const alliances = await getEventAlliances({ eventKey: params.eventKey });
+  const rankings = await getEventRankings({ eventKey: params.eventKey });
 
-  return json({ event, matches, alliances });
+  return json({ event, matches, alliances, rankings });
 }
 
 export default function EventPage() {
-  const { event, alliances, matches } = useLoaderData<typeof loader>();
+  const { event, alliances, matches, rankings } =
+    useLoaderData<typeof loader>();
 
   const startDate = parseDateString(event.start_date);
   const endDate = parseDateString(event.end_date);
@@ -167,7 +175,14 @@ export default function EventPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="rankings">rankings</TabsContent>
+        <TabsContent value="rankings">
+          <RankingsTable
+            rankings={rankings}
+            winners={
+              alliances.find((a) => a.status?.status === 'won')?.picks ?? []
+            }
+          />
+        </TabsContent>
 
         <TabsContent value="awards">awards</TabsContent>
 
