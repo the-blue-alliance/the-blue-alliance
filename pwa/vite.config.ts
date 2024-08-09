@@ -21,6 +21,9 @@ export default defineConfig({
       jsx: 'react',
     }),
   ],
+  build: {
+    sourcemap: true,
+  },
   define: {
     __COMMIT_HASH__: JSON.stringify(commitHash),
   },
