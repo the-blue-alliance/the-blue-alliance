@@ -1,8 +1,10 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
+import { useMemo } from 'react';
 import { getEvent, getEventAlliances, getEventMatches } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import InlineIcon from '~/components/tba/inlineIcon';
+import MatchResultsTable from '~/components/tba/matchResultsTable';
 import { Badge } from '~/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { parseDateString } from '~/lib/utils';
@@ -44,6 +46,11 @@ export default function EventPage() {
     day: 'numeric',
     year: 'numeric',
   });
+
+  const quals = useMemo(
+    () => matches.filter((m) => m.comp_level === 'qm'),
+    [matches],
+  );
 
   return (
     <>
@@ -146,10 +153,17 @@ export default function EventPage() {
         </TabsList>
 
         <TabsContent value="results">
-          <div className="flex">
-            <div className="w-1/2 shrink-0">{matches.length} matches</div>
+          <div className="flex flex-wrap gap-4 lg:flex-nowrap">
+            <div className="basis-full lg:basis-1/2">
+              <MatchResultsTable
+                matches={quals}
+                title="Qualification Matches"
+              />
+            </div>
 
-            <AllianceSelectionTable alliances={alliances} />
+            <div className="basis-full lg:basis-1/2">
+              <AllianceSelectionTable alliances={alliances} />
+            </div>
           </div>
         </TabsContent>
 

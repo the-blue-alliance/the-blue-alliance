@@ -52,6 +52,14 @@ const config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        'alliance-blue': {
+          light: '#eef',
+          dark: '#ddf',
+        },
+        'alliance-red': {
+          light: '#fee',
+          dark: '#fdd',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
