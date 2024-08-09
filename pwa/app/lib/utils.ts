@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Match } from '~/api/v3';
+import { Award, Match } from '~/api/v3';
+import { AwardType, SORT_ORDER } from '~/lib/api/AwardType';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -8,6 +9,10 @@ export function cn(...inputs: ClassValue[]) {
 
 export function parseDateString(date: string) {
   return new Date(date);
+}
+
+export function removeNonNumeric(str: string): string {
+  return str.replace(/\D/g, '');
 }
 
 export function sortMatchComparator(a: Match, b: Match) {
@@ -26,6 +31,17 @@ export function sortMatchComparator(a: Match, b: Match) {
   }
 
   return a.set_number - b.set_number || a.match_number - b.match_number;
+}
+
+export function sortAwardsComparator(a: Award, b: Award) {
+  const orderA = SORT_ORDER[a.award_type as AwardType] ?? 1000;
+  const orderB = SORT_ORDER[b.award_type as AwardType] ?? 1000;
+
+  return orderA - orderB || a.award_type - b.award_type;
+}
+
+export function sortTeamKeysComparator(a: string, b: string) {
+  return Number(removeNonNumeric(a)) - Number(removeNonNumeric(b));
 }
 
 export function timestampsAreOnDifferentDays(
