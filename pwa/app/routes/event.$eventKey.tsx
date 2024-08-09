@@ -38,11 +38,13 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Error('Missing eventKey');
   }
 
-  const event = await getEvent({ eventKey: params.eventKey });
-  const matches = await getEventMatches({ eventKey: params.eventKey });
-  const alliances = await getEventAlliances({ eventKey: params.eventKey });
-  const rankings = await getEventRankings({ eventKey: params.eventKey });
-  const awards = await getEventAwards({ eventKey: params.eventKey });
+  const [event, matches, alliances, rankings, awards] = await Promise.all([
+    getEvent({ eventKey: params.eventKey }),
+    getEventMatches({ eventKey: params.eventKey }),
+    getEventAlliances({ eventKey: params.eventKey }),
+    getEventRankings({ eventKey: params.eventKey }),
+    getEventAwards({ eventKey: params.eventKey }),
+  ]);
 
   return json({ event, matches, alliances, rankings, awards });
 }
