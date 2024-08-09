@@ -505,6 +505,8 @@ jobs:
       - name: Set up Sentry Release
         run: ./ops/pwa/set_sentry_release.sh
         env:
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
