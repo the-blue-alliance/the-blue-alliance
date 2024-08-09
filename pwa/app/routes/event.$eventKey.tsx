@@ -2,18 +2,25 @@ import { json, LoaderFunctionArgs } from '@remix-run/node';
 import { Link, useLoaderData } from '@remix-run/react';
 import { useMemo } from 'react';
 import {
+  Award,
   getEvent,
   getEventAlliances,
+  getEventAwards,
   getEventMatches,
   getEventRankings,
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
+import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import InlineIcon from '~/components/tba/inlineIcon';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
 import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { parseDateString } from '~/lib/utils';
+import {
+  parseDateString,
+  sortAwardsComparator,
+  sortTeamKeysComparator,
+} from '~/lib/utils';
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';
@@ -35,12 +42,13 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const matches = await getEventMatches({ eventKey: params.eventKey });
   const alliances = await getEventAlliances({ eventKey: params.eventKey });
   const rankings = await getEventRankings({ eventKey: params.eventKey });
+  const awards = await getEventAwards({ eventKey: params.eventKey });
 
-  return json({ event, matches, alliances, rankings });
+  return json({ event, matches, alliances, rankings, awards });
 }
 
 export default function EventPage() {
-  const { event, alliances, matches, rankings } =
+  const { event, alliances, matches, rankings, awards } =
     useLoaderData<typeof loader>();
 
   const startDate = parseDateString(event.start_date);
@@ -184,7 +192,9 @@ export default function EventPage() {
           />
         </TabsContent>
 
-        <TabsContent value="awards">awards</TabsContent>
+        <TabsContent value="awards">
+          <AwardsTab awards={awards} />
+        </TabsContent>
 
         <TabsContent value="teams">teams</TabsContent>
 
@@ -193,5 +203,43 @@ export default function EventPage() {
         <TabsContent value="media">media</TabsContent>
       </Tabs>
     </>
+  );
+}
+
+function AwardsTab({ awards }: { awards: Award[] }) {
+  awards.sort(sortAwardsComparator);
+  return (
+    <div className="flex flex-wrap-reverse">
+      <div className="mt-1 flow-root w-full">
+        <dl className="divide-y divide-gray-100 text-sm">
+          {awards.map((award) => (
+            <div
+              key={award.name}
+              className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4 sm:px-10"
+            >
+              <dt className="font-medium text-gray-900 sm:col-span-2">
+                {award.name}
+              </dt>
+              <dd className="text-gray-700 sm:text-right">
+                {award.recipient_list
+                  .sort((a, b) =>
+                    sortTeamKeysComparator(
+                      a.team_key ?? '0',
+                      b.team_key ?? '0',
+                    ),
+                  )
+                  .map((r, i) => [
+                    i > 0 && (r.awardee ? <br /> : ', '),
+                    <AwardRecipientLink
+                      recipient={r}
+                      key={`${award.award_type}-${r.awardee}-${r.team_key}`}
+                    />,
+                  ])}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
   );
 }
