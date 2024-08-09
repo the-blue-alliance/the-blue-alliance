@@ -185,11 +185,18 @@ jobs:
           node-version: "20"
           cache: "npm"
       - name: Install Dependencies
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa ci
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
       - name: Run Build
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa run build
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pwa-build
+          path: pwa/build
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-latest
@@ -490,6 +497,11 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     steps:
       - uses: actions/checkout@v4
+      - name: Download production artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pwa-build
+          path: pwa/build
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -499,10 +511,6 @@ jobs:
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh pwa/pwa.yaml
   deploy-cron:
