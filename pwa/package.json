@@ -48,7 +48,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react": "7.35.0",
     "eslint-plugin-tailwindcss": "3.17.4",
-    "eslint": "8.38.0",
+    "eslint": "9.8.0",
     "oazapfts": "6.1.0",
     "postcss": "8.4.41",
     "prettier-plugin-classnames": "0.7.1",
