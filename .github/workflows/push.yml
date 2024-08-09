@@ -499,6 +499,10 @@ jobs:
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
       - name: Deploy
         run: ./ops/deploy/deploy_module.sh pwa/pwa.yaml
   deploy-cron:
@@ -521,10 +525,6 @@ jobs:
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
       - name: Deploy
         run: gcloud app deploy src/cron.yaml
   deploy-dispatch:
