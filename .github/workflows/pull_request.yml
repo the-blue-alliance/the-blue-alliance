@@ -21,6 +21,7 @@ jobs:
           filters: |
             python:
               - '**/*.py'
+              - '**/requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
@@ -47,6 +48,7 @@ jobs:
           filters: |
             python:
               - '**/*.py'
+              - '**/requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
@@ -76,6 +78,7 @@ jobs:
           filters: |
             python:
               - '**/*.py'
+              - '**/requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
@@ -109,6 +112,7 @@ jobs:
           filters: |
             python:
               - '**/*.py'
+              - '**/requirements.txt'
       - name: Set up Python 3.8
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
@@ -269,6 +273,7 @@ jobs:
             web:
               - 'ops/**'
               - 'src/**'
+              - 'requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v5
