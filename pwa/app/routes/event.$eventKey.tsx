@@ -17,13 +17,15 @@ import {
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import InlineIcon from '~/components/tba/inlineIcon';
-import MatchResultsTable from '~/components/tba/matchResultsTable';
+import MatchResultsTableDoubleElim from '~/components/tba/matchResultsTables/doubleElim';
+import MatchResultsTableQuals from '~/components/tba/matchResultsTables/quals';
 import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import {
   parseDateString,
   sortAwardsComparator,
+  sortMatchComparator,
   sortTeamKeysComparator,
 } from '~/lib/utils';
 import BiCalendar from '~icons/bi/calendar';
@@ -82,10 +84,30 @@ export default function EventPage() {
       })
     : '';
 
-  const quals = useMemo(
-    () => matches.filter((m) => m.comp_level === 'qm'),
+  const sortedMatches = useMemo(
+    () => matches.sort(sortMatchComparator),
     [matches],
   );
+
+  const quals = useMemo(
+    () => sortedMatches.filter((m) => m.comp_level === 'qm'),
+    [sortedMatches],
+  );
+
+  const elims = useMemo(
+    () => sortedMatches.filter((m) => m.comp_level !== 'qm'),
+    [sortedMatches],
+  );
+
+  const leftSideMatches =
+    quals.length > 0 ? (
+      <MatchResultsTableQuals matches={quals} />
+    ) : (
+      <MatchResultsTableDoubleElim matches={elims} />
+    );
+
+  const rightSideElims =
+    quals.length > 0 ? <MatchResultsTableDoubleElim matches={elims} /> : <></>;
 
   return (
     <>
@@ -189,15 +211,11 @@ export default function EventPage() {
 
         <TabsContent value="results">
           <div className="flex flex-wrap gap-4 lg:flex-nowrap">
-            <div className="basis-full lg:basis-1/2">
-              <MatchResultsTable
-                matches={quals}
-                title="Qualification Matches"
-              />
-            </div>
+            <div className="basis-full lg:basis-1/2">{leftSideMatches}</div>
 
             <div className="basis-full lg:basis-1/2">
               <AllianceSelectionTable alliances={alliances ?? []} />
+              {rightSideElims}
             </div>
           </div>
         </TabsContent>
