@@ -12,7 +12,8 @@
     "format:fix": "prettier --write .",
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
-    "generate-api": "oazapfts ../src/backend/web/static/swagger/api_v3.json --optimistic --argumentStyle=object > app/api/v3.ts"
+    "generate-api": "oazapfts ../src/backend/web/static/swagger/api_v3.json --optimistic --argumentStyle=object > app/api/v3.ts",
+    "bundle-visualizer": "npx vite-bundle-visualizer"
   },
   "dependencies": {
     "@oazapfts/runtime": "1.0.3",
