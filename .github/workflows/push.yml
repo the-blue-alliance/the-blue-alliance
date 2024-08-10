@@ -390,6 +390,8 @@ jobs:
             default:
               - 'ops/**'
               - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
         if: steps.changes.outputs.default == 'true'
         uses: actions/setup-python@v5
@@ -434,6 +436,8 @@ jobs:
             web:
               - 'ops/**'
               - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v5
@@ -478,6 +482,8 @@ jobs:
             api:
               - 'ops/**'
               - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
         if: steps.changes.outputs.api == 'true'
         uses: actions/setup-python@v5
@@ -516,6 +522,8 @@ jobs:
             tasks-io:
               - 'ops/**'
               - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
         if: steps.changes.outputs.tasks-io == 'true'
         uses: actions/setup-python@v5
@@ -549,6 +557,8 @@ jobs:
             tasks-cpu:
               - 'ops/**'
               - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: actions/setup-python@v5
