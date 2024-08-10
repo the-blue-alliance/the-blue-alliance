@@ -142,30 +142,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            node:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
       - name: Set up Node
+        if: steps.changes.outputs.node == 'true'
         uses: actions/setup-node@v4.0.3
         with:
           node-version: "18"
           cache: "npm"
       - name: Install Dependencies
+        if: steps.changes.outputs.node == 'true'
         run: npm ci
       - name: Run Format & Lint
+        if: steps.changes.outputs.node == 'true'
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            node:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
       - name: Set up Node
+        if: steps.changes.outputs.node == 'true'
         uses: actions/setup-node@v4.0.3
         with:
           node-version: "18"
           cache: "npm"
       - name: Install Dependencies
+        if: steps.changes.outputs.node == 'true'
         run: npm ci
       - name: Run Tests
+        if: steps.changes.outputs.node == 'true'
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
+        if: steps.changes.outputs.node == 'true'
         uses: codecov/codecov-action@v4.5.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -242,18 +265,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            buildweb:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.12
+        if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Set up Node
+        if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-node@v4.0.3
         with:
           node-version: "18"
           cache: "npm"
       - name: Install Node Dependencies
+        if: steps.changes.outputs.buildweb == 'true'
         run: npm ci
       - name: Run Build
+        if: steps.changes.outputs.buildweb == 'true'
         run: ./ops/build/run_buildweb.sh --env
 
   ops-test:
@@ -273,6 +309,7 @@ jobs:
             web:
               - 'ops/**'
               - 'src/**'
+              - 'package.json'
               - 'requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.web == 'true'
