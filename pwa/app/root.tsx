@@ -25,7 +25,7 @@ Sentry.init({
   enabled: process.env.NODE_ENV === 'production',
 });
 
-api.defaults.baseUrl = 'https://thebluealliance.com/api/v3/';
+api.defaults.baseUrl = 'https://www.thebluealliance.com/api/v3/';
 api.defaults.headers = {
   'X-TBA-Auth-Key': import.meta.env.VITE_TBA_API_READ_KEY,
 };

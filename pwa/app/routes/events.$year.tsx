@@ -1,8 +1,13 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
-import { Link, useLoaderData } from '@remix-run/react';
+import {
+  ClientLoaderFunctionArgs,
+  Link,
+  Params,
+  useLoaderData,
+} from '@remix-run/react';
 import { getEventsByYear } from '~/api/v3';
 
-export async function loader({ params }: LoaderFunctionArgs) {
+async function loadData(params: Params) {
   // TODO: Handle cases where no year is provided
   if (params.year === undefined || !/^\d{4}$/.test(params.year || '')) {
     throw new Response(null, {
@@ -13,7 +18,15 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const year = parseInt(params.year);
   const events = await getEventsByYear({ year });
 
-  return json({ year, events });
+  return { year, events };
+}
+
+export async function loader({ params }: LoaderFunctionArgs) {
+  return json(await loadData(params));
+}
+
+export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+  return await loadData(params);
 }
 
 export default function YearEventsPage() {
