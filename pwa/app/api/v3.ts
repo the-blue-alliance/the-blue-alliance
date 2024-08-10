@@ -139,56 +139,56 @@ export type Event = {
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
   event_type: number;
-  district?: DistrictList;
+  district: DistrictList;
   /** City, town, village, etc. the event is located in. */
-  city?: string;
+  city: string | null;
   /** State or Province the event is located in. */
-  state_prov?: string;
+  state_prov: string | null;
   /** Country the event is located in. */
-  country?: string;
+  country: string | null;
   /** Event start date in `yyyy-mm-dd` format. */
-  start_date: string;
+  start_date: string | null;
   /** Event end date in `yyyy-mm-dd` format. */
-  end_date: string;
+  end_date: string | null;
   /** Year the event data is for. */
   year: number;
   /** Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null. */
-  short_name?: string | null;
+  short_name: string | null;
   /** Event Type, eg Regional, District, or Offseason. */
   event_type_string: string;
   /** Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.) */
-  week?: number;
+  week: number | null;
   /** Address of the event's venue, if available. */
-  address?: string;
+  address: string | null;
   /** Postal code from the event address. */
-  postal_code?: string;
+  postal_code: string | null;
   /** Google Maps Place ID for the event address. */
-  gmaps_place_id?: string;
+  gmaps_place_id: string | null;
   /** Link to address location on Google Maps. */
-  gmaps_url?: string;
+  gmaps_url: string | null;
   /** Latitude for the event address. */
-  lat?: number;
+  lat: number | null;
   /** Longitude for the event address. */
-  lng?: number;
+  lng: number | null;
   /** Name of the location at the address for the event, eg. Blue Alliance High School. */
-  location_name?: string;
+  location_name: string | null;
   /** Timezone name. */
-  timezone?: string;
+  timezone: string;
   /** The event's website, if any. */
-  website?: string;
+  website: string | null;
   /** The FIRST internal Event ID, used to link to the event on the FRC webpage. */
-  first_event_id?: string | null;
+  first_event_id: string | null;
   /** Public facing event code used by FIRST (on frc-events.firstinspires.org, for example) */
-  first_event_code?: string;
-  webcasts?: Webcast[];
+  first_event_code: string | null;
+  webcasts: Webcast[];
   /** An array of event keys for the divisions at this event. */
-  division_keys?: string[];
+  division_keys: string[];
   /** The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`. */
-  parent_event_key?: string | null;
+  parent_event_key: string | null;
   /** Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null. */
-  playoff_type?: number;
+  playoff_type: number | null;
   /** String representation of the `playoff_type`, or null. */
-  playoff_type_string?: string;
+  playoff_type_string: string | null;
 };
 export type EventSimple = {
   /** TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event. */
@@ -199,17 +199,17 @@ export type EventSimple = {
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
   event_type: number;
-  district?: DistrictList;
+  district: DistrictList;
   /** City, town, village, etc. the event is located in. */
-  city?: string;
+  city: string | null;
   /** State or Province the event is located in. */
-  state_prov?: string;
+  state_prov: string | null;
   /** Country the event is located in. */
-  country?: string;
+  country: string | null;
   /** Event start date in `yyyy-mm-dd` format. */
-  start_date: string;
+  start_date: string | null;
   /** Event end date in `yyyy-mm-dd` format. */
-  end_date: string;
+  end_date: string | null;
   /** Year the event data is for. */
   year: number;
 };
