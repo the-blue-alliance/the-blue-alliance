@@ -4070,11 +4070,6 @@
             "type": "integer",
             "description": "First year the team officially competed."
           },
-          "motto": {
-            "type": "string",
-            "nullable": true,
-            "description": "Team's motto as provided by FIRST. This field is deprecated and will return null - will be removed at end-of-season in 2019."
-          },
           "home_championship": {
             "type": "object",
             "properties": {},

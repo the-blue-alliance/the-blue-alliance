@@ -67,8 +67,6 @@ export type Team = {
   website?: string | null;
   /** First year the team officially competed. */
   rookie_year?: number;
-  /** Team's motto as provided by FIRST. This field is deprecated and will return null - will be removed at end-of-season in 2019. */
-  motto?: string | null;
   /** Location of the team's home championship each year as a key-value pair. The year (as a string) is the key, and the city is the value. */
   home_championship?: {};
 };
