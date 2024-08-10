@@ -38,8 +38,8 @@ export default function Thanks(): JSX.Element {
           <p>Thank you to our generous sponsors for allowing our app to run.</p>
           <h4 className="text-xl">Platinum</h4>
           <ul>
-            <li>
-              <p className="pl-1">
+            <li className="list-disc">
+              <p>
                 <a href="https://www.andymark.com/" title="AndyMark">
                   AndyMark
                 </a>
@@ -48,7 +48,7 @@ export default function Thanks(): JSX.Element {
           </ul>
           <h4 className="text-xl">Gold</h4>
           <ul>
-            <li className="pl-1">
+            <li className="list-disc">
               <p>
                 <a
                   href="https://www.thethriftybot.com/"
@@ -64,31 +64,20 @@ export default function Thanks(): JSX.Element {
         <div>
           <h3 className="text-2xl">Built With</h3>
           <ul>
-            <li className="pl-1">
+            <li className="list-disc">
               <p>
-                <a
-                  href="http://www.komodomedia.com/download/#social-network-icon-pack"
-                  title="Komodo Media"
-                >
-                  Komodo Media
+                <a href="https://tailwindcss.com/" title="Tailwind">
+                  Tailwind
                 </a>
-                &apos;s social media icons
+                &apos;s CSS framework
               </p>
             </li>
-            <li className="pl-1">
+            <li className="list-disc">
               <p>
-                <a href="https://github.com/twbs/bootstrap" title="Bootstrap">
-                  Bootstrap
+                <a href="https://remix.run/" title="Remix">
+                  Remix
                 </a>
-                &apos;s HTML CSS JS framework
-              </p>
-            </li>
-            <li className="pl-1">
-              <p>
-                <a href="https://react.dev/" title="React">
-                  React
-                </a>
-                &apos;s web development framework
+                &apos;s full stack web development framework
               </p>
             </li>
           </ul>
