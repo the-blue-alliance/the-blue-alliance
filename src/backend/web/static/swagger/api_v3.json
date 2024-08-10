@@ -4111,12 +4111,16 @@
       },
       "Event_Simple": {
         "required": [
-          "end_date",
-          "event_code",
-          "event_type",
           "key",
           "name",
+          "event_code",
+          "event_type",
+          "district",
+          "city",
+          "state_prov",
+          "country",
           "start_date",
+          "end_date",
           "year"
         ],
         "type": "object",
@@ -4143,23 +4147,28 @@
           },
           "city": {
             "type": "string",
+            "nullable": true,
             "description": "City, town, village, etc. the event is located in."
           },
           "state_prov": {
             "type": "string",
+            "nullable": true,
             "description": "State or Province the event is located in."
           },
           "country": {
             "type": "string",
+            "nullable": true,
             "description": "Country the event is located in."
           },
           "start_date": {
             "type": "string",
+            "nullable": true,
             "description": "Event start date in `yyyy-mm-dd` format.",
             "format": "date"
           },
           "end_date": {
             "type": "string",
+            "nullable": true,
             "description": "Event end date in `yyyy-mm-dd` format.",
             "format": "date"
           },
@@ -4171,14 +4180,36 @@
       },
       "Event": {
         "required": [
-          "end_date",
-          "event_code",
-          "event_type",
-          "event_type_string",
           "key",
           "name",
+          "event_code",
+          "event_type",
+          "district",
+          "city",
+          "state_prov",
+          "country",
           "start_date",
-          "year"
+          "end_date",
+          "year",
+          "short_name",
+          "event_type_string",
+          "week",
+          "address",
+          "postal_code",
+          "gmaps_place_id",
+          "gmaps_url",
+          "lat",
+          "lng",
+          "location_name",
+          "timezone",
+          "website",
+          "first_event_id",
+          "first_event_code",
+          "webcasts",
+          "division_keys",
+          "parent_event_key",
+          "playoff_type",
+          "playoff_type_string"
         ],
         "type": "object",
         "properties": {
@@ -4204,23 +4235,28 @@
           },
           "city": {
             "type": "string",
+            "nullable": true,
             "description": "City, town, village, etc. the event is located in."
           },
           "state_prov": {
             "type": "string",
+            "nullable": true,
             "description": "State or Province the event is located in."
           },
           "country": {
             "type": "string",
+            "nullable": true,
             "description": "Country the event is located in."
           },
           "start_date": {
             "type": "string",
+            "nullable": true,
             "description": "Event start date in `yyyy-mm-dd` format.",
             "format": "date"
           },
           "end_date": {
             "type": "string",
+            "nullable": true,
             "description": "Event end date in `yyyy-mm-dd` format.",
             "format": "date"
           },
@@ -4239,37 +4275,45 @@
           },
           "week": {
             "type": "integer",
+            "nullable": true,
             "description": "Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.)"
           },
           "address": {
             "type": "string",
+            "nullable": true,
             "description": "Address of the event's venue, if available."
           },
           "postal_code": {
             "type": "string",
+            "nullable": true,
             "description": "Postal code from the event address."
           },
           "gmaps_place_id": {
             "type": "string",
+            "nullable": true,
             "description": "Google Maps Place ID for the event address."
           },
           "gmaps_url": {
             "type": "string",
+            "nullable": true,
             "description": "Link to address location on Google Maps.",
             "format": "url"
           },
           "lat": {
             "type": "number",
+            "nullable": true,
             "description": "Latitude for the event address.",
             "format": "double"
           },
           "lng": {
             "type": "number",
+            "nullable": true,
             "description": "Longitude for the event address.",
             "format": "double"
           },
           "location_name": {
             "type": "string",
+            "nullable": true,
             "description": "Name of the location at the address for the event, eg. Blue Alliance High School."
           },
           "timezone": {
@@ -4278,6 +4322,7 @@
           },
           "website": {
             "type": "string",
+            "nullable": true,
             "description": "The event's website, if any."
           },
           "first_event_id": {
@@ -4287,6 +4332,7 @@
           },
           "first_event_code": {
             "type": "string",
+            "nullable": true,
             "description": "Public facing event code used by FIRST (on frc-events.firstinspires.org, for example)"
           },
           "webcasts": {
@@ -4309,10 +4355,12 @@
           },
           "playoff_type": {
             "type": "integer",
+            "nullable": true,
             "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null."
           },
           "playoff_type_string": {
             "type": "string",
+            "nullable": true,
             "description": "String representation of the `playoff_type`, or null."
           }
         }

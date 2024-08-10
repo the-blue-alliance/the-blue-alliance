@@ -53,17 +53,21 @@ export default function EventPage() {
   const { event, alliances, matches, rankings, awards } =
     useLoaderData<typeof loader>();
 
-  const startDate = parseDateString(event.start_date);
-  const endDate = parseDateString(event.end_date);
-  const startDateStr = startDate.toLocaleDateString('default', {
-    month: 'long',
-    day: 'numeric',
-  });
-  const endDateStr = endDate.toLocaleDateString('default', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  const startDate = event.start_date ? parseDateString(event.start_date) : null;
+  const endDate = event.end_date ? parseDateString(event.end_date) : null;
+  const startDateStr = startDate
+    ? startDate.toLocaleDateString('default', {
+        month: 'long',
+        day: 'numeric',
+      })
+    : '';
+  const endDateStr = endDate
+    ? endDate.toLocaleDateString('default', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : '';
 
   const quals = useMemo(
     () => matches.filter((m) => m.comp_level === 'qm'),
