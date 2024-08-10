@@ -1,5 +1,10 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
-import { Link, useLoaderData } from '@remix-run/react';
+import {
+  type ClientLoaderFunctionArgs,
+  Link,
+  Params,
+  useLoaderData,
+} from '@remix-run/react';
 import { useMemo } from 'react';
 import {
   Award,
@@ -33,7 +38,7 @@ import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
 import MdiRobot from '~icons/mdi/robot';
 import MdiTournament from '~icons/mdi/tournament';
 
-export async function loader({ params }: LoaderFunctionArgs) {
+async function loadData(params: Params) {
   if (params.eventKey === undefined) {
     throw new Error('Missing eventKey');
   }
@@ -46,7 +51,15 @@ export async function loader({ params }: LoaderFunctionArgs) {
     getEventAwards({ eventKey: params.eventKey }),
   ]);
 
-  return json({ event, matches, alliances, rankings, awards });
+  return { event, matches, alliances, rankings, awards };
+}
+
+export async function loader({ params }: LoaderFunctionArgs) {
+  return json(await loadData(params));
+}
+
+export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+  return await loadData(params);
 }
 
 export default function EventPage() {
