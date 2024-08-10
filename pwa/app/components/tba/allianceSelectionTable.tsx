@@ -61,7 +61,7 @@ export default function AllianceSelectionTable(props: {
     Math.max(...props.alliances.map((a) => a.picks.length)) || 3;
 
   return (
-    <div className="mt-5">
+    <>
       <div className="text-2xl font-bold">Alliances</div>
 
       <Table className="table-fixed">
@@ -112,6 +112,6 @@ export default function AllianceSelectionTable(props: {
           ))}
         </TableBody>
       </Table>
-    </div>
+    </>
   );
 }

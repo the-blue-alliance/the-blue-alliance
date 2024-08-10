@@ -7,12 +7,12 @@ export default function MatchResultsTableQuals({
   matches: Match[];
 }) {
   return (
-    <div>
-      <div className="mb-2 text-2xl font-bold">Qualification Results</div>
+    <>
+      <div className="text-2xl font-bold">Qualification Results</div>
       <MatchResultsTableBase
         matches={matches}
         matchTitleFormatter={(m) => `Qual ${m.match_number}`}
       />
-    </div>
+    </>
   );
 }
