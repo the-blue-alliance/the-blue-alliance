@@ -2318,7 +2318,8 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/Elimination_Alliance"
-                  }
+                  },
+                  "nullable": true
                 }
               }
             }
@@ -2372,7 +2373,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_Insights"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_Insights"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             }
@@ -2534,7 +2542,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_Predictions"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_Predictions"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             }
@@ -2643,7 +2658,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_District_Points"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_District_Points"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             }
@@ -4569,7 +4591,8 @@
       "Event_Ranking": {
         "required": [
           "rankings",
-          "sort_order_info"
+          "sort_order_info",
+          "extra_stats_info"
         ],
         "type": "object",
         "properties": {
@@ -4582,7 +4605,10 @@
                 "matches_played",
                 "rank",
                 "record",
-                "team_key"
+                "team_key",
+                "extra_stats",
+                "qual_average",
+                "sort_orders"
               ],
               "type": "object",
               "properties": {
@@ -5524,6 +5550,10 @@
           },
           "alliances": {
             "type": "object",
+            "required": [
+              "red",
+              "blue"
+            ],
             "properties": {
               "red": {
                 "$ref": "#/components/schemas/Match_alliance"
@@ -5845,6 +5875,12 @@
       },
       "Match_Score_Breakdown_2015": {
         "type": "object",
+        "required": [
+          "blue",
+          "red",
+          "coopertition",
+          "coopertition_points"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2015_Alliance"
@@ -5945,6 +5981,10 @@
       },
       "Match_Score_Breakdown_2016": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2016_Alliance"
@@ -6091,6 +6131,10 @@
       },
       "Match_Score_Breakdown_2017": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2017_Alliance"
@@ -6222,6 +6266,10 @@
       },
       "Match_Score_Breakdown_2018": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2018_Alliance"
@@ -6480,6 +6528,10 @@
       },
       "Match_Score_Breakdown_2019": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2019_Alliance"
@@ -6650,6 +6702,10 @@
       },
       "Match_Score_Breakdown_2020": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2020_Alliance"
@@ -6771,6 +6827,10 @@
       },
       "Match_Score_Breakdown_2022": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2022_Alliance"
@@ -6941,6 +7001,10 @@
       },
       "Match_Score_Breakdown_2023": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2023_Alliance"
@@ -6996,6 +7060,11 @@
           },
           "autoCommunity": {
             "type": "object",
+            "required": [
+              "B",
+              "M",
+              "T"
+            ],
             "properties": {
               "B": {
                 "type": "array",
@@ -7124,6 +7193,10 @@
             "type": "array",
             "items": {
               "type": "object",
+              "required": [
+                "nodes",
+                "row"
+              ],
               "properties": {
                 "nodes": {
                   "type": "array",
@@ -7152,6 +7225,11 @@
           },
           "teleopCommunity": {
             "type": "object",
+            "required": [
+              "B",
+              "M",
+              "T"
+            ],
             "properties": {
               "B": {
                 "type": "array",
@@ -7210,6 +7288,10 @@
       },
       "Match_Score_Breakdown_2024": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
@@ -7434,7 +7516,9 @@
       },
       "Elimination_Alliance": {
         "required": [
-          "picks"
+          "picks",
+          "declines",
+          "status"
         ],
         "type": "object",
         "properties": {
@@ -7445,6 +7529,11 @@
           },
           "backup": {
             "type": "object",
+            "nullable": true,
+            "required": [
+              "in",
+              "out"
+            ],
             "properties": {
               "in": {
                 "type": "string",
@@ -7533,6 +7622,10 @@
       },
       "Award_Recipient": {
         "type": "object",
+        "required": [
+          "team_key",
+          "awardee"
+        ],
         "properties": {
           "team_key": {
             "type": "string",

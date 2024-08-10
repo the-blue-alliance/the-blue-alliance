@@ -197,7 +197,7 @@ export default function EventPage() {
             </div>
 
             <div className="basis-full lg:basis-1/2">
-              <AllianceSelectionTable alliances={alliances} />
+              <AllianceSelectionTable alliances={alliances ?? []} />
             </div>
           </div>
         </TabsContent>
@@ -206,7 +206,7 @@ export default function EventPage() {
           <RankingsTable
             rankings={rankings}
             winners={
-              alliances.find((a) => a.status?.status === 'won')?.picks ?? []
+              alliances?.find((a) => a.status?.status === 'won')?.picks ?? []
             }
           />
         </TabsContent>
