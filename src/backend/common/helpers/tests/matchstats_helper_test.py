@@ -16,7 +16,7 @@ def auto_add_ndb_context(ndb_context) -> None:
 
 
 def api_data_to_matchstats(
-    api_data: Dict[StatType, Dict[TeamKey, float]]
+    api_data: Dict[StatType, Dict[TeamKey, float]],
 ) -> EventMatchStats:
     data: EventMatchStats = {}
     for stat_type in StatType:
@@ -47,7 +47,9 @@ def assert_coprs_values_equal(
     for component, oprs in coprs.items():
         assert oprs.keys() == expected_coprs[component].keys()
         for team_key, opr in oprs.items():
-            assert opr == pytest.approx(expected_coprs[component][team_key])  # pyre-ignore[16]
+            assert opr == pytest.approx(  # pyre-ignore[16]
+                expected_coprs[component][team_key]
+            )
 
 
 def test_compute_matchstats_no_matches() -> None:
