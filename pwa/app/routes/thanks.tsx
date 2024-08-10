@@ -72,7 +72,7 @@ export default function Thanks(): JSX.Element {
                 >
                   Komodo Media
                 </a>
-                's social media icons
+                &apos;s social media icons
               </p>
             </li>
             <li className="pl-1">
@@ -80,7 +80,7 @@ export default function Thanks(): JSX.Element {
                 <a href="https://github.com/twbs/bootstrap" title="Bootstrap">
                   Bootstrap
                 </a>
-                's HTML CSS JS framework
+                &apos;s HTML CSS JS framework
               </p>
             </li>
             <li className="pl-1">
@@ -88,7 +88,7 @@ export default function Thanks(): JSX.Element {
                 <a href="https://react.dev/" title="React">
                   React
                 </a>
-                's web development framework
+                &apos;s web development framework
               </p>
             </li>
           </ul>
