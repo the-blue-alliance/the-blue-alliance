@@ -41,8 +41,8 @@ export default function MatchResultsTableDoubleElim({
   );
 
   return (
-    <div>
-      <h1 className="mt-1.5 text-2xl font-bold">Playoff Results</h1>
+    <>
+      <h1 className="text-2xl font-bold">Playoff Results</h1>
       {Object.entries(matchesGroupedByRound).map(([round, matches]) => (
         <div key={round}>
           <div className="mt-1.5 text-lg">Round {round}</div>
@@ -62,6 +62,6 @@ export default function MatchResultsTableDoubleElim({
           />
         </>
       )}
-    </div>
+    </>
   );
 }
