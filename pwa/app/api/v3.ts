@@ -38,37 +38,35 @@ export type Team = {
   /** Official team number issued by FIRST. */
   team_number: number;
   /** Team nickname provided by FIRST. */
-  nickname?: string;
+  nickname: string | null;
   /** Official long name registered with FIRST. */
-  name: string;
+  name: string | null;
   /** Name of team school or affilited group registered with FIRST. */
-  school_name?: string;
+  school_name: string | null;
   /** City of team derived from parsing the address registered with FIRST. */
-  city?: string;
+  city: string | null;
   /** State of team derived from parsing the address registered with FIRST. */
-  state_prov?: string;
+  state_prov: string | null;
   /** Country of team derived from parsing the address registered with FIRST. */
-  country?: string;
+  country: string | null;
   /** Will be NULL, for future development. */
-  address?: string | null;
+  address: string | null;
   /** Postal code from the team address. */
-  postal_code?: string;
+  postal_code: string | null;
   /** Will be NULL, for future development. */
-  gmaps_place_id?: string | null;
+  gmaps_place_id: string | null;
   /** Will be NULL, for future development. */
-  gmaps_url?: string | null;
+  gmaps_url: string | null;
   /** Will be NULL, for future development. */
-  lat?: number;
+  lat: number | null;
   /** Will be NULL, for future development. */
-  lng?: number;
+  lng: number | null;
   /** Will be NULL, for future development. */
-  location_name?: string | null;
+  location_name: string | null;
   /** Official website associated with the team. */
   website?: string | null;
   /** First year the team officially competed. */
-  rookie_year?: number;
-  /** Location of the team's home championship each year as a key-value pair. The year (as a string) is the key, and the city is the value. */
-  home_championship?: {};
+  rookie_year: number | null;
 };
 export type TeamSimple = {
   /** TBA team key with the format `frcXXXX` with `XXXX` representing the team number. */
@@ -76,15 +74,15 @@ export type TeamSimple = {
   /** Official team number issued by FIRST. */
   team_number: number;
   /** Team nickname provided by FIRST. */
-  nickname?: string;
+  nickname: string | null;
   /** Official long name registered with FIRST. */
-  name: string;
+  name: string | null;
   /** City of team derived from parsing the address registered with FIRST. */
-  city?: string;
+  city: string | null;
   /** State of team derived from parsing the address registered with FIRST. */
-  state_prov?: string;
+  state_prov: string | null;
   /** Country of team derived from parsing the address registered with FIRST. */
-  country?: string;
+  country: string | null;
 };
 export type DistrictList = {
   /** The short identifier for the district. */
