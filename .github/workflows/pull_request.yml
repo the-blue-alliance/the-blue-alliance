@@ -15,34 +15,54 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements.txt'
       - name: Set up Python 3.12
+        if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
       - name: Install Dependencies
+        if: steps.changes.outputs.python == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Type Check
+        if: steps.changes.outputs.python == 'true'
         run: ./ops/typecheck_py3.sh
   py3-lint:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements.txt'
       - name: Set up Python 3.12
+        if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
       - name: Install Dependencies
+        if: steps.changes.outputs.python == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Format & Lint
+        if: steps.changes.outputs.python == 'true'
         run: ./ops/lint_py3.sh
   py3-test:
     name: "[py3] Test"
@@ -52,19 +72,30 @@ jobs:
         group: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements.txt'
       - name: Set up Python 3.12
+        if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
       - name: Install Dependencies
+        if: steps.changes.outputs.python == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Tests
+        if: steps.changes.outputs.python == 'true'
         run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
       - name: Save coverage artifacts
+        if: steps.changes.outputs.python == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: coverage${{ matrix.group }}
@@ -75,21 +106,33 @@ jobs:
     needs: [py3-test]
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements.txt'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Install Dependencies
+        if: steps.changes.outputs.python == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Download all artifacts
+        if: steps.changes.outputs.python == 'true'
         uses: actions/download-artifact@v4
       - name: Combine coverage
+        if: steps.changes.outputs.python == 'true'
         run: |
           coverage combine coverage*/.coverage*
           coverage xml
       - name: Upload coverage to Codecov
+        if: steps.changes.outputs.python == 'true'
         uses: codecov/codecov-action@v4.5.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -99,30 +142,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            node:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
       - name: Set up Node
+        if: steps.changes.outputs.node == 'true'
         uses: actions/setup-node@v4.0.3
         with:
           node-version: "18"
           cache: "npm"
       - name: Install Dependencies
+        if: steps.changes.outputs.node == 'true'
         run: npm ci
       - name: Run Format & Lint
+        if: steps.changes.outputs.node == 'true'
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            node:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
       - name: Set up Node
+        if: steps.changes.outputs.node == 'true'
         uses: actions/setup-node@v4.0.3
         with:
           node-version: "18"
           cache: "npm"
       - name: Install Dependencies
+        if: steps.changes.outputs.node == 'true'
         run: npm ci
       - name: Run Tests
+        if: steps.changes.outputs.node == 'true'
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
+        if: steps.changes.outputs.node == 'true'
         uses: codecov/codecov-action@v4.5.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -199,18 +265,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            buildweb:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.12
+        if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Set up Node
+        if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-node@v4.0.3
         with:
           node-version: "18"
           cache: "npm"
       - name: Install Node Dependencies
+        if: steps.changes.outputs.buildweb == 'true'
         run: npm ci
       - name: Run Build
+        if: steps.changes.outputs.buildweb == 'true'
         run: ./ops/build/run_buildweb.sh --env
 
   ops-test:
@@ -230,6 +309,8 @@ jobs:
             web:
               - 'ops/**'
               - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v5
