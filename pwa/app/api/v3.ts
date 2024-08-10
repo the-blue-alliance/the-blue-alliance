@@ -320,10 +320,10 @@ export type MatchScoreBreakdown2015Alliance = {
   robot_set?: boolean;
 };
 export type MatchScoreBreakdown2015 = {
-  blue?: MatchScoreBreakdown2015Alliance;
-  red?: MatchScoreBreakdown2015Alliance;
-  coopertition?: 'None' | 'Unknown' | 'Stack';
-  coopertition_points?: number;
+  blue: MatchScoreBreakdown2015Alliance;
+  red: MatchScoreBreakdown2015Alliance;
+  coopertition: 'None' | 'Unknown' | 'Stack';
+  coopertition_points: number;
 };
 export type MatchScoreBreakdown2016Alliance = {
   autoPoints?: number;
@@ -366,8 +366,8 @@ export type MatchScoreBreakdown2016Alliance = {
   position5crossings?: number;
 };
 export type MatchScoreBreakdown2016 = {
-  blue?: MatchScoreBreakdown2016Alliance;
-  red?: MatchScoreBreakdown2016Alliance;
+  blue: MatchScoreBreakdown2016Alliance;
+  red: MatchScoreBreakdown2016Alliance;
 };
 export type MatchScoreBreakdown2017Alliance = {
   autoPoints?: number;
@@ -405,8 +405,8 @@ export type MatchScoreBreakdown2017Alliance = {
   touchpadFar?: string;
 };
 export type MatchScoreBreakdown2017 = {
-  blue?: MatchScoreBreakdown2017Alliance;
-  red?: MatchScoreBreakdown2017Alliance;
+  blue: MatchScoreBreakdown2017Alliance;
+  red: MatchScoreBreakdown2017Alliance;
 };
 export type MatchScoreBreakdown2018Alliance = {
   adjustPoints?: number;
@@ -449,8 +449,8 @@ export type MatchScoreBreakdown2018Alliance = {
   tba_gameData?: string;
 };
 export type MatchScoreBreakdown2018 = {
-  blue?: MatchScoreBreakdown2018Alliance;
-  red?: MatchScoreBreakdown2018Alliance;
+  blue: MatchScoreBreakdown2018Alliance;
+  red: MatchScoreBreakdown2018Alliance;
 };
 export type MatchScoreBreakdown2019Alliance = {
   adjustPoints?: number;
@@ -506,8 +506,8 @@ export type MatchScoreBreakdown2019Alliance = {
   totalPoints?: number;
 };
 export type MatchScoreBreakdown2019 = {
-  blue?: MatchScoreBreakdown2019Alliance;
-  red?: MatchScoreBreakdown2019Alliance;
+  blue: MatchScoreBreakdown2019Alliance;
+  red: MatchScoreBreakdown2019Alliance;
 };
 export type MatchScoreBreakdown2020Alliance = {
   initLineRobot1?: string;
@@ -548,8 +548,8 @@ export type MatchScoreBreakdown2020Alliance = {
   totalPoints?: number;
 };
 export type MatchScoreBreakdown2020 = {
-  blue?: MatchScoreBreakdown2020Alliance;
-  red?: MatchScoreBreakdown2020Alliance;
+  blue: MatchScoreBreakdown2020Alliance;
+  red: MatchScoreBreakdown2020Alliance;
 };
 export type MatchScoreBreakdown2022Alliance = {
   taxiRobot1?: 'Yes' | 'No';
@@ -594,8 +594,8 @@ export type MatchScoreBreakdown2022Alliance = {
   totalPoints?: number;
 };
 export type MatchScoreBreakdown2022 = {
-  blue?: MatchScoreBreakdown2022Alliance;
-  red?: MatchScoreBreakdown2022Alliance;
+  blue: MatchScoreBreakdown2022Alliance;
+  red: MatchScoreBreakdown2022Alliance;
 };
 export type MatchScoreBreakdown2023Alliance = {
   activationBonusAchieved?: boolean;
@@ -607,9 +607,9 @@ export type MatchScoreBreakdown2023Alliance = {
   autoChargeStationRobot3?: 'None' | 'Docked';
   autoDocked?: boolean;
   autoCommunity?: {
-    B?: ('None' | 'Cone' | 'Cube')[];
-    M?: ('None' | 'Cone' | 'Cube')[];
-    T?: ('None' | 'Cone' | 'Cube')[];
+    B: ('None' | 'Cone' | 'Cube')[];
+    M: ('None' | 'Cone' | 'Cube')[];
+    T: ('None' | 'Cone' | 'Cube')[];
   };
   autoGamePieceCount?: number;
   autoGamePiecePoints?: number;
@@ -632,14 +632,14 @@ export type MatchScoreBreakdown2023Alliance = {
   techFoulCount?: number;
   linkPoints?: number;
   links?: {
-    nodes?: ('None' | 'Cone' | 'Cube')[];
-    row?: 'Bottom' | 'Mid' | 'Top';
+    nodes: ('None' | 'Cone' | 'Cube')[];
+    row: 'Bottom' | 'Mid' | 'Top';
   }[];
   sustainabilityBonusAchieved?: boolean;
   teleopCommunity?: {
-    B?: ('None' | 'Cone' | 'Cube')[];
-    M?: ('None' | 'Cone' | 'Cube')[];
-    T?: ('None' | 'Cone' | 'Cube')[];
+    B: ('None' | 'Cone' | 'Cube')[];
+    M: ('None' | 'Cone' | 'Cube')[];
+    T: ('None' | 'Cone' | 'Cube')[];
   };
   teleopGamePieceCount?: number;
   teleopGamePiecePoints?: number;
@@ -649,8 +649,8 @@ export type MatchScoreBreakdown2023Alliance = {
   totalPoints?: number;
 };
 export type MatchScoreBreakdown2023 = {
-  blue?: MatchScoreBreakdown2023Alliance;
-  red?: MatchScoreBreakdown2023Alliance;
+  blue: MatchScoreBreakdown2023Alliance;
+  red: MatchScoreBreakdown2023Alliance;
 };
 export type MatchScoreBreakdown2024Alliance = {
   adjustPoints?: number;
@@ -707,8 +707,8 @@ export type MatchScoreBreakdown2024Alliance = {
   trapStageRight?: boolean;
 };
 export type MatchScoreBreakdown2024 = {
-  blue?: MatchScoreBreakdown2024Alliance;
-  red?: MatchScoreBreakdown2024Alliance;
+  blue: MatchScoreBreakdown2024Alliance;
+  red: MatchScoreBreakdown2024Alliance;
 };
 export type Match = {
   /** TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set. */
@@ -760,9 +760,9 @@ export type Match = {
 };
 export type AwardRecipient = {
   /** The TBA team key for the team that was given the award. May be null. */
-  team_key?: string | null;
+  team_key: string | null;
   /** The name of the individual given the award. May be null. */
-  awardee?: string | null;
+  awardee: string | null;
 };
 export type Award = {
   /** The name of the award as provided by FIRST. May vary for the same award type. */
@@ -787,8 +787,8 @@ export type MatchSimple = {
   match_number: number;
   /** A list of alliances, the teams on the alliances, and their score. */
   alliances: {
-    red?: MatchAlliance;
-    blue?: MatchAlliance;
+    red: MatchAlliance;
+    blue: MatchAlliance;
   };
   /** The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie. */
   winning_alliance: 'red' | 'blue' | '';
@@ -835,15 +835,15 @@ export type EliminationAlliance = {
   /** Backup team called in, may be null. */
   backup?: {
     /** Team key that was called in as the backup. */
-    in?: string;
+    in: string;
     /** Team key that was replaced by the backup team. */
-    out?: string;
-  };
+    out: string;
+  } | null;
   /** List of teams that declined the alliance. */
-  declines?: string[];
+  declines: string[];
   /** List of team keys picked for the alliance. First pick is captain. */
   picks: string[];
-  status?: {
+  status: {
     playoff_average?: number;
     level?: string;
     record?: WltRecord;
@@ -883,11 +883,11 @@ export type EventRanking = {
     /** Number of matches played by this team. */
     matches_played: number;
     /** The average match score during qualifications. Year specific. May be null if not relevant for a given year. */
-    qual_average?: number | null;
+    qual_average: number | null;
     /** Additional special data on the team's performance calculated by TBA. */
-    extra_stats?: number[];
+    extra_stats: number[];
     /** Additional year-specific information, may be null. See parent `sort_order_info` for details. */
-    sort_orders?: number[] | null;
+    sort_orders: number[] | null;
     record: WltRecord;
     /** The team's rank at the event as provided by FIRST. */
     rank: number;
@@ -897,7 +897,7 @@ export type EventRanking = {
     team_key: string;
   }[];
   /** List of special TBA-generated values provided in the `extra_stats` array for each item. */
-  extra_stats_info?: {
+  extra_stats_info: {
     /** Integer expressing the number of digits of precision in the number provided in `sort_orders`. */
     precision: number;
     /** Name of the field used in the `extra_stats` array. */
@@ -2499,7 +2499,7 @@ export function getEventAlliances(
     oazapfts.fetchJson<
       | {
           status: 200;
-          data: EliminationAlliance[];
+          data: EliminationAlliance[] | null;
         }
       | {
           status: 304;
@@ -2536,7 +2536,7 @@ export function getEventInsights(
     oazapfts.fetchJson<
       | {
           status: 200;
-          data: EventInsights;
+          data: EventInsights | null;
         }
       | {
           status: 304;
@@ -2647,7 +2647,7 @@ export function getEventPredictions(
     oazapfts.fetchJson<
       | {
           status: 200;
-          data: EventPredictions;
+          data: EventPredictions | null;
         }
       | {
           status: 304;
@@ -2721,7 +2721,7 @@ export function getEventDistrictPoints(
     oazapfts.fetchJson<
       | {
           status: 200;
-          data: EventDistrictPoints;
+          data: EventDistrictPoints | null;
         }
       | {
           status: 304;
