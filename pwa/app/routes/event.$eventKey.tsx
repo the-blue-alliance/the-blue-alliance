@@ -54,7 +54,31 @@ async function loadData(params: Params) {
     getEventAwards({ eventKey: params.eventKey }),
   ]);
 
-  return { event, matches, alliances, rankings, awards };
+  if (event.status == 404) {
+    throw new Response(null, {
+      status: 404,
+    });
+  }
+
+  if (
+    event.status !== 200 ||
+    matches.status !== 200 ||
+    alliances.status !== 200 ||
+    rankings.status !== 200 ||
+    awards.status !== 200
+  ) {
+    throw new Response(null, {
+      status: 500,
+    });
+  }
+
+  return {
+    event: event.data,
+    matches: matches.data,
+    alliances: alliances.data,
+    rankings: rankings.data,
+    awards: awards.data,
+  };
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {

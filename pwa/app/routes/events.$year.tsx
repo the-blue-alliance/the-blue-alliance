@@ -18,7 +18,13 @@ async function loadData(params: Params) {
   const year = parseInt(params.year);
   const events = await getEventsByYear({ year });
 
-  return { year, events };
+  if (events.status !== 200) {
+    throw new Response(null, {
+      status: 500,
+    });
+  }
+
+  return { year, events: events.data };
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
