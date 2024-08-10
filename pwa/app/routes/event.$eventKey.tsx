@@ -2,6 +2,7 @@ import { json, LoaderFunctionArgs } from '@remix-run/node';
 import {
   type ClientLoaderFunctionArgs,
   Link,
+  MetaFunction,
   Params,
   useLoaderData,
 } from '@remix-run/react';
@@ -63,6 +64,16 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   return await loadData(params);
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    { title: `${data?.event.name} (${data?.event.year}) - The Blue Alliance` },
+    {
+      name: 'description',
+      content: `Videos and match results for the ${data?.event.year} ${data?.event.name} FIRST Robotics Competition.`,
+    },
+  ];
+};
 
 export default function EventPage() {
   const { event, alliances, matches, rankings, awards } =
