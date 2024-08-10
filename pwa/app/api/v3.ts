@@ -289,9 +289,9 @@ export type MatchAlliance = {
   score: number;
   team_keys: string[];
   /** TBA team keys (eg `frc254`) of any teams playing as a surrogate. */
-  surrogate_team_keys?: string[];
+  surrogate_team_keys: string[];
   /** TBA team keys (eg `frc254`) of any disqualified teams. */
-  dq_team_keys?: string[];
+  dq_team_keys: string[];
 };
 export type MatchScoreBreakdown2015Alliance = {
   auto_points?: number;
@@ -720,24 +720,24 @@ export type Match = {
   /** The match number of the match in the competition level. */
   match_number: number;
   /** A list of alliances, the teams on the alliances, and their score. */
-  alliances?: {
-    red?: MatchAlliance;
-    blue?: MatchAlliance;
+  alliances: {
+    red: MatchAlliance;
+    blue: MatchAlliance;
   };
   /** The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie. */
-  winning_alliance?: 'red' | 'blue' | '';
+  winning_alliance: 'red' | 'blue' | '';
   /** Event key of the event the match was played at. */
   event_key: string;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule. */
-  time?: number;
+  time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time. */
-  actual_time?: number;
+  actual_time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time. */
-  predicted_time?: number;
+  predicted_time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result was posted. */
-  post_result_time?: number;
+  post_result_time: number | null;
   /** Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null. */
-  score_breakdown?:
+  score_breakdown:
     | (
         | MatchScoreBreakdown2015
         | MatchScoreBreakdown2016
@@ -751,11 +751,11 @@ export type Match = {
       )
     | null;
   /** Array of video objects associated with this match. */
-  videos?: {
+  videos: {
     /** Can be one of 'youtube' or 'tba' */
-    type?: string;
+    type: string;
     /** Unique key representing this video */
-    key?: string;
+    key: string;
   }[];
 };
 export type AwardRecipient = {
@@ -786,20 +786,20 @@ export type MatchSimple = {
   /** The match number of the match in the competition level. */
   match_number: number;
   /** A list of alliances, the teams on the alliances, and their score. */
-  alliances?: {
+  alliances: {
     red?: MatchAlliance;
     blue?: MatchAlliance;
   };
   /** The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie. */
-  winning_alliance?: 'red' | 'blue' | '';
+  winning_alliance: 'red' | 'blue' | '';
   /** Event key of the event the match was played at. */
   event_key: string;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule. */
-  time?: number;
+  time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time. */
-  predicted_time?: number;
+  predicted_time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time. */
-  actual_time?: number;
+  actual_time: number | null;
 };
 export type Media = {
   /** String type of the media element. */
