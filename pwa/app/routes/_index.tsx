@@ -4,8 +4,16 @@ import { json, useLoaderData } from '@remix-run/react';
 import { getStatus } from '~/api/v3';
 
 export async function loader() {
+  const status = await getStatus({});
+
+  if (status.status !== 200) {
+    throw new Response(null, {
+      status: 500,
+    });
+  }
+
   return json({
-    status: await getStatus({}),
+    status: status.data,
   });
 }
 
