@@ -961,6 +961,8 @@ export function getStatus({ ifNoneMatch }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>("/status", {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -986,6 +988,8 @@ export function getTeams({ ifNoneMatch, pageNum }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/teams/${encodeURIComponent(pageNum)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1011,6 +1015,8 @@ export function getTeamsSimple({ ifNoneMatch, pageNum }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/teams/${encodeURIComponent(pageNum)}/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1036,6 +1042,8 @@ export function getTeamsKeys({ ifNoneMatch, pageNum }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/teams/${encodeURIComponent(pageNum)}/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1062,6 +1070,8 @@ export function getTeamsByYear({ ifNoneMatch, year, pageNum }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1088,6 +1098,8 @@ export function getTeamsByYearSimple({ ifNoneMatch, year, pageNum }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1114,6 +1126,8 @@ export function getTeamsByYearKeys({ ifNoneMatch, year, pageNum }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1139,6 +1153,8 @@ export function getTeam({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1164,6 +1180,8 @@ export function getTeamSimple({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1189,6 +1207,8 @@ export function getTeamYearsParticipated({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/years_participated`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1214,6 +1234,8 @@ export function getTeamDistricts({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/districts`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1239,6 +1261,8 @@ export function getTeamRobots({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/robots`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1264,6 +1288,8 @@ export function getTeamEvents({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/events`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1289,6 +1315,8 @@ export function getTeamEventsSimple({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/events/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1314,6 +1342,8 @@ export function getTeamEventsKeys({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/events/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1340,6 +1370,8 @@ export function getTeamEventsByYear({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1366,6 +1398,8 @@ export function getTeamEventsByYearSimple({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1392,6 +1426,8 @@ export function getTeamEventsByYearKeys({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1420,6 +1456,8 @@ export function getTeamEventsStatusesByYear({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/statuses`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1446,6 +1484,8 @@ export function getTeamEventMatches({ ifNoneMatch, teamKey, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1472,6 +1512,8 @@ export function getTeamEventMatchesSimple({ ifNoneMatch, teamKey, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1498,6 +1540,8 @@ export function getTeamEventMatchesKeys({ ifNoneMatch, teamKey, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1524,6 +1568,8 @@ export function getTeamEventAwards({ ifNoneMatch, teamKey, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/awards`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1550,6 +1596,8 @@ export function getTeamEventStatus({ ifNoneMatch, teamKey, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/status`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1575,6 +1623,8 @@ export function getTeamAwards({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/awards`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1601,6 +1651,8 @@ export function getTeamAwardsByYear({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/awards/${encodeURIComponent(year)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1627,6 +1679,8 @@ export function getTeamMatchesByYear({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1653,6 +1707,8 @@ export function getTeamMatchesByYearSimple({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1679,6 +1735,8 @@ export function getTeamMatchesByYearKeys({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1705,6 +1763,8 @@ export function getTeamMediaByYear({ ifNoneMatch, teamKey, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/media/${encodeURIComponent(year)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1731,6 +1791,8 @@ export function getTeamMediaByTag({ ifNoneMatch, teamKey, mediaTag }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/media/tag/${encodeURIComponent(mediaTag)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1758,6 +1820,8 @@ export function getTeamMediaByTagYear({ ifNoneMatch, teamKey, mediaTag, year }: 
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/media/tag/${encodeURIComponent(mediaTag)}/${encodeURIComponent(year)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1783,6 +1847,8 @@ export function getTeamSocialMedia({ ifNoneMatch, teamKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/team/${encodeURIComponent(teamKey)}/social_media`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1808,6 +1874,8 @@ export function getEventsByYear({ ifNoneMatch, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/events/${encodeURIComponent(year)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1833,6 +1901,8 @@ export function getEventsByYearSimple({ ifNoneMatch, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/events/${encodeURIComponent(year)}/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1858,6 +1928,8 @@ export function getEventsByYearKeys({ ifNoneMatch, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/events/${encodeURIComponent(year)}/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1883,6 +1955,8 @@ export function getEvent({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1908,6 +1982,8 @@ export function getEventSimple({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1933,6 +2009,8 @@ export function getEventAlliances({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/alliances`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1958,6 +2036,8 @@ export function getEventInsights({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/insights`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1983,6 +2063,8 @@ export function getEventOpRs({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/oprs`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2008,6 +2090,8 @@ export function getEventCopRs({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/coprs`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2033,6 +2117,8 @@ export function getEventPredictions({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/predictions`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2058,6 +2144,8 @@ export function getEventRankings({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/rankings`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2083,6 +2171,8 @@ export function getEventDistrictPoints({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/district_points`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2108,6 +2198,8 @@ export function getEventTeams({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/teams`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2133,6 +2225,8 @@ export function getEventTeamsSimple({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/teams/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2158,6 +2252,8 @@ export function getEventTeamsKeys({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/teams/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2185,6 +2281,8 @@ export function getEventTeamsStatuses({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/teams/statuses`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2210,6 +2308,8 @@ export function getEventMatches({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/matches`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2235,6 +2335,8 @@ export function getEventMatchesSimple({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/matches/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2260,6 +2362,8 @@ export function getEventMatchesKeys({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/matches/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2287,6 +2391,8 @@ export function getEventMatchTimeseries({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/matches/timeseries`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2312,6 +2418,8 @@ export function getEventAwards({ ifNoneMatch, eventKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/event/${encodeURIComponent(eventKey)}/awards`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2337,6 +2445,8 @@ export function getMatch({ ifNoneMatch, matchKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/match/${encodeURIComponent(matchKey)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2362,6 +2472,8 @@ export function getMatchSimple({ ifNoneMatch, matchKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/match/${encodeURIComponent(matchKey)}/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2389,6 +2501,8 @@ export function getMatchTimeseries({ ifNoneMatch, matchKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/match/${encodeURIComponent(matchKey)}/timeseries`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2414,6 +2528,8 @@ export function getMatchZebra({ ifNoneMatch, matchKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/match/${encodeURIComponent(matchKey)}/zebra_motionworks`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2439,6 +2555,8 @@ export function getDistrictsByYear({ ifNoneMatch, year }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/districts/${encodeURIComponent(year)}`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2464,6 +2582,8 @@ export function getDistrictEvents({ ifNoneMatch, districtKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/district/${encodeURIComponent(districtKey)}/events`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2489,6 +2609,8 @@ export function getDistrictEventsSimple({ ifNoneMatch, districtKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/district/${encodeURIComponent(districtKey)}/events/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2514,6 +2636,8 @@ export function getDistrictEventsKeys({ ifNoneMatch, districtKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/district/${encodeURIComponent(districtKey)}/events/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2539,6 +2663,8 @@ export function getDistrictTeams({ ifNoneMatch, districtKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/district/${encodeURIComponent(districtKey)}/teams`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2564,6 +2690,8 @@ export function getDistrictTeamsSimple({ ifNoneMatch, districtKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/district/${encodeURIComponent(districtKey)}/teams/simple`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2589,6 +2717,8 @@ export function getDistrictTeamsKeys({ ifNoneMatch, districtKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/district/${encodeURIComponent(districtKey)}/teams/keys`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2614,6 +2744,8 @@ export function getDistrictRankings({ ifNoneMatch, districtKey }: {
             /** Authorization error description. */
             Error: string;
         };
+    } | {
+        status: 404;
     }>(`/district/${encodeURIComponent(districtKey)}/rankings`, {
         ...opts,
         headers: oazapfts.mergeHeaders(opts?.headers, {
