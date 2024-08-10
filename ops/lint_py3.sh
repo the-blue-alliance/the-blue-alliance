@@ -6,8 +6,8 @@ if [ -n "$CI" ]; then
 fi
 
 if [ "$1" == "--fix" ]; then
-    black ./ --exclude '/(old_py2|stubs|subtrees|venv)/'
+    black ./ --exclude '/(old_py2|stubs|subtrees|venv|.venv|node_modules)/'
 else
-    black ./ --check --diff --exclude '/(old_py2|stubs|subtrees|venv)/'
+    black ./ --check --diff --exclude '/(old_py2|stubs|subtrees|venv|.venv|node_modules)/'
 fi
 flake8 ./
