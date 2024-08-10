@@ -776,7 +776,7 @@ class InsightsHelper(object):
         Returns a list of Insights where, depending on the Insight, the data
         is either a team or a list of teams
         """
-        ca_winner = None
+        ca_winners = []
         world_champions = []
         world_finalists = []
         division_winners = []
@@ -787,7 +787,7 @@ class InsightsHelper(object):
                 team_key_name = team_key.id()
                 if award.event_type_enum == EventType.CMP_FINALS:
                     if award.award_type_enum == AwardType.CHAIRMANS:
-                        ca_winner = team_key_name
+                        ca_winners.append(team_key_name)
                     elif award.award_type_enum == AwardType.WINNER:
                         world_champions.append(team_key_name)
                     elif award.award_type_enum == AwardType.FINALIST:
@@ -804,10 +804,10 @@ class InsightsHelper(object):
         division_finalists = self._sortTeamList(division_finalists)
 
         insights = []
-        if ca_winner is not None:
+        if ca_winners != []:
             insights += [
                 self._createInsight(
-                    ca_winner, Insight.INSIGHT_NAMES[Insight.CA_WINNER], year
+                    ca_winners, Insight.INSIGHT_NAMES[Insight.CA_WINNER], year
                 )
             ]
         if world_champions != []:

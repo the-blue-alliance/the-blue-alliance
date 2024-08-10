@@ -34,6 +34,12 @@ from backend.api.handlers.event import (
     event_teams_statuses,
 )
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
+from backend.api.handlers.insights import (
+    insights_leaderboards_all,
+    insights_leaderboards_year,
+    insights_notables_all,
+    insights_notables_year,
+)
 from backend.api.handlers.match import match, zebra_motionworks
 from backend.api.handlers.media import media_tags
 from backend.api.handlers.status import status
@@ -265,6 +271,20 @@ api_v3.add_url_rule(
     "/teams/<int:year>/<int:page_num>/<model_type:model_type>",
     view_func=team_list,
 )
+
+# Insights
+api_v3.add_url_rule("/insights/leaderboards/all", view_func=insights_leaderboards_all)
+api_v3.add_url_rule(
+    "/insights/leaderboards/<int:year>", view_func=insights_leaderboards_year
+)
+# api_v3.add_url_rule("/insights/leaderboards/<string:name>", view_func=None)
+# api_v3.add_url_rule("/insights/leaderboard/<string:name>/<int:year>", view_func=None)
+
+api_v3.add_url_rule("/insights/notables/all", view_func=insights_notables_all)
+api_v3.add_url_rule("/insights/notables/<int:year>", view_func=insights_notables_year)
+# api_v3.add_url_rule("/insights/notables/<string:name>", view_func=None)
+# api_v3.add_url_rule("/insights/notable/<string:name>/<int:year>", view_func=None)
+
 
 # Trusted API
 trusted_api = Blueprint("trusted_api", __name__, url_prefix="/api/trusted/v1")
