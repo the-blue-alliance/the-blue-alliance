@@ -262,36 +262,51 @@ jobs:
           - 5000:5000
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            web:
+              - 'ops/**'
+              - 'src/**'
       - name: Set up Python 3.12
+        if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
       - name: Install Python Dependencies
+        if: steps.changes.outputs.web == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Set up Node
+        if: steps.changes.outputs.web == 'true'
         uses: actions/setup-node@v4.0.3
         with:
           node-version: "18"
           cache: "npm"
       - name: Install Node Dependencies
+        if: steps.changes.outputs.web == 'true'
         run: |
           npm ci
           npm install -g capture-website-cli
       - name: Install Vagrant
+        if: steps.changes.outputs.web == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install vagrant
       - name: Create keys file
+        if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
       - name: Set up Docker Buildx
+        if: steps.changes.outputs.web == 'true'
         id: buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       - name: Build Docker Image
+        if: steps.changes.outputs.web == 'true'
         uses: docker/build-push-action@v6.6.1
         with:
           builder: ${{ steps.buildx.outputs.name }}
@@ -303,14 +318,19 @@ jobs:
             ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
           cache-to: type=gha,mode=max
       - name: Start Container
+        if: steps.changes.outputs.web == 'true'
         run: vagrant up
       - name: Test Vagrant Startup
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/test_vagrant_startup.py
       - name: Test Ops Fullstack
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/test_ops.sh
       - name: Capture screenshots
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
+        if: steps.changes.outputs.web == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ci_screenshots
