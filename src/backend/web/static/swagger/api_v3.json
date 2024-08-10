@@ -5486,11 +5486,16 @@
       },
       "Match_Simple": {
         "required": [
-          "comp_level",
-          "event_key",
           "key",
+          "comp_level",
+          "set_number",
           "match_number",
-          "set_number"
+          "alliances",
+          "winning_alliance",
+          "event_key",
+          "time",
+          "predicted_time",
+          "actual_time"
         ],
         "type": "object",
         "properties": {
@@ -5544,16 +5549,19 @@
           },
           "time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.",
             "format": "int64"
           },
           "predicted_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.",
             "format": "int64"
           },
           "actual_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.",
             "format": "int64"
           }
@@ -5565,7 +5573,16 @@
           "event_key",
           "key",
           "match_number",
-          "set_number"
+          "set_number",
+          "alliances",
+          "winning_alliance",
+          "event_key",
+          "time",
+          "actual_time",
+          "predicted_time",
+          "post_result_time",
+          "score_breakdown",
+          "videos"
         ],
         "type": "object",
         "properties": {
@@ -5594,6 +5611,10 @@
           },
           "alliances": {
             "type": "object",
+            "required": [
+              "red",
+              "blue"
+            ],
             "properties": {
               "red": {
                 "$ref": "#/components/schemas/Match_alliance"
@@ -5619,21 +5640,25 @@
           },
           "time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.",
             "format": "int64"
           },
           "actual_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.",
             "format": "int64"
           },
           "predicted_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.",
             "format": "int64"
           },
           "post_result_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result was posted.",
             "format": "int64"
           },
@@ -5675,6 +5700,10 @@
             "description": "Array of video objects associated with this match.",
             "items": {
               "type": "object",
+              "required": [
+                "type",
+                "key"
+              ],
               "properties": {
                 "type": {
                   "type": "string",
@@ -5692,7 +5721,9 @@
       "Match_alliance": {
         "required": [
           "score",
-          "team_keys"
+          "team_keys",
+          "surrogate_team_keys",
+          "dq_team_keys"
         ],
         "type": "object",
         "properties": {
