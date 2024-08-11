@@ -11,6 +11,7 @@ exclude =
   ./venv/
   ./node_modules/
   ./.pyre
+  ./pwa/
 
 application_import_names = backend
 import-order-style = edited
