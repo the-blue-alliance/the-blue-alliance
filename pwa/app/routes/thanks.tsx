@@ -19,7 +19,7 @@ export default function Thanks(): JSX.Element {
           <h3 className="text-2xl">Contributors</h3>
           <p>
             Thanks to our code contributors for our{' '}
-            <a href="/https://github.com/the-blue-alliance/the-blue-alliance/graphs/contributors">
+            <a href="https://github.com/the-blue-alliance/the-blue-alliance/graphs/contributors">
               web app,
             </a>{' '}
             <a href="https://github.com/the-blue-alliance/the-blue-alliance-android/graphs/contributors">
