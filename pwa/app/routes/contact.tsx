@@ -1,5 +1,6 @@
 import { Link } from '@remix-run/react';
-import { Button } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
+import { cn } from '~/lib/utils';
 
 export default function Contact(): JSX.Element {
   return (
@@ -91,34 +92,38 @@ export default function Contact(): JSX.Element {
         <div>
           <h3 className="text-2xl">Everything else...</h3>
           <p>Feel free to reach out to us!</p>
-
-          <Button
-            onClick={() =>
-              (location.href = 'mailto:contact@thebluealliance.com')
-            }
+          <a
+            href="mailto:contact@thebluealliance.com"
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' }),
+            )}
           >
             Email Us!
-          </Button>
-          <Button
-            onClick={() =>
-              (location.href = 'https://the-blue-alliance.slack.com/')
-            }
+          </a>
+          <a
+            href="https://the-blue-alliance.slack.com/"
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' }),
+            )}
           >
             Join our Slack!
-          </Button>
-          <Button
-            onClick={() =>
-              (location.href =
-                'https://groups.google.com/forum/#!forum/thebluealliance-developers')
-            }
+          </a>
+          <a
+            href="https://groups.google.com/forum/#!forum/thebluealliance-developers"
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' }),
+            )}
           >
             Join our Developer Mailing List!
-          </Button>
-          <Button
-            onClick={() => (location.href = 'https://www.chiefdelphi.com/')}
+          </a>
+          <a
+            href="https://www.chiefdelphi.com/"
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' }),
+            )}
           >
             Ask Chief Delphi Fourms!
-          </Button>
+          </a>
         </div>
       </div>
     </>
