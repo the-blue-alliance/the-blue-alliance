@@ -1,4 +1,3 @@
-import { Link } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 
 export default function About(): JSX.Element {
@@ -79,9 +78,9 @@ export default function About(): JSX.Element {
             <blockquote>
               <p>
                 <em>
-                  "To transform our culture by creating a world where science
-                  and technology are celebrated and where young people dream of
-                  becoming science and technology leaders."
+                  &quot;To transform our culture by creating a world where
+                  science and technology are celebrated and where young people
+                  dream of becoming science and technology leaders.&quot;
                 </em>
               </p>
               <small>
@@ -125,6 +124,17 @@ export default function About(): JSX.Element {
                   Statbotics
                 </a>{' '}
                 - Unique FRC team and event performance comparisons
+              </p>
+            </li>
+            <li className="list-disc">
+              <p>
+                <a
+                  href="https://discord.gg/frc"
+                  title="Unofficial FIRST Discord Server"
+                >
+                  Unofficial <em>FIRST</em> Discord Server
+                </a>{' '}
+                - Resource and chat hub for everything FRC
               </p>
             </li>
           </ul>
