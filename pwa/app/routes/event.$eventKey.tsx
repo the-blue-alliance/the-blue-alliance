@@ -1,13 +1,34 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
-import { Link, useLoaderData } from '@remix-run/react';
+import {
+  type ClientLoaderFunctionArgs,
+  Link,
+  MetaFunction,
+  Params,
+  useLoaderData,
+} from '@remix-run/react';
 import { useMemo } from 'react';
-import { getEvent, getEventAlliances, getEventMatches } from '~/api/v3';
+import {
+  Award,
+  getEvent,
+  getEventAlliances,
+  getEventAwards,
+  getEventMatches,
+  getEventRankings,
+} from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
+import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import InlineIcon from '~/components/tba/inlineIcon';
-import MatchResultsTable from '~/components/tba/matchResultsTable';
+import MatchResultsTableDoubleElim from '~/components/tba/matchResultsTables/doubleElim';
+import MatchResultsTableQuals from '~/components/tba/matchResultsTables/quals';
+import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { parseDateString } from '~/lib/utils';
+import {
+  parseDateString,
+  sortAwardsComparator,
+  sortMatchComparator,
+  sortTeamKeysComparator,
+} from '~/lib/utils';
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';
@@ -20,37 +41,108 @@ import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
 import MdiRobot from '~icons/mdi/robot';
 import MdiTournament from '~icons/mdi/tournament';
 
-export async function loader({ params }: LoaderFunctionArgs) {
+async function loadData(params: Params) {
   if (params.eventKey === undefined) {
     throw new Error('Missing eventKey');
   }
 
-  const event = await getEvent({ eventKey: params.eventKey });
-  const matches = await getEventMatches({ eventKey: params.eventKey });
-  const alliances = await getEventAlliances({ eventKey: params.eventKey });
+  const [event, matches, alliances, rankings, awards] = await Promise.all([
+    getEvent({ eventKey: params.eventKey }),
+    getEventMatches({ eventKey: params.eventKey }),
+    getEventAlliances({ eventKey: params.eventKey }),
+    getEventRankings({ eventKey: params.eventKey }),
+    getEventAwards({ eventKey: params.eventKey }),
+  ]);
 
-  return json({ event, matches, alliances });
+  if (event.status == 404) {
+    throw new Response(null, {
+      status: 404,
+    });
+  }
+
+  if (
+    event.status !== 200 ||
+    matches.status !== 200 ||
+    alliances.status !== 200 ||
+    rankings.status !== 200 ||
+    awards.status !== 200
+  ) {
+    throw new Response(null, {
+      status: 500,
+    });
+  }
+
+  return {
+    event: event.data,
+    matches: matches.data,
+    alliances: alliances.data,
+    rankings: rankings.data,
+    awards: awards.data,
+  };
 }
 
+export async function loader({ params }: LoaderFunctionArgs) {
+  return json(await loadData(params));
+}
+
+export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+  return await loadData(params);
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    { title: `${data?.event.name} (${data?.event.year}) - The Blue Alliance` },
+    {
+      name: 'description',
+      content: `Videos and match results for the ${data?.event.year} ${data?.event.name} FIRST Robotics Competition.`,
+    },
+  ];
+};
+
 export default function EventPage() {
-  const { event, alliances, matches } = useLoaderData<typeof loader>();
+  const { event, alliances, matches, rankings, awards } =
+    useLoaderData<typeof loader>();
 
-  const startDate = parseDateString(event.start_date);
-  const endDate = parseDateString(event.end_date);
-  const startDateStr = startDate.toLocaleDateString('default', {
-    month: 'long',
-    day: 'numeric',
-  });
-  const endDateStr = endDate.toLocaleDateString('default', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  const startDate = event.start_date ? parseDateString(event.start_date) : null;
+  const endDate = event.end_date ? parseDateString(event.end_date) : null;
+  const startDateStr = startDate
+    ? startDate.toLocaleDateString('default', {
+        month: 'long',
+        day: 'numeric',
+      })
+    : '';
+  const endDateStr = endDate
+    ? endDate.toLocaleDateString('default', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : '';
 
-  const quals = useMemo(
-    () => matches.filter((m) => m.comp_level === 'qm'),
+  const sortedMatches = useMemo(
+    () => matches.sort(sortMatchComparator),
     [matches],
   );
+
+  const quals = useMemo(
+    () => sortedMatches.filter((m) => m.comp_level === 'qm'),
+    [sortedMatches],
+  );
+
+  const elims = useMemo(
+    () => sortedMatches.filter((m) => m.comp_level !== 'qm'),
+    [sortedMatches],
+  );
+
+  const leftSideMatches =
+    quals.length > 0 ? (
+      <MatchResultsTableQuals matches={quals} />
+    ) : (
+      <MatchResultsTableDoubleElim matches={elims} />
+    );
+
+  const rightSideElims =
+    quals.length > 0 ? <MatchResultsTableDoubleElim matches={elims} /> : <></>;
 
   return (
     <>
@@ -154,22 +246,27 @@ export default function EventPage() {
 
         <TabsContent value="results">
           <div className="flex flex-wrap gap-4 lg:flex-nowrap">
-            <div className="basis-full lg:basis-1/2">
-              <MatchResultsTable
-                matches={quals}
-                title="Qualification Matches"
-              />
-            </div>
+            <div className="basis-full lg:basis-1/2">{leftSideMatches}</div>
 
             <div className="basis-full lg:basis-1/2">
-              <AllianceSelectionTable alliances={alliances} />
+              <AllianceSelectionTable alliances={alliances ?? []} />
+              {rightSideElims}
             </div>
           </div>
         </TabsContent>
 
-        <TabsContent value="rankings">rankings</TabsContent>
+        <TabsContent value="rankings">
+          <RankingsTable
+            rankings={rankings}
+            winners={
+              alliances?.find((a) => a.status?.status === 'won')?.picks ?? []
+            }
+          />
+        </TabsContent>
 
-        <TabsContent value="awards">awards</TabsContent>
+        <TabsContent value="awards">
+          <AwardsTab awards={awards} />
+        </TabsContent>
 
         <TabsContent value="teams">teams</TabsContent>
 
@@ -178,5 +275,43 @@ export default function EventPage() {
         <TabsContent value="media">media</TabsContent>
       </Tabs>
     </>
+  );
+}
+
+function AwardsTab({ awards }: { awards: Award[] }) {
+  awards.sort(sortAwardsComparator);
+  return (
+    <div className="flex flex-wrap-reverse">
+      <div className="mt-1 flow-root w-full">
+        <dl className="divide-y divide-gray-100 text-sm">
+          {awards.map((award) => (
+            <div
+              key={award.name}
+              className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4 sm:px-10"
+            >
+              <dt className="font-medium text-gray-900 sm:col-span-2">
+                {award.name}
+              </dt>
+              <dd className="text-gray-700 sm:text-right">
+                {award.recipient_list
+                  .sort((a, b) =>
+                    sortTeamKeysComparator(
+                      a.team_key ?? '0',
+                      b.team_key ?? '0',
+                    ),
+                  )
+                  .map((r, i) => [
+                    i > 0 && (r.awardee ? <br /> : ', '),
+                    <AwardRecipientLink
+                      recipient={r}
+                      key={`${award.award_type}-${r.awardee}-${r.team_key}`}
+                    />,
+                  ])}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
   );
 }
