@@ -90,7 +90,7 @@ export default function Contact(): JSX.Element {
 
         <div>
           <h3 className="text-2xl">Everything else...</h3>
-          <p>Drop us a line!</p>
+          <p>Feel free to reach out to us!</p>
 
           <Button
             onClick={() =>
@@ -98,6 +98,26 @@ export default function Contact(): JSX.Element {
             }
           >
             Email Us!
+          </Button>
+          <Button
+            onClick={() =>
+              (location.href = 'https://the-blue-alliance.slack.com/')
+            }
+          >
+            Join our Slack!
+          </Button>
+          <Button
+            onClick={() =>
+              (location.href =
+                'https://groups.google.com/forum/#!forum/thebluealliance-developers')
+            }
+          >
+            Join our Developer Mailing List!
+          </Button>
+          <Button
+            onClick={() => (location.href = 'https://www.chiefdelphi.com/')}
+          >
+            Ask Chief Delphi Fourms!
           </Button>
         </div>
       </div>
