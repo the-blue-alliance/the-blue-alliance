@@ -1,4 +1,6 @@
-import { Button } from '~/components/ui/button';
+import { Link } from '@remix-run/react';
+import { buttonVariants } from '~/components/ui/button';
+import { cn } from '~/lib/utils';
 
 export default function About(): JSX.Element {
   return (
@@ -26,19 +28,30 @@ export default function About(): JSX.Element {
           <p>
             You can support The Blue Alliance or reach us with the following:
           </p>
-          <Button
-            onClick={() =>
-              (location.href = 'https://github.com/the-blue-alliance')
-            }
+          <a
+            href="https://github.com/the-blue-alliance"
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' }),
+            )}
           >
             Contribute on GitHub!
-          </Button>
-          <Button onClick={() => (window.location.href = '/donate')}>
+          </a>
+          <Link
+            to="/donate"
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' }),
+            )}
+          >
             Donate with PayPal
-          </Button>
-          <Button onClick={() => (window.location.href = '/contact')}>
+          </Link>
+          <Link
+            to="/contact"
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' }),
+            )}
+          >
             Contact Us!
-          </Button>
+          </Link>
         </div>
 
         <div>
