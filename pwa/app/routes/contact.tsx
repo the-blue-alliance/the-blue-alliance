@@ -1,7 +1,7 @@
 import { Link } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 
-export default function Thanks(): JSX.Element {
+export default function Contact(): JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y [&_*]:mt-4">
@@ -91,7 +91,14 @@ export default function Thanks(): JSX.Element {
         <div>
           <h3 className="text-2xl">Everything else...</h3>
           <p>Drop us a line!</p>
-          <Button>Email Us!</Button>
+
+          <Button
+            onClick={() =>
+              (location.href = 'mailto:contact@thebluealliance.com')
+            }
+          >
+            Email Us!
+          </Button>
         </div>
       </div>
     </>
