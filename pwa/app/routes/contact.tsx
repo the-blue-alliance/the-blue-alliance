@@ -1,3 +1,6 @@
+import { Link } from '@remix-run/react';
+import { Button } from '~/components/ui/button';
+
 export default function Thanks(): JSX.Element {
   return (
     <>
@@ -34,11 +37,9 @@ export default function Thanks(): JSX.Element {
             FIRST Digital Kit of Parts to change robot names and approve or
             change media on your own team page. You can get the code for your
             team from the FIRST Digital Kit of Parts, and redeem it at the{' '}
-            <a href="https://thebluealliance.com/mod">
-              TBA Team Mod dashboard.
-            </a>{' '}
-            Only one TBA account may be the &quot;team mod&quot; each year, so
-            please choose carefully.
+            <Link to="/mod">TBA Team Mod dashboard</Link> Only one TBA account
+            may be the &quot;team mod&quot; each year, so please choose
+            carefully.
           </p>
         </div>
 
@@ -48,8 +49,7 @@ export default function Thanks(): JSX.Element {
           </h3>
           <p>
             Learn how you can help add match video, offseason results, report
-            bad data, and more{' '}
-            <a href="https://www.thebluealliance.com/add-data">here.</a>
+            bad data, and more <Link to="/add-data">here.</Link>
           </p>
         </div>
 
@@ -91,12 +91,7 @@ export default function Thanks(): JSX.Element {
         <div>
           <h3 className="text-2xl">Everything else...</h3>
           <p>Drop us a line!</p>
-          <a
-            className="btn btn-blue my-2"
-            href="mailto:contact@thebluealliance.com"
-          >
-            Email Us!
-          </a>
+          <Button>Email Us!</Button>
         </div>
       </div>
     </>
