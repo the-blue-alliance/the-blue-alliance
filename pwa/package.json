@@ -30,7 +30,7 @@
     "isbot": "4.1.0",
     "lodash-es": "4.17.21",
     "lucide-react": "0.427.0",
-    "react": "18.2.0",
+    "react": "18.3.1",
     "react-dom": "18.2.0",
     "tailwind-merge": "2.4.0",
     "tailwindcss-animate": "1.0.7"
@@ -40,7 +40,7 @@
     "@remix-run/dev": "2.11.1",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
-    "@types/react": "18.2.20",
+    "@types/react": "18.3.3",
     "@types/react-dom": "18.2.7",
     "@typescript-eslint/eslint-plugin": "6.7.4",
     "@typescript-eslint/parser": "6.21.0",
