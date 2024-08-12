@@ -71,4 +71,15 @@
   a {
     @apply text-blue-800 visited:text-purple-700 hover:underline;
   }
+
+  /* Create small blue buttons */
+  .btn {
+    @apply rounded px-4 py-2 font-bold;
+  }
+  .btn-blue {
+    @apply bg-blue-500 text-white;
+  }
+  .btn-blue:hover {
+    @apply bg-blue-700;
+  }
 }

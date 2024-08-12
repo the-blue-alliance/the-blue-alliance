@@ -1,0 +1,104 @@
+export default function Thanks(): JSX.Element {
+  return (
+    <>
+      <div className="flex flex-col divide-y [&_*]:mt-4">
+        <div>
+          <h1 className="text-3xl font-medium">Contact us</h1>
+          <p>
+            We&apos;d love to hear from you. Here&apos;s how to get in touch
+            about different issues or questions.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-2xl">Is your team&apos;s information wrong?</h3>
+          <h4 className="text-xl">Team information</h4>
+          <p>
+            Most team data - like names, websites, sponsors, etc - are updated
+            directly from FIRST. If your team&apos;s information is incorrect on
+            The Blue Alliance, please check that it is correct on FIRST&apos;s
+            website. We update our records from{' '}
+            <a href="https://my.firstinspires.org/Dashboard/">
+              <em>FIRST</em>&apos;s Team Information Management System
+            </a>{' '}
+            daily, and are unable to change your team information to anything
+            other than what is listed there. You can ask your team&apos;s Lead
+            Mentor to update the information in FIRST TIMS and it will update on
+            The Blue Alliance within a day or two.
+          </p>
+          <h4 className="text-xl">Photos, Social Media, and Robot Names</h4>
+          <p>
+            Some team data - like photos, CAD models, social media, and robot
+            names - are provided to The Blue Alliance through crowdsourcing or
+            by teams directly. Teams can use the Team Moderator codes in the
+            FIRST Digital Kit of Parts to change robot names and approve or
+            change media on your own team page. You can get the code for your
+            team from the FIRST Digital Kit of Parts, and redeem it at the{' '}
+            <a href="https://thebluealliance.com/mod">
+              TBA Team Mod dashboard.
+            </a>{' '}
+            Only one TBA account may be the &quot;team mod&quot; each year, so
+            please choose carefully.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-2xl">
+            Have match videos or data to add to The Blue Alliance?
+          </h3>
+          <p>
+            Learn how you can help add match video, offseason results, report
+            bad data, and more{' '}
+            <a href="https://www.thebluealliance.com/add-data">here.</a>
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-2xl">Want to help keep our data up to date?</h3>
+          <p>
+            Join{' '}
+            <a href="https://www.facebook.com/groups/moardata/">
+              our facebook group
+            </a>{' '}
+            to help add offseason results, report bad data, give us feedback,
+            and more!
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-2xl">Need API access?</h3>
+          <p>
+            You can review the{' '}
+            <a href="https://www.facebook.com/groups/moardata/">
+              documentation for our APIs
+            </a>{' '}
+            on our website.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-2xl">Want to help improve The Blue Alliance?</h3>
+          <p>
+            Check out our{' '}
+            <a href="https://github.com/the-blue-alliance/the-blue-alliance">
+              GitHub repository
+            </a>{' '}
+            if you&apos;d like to help improve The Blue Alliance website or
+            APIs.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-2xl">Everything else...</h3>
+          <p>Drop us a line!</p>
+          <a
+            className="btn btn-blue my-2"
+            href="mailto:contact@thebluealliance.com"
+          >
+            Email Us!
+          </a>
+        </div>
+      </div>
+    </>
+  );
+}
