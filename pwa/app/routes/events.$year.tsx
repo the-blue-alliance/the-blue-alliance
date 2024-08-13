@@ -1,7 +1,6 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
-  Link,
   Params,
   useLoaderData,
 } from '@remix-run/react';
@@ -129,7 +128,7 @@ export default function YearEventsPage() {
         </h1>
         {groupedEvents.map((group) => (
           <div key={group.groupName}>
-            <h2 className="text-2xl mt-5">
+            <h2 className="mt-5 text-2xl">
               {group.groupName}{' '}
               <small className="text-slate-500">
                 {group.events.length}{' '}

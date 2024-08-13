@@ -22,7 +22,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
       </TableHeader>
       <TableBody>
         {events.map((event) => (
-          <TableRow>
+          <TableRow key={event.key}>
             <TableCell className="w-8/12">
               <Link className="text-base" to={`/event/${event.key}`}>
                 {event.name}
