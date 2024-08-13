@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
+import { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
   json,
@@ -34,6 +34,20 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   return await loadData(params);
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    {
+      title: `${data?.team.nickname} - Team ${data?.team.team_number} - The Blue Alliance`,
+    },
+    {
+      name: 'description',
+      content:
+        `From ${data?.team.city}, ${data?.team.state_prov} ${data?.team.postal_code}, ${data?.team.country}.` +
+        ' Team information, match results, and match videos from the FIRST Robotics Competition.',
+    },
+  ];
+};
 
 export default function TeamPage(): JSX.Element {
   const { team } = useLoaderData<typeof loader>();
