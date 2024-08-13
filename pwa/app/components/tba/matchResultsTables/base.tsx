@@ -1,8 +1,14 @@
+import { Tooltip } from '@radix-ui/react-tooltip';
 import { Link } from '@remix-run/react';
 import { type VariantProps, cva } from 'class-variance-authority';
 import type React from 'react';
 import { Fragment } from 'react';
 import { Match } from '~/api/v3';
+import {
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { cn, timestampsAreOnDifferentDays, zip } from '~/lib/utils';
 import PlayCircle from '~icons/bi/play-circle';
 
@@ -166,7 +172,18 @@ export default function MatchResultsTableBase({
                 dq={m.alliances?.red?.dq_team_keys?.includes(k)}
                 surrogate={m.alliances?.red?.surrogate_team_keys?.includes(k)}
               >
-                <Link to={`/team/${k?.substring(3)}`}>{k?.substring(3)}</Link>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link to={`/team/${k?.substring(3)}`}>
+                        {k?.substring(3)}
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>DQ</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </GridCell>
             ))}
 
