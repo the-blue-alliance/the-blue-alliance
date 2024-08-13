@@ -21,7 +21,7 @@ export function getEventDateString(event: Event, month: 'long' | 'short') {
     year: 'numeric',
   });
 
-  if (startDate == endDate) {
+  if (startDate.getTime() === endDate.getTime()) {
     return endDateString;
   }
 
