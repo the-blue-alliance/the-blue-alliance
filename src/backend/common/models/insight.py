@@ -1,9 +1,12 @@
 import json
-from typing import Set
+from typing import Dict, Literal, Set
 
 from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
+
+
+LeaderboardKeyType = Literal["team"] | Literal["event"] | Literal["match"]
 
 
 class Insight(CachedModel):
@@ -36,6 +39,9 @@ class Insight(CachedModel):
     ELIM_WINNING_MARGIN_DISTRIBUTION = 20
     EINSTEIN_STREAK = 21
     MATCHES_PLAYED = 22
+    TYPED_LEADERBOARD_BLUE_BANNERS = 23
+    TYPED_LEADERBOARD_MOST_MATCHES_PLAYED = 24
+    TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT = 25
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -64,8 +70,25 @@ class Insight(CachedModel):
         ELIM_WINNING_MARGIN_DISTRIBUTION: "elim_winning_margin_distribution",
         EINSTEIN_STREAK: "einstein_streak",
         MATCHES_PLAYED: "matches_played",
+        TYPED_LEADERBOARD_BLUE_BANNERS: "typed_leaderboard_blue_banners",
+        TYPED_LEADERBOARD_MOST_MATCHES_PLAYED: "typed_leaderboard_most_matches_played",
+        TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "typed_leaderboard_highest_median_score_by_event",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
+    }
+
+    TYPED_LEADERBOARD_MATCH_INSIGHTS = {
+        TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
+        TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT,
+    }
+    TYPED_LEADERBOARD_AWARD_INSIGHTS = {
+        TYPED_LEADERBOARD_BLUE_BANNERS,
+    }
+
+    TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
+        TYPED_LEADERBOARD_BLUE_BANNERS: "team",
+        TYPED_LEADERBOARD_MOST_MATCHES_PLAYED: "team",
+        TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "event",
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting
