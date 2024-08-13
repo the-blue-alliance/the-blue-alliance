@@ -84,17 +84,17 @@ function groupBySections(events: Event[]): EventGroup[] {
     }
 
     // FOC
-    if (event.event_type == EventType.FOC) {
+    if ((event.event_type as EventType) == EventType.FOC) {
       FOCEvents.events.push(event);
     }
 
     // Preaseason
-    if (event.event_type == EventType.PRESEASON) {
+    if ((event.event_type as EventType) == EventType.PRESEASON) {
       preaseasonEvents.events.push(event);
     }
 
     // Offseason
-    if (event.event_type == EventType.OFFSEASON) {
+    if ((event.event_type as EventType) == EventType.OFFSEASON) {
       offseasonEvents.events.push(event);
     }
   });

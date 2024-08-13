@@ -34,7 +34,7 @@ export default function Index() {
   // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
-  const commitHash: string = __COMMIT_HASH__;
+  const commitHash = __COMMIT_HASH__ as string;
 
   return (
     <div className="p-4 font-sans">
