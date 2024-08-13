@@ -1,3 +1,5 @@
+import { Link } from '@remix-run/react';
+
 export default function Thanks(): JSX.Element {
   return (
     <>
@@ -11,7 +13,7 @@ export default function Thanks(): JSX.Element {
           </p>
           <p>
             If you would like to support the site, please consider{' '}
-            <a href="/donate">making a donation.</a>
+            <Link to="/donate">making a donation.</Link>
           </p>
         </div>
 
