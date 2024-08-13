@@ -37,15 +37,15 @@ export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   return await loadData(params);
 }
 
-type EventGroup = {
+interface EventGroup {
   groupName: string;
   events: Event[];
-};
+}
 
 function groupBySections(events: Event[]): EventGroup[] {
   // TODO: Handle 2021 remote events
-  const eventsByWeek: Map<number, EventGroup> = new Map();
-  const eventsByChampionship: Map<string, EventGroup> = new Map();
+  const eventsByWeek = new Map<number, EventGroup>();
+  const eventsByChampionship = new Map<string, EventGroup>();
   const FOCEvents: EventGroup = {
     groupName: 'FIRST Festival of Champions',
     events: [],

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Match } from '~/api/v3';
 import MatchResultsTableBase from '~/components/tba/matchResultsTables/base';
 
-const DOUBLE_ELIM_ROUND_MAPPING: { [key: number]: number } = {
+const DOUBLE_ELIM_ROUND_MAPPING: Record<number, number> = {
   1: 1,
   2: 1,
   3: 1,
