@@ -1,7 +1,9 @@
 import type { MetaFunction } from '@remix-run/node';
 import { json, useLoaderData } from '@remix-run/react';
+import { Theme, useTheme } from 'remix-themes';
 
 import { getStatus } from '~/api/v3';
+import { Button } from '~/components/ui/button';
 
 export async function loader() {
   const status = await getStatus({});
@@ -30,6 +32,7 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   const { status } = useLoaderData<typeof loader>();
+  const [, setTheme] = useTheme();
 
   // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -51,6 +54,8 @@ export default function Index() {
       >
         Commit: {commitHash}
       </a>
+      <Button onClick={() => setTheme(Theme.LIGHT)}>Light</Button>
+      <Button onClick={() => setTheme(Theme.DARK)}>Dark</Button>
     </div>
   );
 }

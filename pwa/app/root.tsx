@@ -4,10 +4,19 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from '@remix-run/react';
 import * as Sentry from '@sentry/react';
 import './tailwind.css';
 import * as api from '~/api/v3';
+import clsx from 'clsx';
+import {
+  PreventFlashOnWrongTheme,
+  ThemeProvider,
+  useTheme,
+} from 'remix-themes';
+import { LoaderFunctionArgs } from '@remix-run/node';
+import { themeSessionResolver } from './sessions.server';
 
 Sentry.init({
   dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
@@ -30,9 +39,27 @@ api.defaults.headers = {
   'X-TBA-Auth-Key': import.meta.env.VITE_TBA_API_READ_KEY,
 };
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { getTheme } = await themeSessionResolver(request);
+  return {
+    theme: getTheme(),
+  };
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>();
   return (
-    <html lang="en">
+    <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
+      <InnerLayout>{children}</InnerLayout>
+    </ThemeProvider>
+  );
+}
+
+function InnerLayout({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>();
+  const [theme] = useTheme();
+  return (
+    <html lang="en" className={clsx(theme)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -47,6 +74,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           rel="stylesheet"
         />
         <Meta />
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
         <Links />
       </head>
       <body>
