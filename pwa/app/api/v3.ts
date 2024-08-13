@@ -143,9 +143,9 @@ export type Event = {
   /** Country the event is located in. */
   country: string | null;
   /** Event start date in `yyyy-mm-dd` format. */
-  start_date: string | null;
+  start_date: string;
   /** Event end date in `yyyy-mm-dd` format. */
-  end_date: string | null;
+  end_date: string;
   /** Year the event data is for. */
   year: number;
   /** Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null. */
@@ -203,9 +203,9 @@ export type EventSimple = {
   /** Country the event is located in. */
   country: string | null;
   /** Event start date in `yyyy-mm-dd` format. */
-  start_date: string | null;
+  start_date: string;
   /** Event end date in `yyyy-mm-dd` format. */
-  end_date: string | null;
+  end_date: string;
   /** Year the event data is for. */
   year: number;
 };

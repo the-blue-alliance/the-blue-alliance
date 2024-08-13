@@ -4398,13 +4398,11 @@
           },
           "start_date": {
             "type": "string",
-            "nullable": true,
             "description": "Event start date in `yyyy-mm-dd` format.",
             "format": "date"
           },
           "end_date": {
             "type": "string",
-            "nullable": true,
             "description": "Event end date in `yyyy-mm-dd` format.",
             "format": "date"
           },
@@ -4486,13 +4484,11 @@
           },
           "start_date": {
             "type": "string",
-            "nullable": true,
             "description": "Event start date in `yyyy-mm-dd` format.",
             "format": "date"
           },
           "end_date": {
             "type": "string",
-            "nullable": true,
             "description": "Event end date in `yyyy-mm-dd` format.",
             "format": "date"
           },
