@@ -98,12 +98,10 @@ function ConditionalTooltip({
       <TooltipProvider delayDuration={100}>
         <Tooltip>
           <TooltipTrigger asChild>{children}</TooltipTrigger>
-          <TooltipContent>
-            <p>
-              {dq && 'DQ'}
-              {dq && surrogate && ' | '}
-              {surrogate && 'Surrogate'}
-            </p>
+          <TooltipContent className="font-normal">
+            {dq && 'DQ'}
+            {dq && surrogate && ' | '}
+            {surrogate && 'Surrogate'}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
