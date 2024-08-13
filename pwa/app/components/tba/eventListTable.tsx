@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table';
+} from '~/components/ui/table';
 import { Link } from '@remix-run/react';
 import { getEventDateString } from '~/lib/utils';
 

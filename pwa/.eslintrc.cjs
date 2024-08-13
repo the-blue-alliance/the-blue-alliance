@@ -23,10 +23,15 @@ module.exports = {
 
   // Base config
   extends: ['eslint:recommended', 'prettier', 'plugin:tailwindcss/recommended'],
+  plugins: ['no-relative-import-paths'],
   rules: {
     // Fix for eslint not knowing how to resolve unplugin icons
     'import/no-unresolved': ['error', { ignore: ['^~icons/'] }],
     'tailwindcss/no-custom-classname': 'off',
+    'no-relative-import-paths/no-relative-import-paths': [
+      'error',
+      { allowSameFolder: true },
+    ],
   },
 
   overrides: [
