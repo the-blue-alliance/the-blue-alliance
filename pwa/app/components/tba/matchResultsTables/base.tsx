@@ -84,6 +84,34 @@ function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
   return `https://www.youtube.com/watch?v=${match.videos[0].key}`;
 }
 
+function ConditionalTooltip({
+  children,
+  dq,
+  surrogate,
+}: {
+  children: React.ReactNode;
+  dq: boolean;
+  surrogate: boolean;
+}) {
+  if (dq || surrogate) {
+    return (
+      <TooltipProvider delayDuration={100}>
+        <Tooltip>
+          <TooltipTrigger asChild>{children}</TooltipTrigger>
+          <TooltipContent>
+            <p>
+              {dq && 'DQ'}
+              {dq && surrogate && ' | '}
+              {surrogate && 'Surrogate'}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+  return <>{children}</>;
+}
+
 export default function MatchResultsTableBase({
   matches,
   matchTitleFormatter,
@@ -164,48 +192,57 @@ export default function MatchResultsTableBase({
             <GridCell className="row-span-2">{matchTitleFormatter(m)}</GridCell>
 
             {/* red alliance */}
-            {m.alliances?.red?.team_keys.map((k) => (
-              <GridCell
-                key={k}
-                allianceColor={'red'}
-                matchResult={m.winning_alliance === 'red' ? 'winner' : 'loser'}
-                dq={m.alliances?.red?.dq_team_keys?.includes(k)}
-                surrogate={m.alliances?.red?.surrogate_team_keys?.includes(k)}
-              >
-                <TooltipProvider delayDuration={100}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link to={`/team/${k?.substring(3)}`}>
-                        {k?.substring(3)}
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>DQ</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </GridCell>
-            ))}
+            {m.alliances?.red?.team_keys.map((k) => {
+              const dq = m.alliances?.red?.dq_team_keys?.includes(k);
+              const surrogate =
+                m.alliances?.red?.surrogate_team_keys?.includes(k);
+              return (
+                <GridCell
+                  key={k}
+                  allianceColor={'red'}
+                  matchResult={
+                    m.winning_alliance === 'red' ? 'winner' : 'loser'
+                  }
+                  dq={dq}
+                  surrogate={surrogate}
+                >
+                  <ConditionalTooltip dq={dq} surrogate={surrogate}>
+                    <Link to={`/team/${k?.substring(3)}`}>
+                      {k?.substring(3)}
+                    </Link>
+                  </ConditionalTooltip>
+                </GridCell>
+              );
+            })}
 
             {/* blue alliance */}
             {zip(m.alliances?.blue?.team_keys, [
               'col-start-3 row-start-2 lg:col-start-6 lg:row-start-1',
               'col-start-4 row-start-2 lg:col-start-7 lg:row-start-1',
               'col-start-5 row-start-2 lg:col-start-8 lg:row-start-1',
-            ]).map(([k, x]) => (
-              <GridCell
-                key={k}
-                allianceColor={'blue'}
-                matchResult={m.winning_alliance === 'blue' ? 'winner' : 'loser'}
-                className={x}
-                dq={m.alliances?.blue?.dq_team_keys?.includes(k ?? '')}
-                surrogate={m.alliances?.blue?.surrogate_team_keys?.includes(
-                  k ?? '',
-                )}
-              >
-                <Link to={`/team/${k?.substring(3)}`}>{k?.substring(3)}</Link>
-              </GridCell>
-            ))}
+            ]).map(([k, x]) => {
+              const dq = m.alliances?.blue?.dq_team_keys?.includes(k);
+              const surrogate =
+                m.alliances?.blue?.surrogate_team_keys?.includes(k);
+              return (
+                <GridCell
+                  key={k}
+                  allianceColor={'blue'}
+                  matchResult={
+                    m.winning_alliance === 'blue' ? 'winner' : 'loser'
+                  }
+                  className={x}
+                  dq={dq}
+                  surrogate={surrogate}
+                >
+                  <ConditionalTooltip dq={dq} surrogate={surrogate}>
+                    <Link to={`/team/${k?.substring(3)}`}>
+                      {k?.substring(3)}
+                    </Link>
+                  </ConditionalTooltip>
+                </GridCell>
+              );
+            })}
 
             {/* scores */}
             <GridCell
