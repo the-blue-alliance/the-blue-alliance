@@ -13,16 +13,15 @@ import {
 
 import { cn } from '~/lib/utils';
 import { Input } from "~/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
-import { DropdownMenuContent, DropdownMenuItem } from "../../ui/dropdown-menu";
-import { StarIcon } from "../icons/StarIcon";
-import { CalendarIcon } from "../icons/CalendarIcon";
-import { PersonIcon } from "../icons/PersonIcon";
-import { VideoCameraIcon } from "../icons/VideoCameraIcon";
-import { InsightIcon } from "../icons/InsightIcon";
-import { MoreIcon } from "../icons/MoreIcon";
-import { BlogIcon } from "../icons/BlogIcon";
-import { GearIcon } from "../icons/GearIcon";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { StarIcon } from "~/components/tba/icons/StarIcon";
+import { CalendarIcon } from "~/components/tba/icons/CalendarIcon";
+import { PersonIcon } from "~/components/tba/icons/PersonIcon";
+import { VideoCameraIcon } from "~/components/tba/icons/VideoCameraIcon";
+import { InsightIcon } from "~/components/tba/icons/InsightIcon";
+import { MoreIcon } from "~/components/tba/icons/MoreIcon";
+import { BlogIcon } from "~/components/tba/icons/BlogIcon";
+import { GearIcon } from "~/components/tba/icons/GearIcon";
 
 
 type MenuItemProps = {
