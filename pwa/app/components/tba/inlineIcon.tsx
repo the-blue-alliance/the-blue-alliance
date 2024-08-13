@@ -1,7 +1,24 @@
+import { cva, VariantProps } from 'class-variance-authority';
 import React, { ReactNode } from 'react';
 import { cn } from '~/lib/utils';
 
-interface InlineIconProps extends React.HTMLAttributes<HTMLDivElement> {
+// For very long text blocks, flex makes the icon really tiny. Use flexless for those.
+// Flex approach in general is easier to work with, so that's the default.
+const inlineIconVariants = cva('[&>*:first-child]:size-[1em]', {
+  variants: {
+    displayStyle: {
+      flex: 'flex items-center text-center',
+      flexless: '[&>*]:inline',
+    },
+  },
+  defaultVariants: {
+    displayStyle: 'flex',
+  },
+});
+
+interface InlineIconProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+  VariantProps<typeof inlineIconVariants> {
   children: ReactNode[];
 }
 /**
@@ -16,19 +33,16 @@ interface InlineIconProps extends React.HTMLAttributes<HTMLDivElement> {
 export default function InlineIcon({
   className,
   children,
+  displayStyle,
   ...props
 }: InlineIconProps) {
   return (
     <div
-      className={cn(
-        `flex items-center text-center [&>*:first-child]:h-[1em]
-        [&>*:first-child]:w-[1em]`,
-        className,
-      )}
+      className={cn(inlineIconVariants({ displayStyle, className }))}
       {...props}
     >
       {children[0]}
-      <span className="ml-1 block">{children.slice(1)}</span>
+      <span className="ml-1">{children.slice(1)}</span>
     </div>
   );
 }

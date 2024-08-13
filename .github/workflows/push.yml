@@ -5,8 +5,6 @@ on:
     branches:
       - py3
 
-concurrency: deploy-${{ github.ref }}
-
 jobs:
   py3-type:
     name: "[py3] Type Check"
@@ -185,11 +183,18 @@ jobs:
           node-version: "20"
           cache: "npm"
       - name: Install Dependencies
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa ci
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
       - name: Run Build
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa run build
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pwa-build
+          path: pwa/build
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-latest
@@ -285,7 +290,7 @@ jobs:
           driver-opts: network=host
       - name: Build Docker Image
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/build-push-action@v6.4.1
+        uses: docker/build-push-action@v6.7.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker
@@ -310,66 +315,102 @@ jobs:
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-queues-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            queue:
+              - 'src/queue.yaml'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.queue == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.queue == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.queue == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.queue == 'true'
         run: gcloud app deploy src/queue.yaml
   deploy-index:
     name: Deploy Index
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-index-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            index:
+              - 'src/index.yaml'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.index == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.index == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.index == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.index == 'true'
         run: gcloud app deploy src/index.yaml
   deploy-default:
     name: Deploy Default Service
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-default-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            default:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.default == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.default == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.default == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.default == 'true'
         run: ./ops/deploy/deploy_module.sh src/default.yaml
   deploy-web:
     name: Deploy Web Service
@@ -387,141 +428,237 @@ jobs:
         deploy-index,
       ]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-web-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            web:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Download production artifacts
+        if: steps.changes.outputs.web == 'true'
         uses: actions/download-artifact@v4
         with:
           name: web-build
           path: src/build
       - name: Update env_variables.yaml
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/deploy/update_env_variables_yaml.sh
         env:
           FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.web == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.web == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/deploy/deploy_module.sh src/web.yaml
   deploy-api:
     name: Deploy API Service
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-api-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            api:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.api == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Update env_variables.yaml
+        if: steps.changes.outputs.api == 'true'
         run: ./ops/deploy/update_env_variables_yaml.sh
         env:
           FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.api == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.api == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.api == 'true'
         run: ./ops/deploy/deploy_module.sh src/api.yaml
   deploy-tasks-io:
     name: Deploy Tasks IO Service
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-tasks-io-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            tasks-io:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.tasks-io == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.tasks-io == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.tasks-io == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.tasks-io == 'true'
         run: ./ops/deploy/deploy_module.sh src/tasks_io.yaml
   deploy-tasks-cpu:
     name: Deploy Tasks CPU Service
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-tasks-cpu-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            tasks-cpu:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.tasks-cpu == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.tasks-cpu == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.tasks-cpu == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.tasks-cpu == 'true'
         run: ./ops/deploy/deploy_module.sh src/tasks_cpu.yaml
   deploy-pwa:
     name: Deploy PWA Service
     runs-on: ubuntu-latest
     needs: [pwa-lint, pwa-type, pwa-build]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-pwa-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 10 # Needed for Sentry release
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            pwa:
+              - 'ops/**'
+              - 'pwa/**'
+      - name: Download production artifacts
+        if: steps.changes.outputs.pwa == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: pwa-build
+          path: pwa/build
+      - name: Set up Sentry Release
+        if: steps.changes.outputs.pwa == 'true'
+        run: ./ops/pwa/set_sentry_release.sh
+        env:
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.pwa == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.pwa == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.pwa == 'true'
         run: ./ops/deploy/deploy_module.sh pwa/pwa.yaml
   deploy-cron:
     name: Deploy Cron Jobs
     runs-on: ubuntu-latest
     needs: [deploy-tasks-io, deploy-tasks-cpu]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-cron-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            cron:
+              - 'src/cron.yaml'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.cron == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.cron == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.cron == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.cron == 'true'
         run: gcloud app deploy src/cron.yaml
   deploy-dispatch:
     name: Deploy Dispatch
@@ -537,20 +674,31 @@ jobs:
         deploy-pwa,
       ]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-dispatch-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            dispatch:
+              - 'src/dispatch.yaml'
       - name: Set up Python 3.8
+        if: steps.changes.outputs.dispatch == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.dispatch == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.dispatch == 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.dispatch == 'true'
         run: ./ops/deploy/deploy_dispatch.sh

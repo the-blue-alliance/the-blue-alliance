@@ -92,7 +92,10 @@ module.exports = {
     {
       files: ['app/components/ui/*.tsx'],
       rules: {
-        'react/prop-types': [2, { ignore: ['className'] }],
+        'react/prop-types': [
+          2,
+          { ignore: ['className', 'variant', 'size', 'sideOffset'] },
+        ],
       },
     },
   ],

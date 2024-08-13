@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.8.2
+ * 3.9.0
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -38,39 +38,35 @@ export type Team = {
   /** Official team number issued by FIRST. */
   team_number: number;
   /** Team nickname provided by FIRST. */
-  nickname?: string;
+  nickname: string;
   /** Official long name registered with FIRST. */
   name: string;
   /** Name of team school or affilited group registered with FIRST. */
-  school_name?: string;
+  school_name: string | null;
   /** City of team derived from parsing the address registered with FIRST. */
-  city?: string;
+  city: string | null;
   /** State of team derived from parsing the address registered with FIRST. */
-  state_prov?: string;
+  state_prov: string | null;
   /** Country of team derived from parsing the address registered with FIRST. */
-  country?: string;
+  country: string | null;
   /** Will be NULL, for future development. */
-  address?: string;
+  address: string | null;
   /** Postal code from the team address. */
-  postal_code?: string;
+  postal_code: string | null;
   /** Will be NULL, for future development. */
-  gmaps_place_id?: string;
+  gmaps_place_id: string | null;
   /** Will be NULL, for future development. */
-  gmaps_url?: string;
+  gmaps_url: string | null;
   /** Will be NULL, for future development. */
-  lat?: number;
+  lat: number | null;
   /** Will be NULL, for future development. */
-  lng?: number;
+  lng: number | null;
   /** Will be NULL, for future development. */
-  location_name?: string;
+  location_name: string | null;
   /** Official website associated with the team. */
-  website?: string;
+  website?: string | null;
   /** First year the team officially competed. */
-  rookie_year?: number;
-  /** Team's motto as provided by FIRST. This field is deprecated and will return null - will be removed at end-of-season in 2019. */
-  motto?: string;
-  /** Location of the team's home championship each year as a key-value pair. The year (as a string) is the key, and the city is the value. */
-  home_championship?: {};
+  rookie_year: number | null;
 };
 export type TeamSimple = {
   /** TBA team key with the format `frcXXXX` with `XXXX` representing the team number. */
@@ -78,15 +74,15 @@ export type TeamSimple = {
   /** Official team number issued by FIRST. */
   team_number: number;
   /** Team nickname provided by FIRST. */
-  nickname?: string;
+  nickname: string;
   /** Official long name registered with FIRST. */
   name: string;
   /** City of team derived from parsing the address registered with FIRST. */
-  city?: string;
+  city: string | null;
   /** State of team derived from parsing the address registered with FIRST. */
-  state_prov?: string;
+  state_prov: string | null;
   /** Country of team derived from parsing the address registered with FIRST. */
-  country?: string;
+  country: string | null;
 };
 export type DistrictList = {
   /** The short identifier for the district. */
@@ -126,9 +122,9 @@ export type Webcast = {
   /** Type specific channel information. May be the YouTube stream, or Twitch channel name. In the case of iframe types, contains HTML to embed the stream in an HTML iframe. */
   channel: string;
   /** The date for the webcast in `yyyy-mm-dd` format. May be null. */
-  date?: string;
+  date?: string | null;
   /** File identification as may be required for some types. May be null. */
-  file?: string;
+  file?: string | null;
 };
 export type Event = {
   /** TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event. */
@@ -139,13 +135,13 @@ export type Event = {
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
   event_type: number;
-  district?: DistrictList;
+  district: DistrictList;
   /** City, town, village, etc. the event is located in. */
-  city?: string;
+  city: string | null;
   /** State or Province the event is located in. */
-  state_prov?: string;
+  state_prov: string | null;
   /** Country the event is located in. */
-  country?: string;
+  country: string | null;
   /** Event start date in `yyyy-mm-dd` format. */
   start_date: string;
   /** Event end date in `yyyy-mm-dd` format. */
@@ -153,42 +149,42 @@ export type Event = {
   /** Year the event data is for. */
   year: number;
   /** Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null. */
-  short_name?: string;
+  short_name: string | null;
   /** Event Type, eg Regional, District, or Offseason. */
   event_type_string: string;
   /** Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.) */
-  week?: number;
+  week: number | null;
   /** Address of the event's venue, if available. */
-  address?: string;
+  address: string | null;
   /** Postal code from the event address. */
-  postal_code?: string;
+  postal_code: string | null;
   /** Google Maps Place ID for the event address. */
-  gmaps_place_id?: string;
+  gmaps_place_id: string | null;
   /** Link to address location on Google Maps. */
-  gmaps_url?: string;
+  gmaps_url: string | null;
   /** Latitude for the event address. */
-  lat?: number;
+  lat: number | null;
   /** Longitude for the event address. */
-  lng?: number;
+  lng: number | null;
   /** Name of the location at the address for the event, eg. Blue Alliance High School. */
-  location_name?: string;
+  location_name: string | null;
   /** Timezone name. */
-  timezone?: string;
+  timezone: string;
   /** The event's website, if any. */
-  website?: string;
+  website: string | null;
   /** The FIRST internal Event ID, used to link to the event on the FRC webpage. */
-  first_event_id?: string;
+  first_event_id: string | null;
   /** Public facing event code used by FIRST (on frc-events.firstinspires.org, for example) */
-  first_event_code?: string;
-  webcasts?: Webcast[];
+  first_event_code: string | null;
+  webcasts: Webcast[];
   /** An array of event keys for the divisions at this event. */
-  division_keys?: string[];
+  division_keys: string[];
   /** The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`. */
-  parent_event_key?: string;
+  parent_event_key: string | null;
   /** Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null. */
-  playoff_type?: number;
+  playoff_type: number | null;
   /** String representation of the `playoff_type`, or null. */
-  playoff_type_string?: string;
+  playoff_type_string: string | null;
 };
 export type EventSimple = {
   /** TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event. */
@@ -199,13 +195,13 @@ export type EventSimple = {
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
   event_type: number;
-  district?: DistrictList;
+  district: DistrictList;
   /** City, town, village, etc. the event is located in. */
-  city?: string;
+  city: string | null;
   /** State or Province the event is located in. */
-  state_prov?: string;
+  state_prov: string | null;
   /** Country the event is located in. */
-  country?: string;
+  country: string | null;
   /** Event start date in `yyyy-mm-dd` format. */
   start_date: string;
   /** Event end date in `yyyy-mm-dd` format. */
@@ -253,10 +249,10 @@ export type TeamEventStatusAllianceBackup = {
   out?: string;
   /** TBA key for the backup team called in. */
   in?: string;
-};
+} | null;
 export type TeamEventStatusAlliance = {
   /** Alliance name, may be null. */
-  name?: string;
+  name?: string | null;
   /** Alliance number. */
   number: number;
   backup?: TeamEventStatusAllianceBackup;
@@ -271,8 +267,8 @@ export type TeamEventStatusPlayoff = {
   /** Current competition status for the playoffs. */
   status?: 'won' | 'eliminated' | 'playing';
   /** The average match score during playoffs. Year specific. May be null if not relevant for a given year. */
-  playoff_average?: number;
-};
+  playoff_average?: number | null;
+} | null;
 export type TeamEventStatus = {
   qual?: TeamEventStatusRank;
   alliance?: TeamEventStatusAlliance;
@@ -293,9 +289,426 @@ export type MatchAlliance = {
   score: number;
   team_keys: string[];
   /** TBA team keys (eg `frc254`) of any teams playing as a surrogate. */
-  surrogate_team_keys?: string[];
+  surrogate_team_keys: string[];
   /** TBA team keys (eg `frc254`) of any disqualified teams. */
-  dq_team_keys?: string[];
+  dq_team_keys: string[];
+};
+export type MatchScoreBreakdown2015Alliance = {
+  auto_points?: number;
+  teleop_points?: number;
+  container_points?: number;
+  tote_points?: number;
+  litter_points?: number;
+  foul_points?: number;
+  adjust_points?: number;
+  total_points?: number;
+  foul_count?: number;
+  tote_count_far?: number;
+  tote_count_near?: number;
+  tote_set?: boolean;
+  tote_stack?: boolean;
+  container_count_level1?: number;
+  container_count_level2?: number;
+  container_count_level3?: number;
+  container_count_level4?: number;
+  container_count_level5?: number;
+  container_count_level6?: number;
+  container_set?: boolean;
+  litter_count_container?: number;
+  litter_count_landfill?: number;
+  litter_count_unprocessed?: number;
+  robot_set?: boolean;
+};
+export type MatchScoreBreakdown2015 = {
+  blue: MatchScoreBreakdown2015Alliance;
+  red: MatchScoreBreakdown2015Alliance;
+  coopertition: 'None' | 'Unknown' | 'Stack';
+  coopertition_points: number;
+};
+export type MatchScoreBreakdown2016Alliance = {
+  autoPoints?: number;
+  teleopPoints?: number;
+  breachPoints?: number;
+  foulPoints?: number;
+  capturePoints?: number;
+  adjustPoints?: number;
+  totalPoints?: number;
+  robot1Auto?: 'Crossed' | 'Reached' | 'None';
+  robot2Auto?: 'Crossed' | 'Reached' | 'None';
+  robot3Auto?: 'Crossed' | 'Reached' | 'None';
+  autoReachPoints?: number;
+  autoCrossingPoints?: number;
+  autoBouldersLow?: number;
+  autoBouldersHigh?: number;
+  autoBoulderPoints?: number;
+  teleopCrossingPoints?: number;
+  teleopBouldersLow?: number;
+  teleopBouldersHigh?: number;
+  teleopBoulderPoints?: number;
+  teleopDefensesBreached?: boolean;
+  teleopChallengePoints?: number;
+  teleopScalePoints?: number;
+  teleopTowerCaptured?: number;
+  towerFaceA?: string;
+  towerFaceB?: string;
+  towerFaceC?: string;
+  towerEndStrength?: number;
+  techFoulCount?: number;
+  foulCount?: number;
+  position2?: string;
+  position3?: string;
+  position4?: string;
+  position5?: string;
+  position1crossings?: number;
+  position2crossings?: number;
+  position3crossings?: number;
+  position4crossings?: number;
+  position5crossings?: number;
+};
+export type MatchScoreBreakdown2016 = {
+  blue: MatchScoreBreakdown2016Alliance;
+  red: MatchScoreBreakdown2016Alliance;
+};
+export type MatchScoreBreakdown2017Alliance = {
+  autoPoints?: number;
+  teleopPoints?: number;
+  foulPoints?: number;
+  adjustPoints?: number;
+  totalPoints?: number;
+  robot1Auto?: 'Unknown' | 'Mobility' | 'None';
+  robot2Auto?: 'Unknown' | 'Mobility' | 'None';
+  robot3Auto?: 'Unknown' | 'Mobility' | 'None';
+  rotor1Auto?: boolean;
+  rotor2Auto?: boolean;
+  autoFuelLow?: number;
+  autoFuelHigh?: number;
+  autoMobilityPoints?: number;
+  autoRotorPoints?: number;
+  autoFuelPoints?: number;
+  teleopFuelPoints?: number;
+  teleopFuelLow?: number;
+  teleopFuelHigh?: number;
+  teleopRotorPoints?: number;
+  kPaRankingPointAchieved?: boolean;
+  teleopTakeoffPoints?: number;
+  kPaBonusPoints?: number;
+  rotorBonusPoints?: number;
+  rotor1Engaged?: boolean;
+  rotor2Engaged?: boolean;
+  rotor3Engaged?: boolean;
+  rotor4Engaged?: boolean;
+  rotorRankingPointAchieved?: boolean;
+  techFoulCount?: number;
+  foulCount?: number;
+  touchpadNear?: string;
+  touchpadMiddle?: string;
+  touchpadFar?: string;
+};
+export type MatchScoreBreakdown2017 = {
+  blue: MatchScoreBreakdown2017Alliance;
+  red: MatchScoreBreakdown2017Alliance;
+};
+export type MatchScoreBreakdown2018Alliance = {
+  adjustPoints?: number;
+  autoOwnershipPoints?: number;
+  autoPoints?: number;
+  autoQuestRankingPoint?: boolean;
+  autoRobot1?: string;
+  autoRobot2?: string;
+  autoRobot3?: string;
+  autoRunPoints?: number;
+  autoScaleOwnershipSec?: number;
+  autoSwitchAtZero?: boolean;
+  autoSwitchOwnershipSec?: number;
+  endgamePoints?: number;
+  endgameRobot1?: string;
+  endgameRobot2?: string;
+  endgameRobot3?: string;
+  faceTheBossRankingPoint?: boolean;
+  foulCount?: number;
+  foulPoints?: number;
+  rp?: number;
+  techFoulCount?: number;
+  teleopOwnershipPoints?: number;
+  teleopPoints?: number;
+  teleopScaleBoostSec?: number;
+  teleopScaleForceSec?: number;
+  teleopScaleOwnershipSec?: number;
+  teleopSwitchBoostSec?: number;
+  teleopSwitchForceSec?: number;
+  teleopSwitchOwnershipSec?: number;
+  totalPoints?: number;
+  vaultBoostPlayed?: number;
+  vaultBoostTotal?: number;
+  vaultForcePlayed?: number;
+  vaultForceTotal?: number;
+  vaultLevitatePlayed?: number;
+  vaultLevitateTotal?: number;
+  vaultPoints?: number;
+  /** Unofficial TBA-computed value of the FMS provided GameData given to the alliance teams at the start of the match. 3 Character String containing `L` and `R` only. The first character represents the near switch, the 2nd the scale, and the 3rd the far, opposing, switch from the alliance's perspective. An `L` in a position indicates the platform on the left will be lit for the alliance while an `R` will indicate the right platform will be lit for the alliance. See also [WPI Screen Steps](https://wpilib.screenstepslive.com/s/currentCS/m/getting_started/l/826278-2018-game-data-details). */
+  tba_gameData?: string;
+};
+export type MatchScoreBreakdown2018 = {
+  blue: MatchScoreBreakdown2018Alliance;
+  red: MatchScoreBreakdown2018Alliance;
+};
+export type MatchScoreBreakdown2019Alliance = {
+  adjustPoints?: number;
+  autoPoints?: number;
+  bay1?: string;
+  bay2?: string;
+  bay3?: string;
+  bay4?: string;
+  bay5?: string;
+  bay6?: string;
+  bay7?: string;
+  bay8?: string;
+  cargoPoints?: number;
+  completeRocketRankingPoint?: boolean;
+  completedRocketFar?: boolean;
+  completedRocketNear?: boolean;
+  endgameRobot1?: string;
+  endgameRobot2?: string;
+  endgameRobot3?: string;
+  foulCount?: number;
+  foulPoints?: number;
+  habClimbPoints?: number;
+  habDockingRankingPoint?: boolean;
+  habLineRobot1?: string;
+  habLineRobot2?: string;
+  habLineRobot3?: string;
+  hatchPanelPoints?: number;
+  lowLeftRocketFar?: string;
+  lowLeftRocketNear?: string;
+  lowRightRocketFar?: string;
+  lowRightRocketNear?: string;
+  midLeftRocketFar?: string;
+  midLeftRocketNear?: string;
+  midRightRocketFar?: string;
+  midRightRocketNear?: string;
+  preMatchBay1?: string;
+  preMatchBay2?: string;
+  preMatchBay3?: string;
+  preMatchBay6?: string;
+  preMatchBay7?: string;
+  preMatchBay8?: string;
+  preMatchLevelRobot1?: string;
+  preMatchLevelRobot2?: string;
+  preMatchLevelRobot3?: string;
+  rp?: number;
+  sandStormBonusPoints?: number;
+  techFoulCount?: number;
+  teleopPoints?: number;
+  topLeftRocketFar?: string;
+  topLeftRocketNear?: string;
+  topRightRocketFar?: string;
+  topRightRocketNear?: string;
+  totalPoints?: number;
+};
+export type MatchScoreBreakdown2019 = {
+  blue: MatchScoreBreakdown2019Alliance;
+  red: MatchScoreBreakdown2019Alliance;
+};
+export type MatchScoreBreakdown2020Alliance = {
+  initLineRobot1?: string;
+  endgameRobot1?: string;
+  initLineRobot2?: string;
+  endgameRobot2?: string;
+  initLineRobot3?: string;
+  endgameRobot3?: string;
+  autoCellsBottom?: number;
+  autoCellsOuter?: number;
+  autoCellsInner?: number;
+  teleopCellsBottom?: number;
+  teleopCellsOuter?: number;
+  teleopCellsInner?: number;
+  stage1Activated?: boolean;
+  stage2Activated?: boolean;
+  stage3Activated?: boolean;
+  stage3TargetColor?: string;
+  endgameRungIsLevel?: string;
+  autoInitLinePoints?: number;
+  autoCellPoints?: number;
+  autoPoints?: number;
+  teleopCellPoints?: number;
+  controlPanelPoints?: number;
+  endgamePoints?: number;
+  teleopPoints?: number;
+  shieldOperationalRankingPoint?: boolean;
+  shieldEnergizedRankingPoint?: boolean;
+  /** Unofficial TBA-computed value that indicates whether the shieldEnergizedRankingPoint was earned normally or awarded due to a foul. */
+  tba_shieldEnergizedRankingPointFromFoul?: boolean;
+  /** Unofficial TBA-computed value that counts the number of robots who were hanging at the end of the match. */
+  tba_numRobotsHanging?: number;
+  foulCount?: number;
+  techFoulCount?: number;
+  adjustPoints?: number;
+  foulPoints?: number;
+  rp?: number;
+  totalPoints?: number;
+};
+export type MatchScoreBreakdown2020 = {
+  blue: MatchScoreBreakdown2020Alliance;
+  red: MatchScoreBreakdown2020Alliance;
+};
+export type MatchScoreBreakdown2022Alliance = {
+  taxiRobot1?: 'Yes' | 'No';
+  endgameRobot1?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
+  taxiRobot2?: 'Yes' | 'No';
+  endgameRobot2?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
+  taxiRobot3?: 'Yes' | 'No';
+  endgameRobot3?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
+  autoCargoLowerNear?: number;
+  autoCargoLowerFar?: number;
+  autoCargoLowerBlue?: number;
+  autoCargoLowerRed?: number;
+  autoCargoUpperNear?: number;
+  autoCargoUpperFar?: number;
+  autoCargoUpperBlue?: number;
+  autoCargoUpperRed?: number;
+  autoCargoTotal?: number;
+  teleopCargoLowerNear?: number;
+  teleopCargoLowerFar?: number;
+  teleopCargoLowerBlue?: number;
+  teleopCargoLowerRed?: number;
+  teleopCargoUpperNear?: number;
+  teleopCargoUpperFar?: number;
+  teleopCargoUpperBlue?: number;
+  teleopCargoUpperRed?: number;
+  teleopCargoTotal?: number;
+  matchCargoTotal?: number;
+  autoTaxiPoints?: number;
+  autoCargoPoints?: number;
+  autoPoints?: number;
+  quintetAchieved?: boolean;
+  teleopCargoPoints?: number;
+  endgamePoints?: number;
+  teleopPoints?: number;
+  cargoBonusRankingPoint?: boolean;
+  hangarBonusRankingPoint?: boolean;
+  foulCount?: number;
+  techFoulCount?: number;
+  adjustPoints?: number;
+  foulPoints?: number;
+  rp?: number;
+  totalPoints?: number;
+};
+export type MatchScoreBreakdown2022 = {
+  blue: MatchScoreBreakdown2022Alliance;
+  red: MatchScoreBreakdown2022Alliance;
+};
+export type MatchScoreBreakdown2023Alliance = {
+  activationBonusAchieved?: boolean;
+  adjustPoints?: number;
+  autoBridgeState?: 'NotLevel' | 'Level';
+  autoChargeStationPoints?: number;
+  autoChargeStationRobot1?: 'None' | 'Docked';
+  autoChargeStationRobot2?: 'None' | 'Docked';
+  autoChargeStationRobot3?: 'None' | 'Docked';
+  autoDocked?: boolean;
+  autoCommunity?: {
+    B: ('None' | 'Cone' | 'Cube')[];
+    M: ('None' | 'Cone' | 'Cube')[];
+    T: ('None' | 'Cone' | 'Cube')[];
+  };
+  autoGamePieceCount?: number;
+  autoGamePiecePoints?: number;
+  autoMobilityPoints?: number;
+  mobilityRobot1?: 'Yes' | 'No';
+  mobilityRobot2?: 'Yes' | 'No';
+  mobilityRobot3?: 'Yes' | 'No';
+  autoPoints?: number;
+  coopGamePieceCount?: number;
+  coopertitionCriteriaMet?: boolean;
+  endGameBridgeState?: 'NotLevel' | 'Level';
+  endGameChargeStationPoints?: number;
+  endGameChargeStationRobot1?: 'None' | 'Docked';
+  endGameChargeStationRobot2?: 'None' | 'Docked';
+  endGameChargeStationRobot3?: 'None' | 'Docked';
+  endGameParkPoints?: number;
+  extraGamePieceCount?: number;
+  foulCount?: number;
+  foulPoints?: number;
+  techFoulCount?: number;
+  linkPoints?: number;
+  links?: {
+    nodes: ('None' | 'Cone' | 'Cube')[];
+    row: 'Bottom' | 'Mid' | 'Top';
+  }[];
+  sustainabilityBonusAchieved?: boolean;
+  teleopCommunity?: {
+    B: ('None' | 'Cone' | 'Cube')[];
+    M: ('None' | 'Cone' | 'Cube')[];
+    T: ('None' | 'Cone' | 'Cube')[];
+  };
+  teleopGamePieceCount?: number;
+  teleopGamePiecePoints?: number;
+  totalChargeStationPoints?: number;
+  teleopPoints?: number;
+  rp?: number;
+  totalPoints?: number;
+};
+export type MatchScoreBreakdown2023 = {
+  blue: MatchScoreBreakdown2023Alliance;
+  red: MatchScoreBreakdown2023Alliance;
+};
+export type MatchScoreBreakdown2024Alliance = {
+  adjustPoints?: number;
+  autoAmpNoteCount?: number;
+  autoAmpNotePoints?: number;
+  autoLeavePoints?: number;
+  autoLineRobot1?: string;
+  autoLineRobot2?: string;
+  autoLineRobot3?: string;
+  autoPoints?: number;
+  autoSpeakerNoteCount?: number;
+  autoSpeakerNotePoints?: number;
+  autoTotalNotePoints?: number;
+  coopNotePlayed?: boolean;
+  coopertitionBonusAchieved?: boolean;
+  coopertitionCriteriaMet?: boolean;
+  endGameHarmonyPoints?: number;
+  endGameNoteInTrapPoints?: number;
+  endGameOnStagePoints?: number;
+  endGameParkPoints?: number;
+  endGameRobot1?: string;
+  endGameRobot2?: string;
+  endGameRobot3?: string;
+  endGameSpotLightBonusPoints?: number;
+  endGameTotalStagePoints?: number;
+  ensembleBonusAchieved?: boolean;
+  ensembleBonusOnStageRobotsThreshold?: number;
+  ensembleBonusStagePointsThreshold?: number;
+  foulCount?: number;
+  foulPoints?: number;
+  g206Penalty?: boolean;
+  g408Penalty?: boolean;
+  g424Penalty?: boolean;
+  melodyBonusAchieved?: boolean;
+  melodyBonusThreshold?: number;
+  melodyBonusThresholdCoop?: number;
+  melodyBonusThresholdNonCoop?: number;
+  micCenterStage?: boolean;
+  micStageLeft?: boolean;
+  micStageRight?: boolean;
+  rp?: number;
+  techFoulCount?: number;
+  teleopAmpNoteCount?: number;
+  teleopAmpNotePoints?: number;
+  teleopPoints?: number;
+  teleopSpeakerNoteAmplifiedCount?: number;
+  teleopSpeakerNoteAmplifiedPoints?: number;
+  teleopSpeakerNoteCount?: number;
+  teleopSpeakerNotePoints?: number;
+  teleopTotalNotePoints?: number;
+  totalPoints?: number;
+  trapCenterStage?: boolean;
+  trapStageLeft?: boolean;
+  trapStageRight?: boolean;
+};
+export type MatchScoreBreakdown2024 = {
+  blue: MatchScoreBreakdown2024Alliance;
+  red: MatchScoreBreakdown2024Alliance;
 };
 export type Match = {
   /** TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set. */
@@ -307,37 +720,49 @@ export type Match = {
   /** The match number of the match in the competition level. */
   match_number: number;
   /** A list of alliances, the teams on the alliances, and their score. */
-  alliances?: {
-    red?: MatchAlliance;
-    blue?: MatchAlliance;
+  alliances: {
+    red: MatchAlliance;
+    blue: MatchAlliance;
   };
   /** The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie. */
-  winning_alliance?: 'red' | 'blue' | '';
+  winning_alliance: 'red' | 'blue' | '';
   /** Event key of the event the match was played at. */
   event_key: string;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule. */
-  time?: number;
+  time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time. */
-  actual_time?: number;
+  actual_time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time. */
-  predicted_time?: number;
+  predicted_time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result was posted. */
-  post_result_time?: number;
+  post_result_time: number | null;
   /** Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null. */
-  score_breakdown?: {};
+  score_breakdown:
+    | (
+        | MatchScoreBreakdown2015
+        | MatchScoreBreakdown2016
+        | MatchScoreBreakdown2017
+        | MatchScoreBreakdown2018
+        | MatchScoreBreakdown2019
+        | MatchScoreBreakdown2020
+        | MatchScoreBreakdown2022
+        | MatchScoreBreakdown2023
+        | MatchScoreBreakdown2024
+      )
+    | null;
   /** Array of video objects associated with this match. */
-  videos?: {
+  videos: {
     /** Can be one of 'youtube' or 'tba' */
-    type?: string;
+    type: string;
     /** Unique key representing this video */
-    key?: string;
+    key: string;
   }[];
 };
 export type AwardRecipient = {
   /** The TBA team key for the team that was given the award. May be null. */
-  team_key?: string;
+  team_key: string | null;
   /** The name of the individual given the award. May be null. */
-  awardee?: string;
+  awardee: string | null;
 };
 export type Award = {
   /** The name of the award as provided by FIRST. May vary for the same award type. */
@@ -361,20 +786,20 @@ export type MatchSimple = {
   /** The match number of the match in the competition level. */
   match_number: number;
   /** A list of alliances, the teams on the alliances, and their score. */
-  alliances?: {
-    red?: MatchAlliance;
-    blue?: MatchAlliance;
+  alliances: {
+    red: MatchAlliance;
+    blue: MatchAlliance;
   };
   /** The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie. */
-  winning_alliance?: 'red' | 'blue' | '';
+  winning_alliance: 'red' | 'blue' | '';
   /** Event key of the event the match was played at. */
   event_key: string;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule. */
-  time?: number;
+  time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time. */
-  predicted_time?: number;
+  predicted_time: number | null;
   /** UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time. */
-  actual_time?: number;
+  actual_time: number | null;
 };
 export type Media = {
   /** String type of the media element. */
@@ -396,7 +821,9 @@ export type Media = {
   /** The key used to identify this media on the media site. */
   foreign_key: string;
   /** If required, a JSON dict of additional media information. */
-  details?: {};
+  details?: {
+    [key: string]: any;
+  };
   /** True if the media is of high quality. */
   preferred?: boolean;
   /** Direct URL to the media. */
@@ -406,19 +833,19 @@ export type Media = {
 };
 export type EliminationAlliance = {
   /** Alliance name, may be null. */
-  name?: string;
+  name?: string | null;
   /** Backup team called in, may be null. */
   backup?: {
     /** Team key that was called in as the backup. */
-    in?: string;
+    in: string;
     /** Team key that was replaced by the backup team. */
-    out?: string;
-  };
+    out: string;
+  } | null;
   /** List of teams that declined the alliance. */
-  declines?: string[];
+  declines: string[];
   /** List of team keys picked for the alliance. First pick is captain. */
   picks: string[];
-  status?: {
+  status: {
     playoff_average?: number;
     level?: string;
     record?: WltRecord;
@@ -458,11 +885,11 @@ export type EventRanking = {
     /** Number of matches played by this team. */
     matches_played: number;
     /** The average match score during qualifications. Year specific. May be null if not relevant for a given year. */
-    qual_average?: number;
+    qual_average: number | null;
     /** Additional special data on the team's performance calculated by TBA. */
-    extra_stats?: number[];
+    extra_stats: number[];
     /** Additional year-specific information, may be null. See parent `sort_order_info` for details. */
-    sort_orders?: number[];
+    sort_orders: number[] | null;
     record: WltRecord;
     /** The team's rank at the event as provided by FIRST. */
     rank: number;
@@ -472,7 +899,7 @@ export type EventRanking = {
     team_key: string;
   }[];
   /** List of special TBA-generated values provided in the `extra_stats` array for each item. */
-  extra_stats_info?: {
+  extra_stats_info: {
     /** Integer expressing the number of digits of precision in the number provided in `sort_orders`. */
     precision: number;
     /** Name of the field used in the `extra_stats` array. */
@@ -557,6 +984,22 @@ export type DistrictRanking = {
     qual_points: number;
   }[];
 };
+export type LeaderboardInsight = {
+  data: {
+    rankings: {
+      /** Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played. */
+      value: number;
+      /** Team/Event/Match keys that have the corresponding value. */
+      keys: string[];
+    }[];
+    /** What type of key is used in the rankings; either 'team', 'event', or 'match'. */
+    key_type: 'team' | 'event' | 'match';
+  };
+  /** Name of the insight. */
+  name: string;
+  /** Year the insight was measured in (year=0 for overall insights). */
+  year: number;
+};
 /**
  * Returns API status, and TBA status information.
  */
@@ -568,29 +1011,30 @@ export function getStatus(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: ApiStatus;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >('/status', {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: ApiStatus;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >('/status', {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of `Team` objects, paginated in groups of 500.
@@ -605,29 +1049,30 @@ export function getTeams(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Team[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/teams/${encodeURIComponent(pageNum)}`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Team[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/teams/${encodeURIComponent(pageNum)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of short form `Team_Simple` objects, paginated in groups of 500.
@@ -642,29 +1087,30 @@ export function getTeamsSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: TeamSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/teams/${encodeURIComponent(pageNum)}/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: TeamSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/teams/${encodeURIComponent(pageNum)}/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of Team keys, paginated in groups of 500. (Note, each page will not have 500 teams, but will include the teams within that range of 500.)
@@ -679,29 +1125,30 @@ export function getTeamsKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/teams/${encodeURIComponent(pageNum)}/keys`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/teams/${encodeURIComponent(pageNum)}/keys`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of `Team` objects that competed in the given year, paginated in groups of 500.
@@ -718,29 +1165,30 @@ export function getTeamsByYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Team[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Team[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of short form `Team_Simple` objects that competed in the given year, paginated in groups of 500.
@@ -757,31 +1205,32 @@ export function getTeamsByYearSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: TeamSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}/simple`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: TeamSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}/simple`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -799,32 +1248,30 @@ export function getTeamsByYearKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}/keys`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
-  );
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}/keys`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
 }
 /**
  * Gets a `Team` object for the team referenced by the given key.
@@ -839,29 +1286,30 @@ export function getTeam(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Team;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Team;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a `Team_Simple` object for the team referenced by the given key.
@@ -876,29 +1324,30 @@ export function getTeamSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: TeamSimple;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: TeamSimple;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of years in which the team participated in at least one competition.
@@ -913,29 +1362,30 @@ export function getTeamYearsParticipated(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: number[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/years_participated`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: number[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/years_participated`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets an array of districts representing each year the team was in a district. Will return an empty array if the team was never in a district.
@@ -950,29 +1400,30 @@ export function getTeamDistricts(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: DistrictList[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/districts`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: DistrictList[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/districts`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of year and robot name pairs for each year that a robot name was provided. Will return an empty array if the team has never named a robot.
@@ -987,29 +1438,30 @@ export function getTeamRobots(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: TeamRobot[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/robots`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: TeamRobot[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/robots`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of all events this team has competed at.
@@ -1024,29 +1476,30 @@ export function getTeamEvents(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Event[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/events`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Event[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/events`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a short-form list of all events this team has competed at.
@@ -1061,29 +1514,30 @@ export function getTeamEventsSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/events/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/events/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of the event keys for all events this team has competed at.
@@ -1098,29 +1552,30 @@ export function getTeamEventsKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/events/keys`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/events/keys`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of events this team has competed at in the given year.
@@ -1137,32 +1592,30 @@ export function getTeamEventsByYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Event[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
-  );
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Event[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
 }
 /**
  * Gets a short-form list of events this team has competed at in the given year.
@@ -1179,31 +1632,32 @@ export function getTeamEventsByYearSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/simple`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/simple`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1221,31 +1675,32 @@ export function getTeamEventsByYearKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/keys`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/keys`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1263,33 +1718,34 @@ export function getTeamEventsStatusesByYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: {
-            [key: string]: TeamEventStatus;
-          };
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/statuses`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: {
+          [key: string]: TeamEventStatus;
+        };
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/statuses`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1307,31 +1763,32 @@ export function getTeamEventMatches(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Match[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Match[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1349,31 +1806,32 @@ export function getTeamEventMatchesSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Match[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches/simple`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Match[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches/simple`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1391,31 +1849,32 @@ export function getTeamEventMatchesKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches/keys`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches/keys`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1433,31 +1892,32 @@ export function getTeamEventAwards(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Award[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/awards`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Award[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/awards`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1475,31 +1935,32 @@ export function getTeamEventStatus(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: TeamEventStatus;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/status`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: TeamEventStatus;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/status`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1515,29 +1976,30 @@ export function getTeamAwards(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Award[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/awards`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Award[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/awards`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of awards the given team has won in a given year.
@@ -1554,32 +2016,30 @@ export function getTeamAwardsByYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Award[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/awards/${encodeURIComponent(year)}`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
-  );
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Award[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/awards/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
 }
 /**
  * Gets a list of matches for the given team and year.
@@ -1596,31 +2056,32 @@ export function getTeamMatchesByYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Match[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Match[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1638,31 +2099,32 @@ export function getTeamMatchesByYearSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: MatchSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}/simple`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: MatchSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}/simple`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1680,31 +2142,32 @@ export function getTeamMatchesByYearKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}/keys`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}/keys`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1722,32 +2185,30 @@ export function getTeamMediaByYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Media[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/media/${encodeURIComponent(year)}`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
-  );
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Media[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/media/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
 }
 /**
  * Gets a list of Media (videos / pictures) for the given team and tag.
@@ -1764,31 +2225,32 @@ export function getTeamMediaByTag(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Media[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/media/tag/${encodeURIComponent(mediaTag)}`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Media[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/media/tag/${encodeURIComponent(mediaTag)}`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1808,31 +2270,32 @@ export function getTeamMediaByTagYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Media[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(
-      `/team/${encodeURIComponent(teamKey)}/media/tag/${encodeURIComponent(mediaTag)}/${encodeURIComponent(year)}`,
-      {
-        ...opts,
-        headers: oazapfts.mergeHeaders(opts?.headers, {
-          'If-None-Match': ifNoneMatch,
-        }),
-      },
-    ),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Media[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(
+    `/team/${encodeURIComponent(teamKey)}/media/tag/${encodeURIComponent(mediaTag)}/${encodeURIComponent(year)}`,
+    {
+      ...opts,
+      headers: oazapfts.mergeHeaders(opts?.headers, {
+        'If-None-Match': ifNoneMatch,
+      }),
+    },
   );
 }
 /**
@@ -1848,29 +2311,30 @@ export function getTeamSocialMedia(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Media[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/team/${encodeURIComponent(teamKey)}/social_media`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Media[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/social_media`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of events in the given year.
@@ -1885,29 +2349,30 @@ export function getEventsByYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Event[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/events/${encodeURIComponent(year)}`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Event[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/events/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a short-form list of events in the given year.
@@ -1922,29 +2387,30 @@ export function getEventsByYearSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/events/${encodeURIComponent(year)}/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/events/${encodeURIComponent(year)}/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of event keys in the given year.
@@ -1959,29 +2425,30 @@ export function getEventsByYearKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/events/${encodeURIComponent(year)}/keys`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/events/${encodeURIComponent(year)}/keys`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets an Event.
@@ -1996,29 +2463,30 @@ export function getEvent(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Event;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Event;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a short-form Event.
@@ -2033,29 +2501,30 @@ export function getEventSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventSimple;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventSimple;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of Elimination Alliances for the given Event.
@@ -2070,29 +2539,30 @@ export function getEventAlliances(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EliminationAlliance[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/alliances`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EliminationAlliance[] | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/alliances`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a set of Event-specific insights for the given Event.
@@ -2107,29 +2577,30 @@ export function getEventInsights(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventInsights;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/insights`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventInsights | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/insights`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a set of Event OPRs (including OPR, DPR, and CCWM) for the given Event.
@@ -2144,29 +2615,30 @@ export function getEventOpRs(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventOpRs;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/oprs`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventOpRs;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/oprs`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a set of Event Component OPRs for the given Event.
@@ -2181,29 +2653,30 @@ export function getEventCopRs(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventCopRs;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/coprs`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventCopRs;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/coprs`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets information on TBA-generated predictions for the given Event. Contains year-specific information. *WARNING* This endpoint is currently under development and may change at any time.
@@ -2218,29 +2691,30 @@ export function getEventPredictions(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventPredictions;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/predictions`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventPredictions | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/predictions`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of team rankings for the Event.
@@ -2255,29 +2729,30 @@ export function getEventRankings(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventRanking;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/rankings`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventRanking;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/rankings`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of team rankings for the Event.
@@ -2292,29 +2767,30 @@ export function getEventDistrictPoints(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventDistrictPoints;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/district_points`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventDistrictPoints | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/district_points`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of `Team` objects that competed in the given event.
@@ -2329,29 +2805,30 @@ export function getEventTeams(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Team[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/teams`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Team[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/teams`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a short-form list of `Team` objects that competed in the given event.
@@ -2366,29 +2843,30 @@ export function getEventTeamsSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: TeamSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/teams/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: TeamSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/teams/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of `Team` keys that competed in the given event.
@@ -2403,29 +2881,30 @@ export function getEventTeamsKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/teams/keys`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/teams/keys`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a key-value list of the event statuses for teams competing at the given event.
@@ -2440,31 +2919,32 @@ export function getEventTeamsStatuses(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: {
-            [key: string]: TeamEventStatus;
-          };
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/teams/statuses`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: {
+          [key: string]: TeamEventStatus;
+        };
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/teams/statuses`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of matches for the given event.
@@ -2479,29 +2959,30 @@ export function getEventMatches(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Match[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/matches`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Match[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/matches`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a short-form list of matches for the given event.
@@ -2516,29 +2997,30 @@ export function getEventMatchesSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: MatchSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/matches/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: MatchSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/matches/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of match keys for the given event.
@@ -2553,29 +3035,30 @@ export function getEventMatchesKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/matches/keys`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/matches/keys`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets an array of Match Keys for the given event key that have timeseries data. Returns an empty array if no matches have timeseries data.
@@ -2592,29 +3075,30 @@ export function getEventMatchTimeseries(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/matches/timeseries`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/matches/timeseries`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of awards from the given event.
@@ -2629,29 +3113,30 @@ export function getEventAwards(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Award[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/event/${encodeURIComponent(eventKey)}/awards`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Award[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/awards`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a `Match` object for the given match key.
@@ -2666,29 +3151,30 @@ export function getMatch(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Match;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/match/${encodeURIComponent(matchKey)}`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Match;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/match/${encodeURIComponent(matchKey)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a short-form `Match` object for the given match key.
@@ -2703,29 +3189,30 @@ export function getMatchSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: MatchSimple;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/match/${encodeURIComponent(matchKey)}/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: MatchSimple;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/match/${encodeURIComponent(matchKey)}/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets an array of game-specific Match Timeseries objects for the given match key or an empty array if not available.
@@ -2742,29 +3229,30 @@ export function getMatchTimeseries(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: {}[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/match/${encodeURIComponent(matchKey)}/timeseries`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: {}[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/match/${encodeURIComponent(matchKey)}/timeseries`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets Zebra MotionWorks data for a Match for the given match key.
@@ -2779,29 +3267,30 @@ export function getMatchZebra(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Zebra;
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/match/${encodeURIComponent(matchKey)}/zebra_motionworks`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Zebra;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/match/${encodeURIComponent(matchKey)}/zebra_motionworks`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of districts and their corresponding district key, for the given year.
@@ -2816,29 +3305,30 @@ export function getDistrictsByYear(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: DistrictList[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/districts/${encodeURIComponent(year)}`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: DistrictList[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/districts/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of events in the given district.
@@ -2853,29 +3343,30 @@ export function getDistrictEvents(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Event[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/district/${encodeURIComponent(districtKey)}/events`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Event[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/events`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a short-form list of events in the given district.
@@ -2890,29 +3381,30 @@ export function getDistrictEventsSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: EventSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/district/${encodeURIComponent(districtKey)}/events/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/events/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of event keys for events in the given district.
@@ -2927,29 +3419,30 @@ export function getDistrictEventsKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/district/${encodeURIComponent(districtKey)}/events/keys`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/events/keys`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of `Team` objects that competed in events in the given district.
@@ -2964,29 +3457,30 @@ export function getDistrictTeams(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: Team[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/district/${encodeURIComponent(districtKey)}/teams`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Team[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/teams`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a short-form list of `Team` objects that competed in events in the given district.
@@ -3001,29 +3495,30 @@ export function getDistrictTeamsSimple(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: TeamSimple[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/district/${encodeURIComponent(districtKey)}/teams/simple`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: TeamSimple[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/teams/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of `Team` objects that competed in events in the given district.
@@ -3038,29 +3533,30 @@ export function getDistrictTeamsKeys(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: string[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/district/${encodeURIComponent(districtKey)}/teams/keys`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: string[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/teams/keys`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
 }
 /**
  * Gets a list of team district rankings for the given district.
@@ -3075,27 +3571,66 @@ export function getDistrictRankings(
   },
   opts?: Oazapfts.RequestOpts,
 ) {
-  return oazapfts.ok(
-    oazapfts.fetchJson<
-      | {
-          status: 200;
-          data: DistrictRanking[];
-        }
-      | {
-          status: 304;
-        }
-      | {
-          status: 401;
-          data: {
-            /** Authorization error description. */
-            Error: string;
-          };
-        }
-    >(`/district/${encodeURIComponent(districtKey)}/rankings`, {
-      ...opts,
-      headers: oazapfts.mergeHeaders(opts?.headers, {
-        'If-None-Match': ifNoneMatch,
-      }),
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: DistrictRanking[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/rankings`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
     }),
-  );
+  });
+}
+/**
+ * Gets a list of `LeaderboardInsight` objects from a specific year. Use year=0 for overall.
+ */
+export function getInsightsLeaderboardsYear(
+  {
+    ifNoneMatch,
+    year,
+  }: {
+    ifNoneMatch?: string;
+    year: number;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: LeaderboardInsight[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/insights/leaderboards/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
 }

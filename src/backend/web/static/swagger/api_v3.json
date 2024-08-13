@@ -3,9 +3,9 @@
   "info": {
     "title": "The Blue Alliance API v3",
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.8.2",
+    "version": "3.9.0",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "servers": [
     {
@@ -36,6 +36,10 @@
     {
       "name": "district",
       "description": "Calls that return district, or district-related information."
+    },
+    {
+      "name": "insight",
+      "description": "Calls that return insights, or insight-related information."
     }
   ],
   "paths": {
@@ -81,6 +85,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -139,6 +146,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -197,6 +207,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -255,6 +268,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -316,6 +332,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -377,6 +396,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -439,6 +461,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -493,6 +518,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -547,6 +575,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -604,6 +635,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -662,6 +696,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -719,6 +756,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -777,6 +817,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -835,6 +878,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -894,6 +940,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -955,6 +1004,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1016,6 +1068,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1078,6 +1133,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1141,6 +1199,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1203,6 +1264,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1265,6 +1329,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1328,6 +1395,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1389,6 +1459,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1447,6 +1520,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1504,6 +1580,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1564,6 +1643,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1625,6 +1707,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1686,6 +1771,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1748,6 +1836,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1808,6 +1899,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1868,6 +1962,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1931,6 +2028,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -1988,6 +2088,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2046,6 +2149,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2104,6 +2210,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2163,6 +2272,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2217,6 +2329,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2271,6 +2386,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2318,7 +2436,8 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/Elimination_Alliance"
-                  }
+                  },
+                  "nullable": true
                 }
               }
             }
@@ -2328,6 +2447,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2372,7 +2494,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_Insights"
+                  "nullable": true,
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_Insights"
+                    }
+                  ]
                 }
               }
             }
@@ -2382,6 +2509,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2436,6 +2566,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2490,6 +2623,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2534,7 +2670,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_Predictions"
+                  "nullable": true,
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_Predictions"
+                    }
+                  ]
                 }
               }
             }
@@ -2544,6 +2685,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2598,6 +2742,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2643,7 +2790,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_District_Points"
+                  "nullable": true,
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_District_Points"
+                    }
+                  ]
                 }
               }
             }
@@ -2653,6 +2805,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2712,6 +2867,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2771,6 +2929,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2831,6 +2992,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2891,6 +3055,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -2949,6 +3116,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3007,6 +3177,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3066,6 +3239,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3125,6 +3301,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3182,6 +3361,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3236,6 +3418,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3290,6 +3475,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3348,6 +3536,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3402,6 +3593,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3459,6 +3653,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3518,6 +3715,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3583,6 +3783,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3643,6 +3846,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3702,6 +3908,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3761,6 +3970,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3821,6 +4033,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3880,6 +4095,70 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/leaderboards/{year}": {
+      "get": {
+        "tags": [
+          "insight",
+          "list"
+        ],
+        "description": "Gets a list of `LeaderboardInsight` objects from a specific year. Use year=0 for overall.",
+        "operationId": "getInsightsLeaderboardsYear",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LeaderboardInsight"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "security": [
@@ -3951,7 +4230,11 @@
         "required": [
           "key",
           "name",
-          "team_number"
+          "team_number",
+          "nickname",
+          "city",
+          "state_prov",
+          "country"
         ],
         "type": "object",
         "properties": {
@@ -3973,14 +4256,17 @@
           },
           "city": {
             "type": "string",
+            "nullable": true,
             "description": "City of team derived from parsing the address registered with FIRST."
           },
           "state_prov": {
             "type": "string",
+            "nullable": true,
             "description": "State of team derived from parsing the address registered with FIRST."
           },
           "country": {
             "type": "string",
+            "nullable": true,
             "description": "Country of team derived from parsing the address registered with FIRST."
           }
         }
@@ -3989,7 +4275,20 @@
         "required": [
           "key",
           "name",
-          "team_number"
+          "team_number",
+          "nickname",
+          "school_name",
+          "city",
+          "state_prov",
+          "country",
+          "address",
+          "postal_code",
+          "gmaps_place_id",
+          "gmaps_url",
+          "lat",
+          "lng",
+          "location_name",
+          "rookie_year"
         ],
         "type": "object",
         "properties": {
@@ -4011,68 +4310,72 @@
           },
           "school_name": {
             "type": "string",
+            "nullable": true,
             "description": "Name of team school or affilited group registered with FIRST."
           },
           "city": {
             "type": "string",
+            "nullable": true,
             "description": "City of team derived from parsing the address registered with FIRST."
           },
           "state_prov": {
             "type": "string",
+            "nullable": true,
             "description": "State of team derived from parsing the address registered with FIRST."
           },
           "country": {
             "type": "string",
+            "nullable": true,
             "description": "Country of team derived from parsing the address registered with FIRST."
           },
           "address": {
             "type": "string",
+            "nullable": true,
             "description": "Will be NULL, for future development."
           },
           "postal_code": {
             "type": "string",
+            "nullable": true,
             "description": "Postal code from the team address."
           },
           "gmaps_place_id": {
             "type": "string",
+            "nullable": true,
             "description": "Will be NULL, for future development."
           },
           "gmaps_url": {
             "type": "string",
+            "nullable": true,
             "description": "Will be NULL, for future development.",
             "format": "url"
           },
           "lat": {
             "type": "number",
+            "nullable": true,
             "description": "Will be NULL, for future development.",
             "format": "double"
           },
           "lng": {
             "type": "number",
+            "nullable": true,
             "description": "Will be NULL, for future development.",
             "format": "double"
           },
           "location_name": {
             "type": "string",
+            "nullable": true,
             "description": "Will be NULL, for future development."
           },
           "website": {
             "type": "string",
+            "nullable": true,
             "description": "Official website associated with the team.",
             "format": "url"
           },
           "rookie_year": {
             "type": "integer",
+            "nullable": true,
             "description": "First year the team officially competed."
-          },
-          "motto": {
-            "type": "string",
-            "description": "Team's motto as provided by FIRST. This field is deprecated and will return null - will be removed at end-of-season in 2019."
-          },
-          "home_championship": {
-            "type": "object",
-            "properties": {},
-            "description": "Location of the team's home championship each year as a key-value pair. The year (as a string) is the key, and the city is the value."
           }
         }
       },
@@ -4105,12 +4408,16 @@
       },
       "Event_Simple": {
         "required": [
-          "end_date",
-          "event_code",
-          "event_type",
           "key",
           "name",
+          "event_code",
+          "event_type",
+          "district",
+          "city",
+          "state_prov",
+          "country",
           "start_date",
+          "end_date",
           "year"
         ],
         "type": "object",
@@ -4132,18 +4439,22 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "$ref": "#/components/schemas/District_List"
+            "$ref": "#/components/schemas/District_List",
+            "nullable": true
           },
           "city": {
             "type": "string",
+            "nullable": true,
             "description": "City, town, village, etc. the event is located in."
           },
           "state_prov": {
             "type": "string",
+            "nullable": true,
             "description": "State or Province the event is located in."
           },
           "country": {
             "type": "string",
+            "nullable": true,
             "description": "Country the event is located in."
           },
           "start_date": {
@@ -4164,14 +4475,36 @@
       },
       "Event": {
         "required": [
-          "end_date",
-          "event_code",
-          "event_type",
-          "event_type_string",
           "key",
           "name",
+          "event_code",
+          "event_type",
+          "district",
+          "city",
+          "state_prov",
+          "country",
           "start_date",
-          "year"
+          "end_date",
+          "year",
+          "short_name",
+          "event_type_string",
+          "week",
+          "address",
+          "postal_code",
+          "gmaps_place_id",
+          "gmaps_url",
+          "lat",
+          "lng",
+          "location_name",
+          "timezone",
+          "website",
+          "first_event_id",
+          "first_event_code",
+          "webcasts",
+          "division_keys",
+          "parent_event_key",
+          "playoff_type",
+          "playoff_type_string"
         ],
         "type": "object",
         "properties": {
@@ -4192,18 +4525,22 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "$ref": "#/components/schemas/District_List"
+            "$ref": "#/components/schemas/District_List",
+            "nullable": true
           },
           "city": {
             "type": "string",
+            "nullable": true,
             "description": "City, town, village, etc. the event is located in."
           },
           "state_prov": {
             "type": "string",
+            "nullable": true,
             "description": "State or Province the event is located in."
           },
           "country": {
             "type": "string",
+            "nullable": true,
             "description": "Country the event is located in."
           },
           "start_date": {
@@ -4222,6 +4559,7 @@
           },
           "short_name": {
             "type": "string",
+            "nullable": true,
             "description": "Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
           },
           "event_type_string": {
@@ -4230,37 +4568,45 @@
           },
           "week": {
             "type": "integer",
+            "nullable": true,
             "description": "Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.)"
           },
           "address": {
             "type": "string",
+            "nullable": true,
             "description": "Address of the event's venue, if available."
           },
           "postal_code": {
             "type": "string",
+            "nullable": true,
             "description": "Postal code from the event address."
           },
           "gmaps_place_id": {
             "type": "string",
+            "nullable": true,
             "description": "Google Maps Place ID for the event address."
           },
           "gmaps_url": {
             "type": "string",
+            "nullable": true,
             "description": "Link to address location on Google Maps.",
             "format": "url"
           },
           "lat": {
             "type": "number",
+            "nullable": true,
             "description": "Latitude for the event address.",
             "format": "double"
           },
           "lng": {
             "type": "number",
+            "nullable": true,
             "description": "Longitude for the event address.",
             "format": "double"
           },
           "location_name": {
             "type": "string",
+            "nullable": true,
             "description": "Name of the location at the address for the event, eg. Blue Alliance High School."
           },
           "timezone": {
@@ -4269,14 +4615,17 @@
           },
           "website": {
             "type": "string",
+            "nullable": true,
             "description": "The event's website, if any."
           },
           "first_event_id": {
             "type": "string",
+            "nullable": true,
             "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
           },
           "first_event_code": {
             "type": "string",
+            "nullable": true,
             "description": "Public facing event code used by FIRST (on frc-events.firstinspires.org, for example)"
           },
           "webcasts": {
@@ -4294,14 +4643,17 @@
           },
           "parent_event_key": {
             "type": "string",
+            "nullable": true,
             "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`."
           },
           "playoff_type": {
             "type": "integer",
+            "nullable": true,
             "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null."
           },
           "playoff_type_string": {
             "type": "string",
+            "nullable": true,
             "description": "String representation of the `playoff_type`, or null."
           }
         }
@@ -4414,6 +4766,7 @@
         "properties": {
           "name": {
             "type": "string",
+            "nullable": true,
             "description": "Alliance name, may be null."
           },
           "number": {
@@ -4431,6 +4784,7 @@
       },
       "Team_Event_Status_alliance_backup": {
         "type": "object",
+        "nullable": true,
         "properties": {
           "out": {
             "type": "string",
@@ -4445,6 +4799,7 @@
       },
       "Team_Event_Status_playoff": {
         "type": "object",
+        "nullable": true,
         "properties": {
           "level": {
             "type": "string",
@@ -4474,6 +4829,7 @@
           },
           "playoff_average": {
             "type": "integer",
+            "nullable": true,
             "description": "The average match score during playoffs. Year specific. May be null if not relevant for a given year."
           }
         },
@@ -4482,7 +4838,8 @@
       "Event_Ranking": {
         "required": [
           "rankings",
-          "sort_order_info"
+          "sort_order_info",
+          "extra_stats_info"
         ],
         "type": "object",
         "properties": {
@@ -4495,7 +4852,10 @@
                 "matches_played",
                 "rank",
                 "record",
-                "team_key"
+                "team_key",
+                "extra_stats",
+                "qual_average",
+                "sort_orders"
               ],
               "type": "object",
               "properties": {
@@ -4505,6 +4865,7 @@
                 },
                 "qual_average": {
                   "type": "integer",
+                  "nullable": true,
                   "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
                 },
                 "extra_stats": {
@@ -4516,6 +4877,7 @@
                 },
                 "sort_orders": {
                   "type": "array",
+                  "nullable": true,
                   "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
                   "items": {
                     "type": "number"
@@ -5397,11 +5759,16 @@
       },
       "Match_Simple": {
         "required": [
-          "comp_level",
-          "event_key",
           "key",
+          "comp_level",
+          "set_number",
           "match_number",
-          "set_number"
+          "alliances",
+          "winning_alliance",
+          "event_key",
+          "time",
+          "predicted_time",
+          "actual_time"
         ],
         "type": "object",
         "properties": {
@@ -5430,6 +5797,10 @@
           },
           "alliances": {
             "type": "object",
+            "required": [
+              "red",
+              "blue"
+            ],
             "properties": {
               "red": {
                 "$ref": "#/components/schemas/Match_alliance"
@@ -5455,16 +5826,19 @@
           },
           "time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.",
             "format": "int64"
           },
           "predicted_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.",
             "format": "int64"
           },
           "actual_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.",
             "format": "int64"
           }
@@ -5476,7 +5850,15 @@
           "event_key",
           "key",
           "match_number",
-          "set_number"
+          "set_number",
+          "alliances",
+          "winning_alliance",
+          "time",
+          "actual_time",
+          "predicted_time",
+          "post_result_time",
+          "score_breakdown",
+          "videos"
         ],
         "type": "object",
         "properties": {
@@ -5505,6 +5887,10 @@
           },
           "alliances": {
             "type": "object",
+            "required": [
+              "red",
+              "blue"
+            ],
             "properties": {
               "red": {
                 "$ref": "#/components/schemas/Match_alliance"
@@ -5530,27 +5916,59 @@
           },
           "time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.",
             "format": "int64"
           },
           "actual_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.",
             "format": "int64"
           },
           "predicted_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.",
             "format": "int64"
           },
           "post_result_time": {
             "type": "integer",
+            "nullable": true,
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result was posted.",
             "format": "int64"
           },
           "score_breakdown": {
-            "type": "object",
-            "properties": {},
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2015"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2016"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2017"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2018"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2019"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2020"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2022"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2023"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2024"
+              }
+            ],
+            "nullable": true,
             "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
           },
           "videos": {
@@ -5558,6 +5976,10 @@
             "description": "Array of video objects associated with this match.",
             "items": {
               "type": "object",
+              "required": [
+                "type",
+                "key"
+              ],
               "properties": {
                 "type": {
                   "type": "string",
@@ -5575,7 +5997,9 @@
       "Match_alliance": {
         "required": [
           "score",
-          "team_keys"
+          "team_keys",
+          "surrogate_team_keys",
+          "dq_team_keys"
         ],
         "type": "object",
         "properties": {
@@ -5697,6 +6121,12 @@
       },
       "Match_Score_Breakdown_2015": {
         "type": "object",
+        "required": [
+          "blue",
+          "red",
+          "coopertition",
+          "coopertition_points"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2015_Alliance"
@@ -5797,6 +6227,10 @@
       },
       "Match_Score_Breakdown_2016": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2016_Alliance"
@@ -5943,6 +6377,10 @@
       },
       "Match_Score_Breakdown_2017": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2017_Alliance"
@@ -6074,6 +6512,10 @@
       },
       "Match_Score_Breakdown_2018": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2018_Alliance"
@@ -6332,6 +6774,10 @@
       },
       "Match_Score_Breakdown_2019": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2019_Alliance"
@@ -6502,6 +6948,10 @@
       },
       "Match_Score_Breakdown_2020": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2020_Alliance"
@@ -6623,6 +7073,10 @@
       },
       "Match_Score_Breakdown_2022": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2022_Alliance"
@@ -6793,6 +7247,10 @@
       },
       "Match_Score_Breakdown_2023": {
         "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2023_Alliance"
@@ -6848,6 +7306,11 @@
           },
           "autoCommunity": {
             "type": "object",
+            "required": [
+              "B",
+              "M",
+              "T"
+            ],
             "properties": {
               "B": {
                 "type": "array",
@@ -6976,6 +7439,10 @@
             "type": "array",
             "items": {
               "type": "object",
+              "required": [
+                "nodes",
+                "row"
+              ],
               "properties": {
                 "nodes": {
                   "type": "array",
@@ -7004,6 +7471,11 @@
           },
           "teleopCommunity": {
             "type": "object",
+            "required": [
+              "B",
+              "M",
+              "T"
+            ],
             "properties": {
               "B": {
                 "type": "array",
@@ -7060,6 +7532,183 @@
           }
         }
       },
+      "Match_Score_Breakdown_2024": {
+        "type": "object",
+        "required": [
+          "blue",
+          "red"
+        ],
+        "properties": {
+          "blue": {
+            "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
+          },
+          "red": {
+            "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
+          }
+        },
+        "description": "See the 2024 FMS API documentation for a description of each value. https://frc-api-docs.firstinspires.org"
+      },
+      "Match_Score_Breakdown_2024_Alliance": {
+        "type": "object",
+        "properties": {
+          "adjustPoints": {
+            "type": "integer"
+          },
+          "autoAmpNoteCount": {
+            "type": "integer"
+          },
+          "autoAmpNotePoints": {
+            "type": "integer"
+          },
+          "autoLeavePoints": {
+            "type": "integer"
+          },
+          "autoLineRobot1": {
+            "type": "string"
+          },
+          "autoLineRobot2": {
+            "type": "string"
+          },
+          "autoLineRobot3": {
+            "type": "string"
+          },
+          "autoPoints": {
+            "type": "integer"
+          },
+          "autoSpeakerNoteCount": {
+            "type": "integer"
+          },
+          "autoSpeakerNotePoints": {
+            "type": "integer"
+          },
+          "autoTotalNotePoints": {
+            "type": "integer"
+          },
+          "coopNotePlayed": {
+            "type": "boolean"
+          },
+          "coopertitionBonusAchieved": {
+            "type": "boolean"
+          },
+          "coopertitionCriteriaMet": {
+            "type": "boolean"
+          },
+          "endGameHarmonyPoints": {
+            "type": "integer"
+          },
+          "endGameNoteInTrapPoints": {
+            "type": "integer"
+          },
+          "endGameOnStagePoints": {
+            "type": "integer"
+          },
+          "endGameParkPoints": {
+            "type": "integer"
+          },
+          "endGameRobot1": {
+            "type": "string"
+          },
+          "endGameRobot2": {
+            "type": "string"
+          },
+          "endGameRobot3": {
+            "type": "string"
+          },
+          "endGameSpotLightBonusPoints": {
+            "type": "integer"
+          },
+          "endGameTotalStagePoints": {
+            "type": "integer"
+          },
+          "ensembleBonusAchieved": {
+            "type": "boolean"
+          },
+          "ensembleBonusOnStageRobotsThreshold": {
+            "type": "integer"
+          },
+          "ensembleBonusStagePointsThreshold": {
+            "type": "integer"
+          },
+          "foulCount": {
+            "type": "integer"
+          },
+          "foulPoints": {
+            "type": "integer"
+          },
+          "g206Penalty": {
+            "type": "boolean"
+          },
+          "g408Penalty": {
+            "type": "boolean"
+          },
+          "g424Penalty": {
+            "type": "boolean"
+          },
+          "melodyBonusAchieved": {
+            "type": "boolean"
+          },
+          "melodyBonusThreshold": {
+            "type": "integer"
+          },
+          "melodyBonusThresholdCoop": {
+            "type": "integer"
+          },
+          "melodyBonusThresholdNonCoop": {
+            "type": "integer"
+          },
+          "micCenterStage": {
+            "type": "boolean"
+          },
+          "micStageLeft": {
+            "type": "boolean"
+          },
+          "micStageRight": {
+            "type": "boolean"
+          },
+          "rp": {
+            "type": "integer"
+          },
+          "techFoulCount": {
+            "type": "integer"
+          },
+          "teleopAmpNoteCount": {
+            "type": "integer"
+          },
+          "teleopAmpNotePoints": {
+            "type": "integer"
+          },
+          "teleopPoints": {
+            "type": "integer"
+          },
+          "teleopSpeakerNoteAmplifiedCount": {
+            "type": "integer"
+          },
+          "teleopSpeakerNoteAmplifiedPoints": {
+            "type": "integer"
+          },
+          "teleopSpeakerNoteCount": {
+            "type": "integer"
+          },
+          "teleopSpeakerNotePoints": {
+            "type": "integer"
+          },
+          "teleopTotalNotePoints": {
+            "type": "integer"
+          },
+          "totalPoints": {
+            "type": "integer"
+          },
+          "trapCenterStage": {
+            "type": "boolean"
+          },
+          "trapStageLeft": {
+            "type": "boolean"
+          },
+          "trapStageRight": {
+            "type": "boolean"
+          }
+        }
+      },
       "Media": {
         "required": [
           "type",
@@ -7093,7 +7742,7 @@
           },
           "details": {
             "type": "object",
-            "properties": {},
+            "additionalProperties": true,
             "description": "If required, a JSON dict of additional media information."
           },
           "preferred": {
@@ -7113,16 +7762,24 @@
       },
       "Elimination_Alliance": {
         "required": [
-          "picks"
+          "picks",
+          "declines",
+          "status"
         ],
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
+            "nullable": true,
             "description": "Alliance name, may be null."
           },
           "backup": {
             "type": "object",
+            "nullable": true,
+            "required": [
+              "in",
+              "out"
+            ],
             "properties": {
               "in": {
                 "type": "string",
@@ -7211,13 +7868,19 @@
       },
       "Award_Recipient": {
         "type": "object",
+        "required": [
+          "team_key",
+          "awardee"
+        ],
         "properties": {
           "team_key": {
             "type": "string",
+            "nullable": true,
             "description": "The TBA team key for the team that was given the award. May be null."
           },
           "awardee": {
             "type": "string",
+            "nullable": true,
             "description": "The name of the individual given the award. May be null."
           }
         },
@@ -7377,13 +8040,74 @@
           },
           "date": {
             "type": "string",
+            "nullable": true,
             "description": "The date for the webcast in `yyyy-mm-dd` format. May be null."
           },
           "file": {
             "type": "string",
+            "nullable": true,
             "description": "File identification as may be required for some types. May be null."
           }
         }
+      },
+      "LeaderboardInsight": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "rankings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "number",
+                      "description": "Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played."
+                    },
+                    "keys": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Team/Event/Match keys that have the corresponding value."
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "keys"
+                  ]
+                }
+              },
+              "key_type": {
+                "type": "string",
+                "enum": [
+                  "team",
+                  "event",
+                  "match"
+                ],
+                "description": "What type of key is used in the rankings; either 'team', 'event', or 'match'."
+              }
+            },
+            "required": [
+              "rankings",
+              "key_type"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the insight."
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year the insight was measured in (year=0 for overall insights)."
+          }
+        },
+        "required": [
+          "data",
+          "name",
+          "year"
+        ]
       }
     },
     "responses": {
@@ -7405,6 +8129,9 @@
             }
           }
         }
+      },
+      "NotFound": {
+        "description": "Not Found"
       },
       "NotModified": {
         "description": "Not Modified - Use Local Cached Value"

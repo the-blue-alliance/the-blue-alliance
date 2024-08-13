@@ -1,6 +1,5 @@
 import { Link } from '@remix-run/react';
 import { type VariantProps, cva } from 'class-variance-authority';
-import { max } from 'lodash-es';
 import type React from 'react';
 import BiTrophy from '~icons/bi/trophy';
 import InlineIcon from './inlineIcon';
@@ -30,7 +29,7 @@ const rowVariants = cva('text-center', {
 
 interface AllianceTableRowProps
   extends React.HTMLAttributes<HTMLTableRowElement>,
-    VariantProps<typeof rowVariants> {}
+  VariantProps<typeof rowVariants> { }
 
 function AllianceTableRow({
   className,
@@ -58,11 +57,12 @@ function extractAllianceNumber(input: string): string {
 export default function AllianceSelectionTable(props: {
   alliances: EliminationAlliance[];
 }) {
-  const allianceSize = max(props.alliances.map((a) => a.picks.length)) || 3;
+  const allianceSize =
+    Math.max(...props.alliances.map((a) => a.picks.length)) || 3;
 
   return (
-    <div className="mt-5">
-      <div className="text-2xl font-bold">Alliances</div>
+    <>
+      <div className="text-2xl">Alliances</div>
 
       <Table className="table-fixed">
         <TableHeader>
@@ -112,6 +112,6 @@ export default function AllianceSelectionTable(props: {
           ))}
         </TableBody>
       </Table>
-    </div>
+    </>
   );
 }
