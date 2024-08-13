@@ -13,6 +13,7 @@ module.exports = {
     ecmaFeatures: {
       jsx: true,
     },
+    project: ["tsconfig.json"],
   },
   env: {
     browser: true,
@@ -73,7 +74,7 @@ module.exports = {
         },
       },
       extends: [
-        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/strict-type-checked',
         'plugin:import/recommended',
         'plugin:import/typescript',
       ],
