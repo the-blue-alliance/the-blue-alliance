@@ -34,6 +34,7 @@ from backend.api.handlers.event import (
     event_teams_statuses,
 )
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
+from backend.api.handlers.insights import insights_leaderboards_year
 from backend.api.handlers.match import match, zebra_motionworks
 from backend.api.handlers.media import media_tags
 from backend.api.handlers.status import status
@@ -264,6 +265,11 @@ api_v3.add_url_rule("/teams/<int:year>/<int:page_num>", view_func=team_list)
 api_v3.add_url_rule(
     "/teams/<int:year>/<int:page_num>/<model_type:model_type>",
     view_func=team_list,
+)
+
+# Insights
+api_v3.add_url_rule(
+    "/insights/leaderboards/<int:year>", view_func=insights_leaderboards_year
 )
 
 # Trusted API

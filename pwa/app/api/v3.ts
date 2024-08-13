@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.8.2
+ * 3.9.0
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -981,6 +981,22 @@ export type DistrictRanking = {
     /** Points awarded for qualification match performance. */
     qual_points: number;
   }[];
+};
+export type LeaderboardInsight = {
+  data: {
+    rankings: {
+      /** Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played. */
+      value: number;
+      /** Team/Event/Match keys that have the corresponding value. */
+      keys: string[];
+    }[];
+    /** What type of key is used in the rankings; either 'team', 'event', or 'match'. */
+    key_type: 'team' | 'event' | 'match';
+  };
+  /** Name of the insight. */
+  name: string;
+  /** Year the insight was measured in (year=0 for overall insights). */
+  year: number;
 };
 /**
  * Returns API status, and TBA status information.
@@ -3572,6 +3588,44 @@ export function getDistrictRankings(
         status: 404;
       }
   >(`/district/${encodeURIComponent(districtKey)}/rankings`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets a list of `LeaderboardInsight` objects from a specific year. Use year=0 for overall.
+ */
+export function getInsightsLeaderboardsYear(
+  {
+    ifNoneMatch,
+    year,
+  }: {
+    ifNoneMatch?: string;
+    year: number;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: LeaderboardInsight[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/insights/leaderboards/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
