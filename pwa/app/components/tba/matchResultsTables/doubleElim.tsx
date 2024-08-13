@@ -42,7 +42,7 @@ export default function MatchResultsTableDoubleElim({
 
   return (
     <>
-      <h1 className="text-2xl font-bold">Playoff Results</h1>
+      <h1 className="text-2xl">Playoff Results</h1>
       {Object.entries(matchesGroupedByRound).map(([round, matches]) => (
         <div key={round}>
           <div className="mt-1.5 text-lg">Round {round}</div>
