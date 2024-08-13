@@ -24,7 +24,7 @@ import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import {
-  parseDateString,
+  getEventDateString,
   sortAwardsComparator,
   sortMatchComparator,
   sortTeamKeysComparator,
@@ -103,22 +103,6 @@ export default function EventPage() {
   const { event, alliances, matches, rankings, awards } =
     useLoaderData<typeof loader>();
 
-  const startDate = event.start_date ? parseDateString(event.start_date) : null;
-  const endDate = event.end_date ? parseDateString(event.end_date) : null;
-  const startDateStr = startDate
-    ? startDate.toLocaleDateString('default', {
-        month: 'long',
-        day: 'numeric',
-      })
-    : '';
-  const endDateStr = endDate
-    ? endDate.toLocaleDateString('default', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : '';
-
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
     [matches],
@@ -153,7 +137,7 @@ export default function EventPage() {
 
         <InlineIcon>
           <BiCalendar />
-          {startDateStr} to {endDateStr}
+          {getEventDateString(event, 'long')}
           {event.week !== undefined && event.week !== null && (
             <Badge className="mx-2 h-[1.5em] align-text-top">
               Week {event.week + 1}

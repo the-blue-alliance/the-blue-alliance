@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Award, Match } from '~/api/v3';
+import { Award, Event, Match } from '~/api/v3';
 import { AwardType, SORT_ORDER } from '~/lib/api/AwardType';
 
 export function cn(...inputs: ClassValue[]) {
@@ -9,6 +9,28 @@ export function cn(...inputs: ClassValue[]) {
 
 export function parseDateString(date: string) {
   return new Date(date);
+}
+
+export function getEventDateString(event: Event, month: 'long' | 'short') {
+  const startDate = parseDateString(event.start_date);
+  const endDate = parseDateString(event.end_date);
+
+  const endDateString = endDate.toLocaleDateString('default', {
+    month: month,
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  if (startDate.getTime() === endDate.getTime()) {
+    return endDateString;
+  }
+
+  const startDateString = startDate.toLocaleDateString('default', {
+    month: month,
+    day: 'numeric',
+  });
+
+  return `${startDateString} to ${endDateString}`;
 }
 
 export function removeNonNumeric(str: string): string {
@@ -42,6 +64,34 @@ export function sortAwardsComparator(a: Award, b: Award) {
 
 export function sortTeamKeysComparator(a: string, b: string) {
   return Number(removeNonNumeric(a)) - Number(removeNonNumeric(b));
+}
+
+export function sortEventsComparator(a: Event, b: Event) {
+  // First sort by date
+  const start_date_a = parseDateString(a.start_date);
+  const start_date_b = parseDateString(b.start_date);
+  const end_date_a = parseDateString(a.end_date);
+  const end_date_b = parseDateString(b.end_date);
+  if (start_date_a < start_date_b) {
+    return -1;
+  }
+  if (start_date_a > start_date_b) {
+    return 1;
+  }
+  if (end_date_a < end_date_b) {
+    return -1;
+  }
+  if (end_date_a > end_date_b) {
+    return 1;
+  }
+  // Then sort by name
+  if (a.name < b.name) {
+    return -1;
+  }
+  if (a.name > b.name) {
+    return 1;
+  }
+  return 0;
 }
 
 export function timestampsAreOnDifferentDays(
