@@ -79,7 +79,11 @@ module.exports = {
         'plugin:import/typescript',
       ],
       parserOptions: {
-        project: ["tsconfig.json"],
+        project: ['tsconfig.json'],
+      },
+      rules: {
+        // See https://github.com/typescript-eslint/typescript-eslint/issues/6226
+        '@typescript-eslint/no-throw-literal': 'off',
       },
     },
 
