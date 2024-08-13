@@ -86,9 +86,9 @@ export default function TeamPage(): JSX.Element {
   return (
     <div className="flex flex-wrap justify-center">
       <div className="basis-1/2">
-        <div className="text-3xl font-semibold">
+        <h1 className="mb-2.5 mt-5 text-4xl">
           Team {team.team_number} - {team.nickname}
-        </div>
+        </h1>
 
         <InlineIcon>
           <BiPinMapFill />
