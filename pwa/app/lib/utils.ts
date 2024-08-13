@@ -38,7 +38,7 @@ export function removeNonNumeric(str: string): string {
 }
 
 export function sortMatchComparator(a: Match, b: Match) {
-  const compLevelValues: Record<string, number> = {
+  const compLevelValues = {
     f: 5,
     sf: 4,
     qf: 3,
@@ -46,10 +46,7 @@ export function sortMatchComparator(a: Match, b: Match) {
     qm: 1,
   };
   if (a.comp_level !== b.comp_level) {
-    return (
-      (compLevelValues[a.comp_level] ?? 0) -
-      (compLevelValues[b.comp_level] ?? 0)
-    );
+    return compLevelValues[a.comp_level] - compLevelValues[b.comp_level];
   }
 
   return a.set_number - b.set_number || a.match_number - b.match_number;
