@@ -12,10 +12,16 @@
   "forwardPorts": [5173],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postStartCommand": "cd pwa/;npm install;npm run dev"
+  "postStartCommand": "cd pwa/;npm install;npm run dev",
 
   // Configure tool-specific properties.
-  // "customizations": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  }
 
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
   // "remoteUser": "root"
