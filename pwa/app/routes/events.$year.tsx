@@ -6,6 +6,7 @@ import {
 } from '@remix-run/react';
 import { getEventsByYear, Event } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
+import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
 import { sortEventsComparator } from '~/lib/utils';
 
 async function loadData(params: Params) {
@@ -66,7 +67,7 @@ function groupBySections(events: Event[]): EventGroup[] {
     }
 
     // Events by Championship
-    if (event.event_type == 3 || event.event_type == 4) {
+    if (CMP_EVENT_TYPES.has(event.event_type)) {
       const groupName =
         event.year >= 2017 && event.year <= 2022
           ? `FIRST Championship - ${event.city}`
@@ -83,17 +84,17 @@ function groupBySections(events: Event[]): EventGroup[] {
     }
 
     // FOC
-    if (event.event_type == 6) {
+    if (event.event_type == EventType.FOC) {
       FOCEvents.events.push(event);
     }
 
     // Preaseason
-    if (event.event_type == 100) {
+    if (event.event_type == EventType.PRESEASON) {
       preaseasonEvents.events.push(event);
     }
 
     // Offseason
-    if (event.event_type == 99) {
+    if (event.event_type == EventType.OFFSEASON) {
       offseasonEvents.events.push(event);
     }
   });
