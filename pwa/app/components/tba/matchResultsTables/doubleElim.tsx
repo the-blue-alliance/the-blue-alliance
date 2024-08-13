@@ -3,21 +3,21 @@ import { useMemo } from 'react';
 import { Match } from '~/api/v3';
 import MatchResultsTableBase from '~/components/tba/matchResultsTables/base';
 
-const DOUBLE_ELIM_ROUND_MAPPING: Record<number, number> = {
-  1: 1,
-  2: 1,
-  3: 1,
-  4: 1,
-  5: 2,
-  6: 2,
-  7: 2,
-  8: 2,
-  9: 3,
-  10: 3,
-  11: 4,
-  12: 4,
-  13: 5,
-};
+const DOUBLE_ELIM_ROUND_MAPPING = new Map<number, number>([
+  [1, 1],
+  [2, 1],
+  [3, 1],
+  [4, 1],
+  [5, 2],
+  [6, 2],
+  [7, 2],
+  [8, 2],
+  [9, 3],
+  [10, 3],
+  [11, 4],
+  [12, 4],
+  [13, 5],
+]);
 
 export default function MatchResultsTableDoubleElim({
   matches,
@@ -36,7 +36,10 @@ export default function MatchResultsTableDoubleElim({
 
   const matchesGroupedByRound = useMemo(
     () =>
-      groupBy(nonFinals, (m) => DOUBLE_ELIM_ROUND_MAPPING[m.set_number] ?? 1),
+      groupBy(
+        nonFinals,
+        (m) => DOUBLE_ELIM_ROUND_MAPPING.get(m.set_number) ?? 1,
+      ),
     [nonFinals],
   );
 
