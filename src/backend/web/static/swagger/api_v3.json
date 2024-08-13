@@ -4248,12 +4248,10 @@
           },
           "nickname": {
             "type": "string",
-            "nullable": true,
             "description": "Team nickname provided by FIRST."
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "description": "Official long name registered with FIRST."
           },
           "city": {
@@ -4304,12 +4302,10 @@
           },
           "nickname": {
             "type": "string",
-            "nullable": true,
             "description": "Team nickname provided by FIRST."
           },
           "name": {
             "type": "string",
-            "nullable": true,
             "description": "Official long name registered with FIRST."
           },
           "school_name": {
@@ -7746,7 +7742,7 @@
           },
           "details": {
             "type": "object",
-            "properties": {},
+            "additionalProperties": true,
             "description": "If required, a JSON dict of additional media information."
           },
           "preferred": {

@@ -38,9 +38,9 @@ export type Team = {
   /** Official team number issued by FIRST. */
   team_number: number;
   /** Team nickname provided by FIRST. */
-  nickname: string | null;
+  nickname: string;
   /** Official long name registered with FIRST. */
-  name: string | null;
+  name: string;
   /** Name of team school or affilited group registered with FIRST. */
   school_name: string | null;
   /** City of team derived from parsing the address registered with FIRST. */
@@ -74,9 +74,9 @@ export type TeamSimple = {
   /** Official team number issued by FIRST. */
   team_number: number;
   /** Team nickname provided by FIRST. */
-  nickname: string | null;
+  nickname: string;
   /** Official long name registered with FIRST. */
-  name: string | null;
+  name: string;
   /** City of team derived from parsing the address registered with FIRST. */
   city: string | null;
   /** State of team derived from parsing the address registered with FIRST. */
@@ -821,7 +821,9 @@ export type Media = {
   /** The key used to identify this media on the media site. */
   foreign_key: string;
   /** If required, a JSON dict of additional media information. */
-  details?: {};
+  details?: {
+    [key: string]: any;
+  };
   /** True if the media is of high quality. */
   preferred?: boolean;
   /** Direct URL to the media. */
