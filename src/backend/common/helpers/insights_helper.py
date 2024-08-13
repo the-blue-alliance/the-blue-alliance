@@ -1,8 +1,9 @@
 import itertools
 import json
 import math
+import statistics
 from collections import defaultdict
-from typing import Any, Dict, List, NamedTuple, Tuple
+from typing import Any, DefaultDict, Dict, List, NamedTuple, Tuple, TypedDict
 
 import numpy as np
 from google.appengine.ext import ndb
@@ -16,6 +17,7 @@ from backend.common.consts.event_type import (
     EventType,
     SEASON_EVENT_TYPES,
 )
+from backend.common.consts.insight_type import InsightType
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_helper import (
     EventHelper,
@@ -25,10 +27,13 @@ from backend.common.helpers.event_helper import (
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
-from backend.common.models.insight import Insight
-from backend.common.models.keys import TeamKey, Year
+from backend.common.models.insight import Insight, LeaderboardKeyType
+from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.team import Team
+
+
+CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float]
 
 
 class EventMatches(NamedTuple):
@@ -39,6 +44,24 @@ class EventMatches(NamedTuple):
 class WeekEventMatches(NamedTuple):
     week: str
     event_matches: List[EventMatches]
+
+
+class LeaderboardRanking(TypedDict):
+    keys: List[TeamKey | EventKey | MatchKey]
+    value: int | float
+
+
+class LeaderboardData(TypedDict):
+    rankings: List[LeaderboardRanking]
+    key_type: LeaderboardKeyType
+
+
+class LeaderboardInsight(TypedDict):
+    """This is the type that should be returned over the API!"""
+
+    data: LeaderboardData
+    name: str
+    year: int
 
 
 class InsightsHelper(object):
@@ -81,6 +104,15 @@ class InsightsHelper(object):
         insights += self._calculateNumMatches(week_event_matches, year)
         insights += self._calculateYearSpecific(week_event_matches, year)
         insights += self._calculateMatchesByTeam(week_event_matches, year)
+
+        # leaderboard (exposed in API)
+        insights += self._calculate_leaderboard_most_matches_played_by_team(
+            week_event_matches, year
+        )
+        insights += self._calculate_leaderboard_highest_median_score_by_event(
+            week_event_matches, year
+        )
+
         return insights
 
     @classmethod
@@ -122,6 +154,9 @@ class InsightsHelper(object):
         insights += self._calculateChampionshipStats(award_futures, year)
         insights += self._calculateRegionalStats(award_futures, year)
         insights += self._calculateSuccessfulElimTeamups(award_futures, year)
+
+        # leaderboards (exposed in API)
+        insights += self._calculate_leaderboard_blue_banners(award_futures, year)
 
         return insights
 
@@ -227,6 +262,97 @@ class InsightsHelper(object):
         )
 
     @classmethod
+    def _create_leaderboard_from_dict_counts(
+        cls,
+        counter: CounterDictType,
+        insight_type: int,
+        year: int,
+    ) -> Insight:
+        sorted_leaderboard_tuples = cls._sort_counter_dict(
+            counter, key_type=Insight.TYPED_LEADERBOARD_KEY_TYPES[insight_type]
+        )
+        leaderboard_rankings: List[LeaderboardRanking] = [
+            LeaderboardRanking(keys=keys, value=value)
+            for (value, keys) in sorted_leaderboard_tuples[:25]
+        ]
+        leaderboard_data = LeaderboardData(
+            rankings=leaderboard_rankings,
+            key_type=Insight.TYPED_LEADERBOARD_KEY_TYPES[insight_type],
+        )
+
+        return cls._createInsight(
+            data=leaderboard_data,
+            name=Insight.INSIGHT_NAMES[insight_type],
+            year=year,
+        )
+
+    @classmethod
+    def _calculate_leaderboard_blue_banners(
+        cls, award_futures: List[TypedFuture[Award]], year: Year
+    ) -> List[Insight]:
+        data = defaultdict(int)
+        for award_future in award_futures:
+            award = award_future.get_result()
+            if award.award_type_enum in BLUE_BANNER_AWARDS and award.count_banner:
+                for team_key in award.team_list:
+                    data[team_key.id()] += 1
+
+        return [
+            cls._create_leaderboard_from_dict_counts(
+                data, Insight.TYPED_LEADERBOARD_BLUE_BANNERS, year
+            )
+        ]
+
+    @classmethod
+    def _calculate_leaderboard_most_matches_played_by_team(
+        cls, week_event_matches: List[WeekEventMatches], year: Year
+    ) -> List[Insight]:
+        counter = defaultdict(lambda: 0)
+        for _, week_events in week_event_matches:
+            for _, matches in week_events:
+                for match in matches:
+                    if match.has_been_played:
+                        for alliance in match.alliances.values():
+                            for tk in alliance["teams"]:
+                                counter[tk] += 1
+
+        return [
+            cls._create_leaderboard_from_dict_counts(
+                counter,
+                Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
+                year,
+            )
+        ]
+
+    @classmethod
+    def _calculate_leaderboard_highest_median_score_by_event(
+        cls, week_event_matches: List[WeekEventMatches], year: Year
+    ) -> List[Insight]:
+        scores = defaultdict(list)
+        for _, week_events in week_event_matches:
+            for event, matches in week_events:
+                for match in matches:
+                    if match.has_been_played:
+                        scores[event.key.id()].append(
+                            match.alliances[AllianceColor.RED]["score"]
+                        )
+                        scores[event.key.id()].append(
+                            match.alliances[AllianceColor.BLUE]["score"]
+                        )
+
+        medians = defaultdict(int)
+        for event_key, scores_list in scores.items():
+            medians[event_key] = statistics.median(sorted(scores_list))
+
+        return [
+            cls._create_leaderboard_from_dict_counts(
+                medians,
+                Insight.TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT,
+                year,
+            )
+        ]
+
+    @classmethod
     def _generateMatchData(self, match: Match, event: Event) -> Dict:
         """
         A dict of any data needed for front-end rendering
@@ -243,29 +369,32 @@ class InsightsHelper(object):
         }
 
     @classmethod
-    def _sortTeamWinsDict(
-        self, wins_dict: Dict[TeamKey, int]
-    ) -> List[Tuple[int, List[TeamKey]]]:
+    def _sort_counter_dict(
+        cls, count: CounterDictType, key_type: LeaderboardKeyType = "team"
+    ) -> List[Tuple[int | float, List[str]]]:
         """
-        Sorts dicts with key: number of wins, value: list of teams
-        by number of wins and by team number
+        Takes an object that looks like: {"frc1": 5, "frc2": 5, "frc3": 3}
+        (may be match, event, or team keys) and returns a list of tuples that
+        are (magnitude, list of keys) grouped by magnitude, and then sorted by
+        magnitude, e.g. [(5, ["frc1", "frc2"]), (2, ["frc3"])].
+        """
 
-        Returns teams grouped by win count, like such:
-        [
-            [5, ["frc123", "frc1234"]],
-            [4, ["frc12"]],
-            [1, [ "frc0", "frc1", "frc12345"]],
-        ]
-        """
-        sorted_wins_tuples = sorted(
-            wins_dict.items(), key=lambda pair: int(pair[0][3:])
-        )  # Sort by team number
+        # sort by:
+        #   team: team number
+        #   event & match: alphabetically by key
+        tuples = []
+        if key_type == "team":
+            tuples = sorted(count.items(), key=lambda pair: int(pair[0][3:]))
+        else:
+            tuples = sorted(count.items(), key=lambda pair: pair[4:])
+
+        # group by magnitude
         temp = defaultdict(list)
-        for team, numWins in sorted_wins_tuples:
-            temp[numWins].append(team)
-        return sorted(
-            temp.items(), key=lambda pair: int(pair[0]), reverse=True
-        )  # Sort by win number
+        for team, num in tuples:
+            temp[num].append(team)
+
+        # sort by magnitude
+        return sorted(temp.items(), key=lambda pair: float(pair[0]), reverse=True)
 
     @classmethod
     def _sortTeamYearWinsDict(self, wins_dict):
@@ -406,7 +535,7 @@ class InsightsHelper(object):
                             for tk in alliance["teams"]:
                                 counter[tk] += 1
 
-        grouped_by_win_count = self._sortTeamWinsDict(counter)
+        grouped_by_win_count = self._sort_counter_dict(counter)
 
         return [
             self._createInsight(
@@ -756,7 +885,7 @@ class InsightsHelper(object):
                 for team_key in award.team_list:
                     team_key_name = team_key.id()
                     blue_banner_winners[team_key_name] += 1
-        blue_banner_winners = self._sortTeamWinsDict(blue_banner_winners)
+        blue_banner_winners = self._sort_counter_dict(blue_banner_winners)
 
         insight = None
         if blue_banner_winners != []:
@@ -872,7 +1001,7 @@ class InsightsHelper(object):
                     regional_winners[team_key_name] += 1
 
         rca_winners = self._sortTeamList(rca_winners)
-        regional_winners = self._sortTeamWinsDict(regional_winners)
+        regional_winners = self._sort_counter_dict(regional_winners)
 
         insights = []
         if rca_winners != []:
@@ -939,6 +1068,10 @@ class InsightsHelper(object):
                     num_matches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], 0
                 )
             )
+
+        insights.extend(
+            self.do_overall_leaderboard_insights(insight_type=InsightType.MATCHES)
+        )
 
         return insights
 
@@ -1027,12 +1160,12 @@ class InsightsHelper(object):
         )
 
         # Sorting
-        regional_winners = self._sortTeamWinsDict(regional_winners)
-        blue_banners = self._sortTeamWinsDict(blue_banners)
-        rca_winners = self._sortTeamWinsDict(rca_winners)
+        regional_winners = self._sort_counter_dict(regional_winners)
+        blue_banners = self._sort_counter_dict(blue_banners)
+        rca_winners = self._sort_counter_dict(rca_winners)
         world_champions = self._sortTeamYearWinsDict(world_champions)
         division_winners = self._sortTeamYearWinsDict(division_winners)
-        einstein_streak = self._sortTeamWinsDict(einstein_streak)
+        einstein_streak = self._sort_counter_dict(einstein_streak)
 
         # Creating Insights
         if regional_winners:
@@ -1088,4 +1221,43 @@ class InsightsHelper(object):
                 )
             )
 
+        insights.extend(
+            self.do_overall_leaderboard_insights(insight_type=InsightType.AWARDS)
+        )
+
         return insights
+
+    @classmethod
+    def do_overall_leaderboard_insights(
+        cls, insight_type: InsightType
+    ) -> List[Insight]:
+        insight_types: set[int] = set()
+        if insight_type == InsightType.AWARDS:
+            insight_types = Insight.TYPED_LEADERBOARD_AWARD_INSIGHTS
+        elif insight_type == InsightType.MATCHES:
+            insight_types = Insight.TYPED_LEADERBOARD_MATCH_INSIGHTS
+
+        overall_insights = []
+        for insight_type in insight_types:
+            insights = Insight.query(
+                Insight.name == Insight.INSIGHT_NAMES[insight_type],
+                Insight.year != 0,
+            ).fetch(1000)
+
+            data = defaultdict(int)
+            for insight in insights:
+                leaderboard_data: LeaderboardData = insight.data
+                for leaderboard_ranking in leaderboard_data["rankings"]:
+                    for team in leaderboard_ranking["keys"]:
+                        # pyre says we can't add a possible float to an int, but it doesn't matter here
+                        data[team] += leaderboard_ranking["value"]  # pyre-ignore[58]
+
+            overall_insights.append(
+                cls._create_leaderboard_from_dict_counts(
+                    data,
+                    insight_type,
+                    year=0,
+                )
+            )
+
+        return overall_insights
