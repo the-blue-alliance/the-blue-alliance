@@ -6,6 +6,7 @@ import {
   useLoaderData,
 } from '@remix-run/react';
 import { getEventsByYear, Event } from '~/api/v3';
+import EventListTable from '~/components/tba/eventListTable';
 import { sortEventsComparator } from '~/lib/utils';
 
 async function loadData(params: Params) {
@@ -67,29 +68,25 @@ export default function YearEventsPage() {
   const eventsByWeek = groupByWeek(sortedEvents);
 
   return (
-    <>
-      <h1 className="mb-2.5 mt-5 text-4xl">
-        {year} <i>FIRST</i> Robotics Competition Events
-      </h1>
-      {eventsByWeek.map((group) => (
-        <div key={group.groupName}>
-          <h2 className="text-2xl mt-5">
-            {group.groupName}{' '}
-            <small className="text-slate-500">
-              {group.events.length}{' '}
-              {`Event${group.events.length > 1 ? 's' : ''}`}
-            </small>
-          </h2>
-          {group.events.map((event) => (
-            <div key={event.key}>
-              <Link to={`/event/${event.key}`}>{event.name}</Link>
-              <div>
-                {event.city}, {event.state_prov}, {event.country}
-              </div>
-            </div>
-          ))}
-        </div>
-      ))}
-    </>
+    <div className="flex flex-wrap gap-4 lg:flex-nowrap">
+      <div className="basis-full lg:basis-1/6">TODO Year Picker & Sections</div>
+      <div className="basis-full lg:basis-5/6">
+        <h1 className="mb-2.5 mt-5 text-4xl">
+          {year} <i>FIRST</i> Robotics Competition Events
+        </h1>
+        {eventsByWeek.map((group) => (
+          <div key={group.groupName}>
+            <h2 className="text-2xl mt-5">
+              {group.groupName}{' '}
+              <small className="text-slate-500">
+                {group.events.length}{' '}
+                {`Event${group.events.length > 1 ? 's' : ''}`}
+              </small>
+            </h2>
+            <EventListTable events={group.events} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

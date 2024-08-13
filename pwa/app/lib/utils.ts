@@ -11,6 +11,28 @@ export function parseDateString(date: string) {
   return new Date(date);
 }
 
+export function getEventDateString(event: Event, month: 'long' | 'short') {
+  const startDate = parseDateString(event.start_date);
+  const endDate = parseDateString(event.end_date);
+
+  const endDateString = endDate.toLocaleDateString('default', {
+    month: month,
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  if (startDate == endDate) {
+    return endDateString;
+  }
+
+  const startDateString = startDate.toLocaleDateString('default', {
+    month: month,
+    day: 'numeric',
+  });
+
+  return `${startDateString} to ${endDateString}`;
+}
+
 export function removeNonNumeric(str: string): string {
   return str.replace(/\D/g, '');
 }
