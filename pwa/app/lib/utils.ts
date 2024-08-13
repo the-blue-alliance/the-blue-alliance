@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Award, Event, Match } from '~/api/v3';
+import { Award, Event, Match, Team } from '~/api/v3';
 import { AwardType, SORT_ORDER } from '~/lib/api/AwardType';
 
 export function cn(...inputs: ClassValue[]) {
@@ -60,6 +60,10 @@ export function sortAwardsComparator(a: Award, b: Award) {
   const orderB = SORT_ORDER[b.award_type as AwardType] ?? 1000;
 
   return orderA - orderB || a.award_type - b.award_type;
+}
+
+export function sortTeamsComparator(a: Team, b: Team) {
+  return a.team_number - b.team_number;
 }
 
 export function sortTeamKeysComparator(a: string, b: string) {

@@ -14,6 +14,8 @@ import {
   getEventAwards,
   getEventMatches,
   getEventRankings,
+  getEventTeams,
+  Team,
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
@@ -22,12 +24,25 @@ import MatchResultsTableDoubleElim from '~/components/tba/matchResultsTables/dou
 import MatchResultsTableQuals from '~/components/tba/matchResultsTables/quals';
 import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
+import { Card } from '~/components/ui/card';
+import {
+  Credenza,
+  CredenzaBody,
+  CredenzaClose,
+  CredenzaContent,
+  CredenzaDescription,
+  CredenzaFooter,
+  CredenzaHeader,
+  CredenzaTitle,
+  CredenzaTrigger,
+} from '~/components/ui/credenza';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import {
   getEventDateString,
   sortAwardsComparator,
   sortMatchComparator,
   sortTeamKeysComparator,
+  sortTeamsComparator,
 } from '~/lib/utils';
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
@@ -46,13 +61,15 @@ async function loadData(params: Params) {
     throw new Error('Missing eventKey');
   }
 
-  const [event, matches, alliances, rankings, awards] = await Promise.all([
-    getEvent({ eventKey: params.eventKey }),
-    getEventMatches({ eventKey: params.eventKey }),
-    getEventAlliances({ eventKey: params.eventKey }),
-    getEventRankings({ eventKey: params.eventKey }),
-    getEventAwards({ eventKey: params.eventKey }),
-  ]);
+  const [event, matches, alliances, rankings, awards, teams] =
+    await Promise.all([
+      getEvent({ eventKey: params.eventKey }),
+      getEventMatches({ eventKey: params.eventKey }),
+      getEventAlliances({ eventKey: params.eventKey }),
+      getEventRankings({ eventKey: params.eventKey }),
+      getEventAwards({ eventKey: params.eventKey }),
+      getEventTeams({ eventKey: params.eventKey }),
+    ]);
 
   if (event.status == 404) {
     throw new Response(null, {
@@ -65,7 +82,8 @@ async function loadData(params: Params) {
     matches.status !== 200 ||
     alliances.status !== 200 ||
     rankings.status !== 200 ||
-    awards.status !== 200
+    awards.status !== 200 ||
+    teams.status !== 200
   ) {
     throw new Response(null, {
       status: 500,
@@ -78,6 +96,7 @@ async function loadData(params: Params) {
     alliances: alliances.data,
     rankings: rankings.data,
     awards: awards.data,
+    teams: teams.data,
   };
 }
 
@@ -100,7 +119,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export default function EventPage() {
-  const { event, alliances, matches, rankings, awards } =
+  const { event, alliances, matches, rankings, awards, teams } =
     useLoaderData<typeof loader>();
 
   const sortedMatches = useMemo(
@@ -252,7 +271,9 @@ export default function EventPage() {
           <AwardsTab awards={awards} />
         </TabsContent>
 
-        <TabsContent value="teams">teams</TabsContent>
+        <TabsContent value="teams">
+          <TeamsTab teams={teams} />
+        </TabsContent>
 
         <TabsContent value="insights">insights</TabsContent>
 
@@ -296,6 +317,57 @@ function AwardsTab({ awards }: { awards: Award[] }) {
           ))}
         </dl>
       </div>
+    </div>
+  );
+}
+
+function TeamsTab({ teams }: { teams: Team[] }) {
+  teams.sort(sortTeamsComparator);
+
+  // Lot todo here:
+  // 1. add robot images
+  // 2. create a TeamEvent component that shows schedule, etc, which is inside CredenzaBody
+  // 3. add hover effects
+  // 4. split out CredenzaTrigger, so the same UI (Body) can be triggered by different UI elements
+  return (
+    <div className="md:columns-2">
+      {teams.map((t) => (
+        <Credenza key={t.key}>
+          <CredenzaTrigger asChild>
+            <Card className="my-1 flex cursor-pointer items-center gap-4 rounded-lg bg-background p-4">
+              <div className="grid flex-1 gap-1">
+                <div className="font-medium">
+                  {t.team_number} - {t.nickname}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {t.city}, {t.state_prov}, {t.country}
+                </div>
+              </div>
+              <img
+                src="https://placehold.co/400x400"
+                alt=""
+                className="size-20"
+              />
+            </Card>
+          </CredenzaTrigger>
+          <CredenzaContent>
+            <CredenzaHeader>
+              <CredenzaTitle>
+                {t.team_number} - {t.nickname}
+              </CredenzaTitle>
+              <CredenzaDescription>
+                {t.city}, {t.state_prov}, {t.country}
+              </CredenzaDescription>
+            </CredenzaHeader>
+            <CredenzaBody>Full name: {t.name}</CredenzaBody>
+            <CredenzaFooter>
+              <CredenzaClose asChild>
+                <button>Close</button>
+              </CredenzaClose>
+            </CredenzaFooter>
+          </CredenzaContent>
+        </Credenza>
+      ))}
     </div>
   );
 }

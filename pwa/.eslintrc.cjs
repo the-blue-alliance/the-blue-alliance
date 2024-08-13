@@ -54,6 +54,14 @@ module.exports = {
           typescript: {},
         },
       },
+      rules: {
+        // https://github.com/redpangilinan/credenza
+        // needs vaul-drawer-wrapper around root element
+        'react/no-unknown-property': [
+          'error',
+          { ignore: ['vaul-drawer-wrapper'] },
+        ],
+      },
     },
 
     // Typescript
@@ -94,7 +102,15 @@ module.exports = {
       rules: {
         'react/prop-types': [
           2,
-          { ignore: ['className', 'variant', 'size', 'sideOffset'] },
+          {
+            ignore: [
+              'className',
+              'variant',
+              'size',
+              'sideOffset',
+              'shouldScaleBackground',
+            ],
+          },
         ],
       },
     },
