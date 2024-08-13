@@ -6,7 +6,9 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
-  // "features": {},
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/prettier:1": {}
+  },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [5173],
@@ -17,9 +19,26 @@
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
-      "extensions": [
-        "bradlc.vscode-tailwindcss"
-      ]
+      "extensions": ["bradlc.vscode-tailwindcss", "esbenp.prettier-vscode"],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "prettier.prettierPath": "pwa/node_modules/prettier",
+        "prettier.configPath": "pwa/prettier.config.js",
+        "prettier.requireConfig": true,
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "files.autoSave": "afterDelay",
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit",
+          "source.sortImports": "always",
+          "source.organizeImports": "always"
+        },
+        "javascript.preferences.importModuleSpecifier": "non-relative",
+        "tailwindCSS.experimental.classRegex": [
+          ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+          ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+        ]
+      }
     }
   }
 
