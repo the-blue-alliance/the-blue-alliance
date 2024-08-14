@@ -1,9 +1,12 @@
 import {
+  isRouteErrorResponse,
   Links,
   Meta,
+  MetaFunction,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteError,
 } from '@remix-run/react';
 import * as Sentry from '@sentry/react';
 import './tailwind.css';
@@ -64,4 +67,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return <Outlet />;
+}
+
+export const meta: MetaFunction = ({ error }) => {
+  const isRouteError = isRouteErrorResponse(error);
+  const title =
+    isRouteError && error.status === 404 ? '404 - Page Not Found' : 'Error';
+  return [{ title: error ? title : 'The Blue Alliance' }];
+};
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  const isRouteError = isRouteErrorResponse(error);
+  return (
+    <>
+      <h1 className="mb-2.5 mt-5 text-4xl">Oh Noes!1!!</h1>
+      <h2 className="text-2xl">
+        {isRouteError ? `Error ${error.status}` : 'An unknown error occurred.'}
+      </h2>
+    </>
+  );
 }
