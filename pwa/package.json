@@ -36,7 +36,7 @@
     "lodash-es": "4.17.21",
     "lucide-react": "0.427.0",
     "react": "18.3.1",
-    "react-dom": "18.2.0",
+    "react-dom": "18.3.1",
     "tailwind-merge": "2.5.2",
     "tailwindcss-animate": "1.0.7",
     "vaul": "0.9.1"
@@ -47,7 +47,7 @@
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@types/react": "18.3.3",
-    "@types/react-dom": "18.2.7",
+    "@types/react-dom": "18.3.0",
     "@typescript-eslint/eslint-plugin": "6.7.4",
     "@typescript-eslint/parser": "6.21.0",
     "autoprefixer": "10.4.20",
