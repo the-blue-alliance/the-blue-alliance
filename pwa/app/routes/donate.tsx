@@ -1,7 +1,7 @@
 import { Link } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 
-export default function Contact(): JSX.Element {
+export default function Donate(): JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y [&_*]:mt-4">
