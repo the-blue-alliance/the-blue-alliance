@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.0
+ * 3.9.1
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -227,7 +227,7 @@ export type TeamEventStatusRank = {
     qual_average?: number;
     /** Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value. */
     sort_orders?: number[];
-    record?: WltRecord;
+    record?: WltRecord | null;
     /** Relative rank of this team. */
     rank?: number;
     /** Number of matches the team was disqualified for. */
@@ -262,8 +262,8 @@ export type TeamEventStatusAlliance = {
 export type TeamEventStatusPlayoff = {
   /** The highest playoff level the team reached. */
   level?: 'qm' | 'ef' | 'qf' | 'sf' | 'f';
-  current_level_record?: WltRecord;
-  record?: WltRecord;
+  current_level_record?: WltRecord | null;
+  record?: WltRecord | null;
   /** Current competition status for the playoffs. */
   status?: 'won' | 'eliminated' | 'playing';
   /** The average match score during playoffs. Year specific. May be null if not relevant for a given year. */
@@ -848,8 +848,8 @@ export type EliminationAlliance = {
   status: {
     playoff_average?: number;
     level?: string;
-    record?: WltRecord;
-    current_level_record?: WltRecord;
+    record?: WltRecord | null;
+    current_level_record?: WltRecord | null;
     status?: string;
   };
 };
@@ -890,7 +890,7 @@ export type EventRanking = {
     extra_stats: number[];
     /** Additional year-specific information, may be null. See parent `sort_order_info` for details. */
     sort_orders: number[] | null;
-    record: WltRecord;
+    record: WltRecord | null;
     /** The team's rank at the event as provided by FIRST. */
     rank: number;
     /** Number of times disqualified. */
