@@ -1,6 +1,5 @@
 import { Link } from '@remix-run/react';
-import { buttonVariants } from '~/components/ui/button';
-import { cn } from '~/lib/utils';
+import { Button } from '~/components/ui/button';
 
 export default function Contact(): JSX.Element {
   return (
@@ -70,10 +69,8 @@ export default function Contact(): JSX.Element {
           <h3 className="text-2xl">Need API access?</h3>
           <p>
             You can review the{' '}
-            <a href="https://www.facebook.com/groups/moardata/">
-              documentation for our APIs
-            </a>{' '}
-            on our website.
+            <Link to="/apidocs">documentation for our APIs</Link> on our
+            website.
           </p>
         </div>
 
@@ -92,38 +89,17 @@ export default function Contact(): JSX.Element {
         <div>
           <h3 className="text-2xl">Everything else...</h3>
           <p>Feel free to reach out to us!</p>
-          <a
-            href="mailto:contact@thebluealliance.com"
-            className={cn(
-              buttonVariants({ variant: 'default', size: 'default' }),
-            )}
-          >
-            Email Us!
-          </a>
-          <a
-            href="https://the-blue-alliance.slack.com/"
-            className={cn(
-              buttonVariants({ variant: 'default', size: 'default' }),
-            )}
-          >
-            Join our Slack!
-          </a>
-          <a
-            href="https://groups.google.com/forum/#!forum/thebluealliance-developers"
-            className={cn(
-              buttonVariants({ variant: 'default', size: 'default' }),
-            )}
-          >
-            Join our Developer Mailing List!
-          </a>
-          <a
-            href="https://www.chiefdelphi.com/"
-            className={cn(
-              buttonVariants({ variant: 'default', size: 'default' }),
-            )}
-          >
-            Ask Chief Delphi Fourms!
-          </a>
+          <Button asChild>
+            <a href="mailto:contact@thebluealliance.com">Email Us!</a>
+          </Button>
+          <Button asChild>
+            <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">
+              Join our Developer Mailing List!
+            </a>
+          </Button>
+          <Button asChild>
+            <a href="https://www.chiefdelphi.com/">Ask Chief Delphi Fourms!</a>
+          </Button>
         </div>
       </div>
     </>
