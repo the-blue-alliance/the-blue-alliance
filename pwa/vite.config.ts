@@ -7,7 +7,7 @@ import Icons from 'unplugin-icons/vite';
 function getCommitHash(): string {
   try {
     return child.execSync('git rev-parse --short HEAD').toString();
-  } catch (error) {
+  } catch {
     return 'unknown';
   }
 }

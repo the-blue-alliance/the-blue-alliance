@@ -44,7 +44,7 @@ function AllianceTableRow({
 function extractAllianceNumber(input: string): string {
   // Regular expression to match "Alliance" followed by a space and one or more digits
   const regex = /^Alliance (\d+)$/;
-  const match = input.match(regex);
+  const match = regex.exec(input);
 
   if (match) {
     // If there's a match, return the captured number as a string
@@ -105,7 +105,7 @@ export default function AllianceSelectionTable(props: {
                     </Link>
                   </TableCell>
                 ) : (
-                  <TableCell key={`${a.name}-${i}`}>-</TableCell>
+                  <TableCell key={`${a.name ?? 'Alliance'}-${i}`}>-</TableCell>
                 ),
               )}
             </AllianceTableRow>
