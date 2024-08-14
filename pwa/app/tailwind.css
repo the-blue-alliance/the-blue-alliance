@@ -68,8 +68,8 @@
     @apply bg-background text-foreground;
   }
 
-  /* Apply blue text and a hover underline to every link; purple if the user has visited it before */
+  /* Apply blue text and a hover underline to every link */
   a {
-    @apply text-blue-800 visited:text-purple-700 hover:underline;
+    @apply text-blue-800 hover:underline;
   }
 }

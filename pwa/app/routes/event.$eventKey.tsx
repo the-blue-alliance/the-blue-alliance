@@ -14,6 +14,8 @@ import {
   getEventAwards,
   getEventMatches,
   getEventRankings,
+  getEventTeams,
+  Team,
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
@@ -22,13 +24,23 @@ import MatchResultsTableDoubleElim from '~/components/tba/matchResultsTables/dou
 import MatchResultsTableQuals from '~/components/tba/matchResultsTables/quals';
 import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { Card } from '~/components/ui/card';
 import {
-  parseDateString,
-  sortAwardsComparator,
-  sortMatchComparator,
-  sortTeamKeysComparator,
-} from '~/lib/utils';
+  Credenza,
+  CredenzaBody,
+  CredenzaClose,
+  CredenzaContent,
+  CredenzaDescription,
+  CredenzaFooter,
+  CredenzaHeader,
+  CredenzaTitle,
+  CredenzaTrigger,
+} from '~/components/ui/credenza';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { sortAwardsComparator } from '~/lib/awardUtils';
+import { getEventDateString } from '~/lib/eventUtils';
+import { sortMatchComparator } from '~/lib/matchUtils';
+import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';
@@ -46,13 +58,15 @@ async function loadData(params: Params) {
     throw new Error('Missing eventKey');
   }
 
-  const [event, matches, alliances, rankings, awards] = await Promise.all([
-    getEvent({ eventKey: params.eventKey }),
-    getEventMatches({ eventKey: params.eventKey }),
-    getEventAlliances({ eventKey: params.eventKey }),
-    getEventRankings({ eventKey: params.eventKey }),
-    getEventAwards({ eventKey: params.eventKey }),
-  ]);
+  const [event, matches, alliances, rankings, awards, teams] =
+    await Promise.all([
+      getEvent({ eventKey: params.eventKey }),
+      getEventMatches({ eventKey: params.eventKey }),
+      getEventAlliances({ eventKey: params.eventKey }),
+      getEventRankings({ eventKey: params.eventKey }),
+      getEventAwards({ eventKey: params.eventKey }),
+      getEventTeams({ eventKey: params.eventKey }),
+    ]);
 
   if (event.status == 404) {
     throw new Response(null, {
@@ -65,7 +79,8 @@ async function loadData(params: Params) {
     matches.status !== 200 ||
     alliances.status !== 200 ||
     rankings.status !== 200 ||
-    awards.status !== 200
+    awards.status !== 200 ||
+    teams.status !== 200
   ) {
     throw new Response(null, {
       status: 500,
@@ -78,6 +93,7 @@ async function loadData(params: Params) {
     alliances: alliances.data,
     rankings: rankings.data,
     awards: awards.data,
+    teams: teams.data,
   };
 }
 
@@ -100,24 +116,8 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export default function EventPage() {
-  const { event, alliances, matches, rankings, awards } =
+  const { event, alliances, matches, rankings, awards, teams } =
     useLoaderData<typeof loader>();
-
-  const startDate = event.start_date ? parseDateString(event.start_date) : null;
-  const endDate = event.end_date ? parseDateString(event.end_date) : null;
-  const startDateStr = startDate
-    ? startDate.toLocaleDateString('default', {
-        month: 'long',
-        day: 'numeric',
-      })
-    : '';
-  const endDateStr = endDate
-    ? endDate.toLocaleDateString('default', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : '';
 
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
@@ -137,12 +137,14 @@ export default function EventPage() {
   const leftSideMatches =
     quals.length > 0 ? (
       <MatchResultsTableQuals matches={quals} />
-    ) : (
+    ) : elims.length > 0 ? (
       <MatchResultsTableDoubleElim matches={elims} />
-    );
+    ) : null;
 
   const rightSideElims =
-    quals.length > 0 ? <MatchResultsTableDoubleElim matches={elims} /> : <></>;
+    quals.length > 0 && elims.length > 0 ? (
+      <MatchResultsTableDoubleElim matches={elims} />
+    ) : null;
 
   return (
     <>
@@ -153,8 +155,8 @@ export default function EventPage() {
 
         <InlineIcon>
           <BiCalendar />
-          {startDateStr} to {endDateStr}
-          {event.week !== undefined && event.week !== null && (
+          {getEventDateString(event, 'long')}
+          {event.week !== null && (
             <Badge className="mx-2 h-[1.5em] align-text-top">
               Week {event.week + 1}
             </Badge>
@@ -201,33 +203,45 @@ export default function EventPage() {
         </InlineIcon>
       </div>
 
-      <Tabs defaultValue="results" className="">
+      <Tabs
+        defaultValue={matches.length > 0 ? 'results' : 'teams'}
+        className=""
+      >
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly [&>*]:basis-1/2
             lg:[&>*]:basis-1"
         >
-          <TabsTrigger value="results">
-            <InlineIcon>
-              <MdiTournament />
-              Results
-            </InlineIcon>
-          </TabsTrigger>
-          <TabsTrigger value="rankings">
-            <InlineIcon>
-              <BiListOl />
-              Rankings
-            </InlineIcon>
-          </TabsTrigger>
-          <TabsTrigger value="awards">
-            <InlineIcon>
-              <BiTrophy />
-              Awards
-            </InlineIcon>
-          </TabsTrigger>
+          {(matches.length > 0 || (alliances && alliances.length > 0)) && (
+            <TabsTrigger value="results">
+              <InlineIcon>
+                <MdiTournament />
+                Results
+              </InlineIcon>
+            </TabsTrigger>
+          )}
+          {rankings.rankings.length > 0 && (
+            <TabsTrigger value="rankings">
+              <InlineIcon>
+                <BiListOl />
+                Rankings
+              </InlineIcon>
+            </TabsTrigger>
+          )}
+          {awards.length > 0 && (
+            <TabsTrigger value="awards">
+              <InlineIcon>
+                <BiTrophy />
+                Awards
+              </InlineIcon>
+            </TabsTrigger>
+          )}
           <TabsTrigger value="teams">
             <InlineIcon>
               <MdiRobot />
               Teams
+              <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
+                {teams.length}
+              </Badge>
             </InlineIcon>
           </TabsTrigger>
           <TabsTrigger value="insights">
@@ -249,7 +263,7 @@ export default function EventPage() {
             <div className="basis-full lg:basis-1/2">{leftSideMatches}</div>
 
             <div className="basis-full lg:basis-1/2">
-              <AllianceSelectionTable alliances={alliances ?? []} />
+              {alliances && <AllianceSelectionTable alliances={alliances} />}
               {rightSideElims}
             </div>
           </div>
@@ -259,7 +273,7 @@ export default function EventPage() {
           <RankingsTable
             rankings={rankings}
             winners={
-              alliances?.find((a) => a.status?.status === 'won')?.picks ?? []
+              alliances?.find((a) => a.status.status === 'won')?.picks ?? []
             }
           />
         </TabsContent>
@@ -268,7 +282,9 @@ export default function EventPage() {
           <AwardsTab awards={awards} />
         </TabsContent>
 
-        <TabsContent value="teams">teams</TabsContent>
+        <TabsContent value="teams">
+          <TeamsTab teams={teams} />
+        </TabsContent>
 
         <TabsContent value="insights">insights</TabsContent>
 
@@ -312,6 +328,57 @@ function AwardsTab({ awards }: { awards: Award[] }) {
           ))}
         </dl>
       </div>
+    </div>
+  );
+}
+
+function TeamsTab({ teams }: { teams: Team[] }) {
+  teams.sort(sortTeamsComparator);
+
+  // Lot todo here:
+  // 1. add robot images
+  // 2. create a TeamEvent component that shows schedule, etc, which is inside CredenzaBody
+  // 3. add hover effects
+  // 4. split out CredenzaTrigger, so the same UI (Body) can be triggered by different UI elements
+  return (
+    <div className="md:columns-2">
+      {teams.map((t) => (
+        <Credenza key={t.key}>
+          <CredenzaTrigger asChild>
+            <Card className="my-1 flex cursor-pointer items-center gap-4 rounded-lg bg-background p-4">
+              <div className="grid flex-1 gap-1">
+                <div className="font-medium">
+                  {t.team_number} - {t.nickname}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {t.city}, {t.state_prov}, {t.country}
+                </div>
+              </div>
+              <img
+                src="https://placehold.co/400x400"
+                alt=""
+                className="size-20"
+              />
+            </Card>
+          </CredenzaTrigger>
+          <CredenzaContent>
+            <CredenzaHeader>
+              <CredenzaTitle>
+                {t.team_number} - {t.nickname}
+              </CredenzaTitle>
+              <CredenzaDescription>
+                {t.city}, {t.state_prov}, {t.country}
+              </CredenzaDescription>
+            </CredenzaHeader>
+            <CredenzaBody>Full name: {t.name}</CredenzaBody>
+            <CredenzaFooter>
+              <CredenzaClose asChild>
+                <button>Close</button>
+              </CredenzaClose>
+            </CredenzaFooter>
+          </CredenzaContent>
+        </Credenza>
+      ))}
     </div>
   );
 }

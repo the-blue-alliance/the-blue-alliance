@@ -1,14 +1,16 @@
-import { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
+import { LoaderFunctionArgs } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
   json,
   Link,
+  MetaFunction,
   Params,
   useLoaderData,
 } from '@remix-run/react';
 import { useMemo } from 'react';
 import { getTeam, getTeamMediaByYear } from '~/api/v3';
 import InlineIcon from '~/components/tba/inlineIcon';
+import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
@@ -83,12 +85,18 @@ export default function TeamPage(): JSX.Element {
     [media],
   );
 
+  const maybeAvatar = useMemo(
+    () => media.find((m) => m.type === 'avatar'),
+    [media],
+  );
+
   return (
     <div className="flex flex-wrap justify-center">
       <div className="basis-1/2">
-        <div className="text-3xl font-semibold">
+        <h1 className="mb-2.5 mt-5 text-4xl">
+          {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
           Team {team.team_number} - {team.nickname}
-        </div>
+        </h1>
 
         <InlineIcon>
           <BiPinMapFill />

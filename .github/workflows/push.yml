@@ -5,8 +5,6 @@ on:
     branches:
       - py3
 
-concurrency: deploy-${{ github.ref }}
-
 jobs:
   py3-type:
     name: "[py3] Type Check"
@@ -292,7 +290,7 @@ jobs:
           driver-opts: network=host
       - name: Build Docker Image
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/build-push-action@v6.6.1
+        uses: docker/build-push-action@v6.7.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker
@@ -317,6 +315,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-queues-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -349,6 +348,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-index-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -381,6 +381,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-default-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -427,6 +428,7 @@ jobs:
         deploy-index,
       ]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-web-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -473,6 +475,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-api-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -513,6 +516,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-tasks-io-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -548,6 +552,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-tasks-cpu-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -583,6 +588,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [pwa-lint, pwa-type, pwa-build]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-pwa-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -626,6 +632,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-tasks-io, deploy-tasks-cpu]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-cron-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -667,6 +674,7 @@ jobs:
         deploy-pwa,
       ]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-dispatch-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3

@@ -1,10 +1,13 @@
 import {
+  isRouteErrorResponse,
   Links,
   Meta,
+  MetaFunction,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteError,
 } from '@remix-run/react';
 import * as Sentry from '@sentry/react';
 import './tailwind.css';
@@ -78,7 +81,11 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <div className="container mx-auto text-sm">{children}</div>
+        <div className="container mx-auto text-sm">
+          <div vaul-drawer-wrapper="" className="bg-background">
+            {children}
+          </div>
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -88,4 +95,24 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return <Outlet />;
+}
+
+export const meta: MetaFunction = ({ error }) => {
+  const isRouteError = isRouteErrorResponse(error);
+  const title =
+    isRouteError && error.status === 404 ? '404 - Page Not Found' : 'Error';
+  return [{ title: error ? title : 'The Blue Alliance' }];
+};
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  const isRouteError = isRouteErrorResponse(error);
+  return (
+    <>
+      <h1 className="mb-2.5 mt-5 text-4xl">Oh Noes!1!!</h1>
+      <h2 className="text-2xl">
+        {isRouteError ? `Error ${error.status}` : 'An unknown error occurred.'}
+      </h2>
+    </>
+  );
 }

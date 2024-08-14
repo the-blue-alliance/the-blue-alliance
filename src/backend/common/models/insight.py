@@ -42,6 +42,8 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_BLUE_BANNERS = 23
     TYPED_LEADERBOARD_MOST_MATCHES_PLAYED = 24
     TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT = 25
+    TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE = 26
+    TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE = 27
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -73,6 +75,8 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_BLUE_BANNERS: "typed_leaderboard_blue_banners",
         TYPED_LEADERBOARD_MOST_MATCHES_PLAYED: "typed_leaderboard_most_matches_played",
         TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "typed_leaderboard_highest_median_score_by_event",
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE: "typed_leaderboard_highest_match_clean_score",
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE: "typed_leaderboard_highest_match_clean_combined_score",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
     }
@@ -80,6 +84,8 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_MATCH_INSIGHTS = {
         TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
         TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT,
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE,
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE,
     }
     TYPED_LEADERBOARD_AWARD_INSIGHTS = {
         TYPED_LEADERBOARD_BLUE_BANNERS,
@@ -89,6 +95,8 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_BLUE_BANNERS: "team",
         TYPED_LEADERBOARD_MOST_MATCHES_PLAYED: "team",
         TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "event",
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE: "match",
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE: "match",
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting

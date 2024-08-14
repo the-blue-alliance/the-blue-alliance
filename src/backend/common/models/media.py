@@ -156,7 +156,7 @@ class Media(CachedModel):
 
     @property
     def imgur_direct_url(self) -> str:
-        return "https://i.imgur.com/{}h.jpg".format(self.foreign_key)
+        return "https://i.imgur.com/{}.jpeg".format(self.foreign_key)
 
     @property
     def imgur_direct_url_med(self) -> str:
