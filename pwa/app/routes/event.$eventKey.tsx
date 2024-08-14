@@ -37,13 +37,10 @@ import {
   CredenzaTrigger,
 } from '~/components/ui/credenza';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import {
-  getEventDateString,
-  sortAwardsComparator,
-  sortMatchComparator,
-  sortTeamKeysComparator,
-  sortTeamsComparator,
-} from '~/lib/utils';
+import { sortAwardsComparator } from '~/lib/awardUtils';
+import { getEventDateString } from '~/lib/eventUtils';
+import { sortMatchComparator } from '~/lib/matchUtils';
+import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';

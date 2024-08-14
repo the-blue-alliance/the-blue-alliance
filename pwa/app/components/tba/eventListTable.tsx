@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Link } from '@remix-run/react';
-import { getEventDateString } from '~/lib/utils';
+import { getEventDateString } from '~/lib/eventUtils';
 
 export default function EventListTable({ events }: { events: Event[] }) {
   return (
