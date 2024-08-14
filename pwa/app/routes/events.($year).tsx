@@ -1,6 +1,7 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
+  MetaFunction,
   Params,
   useLoaderData,
 } from '@remix-run/react';
@@ -42,6 +43,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   return await loadData(params);
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    {
+      title: `${data?.year} FIRST Robotics Events - The Blue Alliance`,
+    },
+    {
+      name: 'description',
+      content: `Event list for the ${data?.year} FIRST Robotics Competition.`,
+    },
+  ];
+};
 
 interface EventGroup {
   groupName: string;
