@@ -66,6 +66,8 @@ const config = {
           light: '#fee',
           dark: '#fdd',
         },
+        'first-avatar-red': { DEFAULT: '#ed1c24' },
+        'first-avatar-blue': { DEFAULT: '#0066b3' },
       },
       borderRadius: {
         lg: 'var(--radius)',
