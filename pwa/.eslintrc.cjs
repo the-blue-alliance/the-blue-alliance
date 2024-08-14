@@ -97,6 +97,15 @@ module.exports = {
       rules: {
         // See https://github.com/typescript-eslint/typescript-eslint/issues/6226
         '@typescript-eslint/no-throw-literal': 'off',
+        '@typescript-eslint/restrict-template-expressions': [
+          'error',
+          { allowNumber: true },
+        ],
+        // See https://github.com/typescript-eslint/typescript-eslint/issues/6226
+        '@typescript-eslint/only-throw-error': [
+          'off',
+          { allowThrowingAny: false, allowThrowingUnknown: false },
+        ],
       },
     },
 
@@ -113,18 +122,7 @@ module.exports = {
     {
       files: ['app/components/ui/*.tsx'],
       rules: {
-        'react/prop-types': [
-          2,
-          {
-            ignore: [
-              'className',
-              'variant',
-              'size',
-              'sideOffset',
-              'shouldScaleBackground',
-            ],
-          },
-        ],
+        'react/prop-types': ['off'],
       },
     },
   ],
