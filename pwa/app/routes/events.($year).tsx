@@ -8,7 +8,7 @@ import {
 import { getEventsByYear, Event } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
-import { sortEventsComparator } from '~/lib/eventUtils';
+import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
 import { parseParamsForYearElseDefault } from '~/lib/utils';
 
 async function loadData(params: Params) {
@@ -62,8 +62,7 @@ interface EventGroup {
 }
 
 function groupBySections(events: Event[]): EventGroup[] {
-  // TODO: Handle 2021 remote events
-  const eventsByWeek = new Map<number, EventGroup>();
+  const eventsByWeek = new Map<string, EventGroup>();
   const eventsByChampionship = new Map<string, EventGroup>();
   const FOCEvents: EventGroup = {
     groupName: 'FIRST Festival of Champions',
@@ -73,13 +72,14 @@ function groupBySections(events: Event[]): EventGroup[] {
   const offseasonEvents: EventGroup = { groupName: 'Offseason', events: [] };
   events.forEach((event) => {
     // Events by week
-    if (event.week != null) {
-      const weekGroup = eventsByWeek.get(event.week);
+    const weekStr = getEventWeekString(event);
+    if (weekStr != null) {
+      const weekGroup = eventsByWeek.get(weekStr);
       if (weekGroup) {
         weekGroup.events.push(event);
       } else {
-        eventsByWeek.set(event.week, {
-          groupName: `Week ${event.week + 1}`,
+        eventsByWeek.set(weekStr, {
+          groupName: weekStr,
           events: [event],
         });
       }
@@ -88,7 +88,7 @@ function groupBySections(events: Event[]): EventGroup[] {
     // Events by Championship
     if (CMP_EVENT_TYPES.has(event.event_type)) {
       const groupName =
-        event.year >= 2017 && event.year <= 2022
+        event.year >= 2017 && event.year <= 2020
           ? `FIRST Championship - ${event.city}`
           : 'FIRST Championship';
       const championshipGroup = eventsByChampionship.get(groupName);

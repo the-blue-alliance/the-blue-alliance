@@ -49,3 +49,28 @@ export function getEventDateString(event: Event, month: 'long' | 'short') {
 
   return `${startDateString} to ${endDateString}`;
 }
+
+export function getEventWeekString(event: Event) {
+  if (event.week === null) {
+    return null;
+  }
+  if (event.year == 2016) {
+    return `Week ${event.week == 0 ? '0.5' : event.week}`;
+  }
+  if (event.year == 2021) {
+    if (event.week == 0) {
+      return 'Participation';
+    }
+    if (event.week == 6) {
+      return 'FIRST Innovation Challenge';
+    }
+    if (event.week == 7) {
+      return 'INFINITE RECHARGE At Home Challenge';
+    }
+    if (event.week == 8) {
+      return 'Game Design Challenge';
+    }
+    return 'Awards';
+  }
+  return `Week ${event.week + 1}`;
+}
