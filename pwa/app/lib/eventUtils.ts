@@ -28,9 +28,16 @@ export function sortEventsComparator(a: Event, b: Event) {
   return 0;
 }
 
+/** Returns a Date object at midnight in the user's timezone on the specified YYYY-MM-DD. */
+function getLocalMidnightOnDate(yyyymmdd: string) {
+  const date = new Date(yyyymmdd + 'T00:00:00Z');
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
 export function getEventDateString(event: Event, month: 'long' | 'short') {
-  const startDate = new Date(event.start_date);
-  const endDate = new Date(event.end_date);
+  // Local dates are needed since the toLocaleDateString depends on the user's local timezone.
+  const startDate = getLocalMidnightOnDate(event.start_date);
+  const endDate = getLocalMidnightOnDate(event.end_date);
 
   const endDateString = endDate.toLocaleDateString('default', {
     month: month,
