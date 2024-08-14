@@ -1,6 +1,7 @@
 import { Params } from '@remix-run/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { getStatus } from '~/api/v3';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -10,11 +11,15 @@ export function removeNonNumeric(str: string): string {
   return str.replace(/\D/g, '');
 }
 
-export function parseParamsForYearElseDefault(
+export async function parseParamsForYearElseDefault(
   params: Params<string>,
-): number | undefined {
+): Promise<number | undefined> {
   if (params.year === undefined) {
-    return 2024; // TODO:
+    // TODO: Cache this call
+    const status = await getStatus({});
+    return status.status === 200
+      ? status.data.current_season
+      : new Date().getFullYear();
   }
 
   const year = Number(params.year);

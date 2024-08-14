@@ -12,7 +12,7 @@ import { sortEventsComparator } from '~/lib/eventUtils';
 import { parseParamsForYearElseDefault } from '~/lib/utils';
 
 async function loadData(params: Params) {
-  const year = parseParamsForYearElseDefault(params);
+  const year = await parseParamsForYearElseDefault(params);
   if (year === undefined) {
     throw new Response(null, {
       status: 404,
