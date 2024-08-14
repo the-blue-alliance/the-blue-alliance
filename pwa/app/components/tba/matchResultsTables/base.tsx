@@ -77,7 +77,7 @@ function GridCell({
 }
 
 function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
-  if (match.videos === undefined || match.videos.length === 0) {
+  if (match.videos.length === 0) {
     return undefined;
   }
 
@@ -181,7 +181,7 @@ export default function MatchResultsTableBase({
           <div className={gridStyle}>
             {/* play button and match title */}
             <GridCell className="row-span-2">
-              {m.videos !== undefined && m.videos.length > 0 && (
+              {m.videos.length > 0 && (
                 <Link to={maybeGetFirstMatchVideoURL(m) ?? '#'}>
                   <PlayCircle className="inline" />
                 </Link>
@@ -190,10 +190,9 @@ export default function MatchResultsTableBase({
             <GridCell className="row-span-2">{matchTitleFormatter(m)}</GridCell>
 
             {/* red alliance */}
-            {m.alliances?.red?.team_keys.map((k) => {
-              const dq = m.alliances?.red?.dq_team_keys?.includes(k);
-              const surrogate =
-                m.alliances?.red?.surrogate_team_keys?.includes(k);
+            {m.alliances.red.team_keys.map((k) => {
+              const dq = m.alliances.red.dq_team_keys.includes(k);
+              const surrogate = m.alliances.red.surrogate_team_keys.includes(k);
               return (
                 <GridCell
                   key={k}
@@ -205,23 +204,21 @@ export default function MatchResultsTableBase({
                   surrogate={surrogate}
                 >
                   <ConditionalTooltip dq={dq} surrogate={surrogate}>
-                    <Link to={`/team/${k?.substring(3)}`}>
-                      {k?.substring(3)}
-                    </Link>
+                    <Link to={`/team/${k.substring(3)}`}>{k.substring(3)}</Link>
                   </ConditionalTooltip>
                 </GridCell>
               );
             })}
 
             {/* blue alliance */}
-            {zip(m.alliances?.blue?.team_keys, [
+            {zip(m.alliances.blue.team_keys, [
               'col-start-3 row-start-2 lg:col-start-6 lg:row-start-1',
               'col-start-4 row-start-2 lg:col-start-7 lg:row-start-1',
               'col-start-5 row-start-2 lg:col-start-8 lg:row-start-1',
             ]).map(([k, x]) => {
-              const dq = m.alliances?.blue?.dq_team_keys?.includes(k);
+              const dq = m.alliances.blue.dq_team_keys.includes(k);
               const surrogate =
-                m.alliances?.blue?.surrogate_team_keys?.includes(k);
+                m.alliances.blue.surrogate_team_keys.includes(k);
               return (
                 <GridCell
                   key={k}
@@ -234,9 +231,7 @@ export default function MatchResultsTableBase({
                   surrogate={surrogate}
                 >
                   <ConditionalTooltip dq={dq} surrogate={surrogate}>
-                    <Link to={`/team/${k?.substring(3)}`}>
-                      {k?.substring(3)}
-                    </Link>
+                    <Link to={`/team/${k.substring(3)}`}>{k.substring(3)}</Link>
                   </ConditionalTooltip>
                 </GridCell>
               );
@@ -249,7 +244,7 @@ export default function MatchResultsTableBase({
               matchResult={m.winning_alliance === 'red' ? 'winner' : 'loser'}
               teamOrScore={'score'}
             >
-              {m.alliances?.red?.score}
+              {m.alliances.red.score}
             </GridCell>
             <GridCell
               className="col-start-6 lg:col-start-10"
@@ -257,7 +252,7 @@ export default function MatchResultsTableBase({
               matchResult={m.winning_alliance === 'blue' ? 'winner' : 'loser'}
               teamOrScore={'score'}
             >
-              {m.alliances?.blue?.score}
+              {m.alliances.blue.score}
             </GridCell>
           </div>
         </Fragment>

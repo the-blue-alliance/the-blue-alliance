@@ -47,13 +47,13 @@ export default function RankingsTable({
     }),
   );
 
-  const generatedCols: RankingColumnType = (
-    rankings.extra_stats_info ?? []
-  ).map((stat, idx) => ({
-    header: stat.name,
-    accessorFn: (row) => row.extra_stats?.[idx],
-    sortDescFirst: true,
-  }));
+  const generatedCols: RankingColumnType = rankings.extra_stats_info.map(
+    (stat, idx) => ({
+      header: stat.name,
+      accessorFn: (row) => row.extra_stats[idx],
+      sortDescFirst: true,
+    }),
+  );
 
   return (
     <DataTable

@@ -23,10 +23,15 @@ module.exports = {
 
   // Base config
   extends: ['eslint:recommended', 'prettier', 'plugin:tailwindcss/recommended'],
+  plugins: ['no-relative-import-paths'],
   rules: {
     // Fix for eslint not knowing how to resolve unplugin icons
     'import/no-unresolved': ['error', { ignore: ['^~icons/'] }],
     'tailwindcss/no-custom-classname': 'off',
+    'no-relative-import-paths/no-relative-import-paths': [
+      'error',
+      { allowSameFolder: true },
+    ],
   },
 
   overrides: [
@@ -73,10 +78,18 @@ module.exports = {
         },
       },
       extends: [
-        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/strict-type-checked',
+        'plugin:@typescript-eslint/stylistic-type-checked',
         'plugin:import/recommended',
         'plugin:import/typescript',
       ],
+      parserOptions: {
+        project: ['tsconfig.json'],
+      },
+      rules: {
+        // See https://github.com/typescript-eslint/typescript-eslint/issues/6226
+        '@typescript-eslint/no-throw-literal': 'off',
+      },
     },
 
     // Node
