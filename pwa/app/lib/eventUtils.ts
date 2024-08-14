@@ -1,27 +1,5 @@
 import { Event } from '~/api/v3';
 
-export function getEventDateString(event: Event, month: 'long' | 'short') {
-  const startDate = new Date(event.start_date);
-  const endDate = new Date(event.end_date);
-
-  const endDateString = endDate.toLocaleDateString('default', {
-    month: month,
-    day: 'numeric',
-    year: 'numeric',
-  });
-
-  if (startDate.getTime() === endDate.getTime()) {
-    return endDateString;
-  }
-
-  const startDateString = startDate.toLocaleDateString('default', {
-    month: month,
-    day: 'numeric',
-  });
-
-  return `${startDateString} to ${endDateString}`;
-}
-
 export function sortEventsComparator(a: Event, b: Event) {
   // First sort by date
   const start_date_a = new Date(a.start_date);
@@ -48,4 +26,26 @@ export function sortEventsComparator(a: Event, b: Event) {
     return 1;
   }
   return 0;
+}
+
+export function getEventDateString(event: Event, month: 'long' | 'short') {
+  const startDate = new Date(event.start_date);
+  const endDate = new Date(event.end_date);
+
+  const endDateString = endDate.toLocaleDateString('default', {
+    month: month,
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  if (startDate.getTime() === endDate.getTime()) {
+    return endDateString;
+  }
+
+  const startDateString = startDate.toLocaleDateString('default', {
+    month: month,
+    day: 'numeric',
+  });
+
+  return `${startDateString} to ${endDateString}`;
 }
