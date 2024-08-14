@@ -18,7 +18,7 @@ const inlineIconVariants = cva('[&>*:first-child]:size-[1em]', {
 
 interface InlineIconProps
   extends React.HTMLAttributes<HTMLDivElement>,
-  VariantProps<typeof inlineIconVariants> {
+    VariantProps<typeof inlineIconVariants> {
   children: ReactNode[];
 }
 /**
