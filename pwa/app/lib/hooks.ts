@@ -15,7 +15,9 @@ export function useMediaQuery(query: string) {
     result.addEventListener('change', onChange);
     setValue(result.matches);
 
-    return () => result.removeEventListener('change', onChange);
+    return () => {
+      result.removeEventListener('change', onChange);
+    };
   }, [query]);
 
   return value;
