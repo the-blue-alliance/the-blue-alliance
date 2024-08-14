@@ -47,6 +47,30 @@ export default function RankingsTable({
     }),
   );
 
+  const summaryCols: RankingColumnType = [
+    {
+      header: 'Record (W-L-T)',
+      accessorFn: (row) =>
+        `${row.record.wins}-${row.record.losses}-${row.record.ties}`,
+      sortDescFirst: true,
+      sortingFn: (a, b) => {
+        const aRP = 2 * a.original.record.wins + a.original.record.ties;
+        const bRP = 2 * b.original.record.wins + b.original.record.ties;
+        return aRP - bRP;
+      },
+    },
+    {
+      header: 'DQ',
+      accessorFn: (row) => row.dq,
+      sortDescFirst: true,
+    },
+    {
+      header: 'Played',
+      accessorFn: (row) => row.matches_played,
+      sortDescFirst: true,
+    },
+  ];
+
   const generatedCols: RankingColumnType = rankings.extra_stats_info.map(
     (stat, idx) => ({
       header: stat.name,
@@ -57,7 +81,10 @@ export default function RankingsTable({
 
   return (
     <DataTable
-      columns={standardCols.concat(sortOrderCols).concat(generatedCols)}
+      columns={standardCols
+        .concat(sortOrderCols)
+        .concat(summaryCols)
+        .concat(generatedCols)}
       data={rankings.rankings}
       conditionalRowStyling={(row) =>
         cn({
