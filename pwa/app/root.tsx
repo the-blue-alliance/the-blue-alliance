@@ -49,14 +49,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
         <Meta />
         <Links />
-      </head >
+      </head>
       <body>
         <Nav />
         <div className="container mx-auto px-4 text-sm pt-14">{children}</div>
         <ScrollRestoration />
         <Scripts />
-      </body >
-    </html >
+      </body>
+    </html>
   );
 }
 
