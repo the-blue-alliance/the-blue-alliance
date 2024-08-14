@@ -1,6 +1,7 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
+  MetaFunction,
   Params,
   useLoaderData,
 } from '@remix-run/react';
@@ -8,21 +9,27 @@ import { getEventsByYear, Event } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
 import { sortEventsComparator } from '~/lib/eventUtils';
+import { parseParamsForYearElseDefault } from '~/lib/utils';
 
 async function loadData(params: Params) {
-  // TODO: Handle cases where no year is provided
-  if (params.year === undefined || !/^\d{4}$/.test(params.year || '')) {
+  const year = await parseParamsForYearElseDefault(params);
+  if (year === undefined) {
     throw new Response(null, {
       status: 404,
     });
   }
 
-  const year = parseInt(params.year);
   const events = await getEventsByYear({ year });
 
   if (events.status !== 200) {
     throw new Response(null, {
       status: 500,
+    });
+  }
+
+  if (events.data.length === 0) {
+    throw new Response(null, {
+      status: 404,
     });
   }
 
@@ -36,6 +43,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
   return await loadData(params);
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [
+    {
+      title: `${data?.year} FIRST Robotics Events - The Blue Alliance`,
+    },
+    {
+      name: 'description',
+      content: `Event list for the ${data?.year} FIRST Robotics Competition.`,
+    },
+  ];
+};
 
 interface EventGroup {
   groupName: string;
