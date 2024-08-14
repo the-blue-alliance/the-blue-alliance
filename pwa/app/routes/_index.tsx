@@ -54,8 +54,20 @@ export default function Index() {
       >
         Commit: {commitHash}
       </a>
-      <Button onClick={() => setTheme(Theme.LIGHT)}>Light</Button>
-      <Button onClick={() => setTheme(Theme.DARK)}>Dark</Button>
+      <Button
+        onClick={() => {
+          setTheme(Theme.LIGHT);
+        }}
+      >
+        Light
+      </Button>
+      <Button
+        onClick={() => {
+          setTheme(Theme.DARK);
+        }}
+      >
+        Dark
+      </Button>
     </div>
   );
 }
