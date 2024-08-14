@@ -112,6 +112,9 @@ class InsightsHelper(object):
         insights += self._calculate_leaderboard_highest_median_score_by_event(
             week_event_matches, year
         )
+        insights += self._calculate_highest_clean_and_combined_scores(
+            week_event_matches, year
+        )
 
         return insights
 
@@ -322,6 +325,46 @@ class InsightsHelper(object):
                 Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
                 year,
             )
+        ]
+
+    @classmethod
+    def _calculate_highest_clean_and_combined_scores(
+        cls, week_event_matches: List[WeekEventMatches], year: Year
+    ) -> List[Insight]:
+        """Core logic is pretty much the same for both insights, so do both in 1 method."""
+        match_winning_scores = defaultdict(int)
+        match_combined_scores = defaultdict(int)
+
+        for _, week_events in week_event_matches:
+            for _, matches in week_events:
+                for match in matches:
+                    if match.has_been_played:
+                        redScore = int(match.alliances[AllianceColor.RED]["score"])
+                        blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
+
+                        if year >= 2016:
+                            if match.score_breakdown:
+                                redScore -= none_throws(match.score_breakdown)[
+                                    AllianceColor.RED
+                                ].get("foulPoints", 0)
+                                blueScore -= none_throws(match.score_breakdown)[
+                                    AllianceColor.BLUE
+                                ].get("foulPoints", 0)
+
+                        match_winning_scores[match.key.id()] = max(redScore, blueScore)
+                        match_combined_scores[match.key.id()] = redScore + blueScore
+
+        return [
+            cls._create_leaderboard_from_dict_counts(
+                match_winning_scores,
+                Insight.TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE,
+                year,
+            ),
+            cls._create_leaderboard_from_dict_counts(
+                match_combined_scores,
+                Insight.TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE,
+                year,
+            ),
         ]
 
     @classmethod
