@@ -66,7 +66,6 @@ module.exports = {
           'error',
           { ignore: ['vaul-drawer-wrapper'] },
         ],
-        'jsx-a11y/no-noninteractive-element-interactions': 'off',
       },
     },
 

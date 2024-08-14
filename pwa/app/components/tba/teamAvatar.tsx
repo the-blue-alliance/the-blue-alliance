@@ -18,15 +18,12 @@ export default function TeamAvatar({ media }: { media: Media }): JSX.Element {
   };
 
   return (
-    <img
-      alt="Team Avatar"
-      src={`data:image/png;base64, ${media.details.base64Image}`}
-      className={cn(
-        'size-12 rounded inline mr-2 p-1 cursor-pointer',
-        colorClass,
-      )}
-      onClick={handler}
-      onKeyDown={handler}
-    />
+    <button className="mr-2" onClick={handler} onKeyDown={handler}>
+      <img
+        alt="Team Avatar"
+        src={`data:image/png;base64, ${media.details.base64Image}`}
+        className={cn('size-12 rounded inline p-1', colorClass)}
+      />
+    </button>
   );
 }
