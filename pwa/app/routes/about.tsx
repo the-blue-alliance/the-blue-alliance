@@ -1,6 +1,8 @@
 import { Link } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 
+import first_logo from '../images/first_logo.png';
+
 export default function About(): JSX.Element {
   return (
     <>
@@ -70,11 +72,7 @@ export default function About(): JSX.Element {
           </p>
 
           <div className="flex">
-            <img
-              src="https://www.firstinspires.org/sites/default/files/uploads/resource_library/brand/thumbnails/FIRST-V.png"
-              alt="FIRST' Logo"
-              className="h-16 w-auto"
-            />
+            <img src={first_logo} alt="FIRST Logo" className="h-30 w-auto" />
 
             <blockquote>
               <p>
