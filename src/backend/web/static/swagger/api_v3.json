@@ -7763,8 +7763,7 @@
       "Elimination_Alliance": {
         "required": [
           "picks",
-          "declines",
-          "status"
+          "declines"
         ],
         "type": "object",
         "properties": {
