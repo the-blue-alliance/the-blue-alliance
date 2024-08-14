@@ -12,7 +12,7 @@ export function removeNonNumeric(str: string): string {
 }
 
 export async function parseParamsForYearElseDefault(
-  params: Params<string>,
+  params: Params,
 ): Promise<number | undefined> {
   if (params.year === undefined) {
     // TODO: Cache this call
