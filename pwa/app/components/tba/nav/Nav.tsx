@@ -14,15 +14,14 @@ import {
 import { cn } from '~/lib/utils';
 import { Input } from "~/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { StarIcon } from "~/components/tba/icons/StarIcon";
-import { CalendarIcon } from "~/components/tba/icons/CalendarIcon";
-import { PersonIcon } from "~/components/tba/icons/PersonIcon";
-import { VideoCameraIcon } from "~/components/tba/icons/VideoCameraIcon";
-import { InsightIcon } from "~/components/tba/icons/InsightIcon";
-import { MoreIcon } from "~/components/tba/icons/MoreIcon";
-import { BlogIcon } from "~/components/tba/icons/BlogIcon";
-import { GearIcon } from "~/components/tba/icons/GearIcon";
-
+import BiStarFill from '~icons/bi/star-fill';
+import IonCalendar from '~icons/ion/calendar';
+import BiPeopleFill from '~icons/bi/people-fill';
+import BiCameraVideoFill from '~icons/bi/camera-video-fill';
+import BiBarChartLineFill from '~icons/bi/bar-chart-line-fill';
+import BiThreeDotsVertical from '~icons/bi/three-dots-vertical';
+import BiPencilFill from '~icons/bi/pencil-fill';
+import BiGearFill from '~icons/bi/gear-fill';
 
 type MenuItemProps = {
     icon: React.ReactNode;
@@ -68,16 +67,16 @@ export const Nav = () => {
                     <img src="https://www.thebluealliance.com/images/tba_lamp.svg" className="h-8 pr-4 w-8" />
                     <div className="text-2xl text-white whitespace-nowrap pr-2">The Blue Alliance</div>
                     <div className="grow" />
-                    <MenuItem icon={<StarIcon />} title="myTBA" />
-                    <MenuItem icon={<CalendarIcon />} title="Events" />
-                    <MenuItem icon={<PersonIcon />} title="Teams" />
-                    <MenuItem icon={<VideoCameraIcon />} title="GameDay" />
-                    <MenuItem icon={<InsightIcon />} title="Insights" />
+                    <MenuItem icon={<BiStarFill />} title="myTBA" />
+                    <MenuItem icon={<IonCalendar />} title="Events" />
+                    <MenuItem icon={<BiPeopleFill />} title="Teams" />
+                    <MenuItem icon={<BiCameraVideoFill />} title="GameDay" />
+                    <MenuItem icon={<BiBarChartLineFill />} title="Insights" />
                     <Popover>
-                        <PopoverTrigger><MenuItem title="More" icon={<MoreIcon />} /> </PopoverTrigger>
+                        <PopoverTrigger><MenuItem title="More" icon={<BiThreeDotsVertical />} /> </PopoverTrigger>
                         <PopoverContent sideOffset={12} alignOffset={-2} align="start" className={cn("mt-6 bg-primary px-1 py-1 w-30 m-0 border-none drop-shadow-lg shadow-l rounded-md ")}>
-                            <DropMenuItem icon={<BlogIcon />} title="Blog" />
-                            <DropMenuItem icon={<GearIcon />} title="Account" />
+                            <DropMenuItem icon={<BiPencilFill />} title="Blog" />
+                            <DropMenuItem icon={<BiGearFill />} title="Account" />
                         </PopoverContent>
                     </Popover>
 
