@@ -7,7 +7,7 @@ import {
 import { getEventsByYear, Event } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
-import { sortEventsComparator } from '~/lib/utils';
+import { sortEventsComparator } from '~/lib/eventUtils';
 
 async function loadData(params: Params) {
   // TODO: Handle cases where no year is provided
