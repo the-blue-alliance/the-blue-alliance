@@ -137,12 +137,14 @@ export default function EventPage() {
   const leftSideMatches =
     quals.length > 0 ? (
       <MatchResultsTableQuals matches={quals} />
-    ) : (
+    ) : elims.length > 0 ? (
       <MatchResultsTableDoubleElim matches={elims} />
-    );
+    ) : null;
 
   const rightSideElims =
-    quals.length > 0 ? <MatchResultsTableDoubleElim matches={elims} /> : <></>;
+    quals.length > 0 && elims.length > 0 ? (
+      <MatchResultsTableDoubleElim matches={elims} />
+    ) : null;
 
   return (
     <>
@@ -201,29 +203,38 @@ export default function EventPage() {
         </InlineIcon>
       </div>
 
-      <Tabs defaultValue="results" className="">
+      <Tabs
+        defaultValue={matches.length > 0 ? 'results' : 'teams'}
+        className=""
+      >
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly [&>*]:basis-1/2
             lg:[&>*]:basis-1"
         >
-          <TabsTrigger value="results">
-            <InlineIcon>
-              <MdiTournament />
-              Results
-            </InlineIcon>
-          </TabsTrigger>
-          <TabsTrigger value="rankings">
-            <InlineIcon>
-              <BiListOl />
-              Rankings
-            </InlineIcon>
-          </TabsTrigger>
-          <TabsTrigger value="awards">
-            <InlineIcon>
-              <BiTrophy />
-              Awards
-            </InlineIcon>
-          </TabsTrigger>
+          {(matches.length > 0 || (alliances && alliances.length > 0)) && (
+            <TabsTrigger value="results">
+              <InlineIcon>
+                <MdiTournament />
+                Results
+              </InlineIcon>
+            </TabsTrigger>
+          )}
+          {rankings.rankings.length > 0 && (
+            <TabsTrigger value="rankings">
+              <InlineIcon>
+                <BiListOl />
+                Rankings
+              </InlineIcon>
+            </TabsTrigger>
+          )}
+          {awards.length > 0 && (
+            <TabsTrigger value="awards">
+              <InlineIcon>
+                <BiTrophy />
+                Awards
+              </InlineIcon>
+            </TabsTrigger>
+          )}
           <TabsTrigger value="teams">
             <InlineIcon>
               <MdiRobot />
@@ -249,7 +260,7 @@ export default function EventPage() {
             <div className="basis-full lg:basis-1/2">{leftSideMatches}</div>
 
             <div className="basis-full lg:basis-1/2">
-              <AllianceSelectionTable alliances={alliances ?? []} />
+              {alliances && <AllianceSelectionTable alliances={alliances} />}
               {rightSideElims}
             </div>
           </div>
