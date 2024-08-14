@@ -239,6 +239,9 @@ export default function EventPage() {
             <InlineIcon>
               <MdiRobot />
               Teams
+              <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
+                {teams.length}
+              </Badge>
             </InlineIcon>
           </TabsTrigger>
           <TabsTrigger value="insights">
