@@ -1,4 +1,4 @@
-import { Match, Team } from '~/api/v3';
+import { Match } from '~/api/v3';
 
 export function sortMatchComparator(a: Match, b: Match) {
   const compLevelValues = {
