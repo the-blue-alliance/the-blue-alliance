@@ -1,6 +1,5 @@
 import { Link } from '@remix-run/react';
-import { buttonVariants } from '~/components/ui/button';
-import { cn } from '~/lib/utils';
+import { Button } from '~/components/ui/button';
 
 export default function About(): JSX.Element {
   return (
@@ -10,9 +9,10 @@ export default function About(): JSX.Element {
           <h1 className="text-3xl font-medium">About Us</h1>
           <p>
             Founded in the fall of 2006, The Blue Alliance began as a website
-            dedicated to providing everyone involved in the FIRST Robotics
-            Competition (FRC) with scouting data and match videos. Since then,
-            the project has grown to include developers from within the FIRST
+            dedicated to providing everyone involved in the <em>FIRST</em>{' '}
+            Robotics Competition (FRC) with scouting data and match videos.
+            Since then, the project has grown to include developers from within
+            the <em>FIRST</em>
             community from various teams all over the world. We continually
             strive to make The Blue Alliance an even more valuable resource for
             our users. Other additions to The Blue Alliance include match
@@ -28,30 +28,17 @@ export default function About(): JSX.Element {
           <p>
             You can support The Blue Alliance or reach us with the following:
           </p>
-          <a
-            href="https://github.com/the-blue-alliance"
-            className={cn(
-              buttonVariants({ variant: 'default', size: 'default' }),
-            )}
-          >
-            Contribute on GitHub!
-          </a>
-          <Link
-            to="/donate"
-            className={cn(
-              buttonVariants({ variant: 'default', size: 'default' }),
-            )}
-          >
-            Donate with PayPal
-          </Link>
-          <Link
-            to="/contact"
-            className={cn(
-              buttonVariants({ variant: 'default', size: 'default' }),
-            )}
-          >
-            Contact Us!
-          </Link>
+          <Button asChild>
+            <a href="https://github.com/the-blue-alliance">
+              Contribute on GitHub!
+            </a>
+          </Button>
+          <Button asChild>
+            <Link to="/donate">Donate with PayPal</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/contact">Contact Us!</Link>
+          </Button>
         </div>
 
         <div>
@@ -66,8 +53,9 @@ export default function About(): JSX.Element {
             (For Inspiration and Recognition of Science and Technology) is a
             non-profit organization with the mission of inspiring young people
             to be science and technology leaders. With programs that involve
-            students from kindergarten through high school, FIRST has become a
-            world-wide phenomenon with teams from all six inhabited continents.
+            students from kindergarten through high school, <em>FIRST</em> has
+            become a world-wide phenomenon with teams from all six inhabited
+            continents.
           </p>
           <p>
             The{' '}
@@ -125,7 +113,7 @@ export default function About(): JSX.Element {
             </li>
             <li className="list-disc">
               <p>
-                <a href="http://frc.link/" title="FRC Links">
+                <a href="https://frc.link/" title="FRC Links">
                   FRC Links
                 </a>{' '}
                 - Easy access to specific FRC team and event pages
@@ -137,17 +125,6 @@ export default function About(): JSX.Element {
                   Statbotics
                 </a>{' '}
                 - Unique FRC team and event performance comparisons
-              </p>
-            </li>
-            <li className="list-disc">
-              <p>
-                <a
-                  href="https://discord.gg/frc"
-                  title="Unofficial FIRST Discord Server"
-                >
-                  Unofficial <em>FIRST</em> Discord Server
-                </a>{' '}
-                - Resource and chat hub for everything FRC
               </p>
             </li>
           </ul>
