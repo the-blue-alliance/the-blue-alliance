@@ -35,6 +35,7 @@ api.defaults.headers = {
 };
 
 // Custom fetch that uses an in-memory cache to handle ETags.
+// TODO: Maybe also use localStorage for clients?
 const cache = new LRUCache<string, Response>({
   max: 500,
 });
