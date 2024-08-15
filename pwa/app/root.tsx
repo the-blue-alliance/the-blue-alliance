@@ -33,6 +33,31 @@ api.defaults.headers = {
   'X-TBA-Auth-Key': import.meta.env.VITE_TBA_API_READ_KEY,
 };
 
+// Custom fetch that uses an in-memory cache to handle ETags.
+const cache = new Map<string, Response>();
+api.defaults.fetch = async (url, options = {}) => {
+  if (options.method && options.method !== 'GET') {
+    return fetch(url, options);
+  }
+
+  // Only cache GET requests
+  const cachedResponse = cache.get(url as string);
+  const etag = cachedResponse?.headers.get('ETag');
+  if (cachedResponse && etag) {
+    (options.headers as Headers).set('If-None-Match', etag);
+  }
+
+  const response = await fetch(url, options);
+  if (response.status === 304 && cachedResponse) {
+    return cachedResponse.clone();
+  }
+
+  if (response.status === 200 && response.headers.has('ETag')) {
+    cache.set(url as string, response.clone());
+  }
+  return response;
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
