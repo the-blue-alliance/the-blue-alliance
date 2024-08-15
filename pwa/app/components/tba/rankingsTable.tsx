@@ -25,7 +25,7 @@ export default function RankingsTable({
           className="whitespace-nowrap"
         >
           {winners.includes(row.original.team_key) ? (
-            <InlineIcon className="justify-center">
+            <InlineIcon className="relative right-[1ch] justify-center">
               <BiTrophy />
               {row.original.team_key.substring(3)}
             </InlineIcon>

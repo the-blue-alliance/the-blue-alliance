@@ -845,7 +845,7 @@ export type EliminationAlliance = {
   declines: string[];
   /** List of team keys picked for the alliance. First pick is captain. */
   picks: string[];
-  status: {
+  status?: {
     playoff_average?: number;
     level?: string;
     record?: WltRecord | null;

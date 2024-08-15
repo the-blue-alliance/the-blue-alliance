@@ -9,19 +9,20 @@ import {
 import { useMemo } from 'react';
 import {
   Award,
+  Event,
   getEvent,
   getEventAlliances,
   getEventAwards,
   getEventMatches,
   getEventRankings,
   getEventTeams,
+  Match,
   Team,
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import InlineIcon from '~/components/tba/inlineIcon';
-import MatchResultsTableDoubleElim from '~/components/tba/matchResultsTables/doubleElim';
-import MatchResultsTableQuals from '~/components/tba/matchResultsTables/quals';
+import MatchResultsTable from '~/components/tba/matchResultsTable';
 import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
 import { Card } from '~/components/ui/card';
@@ -36,6 +37,7 @@ import {
   CredenzaTitle,
   CredenzaTrigger,
 } from '~/components/ui/credenza';
+import { ScrollArea } from '~/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import { getEventDateString } from '~/lib/eventUtils';
@@ -135,15 +137,24 @@ export default function EventPage() {
   );
 
   const leftSideMatches =
-    quals.length > 0 ? (
-      <MatchResultsTableQuals matches={quals} />
-    ) : elims.length > 0 ? (
-      <MatchResultsTableDoubleElim matches={elims} />
+    matches.length > 0 ? (
+      <>
+        <h2 className="text-xl">
+          {quals.length > 0 ? 'Quals' : 'Elims'} Results
+        </h2>
+        <MatchResultsTable
+          matches={quals.length > 0 ? quals : elims}
+          event={event}
+        />
+      </>
     ) : null;
 
   const rightSideElims =
     quals.length > 0 && elims.length > 0 ? (
-      <MatchResultsTableDoubleElim matches={elims} />
+      <>
+        <h2 className="mt-4 text-xl">Playoff Results</h2>
+        <MatchResultsTable matches={elims} event={event} />
+      </>
     ) : null;
 
   return (
@@ -273,7 +284,7 @@ export default function EventPage() {
           <RankingsTable
             rankings={rankings}
             winners={
-              alliances?.find((a) => a.status.status === 'won')?.picks ?? []
+              alliances?.find((a) => a.status?.status === 'won')?.picks ?? []
             }
           />
         </TabsContent>
@@ -283,7 +294,7 @@ export default function EventPage() {
         </TabsContent>
 
         <TabsContent value="teams">
-          <TeamsTab teams={teams} />
+          <TeamsTab teams={teams} matches={sortedMatches} event={event} />
         </TabsContent>
 
         <TabsContent value="insights">insights</TabsContent>
@@ -332,7 +343,15 @@ function AwardsTab({ awards }: { awards: Award[] }) {
   );
 }
 
-function TeamsTab({ teams }: { teams: Team[] }) {
+function TeamsTab({
+  teams,
+  matches,
+  event,
+}: {
+  teams: Team[];
+  matches: Match[];
+  event: Event;
+}) {
   teams.sort(sortTeamsComparator);
 
   // Lot todo here:
@@ -370,7 +389,20 @@ function TeamsTab({ teams }: { teams: Team[] }) {
                 {t.city}, {t.state_prov}, {t.country}
               </CredenzaDescription>
             </CredenzaHeader>
-            <CredenzaBody>Full name: {t.name}</CredenzaBody>
+            <CredenzaBody>
+              <h1 className="text-xl">{event.short_name}</h1>
+              <ScrollArea className="h-[70vh] md:h-auto">
+                <MatchResultsTable
+                  team={t}
+                  matches={matches.filter(
+                    (m) =>
+                      m.alliances.blue.team_keys.includes(t.key) ||
+                      m.alliances.red.team_keys.includes(t.key),
+                  )}
+                  event={event}
+                />
+              </ScrollArea>
+            </CredenzaBody>
             <CredenzaFooter>
               <CredenzaClose asChild>
                 <button>Close</button>

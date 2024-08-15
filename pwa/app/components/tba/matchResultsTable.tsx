@@ -2,13 +2,16 @@ import { Tooltip } from '@radix-ui/react-tooltip';
 import { Link } from '@remix-run/react';
 import { type VariantProps, cva } from 'class-variance-authority';
 import type React from 'react';
-import { Fragment } from 'react';
-import { Match } from '~/api/v3';
+import { Fragment, useMemo } from 'react';
+import { Event, Match, Team } from '~/api/v3';
+import { groupBy } from 'lodash-es';
 import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { DOUBLE_ELIM_ROUND_MAPPING, PlayoffType } from '~/lib/api/PlayoffType';
+import { matchTitleShort } from '~/lib/matchUtils';
 import { cn, timestampsAreOnDifferentDays, zip } from '~/lib/utils';
 import PlayCircle from '~icons/bi/play-circle';
 
@@ -46,6 +49,7 @@ const cellVariants = cva('', {
   ],
 });
 
+// todo: implement RP dot markers
 interface CellProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof cellVariants> {
@@ -110,13 +114,70 @@ function ConditionalTooltip({
   return <>{children}</>;
 }
 
-export default function MatchResultsTableBase({
-  matches,
-  matchTitleFormatter,
-}: {
+interface MatchResultsTableProps {
   matches: Match[];
-  matchTitleFormatter: (match: Match) => string;
-}) {
+  team?: Team;
+  event: Event;
+}
+
+export default function MatchResultsTable(props: MatchResultsTableProps) {
+  const hasPlayoffs =
+    props.matches.filter((m) => m.comp_level !== 'qm').length > 0;
+
+  const groupByRound =
+    hasPlayoffs &&
+    (props.event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM ||
+      props.event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM);
+
+  const dividersBetweenRounds = !groupByRound && hasPlayoffs;
+
+  const matchesGroupedByRound = useMemo(
+    () =>
+      groupByRound
+        ? groupBy(
+            props.matches.filter((m) => m.comp_level !== 'f'),
+            (m) => DOUBLE_ELIM_ROUND_MAPPING.get(m.set_number) ?? 1,
+          )
+        : {},
+    [groupByRound, props.matches],
+  );
+
+  const finals = useMemo(
+    () => props.matches.filter((m) => m.comp_level === 'f'),
+    [props.matches],
+  );
+
+  // TODO: implement me for 2022 and prior single elim bracket tables
+  // (the grey divider boxes between rows)
+  if (dividersBetweenRounds) {
+    return <MatchResultsTableGroup {...props} />;
+  }
+
+  if (!hasPlayoffs) {
+    return <MatchResultsTableGroup {...props} />;
+  }
+
+  return (
+    <>
+      {Object.entries(matchesGroupedByRound).map(([round, matches]) => (
+        <div key={round}>
+          <div className="mt-1.5 text-lg">Round {round}</div>
+          <MatchResultsTableGroup {...props} matches={matches} />
+        </div>
+      ))}
+
+      {finals.length > 0 && (
+        <>
+          <div className="mt-1.5 text-lg">Finals</div>
+          <MatchResultsTableGroup {...props} matches={finals} />
+        </>
+      )}
+    </>
+  );
+}
+
+// todo: add support for specific-team underlines
+function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
   const gridStyle = cn(
     // always use these classes:
     'grid items-center justify-items-center',
@@ -129,7 +190,7 @@ export default function MatchResultsTableBase({
     '[&>*]:border-[#ddd] [&>*]:border-[1px]',
     // use these on desktop:
     'lg:grid-rows-1',
-    'lg:grid-cols-[calc(1.25em+6px*2)_8em_repeat(6,minmax(0,1fr))_0.9fr_0.9fr]',
+    'lg:grid-cols-[calc(1.25em+6px*2)_10em_repeat(6,minmax(0,1fr))_0.9fr_0.9fr]',
     'lg:border-[#ddd] lg:border-b-[1px]',
     '[&>*]:lg:border-0 [&>*]:lg:border-r-[1px]', // reset the border, then apply one to the right
   );
@@ -187,7 +248,9 @@ export default function MatchResultsTableBase({
                 </Link>
               )}
             </GridCell>
-            <GridCell className="row-span-2">{matchTitleFormatter(m)}</GridCell>
+            <GridCell className="row-span-2">
+              {matchTitleShort(m, event)}
+            </GridCell>
 
             {/* red alliance */}
             {m.alliances.red.team_keys.map((k) => {

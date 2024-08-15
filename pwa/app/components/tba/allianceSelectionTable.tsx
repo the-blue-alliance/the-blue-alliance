@@ -62,7 +62,7 @@ export default function AllianceSelectionTable(props: {
 
   return (
     <>
-      <div className="text-2xl">Alliances</div>
+      <div className="text-xl">Alliances</div>
 
       <Table className="table-fixed">
         <TableHeader>
@@ -75,11 +75,11 @@ export default function AllianceSelectionTable(props: {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {props.alliances.map((a) => (
+          {props.alliances.map((a, idx) => (
             <AllianceTableRow
               key={a.name}
               variant={
-                a.status.level === 'f'
+                a.status?.level === 'f'
                   ? a.status.status === 'won'
                     ? 'winner'
                     : 'finalist'
@@ -87,13 +87,13 @@ export default function AllianceSelectionTable(props: {
               }
             >
               <TableCell className="">
-                {a.status.status === 'won' ? (
-                  <InlineIcon className="justify-center">
+                {a.status?.status === 'won' ? (
+                  <InlineIcon className="relative right-[1ch] justify-center">
                     <BiTrophy />
-                    {extractAllianceNumber(a.name ?? '')}
+                    {extractAllianceNumber(a.name ?? `${idx + 1}`)}
                   </InlineIcon>
                 ) : (
-                  <>{extractAllianceNumber(a.name ?? '')}</>
+                  <>{extractAllianceNumber(a.name ?? `${idx + 1}`)}</>
                 )}
               </TableCell>
 
