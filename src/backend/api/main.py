@@ -107,6 +107,7 @@ CORS(
     origins="*",
     methods=["OPTIONS", "GET"],
     allow_headers=["X-TBA-Auth-Key", "If-None-Match", "If-Modified-Since"],
+    expose_headers=["ETag"],
 )
 
 # Overall Status
