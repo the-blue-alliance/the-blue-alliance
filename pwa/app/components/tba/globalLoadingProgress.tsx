@@ -16,9 +16,12 @@ export default function GlobalLoadingProgress() {
     } else {
       setProgress(100);
       // Wait before hiding the progress bar
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         setHidden(true);
       }, 250);
+      return () => {
+        clearTimeout(timeout);
+      };
     }
   }, [active]);
 
