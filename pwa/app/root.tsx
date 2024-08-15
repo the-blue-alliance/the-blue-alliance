@@ -11,6 +11,7 @@ import {
 import * as Sentry from '@sentry/react';
 import './tailwind.css';
 import * as api from '~/api/v3';
+import { LRUCache } from 'lru-cache';
 
 Sentry.init({
   dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
@@ -34,7 +35,9 @@ api.defaults.headers = {
 };
 
 // Custom fetch that uses an in-memory cache to handle ETags.
-const cache = new Map<string, Response>();
+const cache = new LRUCache<string, Response>({
+  max: 500,
+});
 api.defaults.fetch = async (url, options = {}) => {
   if (options.method && options.method !== 'GET') {
     return fetch(url, options);
