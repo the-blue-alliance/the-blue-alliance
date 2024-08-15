@@ -12,8 +12,8 @@ import * as Sentry from '@sentry/react';
 import { LRUCache } from 'lru-cache';
 
 import * as api from '~/api/v3';
-import GlobalLoadingProgress from './components/tba/globalLoadingProgress';
 
+import GlobalLoadingProgress from './components/tba/globalLoadingProgress';
 import './tailwind.css';
 
 Sentry.init({
