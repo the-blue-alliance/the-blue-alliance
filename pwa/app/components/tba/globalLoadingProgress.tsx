@@ -1,6 +1,7 @@
 import { useNavigation } from '@remix-run/react';
-import { Progress } from '~/components/ui/progress';
 import { useEffect, useState } from 'react';
+
+import { Progress } from '~/components/ui/progress';
 
 // TODO: Integrate with nav bar
 export default function GlobalLoadingProgress() {
