@@ -49,7 +49,6 @@ export default function About(): JSX.Element {
           </h3>
           <p>
             <a href="http://www.firstinspires.org/">
-              {' '}
               <em>FIRST</em>
             </a>{' '}
             (For Inspiration and Recognition of Science and Technology) is a
