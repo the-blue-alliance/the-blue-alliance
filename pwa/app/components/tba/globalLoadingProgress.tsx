@@ -23,18 +23,20 @@ export default function GlobalLoadingProgress() {
   }, [active]);
 
   useEffect(() => {
-    if (hidden || progress >= 100) {
+    if (hidden) {
       return;
     }
-    const timer = setTimeout(() => {
+    const interval = setInterval(() => {
       // Advance 30% of the remaining progress, stalling at 95% until the navigation is complete
-      const remaining = 95 - progress;
-      setProgress(Math.min(95, progress + 0.3 * remaining));
+      setProgress((prevProgres) => {
+        const remaining = 95 - prevProgres;
+        return Math.min(95, prevProgres + 0.3 * remaining);
+      });
     }, 200);
     return () => {
-      clearTimeout(timer);
+      clearInterval(interval);
     };
-  }, [hidden, progress]);
+  }, [hidden]);
 
   if (hidden) {
     return null;
