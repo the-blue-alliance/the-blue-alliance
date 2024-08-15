@@ -26,7 +26,7 @@ export default function GlobalLoadingProgress() {
   }, [active]);
 
   useEffect(() => {
-    if (hidden) {
+    if (!active || hidden) {
       return;
     }
     const interval = setInterval(() => {
@@ -39,7 +39,7 @@ export default function GlobalLoadingProgress() {
     return () => {
       clearInterval(interval);
     };
-  }, [hidden]);
+  }, [active, hidden]);
 
   if (hidden) {
     return null;
