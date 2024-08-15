@@ -38,11 +38,13 @@ api.defaults.headers = {
 
 // Custom fetch that uses an in-memory cache to handle ETags.
 // TODO: Maybe also use localStorage for clients?
+// TODO: Fix CORS on client
+const isServer = typeof window === 'undefined';
 const cache = new LRUCache<string, Response>({
   max: 500,
 });
 api.defaults.fetch = async (url, options = {}) => {
-  if (options.method && options.method !== 'GET') {
+  if ((options.method && options.method !== 'GET') || !isServer) {
     return fetch(url, options);
   }
 
