@@ -1,6 +1,7 @@
 import { Link } from '@remix-run/react';
 import { type VariantProps, cva } from 'class-variance-authority';
 import type React from 'react';
+
 import BiTrophy from '~icons/bi/trophy';
 
 import { EliminationAlliance } from '~/api/v3';

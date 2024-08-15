@@ -7,6 +7,7 @@ import {
   useLoaderData,
 } from '@remix-run/react';
 import { useMemo } from 'react';
+
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';

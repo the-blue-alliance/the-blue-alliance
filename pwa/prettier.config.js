@@ -10,7 +10,7 @@ export default {
   ],
   tailwindFunctions: ['clsx', 'cn'],
   customFunctions: ['clsx', 'cn'],
-  importOrder: ['^@/(.*)$', '^~/(.*)$', '^[./]'],
+  importOrder: ['^@/(.*)$', '^~icons/(.*)$', '^~/(.*)$', '^[./]'],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
 };

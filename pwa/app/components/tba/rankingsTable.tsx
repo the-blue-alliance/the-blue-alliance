@@ -1,5 +1,6 @@
 import { Link } from '@remix-run/react';
 import type { ColumnDef } from '@tanstack/react-table';
+
 import BiTrophy from '~icons/bi/trophy';
 
 import { EventRanking } from '~/api/v3';
