@@ -9,9 +9,9 @@ import {
   useRouteError,
 } from '@remix-run/react';
 import * as Sentry from '@sentry/react';
+import { LRUCache } from 'lru-cache';
 
 import * as api from '~/api/v3';
-import { LRUCache } from 'lru-cache';
 
 import './tailwind.css';
 
