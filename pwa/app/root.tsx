@@ -1,16 +1,18 @@
 import {
-  isRouteErrorResponse,
   Links,
   Meta,
   MetaFunction,
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
   useRouteError,
 } from '@remix-run/react';
 import * as Sentry from '@sentry/react';
-import './tailwind.css';
+
 import * as api from '~/api/v3';
+
+import './tailwind.css';
 
 Sentry.init({
   dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',

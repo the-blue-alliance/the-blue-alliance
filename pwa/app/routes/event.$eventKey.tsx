@@ -1,4 +1,4 @@
-import { json, LoaderFunctionArgs } from '@remix-run/node';
+import { LoaderFunctionArgs, json } from '@remix-run/node';
 import {
   type ClientLoaderFunctionArgs,
   Link,
@@ -7,17 +7,29 @@ import {
   useLoaderData,
 } from '@remix-run/react';
 import { useMemo } from 'react';
+import BiCalendar from '~icons/bi/calendar';
+import BiGraphUp from '~icons/bi/graph-up';
+import BiInfoCircleFill from '~icons/bi/info-circle-fill';
+import BiLink from '~icons/bi/link';
+import BiListOl from '~icons/bi/list-ol';
+import BiPinMapFill from '~icons/bi/pin-map-fill';
+import BiTrophy from '~icons/bi/trophy';
+import MdiFolderMediaOutline from '~icons/mdi/folder-media-outline';
+import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
+import MdiRobot from '~icons/mdi/robot';
+import MdiTournament from '~icons/mdi/tournament';
+
 import {
   Award,
   Event,
+  Match,
+  Team,
   getEvent,
   getEventAlliances,
   getEventAwards,
   getEventMatches,
   getEventRankings,
   getEventTeams,
-  Match,
-  Team,
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
@@ -43,17 +55,6 @@ import { sortAwardsComparator } from '~/lib/awardUtils';
 import { getEventDateString } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
-import BiCalendar from '~icons/bi/calendar';
-import BiGraphUp from '~icons/bi/graph-up';
-import BiInfoCircleFill from '~icons/bi/info-circle-fill';
-import BiLink from '~icons/bi/link';
-import BiListOl from '~icons/bi/list-ol';
-import BiPinMapFill from '~icons/bi/pin-map-fill';
-import BiTrophy from '~icons/bi/trophy';
-import MdiFolderMediaOutline from '~icons/mdi/folder-media-outline';
-import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
-import MdiRobot from '~icons/mdi/robot';
-import MdiTournament from '~icons/mdi/tournament';
 
 async function loadData(params: Params) {
   if (params.eventKey === undefined) {

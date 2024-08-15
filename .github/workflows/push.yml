@@ -152,7 +152,7 @@ jobs:
         run: npm --prefix pwa ci
       - name: Run Format
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa run format:check
+        run: npm --prefix pwa run format
       - name: Run Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa run lint

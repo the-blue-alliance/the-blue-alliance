@@ -2,7 +2,8 @@ import { Link } from '@remix-run/react';
 import { type VariantProps, cva } from 'class-variance-authority';
 import type React from 'react';
 import BiTrophy from '~icons/bi/trophy';
-import InlineIcon from './inlineIcon';
+
+import { EliminationAlliance } from '~/api/v3';
 import {
   Table,
   TableBody,
@@ -11,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { EliminationAlliance } from '~/api/v3';
 import { cn } from '~/lib/utils';
+
+import InlineIcon from './inlineIcon';
 
 const rowVariants = cva('text-center', {
   variants: {

@@ -1,10 +1,12 @@
 import { Link } from '@remix-run/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { cn } from '~/lib/utils';
 import BiTrophy from '~icons/bi/trophy';
-import InlineIcon from './inlineIcon';
-import { DataTable } from '~/components/tba/dataTable';
+
 import { EventRanking } from '~/api/v3';
+import { DataTable } from '~/components/tba/dataTable';
+import { cn } from '~/lib/utils';
+
+import InlineIcon from './inlineIcon';
 
 type RankingColumnType = ColumnDef<EventRanking['rankings'][number]>[];
 

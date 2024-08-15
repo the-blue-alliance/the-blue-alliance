@@ -1,22 +1,23 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
-  json,
   Link,
   MetaFunction,
   Params,
+  json,
   useLoaderData,
 } from '@remix-run/react';
 import { useMemo } from 'react';
-import { getTeam, getTeamMediaByYear } from '~/api/v3';
-import InlineIcon from '~/components/tba/inlineIcon';
-import TeamAvatar from '~/components/tba/teamAvatar';
-import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';
 import BiLink from '~icons/bi/link';
 import BiPinMapFill from '~icons/bi/pin-map-fill';
+
+import { getTeam, getTeamMediaByYear } from '~/api/v3';
+import InlineIcon from '~/components/tba/inlineIcon';
+import TeamAvatar from '~/components/tba/teamAvatar';
+import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
 
 async function loadData(params: Params) {
   if (params.teamNumber === undefined) {

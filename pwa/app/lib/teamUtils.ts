@@ -1,4 +1,5 @@
 import { Team } from '~/api/v3';
+
 import { removeNonNumeric } from './utils';
 
 export function sortTeamsComparator(a: Team, b: Team) {

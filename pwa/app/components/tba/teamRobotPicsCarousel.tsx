@@ -1,3 +1,5 @@
+import Autoplay from 'embla-carousel-autoplay';
+
 import { Media } from '~/api/v3';
 import { Card, CardContent } from '~/components/ui/card';
 import {
@@ -7,7 +9,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '~/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
 
 export default function TeamRobotPicsCarousel({
   media,
