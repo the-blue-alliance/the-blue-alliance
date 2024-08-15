@@ -11,11 +11,12 @@ export default function GlobalLoadingProgress() {
 
   useEffect(() => {
     if (active) {
-      setProgress(10);
+      // Start at 15% to give the impression of a fast start
+      setProgress(15);
       setHidden(false);
     } else {
+      // Wait before hiding the progress bar so the user sees it at 100%
       setProgress(100);
-      // Wait before hiding the progress bar
       const timeout = setTimeout(() => {
         setHidden(true);
       }, 250);
