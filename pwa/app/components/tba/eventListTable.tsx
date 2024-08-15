@@ -1,3 +1,5 @@
+import { Link } from '@remix-run/react';
+
 import { Event } from '~/api/v3';
 import {
   Table,
@@ -7,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { Link } from '@remix-run/react';
 import { getEventDateString } from '~/lib/eventUtils';
 
 export default function EventListTable({ events }: { events: Event[] }) {

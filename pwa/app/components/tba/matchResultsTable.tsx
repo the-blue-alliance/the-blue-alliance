@@ -1,10 +1,13 @@
 import { Tooltip } from '@radix-ui/react-tooltip';
 import { Link } from '@remix-run/react';
 import { type VariantProps, cva } from 'class-variance-authority';
+import { groupBy } from 'lodash-es';
 import type React from 'react';
 import { Fragment, useMemo } from 'react';
+
+import PlayCircle from '~icons/bi/play-circle';
+
 import { Event, Match, Team } from '~/api/v3';
-import { groupBy } from 'lodash-es';
 import {
   TooltipContent,
   TooltipProvider,
@@ -13,7 +16,6 @@ import {
 import { DOUBLE_ELIM_ROUND_MAPPING, PlayoffType } from '~/lib/api/PlayoffType';
 import { matchTitleShort } from '~/lib/matchUtils';
 import { cn, timestampsAreOnDifferentDays, zip } from '~/lib/utils';
-import PlayCircle from '~icons/bi/play-circle';
 
 const cellVariants = cva('', {
   variants: {

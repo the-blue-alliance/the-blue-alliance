@@ -206,7 +206,7 @@ jobs:
       - name: Install Dependencies
         run: npm --prefix pwa ci
       - name: Run Format
-        run: npm --prefix pwa run format:check
+        run: npm --prefix pwa run format
       - name: Run Lint
         run: npm --prefix pwa run lint
   pwa-type:

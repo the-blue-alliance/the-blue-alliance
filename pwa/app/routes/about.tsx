@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
-import { Button } from '~/components/ui/button';
 
+import { Button } from '~/components/ui/button';
 import first_logo from '~/images/first_logo.png';
 
 export default function About(): JSX.Element {

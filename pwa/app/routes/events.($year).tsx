@@ -1,11 +1,12 @@
-import { json, LoaderFunctionArgs } from '@remix-run/node';
+import { LoaderFunctionArgs, json } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
   MetaFunction,
   Params,
   useLoaderData,
 } from '@remix-run/react';
-import { getEventsByYear, Event } from '~/api/v3';
+
+import { Event, getEventsByYear } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
 import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';

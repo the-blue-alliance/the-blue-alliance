@@ -1,5 +1,6 @@
-import { cva, VariantProps } from 'class-variance-authority';
+import { VariantProps, cva } from 'class-variance-authority';
 import React, { ReactNode } from 'react';
+
 import { cn } from '~/lib/utils';
 
 // For very long text blocks, flex makes the icon really tiny. Use flexless for those.
