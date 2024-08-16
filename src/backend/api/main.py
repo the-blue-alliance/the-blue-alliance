@@ -102,18 +102,22 @@ app.url_map.converters["model_type"] = ModelTypeConverter
 app.url_map.converters["event_detail_type"] = EventDetailTypeConverter
 
 api_v3 = Blueprint("apiv3", __name__, url_prefix="/api/v3")
+CORS(
+    api_v3,
+    origins="*",
+    methods=["OPTIONS", "GET"],
+    allow_headers=["X-TBA-Auth-Key", "If-None-Match", "If-Modified-Since"],
+    expose_headers=["ETag"],
+    max_age=60 * 60,
+)
 
 
 @api_v3.after_request
 def apply_vary_header(response):
     # Experimenting with manually setting this.
     response.headers.set("Access-Control-Allow-Origin", "*")
-    response.headers.set("Access-Control-Allow-Methods", "OPTIONS, GET")
-    response.headers.set(
-        "Access-Control-Allow-Headers", "X-TBA-Auth-Key, If-Modified-Since"
-    )
-    response.headers.set("Access-Control-Expose-Headers", "ETag")
-    response.headers.set("Access-Control-Max-Age", "3600")
+    # CORS doesn't always apply the Vary: Origin header, so we do it manually.
+    # This is necessary for Google's edge cache to work correctly.
     response.headers.set("Vary", "Origin")
     return response
 
