@@ -3,6 +3,7 @@ import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { RemixVitePWA } from '@vite-pwa/remix';
 
 function getCommitHash(): string {
   try {
@@ -12,6 +13,8 @@ function getCommitHash(): string {
   }
 }
 
+const { RemixVitePWAPlugin, RemixPWAPreset } = RemixVitePWA();
+
 export default defineConfig({
   plugins: [
     remix({
@@ -20,11 +23,32 @@ export default defineConfig({
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
       },
+      presets: [RemixPWAPreset()],
     }),
     tsconfigPaths(),
     Icons({
       compiler: 'jsx',
       jsx: 'react',
+    }),
+    RemixVitePWAPlugin({
+      strategies: 'generateSW',
+      manifest: {
+        name: 'The Blue Alliance',
+        short_name: 'TBA',
+        description:
+          'The Blue Alliance is the best way to scout, watch, and relive the FIRST Robotics Competition.',
+        start_url: '/',
+        display: 'standalone',
+        theme_color: '#3F51B5',
+        background_color: '#3F51B5',
+        icons: [
+          {
+            src: 'icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+        ],
+      },
     }),
   ],
   build: {

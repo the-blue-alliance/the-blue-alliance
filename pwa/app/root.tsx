@@ -10,6 +10,7 @@ import {
 } from '@remix-run/react';
 import * as Sentry from '@sentry/react';
 import { LRUCache } from 'lru-cache';
+import { pwaInfo } from 'virtual:pwa-info';
 
 import * as api from '~/api/v3';
 
@@ -84,6 +85,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
           rel="stylesheet"
         />
         <Meta />
+        {pwaInfo ? (
+          <link
+            rel="manifest"
+            href={pwaInfo.webManifest.href}
+            crossOrigin={
+              pwaInfo.webManifest.useCredentials ? 'use-credentials' : undefined
+            }
+          />
+        ) : null}
         <Links />
       </head>
       <body>
