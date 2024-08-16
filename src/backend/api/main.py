@@ -102,22 +102,14 @@ app.url_map.converters["model_type"] = ModelTypeConverter
 app.url_map.converters["event_detail_type"] = EventDetailTypeConverter
 
 api_v3 = Blueprint("apiv3", __name__, url_prefix="/api/v3")
-
-
-@api_v3.after_request
-def apply_vary_header(response):
-    # Experimenting with manually setting this.
-    response.headers.set("Access-Control-Allow-Origin", "*")
-    response.headers.set("Access-Control-Allow-Methods", "OPTIONS, GET")
-    response.headers.set(
-        "Access-Control-Allow-Headers",
-        "X-TBA-Auth-Key, If-Modified-Since, If-None-Match",
-    )
-    response.headers.set("Access-Control-Expose-Headers", "ETag")
-    response.headers.set("Access-Control-Max-Age", "3600")
-    response.headers.set("Vary", "Origin")
-    return response
-
+CORS(
+    api_v3,
+    origins="*",
+    methods=["OPTIONS", "GET"],
+    allow_headers=["X-TBA-Auth-Key", "If-None-Match", "If-Modified-Since"],
+    expose_headers=["ETag"],
+    max_age=24 * 60 * 60,
+)
 
 # Overall Status
 api_v3.add_url_rule("/status", view_func=status)
