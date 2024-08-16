@@ -115,6 +115,11 @@ class Insight(CachedModel):
     }
 
     def __init__(self, *args, **kw):
+        # store set of affected references referenced keys for cache clearing
+        # keys must be model properties
+        self._affected_references = {
+            "year": set(),
+        }
         self._data = None
         super(Insight, self).__init__(*args, **kw)
 
