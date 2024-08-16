@@ -111,6 +111,15 @@ CORS(
     max_age=60 * 60,
 )
 
+
+@api_v3.after_request
+def apply_vary_header(response):
+    # CORS doesn't always apply the Vary: Origin header, so we do it manually.
+    # This is necessary for Google's edge cache to work correctly.
+    response.headers.set("Vary", "Origin")
+    return response
+
+
 # Overall Status
 api_v3.add_url_rule("/status", view_func=status)
 
