@@ -110,7 +110,8 @@ def apply_vary_header(response):
     response.headers.set("Access-Control-Allow-Origin", "*")
     response.headers.set("Access-Control-Allow-Methods", "OPTIONS, GET")
     response.headers.set(
-        "Access-Control-Allow-Headers", "X-TBA-Auth-Key, If-Modified-Since"
+        "Access-Control-Allow-Headers",
+        "X-TBA-Auth-Key, If-Modified-Since, If-None-Match",
     )
     response.headers.set("Access-Control-Expose-Headers", "ETag")
     response.headers.set("Access-Control-Max-Age", "3600")
