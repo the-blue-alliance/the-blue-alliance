@@ -32,6 +32,8 @@ module.exports = {
       'error',
       { allowSameFolder: true },
     ],
+    'no-console': 'warn',
+    'no-else-return': 'error',
   },
 
   overrides: [

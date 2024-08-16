@@ -212,7 +212,6 @@ function LeaderboardKeyLink({
     return (
       <Link to={`/team/${keyVal.substring(3)}`}>{keyVal.substring(3)}</Link>
     );
-  } else {
-    return <Link to={`/${keyType}/${keyVal}`}>{keyVal}</Link>;
   }
+  return <Link to={`/${keyType}/${keyVal}`}>{keyVal}</Link>;
 }
