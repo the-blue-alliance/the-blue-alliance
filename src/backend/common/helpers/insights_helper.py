@@ -385,6 +385,9 @@ class InsightsHelper(object):
 
         medians = defaultdict(int)
         for event_key, scores_list in scores.items():
+            if len(scores_list) < 10:
+                continue
+
             medians[event_key] = statistics.median(sorted(scores_list))
 
         return [
