@@ -108,6 +108,7 @@ CORS(
     methods=["OPTIONS", "GET"],
     allow_headers=["X-TBA-Auth-Key", "If-None-Match", "If-Modified-Since"],
     expose_headers=["ETag"],
+    max_age=24 * 60 * 60,
 )
 
 # Overall Status
