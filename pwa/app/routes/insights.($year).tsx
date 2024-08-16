@@ -26,6 +26,12 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { NAME_TO_DISPLAY_NAME } from '~/lib/insightUtils';
 
 async function loadData(params: Params) {
@@ -137,8 +143,8 @@ function Leaderboard({ leaderboard }: { leaderboard: LeaderboardInsight }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px] text-center">#</TableHead>
-                <TableHead className="text-right capitalize">
+                <TableHead className="w-[6ch] text-center">#</TableHead>
+                <TableHead className="text-left capitalize">
                   {leaderboard.data.key_type}
                 </TableHead>
               </TableRow>
@@ -149,7 +155,7 @@ function Leaderboard({ leaderboard }: { leaderboard: LeaderboardInsight }) {
                 .map((r, i) => (
                   <TableRow key={i}>
                     <TableCell className="text-center">{r.value}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="pl-4 text-left">
                       <LeaderboardKeyList
                         cutoffSize={MAX_KEYS_PER_ROW}
                         keyType={leaderboard.data.key_type}
@@ -195,8 +201,26 @@ function LeaderboardKeyList({
           <LeaderboardKeyLink keyType={keyType} keyVal={k} />
         </React.Fragment>
       ))}
-      {keyVals.length > cutoffSize &&
-        ` (... and ${keyVals.length - cutoffSize} more)`}
+      {keyVals.length > cutoffSize && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="italic">
+              &nbsp;(and {keyVals.length - cutoffSize} other
+              {keyVals.length - cutoffSize > 1 ? 's' : ''})
+            </TooltipTrigger>
+            <TooltipContent className="max-w-[500px] whitespace-normal break-words text-center">
+              <p>
+                {keyVals.map((k, i) => (
+                  <React.Fragment key={k}>
+                    {i > 0 && ', '}
+                    <LeaderboardKeyLink keyType={keyType} keyVal={k} />
+                  </React.Fragment>
+                ))}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
     </>
   );
 }
