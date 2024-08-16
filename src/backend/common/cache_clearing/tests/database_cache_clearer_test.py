@@ -559,7 +559,7 @@ class TestDatabaseCacheClearer(unittest.TestCase):
         }
         cache_keys = [q[0] for q in get_affected_queries.insight_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 3)
+        self.assertEqual(len(cache_keys), 6)
         self.assertTrue(
             insight_query.InsightsLeaderboardsYearQuery(0).cache_key in cache_keys
         )
@@ -568,4 +568,13 @@ class TestDatabaseCacheClearer(unittest.TestCase):
         )
         self.assertTrue(
             insight_query.InsightsLeaderboardsYearQuery(2024).cache_key in cache_keys
+        )
+        self.assertTrue(
+            insight_query.InsightsNotablesYearQuery(0).cache_key in cache_keys
+        )
+        self.assertTrue(
+            insight_query.InsightsNotablesYearQuery(2023).cache_key in cache_keys
+        )
+        self.assertTrue(
+            insight_query.InsightsNotablesYearQuery(2024).cache_key in cache_keys
         )

@@ -64,6 +64,28 @@ class LeaderboardInsight(TypedDict):
     year: int
 
 
+class NotableEntry(TypedDict):
+    team_key: TeamKey
+
+    # this needs to be a list to support overall
+    # in an individual year, this should probably always be len 1
+    context: List[EventKey]
+
+
+class NotablesData(TypedDict):
+    """In case we need more data in the future, we can add it here."""
+
+    entries: List[NotableEntry]
+
+
+class NotablesInsight(TypedDict):
+    """This is the type that should be returned over the API!"""
+
+    data: NotablesData
+    name: str
+    year: int
+
+
 class InsightsHelper(object):
     """
     Helper for calculating insights and generating Insight objects
@@ -79,9 +101,7 @@ class InsightsHelper(object):
             Event.query(Event.year == year).order(Event.start_date).fetch(1000)
         )
         events_by_week = EventHelper.group_by_week(official_events)
-        week_event_matches = (
-            []
-        )  # Tuples of: (week, events) where events are tuples of (event, matches)
+        week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
             if week in {OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL}:
                 continue
@@ -160,6 +180,12 @@ class InsightsHelper(object):
 
         # leaderboards (exposed in API)
         insights += self._calculate_leaderboard_blue_banners(award_futures, year)
+
+        # notables (exposed in API)
+        insights += self._calculate_notables_hall_of_fame(award_futures, year)
+        insights += self._calculate_notables_division_winners(award_futures, year)
+        insights += self._calculate_notables_world_champions(award_futures, year)
+        insights += self._calculate_notables_wfa(award_futures, year)
 
         return insights
 
@@ -290,6 +316,24 @@ class InsightsHelper(object):
         )
 
     @classmethod
+    def _create_notable_insight(
+        cls,
+        teams: Dict[TeamKey, List[EventKey]] | DefaultDict[TeamKey, List[EventKey]],
+        insight_type: int,
+        year: int,
+    ) -> Insight:
+        return cls._createInsight(
+            data=NotablesData(
+                entries=[
+                    NotableEntry(team_key=team_key, context=context)
+                    for team_key, context in teams.items()
+                ]
+            ),
+            name=Insight.INSIGHT_NAMES[insight_type],
+            year=year,
+        )
+
+    @classmethod
     def _calculate_leaderboard_blue_banners(
         cls, award_futures: List[TypedFuture[Award]], year: Year
     ) -> List[Insight]:
@@ -399,6 +443,87 @@ class InsightsHelper(object):
         ]
 
     @classmethod
+    def _calculate_notables_from_einstein_award(
+        cls,
+        award_futures: List[TypedFuture[Award]],
+        year: Year,
+        award_type: AwardType,
+        insight_type: int,
+    ) -> List[Insight]:
+        team_context_map: Dict[TeamKey, List[EventKey]] = {}
+        for award_future in award_futures:
+            award = award_future.get_result()
+            if (
+                award.event_type_enum == EventType.CMP_FINALS
+                and award.award_type_enum == award_type
+            ):
+                for tk in award.team_list:
+                    team_context_map[str(tk.id())] = [str(award.event.id())]
+
+        return [
+            cls._create_notable_insight(
+                team_context_map,
+                insight_type,
+                year,
+            )
+        ]
+
+    @classmethod
+    def _calculate_notables_hall_of_fame(
+        cls, award_futures: List[TypedFuture[Award]], year: Year
+    ):
+        return cls._calculate_notables_from_einstein_award(
+            award_futures,
+            year,
+            AwardType.CHAIRMANS,
+            Insight.TYPED_NOTABLES_HALL_OF_FAME,
+        )
+
+    @classmethod
+    def _calculate_notables_world_champions(
+        cls, award_futures: List[TypedFuture[Award]], year: Year
+    ) -> List[Insight]:
+        return cls._calculate_notables_from_einstein_award(
+            award_futures,
+            year,
+            AwardType.WINNER,
+            Insight.TYPED_NOTABLES_WORLD_CHAMPIONS,
+        )
+
+    @classmethod
+    def _calculate_notables_wfa(
+        cls, award_futures: List[TypedFuture[Award]], year: Year
+    ) -> List[Insight]:
+        return cls._calculate_notables_from_einstein_award(
+            award_futures,
+            year,
+            AwardType.WOODIE_FLOWERS,
+            Insight.TYPED_NOTABLES_WFA,
+        )
+
+    @classmethod
+    def _calculate_notables_division_winners(
+        cls, award_futures: List[TypedFuture[Award]], year: Year
+    ):
+        team_context_map: Dict[TeamKey, List[EventKey]] = {}
+        for award_future in award_futures:
+            award = award_future.get_result()
+            if (
+                award.event_type_enum == EventType.CMP_DIVISION
+                and award.award_type_enum == AwardType.WINNER
+            ):
+                for tk in award.team_list:
+                    team_context_map[str(tk.id())] = [str(award.event.id())]
+
+        return [
+            cls._create_notable_insight(
+                team_context_map,
+                Insight.TYPED_NOTABLES_DIVISION_WINNERS,
+                year,
+            )
+        ]
+
+    @classmethod
     def _generateMatchData(self, match: Match, event: Event) -> Dict:
         """
         A dict of any data needed for front-end rendering
@@ -473,9 +598,7 @@ class InsightsHelper(object):
         Returns an Insight where the data is a list of tuples:
         (week string, list of highest scoring matches)
         """
-        highscore_matches_by_week = (
-            []
-        )  # tuples: week, list of matches (if there are ties)
+        highscore_matches_by_week = []  # tuples: week, list of matches (if there are ties)
         for week, week_events in week_event_matches:
             week_highscore_matches = []
             highscore = 0
@@ -840,9 +963,9 @@ class InsightsHelper(object):
                 roundedScore = margin - int(margin % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_winning_margin_distribution_normalized:
-                    elim_winning_margin_distribution_normalized[
-                        roundedScore
-                    ] += contribution
+                    elim_winning_margin_distribution_normalized[roundedScore] += (
+                        contribution
+                    )
                 else:
                     elim_winning_margin_distribution_normalized[roundedScore] = (
                         contribution
@@ -1270,6 +1393,7 @@ class InsightsHelper(object):
         insights.extend(
             self.do_overall_leaderboard_insights(insight_type=InsightType.AWARDS)
         )
+        insights.extend(self._do_overall_notable_insights())
 
         return insights
 
@@ -1304,6 +1428,27 @@ class InsightsHelper(object):
                     insight_type,
                     year=0,
                 )
+            )
+
+        return overall_insights
+
+    @classmethod
+    def _do_overall_notable_insights(cls) -> List[Insight]:
+        overall_insights = []
+
+        for insight_type in Insight.NOTABLE_INSIGHTS:
+            insights = Insight.query(
+                Insight.name == Insight.INSIGHT_NAMES[insight_type],
+                Insight.year != 0,
+            ).fetch(1000)
+
+            team_context_map: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
+            for insight in insights:
+                for entry in insight.data["entries"]:
+                    team_context_map[entry["team_key"]].extend(entry["context"])
+
+            overall_insights.append(
+                cls._create_notable_insight(team_context_map, insight_type, year=0)
             )
 
         return overall_insights
