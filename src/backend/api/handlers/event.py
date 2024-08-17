@@ -25,6 +25,7 @@ from backend.common.queries.event_query import (
     EventQuery,
 )
 from backend.common.queries.match_query import EventMatchesQuery
+from backend.common.queries.media_query import EventTeamsMediasQuery
 from backend.common.queries.team_query import EventEventTeamsQuery, EventTeamsQuery
 
 
@@ -145,6 +146,19 @@ def event_teams_statuses(event_key: EventKey) -> Response:
             )
         statuses[event_team.team.id()] = status
     return profiled_jsonify(statuses)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
+def event_teams_media(event_key: EventKey) -> Response:
+    track_call_after_response("event/teams/media", event_key)
+
+    query = EventTeamsMediasQuery(event_key=event_key).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+
+    return profiled_jsonify(query)
 
 
 @api_authenticated

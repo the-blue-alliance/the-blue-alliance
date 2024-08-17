@@ -31,6 +31,7 @@ from backend.api.handlers.event import (
     event_matches,
     event_playoff_advancement,
     event_teams,
+    event_teams_media,
     event_teams_statuses,
 )
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
@@ -160,6 +161,7 @@ api_v3.add_url_rule("/event/<string:event_key>/awards", view_func=event_awards)
 api_v3.add_url_rule(
     "/event/<string:event_key>/playoff_advancement", view_func=event_playoff_advancement
 )
+api_v3.add_url_rule("/event/<string:event_key>/team_media", view_func=event_teams_media)
 
 # Event List
 api_v3.add_url_rule("/events/all", view_func=event_list_all)

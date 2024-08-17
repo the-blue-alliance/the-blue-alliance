@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.1
+ * 3.9.2
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -827,6 +827,8 @@ export type Media = {
   };
   /** True if the media is of high quality. */
   preferred?: boolean;
+  /** List of teams that this media belongs to. Most likely length 1. */
+  team_keys: string[];
   /** Direct URL to the media. */
   direct_url?: string;
   /** The URL that leads to the full web page for the media, if one exists. */
@@ -3133,6 +3135,44 @@ export function getEventAwards(
         status: 404;
       }
   >(`/event/${encodeURIComponent(eventKey)}/awards`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets a list of media objects that correspond to teams at this event.
+ */
+export function getEventTeamMedia(
+  {
+    ifNoneMatch,
+    eventKey,
+  }: {
+    ifNoneMatch?: string;
+    eventKey: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Media[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/team_media`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
