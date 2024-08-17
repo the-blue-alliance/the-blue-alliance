@@ -210,7 +210,10 @@ export default function YearEventsPage() {
       </div>
       <div className="basis-full lg:basis-5/6">
         <h1 className="mb-2.5 mt-5 text-4xl">
-          {year} <i>FIRST</i> Robotics Competition Events
+          {year} <i>FIRST</i> Robotics Competition Events{' '}
+          <small className="text-xl text-slate-500">
+            {events.length} Events
+          </small>
         </h1>
         {groupedEvents.map((group) => (
           <div key={group.slug} id={group.slug}>
