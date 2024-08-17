@@ -5,4 +5,7 @@ export const NAME_TO_DISPLAY_NAME: Record<string, string> = {
   typed_leaderboard_highest_match_clean_score: 'Highest Clean Score',
   typed_leaderboard_highest_match_clean_combined_score:
     'Highest Clean Combined Score',
+  typed_leaderboard_most_awards: 'Most Awards',
+  typed_leaderboard_most_non_champs_event_wins:
+    'Most Non-Championship Event Wins',
 };
