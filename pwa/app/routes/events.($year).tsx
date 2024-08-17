@@ -1,7 +1,6 @@
 import { LoaderFunctionArgs, json } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
-  Link,
   MetaFunction,
   Params,
   useLoaderData,
@@ -23,7 +22,6 @@ import {
   TableOfContentsItem,
   TableOfContentsLink,
   TableOfContentsList,
-  TableOfContentsTitle,
 } from '~/components/ui/toc';
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
 import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
