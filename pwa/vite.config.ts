@@ -1,9 +1,9 @@
 import { vitePlugin as remix } from '@remix-run/dev';
+import { RemixVitePWA } from '@vite-pwa/remix';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { RemixVitePWA } from '@vite-pwa/remix';
 
 function getCommitHash(): string {
   try {
@@ -43,9 +43,26 @@ export default defineConfig({
         background_color: '#3F51B5',
         icons: [
           {
-            src: 'icon-512.png',
+            src: 'icons/icon-64.png',
+            sizes: '64x64',
+            type: 'image/png',
+          },
+          {
+            src: 'icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: 'icons/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/maskable-icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },

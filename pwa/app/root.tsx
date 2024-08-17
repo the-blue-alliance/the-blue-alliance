@@ -88,6 +88,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {pwaInfo ? (
           <link rel="manifest" href={pwaInfo.webManifest.href} />
         ) : null}
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
         <Links />
       </head>
       <body>
