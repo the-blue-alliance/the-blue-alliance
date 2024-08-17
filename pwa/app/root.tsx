@@ -86,13 +86,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
         <Meta />
         {pwaInfo ? (
-          <link
-            rel="manifest"
-            href={pwaInfo.webManifest.href}
-            crossOrigin={
-              pwaInfo.webManifest.useCredentials ? 'use-credentials' : undefined
-            }
-          />
+          <link rel="manifest" href={pwaInfo.webManifest.href} />
         ) : null}
         <Links />
       </head>
