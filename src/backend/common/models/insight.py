@@ -44,6 +44,8 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT = 25
     TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE = 26
     TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE = 27
+    TYPED_LEADERBOARD_MOST_AWARDS = 28
+    TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS = 29
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -77,6 +79,8 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "typed_leaderboard_highest_median_score_by_event",
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE: "typed_leaderboard_highest_match_clean_score",
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE: "typed_leaderboard_highest_match_clean_combined_score",
+        TYPED_LEADERBOARD_MOST_AWARDS: "typed_leaderboard_most_awards",
+        TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "typed_leaderboard_most_non_champs_event_wins",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
     }
@@ -89,6 +93,8 @@ class Insight(CachedModel):
     }
     TYPED_LEADERBOARD_AWARD_INSIGHTS = {
         TYPED_LEADERBOARD_BLUE_BANNERS,
+        TYPED_LEADERBOARD_MOST_AWARDS,
+        TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS,
     }
 
     TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
@@ -97,6 +103,8 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "event",
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE: "match",
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE: "match",
+        TYPED_LEADERBOARD_MOST_AWARDS: "team",
+        TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "team",
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting
