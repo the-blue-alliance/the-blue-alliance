@@ -19,6 +19,17 @@ import { getTeam, getTeamMediaByYear } from '~/api/v3';
 import InlineIcon from '~/components/tba/inlineIcon';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '~/components/ui/accordion';
+import { Badge } from '~/components/ui/badge';
+import {
+  attemptToParseSchoolNameFromOldTeamName,
+  attemptToParseSponsors,
+} from '~/lib/teamUtils';
 
 async function loadData(params: Params) {
   if (params.teamNumber === undefined) {
@@ -92,6 +103,10 @@ export default function TeamPage(): JSX.Element {
     [media],
   );
 
+  const sponsors = attemptToParseSponsors(team.name);
+  const schoolName =
+    team.school_name ?? attemptToParseSchoolNameFromOldTeamName(team.name);
+
   return (
     <div className="flex flex-wrap justify-center">
       <div className="basis-1/2">
@@ -105,10 +120,36 @@ export default function TeamPage(): JSX.Element {
           {team.city}, {team.state_prov}, {team.country}
         </InlineIcon>
 
-        <InlineIcon displayStyle={'flexless'}>
-          <BiInfoCircleFill />
-          {team.name}
-        </InlineIcon>
+        {sponsors.length > 0 ? (
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1" className="border-0">
+              <AccordionTrigger className="p-0 text-left font-normal">
+                <InlineIcon displayStyle={'flexless'}>
+                  <BiInfoCircleFill />
+                  {schoolName}
+                  {sponsors.length > 0 && ` with ${sponsors.length} sponsor`}
+                  {sponsors.length > 1 && 's'}
+                </InlineIcon>
+              </AccordionTrigger>
+              <AccordionContent className="pb-0">
+                {sponsors.map((sponsor, i) => (
+                  <Badge
+                    className="m-px font-normal"
+                    key={i}
+                    variant={'secondary'}
+                  >
+                    {sponsor}
+                  </Badge>
+                ))}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        ) : (
+          <InlineIcon displayStyle={'flexless'}>
+            <BiInfoCircleFill />
+            {schoolName}
+          </InlineIcon>
+        )}
 
         <InlineIcon>
           <BiCalendar />

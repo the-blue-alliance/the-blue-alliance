@@ -15,10 +15,12 @@
     "typecheck": "tsc",
     "generate-api": "oazapfts ../src/backend/web/static/swagger/api_v3.json --argumentStyle=object > app/api/v3.ts",
     "generate-pwa-assets": "pwa-assets-generator",
-    "bundle-visualizer": "npx vite-bundle-visualizer"
+    "bundle-visualizer": "npx vite-bundle-visualizer",
+    "test": "vitest"
   },
   "dependencies": {
     "@oazapfts/runtime": "1.0.3",
+    "@radix-ui/react-accordion": "1.2.0",
     "@radix-ui/react-dialog": "1.1.1",
     "@radix-ui/react-progress": "1.1.0",
     "@radix-ui/react-scroll-area": "1.1.0",
@@ -85,7 +87,8 @@
     "typescript": "5.5.4",
     "unplugin-icons": "0.19.2",
     "vite": "5.4.1",
-    "vite-tsconfig-paths": "4.2.1"
+    "vite-tsconfig-paths": "4.2.1",
+    "vitest": "2.0.5"
   },
   "engines": {
     "node": "20.16.0"
