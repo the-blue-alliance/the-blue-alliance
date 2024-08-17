@@ -124,33 +124,12 @@ class InsightsHelper(object):
         """
         Calculate award insights for a given year. Returns a list of Insights.
         """
-        # Get all Blue Banner, Division Finalist, and Championship Finalist awards
-        blue_banner_award_keys_future = Award.query(
-            Award.year == year,
-            Award.award_type_enum.IN(BLUE_BANNER_AWARDS),  # pyre-ignore[16]
-            Award.event_type_enum.IN(
-                {
-                    EventType.REGIONAL,
-                    EventType.DISTRICT,
-                    EventType.DISTRICT_CMP_DIVISION,
-                    EventType.DISTRICT_CMP,
-                    EventType.CMP_DIVISION,
-                    EventType.CMP_FINALS,
-                    EventType.FOC,
-                    EventType.REMOTE,
-                }
-            ),
-        ).fetch_async(10000, keys_only=True)
-        cmp_finalist_award_keys_future = Award.query(
-            Award.year == year,
-            Award.award_type_enum == AwardType.FINALIST,
-            Award.event_type_enum.IN({EventType.CMP_DIVISION, EventType.CMP_FINALS}),
-        ).fetch_async(10000, keys_only=True)
-
         award_futures = ndb.get_multi_async(
-            set(blue_banner_award_keys_future.get_result()).union(
-                set(cmp_finalist_award_keys_future.get_result())
+            Award.query(
+                Award.year == year, Award.event_type_enum.IN(SEASON_EVENT_TYPES)
             )
+            .fetch_async(10000, keys_only=True)
+            .get_result()
         )
 
         insights = []
