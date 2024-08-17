@@ -1,6 +1,7 @@
 import { LoaderFunctionArgs, json } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
+  Link,
   MetaFunction,
   Params,
   useLoaderData,
@@ -16,9 +17,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
+import {
+  TableOfContentsItem,
+  TableOfContentsLink,
+  TableOfContentsList,
+  TableOfContentsTitle,
+} from '~/components/ui/toc';
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
 import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
-import { VALID_YEARS, parseParamsForYearElseDefault } from '~/lib/utils';
+import {
+  VALID_YEARS,
+  parseParamsForYearElseDefault,
+  slugify,
+} from '~/lib/utils';
 
 async function loadData(params: Params) {
   const year = await parseParamsForYearElseDefault(params);
@@ -67,6 +78,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 interface EventGroup {
   groupName: string;
+  slug: string;
   events: Event[];
 }
 
@@ -75,10 +87,19 @@ function groupBySections(events: Event[]): EventGroup[] {
   const eventsByChampionship = new Map<string, EventGroup>();
   const FOCEvents: EventGroup = {
     groupName: 'FIRST Festival of Champions',
+    slug: 'foc',
     events: [],
   };
-  const preaseasonEvents: EventGroup = { groupName: 'Preseason', events: [] };
-  const offseasonEvents: EventGroup = { groupName: 'Offseason', events: [] };
+  const preaseasonEvents: EventGroup = {
+    groupName: 'Preseason',
+    slug: 'preaseason',
+    events: [],
+  };
+  const offseasonEvents: EventGroup = {
+    groupName: 'Offseason',
+    slug: 'offseason',
+    events: [],
+  };
   events.forEach((event) => {
     // Events by week
     const weekStr = getEventWeekString(event);
@@ -89,6 +110,7 @@ function groupBySections(events: Event[]): EventGroup[] {
       } else {
         eventsByWeek.set(weekStr, {
           groupName: weekStr,
+          slug: slugify(weekStr),
           events: [event],
         });
       }
@@ -106,6 +128,7 @@ function groupBySections(events: Event[]): EventGroup[] {
       } else {
         eventsByChampionship.set(groupName, {
           groupName,
+          slug: slugify(groupName),
           events: [event],
         });
       }
@@ -169,6 +192,15 @@ export default function YearEventsPage() {
               ))}
             </SelectContent>
           </Select>
+          <TableOfContentsList className="mt-5">
+            {groupedEvents.map((group) => (
+              <TableOfContentsItem key={group.slug}>
+                <TableOfContentsLink to={`#${group.slug}`}>
+                  {group.groupName}
+                </TableOfContentsLink>
+              </TableOfContentsItem>
+            ))}
+          </TableOfContentsList>
         </div>
       </div>
       <div className="basis-full lg:basis-5/6">
@@ -176,7 +208,7 @@ export default function YearEventsPage() {
           {year} <i>FIRST</i> Robotics Competition Events
         </h1>
         {groupedEvents.map((group) => (
-          <div key={group.groupName}>
+          <div key={group.slug} id={group.slug}>
             <h2 className="mt-5 text-2xl">
               {group.groupName}{' '}
               <small className="text-slate-500">

@@ -19,6 +19,14 @@ export function removeNonNumeric(str: string): string {
   return str.replace(/\D/g, '');
 }
 
+export function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
 export async function parseParamsForYearElseDefault(
   params: Params,
 ): Promise<number | undefined> {
