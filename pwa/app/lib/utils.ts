@@ -4,12 +4,27 @@ import { twMerge } from 'tailwind-merge';
 
 import { getStatus } from '~/api/v3';
 
+// TODO: Generate this from the API
+const VALID_YEARS: number[] = [];
+for (let i = 2024; i >= 1992; i--) {
+  VALID_YEARS.push(i);
+}
+export { VALID_YEARS };
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function removeNonNumeric(str: string): string {
   return str.replace(/\D/g, '');
+}
+
+export function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
 }
 
 export async function parseParamsForYearElseDefault(
