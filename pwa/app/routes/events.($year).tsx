@@ -198,6 +198,7 @@ export default function YearEventsPage() {
               <TableOfContentsItem key={group.slug}>
                 <TableOfContentsLink
                   to={`#${group.slug}`}
+                  replace={true}
                   isActive={inView.has(group.slug)}
                 >
                   {group.groupName}
