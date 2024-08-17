@@ -7,6 +7,8 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react';
+import { useState } from 'react';
+import { InView } from 'react-intersection-observer';
 
 import { Event, getEventsByYear } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
@@ -167,6 +169,7 @@ function groupBySections(events: Event[]): EventGroup[] {
 
 export default function YearEventsPage() {
   const { year, events } = useLoaderData<typeof loader>();
+  const [inView, setInView] = useState(new Set());
   const navigate = useNavigate();
 
   const sortedEvents = events.sort(sortEventsComparator);
@@ -195,7 +198,10 @@ export default function YearEventsPage() {
           <TableOfContentsList className="mt-5">
             {groupedEvents.map((group) => (
               <TableOfContentsItem key={group.slug}>
-                <TableOfContentsLink to={`#${group.slug}`}>
+                <TableOfContentsLink
+                  to={`#${group.slug}`}
+                  isActive={inView.has(group.slug)}
+                >
                   {group.groupName}
                 </TableOfContentsLink>
               </TableOfContentsItem>
@@ -209,14 +215,28 @@ export default function YearEventsPage() {
         </h1>
         {groupedEvents.map((group) => (
           <div key={group.slug} id={group.slug}>
-            <h2 className="mt-5 text-2xl">
-              {group.groupName}{' '}
-              <small className="text-slate-500">
-                {group.events.length}{' '}
-                {`Event${group.events.length > 1 ? 's' : ''}`}
-              </small>
-            </h2>
-            <EventListTable events={group.events} />
+            <InView
+              as="div"
+              onChange={(inView) => {
+                setInView((prev) => {
+                  if (inView) {
+                    prev.add(group.slug);
+                  } else {
+                    prev.delete(group.slug);
+                  }
+                  return new Set(prev);
+                });
+              }}
+            >
+              <h2 className="mt-5 text-2xl">
+                {group.groupName}{' '}
+                <small className="text-slate-500">
+                  {group.events.length}{' '}
+                  {`Event${group.events.length > 1 ? 's' : ''}`}
+                </small>
+              </h2>
+              <EventListTable events={group.events} />
+            </InView>
           </div>
         ))}
       </div>
