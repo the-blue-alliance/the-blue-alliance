@@ -4,13 +4,21 @@ import {
   MetaFunction,
   Params,
   useLoaderData,
+  useNavigate,
 } from '@remix-run/react';
 
 import { Event, getEventsByYear } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
 import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
-import { parseParamsForYearElseDefault } from '~/lib/utils';
+import { VALID_YEARS, parseParamsForYearElseDefault } from '~/lib/utils';
 
 async function loadData(params: Params) {
   const year = await parseParamsForYearElseDefault(params);
@@ -136,13 +144,33 @@ function groupBySections(events: Event[]): EventGroup[] {
 
 export default function YearEventsPage() {
   const { year, events } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
 
   const sortedEvents = events.sort(sortEventsComparator);
   const groupedEvents = groupBySections(sortedEvents);
 
   return (
     <div className="flex flex-wrap gap-4 lg:flex-nowrap">
-      <div className="basis-full lg:basis-1/6">TODO Year Picker & Sections</div>
+      <div className="basis-full lg:basis-1/6">
+        <div className="sticky top-0 pt-5">
+          <Select
+            onValueChange={(value) => {
+              navigate(`/events/${value}`);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={year} />
+            </SelectTrigger>
+            <SelectContent>
+              {VALID_YEARS.map((y) => (
+                <SelectItem key={y} value={`${y}`}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       <div className="basis-full lg:basis-5/6">
         <h1 className="mb-2.5 mt-5 text-4xl">
           {year} <i>FIRST</i> Robotics Competition Events
