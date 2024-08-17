@@ -15,7 +15,7 @@ MediaDict = NewType("MediaDict", Dict)
 
 class MediaConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 5,
+        ApiMajorVersion.API_V3: 6,
     }
 
     @classmethod
@@ -40,6 +40,7 @@ class MediaConverter(ConverterBase):
             "preferred": True if media.preferred_references != [] else False,
             "view_url": None,
             "direct_url": None,
+            "team_keys": [r.id() for r in media.references if r.kind() == "Team"],
         }
         if media.slug_name == "youtube":
             dict["direct_url"] = "https://img.youtube.com/vi/{}/hqdefault.jpg".format(
