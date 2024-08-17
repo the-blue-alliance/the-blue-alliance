@@ -510,3 +510,37 @@ def test_rankings() -> None:
 
     event._details = None
     assert event.rankings == rankings
+
+
+def test_venue_address():
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        venue="Bellarmine College Preparatory",
+        venue_address="Bellarmine College Preparatory\n960 W. Hedding St.\nSan Jose, CA, USA",
+        city="San Jose",
+        state_prov="CA",
+        country="USA",
+    )
+    assert event.venue_or_venue_from_address == "Bellarmine College Preparatory"
+    assert (
+        event.venue_address_safe
+        == "Bellarmine College Preparatory\n960 W. Hedding St.\nSan Jose, CA, USA"
+    )
+
+    event = Event(
+        id="2024cabe",
+        year=2024,
+        event_short="cabe",
+        venue="Berkeley High School",
+        venue_address="1980 Allston Way",
+        city="Berkeley",
+        state_prov="CA",
+        country="USA",
+    )
+    assert event.venue_or_venue_from_address == "Berkeley High School"
+    assert (
+        event.venue_address_safe
+        == "Berkeley High School\n1980 Allston Way\nBerkeley, CA, USA"
+    )
