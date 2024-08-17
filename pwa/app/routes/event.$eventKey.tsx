@@ -20,20 +20,24 @@ import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
 import MdiRobot from '~icons/mdi/robot';
 import MdiTournament from '~icons/mdi/tournament';
 
+import { EventColors, getEventColors } from '~/api/colors';
 import {
   Award,
   Event,
+  EventCopRs,
   Match,
   Team,
   getEvent,
   getEventAlliances,
   getEventAwards,
+  getEventCopRs,
   getEventMatches,
   getEventRankings,
   getEventTeams,
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
+import CoprScatterChart from '~/components/tba/coprScatterPlot';
 import InlineIcon from '~/components/tba/inlineIcon';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
 import RankingsTable from '~/components/tba/rankingsTable';
@@ -62,7 +66,7 @@ async function loadData(params: Params) {
     throw new Error('Missing eventKey');
   }
 
-  const [event, matches, alliances, rankings, awards, teams] =
+  const [event, matches, alliances, rankings, awards, teams, coprs, colors] =
     await Promise.all([
       getEvent({ eventKey: params.eventKey }),
       getEventMatches({ eventKey: params.eventKey }),
@@ -70,6 +74,8 @@ async function loadData(params: Params) {
       getEventRankings({ eventKey: params.eventKey }),
       getEventAwards({ eventKey: params.eventKey }),
       getEventTeams({ eventKey: params.eventKey }),
+      getEventCopRs({ eventKey: params.eventKey }),
+      getEventColors(params.eventKey),
     ]);
 
   if (event.status == 404) {
@@ -84,7 +90,9 @@ async function loadData(params: Params) {
     alliances.status !== 200 ||
     rankings.status !== 200 ||
     awards.status !== 200 ||
-    teams.status !== 200
+    teams.status !== 200 ||
+    coprs.status !== 200 ||
+    colors.status !== 200
   ) {
     throw new Response(null, {
       status: 500,
@@ -98,6 +106,8 @@ async function loadData(params: Params) {
     rankings: rankings.data,
     awards: awards.data,
     teams: teams.data,
+    coprs: coprs.data,
+    colors: colors.data,
   };
 }
 
@@ -120,7 +130,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export default function EventPage() {
-  const { event, alliances, matches, rankings, awards, teams } =
+  const { event, alliances, matches, rankings, awards, teams, coprs, colors } =
     useLoaderData<typeof loader>();
 
   const sortedMatches = useMemo(
@@ -299,7 +309,9 @@ export default function EventPage() {
           <TeamsTab teams={teams} matches={sortedMatches} event={event} />
         </TabsContent>
 
-        <TabsContent value="insights">insights</TabsContent>
+        <TabsContent value="insights">
+          <InsightsTab colors={colors} coprs={coprs} />
+        </TabsContent>
 
         <TabsContent value="media">media</TabsContent>
       </Tabs>
@@ -413,6 +425,20 @@ function TeamsTab({
           </CredenzaContent>
         </Credenza>
       ))}
+    </div>
+  );
+}
+
+function InsightsTab({
+  coprs,
+  colors,
+}: {
+  coprs: EventCopRs;
+  colors: EventColors;
+}) {
+  return (
+    <div>
+      <CoprScatterChart coprs={coprs} colors={colors} />
     </div>
   );
 }
