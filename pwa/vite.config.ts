@@ -37,7 +37,7 @@ export default defineConfig({
         short_name: 'TBA',
         description:
           'The Blue Alliance is the best way to scout, watch, and relive the FIRST Robotics Competition.',
-        start_url: '/',
+        start_url: '/?homescreen=1',
         display: 'standalone',
         theme_color: '#3F51B5',
         background_color: '#3F51B5',
