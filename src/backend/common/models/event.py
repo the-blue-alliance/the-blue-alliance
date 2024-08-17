@@ -559,20 +559,20 @@ class Event(CachedModel):
                     none_throws(self.location).encode("utf-8"),
                 )
         else:
-            if not self.venue or not self.location:
-                self._venue_address_safe = None
-            else:
-                self._venue_address_safe = self.venue_address.replace("\r\n", "\n")
-                if self.venue not in self._venue_address_safe:
-                    self._venue_address_safe = "{}\n{}".format(
-                        none_throws(self.venue),
-                        self._venue_address_safe,
-                    )
-                if self.location not in self._venue_address_safe:
-                    self._venue_address_safe = "{}\n{}".format(
-                        self._venue_address_safe,
-                        none_throws(self.location),
-                    )
+            self._venue_address_safe = self.venue_address.replace("\r\n", "\n")
+            if self.venue is not None and self.venue not in self._venue_address_safe:
+                self._venue_address_safe = "{}\n{}".format(
+                    none_throws(self.venue),
+                    self._venue_address_safe,
+                )
+            if (
+                self.location is not None
+                and self.location not in self._venue_address_safe
+            ):
+                self._venue_address_safe = "{}\n{}".format(
+                    self._venue_address_safe,
+                    none_throws(self.location),
+                )
         return self._venue_address_safe
 
     @property
