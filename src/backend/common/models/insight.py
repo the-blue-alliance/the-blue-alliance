@@ -44,6 +44,10 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT = 25
     TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE = 26
     TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE = 27
+    TYPED_NOTABLES_HALL_OF_FAME = 28
+    TYPED_NOTABLES_DIVISION_WINNERS = 29
+    TYPED_NOTABLES_WORLD_CHAMPIONS = 30
+    TYPED_NOTABLES_WFA = 31
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -79,6 +83,10 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE: "typed_leaderboard_highest_match_clean_combined_score",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
+        TYPED_NOTABLES_HALL_OF_FAME: "notables_hall_of_fame",
+        TYPED_NOTABLES_DIVISION_WINNERS: "notables_division_winners",
+        TYPED_NOTABLES_WORLD_CHAMPIONS: "notables_world_champions",
+        TYPED_NOTABLES_WFA: "notables_wfa",
     }
 
     TYPED_LEADERBOARD_MATCH_INSIGHTS = {
@@ -97,6 +105,13 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "event",
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE: "match",
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE: "match",
+    }
+
+    NOTABLE_INSIGHTS = {
+        TYPED_NOTABLES_HALL_OF_FAME,
+        TYPED_NOTABLES_DIVISION_WINNERS,
+        TYPED_NOTABLES_WORLD_CHAMPIONS,
+        TYPED_NOTABLES_WFA,
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting
