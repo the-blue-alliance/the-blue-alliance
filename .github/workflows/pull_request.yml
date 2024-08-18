@@ -223,6 +223,20 @@ jobs:
         run: npm --prefix pwa ci
       - name: Run Type Check
         run: npm --prefix pwa run typecheck
+  pwa-test:
+    name: "[pwa] Test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm --prefix pwa ci
+      - name: Run Test
+        run: npm --prefix pwa test
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-latest
