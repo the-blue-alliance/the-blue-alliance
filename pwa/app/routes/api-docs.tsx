@@ -159,7 +159,7 @@ export default function Api_Docs(): JSX.Element {
               particular, the <code>max-age</code> value in the{' '}
               <code>Cache-Control</code> header contains the number of seconds
               the API result should be considered valid for. See also{' '}
-              <a ref="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=en#cache-control">
+              <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=en#cache-control">
                 Google&apos;s Cache-Control reference
               </a>
               .
@@ -177,7 +177,7 @@ export default function Api_Docs(): JSX.Element {
               Alliance and are not guaranteed to be complete implementations of
               the API. They are merely provided as a convenience to developers
               looking to get started and can be found{' '}
-              <a ref="https://github.com/TBA-API">on the TBA-API GitHub</a>.
+              <a href="https://github.com/TBA-API">on the TBA-API GitHub</a>.
             </p>
           </div>
         </div>
