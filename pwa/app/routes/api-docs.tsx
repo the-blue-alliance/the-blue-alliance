@@ -57,15 +57,15 @@ export default function Api_Docs(): JSX.Element {
             APIs work by having your computer send a web request to our servers
             asking for some piece of data, and our servers send the data back to
             your computer. You can ask for information about teams or matches,
-            or even send us information, like letting us know there's a robot
-            photo we should add to our data set.
+            or even send us information, like letting us know there&apos;s a
+            robot photo we should add to our data set.
           </p>
           <p>
             First, you need some way of sending HTTPS Requests to The Blue
-            Alliance's servers. This will be your primary means of communication
-            with TBA. For testing purposes, your web browser may suffice. For
-            more advanced applications, you may want to use an external library,
-            such as{' '}
+            Alliance&apos;s servers. This will be your primary means of
+            communication with TBA. For testing purposes, your web browser may
+            suffice. For more advanced applications, you may want to use an
+            external library, such as{' '}
             <a href="https://www.w3schools.com/jquery/jquery_ajax_intro.asp">
               jQuery
             </a>{' '}
@@ -82,10 +82,10 @@ export default function Api_Docs(): JSX.Element {
             parse JSON text in the language of your choice.
           </p>
           <p>
-            Once you've figured out how to make HTTPS requests, you will need to
-            figure out how to manipulate request and response headers. These
-            will be used to pass authentication keys to TBA and understand the
-            cache life of returned data.
+            Once you&apos;ve figured out how to make HTTPS requests, you will
+            need to figure out how to manipulate request and response headers.
+            These will be used to pass authentication keys to TBA and understand
+            the cache life of returned data.
           </p>
         </div>
 
@@ -147,7 +147,7 @@ export default function Api_Docs(): JSX.Element {
             <p>
               For more details, see{' '}
               <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag">
-                Mozilla's ETag reference
+                Mozilla&apos;s ETag reference
               </a>
               .
             </p>
@@ -160,7 +160,7 @@ export default function Api_Docs(): JSX.Element {
               <code>Cache-Control</code> header contains the number of seconds
               the API result should be considered valid for. See also{' '}
               <a ref="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=en#cache-control">
-                Google's Cache-Control reference
+                Google&apos;s Cache-Control reference
               </a>
               .
             </p>
@@ -221,8 +221,8 @@ export default function Api_Docs(): JSX.Element {
             </a>
           </h3>
           <p>
-            If you're looking to run SQL queries over the TBA database, you can
-            use this{' '}
+            If you&apos;re looking to run SQL queries over the TBA database, you
+            can use this{' '}
             <a href="https://www.thebluealliance.com/bigquery">BigQuery</a>{' '}
             dataset. This contains a full replica of the TBA database, so the
             possibilities are endless!
@@ -237,7 +237,7 @@ export default function Api_Docs(): JSX.Element {
             You can find these data archives on
             <a href="https://github.com/the-blue-alliance/the-blue-alliance-data">
               {' '}
-              The Blue Alliance's TBA Data Repository
+              The Blue Alliance&apos;s TBA Data Repository
             </a>
           </p>
         </div>
@@ -269,10 +269,10 @@ export default function Api_Docs(): JSX.Element {
               </li>
               <li className="list-disc">
                 <p>
-                  If you’d like your project to become an official part of The
-                  Blue Alliance, please{' '}
-                  <Link to="/contact">reach out to us</Link>. We’d love to talk
-                  more!
+                  If you&apos;d like your project to become an official part of
+                  The Blue Alliance, please{' '}
+                  <Link to="/contact">reach out to us</Link>. We&apos;d love to
+                  talk more!
                 </p>
               </li>
             </ul>
