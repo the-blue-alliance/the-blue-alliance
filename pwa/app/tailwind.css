@@ -72,3 +72,17 @@
     @apply text-blue-800 hover:underline;
   }
 }
+
+@layer utilities {
+  .content-visibility-visible {
+    content-visibility: visible;
+  }
+
+  .content-visibility-hidden {
+    content-visibility: hidden;
+  }
+
+  .content-visibility-auto {
+    content-visibility: auto;
+  }
+}
