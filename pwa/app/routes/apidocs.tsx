@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 
-export default function Api_Docs(): JSX.Element {
+export default function ApiDocs(): JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y [&_*]:mt-4">
@@ -252,7 +252,7 @@ export default function Api_Docs(): JSX.Element {
           </p>
 
           <div>
-            <h4 className="text-xl">1. Brading</h4>
+            <h4 className="text-xl">1. Branding</h4>
             <ul>
               <li className="list-disc">
                 <p>
