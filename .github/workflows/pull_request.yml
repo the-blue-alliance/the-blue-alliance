@@ -236,7 +236,7 @@ jobs:
       - name: Install Dependencies
         run: npm --prefix pwa ci
       - name: Run Test
-        run: npm --prefix pwa run coverage
+        run: npm --prefix pwa test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.5.0
         with:

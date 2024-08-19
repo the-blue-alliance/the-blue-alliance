@@ -187,7 +187,7 @@ jobs:
         run: npm --prefix pwa ci
       - name: Run Test
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa run coverage
+        run: npm --prefix pwa test
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         uses: codecov/codecov-action@v4.5.0
