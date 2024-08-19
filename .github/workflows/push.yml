@@ -212,6 +212,8 @@ jobs:
           TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
       - name: Run Build
         run: npm --prefix pwa run build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
