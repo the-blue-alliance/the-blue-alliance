@@ -10,7 +10,6 @@ import { hydrateRoot } from 'react-dom/client';
 
 Sentry.init({
   dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
-  tracePropagationTargets: [/^https:\/\/beta\.thebluealliance\.com/],
   tracesSampleRate: 1,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
