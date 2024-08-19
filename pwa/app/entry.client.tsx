@@ -20,6 +20,8 @@ Sentry.init({
       useLocation,
       useMatches,
     }),
+    // https://github.com/getsentry/sentry-javascript/issues/12706
+    // eslint-disable-next-line import/namespace
     Sentry.replayIntegration(),
   ],
   enabled: process.env.NODE_ENV === 'production',
