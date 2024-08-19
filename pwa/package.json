@@ -33,7 +33,6 @@
     "@remix-run/node": "2.11.1",
     "@remix-run/react": "2.11.1",
     "@sentry/remix": "8.26.0",
-    "@sentry/vite-plugin": "2.22.2",
     "@tanstack/react-table": "8.20.1",
     "@types/lodash-es": "4.17.12",
     "class-variance-authority": "0.7.0",
@@ -58,6 +57,7 @@
   "devDependencies": {
     "@iconify/json": "2.2.237",
     "@remix-run/dev": "2.11.1",
+    "@sentry/vite-plugin": "2.22.2",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
