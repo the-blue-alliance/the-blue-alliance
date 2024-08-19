@@ -13,7 +13,13 @@ jobs:
         uses: dependabot/fetch-metadata@v2.2.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      # Allow auto-merging for patch and minor updates if all checks pass
+      # Auto-approve and auto-merge for patch and minor updates if all checks pass
+      - name: Auto-approve PR
+        if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Enable auto-merge for Dependabot PRs
         if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
         run: gh pr merge --auto --squash "$PR_URL"
