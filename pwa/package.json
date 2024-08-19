@@ -16,7 +16,7 @@
     "generate-api": "oazapfts ../src/backend/web/static/swagger/api_v3.json --argumentStyle=object > app/api/v3.ts",
     "generate-pwa-assets": "pwa-assets-generator",
     "bundle-visualizer": "npx vite-bundle-visualizer",
-    "test": "vitest --coverage"
+    "test": "vitest ./app --coverage"
   },
   "dependencies": {
     "@oazapfts/runtime": "1.0.3",
