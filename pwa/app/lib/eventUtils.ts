@@ -61,23 +61,26 @@ export function getEventWeekString(event: Event) {
   if (event.week === null) {
     return null;
   }
-  if (event.year == 2016) {
-    return `Week ${event.week == 0 ? '0.5' : event.week}`;
+  switch (event.year) {
+    case 2016:
+      return event.week === 0 ? 'Week 0.5' : `Week ${event.week}`;
+    case 2021: {
+      switch (event.week) {
+        case 0:
+          return 'Participation';
+        case 6:
+          return 'FIRST Innovation Challenge';
+        case 7:
+          return 'INFINITE RECHARGE At Home Challenge';
+        case 8:
+          return 'Game Design Challenge';
+        case 9:
+          return 'Awards';
+        default:
+          return null;
+      }
+    }
+    default:
+      return `Week ${event.week + 1}`;
   }
-  if (event.year == 2021) {
-    if (event.week == 0) {
-      return 'Participation';
-    }
-    if (event.week == 6) {
-      return 'FIRST Innovation Challenge';
-    }
-    if (event.week == 7) {
-      return 'INFINITE RECHARGE At Home Challenge';
-    }
-    if (event.week == 8) {
-      return 'Game Design Challenge';
-    }
-    return 'Awards';
-  }
-  return `Week ${event.week + 1}`;
 }
