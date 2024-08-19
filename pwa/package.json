@@ -31,7 +31,7 @@
     "@radix-ui/react-tooltip": "1.1.2",
     "@remix-run/express": "2.11.2",
     "@remix-run/node": "2.11.1",
-    "@remix-run/react": "2.11.1",
+    "@remix-run/react": "2.11.2",
     "@sentry/remix": "8.26.0",
     "@tanstack/react-table": "8.20.1",
     "@types/lodash-es": "4.17.12",
