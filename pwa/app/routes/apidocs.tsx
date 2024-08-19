@@ -92,7 +92,7 @@ export default function ApiDocs(): JSX.Element {
         <div>
           <div>
             <h3 className="text-2xl">
-              <Link to="/api-docs/apiread">Read API (v3)</Link>
+              <Link to="/apidocs/v3">Read API (v3)</Link>
             </h3>
             <p>
               Most people want to pull event listings, team information, match
@@ -184,7 +184,7 @@ export default function ApiDocs(): JSX.Element {
 
         <div>
           <h3 className="text-2xl">
-            <Link to="/api-docs/webhooks">Webhooks</Link>
+            <Link to="/apidocs/webhooks">Webhooks</Link>
           </h3>
           <p>
             The TBA API also includes support for{' '}
@@ -194,14 +194,14 @@ export default function ApiDocs(): JSX.Element {
             instantly to the change. This can save both your client and our
             server time and processing power, as it can reduce the need to poll
             the API. See{' '}
-            <Link to="/api-docs/webhooks">our webhook documentation page</Link>{' '}
+            <Link to="/apidocs/webhooks">our webhook documentation page</Link>{' '}
             for more information.
           </p>
         </div>
 
         <div>
           <h3 className="text-2xl">
-            <Link to="/api-docs/apiwrite">Write API (v1)</Link>
+            <Link to="/apidocs/trusted/v1">Write API (v1)</Link>
           </h3>
           <p>
             The Blue Alliance provides a Write API, called the Trusted API,
@@ -245,10 +245,10 @@ export default function ApiDocs(): JSX.Element {
         <div>
           <h3 className="text-2xl">Developer Guidlines</h3>
           <p>
-            We’re excited to see you building things on top of The Blue
-            Alliance’s APIs! We love seeing the creativity and utility in these
-            projects. We have a few developer guidelines to help guide your
-            work.
+            We&apos;re excited to see you building things on top of The Blue
+            Alliance&apos;s APIs! We love seeing the creativity and utility in
+            these projects. We have a few developer guidelines to help guide
+            your work.
           </p>
 
           <div>
