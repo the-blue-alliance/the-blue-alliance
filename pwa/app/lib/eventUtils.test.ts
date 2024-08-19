@@ -5,6 +5,7 @@ import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
 
 describe.concurrent('getEventDateString', () => {
   test('Same start and end date', () => {
+    // @ts-ignore
     const event: Event = {
       key: '2024test',
       name: 'Test Event',
@@ -15,6 +16,7 @@ describe.concurrent('getEventDateString', () => {
   });
 
   test('Different start and end dates', () => {
+    // @ts-ignore
     const event: Event = {
       key: '2024test',
       name: 'Test Event',
@@ -25,6 +27,7 @@ describe.concurrent('getEventDateString', () => {
   });
 
   test('Different month start and end dates', () => {
+    // @ts-ignore
     const event: Event = {
       key: '2024test',
       name: 'Test Event',
@@ -37,6 +40,7 @@ describe.concurrent('getEventDateString', () => {
 
 describe.concurrent('getEventWeekString', () => {
   test('Null year', () => {
+    // @ts-ignore
     const event: Event = {
       year: 2024,
       week: null,
@@ -45,6 +49,7 @@ describe.concurrent('getEventWeekString', () => {
   });
 
   test('Nominal case', () => {
+    // @ts-ignore
     const event: Event = {
       year: 2024,
       week: 0,
@@ -53,12 +58,14 @@ describe.concurrent('getEventWeekString', () => {
   });
 
   test('2016 special case', () => {
+    // @ts-ignore
     const event1: Event = {
       year: 2016,
       week: 0,
     };
     expect(getEventWeekString(event1)).toEqual('Week 0.5');
 
+    // @ts-ignore
     const event2: Event = {
       year: 2016,
       week: 1,
@@ -67,6 +74,7 @@ describe.concurrent('getEventWeekString', () => {
   });
 
   test('2021 special case: Participation', () => {
+    // @ts-ignore
     const event: Event = {
       year: 2021,
       week: 0,
@@ -75,6 +83,7 @@ describe.concurrent('getEventWeekString', () => {
   });
 
   test('2021 special case: Innovation', () => {
+    // @ts-ignore
     const event: Event = {
       year: 2021,
       week: 6,
@@ -83,6 +92,7 @@ describe.concurrent('getEventWeekString', () => {
   });
 
   test('2021 special case: IR@H', () => {
+    // @ts-ignore
     const event: Event = {
       year: 2021,
       week: 7,
@@ -93,6 +103,7 @@ describe.concurrent('getEventWeekString', () => {
   });
 
   test('2021 special case: GDC', () => {
+    // @ts-ignore
     const event: Event = {
       year: 2021,
       week: 8,
@@ -101,6 +112,7 @@ describe.concurrent('getEventWeekString', () => {
   });
 
   test('2021 special case: Awards', () => {
+    // @ts-ignore
     const event: Event = {
       year: 2021,
       week: 9,
