@@ -237,6 +237,11 @@ jobs:
         run: npm --prefix pwa ci
       - name: Run Test
         run: npm --prefix pwa test
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4.5.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./pwa/coverage/
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-latest
