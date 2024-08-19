@@ -8,6 +8,7 @@ import {
   isRouteErrorResponse,
   useRouteError,
 } from '@remix-run/react';
+import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
 import { LRUCache } from 'lru-cache';
 import { pwaInfo } from 'virtual:pwa-info';
 
@@ -239,9 +240,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+function App() {
   return <Outlet />;
 }
+
+export default withSentry(App);
 
 export const meta: MetaFunction = ({ error }) => {
   const isRouteError = isRouteErrorResponse(error);
@@ -253,6 +256,7 @@ export const meta: MetaFunction = ({ error }) => {
 export function ErrorBoundary() {
   const error = useRouteError();
   const isRouteError = isRouteErrorResponse(error);
+  captureRemixErrorBoundaryError(error);
   return (
     <>
       <h1 className="mb-2.5 mt-5 text-4xl">Oh Noes!1!!</h1>

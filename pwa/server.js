@@ -3,6 +3,8 @@ import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
 
+import './instrumentation.server.mjs';
+
 const isProd = process.env.NODE_ENV === 'production';
 
 const viteDevServer = isProd

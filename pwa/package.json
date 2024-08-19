@@ -32,6 +32,8 @@
     "@remix-run/express": "2.11.1",
     "@remix-run/node": "2.11.1",
     "@remix-run/react": "2.11.1",
+    "@sentry/remix": "8.26.0",
+    "@sentry/vite-plugin": "2.22.2",
     "@tanstack/react-table": "8.20.1",
     "@types/lodash-es": "4.17.12",
     "class-variance-authority": "0.7.0",
