@@ -29,7 +29,7 @@
     "@radix-ui/react-slot": "1.1.0",
     "@radix-ui/react-tabs": "1.1.0",
     "@radix-ui/react-tooltip": "1.1.2",
-    "@remix-run/express": "2.11.1",
+    "@remix-run/express": "2.11.2",
     "@remix-run/node": "2.11.1",
     "@remix-run/react": "2.11.1",
     "@sentry/remix": "8.26.0",
