@@ -238,7 +238,7 @@ export default function EventPage() {
               </InlineIcon>
             </TabsTrigger>
           )}
-          {rankings.rankings.length > 0 && (
+          {rankings && rankings.rankings.length > 0 && (
             <TabsTrigger value="rankings">
               <InlineIcon>
                 <BiListOl />
@@ -288,14 +288,16 @@ export default function EventPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="rankings">
-          <RankingsTable
-            rankings={rankings}
-            winners={
-              alliances?.find((a) => a.status?.status === 'won')?.picks ?? []
-            }
-          />
-        </TabsContent>
+        {rankings && (
+          <TabsContent value="rankings">
+            <RankingsTable
+              rankings={rankings}
+              winners={
+                alliances?.find((a) => a.status?.status === 'won')?.picks ?? []
+              }
+            />
+          </TabsContent>
+        )}
 
         <TabsContent value="awards">
           <AwardsTab awards={awards} />

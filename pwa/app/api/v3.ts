@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.2
+ * 3.9.3
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -2621,7 +2621,7 @@ export function getEventOpRs(
   return oazapfts.fetchJson<
     | {
         status: 200;
-        data: EventOpRs;
+        data: EventOpRs | null;
       }
     | {
         status: 304;
@@ -2659,7 +2659,7 @@ export function getEventCopRs(
   return oazapfts.fetchJson<
     | {
         status: 200;
-        data: EventCopRs;
+        data: EventCopRs | null;
       }
     | {
         status: 304;
@@ -2735,7 +2735,7 @@ export function getEventRankings(
   return oazapfts.fetchJson<
     | {
         status: 200;
-        data: EventRanking;
+        data: EventRanking | null;
       }
     | {
         status: 304;
