@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.2
+ * 3.9.3
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
