@@ -2559,7 +2559,9 @@
                   "nullable": true,
                   "allOf": [
                     {
-                  "$ref": "#/components/schemas/Event_OPRs"}]
+                      "$ref": "#/components/schemas/Event_OPRs"
+                    }
+                  ]
                 }
               }
             }
@@ -2618,7 +2620,10 @@
                 "schema": {
                   "nullable": true,
                   "allOf": [
-                    {"$ref": "#/components/schemas/Event_COPRs"}]
+                    {
+                      "$ref": "#/components/schemas/Event_COPRs"
+                    }
+                  ]
                 }
               }
             }
@@ -2738,7 +2743,11 @@
               "application/json": {
                 "schema": {
                   "nullable": true,
-                  "allOf": [{"$ref": "#/components/schemas/Event_Ranking"}]
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_Ranking"
+                    }
+                  ]
                 }
               }
             }
