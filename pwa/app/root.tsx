@@ -8,7 +8,7 @@ import {
   isRouteErrorResponse,
   useRouteError,
 } from '@remix-run/react';
-import * as Sentry from '@sentry/react';
+import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
 import { LRUCache } from 'lru-cache';
 import { pwaInfo } from 'virtual:pwa-info';
 
@@ -16,22 +16,6 @@ import * as api from '~/api/v3';
 
 import GlobalLoadingProgress from './components/tba/globalLoadingProgress';
 import './tailwind.css';
-
-Sentry.init({
-  dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
-  ],
-  // Performance Monitoring
-  tracesSampleRate: 1.0, //  Capture 100% of the transactions
-  // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-  tracePropagationTargets: [/^https:\/\/beta\.thebluealliance\.com/],
-  // Session Replay
-  replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-  replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-  enabled: process.env.NODE_ENV === 'production',
-});
 
 api.defaults.baseUrl = 'https://www.thebluealliance.com/api/v3/';
 api.defaults.headers = {
@@ -256,9 +240,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+function App() {
   return <Outlet />;
 }
+
+export default withSentry(App);
 
 export const meta: MetaFunction = ({ error }) => {
   const isRouteError = isRouteErrorResponse(error);
@@ -270,6 +256,7 @@ export const meta: MetaFunction = ({ error }) => {
 export function ErrorBoundary() {
   const error = useRouteError();
   const isRouteError = isRouteErrorResponse(error);
+  captureRemixErrorBoundaryError(error);
   return (
     <>
       <h1 className="mb-2.5 mt-5 text-4xl">Oh Noes!1!!</h1>
