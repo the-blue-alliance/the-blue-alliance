@@ -212,6 +212,10 @@ export default function ApiDocs(): JSX.Element {
             your desired event. These need to be used when constructing each
             request.
           </p>
+          <p>
+            To see the complete specification of the trusted API, refer to the{' '}
+            <Link to="/apidocs/trusted/v1">full documentation</Link>.
+          </p>
         </div>
 
         <div>
