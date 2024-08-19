@@ -279,6 +279,9 @@ class InsightsHelper(object):
 
         for award_future in award_futures:
             award = award_future.get_result()
+            if award.award_type_enum == AwardType.WILDCARD:
+                continue
+
             for team_key in award.team_list:
                 award_count[team_key.id()] += 1
 
