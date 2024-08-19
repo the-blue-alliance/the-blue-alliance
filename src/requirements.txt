@@ -16,6 +16,7 @@ oauth2client==4.1.3
 protobuf==3.20.2
 pyre-extensions==0.0.30
 requests==2.32.3
+sentry-sdk[flask]==2.13.0
 typing-extensions==4.12.2
 Werkzeug==3.0.3
 appengine-python-standard-tbafork==1.1.5dev1

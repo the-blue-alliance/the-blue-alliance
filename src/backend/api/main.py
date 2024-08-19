@@ -3,6 +3,7 @@ from json import JSONDecodeError
 from flask import Blueprint, Flask, make_response, Response
 from flask_cors import CORS
 from google.appengine.api import wrap_wsgi_app
+import sentry_sdk
 from werkzeug.routing import BaseConverter
 
 from backend.api.handlers.client_api import (
@@ -90,6 +91,12 @@ class EventDetailTypeConverter(BaseConverter):
 
 
 configure_logging()
+
+sentry_sdk.init(
+    dsn="https://e73120477cdc221c7bf452fea4eb9e83@o4507688293695488.ingest.us.sentry.io/4507806370562048",
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
 
 app = Flask(__name__)
 app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
