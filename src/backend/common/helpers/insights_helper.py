@@ -80,9 +80,7 @@ class InsightsHelper(object):
             Event.query(Event.year == year).order(Event.start_date).fetch(1000)
         )
         events_by_week = EventHelper.group_by_week(official_events)
-        week_event_matches = (
-            []
-        )  # Tuples of: (week, events) where events are tuples of (event, matches)
+        week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
             if week in {OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL}:
                 continue
@@ -279,6 +277,9 @@ class InsightsHelper(object):
 
         for award_future in award_futures:
             award = award_future.get_result()
+            if award.award_type_enum == AwardType.WILDCARD:
+                continue
+
             for team_key in award.team_list:
                 award_count[team_key.id()] += 1
 
@@ -472,9 +473,7 @@ class InsightsHelper(object):
         Returns an Insight where the data is a list of tuples:
         (week string, list of highest scoring matches)
         """
-        highscore_matches_by_week = (
-            []
-        )  # tuples: week, list of matches (if there are ties)
+        highscore_matches_by_week = []  # tuples: week, list of matches (if there are ties)
         for week, week_events in week_event_matches:
             week_highscore_matches = []
             highscore = 0
@@ -839,9 +838,9 @@ class InsightsHelper(object):
                 roundedScore = margin - int(margin % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_winning_margin_distribution_normalized:
-                    elim_winning_margin_distribution_normalized[
-                        roundedScore
-                    ] += contribution
+                    elim_winning_margin_distribution_normalized[roundedScore] += (
+                        contribution
+                    )
                 else:
                     elim_winning_margin_distribution_normalized[roundedScore] = (
                         contribution
