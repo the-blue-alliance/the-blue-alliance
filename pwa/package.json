@@ -42,7 +42,7 @@
     "embla-carousel-autoplay": "8.1.8",
     "embla-carousel-react": "8.1.8",
     "express": "4.19.2",
-    "isbot": "5.1.16",
+    "isbot": "5.1.17",
     "lodash-es": "4.17.21",
     "lru-cache": "11.0.0",
     "lucide-react": "0.428.0",
