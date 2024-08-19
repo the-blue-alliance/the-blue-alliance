@@ -1,11 +1,17 @@
 import { createRequestHandler } from '@remix-run/express';
+import * as Sentry from '@sentry/remix';
 import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
 
-import './instrumentation.server.mjs';
-
 const isProd = process.env.NODE_ENV === 'production';
+
+Sentry.init({
+  dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
+  tracesSampleRate: 1,
+  autoInstrumentRemix: true,
+  enabled: isProd,
+});
 
 const viteDevServer = isProd
   ? undefined
