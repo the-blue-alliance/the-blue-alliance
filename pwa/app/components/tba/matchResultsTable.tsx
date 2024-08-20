@@ -198,7 +198,7 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
   );
 
   return (
-    <div className="border-l border-t border-[#ddd]">
+    <div className="min-w-[25rem] border-l border-t border-[#ddd] md:min-w-[35rem]">
       <div className={cn(gridStyle, 'bg-[#f0f0f0] font-semibold')}>
         <div className="row-span-2 lg:row-span-1">
           <PlayCircle className="inline" />
