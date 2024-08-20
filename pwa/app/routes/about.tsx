@@ -45,7 +45,7 @@ export default function About(): JSX.Element {
 
         <div>
           <h3 className="text-2xl">
-            About <em>FIRST</em> and <em>FIRST</em> Robotics Competition
+            <em>FIRST</em>
           </h3>
           <p>
             <a href="http://www.firstinspires.org/">
@@ -57,17 +57,6 @@ export default function About(): JSX.Element {
             students from kindergarten through high school, <em>FIRST</em> has
             become a world-wide phenomenon with teams from all six inhabited
             continents.
-          </p>
-          <p>
-            The{' '}
-            <a href="https://www.firstinspires.org/robotics/frc">
-              <em>FIRST</em> Robotics Competition (FRC)
-            </a>{' '}
-            gives high school students and their adult mentors the opportunity
-            to work and create together to solve a common problem. Each{' '}
-            <em>FIRST</em> Robotics Competition season culminates with local and
-            regional events where qualifying teams compete for awards and a spot
-            in the <em>FIRST</em> Championship.
           </p>
 
           <div className="flex">

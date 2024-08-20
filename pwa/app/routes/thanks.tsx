@@ -68,18 +68,18 @@ export default function Thanks(): JSX.Element {
           <ul>
             <li className="list-disc">
               <p>
-                <a href="https://tailwindcss.com/" title="Tailwind">
-                  Tailwind
-                </a>
-                &apos;s CSS framework
-              </p>
-            </li>
-            <li className="list-disc">
-              <p>
                 <a href="https://remix.run/" title="Remix">
                   Remix
                 </a>
                 &apos;s full stack web development framework
+              </p>
+            </li>
+            <li className="list-disc">
+              <p>
+                <a href="https://tailwindcss.com/" title="Tailwind">
+                  Tailwind
+                </a>
+                &apos;s CSS framework
               </p>
             </li>
           </ul>
