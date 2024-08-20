@@ -1,4 +1,5 @@
 import { vitePlugin as remix } from '@remix-run/dev';
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { RemixVitePWA } from '@vite-pwa/remix';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
@@ -66,6 +67,10 @@ export default defineConfig({
           },
         ],
       },
+    }),
+    sentryVitePlugin({
+      org: 'the-blue-alliance',
+      project: 'the-blue-alliance-pwa',
     }),
   ],
   build: {

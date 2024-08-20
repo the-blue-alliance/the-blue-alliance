@@ -19,12 +19,15 @@ import BiPinMapFill from '~icons/bi/pin-map-fill';
 import {
   getTeam,
   getTeamEventsByYear,
+  getTeamEventsStatusesByYear,
+  getTeamMatchesByYear,
   getTeamMediaByYear,
   getTeamSocialMedia,
   getTeamYearsParticipated,
 } from '~/api/v3';
 import InlineIcon from '~/components/tba/inlineIcon';
 import TeamAvatar from '~/components/tba/teamAvatar';
+import TeamEventAppearance from '~/components/tba/teamEventAppearance';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
 import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
 import {
@@ -62,13 +65,16 @@ async function loadData(params: Params) {
   // todo: add year support
   const year = 2024;
 
-  const [team, media, socials, yearsParticipated, events] = await Promise.all([
-    getTeam({ teamKey }),
-    getTeamMediaByYear({ teamKey, year }),
-    getTeamSocialMedia({ teamKey }),
-    getTeamYearsParticipated({ teamKey }),
-    getTeamEventsByYear({ teamKey, year }),
-  ]);
+  const [team, media, socials, yearsParticipated, events, matches, statuses] =
+    await Promise.all([
+      getTeam({ teamKey }),
+      getTeamMediaByYear({ teamKey, year }),
+      getTeamSocialMedia({ teamKey }),
+      getTeamYearsParticipated({ teamKey }),
+      getTeamEventsByYear({ teamKey, year }),
+      getTeamMatchesByYear({ teamKey, year }),
+      getTeamEventsStatusesByYear({ teamKey, year }),
+    ]);
 
   if (team.status === 404) {
     throw new Response(null, { status: 404 });
@@ -79,7 +85,9 @@ async function loadData(params: Params) {
     media.status !== 200 ||
     socials.status !== 200 ||
     yearsParticipated.status !== 200 ||
-    events.status !== 200
+    events.status !== 200 ||
+    matches.status !== 200 ||
+    statuses.status !== 200
   ) {
     throw new Response(null, { status: 500 });
   }
@@ -90,6 +98,8 @@ async function loadData(params: Params) {
     socials: socials.data,
     yearsParticipated: yearsParticipated.data,
     events: events.data,
+    matches: matches.data,
+    statuses: statuses.data,
   };
 }
 
@@ -117,7 +127,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export default function TeamPage(): JSX.Element {
   const navigate = useNavigate();
-  const { team, media, socials, yearsParticipated, events } =
+  const { team, media, socials, yearsParticipated, events, matches, statuses } =
     useLoaderData<typeof loader>();
 
   events.sort(sortEventsComparator);
@@ -267,6 +277,17 @@ export default function TeamPage(): JSX.Element {
 
         <div>
           <h1 className=" text-4xl">Event Results</h1>
+
+          {events.map((e) => (
+            <div key={e.key}>
+              <TeamEventAppearance
+                event={e}
+                matches={matches.filter((m) => m.event_key === e.key)}
+                status={statuses[e.key]}
+              />
+              <Separator className="my-4" />
+            </div>
+          ))}
         </div>
       </div>
     </div>

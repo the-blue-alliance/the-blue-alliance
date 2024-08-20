@@ -8,10 +8,10 @@ google-api-core==1.34.0
 google-api-python-client==2.141.0
 google-cloud-logging==3.9.0
 google-cloud-storage==2.14.0
-grpcio==1.65.4
+grpcio==1.65.5
 Jinja2==3.1.4
 MarkupSafe==2.1.5
-numpy==2.0.1
+numpy==2.1.0
 oauth2client==4.1.3
 protobuf==3.20.2
 pyre-extensions==0.0.30
