@@ -6,7 +6,7 @@ Flask-Cors==4.0.1
 Flask-WTF==1.2.1
 google-api-core==1.34.0
 google-api-python-client==2.142.0
-google-cloud-logging==3.9.0
+google-cloud-logging==3.11.1
 google-cloud-storage==2.14.0
 grpcio==1.65.5
 Jinja2==3.1.4
