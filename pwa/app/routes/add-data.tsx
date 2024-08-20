@@ -50,10 +50,10 @@ export default function Add_Data(): JSX.Element {
         </div>
 
         <div>
-          <h3 className="text-2xl">Adding Match Videos</h3>
+          <h3 className="text-2xl">Adding a New Offseason Event</h3>
           <p>
             Do you know of an offseason event missing from TBA? You can suggest
-            an event to be added <Link to="/suggest/offseason">here.</Link> The
+            an event to be added <Link to="/suggest/offseason">here</Link>. The
             request will be reviewed and added shortly.
           </p>
         </div>
