@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.3
+ * 3.9.4
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -1725,7 +1725,7 @@ export function getTeamEventsStatusesByYear(
     | {
         status: 200;
         data: {
-          [key: string]: TeamEventStatus;
+          [key: string]: TeamEventStatus | null;
         };
       }
     | {
@@ -1941,7 +1941,7 @@ export function getTeamEventStatus(
   return oazapfts.fetchJson<
     | {
         status: 200;
-        data: TeamEventStatus;
+        data: TeamEventStatus | null;
       }
     | {
         status: 304;
@@ -2926,7 +2926,7 @@ export function getEventTeamsStatuses(
     | {
         status: 200;
         data: {
-          [key: string]: TeamEventStatus;
+          [key: string]: TeamEventStatus | null;
         };
       }
     | {
