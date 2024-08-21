@@ -8,7 +8,7 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
@@ -50,11 +50,14 @@ import {
   TableOfContentsLink,
   TableOfContentsList,
 } from '~/components/ui/toc';
+import { EventType, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortEventsComparator } from '~/lib/eventUtils';
+import { calculateTeamRecordFromMatches } from '~/lib/matchUtils';
 import {
   attemptToParseSchoolNameFromOldTeamName,
   attemptToParseSponsors,
 } from '~/lib/teamUtils';
+import { stringifyRecord } from '~/lib/utils';
 
 async function loadData(params: Params) {
   if (params.teamNumber === undefined) {
@@ -159,6 +162,34 @@ export default function TeamPage(): JSX.Element {
   const sponsors = attemptToParseSponsors(team.name);
   const schoolName =
     team.school_name ?? attemptToParseSchoolNameFromOldTeamName(team.name);
+
+  const officialEvents = events.filter((e) =>
+    SEASON_EVENT_TYPES.has(e.event_type as EventType),
+  );
+  const unofficialEvents = events.filter(
+    (e) => !SEASON_EVENT_TYPES.has(e.event_type as EventType),
+  );
+
+  const officialRecord = useMemo(
+    () =>
+      calculateTeamRecordFromMatches(
+        team.key,
+        matches.filter((m) =>
+          officialEvents.map((e) => e.key).includes(m.event_key),
+        ),
+      ),
+    [matches, team.key, officialEvents],
+  );
+  const unofficialRecord = useMemo(
+    () =>
+      calculateTeamRecordFromMatches(
+        team.key,
+        matches.filter((m) =>
+          unofficialEvents.map((e) => e.key).includes(m.event_key),
+        ),
+      ),
+    [matches, team.key, unofficialEvents],
+  );
 
   return (
     <div className="flex flex-wrap sm:flex-nowrap">
@@ -273,10 +304,39 @@ export default function TeamPage(): JSX.Element {
           </div>
         </div>
 
-        <Separator className="my-2" />
+        <Separator className="mb-4 mt-8" />
 
         <div>
-          <h1 className=" text-4xl">Event Results</h1>
+          <StatsBlock>
+            <Stat label="Official Events" value={officialEvents.length} />
+            {unofficialEvents.length > 0 && (
+              <Stat label="Unofficial Events" value={unofficialEvents.length} />
+            )}
+
+            <Stat
+              label="Official Record"
+              value={stringifyRecord(officialRecord)}
+            />
+
+            {unofficialEvents.length > 0 && (
+              <>
+                <Stat
+                  label="Unofficial Record"
+                  value={stringifyRecord(unofficialRecord)}
+                />
+                <Stat
+                  label="Overall Record"
+                  value={stringifyRecord({
+                    wins: officialRecord.wins + unofficialRecord.wins,
+                    losses: officialRecord.losses + unofficialRecord.losses,
+                    ties: officialRecord.ties + unofficialRecord.ties,
+                  })}
+                />
+              </>
+            )}
+          </StatsBlock>
+
+          <Separator className="mb-8 mt-4" />
 
           {events.map((e) => (
             <div key={e.key}>
@@ -290,6 +350,25 @@ export default function TeamPage(): JSX.Element {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatsBlock({
+  children,
+}: {
+  children: React.ReactNode | React.ReactNode[];
+}) {
+  return <dl className="flex flex-wrap justify-center gap-4">{children}</dl>;
+}
+
+function Stat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="mx-auto flex w-[calc(50%-0.5rem)] min-w-[14ch] flex-col text-center sm:w-[calc(20%-0.8rem)]">
+      <dt className="text-gray-500">{label}</dt>
+      <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900">
+        {value}
+      </dd>
     </div>
   );
 }

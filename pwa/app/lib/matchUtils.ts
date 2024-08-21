@@ -1,4 +1,4 @@
-import { Event, Match } from '~/api/v3';
+import { Event, Match, WltRecord } from '~/api/v3';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 
 const COMP_LEVEL_SORT_ORDER = {
@@ -66,4 +66,39 @@ export function matchTitleShort(match: Match, event: Event): string {
   // todo later in development: replace this with reasonable fallback
   console.log(match.key, event);
   return 'IF YOU SEE THIS PLEASE PING JUSTIN/EUGENE WITH EVENT KEY';
+}
+
+function matchHasBeenPlayed(match: Match) {
+  return match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+}
+
+export function calculateTeamRecordFromMatches(
+  teamKey: string,
+  matches: Match[],
+): WltRecord {
+  const won = matches.filter(
+    (m) =>
+      (m.winning_alliance === 'red' &&
+        m.alliances.red.team_keys.includes(teamKey)) ||
+      (m.winning_alliance === 'blue' &&
+        m.alliances.blue.team_keys.includes(teamKey)),
+  ).length;
+
+  const lost = matches.filter(
+    (m) =>
+      (m.winning_alliance === 'red' &&
+        m.alliances.blue.team_keys.includes(teamKey)) ||
+      (m.winning_alliance === 'blue' &&
+        m.alliances.red.team_keys.includes(teamKey)),
+  ).length;
+
+  const tied = matches.filter(
+    (m) =>
+      (m.alliances.blue.team_keys.includes(teamKey) ||
+        m.alliances.red.team_keys.includes(teamKey)) &&
+      m.winning_alliance === '' &&
+      matchHasBeenPlayed(m),
+  ).length;
+
+  return { wins: won, losses: lost, ties: tied };
 }

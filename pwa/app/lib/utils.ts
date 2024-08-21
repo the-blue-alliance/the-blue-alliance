@@ -2,7 +2,7 @@ import { Params } from '@remix-run/react';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import { getStatus } from '~/api/v3';
+import { WltRecord, getStatus } from '~/api/v3';
 
 // TODO: Generate this from the API
 const VALID_YEARS: number[] = [];
@@ -77,4 +77,8 @@ export function zip<T extends unknown[]>(...arrays: (T | undefined)[]): T[] {
   }
 
   return zipped;
+}
+
+export function stringifyRecord(record: WltRecord): string {
+  return `${record.wins}-${record.losses}-${record.ties}`;
 }
