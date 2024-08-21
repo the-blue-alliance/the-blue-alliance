@@ -70,8 +70,9 @@ export const Nav = () => {
       <NavigationMenu>
         <NavigationMenuList className="flex w-full grow">
           <img
-            src="https://www.thebluealliance.com/images/tba_lamp.svg"
+            src="/public/icons/tba-lamp.svg"
             className="size-8 pr-4"
+            alt="The Blue Alliance Logo"
           />
           <div className="whitespace-nowrap pr-2 text-2xl text-white">
             The Blue Alliance
