@@ -41,7 +41,7 @@ export const MenuItem = ({ icon, title, route }: MenuItemProps) => {
         asChild
       >
         {route ? (
-          <Link to={route}>
+          <Link to={route} className="hover:no-underline">
             {icon}
             <div className="pl-2">{title}</div>
           </Link>
@@ -91,7 +91,7 @@ export const Nav = () => {
             className="size-8 pr-4"
             alt="The Blue Alliance Logo"
           />
-          <Link to="/">
+          <Link to="/" className="hover:no-underline">
             <div className="whitespace-nowrap pr-2 text-2xl text-white">
               The Blue Alliance
             </div>
