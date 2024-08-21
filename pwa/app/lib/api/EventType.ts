@@ -18,3 +18,14 @@ export const CMP_EVENT_TYPES = new Set([
   EventType.CMP_DIVISION,
   EventType.CMP_FINALS,
 ]);
+
+export const SEASON_EVENT_TYPES = new Set([
+  EventType.REGIONAL,
+  EventType.DISTRICT,
+  EventType.DISTRICT_CMP_DIVISION,
+  EventType.DISTRICT_CMP,
+  EventType.CMP_DIVISION,
+  EventType.CMP_FINALS,
+  EventType.FOC,
+  EventType.REMOTE,
+]);
