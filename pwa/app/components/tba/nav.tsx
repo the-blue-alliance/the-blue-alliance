@@ -1,3 +1,5 @@
+import { Link } from '@remix-run/react';
+
 import BiBarChartLineFill from '~icons/bi/bar-chart-line-fill';
 import BiCameraVideoFill from '~icons/bi/camera-video-fill';
 import BiGearFill from '~icons/bi/gear-fill';
@@ -23,18 +25,29 @@ import {
 import { cn } from '~/lib/utils';
 
 interface MenuItemProps {
+  route?: string;
   icon: React.ReactNode;
   title: string;
 }
 
-export const MenuItem = ({ icon, title }: MenuItemProps) => {
+export const MenuItem = ({ icon, title, route }: MenuItemProps) => {
   return (
     <NavigationMenuItem>
       <NavigationMenuLink
         className={navigationMenuTriggerStyle() + ' h-10 px-4 cursor-pointer'}
+        asChild
       >
-        {icon}
-        <div className="pl-2">{title}</div>
+        {route ? (
+          <Link to={route}>
+            {icon}
+            <div className="pl-2">{title}</div>
+          </Link>
+        ) : (
+          <div>
+            {icon}
+            <div className="pl-2">{title}</div>
+          </div>
+        )}
       </NavigationMenuLink>
     </NavigationMenuItem>
   );
@@ -79,10 +92,14 @@ export const Nav = () => {
           </div>
           <div className="grow" />
           <MenuItem icon={<BiStarFill />} title="myTBA" />
-          <MenuItem icon={<IonCalendar />} title="Events" />
+          <MenuItem icon={<IonCalendar />} title="Events" route="/events" />
           <MenuItem icon={<BiPeopleFill />} title="Teams" />
           <MenuItem icon={<BiCameraVideoFill />} title="GameDay" />
-          <MenuItem icon={<BiBarChartLineFill />} title="Insights" />
+          <MenuItem
+            icon={<BiBarChartLineFill />}
+            title="Insights"
+            route="/insights"
+          />
           <Popover>
             <PopoverTrigger>
               <MenuItem title="More" icon={<BiThreeDotsVertical />} />{' '}
