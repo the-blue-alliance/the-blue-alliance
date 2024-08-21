@@ -43,5 +43,5 @@ export default defineConfig({
     preset: '2023',
   },
   preset,
-  images: ['public/icons/tba-lamp.svg'],
+  images: ['app/images/tba/tba-lamp.svg'],
 });
