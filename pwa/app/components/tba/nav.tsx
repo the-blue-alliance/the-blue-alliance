@@ -22,6 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover';
+import lamp from '~/images/tba/tba-lamp.svg';
 import { cn } from '~/lib/utils';
 
 interface MenuItemProps {
@@ -83,13 +84,15 @@ export const Nav = () => {
       <NavigationMenu>
         <NavigationMenuList className="flex w-full grow">
           <img
-            src="/public/icons/tba-lamp.svg"
+            src={lamp}
             className="size-8 pr-4"
             alt="The Blue Alliance Logo"
           />
-          <div className="whitespace-nowrap pr-2 text-2xl text-white">
-            The Blue Alliance
-          </div>
+          <Link to="/">
+            <div className="whitespace-nowrap pr-2 text-2xl text-white">
+              The Blue Alliance
+            </div>
+          </Link>
           <div className="grow" />
           <MenuItem icon={<BiStarFill />} title="myTBA" />
           <MenuItem icon={<IonCalendar />} title="Events" route="/events" />
