@@ -15,6 +15,7 @@ import { pwaInfo } from 'virtual:pwa-info';
 import * as api from '~/api/v3';
 
 import GlobalLoadingProgress from './components/tba/globalLoadingProgress';
+import { Nav } from './components/tba/nav';
 import './tailwind.css';
 
 api.defaults.baseUrl = 'https://www.thebluealliance.com/api/v3/';
@@ -228,7 +229,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <GlobalLoadingProgress />
-        <div className="container mx-auto text-sm">
+        <Nav />
+        <div className="container mx-auto text-sm px-4 pt-14">
           <div vaul-drawer-wrapper="" className="bg-background">
             {children}
           </div>
