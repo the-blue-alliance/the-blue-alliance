@@ -22,10 +22,10 @@ import {
 } from '~/components/ui/popover';
 import { cn } from '~/lib/utils';
 
-type MenuItemProps = {
+interface MenuItemProps {
   icon: React.ReactNode;
   title: string;
-};
+}
 
 export const MenuItem = ({ icon, title }: MenuItemProps) => {
   return (
@@ -55,7 +55,7 @@ export const DropMenuItem = ({ icon, title }: MenuItemProps) => {
           navigationMenuTriggerStyle() + ' cursor-pointer w-full grow h-10'
         }
       >
-        <div className="content-between flex flex-row grow justify-start items-center flex-wrap px-2">
+        <div className="flex grow flex-row flex-wrap content-between items-center justify-start px-2">
           {icon}
           <div className="pl-2 antialiased">{title}</div>
         </div>
@@ -66,14 +66,14 @@ export const DropMenuItem = ({ icon, title }: MenuItemProps) => {
 
 export const Nav = () => {
   return (
-    <div className="flex fixed p-2 w-full flex-grow grow justify-center bg-primary shadow-md z-10">
+    <div className="fixed z-10 flex w-full grow justify-center bg-primary p-2 shadow-md">
       <NavigationMenu>
-        <NavigationMenuList className="flex flex-grow w-full">
+        <NavigationMenuList className="flex w-full grow">
           <img
             src="https://www.thebluealliance.com/images/tba_lamp.svg"
-            className="h-8 pr-4 w-8"
+            className="size-8 pr-4"
           />
-          <div className="text-2xl text-white whitespace-nowrap pr-2">
+          <div className="whitespace-nowrap pr-2 text-2xl text-white">
             The Blue Alliance
           </div>
           <div className="grow" />
@@ -103,8 +103,8 @@ export const Nav = () => {
         <Input
           placeholder="Search"
           type="search"
-          className="ml-8 h-8 bg-accent border-none focus:bg-white focus-visible:border-none
-              focus:outline-none focus:ring-none transition-all focus:text-black"
+          className="focus:ring-none ml-8 h-8 border-none bg-accent transition-all
+              focus:bg-white focus:text-black focus:outline-none focus-visible:border-none"
         />
       </NavigationMenu>
     </div>

@@ -230,7 +230,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <GlobalLoadingProgress />
         <Nav />
-        <div className="container mx-auto text-sm px-4 pt-14">
+        <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
             {children}
           </div>
