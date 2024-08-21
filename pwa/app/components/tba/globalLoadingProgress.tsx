@@ -48,7 +48,7 @@ export default function GlobalLoadingProgress() {
   }
   return (
     <Progress
-      className="absolute z-20 top-0 h-1 rounded-none"
+      className="absolute top-0 z-20 h-1 rounded-none"
       value={progress}
     />
   );
