@@ -25,6 +25,8 @@ import {
 import lamp from '~/images/tba/tba-lamp.svg';
 import { cn } from '~/lib/utils';
 
+import GlobalLoadingProgress from './globalLoadingProgress';
+
 interface MenuItemProps {
   route?: string;
   icon: React.ReactNode;
@@ -39,7 +41,7 @@ export const MenuItem = ({ icon, title, route }: MenuItemProps) => {
         asChild
       >
         {route ? (
-          <Link to={route}>
+          <Link to={route} className="hover:no-underline">
             {icon}
             <div className="pl-2">{title}</div>
           </Link>
@@ -81,6 +83,7 @@ export const DropMenuItem = ({ icon, title }: MenuItemProps) => {
 export const Nav = () => {
   return (
     <div className="fixed z-10 flex w-full grow justify-center bg-primary p-2 shadow-md">
+      <GlobalLoadingProgress />
       <NavigationMenu>
         <NavigationMenuList className="flex w-full grow">
           <img
@@ -88,7 +91,7 @@ export const Nav = () => {
             className="size-8 pr-4"
             alt="The Blue Alliance Logo"
           />
-          <Link to="/">
+          <Link to="/" className="hover:no-underline">
             <div className="whitespace-nowrap pr-2 text-2xl text-white">
               The Blue Alliance
             </div>

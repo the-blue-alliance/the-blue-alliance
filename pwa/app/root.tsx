@@ -14,7 +14,6 @@ import { pwaInfo } from 'virtual:pwa-info';
 
 import * as api from '~/api/v3';
 
-import GlobalLoadingProgress from './components/tba/globalLoadingProgress';
 import { Nav } from './components/tba/nav';
 import './tailwind.css';
 
@@ -228,7 +227,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <GlobalLoadingProgress />
         <Nav />
         <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
