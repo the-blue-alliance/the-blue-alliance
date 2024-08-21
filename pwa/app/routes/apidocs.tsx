@@ -113,6 +113,9 @@ export default function ApiDocs(): JSX.Element {
 
           <div>
             <h4 className="text-xl">Authentication</h4>
+            <h5 className="text-l">
+              <code>X-TBA-Auth-Key</code> Header
+            </h5>
             <p>
               Generate an access token on your{' '}
               <Link to="/account">Account Dashboard</Link> in the Read API Keys
@@ -128,6 +131,9 @@ export default function ApiDocs(): JSX.Element {
 
           <div>
             <h4 className="text-xl">Caching</h4>
+            <h5 className="text-l">
+              <code>ETag</code> and <code>If-None-Match</code> Headers
+            </h5>
             <p>
               All API responses have an <code>Etag</code> header which specifies
               the version of the most recent response. When making repeated
@@ -151,6 +157,9 @@ export default function ApiDocs(): JSX.Element {
               </a>
               .
             </p>
+            <h5 className="text-l">
+              <code>Cache-Control</code> Header
+            </h5>
             <p>
               If your application makes many queries to the TBA API and you are
               capable of caching the results locally, the{' '}
@@ -188,7 +197,7 @@ export default function ApiDocs(): JSX.Element {
           </h3>
           <p>
             The TBA API also includes support for{' '}
-            <a href="https://en.wikipedia.org/wiki/Webhook">Webhooks</a>, or
+            <a href="https://en.wikipedia.org/wiki/Webhook">webhooks</a>, or
             HTTP callbacks. When an item of interest changes, TBA can send a
             HTTP request to your server, allowing your application to react
             instantly to the change. This can save both your client and our
