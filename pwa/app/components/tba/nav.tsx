@@ -25,6 +25,8 @@ import {
 import lamp from '~/images/tba/tba-lamp.svg';
 import { cn } from '~/lib/utils';
 
+import GlobalLoadingProgress from './globalLoadingProgress';
+
 interface MenuItemProps {
   route?: string;
   icon: React.ReactNode;
@@ -81,6 +83,7 @@ export const DropMenuItem = ({ icon, title }: MenuItemProps) => {
 export const Nav = () => {
   return (
     <div className="fixed z-10 flex w-full grow justify-center bg-primary p-2 shadow-md">
+      <GlobalLoadingProgress />
       <NavigationMenu>
         <NavigationMenuList className="flex w-full grow">
           <img
