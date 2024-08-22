@@ -49,15 +49,22 @@ export async function parseParamsForYearElseDefault(
 export function timestampsAreOnDifferentDays(
   timestamp1: number,
   timestamp2: number,
+  timezone: string,
 ): boolean {
   const date1 = new Date(timestamp1 * 1000);
   const date2 = new Date(timestamp2 * 1000);
 
-  return (
-    date1.getFullYear() !== date2.getFullYear() ||
-    date1.getMonth() !== date2.getMonth() ||
-    date1.getDate() !== date2.getDate()
-  );
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  const formattedDate1 = formatter.format(date1);
+  const formattedDate2 = formatter.format(date2);
+
+  return formattedDate1 !== formattedDate2;
 }
 
 export function zip<T extends unknown[]>(...arrays: (T | undefined)[]): T[] {
