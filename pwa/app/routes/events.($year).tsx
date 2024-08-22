@@ -28,6 +28,7 @@ import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
 import {
   VALID_YEARS,
   parseParamsForYearElseDefault,
+  pluralize,
   slugify,
 } from '~/lib/utils';
 
@@ -233,8 +234,7 @@ export default function YearEventsPage() {
               <h2 className="mt-5 text-2xl">
                 {group.groupName}{' '}
                 <small className="text-slate-500">
-                  {group.events.length}{' '}
-                  {`Event${group.events.length > 1 ? 's' : ''}`}
+                  {pluralize(group.events.length, 'Event', 'Events')}
                 </small>
               </h2>
               <EventListTable events={group.events} />

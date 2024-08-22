@@ -33,6 +33,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { NAME_TO_DISPLAY_NAME } from '~/lib/insightUtils';
+import { pluralize } from '~/lib/utils';
 
 async function loadData(params: Params) {
   let numericYear = -1;
@@ -205,8 +206,8 @@ function LeaderboardKeyList({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger className="italic">
-              &nbsp;(and {keyVals.length - cutoffSize} other
-              {keyVals.length - cutoffSize > 1 ? 's' : ''})
+              &nbsp;(and{' '}
+              {pluralize(keyVals.length - cutoffSize, 'other', 'others')})
             </TooltipTrigger>
             <TooltipContent className="max-w-[500px] whitespace-normal break-words text-center">
               <p>
