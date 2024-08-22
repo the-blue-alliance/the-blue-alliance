@@ -216,12 +216,12 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
       {matches.map((m, i) => (
         <Fragment key={m.key}>
           {i > 0 &&
-            matches[i - 1].actual_time &&
-            m.actual_time &&
-            // TODO: add timezone support
+            matches[i - 1].time &&
+            m.time &&
             timestampsAreOnDifferentDays(
-              matches[i - 1].actual_time ?? m.actual_time,
-              m.actual_time,
+              matches[i - 1].time ?? m.time,
+              m.time,
+              event.timezone,
             ) && (
               <div
                 className={cn(
