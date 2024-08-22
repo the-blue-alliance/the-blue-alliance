@@ -28,14 +28,15 @@ import { cn } from '~/lib/utils';
 import GlobalLoadingProgress from './globalLoadingProgress';
 
 interface MenuItemProps {
+  className?: string;
   route?: string;
   icon: React.ReactNode;
   title: string;
 }
 
-export const MenuItem = ({ icon, title, route }: MenuItemProps) => {
+export const MenuItem = ({ className, icon, title, route }: MenuItemProps) => {
   return (
-    <NavigationMenuItem>
+    <NavigationMenuItem className={className}>
       <NavigationMenuLink
         className={navigationMenuTriggerStyle() + ' h-10 px-4 cursor-pointer'}
         asChild
@@ -43,12 +44,12 @@ export const MenuItem = ({ icon, title, route }: MenuItemProps) => {
         {route ? (
           <Link to={route} className="hover:no-underline">
             {icon}
-            <div className="pl-2">{title}</div>
+            <div className="pl-2 hidden sm:block">{title}</div>
           </Link>
         ) : (
           <div>
             {icon}
-            <div className="pl-2">{title}</div>
+            <div className="pl-2 hidden sm:block">{title}</div>
           </div>
         )}
       </NavigationMenuLink>
@@ -56,7 +57,7 @@ export const MenuItem = ({ icon, title, route }: MenuItemProps) => {
   );
 };
 
-export const DropMenuItem = ({ icon, title }: MenuItemProps) => {
+export const DropMenuItem = ({ className, icon, title }: MenuItemProps) => {
   return (
     <NavigationMenuItem
       className={cn(
@@ -64,11 +65,13 @@ export const DropMenuItem = ({ icon, title }: MenuItemProps) => {
           text-md outline-none transition-colors focus:bg-background
           focus:text-accent-foreground data-[disabled]:pointer-events-none
           data-[disabled]:opacity-50`,
+        className,
       )}
     >
       <NavigationMenuLink
         className={
-          navigationMenuTriggerStyle() + ' cursor-pointer w-full grow h-10'
+          navigationMenuTriggerStyle() +
+          ' cursor-pointer w-full grow h-10 hover:no-underline'
         }
       >
         <div className="flex grow flex-row flex-wrap content-between items-center justify-start px-2">
@@ -88,20 +91,29 @@ export const Nav = () => {
         <NavigationMenuList className="flex w-full grow">
           <img
             src={lamp}
-            className="size-8 pr-4"
+            className="size-8 ml-8 mr-2 lg:mr-4"
             alt="The Blue Alliance Logo"
           />
           <Link to="/" className="hover:no-underline">
-            <div className="whitespace-nowrap pr-2 text-2xl text-white">
+            <div className="whitespace-nowrap pr-2 text-2xl text-white hidden xl:block">
               The Blue Alliance
             </div>
           </Link>
           <div className="grow" />
           <MenuItem icon={<BiStarFill />} title="myTBA" />
           <MenuItem icon={<IonCalendar />} title="Events" route="/events" />
-          <MenuItem icon={<BiPeopleFill />} title="Teams" />
-          <MenuItem icon={<BiCameraVideoFill />} title="GameDay" />
           <MenuItem
+            className="hidden lg:block"
+            icon={<BiPeopleFill />}
+            title="Teams"
+          />
+          <MenuItem
+            className="hidden lg:block"
+            icon={<BiCameraVideoFill />}
+            title="GameDay"
+          />
+          <MenuItem
+            className="hidden lg:block"
             icon={<BiBarChartLineFill />}
             title="Insights"
             route="/insights"
@@ -119,6 +131,21 @@ export const Nav = () => {
                   rounded-md `,
               )}
             >
+              <DropMenuItem
+                className="block lg:hidden"
+                icon={<BiPeopleFill />}
+                title="Teams"
+              />
+              <DropMenuItem
+                className="block lg:hidden"
+                icon={<BiCameraVideoFill />}
+                title="GameDay"
+              />
+              <DropMenuItem
+                className="block lg:hidden"
+                icon={<BiBarChartLineFill />}
+                title="Insights"
+              />
               <DropMenuItem icon={<BiPencilFill />} title="Blog" />
               <DropMenuItem icon={<BiGearFill />} title="Account" />
             </PopoverContent>
