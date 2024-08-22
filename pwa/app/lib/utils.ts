@@ -89,3 +89,12 @@ export function zip<T extends unknown[]>(...arrays: (T | undefined)[]): T[] {
 export function stringifyRecord(record: WltRecord): string {
   return `${record.wins}-${record.losses}-${record.ties}`;
 }
+
+export function pluralize(
+  count: number,
+  singular: string,
+  plural: string,
+  includeNumber = true,
+) {
+  return `${includeNumber ? `${count} ` : ''}${count === 1 ? singular : plural}`;
+}
