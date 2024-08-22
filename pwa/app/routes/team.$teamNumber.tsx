@@ -57,7 +57,7 @@ import {
   attemptToParseSchoolNameFromOldTeamName,
   attemptToParseSponsors,
 } from '~/lib/teamUtils';
-import { stringifyRecord } from '~/lib/utils';
+import { pluralize, stringifyRecord } from '~/lib/utils';
 
 async function loadData(params: Params) {
   if (params.teamNumber === undefined) {
@@ -250,8 +250,7 @@ export default function TeamPage(): JSX.Element {
                         <BiInfoCircleFill />
                         {schoolName}
                         {sponsors.length > 0 &&
-                          ` with ${sponsors.length} sponsor`}
-                        {sponsors.length > 1 && 's'}
+                          ` with ${pluralize(sponsors.length, ' sponsor', ' sponsors')}`}
                       </InlineIcon>
                     </AccordionTrigger>
                     <AccordionContent className="pb-0">
@@ -310,9 +309,15 @@ export default function TeamPage(): JSX.Element {
 
         <div>
           <StatsBlock>
-            <Stat label="Official Events" value={officialEvents.length} />
+            <Stat
+              label={`Official ${pluralize(officialEvents.length, 'Event', 'Events', false)}`}
+              value={officialEvents.length}
+            />
             {unofficialEvents.length > 0 && (
-              <Stat label="Unofficial Events" value={unofficialEvents.length} />
+              <Stat
+                label={`Unofficial ${pluralize(unofficialEvents.length, 'Event', 'Events', false)}`}
+                value={unofficialEvents.length}
+              />
             )}
 
             <Stat
@@ -320,22 +325,27 @@ export default function TeamPage(): JSX.Element {
               value={stringifyRecord(officialRecord)}
             />
 
-            {unofficialEvents.length > 0 && (
-              <>
-                <Stat
-                  label="Unofficial Record"
-                  value={stringifyRecord(unofficialRecord)}
-                />
-                <Stat
-                  label="Overall Record"
-                  value={stringifyRecord({
-                    wins: officialRecord.wins + unofficialRecord.wins,
-                    losses: officialRecord.losses + unofficialRecord.losses,
-                    ties: officialRecord.ties + unofficialRecord.ties,
-                  })}
-                />
-              </>
-            )}
+            {unofficialEvents.length > 0 &&
+              unofficialRecord.wins +
+                unofficialRecord.losses +
+                unofficialRecord.ties >
+                0 && (
+                <>
+                  <Stat
+                    label="Unofficial Record"
+                    value={stringifyRecord(unofficialRecord)}
+                  />
+
+                  <Stat
+                    label="Overall Record"
+                    value={stringifyRecord({
+                      wins: officialRecord.wins + unofficialRecord.wins,
+                      losses: officialRecord.losses + unofficialRecord.losses,
+                      ties: officialRecord.ties + unofficialRecord.ties,
+                    })}
+                  />
+                </>
+              )}
           </StatsBlock>
 
           <Separator className="mb-8 mt-4" />
