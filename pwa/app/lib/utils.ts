@@ -98,3 +98,54 @@ export function pluralize(
 ) {
   return `${includeNumber ? `${count} ` : ''}${count === 1 ? singular : plural}`;
 }
+
+export function addRecords(record1: WltRecord, record2: WltRecord): WltRecord {
+  return {
+    wins: record1.wins + record2.wins,
+    losses: record1.losses + record2.losses,
+    ties: record1.ties + record2.ties,
+  };
+}
+
+export function winrateFromRecord(record: WltRecord): number {
+  return record.wins / Math.max(1, record.wins + record.losses + record.ties);
+}
+
+function confidence(ups: number, downs: number, z = 1.96): number {
+  const n: number = ups + downs;
+  if (n === 0) {
+    return 0;
+  }
+
+  const phat: number = ups / n;
+  return (
+    (phat +
+      (z * z) / (2 * n) -
+      z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
+    (1 + (z * z) / n)
+  );
+}
+
+// function wilsonSort<T>(
+//   objs: T[],
+//   positive: (item: T) => number,
+//   negative: (item: T) => number,
+//   minimumTotal = 0,
+//   z = 1.96,
+// ): T[] {
+//   return objs
+//     .sort(
+//       (a, b) =>
+//         confidence(positive(b), negative(b), z) -
+//         confidence(positive(a), negative(a), z),
+//     )
+//     .filter((item) => positive(item) + negative(item) >= minimumTotal);
+// }
+
+export function recordConfidence(record: WltRecord): number {
+  return confidence(record.wins, record.losses);
+}
+
+export function recordInverseConfidence(record: WltRecord): number {
+  return confidence(record.losses, record.wins);
+}
