@@ -72,17 +72,20 @@ function matchHasBeenPlayed(match: Match) {
   return match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
 }
 
-export function calculateTeamRecordFromMatches(
+export function calculateTeamRecordsFromMatches(
   teamKey: string,
   matches: Match[],
-): WltRecord {
+): {
+  quals: WltRecord;
+  playoff: WltRecord;
+} {
   const won = matches.filter(
     (m) =>
       (m.winning_alliance === 'red' &&
         m.alliances.red.team_keys.includes(teamKey)) ||
       (m.winning_alliance === 'blue' &&
         m.alliances.blue.team_keys.includes(teamKey)),
-  ).length;
+  );
 
   const lost = matches.filter(
     (m) =>
@@ -90,7 +93,7 @@ export function calculateTeamRecordFromMatches(
         m.alliances.blue.team_keys.includes(teamKey)) ||
       (m.winning_alliance === 'blue' &&
         m.alliances.red.team_keys.includes(teamKey)),
-  ).length;
+  );
 
   const tied = matches.filter(
     (m) =>
@@ -98,7 +101,19 @@ export function calculateTeamRecordFromMatches(
         m.alliances.red.team_keys.includes(teamKey)) &&
       m.winning_alliance === '' &&
       matchHasBeenPlayed(m),
-  ).length;
+  );
 
-  return { wins: won, losses: lost, ties: tied };
+  const quals: WltRecord = {
+    wins: won.filter((m) => m.comp_level === 'qm').length,
+    losses: lost.filter((m) => m.comp_level === 'qm').length,
+    ties: tied.filter((m) => m.comp_level === 'qm').length,
+  };
+
+  const playoff: WltRecord = {
+    wins: won.filter((m) => m.comp_level !== 'qm').length,
+    losses: lost.filter((m) => m.comp_level !== 'qm').length,
+    ties: tied.filter((m) => m.comp_level !== 'qm').length,
+  };
+
+  return { quals, playoff };
 }
