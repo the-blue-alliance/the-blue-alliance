@@ -176,7 +176,7 @@ export default function YearEventsPage() {
   return (
     <div className="flex flex-wrap gap-4 lg:flex-nowrap">
       <div className="basis-full lg:basis-1/6">
-        <div className="sticky top-0 pt-5">
+        <div className="sticky top-14 pt-5">
           <Select
             onValueChange={(value) => {
               navigate(`/events/${value}`);
