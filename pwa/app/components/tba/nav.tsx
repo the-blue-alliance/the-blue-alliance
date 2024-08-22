@@ -44,12 +44,12 @@ export const MenuItem = ({ className, icon, title, route }: MenuItemProps) => {
         {route ? (
           <Link to={route} className="hover:no-underline">
             {icon}
-            <div className="pl-2 hidden sm:block">{title}</div>
+            <div className="hidden pl-2 sm:block">{title}</div>
           </Link>
         ) : (
           <div>
             {icon}
-            <div className="pl-2 hidden sm:block">{title}</div>
+            <div className="hidden pl-2 sm:block">{title}</div>
           </div>
         )}
       </NavigationMenuLink>
@@ -57,7 +57,12 @@ export const MenuItem = ({ className, icon, title, route }: MenuItemProps) => {
   );
 };
 
-export const DropMenuItem = ({ className, icon, title }: MenuItemProps) => {
+export const DropMenuItem = ({
+  className,
+  icon,
+  title,
+  route,
+}: MenuItemProps) => {
   return (
     <NavigationMenuItem
       className={cn(
@@ -73,11 +78,22 @@ export const DropMenuItem = ({ className, icon, title }: MenuItemProps) => {
           navigationMenuTriggerStyle() +
           ' cursor-pointer w-full grow h-10 hover:no-underline'
         }
+        asChild
       >
-        <div className="flex grow flex-row flex-wrap content-between items-center justify-start px-2">
-          {icon}
-          <div className="pl-2 antialiased">{title}</div>
-        </div>
+        {route ? (
+          <Link
+            to={route}
+            className="flex grow flex-row flex-wrap content-between items-center justify-start px-2 text-white hover:no-underline"
+          >
+            {icon}
+            <div className="pl-2 antialiased">{title}</div>
+          </Link>
+        ) : (
+          <div className="flex grow flex-row flex-wrap content-between items-center justify-start px-2">
+            {icon}
+            <div className="pl-2 antialiased">{title}</div>
+          </div>
+        )}
       </NavigationMenuLink>
     </NavigationMenuItem>
   );
@@ -89,13 +105,13 @@ export const Nav = () => {
       <GlobalLoadingProgress />
       <NavigationMenu>
         <NavigationMenuList className="flex w-full grow">
-          <img
-            src={lamp}
-            className="size-8 ml-8 mr-2 lg:mr-4"
-            alt="The Blue Alliance Logo"
-          />
-          <Link to="/" className="hover:no-underline">
-            <div className="whitespace-nowrap pr-2 text-2xl text-white hidden xl:block">
+          <Link to="/" className="ml-4 flex hover:no-underline">
+            <img
+              src={lamp}
+              className="size-8 max-w-none"
+              alt="The Blue Alliance Logo"
+            />
+            <div className="ml-4 hidden whitespace-nowrap text-2xl text-white xl:block">
               The Blue Alliance
             </div>
           </Link>
@@ -132,19 +148,21 @@ export const Nav = () => {
               )}
             >
               <DropMenuItem
-                className="block lg:hidden"
+                className="lg:hidden"
                 icon={<BiPeopleFill />}
                 title="Teams"
+                route="/teams"
               />
               <DropMenuItem
-                className="block lg:hidden"
+                className="lg:hidden"
                 icon={<BiCameraVideoFill />}
                 title="GameDay"
               />
               <DropMenuItem
-                className="block lg:hidden"
+                className="lg:hidden"
                 icon={<BiBarChartLineFill />}
                 title="Insights"
+                route="/insights"
               />
               <DropMenuItem icon={<BiPencilFill />} title="Blog" />
               <DropMenuItem icon={<BiGearFill />} title="Account" />
@@ -154,7 +172,7 @@ export const Nav = () => {
         <Input
           placeholder="Search"
           type="search"
-          className="focus:ring-none ml-8 h-8 border-none bg-accent transition-all
+          className="focus:ring-none ml-4 h-8 border-none bg-accent transition-all
               focus:bg-white focus:text-black focus:outline-none focus-visible:border-none"
         />
       </NavigationMenu>
