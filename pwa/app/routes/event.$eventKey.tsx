@@ -55,7 +55,7 @@ import {
 import { ScrollArea } from '~/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortAwardsComparator } from '~/lib/awardUtils';
-import { getEventDateString } from '~/lib/eventUtils';
+import { getEventDateString, isValidEventKey } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
@@ -63,6 +63,12 @@ import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 async function loadData(params: Params) {
   if (params.eventKey === undefined) {
     throw new Error('Missing eventKey');
+  }
+
+  if (!isValidEventKey(params.eventKey)) {
+    throw new Response(null, {
+      status: 404,
+    });
   }
 
   const [event, matches, alliances, rankings, awards, teams, teamMedia] =
