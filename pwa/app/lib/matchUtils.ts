@@ -17,6 +17,12 @@ const COMP_LEVEL_SHORT_STRINGS = {
   qm: 'Quals',
 };
 
+export function isValidMatchKey(key: string) {
+  return /^[1-9]\d{3}[a-z]+[0-9]*_(?:qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$/.test(
+    key,
+  );
+}
+
 export function sortMatchComparator(a: Match, b: Match) {
   if (a.comp_level !== b.comp_level) {
     return (
