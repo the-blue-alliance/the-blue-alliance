@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { DOUBLE_ELIM_ROUND_MAPPING, PlayoffType } from '~/lib/api/PlayoffType';
-import { matchTitleShort } from '~/lib/matchUtils';
+import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, timestampsAreOnDifferentDays, zip } from '~/lib/utils';
 
 const cellVariants = cva('', {
@@ -123,6 +123,8 @@ interface MatchResultsTableProps {
 }
 
 export default function MatchResultsTable(props: MatchResultsTableProps) {
+  props.matches.sort(sortMatchComparator);
+
   const hasPlayoffs =
     props.matches.filter((m) => m.comp_level !== 'qm').length > 0;
 
