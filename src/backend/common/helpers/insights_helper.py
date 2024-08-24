@@ -34,7 +34,7 @@ from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
-CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float]
+CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float] | Dict[Any, int]
 
 
 class EventMatches(NamedTuple):
@@ -115,6 +115,11 @@ class InsightsHelper(object):
         )
         insights += self._calculate_highest_clean_and_combined_scores(
             week_event_matches, year
+        )
+        insights += (
+            self._calculate_leaderboard_most_unique_teams_played_with_or_against(
+                week_event_matches, year
+            )
         )
 
         return insights
@@ -396,6 +401,34 @@ class InsightsHelper(object):
             cls._create_leaderboard_from_dict_counts(
                 medians,
                 Insight.TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT,
+                year,
+            )
+        ]
+
+    @classmethod
+    def _calculate_leaderboard_most_unique_teams_played_with_or_against(
+        cls, week_event_matches: List[WeekEventMatches], year: Year
+    ) -> List[Insight]:
+        met_teams_set = defaultdict(set)
+        for _, week_events in week_event_matches:
+            for _, matches in week_events:
+                for match in matches:
+                    if match.has_been_played:
+                        all_teams = (
+                            match.alliances[AllianceColor.RED]["teams"]
+                            + match.alliances[AllianceColor.BLUE]["teams"]
+                        )
+
+                        for team in all_teams:
+                            for other_team in all_teams:
+                                if team != other_team:
+                                    met_teams_set[team].add(other_team)
+
+        counter = {tk: len(met_teams) for tk, met_teams in met_teams_set.items()}
+        return [
+            cls._create_leaderboard_from_dict_counts(
+                counter,
+                Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
                 year,
             )
         ]
