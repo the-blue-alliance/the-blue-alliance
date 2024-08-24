@@ -17,5 +17,5 @@ protobuf==3.20.2
 pyre-extensions==0.0.30
 requests==2.32.3
 typing-extensions==4.12.2
-Werkzeug==3.0.3
+Werkzeug==3.0.4
 appengine-python-standard-tbafork==1.1.5dev1

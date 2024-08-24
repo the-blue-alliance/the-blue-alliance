@@ -1,7 +1,24 @@
 import { describe, expect, test } from 'vitest';
 
 import { Event } from '~/api/v3';
-import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
+import {
+  getEventDateString,
+  getEventWeekString,
+  isValidEventKey,
+} from '~/lib/eventUtils';
+
+describe.concurrent('isValidEventKey', () => {
+  test.each(['2010ct', '2014onto2', '202121fim', '2022dc305'])(
+    'valid event key',
+    (key) => {
+      expect(isValidEventKey(key)).toBe(true);
+    },
+  );
+
+  test.each(['210c1', 'frc2010ct', '2010 ct'])('invalid event key', (key) => {
+    expect(isValidEventKey(key)).toBe(false);
+  });
+});
 
 describe.concurrent('getEventDateString', () => {
   test('Same start and end date', () => {

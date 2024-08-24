@@ -1,5 +1,9 @@
 import { Event } from '~/api/v3';
 
+export function isValidEventKey(key: string) {
+  return /^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,3}$/.test(key);
+}
+
 export function sortEventsComparator(a: Event, b: Event) {
   // First sort by date
   const start_date_a = new Date(a.start_date);
