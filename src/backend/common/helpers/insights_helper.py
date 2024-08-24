@@ -34,7 +34,7 @@ from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
-CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float]
+CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float] | Dict[Any, int]
 
 
 class EventMatches(NamedTuple):
@@ -80,9 +80,7 @@ class InsightsHelper(object):
             Event.query(Event.year == year).order(Event.start_date).fetch(1000)
         )
         events_by_week = EventHelper.group_by_week(official_events)
-        week_event_matches = (
-            []
-        )  # Tuples of: (week, events) where events are tuples of (event, matches)
+        week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
             if week in {OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL}:
                 continue
@@ -115,6 +113,11 @@ class InsightsHelper(object):
         )
         insights += self._calculate_highest_clean_and_combined_scores(
             week_event_matches, year
+        )
+        insights += (
+            self._calculate_leaderboard_most_unique_teams_played_with_or_against(
+                week_event_matches, year
+            )
         )
 
         return insights
@@ -401,6 +404,34 @@ class InsightsHelper(object):
         ]
 
     @classmethod
+    def _calculate_leaderboard_most_unique_teams_played_with_or_against(
+        cls, week_event_matches: List[WeekEventMatches], year: Year
+    ) -> List[Insight]:
+        met_teams_set = defaultdict(set)
+        for _, week_events in week_event_matches:
+            for _, matches in week_events:
+                for match in matches:
+                    if match.has_been_played:
+                        all_teams = (
+                            match.alliances[AllianceColor.RED]["teams"]
+                            + match.alliances[AllianceColor.BLUE]["teams"]
+                        )
+
+                        for team in all_teams:
+                            for other_team in all_teams:
+                                if team != other_team:
+                                    met_teams_set[team].add(other_team)
+
+        counter = {tk: len(met_teams) for tk, met_teams in met_teams_set.items()}
+        return [
+            cls._create_leaderboard_from_dict_counts(
+                counter,
+                Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
+                year,
+            )
+        ]
+
+    @classmethod
     def _generateMatchData(self, match: Match, event: Event) -> Dict:
         """
         A dict of any data needed for front-end rendering
@@ -475,9 +506,7 @@ class InsightsHelper(object):
         Returns an Insight where the data is a list of tuples:
         (week string, list of highest scoring matches)
         """
-        highscore_matches_by_week = (
-            []
-        )  # tuples: week, list of matches (if there are ties)
+        highscore_matches_by_week = []  # tuples: week, list of matches (if there are ties)
         for week, week_events in week_event_matches:
             week_highscore_matches = []
             highscore = 0
@@ -842,9 +871,9 @@ class InsightsHelper(object):
                 roundedScore = margin - int(margin % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_winning_margin_distribution_normalized:
-                    elim_winning_margin_distribution_normalized[
-                        roundedScore
-                    ] += contribution
+                    elim_winning_margin_distribution_normalized[roundedScore] += (
+                        contribution
+                    )
                 else:
                     elim_winning_margin_distribution_normalized[roundedScore] = (
                         contribution
