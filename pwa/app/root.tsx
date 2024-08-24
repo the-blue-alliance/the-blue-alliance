@@ -14,6 +14,7 @@ import { pwaInfo } from 'virtual:pwa-info';
 
 import * as api from '~/api/v3';
 
+import { Footer } from './components/tba/footer';
 import { Nav } from './components/tba/nav';
 import './tailwind.css';
 
@@ -233,6 +234,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {children}
           </div>
         </div>
+        <Footer />
         <ScrollRestoration />
         <Scripts />
       </body>
