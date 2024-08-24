@@ -1,6 +1,8 @@
 import { Link } from '@remix-run/react';
 
-import BiInfoCircleFill from '~icons/bi/info-circle-fill';
+import BiInfoCircleFill from '~icons/bi/info-circle-fill?width=16px&height=16px';
+
+import andymark_logo from '~/images/andymark_logo.png';
 
 export const Footer = () => {
   // TODO: Implement this as a backend/cache thing
@@ -15,14 +17,15 @@ export const Footer = () => {
   });
 
   return (
-    <div className="p-5 flex flex-col justify-center">
+    <div className="p-5 flex flex-col space-y-3 text-center">
       <div className="justify-center">
-        <hr className="w-full my-1" />
-
+        <hr className="w-full" />
+      </div>
+      <div>
         <div className="flex flex-row justify-center">
-          <BiInfoCircleFill className="m-2" />
+          <BiInfoCircleFill className="mx-1 mt-1" />
 
-          <div className="mt-1.5">
+          <div className="mt-0">
             Data provided by the{' '}
             <Link
               to="https://frc-events.firstinspires.org/services/API"
@@ -34,55 +37,62 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-      {/* <div> */}
-      {/* style="overflow: hidden;" */}
-      {/* <div
-            className="fb-like"
-            data-href="https://www.facebook.com/thebluealliance"
-            data-width="450"
-            data-layout="standard"
-            data-action="like"
-            data-show-faces="true"
-            data-share="true"
-          ></div> */}
-      {/* </div> */}
 
-      <div className="flex grow justify-center my-1">
+      {/* TODO: implement the FB like/share widget */}
+      {/* <div style="overflow: hidden;">
+        <div
+          class="fb-like"
+          data-href="https://www.facebook.com/thebluealliance"
+          data-width="450"
+          data-layout="standard"
+          data-action="like"
+          data-show-faces="true"
+          data-share="true"
+        ></div>
+      </div> */}
+
+      <div className="flex grow justify-center">
         <hr className="w-full max-w-lg" />
       </div>
 
-      {/* {% if render_time %} */}
-      <div className="text-center">
-        <p>This page was generated on {render_time}</p>
+      <div>This page was generated on {render_time}</div>
+      <div className="flex flex-row justify-center">
+        Thanks to our platinum sponsor
+        <Link to="https://www.andymark.com/" title="AndyMark" target="_blank">
+          <img
+            className="ml-1 mt-0.5"
+            src={andymark_logo}
+            alt="AndyMark"
+            width="100"
+          />
+        </Link>
       </div>
-      {/* {% endif %} */}
-      {/* <div><p>Thanks to our platinum sponsor <a href="https://www.andymark.com/" title="AndyMark"><img src="/images/andymark_logo.png" alt="AndyMark" width="100" /></a></p></div> */}
-      {/* <div>
-          <p>
-            The Blue Alliance is{' '}
-            <a
-              href="https://github.com/the-blue-alliance/the-blue-alliance/"
-              title="The Blue Alliance GitHub"
-            >
-              open source
-            </a>
-            . Help improve it!
-          </p>
-        </div> */}
-      <div className="text-center">
-        <a href="/about">About</a>
+
+      <div>
+        The Blue Alliance is{' '}
+        <Link
+          to="https://github.com/the-blue-alliance/the-blue-alliance/"
+          title="The Blue Alliance GitHub"
+        >
+          open source
+        </Link>
+        . Help improve it!
+      </div>
+
+      <div>
+        <Link to="/about">About</Link>
         {' - '}
-        <a href="/add-data">Add Data</a>
+        <Link to="/add-data">Add Data</Link>
         {' - '}
-        <a href="/contact">Contact</a>
+        <Link to="/contact">Contact</Link>
         {' - '}
-        <a href="/donate">Donate</a>
+        <Link to="/donate">Donate</Link>
         {' - '}
-        <a href="/thanks">Thanks</a>
+        <Link to="/thanks">Thanks</Link>
         {' - '}
-        <a href="/apidocs">API</a>
+        <Link to="/apidocs">API</Link>
         {' - '}
-        <a href="/privacy">Privacy</a>
+        <Link to="/privacy">Privacy</Link>
       </div>
 
       <hr className="mt-1" />
