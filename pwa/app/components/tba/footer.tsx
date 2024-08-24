@@ -30,6 +30,7 @@ export const Footer = () => {
             <Link
               to="https://frc-events.firstinspires.org/services/API"
               target="_blank"
+              rel="noreferrer"
             >
               <em>FIRST</em>
               <sup>®</sup> Events API
@@ -58,7 +59,12 @@ export const Footer = () => {
       <div>This page was generated on {render_time}</div>
       <div className="flex flex-row justify-center">
         Thanks to our platinum sponsor
-        <Link to="https://www.andymark.com/" title="AndyMark" target="_blank">
+        <Link
+          to="https://www.andymark.com/"
+          title="AndyMark"
+          target="_blank"
+          rel="noreferrer"
+        >
           <img
             className="ml-1 mt-0.5"
             src={andymark_logo}
