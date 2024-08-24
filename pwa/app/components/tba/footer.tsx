@@ -17,7 +17,7 @@ export const Footer = () => {
   });
 
   return (
-    <div className="p-5 flex flex-col space-y-3 text-center">
+    <div className="flex flex-col space-y-3 p-5 text-center">
       <div className="justify-center">
         <hr className="w-full" />
       </div>
