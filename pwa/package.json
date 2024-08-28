@@ -60,7 +60,7 @@
   "devDependencies": {
     "@iconify/json": "2.2.241",
     "@remix-run/dev": "2.11.2",
-    "@sentry/vite-plugin": "2.22.2",
+    "@sentry/vite-plugin": "2.22.3",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
