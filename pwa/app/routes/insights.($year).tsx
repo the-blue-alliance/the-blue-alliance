@@ -9,6 +9,9 @@ import {
 } from '@remix-run/react';
 import React from 'react';
 
+import BiChevronBarDown from '~icons/bi/chevron-bar-down';
+import BiChevronBarUp from '~icons/bi/chevron-bar-up';
+
 import { LeaderboardInsight, getInsightsLeaderboardsYear } from '~/api/v3';
 import { Button } from '~/components/ui/button';
 import {
@@ -33,6 +36,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { NAME_TO_DISPLAY_NAME } from '~/lib/insightUtils';
+import { pluralize } from '~/lib/utils';
 
 async function loadData(params: Params) {
   let numericYear = -1;
@@ -132,19 +136,33 @@ function Leaderboard({ leaderboard }: { leaderboard: LeaderboardInsight }) {
 
   return (
     <div className="m-3">
-      <Card>
-        <CardHeader>
-          <CardTitle>{displayName}</CardTitle>
+      <Card className="border-gray-300">
+        <CardHeader className="px-6 pb-1 pt-4">
+          <CardTitle>
+            <div className="flex justify-between align-middle">
+              <div className="self-center">{displayName}</div>
+              <Button
+                variant={'ghost'}
+                onClick={() => {
+                  setExpanded(!expanded);
+                }}
+                size={'sm'}
+              >
+                {expanded ? <BiChevronBarUp /> : <BiChevronBarDown />}
+                <span className="sr-only">Toggle</span>
+              </Button>
+            </div>
+          </CardTitle>
           <CardDescription>
             {leaderboard.year > 0 ? leaderboard.year : 'Overall'}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pb-3">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[6ch] text-center">#</TableHead>
-                <TableHead className="text-left capitalize">
+                <TableHead className="h-8 w-[6ch] text-center">#</TableHead>
+                <TableHead className="h-8 text-left capitalize">
                   {leaderboard.data.key_type}
                 </TableHead>
               </TableRow>
@@ -166,18 +184,6 @@ function Leaderboard({ leaderboard }: { leaderboard: LeaderboardInsight }) {
                 ))}
             </TableBody>
           </Table>
-
-          {leaderboard.data.rankings.length > PRE_EXPANDED_ROWS && (
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                setExpanded((prev) => !prev);
-              }}
-            >
-              {expanded ? 'Show Less' : 'Show More'}
-            </Button>
-          )}
         </CardContent>
       </Card>
     </div>
@@ -205,8 +211,8 @@ function LeaderboardKeyList({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger className="italic">
-              &nbsp;(and {keyVals.length - cutoffSize} other
-              {keyVals.length - cutoffSize > 1 ? 's' : ''})
+              &nbsp;(and{' '}
+              {pluralize(keyVals.length - cutoffSize, 'other', 'others')})
             </TooltipTrigger>
             <TooltipContent className="max-w-[500px] whitespace-normal break-words text-center">
               <p>

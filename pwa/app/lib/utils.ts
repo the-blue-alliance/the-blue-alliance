@@ -2,7 +2,7 @@ import { Params } from '@remix-run/react';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import { getStatus } from '~/api/v3';
+import { WltRecord, getStatus } from '~/api/v3';
 
 // TODO: Generate this from the API
 const VALID_YEARS: number[] = [];
@@ -49,15 +49,22 @@ export async function parseParamsForYearElseDefault(
 export function timestampsAreOnDifferentDays(
   timestamp1: number,
   timestamp2: number,
+  timezone: string,
 ): boolean {
   const date1 = new Date(timestamp1 * 1000);
   const date2 = new Date(timestamp2 * 1000);
 
-  return (
-    date1.getFullYear() !== date2.getFullYear() ||
-    date1.getMonth() !== date2.getMonth() ||
-    date1.getDate() !== date2.getDate()
-  );
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  const formattedDate1 = formatter.format(date1);
+  const formattedDate2 = formatter.format(date2);
+
+  return formattedDate1 !== formattedDate2;
 }
 
 export function zip<T extends unknown[]>(...arrays: (T | undefined)[]): T[] {
@@ -86,4 +93,30 @@ export function parseDate(date: string) {
 
 export function convertMsToDays(time: number) {
   return time / (1000 * 60 * 60 * 24);
+}
+
+  export function stringifyRecord(record: WltRecord): string {
+  return `${record.wins}-${record.losses}-${record.ties}`;
+}
+
+export function pluralize(
+  count: number,
+  singular: string,
+  plural: string,
+  includeNumber = true,
+) {
+  return `${includeNumber ? `${count} ` : ''}${count === 1 ? singular : plural}`;
+}
+
+export function addRecords(record1: WltRecord, record2: WltRecord): WltRecord {
+  return {
+    wins: record1.wins + record2.wins,
+    losses: record1.losses + record2.losses,
+    ties: record1.ties + record2.ties,
+  };
+}
+
+export function winrateFromRecord(record: WltRecord): number {
+  return record.wins / Math.max(1, record.wins + record.losses + record.ties);
+}
 }

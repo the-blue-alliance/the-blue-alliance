@@ -8,7 +8,7 @@ google-api-core==1.34.0
 google-api-python-client==2.142.0
 google-cloud-logging==3.9.0
 google-cloud-storage==2.14.0
-grpcio==1.65.5
+grpcio==1.66.0
 Jinja2==3.1.4
 MarkupSafe==2.1.5
 numpy==2.1.0
@@ -17,5 +17,5 @@ protobuf==3.20.2
 pyre-extensions==0.0.30
 requests==2.32.3
 typing-extensions==4.12.2
-Werkzeug==3.0.3
+Werkzeug==3.0.4
 appengine-python-standard-tbafork==1.1.5dev1

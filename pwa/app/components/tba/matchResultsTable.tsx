@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { DOUBLE_ELIM_ROUND_MAPPING, PlayoffType } from '~/lib/api/PlayoffType';
-import { matchTitleShort } from '~/lib/matchUtils';
+import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, timestampsAreOnDifferentDays, zip } from '~/lib/utils';
 
 const cellVariants = cva('', {
@@ -123,6 +123,8 @@ interface MatchResultsTableProps {
 }
 
 export default function MatchResultsTable(props: MatchResultsTableProps) {
+  props.matches.sort(sortMatchComparator);
+
   const hasPlayoffs =
     props.matches.filter((m) => m.comp_level !== 'qm').length > 0;
 
@@ -216,12 +218,12 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
       {matches.map((m, i) => (
         <Fragment key={m.key}>
           {i > 0 &&
-            matches[i - 1].actual_time &&
-            m.actual_time &&
-            // TODO: add timezone support
+            matches[i - 1].time &&
+            m.time &&
             timestampsAreOnDifferentDays(
-              matches[i - 1].actual_time ?? m.actual_time,
-              m.actual_time,
+              matches[i - 1].time ?? m.time,
+              m.time,
+              event.timezone,
             ) && (
               <div
                 className={cn(
