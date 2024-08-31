@@ -95,7 +95,7 @@ export function convertMsToDays(time: number) {
   return time / (1000 * 60 * 60 * 24);
 }
 
-  export function stringifyRecord(record: WltRecord): string {
+export function stringifyRecord(record: WltRecord): string {
   return `${record.wins}-${record.losses}-${record.ties}`;
 }
 
@@ -118,5 +118,4 @@ export function addRecords(record1: WltRecord, record2: WltRecord): WltRecord {
 
 export function winrateFromRecord(record: WltRecord): number {
   return record.wins / Math.max(1, record.wins + record.losses + record.ties);
-}
 }
