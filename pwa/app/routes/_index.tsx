@@ -72,7 +72,7 @@ export default function Index() {
           </p>
         </div>
       </div>
-      <h1 className="mb-2.5 mt-5 text-4xl">This Week's Events</h1>
+      <h1 className="mb-2.5 mt-5 text-4xl">This Week&apos;s Events</h1>
       <EventListTable events={events} />
     </div>
   );
