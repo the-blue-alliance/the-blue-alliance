@@ -1,3 +1,4 @@
+import { Schema, ValidateEnv } from '@julr/vite-plugin-validate-env';
 import { vitePlugin as remix } from '@remix-run/dev';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { RemixVitePWA } from '@vite-pwa/remix';
@@ -71,6 +72,11 @@ export default defineConfig({
     sentryVitePlugin({
       org: 'the-blue-alliance',
       project: 'the-blue-alliance-pwa',
+    }),
+    ValidateEnv({
+      VITE_TBA_API_READ_KEY: Schema.string({
+        message: 'Get your API key at https://www.thebluealliance.com/account',
+      }),
     }),
   ],
   build: {
