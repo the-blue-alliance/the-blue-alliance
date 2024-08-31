@@ -88,8 +88,8 @@ export function getEventWeekString(event: Event) {
 }
 
 export function getCurrentWeekEvents(events: Event[]) {
-  //const now = new Date();
-  const now = new Date('Jul 17, 2024');
+  const now = new Date();
+  //const now = new Date('Jul 17, 2024');
   const filteredEvents = [];
 
   const diffFromWeekStart = now.getDay();

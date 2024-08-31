@@ -2,6 +2,7 @@ import type { MetaFunction } from '@remix-run/node';
 import { json, useLoaderData } from '@remix-run/react';
 
 import { getEventsByYear, getStatus } from '~/api/v3';
+import EventListTable from '~/components/tba/eventListTable';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 
 export async function loader() {
@@ -55,14 +56,9 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   const { status, events } = useLoaderData<typeof loader>();
 
-  // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  const commitHash = __COMMIT_HASH__ as string;
-
   return (
     <div>
-      <div className="bg-white px-6 py-2 sm:py-8 lg:px-8">
+      <div className="bg-white px-6 py-10 sm:py-8 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
             The Blue Alliance
@@ -95,25 +91,8 @@ export default function Index() {
           </div>
         </div>
       </div>
-      <h1 className="text-3xl">The Blue Alliance</h1>
-      <p>
-        The Blue Alliance is the best way to scout, watch, and relive the{' '}
-        <i>FIRST</i> Robotics Competition.
-      </p>
-      <p>Current Season: {status.current_season}</p>
-      <p>Total Events: {events.length}</p>
-      {events.map((event) => (
-        <a key={event.event_code} href={event.event_code}>
-          {event.name}
-        </a>
-      ))}
-      <a
-        href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
-        target="_blank"
-        rel="noreferrer"
-      >
-        Commit: {commitHash}
-      </a>
+      <h1 className="mb-2.5 mt-5 text-4xl">This Week's Events</h1>
+      <EventListTable events={events} />
     </div>
   );
 }
