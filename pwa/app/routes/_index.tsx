@@ -54,11 +54,11 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const { status, events } = useLoaderData<typeof loader>();
+  const { events } = useLoaderData<typeof loader>();
 
   return (
     <div>
-      <div className="bg-white px-6 py-10 sm:py-8 lg:px-8">
+      <div className="px-6 py-10 sm:py-8 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
             The Blue Alliance
@@ -70,25 +70,6 @@ export default function Index() {
               Learn More About <i>FIRST</i>
             </a>
           </p>
-          <div className="mx-auto mt-10 max-w-3xl lg:mx-0 lg:max-w-none">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-5 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
-              <a href="/suggest/offseason">
-                Add an Offseason Event <span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="/eventwizard">
-                Add Offseason Event Data <span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="/add-data">
-                Adding Data Overview <span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="https://github.com/the-blue-alliance">
-                Hack on TBA<span aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="/donate">
-                Donate to TBA<span aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </div>
         </div>
       </div>
       <h1 className="mb-2.5 mt-5 text-4xl">This Week's Events</h1>
