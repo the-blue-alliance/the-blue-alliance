@@ -78,3 +78,12 @@ export function zip<T extends unknown[]>(...arrays: (T | undefined)[]): T[] {
 
   return zipped;
 }
+
+export function parseDate(date: string) {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Date(year, month - 1, day).getTime();
+}
+
+export function convertMsToDays(time: number) {
+  return time / (1000 * 60 * 60 * 24);
+}

@@ -1,5 +1,7 @@
 import { Event } from '~/api/v3';
 
+import { convertMsToDays, parseDate } from './utils';
+
 export function sortEventsComparator(a: Event, b: Event) {
   // First sort by date
   const start_date_a = new Date(a.start_date);
@@ -83,4 +85,32 @@ export function getEventWeekString(event: Event) {
     default:
       return `Week ${event.week + 1}`;
   }
+}
+
+export function getCurrentWeekEvents(events: Event[]) {
+  //const now = new Date();
+  const now = new Date('Jul 17, 2024');
+  const filteredEvents = [];
+
+  const diffFromWeekStart = now.getDay();
+  const closestStartMonday = new Date(now).setDate(
+    now.getDate() - diffFromWeekStart,
+  );
+
+  for (const event of events) {
+    const startDate = parseDate(event.start_date);
+
+    const timeOffsetDays = Math.floor(
+      convertMsToDays(startDate - closestStartMonday),
+    );
+
+    if (timeOffsetDays === 0 || (timeOffsetDays > 0 && timeOffsetDays < 7)) {
+      filteredEvents.push(event);
+    }
+  }
+  return filteredEvents;
+}
+
+export function sortEvents(events: Event[]) {
+  return events.sort((a, b) => sortEventsComparator(a, b));
 }
