@@ -155,7 +155,8 @@ class FRCAPI:
         }
 
         with Span(f"frc_api_fetch:{endpoint}"):
-            return self.session.get(url, headers=headers)
+            # TODO: Reenable SSL verification. Disabled on 2024-08-31 due to FIRST SSL issues.
+            return self.session.get(url, headers=headers, verify=False)
 
     @staticmethod
     def get_cached_gcs_files(gcs_dir_name: str):

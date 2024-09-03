@@ -13,7 +13,7 @@ export default function TeamRobotPicsCarousel({
   media,
 }: {
   media: Media[];
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <Carousel className="w-full max-w-xs" plugins={[Autoplay({ delay: 5000 })]}>
       <CarouselContent className="items-center">

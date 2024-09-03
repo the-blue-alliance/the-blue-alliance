@@ -17,7 +17,7 @@ export default function TeamEventAppearance({
   event: Event;
   matches: Match[];
   status: TeamEventStatus | null;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <div className="flex flex-wrap gap-x-8 [&>*]:sm:flex-1">
       <div className="">

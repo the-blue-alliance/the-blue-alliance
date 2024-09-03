@@ -96,10 +96,11 @@ jobs:
         run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
+          include-hidden-files: true
   py3-coverage:
     name: "[py3] Coverage"
     runs-on: ubuntu-latest
@@ -235,6 +236,10 @@ jobs:
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
       - name: Run Test
         run: npm --prefix pwa test
       - name: Upload coverage to Codecov
@@ -254,6 +259,10 @@ jobs:
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
       - name: Run Build
         run: npm --prefix pwa run build
   bash-lint:
@@ -392,7 +401,7 @@ jobs:
         run: ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle

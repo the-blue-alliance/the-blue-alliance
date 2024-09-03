@@ -38,7 +38,7 @@ function AllianceTableRow({
   className,
   variant,
   ...props
-}: AllianceTableRowProps): JSX.Element {
+}: AllianceTableRowProps): React.JSX.Element {
   return (
     <TableRow className={cn(rowVariants({ variant, className }))} {...props} />
   );
