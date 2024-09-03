@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.4
+ * 3.9.5
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -136,7 +136,7 @@ export type Event = {
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
   event_type: number;
-  district: DistrictList;
+  district: DistrictList | null;
   /** City, town, village, etc. the event is located in. */
   city: string | null;
   /** State or Province the event is located in. */
@@ -196,7 +196,7 @@ export type EventSimple = {
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
   event_type: number;
-  district: DistrictList;
+  district: DistrictList | null;
   /** City, town, village, etc. the event is located in. */
   city: string | null;
   /** State or Province the event is located in. */
