@@ -2,7 +2,7 @@ gunicorn==23.0.0
 firebase_admin==6.5.0
 Flask==3.0.3
 Flask-Caching==2.3.0
-Flask-Cors==4.0.1
+Flask-Cors==5.0.0
 Flask-WTF==1.2.1
 google-api-core==1.34.0
 google-api-python-client==2.142.0
