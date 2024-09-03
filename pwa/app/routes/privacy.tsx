@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 
-export default function Privacy(): JSX.Element {
+export default function Privacy(): React.JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y [&_*]:mt-4">

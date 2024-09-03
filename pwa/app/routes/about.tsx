@@ -3,7 +3,7 @@ import { Link } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 import first_logo from '~/images/first_logo.png';
 
-export default function About(): JSX.Element {
+export default function About(): React.JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y [&_*]:mt-4">

@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { Media } from '~/api/v3';
 import { cn } from '~/lib/utils';
 
-export default function TeamAvatar({ media }: { media: Media }): JSX.Element {
+export default function TeamAvatar({
+  media,
+}: {
+  media: Media;
+}): React.JSX.Element {
   const [colorClass, setColorClass] = useState('bg-first-avatar-blue');
 
   if (!media.details) {

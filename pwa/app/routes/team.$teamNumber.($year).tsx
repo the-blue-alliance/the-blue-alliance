@@ -175,7 +175,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
-export default function TeamPage(): JSX.Element {
+export default function TeamPage(): React.JSX.Element {
   const navigate = useNavigate();
   const {
     year,
