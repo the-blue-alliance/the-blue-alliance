@@ -487,9 +487,9 @@ def test_end_date_or_distant_future(
 @pytest.mark.parametrize(
     "current_date,expected_event_keys",
     [
-        (datetime.datetime(2019, 3, 1), [f"event_{i}" for i in range(1, 3)]),
-        (datetime.datetime(2019, 3, 4), [f"event_{i}" for i in range(3, 6)]),
-        (datetime.datetime(2019, 3, 6), [f"event_{i}" for i in range(5, 8)]),
+        (datetime.datetime(2019, 3, 1), [f"event_{i}" for i in range(1, 4)]),
+        (datetime.datetime(2019, 3, 4), [f"event_{i}" for i in range(3, 7)]),
+        (datetime.datetime(2019, 3, 6), [f"event_{i}" for i in range(5, 9)]),
     ],
 )
 def test_within_a_day(ndb_context, current_date, expected_event_keys):
