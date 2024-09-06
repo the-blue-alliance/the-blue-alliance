@@ -23,7 +23,7 @@ export const Footer = () => {
       </div>
       <div>
         <div className="flex flex-row justify-center">
-          <BiInfoCircleFill className="mx-1 mt-1" />
+          <BiInfoCircleFill className="mx-1 mt-1" height={16} />
 
           <div className="mt-0">
             Data provided by the{' '}
