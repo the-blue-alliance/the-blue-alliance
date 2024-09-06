@@ -39,19 +39,6 @@ export const Footer = () => {
         </div>
       </div>
 
-      {/* TODO: implement the FB like/share widget */}
-      {/* <div style="overflow: hidden;">
-        <div
-          class="fb-like"
-          data-href="https://www.facebook.com/thebluealliance"
-          data-width="450"
-          data-layout="standard"
-          data-action="like"
-          data-show-faces="true"
-          data-share="true"
-        ></div>
-      </div> */}
-
       <div className="flex grow justify-center">
         <hr className="w-full max-w-lg" />
       </div>
