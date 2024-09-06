@@ -66,3 +66,10 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 4. Click the `Unplugin Icons` tab.
 5. Copy the generated `import ...` string.
 6. Use your imported component as a regular React component (e.g. `<MdiMyIcon />`).
+
+## Adding environment variables
+
+1. Put some form of example in `default.env`
+2. Add the environment variable to `app/vite-env.d.ts`
+3. Add a validator to `vite.config.ts`
+4. You can then reference it in code with `import.env.meta.VITE_MY_VAR`.

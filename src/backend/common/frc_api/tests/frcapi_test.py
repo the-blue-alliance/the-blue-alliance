@@ -192,4 +192,7 @@ def test_get(endpoint: str) -> None:
     with patch.object(api.session, "get") as mock_get:
         api._get(endpoint)
 
-    mock_get.assert_called_once_with(expected_url, headers=expected_headers)
+    # TODO: Reenable SSL verification. Disabled on 2024-08-31 due to FIRST SSL issues.
+    mock_get.assert_called_once_with(
+        expected_url, headers=expected_headers, verify=False
+    )

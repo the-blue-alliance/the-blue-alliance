@@ -27,6 +27,14 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
+  groups:
+    remix-run:
+      patterns:
+        - "@remix-run/*"
+    embla-carousel:
+      patterns:
+        - "embla-carousel-autoplay"
+        - "embla-carousel-react"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

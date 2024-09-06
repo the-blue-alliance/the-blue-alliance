@@ -82,6 +82,7 @@ import {
 } from '~/lib/teamUtils';
 import {
   addRecords,
+  parseParamsForYearElseDefault,
   pluralize,
   stringifyRecord,
   winrateFromRecord,
@@ -93,8 +94,10 @@ async function loadData(params: Params) {
   }
 
   const teamKey = `frc${params.teamNumber}`;
-  // todo: add year support
-  const year = 2024;
+  const year = await parseParamsForYearElseDefault(params);
+  if (year === undefined) {
+    throw new Response(null, { status: 404 });
+  }
 
   const [
     team,
@@ -133,7 +136,12 @@ async function loadData(params: Params) {
     throw new Response(null, { status: 500 });
   }
 
+  if (!yearsParticipated.data.includes(year)) {
+    throw new Response(null, { status: 404 });
+  }
+
   return {
+    year,
     team: team.data,
     media: media.data,
     socials: socials.data,
@@ -167,9 +175,10 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
-export default function TeamPage(): JSX.Element {
+export default function TeamPage(): React.JSX.Element {
   const navigate = useNavigate();
   const {
+    year,
     team,
     media,
     socials,
@@ -219,7 +228,7 @@ export default function TeamPage(): JSX.Element {
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={yearsParticipated[0]} />
+            <SelectValue placeholder={year} />
           </SelectTrigger>
           <SelectContent>
             {yearsParticipated.map((y) => (

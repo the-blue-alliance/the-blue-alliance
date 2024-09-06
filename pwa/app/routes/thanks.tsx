@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 
-export default function Thanks(): JSX.Element {
+export default function Thanks(): React.JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y [&_*]:mt-4">
