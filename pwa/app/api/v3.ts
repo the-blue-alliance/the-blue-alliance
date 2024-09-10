@@ -991,7 +991,7 @@ export type LeaderboardInsight = {
   data: {
     rankings: {
       /** Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played. */
-      value: number;
+      value: number | WltRecord;
       /** Team/Event/Match keys that have the corresponding value. */
       keys: string[];
     }[];

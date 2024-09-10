@@ -8218,7 +8218,14 @@
                   "type": "object",
                   "properties": {
                     "value": {
-                      "type": "number",
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "$ref": "#/components/schemas/WLT_Record"
+                        }
+                      ],
                       "description": "Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played."
                     },
                     "keys": {
