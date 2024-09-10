@@ -44,7 +44,7 @@
     "cross-env": "7.0.3",
     "embla-carousel-autoplay": "8.2.1",
     "embla-carousel-react": "8.2.1",
-    "express": "4.19.2",
+    "express": "4.20.0",
     "isbot": "5.1.17",
     "lodash-es": "4.17.21",
     "lru-cache": "11.0.1",
