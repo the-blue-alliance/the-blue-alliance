@@ -172,8 +172,8 @@ export const Nav = () => {
           <Input
             placeholder="Search"
             type="search"
-            className="focus:ring-none h-8 border-none outline-none bg-accent transition-all
-              focus:bg-white focus:text-black focus:outline-none focus-visible:border-none"
+            className="focus:ring-none h-8 border-none bg-accent outline-none
+              transition-all focus:bg-white focus:text-black focus:outline-none focus-visible:border-none"
           />
         </div>
       </NavigationMenu>

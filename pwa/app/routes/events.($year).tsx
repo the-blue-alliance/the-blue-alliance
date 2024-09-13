@@ -210,7 +210,7 @@ export default function YearEventsPage() {
         </div>
       </div>
       <div className="basis-full lg:basis-5/6">
-        <h1 className="mt-5 mb-3 text-3xl font-medium">
+        <h1 className="mb-3 mt-5 text-3xl font-medium">
           {year} <em>FIRST</em> Robotics Competition Events{' '}
           <small className="text-xl text-slate-500">
             {events.length} Events

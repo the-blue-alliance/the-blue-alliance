@@ -1,14 +1,13 @@
 import { Link } from '@remix-run/react';
 
 import { Button } from '~/components/ui/button';
-import first_logo from '~/images/first_logo.png';
 
 export default function About(): React.JSX.Element {
   return (
     <div className="container max-w-4xl">
       <h1 className="mt-8 text-3xl font-medium">About Us</h1>
       <div className="[&_p]:mb-2">
-        <section className="py-6 border-b">
+        <section className="border-b py-6">
           <p>
             Founded in the fall of 2006, The Blue Alliance began as a website
             dedicated to providing everyone involved in the <em>FIRST</em>{' '}
@@ -49,8 +48,8 @@ export default function About(): React.JSX.Element {
           </div>
         </section>
 
-        <section className="py-6 border-b">
-          <h3 className="text-2xl font-medium mb-2">
+        <section className="border-b py-6">
+          <h3 className="mb-2 text-2xl font-medium">
             About <em>FIRST</em>
             <sup>®</sup>
           </h3>
@@ -85,7 +84,7 @@ export default function About(): React.JSX.Element {
         </section>
 
         <section className="py-6">
-          <h3 className="text-2xl font-medium mb-2">Other community sites</h3>
+          <h3 className="mb-2 text-2xl font-medium">Other community sites</h3>
           <p>
             Here are some other amazing resources that the <em>FIRST</em>{' '}
             community has to offer.
