@@ -19,9 +19,9 @@ export default function TeamEventAppearance({
   status: TeamEventStatus | null;
 }): React.JSX.Element {
   return (
-    <div className="flex flex-wrap gap-x-8 [&>*]:sm:flex-1">
+    <div className="flex flex-wrap gap-x-8 [&>*]:sm:flex-1" id={event.key}>
       <div className="">
-        <h2 className="text-2xl">
+        <h2 className="text-2xl font-medium">
           <Link to={`/event/${event.key}`}>{event.name}</Link>
         </h2>
         <InlineIcon>

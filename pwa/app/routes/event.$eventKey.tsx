@@ -174,7 +174,7 @@ export default function EventPage() {
   return (
     <>
       <div className="mb-2.5 flex flex-col">
-        <h1 className="mb-2.5 mt-5 text-4xl">
+        <h1 className="mb-2.5 mt-5 text-3xl font-medium">
           {event.name} {event.year}
         </h1>
 
@@ -403,7 +403,7 @@ function TeamsTab({
                   <img
                     src={maybeImage}
                     alt={`${t.team_number}'s robot`}
-                    className="h-full w-1/3 rounded-lg border-4 border-neutral-400 object-cover"
+                    className="h-full w-1/3 rounded-lg border-2 border-neutral-300 object-cover"
                     loading="lazy"
                   />
                 );

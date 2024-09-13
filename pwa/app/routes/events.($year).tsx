@@ -175,7 +175,7 @@ export default function YearEventsPage() {
   const groupedEvents = groupBySections(sortedEvents);
 
   return (
-    <div className="flex flex-wrap gap-4 lg:flex-nowrap">
+    <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <div className="basis-full lg:basis-1/6">
         <div className="sticky top-14 pt-5">
           <Select
@@ -210,8 +210,8 @@ export default function YearEventsPage() {
         </div>
       </div>
       <div className="basis-full lg:basis-5/6">
-        <h1 className="mb-2.5 mt-5 text-4xl">
-          {year} <i>FIRST</i> Robotics Competition Events{' '}
+        <h1 className="mt-5 mb-3 text-3xl font-medium">
+          {year} <em>FIRST</em> Robotics Competition Events{' '}
           <small className="text-xl text-slate-500">
             {events.length} Events
           </small>
