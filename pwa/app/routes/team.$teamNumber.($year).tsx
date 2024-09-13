@@ -1,7 +1,6 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
-  Link,
   MetaFunction,
   Params,
   json,
@@ -10,11 +9,11 @@ import {
 } from '@remix-run/react';
 import { useMemo } from 'react';
 
-import BiCalendar from '~icons/bi/calendar';
-import BiGraphUp from '~icons/bi/graph-up';
-import BiInfoCircleFill from '~icons/bi/info-circle-fill';
-import BiLink from '~icons/bi/link';
-import BiPinMapFill from '~icons/bi/pin-map-fill';
+import SponsorsIcon from '~icons/lucide/anchor';
+import SourceIcon from '~icons/lucide/badge-check';
+import StatbotIcon from '~icons/lucide/chart-spline';
+import LocationIcon from '~icons/lucide/map-pin';
+import RookieIcon from '~icons/lucide/sprout';
 
 import {
   Award,
@@ -31,7 +30,7 @@ import {
   getTeamSocialMedia,
   getTeamYearsParticipated,
 } from '~/api/v3';
-import InlineIcon from '~/components/tba/inlineIcon';
+import DetailEntity from '~/components/tba/detailEntity';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamEventAppearance from '~/components/tba/teamEventAppearance';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
@@ -261,67 +260,71 @@ export default function TeamPage(): React.JSX.Element {
                 {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
                 Team {team.team_number} - {team.nickname}
               </h1>
-              <InlineIcon>
-                <BiPinMapFill />
-                <a
-                  href={`https://maps.google.com/maps?q=${team.city}, ${team.state_prov}, ${team.country}`}
-                >
-                  {team.city}, {team.state_prov}, {team.country}
-                </a>
-              </InlineIcon>
 
-              {sponsors.length > 0 ? (
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="item-1" className="border-0">
-                    <AccordionTrigger className="justify-normal p-0 text-left font-normal">
-                      <InlineIcon displayStyle={'flexless'}>
-                        <BiInfoCircleFill />
-                        {schoolName}
-                        {sponsors.length > 0 &&
-                          ` with ${pluralize(sponsors.length, ' sponsor', ' sponsors')}`}
-                      </InlineIcon>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-0">
-                      {sponsors.map((sponsor, i) => (
-                        <Badge
-                          className="m-px font-normal"
-                          key={i}
-                          variant={'secondary'}
-                        >
-                          {sponsor}
-                        </Badge>
-                      ))}
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              ) : (
-                <InlineIcon displayStyle={'flexless'}>
-                  <BiInfoCircleFill />
-                  {schoolName}
-                </InlineIcon>
-              )}
+              <div className="space-y-1 mb-2">
+                <DetailEntity icon={<LocationIcon />}>
+                  From{' '}
+                  <a
+                    href={`https://maps.google.com/maps?q=${encodeURIComponent(`${team.city}, ${team.state_prov}, ${team.country}`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {team.city}, {team.state_prov}, {team.country}
+                  </a>
+                </DetailEntity>
 
-              <InlineIcon>
-                <BiCalendar />
-                Rookie Year: {team.rookie_year}
-              </InlineIcon>
+                {sponsors.length > 0 ? (
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="item-1" className="border-0">
+                      <AccordionTrigger className="justify-normal p-0 text-left font-normal">
+                        <DetailEntity icon={<SponsorsIcon />}>
+                          {schoolName}
+                          {sponsors.length > 0 &&
+                            ` with ${pluralize(sponsors.length, ' sponsor', ' sponsors')}`}
+                        </DetailEntity>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-0">
+                        {sponsors.map((sponsor, i) => (
+                          <Badge
+                            className="m-px font-normal"
+                            key={i}
+                            variant={'secondary'}
+                          >
+                            {sponsor}
+                          </Badge>
+                        ))}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                ) : (
+                  <DetailEntity icon={<SponsorsIcon />}>
+                    {schoolName}
+                  </DetailEntity>
+                )}
 
-              <InlineIcon>
-                <BiLink />
-                Details on{' '}
-                <Link
-                  to={`https://frc-events.firstinspires.org/team/${team.team_number}`}
-                >
-                  FRC Events
-                </Link>
-              </InlineIcon>
-
-              <InlineIcon>
-                <BiGraphUp />
-                <Link to={`https://www.statbotics.io/team/${team.team_number}`}>
-                  Statbotics
-                </Link>
-              </InlineIcon>
+                <DetailEntity icon={<RookieIcon />}>
+                  Rookie Year: {team.rookie_year}
+                </DetailEntity>
+                <DetailEntity icon={<SourceIcon />}>
+                  Details on{' '}
+                  <a
+                    href={`https://frc-events.firstinspires.org/team/${team.team_number}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    FRC Events
+                  </a>
+                </DetailEntity>
+                <DetailEntity icon={<StatbotIcon />}>
+                  <a
+                    href={`https://www.statbotics.io/team/${team.team_number}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Statbotics
+                  </a>
+                </DetailEntity>
+              </div>
             </div>
 
             <div className="flex flex-wrap justify-center md:justify-start">

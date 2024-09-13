@@ -8,17 +8,17 @@ import {
 } from '@remix-run/react';
 import { useMemo } from 'react';
 
-import BiCalendar from '~icons/bi/calendar';
-import BiGraphUp from '~icons/bi/graph-up';
-import BiInfoCircleFill from '~icons/bi/info-circle-fill';
-import BiLink from '~icons/bi/link';
-import BiListOl from '~icons/bi/list-ol';
-import BiPinMapFill from '~icons/bi/pin-map-fill';
-import BiTrophy from '~icons/bi/trophy';
-import MdiFolderMediaOutline from '~icons/mdi/folder-media-outline';
-import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
-import MdiRobot from '~icons/mdi/robot';
-import MdiTournament from '~icons/mdi/tournament';
+import SourceIcon from '~icons/lucide/badge-check';
+import TeamsIcon from '~icons/lucide/bot';
+import DateIcon from '~icons/lucide/calendar-days';
+import StatbotIcon from '~icons/lucide/chart-spline';
+import WebsiteIcon from '~icons/lucide/globe';
+import RankingsIcon from '~icons/lucide/list-ordered';
+import LocationIcon from '~icons/lucide/map-pin';
+import InsightsIcon from '~icons/lucide/scatter-chart';
+import AwardsIcon from '~icons/lucide/trophy';
+import MediaIcon from '~icons/mdi/folder-media-outline';
+import ResultsIcon from '~icons/mdi/tournament';
 
 import {
   Award,
@@ -36,6 +36,7 @@ import {
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
+import DetailEntity from '~/components/tba/detailEntity';
 import InlineIcon from '~/components/tba/inlineIcon';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
 import RankingsTable from '~/components/tba/rankingsTable';
@@ -178,54 +179,55 @@ export default function EventPage() {
           {event.name} {event.year}
         </h1>
 
-        <InlineIcon>
-          <BiCalendar />
-          {getEventDateString(event, 'long')}
-          {event.week !== null && (
-            <Badge className="mx-2 h-[1.5em] align-text-top">
-              Week {event.week + 1}
-            </Badge>
+        <div className="space-y-1 mb-2">
+          <DetailEntity icon={<DateIcon />}>
+            {getEventDateString(event, 'long')}
+            {event.week !== null && (
+              <Badge className="mx-2 h-[1.5em] align-text-top">
+                Week {event.week + 1}
+              </Badge>
+            )}
+          </DetailEntity>
+          <DetailEntity icon={<LocationIcon />}>
+            {event.gmaps_url ? (
+              <Link to={event.gmaps_url}>
+                {event.city}, {event.state_prov}, {event.country}
+              </Link>
+            ) : (
+              <>
+                {event.city}, {event.state_prov}, {event.country}
+              </>
+            )}
+          </DetailEntity>
+          {event.website && (
+            <DetailEntity icon={<WebsiteIcon />}>
+              <a href={event.website} target="_blank" rel="noreferrer">
+                View event's website
+              </a>
+            </DetailEntity>
           )}
-        </InlineIcon>
-
-        <InlineIcon>
-          <BiPinMapFill />
-
-          {event.gmaps_url ? (
-            <Link to={event.gmaps_url}>
-              {event.city}, {event.state_prov}, {event.country}
-            </Link>
-          ) : (
-            <>
-              {event.city}, {event.state_prov}, {event.country}
-            </>
+          {event.first_event_code && (
+            <DetailEntity icon={<SourceIcon />}>
+              Details on{' '}
+              <a
+                href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                FRC Events
+              </a>
+            </DetailEntity>
           )}
-        </InlineIcon>
-        {event.website && (
-          <InlineIcon>
-            <BiLink />
-            <Link to={event.website}>{event.website}</Link>
-          </InlineIcon>
-        )}
-
-        {event.first_event_code && (
-          <InlineIcon>
-            <BiInfoCircleFill />
-            Details on{' '}
-            <Link
-              to={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+          <DetailEntity icon={<StatbotIcon />}>
+            <a
+              href={`https://www.statbotics.io/event/${event.key}`}
+              target="_blank"
+              rel="noreferrer"
             >
-              FRC Events
-            </Link>
-          </InlineIcon>
-        )}
-
-        <InlineIcon>
-          <BiGraphUp />
-          <Link to={`https://www.statbotics.io/event/${event.key}`}>
-            Statbotics
-          </Link>
-        </InlineIcon>
+              Statbotics
+            </a>
+          </DetailEntity>
+        </div>
       </div>
 
       <Tabs
@@ -239,7 +241,7 @@ export default function EventPage() {
           {(matches.length > 0 || (alliances && alliances.length > 0)) && (
             <TabsTrigger value="results">
               <InlineIcon>
-                <MdiTournament />
+                <ResultsIcon />
                 Results
               </InlineIcon>
             </TabsTrigger>
@@ -247,7 +249,7 @@ export default function EventPage() {
           {rankings && rankings.rankings.length > 0 && (
             <TabsTrigger value="rankings">
               <InlineIcon>
-                <BiListOl />
+                <RankingsIcon />
                 Rankings
               </InlineIcon>
             </TabsTrigger>
@@ -255,14 +257,14 @@ export default function EventPage() {
           {awards.length > 0 && (
             <TabsTrigger value="awards">
               <InlineIcon>
-                <BiTrophy />
+                <AwardsIcon />
                 Awards
               </InlineIcon>
             </TabsTrigger>
           )}
           <TabsTrigger value="teams">
             <InlineIcon>
-              <MdiRobot />
+              <TeamsIcon />
               Teams
               <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
                 {teams.length}
@@ -271,13 +273,13 @@ export default function EventPage() {
           </TabsTrigger>
           <TabsTrigger value="insights">
             <InlineIcon>
-              <MdiGraphBoxOutline />
+              <InsightsIcon />
               Insights
             </InlineIcon>
           </TabsTrigger>
           <TabsTrigger value="media">
             <InlineIcon>
-              <MdiFolderMediaOutline />
+              <MediaIcon />
               Media
             </InlineIcon>
           </TabsTrigger>

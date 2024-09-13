@@ -1,10 +1,10 @@
 import { Link } from '@remix-run/react';
 
-import BiCalendar from '~icons/bi/calendar';
-import BiPinMapFill from '~icons/bi/pin-map-fill';
+import DateIcon from '~icons/lucide/calendar-days';
+import LocationIcon from '~icons/lucide/map-pin';
 
 import { Event, Match, TeamEventStatus } from '~/api/v3';
-import InlineIcon from '~/components/tba/inlineIcon';
+import DetailEntity from '~/components/tba/detailEntity';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
 import { Badge } from '~/components/ui/badge';
 import { getEventDateString } from '~/lib/eventUtils';
@@ -24,25 +24,26 @@ export default function TeamEventAppearance({
         <h2 className="text-2xl">
           <Link to={`/event/${event.key}`}>{event.name}</Link>
         </h2>
-        <InlineIcon>
-          <BiCalendar />
-          {getEventDateString(event, 'long')}
-          {event.week !== null && (
-            <Badge variant={'secondary'} className="ml-2">
-              Week {event.week + 1}
-            </Badge>
-          )}
-        </InlineIcon>
-        <InlineIcon>
-          <BiPinMapFill />
-          <a
-            href={`https://maps.google.com/?q=${event.city}, ${event.state_prov}, ${event.country}`}
-          >
-            {event.city}, {event.state_prov}, {event.country}
-          </a>
-        </InlineIcon>
 
-        <div className="my-3" />
+        <div className="space-y-1 mb-3">
+          <DetailEntity icon={<DateIcon />}>
+            {getEventDateString(event, 'long')}
+            {event.week !== null && (
+              <Badge variant={'secondary'} className="ml-2">
+                Week {event.week + 1}
+              </Badge>
+            )}
+          </DetailEntity>
+          <DetailEntity icon={<LocationIcon />}>
+            <a
+              href={`https://maps.google.com/maps?q=${encodeURIComponent(`${event.city}, ${event.state_prov}, ${event.country}`)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {event.city}, {event.state_prov}, {event.country}
+            </a>
+          </DetailEntity>
+        </div>
 
         <TeamStatus status={status} />
       </div>
