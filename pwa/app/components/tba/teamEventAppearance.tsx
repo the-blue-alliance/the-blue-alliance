@@ -25,7 +25,7 @@ export default function TeamEventAppearance({
           <Link to={`/event/${event.key}`}>{event.name}</Link>
         </h2>
 
-        <div className="space-y-1 mb-3">
+        <div className="mb-3 space-y-1">
           <DetailEntity icon={<DateIcon />}>
             {getEventDateString(event, 'long')}
             {event.week !== null && (

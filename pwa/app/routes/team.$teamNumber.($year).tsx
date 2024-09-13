@@ -261,7 +261,7 @@ export default function TeamPage(): React.JSX.Element {
                 Team {team.team_number} - {team.nickname}
               </h1>
 
-              <div className="space-y-1 mb-2">
+              <div className="mb-2 space-y-1">
                 <DetailEntity icon={<LocationIcon />}>
                   From{' '}
                   <a

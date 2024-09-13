@@ -179,7 +179,7 @@ export default function EventPage() {
           {event.name} {event.year}
         </h1>
 
-        <div className="space-y-1 mb-2">
+        <div className="mb-2 space-y-1">
           <DetailEntity icon={<DateIcon />}>
             {getEventDateString(event, 'long')}
             {event.week !== null && (
@@ -202,7 +202,7 @@ export default function EventPage() {
           {event.website && (
             <DetailEntity icon={<WebsiteIcon />}>
               <a href={event.website} target="_blank" rel="noreferrer">
-                View event's website
+                View event&apos;s website
               </a>
             </DetailEntity>
           )}
