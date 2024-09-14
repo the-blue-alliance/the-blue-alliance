@@ -226,6 +226,7 @@ export default function TeamPage(): React.JSX.Element {
       <div className="basis-full lg:basis-1/6">
         <div className="top-14 pt-8 sm:sticky">
           <Select
+            value={String(year)}
             onValueChange={(value) => {
               navigate(`/team/${team.team_number}/${value}`);
             }}

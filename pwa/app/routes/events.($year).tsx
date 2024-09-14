@@ -179,6 +179,7 @@ export default function YearEventsPage() {
       <div className="basis-full lg:basis-1/6">
         <div className="sticky top-14 pt-8">
           <Select
+            value={String(year)}
             onValueChange={(value) => {
               navigate(`/events/${value}`);
             }}
