@@ -104,7 +104,7 @@ export const Nav = () => {
   return (
     <div className="fixed z-10 flex w-full grow justify-center bg-primary shadow-md">
       <GlobalLoadingProgress />
-      <NavigationMenu className="px-4 py-2.5 gap-6">
+      <NavigationMenu className="gap-6 px-4 py-2.5">
         <Link to="/" className="flex items-center gap-3 hover:no-underline">
           <img
             src={lamp}
@@ -172,12 +172,12 @@ export const Nav = () => {
         <div className="ml-auto">
           <form>
             <div className="relative">
-              <div className="absolute left-0 inset-y-0 pl-3 flex items-center">
-                <SearchIcon className="h-4 w-4 text-neutral-500" />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                <SearchIcon className="size-4 text-neutral-500" />
               </div>
               <Input
                 placeholder="Search"
-                className="text-sm pl-9 bg-accent transition-all hover:bg-white focus:bg-white"
+                className="bg-accent pl-9 text-sm transition-all hover:bg-white focus:bg-white"
               />
             </div>
           </form>
