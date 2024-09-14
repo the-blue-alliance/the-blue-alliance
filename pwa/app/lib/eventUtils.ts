@@ -101,14 +101,13 @@ export function getCurrentWeekEvents(events: Event[]) {
   );
 
   for (const event of events) {
-    //const startDateMs = parseDate(event.start_date);
     const startDateMs = new Date(event.start_date).getTime();
 
     const timeOffsetDays = Math.floor(
       convertMsToDays(startDateMs - closestStartMonday),
     );
 
-    if (timeOffsetDays === 0 || (timeOffsetDays > 0 && timeOffsetDays < 7)) {
+    if (timeOffsetDays >= 0 && timeOffsetDays < 7) {
       filteredEvents.push(event);
     }
   }
