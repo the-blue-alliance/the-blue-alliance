@@ -14,15 +14,7 @@ export async function loader() {
     });
   }
 
-  const events = await getValidEvents(status.data.current_season);
-
-  return json({
-    status: status.data,
-    events: events,
-  });
-}
-
-export async function getValidEvents(year: number) {
+  const year = status.data.current_season;
   const events = await getEventsByYear({ year });
 
   if (events.status !== 200) {
@@ -31,15 +23,12 @@ export async function getValidEvents(year: number) {
     });
   }
 
-  if (events.data.length === 0) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
-
   const filteredEvents = getCurrentWeekEvents(events.data);
 
-  return filteredEvents;
+  return json({
+    status: status.data,
+    events: filteredEvents,
+  });
 }
 
 export const meta: MetaFunction = () => {
@@ -78,8 +67,22 @@ export default function Index() {
         </div>
       </div>
 
-      <h1 className="mb-2.5 mt-5 text-4xl">This Week&apos;s Events</h1>
-      <EventListTable events={events} />
+      {events.length > 0 ? (
+        <div>
+          <h1 className="mb-2.5 mt-5 text-4xl">This Week&apos;s Events</h1>
+          <EventListTable events={events} />
+        </div>
+      ) : (
+        <h1 className="mb-2.5 mt-5 text-4xl">No Events This Week</h1>
+      )}
+
+      <a
+        href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
+        target="_blank"
+        rel="noreferrer"
+      >
+        Commit: {commitHash}
+      </a>
     </div>
   );
 }
