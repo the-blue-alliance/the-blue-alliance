@@ -224,7 +224,7 @@ export default function TeamPage(): React.JSX.Element {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <div className="basis-full lg:basis-1/6">
-        <div className="top-14 pt-5 sm:sticky">
+        <div className="top-14 pt-8 sm:sticky">
           <Select
             onValueChange={(value) => {
               navigate(`/team/${team.team_number}/${value}`);
@@ -241,7 +241,7 @@ export default function TeamPage(): React.JSX.Element {
               ))}
             </SelectContent>
           </Select>
-          <TableOfContentsList className="mt-5">
+          <TableOfContentsList className="mt-2">
             {events.map((e) => (
               <TableOfContentsItem key={e.key}>
                 <TableOfContentsLink
@@ -257,7 +257,7 @@ export default function TeamPage(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="mt-5 w-full">
+      <div className="mt-8 w-full">
         <div className="flex flex-wrap justify-center sm:flex-nowrap sm:justify-between">
           <div className="flex flex-col justify-between">
             <div>

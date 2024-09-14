@@ -8,6 +8,7 @@ import BiPeopleFill from '~icons/bi/people-fill';
 import BiStarFill from '~icons/bi/star-fill';
 import BiThreeDotsVertical from '~icons/bi/three-dots-vertical';
 import IonCalendar from '~icons/ion/calendar';
+import SearchIcon from '~icons/lucide/search';
 
 import { Input } from '~/components/ui/input';
 import {
@@ -103,7 +104,7 @@ export const Nav = () => {
   return (
     <div className="fixed z-10 flex w-full grow justify-center bg-primary shadow-md">
       <GlobalLoadingProgress />
-      <NavigationMenu className="gap-6">
+      <NavigationMenu className="px-4 py-2.5 gap-6">
         <Link to="/" className="flex items-center gap-3 hover:no-underline">
           <img
             src={lamp}
@@ -169,12 +170,17 @@ export const Nav = () => {
           </Popover>
         </NavigationMenuList>
         <div className="ml-auto">
-          <Input
-            placeholder="Search"
-            type="search"
-            className="focus:ring-none h-8 border-none bg-accent outline-none
-              transition-all focus:bg-white focus:text-black focus:outline-none focus-visible:border-none"
-          />
+          <form>
+            <div className="relative">
+              <div className="absolute left-0 inset-y-0 pl-3 flex items-center">
+                <SearchIcon className="h-4 w-4 text-neutral-500" />
+              </div>
+              <Input
+                placeholder="Search"
+                className="text-sm pl-9 bg-accent transition-all hover:bg-white focus:bg-white"
+              />
+            </div>
+          </form>
         </div>
       </NavigationMenu>
     </div>

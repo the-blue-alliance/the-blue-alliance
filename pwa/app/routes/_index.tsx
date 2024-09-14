@@ -37,8 +37,8 @@ export default function Index() {
   const commitHash = __COMMIT_HASH__ as string;
 
   return (
-    <div className="p-4 font-sans">
-      <h1 className="text-3xl">The Blue Alliance</h1>
+    <div className="py-8 font-sans">
+      <h1 className="mb-3 text-3xl font-medium">The Blue Alliance</h1>
       <p>
         The Blue Alliance is the best way to scout, watch, and relive the{' '}
         <i>FIRST</i> Robotics Competition.

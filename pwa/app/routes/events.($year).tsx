@@ -177,7 +177,7 @@ export default function YearEventsPage() {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <div className="basis-full lg:basis-1/6">
-        <div className="sticky top-14 pt-5">
+        <div className="sticky top-14 pt-8">
           <Select
             onValueChange={(value) => {
               navigate(`/events/${value}`);
@@ -194,7 +194,7 @@ export default function YearEventsPage() {
               ))}
             </SelectContent>
           </Select>
-          <TableOfContentsList className="mt-5">
+          <TableOfContentsList className="mt-2">
             {groupedEvents.map((group) => (
               <TableOfContentsItem key={group.slug}>
                 <TableOfContentsLink
@@ -209,8 +209,8 @@ export default function YearEventsPage() {
           </TableOfContentsList>
         </div>
       </div>
-      <div className="basis-full lg:basis-5/6">
-        <h1 className="mb-3 mt-5 text-3xl font-medium">
+      <div className="basis-full py-8 lg:basis-5/6">
+        <h1 className="mb-3 text-3xl font-medium">
           {year} <em>FIRST</em> Robotics Competition Events{' '}
           <small className="text-xl text-slate-500">
             {events.length} Events

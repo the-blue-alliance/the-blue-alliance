@@ -4,8 +4,8 @@ import { Button } from '~/components/ui/button';
 
 export default function About(): React.JSX.Element {
   return (
-    <div className="container max-w-4xl">
-      <h1 className="mt-8 text-3xl font-medium">About Us</h1>
+    <div className="container max-w-4xl py-8">
+      <h1 className="text-3xl font-medium">About Us</h1>
       <div className="[&_p]:mb-2">
         <section className="border-b py-6">
           <p>
