@@ -93,7 +93,6 @@ export function getEventWeekString(event: Event) {
 
 export function getCurrentWeekEvents(events: Event[]) {
   const now = new Date();
-  //const now = new Date('Jul 17, 2024');
   const filteredEvents = [];
 
   const diffFromWeekStart = now.getDay();
@@ -102,17 +101,18 @@ export function getCurrentWeekEvents(events: Event[]) {
   );
 
   for (const event of events) {
-    const startDate = parseDate(event.start_date);
+    //const startDateMs = parseDate(event.start_date);
+    const startDateMs = new Date(event.start_date).getTime();
 
     const timeOffsetDays = Math.floor(
-      convertMsToDays(startDate - closestStartMonday),
+      convertMsToDays(startDateMs - closestStartMonday),
     );
 
     if (timeOffsetDays === 0 || (timeOffsetDays > 0 && timeOffsetDays < 7)) {
       filteredEvents.push(event);
     }
   }
-  return filteredEvents;
+  return sortEvents(filteredEvents);
 }
 
 export function sortEvents(events: Event[]) {

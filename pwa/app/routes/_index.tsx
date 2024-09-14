@@ -56,6 +56,11 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   const { events } = useLoaderData<typeof loader>();
 
+  // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  const commitHash = __COMMIT_HASH__ as string;
+
   return (
     <div>
       <div className="px-6 py-10 sm:py-8 lg:px-8">
@@ -72,6 +77,7 @@ export default function Index() {
           </p>
         </div>
       </div>
+
       <h1 className="mb-2.5 mt-5 text-4xl">This Week&apos;s Events</h1>
       <EventListTable events={events} />
     </div>
