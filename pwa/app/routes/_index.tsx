@@ -26,7 +26,6 @@ export async function loader() {
   const filteredEvents = getCurrentWeekEvents(events.data);
 
   return json({
-    status: status.data,
     events: filteredEvents,
   });
 }
