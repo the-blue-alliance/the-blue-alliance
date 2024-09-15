@@ -86,6 +86,10 @@ export function zip<T extends unknown[]>(...arrays: (T | undefined)[]): T[] {
   return zipped;
 }
 
+export function convertMsToDays(time: number) {
+  return time / (1000 * 60 * 60 * 24);
+}
+
 export function stringifyRecord(record: WltRecord): string {
   return `${record.wins}-${record.losses}-${record.ties}`;
 }
