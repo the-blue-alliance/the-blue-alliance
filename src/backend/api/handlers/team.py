@@ -18,6 +18,7 @@ from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_tag import get_enum_from_url
 from backend.common.decorators import cached_public
 from backend.common.models.event_team import EventTeam
+from backend.common.models.history import History
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.history import History
 from backend.common.models.team import Team
