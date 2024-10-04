@@ -18,6 +18,7 @@ from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_tag import get_enum_from_url
 from backend.common.decorators import cached_public
 from backend.common.models.event_team import EventTeam
+from backend.common.models.history import History
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.award_query import (
@@ -63,6 +64,16 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
     if model_type is not None:
         team = filter_team_properties([team], model_type)[0]
     return profiled_jsonify(team)
+
+
+def team_history(team_key: TeamKey) -> Response:
+    track_call_after_response("team/history", team_key)
+
+    events = TeamEventsQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
+    awards = TeamAwardsQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
+
+    history: History = History(events=events, awards=awards)
+    return profiled_jsonify(history)
 
 
 @api_authenticated
