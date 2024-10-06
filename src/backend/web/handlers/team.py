@@ -17,7 +17,7 @@ from backend.web.profiled_render import render_template
 from backend.web.renderers.team_renderer import TeamRenderer
 
 MAX_TEAM_NUMBER_EXCLUSIVE = (
-    10000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1
+    11000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1
 )
 TEAMS_PER_PAGE = 1000
 VALID_PAGES = range(
