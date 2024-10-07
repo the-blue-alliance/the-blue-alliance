@@ -85,7 +85,7 @@ def team_canonical(team_number: TeamNumber) -> Response:
     return team_detail(team_number, current_year, is_canonical=True)
 
 
-@cached_public(ttl=timedelta(days=7))
+@cached_public(ttl=timedelta(days=1))
 def team_list(page: int) -> str:
     page_labels = []
     cur_page_label = ""
