@@ -25,7 +25,7 @@
     "react-file-input": "^0.2.5",
     "react-ga": "^3.3.1",
     "react-redux": "^9.1.2",
-    "react-select": "^5.8.0",
+    "react-select": "^5.8.1",
     "redux": "^4.2.1",
     "redux-thunk": "^2.4.2",
     "reselect": "^5.1.1",
