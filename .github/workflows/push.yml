@@ -67,7 +67,7 @@ jobs:
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
       - name: Save coverage artifacts
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -221,7 +221,7 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: pwa-build
           path: pwa/build
@@ -272,7 +272,7 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: web-build
           path: src/build
