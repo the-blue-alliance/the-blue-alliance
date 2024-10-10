@@ -357,11 +357,11 @@ class DistrictHelper:
         alliance_selections: List[EventAlliance],
         teams: List[TeamKey],
     ):
-        search_team = teams[0]
-        for num, alliance in enumerate(alliance_selections):
-            if search_team in alliance["picks"]:
-                return num
-
+        for pos in [0, 1, 2]:
+            search_team = teams[pos]
+            for num, alliance in enumerate(alliance_selections):
+                if search_team in alliance["picks"]:
+                    return num
         return None
 
     @classmethod
