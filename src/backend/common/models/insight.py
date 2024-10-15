@@ -47,6 +47,7 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_MOST_AWARDS = 28
     TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS = 29
     TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST = 30
+    TYPED_LEADERBOARD_BEST_RECORD = 31
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -83,6 +84,7 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_AWARDS: "typed_leaderboard_most_awards",
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "typed_leaderboard_most_non_champs_event_wins",
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "typed_leaderboard_most_unique_teams_played_with_against",
+        TYPED_LEADERBOARD_BEST_RECORD: "typed_leaderboard_best_record",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
     }
@@ -93,6 +95,7 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE,
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE,
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
+        TYPED_LEADERBOARD_BEST_RECORD,
     }
     TYPED_LEADERBOARD_AWARD_INSIGHTS = {
         TYPED_LEADERBOARD_BLUE_BANNERS,
@@ -109,6 +112,7 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_AWARDS: "team",
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "team",
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "team",
+        TYPED_LEADERBOARD_BEST_RECORD: "team",
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting
