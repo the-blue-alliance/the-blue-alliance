@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Optional
 
 from flask import Response
@@ -11,6 +12,7 @@ from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.models.keys import MatchKey
 from backend.common.models.zebra_motionworks import ZebraMotionWorks
 from backend.common.queries.match_query import MatchQuery
@@ -25,10 +27,14 @@ def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Respon
     """
     track_call_after_response("match", match_key, model_type)
 
+    year = int(match_key[:4])
     match = MatchQuery(match_key=match_key).fetch_dict(ApiMajorVersion.API_V3)
     if model_type is not None:
         match = filter_match_properties([match], model_type)[0]
-    return profiled_jsonify(match)
+    return make_cached_response(
+        profiled_jsonify(match),
+        ttl=timedelta(seconds=61) if year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @api_authenticated

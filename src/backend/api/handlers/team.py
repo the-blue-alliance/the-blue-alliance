@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Optional
 
 from flask import Response
@@ -17,6 +18,7 @@ from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_tag import get_enum_from_url
 from backend.common.decorators import cached_public
+from backend.common.flask_cache import make_cached_response
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
@@ -52,7 +54,7 @@ from backend.common.queries.team_query import (
 
 @api_authenticated
 @validate_keys
-@cached_public
+@cached_public(ttl=timedelta(days=1))
 def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
     """
     Returns details about one team, specified by |team_key|.
@@ -67,7 +69,7 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
 
 @api_authenticated
 @validate_keys
-@cached_public
+@cached_public(ttl=timedelta(days=1))
 def team_years_participated(team_key: TeamKey) -> Response:
     """
     Returns a list of years the given Team participated in an event.
@@ -81,7 +83,7 @@ def team_years_participated(team_key: TeamKey) -> Response:
 
 @api_authenticated
 @validate_keys
-@cached_public
+@cached_public(ttl=timedelta(days=1))
 def team_history_districts(team_key: TeamKey) -> Response:
     """
     Returns a list of all DistrictTeam models associated with the given Team.
@@ -96,7 +98,7 @@ def team_history_districts(team_key: TeamKey) -> Response:
 
 @api_authenticated
 @validate_keys
-@cached_public
+@cached_public(ttl=timedelta(days=1))
 def team_history_robots(team_key: TeamKey) -> Response:
     """
     Returns a list of all Robot models associated with the given Team.
@@ -109,7 +111,7 @@ def team_history_robots(team_key: TeamKey) -> Response:
 
 @api_authenticated
 @validate_keys
-@cached_public
+@cached_public(ttl=timedelta(days=1))
 def team_social_media(team_key: TeamKey) -> Response:
     """
     Returns a list of all social media models associated with the given Team.
@@ -124,7 +126,7 @@ def team_social_media(team_key: TeamKey) -> Response:
 
 @api_authenticated
 @validate_keys
-@cached_public
+@cached_public(ttl=timedelta(hours=1))
 def team_events(
     team_key: TeamKey,
     year: Optional[int] = None,
@@ -192,13 +194,17 @@ def team_event_matches(
         "team/event/matches", f"{team_key}/{event_key}", model_type
     )
 
+    year = int(event_key[:4])
     matches = TeamEventMatchesQuery(team_key=team_key, event_key=event_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
 
     if model_type is not None:
         matches = filter_match_properties(matches, model_type)
-    return profiled_jsonify(matches)
+    return make_cached_response(
+        profiled_jsonify(matches),
+        ttl=timedelta(seconds=61) if year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @api_authenticated
@@ -210,10 +216,14 @@ def team_event_awards(team_key: TeamKey, event_key: EventKey) -> Response:
     """
     track_call_after_response("team/event/awards", f"{team_key}/{event_key}")
 
+    year = int(event_key[:4])
     awards = TeamEventAwardsQuery(team_key=team_key, event_key=event_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
-    return profiled_jsonify(awards)
+    return make_cached_response(
+        profiled_jsonify(awards),
+        ttl=timedelta(seconds=61) if year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @api_authenticated
@@ -225,6 +235,7 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
     """
     track_call_after_response("team/event/status", f"{team_key}/{event_key}")
 
+    year = int(event_key[:4])
     event_team = EventTeam.get_by_id("{}_{}".format(event_key, team_key))
 
     status = None
@@ -239,7 +250,10 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
                     "overall_status_str": status_strings["overall"],
                 }
             )
-    return profiled_jsonify(status)
+    return make_cached_response(
+        profiled_jsonify(status),
+        ttl=timedelta(seconds=61) if year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @api_authenticated
@@ -261,7 +275,10 @@ def team_awards(
         awards = TeamYearAwardsQuery(team_key=team_key, year=year).fetch_dict(
             ApiMajorVersion.API_V3
         )
-    return profiled_jsonify(awards)
+    return make_cached_response(
+        profiled_jsonify(awards),
+        ttl=timedelta(seconds=61) if year is None or year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @api_authenticated
@@ -283,7 +300,10 @@ def team_matches(
 
     if model_type is not None:
         matches = filter_match_properties(matches, model_type)
-    return profiled_jsonify(matches)
+    return make_cached_response(
+        profiled_jsonify(matches),
+        ttl=timedelta(seconds=61) if year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @api_authenticated
@@ -298,7 +318,10 @@ def team_media_year(team_key: TeamKey, year: int) -> Response:
     media = TeamYearMediaQuery(team_key=team_key, year=year).fetch_dict(
         ApiMajorVersion.API_V3
     )
-    return profiled_jsonify(media)
+    return make_cached_response(
+        profiled_jsonify(media),
+        ttl=timedelta(seconds=61) if year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @api_authenticated
@@ -328,11 +351,14 @@ def team_media_tag(
         media = TeamYearTagMediasQuery(
             team_key=team_key, media_tag=tag_enum, year=year
         ).fetch_dict(ApiMajorVersion.API_V3)
-    return profiled_jsonify(media)
+    return make_cached_response(
+        profiled_jsonify(media),
+        ttl=timedelta(seconds=61) if year is None or year == datetime.now().year else timedelta(days=1),
+    )
 
 
 @api_authenticated
-@cached_public
+@cached_public(ttl=timedelta(hours=1))
 def team_list_all(model_type: Optional[ModelType] = None) -> Response:
     """
     Returns a list of all teams.
@@ -360,7 +386,7 @@ def team_list_all(model_type: Optional[ModelType] = None) -> Response:
 
 
 @api_authenticated
-@cached_public
+@cached_public(ttl=timedelta(hours=1))
 def team_list(
     page_num: int, year: Optional[int] = None, model_type: Optional[ModelType] = None
 ) -> Response:
