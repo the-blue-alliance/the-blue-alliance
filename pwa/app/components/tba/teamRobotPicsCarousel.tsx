@@ -19,7 +19,7 @@ export default function TeamRobotPicsCarousel({
       <CarouselContent className="items-center">
         {media.map((m, index) => (
           <CarouselItem key={index}>
-            <div className="rounded-lg border-4 border-neutral-600">
+            <div className="rounded-lg border border-border">
               <img
                 className="max-h-[250px] w-full rounded object-contain"
                 src={m.direct_url}
@@ -30,7 +30,7 @@ export default function TeamRobotPicsCarousel({
         ))}
       </CarouselContent>
       {media.length > 1 && (
-        <div className="mt-1 flex justify-center gap-8">
+        <div className="mt-1 flex justify-center gap-2">
           <CarouselPrevious className="relative left-0 transform-none" />
           <CarouselNext className="relative right-0 transform-none" />
         </div>
