@@ -403,7 +403,7 @@ function TeamsTab({
                   <img
                     src={maybeImage}
                     alt={`${t.team_number}'s robot`}
-                    className="h-full w-1/3 rounded-lg border-4 border-neutral-400 object-cover"
+                    className="h-full w-1/3 rounded-lg border border-border object-cover"
                     loading="lazy"
                   />
                 );
