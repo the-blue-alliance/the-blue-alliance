@@ -28,6 +28,7 @@ class MediaType(enum.IntEnum):
     AVATAR = 12
     ONSHAPE = 13
     GITLAB_PROFILE = 14
+    TIKTOK_PROFILE = 15
 
 
 MEDIA_TYPES: Set[MediaType] = {t for t in MediaType}
@@ -49,6 +50,7 @@ SLUG_NAMES: Dict[MediaType, str] = {
     MediaType.EXTERNAL_LINK: "external-link",
     MediaType.AVATAR: "avatar",
     MediaType.GITLAB_PROFILE: "gitlab-profile",
+    MediaType.TIKTOK_PROFILE: "tiktok-profile",
 }
 
 SLUG_NAME_TO_TYPE: Dict[str, MediaType] = {
@@ -71,6 +73,7 @@ TYPE_NAMES: Dict[MediaType, str] = {
     MediaType.AVATAR: "Avatar",
     MediaType.ONSHAPE: "Onshape",
     MediaType.GITLAB_PROFILE: "GitLab Profile",
+    MediaType.TIKTOK_PROFILE: "TikTok Profile",
 }
 
 IMAGE_TYPES: Set[MediaType] = {
@@ -87,6 +90,7 @@ SOCIAL_TYPES: Set[MediaType] = {
     MediaType.INSTAGRAM_PROFILE,
     MediaType.PERISCOPE_PROFILE,
     MediaType.GITLAB_PROFILE,
+    MediaType.TIKTOK_PROFILE,
 }
 
 # Media used to back a Robot Profile
@@ -104,6 +108,7 @@ PROFILE_URLS: Dict[MediaType, str] = {
     MediaType.INSTAGRAM_PROFILE: "https://www.instagram.com/{}",
     MediaType.PERISCOPE_PROFILE: "https://www.periscope.tv/{}",
     MediaType.GITLAB_PROFILE: "https://www.gitlab.com/{}",
+    MediaType.TIKTOK_PROFILE: "https://www.tiktok.com/@{}",
 }
 
 SOCIAL_SORT_ORDER: Dict[MediaType, int] = {
@@ -114,4 +119,5 @@ SOCIAL_SORT_ORDER: Dict[MediaType, int] = {
     MediaType.PERISCOPE_PROFILE: 4,
     MediaType.GITHUB_PROFILE: 5,
     MediaType.GITLAB_PROFILE: 6,
+    MediaType.TIKTOK_PROFILE: 7,
 }
