@@ -61,7 +61,7 @@
     "@iconify/json": "2.2.261",
     "@julr/vite-plugin-validate-env": "1.1.1",
     "@remix-run/dev": "2.13.1",
-    "@sentry/vite-plugin": "2.22.5",
+    "@sentry/vite-plugin": "2.22.6",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
