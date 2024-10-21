@@ -86,6 +86,8 @@ class Event(CachedModel):
     playoff_type: PlayoffType = cast(
         PlayoffType, ndb.IntegerProperty(choices=list(PlayoffType))
     )
+    # Week number, as returned by the FRC API
+    api_week = ndb.IntegerProperty()
 
     # venue, venue_addresss, city, state_prov, country, and postalcode are from FIRST
     venue = ndb.TextProperty(indexed=False)  # Name of the event venue
@@ -365,6 +367,9 @@ class Event(CachedModel):
             or not self.official
         ):
             return None
+
+        if self.api_week is not None:
+            return self.api_week - 1
 
         if self._week:
             return self._week

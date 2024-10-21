@@ -634,3 +634,16 @@ def test_parse_2022_two_alliance_dcmp(test_data_importer):
 
     event = events[0]
     assert event.playoff_type == PlayoffType.BRACKET_2_TEAM
+
+
+def test_parse_weeks(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2025_event_list.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, _ = FMSAPIEventListParser(2025).parse(data)
+    event = events[0]
+
+    assert event.key_name == "2025alhu"
+    assert event.name == "Rocket City Regional"
+    assert event.week == 2

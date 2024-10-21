@@ -221,6 +221,31 @@ def test_week(
     assert e.week_str == week_str
 
 
+@pytest.mark.parametrize(
+    "year, event_type, official, api_week, week_output, week_str",
+    [
+        # Don't forget that weeks are zero indexed, but api_week isn't :)
+        (2025, EventType.REGIONAL, True, 3, 2, "Week 3"),
+        (2025, EventType.CMP_DIVISION, True, 8, None, None),
+        (2025, EventType.OFFSEASON, True, 0, None, None),
+    ],
+)
+def test_api_week(
+    year: Year,
+    event_type: EventType,
+    official: bool,
+    api_week: int,
+    week_output: int,
+    week_str: str,
+) -> None:
+    e = Event(
+        year=year, event_type_enum=event_type, official=official, api_week=api_week
+    )
+
+    assert e.week == week_output
+    assert e.week_str == week_str
+
+
 def test_week_stored_in_context_cache() -> None:
     e = Event(
         id="2019test",
