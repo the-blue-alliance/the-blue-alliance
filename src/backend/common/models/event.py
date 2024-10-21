@@ -336,7 +336,7 @@ class Event(CachedModel):
 
     @property
     def within_a_day(self) -> bool:
-        return self.withinDays(-1, 1)
+        return self.withinDays(-2, 1)
 
     @property
     def past(self) -> bool:
