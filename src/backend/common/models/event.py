@@ -360,11 +360,13 @@ class Event(CachedModel):
     def week(self) -> Optional[int]:
         """
         Returns the week of the event relative to the first official season event as an integer
-        Returns None if the event is not of type NON_CMP_EVENT_TYPES or is not official
+        Returns None if the event is not of type NON_CMP_EVENT_TYPES, is not official, or if
+        api_week is 0 (which only happens for invalid events)
         """
         if (
             self.event_type_enum not in event_type.NON_CMP_EVENT_TYPES
             or not self.official
+            or self.api_week == 0
         ):
             return None
 

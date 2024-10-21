@@ -228,6 +228,7 @@ def test_week(
         (2025, EventType.REGIONAL, True, 3, 2, "Week 3"),
         (2025, EventType.CMP_DIVISION, True, 8, None, None),
         (2025, EventType.OFFSEASON, True, 0, None, None),
+        (2025, EventType.DISTRICT, True, 0, None, None),
     ],
 )
 def test_api_week(
