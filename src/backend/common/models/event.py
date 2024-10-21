@@ -369,6 +369,7 @@ class Event(CachedModel):
             return None
 
         if self.api_week is not None:
+            # TBA weeks are zero-indexed.
             return self.api_week - 1
 
         if self._week:
