@@ -47,6 +47,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install default-jre -y
 
 # dev_appserver expects `python2` to exist
+RUN sudo apt update
+RUN sudo apt install python2 -y
 RUN update-alternatives --install /usr/bin/python2 python2 /usr/bin/python2.7 1
 RUN echo 1 | update-alternatives --config python2
 

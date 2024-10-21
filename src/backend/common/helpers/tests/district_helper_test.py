@@ -12,6 +12,7 @@ from backend.common.models.team import Team
 @pytest.mark.parametrize(
     "event_key",
     [
+        "2024nytr",  # A 2024 event with a backup team
         "2024necmp",  # A 2024 event where one alliance wins no matches
         "2024test",  # A 2024 event with backup robot wins in the final
         "2023onlon",  # A 2023 event with backup robot wins in the final

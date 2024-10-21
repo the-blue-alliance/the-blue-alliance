@@ -38,7 +38,7 @@ def test_bad_page(web_client: Client) -> None:
 def test_team_list_empty_no_page(web_client: Client) -> None:
     resp = web_client.get("/teams")
     assert resp.status_code == 200
-    assert "max-age=604800" in resp.headers["Cache-Control"]
+    assert "max-age=86400" in resp.headers["Cache-Control"]
 
     assert len(get_all_teams(resp.data)) == 0
 

@@ -80,6 +80,26 @@ def team_history(team_key: TeamKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
+def team_history(team_key: TeamKey) -> Response:
+    track_call_after_response("team/history", team_key)
+
+    events_future = TeamEventsQuery(team_key=team_key).fetch_dict_async(
+        ApiMajorVersion.API_V3
+    )
+    awards_future = TeamAwardsQuery(team_key=team_key).fetch_dict_async(
+        ApiMajorVersion.API_V3
+    )
+
+    events = events_future.get_result()
+    awards = awards_future.get_result()
+
+    history: History = History(events=events, awards=awards)
+    return profiled_jsonify(history)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
 def team_years_participated(team_key: TeamKey) -> Response:
     """
     Returns a list of years the given Team participated in an event.
