@@ -28,7 +28,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
               <Link className="text-base" to={`/event/${event.key}`}>
                 {event.name}
               </Link>
-              <div className="text-sm">
+              <div className="text-sm text-neutral-600">
                 {event.city}, {event.state_prov}, {event.country}
               </div>
             </TableCell>

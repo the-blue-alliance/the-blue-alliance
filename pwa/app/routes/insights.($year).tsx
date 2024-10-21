@@ -110,13 +110,13 @@ function SingleYearInsights({
   leaderboards: LeaderboardInsight[];
 }) {
   return (
-    <div>
-      <h1 className="mb-4 text-3xl font-bold">
+    <div className="py-8">
+      <h1 className="mb-3 text-3xl font-medium">
         Insights ({year > 0 ? year : 'Overall'})
       </h1>
 
-      <h3 className="mb-4 text-xl font-bold">Leaderboards</h3>
-      <div className="lg:grid lg:grid-cols-2">
+      <h3 className="mb-4 text-xl font-medium">Leaderboards</h3>
+      <div className="gap-3 lg:grid lg:grid-cols-2">
         {leaderboards.map((l, i) => (
           <Leaderboard leaderboard={l} key={i} />
         ))}
@@ -135,58 +135,56 @@ function Leaderboard({ leaderboard }: { leaderboard: LeaderboardInsight }) {
     NAME_TO_DISPLAY_NAME[leaderboard.name] || leaderboard.name;
 
   return (
-    <div className="m-3">
-      <Card className="border-gray-300">
-        <CardHeader className="px-6 pb-1 pt-4">
-          <CardTitle>
-            <div className="flex justify-between align-middle">
-              <div className="self-center">{displayName}</div>
-              <Button
-                variant={'ghost'}
-                onClick={() => {
-                  setExpanded(!expanded);
-                }}
-                size={'sm'}
-              >
-                {expanded ? <BiChevronBarUp /> : <BiChevronBarDown />}
-                <span className="sr-only">Toggle</span>
-              </Button>
-            </div>
-          </CardTitle>
-          <CardDescription>
-            {leaderboard.year > 0 ? leaderboard.year : 'Overall'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pb-3">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="h-8 w-[6ch] text-center">#</TableHead>
-                <TableHead className="h-8 text-left capitalize">
-                  {leaderboard.data.key_type}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {leaderboard.data.rankings
-                .slice(0, expanded ? 100 : PRE_EXPANDED_ROWS)
-                .map((r, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="text-center">{r.value}</TableCell>
-                    <TableCell className="pl-4 text-left">
-                      <LeaderboardKeyList
-                        cutoffSize={MAX_KEYS_PER_ROW}
-                        keyType={leaderboard.data.key_type}
-                        keyVals={r.keys}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="border-gray-300">
+      <CardHeader className="px-6 pb-1 pt-4">
+        <CardTitle>
+          <div className="flex justify-between align-middle">
+            <div className="self-center">{displayName}</div>
+            <Button
+              variant={'ghost'}
+              onClick={() => {
+                setExpanded(!expanded);
+              }}
+              size={'sm'}
+            >
+              {expanded ? <BiChevronBarUp /> : <BiChevronBarDown />}
+              <span className="sr-only">Toggle</span>
+            </Button>
+          </div>
+        </CardTitle>
+        <CardDescription>
+          {leaderboard.year > 0 ? leaderboard.year : 'Overall'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pb-3">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="h-8 w-[6ch] text-center">#</TableHead>
+              <TableHead className="h-8 text-left capitalize">
+                {leaderboard.data.key_type}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {leaderboard.data.rankings
+              .slice(0, expanded ? 100 : PRE_EXPANDED_ROWS)
+              .map((r, i) => (
+                <TableRow key={i}>
+                  <TableCell className="text-center">{r.value}</TableCell>
+                  <TableCell className="pl-4 text-left">
+                    <LeaderboardKeyList
+                      cutoffSize={MAX_KEYS_PER_ROW}
+                      keyType={leaderboard.data.key_type}
+                      keyVals={r.keys}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
 

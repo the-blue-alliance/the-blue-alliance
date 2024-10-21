@@ -23,7 +23,7 @@ export default function TeamAvatar({
   };
 
   return (
-    <button className="mr-2" onClick={handler} onKeyDown={handler}>
+    <button className="mr-3" onClick={handler} onKeyDown={handler}>
       <img
         alt="Team Avatar"
         src={`data:image/png;base64, ${media.details.base64Image}`}
