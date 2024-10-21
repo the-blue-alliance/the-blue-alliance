@@ -976,3 +976,70 @@ def test_team_list_year(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert len(resp.json) == 0
+
+
+def test_team_history(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Award(
+        id="2020casj_1",
+        year=2020,
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2020casj"),
+        name_str="Winner",
+        team_list=[ndb.Key(Team, "frc254")],
+    ).put()
+    Award(
+        id="2020casj_2",
+        year=2020,
+        award_type_enum=AwardType.FINALIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2020casj"),
+        name_str="Finalist",
+        team_list=[ndb.Key(Team, "frc254")],
+    ).put()
+
+    EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+
+    assert "awards" in resp.json
+    assert resp.json["awards"] == [
+        {
+            "award_type": 1,
+            "event_key": "2020casj",
+            "name": "Winner",
+            "recipient_list": [],
+            "year": 2020,
+        },
+        {
+            "award_type": 2,
+            "event_key": "2020casj",
+            "name": "Finalist",
+            "recipient_list": [],
+            "year": 2020,
+        },
+    ]
+
+    assert "events" in resp.json
+    assert len(resp.json["events"]) == 1
+    assert resp.json["events"][0]["key"] == "2020casj"
