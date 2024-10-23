@@ -168,6 +168,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 WebcastParser.webcast_dict_from_url(url)
                 for url in event.get("webcasts", [])
             ]
+            week = event.get("weekNumber")
 
             # TODO read timezone from API
 
@@ -216,6 +217,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                     playoff_type=playoff_type,
                     start_date=start,
                     end_date=end,
+                    api_week=week,
                     venue=venue,
                     city=city,
                     state_prov=state_prov,
