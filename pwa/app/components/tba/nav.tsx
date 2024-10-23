@@ -9,7 +9,7 @@ import BiStarFill from '~icons/bi/star-fill';
 import BiThreeDotsVertical from '~icons/bi/three-dots-vertical';
 import IonCalendar from '~icons/ion/calendar';
 
-import { Input } from '~/components/ui/input';
+import Searchbar from '~/components/tba/searchbar';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -169,12 +169,7 @@ export const Nav = () => {
             </PopoverContent>
           </Popover>
         </NavigationMenuList>
-        <Input
-          placeholder="Search"
-          type="search"
-          className="focus:ring-none ml-4 h-8 border-none bg-accent transition-all
-              focus:bg-white focus:text-black focus:outline-none focus-visible:border-none"
-        />
+        <Searchbar />
       </NavigationMenu>
     </div>
   );
