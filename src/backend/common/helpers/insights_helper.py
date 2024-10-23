@@ -3,13 +3,27 @@ import json
 import math
 import statistics
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, NamedTuple, Tuple, TypedDict
+from typing import (
+    Any,
+    Callable,
+    DefaultDict,
+    Dict,
+    List,
+    NamedTuple,
+    Tuple,
+    TypedDict,
+    TypeVar,
+)
 
 import numpy as np
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
-from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.alliance_color import (
+    ALLIANCE_COLORS,
+    AllianceColor,
+    OPPONENT,
+)
 from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
 from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.consts.event_type import (
@@ -28,13 +42,19 @@ from backend.common.helpers.event_helper import (
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
+from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.insight import Insight, LeaderboardKeyType
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 
-
-CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float] | Dict[Any, int]
+T = TypeVar("T")
+CounterDictType = (
+    DefaultDict[Any, int]
+    | DefaultDict[Any, float]
+    | DefaultDict[Any, WLTRecord]
+    | Dict[Any, int]
+)
 
 
 class EventMatches(NamedTuple):
@@ -49,7 +69,7 @@ class WeekEventMatches(NamedTuple):
 
 class LeaderboardRanking(TypedDict):
     keys: List[TeamKey | EventKey | MatchKey]
-    value: int | float
+    value: int | float | WLTRecord
 
 
 class LeaderboardData(TypedDict):
@@ -80,9 +100,7 @@ class InsightsHelper(object):
             Event.query(Event.year == year).order(Event.start_date).fetch(1000)
         )
         events_by_week = EventHelper.group_by_week(official_events)
-        week_event_matches = (
-            []
-        )  # Tuples of: (week, events) where events are tuples of (event, matches)
+        week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
             if week in {OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL}:
                 continue
@@ -121,6 +139,7 @@ class InsightsHelper(object):
                 week_event_matches, year
             )
         )
+        insights += self._calculate_leaderboard_best_record(week_event_matches, year)
 
         return insights
 
@@ -434,6 +453,64 @@ class InsightsHelper(object):
         ]
 
     @classmethod
+    def _calculate_leaderboard_best_record(
+        self, week_event_matches: List[WeekEventMatches], year: Year
+    ) -> List[Insight]:
+        records: DefaultDict[TeamKey, WLTRecord] = defaultdict(
+            lambda: WLTRecord(wins=0, losses=0, ties=0)
+        )
+
+        for _, week_events in week_event_matches:
+            for _, matches in week_events:
+                for match in matches:
+                    if match.has_been_played:
+                        if match.winning_alliance == "":
+                            for color in ALLIANCE_COLORS:
+                                for tk in match.alliances[color]["teams"]:
+                                    records[tk]["ties"] += 1
+                        else:
+                            for tk in match.alliances[match.winning_alliance]["teams"]:
+                                records[tk]["wins"] += 1
+                            for tk in match.alliances[OPPONENT[match.winning_alliance]][
+                                "teams"
+                            ]:
+                                records[tk]["losses"] += 1
+
+        record_kvs = defaultdict(list)
+        for tk, trec in records.items():
+            record_kvs[(trec["wins"], trec["losses"], trec["ties"])].append(tk)
+
+        sorted_recs_by_conf = wilson_sort(
+            record_kvs.items(),
+            positive=lambda tup: tup[0][0],
+            negative=lambda tup: tup[0][1] + tup[0][2],
+            minimum_total=15,
+            z=1.96,
+        )
+
+        leaderboard_rankings: List[LeaderboardRanking] = [
+            LeaderboardRanking(
+                keys=keys,
+                value=WLTRecord(wins=value[0], losses=value[1], ties=value[2]),
+            )
+            for (value, keys) in sorted_recs_by_conf[:25]
+        ]
+        leaderboard_data = LeaderboardData(
+            rankings=leaderboard_rankings,
+            key_type=Insight.TYPED_LEADERBOARD_KEY_TYPES[
+                Insight.TYPED_LEADERBOARD_BEST_RECORD
+            ],
+        )
+
+        return [
+            self._createInsight(
+                data=leaderboard_data,
+                name=Insight.INSIGHT_NAMES[Insight.TYPED_LEADERBOARD_BEST_RECORD],
+                year=year,
+            )
+        ]
+
+    @classmethod
     def _generateMatchData(self, match: Match, event: Event) -> Dict:
         """
         A dict of any data needed for front-end rendering
@@ -508,9 +585,7 @@ class InsightsHelper(object):
         Returns an Insight where the data is a list of tuples:
         (week string, list of highest scoring matches)
         """
-        highscore_matches_by_week = (
-            []
-        )  # tuples: week, list of matches (if there are ties)
+        highscore_matches_by_week = []  # tuples: week, list of matches (if there are ties)
         for week, week_events in week_event_matches:
             week_highscore_matches = []
             highscore = 0
@@ -875,9 +950,9 @@ class InsightsHelper(object):
                 roundedScore = margin - int(margin % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_winning_margin_distribution_normalized:
-                    elim_winning_margin_distribution_normalized[
-                        roundedScore
-                    ] += contribution
+                    elim_winning_margin_distribution_normalized[roundedScore] += (
+                        contribution
+                    )
                 else:
                     elim_winning_margin_distribution_normalized[roundedScore] = (
                         contribution
@@ -1342,3 +1417,33 @@ class InsightsHelper(object):
             )
 
         return overall_insights
+
+
+def __confidence(ups: int, downs: int, z: float = 1.96) -> float:
+    n = ups + downs
+
+    if n == 0:
+        return 0
+
+    phat = float(ups) / n
+    return (
+        phat
+        + z * z / (2 * n)
+        - z * math.sqrt((phat * (1 - phat) + z * z / (4 * n)) / n)
+    ) / (1 + z * z / n)
+
+
+def wilson_sort(
+    objs: List[T],
+    positive: Callable[[T], float],
+    negative: Callable[[T], float],
+    minimum_total: float = 0,
+    z: float = 1.96,
+) -> List[T]:
+    return [
+        i
+        for i in sorted(
+            objs, key=lambda e: -__confidence(positive(e), negative(e), z=z)
+        )
+        if (positive(i) + negative(i)) >= minimum_total
+    ]
