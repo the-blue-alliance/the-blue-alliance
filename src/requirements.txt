@@ -3,7 +3,7 @@ firebase_admin==6.5.0
 Flask==3.0.3
 Flask-Caching==2.3.0
 Flask-Cors==5.0.0
-Flask-WTF==1.2.1
+Flask-WTF==1.2.2
 google-api-core==1.34.0
 google-api-python-client==2.149.0
 google-cloud-logging==3.9.0
