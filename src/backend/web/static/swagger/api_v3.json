@@ -587,6 +587,63 @@
         ]
       }
     },
+    "/team/{team_key}/history": {
+      "get": {
+        "tags": [
+          "team"
+        ],
+        "description": "Gets the history for the team referenced by the given key, including their events and awards.",
+        "operationId": "getTeamHistory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/team_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with team's history including events and awards.",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/History"
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/team/{team_key}/years_participated": {
       "get": {
         "tags": [
@@ -8263,6 +8320,27 @@
           "data",
           "name",
           "year"
+        ]
+      },
+      "History": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          },
+          "awards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Award"
+            }
+          }
+        },
+        "required": [
+          "events",
+          "awards"
         ]
       }
     },

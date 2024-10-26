@@ -47,6 +47,7 @@ from backend.api.handlers.team import (
     team_event_status,
     team_events,
     team_events_statuses_year,
+    team_history,
     team_history_districts,
     team_history_robots,
     team_list,
@@ -191,6 +192,7 @@ api_v3.add_url_rule(
 )
 
 # Team History
+api_v3.add_url_rule("/team/<string:team_key>/history", view_func=team_history)
 api_v3.add_url_rule(
     "/team/<string:team_key>/years_participated", view_func=team_years_participated
 )
