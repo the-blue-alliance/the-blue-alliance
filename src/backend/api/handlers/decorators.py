@@ -29,7 +29,7 @@ def api_authenticated(func):
 
             if auth_key:
                 auth = ApiAuthAccess.get_by_id(auth_key)
-                if auth and auth.is_read_key:
+                if auth:
                     auth_owner_id = auth.owner.id() if auth.owner else None
                 else:
                     return (
