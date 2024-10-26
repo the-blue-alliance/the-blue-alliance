@@ -97,7 +97,7 @@ $('#schedule_file').change(function(){
 
         //parse the excel to array of matches
         //headers start on 5th row
-        var matches = XLSX.utils.sheet_to_json(sheet, {range:4});
+        var matches = XLSX.utils.sheet_to_json(sheet, {range:4, raw: false});
         var request_body = [];
 
         $('#schedule_preview').empty();
