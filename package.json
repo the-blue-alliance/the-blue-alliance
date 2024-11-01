@@ -49,7 +49,7 @@
     "jest-puppeteer": "^10.1.4",
     "less": "4.2.0",
     "md5": "^2.3.0",
-    "mini-css-extract-plugin": "^2.9.1",
+    "mini-css-extract-plugin": "^2.9.2",
     "node-fetch": "^2.7.0",
     "process": "^0.11.10",
     "puppeteer": "^23.6.1",
