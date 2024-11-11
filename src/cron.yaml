@@ -83,7 +83,7 @@ cron:
 
 - description: Suggestion Queue Nag
   url: /tasks/do/nag_suggestions
-  schedule: every day 12:00
+  schedule: every day 08:00
   timezone: America/Los_Angeles
 
 - description: Backup Cron job

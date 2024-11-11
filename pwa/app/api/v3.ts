@@ -95,16 +95,6 @@ export type DistrictList = {
   /** Year this district participated. */
   year: number;
 };
-export type TeamRobot = {
-  /** Year this robot competed in. */
-  year: number;
-  /** Name of the robot as provided by the team. */
-  robot_name: string;
-  /** Internal TBA identifier for this robot. */
-  key: string;
-  /** TBA team key for this robot. */
-  team_key: string;
-};
 export type Webcast = {
   /** Type of webcast, typically descriptive of the streaming provider. */
   type:
@@ -186,6 +176,38 @@ export type Event = {
   playoff_type: number | null;
   /** String representation of the `playoff_type`, or null. */
   playoff_type_string: string | null;
+};
+export type AwardRecipient = {
+  /** The TBA team key for the team that was given the award. May be null. */
+  team_key: string | null;
+  /** The name of the individual given the award. May be null. */
+  awardee: string | null;
+};
+export type Award = {
+  /** The name of the award as provided by FIRST. May vary for the same award type. */
+  name: string;
+  /** Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6 */
+  award_type: number;
+  /** The event_key of the event the award was won at. */
+  event_key: string;
+  /** A list of recipients of the award at the event. May have either a team_key or an awardee, both, or neither (in the case the award wasn't awarded at the event). */
+  recipient_list: AwardRecipient[];
+  /** The year this award was won. */
+  year: number;
+};
+export type History = {
+  events: Event[];
+  awards: Award[];
+};
+export type TeamRobot = {
+  /** Year this robot competed in. */
+  year: number;
+  /** Name of the robot as provided by the team. */
+  robot_name: string;
+  /** Internal TBA identifier for this robot. */
+  key: string;
+  /** TBA team key for this robot. */
+  team_key: string;
 };
 export type EventSimple = {
   /** TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event. */
@@ -759,24 +781,6 @@ export type Match = {
     key: string;
   }[];
 };
-export type AwardRecipient = {
-  /** The TBA team key for the team that was given the award. May be null. */
-  team_key: string | null;
-  /** The name of the individual given the award. May be null. */
-  awardee: string | null;
-};
-export type Award = {
-  /** The name of the award as provided by FIRST. May vary for the same award type. */
-  name: string;
-  /** Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6 */
-  award_type: number;
-  /** The event_key of the event the award was won at. */
-  event_key: string;
-  /** A list of recipients of the award at the event. May have either a team_key or an awardee, both, or neither (in the case the award wasn't awarded at the event). */
-  recipient_list: AwardRecipient[];
-  /** The year this award was won. */
-  year: number;
-};
 export type MatchSimple = {
   /** TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set. */
   key: string;
@@ -1346,6 +1350,44 @@ export function getTeamSimple(
         status: 404;
       }
   >(`/team/${encodeURIComponent(teamKey)}/simple`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets the history for the team referenced by the given key, including their events and awards.
+ */
+export function getTeamHistory(
+  {
+    ifNoneMatch,
+    teamKey,
+  }: {
+    ifNoneMatch?: string;
+    teamKey: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: History;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/team/${encodeURIComponent(teamKey)}/history`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,

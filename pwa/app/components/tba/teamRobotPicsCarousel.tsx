@@ -30,7 +30,7 @@ export default function TeamRobotPicsCarousel({
         ))}
       </CarouselContent>
       {media.length > 1 && (
-        <div className="mt-1 flex justify-center gap-8">
+        <div className="mt-1 flex justify-center gap-2">
           <CarouselPrevious className="relative left-0 transform-none" />
           <CarouselNext className="relative right-0 transform-none" />
         </div>
