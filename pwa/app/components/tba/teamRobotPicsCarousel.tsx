@@ -19,7 +19,7 @@ export default function TeamRobotPicsCarousel({
       <CarouselContent className="items-center">
         {media.map((m, index) => (
           <CarouselItem key={index}>
-            <div className="rounded-lg border border-border">
+            <div className="rounded-lg border-2 border-neutral-300">
               <img
                 className="max-h-[250px] w-full rounded object-contain"
                 src={m.direct_url}

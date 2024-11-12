@@ -172,65 +172,63 @@ export default function EventPage() {
     ) : null;
 
   return (
-    <>
-      <div className="mb-2.5 flex flex-col">
-        <h1 className="mb-2.5 mt-5 text-4xl">
-          {event.name} {event.year}
-        </h1>
+    <div className="py-8">
+      <h1 className="mb-3 text-3xl font-medium">
+        {event.name} {event.year}
+      </h1>
 
-        <InlineIcon>
-          <BiCalendar />
-          {getEventDateString(event, 'long')}
-          {event.week !== null && (
-            <Badge className="mx-2 h-[1.5em] align-text-top">
-              Week {event.week + 1}
-            </Badge>
-          )}
-        </InlineIcon>
-
-        <InlineIcon>
-          <BiPinMapFill />
-
-          {event.gmaps_url ? (
-            <Link to={event.gmaps_url}>
-              {event.city}, {event.state_prov}, {event.country}
-            </Link>
-          ) : (
-            <>
-              {event.city}, {event.state_prov}, {event.country}
-            </>
-          )}
-        </InlineIcon>
-        {event.website && (
-          <InlineIcon>
-            <BiLink />
-            <Link to={event.website}>{event.website}</Link>
-          </InlineIcon>
+      <InlineIcon>
+        <BiCalendar />
+        {getEventDateString(event, 'long')}
+        {event.week !== null && (
+          <Badge className="mx-2 h-[1.5em] align-text-top">
+            Week {event.week + 1}
+          </Badge>
         )}
+      </InlineIcon>
 
-        {event.first_event_code && (
-          <InlineIcon>
-            <BiInfoCircleFill />
-            Details on{' '}
-            <Link
-              to={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
-            >
-              FRC Events
-            </Link>
-          </InlineIcon>
+      <InlineIcon>
+        <BiPinMapFill />
+
+        {event.gmaps_url ? (
+          <Link to={event.gmaps_url}>
+            {event.city}, {event.state_prov}, {event.country}
+          </Link>
+        ) : (
+          <>
+            {event.city}, {event.state_prov}, {event.country}
+          </>
         )}
-
+      </InlineIcon>
+      {event.website && (
         <InlineIcon>
-          <BiGraphUp />
-          <Link to={`https://www.statbotics.io/event/${event.key}`}>
-            Statbotics
+          <BiLink />
+          <Link to={event.website}>{event.website}</Link>
+        </InlineIcon>
+      )}
+
+      {event.first_event_code && (
+        <InlineIcon>
+          <BiInfoCircleFill />
+          Details on{' '}
+          <Link
+            to={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+          >
+            FRC Events
           </Link>
         </InlineIcon>
-      </div>
+      )}
+
+      <InlineIcon>
+        <BiGraphUp />
+        <Link to={`https://www.statbotics.io/event/${event.key}`}>
+          Statbotics
+        </Link>
+      </InlineIcon>
 
       <Tabs
         defaultValue={matches.length > 0 ? 'results' : 'teams'}
-        className=""
+        className="mt-4"
       >
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly [&>*]:basis-1/2
@@ -322,7 +320,7 @@ export default function EventPage() {
 
         <TabsContent value="media">media</TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 }
 
@@ -403,7 +401,7 @@ function TeamsTab({
                   <img
                     src={maybeImage}
                     alt={`${t.team_number}'s robot`}
-                    className="h-full w-1/3 rounded-lg border border-border object-cover"
+                    className="h-full w-1/3 rounded-lg border-2 border-neutral-300 object-cover"
                     loading="lazy"
                   />
                 );
@@ -413,14 +411,13 @@ function TeamsTab({
           <CredenzaContent>
             <CredenzaHeader>
               <CredenzaTitle>
-                {t.team_number} - {t.nickname}
+                {t.team_number} - {t.nickname} at {event.short_name}
               </CredenzaTitle>
               <CredenzaDescription>
-                {t.city}, {t.state_prov}, {t.country}
+                From {t.city}, {t.state_prov}, {t.country}
               </CredenzaDescription>
             </CredenzaHeader>
             <CredenzaBody>
-              <h1 className="text-xl">{event.short_name}</h1>
               <ScrollArea className="h-[70vh] md:h-auto">
                 <MatchResultsTable
                   team={t}

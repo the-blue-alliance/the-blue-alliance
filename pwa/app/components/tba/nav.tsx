@@ -8,6 +8,7 @@ import BiPeopleFill from '~icons/bi/people-fill';
 import BiStarFill from '~icons/bi/star-fill';
 import BiThreeDotsVertical from '~icons/bi/three-dots-vertical';
 import IonCalendar from '~icons/ion/calendar';
+import SearchIcon from '~icons/lucide/search';
 
 import { Input } from '~/components/ui/input';
 import {
@@ -38,7 +39,7 @@ export const MenuItem = ({ className, icon, title, route }: MenuItemProps) => {
   return (
     <NavigationMenuItem className={className}>
       <NavigationMenuLink
-        className={navigationMenuTriggerStyle() + ' h-10 px-4 cursor-pointer'}
+        className={navigationMenuTriggerStyle() + ' cursor-pointer'}
         asChild
       >
         {route ? (
@@ -76,7 +77,7 @@ export const DropMenuItem = ({
       <NavigationMenuLink
         className={
           navigationMenuTriggerStyle() +
-          ' cursor-pointer w-full grow h-10 hover:no-underline'
+          ' cursor-pointer w-full grow hover:no-underline'
         }
         asChild
       >
@@ -101,35 +102,34 @@ export const DropMenuItem = ({
 
 export const Nav = () => {
   return (
-    <div className="fixed z-10 flex w-full grow justify-center bg-primary p-2 shadow-md">
+    <div className="fixed z-10 flex w-full grow justify-center bg-primary shadow-md">
       <GlobalLoadingProgress />
-      <NavigationMenu>
+      <NavigationMenu className="gap-6 px-4 py-2.5">
+        <Link to="/" className="flex items-center gap-3 hover:no-underline">
+          <img
+            src={lamp}
+            className="size-6 max-w-none"
+            alt="The Blue Alliance Logo"
+          />
+          <div className="hidden whitespace-nowrap text-xl font-medium tracking-tight	 text-white lg:block">
+            The Blue Alliance
+          </div>
+        </Link>
         <NavigationMenuList className="flex w-full grow">
-          <Link to="/" className="ml-4 flex hover:no-underline">
-            <img
-              src={lamp}
-              className="size-8 max-w-none"
-              alt="The Blue Alliance Logo"
-            />
-            <div className="ml-4 hidden whitespace-nowrap text-2xl text-white xl:block">
-              The Blue Alliance
-            </div>
-          </Link>
-          <div className="grow" />
           <MenuItem icon={<BiStarFill />} title="myTBA" />
           <MenuItem icon={<IonCalendar />} title="Events" route="/events" />
           <MenuItem
-            className="hidden lg:block"
+            className="hidden md:block"
             icon={<BiPeopleFill />}
             title="Teams"
           />
           <MenuItem
-            className="hidden lg:block"
+            className="hidden md:block"
             icon={<BiCameraVideoFill />}
             title="GameDay"
           />
           <MenuItem
-            className="hidden lg:block"
+            className="hidden md:block"
             icon={<BiBarChartLineFill />}
             title="Insights"
             route="/insights"
@@ -169,12 +169,19 @@ export const Nav = () => {
             </PopoverContent>
           </Popover>
         </NavigationMenuList>
-        <Input
-          placeholder="Search"
-          type="search"
-          className="focus:ring-none ml-4 h-8 border-none bg-accent transition-all
-              focus:bg-white focus:text-black focus:outline-none focus-visible:border-none"
-        />
+        <div className="ml-auto">
+          <form>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                <SearchIcon className="size-4 text-neutral-500" />
+              </div>
+              <Input
+                placeholder="Search"
+                className="bg-accent pl-9 text-sm transition-all hover:bg-white focus:bg-white"
+              />
+            </div>
+          </form>
+        </div>
       </NavigationMenu>
     </div>
   );

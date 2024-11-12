@@ -8,7 +8,8 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { InView } from 'react-intersection-observer';
 
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
@@ -188,6 +189,7 @@ export default function TeamPage(): React.JSX.Element {
     statuses,
     awards,
   } = useLoaderData<typeof loader>();
+  const [eventsInView, setEventsInView] = useState(new Set());
 
   events.sort(sortEventsComparator);
 
@@ -220,44 +222,47 @@ export default function TeamPage(): React.JSX.Element {
     team.school_name ?? attemptToParseSchoolNameFromOldTeamName(team.name);
 
   return (
-    <div className="flex flex-wrap sm:flex-nowrap">
-      <div className="top-0 mr-4 pt-5 sm:sticky">
-        <Select
-          onValueChange={(value) => {
-            navigate(`/team/${team.team_number}/${value}`);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={year} />
-          </SelectTrigger>
-          <SelectContent>
-            {yearsParticipated.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
+    <div className="flex flex-wrap gap-8 lg:flex-nowrap">
+      <div className="basis-full lg:basis-1/6">
+        <div className="top-14 pt-8 sm:sticky">
+          <Select
+            value={String(year)}
+            onValueChange={(value) => {
+              navigate(`/team/${team.team_number}/${value}`);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={year} />
+            </SelectTrigger>
+            <SelectContent>
+              {yearsParticipated.map((y) => (
+                <SelectItem key={y} value={`${y}`}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <TableOfContentsList className="mt-2">
+            {events.map((e) => (
+              <TableOfContentsItem key={e.key}>
+                <TableOfContentsLink
+                  to={`#${e.key}`}
+                  replace={true}
+                  isActive={eventsInView.has(e.key)}
+                >
+                  {e.short_name ?? e.name}
+                </TableOfContentsLink>
+              </TableOfContentsItem>
             ))}
-          </SelectContent>
-        </Select>
-        <TableOfContentsList className="mt-5">
-          {events.map((e) => (
-            <TableOfContentsItem key={e.key}>
-              <TableOfContentsLink
-                to="#todo_implement_me"
-                replace={true}
-                // isActive={inView.has(group.slug)}
-              >
-                {e.short_name}
-              </TableOfContentsLink>
-            </TableOfContentsItem>
-          ))}
-        </TableOfContentsList>
+          </TableOfContentsList>
+        </div>
       </div>
 
-      <div className="mt-5 w-full">
+      <div className="mt-8 w-full">
         <div className="flex flex-wrap justify-center sm:flex-nowrap sm:justify-between">
           <div className="flex flex-col justify-between">
             <div>
-              <h1 className="mb-2.5 text-4xl">
+              <h1 className="mb-3 text-3xl font-medium">
                 {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
                 Team {team.team_number} - {team.nickname}
               </h1>
@@ -346,14 +351,27 @@ export default function TeamPage(): React.JSX.Element {
           <Separator className="mb-8 mt-4" />
 
           {events.map((e) => (
-            <div key={e.key}>
+            <InView
+              as="div"
+              key={e.key}
+              onChange={(inView) => {
+                setEventsInView((prev) => {
+                  if (inView) {
+                    prev.add(e.key);
+                  } else {
+                    prev.delete(e.key);
+                  }
+                  return new Set(prev);
+                });
+              }}
+            >
               <TeamEventAppearance
                 event={e}
                 matches={matches.filter((m) => m.event_key === e.key)}
                 status={statuses[e.key]}
               />
               <Separator className="my-4" />
-            </div>
+            </InView>
           ))}
         </div>
       </div>

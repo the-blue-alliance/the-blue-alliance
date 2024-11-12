@@ -1,14 +1,13 @@
 import { Link } from '@remix-run/react';
 
 import { Button } from '~/components/ui/button';
-import first_logo from '~/images/first_logo.png';
 
 export default function About(): React.JSX.Element {
   return (
-    <>
-      <div className="flex flex-col divide-y [&_*]:mt-4">
-        <div>
-          <h1 className="text-3xl font-medium">About Us</h1>
+    <div className="container max-w-4xl py-8">
+      <h1 className="text-3xl font-medium">About Us</h1>
+      <div className="[&_p]:mb-2">
+        <section className="border-b py-6">
           <p>
             Founded in the fall of 2006, The Blue Alliance began as a website
             dedicated to providing everyone involved in the <em>FIRST</em>{' '}
@@ -30,92 +29,88 @@ export default function About(): React.JSX.Element {
           <p>
             You can support The Blue Alliance or reach us with the following:
           </p>
-          <Button asChild>
-            <a href="https://github.com/the-blue-alliance">
-              Contribute on GitHub!
-            </a>
-          </Button>
-          <Button asChild>
-            <Link to="/donate">Donate with PayPal</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/contact">Contact Us!</Link>
-          </Button>
-        </div>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" asChild>
+              <a
+                href="https://github.com/the-blue-alliance"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Contribute on GitHub
+              </a>
+            </Button>
+            <Button size="sm" asChild>
+              <Link to="/donate">Donate with PayPal</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link to="/contact">Contact Us</Link>
+            </Button>
+          </div>
+        </section>
 
-        <div>
-          <h3 className="text-2xl">
-            <em>FIRST</em>
+        <section className="border-b py-6">
+          <h3 className="mb-2 text-2xl font-medium">
+            About <em>FIRST</em>
+            <sup>®</sup>
           </h3>
           <p>
-            <a href="http://www.firstinspires.org/">
-              <em>FIRST</em>
-            </a>{' '}
-            (For Inspiration and Recognition of Science and Technology) is a
-            non-profit organization with the mission of inspiring young people
-            to be science and technology leaders. With programs that involve
-            students from kindergarten through high school, <em>FIRST</em> has
-            become a world-wide phenomenon with teams from all six inhabited
-            continents.
+            <em>FIRST</em>
+            <sup>®</sup> is the world’s leading youth-serving nonprofit
+            advancing STEM education. Through a suite of inclusive, team-based
+            robotics programs for ages 4-18 and backed by a global network of
+            mentors, coaches, volunteers, alumni, and sponsors, FIRST has a
+            proven impact on learning, interest, and skill-building inside and
+            outside of the classroom.
           </p>
+          <p>
+            <em>FIRST</em>
+            <sup>®</sup> Robotics Competition combines the excitement of sport
+            with the rigors of science and technology. Under strict rules,
+            limited time and resources, teams of high school students are
+            challenged to build industrial-size robots to play a difficult field
+            game in alliance with other teams, while they also fundraise to meet
+            their goals, create a team identity, and advance respect and
+            appreciation for STEM within the local community.
+          </p>
+          <Button size="sm" asChild>
+            <a
+              href="http://www.firstinspires.org"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Join the movement
+            </a>
+          </Button>
+        </section>
 
-          <div className="flex">
-            <img src={first_logo} alt="FIRST Logo" className="h-30 w-auto" />
-
-            <blockquote>
-              <p>
-                <em>
-                  &quot;To transform our culture by creating a world where
-                  science and technology are celebrated and where young people
-                  dream of becoming science and technology leaders.&quot;
-                </em>
-              </p>
-              <small>
-                Dean Kamen, <em>FIRST</em> Founder (
-                <a href="http://www.firstinspires.org/about/vision-and-mission">
-                  <em>FIRST</em> Vision
-                </a>
-                )
-              </small>
-            </blockquote>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-2xl">Other community sites</h3>
+        <section className="py-6">
+          <h3 className="mb-2 text-2xl font-medium">Other community sites</h3>
           <p>
             Here are some other amazing resources that the <em>FIRST</em>{' '}
             community has to offer.
           </p>
-
-          <ul>
+          <ul className="list-inside">
             <li className="list-disc">
-              <p>
-                <a href="https://www.chiefdelphi.com/" title="Chief Delphi">
-                  Chief Delphi
-                </a>{' '}
-                - The go-to fourm for FRC discussion
-              </p>
+              <a href="https://www.chiefdelphi.com/" title="Chief Delphi">
+                Chief Delphi
+              </a>{' '}
+              - The go-to fourm for FRC discussion
             </li>
             <li className="list-disc">
-              <p>
-                <a href="https://frc.link/" title="FRC Links">
-                  FRC Links
-                </a>{' '}
-                - Easy access to specific FRC team and event pages
-              </p>
+              <a href="https://frc.link/" title="FRC Links">
+                FRC Links
+              </a>{' '}
+              - Easy access to specific FRC team and event pages
             </li>
             <li className="list-disc">
-              <p>
-                <a href="https://www.statbotics.io/" title="Statbotics">
-                  Statbotics
-                </a>{' '}
-                - Unique FRC team and event performance comparisons
-              </p>
+              <a href="https://www.statbotics.io/" title="Statbotics">
+                Statbotics
+              </a>{' '}
+              - Unique FRC team and event performance comparisons
             </li>
           </ul>
-        </div>
+        </section>
       </div>
-    </>
+    </div>
   );
 }

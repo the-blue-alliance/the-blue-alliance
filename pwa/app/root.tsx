@@ -258,11 +258,11 @@ export function ErrorBoundary() {
   const isRouteError = isRouteErrorResponse(error);
   captureRemixErrorBoundaryError(error);
   return (
-    <>
-      <h1 className="mb-2.5 mt-5 text-4xl">Oh Noes!1!!</h1>
+    <div className="py-8">
+      <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>
       <h2 className="text-2xl">
         {isRouteError ? `Error ${error.status}` : 'An unknown error occurred.'}
       </h2>
-    </>
+    </div>
   );
 }
