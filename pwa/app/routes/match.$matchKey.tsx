@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, json } from '@remix-run/node';
+import { LoaderFunctionArgs } from '@remix-run/node';
 import {
   type ClientLoaderFunctionArgs,
   Link,
@@ -47,7 +47,7 @@ async function loadData(params: Params) {
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  return json(await loadData(params));
+  return await loadData(params);
 }
 
 export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
