@@ -9,7 +9,6 @@ import {
   useRouteError,
 } from '@remix-run/react';
 import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
-import { LRUCache } from 'lru-cache';
 import { pwaInfo } from 'virtual:pwa-info';
 
 import * as api from '~/api/v3';
@@ -22,35 +21,38 @@ api.defaults.headers = {
   'X-TBA-Auth-Key': import.meta.env.VITE_TBA_API_READ_KEY,
 };
 
+// Disabled on 11/12/24 due to clone() issues:
+// https://the-blue-alliance.sentry.io/issues/6042521923
+// ======================================================
 // Custom fetch that uses an in-memory cache to handle ETags.
 // TODO: Maybe also use localStorage for clients?
 // TODO: Fix CORS on client
-const isServer = typeof window === 'undefined';
-const cache = new LRUCache<string, Response>({
-  max: 500,
-});
-api.defaults.fetch = async (url, options = {}) => {
-  if ((options.method && options.method !== 'GET') || !isServer) {
-    return fetch(url, options);
-  }
+// const isServer = typeof window === 'undefined';
+// const cache = new LRUCache<string, Response>({
+//   max: 500,
+// });
+// api.defaults.fetch = async (url, options = {}) => {
+//   if ((options.method && options.method !== 'GET') || !isServer) {
+//     return fetch(url, options);
+//   }
 
-  // Only cache GET requests
-  const cachedResponse = cache.get(url as string);
-  const etag = cachedResponse?.headers.get('ETag');
-  if (cachedResponse && etag) {
-    (options.headers as Headers).set('If-None-Match', etag);
-  }
+//   // Only cache GET requests
+//   const cachedResponse = cache.get(url as string);
+//   const etag = cachedResponse?.headers.get('ETag');
+//   if (cachedResponse && etag) {
+//     (options.headers as Headers).set('If-None-Match', etag);
+//   }
 
-  const response = await fetch(url, options);
-  if (response.status === 304 && cachedResponse) {
-    return cachedResponse.clone();
-  }
+//   const response = await fetch(url, options);
+//   if (response.status === 304 && cachedResponse) {
+//     return cachedResponse.clone();
+//   }
 
-  if (response.status === 200 && response.headers.has('ETag')) {
-    cache.set(url as string, response.clone());
-  }
-  return response;
-};
+//   if (response.status === 200 && response.headers.has('ETag')) {
+//     cache.set(url as string, response.clone());
+//   }
+//   return response;
+// };
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
