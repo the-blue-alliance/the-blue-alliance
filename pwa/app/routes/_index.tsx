@@ -1,5 +1,5 @@
 import type { MetaFunction } from '@remix-run/node';
-import { json, useLoaderData } from '@remix-run/react';
+import { useLoaderData } from '@remix-run/react';
 
 import { getEventsByYear, getStatus } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
@@ -25,9 +25,9 @@ export async function loader() {
 
   const filteredEvents = getCurrentWeekEvents(events.data);
 
-  return json({
+  return {
     events: filteredEvents,
-  });
+  };
 }
 
 export const meta: MetaFunction = () => {
