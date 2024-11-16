@@ -153,13 +153,6 @@ export enum AwardCategory {
   ROBOT_PERFORMANCE_AWARDS = 4,
 }
 
-export const AWARD_CATEGORIES: { [key in AwardCategory]: Set<AwardType> } = {
-  [AwardCategory.MACHINE_AWARDS]: MACHINE_AWARDS,
-  [AwardCategory.TEAM_ATTRIBUTE_AWARDS]: TEAM_ATTRIBUTE_AWARDS,
-  [AwardCategory.SUBMITTED_AWARDS]: SUBMITTED_AWARDS,
-  [AwardCategory.ROBOT_PERFORMANCE_AWARDS]: ROBOT_PERFORMANCE_AWARDS,
-};
-
 export const SORT_ORDER: Partial<Record<AwardType, number>> = {
   [AwardType.CHAIRMANS]: 0,
   [AwardType.FOUNDERS]: 1,
