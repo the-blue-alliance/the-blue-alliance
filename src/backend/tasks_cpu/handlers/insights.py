@@ -128,3 +128,33 @@ def do_overall_insights(kind: str) -> Response:
         )
 
     return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/math/enqueue/insights/<kind>/all")
+def enqueue_all_insights_of_kind(kind: str) -> Response:
+    """
+    Enqueues all insights (all valid years) of a given kind.
+    """
+    try:
+        insight_type = InsightType(kind)
+    except ValueError:
+        logging.warning(f"Unknown insight kind {kind}")
+        abort(404)
+        return  # no-op due to abort; only for type-hinting on insight_type
+
+    for year in SeasonHelper.get_valid_years():
+        taskqueue.add(
+            url=url_for("insights.do_year_insights", kind=insight_type, year=year),
+            method="GET",
+            target="py3-tasks-cpu",
+            queue_name="default",
+        )
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template("math/all_insights_enqueue.html", kind=kind)
+        )
+
+    return make_response("")
