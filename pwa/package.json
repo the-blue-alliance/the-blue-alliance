@@ -60,6 +60,7 @@
   "devDependencies": {
     "@iconify/json": "2.2.269",
     "@julr/vite-plugin-validate-env": "1.1.1",
+    "@playwright/test": "1.48.2",
     "@remix-run/dev": "2.14.0",
     "@sentry/vite-plugin": "2.22.6",
     "@svgr/core": "8.1.0",
@@ -68,6 +69,7 @@
     "@types/compression": "1.7.5",
     "@types/express": "4.17.21",
     "@types/morgan": "1.9.9",
+    "@types/node": "20.16.0",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@typescript-eslint/eslint-plugin": "8.11.0",

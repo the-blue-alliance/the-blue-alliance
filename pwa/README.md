@@ -73,3 +73,30 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 2. Add the environment variable to `app/vite-env.d.ts`
 3. Add a validator to `vite.config.ts`
 4. You can then reference it in code with `import.env.meta.VITE_MY_VAR`.
+
+## Playwright tests
+
+Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports.
+
+```sh
+# Runs the end-to-end tests.
+npx playwright test
+
+# Starts the interactive UI mode.
+npx playwright test --ui
+
+# Runs the tests only on Desktop Chrome.
+npx playwright test --project=chromium
+
+# Runs the tests in a specific file.
+npx playwright test example
+
+# Runs the tests in debug mode.
+npx playwright test --debug
+
+# Auto generate tests with Codegen.
+npx playwright codegen
+
+# Auto generate tests with a specific device
+npx playwright codegen --device="Pixel 7"
+```
