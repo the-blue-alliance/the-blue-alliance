@@ -226,7 +226,7 @@ export default function TeamPage(): React.JSX.Element {
                   replace={true}
                   isActive={eventsInView.has(e.key)}
                 >
-                  {e.short_name ?? e.name}
+                  {e.short_name?.trim() ? e.short_name : e.name}
                 </TableOfContentsLink>
               </TableOfContentsItem>
             ))}
