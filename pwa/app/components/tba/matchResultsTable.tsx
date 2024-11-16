@@ -139,7 +139,9 @@ export default function MatchResultsTable(props: MatchResultsTableProps) {
     () =>
       groupByRound
         ? groupBy(
-            props.matches.filter((m) => m.comp_level !== 'f'),
+            props.matches.filter(
+              (m) => m.comp_level !== 'f' && m.comp_level !== 'qm',
+            ),
             (m) => DOUBLE_ELIM_ROUND_MAPPING.get(m.set_number) ?? 1,
           )
         : {},
@@ -148,6 +150,11 @@ export default function MatchResultsTable(props: MatchResultsTableProps) {
 
   const finals = useMemo(
     () => props.matches.filter((m) => m.comp_level === 'f'),
+    [props.matches],
+  );
+
+  const quals = useMemo(
+    () => props.matches.filter((m) => m.comp_level === 'qm'),
     [props.matches],
   );
 
@@ -163,6 +170,12 @@ export default function MatchResultsTable(props: MatchResultsTableProps) {
 
   return (
     <>
+      {quals.length > 0 && (
+        <>
+          <div className="mt-1.5 text-lg">Quals</div>
+          <MatchResultsTableGroup {...props} matches={quals} />
+        </>
+      )}
       {Object.entries(matchesGroupedByRound).map(([round, matches]) => (
         <div key={round}>
           <div className="mt-1.5 text-lg">Round {round}</div>
