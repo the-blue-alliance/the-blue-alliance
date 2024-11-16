@@ -47,6 +47,9 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_MOST_AWARDS = 28
     TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS = 29
     TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST = 30
+    TYPED_LEADERBOARD_MOST_DIVISION_WINS = 31
+    TYPED_LEADERBOARD_MOST_DIVISION_FINALS_APPEARANCES = 32
+    TYPED_LEADERBOARD_MOST_WORLD_CHAMPIONSHIP_WINS = 33
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -83,6 +86,9 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_AWARDS: "typed_leaderboard_most_awards",
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "typed_leaderboard_most_non_champs_event_wins",
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "typed_leaderboard_most_unique_teams_played_with_against",
+        TYPED_LEADERBOARD_MOST_DIVISION_WINS: "typed_leaderboard_most_division_wins",
+        TYPED_LEADERBOARD_MOST_DIVISION_FINALS_APPEARANCES: "typed_leaderboard_most_division_finals_appearances",
+        TYPED_LEADERBOARD_MOST_WORLD_CHAMPIONSHIP_WINS: "typed_leaderboard_most_world_championship_wins",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
     }
@@ -98,6 +104,9 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_BLUE_BANNERS,
         TYPED_LEADERBOARD_MOST_AWARDS,
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS,
+        TYPED_LEADERBOARD_MOST_DIVISION_WINS,
+        TYPED_LEADERBOARD_MOST_DIVISION_FINALS_APPEARANCES,
+        TYPED_LEADERBOARD_MOST_WORLD_CHAMPIONSHIP_WINS,
     }
 
     TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
@@ -109,6 +118,17 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_AWARDS: "team",
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "team",
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "team",
+        TYPED_LEADERBOARD_MOST_DIVISION_WINS: "team",
+        TYPED_LEADERBOARD_MOST_DIVISION_FINALS_APPEARANCES: "team",
+        TYPED_LEADERBOARD_MOST_WORLD_CHAMPIONSHIP_WINS: "team",
+    }
+
+    # These leaderboards are generated per-year, but are only exposed in the overall insights API endpoint.
+    # Stored as insight names so that we can filter out insights on the API level, since insights are saved as names.
+    TYPED_LEADERBOARD_OVERALL_ONLY_INSIGHTS = {
+        INSIGHT_NAMES[TYPED_LEADERBOARD_MOST_DIVISION_WINS],
+        INSIGHT_NAMES[TYPED_LEADERBOARD_MOST_DIVISION_FINALS_APPEARANCES],
+        INSIGHT_NAMES[TYPED_LEADERBOARD_MOST_WORLD_CHAMPIONSHIP_WINS],
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting

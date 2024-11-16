@@ -80,9 +80,7 @@ class InsightsHelper(object):
             Event.query(Event.year == year).order(Event.start_date).fetch(1000)
         )
         events_by_week = EventHelper.group_by_week(official_events)
-        week_event_matches = (
-            []
-        )  # Tuples of: (week, events) where events are tuples of (event, matches)
+        week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
             if week in {OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL}:
                 continue
@@ -281,6 +279,9 @@ class InsightsHelper(object):
         banner_count = defaultdict(int)
         award_count = defaultdict(int)
         non_cmp_event_win_count = defaultdict(int)
+        div_winner_count = defaultdict(int)
+        div_finals_appearance_count = defaultdict(int)
+        einstein_winner_count = defaultdict(int)
 
         for award_future in award_futures:
             award = award_future.get_result()
@@ -299,6 +300,24 @@ class InsightsHelper(object):
                 ):
                     non_cmp_event_win_count[team_key.id()] += 1
 
+                if (
+                    award.award_type_enum == AwardType.WINNER
+                    and award.event_type_enum == EventType.CMP_DIVISION
+                ):
+                    div_winner_count[team_key.id()] += 1
+
+                if (
+                    award.award_type_enum in [AwardType.WINNER, AwardType.FINALIST]
+                    and award.event_type_enum == EventType.CMP_DIVISION
+                ):
+                    div_finals_appearance_count[team_key.id()] += 1
+
+                if (
+                    award.award_type_enum == AwardType.WINNER
+                    and award.event_type_enum == EventType.CMP_FINALS
+                ):
+                    einstein_winner_count[team_key.id()] += 1
+
         return [
             cls._create_leaderboard_from_dict_counts(
                 banner_count, Insight.TYPED_LEADERBOARD_BLUE_BANNERS, year
@@ -309,6 +328,19 @@ class InsightsHelper(object):
             cls._create_leaderboard_from_dict_counts(
                 non_cmp_event_win_count,
                 Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS,
+                year,
+            ),
+            cls._create_leaderboard_from_dict_counts(
+                div_winner_count, Insight.TYPED_LEADERBOARD_MOST_DIVISION_WINS, year
+            ),
+            cls._create_leaderboard_from_dict_counts(
+                div_finals_appearance_count,
+                Insight.TYPED_LEADERBOARD_MOST_DIVISION_FINALS_APPEARANCES,
+                year,
+            ),
+            cls._create_leaderboard_from_dict_counts(
+                einstein_winner_count,
+                Insight.TYPED_LEADERBOARD_MOST_WORLD_CHAMPIONSHIP_WINS,
                 year,
             ),
         ]
@@ -508,9 +540,7 @@ class InsightsHelper(object):
         Returns an Insight where the data is a list of tuples:
         (week string, list of highest scoring matches)
         """
-        highscore_matches_by_week = (
-            []
-        )  # tuples: week, list of matches (if there are ties)
+        highscore_matches_by_week = []  # tuples: week, list of matches (if there are ties)
         for week, week_events in week_event_matches:
             week_highscore_matches = []
             highscore = 0
@@ -875,9 +905,9 @@ class InsightsHelper(object):
                 roundedScore = margin - int(margin % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_winning_margin_distribution_normalized:
-                    elim_winning_margin_distribution_normalized[
-                        roundedScore
-                    ] += contribution
+                    elim_winning_margin_distribution_normalized[roundedScore] += (
+                        contribution
+                    )
                 else:
                     elim_winning_margin_distribution_normalized[roundedScore] = (
                         contribution
