@@ -1007,6 +1007,17 @@ export type LeaderboardInsight = {
   /** Year the insight was measured in (year=0 for overall insights). */
   year: number;
 };
+export type NotablesInsight = {
+  data: {
+    entries: {
+      /** A list of events this team achieved the notable at. This type may change over time. */
+      context: string[];
+      team_key: string;
+    }[];
+  };
+  name: string;
+  year: number;
+}[];
 /**
  * Returns API status, and TBA status information.
  */
@@ -3711,6 +3722,44 @@ export function getInsightsLeaderboardsYear(
         status: 404;
       }
   >(`/insights/leaderboards/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets a list of `NotablesInsight` objects from a specific year. Use year=0 for overall.
+ */
+export function getInsightsNotablesYear(
+  {
+    ifNoneMatch,
+    year,
+  }: {
+    ifNoneMatch?: string;
+    year: number;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: NotablesInsight[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/insights/notables/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
