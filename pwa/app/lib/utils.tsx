@@ -1,5 +1,6 @@
 import { Params } from '@remix-run/react';
 import { type ClassValue, clsx } from 'clsx';
+import React from 'react';
 import { twMerge } from 'tailwind-merge';
 
 import { WltRecord, getStatus } from '~/api/v3';
@@ -113,4 +114,16 @@ export function addRecords(record1: WltRecord, record2: WltRecord): WltRecord {
 
 export function winrateFromRecord(record: WltRecord): number {
   return record.wins / Math.max(1, record.wins + record.losses + record.ties);
+}
+
+export function joinComponents(
+  components: React.ReactNode[],
+  joinString: string | React.ReactNode,
+) {
+  return components.map((comp, index) => (
+    <React.Fragment key={index}>
+      {comp}
+      {index !== components.length - 1 && joinString}
+    </React.Fragment>
+  ));
 }
