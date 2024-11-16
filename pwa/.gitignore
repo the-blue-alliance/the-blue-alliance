@@ -4,3 +4,7 @@ node_modules
 /build
 /coverage
 .env
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
