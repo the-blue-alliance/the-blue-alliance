@@ -60,7 +60,7 @@
   "devDependencies": {
     "@iconify/json": "2.2.272",
     "@julr/vite-plugin-validate-env": "1.1.1",
-    "@playwright/test": "1.48.2",
+    "@playwright/test": "1.49.0",
     "@remix-run/dev": "2.14.0",
     "@sentry/vite-plugin": "2.22.6",
     "@svgr/core": "8.1.0",
