@@ -21,29 +21,43 @@ test.describe('/team/604/2024', () => {
     await expect(
       page.locator('li').filter({ hasText: 'Einstein' }),
     ).toBeVisible();
+    await expect(
+      page.locator('li').filter({ hasText: 'Sunset Showdown' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('li').filter({ hasText: 'Chezy Champs' }),
+    ).toBeVisible();
   });
 
   test('Event sections', async ({ page }) => {
     await expect(
-      page.getByRole('link', { name: 'Silicon Valley Regional' }),
+      page
+        .getByRole('heading', { name: 'Silicon Valley Regional' })
+        .getByRole('link'),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Sacramento Regional' }),
+      page
+        .getByRole('heading', { name: 'Sacramento Regional' })
+        .getByRole('link'),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Monterey Bay Regional' }),
+      page
+        .getByRole('heading', { name: 'Monterey Bay Regional' })
+        .getByRole('link'),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Milstein Division' }),
+      page
+        .getByRole('heading', { name: 'Milstein Division' })
+        .getByRole('link'),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Einstein Field' }),
+      page.getByRole('heading', { name: 'Einstein Field' }).getByRole('link'),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Sunset Showdown' }),
+      page.getByRole('heading', { name: 'Sunset Showdown' }).getByRole('link'),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Chezy Champs' }),
+      page.getByRole('heading', { name: 'Chezy Champs' }).getByRole('link'),
     ).toBeVisible();
   });
 
