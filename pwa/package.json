@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@iconify/json": "2.2.277",
-    "@julr/vite-plugin-validate-env": "1.1.1",
+    "@julr/vite-plugin-validate-env": "1.2.0",
     "@playwright/test": "1.49.0",
     "@remix-run/dev": "2.14.0",
     "@sentry/vite-plugin": "2.22.6",
