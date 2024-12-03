@@ -2,11 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('navbar is visible', async ({ page }) => {
   await page.goto('http://localhost:5173/');
-  await expect(
-    page.locator('div').filter({
-      hasText: 'The Blue AlliancemyTBAEventsTeamsGameDayInsightsMore',
-    }),
-  ).toBeVisible();
+  await expect(page.locator('nav')).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'The Blue Alliance' }),
   ).toBeVisible();
@@ -27,7 +23,7 @@ test('navbar is visible', async ({ page }) => {
 
 test('(mobile) navbar is visible', async ({ page }) => {
   await page.goto('http://localhost:5173/');
-  await expect(page.getByLabel('Main')).toBeVisible();
+  await expect(page.locator('nav')).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'The Blue Alliance' }),
   ).toBeVisible();

@@ -104,6 +104,8 @@ export default function TeamPage(): React.JSX.Element {
   const { team, history, yearsParticipated, socials } =
     useLoaderData<typeof loader>();
 
+  yearsParticipated.sort((a, b) => b - a);
+
   return (
     <div className="flex flex-wrap sm:flex-nowrap">
       <div className="top-0 mr-4 pt-5 sm:sticky">
@@ -165,6 +167,7 @@ export default function TeamPage(): React.JSX.Element {
                       .map((a) => {
                         const teamRecipients = a.recipient_list
                           .filter((r) => r.awardee !== null)
+                          .filter((r) => r.awardee !== '')
                           .filter((r) => r.team_key === team.key)
                           .map((r) => r.awardee);
 

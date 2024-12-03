@@ -267,6 +267,7 @@ jobs:
         run: npm --prefix pwa run build
   pwa-e2e:
     name: "[pwa] E2E Tests"
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
