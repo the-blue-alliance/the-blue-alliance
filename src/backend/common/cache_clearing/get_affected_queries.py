@@ -315,5 +315,6 @@ def insight_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuer
     queries: List[CachedDatabaseQuery] = []
     for year in years:
         queries.append(insight_query.InsightsLeaderboardsYearQuery(year))
+        queries.append(insight_query.InsightsNotablesYearQuery(year))
 
     return _queries_to_cache_keys_and_queries(queries)
