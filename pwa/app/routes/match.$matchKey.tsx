@@ -1,13 +1,13 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import {
   type ClientLoaderFunctionArgs,
-  Link,
   MetaFunction,
   Params,
   useLoaderData,
 } from '@remix-run/react';
 
 import { getEvent, getMatch } from '~/api/v3';
+import { EventLink } from '~/components/tba/links';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
 
 async function loadData(params: Params) {
@@ -78,9 +78,9 @@ export default function EventPage() {
       <h1 className="mt-5 text-4xl">
         {matchTitleShort(match, event)}{' '}
         <small className="text-xl">
-          <Link to={`/event/${event.key}`}>
+          <EventLink eventOrKey={event}>
             {event.name} {event.year}
-          </Link>
+          </EventLink>
         </small>
       </h1>
     </div>

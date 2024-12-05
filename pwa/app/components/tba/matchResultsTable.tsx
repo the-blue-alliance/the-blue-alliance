@@ -8,6 +8,7 @@ import { Fragment, useMemo } from 'react';
 import PlayCircle from '~icons/bi/play-circle';
 
 import { Event, Match, Team } from '~/api/v3';
+import { TeamLink } from '~/components/tba/links';
 import {
   TooltipContent,
   TooltipProvider,
@@ -284,7 +285,9 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
                   surrogate={surrogate}
                 >
                   <ConditionalTooltip dq={dq} surrogate={surrogate}>
-                    <Link to={`/team/${k.substring(3)}`}>{k.substring(3)}</Link>
+                    <TeamLink teamOrKey={k} year={event.year}>
+                      {k.substring(3)}
+                    </TeamLink>
                   </ConditionalTooltip>
                 </GridCell>
               );
@@ -311,7 +314,9 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
                   surrogate={surrogate}
                 >
                   <ConditionalTooltip dq={dq} surrogate={surrogate}>
-                    <Link to={`/team/${k.substring(3)}`}>{k.substring(3)}</Link>
+                    <TeamLink teamOrKey={k} year={event.year}>
+                      {k.substring(3)}
+                    </TeamLink>
                   </ConditionalTooltip>
                 </GridCell>
               );

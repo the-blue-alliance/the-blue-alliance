@@ -1,7 +1,6 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import {
   ClientLoaderFunctionArgs,
-  Link,
   MetaFunction,
   Params,
   useLoaderData,
@@ -14,6 +13,7 @@ import {
   getTeamSocialMedia,
   getTeamYearsParticipated,
 } from '~/api/v3';
+import { EventLink, TeamLink } from '~/components/tba/links';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import {
   Select,
@@ -153,12 +153,12 @@ export default function TeamPage(): React.JSX.Element {
             {history.events.map((e) => (
               <TableRow key={e.key}>
                 <TableCell>
-                  <Link to={`/team/${team.team_number}/${e.year}`}>
+                  <TeamLink teamOrKey={team} year={e.year}>
                     {e.year}
-                  </Link>
+                  </TeamLink>
                 </TableCell>
                 <TableCell>
-                  <Link to={`/event/${e.key}`}>{e.name}</Link>
+                  <EventLink eventOrKey={e}>{e.name}</EventLink>
                 </TableCell>
                 <TableCell>
                   {joinComponents(

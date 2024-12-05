@@ -286,7 +286,12 @@ export default function EventPage() {
             <div className="basis-full lg:basis-1/2">{leftSideMatches}</div>
 
             <div className="basis-full lg:basis-1/2">
-              {alliances && <AllianceSelectionTable alliances={alliances} />}
+              {alliances && (
+                <AllianceSelectionTable
+                  alliances={alliances}
+                  year={event.year}
+                />
+              )}
               {rightSideElims}
             </div>
           </div>
@@ -351,6 +356,7 @@ function AwardsTab({ awards }: { awards: Award[] }) {
                     <AwardRecipientLink
                       recipient={r}
                       key={`${award.award_type}-${r.awardee}-${r.team_key}`}
+                      year={award.year}
                     />,
                   ])}
               </dd>

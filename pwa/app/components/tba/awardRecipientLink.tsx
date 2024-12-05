@@ -1,16 +1,17 @@
-import { Link } from '@remix-run/react';
-
 import { AwardRecipient } from '~/api/v3';
+import { TeamLink } from '~/components/tba/links';
 
 export default function AwardRecipientLink({
   recipient,
+  year,
 }: {
   recipient: AwardRecipient;
+  year?: number;
 }) {
   const teamLink = recipient.team_key ? (
-    <Link to={`/team/${recipient.team_key.substring(3)}`}>
+    <TeamLink teamOrKey={recipient.team_key} year={year}>
       {recipient.team_key.substring(3)}
-    </Link>
+    </TeamLink>
   ) : (
     <></>
   );
