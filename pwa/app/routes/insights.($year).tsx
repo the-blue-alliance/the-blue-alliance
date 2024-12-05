@@ -12,6 +12,7 @@ import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 
 import { LeaderboardInsight, getInsightsLeaderboardsYear } from '~/api/v3';
+import { TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {
   Card,
@@ -236,9 +237,7 @@ function LeaderboardKeyLink({
   keyVal: string;
 }) {
   if (keyType === 'team') {
-    return (
-      <Link to={`/team/${keyVal.substring(3)}`}>{keyVal.substring(3)}</Link>
-    );
+    return <TeamLink teamOrKey={keyVal}>{keyVal.substring(3)}</TeamLink>;
   }
   return <Link to={`/${keyType}/${keyVal}`}>{keyVal}</Link>;
 }

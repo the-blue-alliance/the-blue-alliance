@@ -11,10 +11,14 @@ import { InView } from 'react-intersection-observer';
 
 import {
   Award,
+  EliminationAlliance,
   Event,
+  EventDistrictPoints,
   Match,
   Team,
   WltRecord,
+  getEventAlliances,
+  getEventDistrictPoints,
   getTeam,
   getTeamAwardsByYear,
   getTeamEventsByYear,
@@ -120,6 +124,32 @@ async function loadData(params: Params) {
     throw new Response(null, { status: 404 });
   }
 
+  // TODO: fetch these in parallel after initial render
+  const eventDistrictPts: Record<string, EventDistrictPoints | null> = {};
+  await Promise.all(
+    events.data.map(async (e) => {
+      if (
+        [
+          EventType.DISTRICT,
+          EventType.DISTRICT_CMP,
+          EventType.DISTRICT_CMP_DIVISION,
+        ].includes(e.event_type)
+      ) {
+        const resp = await getEventDistrictPoints({ eventKey: e.key });
+        eventDistrictPts[e.key] = resp.status === 200 ? resp.data : null;
+      } else {
+        eventDistrictPts[e.key] = null;
+      }
+    }),
+  );
+  const eventAlliances: Record<string, EliminationAlliance[] | null> = {};
+  await Promise.all(
+    events.data.map(async (e) => {
+      const resp = await getEventAlliances({ eventKey: e.key });
+      eventAlliances[e.key] = resp.status === 200 ? resp.data : null;
+    }),
+  );
+
   return {
     year,
     team: team.data,
@@ -130,6 +160,8 @@ async function loadData(params: Params) {
     matches: matches.data,
     statuses: statuses.data,
     awards: awards.data,
+    eventDistrictPts: eventDistrictPts,
+    eventAlliances: eventAlliances,
   };
 }
 
@@ -167,6 +199,8 @@ export default function TeamPage(): React.JSX.Element {
     matches,
     statuses,
     awards,
+    eventDistrictPts,
+    eventAlliances,
   } = useLoaderData<typeof loader>();
   const [eventsInView, setEventsInView] = useState(new Set());
 
@@ -279,6 +313,10 @@ export default function TeamPage(): React.JSX.Element {
                 event={e}
                 matches={matches.filter((m) => m.event_key === e.key)}
                 status={statuses[e.key]}
+                team={team}
+                awards={awards.filter((a) => a.event_key === e.key)}
+                maybeDistrictPoints={eventDistrictPts[e.key]}
+                maybeAlliances={eventAlliances[e.key]}
               />
               <Separator className="my-4" />
             </InView>
