@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.5
+ * 3.9.6
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -1018,6 +1018,16 @@ export type NotablesInsight = {
   name: string;
   year: number;
 }[];
+export type SearchIndex = {
+  teams: {
+    key: string;
+    nickname: string;
+  }[];
+  events: {
+    key: string;
+    name: string;
+  }[];
+};
 /**
  * Returns API status, and TBA status information.
  */
@@ -3760,6 +3770,44 @@ export function getInsightsNotablesYear(
         status: 404;
       }
   >(`/insights/notables/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets a large blob of data that is used on the frontend for searching. May change without notice.
+ */
+export function getSearchIndex(
+  {
+    ifNoneMatch,
+    year,
+  }: {
+    ifNoneMatch?: string;
+    year: number;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: SearchIndex;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >('/search_index', {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
