@@ -58,7 +58,7 @@
     "vaul": "1.1.1"
   },
   "devDependencies": {
-    "@iconify/json": "2.2.281",
+    "@iconify/json": "2.2.282",
     "@julr/vite-plugin-validate-env": "1.2.0",
     "@playwright/test": "1.49.1",
     "@remix-run/dev": "2.15.1",
