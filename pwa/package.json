@@ -31,7 +31,7 @@
     "@radix-ui/react-separator": "1.1.0",
     "@radix-ui/react-slot": "1.1.0",
     "@radix-ui/react-tabs": "1.1.1",
-    "@radix-ui/react-tooltip": "1.1.4",
+    "@radix-ui/react-tooltip": "1.1.5",
     "@remix-run/express": "2.15.1",
     "@remix-run/node": "2.15.1",
     "@remix-run/react": "2.15.1",
