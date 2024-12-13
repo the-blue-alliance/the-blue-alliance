@@ -41,6 +41,7 @@ from backend.api.handlers.insights import (
 )
 from backend.api.handlers.match import match, zebra_motionworks
 from backend.api.handlers.media import media_tags
+from backend.api.handlers.search import search_index
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
     team,
@@ -281,6 +282,9 @@ api_v3.add_url_rule(
     "/insights/leaderboards/<int:year>", view_func=insights_leaderboards_year
 )
 api_v3.add_url_rule("/insights/notables/<int:year>", view_func=insights_notables_year)
+
+# Search
+api_v3.add_url_rule("/search_index", view_func=search_index)
 
 # Trusted API
 trusted_api = Blueprint("trusted_api", __name__, url_prefix="/api/trusted/v1")
