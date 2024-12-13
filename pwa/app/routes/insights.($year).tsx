@@ -6,13 +6,19 @@ import {
   Params,
   useLoaderData,
 } from '@remix-run/react';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 
-import { LeaderboardInsight, getInsightsLeaderboardsYear } from '~/api/v3';
-import { TeamLink } from '~/components/tba/links';
+import {
+  LeaderboardInsight,
+  NotablesInsight,
+  getInsightsLeaderboardsYear,
+  getInsightsNotablesYear,
+} from '~/api/v3';
+import { TitledCard } from '~/components/tba/cards';
+import { EventLink, TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {
   Card,
@@ -35,8 +41,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { NAME_TO_DISPLAY_NAME } from '~/lib/insightUtils';
-import { pluralize } from '~/lib/utils';
+import {
+  LEADERBOARD_NAME_TO_DISPLAY_NAME,
+  NOTABLE_NAME_TO_DISPLAY_NAME,
+  leaderboardFromNotable,
+} from '~/lib/insightUtils';
+import { joinComponents, pluralize } from '~/lib/utils';
 
 async function loadData(params: Params) {
   let numericYear = -1;
@@ -55,21 +65,28 @@ async function loadData(params: Params) {
     });
   }
 
-  const leaderboards = await getInsightsLeaderboardsYear({ year: numericYear });
+  const [leaderboards, notables] = await Promise.all([
+    getInsightsLeaderboardsYear({ year: numericYear }),
+    getInsightsNotablesYear({ year: numericYear }),
+  ]);
 
-  if (leaderboards.status !== 200) {
+  if (leaderboards.status !== 200 || notables.status !== 200) {
     throw new Response(null, {
       status: 500,
     });
   }
 
-  if (leaderboards.data.length === 0) {
+  if (leaderboards.data.length === 0 || notables.data.length === 0) {
     throw new Response(null, {
       status: 404,
     });
   }
 
-  return { year: numericYear, leaderboards: leaderboards.data };
+  return {
+    year: numericYear,
+    leaderboards: leaderboards.data,
+    notables: notables.data,
+  };
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -93,11 +110,15 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export default function InsightsPage() {
-  const { leaderboards, year } = useLoaderData<typeof loader>();
+  const { leaderboards, year, notables } = useLoaderData<typeof loader>();
 
   return (
     <div>
-      <SingleYearInsights leaderboards={leaderboards} year={year} />
+      <SingleYearInsights
+        leaderboards={leaderboards}
+        year={year}
+        notables={notables}
+      />
     </div>
   );
 }
@@ -105,17 +126,31 @@ export default function InsightsPage() {
 function SingleYearInsights({
   year,
   leaderboards,
+  notables,
 }: {
   year: number;
   leaderboards: LeaderboardInsight[];
+  notables: NotablesInsight[];
 }) {
+  const notableDiv =
+    year !== 0 ? (
+      <NotablesYearSpecific notables={notables} />
+    ) : (
+      <NotablesOverall
+        notables={notables.filter((n) => n.name !== 'notables_hall_of_fame')}
+      />
+    );
+
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">
         Insights ({year > 0 ? year : 'Overall'})
       </h1>
 
-      <h3 className="mb-4 text-xl font-medium">Leaderboards</h3>
+      <h3 className="mb-4 text-xl font-medium">Notables</h3>
+      {notableDiv}
+
+      <h3 className="my-4 text-xl font-medium">Leaderboards</h3>
       <div className="gap-3 lg:grid lg:grid-cols-2">
         {leaderboards.map((l, i) => (
           <Leaderboard leaderboard={l} key={i} />
@@ -128,11 +163,17 @@ function SingleYearInsights({
 const MAX_KEYS_PER_ROW = 20;
 const PRE_EXPANDED_ROWS = 10;
 
-function Leaderboard({ leaderboard }: { leaderboard: LeaderboardInsight }) {
+function Leaderboard({
+  leaderboard,
+  contextTooltipMap,
+}: {
+  leaderboard: LeaderboardInsight;
+  contextTooltipMap?: Record<string, ReactNode>;
+}) {
   const [expanded, setExpanded] = React.useState(false);
 
   const displayName =
-    NAME_TO_DISPLAY_NAME[leaderboard.name] || leaderboard.name;
+    LEADERBOARD_NAME_TO_DISPLAY_NAME[leaderboard.name] || leaderboard.name;
 
   return (
     <Card className="border-gray-300">
@@ -177,6 +218,7 @@ function Leaderboard({ leaderboard }: { leaderboard: LeaderboardInsight }) {
                       cutoffSize={MAX_KEYS_PER_ROW}
                       keyType={leaderboard.data.key_type}
                       keyVals={r.keys}
+                      contextTooltipMap={contextTooltipMap}
                     />
                   </TableCell>
                 </TableRow>
@@ -192,17 +234,28 @@ function LeaderboardKeyList({
   keyVals,
   keyType,
   cutoffSize,
+  contextTooltipMap,
 }: {
   keyType: LeaderboardInsight['data']['key_type'];
   keyVals: string[];
   cutoffSize: number;
+  contextTooltipMap?: Record<string, ReactNode>;
 }) {
   return (
     <>
       {keyVals.slice(0, cutoffSize).map((k, i) => (
         <React.Fragment key={k}>
           {i > 0 && ', '}
-          <LeaderboardKeyLink keyType={keyType} keyVal={k} />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <LeaderboardKeyLink keyType={keyType} keyVal={k} />
+              </TooltipTrigger>
+              <TooltipContent>
+                {contextTooltipMap?.[k] ? <p>{contextTooltipMap[k]}</p> : null}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </React.Fragment>
       ))}
       {keyVals.length > cutoffSize && (
@@ -240,4 +293,88 @@ function LeaderboardKeyLink({
     return <TeamLink teamOrKey={keyVal}>{keyVal.substring(3)}</TeamLink>;
   }
   return <Link to={`/${keyType}/${keyVal}`}>{keyVal}</Link>;
+}
+
+function NotablesYearSpecific({ notables }: { notables: NotablesInsight[] }) {
+  const hof = notables.find((n) => n.name === 'notables_hall_of_fame');
+  const worldChamps = notables.find(
+    (n) => n.name === 'notables_world_champions',
+  );
+
+  return (
+    <div className="gap-3 lg:grid lg:grid-cols-2">
+      {hof && (
+        <TitledCard
+          cardTitle={joinComponents(
+            hof.data.entries.map((e) => (
+              <TeamLink key={e.team_key} teamOrKey={e.team_key} year={hof.year}>
+                {e.team_key.substring(3)}
+              </TeamLink>
+            )),
+            '-',
+          )}
+          cardSubtitle={
+            <>
+              {NOTABLE_NAME_TO_DISPLAY_NAME[hof.name] || hof.name} {hof.year}
+            </>
+          }
+        />
+      )}
+      {worldChamps && (
+        <TitledCard
+          cardTitle={joinComponents(
+            worldChamps.data.entries.map((e) => (
+              <TeamLink
+                key={e.team_key}
+                teamOrKey={e.team_key}
+                year={worldChamps.year}
+              >
+                {e.team_key.substring(3)}
+              </TeamLink>
+            )),
+            '-',
+          )}
+          cardSubtitle={
+            <>
+              {NOTABLE_NAME_TO_DISPLAY_NAME[worldChamps.name] ||
+                worldChamps.name}{' '}
+              {worldChamps.year}
+            </>
+          }
+        />
+      )}
+    </div>
+  );
+}
+
+function NotablesOverall({ notables }: { notables: NotablesInsight[] }) {
+  return (
+    <div className="gap-3 lg:grid lg:grid-cols-2">
+      {notables.map((n, i) => {
+        const leaderboard = leaderboardFromNotable(n);
+        const context = n.data.entries.reduce<Record<string, ReactNode>>(
+          (acc, entry) => {
+            acc[entry.team_key] = joinComponents(
+              entry.context.map((c, i) => (
+                <EventLink eventOrKey={c} key={i}>
+                  {c}
+                </EventLink>
+              )),
+              ', ',
+            );
+            return acc;
+          },
+          {},
+        );
+
+        return (
+          <Leaderboard
+            leaderboard={leaderboard}
+            key={i}
+            contextTooltipMap={context}
+          />
+        );
+      })}
+    </div>
+  );
 }

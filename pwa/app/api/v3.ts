@@ -1017,7 +1017,7 @@ export type NotablesInsight = {
   };
   name: string;
   year: number;
-}[];
+};
 export type SearchIndex = {
   teams: {
     key: string;
