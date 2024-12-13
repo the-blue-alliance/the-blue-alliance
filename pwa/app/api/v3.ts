@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.6
+ * 3.9.7
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -3428,6 +3428,44 @@ export function getDistrictsByYear(
         status: 404;
       }
   >(`/districts/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets a list of District objects with the given district abbreviation. This accounts for district abbreviation changes, such as MAR to FMA.
+ */
+export function getDistrict(
+  {
+    ifNoneMatch,
+    districtAbbreviation,
+  }: {
+    ifNoneMatch?: string;
+    districtAbbreviation: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: DistrictList[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtAbbreviation)}/history`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
