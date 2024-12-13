@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
-
 /**
  * By default, Remix will handle generating the HTTP Response for you.
  * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
