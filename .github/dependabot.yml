@@ -37,6 +37,9 @@ updates:
       patterns:
         - "embla-carousel-autoplay"
         - "embla-carousel-react"
+    radix-ui:
+      patterns:
+        - "@radix-ui/*"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
