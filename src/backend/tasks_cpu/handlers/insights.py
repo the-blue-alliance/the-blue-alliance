@@ -147,7 +147,7 @@ def enqueue_all_insights_of_kind(kind: str) -> Response:
             url=url_for("insights.do_year_insights", kind=insight_type, year=year),
             method="GET",
             target="py3-tasks-cpu",
-            queue_name="default",
+            queue_name="run-in-order",
         )
 
     if (
