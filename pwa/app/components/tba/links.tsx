@@ -16,7 +16,10 @@ const TeamLink = React.forwardRef<
       ? removeNonNumeric(teamOrKey)
       : teamOrKey.team_number;
 
-  const href = `/team/${teamNumber}${year ? `/${year}` : ''}`;
+  const yearSuffix =
+    year === undefined ? '' : year === 0 ? 'history' : year.toString();
+
+  const href = `/team/${teamNumber}/${yearSuffix}`;
   return <Link to={href} {...props} ref={ref} />;
 });
 TeamLink.displayName = 'TeamLink';

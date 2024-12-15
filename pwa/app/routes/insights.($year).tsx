@@ -138,6 +138,7 @@ function SingleYearInsights({
     ) : (
       <NotablesOverall
         notables={notables.filter((n) => n.name !== 'notables_hall_of_fame')}
+        year={0}
       />
     );
 
@@ -153,7 +154,7 @@ function SingleYearInsights({
       <h3 className="my-4 text-xl font-medium">Leaderboards</h3>
       <div className="gap-3 lg:grid lg:grid-cols-2">
         {leaderboards.map((l, i) => (
-          <Leaderboard leaderboard={l} key={i} />
+          <Leaderboard leaderboard={l} key={i} year={year} />
         ))}
       </div>
     </div>
@@ -166,9 +167,11 @@ const PRE_EXPANDED_ROWS = 10;
 function Leaderboard({
   leaderboard,
   contextTooltipMap,
+  year,
 }: {
   leaderboard: LeaderboardInsight;
   contextTooltipMap?: Record<string, ReactNode>;
+  year: number;
 }) {
   const [expanded, setExpanded] = React.useState(false);
 
@@ -219,6 +222,7 @@ function Leaderboard({
                       keyType={leaderboard.data.key_type}
                       keyVals={r.keys}
                       contextTooltipMap={contextTooltipMap}
+                      year={year}
                     />
                   </TableCell>
                 </TableRow>
@@ -235,11 +239,13 @@ function LeaderboardKeyList({
   keyType,
   cutoffSize,
   contextTooltipMap,
+  year,
 }: {
   keyType: LeaderboardInsight['data']['key_type'];
   keyVals: string[];
   cutoffSize: number;
   contextTooltipMap?: Record<string, ReactNode>;
+  year: number;
 }) {
   return (
     <>
@@ -249,11 +255,13 @@ function LeaderboardKeyList({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <LeaderboardKeyLink keyType={keyType} keyVal={k} />
+                <LeaderboardKeyLink keyType={keyType} keyVal={k} year={year} />
               </TooltipTrigger>
-              <TooltipContent>
-                {contextTooltipMap?.[k] ? <p>{contextTooltipMap[k]}</p> : null}
-              </TooltipContent>
+              {contextTooltipMap?.[k] ? (
+                <TooltipContent>
+                  <p>{contextTooltipMap[k]}</p>
+                </TooltipContent>
+              ) : null}
             </Tooltip>
           </TooltipProvider>
         </React.Fragment>
@@ -270,7 +278,11 @@ function LeaderboardKeyList({
                 {keyVals.map((k, i) => (
                   <React.Fragment key={k}>
                     {i > 0 && ', '}
-                    <LeaderboardKeyLink keyType={keyType} keyVal={k} />
+                    <LeaderboardKeyLink
+                      keyType={keyType}
+                      keyVal={k}
+                      year={year}
+                    />
                   </React.Fragment>
                 ))}
               </p>
@@ -285,12 +297,18 @@ function LeaderboardKeyList({
 function LeaderboardKeyLink({
   keyVal,
   keyType,
+  year,
 }: {
   keyType: LeaderboardInsight['data']['key_type'];
   keyVal: string;
+  year: number;
 }) {
   if (keyType === 'team') {
-    return <TeamLink teamOrKey={keyVal}>{keyVal.substring(3)}</TeamLink>;
+    return (
+      <TeamLink teamOrKey={keyVal} year={year}>
+        {keyVal.substring(3)}
+      </TeamLink>
+    );
   }
   return <Link to={`/${keyType}/${keyVal}`}>{keyVal}</Link>;
 }
@@ -311,7 +329,7 @@ function NotablesYearSpecific({ notables }: { notables: NotablesInsight[] }) {
                 {e.team_key.substring(3)}
               </TeamLink>
             )),
-            '-',
+            <span className="font-medium">, </span>,
           )}
           cardSubtitle={
             <>
@@ -332,7 +350,7 @@ function NotablesYearSpecific({ notables }: { notables: NotablesInsight[] }) {
                 {e.team_key.substring(3)}
               </TeamLink>
             )),
-            '-',
+            <span className="font-medium">, </span>,
           )}
           cardSubtitle={
             <>
@@ -347,7 +365,13 @@ function NotablesYearSpecific({ notables }: { notables: NotablesInsight[] }) {
   );
 }
 
-function NotablesOverall({ notables }: { notables: NotablesInsight[] }) {
+function NotablesOverall({
+  notables,
+  year,
+}: {
+  notables: NotablesInsight[];
+  year: number;
+}) {
   return (
     <div className="gap-3 lg:grid lg:grid-cols-2">
       {notables.map((n, i) => {
@@ -372,6 +396,7 @@ function NotablesOverall({ notables }: { notables: NotablesInsight[] }) {
             leaderboard={leaderboard}
             key={i}
             contextTooltipMap={context}
+            year={year}
           />
         );
       })}
