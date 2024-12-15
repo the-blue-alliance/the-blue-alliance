@@ -148,7 +148,7 @@ class CachedDatabaseQuery(
             result = yield self._query_async(*args, **kwargs)
             return result
 
-        with Span("{}._do_query".format(self.__class__.__name__)):
+        with Span("{}._do_dict_query".format(self.__class__.__name__)):
             cache_key = self.dict_cache_key(_dict_version)
             cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
             if cached_query_result is None:
