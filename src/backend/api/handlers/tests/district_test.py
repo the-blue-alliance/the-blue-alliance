@@ -26,11 +26,25 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
         id="2019fim",
         year=2019,
         abbreviation="fim",
+        display_name="Michigan",
     ).put()
     District(
         id="2020fim",
         year=2020,
         abbreviation="fim",
+        display_name="Michigan",
+    ).put()
+    District(
+        id="2014mar",
+        year=2014,
+        abbreviation="mar",
+        display_name="Mid-Atlantic",
+    ).put()
+    District(
+        id="2024fma",
+        year=2024,
+        abbreviation="fma",
+        display_name="Mid-Atlantic",
     ).put()
     Event(
         id="2019casj",
@@ -115,6 +129,76 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "2020casf" in resp.json
     assert "2020casj" in resp.json
+
+    resp = api_client.get(
+        "/api/v3/district/fim/history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    assert resp.json == [
+        {
+            "abbreviation": "fim",
+            "display_name": "Michigan",
+            "key": "2019fim",
+            "year": 2019,
+        },
+        {
+            "abbreviation": "fim",
+            "display_name": "Michigan",
+            "key": "2020fim",
+            "year": 2020,
+        },
+    ]
+
+    resp = api_client.get(
+        "/api/v3/district/notadistrict/history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == []
+
+    resp = api_client.get(
+        "/api/v3/district/fma/history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    assert resp.json == [
+        {
+            "abbreviation": "mar",
+            "display_name": "Mid-Atlantic",
+            "key": "2014mar",
+            "year": 2014,
+        },
+        {
+            "abbreviation": "fma",
+            "display_name": "Mid-Atlantic",
+            "key": "2024fma",
+            "year": 2024,
+        },
+    ]
+
+    resp = api_client.get(
+        "/api/v3/district/mar/history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 2
+    assert resp.json == [
+        {
+            "abbreviation": "mar",
+            "display_name": "Mid-Atlantic",
+            "key": "2014mar",
+            "year": 2014,
+        },
+        {
+            "abbreviation": "fma",
+            "display_name": "Mid-Atlantic",
+            "key": "2024fma",
+            "year": 2024,
+        },
+    ]
 
 
 def test_district_teams(ndb_stub, api_client: Client) -> None:

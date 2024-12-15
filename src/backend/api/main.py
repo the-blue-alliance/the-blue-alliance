@@ -17,6 +17,7 @@ from backend.api.handlers.client_api import (
 )
 from backend.api.handlers.district import (
     district_events,
+    district_history,
     district_list_year,
     district_rankings,
     district_teams,
@@ -121,6 +122,9 @@ CORS(
 api_v3.add_url_rule("/status", view_func=status)
 
 # District
+api_v3.add_url_rule(
+    "/district/<string:district_abbreviation>/history", view_func=district_history
+)
 api_v3.add_url_rule("/district/<string:district_key>/events", view_func=district_events)
 api_v3.add_url_rule(
     "/district/<string:district_key>/events/<model_type:model_type>",
@@ -298,17 +302,17 @@ trusted_api.add_url_rule(
     "/event/<string:event_key>/alliance_selections/update",
     methods=["POST"],
     view_func=update_event_alliances,
-),
+)
 trusted_api.add_url_rule(
     "/event/<string:event_key>/awards/update",
     methods=["POST"],
     view_func=update_event_awards,
-),
+)
 trusted_api.add_url_rule(
     "/event/<string:event_key>/info/update",
     methods=["POST"],
     view_func=update_event_info,
-),
+)
 trusted_api.add_url_rule(
     "/event/<string:event_key>/matches/update",
     methods=["POST"],
