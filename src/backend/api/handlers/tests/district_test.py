@@ -8,8 +8,10 @@ from backend.api.handlers.tests.helpers import (
     validate_simple_team_keys,
 )
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.award import Award
 from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
@@ -334,3 +336,56 @@ def test_district_list_year(ndb_stub, api_client: Client) -> None:
     district_keys = set([d["key"] for d in resp.json])
     assert "2020ne" in district_keys
     assert "2020fim" in district_keys
+
+
+def test_district_awards(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2024ne",
+        year=2024,
+        abbreviation="ne",
+    ).put()
+
+    Team(
+        id="frc2713",
+        team_number=2713,
+    ).put()
+
+    Event(
+        id="2024necmp",
+        year=2024,
+        event_short="necmp",
+        district_key=ndb.Key(District, "2024ne"),
+        event_type_enum=EventType.DISTRICT_CMP,
+    ).put()
+
+    Award(
+        id="2024necmp_1",
+        name_str="Winner",
+        event=ndb.Key(Event, "2024necmp"),
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.DISTRICT_CMP,
+        year=2024,
+        team_list=[ndb.Key(Team, "frc2713")],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2024ne/awards",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    assert resp.json == [
+        {
+            "award_type": AwardType.WINNER,
+            "event_key": "2024necmp",
+            "name": "Winner",
+            "recipient_list": [],
+            "year": 2024,
+        }
+    ]
