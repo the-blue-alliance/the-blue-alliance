@@ -8499,53 +8499,50 @@
         ]
       },
       "NotablesInsight": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "data": {
-              "type": "object",
-              "properties": {
-                "entries": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "context": {
-                        "type": "array",
-                        "description": "A list of events this team achieved the notable at. This type may change over time.",
-                        "items": {
-                          "type": "string"
-                        }
-                      },
-                      "team_key": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "context": {
+                      "type": "array",
+                      "description": "A list of events this team achieved the notable at. This type may change over time.",
+                      "items": {
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "context",
-                      "team_key"
-                    ]
-                  }
+                    "team_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "context",
+                    "team_key"
+                  ]
                 }
-              },
-              "required": [
-                "entries"
-              ]
+              }
             },
-            "name": {
-              "type": "string"
-            },
-            "year": {
-              "type": "integer"
-            }
+            "required": [
+              "entries"
+            ]
           },
-          "required": [
-            "data",
-            "name",
-            "year"
-          ]
-        }
+          "name": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "data",
+          "name",
+          "year"
+        ]
       },
       "History": {
         "type": "object",
