@@ -576,7 +576,7 @@ class InsightsHelper(object):
             "alliances": match.alliances,
             "score_breakdown": match.score_breakdown,
             "winning_alliance": match.winning_alliance,
-            "tba_video": match.tba_video,
+            "tba_video": None,
             "youtube_videos_formatted": match.youtube_videos_formatted,
         }
 
