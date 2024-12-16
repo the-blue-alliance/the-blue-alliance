@@ -3945,7 +3945,7 @@
           "event",
           "list"
         ],
-        "description": "Gets a list of events in the given district.",
+        "description": "Gets a list of awards in the given district.",
         "operationId": "getDistrictAwards",
         "parameters": [
           {
