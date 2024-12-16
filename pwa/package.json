@@ -13,7 +13,6 @@
     "format:fix": "prettier --write .",
     "start": "cross-env NODE_ENV=production node ./server.js",
     "typecheck": "tsc",
-    "generate-api": "oazapfts ../src/backend/web/static/swagger/api_v3.json --argumentStyle=object > app/api/v3.ts",
     "generate-pwa-assets": "pwa-assets-generator",
     "bundle-visualizer": "npx vite-bundle-visualizer",
     "test": "vitest ./app --coverage"
