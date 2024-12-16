@@ -3437,7 +3437,7 @@ export function getDistrictsByYear(
 /**
  * Gets a list of District objects with the given district abbreviation. This accounts for district abbreviation changes, such as MAR to FMA.
  */
-export function getDistrict(
+export function getDistrictHistory(
   {
     ifNoneMatch,
     districtAbbreviation,
@@ -3504,6 +3504,44 @@ export function getDistrictEvents(
         status: 404;
       }
   >(`/district/${encodeURIComponent(districtKey)}/events`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets a list of awards in the given district.
+ */
+export function getDistrictAwards(
+  {
+    ifNoneMatch,
+    districtKey,
+  }: {
+    ifNoneMatch?: string;
+    districtKey: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: Award[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/awards`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
@@ -3716,7 +3754,7 @@ export function getDistrictRankings(
   return oazapfts.fetchJson<
     | {
         status: 200;
-        data: DistrictRanking[];
+        data: DistrictRanking[] | null;
       }
     | {
         status: 304;

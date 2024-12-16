@@ -16,6 +16,7 @@ from backend.api.handlers.client_api import (
     update_model_preferences,
 )
 from backend.api.handlers.district import (
+    district_awards,
     district_events,
     district_history,
     district_list_year,
@@ -125,6 +126,7 @@ api_v3.add_url_rule("/status", view_func=status)
 api_v3.add_url_rule(
     "/district/<string:district_abbreviation>/history", view_func=district_history
 )
+api_v3.add_url_rule("/district/<string:district_key>/awards", view_func=district_awards)
 api_v3.add_url_rule("/district/<string:district_key>/events", view_func=district_events)
 api_v3.add_url_rule(
     "/district/<string:district_key>/events/<model_type:model_type>",
