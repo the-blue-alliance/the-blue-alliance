@@ -3511,7 +3511,7 @@ export function getDistrictEvents(
   });
 }
 /**
- * Gets a list of events in the given district.
+ * Gets a list of awards in the given district.
  */
 export function getDistrictAwards(
   {
