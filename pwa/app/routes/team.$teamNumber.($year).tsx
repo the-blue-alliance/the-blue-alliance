@@ -339,10 +339,10 @@ function StatsSection({
   awards: Award[];
 }) {
   const officialEvents = events.filter((e) =>
-    SEASON_EVENT_TYPES.has(e.event_type as EventType),
+    SEASON_EVENT_TYPES.has(e.event_type),
   );
   const unofficialEvents = events.filter(
-    (e) => !SEASON_EVENT_TYPES.has(e.event_type as EventType),
+    (e) => !SEASON_EVENT_TYPES.has(e.event_type),
   );
 
   const officialMatches = useMemo(

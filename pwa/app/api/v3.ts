@@ -7,6 +7,9 @@
 import * as Oazapfts from '@oazapfts/runtime';
 import * as QS from '@oazapfts/runtime/query';
 
+import { AwardType } from '~/lib/api/AwardType';
+import { EventType } from '~/lib/api/EventType';
+
 export const defaults: Oazapfts.Defaults<Oazapfts.CustomHeaders> = {
   headers: {},
   baseUrl: 'https://www.thebluealliance.com/api/v3',
@@ -125,7 +128,7 @@ export type Event = {
   /** Event short code, as provided by FIRST. */
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
-  event_type: number;
+  event_type: EventType;
   district: DistrictList | null;
   /** City, town, village, etc. the event is located in. */
   city: string | null;
@@ -187,7 +190,7 @@ export type Award = {
   /** The name of the award as provided by FIRST. May vary for the same award type. */
   name: string;
   /** Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6 */
-  award_type: number;
+  award_type: AwardType;
   /** The event_key of the event the award was won at. */
   event_key: string;
   /** A list of recipients of the award at the event. May have either a team_key or an awardee, both, or neither (in the case the award wasn't awarded at the event). */
@@ -217,7 +220,7 @@ export type EventSimple = {
   /** Event short code, as provided by FIRST. */
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
-  event_type: number;
+  event_type: EventType;
   district: DistrictList | null;
   /** City, town, village, etc. the event is located in. */
   city: string | null;
