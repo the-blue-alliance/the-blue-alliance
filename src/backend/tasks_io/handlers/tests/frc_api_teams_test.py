@@ -51,7 +51,7 @@ def test_enqueue_rolling(
             assert task_resp.status_code == 200
 
 
-@freeze_time("2020-4-10")
+@freeze_time("2020-4-2")
 def test_enqueue_rolling_no_output_in_taskqueue(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
