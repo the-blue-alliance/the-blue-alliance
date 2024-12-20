@@ -54,8 +54,8 @@ def enqueue_rolling_team_details() -> Response:
     every PERIOD days.
     """
     PERIOD = 14  # a particular team will be updated every PERIOD days
-    day_of_year = datetime.datetime.now().timetuple().tm_yday
-    bucket_num = int(day_of_year % PERIOD)
+    days_since_epoch = (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).days
+    bucket_num = int(days_since_epoch % PERIOD)
 
     highest_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
     highest_team_num = int(highest_team_key.id()[3:])
