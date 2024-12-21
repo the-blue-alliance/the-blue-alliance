@@ -96,7 +96,7 @@ jobs:
         run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -428,7 +428,7 @@ jobs:
         run: ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle
