@@ -168,7 +168,19 @@
       </tr>
       <tr>
         <td>Created - Updated</td>
-        <td><time datetime="{{ event.created|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time> - <time datetime="{{ event.updated|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.updated|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time></td>
+        <td>
+          {% if event.created %}
+          <time datetime="{{ event.created|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time>
+          {% else %}
+          ?
+          {% endif }
+          -
+          {% if event.updated %}
+          <time datetime="{{ event.updated|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.updated|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time>
+          {% else %}
+          ?
+          {% endif %}
+        </td>
       </tr>
     </table>
   </div>
