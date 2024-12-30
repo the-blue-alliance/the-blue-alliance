@@ -29,8 +29,9 @@ class EventDetailsManipulator(ManipulatorBase[EventDetails]):
         new_model: EventDetails,
         old_model: EventDetails,
         auto_union: bool = True,
+        update_manual_attrs: bool = True,
     ) -> EventDetails:
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
         return old_model
 
 

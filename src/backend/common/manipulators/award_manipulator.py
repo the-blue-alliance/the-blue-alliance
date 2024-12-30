@@ -26,7 +26,11 @@ class AwardManipulator(ManipulatorBase[Award]):
 
     @classmethod
     def updateMerge(
-        cls, new_model: Award, old_model: Award, auto_union: bool = True
+        cls,
+        new_model: Award,
+        old_model: Award,
+        auto_union: bool = True,
+        update_manual_attrs: bool = True,
     ) -> Award:
         auto_union_list_attrs = {
             "team_list",
@@ -35,7 +39,7 @@ class AwardManipulator(ManipulatorBase[Award]):
 
         json_list_attrs = {"recipient_json_list"}
 
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
 
         for attr in auto_union_list_attrs:
             # JSON equaltiy comparison is not deterministic

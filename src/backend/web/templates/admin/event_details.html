@@ -167,6 +167,10 @@
         <td>{{event.remap_teams}}</td>
       </tr>
       <tr>
+        <td>Manual Attrs</td>
+        <td>{{event.manual_attrs}}</td>
+      </tr>
+      <tr>
         <td>Created - Updated</td>
         <td><time datetime="{{ event.created|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time> - <time datetime="{{ event.updated|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.updated|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time></td>
       </tr>
