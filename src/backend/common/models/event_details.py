@@ -112,7 +112,8 @@ class EventDetails(CachedModel):
                 if game_year == 2021:
                     # 2021 did not have matches played for rankings
                     continue
-
+                elif not rank["sort_orders"]:
+                    continue
                 elif game_year >= 2017:
                     rank["extra_stats"] = [
                         int(round(rank["sort_orders"][0] * rank["matches_played"])),
