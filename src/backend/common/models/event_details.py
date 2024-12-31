@@ -175,10 +175,11 @@ class EventDetails(CachedModel):
             row = [rank["rank"], rank["team_key"][3:]]
             # for i, item in enumerate(rank['sort_orders']):
             for i, precision in enumerate(precisions):
-                # row.append('%.*f' % (precisions[i], round(item, precisions[i])))
-                row.append(
-                    "%.*f" % (precision, round(rank["sort_orders"][i], precision))
-                )
+                if i < len(rank["sort_orders"]):
+                    # row.append('%.*f' % (precisions[i], round(item, precisions[i])))
+                    row.append(
+                        "%.*f" % (precision, round(rank["sort_orders"][i], precision))
+                    )
             if rank["record"]:
                 record = none_throws(rank["record"])
                 row.append(f"{record['wins']}-{record['losses']}-{record['ties']}")

@@ -273,6 +273,40 @@ def test_rankings_table_game_year_2021(ndb_context) -> None:
     ]
 
 
+def test_rankings_table_game_no_sort_orders(ndb_context) -> None:
+    event_key = "2024test"
+    _create_test_event(event_key)
+
+    details = EventDetails(
+        id=event_key,
+        rankings2=[
+            EventRanking(
+                rank=1,
+                team_key="frc254",
+                record=None,
+                qual_average=None,
+                matches_played=0,
+                dq=0,
+                sort_orders=[],
+            )
+        ],
+    )
+    assert details.rankings_table == [
+        [
+            "Rank",
+            "Team",
+            "Ranking Score",
+            "Avg Coop",
+            "Avg Match",
+            "Avg Auto",
+            "Avg Stage",
+            "DQ",
+            "Played",
+        ],
+        [1, "254", 0, 0],
+    ]
+
+
 def test_rankings_table_game_year_2021_offseason(ndb_context) -> None:
     event_key = "2021isoir1"
     _create_test_event(event_key, EventType.OFFSEASON)
