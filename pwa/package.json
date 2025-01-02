@@ -64,7 +64,7 @@
     "@sentry/vite-plugin": "2.22.7",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
-    "@trivago/prettier-plugin-sort-imports": "5.2.0",
+    "@trivago/prettier-plugin-sort-imports": "5.2.1",
     "@types/compression": "1.7.5",
     "@types/express": "5.0.0",
     "@types/morgan": "1.9.9",
