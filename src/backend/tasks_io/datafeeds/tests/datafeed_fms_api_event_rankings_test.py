@@ -1,13 +1,14 @@
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
-from requests import Response
 
 from backend.common.frc_api import FRCAPI
+from backend.common.futures import InstantFuture
 from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
 )
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
+from backend.common.urlfetch import URLFetchResult
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_rankings_parser import (
     FMSAPIEventRankingsParser,
@@ -20,15 +21,15 @@ def fms_api_secrets(ndb_stub):
 
 
 def test_get_event_rankings() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = (
-        "https://frc-api.firstinspires.org/v3.0/2020/rankings?eventCode=MIKET&page=1"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/rankings?eventCode=MIKET&page=1",
+        200,
+        "",
     )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "rankings", return_value=response
+        FRCAPI, "rankings", return_value=InstantFuture(response)
     ) as mock_api, patch.object(
         FMSAPIEventRankingsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
@@ -43,15 +44,15 @@ def test_get_event_rankings() -> None:
 
 
 def test_get_event_rankings_cmp() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = (
-        "https://frc-api.firstinspires.org/v3.0/2014/teams?eventCode=GALILEO&page=1"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2014/teams?eventCode=GALILEO&page=1",
+        200,
+        "",
     )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "rankings", return_value=response
+        FRCAPI, "rankings", return_value=InstantFuture(response)
     ) as mock_api, patch.object(
         FMSAPIEventRankingsParser, "__init__", return_value=None
     ) as mock_init, patch.object(

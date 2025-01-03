@@ -1,17 +1,18 @@
-from unittest.mock import call, Mock, patch
+from unittest.mock import call, patch
 
 import pytest
 from google.appengine.ext import ndb
-from requests import Response
 
 from backend.common.consts.event_type import EventType
 from backend.common.frc_api import FRCAPI
+from backend.common.futures import InstantFuture
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
 )
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
+from backend.common.urlfetch import URLFetchResult
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
     FMSAPIAwardsParser,
@@ -32,13 +33,15 @@ def test_get_awards_event(first_code, event_short):
         year=2020,
     )
 
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = "https://frc-api.firstinspires.org/v3.0/2020/awards/MIKET/0"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/awards/MIKET/0",
+        200,
+        "",
+    )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "awards", return_value=response
+        FRCAPI, "awards", return_value=InstantFuture(response)
     ) as mock_awards, patch.object(
         FMSAPIAwardsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
@@ -60,13 +63,15 @@ def test_get_awards_event_cmp(first_code, event_short):
         year=2014,
     )
 
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/0"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/0",
+        200,
+        "",
+    )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "awards", return_value=response
+        FRCAPI, "awards", return_value=InstantFuture(response)
     ) as mock_awards, patch.object(
         FMSAPIAwardsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
@@ -98,13 +103,15 @@ def test_get_awards_event_cmp_2015(teams):
             year=2015,
         ).put()
 
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/7332"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/7332",
+        200,
+        "",
+    )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "awards", return_value=response
+        FRCAPI, "awards", return_value=InstantFuture(response)
     ) as mock_awards, patch.object(
         FMSAPIAwardsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
@@ -138,13 +145,15 @@ def test_get_awards_event_cmp_2017(teams):
             year=2017,
         ).put()
 
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/7332"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/7332",
+        200,
+        "",
+    )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "awards", return_value=response
+        FRCAPI, "awards", return_value=InstantFuture(response)
     ) as mock_awards, patch.object(
         FMSAPIAwardsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
