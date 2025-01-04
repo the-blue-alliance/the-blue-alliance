@@ -10,6 +10,11 @@ indexes:
       - name: owner
       - name: expiration
 
+  - kind: ApiAuthAccess
+    properties:
+      - name: auth_types_enum
+      - name: expiration
+
   - kind: Event
     properties:
       - name: __key__
