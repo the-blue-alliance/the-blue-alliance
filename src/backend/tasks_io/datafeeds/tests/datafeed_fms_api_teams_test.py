@@ -39,7 +39,7 @@ def test_get_team_details() -> None:
         FMSAPITeamDetailsParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [([], False)]
-        df.get_team_details(2020, "frc254")
+        df.get_team_details(2020, "frc254").get_result()
 
     mock_api.assert_called_once_with(2020, 254)
     mock_init.assert_called_once_with(2020)
@@ -62,7 +62,7 @@ def test_get_team_avatar() -> None:
         FMSAPITeamAvatarParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [(([], []), False)]
-        df.get_team_avatar(2020, "frc254")
+        df.get_team_avatar(2020, "frc254").get_result()
 
     mock_api.assert_called_once_with(2020, 254)
     mock_init.assert_called_once_with(2020)
@@ -82,7 +82,7 @@ def test_get_team_avatar_parser_failed() -> None:
     ) as mock_api, patch.object(
         FMSAPITeamAvatarParser, "__init__", return_value=None
     ) as mock_init:
-        assert df.get_team_avatar(2020, "frc254") == ([], set())
+        assert df.get_team_avatar(2020, "frc254").get_result() == ([], set())
 
     mock_api.assert_called_once_with(2020, 254)
     mock_init.assert_called_once_with(2020)

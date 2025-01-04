@@ -7,6 +7,7 @@ from google.appengine.ext import testbed
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
@@ -148,7 +149,7 @@ def test_get_no_event(tasks_client: Client) -> None:
 @mock.patch.object(DatafeedFMSAPI, "get_event_alliances")
 def test_get_no_alliances(fmsapi_event_alliances_mock, tasks_client: Client) -> None:
     create_event(official=True)
-    fmsapi_event_alliances_mock.return_value = []
+    fmsapi_event_alliances_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get("/tasks/get/fmsapi_event_alliances/2020nyny")
     assert resp.status_code == 200
@@ -160,7 +161,7 @@ def test_get_no_events_no_output_in_taskqueue(
     fmsapi_event_alliances_mock, tasks_client: Client
 ) -> None:
     create_event(official=True)
-    fmsapi_event_alliances_mock.return_value = []
+    fmsapi_event_alliances_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get(
         "/tasks/get/fmsapi_event_alliances/2020nyny",
@@ -177,7 +178,7 @@ def test_get(
 ) -> None:
     create_event(official=True)
     alliances = [EventAlliance(picks=["frc254"])]
-    fmsapi_event_alliances_mock.return_value = alliances
+    fmsapi_event_alliances_mock.return_value = InstantFuture(alliances)
 
     resp = tasks_client.get("/tasks/get/fmsapi_event_alliances/2020nyny")
     assert resp.status_code == 200
@@ -196,7 +197,7 @@ def test_get_remapteams(
 ) -> None:
     create_event(official=True, remap_teams={"frc254": "frc9000"})
     alliances = [EventAlliance(picks=["frc254"])]
-    fmsapi_event_alliances_mock.return_value = alliances
+    fmsapi_event_alliances_mock.return_value = InstantFuture(alliances)
 
     resp = tasks_client.get("/tasks/get/fmsapi_event_alliances/2020nyny")
     assert resp.status_code == 200

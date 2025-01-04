@@ -44,7 +44,7 @@ def test_get_event_matches() -> None:
         mock_schedule_parse.side_effect = ([], [])
         mock_json_parse.return_value = {"Schedule": [], "Matches": []}
         mock_match_detail_parser.return_value = {}
-        df.get_event_matches("2020miket")
+        df.get_event_matches("2020miket").get_result()
 
     mock_schedule_api.assert_has_calls(
         [call(2020, "miket", "qual"), call(2020, "miket", "playoff")]
@@ -80,7 +80,7 @@ def test_get_event_matches_cmp() -> None:
         mock_schedule_parse.side_effect = ([], [])
         mock_json_parse.return_value = {"Schedule": [], "Matches": []}
         mock_match_detail_parser.return_value = {}
-        df.get_event_matches("2014gal")
+        df.get_event_matches("2014gal").get_result()
 
     mock_schedule_api.assert_has_calls(
         [call(2014, "galileo", "qual"), call(2014, "galileo", "playoff")]

@@ -36,7 +36,7 @@ def test_get_event_teams() -> None:
         FMSAPITeamAvatarParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [(([], []), False)]
-        df.get_event_team_avatars("2020miket")
+        df.get_event_team_avatars("2020miket").get_result()
 
     mock_api.assert_called_once_with(2020, "miket", 1)
     mock_init.assert_called_once_with(2020)
@@ -59,7 +59,7 @@ def test_get_event_teams_paginated() -> None:
         FMSAPITeamAvatarParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [(([], []), True), (([], []), False)]
-        df.get_event_team_avatars("2020miket")
+        df.get_event_team_avatars("2020miket").get_result()
 
     mock_api.assert_has_calls([call(2020, "miket", 1), call(2020, "miket", 2)])
     mock_init.assert_called_once_with(2020)
@@ -82,7 +82,7 @@ def test_get_event_teams_cmp() -> None:
         FMSAPITeamAvatarParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [(([], []), False)]
-        df.get_event_team_avatars("2014gal")
+        df.get_event_team_avatars("2014gal").get_result()
 
     mock_api.assert_called_once_with(2014, "galileo", 1)
     mock_init.assert_called_once_with(2014)
