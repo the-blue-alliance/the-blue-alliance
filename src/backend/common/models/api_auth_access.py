@@ -6,6 +6,7 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.account import Account
+from backend.common.models.district import District
 from backend.common.models.event import Event
 
 
@@ -34,6 +35,10 @@ class ApiAuthAccess(ndb.Model):
     event_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         kind=Event, repeated=True
     )  # events for which auth is granted
+    # On update, we resolve the events in these districts and add them to event_list
+    district_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
+        kind=District, repeated=True
+    )
     # Allow access for all events marked official
     all_official_events: bool = ndb.BooleanProperty()
     expiration: Optional[datetime.datetime] = ndb.DateTimeProperty()
@@ -92,4 +97,13 @@ class ApiAuthAccess(ndb.Model):
     def event_list_str(self) -> str:
         return ",".join(
             [none_throws(event_key.string_id()) for event_key in self.event_list]
+        )
+
+    @property
+    def district_list_str(self) -> str:
+        return ",".join(
+            [
+                none_throws(district_key.string_id())
+                for district_key in self.district_list
+            ]
         )
