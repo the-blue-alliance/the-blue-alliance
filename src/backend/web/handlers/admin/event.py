@@ -445,12 +445,12 @@ def event_add_webcast_post(event_key: EventKey) -> Response:
 
     webcast = Webcast(
         type=WebcastType(request.form.get("webcast_type")),
-        channel=request.form.get("webcast_channel"),
+        channel=none_throws(request.form.get("webcast_channel")),
     )
     if request.form.get("webcast_file"):
-        webcast["file"] = request.form.get("webcast_file")
+        webcast["file"] = none_throws(request.form.get("webcast_file"))
     if request.form.get("webcast_date"):
-        webcast["date"] = request.form.get("webcast_date")
+        webcast["date"] = none_throws(request.form.get("webcast_date"))
 
     EventWebcastAdder.add_webcast(event, webcast)
 
@@ -464,8 +464,8 @@ def event_remove_webcast_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    webcast_type = request.form.get("type")
-    webcast_channel = request.form.get("channel")
+    webcast_type = WebcastType(request.form.get("type"))
+    webcast_channel = none_throws(request.form.get("channel"))
     webcast_index = int(request.form.get("index")) - 1
     if request.form.get("file"):
         webcast_file = request.form.get("file")
