@@ -37,6 +37,16 @@
         </td>
     </tr>
     <tr>
+        <td>API Keys</td>
+        <td>
+            <ul>
+                {% for api_key in api_keys %}
+                    <li><a href="/admin/api_auth/edit/{{api_key.key.id()}}">{{api_key.description}}</a> {% if api_key.expiration %}(Expires: {{api_key.expiration.strftime('%Y-%m-%d')}}){% endif %}</li>
+                {% endfor %}
+            </ul>
+        </td>
+    </tr>
+    <tr>
         <td>Shadow Banned</td>
         <td>{{ user.shadow_banned }}</td>
     </tr>

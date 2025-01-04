@@ -154,7 +154,15 @@ admin_routes.add_url_rule(
     "/api_auth/edit/<auth_id>", view_func=api_auth_edit_post, methods=["POST"]
 )
 admin_routes.add_url_rule(
-    "/api_auth/manage", view_func=api_auth_manage, methods=["GET"]
+    "/api_auth/manage",
+    view_func=api_auth_manage,
+    defaults={"key_type": None},
+    methods=["GET"],
+)
+admin_routes.add_url_rule(
+    "/api_auth/manage/<regex('(read|write|admin)'):key_type>",
+    view_func=api_auth_manage,
+    methods=["GET"],
 )
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_get, methods=["GET"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_post, methods=["POST"])
