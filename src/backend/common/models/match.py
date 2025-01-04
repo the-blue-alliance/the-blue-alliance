@@ -312,7 +312,7 @@ class Match(CachedModel):
         if winning_alliance == "":
             return ""
 
-        return OPPONENT[cast(AllianceColor, winning_alliance)]
+        return OPPONENT[winning_alliance]
 
     @property
     def event_key_name(self) -> EventKey:
