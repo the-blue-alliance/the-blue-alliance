@@ -38,7 +38,7 @@ def test_get_district_list() -> None:
     ) as mock_init, patch.object(
         FMSAPIDistrictListParser, "parse"
     ) as mock_parse:
-        df.get_district_list(2020)
+        df.get_district_list(2020).get_result()
 
     mock_api.assert_called_once_with(2020)
     mock_init.assert_called_once_with(2020)
@@ -61,7 +61,7 @@ def test_get_district_rankings() -> None:
         FMSAPIDistrictRankingsParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = ({}, False)
-        df.get_district_rankings("2020ne")
+        df.get_district_rankings("2020ne").get_result()
 
     mock_api.assert_called_once_with(2020, "ne", 1)
     mock_init.assert_called_once_with()
@@ -84,7 +84,7 @@ def test_get_district_rankings_paginated() -> None:
         FMSAPIDistrictRankingsParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [({}, True), ({}, False)]
-        df.get_district_rankings("2020ne")
+        df.get_district_rankings("2020ne").get_result()
 
     mock_api.assert_has_calls([call(2020, "ne", 1), call(2020, "ne", 2)])
     mock_init.assert_called_once_with()

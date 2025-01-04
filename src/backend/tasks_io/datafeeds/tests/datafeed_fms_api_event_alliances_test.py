@@ -36,7 +36,7 @@ def test_get_event_alliances() -> None:
         FMSAPIEventAlliancesParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [([], False)]
-        df.get_event_alliances("2020miket")
+        df.get_event_alliances("2020miket").get_result()
 
     mock_api.assert_called_once_with(2020, "miket")
     mock_init.assert_called_once_with()
@@ -59,7 +59,7 @@ def test_get_event_alliances_cmp() -> None:
         FMSAPIEventAlliancesParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [([], False)]
-        df.get_event_alliances("2014gal")
+        df.get_event_alliances("2014gal").get_result()
 
     mock_api.assert_called_once_with(2014, "galileo")
     mock_init.assert_called_once_with()

@@ -35,7 +35,7 @@ def test_get_event_list() -> None:
     ) as mock_init, patch.object(
         FMSAPIEventListParser, "parse"
     ) as mock_parse:
-        df.get_event_list(2020)
+        df.get_event_list(2020).get_result()
 
     mock_api.assert_called_once_with(2020)
     mock_init.assert_called_once_with(2020)
@@ -57,7 +57,7 @@ def test_get_event_details() -> None:
     ) as mock_init, patch.object(
         FMSAPIEventListParser, "parse"
     ) as mock_parse:
-        df.get_event_details("2020miket")
+        df.get_event_details("2020miket").get_result()
 
     mock_api.assert_called_once_with(2020, "miket")
     mock_init.assert_called_once_with(2020, short="miket")
@@ -79,7 +79,7 @@ def test_get_event_details_cmp() -> None:
     ) as mock_init, patch.object(
         FMSAPIEventListParser, "parse"
     ) as mock_parse:
-        df.get_event_details("2014gal")
+        df.get_event_details("2014gal").get_result()
 
     mock_api.assert_called_once_with(2014, "galileo")
     mock_init.assert_called_once_with(2014, short="gal")

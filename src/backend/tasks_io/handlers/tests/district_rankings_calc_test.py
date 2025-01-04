@@ -6,6 +6,7 @@ from google.appengine.ext import testbed
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.helpers.district_helper import (
     DistrictHelper,
     DistrictRankingTeamTotal,
@@ -59,7 +60,7 @@ def test_enqueue_event(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
     ndb_stub,
 ) -> None:
-    district_rankings_mock.return_value = {}
+    district_rankings_mock.return_value = InstantFuture({})
     District(
         id="2020test",
         year=2020,
@@ -87,7 +88,7 @@ def test_enqueue_default_year(
     ndb_stub,
 ) -> None:
     season_helper_mock.return_value = 2020
-    district_rankings_mock.return_value = {}
+    district_rankings_mock.return_value = InstantFuture({})
     District(
         id="2020test",
         year=2020,

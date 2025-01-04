@@ -10,6 +10,7 @@ from werkzeug.test import Client
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
@@ -116,7 +117,7 @@ def test_get_no_event(tasks_client: Client) -> None:
 @mock.patch.object(DatafeedFMSAPI, "get_event_matches")
 def test_get_no_matches(fmsapi_matches_mock, tasks_client: Client) -> None:
     create_event(official=True)
-    fmsapi_matches_mock.return_value = []
+    fmsapi_matches_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get("/tasks/get/fmsapi_matches/2020nyny")
     assert resp.status_code == 200
@@ -128,7 +129,7 @@ def test_get_no_matches_no_output_in_taskqueue(
     fmsapi_matches_mock, tasks_client: Client
 ) -> None:
     create_event(official=True)
-    fmsapi_matches_mock.return_value = []
+    fmsapi_matches_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get(
         "/tasks/get/fmsapi_matches/2020nyny",
@@ -156,7 +157,7 @@ def test_get(
         )
     ]
 
-    fmsapi_matches_mock.return_value = matches
+    fmsapi_matches_mock.return_value = InstantFuture(matches)
 
     resp = tasks_client.get("/tasks/get/fmsapi_matches/2020nyny")
     assert resp.status_code == 200
@@ -192,7 +193,7 @@ def test_get_remap_teams(
         )
     ]
 
-    fmsapi_matches_mock.return_value = matches
+    fmsapi_matches_mock.return_value = InstantFuture(matches)
 
     resp = tasks_client.get("/tasks/get/fmsapi_matches/2020nyny")
     assert resp.status_code == 200
@@ -232,7 +233,7 @@ def test_delete_invalid(
         ),
     ]
 
-    fmsapi_matches_mock.return_value = matches
+    fmsapi_matches_mock.return_value = InstantFuture(matches)
 
     # Add existing matches
     [m.put() for m in matches]
@@ -285,7 +286,7 @@ def test_no_delete_invalid(
         ),
     ]
 
-    fmsapi_matches_mock.return_value = matches
+    fmsapi_matches_mock.return_value = InstantFuture(matches)
 
     # Add existing matches
     [m.put() for m in matches]

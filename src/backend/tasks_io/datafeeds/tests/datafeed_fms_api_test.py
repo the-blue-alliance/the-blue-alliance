@@ -97,7 +97,7 @@ def test_get_root(fms_api_secrets):
     with patch.object(
         FRCAPI, "root", return_value=InstantFuture(response)
     ) as mock_root:
-        df.get_root_info() is None
+        df.get_root_info().get_result() is None
 
     mock_root.assert_called_once_with()
 
@@ -114,7 +114,7 @@ def test_get_root_failure(fms_api_secrets):
     with patch.object(
         FRCAPI, "root", return_value=InstantFuture(response)
     ) as mock_root:
-        assert df.get_root_info() is None
+        assert df.get_root_info().get_result() is None
 
     mock_root.assert_called_once_with()
 
@@ -134,11 +134,11 @@ def test_mark_api_down(fms_api_secrets):
 
     df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=InstantFuture(response1)):
-        assert df.get_root_info() is None
+        assert df.get_root_info().get_result() is None
         assert ApiStatusFMSApiDown.get() is True
 
     with patch.object(FRCAPI, "root", return_value=InstantFuture(response2)):
-        assert df.get_root_info() == {}
+        assert df.get_root_info().get_result() == {}
         assert ApiStatusFMSApiDown.get() is False
 
 
@@ -159,7 +159,7 @@ def test_save_response(fms_api_secrets, monkeypatch: pytest.MonkeyPatch):
 
     df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=InstantFuture(response)):
-        df.get_root_info()
+        df.get_root_info().get_result()
 
     client = InMemoryClient.get()
     files = client.get_files()
@@ -188,7 +188,7 @@ def test_save_response_unchanged(fms_api_secrets, monkeypatch: pytest.MonkeyPatc
 
     df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=InstantFuture(response)):
-        df.get_root_info()
+        df.get_root_info().get_result()
 
     client = InMemoryClient.get()
     files = client.get_files()
@@ -196,7 +196,7 @@ def test_save_response_unchanged(fms_api_secrets, monkeypatch: pytest.MonkeyPatc
     f_name = files[0]
 
     with patch.object(FRCAPI, "root", return_value=InstantFuture(response)):
-        df.get_root_info()
+        df.get_root_info().get_result()
 
     # Since the content didn't change, we shouldn't have written another
     assert client.get_files() == [f_name]
@@ -220,7 +220,7 @@ def test_save_response_updated(fms_api_secrets, monkeypatch: pytest.MonkeyPatch)
 
     df = DatafeedFMSAPI(save_response=True)
     with patch.object(FRCAPI, "root", return_value=InstantFuture(response)):
-        df.get_root_info()
+        df.get_root_info().get_result()
 
     client = InMemoryClient.get()
     files = client.get_files()
@@ -239,7 +239,7 @@ def test_save_response_updated(fms_api_secrets, monkeypatch: pytest.MonkeyPatch)
         json.dumps(content2),
     )
     with patch.object(FRCAPI, "root", return_value=InstantFuture(response2)):
-        df.get_root_info()
+        df.get_root_info().get_result()
 
     # Since the content is different, we should have two items
     files = client.get_files()

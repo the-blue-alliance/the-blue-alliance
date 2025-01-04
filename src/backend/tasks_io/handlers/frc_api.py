@@ -103,7 +103,7 @@ def team_details(team_key: TeamKey) -> Response:
 
     fms_df = DatafeedFMSAPI(save_response=True)
     year = datetime.date.today().year
-    fms_details = fms_df.get_team_details(year, team_key)
+    fms_details = fms_df.get_team_details(year, team_key).get_result()
 
     team, district_team, robot = fms_details or (None, None, None)
 
@@ -173,7 +173,7 @@ def team_avatar(team_key: TeamKey) -> Response:
     fms_df = DatafeedFMSAPI(save_response=True)
     year = datetime.date.today().year
 
-    avatar, keys_to_delete = fms_df.get_team_avatar(year, team_key)
+    avatar, keys_to_delete = fms_df.get_team_avatar(year, team_key).get_result()
 
     if avatar:
         MediaManipulator.createOrUpdate(avatar)
@@ -235,8 +235,10 @@ def enqueue_event_list(year: Optional[Year]) -> Response:
 def event_list(year: Year) -> Response:
     df = DatafeedFMSAPI(save_response=True)
 
-    fmsapi_events, event_list_districts = df.get_event_list(year)
+    event_list_future = df.get_event_list(year)
+    district_list_future = df.get_district_list(year)
 
+    fmsapi_events, event_list_districts = event_list_future.get_result()
     # All regular-season events can be inserted without any work involved.
     # We need to de-duplicate offseason events from the FRC Events API with a different code than the TBA event code
     fmsapi_events_offseason = [e for e in fmsapi_events if e.is_offseason]
@@ -260,7 +262,7 @@ def event_list(year: Year) -> Response:
 
     events = listify(EventManipulator.createOrUpdate(events_to_put)) or []
 
-    fmsapi_districts = df.get_district_list(year)
+    fmsapi_districts = district_list_future.get_result()
     merged_districts = DistrictManipulator.mergeModels(
         fmsapi_districts, event_list_districts
     )
@@ -324,12 +326,19 @@ def event_details(event_key: EventKey) -> Response:
     df = DatafeedFMSAPI(save_response=True)
 
     # Update event
-    fmsapi_events, fmsapi_districts = df.get_event_details(event_key)
+    event_details_future = df.get_event_details(event_key)
+    event_teams_future = df.get_event_teams(event_key)
+    event_team_avatars_future = df.get_event_team_avatars(event_key)
+    existing_event_teams_future = EventTeam.query(
+        EventTeam.event == ndb.Key(Event, event_key)
+    ).fetch_async()
+
+    fmsapi_events, fmsapi_districts = event_details_future.get_result()
     event = EventManipulator.createOrUpdate(fmsapi_events[0])
 
     DistrictManipulator.createOrUpdate(fmsapi_districts)
 
-    models = df.get_event_teams(event_key)
+    models = event_teams_future.get_result()
     teams: List[Team] = []
     district_teams: List[DistrictTeam] = []
     robots: List[Robot] = []
@@ -380,7 +389,7 @@ def event_details(event_key: EventKey) -> Response:
 
     # Delete eventteams of teams that are no longer registered
     if event_teams and not skip_eventteams:
-        existing_event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
+        existing_event_teams = existing_event_teams_future.get_result()
 
         # Don't delete EventTeam models for teams who won Awards at the Event, but who did not attend the Event
         award_teams = set()
@@ -417,7 +426,7 @@ def event_details(event_key: EventKey) -> Response:
         event_teams = [event_teams]
 
     if event.year >= 2018:
-        avatars, keys_to_delete = df.get_event_team_avatars(event.key_name)
+        avatars, keys_to_delete = event_team_avatars_future.get_result()
         if avatars:
             MediaManipulator.createOrUpdate(avatars)
         MediaManipulator.delete_keys(keys_to_delete)
@@ -494,7 +503,7 @@ def event_alliances(event_key: EventKey) -> Response:
     if not event:
         return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
-    alliance_selections = df.get_event_alliances(event_key)
+    alliance_selections = df.get_event_alliances(event_key).get_result()
 
     if event and event.remap_teams:
         EventRemapTeamsHelper.remapteams_alliances(
@@ -566,7 +575,7 @@ def event_rankings(event_key: EventKey) -> Response:
     if event is None:
         return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
-    rankings2 = df.get_event_rankings(event_key)
+    rankings2 = df.get_event_rankings(event_key).get_result()
 
     if event and event.remap_teams:
         EventRemapTeamsHelper.remapteams_rankings2(rankings2, event.remap_teams)
@@ -635,7 +644,7 @@ def event_matches(event_key: EventKey) -> Response:
     event.prep_matches()
 
     df = DatafeedFMSAPI(save_response=True)
-    matches = df.get_event_matches(event_key)
+    matches = df.get_event_matches(event_key).get_result()
     existing_matches = event.matches
 
     # Add existing matches to the new matches if they aren't present.
@@ -713,7 +722,7 @@ def awards_event(event_key: EventKey) -> Response:
         return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
     datafeed = DatafeedFMSAPI(save_response=True)
-    awards = datafeed.get_awards(event)
+    awards = datafeed.get_awards(event).get_result()
 
     if event.remap_teams:
         EventRemapTeamsHelper.remapteams_awards(awards, event.remap_teams)
@@ -762,7 +771,7 @@ def awards_event(event_key: EventKey) -> Response:
 @blueprint.route("/backend-tasks/get/district_list/<int:year>")
 def district_list(year: Year) -> Response:
     df = DatafeedFMSAPI()
-    fmsapi_districts = df.get_district_list(year)
+    fmsapi_districts = df.get_district_list(year).get_result()
     districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
 
     template_values = {
@@ -790,7 +799,7 @@ def district_rankings(district_key: DistrictKey) -> Response:
         return make_response(f"No District for key: {Markup.escape(district_key)}", 404)
 
     df = DatafeedFMSAPI()
-    advancement = df.get_district_rankings(district_key)
+    advancement = df.get_district_rankings(district_key).get_result()
     if advancement:
         district.advancement = advancement
         district = DistrictManipulator.createOrUpdate(district)

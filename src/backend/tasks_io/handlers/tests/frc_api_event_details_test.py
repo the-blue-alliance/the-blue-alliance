@@ -7,6 +7,7 @@ from werkzeug.test import Client
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
+from backend.common.futures import InstantFuture
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.award import Award
 from backend.common.models.district import District
@@ -88,9 +89,9 @@ def test_get_bad_key(tasks_client: Client) -> None:
 def test_get_event_details(
     event_mock, teams_mock, avatars_mock, tasks_client: Client
 ) -> None:
-    event_mock.return_value = ([create_event()], [create_district()])
-    teams_mock.return_value = []
-    avatars_mock.return_value = ([], [])
+    event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
+    teams_mock.return_value = InstantFuture([])
+    avatars_mock.return_value = InstantFuture(([], []))
 
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
@@ -108,17 +109,25 @@ def test_get_event_details(
 def test_get_event_details_writes_teams(
     event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
 ) -> None:
-    event_mock.return_value = ([create_event()], [create_district()])
-    teams_mock.return_value = [
+    event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                DistrictTeam(id="2019fim_frc254"),
+                Robot(id="frc254_2019", team=ndb.Key(Team, "frc254"), year=2019),
+            ),
+        ]
+    )
+    avatars_mock.return_value = InstantFuture(
         (
-            Team(id="frc254", team_number=254),
-            DistrictTeam(id="2019fim_frc254"),
-            Robot(id="frc254_2019", team=ndb.Key(Team, "frc254"), year=2019),
-        ),
-    ]
-    avatars_mock.return_value = (
-        [Media(id="avatar_media", foreign_key="", media_type_enum=MediaType.AVATAR)],
-        [],
+            [
+                Media(
+                    id="avatar_media", foreign_key="", media_type_enum=MediaType.AVATAR
+                )
+            ],
+            [],
+        )
     )
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
@@ -139,15 +148,17 @@ def test_get_event_details_writes_teams(
 def test_get_event_details_clears_eventteams(
     event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
 ) -> None:
-    event_mock.return_value = ([create_event()], [create_district()])
-    avatars_mock.return_value = ([], [])
-    teams_mock.return_value = [
-        (
-            Team(id="frc254", team_number=254),
-            None,  # DistrictTeam
-            None,  # Robot
-        ),
-    ]
+    event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
+    avatars_mock.return_value = InstantFuture(([], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,  # DistrictTeam
+                None,  # Robot
+            ),
+        ]
+    )
 
     EventTeam(
         id="2019casj_frc900",
@@ -182,7 +193,9 @@ def test_get_event_details_clears_eventteams(
 
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
 @mock.patch.object(ChampsRegistrationHacks, "should_skip_eventteams", return_value=True)
-@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars", return_value=([], []))
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_skip_eventteams(
@@ -194,14 +207,16 @@ def test_get_event_details_skip_eventteams(
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
-    event_mock.return_value = ([create_event()], [])
-    teams_mock.return_value = [
-        (
-            Team(id="frc254", team_number=254),
-            None,
-            None,
-        ),
-    ]
+    event_mock.return_value = InstantFuture(([create_event()], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
 
@@ -220,9 +235,9 @@ def test_get_event_details_skip_eventteams(
 def test_get_event_details_no_output_in_taskqueue(
     event_mock, teams_mock, avatars_mock, tasks_client: Client
 ) -> None:
-    event_mock.return_value = ([create_event()], [])
-    teams_mock.return_value = []
-    avatars_mock.return_value = ([], [])
+    event_mock.return_value = InstantFuture(([create_event()], []))
+    teams_mock.return_value = InstantFuture([])
+    avatars_mock.return_value = InstantFuture(([], []))
 
     resp = tasks_client.get(
         "/backend-tasks/get/event_details/2019casj",

@@ -5,6 +5,7 @@ from google.appengine.ext import testbed
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.sitevars.apistatus import ApiStatus
@@ -85,8 +86,8 @@ def test_get_bad_year(tasks_client: Client) -> None:
 def test_get_no_events(
     event_list_mock, district_list_mock, tasks_client: Client
 ) -> None:
-    event_list_mock.return_value = ([], [])
-    district_list_mock.return_value = []
+    event_list_mock.return_value = InstantFuture(([], []))
+    district_list_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get("/backend-tasks/get/event_list/2020")
     assert resp.status_code == 200
@@ -98,8 +99,8 @@ def test_get_no_events(
 def test_get_no_events_no_output_in_taskqueue(
     event_list_mock, district_list_mock, tasks_client: Client
 ) -> None:
-    event_list_mock.return_value = ([], [])
-    district_list_mock.return_value = []
+    event_list_mock.return_value = InstantFuture(([], []))
+    district_list_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get(
         "/backend-tasks/get/event_list/2020",
@@ -134,8 +135,8 @@ def test_get(
             abbreviation="fim",
         )
     ]
-    event_list_mock.return_value = (events, districts)
-    district_list_mock.return_value = districts
+    event_list_mock.return_value = InstantFuture((events, districts))
+    district_list_mock.return_value = InstantFuture(districts)
 
     resp = tasks_client.get("/backend-tasks/get/event_list/2019")
     assert resp.status_code == 200
@@ -185,8 +186,8 @@ def test_get_match_offseasons(
             abbreviation="fim",
         )
     ]
-    event_list_mock.return_value = (events, districts)
-    district_list_mock.return_value = districts
+    event_list_mock.return_value = InstantFuture((events, districts))
+    district_list_mock.return_value = InstantFuture(districts)
 
     resp = tasks_client.get("/backend-tasks/get/event_list/2019")
     assert resp.status_code == 200
