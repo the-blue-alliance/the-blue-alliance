@@ -5,12 +5,15 @@
 {% block content %}
 
 <h1>Manage API Authentication</h1>
+<p>Key Types: {%if key_type == 'admin' %}<b>Admin</b>{% else %}<a href="/admin/api_auth/manage/admin">Admin</a>{% endif %}, {% if key_type == 'write'%}<b>Write</b>{% else %}<a href="/admin/api_auth/manage/write">Write</a>{% endif %}, {% if key_type == 'read' %}<b>Read</b>{% else %}<a href="/admin/api_auth/manage/read">Read</a>{% endif %}</p>
+<p>Include Expired: {% if include_expired %}<b>Yes</b>{% else %}<a href="?include_expired=true">Yes</a>{% endif %}, {% if not include_expired %}<b>No</b>{% else %}<a href="?include_expired=false">No</a>{% endif %}</p>
 
+{% if key_type == 'write' %}
 <h2>Write API</h2>
+{% set write_auths = auths %}
 {% include "admin/partials/api_write_table.html" %}
 
-<hr>
-
+{% elif key_type == 'admin' %}
 <h2>Admin API</h2>
 <table class="table table-striped">
   <tr>
@@ -18,7 +21,7 @@
     <th>User</th>
     <th>X-TBA-Auth-Key</th>
   </tr>
-  {% for auth in admin_auths %}
+  {% for auth in auths %}
   <tr>
     <td><a href="/admin/api_auth/edit/{{auth.key.id()}}">{{ auth.description }}</a></td>
     <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id() }}">{{ auth.owner.id() }} {% endif %}</a></td>
@@ -27,6 +30,7 @@
   {% endfor %}
 </table>
 
+{% elif key_type == 'read' %}
 <h2>Read API</h2>
 <table class="table table-striped">
   <tr>
@@ -34,7 +38,7 @@
     <th>User</th>
     <th>X-TBA-Auth-Key</th>
   </tr>
-  {% for auth in read_auths %}
+  {% for auth in auths %}
   <tr>
     <td><a href="/admin/api_auth/edit/{{auth.key.id() }}">{{ auth.description }}</a></td>
     <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id() }}">{{ auth.owner.id() }} {% endif %}</a></td>
@@ -42,4 +46,5 @@
   </tr>
   {% endfor %}
 </table>
+{% endif %}
 {% endblock %}
