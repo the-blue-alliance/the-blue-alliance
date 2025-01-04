@@ -982,6 +982,7 @@ class PredictionHelper:
         all_rankings = defaultdict(lambda: [0] * n)
         all_ranking_points = defaultdict(lambda: [0] * n)
         last_played_match = None
+        sampled_winner: TMatchWinner
         for i in range(n):
             team_ranking_points = defaultdict(int)
             team_rank_tiebreaker = defaultdict(int)
@@ -1004,7 +1005,7 @@ class PredictionHelper:
                     "blue": 0,
                 }
                 # Get actual results or sampled results, depending if match has been played
-                sampled_winner: TMatchWinner = ""
+                sampled_winner = ""
                 if match.has_been_played:
                     score_breakdown = match.score_breakdown
                     if not score_breakdown:  # Can't do rankings without score breakdown
@@ -1216,7 +1217,7 @@ class PredictionHelper:
                                 continue
                             team_ranking_points[team] += 1
                 else:
-                    sampled_winner = cast(AllianceColor, sampled_winner)
+                    sampled_winner = sampled_winner
                     for team in match.alliances[sampled_winner]["teams"]:
                         if team in surrogate_teams and num_played[team] == 3:
                             continue
