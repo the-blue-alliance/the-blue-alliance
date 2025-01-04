@@ -1,4 +1,6 @@
+from typing import cast
 from unittest.mock import Mock, patch
+from wsgiref.types import WSGIApplication
 
 import flask
 import pytest
@@ -42,7 +44,7 @@ def test_AfterResponseMiddleware_init(app: Flask) -> None:
 
 
 def test_AfterResponseMiddleware_callable(app: Flask) -> None:
-    middleware = AfterResponseMiddleware(app)
+    middleware = cast(WSGIApplication, AfterResponseMiddleware(app))
     callback1 = Mock()
     callback2 = Mock()
 
