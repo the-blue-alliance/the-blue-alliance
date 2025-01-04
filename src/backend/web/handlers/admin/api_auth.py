@@ -2,6 +2,7 @@ import logging
 import random
 import string
 from datetime import datetime
+from typing import cast
 
 from flask import abort, redirect, request, url_for
 from google.appengine.ext import ndb
@@ -10,6 +11,7 @@ from werkzeug.wrappers import Response
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.web.profiled_render import render_template
 
@@ -102,9 +104,24 @@ def api_auth_edit_post(auth_id: str) -> Response:
     event_list_str = request.form.get("event_list_str")
     if event_list_str:
         split_events = event_list_str.split(",")
-        event_list = [ndb.Key(Event, event_key.strip()) for event_key in split_events]
+        event_keys = [event_key.strip() for event_key in split_events]
     else:
-        event_list = []
+        event_keys = []
+
+    district_list_str = request.form.get("district_list_str")
+    if district_list_str:
+        split_districts = district_list_str.split(",")
+        district_list = [
+            ndb.Key(District, district_key.strip()) for district_key in split_districts
+        ]
+        district_events = Event.query(
+            cast(ndb.KeyProperty, Event.district_key).IN(district_list)
+        ).fetch(keys_only=True)
+        event_keys.extend(k.string_id() for k in district_events)
+    else:
+        district_list = []
+
+    event_list = [ndb.Key(Event, k) for k in sorted(set(event_keys))]
 
     all_official_events = False
     if request.form.get("all_official_events"):
@@ -123,6 +140,7 @@ def api_auth_edit_post(auth_id: str) -> Response:
                 )
                 for _ in range(64)
             ),
+            district_list=district_list,
             event_list=event_list,
             all_official_events=all_official_events,
             auth_types_enum=auth_types_enum,
@@ -130,6 +148,7 @@ def api_auth_edit_post(auth_id: str) -> Response:
     else:
         auth.description = request.form.get("description", "")
         auth.event_list = event_list
+        auth.district_list = district_list
         auth.all_official_events = all_official_events
         auth.auth_types_enum = auth_types_enum
         auth.owner = owner_key

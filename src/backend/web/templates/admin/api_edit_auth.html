@@ -27,6 +27,10 @@
             <td><input type="checkbox" name="allow_admin" {% if auth.allow_admin %}checked{% endif %}></td>
         </tr>
         <tr>
+            <td>Districts</td>
+            <td><input type="text" name="district_list_str" value="{{auth.district_list_str}}" /></td>
+        </tr>
+        <tr>
             <td>Events</td>
             <td><input type="text" name="event_list_str" value="{{auth.event_list_str}}" /></td>
         </tr>
