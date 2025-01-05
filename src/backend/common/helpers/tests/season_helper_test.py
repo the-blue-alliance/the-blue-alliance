@@ -8,7 +8,7 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
 
 
-EST = timezone("EST")
+EST = timezone("US/Eastern")
 
 
 def test_kickoff_datetime() -> None:

@@ -7,7 +7,7 @@ from backend.common.models.keys import Year
 from backend.common.queries.event_query import EventListQuery, LastSeasonEventQuery
 from backend.common.sitevars.apistatus import ApiStatus
 
-EST = timezone("EST")
+EST = timezone("US/Eastern")
 
 
 class SeasonHelper(object):
@@ -73,7 +73,9 @@ class SeasonHelper(object):
     @staticmethod
     def kickoff_datetime_est(year: Year = datetime.now().year) -> datetime:
         """Computes the date of Kickoff for a given year. Kickoff is always the first Saturday in January after Jan 2nd."""
-        jan_2nd = datetime(year, 1, 2, 10, 30, 00, tzinfo=EST)
+        jan_2nd = datetime(
+            year=year, month=1, day=2, hour=10, minute=30, second=00, tzinfo=EST
+        )
         # Since 2021, Kickoff starts at 12:00am EST
         if year >= 2021:
             jan_2nd = jan_2nd.replace(hour=12, minute=00)
