@@ -30,7 +30,7 @@ jobs:
       - name: Dependabot metadata
         id: dependabot_metadata
         if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
-        uses: dependabot/fetch-metadata@v1.2.1
+        uses: dependabot/fetch-metadata@v2.2.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Authenticate cli
