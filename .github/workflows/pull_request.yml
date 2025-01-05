@@ -153,7 +153,7 @@ jobs:
               - 'package.json'
       - name: Set up Node
         if: steps.changes.outputs.node == 'true'
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "18"
           cache: "npm"
@@ -178,7 +178,7 @@ jobs:
               - 'package.json'
       - name: Set up Node
         if: steps.changes.outputs.node == 'true'
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "18"
           cache: "npm"
@@ -200,7 +200,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "20"
           cache: "npm"
@@ -216,7 +216,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "20"
           cache: "npm"
@@ -230,7 +230,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "20"
           cache: "npm"
@@ -253,7 +253,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "20"
           cache: "npm"
@@ -273,7 +273,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "20.16.0"
           cache: "npm"
@@ -336,7 +336,7 @@ jobs:
           python-version: "3.12"
       - name: Set up Node
         if: steps.changes.outputs.buildweb == 'true'
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "18"
           cache: "npm"
@@ -379,7 +379,7 @@ jobs:
           pip install -r requirements.txt
       - name: Set up Node
         if: steps.changes.outputs.web == 'true'
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: "18"
           cache: "npm"
