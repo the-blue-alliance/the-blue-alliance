@@ -1,12 +1,13 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}API Status{% endblock %}
 
 {% block content %}
 
 <form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-<h1>APIv2 Status</h1>
+<h1>API Status</h1>
 <p>Here you can edit the backed values that supply the Status API endpoint. This contains data about datafeeds that are down, as well as some configuration data for the mobile apps</p>
 
 <table class="table table-striped">
@@ -22,12 +23,9 @@
 
 <h1>Trusted API Status</h1>
 <p>Here you can enable and disable the Trusted API</p>
-<p>Enable the trusted API for Match Video: <input type="checkbox" name="enable_match_video" {% if enable_trustedapi.1 %}checked{% endif %} /></p>
-<p>Enable the trusted API for Event Teams: <input type="checkbox" name="enable_event_teams" {% if enable_trustedapi.2 %}checked{% endif %} /></p>
-<p>Enable the trusted API for Event Matches: <input type="checkbox" name="enable_event_matches" {% if enable_trustedapi.3 %}checked{% endif %} /></p>
-<p>Enable the trusted API for Event Rankings: <input type="checkbox" name="enable_event_rankings" {% if enable_trustedapi.4 %}checked{% endif %} /></p>
-<p>Enable the trusted API for Event Alliances: <input type="checkbox" name="enable_event_alliances" {% if enable_trustedapi.5 %}checked{% endif %} /></p>
-<p>Enable the trusted API for Event Awards: <input type="checkbox" name="enable_event_awards" {% if enable_trustedapi.6 %}checked{% endif %} /></p>
+{% for auth_type in auth_types %}
+    <p>Enable the trusted API for {{auth_type_names[auth_type]}}: <input type="checkbox" name="enable_{{auth_type.name | slugify}}" {% if enable_trustedapi.get(auth_type|string, True) %}checked{%endif%} /></p>
+{% endfor %}
 
 <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-thumbs-up"></span> Update</button>
 
