@@ -1,5 +1,13 @@
 ## Pre-Kickoff
 
+### Bump Year Configuration
+
+The `apistastus` sitevar (edited via `/admin/apistatus`) contains this configuration:
+ - Once events beging to get posted, bump `max_season` to start fetching data
+ - Once offseason events are complete, bump `current_season`
+
+### Team Admin Keys
+
 Each year, we've been generating "team media admin" keys to be distributed in the KOP. We generate one randomly for each team number, and then import them to TBA.
 
 To generate:
