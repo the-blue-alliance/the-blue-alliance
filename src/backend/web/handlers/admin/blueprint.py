@@ -10,6 +10,7 @@ from backend.web.handlers.admin.api_auth import (
     api_auth_edit_post,
     api_auth_manage,
 )
+from backend.web.handlers.admin.apistatus import apistatus_get, apistatus_post
 from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
 from backend.web.handlers.admin.awards import (
     award_dashboard,
@@ -164,6 +165,8 @@ admin_routes.add_url_rule(
     view_func=api_auth_manage,
     methods=["GET"],
 )
+admin_routes.add_url_rule("/apistatus", view_func=apistatus_get, methods=["GET"])
+admin_routes.add_url_rule("/apistatus", view_func=apistatus_post, methods=["POST"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_get, methods=["GET"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_post, methods=["POST"])
 

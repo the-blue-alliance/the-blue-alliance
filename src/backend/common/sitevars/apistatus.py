@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, TypedDict
+from typing import NotRequired, Optional, TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 
@@ -26,7 +26,7 @@ class IOSConfig(TypedDict):
 class ContentType(TypedDict):
     current_season: int
     max_season: int
-    web: Optional[WebConfig]
+    web: NotRequired[Optional[WebConfig]]
     android: Optional[AndroidConfig]
     ios: Optional[IOSConfig]
 
