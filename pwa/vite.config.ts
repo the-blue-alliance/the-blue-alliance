@@ -1,18 +1,18 @@
 import { Schema, ValidateEnv } from '@julr/vite-plugin-validate-env';
-import { vitePlugin as remix } from '@remix-run/dev';
+import { reactRouter } from '@react-router/dev/vite';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
-import { RemixVitePWA } from '@vite-pwa/remix';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-declare module '@remix-run/node' {
-  // or cloudflare, deno, etc.
-  interface Future {
-    v3_singleFetch: true;
-  }
-}
+// declare module '@react-router/node' {
+//   // or cloudflare, deno, etc.
+//   interface Future {
+//     v3_singleFetch: true;
+//   }
+// }
+
 function getCommitHash(): string {
   try {
     return child.execSync('git rev-parse --short HEAD').toString();
@@ -21,63 +21,52 @@ function getCommitHash(): string {
   }
 }
 
-const { RemixVitePWAPlugin, RemixPWAPreset } = RemixVitePWA();
-
 export default defineConfig({
   plugins: [
-    remix({
-      future: {
-        v3_fetcherPersist: true,
-        v3_relativeSplatPath: true,
-        v3_throwAbortReason: true,
-        v3_lazyRouteDiscovery: true,
-        v3_singleFetch: true,
-        v3_routeConfig: true,
-      },
-      presets: [RemixPWAPreset()],
-    }),
+    reactRouter(),
     tsconfigPaths(),
     Icons({
       compiler: 'jsx',
       jsx: 'react',
     }),
-    RemixVitePWAPlugin({
-      strategies: 'generateSW',
-      manifest: {
-        name: 'The Blue Alliance',
-        short_name: 'TBA',
-        description:
-          'The Blue Alliance is the best way to scout, watch, and relive the FIRST Robotics Competition.',
-        start_url: '/?homescreen=1',
-        display: 'standalone',
-        theme_color: '#3F51B5',
-        background_color: '#3F51B5',
-        icons: [
-          {
-            src: 'icons/icon-64.png',
-            sizes: '64x64',
-            type: 'image/png',
-          },
-          {
-            src: 'icons/icon-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: 'icons/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: 'icons/maskable-icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
-        ],
-      },
-    }),
+    // TODO: add once https://github.com/vite-pwa/remix/issues/15 is fixed
+    // RemixVitePWAPlugin({
+    //   strategies: 'generateSW',
+    //   manifest: {
+    //     name: 'The Blue Alliance',
+    //     short_name: 'TBA',
+    //     description:
+    //       'The Blue Alliance is the best way to scout, watch, and relive the FIRST Robotics Competition.',
+    //     start_url: '/?homescreen=1',
+    //     display: 'standalone',
+    //     theme_color: '#3F51B5',
+    //     background_color: '#3F51B5',
+    //     icons: [
+    //       {
+    //         src: 'icons/icon-64.png',
+    //         sizes: '64x64',
+    //         type: 'image/png',
+    //       },
+    //       {
+    //         src: 'icons/icon-192.png',
+    //         sizes: '192x192',
+    //         type: 'image/png',
+    //       },
+    //       {
+    //         src: 'icons/icon-512.png',
+    //         sizes: '512x512',
+    //         type: 'image/png',
+    //         purpose: 'any',
+    //       },
+    //       {
+    //         src: 'icons/maskable-icon-512.png',
+    //         sizes: '512x512',
+    //         type: 'image/png',
+    //         purpose: 'maskable',
+    //       },
+    //     ],
+    //   },
+    // }),
     sentryVitePlugin({
       org: 'the-blue-alliance',
       project: 'the-blue-alliance-pwa',

@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 
 import BiTrophy from '~icons/bi/trophy';

@@ -1,11 +1,11 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
+import { LoaderFunctionArgs } from 'react-router';
 import {
   ClientLoaderFunctionArgs,
   MetaFunction,
   Params,
   useLoaderData,
   useNavigate,
-} from '@remix-run/react';
+} from 'react-router';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 

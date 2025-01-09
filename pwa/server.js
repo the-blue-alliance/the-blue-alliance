@@ -1,4 +1,4 @@
-import { createRequestHandler } from '@remix-run/express';
+import { createRequestHandler } from '@react-router/express';
 import * as Sentry from '@sentry/remix';
 import compression from 'compression';
 import express from 'express';
@@ -6,12 +6,12 @@ import morgan from 'morgan';
 
 const isProd = process.env.NODE_ENV === 'production';
 
-Sentry.init({
-  dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
-  tracesSampleRate: 1,
-  autoInstrumentRemix: true,
-  enabled: isProd,
-});
+// Sentry.init({
+//   dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
+//   tracesSampleRate: 1,
+//   autoInstrumentRemix: true,
+//   enabled: isProd,
+// });
 
 const viteDevServer = isProd
   ? undefined
@@ -23,7 +23,7 @@ const viteDevServer = isProd
 
 const remixHandler = createRequestHandler({
   build: viteDevServer
-    ? () => viteDevServer.ssrLoadModule('virtual:remix/server-build')
+    ? () => viteDevServer.ssrLoadModule('virtual:react-router/server-build')
     : // Ignore the eslint error since the ./build directory doesn't exist until the build script is run.
       // eslint-disable-next-line import/no-unresolved
       await import('./build/server/index.js'),

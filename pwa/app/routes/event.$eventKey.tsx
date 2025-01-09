@@ -1,11 +1,11 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
+import { LoaderFunctionArgs } from 'react-router';
 import {
   type ClientLoaderFunctionArgs,
   Link,
   MetaFunction,
   Params,
   useLoaderData,
-} from '@remix-run/react';
+} from 'react-router';
 import { useMemo } from 'react';
 
 import BiCalendar from '~icons/bi/calendar';

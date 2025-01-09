@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   useRouteError,
-} from '@remix-run/react';
+} from 'react-router';
 import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
 import { pwaInfo } from 'virtual:pwa-info';
 

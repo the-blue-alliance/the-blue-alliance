@@ -1,11 +1,11 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
+import { LoaderFunctionArgs } from 'react-router';
 import {
   ClientLoaderFunctionArgs,
   Link,
   MetaFunction,
   Params,
   useLoaderData,
-} from '@remix-run/react';
+} from 'react-router';
 import React, { ReactNode } from 'react';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
