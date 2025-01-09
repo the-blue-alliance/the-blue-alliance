@@ -61,6 +61,7 @@
     "@julr/vite-plugin-validate-env": "1.2.0",
     "@playwright/test": "1.49.1",
     "@remix-run/dev": "2.15.2",
+    "@remix-run/fs-routes": "2.15.2",
     "@sentry/vite-plugin": "2.22.7",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
