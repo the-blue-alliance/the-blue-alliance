@@ -1,4 +1,4 @@
-import type { MetaFunction } from '@remix-run/node';
+import type { MetaFunction } from 'react-router';
 import { useLoaderData } from '@remix-run/react';
 
 import { getEventsByYear, getStatus } from '~/api/v3';
