@@ -5,7 +5,7 @@ import {
   MetaFunction,
   Params,
   useLoaderData,
-} from '@remix-run/react';
+} from 'react-router';
 import React, { ReactNode } from 'react';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';

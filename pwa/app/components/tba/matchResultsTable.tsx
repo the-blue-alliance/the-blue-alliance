@@ -1,5 +1,5 @@
 import { Tooltip } from '@radix-ui/react-tooltip';
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { groupBy } from 'lodash-es';
 import type React from 'react';

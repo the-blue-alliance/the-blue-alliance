@@ -4,7 +4,7 @@ import {
   MetaFunction,
   Params,
   useLoaderData,
-} from '@remix-run/react';
+} from 'react-router';
 
 import { getEvent, getMatch } from '~/api/v3';
 import { EventLink } from '~/components/tba/links';

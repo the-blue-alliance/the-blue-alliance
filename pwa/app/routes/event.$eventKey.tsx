@@ -5,7 +5,7 @@ import {
   MetaFunction,
   Params,
   useLoaderData,
-} from '@remix-run/react';
+} from 'react-router';
 import { useMemo } from 'react';
 
 import BiCalendar from '~icons/bi/calendar';
