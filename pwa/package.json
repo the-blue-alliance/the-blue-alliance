@@ -47,7 +47,7 @@
     "isbot": "5.1.21",
     "lodash-es": "4.17.21",
     "lru-cache": "11.0.2",
-    "lucide-react": "0.469.0",
+    "lucide-react": "0.471.0",
     "morgan": "1.10.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -57,11 +57,11 @@
     "vaul": "1.1.2"
   },
   "devDependencies": {
-    "@iconify/json": "2.2.293",
+    "@iconify/json": "2.2.294",
     "@julr/vite-plugin-validate-env": "1.2.0",
     "@playwright/test": "1.49.1",
     "@remix-run/dev": "2.15.2",
-    "@sentry/vite-plugin": "2.22.7",
+    "@sentry/vite-plugin": "2.23.0",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@trivago/prettier-plugin-sort-imports": "5.2.1",
