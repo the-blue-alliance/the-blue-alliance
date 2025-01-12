@@ -4511,9 +4511,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/If-None-Match"
-          },
-          {
-            "$ref": "#/components/parameters/year"
           }
         ],
         "responses": {

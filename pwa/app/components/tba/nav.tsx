@@ -8,9 +8,8 @@ import BiPeopleFill from '~icons/bi/people-fill';
 import BiStarFill from '~icons/bi/star-fill';
 import BiThreeDotsVertical from '~icons/bi/three-dots-vertical';
 import IonCalendar from '~icons/ion/calendar';
-import SearchIcon from '~icons/lucide/search';
 
-import { Input } from '~/components/ui/input';
+import Searchbar from '~/components/tba/searchbar';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -169,19 +168,7 @@ export const Nav = () => {
             </PopoverContent>
           </Popover>
         </NavigationMenuList>
-        <div className="ml-auto">
-          <form>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="size-4 text-neutral-500" />
-              </div>
-              <Input
-                placeholder="Search"
-                className="bg-accent pl-9 text-sm transition-all hover:bg-white focus:bg-white"
-              />
-            </div>
-          </form>
-        </div>
+        <Searchbar />
       </NavigationMenu>
     </div>
   );
