@@ -12,7 +12,7 @@ concurrency:
 jobs:
   py3-type:
     name: "[py3] Type Check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -39,7 +39,7 @@ jobs:
         run: ./ops/typecheck_py3.sh
   py3-lint:
     name: "[py3] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -66,7 +66,7 @@ jobs:
         run: ./ops/lint_py3.sh
   py3-test:
     name: "[py3] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         group: [1, 2, 3]
@@ -96,14 +96,14 @@ jobs:
         run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
           include-hidden-files: true
   py3-coverage:
     name: "[py3] Coverage"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [py3-test]
     steps:
       - uses: actions/checkout@v4
@@ -141,7 +141,7 @@ jobs:
           file: coverage.xml
   node-lint:
     name: "[node] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -166,7 +166,7 @@ jobs:
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -197,7 +197,7 @@ jobs:
           directory: ./.node_coverage/
   pwa-lint:
     name: "[pwa] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
@@ -213,7 +213,7 @@ jobs:
         run: npm --prefix pwa run lint
   pwa-type:
     name: "[pwa] Type Check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
@@ -227,7 +227,7 @@ jobs:
         run: npm --prefix pwa run typecheck
   pwa-test:
     name: "[pwa] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
@@ -250,7 +250,7 @@ jobs:
           directory: ./pwa/coverage/
   pwa-build:
     name: "[pwa] Build"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
@@ -269,7 +269,7 @@ jobs:
   pwa-e2e:
     name: "[pwa] E2E Tests"
     if: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
@@ -295,7 +295,7 @@ jobs:
 
   bash-lint:
     name: "[bash] Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.12
@@ -318,7 +318,7 @@ jobs:
 
   build-web:
     name: Build Web
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -350,7 +350,7 @@ jobs:
 
   ops-test:
     name: Ops Fullstack Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       registry:
         image: registry:2
@@ -429,7 +429,7 @@ jobs:
         run: ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle
