@@ -51,6 +51,7 @@ class Insight(CachedModel):
     TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES = 32
     TYPED_NOTABLES_WORLD_CHAMPIONS = 33
     TYPED_NOTABLES_HALL_OF_FAME = 34
+    TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT = 35
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -87,6 +88,7 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_AWARDS: "typed_leaderboard_most_awards",
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "typed_leaderboard_most_non_champs_event_wins",
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "typed_leaderboard_most_unique_teams_played_with_against",
+        TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT: "typed_leaderboard_most_events_played_at",
         TYPED_NOTABLES_DIVISION_WINNERS: "notables_division_winners",
         TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES: "notables_division_finals_appearances",
         TYPED_NOTABLES_WORLD_CHAMPIONS: "notables_world_champions",
@@ -101,6 +103,7 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE,
         TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE,
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
+        TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT,
     }
     TYPED_LEADERBOARD_AWARD_INSIGHTS = {
         TYPED_LEADERBOARD_BLUE_BANNERS,
@@ -117,6 +120,7 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_AWARDS: "team",
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "team",
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "team",
+        TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT: "team",
     }
 
     NOTABLE_INSIGHTS = {

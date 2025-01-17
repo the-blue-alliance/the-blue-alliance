@@ -132,6 +132,9 @@ class InsightsHelper(object):
         insights += self._calculate_leaderboard_most_matches_played_by_team(
             week_event_matches, year
         )
+        insights += self._calculate_leaderboard_most_events_played_at(
+            week_event_matches, year
+        )
         insights += self._calculate_leaderboard_highest_median_score_by_event(
             week_event_matches, year
         )
@@ -376,6 +379,28 @@ class InsightsHelper(object):
             cls._create_leaderboard_from_dict_counts(
                 counter,
                 Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
+                year,
+            )
+        ]
+
+    @classmethod
+    def _calculate_leaderboard_most_events_played_at(
+        cls, week_event_matches: List[WeekEventMatches], year: Year
+    ) -> List[Insight]:
+        events_played_at = defaultdict(set)
+        for _, week_events in week_event_matches:
+            for event, matches in week_events:
+                for match in matches:
+                    if match.has_been_played:
+                        for alliance in match.alliances.values():
+                            for tk in alliance["teams"]:
+                                events_played_at[tk].add(event.key.id())
+
+        counts = {tk: len(events) for tk, events in events_played_at.items()}
+        return [
+            cls._create_leaderboard_from_dict_counts(
+                counts,
+                Insight.TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT,
                 year,
             )
         ]
@@ -1452,6 +1477,13 @@ class InsightsHelper(object):
 
         overall_insights = []
         for insight_type in insight_types:
+            # Skip most unique teams overall insight since we aren't tracking *which* teams are unique
+            if (
+                insight_type
+                == Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST
+            ):
+                continue
+
             insights = Insight.query(
                 Insight.name == Insight.INSIGHT_NAMES[insight_type],
                 Insight.year != 0,
