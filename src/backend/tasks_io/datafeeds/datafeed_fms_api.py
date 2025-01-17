@@ -128,10 +128,10 @@ class DatafeedFMSAPI:
         api_response = yield self.api.team_avatar(year, team_number)
         result = self._parse(api_response, FMSAPITeamAvatarParser(year))
         if result:
-            (avatars, keys_to_delete), _ = result
-            return (avatars, keys_to_delete)
-        else:
-            return [], set()
+            (avatar_result, _) = result
+            if avatar_result:
+                return avatar_result
+        return [], set()
 
     # Returns a tuple: (list(Event), list(District))
     @typed_tasklet
