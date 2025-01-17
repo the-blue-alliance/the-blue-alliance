@@ -21,7 +21,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa -y
 
 # Setup python environment
 ENV PYTHON_VERSION python3.12
-RUN apt-get remove -y $PYTHON_VERSION-minimal
+# RUN apt-get remove -y $PYTHON_VERSION-minimal
 RUN apt-get update && apt-get install -y \
     "$PYTHON_VERSION" \
     "$PYTHON_VERSION-venv" \
