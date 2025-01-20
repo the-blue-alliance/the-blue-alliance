@@ -46,6 +46,19 @@ from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 blueprint = Blueprint("frc_api", __name__)
 
 
+def splay_delay_for(
+    i: int, total: int, total_time: Optional[datetime.timedelta]
+) -> Optional[datetime.datetime]:
+    if total_time is None:
+        return None
+
+    total_window_seconds = total_time.total_seconds()
+    now = datetime.datetime.now()
+    delay_increment = total_window_seconds // total
+    delay = datetime.timedelta(seconds=delay_increment * i)
+    return now + delay
+
+
 @blueprint.route("/tasks/enqueue/fmsapi_team_details_rolling")
 def enqueue_rolling_team_details() -> Response:
     """
@@ -68,11 +81,14 @@ def enqueue_rolling_team_details() -> Response:
     ).fetch(1000, keys_only=True)
 
     teams = ndb.get_multi(team_keys)
-    for team in teams:
+    is_taskqueue = "X-Appengine-Taskname" in request.headers
+    splay_window = datetime.timedelta(hours=1) if is_taskqueue else None
+    for i, team in enumerate(teams):
         taskqueue.add(
             queue_name="datafeed",
             target="py3-tasks-io",
             url=url_for("frc_api.team_details", team_key=team.key_name),
+            eta=splay_delay_for(i, len(teams), splay_window),
             method="GET",
         )
 
@@ -84,9 +100,7 @@ def enqueue_rolling_team_details() -> Response:
         "max_team": max_team,
     }
 
-    if (
-        "X-Appengine-Taskname" not in request.headers
-    ):  # Only write out if not in taskqueue
+    if not is_taskqueue:  # Only write out if not in taskqueue
         return make_response(
             render_template(
                 "datafeeds/rolling_team_details_enqueue.html", **template_values
@@ -269,11 +283,14 @@ def event_list(year: Year) -> Response:
     districts = listify(DistrictManipulator.createOrUpdate(merged_districts))
 
     # Fetch event details for each event
-    for event in events:
+    is_taskqueue = "X-Appengine-Taskname" in request.headers
+    splay_window = datetime.timedelta(hours=2) if is_taskqueue else None
+    for i, event in enumerate(events):
         taskqueue.add(
             queue_name="datafeed",
             target="py3-tasks-io",
             url=url_for("frc_api.event_details", event_key=event.key_name),
+            eta=splay_delay_for(i, len(events), splay_window),
             method="GET",
         )
 
@@ -282,9 +299,7 @@ def event_list(year: Year) -> Response:
         "districts": districts,
     }
 
-    if (
-        "X-Appengine-Taskname" not in request.headers
-    ):  # Only write out if not in taskqueue
+    if not is_taskqueue:  # Only write out if not in taskqueue
         return make_response(
             render_template("datafeeds/fms_event_list_get.html", **template_values)
         )
