@@ -3,6 +3,7 @@ from collections import defaultdict
 from flask import abort, redirect, request, url_for
 from werkzeug.wrappers import Response
 
+from backend.common.consts.media_type import SOCIAL_TYPES
 from backend.common.manipulators.robot_manipulator import RobotManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.district_team import DistrictTeam
@@ -63,8 +64,12 @@ def team_detail(team_number: int) -> str:
     years_participated = sorted(TeamParticipationQuery(team.key_name).fetch())
 
     team_medias_by_year = defaultdict(list)
+    team_social_media = list()
     for media in team_medias:
-        team_medias_by_year[media.year].append(media)
+        if media.media_type_enum in SOCIAL_TYPES:
+            team_social_media.append(media)
+        else:
+            team_medias_by_year[media.year].append(media)
     media_years = sorted(
         team_medias_by_year.keys(),
         key=lambda m: 0 if media.year is None else media.year,
@@ -76,6 +81,7 @@ def team_detail(team_number: int) -> str:
         "team": team,
         "team_media_years": media_years,
         "team_medias_by_year": team_medias_by_year,
+        "team_social_media": team_social_media,
         "robots": robots,
         "district_teams": district_teams,
         "years_participated": years_participated,
