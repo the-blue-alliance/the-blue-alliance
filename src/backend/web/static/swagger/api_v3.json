@@ -5114,7 +5114,8 @@
                 "type": "array",
                 "description": "Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.",
                 "items": {
-                  "type": "number"
+                  "type": "number",
+                  "format": "float"
                 }
               },
               "record": {
@@ -5248,7 +5249,8 @@
             ]
           },
           "playoff_average": {
-            "type": "integer",
+            "type": "number",
+            "format": "double",
             "nullable": true,
             "description": "The average match score during playoffs. Year specific. May be null if not relevant for a given year."
           }
@@ -5300,7 +5302,8 @@
                   "nullable": true,
                   "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
                   "items": {
-                    "type": "number"
+                    "type": "number",
+                    "format": "float"
                   }
                 },
                 "record": {
