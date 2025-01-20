@@ -1,10 +1,9 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, Generator, List, Optional, Set, Tuple
+from typing import Any, Generator, List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
@@ -57,9 +56,6 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_avatar_parser impor
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
     FMSAPITeamDetailsParser,
-)
-from backend.tasks_io.datafeeds.parsers.fms_api.simple_json_parser import (
-    FMSAPISimpleJsonParser,
 )
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
 
@@ -265,56 +261,25 @@ class DatafeedFMSAPI:
         event_short = event_key[4:]
 
         event = Event.get_by_id(event_key)
-        json_parser = FMSAPISimpleJsonParser()
         hs_parser = FMSAPIHybridScheduleParser(year, event_short)
         detail_parser = FMSAPIMatchDetailsParser(year, event_short)
 
         api_event_short = DatafeedFMSAPI._get_event_short(year, event_short, event)
 
         (
-            qual_schedule_result,
-            playoff_schedule_result,
-            qual_matches_result,
-            playoff_matches_result,
+            qual_hybrid_schedule_result,
+            playoff_hybrid_schedule_result,
             qual_scores_result,
             playoff_scores_result,
         ) = yield (
-            self.api.match_schedule(year, api_event_short, "qual"),
-            self.api.match_schedule(year, api_event_short, "playoff"),
-            self.api.matches(year, api_event_short, "qual"),
-            self.api.matches(year, api_event_short, "playoff"),
+            self.api.hybrid_schedule(year, api_event_short, "qual"),
+            self.api.hybrid_schedule(year, api_event_short, "playoff"),
             self.api.match_scores(year, api_event_short, "qual"),
             self.api.match_scores(year, api_event_short, "playoff"),
         )
 
-        qual_schedule = none_throws(self._parse(qual_schedule_result, json_parser))
-        if qual_schedule is None:
-            return []
-
-        playoff_schedule = none_throws(
-            self._parse(playoff_schedule_result, json_parser)
-        )
-        if playoff_schedule is None:
-            return []
-
-        qual_matches = none_throws(self._parse(qual_matches_result, json_parser))
-        if qual_matches is None:
-            return []
-
-        playoff_matches = none_throws(self._parse(playoff_matches_result, json_parser))
-        if playoff_matches is None:
-            return []
-
-        # Because the hybrid score endpoint doesn't exist in the FRC API v3
-        # we manually merge the results from the score/schedule endpoints
-        # and run it through the old hybrid schedule parser (this lets us continue
-        # to handle extra tiebreaker matches, etc)
-        qual_matches_merged = hs_parser.parse(
-            self._merge_match_schedule_and_results(qual_schedule, qual_matches)
-        )
-        playoff_matches_merged = hs_parser.parse(
-            self._merge_match_schedule_and_results(playoff_schedule, playoff_matches)
-        )
+        qual_matches_merged = self._parse(qual_hybrid_schedule_result, hs_parser)
+        playoff_matches_merged = self._parse(playoff_hybrid_schedule_result, hs_parser)
 
         # Organize matches by key
         matches_by_key = {}
@@ -345,52 +310,6 @@ class DatafeedFMSAPI:
                 matches_by_key.values(),
             )
         )
-
-    def _merge_match_schedule_and_results(self, schedule: Dict, matches: Dict) -> Dict:
-        scheduled_matches = schedule["Schedule"]
-        if "Matches" not in matches:
-            matches["Matches"] = [{}] * len(scheduled_matches)
-        return {
-            "Schedule": [
-                self._merge_match(s, m)
-                for s, m in zip(scheduled_matches, matches["Matches"])
-            ]
-        }
-
-    @classmethod
-    def _merge_match(cls, scheduled: Dict, result: Dict) -> Dict:
-        # Over the years, both "Teams" and "teams" have been used in FRC API responses...
-        teams_key = "Teams" if "Teams" in scheduled else "teams"
-
-        # 2024, Week 4: As part of attempting to restore sync,
-        # schedules sync with teams [1, 2, 3] in to-be-played playoff matches
-        # In a case where the only teams for a match are those three, overwrite
-        # the team numbers in each station to None
-        schedule_team_numbers = [t["teamNumber"] for t in scheduled.get(teams_key)]
-        if set(schedule_team_numbers) == {1, 2, 3}:
-            scheduled["teams"] = [
-                {**t, "teamNumber": None} for t in scheduled.get(teams_key)
-            ]
-
-        for field, value in result.items():
-            if field == teams_key:
-                for team in value:
-                    schedule_idx, schedule_team = next(
-                        filter(
-                            lambda t: t[1]["teamNumber"] == team["teamNumber"],
-                            enumerate(scheduled["teams"]),
-                        ),
-                        (None, None),
-                    )
-                    if schedule_team is None:
-                        # 2024, Week 3: Upstream FMS sync issues leading to schedules returned with no teams
-                        # Some match results have been sync'd, so patch around this where we can
-                        scheduled["teams"].append(team)
-                    else:
-                        scheduled["teams"][schedule_idx].update(team)
-            else:
-                scheduled[field] = value
-        return scheduled
 
     @typed_tasklet
     def get_event_team_avatars(
