@@ -1,12 +1,12 @@
 cron:
 - description: FIRST event list scraping. Also includes event details/event teams/team details scraping.
   url: /backend-tasks/enqueue/event_list/current
-  schedule: every day 02:00
+  schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: FIRST team detail scraping
   url: /tasks/enqueue/fmsapi_team_details_rolling
-  schedule: every day 02:30
+  schedule: every day 03:30
   timezone: America/Los_Angeles
 
 - description: FIRST match scraping for current events

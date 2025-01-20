@@ -44,7 +44,6 @@ class EventShortNameHelper:
         # Strip out current year
         if year is not None:
             name_str = name_str.replace(str(year), "").strip()
-            print(name_str)
 
         # Special cases for district championship divisions
         if event_type == EventType.DISTRICT_CMP_DIVISION:
