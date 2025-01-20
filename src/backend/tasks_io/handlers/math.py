@@ -242,7 +242,6 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
         abort(404)
 
     matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, event.year)
-    print(matchstats_dict)
     if not any([v != {} for v in matchstats_dict.values()]):
         logging.warning("Matchstat calculation for {} failed!".format(event_key))
         matchstats_dict = None
