@@ -1,10 +1,12 @@
 import datetime
+import json
 import logging
 import os
 import re
-from typing import Any, Generator, Literal, Optional
+from typing import Any, cast, Dict, Generator, Literal, Optional
 
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.futures import TypedFuture
 from backend.common.models.keys import Year
@@ -86,6 +88,12 @@ class FRCAPI:
 
     def rankings(self, year: Year, event_short: str) -> TypedFuture[URLFetchResult]:
         endpoint = f"/{year}/rankings/{event_short}"
+        return self._get(endpoint)
+
+    def hybrid_schedule(
+        self, year: Year, event_short: str, level: TCompLevel
+    ) -> TypedFuture[URLFetchResult]:
+        endpoint = f"/{year}/schedule/{event_short}/{level}/hybrid"
         return self._get(endpoint)
 
     def match_schedule(
@@ -202,6 +210,7 @@ class FRCAPI:
         return sorted(files)
 
     def _get_simulated(self, endpoint: str, version: str) -> URLFetchResult:
+        sim_year = none_throws(self._sim_time).year
         if version == "v2.0" and "/schedule" in endpoint and "hybrid" not in endpoint:
             # The hybrid schedule endpoint doesn't exist in newer versions,
             # so hack the URLs to make things work with older data
@@ -210,11 +219,44 @@ class FRCAPI:
             regex = re.search(r"/(\d+)/schedule/(\w+)\?tournamentLevel=(\w+)", endpoint)
             if regex:
                 endpoint = f"/{regex.group(1)}/schedule/{regex.group(2)}/{regex.group(3)}/hybrid"
+        elif (
+            version == "v3.0"
+            and "/schedule" in endpoint
+            and "hybrid" in endpoint
+            and sim_year < 2025
+        ):
+            # The hybrid schedule endpoint didn't exist in v3 until the 2025 season, so merge scores/schedule
+            return self._simulate_v3_hybrid_schedule(endpoint, version)
+
+        return self._get_api_response_from_gcs(endpoint, version)
+
+    def _simulate_v3_hybrid_schedule(
+        self, endpoint: str, version: str
+    ) -> URLFetchResult:
+        url_parts = endpoint.split("/")
+        year = int(url_parts[1])
+        event_code = url_parts[3]
+        comp_level = url_parts[4]
+
+        schedule_result = self._get_api_response_from_gcs(
+            f"/{year}/schedule/{event_code}?tournamentLevel={comp_level}", version
+        )
+        matches_result = self._get_api_response_from_gcs(
+            f"/{year}/matches/{event_code}?tournamentLevel={comp_level}", version
+        )
+        merged_content = self._merge_match_schedule_and_results(
+            cast(Dict, schedule_result.json()), cast(Dict, matches_result.json())
+        )
 
         versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
-        url = f"https://frc-api.firstinspires.org/{versioned_endpoint}"
+        hybrid_url = f"https://frc-api.firstinspires.org/{versioned_endpoint}"
+        return URLFetchResult.mock_for_content(
+            hybrid_url, 200, json.dumps(merged_content)
+        )
 
-        # Get list of responses
+    def _get_api_response_from_gcs(self, endpoint: str, version: str) -> URLFetchResult:
+        versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
+        url = f"https://frc-api.firstinspires.org/{versioned_endpoint}"
         try:
             gcs_dir_name = (
                 f"{self.STORAGE_BUCKET_BASE_DIR}/{version}/{endpoint.lstrip('/')}/"
@@ -250,3 +292,49 @@ class FRCAPI:
         except Exception:
             logging.exception("Error fetching sim frc api")
             return URLFetchResult.mock_for_content(url, 500, "")
+
+    def _merge_match_schedule_and_results(self, schedule: Dict, matches: Dict) -> Dict:
+        scheduled_matches = schedule["Schedule"]
+        if "Matches" not in matches:
+            matches["Matches"] = [{}] * len(scheduled_matches)
+        return {
+            "Schedule": [
+                self._merge_match(s, m)
+                for s, m in zip(scheduled_matches, matches["Matches"])
+            ]
+        }
+
+    @classmethod
+    def _merge_match(cls, scheduled: Dict, result: Dict) -> Dict:
+        # Over the years, both "Teams" and "teams" have been used in FRC API responses...
+        teams_key = "Teams" if "Teams" in scheduled else "teams"
+
+        # 2024, Week 4: As part of attempting to restore sync,
+        # schedules sync with teams [1, 2, 3] in to-be-played playoff matches
+        # In a case where the only teams for a match are those three, overwrite
+        # the team numbers in each station to None
+        schedule_team_numbers = [t["teamNumber"] for t in scheduled.get(teams_key)]
+        if set(schedule_team_numbers) == {1, 2, 3}:
+            scheduled["teams"] = [
+                {**t, "teamNumber": None} for t in scheduled.get(teams_key)
+            ]
+
+        for field, value in result.items():
+            if field == teams_key:
+                for team in value:
+                    schedule_idx, schedule_team = next(
+                        filter(
+                            lambda t: t[1]["teamNumber"] == team["teamNumber"],
+                            enumerate(scheduled["teams"]),
+                        ),
+                        (None, None),
+                    )
+                    if schedule_team is None:
+                        # 2024, Week 3: Upstream FMS sync issues leading to schedules returned with no teams
+                        # Some match results have been sync'd, so patch around this where we can
+                        scheduled["teams"].append(team)
+                    else:
+                        scheduled["teams"][schedule_idx].update(team)
+            else:
+                scheduled[field] = value
+        return scheduled
