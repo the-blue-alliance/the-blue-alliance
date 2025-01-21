@@ -5115,7 +5115,7 @@
                 "description": "Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.",
                 "items": {
                   "type": "number",
-                  "format": "float"
+                  "format": "double"
                 }
               },
               "record": {
@@ -5303,7 +5303,7 @@
                   "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
                   "items": {
                     "type": "number",
-                    "format": "float"
+                    "format": "double"
                   }
                 },
                 "record": {
