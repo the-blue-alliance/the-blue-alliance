@@ -6753,7 +6753,7 @@
             "type": "integer"
           },
           "teleopTowerCaptured": {
-            "type": "integer"
+            "type": "boolean"
           },
           "towerFaceA": {
             "type": "string"

@@ -69,7 +69,7 @@ export default function TeamEventAppearance({
         />
       </div>
       <div>
-        <MatchResultsTable matches={matches} event={event} />
+        <MatchResultsTable matches={matches} event={event} team={team} />
       </div>
     </div>
   );

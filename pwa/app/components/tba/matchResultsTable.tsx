@@ -9,6 +9,7 @@ import PlayCircle from '~icons/bi/play-circle';
 
 import { Event, Match, Team } from '~/api/v3';
 import { TeamLink } from '~/components/tba/links';
+import RpDots from '~/components/tba/rpDot';
 import {
   TooltipContent,
   TooltipProvider,
@@ -58,6 +59,7 @@ interface CellProps
     VariantProps<typeof cellVariants> {
   dq?: boolean;
   surrogate?: boolean;
+  teamHighlight?: boolean;
 }
 function GridCell({
   className,
@@ -66,6 +68,7 @@ function GridCell({
   teamOrScore,
   dq,
   surrogate,
+  teamHighlight,
   ...props
 }: CellProps) {
   return (
@@ -76,6 +79,7 @@ function GridCell({
         {
           'line-through': dq,
           'underline decoration-dotted': surrogate,
+          underline: teamHighlight,
         },
       )}
       {...props}
@@ -195,7 +199,11 @@ export default function MatchResultsTable(props: MatchResultsTableProps) {
 }
 
 // todo: add support for specific-team underlines
-function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
+function MatchResultsTableGroup({
+  matches,
+  event,
+  team,
+}: MatchResultsTableProps) {
   const gridStyle = cn(
     // always use these classes:
     'grid items-center justify-items-center',
@@ -283,6 +291,7 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
                   }
                   dq={dq}
                   surrogate={surrogate}
+                  teamHighlight={team?.key === k}
                 >
                   <ConditionalTooltip dq={dq} surrogate={surrogate}>
                     <TeamLink teamOrKey={k} year={event.year}>
@@ -312,6 +321,7 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
                   className={x}
                   dq={dq}
                   surrogate={surrogate}
+                  teamHighlight={team?.key === k}
                 >
                   <ConditionalTooltip dq={dq} surrogate={surrogate}>
                     <TeamLink teamOrKey={k} year={event.year}>
@@ -324,19 +334,39 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
 
             {/* scores */}
             <GridCell
-              className="col-start-6 row-start-1 lg:col-start-9"
+              className="relative col-start-6 row-start-1 lg:col-start-9"
               allianceColor={'red'}
               matchResult={m.winning_alliance === 'red' ? 'winner' : 'loser'}
               teamOrScore={'score'}
+              teamHighlight={
+                team !== undefined &&
+                m.alliances.red.team_keys.includes(team.key)
+              }
             >
+              {m.score_breakdown && (
+                <RpDots
+                  score_breakdown={m.score_breakdown.red}
+                  year={Number(m.key.substring(0, 4))}
+                />
+              )}
               {m.alliances.red.score}
             </GridCell>
             <GridCell
-              className="col-start-6 lg:col-start-10"
+              className="relative col-start-6 lg:col-start-10"
               allianceColor={'blue'}
               matchResult={m.winning_alliance === 'blue' ? 'winner' : 'loser'}
               teamOrScore={'score'}
+              teamHighlight={
+                team !== undefined &&
+                m.alliances.blue.team_keys.includes(team.key)
+              }
             >
+              {m.score_breakdown && (
+                <RpDots
+                  score_breakdown={m.score_breakdown.blue}
+                  year={Number(m.key.substring(0, 4))}
+                />
+              )}
               {m.alliances.blue.score}
             </GridCell>
           </div>
