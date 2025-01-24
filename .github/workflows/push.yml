@@ -97,7 +97,7 @@ jobs:
           coverage xml
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v5.1.2
+        uses: codecov/codecov-action@v5.3.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
@@ -135,7 +135,7 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v5.1.2
+        uses: codecov/codecov-action@v5.3.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
@@ -197,7 +197,7 @@ jobs:
         run: npm --prefix pwa test
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v5.1.2
+        uses: codecov/codecov-action@v5.3.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
