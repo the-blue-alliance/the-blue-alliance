@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% block title %}myTBA Team {{team.team_number}} - The
+Blue Alliance{% endblock %} {% block meta_description %}Manage your favorites
+and subscriptions{% endblock %} {% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <ol class="breadcrumb">
+        <li>
+          <a href="{{ url_for('account.overview') }}">Account Overview</a>
+        </li>
+        <li><a href="/account/mytba#my-teams">Manage myTBA</a></li>
+        <li class="active">Team {{team.team_number}}</li>
+      </ol>
+
+      <h1>myTBA Team: {{team.team_number}} - {{team.nickname}}</h1>
+      <p>Edit your attendance for this team.</p>
+
+      <form method="post">
+        <input name="action" type="hidden" value="subscription_year_add" />
+        <input name="account_id" type="hidden" value="{{ user.uid }}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <table class="table">
+          {% for event_team in event_teams %}
+          <tr>
+            <td>
+              <a href="/event/{{ event_team.event.string_id() }}"
+                >{{ event_team.event.string_id() }}</a
+              >
+            </td>
+
+            <td>
+              <ul style="list-style-type: none">
+                <li>
+                  <input
+                    type="checkbox"
+                    name="favorite_events"
+                    value="{{ event_team.event.string_id() }}"
+                    {% if event_team.key_name in already_favorited %}checked{% endif %}
+                  />
+                </li>
+              </ul>
+            </td>
+          </tr>
+
+          {% endfor %}
+        </table>
+
+        <td>
+          <button type="submit" class="btn btn-primary">
+            <span class="glyphicon glyphicon-thumbs-up"></span> Save
+          </button>
+        </td>
+        <a href="/account/mytba#my-teams" class="btn btn-default"
+          ><span class="glyphicon glyphicon-thumbs-down"></span> Cancel</a
+        >
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
