@@ -115,31 +115,30 @@ def team_details(team_key: TeamKey) -> Response:
 
     # Clean up junk district teams
     # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
-    if team:
-        keys_to_delete = set()
-        # Delete all DistrictTeams that are not valid in the current
-        # year, since each team can only be in one district per year
-        dt_keys = DistrictTeam.query(
-            DistrictTeam.team == team.key, DistrictTeam.year == year
-        ).fetch(keys_only=True)
-        for dt_key in dt_keys:
-            if not district_team or dt_key.id() != district_team.key.id():
-                keys_to_delete.add(dt_key)
+    keys_to_delete = set()
+    # Delete all DistrictTeams that are not valid in the current
+    # year, since each team can only be in one district per year
+    dt_keys = DistrictTeam.query(
+        DistrictTeam.team == team_key, DistrictTeam.year == year
+    ).fetch(keys_only=True)
+    for dt_key in dt_keys:
+        if not district_team or dt_key.id() != district_team.key.id():
+            keys_to_delete.add(dt_key)
 
-        # Delete all DistrictTeam that are for any year that the team
-        # does not have an event
-        dt_keys = DistrictTeam.query(DistrictTeam.team == team.key).fetch()
-        et_keys = EventTeam.query(
-            EventTeam.team == team.key,
-            projection=[EventTeam.year],
-            group_by=[EventTeam.year],
-        ).fetch()
-        et_years = {et_key.year for et_key in et_keys}
+    # Delete all DistrictTeam that are for any year that the team
+    # does not have an event
+    dt_keys = DistrictTeam.query(DistrictTeam.team == team_key).fetch()
+    et_keys = EventTeam.query(
+        EventTeam.team == team_key,
+        projection=[EventTeam.year],
+        group_by=[EventTeam.year],
+    ).fetch()
+    et_years = {et_key.year for et_key in et_keys}
 
-        for dt_key in dt_keys:
-            if dt_key.year not in et_years:
-                keys_to_delete.add(dt_key.key)
-        DistrictTeamManipulator.delete_keys(keys_to_delete)
+    for dt_key in dt_keys:
+        if dt_key.year not in et_years:
+            keys_to_delete.add(dt_key.key)
+    DistrictTeamManipulator.delete_keys(keys_to_delete)
 
     if robot:
         robot = RobotManipulator.createOrUpdate(robot)
