@@ -7,7 +7,7 @@ import { WltRecord, getStatus } from '~/api/v3';
 
 // TODO: Generate this from the API
 const VALID_YEARS: number[] = [];
-for (let i = 2024; i >= 1992; i--) {
+for (let i = 2025; i >= 1992; i--) {
   VALID_YEARS.push(i);
 }
 export { VALID_YEARS };
