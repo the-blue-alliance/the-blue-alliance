@@ -1,9 +1,10 @@
 import json
-from typing import Dict, Literal, Set
+from typing import Dict, Literal, Optional, Set
 
 from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
+from backend.common.models.district import DistrictAbbreviation
 
 
 LeaderboardKeyType = Literal["team"] | Literal["event"] | Literal["match"]
@@ -141,6 +142,10 @@ class Insight(CachedModel):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
+    district_abbreviation: Optional[DistrictAbbreviation] = ndb.StringProperty(
+        required=False
+    )
+
     _json_attrs: Set[str] = {
         "data_json",
     }
@@ -168,11 +173,13 @@ class Insight(CachedModel):
         """
         Returns the string of the key_name of the Insight object before writing it.
         """
-        return self.render_key_name(self.year, self.name)
+        return self.render_key_name(self.year, self.name, self.district_abbreviation)
 
     @classmethod
-    def render_key_name(cls, year, name):
+    def render_key_name(cls, year, name, district_abbreviation):
+        suffix = f"_{district_abbreviation}" if district_abbreviation else ""
+
         if year == 0:
-            return "insights" + "_" + str(name)
+            return "insights" + "_" + str(name) + suffix
         else:
-            return str(year) + "insights" + "_" + str(name)
+            return str(year) + "insights" + "_" + str(name) + suffix

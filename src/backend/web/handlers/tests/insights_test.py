@@ -7,7 +7,7 @@ from backend.common.models.insight import Insight
 
 def test_overall_insights(web_client: Client) -> None:
     Insight(
-        id=Insight.render_key_name(0, "blue_banners"),
+        id=Insight.render_key_name(0, "blue_banners", None),
         year=0,
         name="blue_banners",
         data_json=json.dumps({}),
@@ -21,7 +21,7 @@ def test_overall_insights(web_client: Client) -> None:
 
 def test_detail_insights(web_client: Client) -> None:
     Insight(
-        id=Insight.render_key_name(2022, "blue_banners"),
+        id=Insight.render_key_name(2022, "blue_banners", None),
         year=2022,
         name="blue_banners",
         data_json=json.dumps({}),

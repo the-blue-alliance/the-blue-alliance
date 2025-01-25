@@ -178,7 +178,7 @@ def index_insights(template_values: Dict[str, Any]) -> str:
 
     insights = ndb.get_multi(
         [
-            ndb.Key(Insight, Insight.render_key_name(year, insight_name))
+            ndb.Key(Insight, Insight.render_key_name(year, insight_name, None))
             for insight_name in Insight.INSIGHT_NAMES.values()
         ]
     )
