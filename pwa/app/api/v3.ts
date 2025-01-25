@@ -374,7 +374,7 @@ export type MatchScoreBreakdown2016Alliance = {
   teleopDefensesBreached?: boolean;
   teleopChallengePoints?: number;
   teleopScalePoints?: number;
-  teleopTowerCaptured?: number;
+  teleopTowerCaptured?: boolean;
   towerFaceA?: string;
   towerFaceB?: string;
   towerFaceC?: string;
