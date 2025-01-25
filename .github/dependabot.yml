@@ -40,6 +40,9 @@ updates:
     radix-ui:
       patterns:
         - "@radix-ui/*"
+    vitest:
+      patterns:
+        - "**/vitest*"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
