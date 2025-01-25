@@ -6,7 +6,9 @@ import {
   Params,
   useLoaderData,
 } from '@remix-run/react';
-import { useMemo } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+import { range } from 'lodash-es';
+import { useMemo, useState } from 'react';
 
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
@@ -23,12 +25,14 @@ import MdiTournament from '~icons/mdi/tournament';
 import {
   Award,
   Event,
+  EventCopRs,
   Match,
   Media,
   Team,
   getEvent,
   getEventAlliances,
   getEventAwards,
+  getEventCopRs,
   getEventMatches,
   getEventRankings,
   getEventTeamMedia,
@@ -36,12 +40,19 @@ import {
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
+import { DataTable } from '~/components/tba/dataTable';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLink } from '~/components/tba/links';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
 import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
-import { Card } from '~/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
 import {
   Credenza,
   CredenzaBody,
@@ -54,12 +65,29 @@ import {
   CredenzaTrigger,
 } from '~/components/ui/credenza';
 import { ScrollArea } from '~/components/ui/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
+import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import { getEventDateString, isValidEventKey } from '~/lib/eventUtils';
-import { sortMatchComparator } from '~/lib/matchUtils';
+import {
+  calculateMedianTurnaroundTime,
+  getHighScoreMatch,
+  sortMatchComparator,
+} from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
+import {
+  RANKING_POINT_LABELS,
+  getBonusRankingPoints,
+} from '~/lib/rankingPoints';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
+import { camelCaseToHumanReadable } from '~/lib/utils';
 
 async function loadData(params: Params) {
   if (params.eventKey === undefined) {
@@ -72,7 +100,7 @@ async function loadData(params: Params) {
     });
   }
 
-  const [event, matches, alliances, rankings, awards, teams, teamMedia] =
+  const [event, matches, alliances, rankings, awards, teams, teamMedia, coprs] =
     await Promise.all([
       getEvent({ eventKey: params.eventKey }),
       getEventMatches({ eventKey: params.eventKey }),
@@ -81,6 +109,7 @@ async function loadData(params: Params) {
       getEventAwards({ eventKey: params.eventKey }),
       getEventTeams({ eventKey: params.eventKey }),
       getEventTeamMedia({ eventKey: params.eventKey }),
+      getEventCopRs({ eventKey: params.eventKey }),
     ]);
 
   if (event.status == 404) {
@@ -96,7 +125,8 @@ async function loadData(params: Params) {
     rankings.status !== 200 ||
     awards.status !== 200 ||
     teams.status !== 200 ||
-    teamMedia.status !== 200
+    teamMedia.status !== 200 ||
+    coprs.status !== 200
   ) {
     throw new Response(null, {
       status: 500,
@@ -111,6 +141,7 @@ async function loadData(params: Params) {
     awards: awards.data,
     teams: teams.data,
     teamMedia: teamMedia.data,
+    coprs: coprs.data,
   };
 }
 
@@ -133,8 +164,16 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export default function EventPage() {
-  const { event, alliances, matches, rankings, awards, teams, teamMedia } =
-    useLoaderData<typeof loader>();
+  const {
+    event,
+    alliances,
+    matches,
+    rankings,
+    awards,
+    teams,
+    teamMedia,
+    coprs,
+  } = useLoaderData<typeof loader>();
 
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
@@ -268,12 +307,14 @@ export default function EventPage() {
               </Badge>
             </InlineIcon>
           </TabsTrigger>
-          <TabsTrigger value="insights">
-            <InlineIcon>
-              <MdiGraphBoxOutline />
-              Insights
-            </InlineIcon>
-          </TabsTrigger>
+          {matches.length > 0 && (
+            <TabsTrigger value="insights">
+              <InlineIcon>
+                <MdiGraphBoxOutline />
+                Insights
+              </InlineIcon>
+            </TabsTrigger>
+          )}
           <TabsTrigger value="media">
             <InlineIcon>
               <MdiFolderMediaOutline />
@@ -322,7 +363,12 @@ export default function EventPage() {
           />
         </TabsContent>
 
-        <TabsContent value="insights">insights</TabsContent>
+        <TabsContent value="insights">
+          <MatchStatsTable matches={sortedMatches} year={event.year} />
+          {coprs && Object.keys(coprs).length > 0 && (
+            <ComponentsTable coprs={coprs} year={event.year} />
+          )}
+        </TabsContent>
 
         <TabsContent value="media">media</TabsContent>
       </Tabs>
@@ -448,6 +494,157 @@ function TeamsTab({
           </CredenzaContent>
         </Credenza>
       ))}
+    </div>
+  );
+}
+
+function MatchStatsTable({
+  matches,
+  year,
+}: {
+  matches: Match[];
+  year: number;
+}) {
+  const highScoreQual = useMemo(
+    () => getHighScoreMatch(matches.filter((m) => m.comp_level === 'qm')),
+    [matches],
+  );
+  const highScorePlayoff = useMemo(
+    () => getHighScoreMatch(matches.filter((m) => m.comp_level !== 'qm')),
+    [matches],
+  );
+  const medianTurnaround = useMemo(
+    () => calculateMedianTurnaroundTime(matches),
+    [matches],
+  );
+
+  const rpPercentages = useMemo(
+    () =>
+      range(0, RANKING_POINT_LABELS[year].length).map(
+        (i) =>
+          matches
+            .filter((m) => m.score_breakdown !== null)
+            .map((m) => [
+              getBonusRankingPoints(m.score_breakdown?.red ?? {}),
+              getBonusRankingPoints(m.score_breakdown?.blue ?? {}),
+            ])
+            .map((rps) => (rps[0][i] ? 1 : 0) + (rps[1][i] ? 1 : 0))
+            .reduce((prev, curr) => prev + curr, 0) /
+          (matches.length * 2),
+      ),
+    [matches, year],
+  );
+
+  return (
+    <Table>
+      <TableBody>
+        <TableRow>
+          <TableCell>Total Matches</TableCell>
+          <TableCell>{matches.length}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>High Score (Quals)</TableCell>
+          <TableCell>
+            Qual {highScoreQual.match_number} -{' '}
+            {Math.max(
+              highScoreQual.alliances.red.score,
+              highScoreQual.alliances.blue.score,
+            )}{' '}
+            points
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>High Score (Playoffs)</TableCell>
+          <TableCell>
+            {highScorePlayoff.comp_level.toUpperCase()}
+            {highScorePlayoff.set_number}-{highScorePlayoff.match_number} -{' '}
+            {Math.max(
+              highScorePlayoff.alliances.red.score,
+              highScorePlayoff.alliances.blue.score,
+            )}{' '}
+            points
+          </TableCell>
+        </TableRow>
+        {medianTurnaround !== undefined && (
+          <TableRow>
+            <TableCell>Median Turnaround Time</TableCell>
+            <TableCell>{(medianTurnaround / 60).toFixed(2)} mins</TableCell>
+          </TableRow>
+        )}
+        {rpPercentages.map((rp, i) => (
+          <TableRow key={i}>
+            <TableCell>{RANKING_POINT_LABELS[year][i]} percentage</TableCell>
+            <TableCell>{(rp * 100).toPrecision(2)}%</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+function ComponentsTable({ coprs, year }: { coprs: EventCopRs; year: number }) {
+  const [component, setComponent] = useState('totalPoints');
+
+  // filter any components that are just all zeros
+  const excludedComponents = Object.keys(coprs).filter((k) =>
+    Object.values(coprs[k]).every((v) => v === 0),
+  );
+
+  const columns: ColumnDef<{ teamKey: string; value: number }>[] = [
+    {
+      header: 'Team',
+      accessorFn: (row) => row.teamKey,
+      cell: (cell) => (
+        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
+          {cell.getValue<string>().substring(3)}
+        </TeamLink>
+      ),
+    },
+    {
+      header: 'Value',
+      accessorFn: (row) => row.value.toFixed(2),
+    },
+  ];
+
+  return (
+    <div>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <div className="flex items-center">
+              <span className="basis-1/2">Component OPRs</span>
+              <Select onValueChange={setComponent}>
+                <SelectTrigger className="font-normal">
+                  <SelectValue
+                    placeholder={camelCaseToHumanReadable(component)}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(coprs)
+                    .filter((k) => !excludedComponents.includes(k))
+                    .map((k) => (
+                      <SelectItem key={k} value={k}>
+                        {camelCaseToHumanReadable(k)}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardTitle>
+          <CardDescription></CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DataTable
+            columns={columns}
+            data={Object.entries(coprs[component])
+              .map(([k, v]) => ({
+                teamKey: k,
+                value: v,
+              }))
+              .toSorted((a, b) => b.value - a.value)}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
