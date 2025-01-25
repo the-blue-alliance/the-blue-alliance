@@ -28,9 +28,11 @@ import {
   getTeamSocialMedia,
   getTeamYearsParticipated,
 } from '~/api/v3';
+import { AwardBanner } from '~/components/tba/banner';
 import TeamEventAppearance from '~/components/tba/teamEventAppearance';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
+import { Badge } from '~/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -58,7 +60,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { EventType, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import {
   calculateTeamRecordsFromMatches,
@@ -285,11 +289,30 @@ export default function TeamPage(): React.JSX.Element {
         <Separator className="my-4" />
 
         <StatsSection
+          events={events}
           team={team}
           matches={matches}
           awards={awards}
-          events={events}
+          year={year}
         />
+
+        {awards.filter((a) => BLUE_BANNER_AWARDS.has(a.award_type)).length >
+          0 && (
+          <>
+            <Separator className="my-4" />
+            <div className="flex flex-row justify-around">
+              <BlueBanners
+                awards={awards
+                  .filter((a) => BLUE_BANNER_AWARDS.has(a.award_type))
+                  .filter((a) => {
+                    const event = events.find((e) => e.key === a.event_key);
+                    return event && SEASON_EVENT_TYPES.has(event.event_type);
+                  })}
+                events={events}
+              />
+            </div>
+          </>
+        )}
 
         <div>
           <Separator className="mb-8 mt-4" />
@@ -332,12 +355,16 @@ function StatsSection({
   team,
   matches,
   awards,
+  year,
 }: {
   events: Event[];
   team: Team;
   matches: Match[];
   awards: Award[];
+  year: number;
 }) {
+  const [showTable, setShowTable] = useState(false);
+
   const officialEvents = events.filter((e) =>
     SEASON_EVENT_TYPES.has(e.event_type),
   );
@@ -370,7 +397,6 @@ function StatsSection({
     () => calculateTeamRecordsFromMatches(team.key, unofficialMatches),
     [team.key, unofficialMatches],
   );
-
   const officialQuals = officialRecords.quals;
   const officialPlayoff = officialRecords.playoff;
   const unofficialQuals = unofficialRecords.quals;
@@ -389,78 +415,105 @@ function StatsSection({
   );
 
   return (
-    <div>
-      <div
-        // The padding/margins make the separator not actually perfectly centered
-        // left-47.5 looks significantly better than left-1/2
-        className={`relative flex flex-wrap before:absolute before:inset-y-0
-        before:left-[47.5%]
-        before:hidden before:w-px before:bg-gray-200 sm:mt-0 before:lg:block
-        [&>*]:w-full [&>*]:lg:w-1/2`}
-      >
-        <div className="grid grid-cols-2 items-center gap-y-4">
-          <Stat
-            label={`Official ${pluralize(officialEvents.length, 'Event', 'Events', false)}`}
-            value={officialEvents.length}
-          />
-
-          <Stat
-            label={`Official ${pluralize(matches.length, 'Match', 'Matches', false)}`}
-            value={officialMatches.length}
-          />
-
-          {awards.length > 0 && (
-            <Stat
-              label={pluralize(awards.length, 'Award', 'Awards', false)}
-              value={awards.length}
-            />
-          )}
-
-          {highScoreMatch && (
-            <TooltippedStat
-              label="High Score"
-              value={highScoreMatch.score}
-              tooltip={`${highScoreMatch.match.key} - ${highScoreMatch.alliance.team_keys.map((k) => k.substring(3)).join('-')}`}
-            />
-          )}
-        </div>
-
-        <Separator className="my-4 sm:hidden" />
-
-        <Table className="min-w-[300px] table-fixed [&_tr]:border-b-0">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-center"></TableHead>
-              <TableHead className="text-center">Quals</TableHead>
-              <TableHead className="text-center">Playoffs</TableHead>
-              <TableHead className="text-center">Overall</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableHead>Official</TableHead>
-              <RecordCell record={officialRecords.quals} />
-              <RecordCell record={officialRecords.playoff} />
-              <RecordCell record={officialRecord} />
-            </TableRow>
-
-            <TableRow>
-              <TableHead>Unofficial</TableHead>
-              <RecordCell record={unofficialRecords.quals} />
-              <RecordCell record={unofficialRecords.playoff} />
-              <RecordCell record={unofficialRecord} />
-            </TableRow>
-
-            <TableRow>
-              <TableHead>Combined</TableHead>
-              <RecordCell record={combinedQuals} />
-              <RecordCell record={combinedPlayoff} />
-              <RecordCell record={combinedRecord} />
-            </TableRow>
-          </TableBody>
-        </Table>
+    <>
+      <div className="">
+        Team {team.team_number} was{' '}
+        <span className="font-semibold">
+          {officialRecord.wins}-{officialRecord.losses}
+          {officialRecord.ties > 0 ? `-${officialRecord.ties}` : ''}
+        </span>{' '}
+        in official play and{' '}
+        <span className="font-semibold">
+          {officialRecord.wins + unofficialRecord.wins}-
+          {officialRecord.losses + unofficialRecord.losses}
+          {officialRecord.ties + unofficialRecord.ties > 0
+            ? `-${officialRecord.ties + unofficialRecord.ties}`
+            : ''}
+        </span>{' '}
+        overall in {year}.
+        <Badge
+          className="ml-2 cursor-pointer"
+          onClick={() => {
+            setShowTable((prev) => !prev);
+          }}
+        >
+          {showTable ? 'Hide' : 'Show'} Details
+        </Badge>
       </div>
-    </div>
+
+      {showTable && (
+        <div>
+          <div
+            // The padding/margins make the separator not actually perfectly centered
+            // left-47.5 looks significantly better than left-1/2
+            className={`relative flex flex-wrap before:absolute before:inset-y-0
+          before:left-[47.5%]
+          before:hidden before:w-px before:bg-gray-200 sm:mt-0 before:lg:block
+          [&>*]:w-full [&>*]:lg:w-1/2`}
+          >
+            <div className="grid grid-cols-2 items-center gap-y-4">
+              <Stat
+                label={`Official ${pluralize(officialEvents.length, 'Event', 'Events', false)}`}
+                value={officialEvents.length}
+              />
+
+              <Stat
+                label={`Official ${pluralize(matches.length, 'Match', 'Matches', false)}`}
+                value={officialMatches.length}
+              />
+
+              {awards.length > 0 && (
+                <Stat
+                  label={pluralize(awards.length, 'Award', 'Awards', false)}
+                  value={awards.length}
+                />
+              )}
+
+              {highScoreMatch && (
+                <TooltippedStat
+                  label="High Score"
+                  value={highScoreMatch.score}
+                  tooltip={`${highScoreMatch.match.key} - ${highScoreMatch.alliance.team_keys.map((k) => k.substring(3)).join('-')}`}
+                />
+              )}
+            </div>
+
+            <Table className="table-fixed [&_tr]:border-b-0">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-center"></TableHead>
+                  <TableHead className="text-center">Quals</TableHead>
+                  <TableHead className="text-center">Playoffs</TableHead>
+                  <TableHead className="text-center">Overall</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableHead>Official</TableHead>
+                  <RecordCell record={officialRecords.quals} />
+                  <RecordCell record={officialRecords.playoff} />
+                  <RecordCell record={officialRecord} />
+                </TableRow>
+
+                <TableRow>
+                  <TableHead>Unofficial</TableHead>
+                  <RecordCell record={unofficialRecords.quals} />
+                  <RecordCell record={unofficialRecords.playoff} />
+                  <RecordCell record={unofficialRecord} />
+                </TableRow>
+
+                <TableRow>
+                  <TableHead>Combined</TableHead>
+                  <RecordCell record={combinedQuals} />
+                  <RecordCell record={combinedPlayoff} />
+                  <RecordCell record={combinedRecord} />
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -510,5 +563,20 @@ function TooltippedStat({
         <TooltipContent>{tooltip}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+}
+
+function BlueBanners({ awards, events }: { awards: Award[]; events: Event[] }) {
+  return (
+    <div className="flex flex-row flex-wrap justify-center gap-2">
+      {sortAwardsByEventDate(awards, events).map((a) => (
+        <AwardBanner
+          key={`${a.award_type}-${a.event_key}`}
+          award={a}
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          event={events.find((e) => e.key === a.event_key)!}
+        />
+      ))}
+    </div>
   );
 }
