@@ -112,7 +112,7 @@ class DatafeedFMSAPI:
         result = self._parse(api_response, FMSAPITeamDetailsParser(year))
         if result:
             models, _ = result
-            return next(iter(models), None)
+            return next(iter(models), None) if models else None
         else:
             return None
 
