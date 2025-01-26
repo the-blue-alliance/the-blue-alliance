@@ -154,6 +154,19 @@ def test_fetch_team_details_empty(api_mock, tasks_client: Client) -> None:
     assert Robot.query().fetch() == []
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_details_none(api_mock, tasks_client: Client) -> None:
+    api_mock.return_value = InstantFuture(None)
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc254")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we wrote no models
+    assert Team.get_by_id("frc254") is None
+    assert DistrictTeam.query().fetch() == []
+    assert Robot.query().fetch() == []
+
+
 @freeze_time("2019-04-01")
 @mock.patch.object(DatafeedFMSAPI, "get_team_details")
 def test_fetch_team_clears_districtteams(api_mock, tasks_client: Client) -> None:
@@ -171,6 +184,20 @@ def test_fetch_team_clears_districtteams(api_mock, tasks_client: Client) -> None
 
     # Make sure we wrote no models
     assert Team.get_by_id("frc254") is not None
+    assert DistrictTeam.get_by_id("2019ne_frc254") is None
+
+
+@freeze_time("2019-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_none_clears_districtteams(api_mock, tasks_client: Client) -> None:
+    DistrictTeam(id="2019ne_frc254", team=ndb.Key(Team, "frc254"), year=2019).put()
+    api_mock.return_value = InstantFuture(None)
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc254")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we wrote no models
+    assert Team.get_by_id("frc254") is None
     assert DistrictTeam.get_by_id("2019ne_frc254") is None
 
 

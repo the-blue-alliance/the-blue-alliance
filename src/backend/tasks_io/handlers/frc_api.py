@@ -119,7 +119,7 @@ def team_details(team_key: TeamKey) -> Response:
     # Delete all DistrictTeams that are not valid in the current
     # year, since each team can only be in one district per year
     dt_keys = DistrictTeam.query(
-        DistrictTeam.team == team_key, DistrictTeam.year == year
+        DistrictTeam.team == ndb.Key(Team, team_key), DistrictTeam.year == year
     ).fetch(keys_only=True)
     for dt_key in dt_keys:
         if not district_team or dt_key.id() != district_team.key.id():
@@ -127,9 +127,9 @@ def team_details(team_key: TeamKey) -> Response:
 
     # Delete all DistrictTeam that are for any year that the team
     # does not have an event
-    dt_keys = DistrictTeam.query(DistrictTeam.team == team_key).fetch()
+    dt_keys = DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch()
     et_keys = EventTeam.query(
-        EventTeam.team == team_key,
+        EventTeam.team == ndb.Key(Team, team_key),
         projection=[EventTeam.year],
         group_by=[EventTeam.year],
     ).fetch()
