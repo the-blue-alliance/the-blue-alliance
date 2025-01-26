@@ -168,7 +168,10 @@ def api_auth_manage(key_type: Optional[str]) -> Response:
     elif key_type == "read":
         auth_filter = ApiAuthAccess.auth_types_enum == AuthType.READ_API
     elif key_type == "admin":
-        auth_filter = ApiAuthAccess.allow_admin == True  # noqa: E712
+        auth_filter = ndb.OR(
+            ApiAuthAccess.allow_admin == True,  # noqa: E712
+            ApiAuthAccess.all_official_events == True,  # noqa: E712
+        )
     else:
         return redirect(url_for("admin.api_auth_manage", key_type="write"))
 
