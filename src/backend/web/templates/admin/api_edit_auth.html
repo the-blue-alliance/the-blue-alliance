@@ -24,7 +24,7 @@
         </tr>
         <tr>
             <td>Owner Email</td>
-            <td><input class="form-control" type="text" name="owner" placeholder="foo@bar.com" {% if auth.owner %}value="{{ auth.owner.get.email }}"{% endif %}/></td>
+            <td><input class="form-control" type="text" name="owner" placeholder="foo@bar.com" {% if auth.owner %}value="{{ auth.owner.get().email }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Expiration</td>
