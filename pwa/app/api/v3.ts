@@ -764,17 +764,15 @@ export type Match = {
   post_result_time: number | null;
   /** Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null. */
   score_breakdown:
-    | (
-        | MatchScoreBreakdown2015
-        | MatchScoreBreakdown2016
-        | MatchScoreBreakdown2017
-        | MatchScoreBreakdown2018
-        | MatchScoreBreakdown2019
-        | MatchScoreBreakdown2020
-        | MatchScoreBreakdown2022
-        | MatchScoreBreakdown2023
-        | MatchScoreBreakdown2024
-      )
+    | MatchScoreBreakdown2015
+    | MatchScoreBreakdown2016
+    | MatchScoreBreakdown2017
+    | MatchScoreBreakdown2018
+    | MatchScoreBreakdown2019
+    | MatchScoreBreakdown2020
+    | MatchScoreBreakdown2022
+    | MatchScoreBreakdown2023
+    | MatchScoreBreakdown2024
     | null;
   /** Array of video objects associated with this match. */
   videos: {
