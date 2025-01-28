@@ -17,7 +17,7 @@
     "query-string": "^9.1.1",
     "react": "^18.3.1",
     "react-addons-transition-group": "^15.4.1",
-    "react-bootstrap": "^2.10.7",
+    "react-bootstrap": "^2.10.8",
     "react-bootstrap-typeahead": "^6.3.4",
     "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
