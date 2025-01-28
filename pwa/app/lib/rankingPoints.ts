@@ -16,6 +16,7 @@ export const RANKING_POINT_LABELS: Record<number, string[]> = {
   2018: ['Auto Quest', 'Face The Boss'],
   2019: ['Complete Rocket', 'Hab Docking'],
   2020: ['Shield Energized', 'Shield Operational'],
+  2021: ['Shield Energized', 'Shield Operational'], // Used at Chezy 2021
   2022: ['Cargo Bonus', 'Hangar Bonus'],
   2023: ['Sustainability Bonus', 'Activation Bonus'],
   2024: ['Melody Bonus', 'Ensemble Bonus'],
