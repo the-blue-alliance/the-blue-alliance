@@ -37,6 +37,7 @@ import {
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import InlineIcon from '~/components/tba/inlineIcon';
+import { TeamLink } from '~/components/tba/links';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
 import RankingsTable from '~/components/tba/rankingsTable';
 import { Badge } from '~/components/ui/badge';
@@ -417,7 +418,10 @@ function TeamsTab({
           <CredenzaContent>
             <CredenzaHeader>
               <CredenzaTitle>
-                {t.team_number} - {t.nickname} at {event.short_name}
+                <TeamLink teamOrKey={t.key}>
+                  {t.team_number} - {t.nickname}
+                </TeamLink>{' '}
+                at {event.short_name}
               </CredenzaTitle>
               <CredenzaDescription>
                 From {t.city}, {t.state_prov}, {t.country}
