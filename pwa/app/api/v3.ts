@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.7
+ * 3.9.9
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -296,9 +296,9 @@ export type TeamEventStatusPlayoff = {
   playoff_average?: number | null;
 } | null;
 export type TeamEventStatus = {
-  qual?: TeamEventStatusRank;
-  alliance?: TeamEventStatusAlliance;
-  playoff?: TeamEventStatusPlayoff;
+  qual?: TeamEventStatusRank | null;
+  alliance?: TeamEventStatusAlliance | null;
+  playoff?: TeamEventStatusPlayoff | null;
   /** An HTML formatted string suitable for display to the user containing the team's alliance pick status. */
   alliance_status_str?: string;
   /** An HTML formatter string suitable for display to the user containing the team's playoff status. */
@@ -306,9 +306,9 @@ export type TeamEventStatus = {
   /** An HTML formatted string suitable for display to the user containing the team's overall status summary of the event. */
   overall_status_str?: string;
   /** TBA match key for the next match the team is scheduled to play in at this event, or null. */
-  next_match_key?: string;
+  next_match_key?: string | null;
   /** TBA match key for the last match the team played in at this event, or null. */
-  last_match_key?: string;
+  last_match_key?: string | null;
 };
 export type MatchAlliance = {
   /** Score for this alliance. Will be null or -1 for an unplayed match. */

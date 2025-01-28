@@ -257,6 +257,8 @@ export const meta: MetaFunction = ({ error }) => {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  console.error(error);
+
   const isRouteError = isRouteErrorResponse(error);
   captureRemixErrorBoundaryError(error);
   return (
