@@ -10,10 +10,13 @@ import {
   Team,
   TeamEventStatus,
 } from '~/api/v3';
+import { AwardBanner } from '~/components/tba/banner';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
 import { Badge } from '~/components/ui/badge';
+import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
+import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
 import { cn, joinComponents, pluralize } from '~/lib/utils';
 
@@ -34,6 +37,10 @@ export default function TeamEventAppearance({
   maybeDistrictPoints: EventDistrictPoints | null;
   maybeAlliances: EliminationAlliance[] | null;
 }): React.JSX.Element {
+  const bannerAwards = awards.filter((a) =>
+    BLUE_BANNER_AWARDS.has(a.award_type),
+  );
+
   return (
     <div className="flex flex-wrap gap-x-8 [&>*]:sm:flex-1" id={event.key}>
       <div className="w-full">
@@ -67,6 +74,15 @@ export default function TeamEventAppearance({
           maybeDistrictPoints={maybeDistrictPoints}
           maybeAlliances={maybeAlliances}
         />
+
+        {SEASON_EVENT_TYPES.has(event.event_type) &&
+          bannerAwards.length > 0 && (
+            <div className="mt-6 flex flex-row flex-wrap justify-center gap-2">
+              {bannerAwards.map((a) => (
+                <AwardBanner key={a.award_type} award={a} event={event} />
+              ))}
+            </div>
+          )}
       </div>
       <div>
         <MatchResultsTable matches={matches} event={event} team={team} />
