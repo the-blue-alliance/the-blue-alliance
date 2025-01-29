@@ -415,7 +415,7 @@ function TeamsTab({
               })()}
             </Card>
           </CredenzaTrigger>
-          <CredenzaContent>
+          <CredenzaContent className="md:max-w-[80%] 2xl:max-w-[50%]">
             <CredenzaHeader>
               <CredenzaTitle>
                 <TeamLink teamOrKey={t.key}>
@@ -428,7 +428,7 @@ function TeamsTab({
               </CredenzaDescription>
             </CredenzaHeader>
             <CredenzaBody>
-              <ScrollArea className="h-[70vh] md:h-auto">
+              <ScrollArea className="h-[70vh]">
                 <MatchResultsTable
                   team={t}
                   matches={matches.filter(
