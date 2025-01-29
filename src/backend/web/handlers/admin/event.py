@@ -163,9 +163,8 @@ def event_edit(event_key: EventKey) -> Response:
 
 def event_delete(event_key: EventKey) -> Response:
     if request.method == "POST":
-        if not Event.validate_key_name(event_key):
-            abort(404)
-
+        # We do not check if the event key is valid due to the possibility of invalid events being written.
+        # See: https://github.com/the-blue-alliance/the-blue-alliance/issues/6735
         event = Event.get_by_id(event_key)
         if not event:
             abort(404)
