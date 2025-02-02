@@ -107,6 +107,7 @@ function handleBrowserRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set('Content-Type', 'text/html');
+          responseHeaders.set('Document-Policy', 'js-profiling');
 
           resolve(
             new Response(stream, {
