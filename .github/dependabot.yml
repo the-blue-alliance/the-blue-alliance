@@ -42,7 +42,8 @@ updates:
         - "@radix-ui/*"
     vitest:
       patterns:
-        - "**/vitest*"
+        - "vitest"
+        - "@vitest/coverage-v8"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
