@@ -9,6 +9,7 @@ from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event_team import EventTeam
 from backend.common.models.media import Media
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamParticipationQuery
@@ -61,6 +62,9 @@ def team_detail(team_number: int) -> str:
     team_medias = Media.query(Media.references == team.key).fetch(500)
     robots = Robot.query(Robot.team == team.key).fetch()
     district_teams = DistrictTeam.query(DistrictTeam.team == team.key).fetch()
+    regional_pool_teams = RegionalPoolTeam.query(
+        RegionalPoolTeam.team == team.key
+    ).fetch()
     years_participated = sorted(TeamParticipationQuery(team.key_name).fetch())
 
     team_medias_by_year = defaultdict(list)
@@ -84,6 +88,7 @@ def team_detail(team_number: int) -> str:
         "team_social_media": team_social_media,
         "robots": robots,
         "district_teams": district_teams,
+        "regional_pool_teams": regional_pool_teams,
         "years_participated": years_participated,
     }
 
