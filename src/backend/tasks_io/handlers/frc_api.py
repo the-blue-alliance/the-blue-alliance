@@ -40,6 +40,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
+from backend.common.models.regional_pool_advancement import RegionalPoolAdvancement
 from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -395,7 +396,8 @@ def event_details(event_key: EventKey) -> Response:
 
         if (
             event.year in SeasonHelper.get_valid_regional_pool_years()
-            and event.event_type_enum == EventType.REGIONAL
+            and event.event_type_enum
+            in {EventType.REGIONAL, EventType.CMP_DIVISION, EventType.CMP_FINALS}
             and team is not None
             and district_team is None
         ):
@@ -403,6 +405,14 @@ def event_details(event_key: EventKey) -> Response:
                 id=RegionalPoolTeam.render_key_name(event.year, team.key_name),
                 year=event.year,
                 team=team.key,
+                advancemnet=(
+                    RegionalPoolAdvancement(
+                        cmp=True,
+                    )
+                    if event.event_type_enum
+                    in {EventType.CMP_DIVISION, EventType.CMP_FINALS}
+                    else None
+                ),
             )
             regional_pool_teams.append(regional_pool_team)
 

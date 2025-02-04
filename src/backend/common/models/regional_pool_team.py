@@ -1,8 +1,12 @@
+from typing import Set
+
 from google.appengine.ext import ndb
 
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import RegionalPoolTeamKey, TeamKey, Year
+from backend.common.models.regional_pool_advancement import RegionalPoolAdvancement
+from backend.common.models.regional_pool_ranking import RegionalPoolRanking
 from backend.common.models.team import Team
 
 
@@ -19,6 +23,16 @@ class RegionalPoolTeam(CachedModel):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+    total_points = ndb.IntegerProperty()  # For query ordering
+    earned_points: RegionalPoolRanking = ndb.JsonProperty()  # pyre-ignore[8]
+    advancemnet: RegionalPoolAdvancement = ndb.JsonProperty()  # pyre-ignore[8]
+
+    _mutable_attrs: Set[str] = {
+        "total_points",
+        "earned_points",
+        "advancement",
+    }
 
     def __init__(self, *args, **kw) -> None:
         self._affected_references = {
