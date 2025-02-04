@@ -268,6 +268,17 @@ def districtteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAn
     return _queries_to_cache_keys_and_queries(queries)
 
 
+def regionalpoolteam_updated(
+    affected_refs: TAffectedReferences,
+) -> List[TCacheKeyAndQuery]:
+    # team_keys = _filter(affected_refs["team"])
+    # years = _filter(affected_refs["year"])
+
+    queries: List[CachedDatabaseQuery] = []
+    # TODO
+    return _queries_to_cache_keys_and_queries(queries)
+
+
 def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
     district_abbrevs = _filter(affected_refs["abbreviation"])
