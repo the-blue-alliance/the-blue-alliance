@@ -394,7 +394,6 @@ class DistrictHelper:
 
             winning_alliance = cast(AllianceColor, match.winning_alliance)
 
-            # Get alliance numbers
             winning_alliance_number = cls._get_alliance_number_from_teams(
                 alliance_selections,
                 match.alliances[winning_alliance]["teams"],

@@ -501,7 +501,7 @@ def event_details(event_key: EventKey) -> Response:
     template_values = {
         "event": event,
         "event_teams": event_teams,
-        "district_teams": district_teams,
+        "district_teams": listify(district_teams),
         "regional_pool_teams": regional_pool_teams,
     }
 

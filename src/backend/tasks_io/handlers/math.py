@@ -172,8 +172,7 @@ def regional_event_champs_pool_points_calc(event_key: EventKey) -> Response:
 
     if event.event_type_enum == EventType.REGIONAL:
         taskqueue.add(
-            url=url_for("match.regional_champs_pool_rankings_calc"),
-            year=event.year,
+            url=url_for("math.regional_champs_pool_rankings_calc", year=event.year),
             method="GET",
             target="py3-tasks-io",
             queue_name="default",
@@ -280,7 +279,7 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
     return make_response("")
 
 
-@blueprint.route("/tasks/math/do/regional_champs_pool_rankings_calc/<year:int>")
+@blueprint.route("/tasks/math/do/regional_champs_pool_rankings_calc/<int:year>")
 def regional_champs_pool_rankings_calc(year: Year) -> Response:
     regional_pool = RegionalChampsPool.get_for_year(year)
     if not regional_pool:

@@ -22,6 +22,7 @@ from backend.web.handlers.admin.districts import (
     district_create,
     district_delete,
     district_delete_post,
+    district_details,
     district_edit,
     district_edit_post,
     district_list,
@@ -185,6 +186,7 @@ admin_routes.add_url_rule(
     "/districts", view_func=district_list, defaults={"year": None}
 )
 admin_routes.add_url_rule("/districts/<int:year>", view_func=district_list)
+admin_routes.add_url_rule("/district/<district_key>", view_func=district_details)
 admin_routes.add_url_rule("/district/create", view_func=district_create)
 admin_routes.add_url_rule(
     "/district/delete/<district_key>", methods=["GET"], view_func=district_delete

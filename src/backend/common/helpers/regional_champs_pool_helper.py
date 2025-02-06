@@ -124,7 +124,9 @@ class RegionalChampsPoolHelper(DistrictHelper):
             if event_regional_points is None:
                 continue
 
-            for team_key in set(event_regional_points["points"].keys()).union(set(event_regional_points["tiebreakers"].keys())):
+            for team_key in set(event_regional_points["points"].keys()).union(
+                set(event_regional_points["tiebreakers"].keys())
+            ):
                 team_attendance[team_key].append(event.key_name)
                 if len(team_attendance[team_key]) > 2:
                     continue
@@ -133,7 +135,9 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     team_totals[team_key]["event_points"].append(
                         (event, event_regional_points["points"][team_key])
                     )
-                    team_totals[team_key]["point_total"] += event_regional_points["points"][team_key]["total"]
+                    team_totals[team_key]["point_total"] += event_regional_points[
+                        "points"
+                    ][team_key]["total"]
 
                     # Add tiebreakers in order
                     # TODO: implement tiebreakers
@@ -163,7 +167,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     # -item[1]["tiebreakers"][2],
                     # -item[1]["tiebreakers"][3],
                     # -item[1]["tiebreakers"][4],
-                ]
+                ],
                 # + [-score for score in item[1]["qual_scores"]],
             )
         )
