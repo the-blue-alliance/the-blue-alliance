@@ -10,6 +10,26 @@ from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, Year
 
 
+ALL_KNOWN_DISTRICT_ABBREVIATIONS: Set[DistrictAbbreviation] = {
+    "chs",
+    "fim",
+    "fit",
+    "tx",
+    "in",
+    "fin",
+    "isr",
+    "mar",
+    "fma",
+    "nc",
+    "fnc",
+    "fsc",
+    "ne",
+    "ont",
+    "pnw",
+    "pch",
+}
+
+
 class District(CachedModel):
     """
     One instance of a district in a year. Here, we store info about a district and in-season data
