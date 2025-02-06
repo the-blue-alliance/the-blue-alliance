@@ -9,7 +9,6 @@ import {
   useRouteError,
 } from '@remix-run/react';
 import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
-import { pwaInfo } from 'virtual:pwa-info';
 
 import * as api from '~/api/v3';
 
@@ -71,9 +70,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           rel="stylesheet"
         />
         <Meta />
-        {pwaInfo ? (
-          <link rel="manifest" href={pwaInfo.webManifest.href} />
-        ) : null}
+        <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
         <link
