@@ -12,6 +12,7 @@ EventTeamKey = str
 DistrictKey = str
 DistrictAbbreviation = str
 DistrictTeamKey = str
+RegionalChampsPoolKey = str
 RegionalPoolTeamKey = str
 MatchKey = str
 AwardKey = str
