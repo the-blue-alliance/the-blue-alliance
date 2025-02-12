@@ -6419,6 +6419,9 @@
               },
               {
                 "$ref": "#/components/schemas/Match_Score_Breakdown_2024"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2025"
               }
             ],
             "nullable": true,
@@ -8159,6 +8162,401 @@
           },
           "trapStageRight": {
             "type": "boolean"
+          }
+        },
+        "Match_Score_Breakdown_2025": {
+          "type": "object",
+          "required": [
+            "blue",
+            "red"
+          ],
+          "properties": {
+            "blue": {
+              "$ref": "#/components/schemas/Match_Score_Breakdown_2025_Alliance"
+            },
+            "red": {
+              "$ref": "#/components/schemas/Match_Score_Breakdown_2025_Alliance"
+            }
+          },
+          "description": "See the 2025 FMS API documentation for a description of each value. https://frc-api-docs.firstinspires.org"
+        },
+        "Match_Score_Breakdown_2025_Alliance": {
+        "type": "object",
+        "properties": {
+          "autoLineRobot1": {
+            "type": "string",
+            "enum": []
+          },
+          "autoLineRobot2": {
+            "type": "string",
+            "enum": []
+          },
+          "autoLineRobot3": {
+            "type": "string",
+            "enum": []
+          },
+          "endGameRobot1": {
+            "type": "string",
+            "enum": []
+          },
+          "endGameRobot2": {
+            "type": "string",
+            "enum": []
+          },
+          "endGameRobot3": {
+            "type": "string",
+            "enum": []
+          },
+          "autoCoralCount": {
+            "type": "integer"
+          },
+          "autoMobilityPoints": {
+            "type": "integer"
+          },
+          "autoPoints": {
+            "type": "integer"
+          },
+          "autoCoralPoints": {
+            "type": "integer"
+          },
+          "autoReef": {
+            "type": "object",
+            "required": ["TopRow", "MidRow", "BotRow", "Trough"],
+            "properties": {
+                "TopRow": {
+                  "type": "object",
+                  "required": [
+                    "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "properties": {
+                    "NodeA": {
+                      "type": "boolean"
+                    },
+                    "NodeB": {
+                      "type": "boolean"
+                    },
+                    "NodeC": {
+                      "type": "boolean"
+                    },
+                    "NodeD": {
+                      "type": "boolean"
+                    },
+                    "NodeE": {
+                      "type": "boolean"
+                    },
+                    "NodeF": {
+                      "type": "boolean"
+                    },
+                    "NodeG": {
+                      "type": "boolean"
+                    },
+                    "NodeH": {
+                      "type": "boolean"
+                    },
+                    "NodeI": {
+                      "type": "boolean"
+                    },
+                    "NodeJ": {
+                      "type": "boolean"
+                    },
+                    "NodeK": {
+                      "type": "boolean"
+                    },
+                    "NodeL": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "MidRow": {
+                  "type": "object",
+                  "required": [
+                    "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "properties": {
+                    "NodeA": {
+                      "type": "boolean"
+                    },
+                    "NodeB": {
+                      "type": "boolean"
+                    },
+                    "NodeC": {
+                      "type": "boolean"
+                    },
+                    "NodeD": {
+                      "type": "boolean"
+                    },
+                    "NodeE": {
+                      "type": "boolean"
+                    },
+                    "NodeF": {
+                      "type": "boolean"
+                    },
+                    "NodeG": {
+                      "type": "boolean"
+                    },
+                    "NodeH": {
+                      "type": "boolean"
+                    },
+                    "NodeI": {
+                      "type": "boolean"
+                    },
+                    "NodeJ": {
+                      "type": "boolean"
+                    },
+                    "NodeK": {
+                      "type": "boolean"
+                    },
+                    "NodeL": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "BotRow": {
+                  "type": "object",
+                  "required": [
+                    "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "properties": {
+                    "NodeA": {
+                      "type": "boolean"
+                    },
+                    "NodeB": {
+                      "type": "boolean"
+                    },
+                    "NodeC": {
+                      "type": "boolean"
+                    },
+                    "NodeD": {
+                      "type": "boolean"
+                    },
+                    "NodeE": {
+                      "type": "boolean"
+                    },
+                    "NodeF": {
+                      "type": "boolean"
+                    },
+                    "NodeG": {
+                      "type": "boolean"
+                    },
+                    "NodeH": {
+                      "type": "boolean"
+                    },
+                    "NodeI": {
+                      "type": "boolean"
+                    },
+                    "NodeJ": {
+                      "type": "boolean"
+                    },
+                    "NodeK": {
+                      "type": "boolean"
+                    },
+                    "NodeL": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "Trough": {
+                  "type": "integer"
+                }
+              }
+          },
+          "teleopCoralCount": {
+            "type": "integer"
+          },
+          "teleopPoints": {
+            "type": "integer"
+          },
+          "teleopCoralPoints": {
+            "type": "integer"
+          },
+          "teleopReef": {
+            "type": "object",
+            "required": ["TopRow", "MidRow", "BotRow", "Trough"],
+            "properties": {
+                "TopRow": {
+                  "type": "object",
+                  "required": [
+                    "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "properties": {
+                    "NodeA": {
+                      "type": "boolean"
+                    },
+                    "NodeB": {
+                      "type": "boolean"
+                    },
+                    "NodeC": {
+                      "type": "boolean"
+                    },
+                    "NodeD": {
+                      "type": "boolean"
+                    },
+                    "NodeE": {
+                      "type": "boolean"
+                    },
+                    "NodeF": {
+                      "type": "boolean"
+                    },
+                    "NodeG": {
+                      "type": "boolean"
+                    },
+                    "NodeH": {
+                      "type": "boolean"
+                    },
+                    "NodeI": {
+                      "type": "boolean"
+                    },
+                    "NodeJ": {
+                      "type": "boolean"
+                    },
+                    "NodeK": {
+                      "type": "boolean"
+                    },
+                    "NodeL": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "MidRow": {
+                  "type": "object",
+                  "required": [
+                    "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "properties": {
+                    "NodeA": {
+                      "type": "boolean"
+                    },
+                    "NodeB": {
+                      "type": "boolean"
+                    },
+                    "NodeC": {
+                      "type": "boolean"
+                    },
+                    "NodeD": {
+                      "type": "boolean"
+                    },
+                    "NodeE": {
+                      "type": "boolean"
+                    },
+                    "NodeF": {
+                      "type": "boolean"
+                    },
+                    "NodeG": {
+                      "type": "boolean"
+                    },
+                    "NodeH": {
+                      "type": "boolean"
+                    },
+                    "NodeI": {
+                      "type": "boolean"
+                    },
+                    "NodeJ": {
+                      "type": "boolean"
+                    },
+                    "NodeK": {
+                      "type": "boolean"
+                    },
+                    "NodeL": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "BotRow": {
+                  "type": "object",
+                  "required": [
+                    "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "properties": {
+                    "NodeA": {
+                      "type": "boolean"
+                    },
+                    "NodeB": {
+                      "type": "boolean"
+                    },
+                    "NodeC": {
+                      "type": "boolean"
+                    },
+                    "NodeD": {
+                      "type": "boolean"
+                    },
+                    "NodeE": {
+                      "type": "boolean"
+                    },
+                    "NodeF": {
+                      "type": "boolean"
+                    },
+                    "NodeG": {
+                      "type": "boolean"
+                    },
+                    "NodeH": {
+                      "type": "boolean"
+                    },
+                    "NodeI": {
+                      "type": "boolean"
+                    },
+                    "NodeJ": {
+                      "type": "boolean"
+                    },
+                    "NodeK": {
+                      "type": "boolean"
+                    },
+                    "NodeL": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "Trough": {
+                  "type": "integer"
+                }
+              }
+          },
+          "algaePoints": {
+            "type": "integer"
+          },
+          "netAlgaeCount": {
+            "type": "integer"
+          },
+          "wallAlgaeCount": {
+            "type": "integer"
+          },
+          "endGameBargePoints": {
+            "type": "integer"
+          },
+          "autoBonusAchieved": {
+            "type": "boolean"
+          },
+          "coralBonusAchieved": {
+            "type": "boolean"
+          },
+          "bargeBonusAchieved": {
+            "type": "boolean"
+          },
+          "coopertitionCriteriaMet": {
+            "type": "boolean"
+          },
+          "coopertitionBonusAchieved": {
+            "type": "boolean"
+          },
+          "foulCount": {
+            "type": "integer"
+          },
+          "techFoulCount": {
+            "type": "integer"
+          },
+          "g206Penalty": {
+            "type": "boolean"
+          },
+          "g408Penalty": {
+            "type": "boolean"
+          },
+          "g424Penalty": {
+            "type": "boolean"
+          },
+          "adjustPoints": {
+            "type": "integer"
+          },
+          "foulPoints": {
+            "type": "integer"
+          },
+          "rp": {
+            "type": "integer"
+          },
+          "totalPoints": {
+            "type": "integer"
           }
         }
       },
