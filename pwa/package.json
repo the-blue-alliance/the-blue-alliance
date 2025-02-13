@@ -33,7 +33,7 @@
     "@remix-run/express": "2.15.3",
     "@remix-run/node": "2.15.3",
     "@remix-run/react": "2.15.3",
-    "@sentry/remix": "8.54.0",
+    "@sentry/remix": "9.0.1",
     "@tanstack/react-table": "8.21.2",
     "@types/lodash-es": "4.17.12",
     "class-variance-authority": "0.7.1",
