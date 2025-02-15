@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.9
+ * 3.9.10
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -736,6 +736,132 @@ export type MatchScoreBreakdown2024 = {
   blue: MatchScoreBreakdown2024Alliance;
   red: MatchScoreBreakdown2024Alliance;
 };
+export type MatchScoreBreakdown2025Alliance = {
+  adjustPoints?: number;
+  algaePoints?: number;
+  autoBonusAchieved?: boolean;
+  autoCoralCount?: number;
+  autoCoralPoints?: number;
+  autoLineRobot1?: 'No' | 'Yes';
+  autoLineRobot2?: 'No' | 'Yes';
+  autoLineRobot3?: 'No' | 'Yes';
+  autoMobilityPoints?: number;
+  autoPoints?: number;
+  autoReef?: {
+    topRow: {
+      NodeA: boolean;
+      NodeB: boolean;
+      NodeC: boolean;
+      NodeD: boolean;
+      NodeE: boolean;
+      NodeF: boolean;
+      NodeG: boolean;
+      NodeH: boolean;
+      NodeI: boolean;
+      NodeJ: boolean;
+      NodeK: boolean;
+      NodeL: boolean;
+    };
+    midRow: {
+      NodeA: boolean;
+      NodeB: boolean;
+      NodeC: boolean;
+      NodeD: boolean;
+      NodeE: boolean;
+      NodeF: boolean;
+      NodeG: boolean;
+      NodeH: boolean;
+      NodeI: boolean;
+      NodeJ: boolean;
+      NodeK: boolean;
+      NodeL: boolean;
+    };
+    botRow: {
+      NodeA: boolean;
+      NodeB: boolean;
+      NodeC: boolean;
+      NodeD: boolean;
+      NodeE: boolean;
+      NodeF: boolean;
+      NodeG: boolean;
+      NodeH: boolean;
+      NodeI: boolean;
+      NodeJ: boolean;
+      NodeK: boolean;
+      NodeL: boolean;
+    };
+    trough: number;
+  };
+  bargeBonusAchieved?: boolean;
+  coopertitionCriteriaMet?: boolean;
+  coralBonusAchieved?: boolean;
+  endGameBargePoints?: number;
+  endGameRobot1?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
+  endGameRobot2?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
+  endGameRobot3?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
+  foulCount?: number;
+  foulPoints?: number;
+  g206Penalty?: boolean;
+  g408Penalty?: boolean;
+  g424Penalty?: boolean;
+  netAlgaeCount?: number;
+  rp?: number;
+  techFoulCount?: number;
+  teleopCoralCount?: number;
+  teleopCoralPoints?: number;
+  teleopPoints?: number;
+  teleopReef?: {
+    topRow: {
+      NodeA: boolean;
+      NodeB: boolean;
+      NodeC: boolean;
+      NodeD: boolean;
+      NodeE: boolean;
+      NodeF: boolean;
+      NodeG: boolean;
+      NodeH: boolean;
+      NodeI: boolean;
+      NodeJ: boolean;
+      NodeK: boolean;
+      NodeL: boolean;
+    };
+    midRow: {
+      NodeA: boolean;
+      NodeB: boolean;
+      NodeC: boolean;
+      NodeD: boolean;
+      NodeE: boolean;
+      NodeF: boolean;
+      NodeG: boolean;
+      NodeH: boolean;
+      NodeI: boolean;
+      NodeJ: boolean;
+      NodeK: boolean;
+      NodeL: boolean;
+    };
+    botRow: {
+      NodeA: boolean;
+      NodeB: boolean;
+      NodeC: boolean;
+      NodeD: boolean;
+      NodeE: boolean;
+      NodeF: boolean;
+      NodeG: boolean;
+      NodeH: boolean;
+      NodeI: boolean;
+      NodeJ: boolean;
+      NodeK: boolean;
+      NodeL: boolean;
+    };
+    trough: number;
+  };
+  totalPoints?: number;
+  wallAlgaeCount?: number;
+};
+export type MatchScoreBreakdown2025 = {
+  blue: MatchScoreBreakdown2025Alliance;
+  red: MatchScoreBreakdown2025Alliance;
+};
 export type Match = {
   /** TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set. */
   key: string;
@@ -774,6 +900,7 @@ export type Match = {
         | MatchScoreBreakdown2022
         | MatchScoreBreakdown2023
         | MatchScoreBreakdown2024
+        | MatchScoreBreakdown2025
       )
     | null;
   /** Array of video objects associated with this match. */
