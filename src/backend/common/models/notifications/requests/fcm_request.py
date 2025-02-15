@@ -55,7 +55,7 @@ class FCMRequest(Request):
         Returns:
             messaging.BatchResponse - Batch response object for the messages sent.
         """
-        response = messaging.send_multicast(self._fcm_message(), app=self._app)
+        response = messaging.send_each_for_multicast(self._fcm_message(), app=self._app)
         if response.success_count > 0:
             self.defer_track_notification(response.success_count)
         return response
