@@ -332,43 +332,73 @@ function MatchResultsTableGroup({
               );
             })}
 
-            {/* scores */}
-            <GridCell
-              className="relative col-start-6 row-start-1 lg:col-start-9"
-              allianceColor={'red'}
-              matchResult={m.winning_alliance === 'red' ? 'winner' : 'loser'}
-              teamOrScore={'score'}
-              teamHighlight={
-                team !== undefined &&
-                m.alliances.red.team_keys.includes(team.key)
-              }
-            >
-              {m.score_breakdown && (
-                <RpDots
-                  score_breakdown={m.score_breakdown.red}
-                  year={Number(m.key.substring(0, 4))}
-                />
-              )}
-              {m.alliances.red.score}
-            </GridCell>
-            <GridCell
-              className="relative col-start-6 lg:col-start-10"
-              allianceColor={'blue'}
-              matchResult={m.winning_alliance === 'blue' ? 'winner' : 'loser'}
-              teamOrScore={'score'}
-              teamHighlight={
-                team !== undefined &&
-                m.alliances.blue.team_keys.includes(team.key)
-              }
-            >
-              {m.score_breakdown && (
-                <RpDots
-                  score_breakdown={m.score_breakdown.blue}
-                  year={Number(m.key.substring(0, 4))}
-                />
-              )}
-              {m.alliances.blue.score}
-            </GridCell>
+            {/* unplayed match */}
+            {m.alliances.red.score == -1 && m.alliances.blue.score == -1 && (
+              <GridCell
+                className="relative col-start-6 row-span-2 row-start-1 lg:col-span-2 lg:col-start-9 lg:row-span-1"
+                teamOrScore={'score'}
+              >
+                {m.predicted_time && (
+                  <div className="text-sm italic lg:text-xs">
+                    {new Date(m.predicted_time * 1000).toLocaleTimeString(
+                      'en-US',
+                      {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        weekday: 'short',
+                        hour12: true,
+                      },
+                    )}
+                  </div>
+                )}
+              </GridCell>
+            )}
+
+            {m.alliances.red.score !== -1 && m.alliances.blue.score !== -1 && (
+              <>
+                {/* scores */}
+                <GridCell
+                  className="relative col-start-6 row-start-1 lg:col-start-9"
+                  allianceColor={'red'}
+                  matchResult={
+                    m.winning_alliance === 'red' ? 'winner' : 'loser'
+                  }
+                  teamOrScore={'score'}
+                  teamHighlight={
+                    team !== undefined &&
+                    m.alliances.red.team_keys.includes(team.key)
+                  }
+                >
+                  {m.score_breakdown && (
+                    <RpDots
+                      score_breakdown={m.score_breakdown.red}
+                      year={Number(m.key.substring(0, 4))}
+                    />
+                  )}
+                  {m.alliances.red.score}
+                </GridCell>
+                <GridCell
+                  className="relative col-start-6 lg:col-start-10"
+                  allianceColor={'blue'}
+                  matchResult={
+                    m.winning_alliance === 'blue' ? 'winner' : 'loser'
+                  }
+                  teamOrScore={'score'}
+                  teamHighlight={
+                    team !== undefined &&
+                    m.alliances.blue.team_keys.includes(team.key)
+                  }
+                >
+                  {m.score_breakdown && (
+                    <RpDots
+                      score_breakdown={m.score_breakdown.blue}
+                      year={Number(m.key.substring(0, 4))}
+                    />
+                  )}
+                  {m.alliances.blue.score}
+                </GridCell>
+              </>
+            )}
           </div>
         </Fragment>
       ))}
