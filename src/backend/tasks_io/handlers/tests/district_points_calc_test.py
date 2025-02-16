@@ -27,7 +27,7 @@ def test_enqueue_no_events(
 ) -> None:
     resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/2020")
     assert resp.status_code == 200
-    assert resp.data == b"Enqueued for: []"
+    assert resp.data == b"Enqueued for districts: []\nEnqueued for regionals: []"
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(tasks) == 0

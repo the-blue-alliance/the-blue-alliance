@@ -7,6 +7,7 @@ from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.team_converter import (
@@ -98,6 +99,24 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
             DistrictTeam.district_key == ndb.Key(District, district_key)
         ).fetch_async()
         team_keys = map(lambda district_team: district_team.team, district_teams)
+        teams = yield ndb.get_multi_async(team_keys)
+        return list(teams)
+
+
+class RegionalTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "regional_teams_{year}"
+    DICT_CONVERTER = TeamConverter
+
+    def __init__(self, year: Year) -> None:
+        super().__init__(year=year)
+
+    @typed_tasklet
+    def _query_async(self, year: Year) -> Generator[Any, Any, List[Team]]:
+        regional_teams = yield RegionalPoolTeam.query(
+            RegionalPoolTeam.year == year
+        ).fetch_async()
+        team_keys = map(lambda t: t.team, regional_teams)
         teams = yield ndb.get_multi_async(team_keys)
         return list(teams)
 

@@ -239,6 +239,13 @@ class Event(CachedModel):
             return self.details.district_points
 
     @property
+    def regional_champs_pool_points(self) -> Optional[EventDistrictPoints]:
+        if self.event_type_enum != EventType.REGIONAL or self.details is None:
+            return None
+
+        return self.details.regional_champs_pool_points
+
+    @property
     def playoff_advancement(self) -> Optional[TPlayoffAdvancement]:
         if self.details is None:
             return None

@@ -9,6 +9,7 @@ from google.appengine.ext import ndb
 from markupsafe import Markup
 from pyre_extensions import none_throws
 
+from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
@@ -28,6 +29,9 @@ from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
+from backend.common.manipulators.regional_pool_team_manipulator import (
+    RegionalPoolTeamManipulator,
+)
 from backend.common.manipulators.robot_manipulator import RobotManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.district import District
@@ -36,6 +40,8 @@ from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
+from backend.common.models.regional_pool_advancement import RegionalPoolAdvancement
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.sitevars.apistatus import ApiStatus
@@ -120,12 +126,32 @@ def team_details(team_key: TeamKey) -> Response:
     fms_details = fms_df.get_team_details(year, team_key).get_result()
 
     team, district_team, robot = fms_details or (None, None, None)
+    regional_pool_team: Optional[RegionalPoolTeam] = None
 
     if team:
         team = TeamManipulator.createOrUpdate(team)
 
     if district_team:
         district_team = DistrictTeamManipulator.createOrUpdate(district_team)
+
+        if year in SeasonHelper.get_valid_regional_pool_years():
+            regional_pool_key = ndb.Key(
+                RegionalPoolTeam,
+                RegionalPoolTeam.render_key_name(year, team_key),
+            )
+            RegionalPoolTeamManipulator.delete_keys([regional_pool_key])
+
+    if (
+        year in SeasonHelper.get_valid_regional_pool_years()
+        and team
+        and not district_team
+    ):
+        regional_pool_team = RegionalPoolTeam(
+            id=RegionalPoolTeam.render_key_name(year, team.key_name),
+            year=year,
+            team=team.key,
+        )
+        RegionalPoolTeamManipulator.createOrUpdate(regional_pool_team)
 
     # Clean up junk district teams
     # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
@@ -163,6 +189,7 @@ def team_details(team_key: TeamKey) -> Response:
         "success": team is not None,
         "robot": robot,
         "district_team": district_team,
+        "regional_pool_team": regional_pool_team,
     }
 
     if (
@@ -355,6 +382,7 @@ def event_details(event_key: EventKey) -> Response:
     models = event_teams_future.get_result()
     teams: List[Team] = []
     district_teams: List[DistrictTeam] = []
+    regional_pool_teams: List[RegionalPoolTeam] = []
     robots: List[Robot] = []
     for group in models:
         # models is a list of tuples (team, districtTeam, robot)
@@ -365,6 +393,28 @@ def event_details(event_key: EventKey) -> Response:
         district_team = group[1]
         if isinstance(district_team, DistrictTeam):
             district_teams.append(district_team)
+
+        if (
+            event.year in SeasonHelper.get_valid_regional_pool_years()
+            and event.event_type_enum
+            in {EventType.REGIONAL, EventType.CMP_DIVISION, EventType.CMP_FINALS}
+            and team is not None
+            and district_team is None
+        ):
+            regional_pool_team = RegionalPoolTeam(
+                id=RegionalPoolTeam.render_key_name(event.year, team.key_name),
+                year=event.year,
+                team=team.key,
+                advancemnet=(
+                    RegionalPoolAdvancement(
+                        cmp=True,
+                    )
+                    if event.event_type_enum
+                    in {EventType.CMP_DIVISION, EventType.CMP_FINALS}
+                    else None
+                ),
+            )
+            regional_pool_teams.append(regional_pool_team)
 
         robot = group[2]
         if isinstance(robot, Robot):
@@ -378,6 +428,9 @@ def event_details(event_key: EventKey) -> Response:
 
     district_teams = DistrictTeamManipulator.createOrUpdate(district_teams)
     robots = RobotManipulator.createOrUpdate(robots)
+    regional_pool_teams = RegionalPoolTeamManipulator.createOrUpdate(
+        regional_pool_teams
+    )
 
     if not teams:
         # No teams found registered for this event
@@ -448,6 +501,8 @@ def event_details(event_key: EventKey) -> Response:
     template_values = {
         "event": event,
         "event_teams": event_teams,
+        "district_teams": listify(district_teams),
+        "regional_pool_teams": regional_pool_teams,
     }
 
     if (

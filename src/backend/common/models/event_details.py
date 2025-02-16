@@ -35,6 +35,9 @@ class EventDetails(CachedModel):
         ndb.JsonProperty()
     )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points: EventDistrictPoints = cast(EventDistrictPoints, ndb.JsonProperty())
+    regional_champs_pool_points: EventDistrictPoints = cast(
+        EventDistrictPoints, ndb.JsonProperty()
+    )
     matchstats: EventMatchstats = cast(
         EventMatchstats, ndb.JsonProperty()
     )  # for OPR, DPR, CCWM, etc.
@@ -61,6 +64,7 @@ class EventDetails(CachedModel):
         "rankings",
         "rankings2",
         "playoff_advancement",
+        "regional_champs_pool_points",
     }
 
     def __init__(self, *args, **kw):

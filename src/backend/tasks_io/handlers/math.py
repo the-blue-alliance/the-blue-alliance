@@ -8,7 +8,7 @@ from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
-from backend.common.futures import TypedFuture
+from backend.common.futures import InstantFuture, TypedFuture
 from backend.common.helpers.district_helper import DistrictHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
@@ -17,21 +17,31 @@ from backend.common.helpers.listify import listify
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
 from backend.common.helpers.prediction_helper import PredictionHelper
+from backend.common.helpers.regional_champs_pool_helper import RegionalChampsPoolHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
+from backend.common.manipulators.regional_champs_pool_manipulator import (
+    RegionalChampsPoolManipulator,
+)
 from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import DistrictKey, EventKey, Year
+from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.regional_pool_ranking import RegionalPoolRanking
 from backend.common.models.team import Team
 from backend.common.queries.district_query import DistrictsInYearQuery
-from backend.common.queries.event_query import DistrictEventsQuery, EventListQuery
-from backend.common.queries.team_query import DistrictTeamsQuery
+from backend.common.queries.event_query import (
+    DistrictEventsQuery,
+    EventListQuery,
+    RegionalEventsQuery,
+)
+from backend.common.queries.team_query import DistrictTeamsQuery, RegionalTeamsQuery
 
 
 blueprint = Blueprint("math", __name__)
@@ -46,13 +56,41 @@ def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 
-    event_keys: List[ndb.Key] = Event.query(
-        Event.year == year, Event.event_type_enum.IN(SEASON_EVENT_TYPES)
-    ).fetch(None, keys_only=True)
-    for event_key in event_keys:
+    if year in SeasonHelper.get_valid_regional_pool_years():
+        district_point_types = SEASON_EVENT_TYPES - {EventType.REGIONAL}
+        regional_point_types = {EventType.REGIONAL}
+    else:
+        district_point_types = SEASON_EVENT_TYPES
+        regional_point_types = {}
+
+    district_event_keys_future: TypedFuture[List[ndb.Key]] = Event.query(
+        Event.year == year, Event.event_type_enum.IN(district_point_types)
+    ).fetch_async(None, keys_only=True)
+    regional_event_keys_future: TypedFuture[List[ndb.Key]] = (
+        Event.query(
+            Event.year == year, Event.event_type_enum.IN(regional_point_types)
+        ).fetch_async(None, keys_only=True)
+        if regional_point_types
+        else InstantFuture(result=[])
+    )
+
+    district_event_keys = district_event_keys_future.get_result()
+    for event_key in district_event_keys:
         taskqueue.add(
             url=url_for(
                 "math.event_district_points_calc", event_key=event_key.string_id()
+            ),
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
+
+    regional_event_keys = regional_event_keys_future.get_result()
+    for event_key in regional_event_keys:
+        taskqueue.add(
+            url=url_for(
+                "math.regional_event_champs_pool_points_calc",
+                event_key=event_key.string_id(),
             ),
             method="GET",
             target="py3-tasks-io",
@@ -63,7 +101,10 @@ def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(
-            "Enqueued for: {}".format([event_key.id() for event_key in event_keys])
+            "Enqueued for districts: {}\nEnqueued for regionals: {}".format(
+                [event_key.id() for event_key in district_event_keys],
+                [event_key.id() for event_key in regional_event_keys],
+            )
         )
 
     return make_response("")
@@ -106,6 +147,42 @@ def event_district_points_calc(event_key: EventKey) -> Response:
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(json.dumps(district_points, sort_keys=True, indent=2))
+
+    return make_response("")
+
+
+@blueprint.route("/tasks/math/do/regional_champs_pool_points_calc/<event_key>")
+def regional_event_champs_pool_points_calc(event_key: EventKey) -> Response:
+    """
+    Calculates regional CMP pool advancement points for an event (2025+)
+    """
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    if event.year not in SeasonHelper.get_valid_regional_pool_years():
+        return make_response("")
+
+    regional_pool_points = RegionalChampsPoolHelper.calculate_event_points(event)
+    event_details = EventDetails(
+        id=event_key, regional_champs_pool_points=regional_pool_points
+    )
+    EventDetailsManipulator.createOrUpdate(event_details)
+
+    if event.event_type_enum == EventType.REGIONAL:
+        taskqueue.add(
+            url=url_for("math.regional_champs_pool_rankings_calc", year=event.year),
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+            # TODO: ^ new queue with a rate limit
+        )
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(json.dumps(regional_pool_points, sort_keys=True, indent=2))
 
     return make_response("")
 
@@ -198,6 +275,53 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
     ):  # Only write out if not in taskqueue
         return make_response(
             f"Finished calculating rankings for: {district_key}:\n{rankings}"
+        )
+    return make_response("")
+
+
+@blueprint.route("/tasks/math/do/regional_champs_pool_rankings_calc/<int:year>")
+def regional_champs_pool_rankings_calc(year: Year) -> Response:
+    regional_pool = RegionalChampsPool.get_for_year(year)
+    if not regional_pool:
+        return make_response(f"Regional champs pool not found for year {year}", 404)
+
+    events_future: TypedFuture[List[Event]] = RegionalEventsQuery(year).fetch_async()
+    teams_future: TypedFuture[List[Team]] = RegionalTeamsQuery(year).fetch_async()
+
+    events = events_future.get_result()
+    for event in events:
+        event.prep_details
+
+    events = EventHelper.sorted_events(events)
+    team_totals = RegionalChampsPoolHelper.calculate_rankings(
+        events, teams_future, year
+    )
+
+    rankings: List[RegionalPoolRanking] = []
+    current_rank = 1
+    for key, points in team_totals.items():
+        point_detail = RegionalPoolRanking(
+            rank=current_rank,
+            team_key=key,
+            event_points=[],
+            rookie_bonus=points.get("rookie_bonus", 0),
+            point_total=points["point_total"],
+        )
+        for event, event_points in points["event_points"]:
+            event_points["event_key"] = event.key_name
+            point_detail["event_points"].append(event_points)
+
+        rankings.append(point_detail)
+        current_rank += 1
+
+    if rankings:
+        regional_pool.rankings = rankings
+        RegionalChampsPoolManipulator.createOrUpdate(regional_pool)
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            f"Finished calculating regional pool rankings for: {year}:\n{rankings}"
         )
     return make_response("")
 

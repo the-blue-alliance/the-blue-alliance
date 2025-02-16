@@ -101,6 +101,15 @@
             {% endfor %}
         </td>
     </tr>
+    <tr>
+        <td>Regional Pool Participation</td>
+        <td>
+            {% for rp_team in regional_pool_teams %}
+                {{ rp_team.key.string_id() }}
+                {% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
 </table>
 
 <p>Teams are currently uneditable. They are updated via FRC API scraping.</p>
