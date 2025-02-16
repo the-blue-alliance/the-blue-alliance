@@ -27,7 +27,6 @@ from backend.common.consts.award_type import AwardType
 from backend.common.consts.client_type import (
     ClientType,
     FCM_CLIENTS,
-    FCM_LEGACY_CLIENTS,
 )
 from backend.common.consts.client_type import NAMES as CLIENT_TYPE_NAMES
 from backend.common.consts.event_type import EventType
@@ -784,36 +783,6 @@ class TestTBANSHelper(unittest.TestCase):
             success = TBANSHelper._ping_client(client)
 
             mock_fcm_request_constructor.assert_called_once()
-            assert (
-                mock_fcm_request_constructor.call_args[1]["legacy_data_format"] is False
-            )
-            mock_send.assert_called_once()
-            assert success
-
-    def test_ping_fcm_legacy(self):
-        client = MobileClient(
-            parent=ndb.Key(Account, "user_id"),
-            user_id="user_id",
-            messaging_id="token",
-            client_type=ClientType.OS_ANDROID,
-            device_uuid="uuid",
-            display_name="Phone",
-        )
-
-        batch_response = messaging.BatchResponse(
-            [messaging.SendResponse({"name": "abc"}, None)]
-        )
-        with patch.object(
-            FCMRequest, "__init__", mock.MagicMock(spec=FCMRequest, return_value=None)
-        ) as mock_fcm_request_constructor, patch.object(
-            FCMRequest, "send", return_value=batch_response
-        ) as mock_send:
-            success = TBANSHelper._ping_client(client)
-
-            mock_fcm_request_constructor.assert_called_once()
-            assert (
-                mock_fcm_request_constructor.call_args[1]["legacy_data_format"] is True
-            )
             mock_send.assert_called_once()
             assert success
 
@@ -1039,9 +1008,6 @@ class TestTBANSHelper(unittest.TestCase):
             c.put()
 
         expected_fcm = [c for c in clients if c.client_type in FCM_CLIENTS]
-        expected_legacy_fcm = [
-            c for c in clients if c.client_type in FCM_LEGACY_CLIENTS
-        ]
         expected_webhook = [c for c in clients if c.client_type == ClientType.WEBHOOK]
 
         notification = MockNotification()
@@ -1049,14 +1015,7 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper, "_defer_webhook"
         ) as mock_webhook:
             TBANSHelper._send(["user_id"], notification)
-            mock_fcm.assert_has_calls(
-                [
-                    mock.call(expected_fcm, notification),
-                    mock.call(
-                        expected_legacy_fcm, notification, legacy_data_format=True
-                    ),
-                ]
-            )
+            mock_fcm.assert_called_once_with(expected_fcm, notification)
             mock_webhook.assert_called_once_with(expected_webhook, notification)
 
     def test_defer_fcm(self):
@@ -1121,10 +1080,7 @@ class TestTBANSHelper(unittest.TestCase):
     #     TBANSHelper._send_fcm([], MockNotification(), backoff_iteration=6)
 
     def test_send_fcm_filter_fcm_clients(self):
-        expected = [
-            "client_type_{}".format(client_type)
-            for client_type in (FCM_CLIENTS | FCM_LEGACY_CLIENTS)
-        ]
+        expected = ["client_type_{}".format(client_type) for client_type in FCM_CLIENTS]
         clients = [
             MobileClient(
                 parent=ndb.Key(Account, "user_id"),

@@ -22,7 +22,7 @@ class FCMRequest(Request):
         tokens (list, string): The FCM registration tokens (up to 500) to send a message to.
     """
 
-    def __init__(self, app, notification, tokens=None, legacy_data_format=False):
+    def __init__(self, app, notification, tokens=None):
         """
         Note:
             Should only supply one delivery method - either token, topic, or connection.
@@ -43,7 +43,6 @@ class FCMRequest(Request):
             )
 
         self.tokens = tokens
-        self.legacy_data_format = legacy_data_format
 
     def __str__(self):
         return "FCMRequest(tokens={}, notification={})".format(
@@ -98,19 +97,17 @@ class FCMRequest(Request):
             # Set content_available
             apns_config.payload.aps.content_available = True
 
-        # Add `notification_type` to data payload
-        if self.legacy_data_format:
-            data_payload = self._legacy_data_format_payload()
-        else:
-            data_payload = (
-                self.notification.data_payload if self.notification.data_payload else {}
-            )
+        # Setup data payload - base case for None data payloads
+        data_payload = (
+            self.notification.data_payload if self.notification.data_payload else {}
+        )
         # Remove `None` from data payload, since FCM won't accept them
         data_payload = {k: v for k, v in data_payload.items() if v is not None}
         from backend.common.consts.notification_type import (
             TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
         )
 
+        # Add `notification_type` to data payload
         data_payload["notification_type"] = NOTIFICATION_TYPE_NAMES[
             self.notification.__class__._type()
         ]
@@ -123,21 +120,3 @@ class FCMRequest(Request):
             webpush=webpush_config,
             apns=apns_config,
         )
-
-    def _legacy_data_format_payload(self):
-        from backend.common.consts.notification_type import (
-            TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
-        )
-
-        json_dict = {
-            "notification_type": NOTIFICATION_TYPE_NAMES[
-                self.notification.__class__._type()
-            ]
-        }
-
-        if self.notification.webhook_message_data:
-            json_dict["message_data"] = json.dumps(
-                self.notification.webhook_message_data
-            )
-
-        return json_dict
