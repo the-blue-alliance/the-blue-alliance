@@ -1,0 +1,358 @@
+{% macro mobility(team, did_mobility) %}
+{% if did_mobility %}
+<span class="glyphicon glyphicon-ok" rel="tooltip" title="{{team|digits}}"></span>
+{% else %}
+<span class="glyphicon glyphicon-remove" rel="tooltip" title="{{team|digits}}"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro endgame(team, endgame_result) %}
+{% if endgame_result == 'DeepCage' %}
+<span rel="tooltip" title="{{team|digits}}">Deep Cage (+12)</span>
+{% elif endgame_result == 'ShallowCage' %}
+<span rel="tooltip" title="{{team|digits}}">Shallow Cage (+6)</span>
+{% elif endgame_result == 'Parked' %}
+<span rel="tooltip" title="{{team|digits}}">Parked (+2)</span>
+{% else %}
+<span rel="tooltip" title="{{team|digits}}" class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro coopertition_criteria(earned) %}
+{% if earned %}
+<span class="glyphicon glyphicon-ok"></span>
+{% else %}
+<span class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro rp_bonus(earned) %}
+{% if earned %}
+<span class="glyphicon glyphicon-ok"></span> (+1 RP)
+{% else %}
+<span class="glyphicon glyphicon-remove"></span>
+{% endif %}
+{% endmacro %}
+
+{% macro fouls(alliance_breakdown) %}
+{%if alliance_breakdown.foulCount%}{{alliance_breakdown.foulCount}}{%else%}0{%endif%} /
+{%if alliance_breakdown.techFoulCount%}{{alliance_breakdown.techFoulCount}}{%else%}0{%endif%}
+{% endmacro %}
+
+<table class="match-table">
+    <tbody>
+    <!-- Autonomous -->
+    <!-- Mobility -->
+    {% if "autoLineRobot1" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            {{mobility(match.alliances.red.teams.0, match.score_breakdown.red.autoLineRobot1 == 'Yes')}}
+            {{mobility(match.alliances.red.teams.1, match.score_breakdown.red.autoLineRobot2 == 'Yes')}}
+            {{mobility(match.alliances.red.teams.2, match.score_breakdown.red.autoLineRobot3 == 'Yes')}}
+            (+{{match.score_breakdown.red.autoMobilityPoints}})
+        </td>
+        <td>Auto Leave</td>
+        <td class="blueScore" colspan="2">
+            {{mobility(match.alliances.blue.teams.0, match.score_breakdown.blue.autoLineRobot1 == 'Yes')}}
+            {{mobility(match.alliances.blue.teams.1, match.score_breakdown.blue.autoLineRobot2 == 'Yes')}}
+            {{mobility(match.alliances.blue.teams.2, match.score_breakdown.blue.autoLineRobot3 == 'Yes')}}
+            (+{{match.score_breakdown.blue.autoMobilityPoints}})
+        </td>
+    </tr>
+    {% endif %}
+
+    <!--Auto Game Pieces-->
+    {% if "autoCoralCount" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{match.score_breakdown.red.autoCoralCount}}
+        </td>
+        <td>Auto Coral Count</td>
+        <td class="blue" colspan="2">
+            {{match.score_breakdown.blue.autoCoralCount}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "autoCoralPoints" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            {{match.score_breakdown.red.autoCoralPoints}}
+        </td>
+        <td>Auto Coral Points</td>
+        <td class="blueScore" colspan="2">
+            {{match.score_breakdown.blue.autoCoralPoints}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "autoPoints" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            <b>{{match.score_breakdown.red.autoPoints}}</b>
+        </td>
+        <th>Total Auto</th>
+        <td class="blueScore" colspan="2">
+            <b>{{match.score_breakdown.blue.autoPoints}}</b>
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop -->
+    <!-- Game Piece Points -->
+    {% if "teleopCoralCount" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{match.score_breakdown.red.teleopCoralCount}}
+        </td>
+        <td>Teleop Coral Count</td>
+        <td class="blue" colspan="2">
+            {{match.score_breakdown.blue.teleopCoralCount}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "teleopCoralPoints" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            {{match.score_breakdown.red.teleopCoralPoints}}
+        </td>
+        <td>Teleop Coral Points</td>
+        <td class="blueScore" colspan="2">
+            {{match.score_breakdown.blue.teleopCoralPoints}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "wallAlgaeCount" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{match.score_breakdown.red.wallAlgaeCount}}
+        </td>
+        <td>Processor Algae Count</td>
+        <td class="blue" colspan="2">
+            {{match.score_breakdown.blue.wallAlgaeCount}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "netAlgaeCount" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{match.score_breakdown.red.netAlgaeCount}}
+        </td>
+        <td>Net Algae Count</td>
+        <td class="blue" colspan="2">
+            {{match.score_breakdown.blue.netAlgaeCount}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "algaePoints" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            {{match.score_breakdown.red.algaePoints}}
+        </td>
+        <td>Algae Points</td>
+        <td class="blueScore" colspan="2">
+            {{match.score_breakdown.blue.algaePoints}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Endgame -->
+    {% if "endGameRobot1" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{endgame(match.alliances.red.teams.0, match.score_breakdown.red.endGameRobot1)}}
+        </td>
+        <td>Robot 1 Endgame</td>
+        <td class="blue" colspan="2">
+            {{endgame(match.alliances.blue.teams.0, match.score_breakdown.blue.endGameRobot1)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "endGameRobot2" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{endgame(match.alliances.red.teams.1, match.score_breakdown.red.endGameRobot2)}}
+        </td>
+        <td>Robot 2 Endgame</td>
+        <td class="blue" colspan="2">
+            {{endgame(match.alliances.blue.teams.1, match.score_breakdown.blue.endGameRobot2)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "endGameRobot3" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{endgame(match.alliances.red.teams.2, match.score_breakdown.red.endGameRobot3)}}
+        </td>
+        <td>Robot 3 Endgame</td>
+        <td class="blue" colspan="2">
+            {{endgame(match.alliances.blue.teams.2, match.score_breakdown.blue.endGameRobot3)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "endGameBargePoints" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            {{match.score_breakdown.red.endGameBargePoints}}
+        </td>
+        <td>Barge Points</td>
+        <td class="blueScore" colspan="2">
+            {{match.score_breakdown.blue.endGameBargePoints}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Teleop Score -->
+    {% if "teleopPoints" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            <b>{% if match.score_breakdown.red.teleopPoints
+                %}{{match.score_breakdown.red.teleopPoints}}{%else%}0{%endif%}</b>
+        </td>
+        <th>Total Teleop</th>
+        <td class="blueScore" colspan="2">
+            <b>{% if match.score_breakdown.blue.teleopPoints
+                %}{{match.score_breakdown.blue.teleopPoints}}{%else%}0{%endif%}</b>
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Coop -->
+    {% if "coopertitionCriteriaMet" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{coopertition_criteria(match.score_breakdown.red.coopertitionCriteriaMet)}}
+        </td>
+        <td>Coopertition Criteria Met</td>
+        <td class="blue" colspan="2">
+            {{coopertition_criteria(match.score_breakdown.blue.coopertitionCriteriaMet)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Bonus RP -->
+    {% if "autoBonusAchieved" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{rp_bonus(match.score_breakdown.red.autoBonusAchieved)}}
+        </td>
+        <td>Auto Bonus</td>
+        <td class="blue" colspan="2">
+            {{rp_bonus(match.score_breakdown.blue.autoBonusAchieved)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "coralBonusAchieved" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{rp_bonus(match.score_breakdown.red.coralBonusAchieved)}}
+        </td>
+        <td>Coral Bonus</td>
+        <td class="blue" colspan="2">
+            {{rp_bonus(match.score_breakdown.blue.coralBonusAchieved)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "bargeBonusAchieved" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{rp_bonus(match.score_breakdown.red.bargeBonusAchieved)}}
+        </td>
+        <td>Barge Bonus</td>
+        <td class="blue" colspan="2">
+            {{rp_bonus(match.score_breakdown.blue.bargeBonusAchieved)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Fouls & Adjustments -->
+    {% if "foulCount" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            {{fouls(match.score_breakdown.blue)}}
+        </td>
+        <td>Fouls / Tech Fouls</td>
+        <td class="blue" colspan="2">
+            {{fouls(match.score_breakdown.red)}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "foulPoints" in match.score_breakdown.red %}
+    <tr class="key">
+        <td class="redScore" colspan="2">
+            {{match.score_breakdown.red.foulPoints}}
+        </td>
+        <td>Foul Points</td>
+        <td class="blueScore" colspan="2">
+            {{match.score_breakdown.blue.foulPoints}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "adjustPoints" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">{% if
+            match.score_breakdown.red.adjustPoints%}{{match.score_breakdown.red.adjustPoints}}{%else%}0{%endif%}</td>
+        <td>Adjustments</td>
+        <td class="blue" colspan="2">{%if
+            match.score_breakdown.blue.adjustPoints%}{{match.score_breakdown.blue.adjustPoints}}{%else%}0{%endif%}</td>
+    </tr>
+    {% endif %}
+
+    <tr class="key">
+      <td class="redScore" colspan="2"><b>{%if match.score_breakdown.red.totalPoints%}{{match.score_breakdown.red.totalPoints}}{%else%}0{%endif%}</b></td>
+      <th>Total Score</th>
+      <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
+    </tr>
+
+    <tr>
+      <td class="red" colspan="2">
+        {% if match.score_breakdown.red.autoBonusAchieved %}
+        <svg class="top-left-dot" rel="tooltip" title="Auto Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.red.coralBonusAchieved %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Coral Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.red.bargeBonusAchieved %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Barge Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.red.rp}} RP
+      </td>
+      <td>Ranking Points</td>
+      <td class="blue" colspan="2">
+        {% if match.score_breakdown.blue.autoBonusAchieved %}
+        <svg class="top-left-dot" rel="tooltip" title="Auto Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.blue.coralBonusAchieved %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Coral Bonus">
+          <circle cx="2" cy="2" r="2"/>
+        </svg>
+        {% endif %}
+        {% if match.score_breakdown.blue.bargeBonusAchieved %}
+        <svg class="top-left-dot-2" rel="tooltip" title="Barge Bonus">
+            <circle cx="2" cy="2" r="2" />
+        </svg>
+        {% endif %}
+        +{{match.score_breakdown.blue.rp}} RP
+      </td>
+    </tr>
+    </tbody>
+</table>
