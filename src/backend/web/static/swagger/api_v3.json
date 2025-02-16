@@ -8229,42 +8229,42 @@
               "topRow": {
                 "type": "object",
                 "required": [
-                  "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "nodeA", "nodeB", "nodeC", "nodeD", "nodeE", "nodeF", "nodeG", "nodeH", "nodeI", "nodeJ", "nodeK", "nodeL"],
                 "properties": {
-                  "NodeA": {
+                  "nodeA": {
                     "type": "boolean"
                   },
-                  "NodeB": {
+                  "nodeB": {
                     "type": "boolean"
                   },
-                  "NodeC": {
+                  "nodeC": {
                     "type": "boolean"
                   },
-                  "NodeD": {
+                  "nodeD": {
                     "type": "boolean"
                   },
-                  "NodeE": {
+                  "nodeE": {
                     "type": "boolean"
                   },
-                  "NodeF": {
+                  "nodeF": {
                     "type": "boolean"
                   },
-                  "NodeG": {
+                  "nodeG": {
                     "type": "boolean"
                   },
-                  "NodeH": {
+                  "nodeH": {
                     "type": "boolean"
                   },
-                  "NodeI": {
+                  "nodeI": {
                     "type": "boolean"
                   },
-                  "NodeJ": {
+                  "nodeJ": {
                     "type": "boolean"
                   },
-                  "NodeK": {
+                  "nodeK": {
                     "type": "boolean"
                   },
-                  "NodeL": {
+                  "nodeL": {
                     "type": "boolean"
                   }
                 }
@@ -8272,42 +8272,42 @@
               "midRow": {
                 "type": "object",
                 "required": [
-                  "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "nodeA", "nodeB", "nodeC", "nodeD", "nodeE", "nodeF", "nodeG", "nodeH", "nodeI", "nodeJ", "nodeK", "nodeL"],
                 "properties": {
-                  "NodeA": {
+                  "nodeA": {
                     "type": "boolean"
                   },
-                  "NodeB": {
+                  "nodeB": {
                     "type": "boolean"
                   },
-                  "NodeC": {
+                  "nodeC": {
                     "type": "boolean"
                   },
-                  "NodeD": {
+                  "nodeD": {
                     "type": "boolean"
                   },
-                  "NodeE": {
+                  "nodeE": {
                     "type": "boolean"
                   },
-                  "NodeF": {
+                  "nodeF": {
                     "type": "boolean"
                   },
-                  "NodeG": {
+                  "nodeG": {
                     "type": "boolean"
                   },
-                  "NodeH": {
+                  "nodeH": {
                     "type": "boolean"
                   },
-                  "NodeI": {
+                  "nodeI": {
                     "type": "boolean"
                   },
-                  "NodeJ": {
+                  "nodeJ": {
                     "type": "boolean"
                   },
-                  "NodeK": {
+                  "nodeK": {
                     "type": "boolean"
                   },
-                  "NodeL": {
+                  "nodeL": {
                     "type": "boolean"
                   }
                 }
@@ -8315,42 +8315,42 @@
               "botRow": {
                 "type": "object",
                 "required": [
-                  "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "nodeA", "nodeB", "nodeC", "nodeD", "nodeE", "nodeF", "nodeG", "nodeH", "nodeI", "nodeJ", "nodeK", "nodeL"],
                 "properties": {
-                  "NodeA": {
+                  "nodeA": {
                     "type": "boolean"
                   },
-                  "NodeB": {
+                  "nodeB": {
                     "type": "boolean"
                   },
-                  "NodeC": {
+                  "nodeC": {
                     "type": "boolean"
                   },
-                  "NodeD": {
+                  "nodeD": {
                     "type": "boolean"
                   },
-                  "NodeE": {
+                  "nodeE": {
                     "type": "boolean"
                   },
-                  "NodeF": {
+                  "nodeF": {
                     "type": "boolean"
                   },
-                  "NodeG": {
+                  "nodeG": {
                     "type": "boolean"
                   },
-                  "NodeH": {
+                  "nodeH": {
                     "type": "boolean"
                   },
-                  "NodeI": {
+                  "nodeI": {
                     "type": "boolean"
                   },
-                  "NodeJ": {
+                  "nodeJ": {
                     "type": "boolean"
                   },
-                  "NodeK": {
+                  "nodeK": {
                     "type": "boolean"
                   },
-                  "NodeL": {
+                  "nodeL": {
                     "type": "boolean"
                   }
                 }
@@ -8430,42 +8430,42 @@
               "topRow": {
                 "type": "object",
                 "required": [
-                  "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "nodeA", "nodeB", "nodeC", "nodeD", "nodeE", "nodeF", "nodeG", "nodeH", "nodeI", "nodeJ", "nodeK", "nodeL"],
                 "properties": {
-                  "NodeA": {
+                  "nodeA": {
                     "type": "boolean"
                   },
-                  "NodeB": {
+                  "nodeB": {
                     "type": "boolean"
                   },
-                  "NodeC": {
+                  "nodeC": {
                     "type": "boolean"
                   },
-                  "NodeD": {
+                  "nodeD": {
                     "type": "boolean"
                   },
-                  "NodeE": {
+                  "nodeE": {
                     "type": "boolean"
                   },
-                  "NodeF": {
+                  "nodeF": {
                     "type": "boolean"
                   },
-                  "NodeG": {
+                  "nodeG": {
                     "type": "boolean"
                   },
-                  "NodeH": {
+                  "nodeH": {
                     "type": "boolean"
                   },
-                  "NodeI": {
+                  "nodeI": {
                     "type": "boolean"
                   },
-                  "NodeJ": {
+                  "nodeJ": {
                     "type": "boolean"
                   },
-                  "NodeK": {
+                  "nodeK": {
                     "type": "boolean"
                   },
-                  "NodeL": {
+                  "nodeL": {
                     "type": "boolean"
                   }
                 }
@@ -8473,42 +8473,42 @@
               "midRow": {
                 "type": "object",
                 "required": [
-                  "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "nodeA", "nodeB", "nodeC", "nodeD", "nodeE", "nodeF", "nodeG", "nodeH", "nodeI", "nodeJ", "nodeK", "nodeL"],
                 "properties": {
-                  "NodeA": {
+                  "nodeA": {
                     "type": "boolean"
                   },
-                  "NodeB": {
+                  "nodeB": {
                     "type": "boolean"
                   },
-                  "NodeC": {
+                  "nodeC": {
                     "type": "boolean"
                   },
-                  "NodeD": {
+                  "nodeD": {
                     "type": "boolean"
                   },
-                  "NodeE": {
+                  "nodeE": {
                     "type": "boolean"
                   },
-                  "NodeF": {
+                  "nodeF": {
                     "type": "boolean"
                   },
-                  "NodeG": {
+                  "nodeG": {
                     "type": "boolean"
                   },
-                  "NodeH": {
+                  "nodeH": {
                     "type": "boolean"
                   },
-                  "NodeI": {
+                  "nodeI": {
                     "type": "boolean"
                   },
-                  "NodeJ": {
+                  "nodeJ": {
                     "type": "boolean"
                   },
-                  "NodeK": {
+                  "nodeK": {
                     "type": "boolean"
                   },
-                  "NodeL": {
+                  "nodeL": {
                     "type": "boolean"
                   }
                 }
@@ -8516,42 +8516,42 @@
               "botRow": {
                 "type": "object",
                 "required": [
-                  "NodeA", "NodeB", "NodeC", "NodeD", "NodeE", "NodeF", "NodeG", "NodeH", "NodeI", "NodeJ", "NodeK", "NodeL"],
+                  "nodeA", "nodeB", "nodeC", "nodeD", "nodeE", "nodeF", "nodeG", "nodeH", "nodeI", "nodeJ", "nodeK", "nodeL"],
                 "properties": {
-                  "NodeA": {
+                  "nodeA": {
                     "type": "boolean"
                   },
-                  "NodeB": {
+                  "nodeB": {
                     "type": "boolean"
                   },
-                  "NodeC": {
+                  "nodeC": {
                     "type": "boolean"
                   },
-                  "NodeD": {
+                  "nodeD": {
                     "type": "boolean"
                   },
-                  "NodeE": {
+                  "nodeE": {
                     "type": "boolean"
                   },
-                  "NodeF": {
+                  "nodeF": {
                     "type": "boolean"
                   },
-                  "NodeG": {
+                  "nodeG": {
                     "type": "boolean"
                   },
-                  "NodeH": {
+                  "nodeH": {
                     "type": "boolean"
                   },
-                  "NodeI": {
+                  "nodeI": {
                     "type": "boolean"
                   },
-                  "NodeJ": {
+                  "nodeJ": {
                     "type": "boolean"
                   },
-                  "NodeK": {
+                  "nodeK": {
                     "type": "boolean"
                   },
-                  "NodeL": {
+                  "nodeL": {
                     "type": "boolean"
                   }
                 }
