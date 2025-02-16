@@ -26,7 +26,8 @@ If you want to test myTBA (or other sign-in related features) locally, you'll ne
 7. Enter a name, such as `tba-dev`
 8. Hit Register app
 9. Copy the `appId` and `authDomain` to `src/backend/web/static/javascript/tba_js/tba_keys.js`. You may need to `chmod` this depending on your local environment and how the file was made.
-10. Go to http://localhost:8080/account/login and Sign in with Google.
+10. Run `./ops/build/run_buildweb.sh` to rebuild JS bundles.
+11. Go to http://localhost:8080/account/login and Sign in with Google.
 
 Nothing actually gets used in your Firebase project, so you won't be charged for anything. TBA uses the Firebase emulator to provide two fake accounts (see below) - however in order to connect to the emulator, auth initialization must succeed, and in order for that to succeed, it must have a valid app ID and auth domain.
 

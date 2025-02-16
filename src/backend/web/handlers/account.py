@@ -36,11 +36,11 @@ from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
-from backend.common.models.event_team import EventTeam
 from backend.common.models.favorite import Favorite
 from backend.common.models.keys import EventKey, TeamNumber
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
+from backend.common.queries.event_query import TeamEventsQuery
 from backend.common.sitevars.notifications_enable import NotificationsEnable
 from backend.web.decorators import enforce_login, require_login, require_login_only
 from backend.web.redirect import is_safe_url, safe_next_redirect
@@ -470,12 +470,12 @@ def mytba_eventteam_get(team_number: TeamNumber) -> str:
 
     user = none_throws(current_user())
 
-    event_teams = EventTeam.query(EventTeam.team == team.key).fetch(1000)
+    team_events = TeamEventsQuery(none_throws(team.key.string_id())).fetch()
 
     favorites = Favorite.query(
         Favorite.model_type == ModelType.EVENT_TEAM,
         Favorite.model_key.IN(  # pyre-ignore[16]
-            [f"{et.event.string_id()}_{team.key.string_id()}" for et in event_teams]
+            [f"{event.key.string_id()}_{team.key.string_id()}" for event in team_events]
         ),
         ancestor=none_throws(user.account_key),
     ).fetch(1000)
@@ -486,7 +486,7 @@ def mytba_eventteam_get(team_number: TeamNumber) -> str:
 
     template_values = {
         "team": team,
-        "event_teams": event_teams,
+        "team_events": team_events,
         "already_favorited": already_favorited,
     }
     return render_template("mytba_eventteam.html", **template_values)
@@ -502,15 +502,12 @@ def mytba_eventteam_post(team_number: TeamNumber) -> Response:
     team_key = f"frc{team_number}"
 
     user = none_throws(current_user())
-    event_teams = EventTeam.query(EventTeam.team == team.key).fetch(1000)
-    for event_team in event_teams:
+    team_events = TeamEventsQuery(none_throws(team.key.string_id())).fetch()
+    for event in team_events:
         MyTBAHelper.remove_favorite(
             account_key=none_throws(user.account_key),
-            model_key=f"{event_team.event.string_id()}_{team.key.string_id()}",
+            model_key=f"{event.key.string_id()}_{team.key.string_id()}",
             model_type=ModelType.EVENT_TEAM,
-        )
-        print(
-            f"Removing favorite {team_key} @ {event_team.event.string_id()}", flush=True
         )
 
     favorites = request.form.getlist("favorite_events")
@@ -524,7 +521,6 @@ def mytba_eventteam_post(team_number: TeamNumber) -> Response:
                     model_key=f"{event_key}_{team_key}",
                 )
             )
-            print(f"Favoriting {team_key} @ {event_key}", flush=True)
 
     response = redirect(url_for("account.mytba"))
     return response

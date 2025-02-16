@@ -1,6 +1,7 @@
-{% extends "base.html" %} {% block title %}myTBA Team {{team.team_number}} - The
-Blue Alliance{% endblock %} {% block meta_description %}Manage your favorites
-and subscriptions{% endblock %} {% block content %}
+{% extends "base.html" %}
+{% block title %}myTBA Team {{team.team_number}} - TheBlue Alliance{% endblock %}
+{% block meta_description %}Manage your favorites and subscriptions{% endblock %}
+{% block content %}
 <div class="container">
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
@@ -21,11 +22,11 @@ and subscriptions{% endblock %} {% block content %}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
         <table class="table">
-          {% for event_team in event_teams %}
+          {% for event in team_events %}
           <tr>
             <td>
-              <a href="/event/{{ event_team.event.string_id() }}"
-                >{{ event_team.event.string_id() }}</a
+              <a href="/event/{{ event.key.string_id() }}"
+                >{{ event.key.string_id() }}</a
               >
             </td>
 
@@ -35,8 +36,8 @@ and subscriptions{% endblock %} {% block content %}
                   <input
                     type="checkbox"
                     name="favorite_events"
-                    value="{{ event_team.event.string_id() }}"
-                    {% if event_team.key_name in already_favorited %}checked{% endif %}
+                    value="{{ event.key.string_id() }}"
+                    {% if event.key.string_id() ~ '_' ~ team.key.string_id() in already_favorited %}checked{% endif %}
                   />
                 </li>
               </ul>
