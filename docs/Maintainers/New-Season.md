@@ -93,7 +93,11 @@ TODO
 
 ### Ranking Sort Orders
 
-TODO
+[Ranking sort orders](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/ranking_sort_orders.py) need to be updated to add the sort orders for the new year. This information can be found in the game manual, generally under some "Qualification Ranking" section. This is a pre-step for supporting Event Rankings.
+
+[[/docs/images/ranking-sort-orders-example.png]]
+
+Here is an [example PR](https://github.com/the-blue-alliance/the-blue-alliance/pull/7115) for the example screenshot.
 
 ### Predictions
 
