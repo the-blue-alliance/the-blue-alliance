@@ -1,0 +1,46 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>End Date</th>
+      <th>Week</th>
+      <th>Type</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for event in attendance_stats_helper.events %}
+    <tr>
+      <td>{{ event.name }}</td>
+      <td>{{ event.end_date }}</td>
+      <td>{{ event.week_str }}</td>
+      <td>{{ event.event_type_str }}</td>
+      <td>{{ event.city }}, {{ event.state_prov }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table class="table">
+  <tr>
+    <th>Event Count</th>
+    <td>{{ attendance_stats_helper.event_count }}</td>
+  </tr>
+  <tr>
+    <th>Total Days</th>
+    <td>{{ attendance_stats_helper.total_days }}</td>
+  </tr>
+  <tr>
+    <th>Total Matches</th>
+    <td>{{ attendance_stats_helper.total_matches }}</td>
+  </tr>
+  <tr>
+    <th>Record</th>
+    <td>
+      {{ attendance_stats_helper.record.wins }}-{{
+      attendance_stats_helper.record.losses }}-{{
+      attendance_stats_helper.record.ties }} ({{ attendance_stats_helper.winrate | round(1) }}%)
+    </td>
+  </tr>
+</table>

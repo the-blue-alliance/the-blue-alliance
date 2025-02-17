@@ -18,3 +18,4 @@ MatchKey = str
 AwardKey = str
 MediaKey = str
 RobotKey = str
+UserEventTeamKey = str

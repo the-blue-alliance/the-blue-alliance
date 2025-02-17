@@ -40,10 +40,10 @@ from backend.common.models.favorite import Favorite
 from backend.common.models.keys import EventKey, TeamNumber
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
+from backend.common.queries.event_query import TeamEventsQuery
 from backend.common.sitevars.notifications_enable import NotificationsEnable
 from backend.web.decorators import enforce_login, require_login, require_login_only
 from backend.web.redirect import is_safe_url, safe_next_redirect
-
 
 blueprint = Blueprint("account", __name__, url_prefix="/account")
 
@@ -241,6 +241,7 @@ def mytba() -> str:
         (event, MatchHelper.natural_sorted_matches(mytba_event_matches[event.key]))
         for event in mytba_event_matches_events
     ]
+    attendance_stats_helper = mytba.attendance_stats_helper
 
     template_values = {
         "event_fav_sub": [
@@ -279,6 +280,7 @@ def mytba() -> str:
         ],
         "status": request.args.get("status"),
         "year": SeasonHelper.effective_season_year(),
+        "attendance_stats_helper": attendance_stats_helper,
     }
     return render_template("mytba.html", **template_values)
 
@@ -457,6 +459,71 @@ def mytba_event_post(event_key: EventKey) -> Response:
     return safe_next_redirect(
         url_for("account.mytba", _anchor="my-events", status="event_updated")
     )
+
+
+@blueprint.get("/mytba/eventteam/<int:team_number>")
+@require_login
+def mytba_eventteam_get(team_number: TeamNumber) -> str:
+    team = Team.get_by_id(f"frc{team_number}")
+    if not team:
+        abort(404)
+
+    user = none_throws(current_user())
+
+    team_events = TeamEventsQuery(none_throws(team.key.string_id())).fetch()
+
+    favorites = Favorite.query(
+        Favorite.model_type == ModelType.EVENT_TEAM,
+        Favorite.model_key.IN(  # pyre-ignore[16]
+            [f"{event.key.string_id()}_{team.key.string_id()}" for event in team_events]
+        ),
+        ancestor=none_throws(user.account_key),
+    ).fetch(1000)
+
+    already_favorited = set()
+    if favorites:
+        already_favorited = {f.model_key for f in favorites}
+
+    template_values = {
+        "team": team,
+        "team_events": team_events,
+        "already_favorited": already_favorited,
+    }
+    return render_template("mytba_eventteam.html", **template_values)
+
+
+@blueprint.post("/mytba/eventteam/<int:team_number>")
+@require_login
+def mytba_eventteam_post(team_number: TeamNumber) -> Response:
+    team = Team.get_by_id(f"frc{team_number}")
+    if not team:
+        abort(404)
+
+    team_key = f"frc{team_number}"
+
+    user = none_throws(current_user())
+    team_events = TeamEventsQuery(none_throws(team.key.string_id())).fetch()
+    for event in team_events:
+        MyTBAHelper.remove_favorite(
+            account_key=none_throws(user.account_key),
+            model_key=f"{event.key.string_id()}_{team.key.string_id()}",
+            model_type=ModelType.EVENT_TEAM,
+        )
+
+    favorites = request.form.getlist("favorite_events")
+    if favorites:
+        for event_key in favorites:
+            MyTBAHelper.add_favorite(
+                Favorite(
+                    parent=none_throws(user.account_key),
+                    user_id=none_throws(user.account_key).id(),
+                    model_type=ModelType.EVENT_TEAM,
+                    model_key=f"{event_key}_{team_key}",
+                )
+            )
+
+    response = redirect(url_for("account.mytba"))
+    return response
 
 
 @blueprint.route("/ping", methods=["POST"])
