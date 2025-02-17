@@ -336,7 +336,7 @@ class TestTBANSHelper(unittest.TestCase):
             # Make sure our taskqueue tasks execute what we expect
             with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
                 deferred.run(tasks[0].payload)
-                mock_send_fcm.assert_called_once_with([client], ANY, False)
+                mock_send_fcm.assert_called_once_with([client], ANY)
                 # Make sure the notification is a BroadcastNotification
                 notification = mock_send_fcm.call_args[0][1]
                 assert isinstance(notification, BroadcastNotification)
@@ -1036,7 +1036,7 @@ class TestTBANSHelper(unittest.TestCase):
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
             deferred.run(tasks[0].payload)
-            mock_send_fcm.assert_called_once_with([client], ANY, False)
+            mock_send_fcm.assert_called_once_with([client], ANY)
 
     def test_defer_webhook(self):
         client = MobileClient(
@@ -1096,7 +1096,7 @@ class TestTBANSHelper(unittest.TestCase):
             autospec=True,
         ) as mock_init:
             TBANSHelper._send_fcm(clients, MockNotification())
-            mock_init.assert_called_once_with(ANY, ANY, expected, False)
+            mock_init.assert_called_once_with(ANY, ANY, expected)
 
     def test_send_fcm_filter_from_notification(self):
         clients = [
@@ -1410,7 +1410,7 @@ class TestTBANSHelper(unittest.TestCase):
                 "logging.error"
             ):
                 # call_time = time.time()
-                TBANSHelper._send_fcm([client], MockNotification(), False, i)
+                TBANSHelper._send_fcm([client], MockNotification(), i)
 
                 # NOTE: Removed in https://github.com/the-blue-alliance/the-blue-alliance/pull/4620
                 # Check that we queue'd for a retry with the proper countdown time
