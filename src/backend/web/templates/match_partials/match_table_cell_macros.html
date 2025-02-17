@@ -78,9 +78,10 @@
       or match.score_breakdown.get(alliance_color).completeRocketRankingPoint
       or match.score_breakdown.get(alliance_color).shieldEnergizedRankingPoint
       or match.score_breakdown.get(alliance_color).cargoBonusRankingPoint
-      or match.score_breakdown.get(alliance_color).sustainabilityBonusAchieved 
-      or match.score_breakdown.get(alliance_color).melodyBonusAchieved %}
-    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% elif match.year == 2019 %}Complete Rocket{% elif match.year == 2020 %}Shield Energized{% elif match.year == 2022 %}Cargo Bonus{% elif match.year == 2023 %}Sustainability Bonus{% elif match.year == 2024 %}Melody Bonus{% endif %}">
+      or match.score_breakdown.get(alliance_color).sustainabilityBonusAchieved
+      or match.score_breakdown.get(alliance_color).melodyBonusAchieved
+      or match.score_breakdown.get(alliance_color).autoBonusAchieved %}
+    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% elif match.year == 2019 %}Complete Rocket{% elif match.year == 2020 %}Shield Energized{% elif match.year == 2022 %}Cargo Bonus{% elif match.year == 2023 %}Sustainability Bonus{% elif match.year == 2024 %}Melody Bonus{% elif match.year == 2025 %}Auto Bonus{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
@@ -92,8 +93,14 @@
       or match.score_breakdown.get(alliance_color).shieldOperationalRankingPoint
       or match.score_breakdown.get(alliance_color).hangarBonusRankingPoint
       or match.score_breakdown.get(alliance_color).activationBonusAchieved
-      or match.score_breakdown.get(alliance_color).ensembleBonusAchieved %}
-    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% elif match.year == 2018 %}Face The Boss{% elif match.year == 2019 %}HAB Docking{% elif match.year == 2020 %}Shield Operational{% elif match.year == 2022 %}Hangar Bonus{% elif match.year == 2023 %}Activation Bonus{% elif match.year == 2024 %}Ensemble Bonus{% endif %}">
+      or match.score_breakdown.get(alliance_color).ensembleBonusAchieved
+      or match.score_breakdown.get(alliance_color).coralBonusAchieved %}
+    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% elif match.year == 2018 %}Face The Boss{% elif match.year == 2019 %}HAB Docking{% elif match.year == 2020 %}Shield Operational{% elif match.year == 2022 %}Hangar Bonus{% elif match.year == 2023 %}Activation Bonus{% elif match.year == 2024 %}Ensemble Bonus{% elif match.year == 2025 %}Coral Bonus{% endif %}">
+      <circle cx="2" cy="2" r="2"/>
+    </svg>
+    {% endif %}
+    {% if match.score_breakdown.get(alliance_color).bargeBonusAchieved %}
+    <svg class="top-left-dot-3" rel="tooltip" title="{% if match.year == 2025 %}Barge Bonus{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
