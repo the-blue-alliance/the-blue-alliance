@@ -218,62 +218,50 @@ class Match(CachedModel):
                 return None
 
             if self.has_been_played:
-                # Add in RP calculations
-                if self.year in {2016, 2017}:
-                    for color in ALLIANCE_COLORS:
-                        if self.comp_level == "qm":
-                            rp_earned = 0
-                            if self.winning_alliance == color:
-                                rp_earned += 2
-                            elif self.winning_alliance == "":
-                                rp_earned += 1
-
-                            if self.year == 2016:
-                                if score_breakdown.get(color, {}).get(
-                                    "teleopDefensesBreached"
-                                ):
-                                    rp_earned += 1
-                                if score_breakdown.get(color, {}).get(
-                                    "teleopTowerCaptured"
-                                ):
-                                    rp_earned += 1
-                            elif self.year == 2017:
-                                if score_breakdown.get(color, {}).get(
-                                    "kPaRankingPointAchieved"
-                                ):
-                                    rp_earned += 1
-                                if score_breakdown.get(color, {}).get(
-                                    "rotorRankingPointAchieved"
-                                ):
-                                    rp_earned += 1
-                            score_breakdown[color]["tba_rpEarned"] = rp_earned
-                        else:
-                            score_breakdown[color]["tba_rpEarned"] = None
-                # Derive if bonus RP came from fouls
-                if self.year == 2020:
-                    for color in ALLIANCE_COLORS:
-                        score_breakdown[color][
-                            "tba_shieldEnergizedRankingPointFromFoul"
-                        ] = (
-                            score_breakdown[color]["shieldEnergizedRankingPoint"]
-                            and not score_breakdown[color]["stage3Activated"]
-                        )
-                        score_breakdown[color]["tba_numRobotsHanging"] = sum(
-                            [
-                                (
-                                    1
-                                    if score_breakdown[color].get(
-                                        "endgameRobot{}".format(i)
-                                    )
-                                    == "Hang"
-                                    else 0
-                                )
-                                for i in range(1, 4)
-                            ]
-                        )
+                score_breakdown = self._add_tba_breakdown_fields(score_breakdown)
             self._score_breakdown = score_breakdown
 
         return self._score_breakdown
+
+    # fmt: off
+    def _add_tba_breakdown_fields(self, score_breakdown: MatchScoreBreakdown) -> MatchScoreBreakdown:
+        # Add our computed `tba_` fields
+        for color in ALLIANCE_COLORS:
+            # Add in RP calculations
+            if self.year in {2016, 2017}:
+                if self.comp_level == "qm":
+                    rp_earned = 0
+                    if self.winning_alliance == color:
+                        rp_earned += 2
+                    elif self.winning_alliance == "":
+                        rp_earned += 1
+
+                    score_breakdown_color = score_breakdown.get(color, {})
+                    if self.year == 2016:
+                        if score_breakdown_color.get("teleopDefensesBreached"):
+                            rp_earned += 1
+                        if score_breakdown_color.get("teleopTowerCaptured"):
+                            rp_earned += 1
+                    elif self.year == 2017:
+                        if score_breakdown_color.get("kPaRankingPointAchieved"):
+                            rp_earned += 1
+                        if score_breakdown_color.get("rotorRankingPointAchieved"):
+                            rp_earned += 1
+                    score_breakdown[color]["tba_rpEarned"] = rp_earned
+                else:
+                    score_breakdown[color]["tba_rpEarned"] = None
+            # Derive if bonus RP came from fouls
+            elif self.year == 2020:
+                score_breakdown[color]["tba_shieldEnergizedRankingPointFromFoul"] = (score_breakdown[color]["shieldEnergizedRankingPoint"] and not score_breakdown[color]["stage3Activated"])
+                score_breakdown[color]["tba_numRobotsHanging"] = sum([(1 if score_breakdown[color].get("endgameRobot{}".format(i)) == "Hang" else 0) for i in range(1, 4)])
+            # Add count of coral per level
+            elif self.year == 2025:
+                for period in ["auto", "teleop"]:
+                    for row in ["bot", "mid", "top"]:
+                        row_count = sum([1 for v in score_breakdown[color][f"{period}Reef"][f"{row}Row"].values() if v])
+                        score_breakdown[color][f"{period}Reef"][f"tba_{row}RowCount"] = row_count
+        # fmt: on
+        return score_breakdown
 
     @property
     def winning_alliance(self) -> TMatchWinner:
