@@ -60,7 +60,9 @@ Once the game is announced, the landing page type should be changed to `Build Se
 
 ### Avatars
 
-TODO
+At some point during the build season avatar submissions will open. This is generally accompanied by a blog post from FIRST letting teams know submissions are open, and guiding teams on how to submit their avatars. We should add a link to this blog post from the [avatars page](https://github.com/rbgk/the-blue-alliance/blob/py3/src/backend/web/templates/avatars.html) at the top. See an [example PR from 2025](https://github.com/the-blue-alliance/the-blue-alliance/pull/7060).
+
+Optionally, the build season landing page `build_handler_show_avatars` property can be swapped to true. However, the avatars page attempts to load ALL team avatars in one go, which causes a 500 due to our request going OOM. This is a neat little page to look at, but we might not want to advertise it until optimizations have been made.
 
 ## Pre-First Event
 
