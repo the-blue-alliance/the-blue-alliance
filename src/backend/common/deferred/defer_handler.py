@@ -26,7 +26,7 @@ def _decode_deferred_payload(environ):
 
 def handle_defer(path: str) -> Response:
     updated_environ = _decode_deferred_payload(request.environ)
-    return defer_app.application.post(updated_environ)
+    return defer_app.post(updated_environ)
 
 
 def install_defer_routes(app: Flask) -> None:
