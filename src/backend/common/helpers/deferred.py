@@ -7,13 +7,12 @@ from google.appengine.api.apiproxy_stub_map import UserRPC
 from google.appengine.ext.deferred.deferred import (
     _curry_callable,
     _DEFAULT_QUEUE,
+    _DEFAULT_URL,
     _DeferredTaskEntity,
     _TASKQUEUE_HEADERS,
     run,
     run_from_datastore,
 )
-
-_DEFAULT_URL = "/_ah/queue/deferred_encoded"
 
 
 def _serialize(obj: Any, *args, **kwargs) -> bytes:
@@ -43,7 +42,7 @@ def defer_safe(obj: Any, *args, **kwargs) -> UserRPC:
     except taskqueue.TaskTooLargeError:
         key = _DeferredTaskEntity(data=pickled).put()
         pickled = _serialize(run_from_datastore, str(key))
-        task = taskqueue.Task(payload=base64.b64encode(pickled), **taskargs)
+        task = taskqueue.Task(payload=pickled, **taskargs)
         return task.add(queue)
 
 
