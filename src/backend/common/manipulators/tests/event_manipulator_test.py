@@ -6,11 +6,11 @@ from unittest.mock import patch
 
 import pytest
 import six
-from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.location_helper import LocationHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.models.event import Event
@@ -124,6 +124,6 @@ class TestEventManipulator(unittest.TestCase):
             # This lets us ensure that the devserver can run our task
             # See https://github.com/GoogleCloudPlatform/appengine-python-standard/issues/45
             six.ensure_text(task.payload)
-            deferred.run(task.payload)
+            run_from_task(task)
 
         assert none_throws(Event.get_by_id("2011ct")).timezone_id is not None

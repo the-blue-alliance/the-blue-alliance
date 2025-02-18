@@ -1,5 +1,8 @@
+import base64
+import io
+
 from flask import Flask, request, Response
-from google.appengine.ext import deferred
+from google.appengine.ext.deferred.deferred import application as defer_app
 
 from backend.common.url_converters import (
     has_regex_url_converter,
@@ -7,8 +10,23 @@ from backend.common.url_converters import (
 )
 
 
+def _decode_deferred_payload(environ):
+    try:
+        request_body_size = int(environ.get("CONTENT_LENGTH", 0))
+    except ValueError:
+        request_body_size = 0
+
+    request_body = environ["wsgi.input"].read(request_body_size)
+
+    decoded_body = base64.b64decode(request_body)
+    environ["CONTENT_LENGTH"] = len(decoded_body)
+    environ["wsgi.input"] = io.BytesIO(decoded_body)
+    return environ
+
+
 def handle_defer(path: str) -> Response:
-    return deferred.application.post(request.environ)
+    updated_environ = _decode_deferred_payload(request.environ)
+    return defer_app.post(updated_environ)
 
 
 def install_defer_routes(app: Flask) -> None:
