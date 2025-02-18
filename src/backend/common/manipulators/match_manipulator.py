@@ -2,9 +2,9 @@ import logging
 from typing import List
 
 from google.appengine.api import taskqueue
-from google.appengine.ext import deferred
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
@@ -81,7 +81,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                 ):
                     # Catch TaskAlreadyExistsError + TombstonedTaskError
                     try:
-                        deferred.defer(
+                        defer_safe(
                             TBANSHelper.match_score,
                             match,
                             _name=f"{match.key_name}_match_score",
@@ -112,7 +112,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
         if "_video_added" in updated_match.updated_attrs:
             # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:
-                deferred.defer(
+                defer_safe(
                     TBANSHelper.match_video,
                     match,
                     _name=f"{match.key_name}_match_video",
@@ -129,7 +129,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     for event in unplayed_match_events:
         # Catch TaskAlreadyExistsError + TombstonedTaskError
         try:
-            deferred.defer(
+            defer_safe(
                 TBANSHelper.event_schedule,
                 event,
                 _name=f"{event.key_name}_event_schedule",
@@ -142,7 +142,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
 
         # Catch TaskAlreadyExistsError + TombstonedTaskError
         try:
-            deferred.defer(
+            defer_safe(
                 TBANSHelper.schedule_upcoming_matches,
                 event,
                 _name=f"{event.key_name}_schedule_upcoming_matches",

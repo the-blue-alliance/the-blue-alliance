@@ -4,13 +4,13 @@ from typing import Optional
 from unittest.mock import patch
 
 import pytest
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.models.award import Award
@@ -157,7 +157,7 @@ class TestAwardManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         # Ensure we have a district_points_calc test enqueued
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
@@ -184,7 +184,7 @@ class TestAwardManipulator(unittest.TestCase):
         assert len(tasks) == 1
 
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
             queue_names="push-notifications"
@@ -203,7 +203,7 @@ class TestAwardManipulator(unittest.TestCase):
 
         for task in tasks:
             with patch.object(TBANSHelper, "awards") as mock_awards:
-                deferred.run(task.payload)
+                run_from_task(task)
 
         # Event is not configured to be within a day - skip it
         mock_awards.assert_not_called()

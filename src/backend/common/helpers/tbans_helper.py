@@ -5,7 +5,6 @@ from typing import List, Optional
 
 import firebase_admin
 from firebase_admin.exceptions import FirebaseError
-from google.appengine.ext import deferred
 
 from backend.common.consts.client_type import (
     ClientType,
@@ -17,6 +16,7 @@ from backend.common.consts.notification_type import (
     ENABLED_TEAM_NOTIFICATIONS,
     NotificationType,
 )
+from backend.common.helpers.deferred import defer_safe
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.mobile_client import MobileClient
@@ -559,7 +559,7 @@ class TBANSHelper:
             cls.match_upcoming(match, user_id)
         else:
             try:
-                deferred.defer(
+                defer_safe(
                     cls.match_upcoming,
                     match,
                     user_id,
@@ -626,7 +626,7 @@ class TBANSHelper:
         BATCH_SIZE = 500
 
         for batch in batch(subscriptions, BATCH_SIZE):
-            deferred.defer(
+            defer_safe(
                 cls._send_subscriptions,
                 batch,
                 notification,
@@ -667,7 +667,7 @@ class TBANSHelper:
     def _defer_fcm(
         cls, clients: List[MobileClient], notification: Notification
     ) -> None:
-        deferred.defer(
+        defer_safe(
             cls._send_fcm,
             clients,
             notification,
@@ -680,7 +680,7 @@ class TBANSHelper:
     def _defer_webhook(
         cls, clients: List[MobileClient], notification: Notification
     ) -> None:
-        deferred.defer(
+        defer_safe(
             cls._send_webhook,
             clients,
             notification,
@@ -796,7 +796,7 @@ class TBANSHelper:
 
             # if retry_clients:
             #     # Try again, with exponential backoff
-            #     deferred.defer(
+            #     defer_safe(
             #         cls._send_fcm,
             #         retry_clients,
             #         notification,

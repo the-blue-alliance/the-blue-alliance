@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import cast, Dict, List
 
-from google.appengine.ext import deferred, ndb
+from google.appengine.ext import ndb
 from requests_mock.mocker import Mocker as RequestsMocker
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -12,6 +12,7 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.helpers.deferred import run_from_task
 from backend.common.models.alliance import EventAlliance, MatchAlliance
 from backend.common.models.award import Award
 from backend.common.models.district import District
@@ -443,7 +444,7 @@ def test_bootstrap_year(
     assert len(tasks) == 2
 
     for task in tasks:
-        deferred.run(task.payload)
+        run_from_task(task)
 
     stored_e1 = Event.get_by_id("2020miket")
     assert e1 == remove_auto_add_properties(stored_e1)

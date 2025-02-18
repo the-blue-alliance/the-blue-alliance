@@ -2,7 +2,15 @@ import base64
 import pickle
 
 from google.appengine.api import taskqueue
-from google.appengine.ext.deferred import _curry_callable, _DEFAULT_QUEUE, _DEFAULT_URL, _DeferredTaskEntity, _TASKQUEUE_HEADERS, run_from_datastore
+from google.appengine.ext.deferred.deferred import (
+    _curry_callable,
+    _DEFAULT_QUEUE,
+    _DEFAULT_URL,
+    _DeferredTaskEntity,
+    _TASKQUEUE_HEADERS,
+    run,
+    run_from_datastore,
+)
 
 
 def _serialize(obj, *args, **kwargs) -> bytes:
@@ -18,7 +26,8 @@ def defer_safe(obj, *args, **kwargs):
 
     taskargs = dict(
         (x, kwargs.pop(("_%s" % x), None))
-        for x in ("countdown", "eta", "name", "target", "retry_options"))
+        for x in ("countdown", "eta", "name", "target", "retry_options")
+    )
     taskargs["url"] = kwargs.pop("_url", _DEFAULT_URL)
     transactional = kwargs.pop("_transactional", False)
     taskargs["headers"] = dict(_TASKQUEUE_HEADERS)
@@ -33,3 +42,8 @@ def defer_safe(obj, *args, **kwargs):
         pickled = _serialize(run_from_datastore, str(key))
         task = taskqueue.Task(payload=pickled, **taskargs)
         return task.add(queue)
+
+
+def run_from_task(task: taskqueue.Task) -> None:
+    decoded = base64.b64decode(task.payload)
+    run(decoded)

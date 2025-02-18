@@ -2,11 +2,11 @@ import json
 from typing import List, Set
 
 from google.appengine.api import taskqueue
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.award import Award
@@ -88,7 +88,7 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
         if event and event.within_a_day:
             # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:
-                deferred.defer(
+                defer_safe(
                     TBANSHelper.awards,
                     event,
                     _name=f"{event.key_name}_awards",
