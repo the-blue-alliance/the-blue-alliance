@@ -1,8 +1,7 @@
 import pytest
-from google.appengine.ext import testbed
+from google.appengine.ext import deferred, testbed
 from werkzeug.test import Client
 
-from backend.common.helpers.deferred import run_from_task
 from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
     FMSApiSecrets,
@@ -19,7 +18,7 @@ def always_drain_taskqueue(
         tasks = taskqueue_stub.get_filtered_tasks(queue_names=queue)
         for task in tasks:
             if task.payload:
-                run_from_task(task)
+                deferred.run(task.payload)
 
     get_queues = ["default", "run-in-order"]
     for queue in get_queues:

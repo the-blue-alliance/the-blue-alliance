@@ -3,11 +3,11 @@ from typing import Optional
 from unittest.mock import patch
 
 import pytest
+from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
-from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -122,7 +122,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
-            run_from_task(task)
+            deferred.run(task.payload)
 
         # Ensure we have a district_points_calc test enqueued
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
@@ -150,7 +150,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
         assert len(tasks) == 1
 
         for task in tasks:
-            run_from_task(task)
+            deferred.run(task.payload)
 
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
             queue_names="push-notifications"
@@ -172,7 +172,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
             with patch.object(
                 TBANSHelper, "alliance_selection"
             ) as mock_alliance_selection:
-                run_from_task(task)
+                deferred.run(task.payload)
 
         # Event is not configured to be within a day - skip it
         mock_alliance_selection.assert_not_called()

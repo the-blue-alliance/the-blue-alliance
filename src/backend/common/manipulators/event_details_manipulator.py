@@ -2,9 +2,9 @@ import logging
 from typing import List
 
 from google.appengine.api import taskqueue
+from google.appengine.ext import deferred
 
 from backend.common.cache_clearing import get_affected_queries
-from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
@@ -71,7 +71,7 @@ def event_details_post_update_hook(
         ):
             # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:
-                defer_safe(
+                deferred.defer(
                     TBANSHelper.alliance_selection,
                     event,
                     _name=f"{event.key_name}_alliance_selection",

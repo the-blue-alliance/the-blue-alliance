@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from google.appengine.ext import testbed
+from google.appengine.ext import deferred, testbed
 from werkzeug.test import Client
 
-from backend.common.helpers.deferred import run_from_task
 from backend.common.models.account import Account
 from backend.common.models.team_admin_access import TeamAdminAccess
 
@@ -25,7 +24,7 @@ def test_add_team_media_mod_deferred(
     for i in range(2):
         tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
         for task in tasks:
-            run_from_task(task)
+            deferred.run(task.payload)
 
     access1 = TeamAdminAccess.get_by_id("frc254_2023")
     assert access1 is not None
@@ -59,7 +58,7 @@ def test_add_team_media_mod_batched(
     for i in range(2):
         tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
         for task in tasks:
-            run_from_task(task)
+            deferred.run(task.payload)
 
     modcodes = TeamAdminAccess.query().fetch()
     assert len(modcodes) == 9999

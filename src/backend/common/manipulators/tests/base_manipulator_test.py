@@ -3,12 +3,12 @@ from typing import Any, Dict, Generator, List, Optional, Set
 
 import pytest
 import six
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.consts.api_version import ApiMajorVersion
-from backend.common.helpers.deferred import run_from_task
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.models.cached_query_result import CachedQueryResult
@@ -325,7 +325,7 @@ def test_cache_clearing(ndb_context, taskqueue_stub) -> None:
     six.ensure_text(tasks[0].payload)
 
     # Run cache clearing manually
-    run_from_task(tasks[0])
+    deferred.run(tasks[0].payload)
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None
@@ -344,7 +344,7 @@ def test_post_update_hook(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    run_from_task(tasks[0])
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
@@ -374,7 +374,7 @@ def test_update_hook_right_args(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    run_from_task(tasks[0])
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
@@ -401,7 +401,7 @@ def test_update_hook_creation(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    run_from_task(tasks[0])
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
@@ -456,7 +456,7 @@ def test_delete_clears_cache(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run cache clearing manually
-    run_from_task(tasks[0])
+    deferred.run(tasks[0].payload)
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None
@@ -474,7 +474,7 @@ def test_delete_runs_hook(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    run_from_task(tasks[0])
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.delete_calls == 1
@@ -509,7 +509,7 @@ def test_delete_hook_right_args(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    run_from_task(tasks[0])
+    deferred.run(tasks[0].payload)
 
     # Make sure the hook ran
     assert DummyManipulator.delete_calls == 1

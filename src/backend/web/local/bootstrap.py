@@ -2,9 +2,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import requests
-from google.appengine.ext import ndb
+from google.appengine.ext import deferred, ndb
 
-from backend.common.helpers.deferred import defer_safe
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.district_team_manipulator import (
@@ -241,13 +240,13 @@ class LocalDataBootstrap:
                 event["key"] for event in cls.fetch_endpoint(f"events/{key}", apiv3_key)
             ]
             for event_key in event_keys:
-                defer_safe(cls.update_event, event_key, apiv3_key)
+                deferred.defer(cls.update_event, event_key, apiv3_key)
             return f"/events/{key}"
         elif key in ALL_KNOWN_DISTRICT_ABBREVIATIONS:
             # bootstrap all years for the given district abbr
             district_history = cls.fetch_district_history(key, apiv3_key)
             for district_year in district_history:
-                defer_safe(cls.update_district, district_year, apiv3_key)
+                deferred.defer(cls.update_district, district_year, apiv3_key)
 
             return f"/events/{key}"
         else:

@@ -8,13 +8,12 @@ import requests_mock
 import six
 from firebase_admin import exceptions as firebase_exceptions
 from freezegun import freeze_time
-from google.appengine.ext import ndb, testbed
+from google.appengine.ext import deferred, ndb, testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
-from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -83,7 +82,7 @@ def auto_add_stubs(
 
 def drain_deferred(taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub) -> None:
     for task in taskqueue_stub.get_filtered_tasks(queue_names="firebase"):
-        run_from_task(task)
+        deferred.run(task.payload)
 
 
 def test_update_live_events_none(
