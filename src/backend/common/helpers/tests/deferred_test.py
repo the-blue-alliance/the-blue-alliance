@@ -1,4 +1,5 @@
 import six
+from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
 
 from backend.common.helpers.deferred import defer_safe, run_from_task
@@ -22,7 +23,15 @@ def _fn(*args, **kwargs) -> None:
 def test_enqueue_deferred(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
-
     arg = "\0"
+    defer_safe(_fn, arg)
+    _drain_deferred(taskqueue_stub)
+
+
+def test_enqueue_deferred_via_datastore(
+    ndb_stub: testbed.datastore_file_stub.DatastoreFileStub,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    arg = "\0" + ("a" * (taskqueue.MAX_TASK_SIZE_BYTES + 1))
     defer_safe(_fn, arg)
     _drain_deferred(taskqueue_stub)
