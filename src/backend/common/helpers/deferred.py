@@ -1,7 +1,9 @@
 import base64
 import pickle
+from typing import Any
 
 from google.appengine.api import taskqueue
+from google.appengine.api.apiproxy_stub_map import UserRPC
 from google.appengine.ext.deferred.deferred import (
     _curry_callable,
     _DEFAULT_QUEUE,
@@ -13,12 +15,12 @@ from google.appengine.ext.deferred.deferred import (
 )
 
 
-def _serialize(obj, *args, **kwargs) -> bytes:
+def _serialize(obj: Any, *args, **kwargs) -> bytes:
     curried = _curry_callable(obj, *args, **kwargs)
     return pickle.dumps(curried, protocol=2)
 
 
-def defer_safe(obj, *args, **kwargs):
+def defer_safe(obj: Any, *args, **kwargs) -> UserRPC:
     """
     A wrapper around app enginer's deferred.defer, but will also base64 encode the payload
     Which avoids some unicode errors when passing arguments with certain types of binary properties
