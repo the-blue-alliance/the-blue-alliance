@@ -281,6 +281,9 @@ admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit, methods=["GET"]
 )
 admin_routes.add_url_rule(
+    "/sitevar/edit", view_func=sitevar_edit_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit_post, methods=["POST"]
 )
 admin_routes.add_url_rule("/gameday", methods=["GET"], view_func=gameday_dashboard)
