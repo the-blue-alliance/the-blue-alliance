@@ -2,7 +2,7 @@ import base64
 import io
 
 from flask import Flask, request, Response
-from google.appengine.ext import deferred
+from google.appengine.ext.deferred.deferred import application as defer_app
 
 from backend.common.url_converters import (
     has_regex_url_converter,
@@ -26,7 +26,7 @@ def _decode_deferred_payload(environ):
 
 def handle_defer(path: str) -> Response:
     updated_environ = _decode_deferred_payload(request.environ)
-    return deferred.application.post(updated_environ)
+    return defer_app.application.post(updated_environ)
 
 
 def install_defer_routes(app: Flask) -> None:
