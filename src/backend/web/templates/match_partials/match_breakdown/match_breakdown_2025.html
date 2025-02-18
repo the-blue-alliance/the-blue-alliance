@@ -6,6 +6,48 @@
 {% endif %}
 {% endmacro %}
 
+{% macro coral(period, score_breakdown) %}
+{% set periodKey = '%sReef'|format(period) %}
+{% set countKey = '%sCoralCount'|format(period) %}
+{% if periodKey in score_breakdown.red and "tba_topRowCount" in score_breakdown.red[periodKey] and "tba_midRowCount" in score_breakdown.red[periodKey] and "tba_botRowCount" in score_breakdown.red[periodKey] and "trough" in score_breakdown.red[periodKey] %}
+    <tr>
+        <td class="red">L4</td>
+        <td class="red">{{score_breakdown.red[periodKey].tba_topRowCount}}</td>
+        <td rowspan="4">{{period|title}} Coral Count</td>
+        <td class="blue">{{score_breakdown.blue[periodKey].tba_topRowCount}}</td>
+        <td class="blue">L4</td>
+    </tr>
+    <tr>
+        <td class="red">L3</td>
+        <td class="red">{{score_breakdown.red[periodKey].tba_midRowCount}}</td>
+        <td class="blue">{{score_breakdown.blue[periodKey].tba_midRowCount}}</td>
+        <td class="blue">L3</td>
+    </tr>
+    <tr>
+        <td class="red">L2</td>
+        <td class="red">{{score_breakdown.red[periodKey].tba_botRowCount}}</td>
+        <td class="blue">{{score_breakdown.blue[periodKey].tba_botRowCount}}</td>
+        <td class="blue">L2</td>
+    </tr>
+    <tr>
+        <td class="red">L1</td>
+        <td class="red">{{score_breakdown.red[periodKey].trough}}</td>
+        <td class="blue">{{score_breakdown.blue[periodKey].trough}}</td>
+        <td class="blue">L1</td>
+    </tr>
+{% elif countKey in score_breakdown.red %}
+<tr>
+    <td class="red" colspan="2">
+        {{score_breakdown.red[countKey]}}
+    </td>
+    <td>{{period|title}} Coral Count</td>
+    <td class="blue" colspan="2">
+        {{score_breakdown.blue[countKey]}}
+    </td>
+</tr>
+{% endif %}
+{% endmacro %}
+
 {% macro endgame(team, endgame_result) %}
 {% if endgame_result == 'DeepCage' %}
 <span rel="tooltip" title="{{team|digits}}">Deep Cage (+12)</span>
@@ -62,17 +104,7 @@
     {% endif %}
 
     <!--Auto Game Pieces-->
-    {% if "autoCoralCount" in match.score_breakdown.red %}
-    <tr>
-        <td class="red" colspan="2">
-            {{match.score_breakdown.red.autoCoralCount}}
-        </td>
-        <td>Auto Coral Count</td>
-        <td class="blue" colspan="2">
-            {{match.score_breakdown.blue.autoCoralCount}}
-        </td>
-    </tr>
-    {% endif %}
+    {{coral('auto', match.score_breakdown)}}
 
     {% if "autoCoralPoints" in match.score_breakdown.red %}
     <tr class="key">
@@ -100,17 +132,7 @@
 
     <!-- Teleop -->
     <!-- Game Piece Points -->
-    {% if "teleopCoralCount" in match.score_breakdown.red %}
-    <tr>
-        <td class="red" colspan="2">
-            {{match.score_breakdown.red.teleopCoralCount}}
-        </td>
-        <td>Teleop Coral Count</td>
-        <td class="blue" colspan="2">
-            {{match.score_breakdown.blue.teleopCoralCount}}
-        </td>
-    </tr>
-    {% endif %}
+    {{coral('teleop', match.score_breakdown)}}
 
     {% if "teleopCoralPoints" in match.score_breakdown.red %}
     <tr class="key">
