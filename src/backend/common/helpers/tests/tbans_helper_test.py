@@ -225,11 +225,25 @@ class TestTBANSHelper(unittest.TestCase):
             alliance_selections=[{"declines": [], "picks": ["frc7332"]}],
         ).put()
 
-        TBANSHelper.alliance_selection(self.event)
+        with patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
+            TBANSHelper.alliance_selection(self.event)
+            mock_has_sent_notification.assert_called_once()
+
+            mock_set_has_sent_notification.assert_called_once_with(ANY)
+            set_has_sent_notification_args = mock_set_has_sent_notification.call_args
+            assert set_has_sent_notification_args.endswith("_alliance_selection")
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 2
 
-        with patch.object(TBANSHelper, "_send") as mock_send:
+        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
+            TBANSHelper, "_has_sent_notification", return_value=False
+        ) as mock_has_sent_notification, patch.object(
+            TBANSHelper, "_set_has_sent_notification"
+        ) as mock_set_has_sent_notification:
             for task in tasks:
                 run_from_task(task)
 
@@ -252,10 +266,6 @@ class TestTBANSHelper(unittest.TestCase):
             team_notification = notifications[1]
             assert team_notification.event == self.event
             assert team_notification.team == self.team
-
-            mock_set_has_sent_notification.assert_called_once_with(ANY)
-            set_has_sent_notification_args = mock_set_has_sent_notification.call_args
-            assert set_has_sent_notification_args.endswith("_alliance_selection")
 
     def test_awards_no_users(self):
         # Test send not called with no subscribed users
