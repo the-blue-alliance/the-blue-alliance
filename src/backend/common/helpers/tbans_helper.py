@@ -717,44 +717,32 @@ class TBANSHelper:
         cls._send(users, notification)
 
     @classmethod
-    def _send(cls, user_ids: List[str], notification: Notification) -> None:
-        fcm_clients_future = MobileClientQuery(
-            user_ids, client_types=list(FCM_CLIENTS)
-        ).fetch_async()
+    def _send(
+        cls,
+        user_ids: List[str],
+        notification: Notification,
+        only_webhooks: bool = False,
+    ) -> None:
         webhook_clients_future = MobileClientQuery(
             user_ids, client_types=[ClientType.WEBHOOK]
         ).fetch_async()
 
-        # Send to FCM clients
-        fcm_clients = fcm_clients_future.get_result()
-        if fcm_clients:
-            cls._defer_fcm(fcm_clients, notification)
+        fcm_clients_future = None
+        if not only_webhooks:
+            fcm_clients_future = MobileClientQuery(
+                user_ids, client_types=list(FCM_CLIENTS)
+            ).fetch_async()
 
         # Send to webhooks
         webhook_clients = webhook_clients_future.get_result()
         if webhook_clients:
             cls._defer_webhook(webhook_clients, notification)
 
-        if not only_webhooks:
-            fcm_clients_future = MobileClientQuery(
-                user_ids, client_types=list(FCM_CLIENTS)
-            ).fetch_async()
-            legacy_fcm_clients_future = MobileClientQuery(
-                user_ids, client_types=list(FCM_LEGACY_CLIENTS)
-            ).fetch_async()
-
+        if fcm_clients_future:
             # Send to FCM clients
             fcm_clients = fcm_clients_future.get_result()
             if fcm_clients:
                 cls._defer_fcm(fcm_clients, notification)
-
-            # Send to Android clients
-            # These use the webhook data format, but over FCM
-            legacy_fcm_clients = legacy_fcm_clients_future.get_result()
-            if legacy_fcm_clients:
-                cls._defer_fcm(
-                    legacy_fcm_clients, notification, legacy_data_format=True
-                )
 
     @classmethod
     def _defer_fcm(
