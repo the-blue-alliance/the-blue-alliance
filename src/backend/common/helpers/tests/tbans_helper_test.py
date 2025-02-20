@@ -184,7 +184,6 @@ class TestTBANSHelper(unittest.TestCase):
             for task in tasks:
                 run_from_task(task)
 
-            TBANSHelper.alliance_selection(self.event)
             # Two calls total - First to the Event, second to frc7332, no call for frc1
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 2
