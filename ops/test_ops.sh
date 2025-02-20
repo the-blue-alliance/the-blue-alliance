@@ -1,6 +1,11 @@
 #!/bin/bash
 
-exit 0
-# TODO something about this is broken
-# tracked in https://github.com/the-blue-alliance/the-blue-alliance/issues/4698
-# npm run testops
+npm run testops -- --runInBand --silent=false
+ret=$?
+
+if [ -n "$CI" ]; then
+    ./ops/dev/pull-gae-logs.sh
+    cat /tmp/tba.log
+fi
+
+exit $ret

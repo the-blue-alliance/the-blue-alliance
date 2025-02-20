@@ -282,6 +282,33 @@
   </div>
   {% endif %}
 
+  {% if matches_played %}
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>Most Matches Played</h3>
+      <table class="table table-striped table-condensed table-center insights-table">
+        <thead>
+          <tr><th>Number</th><th>Teams</th></tr>
+        </thead>
+        <tbody>
+          {% for number, team_list in matches_played.data[:10] %}
+            {% if team_list|length < 50 %}
+            <tr>
+              <td>{{number}}</td>
+              <td>
+                {% for team in team_list %}
+                <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not loop.last %},{% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
   {% if regional_district_winners %}
   <div class="row">
     <div class="col-xs-12">

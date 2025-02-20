@@ -1,5 +1,6 @@
 import pytest
 
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.event_short_name_helper import EventShortNameHelper
 from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.models.district import District
@@ -399,7 +400,7 @@ def test_event_get_short_name():
         EventShortNameHelper.get_short_name(
             "Northeast Utilities FIRST Connecticut Regional"
         )
-        == "Northeast Utilities FIRST Connecticut"
+        == "Northeast Utilities Connecticut"
     )
     assert (
         EventShortNameHelper.get_short_name(
@@ -924,4 +925,68 @@ def test_event_get_short_name():
     assert (
         EventShortNameHelper.get_short_name("Festival de Robotique Regional Day 23")
         == "Festival de Robotique Day 23"
+    )
+    # 2023 edge cases
+    assert (
+        EventShortNameHelper.get_short_name(
+            "FIM District Kettering University Event #1 presented by Ford"
+        )
+        == "Kettering University #1"
+    )
+    assert (
+        EventShortNameHelper.get_short_name(
+            "FIRST in Michigan State Championship presented by DTE Foundation"
+        )
+        == "Michigan"
+    )
+    assert (
+        EventShortNameHelper.get_short_name(
+            "FIRST In Texas District Championship presented by Phillips 66"
+        )
+        == "Texas"
+    )
+    assert (
+        EventShortNameHelper.get_short_name("FIRST Ontario Provincial Championship")
+        == "Ontario"
+    )
+    assert (
+        EventShortNameHelper.get_short_name("New England FIRST District Championship")
+        == "New England"
+    )
+    assert (
+        EventShortNameHelper.get_short_name(
+            "FIRST in Michigan State Championship presented by DTE Foundation - APTIV Division",
+            event_type=EventType.DISTRICT_CMP_DIVISION,
+        )
+        == "MSC - APTIV"
+    )
+    assert (
+        EventShortNameHelper.get_short_name(
+            "FIRST In Texas District Championship presented by Phillips 66 - MERCURY Division",
+            event_type=EventType.DISTRICT_CMP_DIVISION,
+        )
+        == "TDC - MERCURY"
+    )
+    assert (
+        EventShortNameHelper.get_short_name(
+            "FIRST Ontario Provincial Championship - SCIENCE Division",
+            event_type=EventType.DISTRICT_CMP_DIVISION,
+        )
+        == "OPC - SCIENCE"
+    )
+    assert (
+        EventShortNameHelper.get_short_name(
+            "New England FIRST District Championship - MEIR Division",
+            event_type=EventType.DISTRICT_CMP_DIVISION,
+        )
+        == "NEDC - MEIR"
+    )
+    assert (
+        EventShortNameHelper.get_short_name("FIRST Indiana State Championship")
+        == "Indiana"
+    )
+    # 2024 edge cases
+    assert (
+        EventShortNameHelper.get_short_name("2024 FRC Taiwan Playoff", year=2024)
+        == "FRC Taiwan Playoff"
     )

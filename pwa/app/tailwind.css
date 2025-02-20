@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 231 100% 100%;
+    --foreground: 231 5% 10%;
+    --card: 231 50% 100%;
+    --card-foreground: 231 5% 15%;
+    --popover: 231 100% 100%;
+    --popover-foreground: 231 100% 10%;
+    --primary: 231 48.4% 47.8%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 231 30% 90%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 193 30% 95%;
+    --muted-foreground: 231 5% 40%;
+    --accent: 193 30% 90%;
+    --accent-foreground: 231 5% 15%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 231 5% 100%;
+    --border: 231 30% 82%;
+    --input: 231 30% 50%;
+    --ring: 231 48.4% 47.8%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 231 50% 10%;
+    --foreground: 231 5% 100%;
+    --card: 231 50% 10%;
+    --card-foreground: 231 5% 100%;
+    --popover: 231 50% 5%;
+    --popover-foreground: 231 5% 100%;
+    --primary: 231 48.4% 47.8%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 231 30% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 193 30% 25%;
+    --muted-foreground: 231 5% 65%;
+    --accent: 193 30% 25%;
+    --accent-foreground: 231 5% 95%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 231 5% 100%;
+    --border: 231 30% 50%;
+    --input: 231 30% 50%;
+    --ring: 231 48.4% 47.8%;
+    --radius: 0.5rem;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body {
+    @apply scroll-pt-14 antialiased;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Apply blue text and a hover underline to every link */
+  a {
+    @apply text-blue-800 hover:underline;
+  }
+}
+
+@layer utilities {
+  .content-visibility-visible {
+    content-visibility: visible;
+  }
+
+  .content-visibility-hidden {
+    content-visibility: hidden;
+  }
+
+  .content-visibility-auto {
+    content-visibility: auto;
+  }
+}

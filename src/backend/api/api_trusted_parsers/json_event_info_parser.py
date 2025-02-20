@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import AnyStr, Dict, List, Optional, TypedDict
 
 from pyre_extensions import safe_json
@@ -17,6 +18,7 @@ class _WebcastUrlDict(TypedDict, total=False):
     url: str
     type: WebcastType
     channel: str
+    date: str
 
 
 class EventInfoInput(TypedDict, total=False):
@@ -40,7 +42,7 @@ class JSONEventInfoParser:
         info_dict = safe_json.loads(info_json, EventInfoInput, validate=False)
 
         parsed_info: EventInfoParsed = {}
-        if "webcasts" in info_dict:
+        if info_dict.get("webcasts"):
             webcast_list: List[Webcast] = []
             for webcast in info_dict["webcasts"]:
                 if "url" in webcast:
@@ -49,17 +51,27 @@ class JSONEventInfoParser:
                         raise ParserInputException(
                             f"Unknown webcast url {webcast['url']}!"
                         )
-                    webcast_list.append(parsed_webcast)
                 elif "type" in webcast and "channel" in webcast:
-                    webcast_list.append(
-                        Webcast(
-                            type=webcast["type"],
-                            channel=webcast["channel"],
-                        )
+                    parsed_webcast = Webcast(
+                        type=webcast["type"],
+                        channel=webcast["channel"],
                     )
+                else:
+                    raise ParserInputException(f"Invalid webcast: {webcast!r}")
+
+                if "date" in webcast:
+                    try:
+                        datetime.strptime(webcast["date"], "%Y-%m-%d")
+                    except ValueError as e:
+                        raise ParserInputException(
+                            f"Invalid webcast date: {webcast['date']!r}: {e}"
+                        )
+                    parsed_webcast["date"] = webcast["date"]
+                webcast_list.append(parsed_webcast)
+
             parsed_info["webcasts"] = webcast_list
 
-        if "remap_teams" in info_dict:
+        if info_dict.get("remap_teams"):
             for temp_team, remapped_team in info_dict["remap_teams"].items():
                 temp_match = re.match(r"frc\d+", str(temp_team))
                 remapped_match = re.match(r"frc\d+[B-Z]?", str(remapped_team))

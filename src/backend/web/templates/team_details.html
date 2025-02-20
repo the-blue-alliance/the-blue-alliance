@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<button class="tba-fab tba-fab-team" data-team="{{team.key.id()}}">
+<button class="tba-fab tba-fab-team" data-team="{{team.key.id()}}" data-csrf-token="{{csrf_token()}}">
   <span class="glyphicon glyphicon-star favorite"></span>
   <span class="glyphicon glyphicon-star-empty not-favorite"></span>
 </button>
@@ -26,7 +26,7 @@
 
         <h2 class="visible-xs end_header">
         {% if avatar %}
-          <img class="team-avatar single blue" src='{{avatar.avatar_image_source}}'/>
+          <img class="team-avatar single blue" src='{{avatar.avatar_image_url}}'/>
         {% endif %}
         Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
         {% if district_name %}<blockquote class="visible-xs"><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
@@ -141,9 +141,54 @@
                   </ul>
                   {% endif %}
                 </p>
-                {% if comp.playlist %}
-                <a class="btn btn-default" href="{{comp.playlist}}" target="_blank" rel="noopener noreferrer">
-                  <span class="glyphicon glyphicon-play-circle"></span> Watch All Matches</a>
+
+                {% if comp.alliance %} 
+                {% if comp.alliance_status %}
+                <p>
+                They {{comp.alliance_status|safe}}.
+                </p>
+                {% endif %}
+
+                <table class="table table-condensed table-striped">
+                  <tbody>
+                    {% for pick in comp.alliance.picks %}
+                    <tr>
+                      <td>
+                        {% if pick == team.key_name %}<b>{% endif %}
+                        {% if loop.first %}
+                          Captain
+                        {% else %}
+                        {% if loop.index0 >= comp.alliance_size %}
+                          Backup
+                        {% else%}
+                          Pick {{loop.index0}}
+                        {% endif %}
+                        {% endif %}
+                        {% if pick == team.key_name %}</b>{% endif %}
+                      </td>
+                      <td>                 
+                        {% if pick == team.key_name %}<b>{% endif %}
+                        <a href="/team/{{ pick|digits }}/{{year}}">{{ pick|strip_frc }}</a>
+                        {% if pick == team.key_name %}</b>{% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    {% if comp.alliance.backup %}
+                    <tr>
+                      <td>
+                        {% if comp.alliance.backup.in == team.key_name %}<strong>{% endif %}
+                        Backup for <a href="/team/{{ comp.alliance.backup.out|digits }}/{{year}}">{{ comp.alliance.backup.out|strip_frc }}</a>
+                        {% if comp.alliance.backup.in == team.key_name %}</strong>{% endif %}
+                      </td>
+                      <td>
+                        {% if comp.alliance.backup.in == team.key_name %}<strong>{% endif %}
+                        <a href="/team/{{ comp.alliance.backup.in|digits }}/{{year}}">{{ comp.alliance.backup.in|strip_frc }}</a>
+                        {% if comp.alliance.backup.in == team.key_name %}</strong>{% endif %}
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
                 {% endif %}
                 {% endif %}
                 {% if comp.district_points %}
@@ -178,6 +223,10 @@
                       </tr>
                     </tbody>
                   </table>
+                {% endif %}
+                {% if comp.playlist %}
+                <a class="btn btn-default" href="{{comp.playlist}}" target="_blank" rel="noopener noreferrer">
+                  <span class="glyphicon glyphicon-play-circle"></span> Watch All Matches</a>
                 {% endif %}
               </div>
               <div class="col-sm-8" style="margin-top: 1em">

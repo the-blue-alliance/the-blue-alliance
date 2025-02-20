@@ -3,14 +3,22 @@ import unittest
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.playoff_type import DoubleElimRound, PlayoffType
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
+from backend.common.models.alliance import PlayoffOutcome
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
-from backend.common.models.event_team_status import EventTeamLevelStatus
+from backend.common.models.event_team_status import (
+    EventTeamLevelStatus,
+)
 from backend.common.models.match import Match
 from backend.common.tests.event_simulator import EventSimulator
 from backend.common.tests.fixture_loader import load_fixture
+from backend.tests.json_data_importer import JsonDataImporter  # noqa
 
 
 @pytest.fixture(autouse=True)
@@ -30,6 +38,8 @@ def auto_add_ndb_stub(ndb_stub) -> None:
 
 @pytest.mark.usefixtures("ndb_stub", "taskqueue_stub")
 class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
+    maxDiff = None
+
     def test_simulated_event(self):
         es = EventSimulator()
         event = Event.get_by_id("2016nytr")
@@ -318,7 +328,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc5240", status
             ),
-            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.",
+            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was eliminated in the <b>Semifinals</b> with a playoff record of <b>2-3-0</b>.",
         )
 
         status = EventTeamStatusHelper.generate_team_at_event_status("frc229", event)
@@ -360,7 +370,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc5240", status
             ),
-            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.",
+            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was eliminated in the <b>Semifinals</b> with a playoff record of <b>2-3-0</b>.",
         )
 
         status = EventTeamStatusHelper.generate_team_at_event_status("frc229", event)
@@ -402,7 +412,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc5240", status
             ),
-            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.",
+            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was eliminated in the <b>Semifinals</b> with a playoff record of <b>2-3-0</b>.",
         )
 
         status = EventTeamStatusHelper.generate_team_at_event_status("frc229", event)
@@ -444,7 +454,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc5240", status
             ),
-            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.",
+            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was eliminated in the <b>Semifinals</b> with a playoff record of <b>2-3-0</b>.",
         )
 
         status = EventTeamStatusHelper.generate_team_at_event_status("frc229", event)
@@ -486,7 +496,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc5240", status
             ),
-            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.",
+            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was eliminated in the <b>Semifinals</b> with a playoff record of <b>2-3-0</b>.",
         )
 
         status = EventTeamStatusHelper.generate_team_at_event_status("frc229", event)
@@ -528,7 +538,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc5240", status
             ),
-            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.",
+            "Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was eliminated in the <b>Semifinals</b> with a playoff record of <b>2-3-0</b>.",
         )
 
         status = EventTeamStatusHelper.generate_team_at_event_status("frc229", event)
@@ -536,7 +546,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc229", status
             ),
-            "Team 229 was <b>Rank 16/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.",
+            "Team 229 was <b>Rank 16/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> of <b>Alliance 2</b>, and was eliminated in the <b>Finals</b> with a playoff record of <b>5-3-0</b>.",
         )
 
         status = EventTeamStatusHelper.generate_team_at_event_status("frc1665", event)
@@ -544,7 +554,7 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc1665", status
             ),
-            "Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.",
+            "Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> of <b>Alliance 2</b>, and was eliminated in the <b>Finals</b> with a playoff record of <b>5-3-0</b>.",
         )
 
         status = EventTeamStatusHelper.generate_team_at_event_status("frc5964", event)
@@ -558,14 +568,17 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest.TestCase):
 
 @pytest.mark.usefixtures("ndb_context")
 class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
+    maxDiff = None
+
     status_359 = {
         "alliance": {"backup": None, "name": "Alliance 1", "number": 1, "pick": 0},
         "playoff": {
             "current_level_record": {"losses": 1, "ties": 0, "wins": 2},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 1, "ties": 0, "wins": 6},
-            "status": "won",
+            "status": PlayoffOutcome.WON,
         },
         "last_match_key": "2016nytr_f1m3",
         "next_match_key": None,
@@ -587,7 +600,7 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
                 {"name": "Goals", "precision": 0},
                 {"name": "Defense", "precision": 0},
             ],
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -595,10 +608,11 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
         "alliance": {"backup": None, "name": "Alliance 4", "number": 4, "pick": 1},
         "playoff": {
             "current_level_record": {"losses": 2, "ties": 0, "wins": 0},
-            "level": "sf",
+            "level": CompLevel.SF,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 3, "ties": 0, "wins": 2},
-            "status": "eliminated",
+            "status": PlayoffOutcome.ELIMINATED,
         },
         "last_match_key": "2016nytr_sf1m2",
         "next_match_key": None,
@@ -620,7 +634,7 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
                 {"name": "Goals", "precision": 0},
                 {"name": "Defense", "precision": 0},
             ],
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -633,10 +647,11 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
         },
         "playoff": {
             "current_level_record": {"losses": 2, "ties": 0, "wins": 1},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 3, "ties": 0, "wins": 5},
-            "status": "eliminated",
+            "status": PlayoffOutcome.ELIMINATED,
         },
         "last_match_key": "2016nytr_sf2m1",
         "next_match_key": None,
@@ -658,7 +673,7 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
                 {"name": "Goals", "precision": 0},
                 {"name": "Defense", "precision": 0},
             ],
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -671,10 +686,11 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
         },
         "playoff": {
             "current_level_record": {"losses": 2, "ties": 0, "wins": 1},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 3, "ties": 0, "wins": 5},
-            "status": "eliminated",
+            "status": PlayoffOutcome.ELIMINATED,
         },
         "last_match_key": "2016nytr_f1m3",
         "next_match_key": None,
@@ -696,7 +712,7 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
                 {"name": "Goals", "precision": 0},
                 {"name": "Defense", "precision": 0},
             ],
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -723,7 +739,7 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
                 {"name": "Goals", "precision": 0},
                 {"name": "Defense", "precision": 0},
             ],
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -774,7 +790,7 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc5240", status
             ),
-            "Team 5240 was <b>Rank 6/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.",
+            "Team 5240 was <b>Rank 6/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was eliminated in the <b>Semifinals</b> with a playoff record of <b>2-3-0</b>.",
         )
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_alliance_status_string(
@@ -798,7 +814,7 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc229", status
             ),
-            "Team 229 was <b>Rank 20/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.",
+            "Team 229 was <b>Rank 20/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> of <b>Alliance 2</b>, and was eliminated in the <b>Finals</b> with a playoff record of <b>5-3-0</b>.",
         )
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_alliance_status_string(
@@ -822,7 +838,7 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc1665", status
             ),
-            "Team 1665 was <b>Rank 18/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.",
+            "Team 1665 was <b>Rank 18/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> of <b>Alliance 2</b>, and was eliminated in the <b>Finals</b> with a playoff record of <b>5-3-0</b>.",
         )
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_alliance_status_string(
@@ -864,14 +880,17 @@ class Test2016nytrEventTeamStatusHelper(unittest.TestCase):
 
 @pytest.mark.usefixtures("ndb_context")
 class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest.TestCase):
+    maxDiff = None
+
     status_359 = {
         "alliance": None,
         "playoff": {
             "current_level_record": {"losses": 1, "ties": 0, "wins": 2},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 1, "ties": 0, "wins": 6},
-            "status": "won",
+            "status": PlayoffOutcome.WON,
         },
         "last_match_key": "2016nytr_f1m3",
         "next_match_key": None,
@@ -895,10 +914,11 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest.TestCase):
         "alliance": None,
         "playoff": {
             "current_level_record": {"losses": 2, "ties": 0, "wins": 0},
-            "level": "sf",
+            "level": CompLevel.SF,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 3, "ties": 0, "wins": 2},
-            "status": "eliminated",
+            "status": PlayoffOutcome.ELIMINATED,
         },
         "last_match_key": "2016nytr_sf1m2",
         "next_match_key": None,
@@ -922,10 +942,11 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest.TestCase):
         "alliance": None,
         "playoff": {
             "current_level_record": {"losses": 2, "ties": 0, "wins": 1},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 3, "ties": 0, "wins": 5},
-            "status": "eliminated",
+            "status": PlayoffOutcome.ELIMINATED,
         },
         "last_match_key": "2016nytr_sf2m1",
         "next_match_key": None,
@@ -949,10 +970,11 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest.TestCase):
         "alliance": None,
         "playoff": {
             "current_level_record": {"losses": 2, "ties": 0, "wins": 1},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 3, "ties": 0, "wins": 5},
-            "status": "eliminated",
+            "status": PlayoffOutcome.ELIMINATED,
         },
         "last_match_key": "2016nytr_f1m3",
         "next_match_key": None,
@@ -1030,7 +1052,7 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc5240", status
             ),
-            "Team 5240 had a record of <b>9-3-0</b> in quals and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.",
+            "Team 5240 had a record of <b>9-3-0</b> in quals and was eliminated in the <b>Semifinals</b> with a playoff record of <b>2-3-0</b>.",
         )
 
     def test_backup_out(self):
@@ -1042,7 +1064,7 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc229", status
             ),
-            "Team 229 had a record of <b>6-6-0</b> in quals and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.",
+            "Team 229 had a record of <b>6-6-0</b> in quals and was eliminated in the <b>Finals</b> with a playoff record of <b>5-3-0</b>.",
         )
 
     def test_backup_in(self):
@@ -1054,7 +1076,7 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc1665", status
             ),
-            "Team 1665 had a record of <b>6-6-0</b> in quals and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.",
+            "Team 1665 had a record of <b>6-6-0</b> in quals and was eliminated in the <b>Finals</b> with a playoff record of <b>5-3-0</b>.",
         )
 
     def testTeamNotPicked(self):
@@ -1072,14 +1094,17 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest.TestCase):
 
 @pytest.mark.usefixtures("ndb_context")
 class Test2016casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
+    maxDiff = None
+
     status_254 = {
         "alliance": None,
         "playoff": {
             "current_level_record": {"losses": 0, "ties": 0, "wins": 2},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
             "playoff_average": None,
             "record": {"losses": 0, "ties": 0, "wins": 6},
-            "status": "won",
+            "status": PlayoffOutcome.WON,
         },
         "last_match_key": "2016casj_f1m2",
         "next_match_key": None,
@@ -1095,7 +1120,7 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
                 "team_key": "frc254",
             },
             "sort_order_info": None,
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -1127,14 +1152,17 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
 
 @pytest.mark.usefixtures("ndb_context")
 class Test2015casjEventTeamStatusHelper(unittest.TestCase):
+    maxDiff = None
+
     status_254 = {
         "alliance": {"backup": None, "name": "Alliance 1", "number": 1, "pick": 0},
         "playoff": {
             "current_level_record": {"losses": 0, "ties": 0, "wins": 2},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.AVG_SCORE_8_TEAM,
             "playoff_average": 224.14285714285714,
             "record": None,
-            "status": "won",
+            "status": PlayoffOutcome.WON,
         },
         "last_match_key": "2015casj_f1m2",
         "next_match_key": None,
@@ -1157,7 +1185,7 @@ class Test2015casjEventTeamStatusHelper(unittest.TestCase):
                 {"name": "Tote", "precision": 0},
                 {"name": "Litter", "precision": 0},
             ],
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -1165,10 +1193,11 @@ class Test2015casjEventTeamStatusHelper(unittest.TestCase):
         "alliance": {"backup": None, "name": "Alliance 3", "number": 3, "pick": 1},
         "playoff": {
             "current_level_record": None,
-            "level": "sf",
+            "level": CompLevel.SF,
+            "playoff_type": PlayoffType.AVG_SCORE_8_TEAM,
             "playoff_average": 133.59999999999999,
             "record": None,
-            "status": "eliminated",
+            "status": PlayoffOutcome.ELIMINATED,
         },
         "last_match_key": "2015casj_sf1m5",
         "next_match_key": None,
@@ -1191,7 +1220,7 @@ class Test2015casjEventTeamStatusHelper(unittest.TestCase):
                 {"name": "Tote", "precision": 0},
                 {"name": "Litter", "precision": 0},
             ],
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -1219,7 +1248,7 @@ class Test2015casjEventTeamStatusHelper(unittest.TestCase):
                 {"name": "Tote", "precision": 0},
                 {"name": "Litter", "precision": 0},
             ],
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -1259,7 +1288,7 @@ class Test2015casjEventTeamStatusHelper(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc846", status
             ),
-            "Team 846 was <b>Rank 8/57</b> with an average score of <b>97.0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 3</b>, and was <b>eliminated in the Semifinals</b> with a playoff average of <b>133.6</b>.",
+            "Team 846 was <b>Rank 8/57</b> with an average score of <b>97.0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 3</b>, and was eliminated in the <b>Semifinals</b> with a playoff average of <b>133.6</b>.",
         )
 
     def test_team_not_picked(self):
@@ -1273,14 +1302,17 @@ class Test2015casjEventTeamStatusHelper(unittest.TestCase):
 
 @pytest.mark.usefixtures("ndb_context")
 class Test2015casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
+    maxDiff = None
+
     status_254 = {
         "alliance": None,
         "playoff": {
             "current_level_record": {"losses": 0, "ties": 0, "wins": 2},
-            "level": "f",
+            "level": CompLevel.F,
+            "playoff_type": PlayoffType.AVG_SCORE_8_TEAM,
             "playoff_average": 224.14285714285714,
             "record": None,
-            "status": "won",
+            "status": PlayoffOutcome.WON,
         },
         "last_match_key": "2015casj_f1m2",
         "next_match_key": None,
@@ -1296,7 +1328,7 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
                 "team_key": "frc254",
             },
             "sort_order_info": None,
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -1304,10 +1336,11 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
         "alliance": None,
         "playoff": {
             "current_level_record": None,
-            "level": "sf",
+            "level": CompLevel.SF,
+            "playoff_type": PlayoffType.AVG_SCORE_8_TEAM,
             "playoff_average": 133.59999999999999,
             "record": None,
-            "status": "eliminated",
+            "status": PlayoffOutcome.ELIMINATED,
         },
         "last_match_key": "2015casj_sf1m5",
         "next_match_key": None,
@@ -1323,7 +1356,7 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
                 "team_key": "frc846",
             },
             "sort_order_info": None,
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -1344,7 +1377,7 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
                 "team_key": "frc8",
             },
             "sort_order_info": None,
-            "status": "completed",
+            "status": EventTeamLevelStatus.COMPLETED,
         },
     }
 
@@ -1385,7 +1418,7 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string(
                 "frc846", status
             ),
-            "Team 846 had an average score of <b>97.0</b> in quals and was <b>eliminated in the Semifinals</b> with a playoff average of <b>133.6</b>.",
+            "Team 846 had an average score of <b>97.0</b> in quals and was eliminated in the <b>Semifinals</b> with a playoff average of <b>133.6</b>.",
         )
 
     def test_team_not_picked(self):
@@ -1394,4 +1427,415 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest.TestCase):
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string("frc8", status),
             "Team 8 had an average score of <b>42.6</b> in quals.",
+        )
+
+
+@pytest.mark.usefixtures("ndb_context")
+class Test2022cmptxEventTeamStatusHelper(unittest.TestCase):
+    maxDiff = None
+
+    status_1619 = {
+        "qual": None,
+        "alliance": {
+            "pick": 0,
+            "name": "Galileo",
+            "number": 3,
+            "backup": None,
+        },
+        "playoff": {
+            "playoff_type": 4,
+            "status": PlayoffOutcome.WON,
+            "level": CompLevel.F,
+            "current_level_record": {"wins": 2, "losses": 1, "ties": 0},
+            "record": {"wins": 5, "losses": 3, "ties": 0},
+            "round_robin_rank": 2,
+            "advanced_to_round_robin_finals": True,
+        },
+        "last_match_key": "2022cmptx_f1m3",
+        "next_match_key": None,
+    }
+
+    status_4414 = {
+        "qual": None,
+        "alliance": {
+            "pick": 1,
+            "name": "Turing",
+            "number": 2,
+            "backup": None,
+        },
+        "playoff": {
+            "playoff_type": 4,
+            "status": PlayoffOutcome.ELIMINATED,
+            "level": CompLevel.F,
+            "current_level_record": {"wins": 1, "losses": 2, "ties": 0},
+            "record": {"wins": 5, "losses": 3, "ties": 0},
+            "round_robin_rank": 1,
+            "advanced_to_round_robin_finals": True,
+        },
+        "last_match_key": "2022cmptx_f1m3",
+        "next_match_key": None,
+    }
+
+    status_1323 = {
+        "qual": None,
+        "alliance": {
+            "pick": 1,
+            "name": "Carver",
+            "number": 1,
+            "backup": None,
+        },
+        "playoff": {
+            "playoff_type": 4,
+            "status": PlayoffOutcome.ELIMINATED,
+            "level": CompLevel.SF,
+            "current_level_record": {"wins": 2, "losses": 3, "ties": 0},
+            "record": {"wins": 2, "losses": 3, "ties": 0},
+            "round_robin_rank": 4,
+            "advanced_to_round_robin_finals": False,
+        },
+        "last_match_key": "2022cmptx_sf1m13",
+        "next_match_key": None,
+    }
+
+    status_4414_playing = {
+        "qual": None,
+        "alliance": {
+            "pick": 1,
+            "name": "Turing",
+            "number": 2,
+            "backup": None,
+        },
+        "playoff": {
+            "playoff_type": 4,
+            "status": PlayoffOutcome.PLAYING,
+            "level": CompLevel.F,
+            "current_level_record": {"wins": 1, "losses": 1, "ties": 0},
+            "record": {"wins": 5, "losses": 2, "ties": 0},
+            "round_robin_rank": 1,
+            "advanced_to_round_robin_finals": True,
+        },
+        "last_match_key": "2022cmptx_f1m2",
+        "next_match_key": "2022cmptx_f1m3",
+    }
+
+    status_1124 = {
+        "qual": None,
+        "alliance": None,
+        "playoff": None,
+        "last_match_key": None,
+        "next_match_key": None,
+    }
+
+    def setUp(self) -> None:
+        test_data_importer = JsonDataImporter()
+        test_data_importer.import_event(__file__, "data/2022cmptx.json")
+        test_data_importer.import_match_list(__file__, "data/2022cmptx_matches.json")
+        test_data_importer.import_event_alliances(
+            __file__, "data/2022cmptx_alliances.json", "2022cmptx"
+        )
+
+        self.event = Event.get_by_id("2022cmptx")
+
+    def test_event_winner(self) -> None:
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc1619", self.event
+        )
+
+        self.assertDictEqual(status, self.status_1619)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string(
+                "frc1619", status
+            ),
+            "Team 1619 competed in the playoffs as the <b>Captain</b> of <b>Galileo</b> and <b>won the event</b> with a playoff record of <b>5-3-0</b>.",
+        )
+
+    def test_event_finalist(self) -> None:
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc4414", self.event
+        )
+
+        self.assertDictEqual(status, self.status_4414)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string(
+                "frc4414", status
+            ),
+            "Team 4414 competed in the playoffs as the <b>1st Pick</b> of <b>Turing</b> and was eliminated in the <b>Finals</b> with a playoff record of <b>5-3-0</b>.",
+        )
+
+    def test_round_robin_eliminated(self) -> None:
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc1323", self.event
+        )
+
+        self.assertDictEqual(status, self.status_1323)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string(
+                "frc1323", status
+            ),
+            "Team 1323 competed in the playoffs as the <b>1st Pick</b> of <b>Carver</b> and was eliminated in the <b>Round Robin Bracket (Rank 4)</b> with a playoff record of <b>2-3-0</b>.",
+        )
+
+    def test_team_playing_in_finals(self) -> None:
+        # Mark the last finals match as unplayed
+        match = none_throws(Match.get_by_id("2022cmptx_f1m3"))
+        alliances = match.alliances
+        alliances[AllianceColor.RED]["score"] = -1
+        alliances[AllianceColor.BLUE]["score"] = -1
+        match.alliances = alliances
+        match.put()
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc4414", self.event
+        )
+
+        self.assertDictEqual(status, self.status_4414_playing)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string(
+                "frc4414", status
+            ),
+            "Team 4414 is <b>1-1-0</b> in the <b>Finals</b> as the <b>1st Pick</b> of <b>Turing</b>.",
+        )
+
+    def test_team_not_playing(self) -> None:
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc1124", self.event
+        )
+
+        self.assertDictEqual(status, self.status_1124)
+
+
+@pytest.mark.usefixtures("ndb_context")
+class Test2023njflaEventTeamStatusHelper(unittest.TestCase):
+    maxDiff = None
+
+    status_125 = {
+        "qual": {
+            "status": EventTeamLevelStatus.COMPLETED,
+            "ranking": {
+                "rank": None,
+                "matches_played": 12,
+                "dq": None,
+                "record": {"wins": 10, "losses": 2, "ties": 0},
+                "qual_average": None,
+                "sort_orders": None,
+                "team_key": "frc125",
+            },
+            "num_teams": 37,
+            "sort_order_info": None,
+        },
+        "alliance": {
+            "pick": 1,
+            "name": "Alliance 2",
+            "number": 2,
+            "backup": None,
+        },
+        "playoff": {
+            "playoff_type": 10,
+            "status": PlayoffOutcome.WON,
+            "level": CompLevel.F,
+            "double_elim_round": DoubleElimRound.FINALS,
+            "current_level_record": {"wins": 2, "losses": 0, "ties": 0},
+            "record": {"wins": 5, "losses": 0, "ties": 0},
+        },
+        "last_match_key": "2023njfla_f1m2",
+        "next_match_key": "2023njfla_f1m3",
+    }
+
+    status_11 = {
+        "qual": {
+            "status": EventTeamLevelStatus.COMPLETED,
+            "ranking": {
+                "rank": None,
+                "matches_played": 12,
+                "dq": None,
+                "record": {"wins": 11, "losses": 1, "ties": 0},
+                "qual_average": None,
+                "sort_orders": None,
+                "team_key": "frc11",
+            },
+            "num_teams": 37,
+            "sort_order_info": None,
+        },
+        "alliance": {
+            "pick": 0,
+            "name": "Alliance 1",
+            "number": 1,
+            "backup": None,
+        },
+        "playoff": {
+            "playoff_type": 10,
+            "status": PlayoffOutcome.ELIMINATED,
+            "level": CompLevel.F,
+            "double_elim_round": DoubleElimRound.FINALS,
+            "current_level_record": {"wins": 0, "losses": 2, "ties": 0},
+            "record": {"wins": 3, "losses": 3, "ties": 0},
+        },
+        "last_match_key": "2023njfla_f1m2",
+        "next_match_key": "2023njfla_f1m3",
+    }
+
+    status_1811 = {
+        "qual": {
+            "status": EventTeamLevelStatus.COMPLETED,
+            "ranking": {
+                "rank": None,
+                "matches_played": 12,
+                "dq": None,
+                "record": {"wins": 7, "losses": 5, "ties": 0},
+                "qual_average": None,
+                "sort_orders": None,
+                "team_key": "frc1811",
+            },
+            "num_teams": 37,
+            "sort_order_info": None,
+        },
+        "alliance": {
+            "pick": 0,
+            "name": "Alliance 8",
+            "number": 8,
+            "backup": None,
+        },
+        "playoff": {
+            "playoff_type": 10,
+            "status": PlayoffOutcome.ELIMINATED,
+            "level": CompLevel.SF,
+            "double_elim_round": DoubleElimRound.ROUND4,
+            "current_level_record": {"wins": 2, "losses": 2, "ties": 0},
+            "record": {"wins": 2, "losses": 2, "ties": 0},
+        },
+        "last_match_key": "2023njfla_sf12m1",
+        "next_match_key": None,
+    }
+
+    status_1923_unplayed = {
+        "qual": {
+            "status": EventTeamLevelStatus.COMPLETED,
+            "ranking": {
+                "rank": None,
+                "matches_played": 12,
+                "dq": None,
+                "record": {"wins": 10, "losses": 2, "ties": 0},
+                "qual_average": None,
+                "sort_orders": None,
+                "team_key": "frc1923",
+            },
+            "num_teams": 37,
+            "sort_order_info": None,
+        },
+        "alliance": {
+            "pick": 0,
+            "name": "Alliance 2",
+            "number": 2,
+            "backup": None,
+        },
+        "playoff": {
+            "playoff_type": 10,
+            "status": PlayoffOutcome.PLAYING,
+            "level": CompLevel.F,
+            "double_elim_round": DoubleElimRound.FINALS,
+            "current_level_record": {"wins": 1, "losses": 0, "ties": 0},
+            "record": {"wins": 4, "losses": 0, "ties": 0},
+        },
+        "last_match_key": "2023njfla_f1m1",
+        "next_match_key": "2023njfla_f1m2",
+    }
+
+    status_555 = {
+        "qual": {
+            "status": "completed",
+            "ranking": {
+                "rank": None,
+                "matches_played": 12,
+                "dq": None,
+                "record": {"wins": 3, "losses": 9, "ties": 0},
+                "qual_average": None,
+                "sort_orders": None,
+                "team_key": "frc555",
+            },
+            "num_teams": 37,
+            "sort_order_info": None,
+        },
+        "alliance": None,
+        "playoff": None,
+        "last_match_key": "2023njfla_qm72",
+        "next_match_key": None,
+    }
+
+    def setUp(self) -> None:
+        test_data_importer = JsonDataImporter()
+        test_data_importer.import_event(__file__, "data/2023njfla.json")
+        test_data_importer.import_match_list(__file__, "data/2023njfla_matches.json")
+        test_data_importer.import_event_alliances(
+            __file__, "data/2023njfla_alliances.json", "2023njfla"
+        )
+
+        self.event = Event.get_by_id("2023njfla")
+
+    def test_event_winner(self) -> None:
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc125", self.event
+        )
+        self.assertDictEqual(status, self.status_125)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string(
+                "frc125", status
+            ),
+            "Team 125 had a record of <b>10-2-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 2</b>, and <b>won the event</b> with a playoff record of <b>5-0-0</b>.",
+        )
+
+    def test_event_finalist(self) -> None:
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc11", self.event
+        )
+
+        self.assertDictEqual(status, self.status_11)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string("frc11", status),
+            "Team 11 had a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>, and was eliminated in the <b>Finals</b> with a playoff record of <b>3-3-0</b>.",
+        )
+
+    def test_double_elim_eliminated(self) -> None:
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc1811", self.event
+        )
+
+        self.assertDictEqual(status, self.status_1811)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string(
+                "frc1811", status
+            ),
+            "Team 1811 had a record of <b>7-5-0</b> in quals, competed in the playoffs as the <b>Captain</b> of <b>Alliance 8</b>, and was eliminated in the <b>Double Elimination Bracket (Round 4)</b> with a playoff record of <b>2-2-0</b>.",
+        )
+
+    def test_team_playing_in_finals(self) -> None:
+        # Mark the last finals match as unplayed
+        match = none_throws(Match.get_by_id("2023njfla_f1m2"))
+        alliances = match.alliances
+        alliances[AllianceColor.RED]["score"] = -1
+        alliances[AllianceColor.BLUE]["score"] = -1
+        match.alliances = alliances
+        match.put()
+
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc1923", self.event
+        )
+
+        self.assertDictEqual(status, self.status_1923_unplayed)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string(
+                "frc1923", status
+            ),
+            "Team 1923 is <b>1-0-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 2</b>.",
+        )
+
+    def test_team_not_picked(self) -> None:
+        status = EventTeamStatusHelper.generate_team_at_event_status(
+            "frc555", self.event
+        )
+
+        self.assertDictEqual(status, self.status_555)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string(
+                "frc555", status
+            ),
+            "Team 555 had a record of <b>3-9-0</b> in quals.",
         )

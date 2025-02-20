@@ -3,11 +3,11 @@ from typing import Optional
 from unittest.mock import patch
 
 import pytest
-from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -18,7 +18,6 @@ from backend.common.models.event_details import EventDetails
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestEventDetailsManipulator(unittest.TestCase):
-
     taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
 
     @pytest.fixture(autouse=True)
@@ -123,7 +122,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         # Ensure we have a district_points_calc test enqueued
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
@@ -151,13 +150,14 @@ class TestEventDetailsManipulator(unittest.TestCase):
         assert len(tasks) == 1
 
         for task in tasks:
-            with patch.object(
-                TBANSHelper, "alliance_selection"
-            ) as mock_alliance_selection:
-                deferred.run(task.payload)
+            run_from_task(task)
 
-        # Make sure we attempted to dispatch push notifications
-        mock_alliance_selection.assert_called_with(self.event)
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(tasks) == 1
+        task = tasks[0]
+        assert task.name == "2011ct_alliance_selection"
 
     def test_postUpdateHook_notifications_notWithinADay(self):
         self.old_event_details.put()
@@ -172,7 +172,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
             with patch.object(
                 TBANSHelper, "alliance_selection"
             ) as mock_alliance_selection:
-                deferred.run(task.payload)
+                run_from_task(task)
 
         # Event is not configured to be within a day - skip it
         mock_alliance_selection.assert_not_called()

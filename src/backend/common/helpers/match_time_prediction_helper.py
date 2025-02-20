@@ -15,7 +15,6 @@ from backend.common.models.match import Match
 
 
 class MatchTimePredictionHelper:
-
     EPOCH = datetime.datetime.fromtimestamp(0)
     MAX_IN_PAST = datetime.timedelta(minutes=-4)  # One match length, ish
     MAX_SCHEDULE_OFFSET = datetime.timedelta(

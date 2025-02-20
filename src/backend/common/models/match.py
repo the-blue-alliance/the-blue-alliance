@@ -4,7 +4,7 @@ import re
 from typing import cast, Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import (
@@ -15,7 +15,11 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import COMP_LEVELS_VERBOSE, CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.consts.playoff_type import DOUBLE_ELIM_MAPPING_INVERSE, PlayoffType
+from backend.common.consts.playoff_type import (
+    DOUBLE_ELIM_4_MAPPING_INVERSE,
+    DOUBLE_ELIM_MAPPING_INVERSE,
+    PlayoffType,
+)
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.cached_model import CachedModel
@@ -71,7 +75,7 @@ class Match(CachedModel):
     #     "teleop_goal+foul": 40,
     # }}
 
-    comp_level: CompLevel = safe_cast(
+    comp_level: CompLevel = cast(
         CompLevel,
         ndb.StringProperty(
             required=True,
@@ -193,6 +197,11 @@ class Match(CachedModel):
 
         return none_throws(self._alliances)
 
+    @alliances.setter
+    def alliances(self, alliances: Dict[AllianceColor, MatchAlliance]):
+        self._alliances = alliances
+        self.alliances_json = json.dumps(alliances)
+
     @property
     def score_breakdown(self) -> Optional[MatchScoreBreakdown]:
         """
@@ -204,61 +213,55 @@ class Match(CachedModel):
             except json.decoder.JSONDecodeError:
                 return None
 
-            if self.has_been_played:
-                # Add in RP calculations
-                if self.year in {2016, 2017}:
-                    for color in ALLIANCE_COLORS:
-                        if self.comp_level == "qm":
-                            rp_earned = 0
-                            if self.winning_alliance == color:
-                                rp_earned += 2
-                            elif self.winning_alliance == "":
-                                rp_earned += 1
+            if "red" not in score_breakdown or "blue" not in score_breakdown:
+                # Handle some old matches with empty score breakdowns instead of None
+                return None
 
-                            if self.year == 2016:
-                                if score_breakdown.get(color, {}).get(
-                                    "teleopDefensesBreached"
-                                ):
-                                    rp_earned += 1
-                                if score_breakdown.get(color, {}).get(
-                                    "teleopTowerCaptured"
-                                ):
-                                    rp_earned += 1
-                            elif self.year == 2017:
-                                if score_breakdown.get(color, {}).get(
-                                    "kPaRankingPointAchieved"
-                                ):
-                                    rp_earned += 1
-                                if score_breakdown.get(color, {}).get(
-                                    "rotorRankingPointAchieved"
-                                ):
-                                    rp_earned += 1
-                            score_breakdown[color]["tba_rpEarned"] = rp_earned
-                        else:
-                            score_breakdown[color]["tba_rpEarned"] = None
-                # Derive if bonus RP came from fouls
-                if self.year == 2020:
-                    for color in ALLIANCE_COLORS:
-                        score_breakdown[color][
-                            "tba_shieldEnergizedRankingPointFromFoul"
-                        ] = (
-                            score_breakdown[color]["shieldEnergizedRankingPoint"]
-                            and not score_breakdown[color]["stage3Activated"]
-                        )
-                        score_breakdown[color]["tba_numRobotsHanging"] = sum(
-                            [
-                                1
-                                if score_breakdown[color].get(
-                                    "endgameRobot{}".format(i)
-                                )
-                                == "Hang"
-                                else 0
-                                for i in range(1, 4)
-                            ]
-                        )
+            if self.has_been_played:
+                score_breakdown = self._add_tba_breakdown_fields(score_breakdown)
             self._score_breakdown = score_breakdown
 
         return self._score_breakdown
+
+    # fmt: off
+    def _add_tba_breakdown_fields(self, score_breakdown: MatchScoreBreakdown) -> MatchScoreBreakdown:
+        # Add our computed `tba_` fields
+        for color in ALLIANCE_COLORS:
+            # Add in RP calculations
+            if self.year in {2016, 2017}:
+                if self.comp_level == "qm":
+                    rp_earned = 0
+                    if self.winning_alliance == color:
+                        rp_earned += 2
+                    elif self.winning_alliance == "":
+                        rp_earned += 1
+
+                    score_breakdown_color = score_breakdown.get(color, {})
+                    if self.year == 2016:
+                        if score_breakdown_color.get("teleopDefensesBreached"):
+                            rp_earned += 1
+                        if score_breakdown_color.get("teleopTowerCaptured"):
+                            rp_earned += 1
+                    elif self.year == 2017:
+                        if score_breakdown_color.get("kPaRankingPointAchieved"):
+                            rp_earned += 1
+                        if score_breakdown_color.get("rotorRankingPointAchieved"):
+                            rp_earned += 1
+                    score_breakdown[color]["tba_rpEarned"] = rp_earned
+                else:
+                    score_breakdown[color]["tba_rpEarned"] = None
+            # Derive if bonus RP came from fouls
+            elif self.year == 2020:
+                score_breakdown[color]["tba_shieldEnergizedRankingPointFromFoul"] = (score_breakdown[color]["shieldEnergizedRankingPoint"] and not score_breakdown[color]["stage3Activated"])
+                score_breakdown[color]["tba_numRobotsHanging"] = sum([(1 if score_breakdown[color].get("endgameRobot{}".format(i)) == "Hang" else 0) for i in range(1, 4)])
+            # Add count of coral per level
+            elif self.year == 2025:
+                for period in ["auto", "teleop"]:
+                    for row in ["bot", "mid", "top"]:
+                        row_count = sum([1 for v in score_breakdown[color][f"{period}Reef"][f"{row}Row"].values() if v])
+                        score_breakdown[color][f"{period}Reef"][f"tba_{row}RowCount"] = row_count
+        # fmt: on
+        return score_breakdown
 
     @property
     def winning_alliance(self) -> TMatchWinner:
@@ -297,7 +300,7 @@ class Match(CachedModel):
         if winning_alliance == "":
             return ""
 
-        return OPPONENT[cast(AllianceColor, winning_alliance)]
+        return OPPONENT[winning_alliance]
 
     @property
     def event_key_name(self) -> EventKey:
@@ -334,13 +337,34 @@ class Match(CachedModel):
 
         event = self.event.get()
         if (
-            self.comp_level != "qm"
+            self.comp_level != CompLevel.QM
             and event
             and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM
         ):
+            if self.comp_level == CompLevel.F:
+                return f"Finals {self.match_number}"
+
+            # hard-code the match number to 1 for non-finals,
+            # so we can render this correctly for replays
+            match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
+                (self.comp_level, self.set_number, 1)
+            )
+            if match_num is None:
+                match_num = "?"
+
+            replay_suffix = ""
+            if self.match_number > 1:
+                replay_suffix = f" (Play {self.match_number})"
+            return f"Match {match_num}{replay_suffix}"
+
+        elif (
+            self.comp_level != "qm"
+            and event
+            and event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM
+        ):
             if self.comp_level == "f":
                 return f"Finals {self.match_number}"
-            match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
+            match_num = DOUBLE_ELIM_4_MAPPING_INVERSE.get(
                 (self.comp_level, self.set_number, self.match_number)
             )
             if match_num is None:
@@ -495,7 +519,7 @@ class Match(CachedModel):
     @classmethod
     def validate_key_name(cls, match_key: str) -> bool:
         key_name_regex = re.compile(
-            r"^[1-9]\d{3}[a-z]+[0-9]*\_(?:qm|ef\dm|qf\dm|sf\d{1,2}m|f\dm)\d+$"
+            r"^[1-9]\d{3}[a-z]+[0-9]*\_(?:qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$"
         )
         match = re.match(key_name_regex, match_key)
         return True if match else False

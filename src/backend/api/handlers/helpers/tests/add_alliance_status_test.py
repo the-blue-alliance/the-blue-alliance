@@ -2,13 +2,15 @@ from google.appengine.ext import ndb
 
 from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
 from backend.common.consts.comp_level import CompLevel
-from backend.common.models.alliance import EventAlliance
+from backend.common.models.alliance import (
+    EventAlliance,
+    PlayoffAllianceStatus,
+    PlayoffOutcome,
+)
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import (
-    EventTeamPlayoffStatus,
     EventTeamStatus,
     EventTeamStatusAlliance,
-    EventTeamStatusPlayoff,
 )
 
 
@@ -16,7 +18,7 @@ def update_event_team(
     event_key: str,
     team_number: int,
     alliance_number: int,
-    playoff_status: EventTeamStatusPlayoff,
+    playoff_status: PlayoffAllianceStatus,
 ) -> None:
     EventTeam(
         id=f"{event_key}_frc{team_number}",
@@ -50,7 +52,7 @@ def test_unknown_status(ndb_stub):
     add_alliance_status(event_key, alliances)
     assert len(alliances) == 4
     for alliance in alliances:
-        assert alliance["status"] == "unknown"
+        assert "status" not in alliance
 
 
 def test_has_status(ndb_stub):
@@ -61,17 +63,17 @@ def test_has_status(ndb_stub):
         EventAlliance(picks=["frc7", "frc8", "frc9"]),
         EventAlliance(picks=["frc10", "frc11", "frc12"]),
     ]
-    alliance_0_playoff_status = EventTeamStatusPlayoff(
-        level=CompLevel.QF, status=EventTeamPlayoffStatus.PLAYING
+    alliance_0_playoff_status = PlayoffAllianceStatus(
+        level=CompLevel.QF, status=PlayoffOutcome.PLAYING
     )
-    alliance_1_playoff_status = EventTeamStatusPlayoff(
-        level=CompLevel.SF, status=EventTeamPlayoffStatus.ELIMINATED
+    alliance_1_playoff_status = PlayoffAllianceStatus(
+        level=CompLevel.SF, status=PlayoffOutcome.ELIMINATED
     )
-    alliance_2_playoff_status = EventTeamStatusPlayoff(
-        level=CompLevel.F, status=EventTeamPlayoffStatus.PLAYING
+    alliance_2_playoff_status = PlayoffAllianceStatus(
+        level=CompLevel.F, status=PlayoffOutcome.PLAYING
     )
-    alliance_3_playoff_status = EventTeamStatusPlayoff(
-        level=CompLevel.QF, status=EventTeamPlayoffStatus.WON
+    alliance_3_playoff_status = PlayoffAllianceStatus(
+        level=CompLevel.QF, status=PlayoffOutcome.WON
     )
 
     update_event_team(event_key, 1, 0, alliance_0_playoff_status)

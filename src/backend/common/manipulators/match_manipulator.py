@@ -1,10 +1,10 @@
 import logging
-import traceback
 from typing import List
 
 from google.appengine.api import taskqueue
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
@@ -27,7 +27,6 @@ class MatchManipulator(ManipulatorBase[Match]):
     def updateMerge(
         cls, new_model: Match, old_model: Match, auto_union: bool = True
     ) -> Match:
-
         # Lets postUpdateHook know if videos went from 0 to >0
         added_video = not old_model.has_video and new_model.has_video
 
@@ -53,7 +52,6 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     affected_stats_event_keys = set()
     for updated_model in updated_models:
         MatchPostUpdateHooks.firebase_update(updated_model)
-        MatchPostUpdateHooks.enqueue_stats(updated_model)
 
         # Only attrs that affect stats
         if (
@@ -67,16 +65,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
 
     # Enqueue statistics
     for event_key in affected_stats_event_keys:
-        # Enqueue task to calculate matchstats
-        try:
-            taskqueue.add(
-                url=f"/tasks/math/do/event_matchstats/{event_key}",
-                method="GET",
-                target="py3-tasks-io",
-                queue_name="default",
-            )
-        except Exception:
-            logging.exception(f"Error enqueuing event_matchstats for {event_key}")
+        MatchPostUpdateHooks.enqueue_stats(event_key)
 
     # Dispatch push notifications
     unplayed_match_events = []
@@ -85,20 +74,28 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
         event = match.event.get()
         # Only continue if the event is currently happening
         if event and event.now:
-            if match.has_been_played:
+            if match.has_been_played and not match.push_sent:
                 if (
                     updated_match.is_new
                     or "alliances_json" in updated_match.updated_attrs
                 ):
+                    # Catch TaskAlreadyExistsError + TombstonedTaskError
                     try:
-                        TBANSHelper.match_score(match)
-                    except Exception as exception:
-                        logging.error(
-                            "Error sending match {} updates: {}".format(
-                                match.key_name, exception
-                            )
+                        defer_safe(
+                            TBANSHelper.match_score,
+                            match,
+                            _name=f"{match.key_name}_match_score",
+                            _target="py3-tasks-io",
+                            _queue="push-notifications",
+                            _url="/_ah/queue/deferred_notification_send",
                         )
-                        logging.error(traceback.format_exc())
+                        # Update score sent boolean on Match object to make sure we only send a notification once
+                        match.push_sent = True
+                        MatchManipulator.createOrUpdate(
+                            match, run_post_update_hook=False
+                        )
+                    except Exception:
+                        pass
             else:
                 if updated_match.is_new or (
                     set(["alliances_json", "time", "time_string"]).intersection(
@@ -111,34 +108,50 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     if event not in unplayed_match_events:
                         unplayed_match_events.append(event)
 
-        print(updated_match.updated_attrs)
         # Try to send video notifications
         if "_video_added" in updated_match.updated_attrs:
+            # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:
-                TBANSHelper.match_video(match)
-            except Exception as exception:
-                logging.error("Error sending match video updates: {}".format(exception))
-                logging.error(traceback.format_exc())
+                defer_safe(
+                    TBANSHelper.match_video,
+                    match,
+                    _name=f"{match.key_name}_match_video",
+                    _target="py3-tasks-io",
+                    _queue="push-notifications",
+                    _url="/_ah/queue/deferred_notification_send",
+                )
+            except Exception:
+                pass
 
     """
     If we have an unplayed match during an event within a day, send out a schedule update notification
     """
     for event in unplayed_match_events:
+        # Catch TaskAlreadyExistsError + TombstonedTaskError
         try:
-            TBANSHelper.event_schedule(event)
-        except Exception:
-            logging.error(
-                "Eror sending schedule updates for: {}".format(event.key_name)
+            defer_safe(
+                TBANSHelper.event_schedule,
+                event,
+                _name=f"{event.key_name}_event_schedule",
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
             )
-            logging.error(traceback.format_exc())
+        except Exception:
+            pass
+
+        # Catch TaskAlreadyExistsError + TombstonedTaskError
         try:
-            # When an event gets a new schedule, we should schedule `match_upcoming` notifications for the first matches for the event
-            TBANSHelper.schedule_upcoming_matches(event)
-        except Exception:
-            logging.error(
-                "Eror scheduling match_upcoming for: {}".format(event.key_name)
+            defer_safe(
+                TBANSHelper.schedule_upcoming_matches,
+                event,
+                _name=f"{event.key_name}_schedule_upcoming_matches",
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
             )
-            logging.error(traceback.format_exc())
+        except Exception:
+            pass
 
 
 class MatchPostUpdateHooks:
@@ -158,16 +171,15 @@ class MatchPostUpdateHooks:
             logging.exception("Firebase update_match failed!")
 
     @staticmethod
-    def enqueue_stats(model: TUpdatedModel[Match]) -> None:
+    def enqueue_stats(event_key: str) -> None:
         # Enqueue task to calculate district points
-        event_key = model.model.key_name
         try:
             taskqueue.add(
                 url=f"/tasks/math/do/district_points_calc/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
-                queue_name="default",
-                countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
+                queue_name="stats",
+                countdown=90,  # Wait ~1.5m so cache clearing can run before we attempt to recalculate district points
             )
         except Exception:
             logging.exception(f"Error enqueuing district_points_calc for {event_key}")
@@ -178,7 +190,8 @@ class MatchPostUpdateHooks:
                 url=f"/tasks/math/do/event_team_status/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
-                queue_name="default",
+                queue_name="stats",
+                countdown=90,
             )
         except Exception:
             logging.exception(f"Error enqueuing event_team_status for {event_key}")
@@ -189,7 +202,20 @@ class MatchPostUpdateHooks:
                 url=f"/tasks/math/do/playoff_advancement_update/{event_key}",
                 method="GET",
                 target="py3-tasks-io",
-                queue_name="default",
+                queue_name="stats",
+                countdown=90,
             )
         except Exception:
             logging.exception(f"Error enqueuing advancement update for {event_key}")
+
+        # Enqueue task to calculate matchstats
+        try:
+            taskqueue.add(
+                url=f"/tasks/math/do/event_matchstats/{event_key}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="stats",
+                countdown=90,  # Wait ~1.5m so cache clearing can run before we attempt to recalculate matchstats
+            )
+        except Exception:
+            logging.exception(f"Error enqueuing event_matchstats for {event_key}")

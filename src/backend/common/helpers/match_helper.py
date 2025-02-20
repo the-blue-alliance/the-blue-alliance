@@ -30,7 +30,6 @@ TOrganizedKeys = Dict[CompLevel, List[MatchKey]]
 
 
 class MatchHelper(object):
-
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
     Allows us to sort matches by key name.
@@ -122,6 +121,22 @@ class MatchHelper(object):
         return matches
 
     @classmethod
+    def organized_double_elim_4_matches(
+        cls, organized_matches: TOrganizedMatches
+    ) -> TOrganizedDoubleElimMatches:
+        matches = collections.defaultdict(list)
+        for level in COMP_LEVELS:
+            level_matches = organized_matches[level]
+            if level == CompLevel.QM:
+                continue
+            for match in level_matches:
+                double_elim_round = PlayoffTypeHelper.get_double_elim_4_round(
+                    level, match.set_number
+                )
+                matches[double_elim_round].append(match)
+        return matches
+
+    @classmethod
     def recent_matches(cls, matches: List[Match], num: int = 3) -> List[Match]:
         matches = list(filter(lambda x: x.has_been_played, matches))
         matches = cls.play_order_sorted_matches(matches)
@@ -148,8 +163,10 @@ class MatchHelper(object):
     @classmethod
     def add_match_times(cls, event: Event, matches: MutableSequence[Match]) -> None:
         """
-        Calculates and adds match times given an event and match time strings (from USFIRST)
-        Assumes the last match is played on the last day of comeptition and
+        Calculates and adds match times given an event and match time strings (from USFIRST or the trusted API).
+
+        Attempts to match against event dates if weekdays are included in the time strings.
+        Otherwise, assumes the last match is played on the last day of competition and
         works backwards from there.
         """
         if (
@@ -169,7 +186,22 @@ class MatchHelper(object):
         cur_date = event.end_date + datetime.timedelta(
             hours=23, minutes=59, seconds=59
         )  # end_date is specified at midnight of the last day
+
+        # map weekday abbreviations ("sat", "fri") to datetimes for all days that are part of the event
+        # (for events longer than 7 days, this will include only the last 7 days)
+        weekdays_to_dates = {}
+        for day_offset in range((event.end_date - event.start_date).days + 1):
+            day = event.start_date + datetime.timedelta(days=day_offset)
+            weekday_abbrev = day.strftime("%a").lower()[:3]
+            weekdays_to_dates[weekday_abbrev] = day
+
         for match in matches_reversed:
+            r = re.search(r"^[a-z]+", match.time_string.lower())
+            if r is not None:
+                weekday_abbrev = r.group(0)[:3]
+                if weekday_abbrev in weekdays_to_dates:
+                    cur_date = weekdays_to_dates[weekday_abbrev]
+
             r = none_throws(
                 re.search(r"(\d+):(\d+) (am|pm)", match.time_string.lower())
             )

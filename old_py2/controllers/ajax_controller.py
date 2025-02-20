@@ -23,94 +23,6 @@ from models.sitevar import Sitevar
 from models.typeahead_entry import TypeaheadEntry
 
 
-class AccountInfoHandler(LoggedInHandler):
-    """
-    For getting account info.
-    Only provides logged in status for now.
-    """
-    def get(self):
-        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
-        user = self.user_bundle.user
-        self.response.out.write(json.dumps({
-            'logged_in': True if user else False,
-            'user_id': user.user_id() if user else None
-        }))
-
-
-class AccountRegisterFCMToken(LoggedInHandler):
-    """
-    For adding/updating an FCM token
-    """
-    def post(self):
-        if not self.user_bundle.user:
-            self.response.set_status(401)
-            return
-
-        user_id = self.user_bundle.user.user_id()
-        fcm_token = self.request.get('fcm_token')
-        uuid = self.request.get('uuid')
-        display_name = self.request.get('display_name')
-        client_type = ClientType.WEB
-
-        query = MobileClient.query(
-                MobileClient.user_id == user_id,
-                MobileClient.device_uuid == uuid,
-                MobileClient.client_type == client_type)
-        if query.count() == 0:
-            # Record doesn't exist yet, so add it
-            MobileClient(
-                parent=ndb.Key(Account, user_id),
-                user_id=user_id,
-                messaging_id=fcm_token,
-                client_type=client_type,
-                device_uuid=uuid,
-                display_name=display_name).put()
-        else:
-            # Record already exists, update it
-            client = query.fetch(1)[0]
-            client.messaging_id = fcm_token
-            client.display_name = display_name
-            client.put()
-
-
-class AccountFavoritesAddHandler(LoggedInHandler):
-    """
-    For adding an account's favorites
-    """
-    def post(self):
-        if not self.user_bundle.user:
-            self.response.set_status(401)
-            return
-
-        model_type = int(self.request.get("model_type"))
-        model_key = self.request.get("model_key")
-        user_id = self.user_bundle.user.user_id()
-
-        fav = Favorite(
-            parent=ndb.Key(Account, user_id),
-            user_id=user_id,
-            model_key=model_key,
-            model_type=model_type
-        )
-        MyTBAHelper.add_favorite(fav)
-
-
-class AccountFavoritesDeleteHandler(LoggedInHandler):
-    """
-    For deleting an account's favorites
-    """
-    def post(self):
-        if not self.user_bundle.user:
-            self.response.set_status(401)
-            return
-
-        model_key = self.request.get("model_key")
-        model_type = int(self.request.get("model_type"))
-        user_id = self.user_bundle.user.user_id()
-
-        MyTBAHelper.remove_favorite(user_id, model_key, model_type)
-
-
 class LiveEventHandler(CacheableHandler):
     """
     Returns the necessary details to render live components
@@ -237,29 +149,6 @@ class WebcastHandler(CacheableHandler):
         keys = [self._render_cache_key(self.CACHE_KEY_FORMAT.format(event_key, n)) for n in range(10)]
         memcache.delete_multi(keys)
         return keys
-
-
-class AllowedApiWriteEventsHandler(LoggedInHandler):
-    """
-    Get the events the current user is allowed to edit via the trusted API
-    """
-    def get(self):
-        if not self.user_bundle.user:
-            self.response.out.write(json.dumps([]))
-            return
-
-        now = datetime.datetime.now()
-        auth_tokens = ApiAuthAccess.query(ApiAuthAccess.owner == self.user_bundle.account.key,
-                                          ndb.OR(ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now)).fetch()
-        event_keys = []
-        for token in auth_tokens:
-            event_keys.extend(token.event_list)
-
-        events = ndb.get_multi(event_keys)
-        details = []
-        for event in events:
-            details.append({'value': event.key_name, 'label': "{} {}".format(event.year, event.name)})
-        self.response.out.write(json.dumps(details))
 
 
 class PlayoffTypeGetHandler(CacheableHandler):

@@ -1,3 +1,4 @@
+import json
 import re
 from typing import List
 from urllib.parse import urlparse
@@ -12,7 +13,9 @@ from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
+from backend.common.models.suggestion_dict import SuggestionDict
 from backend.common.models.team import Team
+from backend.common.suggestions.media_parser import MediaParser
 from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
@@ -23,6 +26,28 @@ from backend.common.suggestions.suggestion_creator import (
 def login_user_with_permission(login_user):
     login_user.permissions = [AccountPermission.REVIEW_DESIGNS]
     return login_user
+
+
+@pytest.fixture(autouse=True)
+def mock_grabcad_api(monkeypatch: pytest.MonkeyPatch) -> None:
+    def mock_grabcad_dict(url: str) -> SuggestionDict:
+        return SuggestionDict(
+            media_type_enum=MediaType.GRABCAD,
+            foreign_key="2016-148-robowranglers-1",
+            year=2016,
+            details_json=json.dumps(
+                {
+                    "model_name": "2016 | 148 - Robowranglers",
+                    "model_description": "Renegade",
+                    "model_image": "https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/bf832651cc688c27a78c224fbd07d9d7/card.jpg",
+                    "model_created": "2016-09-19T11:52:23Z",
+                }
+            ),
+        )
+
+    monkeypatch.setattr(
+        MediaParser, "_partial_media_dict_from_grabcad", mock_grabcad_dict
+    )
 
 
 def get_suggestion_queue(web_client: Client) -> List[str]:

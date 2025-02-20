@@ -24,7 +24,11 @@ class PlayoffTypeDropdown extends Component {
             loadingPlaceholder="Loading playoff types..."
             clearable={false}
             searchable={false}
-            value={this.props.eventInfo && this.props.eventInfo.playoff_type}
+            value={
+              this.props.eventInfo && {
+                label: this.props.eventInfo.playoff_type_string,
+              }
+            }
             loadOptions={PlayoffTypeDropdown.loadPlayoffTypes}
             onChange={this.props.setType}
             isDisabled={this.props.eventInfo === null}

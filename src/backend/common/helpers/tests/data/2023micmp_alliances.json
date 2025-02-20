@@ -1,0 +1,99 @@
+[
+  {
+    "declines": [],
+    "name": "DTE Energy",
+    "picks": [
+      "frc5907",
+      "frc503",
+      "frc1189",
+      "frc5926"
+    ],
+    "status": {
+      "current_level_record": {
+        "losses": 2,
+        "ties": 0,
+        "wins": 0
+      },
+      "level": "sf",
+      "playoff_average": null,
+      "record": {
+        "losses": 2,
+        "ties": 0,
+        "wins": 0
+      },
+      "status": "eliminated"
+    }
+  },
+  {
+    "declines": [],
+    "name": "Consumers",
+    "picks": [
+      "frc51",
+      "frc818",
+      "frc226"
+    ],
+    "status": {
+      "current_level_record": {
+        "losses": 2,
+        "ties": 0,
+        "wins": 0
+      },
+      "level": "f",
+      "playoff_average": null,
+      "record": {
+        "losses": 2,
+        "ties": 0,
+        "wins": 2
+      },
+      "status": "eliminated"
+    }
+  },
+  {
+    "declines": [],
+    "name": "Ford",
+    "picks": [
+      "frc6090",
+      "frc1506",
+      "frc217"
+    ],
+    "status": {
+      "current_level_record": {
+        "losses": 0,
+        "ties": 0,
+        "wins": 2
+      },
+      "level": "f",
+      "playoff_average": null,
+      "record": {
+        "losses": 1,
+        "ties": 0,
+        "wins": 4
+      },
+      "status": "won"
+    }
+  },
+  {
+    "declines": [],
+    "name": "Aptiv",
+    "picks": [
+      "frc7769",
+      "frc5166",
+      "frc5901"
+    ],
+    "status": {
+      "current_level_record": {
+        "losses": 2,
+        "ties": 0,
+        "wins": 1
+      },
+      "level": "sf",
+      "playoff_average": null,
+      "record": {
+        "losses": 2,
+        "ties": 0,
+        "wins": 1
+      },
+      "status": "eliminated"
+    }
+  }
+]

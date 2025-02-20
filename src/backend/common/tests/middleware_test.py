@@ -1,7 +1,10 @@
+from typing import cast
 from unittest.mock import Mock, patch
+from wsgiref.types import WSGIApplication
 
 import flask
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
 from flask import Flask
 from werkzeug.test import run_wsgi_app
 from werkzeug.wrappers import Request
@@ -16,8 +19,6 @@ from backend.common.middleware import (
 )
 from backend.common.profiler import trace_context
 from backend.common.run_after_response import run_after_response
-from backend.common.sitevars import flask_secrets
-from backend.common.sitevars.flask_secrets import FlaskSecrets
 
 
 def test_TraceRequestMiddleware_init(app: Flask) -> None:
@@ -34,7 +35,7 @@ def test_TraceRequestMiddleware_callable(app: Flask) -> None:
     with app.test_request_context("/"):
         middleware(flask.request.environ, start_response)
 
-    assert type(trace_context.request) == Request
+    assert isinstance(trace_context.request, Request)
 
 
 def test_AfterResponseMiddleware_init(app: Flask) -> None:
@@ -43,7 +44,7 @@ def test_AfterResponseMiddleware_init(app: Flask) -> None:
 
 
 def test_AfterResponseMiddleware_callable(app: Flask) -> None:
-    middleware = AfterResponseMiddleware(app)
+    middleware = cast(WSGIApplication, AfterResponseMiddleware(app))
     callback1 = Mock()
     callback2 = Mock()
 
@@ -65,7 +66,7 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     callback1.assert_not_called()
     callback2.assert_not_called()
     with app.test_request_context("/0"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)  # pyre-ignore[6]
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)
     callback1.assert_not_called()
     callback2.assert_not_called()
 
@@ -73,7 +74,7 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     callback1.assert_not_called()
     callback2.assert_not_called()
     with app.test_request_context("/1"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)  # pyre-ignore[6]
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)
     callback1.assert_called_once()
     callback2.assert_not_called()
 
@@ -81,7 +82,7 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     callback1.assert_called_once()
     callback2.assert_not_called()
     with app.test_request_context("/2"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)  # pyre-ignore[6]
+        run_wsgi_app(middleware, flask.request.environ, buffered=True)
     callback1.assert_called_once()
     callback2.assert_called_once()
 
@@ -91,54 +92,30 @@ def test_install_middleware(app: Flask) -> None:
     with patch.object(
         backend.common.middleware, "_set_secret_key"
     ) as mock_set_secret_key:
-        install_middleware(app)
-        assert len(app.before_request_funcs) > 0
-        for func in app.before_request_funcs[None]:
-            func()
+        install_middleware(app, configure_secret_key=True)
+        assert len(app.before_request_funcs) == 0
     mock_set_secret_key.assert_called_once_with(app)
     assert type(app.wsgi_app) is TraceRequestMiddleware
 
 
-def test_set_secret_key_default(ndb_context, app: Flask) -> None:
+def test_set_secret_key_default(app: Flask) -> None:
     assert app.secret_key is None
     _set_secret_key(app)
-    assert app.secret_key == "thebluealliance"
+    assert app.secret_key == Environment.DEFAULT_FLASK_SECRET_KEY
 
 
-def test_set_secret_key_not_default(ndb_context, app: Flask) -> None:
-    secret_key = "some_new_secret_key"
-    FlaskSecrets.put(flask_secrets.ContentType(secret_key=secret_key))
-
-    assert app.secret_key is None
-    _set_secret_key(app)
-    assert app.secret_key == secret_key
-
-
-def test_set_secret_key_empty_prod(ndb_context, app: Flask) -> None:
-    FlaskSecrets.put(flask_secrets.ContentType(secret_key=""))
+def test_set_secret_key_empty(app: Flask, monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setattr(Environment, "flask_secret_key", lambda: "")
 
     assert app.secret_key is None
-    with patch.object(Environment, "is_prod", return_value=True):
-        with pytest.raises(
-            Exception, match="Secret key may not be default in production!"
-        ):
-            _set_secret_key(app)
-
-
-def test_set_secret_key_default_prod(ndb_context, app: Flask) -> None:
-    assert app.secret_key is None
-    with patch.object(Environment, "is_prod", return_value=True):
-        with pytest.raises(
-            Exception, match="Secret key may not be default in production!"
-        ):
-            _set_secret_key(app)
-
-
-def test_set_secret_key_prod(ndb_context, app: Flask) -> None:
-    secret_key = "some_new_secret_key"
-    FlaskSecrets.put(flask_secrets.ContentType(secret_key=secret_key))
-
-    assert app.secret_key is None
-    with patch.object(Environment, "is_prod", return_value=True):
+    with pytest.raises(Exception, match="Secret key not set!"):
         _set_secret_key(app)
-    assert app.secret_key == secret_key
+
+
+def test_set_secret_key_default_prod(app: Flask) -> None:
+    assert app.secret_key is None
+    with patch.object(Environment, "is_prod", return_value=True):
+        with pytest.raises(
+            Exception, match="Secret key may not be default in production!"
+        ):
+            _set_secret_key(app)

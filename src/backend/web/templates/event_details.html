@@ -66,16 +66,7 @@
           <span class="glyphicon glyphicon-circle-arrow-right"></span> Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a><br />
         {% endif %}
         {{ em.showEventDates(event) }}
-        {% if event.nl and event.nl.name and event.nl.city_state_country %}
-          <br><span class="glyphicon glyphicon-map-marker"></span>
-          <span itemprop="location">
-          {% if event.nl and event.nl.name %}
-            <a href="{{event.nl.place_details.url}}" target="_blank" rel="noopener noreferrer">{{event.nl.name}}</a> in {{event.nl.city_state_country}}
-          {% else %}
-            <a href="//maps.google.com/maps?q={{ event.city_state_country|urlencode }}" target="_blank" rel="noopener noreferrer">{{event.city_state_country}}</a>
-          {% endif %}
-          </span>
-        {% elif event.location or event.venue_address_safe %}
+        {% if event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
           <span itemprop="location">
           {% if event.venue_address_safe %}
@@ -169,8 +160,8 @@
           {% if event.playoff_type == 5 %}
             <!-- PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM -->
             {{mtm.legacy_double_elim_table(double_elim_matches, double_elim_rounds, playlist=elim_playlist)}}
-          {% elif event.playoff_type == 10 %}
-            <!-- PlayoffType.DOUBLE_ELIM_8_TEAM -->
+          {% elif event.playoff_type == 10 or event.playoff_type == 11 %}
+            <!-- PlayoffType.DOUBLE_ELIM_8_TEAM or PlayoffType.DOUBLE_ELIM_4_TEAM -->
             {{mtm.double_elim_table(double_elim_matches, double_elim_rounds, playlist=elim_playlist)}}
           {% else %}
             {{mtm.elim_match_table(matches, playlist=elim_playlist)}}
@@ -212,7 +203,7 @@
         </div>
         {% endif %}
 
-        <!-- Double Elim Bracket -->
+        <!-- Double Elim 8 Bracket -->
         {% if event.playoff_type == 10 and (matches.ef or matches.qf or matches.sf or matches.f) %}
           <div class="col-sm-12">
             <h3>Playoff Bracket</h3>
@@ -221,6 +212,14 @@
             {% else %}
             {% include "bracket_partials/double_elim_bracket_table.html" %}
             {% endif %}
+          </div>
+        {% endif %}
+
+        <!-- Double Elim 4 Bracket -->
+        {% if event.playoff_type == 11 and (matches.ef or matches.qf or matches.sf or matches.f) %}
+          <div class="col-sm-12">
+            <h3>Playoff Bracket</h3>
+            {% include "bracket_partials/double_elim_4_bracket_table.html" %}
           </div>
         {% endif %}
 

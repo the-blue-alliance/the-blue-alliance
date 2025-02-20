@@ -274,11 +274,11 @@ class DistrictHelper:
         # adding in rookie bonus
         # save valid team keys
         valid_team_keys: Set[TeamKey] = set()
-        if type(teams) == ndb.tasklets.Future:
+        if isinstance(teams, ndb.tasklets.Future):
             teams = teams.get_result()
 
         for team in teams:
-            if type(team) == ndb.tasklets.Future:
+            if isinstance(teams, ndb.tasklets.Future):
                 team = team.get_result()
             bonus = cls._get_rookie_bonus(year, team.rookie_year)
 
@@ -357,11 +357,11 @@ class DistrictHelper:
         alliance_selections: List[EventAlliance],
         teams: List[TeamKey],
     ):
-        search_team = teams[0]
-        for num, alliance in enumerate(alliance_selections):
-            if search_team in alliance["picks"]:
-                return num
-
+        for pos in [0, 1, 2]:
+            search_team = teams[pos]
+            for num, alliance in enumerate(alliance_selections):
+                if search_team in alliance["picks"]:
+                    return num
         return None
 
     @classmethod
@@ -370,6 +370,84 @@ class DistrictHelper:
         district_points: EventDistrictPoints,
         matches: List[Match],
         alliance_selections: List[EventAlliance],
+        playoff_type: PlayoffType,
+        POINTS_MULTIPLIER: int,
+    ):
+        double_elim_alliance_pts: DefaultDict[int, int] = defaultdict(int)
+        double_elim_alliance_wins: DefaultDict[int, int] = defaultdict(int)
+        double_elim_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
+        elim_alliances: DefaultDict[TeamKey, int] = defaultdict(int)
+
+        finals_alliance_wins: DefaultDict[int, int] = defaultdict(int)
+        finals_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
+        finals_team_pts: DefaultDict[TeamKey, int] = defaultdict(int)
+
+        if playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+            sf_points = DistrictPointValues.DE_4_SF_WIN
+        else:
+            sf_points = DistrictPointValues.DE_SF_WIN
+
+        for match in matches:
+            if not match.has_been_played or match.winning_alliance == "":
+                # Skip unplayed matches
+                continue
+
+            winning_alliance = cast(AllianceColor, match.winning_alliance)
+
+            winning_alliance_number = cls._get_alliance_number_from_teams(
+                alliance_selections,
+                match.alliances[winning_alliance]["teams"],
+            )
+
+            if match.comp_level == CompLevel.SF:
+                double_elim_alliance_wins[winning_alliance_number] += 1
+
+                for team in match.alliances[winning_alliance]["teams"]:
+                    elim_alliances[team] = winning_alliance_number
+                    double_elim_team_wins[team] += 1
+
+                double_elim_alliance_pts[winning_alliance_number] += sf_points[
+                    match.set_number
+                ]
+
+            if match.comp_level == CompLevel.F:
+                finals_alliance_wins[winning_alliance_number] += 1
+                for team in match.alliances[winning_alliance]["teams"]:
+                    elim_alliances[team] = winning_alliance_number
+                    finals_team_wins[team] += 1
+
+        for team in finals_team_wins:
+            if finals_alliance_wins[elim_alliances[team]] >= 2:
+                finals_team_pts[team] += int(
+                    finals_team_wins[team]
+                    * DistrictPointValues.F_WIN.get(
+                        match.year, DistrictPointValues.F_WIN_DEFAULT
+                    )
+                )
+
+        for team in elim_alliances:
+            alliance = elim_alliances[team]
+            alliance_wins = double_elim_alliance_wins[alliance]
+            multiplier = (
+                0.0
+                if alliance_wins == 0
+                else double_elim_team_wins[team] / alliance_wins
+            )
+            district_points["points"][team]["elim_points"] = int(
+                (
+                    math.ceil(double_elim_alliance_pts[alliance] * multiplier)
+                    + finals_team_pts[team]
+                )
+                * POINTS_MULTIPLIER
+            )
+
+    @classmethod
+    def _calc_elim_match_points_2023(
+        cls,
+        district_points: EventDistrictPoints,
+        matches: List[Match],
+        alliance_selections: List[EventAlliance],
+        playoff_type: PlayoffType,
         POINTS_MULTIPLIER: int,
     ):
         # match_set_key -> alliance -> num wins
@@ -377,8 +455,15 @@ class DistrictHelper:
             lambda: defaultdict(int)
         )
 
+        elim_alliance_pts: DefaultDict[int, int] = defaultdict(int)
         elim_alliance_wins: DefaultDict[int, int] = defaultdict(int)
         elim_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
+        elim_alliances: DefaultDict[TeamKey, int] = defaultdict(int)
+
+        if playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+            sf_points = DistrictPointValues.DE_4_SF_WIN
+        else:
+            sf_points = DistrictPointValues.DE_SF_WIN
 
         for match in matches:
             if not match.has_been_played or match.winning_alliance == "":
@@ -389,7 +474,6 @@ class DistrictHelper:
                 match.event_key_name, match.comp_level, match.set_number
             )
             winning_alliance = cast(AllianceColor, match.winning_alliance)
-            losing_allaince = cast(AllianceColor, match.losing_alliance)
             elim_num_wins[match_set_key][winning_alliance] += 1
 
             # Get alliance numbers
@@ -397,65 +481,34 @@ class DistrictHelper:
                 alliance_selections,
                 match.alliances[winning_alliance]["teams"],
             )
-            losing_alliance_number = cls._get_alliance_number_from_teams(
-                alliance_selections,
-                match.alliances[losing_allaince]["teams"],
-            )
 
             elim_alliance_wins[winning_alliance_number] += 1
 
             for team in match.alliances[winning_alliance]["teams"]:
+                elim_alliances[team] = winning_alliance_number
                 elim_team_wins[team] += 1
 
-            # Loser of match 12 receives 7 points
-            if match.comp_level == CompLevel.SF and match.set_number == 12:
-                for team in alliance_selections[losing_alliance_number]["picks"]:
-                    multiplier = (
-                        POINTS_MULTIPLIER
-                        * elim_team_wins[team]
-                        / elim_alliance_wins[losing_alliance_number]
-                    )
-                    district_points["points"][team]["elim_points"] += math.ceil(
-                        DistrictPointValues.DE_SF_12_LOSS * multiplier
-                    )
-
-            # Loser of match 13 receives 13 points
-            elif match.comp_level == CompLevel.SF and match.set_number == 13:
-                for team in alliance_selections[losing_alliance_number]["picks"]:
-                    multiplier = (
-                        POINTS_MULTIPLIER
-                        * elim_team_wins[team]
-                        / elim_alliance_wins[losing_alliance_number]
-                    )
-                    district_points["points"][team]["elim_points"] += math.ceil(
-                        DistrictPointValues.DE_SF_13_LOSS * multiplier
-                    )
-
+            if match.comp_level == CompLevel.SF:
+                elim_alliance_pts[winning_alliance_number] += sf_points[
+                    match.set_number
+                ]
             elif (
                 match.comp_level == CompLevel.F
                 and elim_num_wins[match_set_key][winning_alliance] >= 2
             ):
-                # Winner of finals receives 30 points
-                for team in alliance_selections[winning_alliance_number]["picks"]:
-                    multiplier = (
-                        POINTS_MULTIPLIER
-                        * elim_team_wins[team]
-                        / elim_alliance_wins[winning_alliance_number]
+                elim_alliance_pts[winning_alliance_number] += int(
+                    2
+                    * DistrictPointValues.F_WIN.get(
+                        match.year, DistrictPointValues.F_WIN_DEFAULT
                     )
-                    district_points["points"][team]["elim_points"] += math.ceil(
-                        DistrictPointValues.DE_F_WIN * multiplier
-                    )
+                )
 
-                # Loser of finals receives 20 points
-                for team in alliance_selections[losing_alliance_number]["picks"]:
-                    multiplier = (
-                        POINTS_MULTIPLIER
-                        * elim_team_wins[team]
-                        / elim_alliance_wins[losing_alliance_number]
-                    )
-                    district_points["points"][team]["elim_points"] += math.ceil(
-                        DistrictPointValues.DE_F_LOSS * multiplier
-                    )
+        for team in elim_alliances:
+            alliance = elim_alliances[team]
+            multiplier = elim_team_wins[team] / elim_alliance_wins[alliance]
+            district_points["points"][team]["elim_points"] = (
+                math.ceil(elim_alliance_pts[alliance] * multiplier) * POINTS_MULTIPLIER
+            )
 
     @classmethod
     def _calc_elim_match_points_pre_2023(
@@ -470,9 +523,9 @@ class DistrictHelper:
         )
 
         # match_set_key -> alliance -> list of list of teams
-        elim_alliances: DefaultDict[
-            str, DefaultDict[AllianceColor, List[TeamKey]]
-        ] = defaultdict(lambda: defaultdict(list))
+        elim_alliances: DefaultDict[str, DefaultDict[AllianceColor, List[TeamKey]]] = (
+            defaultdict(lambda: defaultdict(list))
+        )
         for match in matches:
             if not match.has_been_played or match.winning_alliance == "":
                 # Skip unplayed matches
@@ -628,12 +681,14 @@ class DistrictHelper:
                 for color in ALLIANCE_COLORS:
                     for team in match.alliances[color]["teams"]:
                         score = match.alliances[color]["score"]
-                        district_points["tiebreakers"][team][
-                            "highest_qual_scores"
-                        ] = heapq.nlargest(
-                            3,
-                            district_points["tiebreakers"][team]["highest_qual_scores"]
-                            + [score],
+                        district_points["tiebreakers"][team]["highest_qual_scores"] = (
+                            heapq.nlargest(
+                                3,
+                                district_points["tiebreakers"][team][
+                                    "highest_qual_scores"
+                                ]
+                                + [score],
+                            )
                         )
                         # Make sure that teams without wins don't get dropped from 'points'
                         district_points["points"][team]["qual_points"] += 0
@@ -691,12 +746,12 @@ class DistrictHelper:
             for color in ALLIANCE_COLORS:
                 for team in match.alliances[color]["teams"]:
                     score = match.alliances[color]["score"]
-                    district_points["tiebreakers"][team][
-                        "highest_qual_scores"
-                    ] = heapq.nlargest(
-                        3,
-                        district_points["tiebreakers"][team]["highest_qual_scores"]
-                        + [score],
+                    district_points["tiebreakers"][team]["highest_qual_scores"] = (
+                        heapq.nlargest(
+                            3,
+                            district_points["tiebreakers"][team]["highest_qual_scores"]
+                            + [score],
+                        )
                     )
 
         # elim match point calculations
@@ -719,9 +774,22 @@ class DistrictHelper:
                 elim_matches = organized_matches.get(
                     CompLevel.SF, []
                 ) + organized_matches.get(CompLevel.F, [])
-                cls._calc_elim_match_points(
-                    district_points, elim_matches, elim_alliances, POINTS_MULTIPLIER
-                )
+                if event.year == 2023:
+                    cls._calc_elim_match_points_2023(
+                        district_points,
+                        elim_matches,
+                        elim_alliances,
+                        event.playoff_type,
+                        POINTS_MULTIPLIER,
+                    )
+                else:
+                    cls._calc_elim_match_points(
+                        district_points,
+                        elim_matches,
+                        elim_alliances,
+                        event.playoff_type,
+                        POINTS_MULTIPLIER,
+                    )
 
     @classmethod
     def _alliance_selections_to_points(

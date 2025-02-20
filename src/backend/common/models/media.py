@@ -2,7 +2,7 @@ import json
 from typing import cast, Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts import media_tag, media_type
 from backend.common.consts.media_tag import MediaTag
@@ -27,7 +27,7 @@ class Media(CachedModel):
     MAX_PREFERRED = 3  # Loosely enforced. Not a big deal.
 
     # media_type and foreign_key make up the key_name
-    media_type_enum: MediaType = safe_cast(
+    media_type_enum: MediaType = cast(
         MediaType, ndb.IntegerProperty(required=True, choices=media_type.MEDIA_TYPES)
     )
     media_tag_enum: List[MediaTag] = cast(
@@ -156,7 +156,7 @@ class Media(CachedModel):
 
     @property
     def imgur_direct_url(self) -> str:
-        return "https://i.imgur.com/{}h.jpg".format(self.foreign_key)
+        return "https://i.imgur.com/{}.jpeg".format(self.foreign_key)
 
     @property
     def imgur_direct_url_med(self) -> str:
@@ -276,6 +276,14 @@ class Media(CachedModel):
             return ""
 
     @property
-    def avatar_image_source(self) -> str:
+    def avatar_base64_image(self) -> str:
         image = json.loads(self.details_json)
-        return "data:image/png;base64, {}".format(image["base64Image"])
+        return image["base64Image"]
+
+    @property
+    def avatar_image_source(self) -> str:
+        return "data:image/png;base64, {}".format(self.avatar_base64_image)
+
+    @property
+    def avatar_image_url(self) -> str:
+        return f"/avatar/{self.year}/{self.references[0].id()}.png"

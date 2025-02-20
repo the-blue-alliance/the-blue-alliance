@@ -10,6 +10,7 @@ from backend.common.helpers.playoff_advancement_helper import (
     PlayoffAdvancement,
     PlayoffAdvancementHelper,
 )
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
@@ -75,6 +76,23 @@ def test_enqueue_eventteam_status(
     assert len(tasks) == 1
 
 
+def test_enqueue_eventteam_status_all(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/event_team_status/all")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == len(SeasonHelper.get_valid_years())
+
+    task_urls = {t.url for t in tasks}
+    expected_urls = {
+        f"/tasks/math/enqueue/event_team_status/{y}"
+        for y in SeasonHelper.get_valid_years()
+    }
+    assert task_urls == expected_urls
+
+
 def test_do_eventteam_status_not_found(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
@@ -121,10 +139,44 @@ def test_do_eventteam_status(
     assert et.status == status
 
 
+def test_enqueue_playoff_advancement_all(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/playoff_advancement_update/all")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == len(SeasonHelper.get_valid_years())
+
+    task_urls = {t.url for t in tasks}
+    expected_urls = {
+        f"/tasks/math/enqueue/playoff_advancement_update/{y}"
+        for y in SeasonHelper.get_valid_years()
+    }
+    assert task_urls == expected_urls
+
+
+def test_enqueue_playoff_advancement_year(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    Event(
+        id="2020test",
+        year=2020,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    resp = tasks_client.get("/tasks/math/enqueue/playoff_advancement_update/2020")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+    assert tasks[0].url == "/tasks/math/do/playoff_advancement_update/2020test"
+
+
 def test_enqueue_playoff_advancement_no_event(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
-    resp = tasks_client.get("/tasks/math/enqueue/playoff_advancement_update/asdf")
+    resp = tasks_client.get("/tasks/math/do/playoff_advancement_update/asdf")
     assert resp.status_code == 404
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")

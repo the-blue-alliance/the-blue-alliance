@@ -1,8 +1,10 @@
 import enum
 
+from backend.common.consts.string_enum import StrEnum
+
 
 @enum.unique
-class WebcastStatus(str, enum.Enum):
+class WebcastStatus(StrEnum):
     UNKNOWN = "unknown"
     ONLINE = "online"
     OFFLINE = "offline"

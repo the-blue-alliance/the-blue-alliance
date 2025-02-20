@@ -9,10 +9,12 @@ CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
     "mar": "fma",
     "nc": "fnc",
     "in": "fin",
+    "tx": "fit",
     # New to old
     "fma": "mar",
     "fnc": "nc",
     "fin": "in",
+    "fit": "tx",
 }
 
 

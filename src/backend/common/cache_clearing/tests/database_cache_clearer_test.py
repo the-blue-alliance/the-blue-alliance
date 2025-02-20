@@ -19,6 +19,7 @@ from backend.common.queries import (
     district_query,
     event_details_query,
     event_query,
+    insight_query,
     match_query,
     media_query,
     robot_query,
@@ -550,4 +551,30 @@ class TestDatabaseCacheClearer(unittest.TestCase):
         )
         self.assertTrue(
             event_query.EventDivisionsQuery("2016necmp").cache_key in cache_keys
+        )
+
+    def test_insight_updated(self) -> None:
+        affected_refs = {
+            "year": {0, 2023, 2024},
+        }
+        cache_keys = [q[0] for q in get_affected_queries.insight_updated(affected_refs)]
+
+        self.assertEqual(len(cache_keys), 6)
+        self.assertTrue(
+            insight_query.InsightsLeaderboardsYearQuery(0).cache_key in cache_keys
+        )
+        self.assertTrue(
+            insight_query.InsightsLeaderboardsYearQuery(2023).cache_key in cache_keys
+        )
+        self.assertTrue(
+            insight_query.InsightsLeaderboardsYearQuery(2024).cache_key in cache_keys
+        )
+        self.assertTrue(
+            insight_query.InsightsNotablesYearQuery(0).cache_key in cache_keys
+        )
+        self.assertTrue(
+            insight_query.InsightsNotablesYearQuery(2023).cache_key in cache_keys
+        )
+        self.assertTrue(
+            insight_query.InsightsNotablesYearQuery(2024).cache_key in cache_keys
         )

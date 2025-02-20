@@ -81,18 +81,20 @@
   </g>
   {% endfor %}
 
-  {% for link in breakdown.links %}
-    {% if (row == 'T' and link.row == 'Top') or 
-          (row == 'M' and link.row == 'Mid') or 
-          (row == 'B' and link.row == 'Bottom') %}
-          {{link.nodes}}
-      {% set start_offset =
-        (192 - 24 * link.nodes|max)
-        if is_red else
-        (24 * link.nodes|min) %}
-      {{ drawLink(start_offset) }}
-    {% endif %}
-  {% endfor %}
+  {% if breakdown.links %}
+    {% for link in breakdown.links %}
+      {% if (row == 'T' and link.row == 'Top') or 
+            (row == 'M' and link.row == 'Mid') or 
+            (row == 'B' and link.row == 'Bottom') %}
+            {{link.nodes}}
+        {% set start_offset =
+          (192 - 24 * link.nodes|max)
+          if is_red else
+          (24 * link.nodes|min) %}
+        {{ drawLink(start_offset) }}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 </svg>
 {% endmacro %}
 
@@ -212,6 +214,17 @@
         </td>
     </tr>
     {% endif %}
+    {% if "extraGamePieceCount" in match.score_breakdown.red %}
+    <tr>
+      <td class="red" colspan="2">
+        {{match.score_breakdown.red.extraGamePieceCount}}
+      </td>
+      <td>Supercharged Node Count</td>
+      <td class="blue" colspan="2">
+        {{match.score_breakdown.blue.extraGamePieceCount}}
+      </td>
+    </tr>
+    {% endif %}
     <!-- Game Piece Points -->
     {% if "teleopGamePiecePoints" in match.score_breakdown.red %}
     <tr class="key">
@@ -291,11 +304,11 @@
     {% if "links" in match.score_breakdown.red and "linkPoints" in match.score_breakdown.red %}
     <tr>
         <td class="red" colspan="2">
-            {{match.score_breakdown.red.links|length}} (+{{match.score_breakdown.red.linkPoints}})
+            {% if match.score_breakdown.red.links %}{{match.score_breakdown.red.links|length}}{% else %}0{% endif %} (+{{match.score_breakdown.red.linkPoints}})
         </td>
         <td>Links</td>
         <td class="blue" colspan="2">
-            {{match.score_breakdown.blue.links|length}} (+{{match.score_breakdown.blue.linkPoints}})
+            {% if match.score_breakdown.blue.links %}{{match.score_breakdown.blue.links|length}}{% else %}0{% endif %} (+{{match.score_breakdown.blue.linkPoints}})
         </td>
     </tr>
     {% endif %}

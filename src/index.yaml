@@ -1,0 +1,182 @@
+indexes:
+  - kind: ApiAuthAccess
+    properties:
+      - name: event_list
+      - name: owner
+      - name: expiration
+
+  - kind: ApiAuthAccess
+    properties:
+      - name: owner
+      - name: expiration
+
+  - kind: ApiAuthAccess
+    properties:
+      - name: auth_types_enum
+      - name: expiration
+
+  - kind: ApiAuthAccess
+    properties:
+      - name: allow_admin
+      - name: expiration
+
+  - kind: ApiAuthAccess
+    properties:
+      - name: all_official_events
+      - name: expiration
+
+  - kind: Event
+    properties:
+      - name: __key__
+        direction: desc
+
+  - kind: Event
+    properties:
+      - name: end_date
+      - name: start_date
+
+  - kind: Event
+    properties:
+      - name: event_short
+      - name: year
+      - name: event_short
+
+  - kind: Event
+    properties:
+      - name: event_type_enum
+      - name: year
+      - name: end_date
+        direction: desc
+
+  - kind: Event
+    properties:
+      - name: event_type_enum
+      - name: year
+      - name: first_eid
+
+  - kind: Event
+    properties:
+      - name: event_type_enum
+      - name: year
+      - name: start_date
+
+  - kind: Event
+    properties:
+      - name: official
+      - name: end_date
+
+  - kind: Event
+    properties:
+      - name: year
+      - name: event_district_enum
+
+  - kind: Event
+    properties:
+      - name: year
+      - name: first_eid
+
+  - kind: Event
+    properties:
+      - name: year
+      - name: name
+
+  - kind: Event
+    properties:
+      - name: year
+      - name: start_date
+
+  - kind: Event
+    properties:
+      - name: year
+        direction: desc
+      - name: name
+
+  - kind: EventTeam
+    properties:
+      - name: event
+      - name: team
+
+  - kind: EventTeam
+    properties:
+      - name: event
+      - name: team
+        direction: desc
+
+  - kind: EventTeam
+    properties:
+      - name: team
+      - name: year
+
+  - kind: EventTeam
+    properties:
+      - name: team
+      - name: year
+      - name: event
+
+  - kind: Insight
+    properties:
+      - name: name
+      - name: year
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: comp_level
+      - name: match_number
+      - name: set_number
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: match_number
+      - name: set_number
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: match_number
+      - name: set_number
+      - name: comp_level
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: set_number
+      - name: match_number
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: team_key_names
+      - name: set_number
+      - name: match_number
+
+  - kind: Subscription
+    properties:
+      - name: model_key
+      - name: model_type
+      - name: notification_types
+      - name: user_id
+
+  - kind: Subscription
+    ancestor: yes
+    properties:
+      - name: model_type
+      - name: notification_types
+      - name: model_key
+
+  - kind: TeamAdminAccess
+    properties:
+      - name: account
+      - name: expiration
+
+  - kind: TeamAdminAccess
+    properties:
+      - name: account
+      - name: team_number
+      - name: expiration
+
+  - kind: TeamAdminAccess
+    properties:
+      - name: year
+      - name: team_number

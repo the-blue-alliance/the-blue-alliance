@@ -1,6 +1,14 @@
 from datetime import timedelta
 
-from flask import Blueprint, make_response, redirect, request, Response, url_for
+from flask import (
+    Blueprint,
+    jsonify,
+    make_response,
+    redirect,
+    request,
+    Response,
+    url_for,
+)
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response as WerkzeugResponse
 
@@ -51,7 +59,8 @@ def apidocs_v3() -> str:
 
 
 @blueprint.route("/webhooks")
-@cached_public(ttl=timedelta(weeks=1))
+# @cached_public(ttl=timedelta(weeks=1))
+# TODO: Figure out how we can cache this despite having a CSRF token in the form
 def apidocs_webhooks() -> str:
     template_values = {"enabled": ENABLED_NOTIFICATIONS, "types": NOTIFICATION_TYPES}
     return render_template("apidocs_webhooks.html", template_values)
@@ -68,12 +77,14 @@ def apidocs_webhooks_notification(type: int) -> Response:
     user_id = str(user.uid)
 
     success_response = make_response("ok", 200)
-    error_response = make_response("", 400)
+
+    def error_response(message: str):
+        return make_response(jsonify({"Error": message}), 400)
 
     try:
         notification_type = NotificationType(type)
     except ValueError:
-        return error_response
+        return error_response("Invalid notification type")
 
     if notification_type in [
         NotificationType.ALLIANCE_SELECTION,
@@ -82,13 +93,13 @@ def apidocs_webhooks_notification(type: int) -> Response:
     ]:
         # Handle our Event dispatches
         if not event_key:
-            return error_response
+            return error_response("Event key not specified")
 
         from backend.common.models.event import Event
 
         event = Event.get_by_id(event_key)
         if not event:
-            return error_response
+            return error_response(f"Event {event_key} not found")
 
         if notification_type == NotificationType.ALLIANCE_SELECTION:
             TBANSHelper.alliance_selection(event, user_id=user_id)
@@ -100,7 +111,7 @@ def apidocs_webhooks_notification(type: int) -> Response:
             TBANSHelper.event_schedule(event, user_id=user_id)
             return success_response
 
-        return error_response
+        return error_response("Unexpected error")
     elif notification_type in [
         NotificationType.UPCOMING_MATCH,
         NotificationType.MATCH_SCORE,
@@ -109,13 +120,13 @@ def apidocs_webhooks_notification(type: int) -> Response:
     ]:
         # Handle our Match dispatches
         if not match_key:
-            return error_response
+            return error_response("Match key not specified")
 
         from backend.common.models.match import Match
 
         match = Match.get_by_id(match_key)
         if not match:
-            return error_response
+            return error_response(f"Match {match_key} not found")
 
         if notification_type == NotificationType.UPCOMING_MATCH:
             TBANSHelper.match_upcoming(match, user_id=user_id)
@@ -130,8 +141,8 @@ def apidocs_webhooks_notification(type: int) -> Response:
             TBANSHelper.match_video(match, user_id=user_id)
             return success_response
 
-        return error_response
+        return error_response("Unexpected error")
 
     # TODO: Need to handle district_points_updated here as well
 
-    return error_response
+    return error_response(f"Unknown notification_type {notification_type}")

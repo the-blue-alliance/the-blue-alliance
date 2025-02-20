@@ -7,6 +7,7 @@ from google.appengine.ext import testbed
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_ranking import EventRanking
@@ -113,7 +114,7 @@ def test_get_no_event(tasks_client: Client) -> None:
 @mock.patch.object(DatafeedFMSAPI, "get_event_rankings")
 def test_get_no_rankings(fmsapi_event_rankings_mock, tasks_client: Client) -> None:
     create_event(official=True)
-    fmsapi_event_rankings_mock.return_value = []
+    fmsapi_event_rankings_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get("/tasks/get/fmsapi_event_rankings/2020nyny")
     assert resp.status_code == 200
@@ -125,7 +126,7 @@ def test_get_no_events_no_output_in_taskqueue(
     fmsapi_event_rankings_mock, tasks_client: Client
 ) -> None:
     create_event(official=True)
-    fmsapi_event_rankings_mock.return_value = []
+    fmsapi_event_rankings_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get(
         "/tasks/get/fmsapi_event_rankings/2020nyny",
@@ -152,7 +153,7 @@ def test_get(
             sort_orders=[],
         )
     ]
-    fmsapi_event_rankings_mock.return_value = rankings
+    fmsapi_event_rankings_mock.return_value = InstantFuture(rankings)
 
     resp = tasks_client.get("/tasks/get/fmsapi_event_rankings/2020nyny")
     assert resp.status_code == 200
@@ -181,7 +182,7 @@ def test_get_remapteams(
             sort_orders=[],
         )
     ]
-    fmsapi_event_rankings_mock.return_value = rankings
+    fmsapi_event_rankings_mock.return_value = InstantFuture(rankings)
 
     resp = tasks_client.get("/tasks/get/fmsapi_event_rankings/2020nyny")
     assert resp.status_code == 200

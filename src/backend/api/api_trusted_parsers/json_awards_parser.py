@@ -3,7 +3,7 @@ from typing import AnyStr, Dict, List, TypedDict
 
 from pyre_extensions import safe_json
 
-from backend.common.consts.award_type import AwardType
+from backend.common.consts.award_type import AWARD_TYPES, AwardType
 from backend.common.datafeed_parsers.exceptions import ParserInputException
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.models.award import Award
@@ -29,6 +29,7 @@ class JSONAwardsParser:
     def parse(self, awards_json: AnyStr, event_key: EventKey) -> List[AwardInfoParsed]:
         """
         Parse JSON that contains a list of awards where each award is a dict of:
+        award_type_enum: Int of the award type enum. e.g. 2 for "Tournament Finalist"
         name_str: String of award name. ex: "Tournament Winner" or "Dean's List Finalist"
         team_key: String in the format "frcXXX" for the team that won the award. Can be null.
         awardee: String corresponding to the name of an individual that won the award. Can be null.
@@ -37,6 +38,7 @@ class JSONAwardsParser:
 
         awards_by_key: Dict[AwardKey, AwardInfoParsed] = {}
         for award in awards:
+            award_type_enum = award.get("type_enum", None)
             name_str = award.get("name_str", None)
             team_key = award.get("team_key", None)
             awardee = award.get("awardee", None)
@@ -49,17 +51,23 @@ class JSONAwardsParser:
                     f"Bad team_key: '{team_key}'. Must follow format 'frcXXX' or be null."
                 )
 
-            award_type_enum = AwardHelper.parse_award_type(name_str)
-            if award_type_enum is None:
-                raise ParserInputException(
-                    f"Cannot determine award type from: '{name_str}'. Please contact a www.thebluealliance.com admin."
-                )
+            if award_type_enum not in AWARD_TYPES:
+                # Fall back to name string parsing if award type enum is not valid
+                award_type_enum = AwardHelper.parse_award_type(name_str)
+                if award_type_enum is None:
+                    raise ParserInputException(
+                        f"Cannot determine award type from: '{name_str}'. Please contact a www.thebluealliance.com admin."
+                    )
 
             if not team_key and not awardee:
                 raise ParserInputException("One of team_key or awardee must be set!")
 
             recipient = AwardRecipient(
-                team_number=int(team_key[3:]) if team_key else None,
+                team_number=(
+                    (int(team_key[3:]) if team_key[3:].isdigit() else team_key[3:])
+                    if team_key
+                    else None
+                ),
                 awardee=awardee,
             )
 

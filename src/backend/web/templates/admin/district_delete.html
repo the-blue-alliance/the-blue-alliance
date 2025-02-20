@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{district.key_name}} - Delete{% endblock %}
+
+{% block content %}
+
+<h1>Delete {{ district.key_name }}?</h1>
+
+<form action="/admin/district/delete/{{district.key_name}}" method="post">
+    <legend>Delete {{district.display_name}}?</legend>
+    <p>This will also delete it&rsquo;s DistrictTeams.</p>
+
+    <a href="/admin/districts/{{district.year}}" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-ban-circle"></span> Cancel Delete</a>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <button type="submit" class="btn btn-danger btn-small pull-right"><span class="glyphicon glyphicon-trash"></span> Delete Event</button>
+</form>
+
+{% endblock %}

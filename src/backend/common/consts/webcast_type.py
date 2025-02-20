@@ -1,8 +1,10 @@
 import enum
 
+from backend.common.consts.string_enum import StrEnum
+
 
 @enum.unique
-class WebcastType(str, enum.Enum):
+class WebcastType(StrEnum):
     TWITCH = "twitch"
     YOUTUBE = "youtube"
     IFRAME = "iframe"

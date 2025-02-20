@@ -14,7 +14,6 @@ from backend.common.models.team import Team
 
 @pytest.mark.usefixtures("ndb_context")
 class TestLocationHelper(unittest.TestCase):
-
     test_google_api_key: Optional[str] = None
 
     def setUp(self):

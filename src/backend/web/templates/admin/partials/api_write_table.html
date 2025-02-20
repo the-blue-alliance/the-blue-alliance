@@ -5,6 +5,7 @@
     <th>Expiration</th>
     <th>ID</th>
     <th>Secret</th>
+    <th>Districts</th>
     <th>Events</th>
     <th>All Official Events</th>
     <th>Event Info</th>
@@ -24,8 +25,13 @@
     <td>{{auth.key.id()}}</td>
     <td>{{auth.secret}}</td>
     <td>
+      {% for district_key in auth.district_list %}
+        <div>{{district_key.id()}}</div>
+      {% endfor %}
+    </td>
+    <td>
       {% for event_key in auth.event_list %}
-        <a href="/admin/event/{{event_key.id}}">{{event_key.id()}}</a>
+        <a href="/admin/event/{{event_key.id()}}">{{event_key.id()}}</a>
       {% endfor %}
     </td>
     <td>{% if auth.all_official_events%}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>

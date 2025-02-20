@@ -1,6 +1,7 @@
 import json
 from typing import Dict, List, Optional
 
+import pytest
 from google.appengine.ext import ndb, testbed
 from werkzeug.test import Client
 
@@ -96,7 +97,7 @@ def test_update_event_info(
         "playoff_type": int(PlayoffType.ROUND_ROBIN_6_TEAM),
         "webcasts": [
             {"url": "https://youtu.be/abc123"},
-            {"type": "youtube", "channel": "cde456"},
+            {"type": "youtube", "channel": "cde456", "date": "2024-01-03"},
         ],
         "remap_teams": {
             "frc9323": "frc1323B",
@@ -126,10 +127,13 @@ def test_update_event_info(
     webcast = webcasts[0]
     assert webcast["type"] == "youtube"
     assert webcast["channel"] == "abc123"
+    assert "date" not in webcast
 
     webcast = webcasts[1]
     assert webcast["type"] == "youtube"
     assert webcast["channel"] == "cde456"
+    assert webcast["date"] == "2024-01-03"
+
     assert event.remap_teams == {
         "frc9323": "frc1323B",
         "frc9254": "frc254B",
@@ -139,6 +143,37 @@ def test_update_event_info(
 
     # We should have a job enqueued to remap data
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 1
+
+
+@pytest.mark.parametrize(
+    "invalid_webcast",
+    [
+        {"type": "youtube", "channel": "cde456", "date": "tomorrow"},
+        {"type": "youtube", "channel": "cde456", "date": "2024-03-37"},
+        {"robot": "robot"},
+    ],
+)
+def test_invalid_webcasts_date(
+    invalid_webcast: dict,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    api_client: Client,
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {"webcasts": [invalid_webcast]}
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 400
+
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.webcast == []
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
 
 
 def test_invalid_remap_teams_lowercase(

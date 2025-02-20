@@ -1,20 +1,15 @@
 import datetime
+import logging
 import re
 from typing import List, Optional, Set
 
-from flask import (
-    Blueprint,
-    escape,
-    make_response,
-    render_template,
-    request,
-    Response,
-    url_for,
-)
+from flask import Blueprint, make_response, render_template, request, Response, url_for
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from markupsafe import Markup
+from pyre_extensions import none_throws
 
+from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
@@ -34,6 +29,9 @@ from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
+from backend.common.manipulators.regional_pool_team_manipulator import (
+    RegionalPoolTeamManipulator,
+)
 from backend.common.manipulators.robot_manipulator import RobotManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.district import District
@@ -42,6 +40,8 @@ from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
+from backend.common.models.regional_pool_advancement import RegionalPoolAdvancement
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.sitevars.apistatus import ApiStatus
@@ -49,8 +49,20 @@ from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHac
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
-
 blueprint = Blueprint("frc_api", __name__)
+
+
+def splay_delay_for(
+    i: int, total: int, total_time: Optional[datetime.timedelta]
+) -> Optional[datetime.datetime]:
+    if total_time is None:
+        return None
+
+    total_window_seconds = total_time.total_seconds()
+    now = datetime.datetime.now()
+    delay_increment = total_window_seconds // total
+    delay = datetime.timedelta(seconds=delay_increment * i)
+    return now + delay
 
 
 @blueprint.route("/tasks/enqueue/fmsapi_team_details_rolling")
@@ -61,8 +73,8 @@ def enqueue_rolling_team_details() -> Response:
     every PERIOD days.
     """
     PERIOD = 14  # a particular team will be updated every PERIOD days
-    day_of_year = datetime.datetime.now().timetuple().tm_yday
-    bucket_num = int(day_of_year % PERIOD)
+    days_since_epoch = (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).days
+    bucket_num = int(days_since_epoch % PERIOD)
 
     highest_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
     highest_team_num = int(highest_team_key.id()[3:])
@@ -75,11 +87,14 @@ def enqueue_rolling_team_details() -> Response:
     ).fetch(1000, keys_only=True)
 
     teams = ndb.get_multi(team_keys)
-    for team in teams:
+    is_taskqueue = "X-Appengine-Taskname" in request.headers
+    splay_window = datetime.timedelta(hours=1) if is_taskqueue else None
+    for i, team in enumerate(teams):
         taskqueue.add(
             queue_name="datafeed",
             target="py3-tasks-io",
             url=url_for("frc_api.team_details", team_key=team.key_name),
+            eta=splay_delay_for(i, len(teams), splay_window),
             method="GET",
         )
 
@@ -91,9 +106,7 @@ def enqueue_rolling_team_details() -> Response:
         "max_team": max_team,
     }
 
-    if (
-        "X-Appengine-Taskname" not in request.headers
-    ):  # Only write out if not in taskqueue
+    if not is_taskqueue:  # Only write out if not in taskqueue
         return make_response(
             render_template(
                 "datafeeds/rolling_team_details_enqueue.html", **template_values
@@ -106,13 +119,14 @@ def enqueue_rolling_team_details() -> Response:
 @blueprint.route("/backend-tasks/get/team_details/<team_key>")
 def team_details(team_key: TeamKey) -> Response:
     if not Team.validate_key_name(team_key):
-        return make_response(f"Bad team key: {escape(team_key)}", 400)
+        return make_response(f"Bad team key: {Markup.escape(team_key)}", 400)
 
     fms_df = DatafeedFMSAPI(save_response=True)
     year = datetime.date.today().year
-    fms_details = fms_df.get_team_details(year, team_key)
+    fms_details = fms_df.get_team_details(year, team_key).get_result()
 
     team, district_team, robot = fms_details or (None, None, None)
+    regional_pool_team: Optional[RegionalPoolTeam] = None
 
     if team:
         team = TeamManipulator.createOrUpdate(team)
@@ -120,17 +134,51 @@ def team_details(team_key: TeamKey) -> Response:
     if district_team:
         district_team = DistrictTeamManipulator.createOrUpdate(district_team)
 
+        if year in SeasonHelper.get_valid_regional_pool_years():
+            regional_pool_key = ndb.Key(
+                RegionalPoolTeam,
+                RegionalPoolTeam.render_key_name(year, team_key),
+            )
+            RegionalPoolTeamManipulator.delete_keys([regional_pool_key])
+
+    if (
+        year in SeasonHelper.get_valid_regional_pool_years()
+        and team
+        and not district_team
+    ):
+        regional_pool_team = RegionalPoolTeam(
+            id=RegionalPoolTeam.render_key_name(year, team.key_name),
+            year=year,
+            team=team.key,
+        )
+        RegionalPoolTeamManipulator.createOrUpdate(regional_pool_team)
+
     # Clean up junk district teams
     # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
-    if team:
-        dt_keys = DistrictTeam.query(
-            DistrictTeam.team == team.key, DistrictTeam.year == year
-        ).fetch(keys_only=True)
-        keys_to_delete = set()
-        for dt_key in dt_keys:
-            if not district_team or dt_key.id() != district_team.key.id():
-                keys_to_delete.add(dt_key)
-        DistrictTeamManipulator.delete_keys(keys_to_delete)
+    keys_to_delete = set()
+    # Delete all DistrictTeams that are not valid in the current
+    # year, since each team can only be in one district per year
+    dt_keys = DistrictTeam.query(
+        DistrictTeam.team == ndb.Key(Team, team_key), DistrictTeam.year == year
+    ).fetch(keys_only=True)
+    for dt_key in dt_keys:
+        if not district_team or dt_key.id() != district_team.key.id():
+            keys_to_delete.add(dt_key)
+
+    # Delete all DistrictTeam that are for any year that the team
+    # does not have an event
+    dt_keys = DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch()
+    et_keys = EventTeam.query(
+        EventTeam.team == ndb.Key(Team, team_key),
+        projection=[EventTeam.year],
+        group_by=[EventTeam.year],
+    ).fetch()
+    et_years = {et_key.year for et_key in et_keys}
+
+    for dt_key in dt_keys:
+        if dt_key.year not in et_years:
+            keys_to_delete.add(dt_key.key)
+    DistrictTeamManipulator.delete_keys(keys_to_delete)
 
     if robot:
         robot = RobotManipulator.createOrUpdate(robot)
@@ -141,6 +189,7 @@ def team_details(team_key: TeamKey) -> Response:
         "success": team is not None,
         "robot": robot,
         "district_team": district_team,
+        "regional_pool_team": regional_pool_team,
     }
 
     if (
@@ -158,13 +207,13 @@ def team_details(team_key: TeamKey) -> Response:
 @blueprint.route("/backend-tasks/get/team_avatar/<team_key>")
 def team_avatar(team_key: TeamKey) -> Response:
     if not Team.validate_key_name(team_key):
-        return make_response(f"Bad team key: {escape(team_key)}", 400)
+        return make_response(f"Bad team key: {Markup.escape(team_key)}", 400)
     team = Team.get_by_id(team_key)
 
     fms_df = DatafeedFMSAPI(save_response=True)
     year = datetime.date.today().year
 
-    avatar, keys_to_delete = fms_df.get_team_avatar(year, team_key)
+    avatar, keys_to_delete = fms_df.get_team_avatar(year, team_key).get_result()
 
     if avatar:
         MediaManipulator.createOrUpdate(avatar)
@@ -226,8 +275,10 @@ def enqueue_event_list(year: Optional[Year]) -> Response:
 def event_list(year: Year) -> Response:
     df = DatafeedFMSAPI(save_response=True)
 
-    fmsapi_events, event_list_districts = df.get_event_list(year)
+    event_list_future = df.get_event_list(year)
+    district_list_future = df.get_district_list(year)
 
+    fmsapi_events, event_list_districts = event_list_future.get_result()
     # All regular-season events can be inserted without any work involved.
     # We need to de-duplicate offseason events from the FRC Events API with a different code than the TBA event code
     fmsapi_events_offseason = [e for e in fmsapi_events if e.is_offseason]
@@ -251,18 +302,21 @@ def event_list(year: Year) -> Response:
 
     events = listify(EventManipulator.createOrUpdate(events_to_put)) or []
 
-    fmsapi_districts = df.get_district_list(year)
+    fmsapi_districts = district_list_future.get_result()
     merged_districts = DistrictManipulator.mergeModels(
         fmsapi_districts, event_list_districts
     )
     districts = listify(DistrictManipulator.createOrUpdate(merged_districts))
 
     # Fetch event details for each event
-    for event in events:
+    is_taskqueue = "X-Appengine-Taskname" in request.headers
+    splay_window = datetime.timedelta(hours=2) if is_taskqueue else None
+    for i, event in enumerate(events):
         taskqueue.add(
             queue_name="datafeed",
             target="py3-tasks-io",
             url=url_for("frc_api.event_details", event_key=event.key_name),
+            eta=splay_delay_for(i, len(events), splay_window),
             method="GET",
         )
 
@@ -271,9 +325,7 @@ def event_list(year: Year) -> Response:
         "districts": districts,
     }
 
-    if (
-        "X-Appengine-Taskname" not in request.headers
-    ):  # Only write out if not in taskqueue
+    if not is_taskqueue:  # Only write out if not in taskqueue
         return make_response(
             render_template("datafeeds/fms_event_list_get.html", **template_values)
         )
@@ -284,7 +336,7 @@ def event_list(year: Year) -> Response:
 @blueprint.route("/backend-tasks/enqueue/event_details/<event_key>")
 def enqueue_event_details(event_key: EventKey) -> Response:
     if not Event.validate_key_name(event_key):
-        return make_response(f"Bad event key: {escape(event_key)}", 400)
+        return make_response(f"Bad event key: {Markup.escape(event_key)}", 400)
 
     taskqueue.add(
         queue_name="datafeed",
@@ -310,20 +362,27 @@ def enqueue_event_details(event_key: EventKey) -> Response:
 @blueprint.route("/backend-tasks/get/event_details/<event_key>")
 def event_details(event_key: EventKey) -> Response:
     if not Event.validate_key_name(event_key):
-        return make_response(f"Bad event key: {escape(event_key)}", 400)
+        return make_response(f"Bad event key: {Markup.escape(event_key)}", 400)
 
     df = DatafeedFMSAPI(save_response=True)
 
     # Update event
-    fmsapi_events, fmsapi_districts = df.get_event_details(event_key)
-    new_events = EventManipulator.createOrUpdate(fmsapi_events)
-    event = safe_cast(Event, none_throws(new_events))
+    event_details_future = df.get_event_details(event_key)
+    event_teams_future = df.get_event_teams(event_key)
+    event_team_avatars_future = df.get_event_team_avatars(event_key)
+    existing_event_teams_future = EventTeam.query(
+        EventTeam.event == ndb.Key(Event, event_key)
+    ).fetch_async()
+
+    fmsapi_events, fmsapi_districts = event_details_future.get_result()
+    event = EventManipulator.createOrUpdate(fmsapi_events[0])
 
     DistrictManipulator.createOrUpdate(fmsapi_districts)
 
-    models = df.get_event_teams(event_key)
+    models = event_teams_future.get_result()
     teams: List[Team] = []
     district_teams: List[DistrictTeam] = []
+    regional_pool_teams: List[RegionalPoolTeam] = []
     robots: List[Robot] = []
     for group in models:
         # models is a list of tuples (team, districtTeam, robot)
@@ -334,6 +393,28 @@ def event_details(event_key: EventKey) -> Response:
         district_team = group[1]
         if isinstance(district_team, DistrictTeam):
             district_teams.append(district_team)
+
+        if (
+            event.year in SeasonHelper.get_valid_regional_pool_years()
+            and event.event_type_enum
+            in {EventType.REGIONAL, EventType.CMP_DIVISION, EventType.CMP_FINALS}
+            and team is not None
+            and district_team is None
+        ):
+            regional_pool_team = RegionalPoolTeam(
+                id=RegionalPoolTeam.render_key_name(event.year, team.key_name),
+                year=event.year,
+                team=team.key,
+                advancemnet=(
+                    RegionalPoolAdvancement(
+                        cmp=True,
+                    )
+                    if event.event_type_enum
+                    in {EventType.CMP_DIVISION, EventType.CMP_FINALS}
+                    else None
+                ),
+            )
+            regional_pool_teams.append(regional_pool_team)
 
         robot = group[2]
         if isinstance(robot, Robot):
@@ -347,6 +428,9 @@ def event_details(event_key: EventKey) -> Response:
 
     district_teams = DistrictTeamManipulator.createOrUpdate(district_teams)
     robots = RobotManipulator.createOrUpdate(robots)
+    regional_pool_teams = RegionalPoolTeamManipulator.createOrUpdate(
+        regional_pool_teams
+    )
 
     if not teams:
         # No teams found registered for this event
@@ -355,9 +439,7 @@ def event_details(event_key: EventKey) -> Response:
         teams = [teams]
 
     # Build EventTeams
-    cmp_hack_sitevar = ChampsRegistrationHacks.get()
-    events_without_eventteams = cmp_hack_sitevar["skip_eventteams"]
-    skip_eventteams = event_key in events_without_eventteams
+    skip_eventteams = ChampsRegistrationHacks.should_skip_eventteams(event)
     event_teams = (
         [
             EventTeam(
@@ -374,7 +456,7 @@ def event_details(event_key: EventKey) -> Response:
 
     # Delete eventteams of teams that are no longer registered
     if event_teams and not skip_eventteams:
-        existing_event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
+        existing_event_teams = existing_event_teams_future.get_result()
 
         # Don't delete EventTeam models for teams who won Awards at the Event, but who did not attend the Event
         award_teams = set()
@@ -393,12 +475,25 @@ def event_details(event_key: EventKey) -> Response:
         )
         EventTeamManipulator.delete_keys(et_keys_to_delete)
 
+    if skip_eventteams:
+        # If we're skipping team registrations from upstream,
+        # enqueue a recalculation using local data
+        logging.info(
+            f"SKipping eventteams, enqueueing local computation for {event_key}"
+        )
+        taskqueue.add(
+            url=url_for("math.update_eventteams", event_key=event_key),
+            method="GET",
+            target="py3-tasks-io",
+            params={"allow_deletes": True},
+        )
+
     event_teams = EventTeamManipulator.createOrUpdate(event_teams)
     if type(event_teams) is not list:
         event_teams = [event_teams]
 
     if event.year >= 2018:
-        avatars, keys_to_delete = df.get_event_team_avatars(event.key_name)
+        avatars, keys_to_delete = event_team_avatars_future.get_result()
         if avatars:
             MediaManipulator.createOrUpdate(avatars)
         MediaManipulator.delete_keys(keys_to_delete)
@@ -406,6 +501,8 @@ def event_details(event_key: EventKey) -> Response:
     template_values = {
         "event": event,
         "event_teams": event_teams,
+        "district_teams": listify(district_teams),
+        "regional_pool_teams": regional_pool_teams,
     }
 
     if (
@@ -473,9 +570,9 @@ def event_alliances(event_key: EventKey) -> Response:
     df = DatafeedFMSAPI(save_response=True)
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if not event:
-        return make_response(f"No Event for key: {escape(event_key)}", 404)
+        return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
-    alliance_selections = df.get_event_alliances(event_key)
+    alliance_selections = df.get_event_alliances(event_key).get_result()
 
     if event and event.remap_teams:
         EventRemapTeamsHelper.remapteams_alliances(
@@ -545,9 +642,9 @@ def event_rankings(event_key: EventKey) -> Response:
     df = DatafeedFMSAPI(save_response=True)
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if event is None:
-        return make_response(f"No Event for key: {escape(event_key)}", 404)
+        return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
-    rankings2 = df.get_event_rankings(event_key)
+    rankings2 = df.get_event_rankings(event_key).get_result()
 
     if event and event.remap_teams:
         EventRemapTeamsHelper.remapteams_rankings2(rankings2, event.remap_teams)
@@ -610,10 +707,22 @@ def enqueue_event_matches(year: Optional[Year]) -> Response:
 def event_matches(event_key: EventKey) -> Response:
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if event is None:
-        return make_response(f"No Event for key: {escape(event_key)}", 404)
+        return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
+
+    # Prefetch exisitng matches to merge with new matches
+    event.prep_matches()
 
     df = DatafeedFMSAPI(save_response=True)
-    matches = df.get_event_matches(event_key)
+    matches = df.get_event_matches(event_key).get_result()
+    existing_matches = event.matches
+
+    # Add existing matches to the new matches if they aren't present.
+    # This is necessary so we can delete matches that are no longer valid.
+    new_match_keys = set([m.key.id() for m in matches])
+    for match in existing_matches:
+        if match.key.id() not in new_match_keys:
+            matches.append(match)
+
     matches, keys_to_delete = MatchHelper.delete_invalid_matches(
         matches,
         event,
@@ -626,9 +735,7 @@ def event_matches(event_key: EventKey) -> Response:
     MatchManipulator.delete_keys(keys_to_delete)
     new_matches = listify(MatchManipulator.createOrUpdate(matches))
 
-    template_values = {
-        "matches": new_matches,
-    }
+    template_values = {"matches": new_matches, "deleted_keys": keys_to_delete}
 
     if (
         "X-Appengine-Taskname" not in request.headers
@@ -681,10 +788,10 @@ def awards_year(year: Optional[int]) -> Response:
 def awards_event(event_key: EventKey) -> Response:
     event = Event.get_by_id(event_key) if Event.validate_key_name(event_key) else None
     if event is None:
-        return make_response(f"No Event for key: {escape(event_key)}", 404)
+        return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
     datafeed = DatafeedFMSAPI(save_response=True)
-    awards = datafeed.get_awards(event)
+    awards = datafeed.get_awards(event).get_result()
 
     if event.remap_teams:
         EventRemapTeamsHelper.remapteams_awards(awards, event.remap_teams)
@@ -733,7 +840,7 @@ def awards_event(event_key: EventKey) -> Response:
 @blueprint.route("/backend-tasks/get/district_list/<int:year>")
 def district_list(year: Year) -> Response:
     df = DatafeedFMSAPI()
-    fmsapi_districts = df.get_district_list(year)
+    fmsapi_districts = df.get_district_list(year).get_result()
     districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
 
     template_values = {
@@ -758,10 +865,10 @@ def district_rankings(district_key: DistrictKey) -> Response:
         else None
     )
     if district is None:
-        return make_response(f"No District for key: {escape(district_key)}", 404)
+        return make_response(f"No District for key: {Markup.escape(district_key)}", 404)
 
     df = DatafeedFMSAPI()
-    advancement = df.get_district_rankings(district_key)
+    advancement = df.get_district_rankings(district_key).get_result()
     if advancement:
         district.advancement = advancement
         district = DistrictManipulator.createOrUpdate(district)

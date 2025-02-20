@@ -10,13 +10,33 @@ jobs:
     steps:
       - name: Dependabot metadata
         id: dependabot-metadata
-        uses: dependabot/fetch-metadata@v1.3.6
+        uses: dependabot/fetch-metadata@v2.2.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      # Allow auto-merging for patch and minor updates if all checks pass
+      # Auto-approve and auto-merge for patch and minor updates if all checks pass
+      - name: Auto-approve PR
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Generate merge bot token
+        id: generate_token
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
+        uses: actions/create-github-app-token@v1.11.5
+        with:
+          app_id: ${{ secrets.MERGE_BOT_APP_ID }}
+          private_key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+      - name: Dependabot metadata
+        id: dependabot_metadata
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
+        uses: dependabot/fetch-metadata@v2.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Authenticate cli
+        run: echo "${{ steps.generate_token.outputs.token }}" | gh auth login --with-token
       - name: Enable auto-merge for Dependabot PRs
-        if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' && steps.dependabot_metadata.outputs.dependency-type == 'direct:development'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -77,7 +77,7 @@ class Span(object):
             )
             self._do_trace = ";o=1" in tcontext
             if self._do_trace:
-                logging.info("Trace Context: {}".format(tcontext))
+                logging.debug("Trace Context: {}".format(tcontext))
 
             # Breakup our given cloud tracing context so we can get the flags out of it
             trace_id, root_span_id = tcontext.split(";")[0].split("/")
@@ -89,7 +89,7 @@ class Span(object):
 
     def __enter__(self):
         if self._do_trace:
-            logging.info("CREATED SPAN: {}".format(self._name))
+            logging.debug("CREATED SPAN: {}".format(self._name))
         self._startTime = datetime.now()
         return self
 

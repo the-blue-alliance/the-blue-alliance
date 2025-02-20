@@ -3,9 +3,11 @@ from typing import Dict, List, Union
 
 from typing_extensions import Literal
 
+from backend.common.consts.string_enum import StrEnum
+
 
 @enum.unique
-class AllianceColor(str, enum.Enum):
+class AllianceColor(StrEnum):
     RED = "red"
     BLUE = "blue"
 

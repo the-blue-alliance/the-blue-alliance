@@ -262,3 +262,23 @@ def test_parse_2017_team(test_data_importer, ndb_stub):
     # New properties for 2017
     assert team.school_name == "Leland High"
     assert team.home_cmp == "cmptx"
+
+
+def test_parse_2024_offseason_demo_team(test_data_importer, ndb_stub):
+    path = test_data_importer._get_path(__file__, "data/2024_offseason_demo_team.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    team_details, more_results = FMSAPITeamDetailsParser(2024).parse(data)
+
+    assert team_details is not None
+    assert len(team_details) == 1
+    assert more_results is False
+
+    team, districtTeam, robot = team_details[0]
+
+    assert team.key_name == "frc9970"
+    assert team.team_number == 9970
+    assert team.name is None
+    assert districtTeam is None
+    assert robot is None

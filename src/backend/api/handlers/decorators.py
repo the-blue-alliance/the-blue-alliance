@@ -1,8 +1,10 @@
+import json
 from functools import wraps
-from typing import Set
+from typing import Callable, Set, Type, TypeVar
 
-from flask import g, request
+from flask import g, jsonify, request, Response
 
+from backend.api.client_api_types import VoidRequest
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
 from backend.common.consts.auth_type import AuthType
@@ -27,7 +29,7 @@ def api_authenticated(func):
 
             if auth_key:
                 auth = ApiAuthAccess.get_by_id(auth_key)
-                if auth and auth.is_read_key:
+                if auth:
                     auth_owner_id = auth.owner.id() if auth.owner else None
                 else:
                     return (
@@ -66,6 +68,35 @@ def require_write_auth(auth_types: Set[AuthType]):
                 # This will abort the request on failure
                 TrustedApiAuthHelper.do_trusted_api_auth(event_key, auth_types)
             return func(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator
+
+
+T = TypeVar("T")
+R = TypeVar("R")
+
+
+def client_api_method(
+    req_type: Type[T], resp_type: Type[R]
+) -> Callable[[Callable[[T], R]], Callable[..., Response]]:
+    """
+    This is a decorator to apply JSON request/response models
+    to the API methods
+    """
+
+    def decorator(func: Callable[[T], R]) -> Callable[..., Response]:
+        @wraps(func)
+        def decorated_function(*args, **kwargs) -> Response:
+            data = request.get_data()
+            if data:
+                req = json.loads(data)
+            else:
+                req = VoidRequest()
+
+            resp = func(req)
+            return jsonify(resp)
 
         return decorated_function
 

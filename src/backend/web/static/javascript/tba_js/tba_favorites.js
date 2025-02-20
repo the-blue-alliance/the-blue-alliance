@@ -1,6 +1,6 @@
 var favoriteTeamsCookieName = "tba-favorite-teams";
 
-function updateFavoriteTeams(teamKey, action, skipDelay) {
+function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
   /*
   Updates Favorites locally and on the server and
   updates the page to reflect these changes
@@ -15,6 +15,9 @@ function updateFavoriteTeams(teamKey, action, skipDelay) {
         type: 'POST',
         url: '/_/account/favorites/add',
         data: {'model_key': teamKey, 'model_type': 1},
+        headers: {
+          'X-CSRFToken': csrfToken
+        },
         timeout: 10000,  // 10s
         success: function(data, textStatus, xhr) {
           addLocalFavoriteTeam(teamKey);
@@ -34,6 +37,9 @@ function updateFavoriteTeams(teamKey, action, skipDelay) {
         type: 'POST',
         url: '/_/account/favorites/delete',
         data: {'model_key': teamKey, 'model_type': 1},
+        headers: {
+          'X-CSRFToken': csrfToken
+        },
         timeout: 10000,  // 10s
         success: function(data, textStatus, xhr) {
           deleteLocalFavoriteTeam(teamKey);
@@ -159,7 +165,7 @@ function setupFavAddClick() {
     $(this).find(".not-favorite").hide();
     addSpinner($(this));
 
-    updateFavoriteTeams($(this).attr("data-team"), 'add', false);
+    updateFavoriteTeams($(this).attr("data-team"), 'add', false, $(this).attr("data-csrf-token"));
   });
 }
 
@@ -170,7 +176,7 @@ function setupFavDeleteClick() {
     $(this).find(".favorite").hide();
     addSpinner($(this));
 
-    updateFavoriteTeams($(this).attr("data-team"), 'delete', false);
+    updateFavoriteTeams($(this).attr("data-team"), 'delete', false, $(this).attr("data-csrf-token"));
   });
 }
 

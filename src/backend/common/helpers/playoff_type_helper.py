@@ -4,6 +4,7 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.playoff_type import (
     BRACKET_ELIM_MAPPING,
     BRACKET_OCTO_ELIM_MAPPING,
+    DOUBLE_ELIM_4_MAPPING,
     DOUBLE_ELIM_MAPPING,
     DoubleElimRound,
     LEGACY_DOUBLE_ELIM_MAPPING,
@@ -32,6 +33,9 @@ class PlayoffTypeHelper:
                 return CompLevel.SF if match_number <= 15 else CompLevel.F
             elif playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
                 level, _, _ = DOUBLE_ELIM_MAPPING[match_number]
+                return level
+            elif playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+                level, _, _ = DOUBLE_ELIM_4_MAPPING[match_number]
                 return level
             elif playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
                 level, _, _ = LEGACY_DOUBLE_ELIM_MAPPING[match_number]
@@ -93,6 +97,9 @@ class PlayoffTypeHelper:
                 return 1, match_number
         elif playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
             _, set, match = DOUBLE_ELIM_MAPPING[match_number]
+            return set, match
+        elif playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+            _, set, match = DOUBLE_ELIM_4_MAPPING[match_number]
             return set, match
         elif playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
             _, set, match = LEGACY_DOUBLE_ELIM_MAPPING[match_number]
@@ -177,6 +184,18 @@ class PlayoffTypeHelper:
             return DoubleElimRound.ROUND4
         elif level == CompLevel.SF and set <= 13:
             return DoubleElimRound.ROUND5
+        elif level == CompLevel.F:
+            return DoubleElimRound.FINALS
+        raise ValueError(f"Bad CompLevel/set: {level} {set}")
+
+    @classmethod
+    def get_double_elim_4_round(cls, level: CompLevel, set: int) -> DoubleElimRound:
+        if level == CompLevel.SF and set <= 2:
+            return DoubleElimRound.ROUND1
+        elif level == CompLevel.SF and set <= 4:
+            return DoubleElimRound.ROUND2
+        elif level == CompLevel.SF and set <= 5:
+            return DoubleElimRound.ROUND3
         elif level == CompLevel.F:
             return DoubleElimRound.FINALS
         raise ValueError(f"Bad CompLevel/set: {level} {set}")

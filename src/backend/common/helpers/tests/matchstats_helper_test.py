@@ -16,7 +16,7 @@ def auto_add_ndb_context(ndb_context) -> None:
 
 
 def api_data_to_matchstats(
-    api_data: Dict[StatType, Dict[TeamKey, float]]
+    api_data: Dict[StatType, Dict[TeamKey, float]],
 ) -> EventMatchStats:
     data: EventMatchStats = {}
     for stat_type in StatType:
@@ -32,12 +32,24 @@ def assert_stats_equal(stats: EventMatchStats, expected_stats: EventMatchStats) 
         assert team_stats.keys() == expected_stats[stat].keys()
 
 
-def assert_coprs_equal(
+def assert_coprs_keys_equal(
     coprs: EventComponentOPRs, expected_coprs: EventComponentOPRs
 ) -> None:
     assert coprs.keys() == expected_coprs.keys()
     for component, oprs in coprs.items():
         assert oprs.keys() == expected_coprs[component].keys()
+
+
+def assert_coprs_values_equal(
+    coprs: EventComponentOPRs, expected_coprs: EventComponentOPRs
+) -> None:
+    assert coprs.keys() == expected_coprs.keys()
+    for component, oprs in coprs.items():
+        assert oprs.keys() == expected_coprs[component].keys()
+        for team_key, opr in oprs.items():
+            assert opr == pytest.approx(  # pyre-ignore[16]
+                expected_coprs[component][team_key]
+            )
 
 
 def test_compute_matchstats_no_matches() -> None:
@@ -88,7 +100,21 @@ def test_compute_coprs(test_data_importer) -> None:
         expected_coprs = json.load(f)
 
     coprs = MatchstatsHelper.calculate_coprs(matches, 2019)
-    assert_coprs_equal(coprs, expected_coprs)
+    assert_coprs_keys_equal(coprs, expected_coprs)
+
+
+def test_compute_coprs_2023(test_data_importer) -> None:
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2023cada_matches.json"
+    )
+    with open(
+        os.path.join(os.path.dirname(__file__), "data/2023cada_coprs.json"), "r"
+    ) as f:
+        expected_coprs = json.load(f)
+
+    coprs = MatchstatsHelper.calculate_coprs(matches, 2023)
+    assert_coprs_keys_equal(coprs, expected_coprs)
+    assert_coprs_values_equal(coprs, expected_coprs)
 
 
 def test_compute_coprs_with_b_teams(test_data_importer) -> None:
@@ -101,4 +127,4 @@ def test_compute_coprs_with_b_teams(test_data_importer) -> None:
         expected_coprs = json.load(f)
 
     coprs = MatchstatsHelper.calculate_coprs(matches, 2019)
-    assert_coprs_equal(coprs, expected_coprs)
+    assert_coprs_keys_equal(coprs, expected_coprs)

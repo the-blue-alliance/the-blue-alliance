@@ -198,18 +198,6 @@ def event_detail(event_key: EventKey) -> Response:
     double_elim_matches = PlayoffAdvancementHelper.double_elim_matches(event, matches)
     playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
-    # Lazy handle the case when we haven't backfilled the event details
-    # TODO: Unify with API handler
-    if not bracket_table or not playoff_advancement:
-        (
-            bracket_table2,
-            playoff_advancement2,
-            _,
-            _,
-        ) = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
-        bracket_table = bracket_table or bracket_table2
-        playoff_advancement = playoff_advancement or playoff_advancement2
-
     district_points_sorted = None
     if event.district_key and event.district_points:
         district_points_sorted = sorted(
@@ -266,7 +254,7 @@ def event_detail(event_key: EventKey) -> Response:
         "teams_b": teams_b,
         "num_teams": num_teams,
         "oprs": oprs,
-        "bracket_table": bracket_table,
+        "bracket_table": bracket_table or {},
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
         "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
@@ -278,9 +266,9 @@ def event_detail(event_key: EventKey) -> Response:
         "event_insights_template": event_insights_template,
         "medias_by_slugname": medias_by_slugname,
         "event_divisions": event_divisions,
-        "parent_event": parent_event_future.get_result()
-        if parent_event_future
-        else None,
+        "parent_event": (
+            parent_event_future.get_result() if parent_event_future else None
+        ),
         "double_elim_rounds": playoff_type.DoubleElimRound.__members__.values(),
         "double_elim_matches": double_elim_matches,
         "double_elim_playoff_types": playoff_type.DOUBLE_ELIM_TYPES,
@@ -355,20 +343,26 @@ def event_insights(event_key: EventKey) -> Response:
                 "level": level,
                 "red_actual_score": match.alliances[AllianceColor.RED]["score"],
                 "blue_actual_score": match.alliances[AllianceColor.BLUE]["score"],
-                "red_mean": match_predictions[level][match.key_name]["red"]["score"]
-                if match_predictions
-                else 0,
-                "blue_mean": match_predictions[level][match.key_name]["blue"]["score"]
-                if match_predictions
-                else 0,
-                "red_var": match_predictions[level][match.key_name]["red"]["score_var"]
-                if match_predictions
-                else 0,
-                "blue_var": match_predictions[level][match.key_name]["blue"][
-                    "score_var"
-                ]
-                if match_predictions
-                else 0,
+                "red_mean": (
+                    match_predictions[level][match.key_name]["red"]["score"]
+                    if match_predictions
+                    else 0
+                ),
+                "blue_mean": (
+                    match_predictions[level][match.key_name]["blue"]["score"]
+                    if match_predictions
+                    else 0
+                ),
+                "red_var": (
+                    match_predictions[level][match.key_name]["red"]["score_var"]
+                    if match_predictions
+                    else 0
+                ),
+                "blue_var": (
+                    match_predictions[level][match.key_name]["blue"]["score_var"]
+                    if match_predictions
+                    else 0
+                ),
             }
 
     last_played_match_num = None

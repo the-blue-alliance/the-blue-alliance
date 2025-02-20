@@ -3,12 +3,15 @@ from typing import cast, Dict, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
-from backend.common.consts import comp_level, event_type
+from backend.common.consts import event_type
 from backend.common.consts.award_type import AwardType
+from backend.common.consts.comp_level import COMP_LEVELS
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_tag import MediaTag
+from backend.common.helpers.alliance_helper import AllianceHelper
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.playlist_helper import PlaylistHelper
@@ -73,9 +76,11 @@ class TeamRenderer:
             "years": [award.year for award in hof_awards],
             "media": {
                 "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
-                "presentation": hof_presentation[0].youtube_url_link
-                if len(hof_presentation) > 0
-                else None,
+                "presentation": (
+                    hof_presentation[0].youtube_url_link
+                    if len(hof_presentation) > 0
+                    else None
+                ),
                 "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
         }
@@ -165,7 +170,7 @@ class TeamRenderer:
             playlist = PlaylistHelper.generate_playlist_link(
                 matches_organized=matches_organized,
                 title="{} (Team {})".format(event.name, team.team_number),
-                allow_levels=comp_level.COMP_LEVELS,
+                allow_levels=COMP_LEVELS,
             )
 
             district_points = None
@@ -180,8 +185,38 @@ class TeamRenderer:
                     None,
                 )
 
+            alliance, alliance_pick, alliance_size = (
+                AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
+            )
+
+            if alliance and "name" in alliance:
+                alliance_status = EventTeamStatusHelper._build_playoff_info(
+                    team.key_name,
+                    event.details,
+                    MatchHelper.organized_matches(event.matches)[1],
+                    event.year,
+                    event.playoff_type,
+                )
+                if alliance_status:
+                    alliance_status = " and ".join(
+                        AllianceHelper.generate_playoff_status_string(
+                            alliance_status,
+                            alliance_pick,
+                            alliance["name"],
+                            plural=True,
+                            include_record=False,
+                        )
+                    )
+                else:
+                    alliance_status = None
+            else:
+                alliance_status = None
+
             participation.append(
                 {
+                    "alliance": alliance,
+                    "alliance_status": alliance_status,
+                    "alliance_size": alliance_size,
                     "event": event,
                     "matches": matches_organized,
                     "match_count": match_count,
@@ -329,9 +364,11 @@ class TeamRenderer:
             "years": [award.year for award in hof_awards],
             "media": {
                 "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
-                "presentation": hof_presentation[0].youtube_url_link
-                if len(hof_presentation) > 0
-                else None,
+                "presentation": (
+                    hof_presentation[0].youtube_url_link
+                    if len(hof_presentation) > 0
+                    else None
+                ),
                 "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
         }
@@ -369,9 +406,11 @@ class TeamRenderer:
             event_awards.append((event, sorted_awards))
         event_awards = sorted(
             event_awards,
-            key=lambda e_a: e_a[0].start_date
-            if e_a[0].start_date
-            else datetime.datetime(e_a[0].year, 12, 31),
+            key=lambda e_a: (
+                e_a[0].start_date
+                if e_a[0].start_date
+                else datetime.datetime(e_a[0].year, 12, 31)
+            ),
         )
 
         last_competed = None
@@ -431,9 +470,9 @@ class TeamRenderer:
 
         events_sorted = sorted(
             events_future.get_result(),
-            key=lambda e: e.start_date
-            if e.start_date
-            else datetime.datetime(year, 12, 31),
+            key=lambda e: (
+                e.start_date if e.start_date else datetime.datetime(year, 12, 31)
+            ),
         )  # unknown goes last
 
         matches_by_event_key: Dict[ndb.Key, List[Match]] = {}

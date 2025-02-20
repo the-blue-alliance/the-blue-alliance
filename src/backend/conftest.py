@@ -1,9 +1,10 @@
+from concurrent import futures
 from typing import Generator
 
 import pytest
 from freezegun import api as freezegun_api
+from google.appengine.api import apiproxy_rpc
 from google.appengine.api import datastore_types
-from google.appengine.api.apiproxy_rpc import _THREAD_POOL
 from google.appengine.ext import ndb, testbed
 
 from backend.common.context_cache import context_cache
@@ -11,14 +12,21 @@ from backend.common.models.cached_query_result import CachedQueryResult
 from backend.tests.json_data_importer import JsonDataImporter
 
 
-@pytest.fixture(autouse=True, scope="session")
-def drain_gae_rpc_thread_pool() -> Generator:
+@pytest.fixture(autouse=True)
+def drain_gae_rpc_thread_pool(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> Generator:
+    max_concurrent = apiproxy_rpc._MAX_CONCURRENT_API_CALLS  # pyre-ignore[16]
+    thread_pool = futures.ThreadPoolExecutor(
+        max_concurrent, thread_name_prefix=f"ApiProxyThreadPool:{request.node.name}"
+    )
+    monkeypatch.setattr(apiproxy_rpc, "_THREAD_POOL", thread_pool)
     yield
 
     # This thread pool can leave work dangling after the test session
     # is done, which can cause pytest to hang.
     # So we add this fixture to manually shut it down
-    _THREAD_POOL.shutdown()
+    thread_pool.shutdown()
 
 
 @pytest.fixture(autouse=True)
@@ -48,7 +56,7 @@ def ndb_stub(
     gae_testbed.init_datastore_v3_stub()
 
     # monkeypatch the ndb library to work with freezegun
-    fake_datetime = getattr(freezegun_api, "FakeDatetime")  # pyre-ignore[16]
+    fake_datetime = getattr(freezegun_api, "FakeDatetime")
     v = getattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", {})  # pyre-ignore[16]
     v[fake_datetime] = datastore_types.ValidatePropertyNothing
     monkeypatch.setattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", v)

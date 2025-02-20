@@ -1,6 +1,6 @@
 service: py3-api
-runtime: python310
-entrypoint: gunicorn -b :$PORT backend.api.main:app
+runtime: python312
+entrypoint: gunicorn -t 0 -b :$PORT backend.api.main:app
 app_engine_apis: true
 
 instance_class: F1
@@ -13,3 +13,6 @@ automatic_scaling:
 handlers:
   - url: .*
     script: auto
+
+includes:
+  - env_variables.yaml

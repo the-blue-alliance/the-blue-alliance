@@ -49,6 +49,9 @@
         <li class="active"><a href="#my-teams" data-toggle="tab">My Teams <span class="badge">{{team_fav_sub|length}}</span></a></li>
         <li><a href="#my-events" data-toggle="tab">My Events <span class="badge">{{event_fav_sub|length}}</span></a></li>
         <li><a href="#my-matches" data-toggle="tab">My Matches <span class="badge">{{event_match_fav_sub|length}}</span></a></li>
+        {% if attendance_stats_helper.teams|length > 0 %}
+        <li><a href="#my-eventteams" data-toggle="tab">My Attendance</a></li>
+        {% endif %}
       </ul>
 
       <div class="tab-content">
@@ -152,6 +155,9 @@
           {% else %}
             <p>You have no matches!</p>
           {% endif %}
+        </div>
+        <div class="tab-pane" id="my-eventteams">
+          {% include "mytba_partials/my_eventteams.html" %}
         </div>
       </div>
     </div>

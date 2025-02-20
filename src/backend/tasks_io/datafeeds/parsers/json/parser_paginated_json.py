@@ -13,5 +13,6 @@ class ParserPaginatedJSON(ParserJSON[Tuple[TParsedResponse, bool]]):
     """
 
     @abc.abstractmethod
-    def parse(self, response: Dict[str, Any]) -> Tuple[Optional[TParsedResponse], bool]:
-        ...
+    def parse(
+        self, response: Dict[str, Any]
+    ) -> Tuple[Optional[TParsedResponse], bool]: ...

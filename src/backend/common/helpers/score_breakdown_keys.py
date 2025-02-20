@@ -136,6 +136,7 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "foulPoints",
             "rp",
             "totalPoints",
+            # fields added by TBA:
             "tba_gameData",
         ]
     ),
@@ -310,14 +311,121 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "totalPoints",
         ]
     ),
+    2023: set(
+        [
+            "activationBonusAchieved",
+            "adjustPoints",
+            "autoBridgeState",
+            "autoChargeStationPoints",
+            "autoChargeStationRobot1",
+            "autoChargeStationRobot2",
+            "autoChargeStationRobot3",
+            "autoCommunity",
+            "autoDocked",
+            "autoGamePieceCount",
+            "autoGamePiecePoints",
+            "autoMobilityPoints",
+            "autoPoints",
+            "coopertitionCriteriaMet",
+            "coopGamePieceCount",
+            "endGameBridgeState",
+            "endGameChargeStationPoints",
+            "endGameChargeStationRobot1",
+            "endGameChargeStationRobot2",
+            "endGameChargeStationRobot3",
+            "endGameParkPoints",
+            "extraGamePieceCount",
+            "foulCount",
+            "foulPoints",
+            "g405Penalty",
+            "h111Penalty",
+            "linkPoints",
+            "links",
+            "mobilityRobot1",
+            "mobilityRobot2",
+            "mobilityRobot3",
+            "rp",
+            "sustainabilityBonusAchieved",
+            "techFoulCount",
+            "teleopCommunity",
+            "teleopGamePieceCount",
+            "teleopGamePiecePoints",
+            "teleopPoints",
+            "totalChargeStationPoints",
+            "totalPoints",
+            # fields added by TBA:
+            "tba_extraRp1",
+            "tba_extraRp2",
+        ]
+    ),
+    2024: set(
+        [
+            "adjustPoints",
+            "autoAmpNoteCount",
+            "autoAmpNotePoints",
+            "autoLeavePoints",
+            "autoLineRobot1",
+            "autoLineRobot2",
+            "autoLineRobot3",
+            "autoPoints",
+            "autoSpeakerNoteCount",
+            "autoSpeakerNotePoints",
+            "autoTotalNotePoints",
+            "coopertitionBonusAchieved",
+            "coopertitionCriteriaMet",
+            "coopNotePlayed",
+            "endGameHarmonyPoints",
+            "endGameNoteInTrapPoints",
+            "endGameOnStagePoints",
+            "endGameParkPoints",
+            "endGameRobot1",
+            "endGameRobot2",
+            "endGameRobot3",
+            "endGameSpotLightBonusPoints",
+            "endGameTotalStagePoints",
+            "ensembleBonusAchieved",
+            "ensembleBonusOnStageRobotsThreshold",
+            "ensembleBonusStagePointsThreshold",
+            "foulCount",
+            "foulPoints",
+            "g206Penalty",
+            "g408Penalty",
+            "g424Penalty",
+            "melodyBonusAchieved",
+            "melodyBonusThreshold",
+            "melodyBonusThresholdCoop",
+            "melodyBonusThresholdNonCoop",
+            "micCenterStage",
+            "micStageLeft",
+            "micStageRight",
+            "rp",
+            "techFoulCount",
+            "teleopAmpNoteCount",
+            "teleopAmpNotePoints",
+            "teleopPoints",
+            "teleopSpeakerNoteAmplifiedCount",
+            "teleopSpeakerNoteAmplifiedPoints",
+            "teleopSpeakerNoteCount",
+            "teleopSpeakerNotePoints",
+            "teleopTotalNotePoints",
+            "totalPoints",
+            "trapCenterStage",
+            "trapStageLeft",
+            "trapStageRight",
+            # fields added by TBA:
+            "tba_extraRp1",
+            "tba_extraRp2",
+        ]
+    ),
+    # when adding new fields, please keep them sorted alphabetically
 }
 
 
 class ScoreBreakdownKeys:
     @staticmethod
-    def is_valid_score_breakdown_key(key: str, year: Year):
+    def get_valid_score_breakdown_keys(year: Year) -> set[str]:
         """
-        If valid, returns True. Otherwise, returns the set of valid breakdowns.
+        Return all valid score breakdown keys for the given year.
         """
-        valid_breakdowns = VALID_BREAKDOWNS.get(year, set())
-        return key in valid_breakdowns
+        # return a copy
+        return set(VALID_BREAKDOWNS.get(year, set()))

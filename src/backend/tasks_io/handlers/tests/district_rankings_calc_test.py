@@ -6,14 +6,17 @@ from google.appengine.ext import testbed
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.helpers.district_helper import (
     DistrictHelper,
     DistrictRankingTeamTotal,
 )
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import TeamAtEventDistrictPoints
+from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
 def test_enqueue_bad_year(tasks_client: Client) -> None:
@@ -50,11 +53,14 @@ def test_enqueue_no_output_in_taskqueue(
     assert len(tasks) == 0
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
 def test_enqueue_event(
+    district_rankings_mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
     ndb_stub,
 ) -> None:
+    district_rankings_mock.return_value = InstantFuture({})
     District(
         id="2020test",
         year=2020,
@@ -68,6 +74,36 @@ def test_enqueue_event(
     for task in tasks:
         task_resp = tasks_client.get(task.url)
         assert task_resp.status_code == 200
+
+    taskqueue_stub.Clear()
+
+
+@mock.patch.object(SeasonHelper, "get_current_season")
+@mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
+def test_enqueue_default_year(
+    district_rankings_mock,
+    season_helper_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    ndb_stub,
+) -> None:
+    season_helper_mock.return_value = 2020
+    district_rankings_mock.return_value = InstantFuture({})
+    District(
+        id="2020test",
+        year=2020,
+        abbreviation="test",
+    ).put()
+    resp = tasks_client.get("/tasks/math/enqueue/district_rankings_calc")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 2
+    for task in tasks:
+        task_resp = tasks_client.get(task.url)
+        assert task_resp.status_code == 200
+
+    taskqueue_stub.Clear()
 
 
 def test_calc_no_district(tasks_client: Client) -> None:

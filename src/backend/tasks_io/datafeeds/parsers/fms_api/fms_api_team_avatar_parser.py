@@ -49,8 +49,10 @@ class FMSAPITeamAvatarParser(ParserPaginatedJSON[Tuple[List[Media], Set[ndb.Key]
             )
 
         return (
-            (avatars, media_keys_to_delete)
-            if avatars or media_keys_to_delete
-            else None,
+            (
+                (avatars, media_keys_to_delete)
+                if avatars or media_keys_to_delete
+                else None
+            ),
             (current_page < total_pages),
         )

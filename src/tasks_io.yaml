@@ -1,6 +1,6 @@
 service: py3-tasks-io
-runtime: python310
-entrypoint: gunicorn -b :$PORT backend.tasks_io.main:app
+runtime: python312
+entrypoint: gunicorn -t 0 -b :$PORT backend.tasks_io.main:app
 app_engine_apis: true
 
 instance_class: F1

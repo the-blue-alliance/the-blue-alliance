@@ -7,8 +7,11 @@ from _pytest.monkeypatch import MonkeyPatch
 from flask.testing import FlaskClient
 
 import backend
+from backend.common import auth
 from backend.common.consts.client_type import ClientType
 from backend.common.consts.model_type import ModelType
+from backend.common.helpers.account_deletion import AccountDeletionHelper
+from backend.common.helpers.mytba import AttendanceStatsHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.account import Account
 from backend.common.models.mobile_client import MobileClient
@@ -555,12 +558,15 @@ def test_mytba(
     mock_match_favorite = Mock()
     mock_match_subscription = Mock()
     mock_match_subscription.notification_names = []
+    mock_eventteam_favorite = Mock()
 
     def mock_favorite(model_type, key):
         if model_type == ModelType.EVENT:
             return mock_event_favorite
         elif model_type == ModelType.TEAM:
             return mock_team_favorite
+        elif model_type == ModelType.EVENT_TEAM:
+            return mock_eventteam_favorite
         return mock_match_favorite
 
     def mock_subscription(model_type, key):
@@ -572,6 +578,9 @@ def test_mytba(
 
     mock_mytba.favorite.side_effect = mock_favorite
     mock_mytba.subscription.side_effect = mock_subscription
+    mock_mytba.attendance_stats_helper = AttendanceStatsHelper(
+        event_teams=[], events=[], teams=[], matches={}
+    )
 
     mock_year = 2012
 
@@ -681,3 +690,28 @@ def test_ping_not_our_client(
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/account"
+
+
+def test_delete_confirmation(login_user, web_client: FlaskClient) -> None:
+    response = web_client.get("/account/delete")
+    assert response.status_code == 200
+
+
+def test_delete_post(login_user, web_client: FlaskClient) -> None:
+    with patch.object(
+        backend.web.handlers.account, "revoke_session_cookie"
+    ) as mock_revoke_session_cookie, patch.object(
+        AccountDeletionHelper, "delete_account"
+    ) as mock_delete_account, patch.object(
+        auth, "_delete_user"
+    ) as mock_delete_user:
+        response = web_client.post("/account/delete")
+
+    # make sure we log out the current user and that we call the deletion function
+    assert mock_revoke_session_cookie.called
+    assert mock_delete_account.called
+    assert mock_delete_user.called
+
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/"

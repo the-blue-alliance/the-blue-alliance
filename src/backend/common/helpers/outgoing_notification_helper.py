@@ -7,7 +7,6 @@ from backend.common.environment import Environment
 
 
 class OutgoingNotificationHelper(object):
-
     """
     @classmethod
     def send_admin_alert_email(cls, subject, email_body):

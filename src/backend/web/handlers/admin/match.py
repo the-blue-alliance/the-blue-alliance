@@ -144,3 +144,16 @@ def match_add() -> Response:
     MatchManipulator.createOrUpdate(matches)
 
     return redirect(url_for("admin.event_detail", event_key=event_key))
+
+
+def match_override_score_breakdown() -> Response:
+    match_key = none_throws(request.form.get("match_key"))
+    match = Match.get_by_id(match_key)
+    if not match:
+        abort(404)
+
+    breakdown_json = none_throws(request.form.get("new_breakdown"))
+    match.score_breakdown_json = json.dumps(json.loads(breakdown_json))
+    MatchManipulator.createOrUpdate(match)
+
+    return redirect(url_for("admin.event_detail", event_key=match.event_key_name))

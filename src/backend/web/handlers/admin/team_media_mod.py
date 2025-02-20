@@ -1,11 +1,12 @@
 import csv
+import itertools
 from datetime import datetime
 from io import StringIO
-from typing import Optional
+from typing import List, Optional
 
 from flask import abort, redirect, request, url_for
-from google.appengine.ext import ndb
 
+from backend.common.helpers.deferred import defer_safe
 from backend.common.models.account import Account
 from backend.common.models.keys import TeamNumber, Year
 from backend.common.models.team_admin_access import TeamAdminAccess
@@ -60,26 +61,34 @@ def team_media_mod_add():
     return render_template("admin/team_media_mod_add.html")
 
 
+def team_media_add_single(year: Year, csv_row: List[str]) -> None:
+    team_number = int(csv_row[0])
+    access = TeamAdminAccess(
+        id=TeamAdminAccess.render_key_name(team_number, year),
+        team_number=team_number,
+        year=year,
+        access_code=csv_row[1],
+        expiration=datetime(year=year, month=7, day=1),
+    )
+    access.put()
+
+
+def team_media_add_group(year: Year, csv_rows: List[List[str]]) -> None:
+    for row in csv_rows:
+        defer_safe(team_media_add_single, year, row, _queue="admin")
+
+
 def team_media_mod_add_post():
     year = int(request.form.get("year"))
     auth_codes_csv = request.form.get("auth_codes_csv")
 
     csv_data = list(csv.reader(StringIO(auth_codes_csv), delimiter=","))
-    auth_codes = []
-    for row in csv_data:
-        team_number = int(row[0])
-        auth_codes.append(
-            TeamAdminAccess(
-                id=TeamAdminAccess.render_key_name(team_number, year),
-                team_number=team_number,
-                year=year,
-                access_code=row[1],
-                expiration=datetime(year=year, month=7, day=1),
-            )
-        )
-    ndb.put_multi(auth_codes)
+    for row in itertools.batched(csv_data, 100):
+        # defer the actual datastore write, because with a large number
+        # of teams to add, we don't want to OOM the original request
+        defer_safe(team_media_add_group, year, row, _queue="admin")
 
-    return redirect(url_for("admin.media_mod_list", year=year))
+    return redirect(url_for("admin.team_media_mod_list", year=year))
 
 
 def team_media_mod_edit(year: Year, team_number: TeamNumber):
@@ -89,7 +98,6 @@ def team_media_mod_edit(year: Year, team_number: TeamNumber):
 
     if not access:
         abort(404)
-        return
 
     access = access[0]
     account_email = None
@@ -112,7 +120,6 @@ def team_media_mod_edit_post(year: Year, team_number: TeamNumber):
 
     if not access:
         abort(404)
-        return
 
     access = access[0]
     access_code = request.form.get("access_code")

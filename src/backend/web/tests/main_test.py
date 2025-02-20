@@ -1,7 +1,7 @@
 import importlib
 
 from backend.common.auth import _user_context_processor
-from backend.common.sitevars.flask_secrets import FlaskSecrets
+from backend.common.environment import Environment
 from backend.web.handlers.account import blueprint as account_blueprint
 
 
@@ -12,19 +12,8 @@ def test_app_secret_key(ndb_stub) -> None:
     # imported app, so let's forcibly clear it here to start clean
     importlib.reload(main)
 
-    # Before we run a request, there should be no secret key yet
-    assert main.app.secret_key is None
-
-    # Setting up the secret key will run before the first request
-    assert len(main.app.before_request_funcs) > 0
-
-    # Force run the before-first-request functions
-    with main.app.test_request_context():
-        for func in main.app.before_request_funcs[None]:
-            func()
-
-    # Make sure they set the secret key
-    assert main.app.secret_key == FlaskSecrets.DEFAULT_SECRET_KEY
+    # Make sure the secret key is set
+    assert main.app.secret_key == Environment.DEFAULT_FLASK_SECRET_KEY
 
 
 def test_app_url_map_strict_slashes() -> None:

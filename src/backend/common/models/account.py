@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import List
+from typing import cast, List
 
 from google.appengine.ext import ndb
-from pyre_extensions import safe_cast
 
 from backend.common.consts.account_permission import AccountPermission
 
@@ -17,7 +16,7 @@ class Account(ndb.Model):
     email: str = ndb.StringProperty()
     nickname: str = ndb.StringProperty()
     registered: bool = ndb.BooleanProperty()
-    permissions: List[AccountPermission] = safe_cast(
+    permissions: List[AccountPermission] = cast(
         List[AccountPermission],
         ndb.IntegerProperty(choices=list(AccountPermission), repeated=True),
     )

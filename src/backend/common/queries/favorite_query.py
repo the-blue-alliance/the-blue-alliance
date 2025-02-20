@@ -7,7 +7,6 @@ from backend.common.tasklets import typed_tasklet
 
 
 class FavoriteQuery(DatabaseQuery[List[Favorite], None]):
-
     DICT_CONVERTER = None
 
     def __init__(self, account: Account, keys_only: bool = False) -> None:

@@ -1,0 +1,182 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2023micmp",
+    "name": "Regional FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc201"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5166"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc548"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc226"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 1,
+    "event_key": "2023micmp",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1506"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc217"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 10,
+    "event_key": "2023micmp",
+    "name": "District Championship Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9148"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9312"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 2,
+    "event_key": "2023micmp",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc51"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc818"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc226"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 3,
+    "event_key": "2023micmp",
+    "name": "Woodie Flowers Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Isolina Carlini",
+        "team_key": "frc2832"
+      },
+      {
+        "awardee": "Janet McBride",
+        "team_key": "frc27"
+      },
+      {
+        "awardee": "Chris Purdy",
+        "team_key": "frc3534"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 4,
+    "event_key": "2023micmp",
+    "name": "FIRST Dean's List Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Owen Murray",
+        "team_key": "frc2834"
+      },
+      {
+        "awardee": "Mahima Mahajan",
+        "team_key": "frc226"
+      },
+      {
+        "awardee": "Arjit Agarwal",
+        "team_key": "frc245"
+      },
+      {
+        "awardee": "Bodi Foulke",
+        "team_key": "frc6081"
+      },
+      {
+        "awardee": "Maddie Buley",
+        "team_key": "frc573"
+      },
+      {
+        "awardee": "Jenny Caballero-Carcamo",
+        "team_key": "frc51"
+      },
+      {
+        "awardee": "Jayden Nolte",
+        "team_key": "frc2832"
+      },
+      {
+        "awardee": "Adeline Paul",
+        "team_key": "frc2851"
+      },
+      {
+        "awardee": "Norah Harper",
+        "team_key": "frc1023"
+      },
+      {
+        "awardee": "Sanjith Udupa",
+        "team_key": "frc503"
+      },
+      {
+        "awardee": "Boaz Qiu",
+        "team_key": "frc2619"
+      },
+      {
+        "awardee": "Caleb Burnaby",
+        "team_key": "frc4967"
+      },
+      {
+        "awardee": "Bradly VanDamme",
+        "team_key": "frc7782"
+      },
+      {
+        "awardee": "Audrey Flynn",
+        "team_key": "frc5114"
+      }
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_key": "2023micmp",
+    "name": "Regional Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3875"
+      }
+    ],
+    "year": 2023
+  }
+]

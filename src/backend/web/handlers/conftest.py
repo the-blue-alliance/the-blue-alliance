@@ -26,6 +26,7 @@ def web_client(gae_testbed) -> FlaskClient:
 
     # Disable CSRF protection for unit testing
     app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+    app.secret_key = "testsecret"
 
     return app.test_client()
 
@@ -82,7 +83,7 @@ def captured_templates() -> Generator[List[CapturedTemplate], None, None]:
 
 def get_inputs_from_form(soup: BeautifulSoup) -> Dict:
     fields = {}
-    for form_input in soup.findAll("input"):
+    for form_input in soup.find_all("input"):
         # ignore submit/image with no name attribute
         if form_input["type"] in ["submit", "image"] and "name" not in form_input:
             continue
@@ -114,13 +115,13 @@ def get_inputs_from_form(soup: BeautifulSoup) -> Dict:
         assert False, "input type %s not supported" % form_input["type"]
 
     # textareas
-    for textarea in soup.findAll("textarea"):
+    for textarea in soup.find_all("textarea"):
         fields[textarea["name"]] = textarea.string or ""
 
     # select fields
-    for select in soup.findAll("select"):
+    for select in soup.find_all("select"):
         value = ""
-        options = select.findAll("option")
+        options = select.find_all("option")
         is_multiple = select.has_attr("multiple")
         selected_options = [option for option in options if option.has_attr("selected")]
 

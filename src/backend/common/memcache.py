@@ -10,7 +10,6 @@ from backend.common.cache.gae_builtin_cache import AppEngineBuiltinCache
 
 
 class MemcacheClient:
-
     _cache: Optional[CacheIf] = None
 
     @classmethod

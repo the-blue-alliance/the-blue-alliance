@@ -1,8 +1,10 @@
 import re
 from typing import Optional, Set
 
+from backend.common.consts.event_type import EventType
 from backend.common.decorators import memoize
 from backend.common.models.district import District
+from backend.common.models.keys import Year
 
 
 class EventShortNameHelper:
@@ -25,13 +27,40 @@ class EventShortNameHelper:
         return codes
 
     @classmethod
-    def get_short_name(cls, name_str: str, district_code: Optional[str] = None) -> str:
+    def get_short_name(
+        cls,
+        name_str: str,
+        district_code: Optional[str] = None,
+        event_type: Optional[str] = None,
+        year: Optional[Year] = None,
+    ) -> str:
         """
         Extracts a short name like "Silicon Valley" from an event name like
         "Silicon Valley Regional sponsored by Google.org".
 
         See https://github.com/the-blue-alliance/the-blue-alliance-android/blob/master/android/src/test/java/com/thebluealliance/androidclient/test/helpers/EventHelperTest.java
         """
+
+        # Strip out current year
+        if year is not None:
+            name_str = name_str.replace(str(year), "").strip()
+
+        # Special cases for district championship divisions
+        if event_type == EventType.DISTRICT_CMP_DIVISION:
+            split_name = name_str.split("-")
+
+            event_name = (
+                re.sub(
+                    r"FIRST( in )?( In )?", "", split_name[0].split("Championship")[0]
+                )
+                + " Championship"
+            )
+            division_name = split_name[-1].replace("Division", "").strip()
+            short_name = "{} - {}".format(
+                "".join(item[0].upper() for item in event_name.split()),
+                division_name,
+            )
+            return short_name
 
         all_district_codes = cls._get_all_district_codes()
         if district_code is not None:
@@ -41,6 +70,9 @@ class EventShortNameHelper:
         # Account for 2020 suspensions
         if name_str.startswith("***SUSPENDED***"):
             name_str = name_str.replace("***SUSPENDED***", "")
+
+        # Remove "presented by"
+        name_str = name_str.split("presented by")[0]
 
         # 2015+ districts
         # Numbered events with no name
@@ -72,8 +104,7 @@ class EventShortNameHelper:
                 result = match.group(1).strip()
             else:
                 result = short.strip()
-            if result.startswith("FIRST"):
-                result = result[5:]
-            return result.strip()
+            result = re.sub(r"FIRST( in )?( In )?", "", result)
+            return " ".join(result.split())
 
         return name_str.strip()

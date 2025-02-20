@@ -1,0 +1,4528 @@
+{
+  "Events": [
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "ALHU",
+      "divisionCode": null,
+      "name": "Rocket City Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Von Braun Center",
+      "city": "Huntsville",
+      "stateprov": "AL",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "700 Monroe Street SW",
+      "website": "http://firstinalabama.org/events/frc-events/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires13",
+        "https://www.twitch.tv/firstinspires14"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "ARLI",
+      "divisionCode": null,
+      "name": "Arkansas Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Harding University",
+      "city": "Searcy",
+      "stateprov": "AR",
+      "country": "USA",
+      "dateStart": "2023-03-01T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "Burks Drive",
+      "website": "http://www.firstinspires.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires11",
+        "https://www.twitch.tv/firstinspires12"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "ARPKY",
+      "divisionCode": "ARPKY",
+      "name": "FIRST Championship - FIRST Robotics Competition - Archimedes presented by Kettering University Division",
+      "type": "ChampionshipDivision",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "AUSC",
+      "divisionCode": null,
+      "name": "Southern Cross Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "WIN Sports & Entertainment Centres",
+      "city": "Wollongong",
+      "stateprov": "NSW",
+      "country": "Australia",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "Harbour St. and Crown St.",
+      "website": "https://firstaustralia.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires38"
+      ],
+      "timezone": "AUS Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "AZGL",
+      "divisionCode": null,
+      "name": "Arizona West Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Cactus High School",
+      "city": "Glendale",
+      "stateprov": "AZ",
+      "country": "USA",
+      "dateStart": "2023-03-22T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "6330 W Greenway Road",
+      "website": "https://www.azfirst.info/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires5",
+        "https://www.twitch.tv/firstinspires6"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "AZVA",
+      "divisionCode": null,
+      "name": "Arizona East Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Chapparal High School",
+      "city": "Scottsdale",
+      "stateprov": "AZ",
+      "country": "USA",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "Chapparal High School 6935 E Gold Dust Ave",
+      "website": "https://www.azfirst.info/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires5",
+        "https://www.twitch.tv/firstinspires6"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "BCVI",
+      "divisionCode": null,
+      "name": "Canadian Pacific Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Save-On-Foods Memorial Centre",
+      "city": "Victoria",
+      "stateprov": "BC",
+      "country": "Canada",
+      "dateStart": "2023-02-28T00:00:00",
+      "dateEnd": "2023-03-03T23:59:59",
+      "address": "1925 Blanshard Street",
+      "website": "https://firstroboticsbc.org/frc/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires1",
+        "https://www.twitch.tv/firstinspires2"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "BRBR",
+      "divisionCode": null,
+      "name": "Brazil Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "National Football Stadium",
+      "city": "Brazilia",
+      "stateprov": "DF",
+      "country": "Brazil",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "SRPN Arena BRB Mané Garrincha - Asa Norte",
+      "website": null,
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires36"
+      ],
+      "timezone": "E. South America Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "CAAV",
+      "divisionCode": null,
+      "name": "Aerospace Valley Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Eastside High School",
+      "city": "Lancaster",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "3200 E Ave J 8",
+      "website": "https://cafirst.org/frc/aerospacevalley/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires15",
+        "https://www.twitch.tv/firstinspires16"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "CADA",
+      "divisionCode": null,
+      "name": "Sacramento Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "UC Davis ARC Pavilion",
+      "city": "Davis",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "750 Orchard Road",
+      "website": "https://cafirst.org/frc/sacramento/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires3",
+        "https://www.twitch.tv/firstinspires4"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "CAFR",
+      "divisionCode": null,
+      "name": "Central Valley Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Fresno Convention & Entertainment Center",
+      "city": "Fresno",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "848 M Street",
+      "website": "https://cafirst.org/frc/centralvalley/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires3",
+        "https://www.twitch.tv/firstinspires4"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "CALA",
+      "divisionCode": null,
+      "name": "Los Angeles Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Da Vinci Schools - Da Vinci Gymnasium",
+      "city": "El Segundo",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "201 N Douglas Street",
+      "website": "https://cafirst.org/frc/losangeles/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires15",
+        "https://www.twitch.tv/firstinspires16"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "CAMB",
+      "divisionCode": null,
+      "name": "Monterey Bay Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Seaside High School",
+      "city": "Seaside",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "2200 Noche Buena Street",
+      "website": "https://cafirst.org/frc/montereybay/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires3",
+        "https://www.twitch.tv/firstinspires4"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "CAOC",
+      "divisionCode": null,
+      "name": "Orange County Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Orange County Fairgrounds",
+      "city": "Costa Mesa",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "88 Fair Drive",
+      "website": "https://cafirst.org/frc/orangecounty/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires13",
+        "https://www.twitch.tv/firstinspires14"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "CAPH",
+      "divisionCode": null,
+      "name": "Hueneme Port Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Port of Hueneme",
+      "city": "Port Hueneme",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "319 Ponoma Street",
+      "website": "https://cafirst.org/frc/hueneme/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires5",
+        "https://www.twitch.tv/firstinspires6"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "CASD",
+      "divisionCode": null,
+      "name": "San Diego Regional presented by Qualcomm",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "UCSD - LionTree Arena",
+      "city": "La Jolla",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "9730 Hopkins Drive",
+      "website": "https://cafirst.org/frc/sandiego/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires15",
+        "https://www.twitch.tv/firstinspires16"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "CASF",
+      "divisionCode": null,
+      "name": "San Francisco Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "St. Ignatius College Preparatory",
+      "city": "San Francisco",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "2001 37th Avenue",
+      "website": "https://cafirst.org/frc/sanfrancisco/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires3",
+        "https://www.twitch.tv/firstinspires4"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "CASJ",
+      "divisionCode": null,
+      "name": "Silicon Valley Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "San Jose State University - The Event Center",
+      "city": "San Jose",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "290 South 7th Street",
+      "website": "https://cafirst.org/frc/siliconvalley/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires3",
+        "https://www.twitch.tv/firstinspires4"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "CAVE",
+      "divisionCode": null,
+      "name": "Ventura County Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Port of Hueneme",
+      "city": "Port Hueneme",
+      "stateprov": "CA",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "319 Ponoma Street",
+      "website": "https://cafirst.org/frc/ventura/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires5",
+        "https://www.twitch.tv/firstinspires6"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "CHCMP",
+      "divisionCode": null,
+      "name": "FIRST Chesapeake District Championship",
+      "type": "DistrictChampionship",
+      "districtCode": "CHS",
+      "venue": "Eagle Bank Arena - George Mason Universtiy",
+      "city": "Fairfax",
+      "stateprov": "VA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "4500 Patriot Cir",
+      "website": "https://www.firstchesapeake.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "CMPTX",
+      "divisionCode": null,
+      "name": "FIRST Championship - FIRST Robotics Competition",
+      "type": "Championship",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "CODE",
+      "divisionCode": null,
+      "name": "Colorado Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "University of Denver - Daniel L. Ritchie Center",
+      "city": "Denver",
+      "stateprov": "CO",
+      "country": "USA",
+      "dateStart": "2023-03-22T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "University of Denver 2240 Buchtel Boulevard",
+      "website": "https://coloradofirst.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires1",
+        "https://www.twitch.tv/firstinspires2"
+      ],
+      "timezone": "Mountain Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "CPRA",
+      "divisionCode": "CPRA",
+      "name": "FIRST Championship - FIRST Robotics Competition - Curie presented by Rockwell Automation Division",
+      "type": "ChampionshipDivision",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "CTHAR",
+      "divisionCode": null,
+      "name": "NE District Hartford Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Hartford Public High School",
+      "city": "Hartford",
+      "stateprov": "CT",
+      "country": "USA",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "55 Forest St",
+      "website": "http://www.nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "CTWAT",
+      "divisionCode": null,
+      "name": "NE District Waterbury Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Wilby High School",
+      "city": "Waterbury",
+      "stateprov": "CT",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "460 Buck Hill Road",
+      "website": "http://www.nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "DCMP",
+      "divisionCode": "DCMP",
+      "name": "FIRST Championship - FIRST Robotics Competition - Daly Division",
+      "type": "ChampionshipDivision",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "FLOR",
+      "divisionCode": null,
+      "name": "Orlando Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Addition Financial Arena at the University of Central Florida",
+      "city": "Orlando",
+      "stateprov": "FL",
+      "country": "USA",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "12777 Gemini Blvd N",
+      "website": "http://orlandofrc.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires13",
+        "https://www.twitch.tv/firstinspires14"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "FLTA",
+      "divisionCode": null,
+      "name": "Tallahassee Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Alfred Lawson Jr Multipurpose Center",
+      "city": "Tallahassee",
+      "stateprov": "FL",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "Alfred Lawson Jr Multipurpose Center 1800 Wannish Way",
+      "website": "https://tallahasseefrc.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires13",
+        "https://www.twitch.tv/firstinspires14"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "FLWP",
+      "divisionCode": null,
+      "name": "South Florida Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Palm Beach Convention Center",
+      "city": "West Palm Beach",
+      "stateprov": "FL",
+      "country": "USA",
+      "dateStart": "2023-03-01T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "650 Okeechobee Blvd",
+      "website": "http://soflofrc.firstinflorida.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires13",
+        "https://www.twitch.tv/firstinspires14"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "GAALB",
+      "divisionCode": null,
+      "name": "PCH District Albany Event",
+      "type": "DistrictEvent",
+      "districtCode": "PCH",
+      "venue": "Albany Civic Center",
+      "city": "Albany",
+      "stateprov": "GA",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "100 W. Oglethorpe Blvd",
+      "website": "http://www.gafirst.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "GACAR",
+      "divisionCode": null,
+      "name": "PCH District Carrollton Event",
+      "type": "DistrictEvent",
+      "districtCode": "PCH",
+      "venue": "University of West Georgia - Coliseum",
+      "city": "Carrollton",
+      "stateprov": "GA",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "1601 Maple Street",
+      "website": "http://gafirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "GACMP",
+      "divisionCode": null,
+      "name": "Peachtree District Championship",
+      "type": "DistrictChampionship",
+      "districtCode": "PCH",
+      "venue": "Lakepoint Sports",
+      "city": "Emerson",
+      "stateprov": "GA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "261 Stars Way",
+      "website": "http://www.gafirst.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "GADAL",
+      "divisionCode": null,
+      "name": "PCH District Dalton Event",
+      "type": "DistrictEvent",
+      "districtCode": "PCH",
+      "venue": "Dalton Convention Center",
+      "city": "Dalton",
+      "stateprov": "GA",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "2211 Tony Ingle Parkway",
+      "website": "http://www.gafirst.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "GAGWI",
+      "divisionCode": null,
+      "name": "PCH District Gwinnett Event",
+      "type": "DistrictEvent",
+      "districtCode": "PCH",
+      "venue": "Discovery High School",
+      "city": "Lawrenceville",
+      "stateprov": "GA",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "1335 Old Norcross Road",
+      "website": "http://www.gafirst.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "GAMAC",
+      "divisionCode": null,
+      "name": "PCH District Macon Event",
+      "type": "DistrictEvent",
+      "districtCode": "PCH",
+      "venue": "Mercer University, Hawkins Arena",
+      "city": "Macon",
+      "stateprov": "GA",
+      "country": "USA",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "1400 Coleman Avenue",
+      "website": "http://www.gafirst.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "GCMP",
+      "divisionCode": "GCMP",
+      "name": "FIRST Championship - FIRST Robotics Competition - Galileo Division",
+      "type": "ChampionshipDivision",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "HCMP",
+      "divisionCode": "HCMP",
+      "name": "FIRST Championship - FIRST Robotics Competition - Hopper Division",
+      "type": "ChampionshipDivision",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "HIHO",
+      "divisionCode": null,
+      "name": "Hawaii Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "University of Hawaii at Manoa",
+      "city": "Honolulu",
+      "stateprov": "HI",
+      "country": "USA",
+      "dateStart": "2023-03-22T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "Stan Sheriff Center 1355 Lower Campus Rd",
+      "website": "https://hawaiifirstrobotics.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires37"
+      ],
+      "timezone": "Hawaiian Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "IACF",
+      "divisionCode": null,
+      "name": "Iowa Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "McLeod Center/UNI Dome",
+      "city": "Cedar Falls",
+      "stateprov": "IA",
+      "country": "USA",
+      "dateStart": "2023-03-22T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "2501 Hudson Road",
+      "website": "http://iafirst.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires10",
+        "https://www.twitch.tv/firstinspires9"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "IDBO",
+      "divisionCode": null,
+      "name": "Idaho Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Ford Idaho Center",
+      "city": "Nampa",
+      "stateprov": "ID",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "16200 Idaho Center Blvd",
+      "website": "https://idahofrcregional.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires1",
+        "https://www.twitch.tv/firstinspires2"
+      ],
+      "timezone": "Mountain Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "ILCH",
+      "divisionCode": null,
+      "name": "Midwest Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Credit Union 1 Arena",
+      "city": "Chicago",
+      "stateprov": "IL",
+      "country": "USA",
+      "dateStart": "2023-03-08T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "University of Illinois, Chicago 525 S. Racine Ave",
+      "website": "https://www.firstillinoisrobotics.org/frc/events/midwest-regional/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires7",
+        "https://www.twitch.tv/firstinspires8"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "ILPE",
+      "divisionCode": null,
+      "name": "Central Illinois Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Renaissance Coliseum - Bradley University",
+      "city": "Peoria",
+      "stateprov": "IL",
+      "country": "USA",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "1600 W. Main Street",
+      "website": "http://www.firstillinoisrobotics.org/frc/events/central-illinois-regional/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires7",
+        "https://www.twitch.tv/firstinspires8"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "INCMP",
+      "divisionCode": null,
+      "name": "FIRST Indiana State Championship",
+      "type": "DistrictChampionship",
+      "districtCode": "FIN",
+      "venue": "Kardatzke Center",
+      "city": "Anderson",
+      "stateprov": "IN",
+      "country": "USA",
+      "dateStart": "2023-04-06T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "Anderson University 211 Graceland Ave",
+      "website": "https://www.firstindianarobotics.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "INGRE",
+      "divisionCode": null,
+      "name": "FIN District Greenwood Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIN",
+      "venue": "Center Grove HS",
+      "city": "Greenwood",
+      "stateprov": "IN",
+      "country": "USA",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "2717 S Morgantown Rd",
+      "website": "https://www.firstindianarobotics.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "INMIS",
+      "divisionCode": null,
+      "name": "FIN District Mishawaka Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIN",
+      "venue": "Penn HS",
+      "city": "Mishawaka",
+      "stateprov": "IN",
+      "country": "USA",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "56100 N Bittersweet Road",
+      "website": "https://www.firstindianarobotics.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "INPRI",
+      "divisionCode": null,
+      "name": "FIN District Princeton Event presented by Toyota",
+      "type": "DistrictEvent",
+      "districtCode": "FIN",
+      "venue": "Princeton HS",
+      "city": "Princeton",
+      "stateprov": "IN",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "1101 N Main St",
+      "website": "https://www.firstindianarobotics.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "INWLA",
+      "divisionCode": null,
+      "name": "FIN District Tippecanoe Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIN",
+      "venue": "Jefferson High School",
+      "city": "Lafayette",
+      "stateprov": "IN",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "1801 S. 18th Street",
+      "website": "https://www.firstindianarobotics.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "ISCMP",
+      "divisionCode": null,
+      "name": "FIRST Israel District Championship",
+      "type": "DistrictChampionship",
+      "districtCode": "ISR",
+      "venue": "Pais Arena",
+      "city": "Jerusalem",
+      "stateprov": "JM",
+      "country": "Israel",
+      "dateStart": "2023-03-20T00:00:00",
+      "dateEnd": "2023-03-23T23:59:59",
+      "address": "David Banbanishty Road 1",
+      "website": "http://firstisrael.org.il",
+      "webcasts": [
+
+      ],
+      "timezone": "Israel Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "ISDE1",
+      "divisionCode": null,
+      "name": "ISR District Event #1",
+      "type": "DistrictEvent",
+      "districtCode": "ISR",
+      "venue": "Metro West High School",
+      "city": "Ra'anana",
+      "stateprov": "M",
+      "country": "Israel",
+      "dateStart": "2023-02-26T00:00:00",
+      "dateEnd": "2023-02-28T23:59:59",
+      "address": "Ha-Palmakh St 2",
+      "website": "http://firstisrael.org.il",
+      "webcasts": [
+
+      ],
+      "timezone": "Israel Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "ISDE2",
+      "divisionCode": null,
+      "name": "ISR District Event #2",
+      "type": "DistrictEvent",
+      "districtCode": "ISR",
+      "venue": "Metro West High School",
+      "city": "Ra'anana",
+      "stateprov": "M",
+      "country": "Israel",
+      "dateStart": "2023-03-01T00:00:00",
+      "dateEnd": "2023-03-03T23:59:59",
+      "address": "Ha-Palmakh St 2",
+      "website": "http://firstisrael.org.il",
+      "webcasts": [
+
+      ],
+      "timezone": "Israel Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "ISDE3",
+      "divisionCode": null,
+      "name": "ISR District Event #3",
+      "type": "DistrictEvent",
+      "districtCode": "ISR",
+      "venue": "Metro West High School",
+      "city": "Ra'anana",
+      "stateprov": "M",
+      "country": "Israel",
+      "dateStart": "2023-03-12T00:00:00",
+      "dateEnd": "2023-03-14T23:59:59",
+      "address": "Ha-Palmakh St 2",
+      "website": "http://firstisrael.org.il",
+      "webcasts": [
+
+      ],
+      "timezone": "Israel Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "ISDE4",
+      "divisionCode": null,
+      "name": "ISR District Event #4",
+      "type": "DistrictEvent",
+      "districtCode": "ISR",
+      "venue": "Metro West High School",
+      "city": "Ra'anana",
+      "stateprov": "M",
+      "country": "Israel",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-17T23:59:59",
+      "address": "Ha-Palmakh St 2",
+      "website": "http://firstisrael.org.il",
+      "webcasts": [
+
+      ],
+      "timezone": "Israel Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "JCMP",
+      "divisionCode": "JCMP",
+      "name": "FIRST Championship - FIRST Robotics Competition - Johnson Division",
+      "type": "ChampionshipDivision",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "KSLA",
+      "divisionCode": null,
+      "name": "Heartland Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Olathe South High School",
+      "city": "Olathe",
+      "stateprov": "KS",
+      "country": "USA",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "1640 E 151st Street",
+      "website": "http://www.kcfirst.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires11",
+        "https://www.twitch.tv/firstinspires12"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "LAKE",
+      "divisionCode": null,
+      "name": "Bayou Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Pontchartrain Center",
+      "city": "Kenner",
+      "stateprov": "LA",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "4545 Williams Blvd",
+      "website": "http://www.frcbayouregional.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires13",
+        "https://www.twitch.tv/firstinspires14"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MABOS",
+      "divisionCode": null,
+      "name": "NE District Greater Boston Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Revere High School",
+      "city": "Revere",
+      "stateprov": "MA",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "101 School Street",
+      "website": "http://www.nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MABRI",
+      "divisionCode": null,
+      "name": "NE District SE Mass Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Bridgewater-Raynham Regional High School",
+      "city": "Bridgewater",
+      "stateprov": "MA",
+      "country": "USA",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "415 CenterSt",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MAREA",
+      "divisionCode": null,
+      "name": "NE District North Shore Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Reading Memorial High School",
+      "city": "Reading",
+      "stateprov": "MA",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "62 Oakland Road",
+      "website": "http://www.nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MAWNE",
+      "divisionCode": null,
+      "name": "NE District Western NE Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Western New England University",
+      "city": "Springfield",
+      "stateprov": "MA",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "1215 Wilbraham Road",
+      "website": "https://nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "MAWOR",
+      "divisionCode": null,
+      "name": "NE District WPI Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Worcester Polytechnic Institute",
+      "city": "Worcester",
+      "stateprov": "MA",
+      "country": "USA",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "100 Institute Road",
+      "website": "https://nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "MDBET",
+      "divisionCode": null,
+      "name": "CHS District Bethesda MD Event",
+      "type": "DistrictEvent",
+      "districtCode": "CHS",
+      "venue": "Walt Whitman High School",
+      "city": "Bethesda",
+      "stateprov": "MD",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "7100 Whittier Blvd",
+      "website": "https://firstchesapeake.org/frc/bethesda",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MDTIM",
+      "divisionCode": null,
+      "name": "CHS District Timonium MD Event",
+      "type": "DistrictEvent",
+      "districtCode": "CHS",
+      "venue": "Dulaney High School",
+      "city": "Timonium",
+      "stateprov": "MD",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "255 Padonia Road",
+      "website": "https://firstchesapeake.org/frc/timonium",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MIBEL",
+      "divisionCode": null,
+      "name": "FIM District Belleville Event presented by Belleville Yacht Club",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Belleville High School",
+      "city": "Belleville",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "501 W Columbia Avenue",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires34"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "FourAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "MICMP",
+      "divisionCode": null,
+      "name": "FIRST in Michigan State Championship presented by DTE Foundation",
+      "type": "DistrictChampionshipWithLevels",
+      "districtCode": "FIM",
+      "venue": "Saginaw Valley State University",
+      "city": "University Center",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-04-06T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "Ryder Center 7400 Bay Road",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires31",
+        "https://www.twitch.tv/firstinspires32",
+        "https://www.twitch.tv/firstinspires33",
+        "https://www.twitch.tv/firstinspires34"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "MICMP1",
+      "divisionCode": "MICMP1",
+      "name": "FIRST in Michigan State Championship presented by DTE Foundation - DTE ENERGY FOUNDATION Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "FIM",
+      "venue": "Saginaw Valley State University",
+      "city": "University Center",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-04-06T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "Ryder Center 7400 Bay Road",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires31"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "MICMP2",
+      "divisionCode": "MICMP2",
+      "name": "FIRST in Michigan State Championship presented by DTE Foundation - FORD Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "FIM",
+      "venue": "Saginaw Valley State University",
+      "city": "University Center",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-04-06T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "Ryder Center 7400 Bay Road",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires33"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "MICMP3",
+      "divisionCode": "MICMP3",
+      "name": "FIRST in Michigan State Championship presented by DTE Foundation - APTIV Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "FIM",
+      "venue": "Saginaw Valley State University",
+      "city": "University Center",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-04-06T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "Ryder Center 7400 Bay Road",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires34"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "MICMP4",
+      "divisionCode": "MICMP4",
+      "name": "FIRST in Michigan State Championship presented by DTE Foundation - CONSUMERS ENERGY Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "FIM",
+      "venue": "Saginaw Valley State University",
+      "city": "University Center",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-04-06T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "Ryder Center 7400 Bay Road",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires32"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MIDET",
+      "divisionCode": null,
+      "name": "FIM District Detroit Event presented by DTE",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Cass Tech High School",
+      "city": "Detroit",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "2501 2nd Ave",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires32"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "MIDTR",
+      "divisionCode": null,
+      "name": "FIM District Wayne State University Event presented by Magna",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Wayne State University",
+      "city": "Detroit",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "Matthai Center John C Lodge Freeway 5101",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires35"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MIESC",
+      "divisionCode": null,
+      "name": "FIM District Escanaba Event presented by Highline Fast",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Escanaba High School",
+      "city": "Escanaba",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "500 S. Lincoln Rd",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires35"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MIFOR",
+      "divisionCode": null,
+      "name": "FIM District Calvin University Event presented by Amway",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Van Noord Arena at Calvin University",
+      "city": "Grand Rapids",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "3195 Knight Way Southeast",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires33"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MIJAC",
+      "divisionCode": null,
+      "name": "FIM District Jackson Event presented by Consumers Energy Foundation",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Spring Arbor University",
+      "city": "Spring Arbor",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "106 E Main Street",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires34"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "MIKE2",
+      "divisionCode": null,
+      "name": "FIM District Kettering University Event #2 presented by Ford",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Kettering University",
+      "city": "Flint",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "1700 University Avenue Recreation Center",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires32"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "MIKEN",
+      "divisionCode": null,
+      "name": "FIM District Kentwood Event presented by Dematic",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "East Kentwood High School",
+      "city": "Kentwood",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "6230 Kalamazoo Avenue SE",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires33"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MIKET",
+      "divisionCode": null,
+      "name": "FIM District Kettering University Event #1 presented by Ford",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Kettering University",
+      "city": "Flint",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "1700 University Avenue Recreation Center",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires32"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MILA2",
+      "divisionCode": null,
+      "name": "FIM District Lakeview Event #2",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Lakeview High School",
+      "city": "Battle Creek",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-25T00:00:00",
+      "dateEnd": "2023-03-27T23:59:59",
+      "address": "15060 Helmer Rd S",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires34"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MILAK",
+      "divisionCode": null,
+      "name": "FIM District Lakeview Event #1 presented by Parker-Hannifin",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Lakeview High School",
+      "city": "Battle Creek",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "15060 Helmer Rd S",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires34"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "MILAN",
+      "divisionCode": null,
+      "name": "FIM District Lansing Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Mason High School",
+      "city": "Mason",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "1001 S. Barns Street",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires34"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "MILIV",
+      "divisionCode": null,
+      "name": "FIM District Livonia Event presented by Aisin",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Churchill High School",
+      "city": "Livonia",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "8900 N Newburgh Road",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires35"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MILSU",
+      "divisionCode": null,
+      "name": "FIM District LSSU Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Lake Superior State University",
+      "city": "Sault Ste. Marie",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "650 W. Easterday Ave",
+      "website": null,
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires35"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "MIMCC",
+      "divisionCode": null,
+      "name": "FIM District Macomb Community College Event presented by DTE",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Macomb Community College Sports and Expo Center",
+      "city": "Warren",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "14500 Twelve Mile Rd",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires34"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MIMID",
+      "divisionCode": null,
+      "name": "FIM District Midland Event presented by Dow",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "H.H. Dow High School",
+      "city": "Midland",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "3901 N. Saginaw Road",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires31"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MIMIL",
+      "divisionCode": null,
+      "name": "FIM District Milford Event presented by GM Proving Grounds",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Milford High School",
+      "city": "Highland",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "2380 S Milford Road",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires31"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MIMUS",
+      "divisionCode": null,
+      "name": "FIM District Muskegon Event presented by RENK",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Orchard View High School",
+      "city": "Muskegon",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "16 N Quarterline Road",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires31"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "MISAL",
+      "divisionCode": null,
+      "name": "FIM District Saline Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Saline High School",
+      "city": "Saline",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "1300 Campus Parkway",
+      "website": "https://www.firstinmichigan.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires31"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "MISJO",
+      "divisionCode": null,
+      "name": "FIM District St. Joseph Event presented by Whirlpool Corporation",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "St. Joseph High School",
+      "city": "St. Joseph",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "2521 Stadium Drive",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires33"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MISTA",
+      "divisionCode": null,
+      "name": "FIM District Standish-Sterling Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Standish-Sterling High School",
+      "city": "Standish",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "2401 Grove Street Rd",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires33"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "MITR2",
+      "divisionCode": null,
+      "name": "FIM District Troy Event #2 presented by Magna",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Troy Athens High School",
+      "city": "Troy",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "4333 John R Road",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires32"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MITRY",
+      "divisionCode": null,
+      "name": "FIM District Troy Event #1 presented by Aptiv",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Troy Athens High School",
+      "city": "Troy",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "4333 John R Road",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires32"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MITVC",
+      "divisionCode": null,
+      "name": "FIM District Traverse City Event presented by \"Cone Drive by Timken\"",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Traverse City Central High School",
+      "city": "Traverse City",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "1150 Miliken Drive",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires35"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MIWMI",
+      "divisionCode": null,
+      "name": "FIM District West Michigan Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIM",
+      "venue": "Grand Valley State University",
+      "city": "Allendale",
+      "stateprov": "MI",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "Field House 10915 S Campus Drive",
+      "website": "http://www.firstinmichigan.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires33"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MNDU",
+      "divisionCode": null,
+      "name": "Lake Superior Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "DECC Arena/South Pioneer Hall",
+      "city": "Duluth",
+      "stateprov": "MN",
+      "country": "USA",
+      "dateStart": "2023-03-01T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "Duluth Entertainment Convention Center 350 Harbor Drive",
+      "website": "https://www.frcnorthland.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires7",
+        "https://www.twitch.tv/firstinspires8"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MNDU2",
+      "divisionCode": null,
+      "name": "Northern Lights Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "DECC Arena/Edmund Fitzgerald Exhibit Hall",
+      "city": "Duluth",
+      "stateprov": "MN",
+      "country": "USA",
+      "dateStart": "2023-03-01T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "Duluth Entertainment Convention Center 350 Harbor Drive",
+      "website": "https://www.frcnorthland.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires10",
+        "https://www.twitch.tv/firstinspires9"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "MNMI",
+      "divisionCode": null,
+      "name": "Minnesota 10,000 Lakes Regional presented by Medtronic",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Williams Arena/The Sports Pavilion Univ of MN",
+      "city": "Minneapolis",
+      "stateprov": "MN",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "1925 University Avenue SE",
+      "website": "https://www.frcnorthland.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires10",
+        "https://www.twitch.tv/firstinspires9"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MNMI2",
+      "divisionCode": null,
+      "name": "Minnesota North Star Regional at La Crosse",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "La Crosse Center",
+      "city": "La Crosse",
+      "stateprov": "WI",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "300 Harborview Plaza",
+      "website": "https://www.frcnorthland.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires17",
+        "https://www.twitch.tv/firstinspires18"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "MOKC",
+      "divisionCode": null,
+      "name": "Greater Kansas City Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Lee's Summit North High School",
+      "city": "Lee's Summit",
+      "stateprov": "MO",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "901 NE Douglas Street",
+      "website": "http://www.kcfirst.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires11",
+        "https://www.twitch.tv/firstinspires12"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MOSE",
+      "divisionCode": null,
+      "name": "Central Missouri Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Smith-Cotton High School",
+      "city": "Sedalia",
+      "stateprov": "MO",
+      "country": "USA",
+      "dateStart": "2023-03-22T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "2010 Tiger Pride Boulevard",
+      "website": "http://www.kcfirst.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires11",
+        "https://www.twitch.tv/firstinspires12"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "MOSL",
+      "divisionCode": null,
+      "name": "St. Louis Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Chaifetz Arena",
+      "city": "St. Louis",
+      "stateprov": "MO",
+      "country": "USA",
+      "dateStart": "2023-03-08T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "1 S. Compton Ave",
+      "website": "http://www.FIRSTinMissouri.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires15",
+        "https://www.twitch.tv/firstinspires16"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "MPCIA",
+      "divisionCode": "MPCIA",
+      "name": "FIRST Championship - FIRST Robotics Competition - Milstein presented by CIA Division",
+      "type": "ChampionshipDivision",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "MRCMP",
+      "divisionCode": null,
+      "name": "FIRST Mid-Atlantic District Championship",
+      "type": "DistrictChampionship",
+      "districtCode": "FMA",
+      "venue": "Lehigh University - Stabler Arena",
+      "city": "Bethlehem",
+      "stateprov": "PA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "124 Goodman Drive",
+      "website": "http://www.midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MSLR",
+      "divisionCode": null,
+      "name": "Magnolia Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "South Mississippi Fairgrounds",
+      "city": "Laurel",
+      "stateprov": "MS",
+      "country": "USA",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "1457 Ellisville Blvd",
+      "website": null,
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires17",
+        "https://www.twitch.tv/firstinspires18"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "MXMO",
+      "divisionCode": null,
+      "name": "Regional Monterrey",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "ITESM Campus Monterrey - Arena Borregos",
+      "city": "Monterrey",
+      "stateprov": "MEX",
+      "country": "Mexico",
+      "dateStart": "2023-03-01T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "Av. Eugenio Garza Sada 2501 Sur, Tecnológico",
+      "website": "",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires25",
+        "https://www.twitch.tv/firstinspires26"
+      ],
+      "timezone": "Central Standard Time (Mexico)"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "MXPU",
+      "divisionCode": null,
+      "name": "Regional Puebla",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Tecnológico de Monterrey Campus Puebla",
+      "city": "Puebla",
+      "stateprov": "PUE",
+      "country": "Mexico",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "Atlixcáyotl 5718 Reserva Territorial Atlixcáyotl",
+      "website": null,
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires25",
+        "https://www.twitch.tv/firstinspires26"
+      ],
+      "timezone": "Central Standard Time (Mexico)"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "MXTO",
+      "divisionCode": null,
+      "name": "Regional Laguna",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "ITESM Campus Laguna - Santiago Garza de la Mora",
+      "city": "Torreon",
+      "stateprov": "COA",
+      "country": "Mexico",
+      "dateStart": "2023-03-22T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "Paseo del Tecnologico #751",
+      "website": "https://www.firstlagunaregional.com.mx",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires25",
+        "https://www.twitch.tv/firstinspires26"
+      ],
+      "timezone": "Central Standard Time (Mexico)"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "NCASH",
+      "divisionCode": null,
+      "name": "FNC District UNC Asheville Event",
+      "type": "DistrictEvent",
+      "districtCode": "FNC",
+      "venue": "UNC Asheville - Kimmel Arena",
+      "city": "Asheville",
+      "stateprov": "NC",
+      "country": "USA",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "227 Campus Drive",
+      "website": "http://www.firstnorthcarolina.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires29"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "NCCMP",
+      "divisionCode": null,
+      "name": "FIRST North Carolina District State Championship",
+      "type": "DistrictChampionship",
+      "districtCode": "FNC",
+      "venue": "ECU - Minges Coliseum",
+      "city": "Greenville",
+      "stateprov": "NC",
+      "country": "USA",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "1 Ficklen Drive",
+      "website": "http://www.firstnorthcarolina.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires29"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "NCJOH",
+      "divisionCode": null,
+      "name": "FNC District Johnston County Event",
+      "type": "DistrictEvent",
+      "districtCode": "FNC",
+      "venue": "Rolesville High School",
+      "city": "Rolesville",
+      "stateprov": "NC",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "1099 E Young Street",
+      "website": null,
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires29"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "NCMEC",
+      "divisionCode": null,
+      "name": "FNC District Mecklenburg County Event",
+      "type": "DistrictEvent",
+      "districtCode": "FNC",
+      "venue": "Charlotte Convention Center",
+      "city": "Charlotte",
+      "stateprov": "NC",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "501 S College Street",
+      "website": "https://www.firstnorthcarolina.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires38"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "NCPEM",
+      "divisionCode": null,
+      "name": "FNC District UNC Pembroke Event",
+      "type": "DistrictEvent",
+      "districtCode": "FNC",
+      "venue": "UNC Pembroke - Jones Health and Physical Education Center",
+      "city": "Pembroke",
+      "stateprov": "NC",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "1 University Drive",
+      "website": "http://www.firstnorthcarolina.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires29"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "NCWAK",
+      "divisionCode": null,
+      "name": "FNC District Wake County Event",
+      "type": "DistrictEvent",
+      "districtCode": "FNC",
+      "venue": "Rolesville High School",
+      "city": "Rolesville",
+      "stateprov": "NC",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "1099 E Young Street",
+      "website": null,
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires29"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "NDGF",
+      "divisionCode": null,
+      "name": "Great Northern Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Alerus Center",
+      "city": "Grand Forks",
+      "stateprov": "ND",
+      "country": "USA",
+      "dateStart": "2023-03-08T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "1200 S 42nd Street",
+      "website": "https://www.frcnorthland.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires10",
+        "https://www.twitch.tv/firstinspires9"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "TwoAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "NECMP",
+      "divisionCode": null,
+      "name": "New England FIRST District Championship",
+      "type": "DistrictChampionshipWithLevels",
+      "districtCode": "NE",
+      "venue": "Eastern States Exposition",
+      "city": "West Springfield",
+      "stateprov": "MA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "1305 Memorial Ave",
+      "website": "https://nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "NECMP1",
+      "divisionCode": "NECMP1",
+      "name": "New England FIRST District Championship - MEIR Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "NE",
+      "venue": "Eastern States Exposition",
+      "city": "West Springfield",
+      "stateprov": "MA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "1305 Memorial Ave",
+      "website": "https://nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "NECMP2",
+      "divisionCode": "NECMP2",
+      "name": "New England FIRST District Championship - WILSON Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "NE",
+      "venue": "Eastern States Exposition",
+      "city": "West Springfield",
+      "stateprov": "MA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "1305 Memorial Ave",
+      "website": "https://nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "NHDUR",
+      "divisionCode": null,
+      "name": "NE District UNH Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Whittemore Center Arena",
+      "city": "Durham",
+      "stateprov": "NH",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "128 Main St",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "NHGRS",
+      "divisionCode": null,
+      "name": "NE District Granite State Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Salem High School",
+      "city": "Salem",
+      "stateprov": "NH",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "44 Geremonty Drive",
+      "website": "http://www.nefirst.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "NJFLA",
+      "divisionCode": null,
+      "name": "FMA District Mount Olive Event",
+      "type": "DistrictEvent",
+      "districtCode": "FMA",
+      "venue": "Mount Olive High School",
+      "city": "Flanders",
+      "stateprov": "NJ",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "18 Corey Road",
+      "website": "http://www.midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "NJROB",
+      "divisionCode": null,
+      "name": "FMA District Robbinsville Event",
+      "type": "DistrictEvent",
+      "districtCode": "FMA",
+      "venue": "Robbinsville High School",
+      "city": "Trenton",
+      "stateprov": "NJ",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "155 Robbinsville Edinburg Rd",
+      "website": "http://www.midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "NJSKI",
+      "divisionCode": null,
+      "name": "FMA District Montgomery Event",
+      "type": "DistrictEvent",
+      "districtCode": "FMA",
+      "venue": "Montgomery Township High School",
+      "city": "Skillman",
+      "stateprov": "NJ",
+      "country": "USA",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "1016 Route 601",
+      "website": "http://www.midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "NJTAB",
+      "divisionCode": null,
+      "name": "FMA District Seneca Event",
+      "type": "DistrictEvent",
+      "districtCode": "FMA",
+      "venue": "Seneca High School",
+      "city": "Tabernacle",
+      "stateprov": "NJ",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "110 Carranza Road",
+      "website": "http://www.midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "NJWAS",
+      "divisionCode": null,
+      "name": "FMA District Warren Hills Event",
+      "type": "DistrictEvent",
+      "districtCode": "FMA",
+      "venue": "Warren Hills High School",
+      "city": "Washington",
+      "stateprov": "NJ",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "41 Jackson Valley Rd",
+      "website": "http://www.midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 8,
+      "announcements": [
+
+      ],
+      "code": "NPFCMP",
+      "divisionCode": "NPFCMP",
+      "name": "FIRST Championship - FIRST Robotics Competition - Newton presented by Ford Division",
+      "type": "ChampionshipDivision",
+      "districtCode": null,
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-19T00:00:00",
+      "dateEnd": "2023-04-22T23:59:59",
+      "address": "1001 Avenida De Las Americas",
+      "website": "https://www.firstchampionship.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "NVLV",
+      "divisionCode": null,
+      "name": "Las Vegas Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Thomas & Mack Center",
+      "city": "Las Vegas",
+      "stateprov": "NV",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "4505 S. Maryland Parkway",
+      "website": "http://www.firstnevada.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires5",
+        "https://www.twitch.tv/firstinspires6"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "NYLI",
+      "divisionCode": null,
+      "name": "FIRST Long Island Regional #1",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Hofstra University Arena",
+      "city": "Hempstead",
+      "stateprov": "NY",
+      "country": "USA",
+      "dateStart": "2023-03-19T00:00:00",
+      "dateEnd": "2023-03-22T23:59:59",
+      "address": "1000 Fulton Avenue",
+      "website": "http://www.sbpli-lifirst.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires21",
+        "https://www.twitch.tv/firstinspires24"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "NYLI2",
+      "divisionCode": null,
+      "name": "FIRST Long Island Regional #2",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Hofstra University Arena",
+      "city": "Hempstead",
+      "stateprov": "NY",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "1000 Fulton Avenue",
+      "website": "http://www.sbpli-lifirst.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires21",
+        "https://www.twitch.tv/firstinspires22"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "NYNY",
+      "divisionCode": null,
+      "name": "New York City Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "The Armory Track & Field Center",
+      "city": "New York",
+      "stateprov": "NY",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "216 Fort Washington Avenue",
+      "website": "http://www.nycfirst.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires21",
+        "https://www.twitch.tv/firstinspires22"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "NYRO",
+      "divisionCode": null,
+      "name": "Finger Lakes Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Gordon Field House",
+      "city": "Rochester",
+      "stateprov": "NY",
+      "country": "USA",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "Rochester Institute of Technology 149 Lomb Memorial Drive",
+      "website": "https://www.rit.edu/gcr/firstrobotics/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires19",
+        "https://www.twitch.tv/firstinspires20"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "NYTR",
+      "divisionCode": null,
+      "name": "New York Tech Valley Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "MVP Arena",
+      "city": "Albany",
+      "stateprov": "NY",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "51 S Pearl St",
+      "website": "https://www.techvalleyfirst.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires21",
+        "https://www.twitch.tv/firstinspires22"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "OHCL",
+      "divisionCode": null,
+      "name": "Buckeye Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Cleveland State University - Wolstein Center",
+      "city": "Cleveland",
+      "stateprov": "OH",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "2000 Prospect Street",
+      "website": "https://sites.google.com/view/frcbuckeye/home",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires7",
+        "https://www.twitch.tv/firstinspires8"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "OHMV",
+      "divisionCode": null,
+      "name": "Miami Valley Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Xavier University",
+      "city": "Cincinnati",
+      "stateprov": "OH",
+      "country": "USA",
+      "dateStart": "2023-03-15T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "3800 Victory Parkway",
+      "website": null,
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires10",
+        "https://www.twitch.tv/firstinspires9"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "OKOK",
+      "divisionCode": null,
+      "name": "Oklahoma Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "FireLake Arena",
+      "city": "Shawnee",
+      "stateprov": "OK",
+      "country": "USA",
+      "dateStart": "2023-03-08T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "18145 Old Rangeline Road",
+      "website": "https://www.first-oklahoma.com/frc-portal/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires11",
+        "https://www.twitch.tv/firstinspires12"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "OKTU",
+      "divisionCode": null,
+      "name": "Green Country Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Expo Square Pavilion",
+      "city": "Tulsa",
+      "stateprov": "OK",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "4145 East 21st Street",
+      "website": "http://www.first-oklahoma.com/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires11",
+        "https://www.twitch.tv/firstinspires12"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "ONBAR",
+      "divisionCode": null,
+      "name": "ONT District Georgian Event",
+      "type": "DistrictEvent",
+      "districtCode": "ONT",
+      "venue": "Georgian College",
+      "city": "Barrie",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "Athletic & Fitnees/Student Life Centre 1 Georgian Drive",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "TwoAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "ONCMP",
+      "divisionCode": null,
+      "name": "FIRST Ontario Provincial Championship",
+      "type": "DistrictChampionshipWithLevels",
+      "districtCode": "ONT",
+      "venue": "FIRST Ontario Center",
+      "city": "Hamilton",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "101 York Blvd",
+      "website": "https://www.firstroboticscanada.org/frc/provincialchampionship/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "ONCMP1",
+      "divisionCode": "ONCMP1",
+      "name": "FIRST Ontario Provincial Championship - TECHNOLOGY Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "ONT",
+      "venue": "FIRST Ontario Center",
+      "city": "Hamilton",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "101 York Blvd",
+      "website": "https://www.firstroboticscanada.org/frc/provincialchampionship/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "ONCMP2",
+      "divisionCode": "ONCMP2",
+      "name": "FIRST Ontario Provincial Championship - SCIENCE Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "ONT",
+      "venue": "FIRST Ontario Center",
+      "city": "Hamilton",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "101 York Blvd",
+      "website": "https://www.firstroboticscanada.org/frc/provincialchampionship/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "ONHAM",
+      "divisionCode": null,
+      "name": "ONT District McMaster University",
+      "type": "DistrictEvent",
+      "districtCode": "ONT",
+      "venue": "McMaster University",
+      "city": "Hamilton",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "1280 Main Street West",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "ONLON",
+      "divisionCode": null,
+      "name": "ONT District Western University Engineering Event",
+      "type": "DistrictEvent",
+      "districtCode": "ONT",
+      "venue": "Thompson Recreation Athletic Centre",
+      "city": "London",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "Western University Western Rd & Sarnia Road",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "ONNEW",
+      "divisionCode": null,
+      "name": "ONT District Newmarket Complex Event",
+      "type": "DistrictEvent",
+      "districtCode": "ONT",
+      "venue": "Ray Twinney Sports Complex",
+      "city": "Newmarket",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "100 Eagle Street West",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "ONNOB",
+      "divisionCode": null,
+      "name": "ONT District North Bay Event",
+      "type": "DistrictEvent",
+      "districtCode": "ONT",
+      "venue": "Nipissing University",
+      "city": "North Bay",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "Robert J. Surtees Athletic Centre 100 College Drive",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "ONTOR",
+      "divisionCode": null,
+      "name": "ONT District Humber College Event",
+      "type": "DistrictEvent",
+      "districtCode": "ONT",
+      "venue": "Humber College",
+      "city": "Toronto",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "North Athletic Centre Building A 205 Humber College Blvd",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "ONWAT",
+      "divisionCode": null,
+      "name": "ONT District University of Waterloo Event",
+      "type": "DistrictEvent",
+      "districtCode": "ONT",
+      "venue": "University of Waterloo",
+      "city": "Waterloo",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "PAC - Physical Activities Complex 200 University Avenue West",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "ONWIN",
+      "divisionCode": null,
+      "name": "ONT District Windsor Essex Great Lakes Event",
+      "type": "DistrictEvent",
+      "districtCode": "ONT",
+      "venue": "University of Windsor",
+      "city": "Windsor",
+      "stateprov": "ON",
+      "country": "Canada",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "St Denis Centre 2555 College Avenue",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "ORORE",
+      "divisionCode": null,
+      "name": "PNW District Clackamas Academy Event",
+      "type": "DistrictEvent",
+      "districtCode": "PNW",
+      "venue": "Clackamas Academy",
+      "city": "Oregon City",
+      "stateprov": "OR",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "1306 12th Street",
+      "website": "http://www.firstwa.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires27"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "ORSAL",
+      "divisionCode": null,
+      "name": "PNW District Oregon State Fairgrounds Event",
+      "type": "DistrictEvent",
+      "districtCode": "PNW",
+      "venue": "Oregon State Fairgrounds",
+      "city": "Salem",
+      "stateprov": "OR",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "2330 - 17th St. NE",
+      "website": "https://firstwa.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires27"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "ORWIL",
+      "divisionCode": null,
+      "name": "PNW District Wilsonville Event",
+      "type": "DistrictEvent",
+      "districtCode": "PNW",
+      "venue": "Wilsonville High School",
+      "city": "Wilsonville",
+      "stateprov": "OR",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "6800 SW Wilsonville Road",
+      "website": "https://firstwa.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires27"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "PABEN",
+      "divisionCode": null,
+      "name": "FMA District Bensalem Event",
+      "type": "DistrictEvent",
+      "districtCode": "FMA",
+      "venue": "Bensalem Township High School",
+      "city": "Bensalem",
+      "stateprov": "PA",
+      "country": "USA",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "4319 Hulmeville Road",
+      "website": "https://midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "PACA",
+      "divisionCode": null,
+      "name": "Greater Pittsburgh Regional presented by Argo AI",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "David L. Lawrence Convention Center",
+      "city": "Pittsburgh",
+      "stateprov": "PA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "David L. Lawrence Convention Center 1000 Fort Dequense Blvd",
+      "website": "http://www.firstwcpa.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires7",
+        "https://www.twitch.tv/firstinspires8"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "PAHAT",
+      "divisionCode": null,
+      "name": "FMA District Hatboro-Horsham Event",
+      "type": "DistrictEvent",
+      "districtCode": "FMA",
+      "venue": "Hatboro-Horsham High School",
+      "city": "Horsham",
+      "stateprov": "PA",
+      "country": "USA",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "899 Horsham Road",
+      "website": "http://www.midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "PAPHI",
+      "divisionCode": null,
+      "name": "FMA District Springside Chestnut Hill Academy Event",
+      "type": "DistrictEvent",
+      "districtCode": "FMA",
+      "venue": "Springside Chestnut Hill Academy",
+      "city": "Philadelphia",
+      "stateprov": "PA",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "500 West Willow Grove Avenue",
+      "website": "http://www.midatlanticrobotics.com/",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "PNCMP",
+      "divisionCode": null,
+      "name": "Pacific Northwest FIRST District Championship",
+      "type": "DistrictChampionship",
+      "districtCode": "PNW",
+      "venue": "Eastern Washington University",
+      "city": "Cheney",
+      "stateprov": "WA",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "526 5th St",
+      "website": "http://www.firstwa.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires27",
+        "https://www.twitch.tv/firstinspires28"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "QCMO",
+      "divisionCode": null,
+      "name": "Festival de Robotique Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Colisée Vidéotron",
+      "city": "Trois-Rivières",
+      "stateprov": "QC",
+      "country": "Canada",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "6000, rue du Colisée",
+      "website": "http://robotiquefirstquebec.org/festival/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires24",
+        "https://www.twitch.tv/firstinspires25"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "RINSC",
+      "divisionCode": null,
+      "name": "NE District Rhode Island Event",
+      "type": "DistrictEvent",
+      "districtCode": "NE",
+      "venue": "Ponaganset High School",
+      "city": "North Scituate",
+      "stateprov": "RI",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "137 Anan Wade Rd",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "SCAND",
+      "divisionCode": null,
+      "name": "PCH District Anderson Event presented by Magna",
+      "type": "DistrictEvent",
+      "districtCode": "PCH",
+      "venue": "Civic Center of Anderson",
+      "city": "Anderson",
+      "stateprov": "SC",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "3027 Martin Luther King, Jr. Blvd.",
+      "website": null,
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "SCHAR",
+      "divisionCode": null,
+      "name": "PCH District Hartsville Event presented by South Carolina Department of Education",
+      "type": "DistrictEvent",
+      "districtCode": "PCH",
+      "venue": "Coker University",
+      "city": "Hartsville",
+      "stateprov": "SC",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "300 E. College Avenue",
+      "website": "http://www.gafirst.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "TNKN",
+      "divisionCode": null,
+      "name": "Smoky Mountains Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Knoxville Civic Auditorium",
+      "city": "Knoxville",
+      "stateprov": "TN",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "500 Howard Baker Jr. Ave",
+      "website": "https://www.tnfirst.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires19",
+        "https://www.twitch.tv/firstinspires20"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "TUHC",
+      "divisionCode": null,
+      "name": "Halic Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Volkswagen Arena",
+      "city": "Sanyer",
+      "stateprov": "34",
+      "country": "Turkey",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "Huzur Mh., Maslak Ayazağa Cd. 4/A",
+      "website": "http://www.fikretyukselfoundation.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires36"
+      ],
+      "timezone": "Turkey Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "TUIS",
+      "divisionCode": null,
+      "name": "Istanbul Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Volkswagen Arena",
+      "city": "Sanyer",
+      "stateprov": "34",
+      "country": "Turkey",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "Huzur Mh., Maslak Ayazağa Cd. 4/A",
+      "website": "http://www.fikretyukselfoundation.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires36"
+      ],
+      "timezone": "Turkey Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "TUIS2",
+      "divisionCode": null,
+      "name": "Bosphorus Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Volkswagen Arena",
+      "city": "Sanyer",
+      "stateprov": "34",
+      "country": "Turkey",
+      "dateStart": "2023-03-27T00:00:00",
+      "dateEnd": "2023-03-29T23:59:59",
+      "address": "Huzur Mh., Maslak Ayazağa Cd. 4/A",
+      "website": "http://www.fikretyukselfoundation.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires36"
+      ],
+      "timezone": "Turkey Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "TUIS3",
+      "divisionCode": null,
+      "name": "Izmir Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Fuar İzmir",
+      "city": "Gaziemir",
+      "stateprov": "35",
+      "country": "Turkey",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "Zafer Mahallesi 840 Sk. Fuar Alanı No:2",
+      "website": "http://frcturkey.org",
+      "webcasts": [
+
+      ],
+      "timezone": "Turkey Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "TXAMA",
+      "divisionCode": null,
+      "name": "FIT District Amarillo Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "Amarillo Civic Center",
+      "city": "Amarillo",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-30T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "401 S Buchanan St",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "TXBEL",
+      "divisionCode": null,
+      "name": "FIT District Belton Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "Bell Co. Expo Center",
+      "city": "Belton",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-09T00:00:00",
+      "dateEnd": "2023-03-11T23:59:59",
+      "address": "301 West Loop 121",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 2,
+      "announcements": [
+
+      ],
+      "code": "TXCHA",
+      "divisionCode": null,
+      "name": "FIT District Channelview Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "Channelview High School",
+      "city": "Channelview",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-10T00:00:00",
+      "dateEnd": "2023-03-12T23:59:59",
+      "address": "1100 Sheldon Road",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "TXCLE",
+      "divisionCode": null,
+      "name": "FIT District Space City @ Clear Lake Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "Clear Falls High School",
+      "city": "League City",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "4380 Village Way",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "TwoAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "TXCMP",
+      "divisionCode": null,
+      "name": "FIRST In Texas District Championship presented by Phillips 66",
+      "type": "DistrictChampionshipWithLevels",
+      "districtCode": "FIT",
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "1001 Avenida de las Americas",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "TXCMP1",
+      "divisionCode": "TXCMP1",
+      "name": "FIRST In Texas District Championship presented by Phillips 66 - APOLLO Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "FIT",
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "1001 Avenida de las Americas",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 6,
+      "announcements": [
+
+      ],
+      "code": "TXCMP2",
+      "divisionCode": "TXCMP2",
+      "name": "FIRST In Texas District Championship presented by Phillips 66 - MERCURY Division",
+      "type": "DistrictChampionshipDivision",
+      "districtCode": "FIT",
+      "venue": "George R. Brown Convention Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-04-05T00:00:00",
+      "dateEnd": "2023-04-08T23:59:59",
+      "address": "1001 Avenida de las Americas",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "TXDAL",
+      "divisionCode": null,
+      "name": "FIT District Dallas Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "Becky Lowery Freshman Center",
+      "city": "Allen",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "368 N Greenville Ave",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "TXFOR",
+      "divisionCode": null,
+      "name": "FIT District Fort Worth Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "Nolan Catholic High School",
+      "city": "Fort Worth",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "4501 Bridge St.",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "TXHOU",
+      "divisionCode": null,
+      "name": "FIT District Houston Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "M. O. Campbell Educational Center",
+      "city": "Houston",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-23T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "1865 Aldine Bender, FM 525",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "TXSAN",
+      "divisionCode": null,
+      "name": "FIT District San Antonio Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "Freeman Coliseum",
+      "city": "San Antonio",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "3201 East Houston St.",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "TXWAC",
+      "divisionCode": null,
+      "name": "FIT District Waco Event",
+      "type": "DistrictEvent",
+      "districtCode": "FIT",
+      "venue": "Extraco Event Center",
+      "city": "Waco",
+      "stateprov": "TX",
+      "country": "USA",
+      "dateStart": "2023-03-02T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "4601 Bosque Blvd",
+      "website": "https://firstintexas.org/",
+      "webcasts": [
+
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "UTWV",
+      "divisionCode": null,
+      "name": "Utah Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "Maverik Center",
+      "city": "West Valley City",
+      "stateprov": "UT",
+      "country": "USA",
+      "dateStart": "2023-03-01T00:00:00",
+      "dateEnd": "2023-03-04T23:59:59",
+      "address": "3200 South Decker Lake Drive",
+      "website": "http://www.utfrc.utah.edu",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires3",
+        "https://www.twitch.tv/firstinspires4"
+      ],
+      "timezone": "Mountain Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "VAALE",
+      "divisionCode": null,
+      "name": "CHS District Alexandria VA Event",
+      "type": "DistrictEvent",
+      "districtCode": "CHS",
+      "venue": "Hayfield Secondary School",
+      "city": "Alexandria",
+      "stateprov": "VA",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "7630 Telegraph Rd",
+      "website": "https://firstchesapeake.org/frc/alexandria",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "VABLA",
+      "divisionCode": null,
+      "name": "CHS District Blacksburg VA Event",
+      "type": "DistrictEvent",
+      "districtCode": "CHS",
+      "venue": "Blacksburg High School",
+      "city": "Blacksburg",
+      "stateprov": "VA",
+      "country": "USA",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "3401 Bruin Lane",
+      "website": "https://firstchesapeake.org/frc/blacksburg",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "VAGLE",
+      "divisionCode": null,
+      "name": "CHS District Glen Allen VA Event",
+      "type": "DistrictEvent",
+      "districtCode": "CHS",
+      "venue": "Deep Run High School",
+      "city": "Glen Allen",
+      "stateprov": "VA",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "4801 Twin Hickory Rd",
+      "website": "https://firstchesapeake.org/frc/glen-allen",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "VAPOR",
+      "divisionCode": null,
+      "name": "CHS District Portsmouth VA Event",
+      "type": "DistrictEvent",
+      "districtCode": "CHS",
+      "venue": "Churchland High School",
+      "city": "Portsmouth",
+      "stateprov": "VA",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "4301 Cedar Lane",
+      "website": "https://firstchesapeake.org/frc/portsmouth",
+      "webcasts": [
+
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "WAAHS",
+      "divisionCode": null,
+      "name": "PNW District Auburn Event",
+      "type": "DistrictEvent",
+      "districtCode": "PNW",
+      "venue": "Auburn High School",
+      "city": "Auburn",
+      "stateprov": "WA",
+      "country": "USA",
+      "dateStart": "2023-03-31T00:00:00",
+      "dateEnd": "2023-04-02T23:59:59",
+      "address": "711 E. Main St.",
+      "website": "http://www.firstwa.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires28"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "WABON",
+      "divisionCode": null,
+      "name": "PNW District Bonney Lake Event",
+      "type": "DistrictEvent",
+      "districtCode": "PNW",
+      "venue": "Bonney Lake High School",
+      "city": "Bonney Lake",
+      "stateprov": "WA",
+      "country": "USA",
+      "dateStart": "2023-03-17T00:00:00",
+      "dateEnd": "2023-03-19T23:59:59",
+      "address": "10920 - 199th Ave Ct E.",
+      "website": "http://www.firstwa.org",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires28"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "WASAM",
+      "divisionCode": null,
+      "name": "PNW District Sammamish Event",
+      "type": "DistrictEvent",
+      "districtCode": "PNW",
+      "venue": "Sammamish High School",
+      "city": "Bellevue",
+      "stateprov": "WA",
+      "country": "USA",
+      "dateStart": "2023-03-24T00:00:00",
+      "dateEnd": "2023-03-26T23:59:59",
+      "address": "100 – 140th Ave SE",
+      "website": null,
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires28"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 1,
+      "announcements": [
+
+      ],
+      "code": "WASNO",
+      "divisionCode": null,
+      "name": "PNW District Glacier Peak Event",
+      "type": "DistrictEvent",
+      "districtCode": "PNW",
+      "venue": "Glacier Peak High School",
+      "city": "Snohomish",
+      "stateprov": "WA",
+      "country": "USA",
+      "dateStart": "2023-03-03T00:00:00",
+      "dateEnd": "2023-03-05T23:59:59",
+      "address": "7401 144th Place SE",
+      "website": "http://www.firstwa.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires28"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 3,
+      "announcements": [
+
+      ],
+      "code": "WAYAK",
+      "divisionCode": null,
+      "name": "PNW District SunDome Event",
+      "type": "DistrictEvent",
+      "districtCode": "PNW",
+      "venue": "SunDome State Fair Park",
+      "city": "Yakima",
+      "stateprov": "WA",
+      "country": "USA",
+      "dateStart": "2023-03-16T00:00:00",
+      "dateEnd": "2023-03-18T23:59:59",
+      "address": "1301 S. Fair Avenue",
+      "website": "http://www.firstwa.org/",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires27"
+      ],
+      "timezone": "Pacific Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 0,
+      "announcements": [
+
+      ],
+      "code": "WEEK0",
+      "divisionCode": null,
+      "name": "Week 0",
+      "type": "OffSeasonWithAzureSync",
+      "districtCode": null,
+      "venue": "Bishop Guerton High School",
+      "city": "Nashua",
+      "stateprov": "NH",
+      "country": "USA",
+      "dateStart": "2023-02-18T00:00:00",
+      "dateEnd": "2023-02-18T23:59:00",
+      "address": "194 Lund Rd",
+      "website": "N/A",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires",
+        "https://www.twitch.tv/firstinspires1"
+      ],
+      "timezone": "Eastern Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 5,
+      "announcements": [
+
+      ],
+      "code": "WILA",
+      "divisionCode": null,
+      "name": "Seven Rivers Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "La Crosse Center",
+      "city": "La Crosse",
+      "stateprov": "WI",
+      "country": "USA",
+      "dateStart": "2023-03-29T00:00:00",
+      "dateEnd": "2023-04-01T23:59:59",
+      "address": "300 Harborview Plaza",
+      "website": "https://www.firstinspireswi.org/first-robotics-competition",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires17",
+        "https://www.twitch.tv/firstinspires18"
+      ],
+      "timezone": "Central Standard Time"
+    },
+    {
+      "allianceCount": "EightAlliance",
+      "weekNumber": 4,
+      "announcements": [
+
+      ],
+      "code": "WIMI",
+      "divisionCode": null,
+      "name": "Wisconsin Regional",
+      "type": "Regional",
+      "districtCode": null,
+      "venue": "UW - Milwaukee Panther Arena",
+      "city": "Milwaukee",
+      "stateprov": "WI",
+      "country": "USA",
+      "dateStart": "2023-03-22T00:00:00",
+      "dateEnd": "2023-03-25T23:59:59",
+      "address": "400 West Kilbourn Avenue",
+      "website": "https://www.firstinspireswi.org/first-robotics-competition",
+      "webcasts": [
+        "https://www.twitch.tv/firstinspires7",
+        "https://www.twitch.tv/firstinspires8"
+      ],
+      "timezone": "Central Standard Time"
+    }
+  ],
+  "eventCount": 186
+}

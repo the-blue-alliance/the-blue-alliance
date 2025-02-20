@@ -79,10 +79,7 @@ class EventHelper(object):
                 EventType.CMP_DIVISION,
                 EventType.CMP_FINALS,
             }:
-                if event.year == 2021:
-                    # 2021 had a remote CMP - so only a single CMP
-                    champs_label = CHAMPIONSHIP_EVENTS_LABEL
-                elif event.year >= 2017 and event.year != 2022:
+                if event.year >= 2017 and event.year <= 2020:
                     champs_label = TWO_CHAMPS_LABEL.format(event.city)
                 else:
                     champs_label = CHAMPIONSHIP_EVENTS_LABEL

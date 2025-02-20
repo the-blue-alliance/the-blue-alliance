@@ -8,7 +8,6 @@ from backend.common.queries.types import DictQueryReturn, QueryReturn
 
 
 class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
-
     # Used to version cached outputs
     SUBVERSIONS: Dict[ApiMajorVersion, int]
 

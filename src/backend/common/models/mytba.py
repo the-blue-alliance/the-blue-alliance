@@ -1,7 +1,7 @@
 from datetime import datetime
+from typing import cast
 
 from google.appengine.ext import ndb
-from pyre_extensions import safe_cast
 
 from backend.common.consts.model_type import ModelType
 
@@ -9,7 +9,7 @@ from backend.common.consts.model_type import ModelType
 class MyTBAModel(ndb.Model):
     user_id: str = ndb.StringProperty(required=True)
     model_key: str = ndb.StringProperty(required=True)
-    model_type: ModelType = safe_cast(
+    model_type: ModelType = cast(
         ModelType, ndb.IntegerProperty(required=True, choices=list(ModelType))
     )
 

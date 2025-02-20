@@ -14,6 +14,7 @@ coverage.xml
 .node_coverage/
 **.swp
 venv/
+.venv/
 .testmondata
 .vscode
 .idea
@@ -36,3 +37,6 @@ tba_dev_config.local.json
 # Ignore Firebase config modules
 .firebaserc
 ui-debug.log
+firebase-debug.log
+
+database-debug.log

@@ -1,4 +1,5 @@
 import datetime
+import json
 import unittest
 from typing import Optional
 from urllib.parse import urlparse
@@ -12,10 +13,12 @@ from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.suggestion import Suggestion
+from backend.common.models.suggestion_dict import SuggestionDict
 from backend.common.models.team import Team
 from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.models.user import User
 from backend.common.suggestions.media_creator import MediaCreator
+from backend.common.suggestions.media_parser import MediaParser
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 
 
@@ -26,7 +29,31 @@ def test_login_redirect(web_client):
     assert urlparse(resp.headers["Location"]).path == "/account/login"
 
 
-@pytest.mark.usefixtures("web_client", "ndb_context", "taskqueue_stub", "login_user")
+@pytest.fixture()
+def mock_grabcad_api(monkeypatch: pytest.MonkeyPatch) -> None:
+    def mock_grabcad_dict(url: str) -> SuggestionDict:
+        return SuggestionDict(
+            media_type_enum=MediaType.GRABCAD,
+            foreign_key="2016-148-robowranglers-1",
+            year=2016,
+            details_json=json.dumps(
+                {
+                    "model_name": "2016 | 148 - Robowranglers",
+                    "model_description": "Renegade",
+                    "model_image": "https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/bf832651cc688c27a78c224fbd07d9d7/card.jpg",
+                    "model_created": "2016-09-19T11:52:23Z",
+                }
+            ),
+        )
+
+    monkeypatch.setattr(
+        MediaParser, "_partial_media_dict_from_grabcad", mock_grabcad_dict
+    )
+
+
+@pytest.mark.usefixtures(
+    "web_client", "ndb_context", "taskqueue_stub", "login_user", "mock_grabcad_api"
+)
 class TestSuggestTeamAdminReview(unittest.TestCase):
     account: Optional[User] = None
     web_client: Optional[FlaskClient] = None

@@ -25,6 +25,7 @@ from backend.common.queries.event_query import (
     EventQuery,
 )
 from backend.common.queries.match_query import EventMatchesQuery
+from backend.common.queries.media_query import EventTeamsMediasQuery
 from backend.common.queries.team_query import EventEventTeamsQuery, EventTeamsQuery
 
 
@@ -150,6 +151,19 @@ def event_teams_statuses(event_key: EventKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
+def event_teams_media(event_key: EventKey) -> Response:
+    track_call_after_response("event/teams/media", event_key)
+
+    query = EventTeamsMediasQuery(event_key=event_key).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+
+    return profiled_jsonify(query)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
 def event_matches(
     event_key: EventKey, model_type: Optional[ModelType] = None
 ) -> Response:
@@ -198,20 +212,8 @@ def event_playoff_advancement(event_key: EventKey) -> Response:
     cleaned_matches, _ = MatchHelper.delete_invalid_matches(matches, event)
     _, matches = MatchHelper.organized_matches(cleaned_matches)
 
-    # Lazy handle the case when we haven't backfilled the event details
-    # TODO: Unify with web handler
     bracket_table = event.playoff_bracket
     playoff_advancement = event.playoff_advancement
-    if not bracket_table or not playoff_advancement:
-        (
-            bracket_table2,
-            playoff_advancement2,
-            _,
-            _,
-        ) = PlayoffAdvancementHelper.generate_playoff_advancement(event, matches)
-        bracket_table = bracket_table or bracket_table2
-        playoff_advancement = playoff_advancement or playoff_advancement2
-
     output = PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
         event, playoff_advancement, bracket_table
     )

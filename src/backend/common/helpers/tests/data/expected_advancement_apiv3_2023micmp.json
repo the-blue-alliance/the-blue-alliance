@@ -1,0 +1,369 @@
+[
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "round1",
+    "level_name": "Round 1",
+    "rankings": [
+      {
+        "alliance_name": "DTE Energy",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc5907",
+          "frc503",
+          "frc1189",
+          "frc5926"
+        ]
+      },
+      {
+        "alliance_name": "Aptiv",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7769",
+          "frc5166",
+          "frc5901"
+        ]
+      },
+      {
+        "alliance_name": "Consumers",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc51",
+          "frc818",
+          "frc226"
+        ]
+      },
+      {
+        "alliance_name": "Ford",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc6090",
+          "frc1506",
+          "frc217"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "round2",
+    "level_name": "Round 2",
+    "rankings": [
+      {
+        "alliance_name": "Aptiv",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7769",
+          "frc5166",
+          "frc5901"
+        ]
+      },
+      {
+        "alliance_name": "Consumers",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc51",
+          "frc818",
+          "frc226"
+        ]
+      },
+      {
+        "alliance_name": "DTE Energy",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc5907",
+          "frc503",
+          "frc1189",
+          "frc5926"
+        ]
+      },
+      {
+        "alliance_name": "Ford",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc6090",
+          "frc1506",
+          "frc217"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "round3",
+    "level_name": "Round 3",
+    "rankings": [
+      {
+        "alliance_name": "Aptiv",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc7769",
+          "frc5166",
+          "frc5901"
+        ]
+      },
+      {
+        "alliance_name": "Ford",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc6090",
+          "frc1506",
+          "frc217"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [
+      {
+        "name": "Eliminated",
+        "precision": 0,
+        "type": "bool"
+      }
+    ],
+    "level": "finals",
+    "level_name": "Finals",
+    "rankings": [
+      {
+        "alliance_name": "Consumers",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 2,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc51",
+          "frc818",
+          "frc226"
+        ]
+      },
+      {
+        "alliance_name": "Ford",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 2,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc6090",
+          "frc1506",
+          "frc217"
+        ]
+      },
+      {
+        "alliance_name": "Consumers",
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 2,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc51",
+          "frc818",
+          "frc226"
+        ]
+      },
+      {
+        "alliance_name": "Ford",
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 2,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [],
+        "team_keys": [
+          "frc6090",
+          "frc1506",
+          "frc217"
+        ]
+      }
+    ],
+    "sort_order_info": [],
+    "type": "double_elim"
+  },
+  {
+    "extra_stats_info": [],
+    "level": "f1",
+    "level_name": "Finals",
+    "rankings": [
+      {
+        "alliance_color": "blue",
+        "alliance_name": "Ford",
+        "extra_stats": [],
+        "matches_played": 2,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [
+          2
+        ],
+        "team_keys": [
+          "frc6090",
+          "frc1506",
+          "frc217"
+        ]
+      },
+      {
+        "alliance_color": "red",
+        "alliance_name": "Consumers",
+        "extra_stats": [],
+        "matches_played": 2,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          0
+        ],
+        "team_keys": [
+          "frc51",
+          "frc818",
+          "frc226"
+        ]
+      }
+    ],
+    "sort_order_info": [
+      {
+        "name": "Wins",
+        "precision": 0,
+        "type": "int"
+      }
+    ],
+    "type": "best_of_3"
+  }
+]

@@ -4,26 +4,20 @@ on:
   push:
     branches:
       - py3
-      
-concurrency: deploy-${{ github.ref }}
 
 jobs:
   py3-type:
     name: "[py3] Type Check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -33,20 +27,16 @@ jobs:
         run: ./ops/typecheck_py3.sh
   py3-lint:
     name: "[py3] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -56,90 +46,196 @@ jobs:
         run: ./ops/lint_py3.sh
   py3-test:
     name: "[py3] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        group: [1, 2, 3]
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/test_py3.sh
+        run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
+      - name: Save coverage artifacts
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: coverage${{ matrix.group }}
+          path: .coverage
+          include-hidden-files: true
+  py3-coverage:
+    name: "[py3] Coverage"
+    runs-on: ubuntu-22.04
+    needs: [py3-test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      - name: Combine coverage
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: |
+          coverage combine coverage*/.coverage*
+          coverage xml
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v5.1.2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.xml
   node-lint:
     name: "[node] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: "14"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
       - name: Run Format & Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: "14"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v5.1.2
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
+  pwa-lint:
+    name: "[pwa] Format & Lint"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa ci
+      - name: Run Format
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run format
+      - name: Run Lint
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run lint
+  pwa-type:
+    name: "[pwa] Type Check"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa ci
+      - name: Run Type Check
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run typecheck
+  pwa-test:
+    name: "[pwa] Test"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa ci
+      - name: Create dotenv
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
+      - name: Run Test
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa test
+      - name: Upload coverage to Codecov
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        uses: codecov/codecov-action@v5.1.2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./pwa/coverage/
+  pwa-build:
+    name: "[pwa] Build"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm --prefix pwa ci
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+      - name: Run Build
+        run: npm --prefix pwa run build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: pwa-build
+          path: pwa/build
   bash-lint:
     name: "[bash] Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Shellcheck
         run: |
           python -m pip install --upgrade pip
@@ -155,23 +251,18 @@ jobs:
 
   build-web:
     name: Build Web
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.12"
       - name: Set up Node
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: "14"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Node Dependencies
         run: npm ci
       - name: Run Build
@@ -182,40 +273,37 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: web-build
           path: src/build
 
   ops-test:
     name: Ops Fullstack Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       registry:
         image: registry:2
         ports:
           - 5000:5000
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.12"
       - name: Install Python Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
           python -m pip install --upgrade pip
           pip install requests
       - name: Set up Node
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: "14"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Node Dependencies
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
       - name: Install Vagrant
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -228,12 +316,12 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       - name: Build Docker Image
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/build-push-action@v4.0.0
+        uses: docker/build-push-action@v6.14.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker
@@ -255,94 +343,393 @@ jobs:
 
   deploy-queues:
     name: Deploy Queues
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [py3-type, py3-lint, py3-test]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-queues-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.8'
+          filters: |
+            queue:
+              - 'src/queue.yaml'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.queue == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+        if: steps.changes.outputs.queue == 'true'
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        if: steps.changes.outputs.queue == 'true'
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.queue == 'true'
         run: gcloud app deploy src/queue.yaml
+  deploy-index:
+    name: Deploy Index
+    runs-on: ubuntu-22.04
+    needs: [py3-type, py3-lint, py3-test]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-index-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            index:
+              - 'src/index.yaml'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.index == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.index == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.index == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Deploy
+        if: steps.changes.outputs.index == 'true'
+        run: gcloud app deploy src/index.yaml
+  deploy-default:
+    name: Deploy Default Service
+    runs-on: ubuntu-22.04
+    needs: [py3-type, py3-lint, py3-test]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-default-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            default:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.default == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.default == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.default == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Deploy
+        if: steps.changes.outputs.default == 'true'
+        run: ./ops/deploy/deploy_module.sh src/default.yaml
   deploy-web:
     name: Deploy Web Service
-    runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, node-lint, node-test, build-web, ops-test, deploy-queues]
+    runs-on: ubuntu-22.04
+    needs:
+      [
+        py3-type,
+        py3-lint,
+        py3-test,
+        node-lint,
+        node-test,
+        build-web,
+        ops-test,
+        deploy-queues,
+        deploy-index,
+      ]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-web-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.8'
+          filters: |
+            web:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.web == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
       - name: Download production artifacts
-        uses: actions/download-artifact@v3
+        if: steps.changes.outputs.web == 'true'
+        uses: actions/download-artifact@v4
         with:
           name: web-build
           path: src/build
+      - name: Update env_variables.yaml
+        if: steps.changes.outputs.web == 'true'
+        run: ./ops/deploy/update_env_variables_yaml.sh
+        env:
+          FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+        if: steps.changes.outputs.web == 'true'
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        if: steps.changes.outputs.web == 'true'
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/deploy/deploy_module.sh src/web.yaml
   deploy-api:
     name: Deploy API Service
-    runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
+    runs-on: ubuntu-22.04
+    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-api-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.8'
+          filters: |
+            api:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.api == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Update env_variables.yaml
+        if: steps.changes.outputs.api == 'true'
+        run: ./ops/deploy/update_env_variables_yaml.sh
+        env:
+          FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+        if: steps.changes.outputs.api == 'true'
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        if: steps.changes.outputs.api == 'true'
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.api == 'true'
         run: ./ops/deploy/deploy_module.sh src/api.yaml
   deploy-tasks-io:
     name: Deploy Tasks IO Service
-    runs-on: ubuntu-latest
-    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues]
+    runs-on: ubuntu-22.04
+    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-tasks-io-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.8'
+          filters: |
+            tasks-io:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.tasks-io == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+        if: steps.changes.outputs.tasks-io == 'true'
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v1
+        if: steps.changes.outputs.tasks-io == 'true'
+        uses: google-github-actions/setup-gcloud@v2
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Deploy
+        if: steps.changes.outputs.tasks-io == 'true'
         run: ./ops/deploy/deploy_module.sh src/tasks_io.yaml
+  deploy-tasks-cpu:
+    name: Deploy Tasks CPU Service
+    runs-on: ubuntu-22.04
+    needs: [py3-type, py3-lint, py3-test, ops-test, deploy-queues, deploy-index]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-tasks-cpu-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            tasks-cpu:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.tasks-cpu == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.tasks-cpu == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.tasks-cpu == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Deploy
+        if: steps.changes.outputs.tasks-cpu == 'true'
+        run: ./ops/deploy/deploy_module.sh src/tasks_cpu.yaml
+  deploy-pwa:
+    name: Deploy PWA Service
+    runs-on: ubuntu-22.04
+    needs: [pwa-lint, pwa-type, pwa-test, pwa-build]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-pwa-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 10 # Needed for Sentry release
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            pwa:
+              - 'ops/**'
+              - 'pwa/**'
+      - name: Download production artifacts
+        if: steps.changes.outputs.pwa == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: pwa-build
+          path: pwa/build
+      - name: Set up Sentry Release
+        if: steps.changes.outputs.pwa == 'true'
+        run: ./ops/pwa/set_sentry_release.sh
+        env:
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.pwa == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.pwa == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Deploy
+        if: steps.changes.outputs.pwa == 'true'
+        run: ./ops/deploy/deploy_module.sh pwa/pwa.yaml
+  deploy-cron:
+    name: Deploy Cron Jobs
+    runs-on: ubuntu-22.04
+    needs: [deploy-tasks-io, deploy-tasks-cpu]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-cron-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            cron:
+              - 'src/cron.yaml'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.cron == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.cron == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.cron == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Deploy
+        if: steps.changes.outputs.cron == 'true'
+        run: gcloud app deploy src/cron.yaml
+  deploy-dispatch:
+    name: Deploy Dispatch
+    runs-on: ubuntu-22.04
+    needs:
+      [
+        deploy-queues,
+        deploy-index,
+        deploy-web,
+        deploy-api,
+        deploy-tasks-io,
+        deploy-tasks-cpu,
+        deploy-pwa,
+      ]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-dispatch-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            dispatch:
+              - 'src/dispatch.yaml'
+      - name: Set up Python 3.8
+        if: steps.changes.outputs.dispatch == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.dispatch == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Setup Google Cloud Platform
+        if: steps.changes.outputs.dispatch == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Deploy
+        if: steps.changes.outputs.dispatch == 'true'
+        run: ./ops/deploy/deploy_dispatch.sh

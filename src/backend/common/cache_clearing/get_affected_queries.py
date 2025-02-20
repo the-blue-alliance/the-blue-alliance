@@ -11,6 +11,7 @@ from backend.common.queries import (
     district_query,
     event_details_query,
     event_query,
+    insight_query,
     match_query,
     media_query,
     robot_query,
@@ -267,6 +268,28 @@ def districtteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAn
     return _queries_to_cache_keys_and_queries(queries)
 
 
+def regionalpoolteam_updated(
+    affected_refs: TAffectedReferences,
+) -> List[TCacheKeyAndQuery]:
+    years = _filter(affected_refs["year"])
+
+    queries: List[CachedDatabaseQuery] = []
+    for year in years:
+        queries.append(team_query.RegionalTeamsQuery(year))
+    return _queries_to_cache_keys_and_queries(queries)
+
+
+def regional_champs_pool_updated(
+    affected_refs: TAffectedReferences,
+) -> List[TCacheKeyAndQuery]:
+    years = _filter(affected_refs["year"])
+
+    queries: List[CachedDatabaseQuery] = []
+    for year in years:
+        queries.append(team_query.RegionalTeamsQuery(year))
+    return _queries_to_cache_keys_and_queries(queries)
+
+
 def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
     district_abbrevs = _filter(affected_refs["abbreviation"])
@@ -306,3 +329,14 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
     return _queries_to_cache_keys_and_queries(queries) + event_updated(
         affected_event_refs
     )
+
+
+def insight_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+    years = _filter(affected_refs["year"])
+
+    queries: List[CachedDatabaseQuery] = []
+    for year in years:
+        queries.append(insight_query.InsightsLeaderboardsYearQuery(year))
+        queries.append(insight_query.InsightsNotablesYearQuery(year))
+
+    return _queries_to_cache_keys_and_queries(queries)

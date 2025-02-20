@@ -34,12 +34,15 @@ def test_blueprint() -> None:
     assert rules_map == {
         "/account/api/read_key_add": "account.read_key_add",
         "/account/api/read_key_delete": "account.read_key_delete",
+        "/account/delete": "account.delete",
         "/account/register": "account.register",
         "/account/logout": "account.logout",
         "/account/login": "account.login",
         "/account/edit": "account.edit",
         "/account/mytba": "account.mytba",
-        "/account/mytba/team/<int:team_number>": "account.mytba_team",
+        "/account/mytba/team/<int:team_number>": "account.mytba_team_post",
+        "/account/mytba/event/<string:event_key>": "account.mytba_event_post",
+        "/account/mytba/eventteam/<int:team_number>": "account.mytba_eventteam_post",
         "/account": "account.overview",
         "/account/ping": "account.ping",
     }

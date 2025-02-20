@@ -1,11 +1,11 @@
 from typing import Dict, List, Set
 
 from firebase_admin import db as firebase_db
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
 from backend.common.environment import Environment
 from backend.common.firebase import app as get_firebase_app
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
 from backend.common.models.event import Event
@@ -22,7 +22,6 @@ from backend.common.sitevars.gameday_special_webcasts import GamedaySpecialWebca
 
 
 class FirebasePusher:
-
     DB_URL = "https://{project}.firebaseio.com/"
 
     @classmethod
@@ -70,7 +69,7 @@ class FirebasePusher:
         """
         Deletes a match from an event and event_team
         """
-        deferred.defer(
+        defer_safe(
             cls._delete_data,
             f"e/{match.event_key_name}/m/{match.short_key}",
             _target="py3-tasks-io",
@@ -79,7 +78,7 @@ class FirebasePusher:
         )
 
         # for team_key_name in match.team_key_names:
-        #     deferred.defer(
+        #     defer_safe(
         #     cls._delete_data,
         #     'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
         #     _queue="firebase")
@@ -115,7 +114,7 @@ class FirebasePusher:
             match_data[match.short_key] = cls._construct_match_dict(
                 MatchConverter.matchConverter_v3(match)
             )
-        deferred.defer(
+        defer_safe(
             cls._put_data,
             f"e/{event_key}/m",
             json.dumps(match_data),
@@ -143,7 +142,7 @@ class FirebasePusher:
                 MatchConverter.matchConverter_v3(match)
             )
 
-        deferred.defer(
+        defer_safe(
             cls._patch_data,
             "e/{}/m/{}".format(match.event.id(), match.short_key),
             match_dict,
@@ -153,7 +152,7 @@ class FirebasePusher:
         )
 
         # for team_key_name in match.team_key_names:
-        #     deferred.defer(
+        #     defer_safe(
         #         cls._put_data,
         #         'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
         #         match_data_json,
@@ -171,7 +170,7 @@ class FirebasePusher:
 
         # event_details_json = json.dumps(EventDetailsConverter.convert(event_details, 3))
 
-        # deferred.defer(
+        # defer_safe(
         #     cls._patch_data,
         #     'events/{}/details'.format(event_details.key.id()),
         #     event_details_json,
@@ -199,7 +198,7 @@ class FirebasePusher:
 
         # status_json = json.dumps(status)
 
-        # deferred.defer(
+        # defer_safe(
         #     cls._put_data,
         #     'event_teams/{}/{}/status'.format(event_key, team_key),
         #     status_json,
@@ -227,7 +226,7 @@ class FirebasePusher:
 
             events_by_key[event_key] = partial_event
 
-        deferred.defer(
+        defer_safe(
             cls._put_data,
             "live_events",
             events_by_key,
@@ -236,7 +235,7 @@ class FirebasePusher:
             _url="/_ah/queue/deferred_firebase_update_live_events",
         )
 
-        deferred.defer(
+        defer_safe(
             cls._put_data,
             "special_webcasts",
             cls.get_special_webcasts(),
@@ -298,7 +297,7 @@ class FirebasePusher:
         WebcastOnlineHelper.add_online_status(event.webcast)
 
         converted_event = EventConverter.eventConverter_v3(event)
-        deferred.defer(
+        defer_safe(
             cls._patch_data,
             "live_events/{}".format(event.key_name),
             json.dumps(

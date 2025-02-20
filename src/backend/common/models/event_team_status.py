@@ -1,29 +1,17 @@
 import enum
 from typing import List, Optional, TypedDict
 
-from backend.common.consts.comp_level import CompLevel
-from backend.common.models.alliance import EventAllianceBackup
+from backend.common.consts.string_enum import StrEnum
+from backend.common.models.alliance import EventAllianceBackup, PlayoffAllianceStatus
 from backend.common.models.keys import TeamKey
+from backend.common.models.wlt import WLTRecord
 
 
 @enum.unique
-class EventTeamLevelStatus(str, enum.Enum):
+class EventTeamLevelStatus(StrEnum):
     NOT_STARTED = "not_started"
     PLAYING = "playing"
     COMPLETED = "completed"
-
-
-@enum.unique
-class EventTeamPlayoffStatus(str, enum.Enum):
-    WON = "won"
-    ELIMINATED = "eliminated"
-    PLAYING = "playing"
-
-
-class WLTRecord(TypedDict):
-    wins: int
-    losses: int
-    ties: int
 
 
 class RankingSortOrderInfo(TypedDict):
@@ -48,14 +36,6 @@ class EventTeamStatusQual(TypedDict):
     sort_order_info: Optional[List[RankingSortOrderInfo]]
 
 
-class EventTeamStatusPlayoff(TypedDict):
-    level: CompLevel
-    current_level_record: Optional[WLTRecord]
-    record: Optional[WLTRecord]
-    status: EventTeamPlayoffStatus
-    playoff_average: Optional[float]
-
-
 class EventTeamStatusAlliance(TypedDict):
     name: Optional[str]
     number: int
@@ -65,7 +45,7 @@ class EventTeamStatusAlliance(TypedDict):
 
 class EventTeamStatus(TypedDict):
     qual: Optional[EventTeamStatusQual]
-    playoff: Optional[EventTeamStatusPlayoff]
+    playoff: Optional[PlayoffAllianceStatus]
     alliance: Optional[EventTeamStatusAlliance]
     last_match_key: Optional[str]
     next_match_key: Optional[str]

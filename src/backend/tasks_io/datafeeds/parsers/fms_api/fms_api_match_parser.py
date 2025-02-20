@@ -9,6 +9,7 @@ from pyre_extensions import none_throws
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.media_type import MediaType
+from backend.common.consts.playoff_type import DOUBLE_ELIM_TYPES
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
@@ -98,9 +99,9 @@ class FMSAPIHybridScheduleParser(
         )
 
         parsed_matches: List[Match] = []
-        remapped_matches: Dict[
-            MatchKey, MatchKey
-        ] = {}  # If a key changes due to a tiebreaker
+        remapped_matches: Dict[MatchKey, MatchKey] = (
+            {}
+        )  # If a key changes due to a tiebreaker
         for match, (key_name, comp_level, set_number, match_number) in zip(
             matches, match_identifiers
         ):
@@ -111,7 +112,6 @@ class FMSAPIHybridScheduleParser(
             red_dqs: List[TeamKey] = []
             blue_dqs: List[TeamKey] = []
             team_key_names: List[TeamKey] = []
-            null_team = False
 
             # Sort by station to ensure correct ordering. Kind of hacky.
             sorted_teams = list(
@@ -120,30 +120,33 @@ class FMSAPIHybridScheduleParser(
                     key=lambda team: team["station"],
                 )
             )
-            for team in sorted_teams:
-                if team["teamNumber"] is None:
-                    null_team = True
-                team_key = "frc{}".format(team["teamNumber"])
-                team_key_names.append(team_key)
-                if "Red" in team["station"]:
-                    red_teams.append(team_key)
-                    if team["surrogate"]:
-                        red_surrogates.append(team_key)
-                    if team["dq"]:
-                        red_dqs.append(team_key)
-                elif "Blue" in team["station"]:
-                    blue_teams.append(team_key)
-                    if team["surrogate"]:
-                        blue_surrogates.append(team_key)
-                    if team["dq"]:
-                        blue_dqs.append(team_key)
 
+            null_team = any(t["teamNumber"] is None for t in sorted_teams)
             if (
                 null_team
                 and match["scoreRedFinal"] is None
                 and match["scoreBlueFinal"] is None
             ):
                 continue
+
+            for team in sorted_teams:
+                if team["teamNumber"] is None:
+                    continue
+
+                team_key = "frc{}".format(team["teamNumber"])
+                team_key_names.append(team_key)
+                if "Red" in team["station"]:
+                    red_teams.append(team_key)
+                    if team.get("surrogate", None):
+                        red_surrogates.append(team_key)
+                    if team.get("dq", None):
+                        red_dqs.append(team_key)
+                elif "Blue" in team["station"]:
+                    blue_teams.append(team_key)
+                    if team.get("surrogate", None):
+                        blue_surrogates.append(team_key)
+                    if team.get("dq", None):
+                        blue_dqs.append(team_key)
 
             alliances = {
                 "red": {
@@ -227,7 +230,7 @@ class FMSAPIHybridScheduleParser(
                 and existing_match.actual_time != actual_time
                 and not self.is_blank_match(existing_match)
             ):
-                logging.warning("Match {} is tied!".format(existing_match.key.id()))
+                logging.info("Match {} is tied!".format(existing_match.key.id()))
 
                 # TODO: Only query within set if set_number ever gets indexed
                 match_count = 0
@@ -238,8 +241,15 @@ class FMSAPIHybridScheduleParser(
                     if match_key.startswith("{}{}".format(comp_level, set_number)):
                         match_count += 1
 
-                # Sanity check: Tiebreakers must be played after at least 3 matches if not finals
-                if match_count < 3 and comp_level != "f":
+                # Sanity check:
+                # In a classic bracket, tiebreakers must be played after at least 3 matches
+                # if not finals
+                # But in a double elim bracket, we can play them immediately
+                if (
+                    event.playoff_type not in DOUBLE_ELIM_TYPES
+                    and match_count < 3
+                    and comp_level != CompLevel.F
+                ):
                     logging.warning(
                         "Match supposedly tied, but existing count is {}! Skipping match.".format(
                             match_count
@@ -258,7 +268,7 @@ class FMSAPIHybridScheduleParser(
                 existing_match.tiebreak_match_key = ndb.Key(Match, key_name)
                 parsed_matches.append(existing_match)
 
-                logging.warning("Creating new match: {}".format(key_name))
+                logging.info("Creating new match: {}".format(key_name))
             elif existing_match:
                 remapped_matches[key_name] = existing_match.key.id()
                 key_name = existing_match.key.id()
@@ -372,6 +382,20 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
                     "L" if scale_red else "R",
                     "L" if left_switch_red else "R",
                 )
+
+            elif self.year == 2024:
+                # Bonus thresholds and coop status are in the top level Match object,
+                # duplicate them into each alliance breakdown
+                for key in [
+                    "coopertitionBonusAchieved",
+                    "melodyBonusThresholdCoop",
+                    "melodyBonusThresholdNonCoop",
+                    "melodyBonusThreshold",
+                    "ensembleBonusStagePointsThreshold",
+                    "ensembleBonusOnStageRobotsThreshold",
+                ]:
+                    for color in ALLIANCE_COLORS:
+                        breakdown[color][key] = match[key]
 
             for alliance in match.get("alliances", match.get("Alliances", [])):
                 color = alliance["alliance"].lower()

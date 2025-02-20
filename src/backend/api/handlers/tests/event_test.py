@@ -497,6 +497,9 @@ def test_event_playoff_advancement(
         __file__, "data/2019nyny_alliances.json", "2019nyny"
     )
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
+    test_data_importer.import_event_playoff_advancement(
+        __file__, "data/2019nyny_advancement.json", "2019nyny"
+    )
 
     # Nominal response
     resp = api_client.get(

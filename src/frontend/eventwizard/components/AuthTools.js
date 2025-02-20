@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Dialog from "react-bootstrap-dialog";
 
 class AuthTools extends Component {
   constructor(props) {
@@ -11,12 +10,12 @@ class AuthTools extends Component {
 
   storeAuth() {
     if (!this.props.selectedEvent) {
-      this.dialog.showAlert("You must enter an event key");
+      alert("You must enter an event key");
       return;
     }
 
     if (!this.props.authId || !this.props.authSecret) {
-      this.dialog.showAlert("You must enter you auth ID and secret");
+      alert("You must enter you auth ID and secret");
       return;
     }
 
@@ -28,24 +27,24 @@ class AuthTools extends Component {
       `${this.props.selectedEvent}_auth`,
       JSON.stringify(auth)
     );
-    this.dialog.showAlert("Auth Stored");
+    alert("Auth Stored");
   }
 
   loadAuth() {
     if (!this.props.selectedEvent) {
-      this.dialog.showAlert("You must select an event");
+      alert("You must select an event");
       return;
     }
 
     const auth = localStorage.getItem(`${this.props.selectedEvent}_auth`);
     if (!auth) {
-      this.dialog.showAlert(`No auth found for ${this.props.selectedEvent}`);
+      alert(`No auth found for ${this.props.selectedEvent}`);
       return;
     }
 
     const authData = JSON.parse(auth);
     this.props.setAuth(authData.id, authData.secret);
-    this.dialog.showAlert("Auth Loaded");
+    alert("Auth Loaded");
   }
 
   render() {
@@ -55,11 +54,6 @@ class AuthTools extends Component {
 
     return (
       <div className="form-group" id="auth-tools">
-        <Dialog
-          ref={(dialog) => {
-            this.dialog = dialog;
-          }}
-        />
         <label className="col-sm-2 control-label" htmlFor="load_auth">
           Auth Tools
         </label>

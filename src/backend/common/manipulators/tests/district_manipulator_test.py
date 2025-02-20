@@ -2,17 +2,16 @@ import unittest
 from typing import Optional
 
 import pytest
-from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
+from backend.common.helpers.deferred import run_from_task
 from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.models.district import District
 
 
 @pytest.mark.usefixtures("ndb_context")
 class TestDistrictManipulator(unittest.TestCase):
-
     taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
 
     @pytest.fixture(autouse=True)
@@ -73,7 +72,7 @@ class TestDistrictManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         district = District.get_by_id("2016ne")
         assert district is not None
@@ -101,7 +100,7 @@ class TestDistrictManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         district = District.get_by_id("2016ne")
         assert district is not None
@@ -134,7 +133,7 @@ class TestDistrictManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         district = District.get_by_id("2015ne")
         assert district is not None

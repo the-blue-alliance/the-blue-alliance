@@ -27,7 +27,8 @@
     "official": true,
     "venue": "San Jose State University - The Event Center",
     "webcast_json": "[{\"type\": \"youtube\", \"channel\": \"hBEgC-lZ36Q\"}, {\"type\": \"youtube\", \"channel\": \"QDtyONxuFZY\"}, {\"type\": \"youtube\", \"channel\": \"nMbcgqc7QnY\"}, {\"type\": \"youtube\", \"channel\": \"nnBQ3E167ig\"}, {\"type\": \"youtube\", \"channel\": \"xCdWi6Uhomo\"}, {\"type\": \"youtube\", \"channel\": \"cGe8wdbfl_E\"}]",
-    "district_key": null
+    "district_key": null,
+    "playoff_type": 0
   },
   {
     "comp_level": "f",

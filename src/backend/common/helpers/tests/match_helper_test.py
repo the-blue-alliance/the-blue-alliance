@@ -1,3 +1,5 @@
+import csv
+import datetime
 import json
 import random
 
@@ -174,6 +176,26 @@ def test_organized_double_elim_matches_pre_2023(test_data_importer) -> None:
     assert round_to_match_keys[DoubleElimRound.FINALS] == ["f2m1", "f2m2", "f2m3"]
 
 
+def test_organized_double_elim_4_matches(test_data_importer) -> None:
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2023micmp_matches.json"
+    )
+
+    _, organized_matches = MatchHelper.organized_matches(matches)
+    double_elim_matches = MatchHelper.organized_double_elim_4_matches(organized_matches)
+
+    assert len(double_elim_matches) == 4
+
+    round_to_match_keys = {
+        round: [m.short_key for m in matches]
+        for round, matches in double_elim_matches.items()
+    }
+    assert round_to_match_keys[DoubleElimRound.ROUND1] == ["sf1m1", "sf2m1"]
+    assert round_to_match_keys[DoubleElimRound.ROUND2] == ["sf3m1", "sf4m1"]
+    assert round_to_match_keys[DoubleElimRound.ROUND3] == ["sf5m1"]
+    assert round_to_match_keys[DoubleElimRound.FINALS] == ["f1m1", "f1m2"]
+
+
 def test_play_order_sort(test_data_importer) -> None:
     matches = test_data_importer.parse_match_list(
         __file__, "data/2019nyny_matches.json"
@@ -249,6 +271,145 @@ def test_upcoming_matches_all_played(test_data_importer) -> None:
 
     upcoming_matches = MatchHelper.upcoming_matches(quals, num=3)
     assert upcoming_matches == []
+
+
+def _parse_match_schedule_csv(event, filename):
+    matches = []
+    with open(filename) as f:
+        reader = csv.DictReader((line.lower() for line in f), skipinitialspace=True)
+        for row in reader:
+            alliances = {}
+            for alliance_color in ("red", "blue"):
+                alliances[alliance_color] = {
+                    "teams": [
+                        "frc" + row[f"{alliance_color} {i + 1}"] for i in range(3)
+                    ],
+                    "score": row.get(f"{alliance_color} score", -1),
+                }
+
+            match = Match(
+                event=event.key,
+                id=Match.render_key_name(
+                    event.key_name,
+                    row["comp_level"],
+                    row["set_number"],
+                    row["match_number"],
+                ),
+                comp_level=row["comp_level"],
+                set_number=int(row["set_number"]),
+                match_number=int(row["match_number"]),
+                alliances_json=json.dumps(alliances),
+                time_string=row["time"],
+            )
+
+            matches.append(match)
+
+    return matches
+
+
+def test_add_match_times(test_data_importer):
+    event = Event(
+        id="2014casj",
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+        name="Silicon Valley Regional",
+        start_date=datetime.datetime(2014, 2, 27, 0, 0),
+        end_date=datetime.datetime(2014, 3, 1, 0, 0),
+        year=2014,
+        timezone_id="America/New_York",
+    )
+
+    matches = _parse_match_schedule_csv(
+        event,
+        test_data_importer._get_path(
+            __file__, "data/usfirst_event_matches_2013cama.csv"
+        ),
+    )
+    assert len(matches) == 92
+
+    MatchHelper.add_match_times(event, matches)
+
+    PST_DELTA = datetime.timedelta(hours=-5)
+    assert matches[0].time == datetime.datetime(2014, 2, 28, 9, 0) - PST_DELTA
+    assert matches[75].time == datetime.datetime(2014, 3, 1, 11, 50) - PST_DELTA
+
+
+def test_add_match_times_dst(test_data_importer):
+    event = Event(
+        id="2014casj",
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+        name="Silicon Valley Regional",
+        start_date=datetime.datetime(2014, 3, 8, 0, 0),
+        end_date=datetime.datetime(2014, 3, 9, 0, 0),  # chosen to span DST change
+        year=2014,
+        timezone_id="America/Los_Angeles",
+    )
+
+    matches = _parse_match_schedule_csv(
+        event,
+        test_data_importer._get_path(__file__, "data/usfirst_event_matches_2012ct.csv"),
+    )
+    assert len(matches) == 125
+
+    MatchHelper.add_match_times(event, matches)
+
+    PST_DELTA = datetime.timedelta(hours=-8)
+    PDT_DELTA = datetime.timedelta(hours=-7)
+    assert matches[0].time == datetime.datetime(2014, 3, 8, 9, 0) - PST_DELTA
+    assert matches[-1].time == datetime.datetime(2014, 3, 9, 16, 5) - PDT_DELTA
+
+
+def test_add_match_times_with_weekdays(test_data_importer):
+    event = Event(
+        id="2023mibb",
+        event_short="mibb",
+        event_type_enum=EventType.OFFSEASON,
+        name="Big Bang!",
+        start_date=datetime.datetime(2023, 6, 29, 0, 0),
+        end_date=datetime.datetime(2023, 7, 1, 0, 0),
+        year=2023,
+        timezone_id="America/Detroit",
+    )
+
+    matches = _parse_match_schedule_csv(
+        event,
+        test_data_importer._get_path(__file__, "data/2023mibb_matches_quals.csv"),
+    )
+    assert len(matches) == 60
+
+    MatchHelper.add_match_times(event, matches)
+
+    EDT_DELTA = datetime.timedelta(hours=-4)
+    assert matches[0].time == datetime.datetime(2023, 6, 30, 9, 30) - EDT_DELTA
+    assert matches[49].time == datetime.datetime(2023, 6, 30, 17, 51) - EDT_DELTA
+    assert matches[50].time == datetime.datetime(2023, 7, 1, 9, 30) - EDT_DELTA
+    assert matches[59].time == datetime.datetime(2023, 7, 1, 10, 51) - EDT_DELTA
+
+
+def test_add_match_times_with_weekdays_early_end(test_data_importer):
+    event = Event(
+        id="2023mirr",
+        event_short="mirr",
+        event_type_enum=EventType.OFFSEASON,
+        name="Rainbow Rumble",
+        start_date=datetime.datetime(2023, 7, 21, 0, 0),
+        end_date=datetime.datetime(2023, 7, 23, 0, 0),
+        year=2023,
+        timezone_id="America/Detroit",
+    )
+
+    matches = _parse_match_schedule_csv(
+        event,
+        test_data_importer._get_path(__file__, "data/2023mirr_matches_quals.csv"),
+    )
+    assert len(matches) == 48
+
+    MatchHelper.add_match_times(event, matches)
+
+    EDT_DELTA = datetime.timedelta(hours=-4)
+    assert matches[0].time == datetime.datetime(2023, 7, 22, 10, 30) - EDT_DELTA
+    assert matches[47].time == datetime.datetime(2023, 7, 22, 18, 0) - EDT_DELTA
 
 
 def test_cleanup_matches(ndb_stub, test_data_importer):

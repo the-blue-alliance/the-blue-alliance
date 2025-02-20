@@ -1,5 +1,8 @@
 import abc
+import itertools
 import json
+import logging
+import pickle
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import (
@@ -16,10 +19,10 @@ from typing import (
     TypeVar,
 )
 
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.listify import delistify, listify
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.queries.database_query import CachedDatabaseQuery
@@ -36,7 +39,6 @@ class TUpdatedModel(Generic[TModel]):
 
 
 class ManipulatorBase(abc.ABC, Generic[TModel]):
-
     _post_delete_hooks: List[Callable[[List[TModel]], None]] = None  # pyre-ignore[8]
     _post_update_hooks: List[  # pyre-ignore[8]
         Callable[[List[TUpdatedModel[TModel]]], None]
@@ -92,8 +94,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         new_models: TModel,
         auto_union: bool = True,
         run_post_update_hook: bool = True,
-    ) -> TModel:
-        ...
+    ) -> TModel: ...
 
     @overload
     @classmethod
@@ -102,8 +103,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         new_models: List[TModel],
         auto_union: bool = True,
         run_post_update_hook: bool = True,
-    ) -> List[TModel]:
-        ...
+    ) -> List[TModel]: ...
 
     @classmethod
     def createOrUpdate(
@@ -134,13 +134,11 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @overload
     @classmethod
-    def delete(self, models: TModel, run_post_delete_hook=True) -> None:
-        ...
+    def delete(self, models: TModel, run_post_delete_hook=True) -> None: ...
 
     @overload
     @classmethod
-    def delete(self, models: List[TModel], run_post_delete_hook=True) -> None:
-        ...
+    def delete(self, models: List[TModel], run_post_delete_hook=True) -> None: ...
 
     @classmethod
     def delete(self, models, run_post_delete_hook=True) -> None:
@@ -161,15 +159,13 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @overload
     @classmethod
-    def findOrSpawn(cls, new_models: TModel, auto_union: bool = True) -> TModel:
-        ...
+    def findOrSpawn(cls, new_models: TModel, auto_union: bool = True) -> TModel: ...
 
     @overload
     @classmethod
     def findOrSpawn(
         cls, new_models: List[TModel], auto_union: bool = True
-    ) -> List[TModel]:
-        ...
+    ) -> List[TModel]: ...
 
     @classmethod
     def findOrSpawn(cls, new_models, auto_union=True) -> Any:
@@ -262,7 +258,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             return
 
         for hook in cls._post_delete_hooks:
-            deferred.defer(
+            defer_safe(
                 hook,
                 models,
                 _queue="post-update-hooks",
@@ -286,14 +282,24 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             )
             for model in models
         ]
-        for hook in cls._post_update_hooks:
-            deferred.defer(
-                hook,
-                updated_models,
-                _queue="post-update-hooks",
-                _target="py3-tasks-io",
-                _url=f"/_ah/queue/deferred_{cls.__name__}_runPostUpdateHook",
-            )
+
+        # Split the models into batches to avoid exceeding the task payload limit.
+        BATCH_BYTES_LIMIT = 600000  # Less than 1048487 bytes
+        size_bytes = len(pickle.dumps(updated_models))
+        bytes_per_model = size_bytes / len(updated_models)
+        batch_size = int(BATCH_BYTES_LIMIT / bytes_per_model)
+        logging.info(
+            f"{cls.__name__}._run_post_update_hook() size of {len(updated_models)} updated models: {size_bytes}. Using batch size: {batch_size}"
+        )
+        for batch_models in itertools.batched(updated_models, batch_size):
+            for hook in cls._post_update_hooks:
+                defer_safe(
+                    hook,
+                    list(batch_models),
+                    _queue="post-update-hooks",
+                    _target="py3-tasks-io",
+                    _url=f"/_ah/queue/deferred_{cls.__name__}_runPostUpdateHook",
+                )
 
     """
     Helpers for subclasses
@@ -372,7 +378,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 all_affected_references.append(model._affected_references)
 
         if all_affected_references:
-            deferred.defer(
+            defer_safe(
                 cls._clearCacheDeferred,
                 all_affected_references,
                 _queue="cache-clearing",

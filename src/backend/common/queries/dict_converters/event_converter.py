@@ -48,20 +48,24 @@ class EventConverter(ConverterBase):
             "event_code": event.event_short,
             "event_type": event.event_type_enum,
             "event_type_string": event.event_type_str,
-            "parent_event_key": none_throws(event.parent_event).id()
-            if event.parent_event
-            else None,
+            "parent_event_key": (
+                none_throws(event.parent_event).id() if event.parent_event else None
+            ),
             "playoff_type": event.playoff_type,
-            "playoff_type_string": playoff_type.TYPE_NAMES.get(
-                playoff_type.PlayoffType(event.playoff_type)
-            )
-            if event.playoff_type
-            else None,
-            "district": DistrictConverter(district_future.get_result()).convert(
-                ApiMajorVersion.API_V3
-            )
-            if district_future
-            else None,
+            "playoff_type_string": (
+                playoff_type.TYPE_NAMES.get(
+                    playoff_type.PlayoffType(event.playoff_type)
+                )
+                if event.playoff_type
+                else None
+            ),
+            "district": (
+                DistrictConverter(district_future.get_result()).convert(
+                    ApiMajorVersion.API_V3
+                )
+                if district_future
+                else None
+            ),
             "division_keys": [
                 key.id() for key in event.divisions
             ],  # Datastore stub needs to support repeated properties 2020-06-16 @fangeugene

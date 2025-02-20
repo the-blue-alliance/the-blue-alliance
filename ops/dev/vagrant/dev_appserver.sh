@@ -87,9 +87,9 @@ else
     assert_google_application_credentials
 fi
 
-# The CLI doesn't recognize python310 as a valid runtime yet
-# but it'll still happy run things using the underlying 3.10 binary
-runtime_version="python39"
+# dev_appserver doesn't support the python311 runtime yet
+# but will still point at the local system python3 binary
+runtime_version="python312"
 
 set -x
 dev_appserver.py \
@@ -108,4 +108,4 @@ dev_appserver.py \
     --env_var SAVE_FRC_API_RESPONSE="$save_frc_api_response" \
     --dev_appserver_log_level="$log_level" \
     --enable_task_running yes \
-    src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/dispatch.yaml
+    src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/tasks_cpu.yaml src/dispatch.yaml

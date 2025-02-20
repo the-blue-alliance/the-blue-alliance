@@ -4,7 +4,6 @@ from typing import List, Optional, Set
 
 from flask import make_response, request, Response
 from google.appengine.ext import ndb
-from google.appengine.ext.deferred import defer
 from pyre_extensions import none_throws, safe_json
 
 from backend.api.api_trusted_parsers.json_alliance_selections_parser import (
@@ -27,6 +26,7 @@ from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.media_type import MediaType
 from backend.common.futures import TypedFuture
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.match_helper import MatchHelper
@@ -134,7 +134,7 @@ def update_event_info(event_key: EventKey) -> Response:
 
     if "remap_teams" in parsed_info:
         event.remap_teams = parsed_info["remap_teams"]
-        defer(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
+        defer_safe(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
 
     if "first_event_code" in parsed_info:
         event.official = parsed_info["first_event_code"] is not None
@@ -143,7 +143,7 @@ def update_event_info(event_key: EventKey) -> Response:
     if "playoff_type" in parsed_info:
         event.playoff_type = parsed_info["playoff_type"]
 
-    EventManipulator.createOrUpdate(event)
+    EventManipulator.createOrUpdate(event, auto_union=False)
     return profiled_jsonify({"Success": f"Event {event_key} updated"})
 
 

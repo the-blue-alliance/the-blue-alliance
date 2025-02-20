@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  tba:
+    # image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+    build:
+      context: ./
+      dockerfile: ./ops/dev/docker/Dockerfile
+    volumes:
+      - ./:/tba:delegated
+    tty: true
+    stdin_open: true
+    ports:
+      # Firebase
+      - "4000:4000"
+      - "4400:4400"
+      - "4500:4500"
+      - "9005:9005"
+      - "9000:9000"
+      - "9099:9099"
+      # GAE
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "8084:8084"
+      - "8085:8085"
+      - "8086:8086"
+      - "8087:8087"
+      - "8088:8088"
+      - "8089:8089"
+      # GAE Admin
+      - "8000:8000"
+      # RQ Dashboard
+      - "9181:9181"
+    entrypoint: [ "sh", "/tba/ops/dev/docker/docker-entry.sh" ]
+    command: [ "/usr/sbin/sshd", "-D" ]
+    working_dir: /tba
+    hostname: tba
+    environment:
+      - PUPPETEER_SKIP_DOWNLOAD=true

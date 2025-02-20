@@ -196,9 +196,9 @@ def test_past_future_start_end_today(
         (2020, EventType.REGIONAL, False, 2, None, None),
         (2021, EventType.REGIONAL, True, 0, 0, "Participation"),
         (2021, EventType.DISTRICT, True, 0, 0, "Participation"),
-        (2021, EventType.REMOTE, True, 2, 2, "FIRST Innovation Challenge"),
-        (2021, EventType.REMOTE, True, 3, 3, "INFINITE RECHARGE At Home Challenge"),
-        (2021, EventType.REMOTE, True, 4, 4, "Game Design Challenge"),
+        (2021, EventType.REMOTE, True, 6, 6, "FIRST Innovation Challenge"),
+        (2021, EventType.REMOTE, True, 7, 7, "INFINITE RECHARGE At Home Challenge"),
+        (2021, EventType.REMOTE, True, 8, 8, "Game Design Challenge"),
         (2021, EventType.REMOTE, True, 5, 5, "Awards"),
     ],
 )
@@ -367,6 +367,24 @@ def test_details() -> None:
     assert event.details == d
 
 
+def test_first_api_code() -> None:
+    # Pre-2023 regular event
+    event = Event(id="2019ingre", year=2019, event_short="ingre")
+    assert event.first_api_code == "ingre"
+
+    # 2023 regular event
+    event = Event(id="2023ingre", year=2023, event_short="ingre")
+    assert event.first_api_code == "ingre"
+
+    # Pre-2023 championship div
+    event = Event(id="2022hop", year=2022, event_short="hop")
+    assert event.first_api_code == "hopper"
+
+    # 2023 championship div
+    event = Event(id="2023hop", year=2023, event_short="hop")
+    assert event.first_api_code == "hcmp"
+
+
 def test_get_alliances() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
     assert event.alliance_selections is None
@@ -383,6 +401,24 @@ def test_get_alliances() -> None:
     event._details = None
     assert event.alliance_selections == alliances
     assert event.alliance_teams == teams
+
+
+def test_get_alliances_with_backup() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.alliance_selections is None
+
+    teams = ["frc1", "frc2", "frc3"]
+    alliances = [
+        EventAlliance(picks=teams, backup={"in": "frc4", "out": "frc3"}),
+    ]
+    EventDetails(
+        id="2019ct",
+        alliance_selections=alliances,
+    ).put()
+
+    event._details = None
+    assert event.alliance_selections == alliances
+    assert event.alliance_teams == (teams + ["frc4"])
 
 
 def test_district_points() -> None:
@@ -474,3 +510,37 @@ def test_rankings() -> None:
 
     event._details = None
     assert event.rankings == rankings
+
+
+def test_venue_address():
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        venue="Bellarmine College Preparatory",
+        venue_address="Bellarmine College Preparatory\n960 W. Hedding St.\nSan Jose, CA, USA",
+        city="San Jose",
+        state_prov="CA",
+        country="USA",
+    )
+    assert event.venue_or_venue_from_address == "Bellarmine College Preparatory"
+    assert (
+        event.venue_address_safe
+        == "Bellarmine College Preparatory\n960 W. Hedding St.\nSan Jose, CA, USA"
+    )
+
+    event = Event(
+        id="2024cabe",
+        year=2024,
+        event_short="cabe",
+        venue="Berkeley High School",
+        venue_address="1980 Allston Way",
+        city="Berkeley",
+        state_prov="CA",
+        country="USA",
+    )
+    assert event.venue_or_venue_from_address == "Berkeley High School"
+    assert (
+        event.venue_address_safe
+        == "Berkeley High School\n1980 Allston Way\nBerkeley, CA, USA"
+    )

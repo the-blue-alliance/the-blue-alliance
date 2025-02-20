@@ -4,6 +4,7 @@ import abc
 import logging
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
+from google.appengine.api.datastore_errors import BadRequestError
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -23,8 +24,7 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
         self._query_args = kwargs
 
     @abc.abstractmethod
-    def _query_async(self) -> TypedFuture[QueryReturn]:
-        ...
+    def _query_async(self) -> TypedFuture[QueryReturn]: ...
 
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
@@ -124,14 +124,21 @@ class CachedDatabaseQuery(
             result = yield self._query_async(*args, **kwargs)
             return result
 
-        cache_key = self.cache_key
-        cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
-        if cached_query_result is None:
-            query_result = yield self._query_async(*args, **kwargs)
-            if self.CACHE_WRITES_ENABLED:
-                yield CachedQueryResult(id=cache_key, result=query_result).put_async()
-            return query_result
-        return cached_query_result.result
+        with Span("{}._do_query".format(self.__class__.__name__)):
+            cache_key = self.cache_key
+            cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
+            if cached_query_result is None:
+                query_result = yield self._query_async(*args, **kwargs)
+                if self.CACHE_WRITES_ENABLED:
+                    try:
+                        yield CachedQueryResult(
+                            id=cache_key, result=query_result
+                        ).put_async()
+                    except BadRequestError as e:
+                        logging.warning("CachedQueryResult.put_async() failed!")
+                        logging.exception(e)
+                return query_result
+            return cached_query_result.result
 
     @ndb.tasklet
     def _do_dict_query(
@@ -141,19 +148,24 @@ class CachedDatabaseQuery(
             result = yield self._query_async(*args, **kwargs)
             return result
 
-        cache_key = self.dict_cache_key(_dict_version)
-        cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
-        if cached_query_result is None:
-            query_result = yield self._query_async(*args, **kwargs)
+        with Span("{}._do_dict_query".format(self.__class__.__name__)):
+            cache_key = self.dict_cache_key(_dict_version)
+            cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
+            if cached_query_result is None:
+                query_result = yield self._query_async(*args, **kwargs)
 
-            # See https://github.com/facebook/pyre-check/issues/267
-            converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
-                query_result
-            ).convert(_dict_version)
+                # See https://github.com/facebook/pyre-check/issues/267
+                converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
+                    query_result
+                ).convert(_dict_version)
 
-            if self.CACHE_WRITES_ENABLED:
-                yield CachedQueryResult(
-                    id=cache_key, result_dict=converted_result
-                ).put_async()
-            return converted_result
-        return cached_query_result.result_dict
+                if self.CACHE_WRITES_ENABLED:
+                    try:
+                        yield CachedQueryResult(
+                            id=cache_key, result_dict=converted_result
+                        ).put_async()
+                    except BadRequestError as e:
+                        logging.warning("CachedQueryResult.put_async() failed!")
+                        logging.exception(e)
+                return converted_result
+            return cached_query_result.result_dict

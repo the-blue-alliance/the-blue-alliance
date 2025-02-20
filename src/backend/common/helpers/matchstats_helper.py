@@ -56,8 +56,8 @@ MANUAL_COMPONENTS = {
     },
     2023: {
         "Total Game Piece Count": lambda match, color: (
-            match.score_breakdown[color].get("autoGamePieceCount", 0)
-            + match.score_breakdown[color].get("teleopGamePieceCount", 0)
+            match.score_breakdown[color].get("teleopGamePieceCount", 0)
+            + match.score_breakdown[color].get("extraGamePieceCount", 0)
         ),
         "Total Game Piece Points": lambda match, color: (
             match.score_breakdown[color].get("autoGamePiecePoints", 0)
@@ -76,9 +76,6 @@ MANUAL_COMPONENTS = {
         "Total Cones Scored": lambda match, color: (
             sum(
                 [
-                    match.score_breakdown[color]["autoCommunity"]["B"].count("Cone"),
-                    match.score_breakdown[color]["autoCommunity"]["M"].count("Cone"),
-                    match.score_breakdown[color]["autoCommunity"]["T"].count("Cone"),
                     match.score_breakdown[color]["teleopCommunity"]["B"].count("Cone"),
                     match.score_breakdown[color]["teleopCommunity"]["M"].count("Cone"),
                     match.score_breakdown[color]["teleopCommunity"]["T"].count("Cone"),
@@ -88,14 +85,107 @@ MANUAL_COMPONENTS = {
         "Total Cubes Scored": lambda match, color: (
             sum(
                 [
-                    match.score_breakdown[color]["autoCommunity"]["B"].count("Cube"),
-                    match.score_breakdown[color]["autoCommunity"]["M"].count("Cube"),
-                    match.score_breakdown[color]["autoCommunity"]["T"].count("Cube"),
                     match.score_breakdown[color]["teleopCommunity"]["B"].count("Cube"),
                     match.score_breakdown[color]["teleopCommunity"]["M"].count("Cube"),
                     match.score_breakdown[color]["teleopCommunity"]["T"].count("Cube"),
                 ]
             )
+        ),
+    },
+    2024: {
+        "Total Mic": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("micCenterStage", 0),
+                match.score_breakdown[color].get("micStageLeft", 0),
+                match.score_breakdown[color].get("micStageRight", 0),
+            ]
+        ),
+        "Total Trap": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("trapCenterStage", 0),
+                match.score_breakdown[color].get("trapStageLeft", 0),
+                match.score_breakdown[color].get("trapStageRight", 0),
+            ]
+        ),
+        "Total Teleop Game Pieces": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("teleopAmpNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
+            ]
+        ),
+        "Total Auto Game Pieces": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoAmpNoteCount", 0),
+                match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
+            ]
+        ),
+        "Total Overall Game Pieces": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoAmpNoteCount", 0),
+                match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopAmpNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
+                match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
+            ]
+        ),
+        "Amplification Rate": lambda match, color: match.score_breakdown[color].get(
+            "teleopSpeakerNoteAmplifiedCount", 0
+        )
+        / max(
+            1,
+            match.score_breakdown[color].get("teleopSpeakerNoteCount", 0)
+            + match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
+        ),
+    },
+    2025: {
+        "L1 Coral Count": lambda match, color: (
+            match.score_breakdown[color].get("autoReef", {}).get("trough", 0)
+            + match.score_breakdown[color].get("teleopReef", {}).get("trough", 0)
+        ),
+        "L2 Coral Count": lambda match, color: (
+            match.score_breakdown[color].get("autoReef", {}).get("tba_botRowCount", 0)
+            + match.score_breakdown[color]
+            .get("teleopReef", {})
+            .get("tba_botRowCount", 0)
+        ),
+        "L3 Coral Count": lambda match, color: (
+            match.score_breakdown[color].get("autoReef", {}).get("tba_midRowCount", 0)
+            + match.score_breakdown[color]
+            .get("teleopReef", {})
+            .get("tba_midRowCount", 0)
+        ),
+        "L4 Coral Count": lambda match, color: (
+            match.score_breakdown[color].get("autoReef", {}).get("tba_topRowCount", 0)
+            + match.score_breakdown[color]
+            .get("teleopReef", {})
+            .get("tba_topRowCount", 0)
+        ),
+        "Total Coral Count": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoCoralCount", 0),
+                match.score_breakdown[color].get("teleopCoralCount", 0),
+            ]
+        ),
+        "Total Coral Points": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoCoralPoints", 0),
+                match.score_breakdown[color].get("teleopCoralPoints", 0),
+            ]
+        ),
+        "Total Algae Count": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("wallAlgaeCount", 0),
+                match.score_breakdown[color].get("netAlgaeCount", 0),
+            ]
+        ),
+        "Total Game Piece Count": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoCoralCount", 0),
+                match.score_breakdown[color].get("teleopCoralCount", 0),
+                match.score_breakdown[color].get("wallAlgaeCount", 0),
+                match.score_breakdown[color].get("netAlgaeCount", 0),
+            ]
         ),
     },
 }

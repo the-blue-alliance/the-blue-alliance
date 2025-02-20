@@ -1,11 +1,15 @@
+from collections import defaultdict
+
 from flask import abort, redirect, request, url_for
 from werkzeug.wrappers import Response
 
+from backend.common.consts.media_type import SOCIAL_TYPES
 from backend.common.manipulators.robot_manipulator import RobotManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event_team import EventTeam
 from backend.common.models.media import Media
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamParticipationQuery
@@ -58,25 +62,33 @@ def team_detail(team_number: int) -> str:
     team_medias = Media.query(Media.references == team.key).fetch(500)
     robots = Robot.query(Robot.team == team.key).fetch()
     district_teams = DistrictTeam.query(DistrictTeam.team == team.key).fetch()
+    regional_pool_teams = RegionalPoolTeam.query(
+        RegionalPoolTeam.team == team.key
+    ).fetch()
     years_participated = sorted(TeamParticipationQuery(team.key_name).fetch())
 
-    team_medias_by_year = {}
+    team_medias_by_year = defaultdict(list)
+    team_social_media = list()
     for media in team_medias:
-        if not media.year:
-            continue
-        if media.year in team_medias_by_year:
-            team_medias_by_year[media.year].append(media)
+        if media.media_type_enum in SOCIAL_TYPES:
+            team_social_media.append(media)
         else:
-            team_medias_by_year[media.year] = [media]
-    media_years = sorted(team_medias_by_year.keys(), reverse=True)
+            team_medias_by_year[media.year].append(media)
+    media_years = sorted(
+        team_medias_by_year.keys(),
+        key=lambda m: 0 if media.year is None else media.year,
+        reverse=True,
+    )
 
     template_values = {
         "event_teams": event_teams,
         "team": team,
         "team_media_years": media_years,
         "team_medias_by_year": team_medias_by_year,
+        "team_social_media": team_social_media,
         "robots": robots,
         "district_teams": district_teams,
+        "regional_pool_teams": regional_pool_teams,
         "years_participated": years_participated,
     }
 

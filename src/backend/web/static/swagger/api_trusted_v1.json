@@ -20,7 +20,7 @@
           "Event Details"
         ],
         "summary": "Update top-level properties for the event",
-        "description": "An endpoint to overwrite certain event fields",
+        "description": "An endpoint to overwrite certain event fields. All fields are optional, set only the ones you wish to update",
         "operationId": "updateEventInfo",
         "parameters": [
           {
@@ -496,6 +496,11 @@
           "name_str"
         ],
         "properties": {
+          "type_enum": {
+            "type": "integer",
+            "description": "Type enum of the award. If null, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/award_type.py",
+            "example": "1"
+          },
           "name_str": {
             "type": "string",
             "description": "Name of the award",
@@ -539,6 +544,16 @@
                   "example": "https://youtu.be/abc123"
                 }
               }
+            }
+          },
+          "remap_teams": {
+            "type": "object",
+            "description": "A mapping of temp key --> remapped key (including B team keys)",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "frc1337": "frc337B"
             }
           }
         }

@@ -10,9 +10,27 @@ from backend.common.auth import (
     _user_context_processor,
     create_session_cookie,
     current_user,
+    delete_user,
     revoke_session_cookie,
+    verify_id_token,
 )
 from backend.common.models.user import User
+
+
+def test_validate_id_token() -> None:
+    with patch.object(auth, "verify_id_token") as mock_verify_id_token:
+        mock_verify_id_token.return_value = {}
+        decoded_token = verify_id_token("abc123")
+        assert decoded_token == {}
+
+
+def test_expired_id_token() -> None:
+    with patch.object(auth, "verify_id_token") as mock_verify_id_token:
+        mock_verify_id_token.side_effect = auth.ExpiredIdTokenError(
+            "expired token", None
+        )
+        decoded_token = verify_id_token("abc123")
+        assert decoded_token is None
 
 
 def test_create_session_cookie(secret_app: Flask) -> None:
@@ -105,6 +123,13 @@ def test_current_user() -> None:
     with patch.object(backend_auth, "_decoded_claims", return_value={"abc": "abc"}):
         user = current_user()
     assert user is not None
+
+
+def test_delete_user() -> None:
+    with patch.object(auth, "delete_user") as mock_delete_user:
+        delete_user("test_uid")
+
+    mock_delete_user.assert_called_once_with("test_uid", app=ANY)
 
 
 def test_user_context_processor_no_claims() -> None:

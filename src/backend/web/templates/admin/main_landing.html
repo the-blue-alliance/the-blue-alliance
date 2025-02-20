@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+
+{% block title %}TBA - Main Landing Page{% endblock %}
+
+{% block content %}
+
+<h1>TBA Main Landing Page</h1>
+
+<h2>Page Type</h2>
+<p>Choose which landing page to use</p>
+<form id="landing_form" method="post">
+<select name="landing_type">
+  <option value=""></option>
+{% for enum, name in landing_types.items() %}
+  <option value="{{ enum.value }}" {% if current_landing == enum %}selected{% endif %}>{{ name }}</option>
+{% endfor %}
+</select>
+
+<h2>Page Properties</h2>
+<table class="table table-slanding_typetriped">
+<tr><th>Key</th><th>Value</th></tr>
+{% for key, value in current_config.items() %}
+  {% if key != 'current_landing' %}
+  <tr>
+    <td>{{ key }}</td>
+    {% if value is boolean %}
+    <td><input type="checkbox" name="{{ key }}"{% if value %} checked{% endif %}/></td>
+    {% else %}
+    <td><input name="{{ key }}" value="{{ value }}" placeholder="Value" /></td>
+    {% endif %}
+  </tr>
+  {% endif %}
+{% endfor %}
+</table>
+
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+</form>
+{% endblock %}

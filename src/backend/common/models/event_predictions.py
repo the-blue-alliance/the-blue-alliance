@@ -4,9 +4,13 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.models.keys import MatchKey, TeamKey
 
 
+class TComputedMatchInfo(TypedDict):
+    mean: Dict[TeamKey, float]
+    var: Dict[TeamKey, float]
+
+
 TQualPlayoff = Literal["qual", "playoff"]
-TStatType = Literal["mean", "var"]
-TStatMeanVar = Dict[str, Dict[TStatType, Dict[TeamKey, float]]]
+TStatMeanVar = Dict[str, TComputedMatchInfo]
 
 
 class MatchPrediction(TypedDict):

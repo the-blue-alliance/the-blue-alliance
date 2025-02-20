@@ -3,7 +3,7 @@
 # https://black.readthedocs.io/en/stable/the_black_code_style.html
 max-line-length = 88
 select = C,E,F,W,B,B950,I
-ignore = E203, E501, W503
+ignore = E203, E501, E704, W503
 exclude =
   ./old_py2/
   ./stubs/
@@ -11,6 +11,7 @@ exclude =
   ./venv/
   ./node_modules/
   ./.pyre
+  ./pwa/
 
 application_import_names = backend
 import-order-style = edited
@@ -23,5 +24,6 @@ banned-modules =
 extension =
   E = service_import_checker:ServiceImportChecker
   E = api_authenticated_decorator_checker:APIAuthenticatedDecoratorCheker
+  E = use_safe_deferred_checker:UseSafeDeferredChecker
 paths =
   ./flake8_plugins

@@ -1,6 +1,4 @@
 import json
-import logging
-import traceback
 from typing import List, Set
 
 from google.appengine.api import taskqueue
@@ -8,6 +6,7 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.award import Award
@@ -47,6 +46,7 @@ class AwardManipulator(ManipulatorBase[Award]):
                 old_list = getattr(old_model, attr)
                 new_list = getattr(new_model, attr)
 
+            is_changed = old_list != new_list
             if auto_union:
                 for item in new_list:
                     if item not in old_list:
@@ -62,6 +62,7 @@ class AwardManipulator(ManipulatorBase[Award]):
                 merged_list = old_list
 
             setattr(old_model, attr, merged_list)
+            old_model._dirty |= is_changed
 
         return old_model
 
@@ -85,10 +86,15 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
         # Send push notifications if the awards post was within +/- 1 day of the Event
         event = event_key.get()
         if event and event.within_a_day:
+            # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:
-                TBANSHelper.awards(event)
-            except Exception as exception:
-                logging.error(
-                    "Error sending {} award updates: {}".format(event.id(), exception)
+                defer_safe(
+                    TBANSHelper.awards,
+                    event,
+                    _name=f"{event.key_name}_awards",
+                    _target="py3-tasks-io",
+                    _queue="push-notifications",
+                    _url="/_ah/queue/deferred_notification_send",
                 )
-                logging.error(traceback.format_exc())
+            except Exception:
+                pass

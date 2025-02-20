@@ -11,7 +11,7 @@ EventDetailsDict = NewType("EventDetailsDict", Dict)
 
 class EventDetailsConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 3,
+        ApiMajorVersion.API_V3: 4,
     }
 
     @classmethod
@@ -36,6 +36,14 @@ class EventDetailsConverter(ConverterBase):
                             team = "frc{}".format(team)
                         normalized_oprs[stat_type][team] = value
 
+        normalized_coprs = defaultdict(dict)
+        if event_details and event_details.coprs:
+            for copr_type, coprs in event_details.coprs.items():
+                for team, value in coprs.items():
+                    if "frc" not in team:
+                        team = "frc{}".format(team)
+                    normalized_coprs[copr_type][team] = value
+
         rankings = {}
         if event_details:
             rankings = event_details.renderable_rankings
@@ -49,12 +57,13 @@ class EventDetailsConverter(ConverterBase):
         event_details_dict = {
             "alliances": event_details.alliance_selections if event_details else [],
             "district_points": event_details.district_points if event_details else {},
-            "insights": event_details.insights
-            if event_details
-            else {"qual": {}, "playoff": {}},
+            "insights": (
+                event_details.insights if event_details else {"qual": {}, "playoff": {}}
+            ),
             "oprs": normalized_oprs if normalized_oprs else {},  # OPRs, DPRs, CCWMs
             "predictions": event_details.predictions if event_details else {},
             "rankings": rankings,
+            "coprs": normalized_coprs,
         }
 
         return EventDetailsDict(event_details_dict)

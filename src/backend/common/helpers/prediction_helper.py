@@ -10,11 +10,10 @@ from typing import (
     MutableMapping,
     Optional,
     Tuple,
-    TypedDict,
 )
 
 import numpy as np
-from pyre_extensions.refinement import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
@@ -34,6 +33,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_predictions import (
     MatchPrediction,
     MatchPredictionStatsLevel,
+    TComputedMatchInfo,
     TEventStatMeanVars,
     TMatchPredictions,
     TMatchPredictionStats,
@@ -46,11 +46,6 @@ from backend.common.models.keys import TeamKey
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.queries.event_query import TeamYearEventsQuery
-
-
-class TComputedMatchInfo(TypedDict):
-    mean: Dict[TeamKey, float]
-    var: Dict[TeamKey, float]
 
 
 class ContributionCalculator:
@@ -363,6 +358,55 @@ class ContributionCalculator:
                                 "teleopCargo{}{}".format(goal, exit)
                             ]
                     means[color] = count
+                elif self._stat == "game_piece_scored":
+                    count = 0
+                    for mode in ["auto", "teleop"]:
+                        count += score_breakdown[color]["{}GamePieceCount".format(mode)]
+                    means[color] = count
+                elif self._stat == "links":
+                    count = 0
+                    count = math.floor((score_breakdown[color]["linkPoints"]) / 5)
+                    means[color] = count
+                elif self._stat == "charge_station_points":
+                    count = 0
+                    count = score_breakdown[color]["totalChargeStationPoints"]
+                    means[color] = count
+                elif self._stat == "note_scored":
+                    count = 0
+                    for mode in ["auto", "teleop"]:
+                        for position in ["Amp", "Speaker"]:
+                            if position == "Speaker" and mode == "teleop":
+                                for type in ["NoteCount", "NoteAmplifiedCount"]:
+                                    count += score_breakdown[color][
+                                        "{}{}{}".format(mode, position, type)
+                                    ]
+                            else:
+                                count += score_breakdown[color][
+                                    "{}{}NoteCount".format(mode, position)
+                                ]
+                    means[color] = count
+                elif self._stat == "stage_points":
+                    count = 0
+                    count = score_breakdown[color]["endGameTotalStagePoints"]
+                    means[color] = count
+                elif self._stat == "robot_on_stage":
+                    count = 0
+                    for i in range(1, 4):
+                        if (
+                            score_breakdown[color]["endGameRobot{}".format(i)]
+                            == "StageLeft"
+                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            == "StageRight"
+                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            == "CenterStage"
+                        ):
+                            count += 1
+                    means[color] = count
+                elif self._stat == "2024_coopertition_criteria":
+                    count = 0
+                    if score_breakdown[color]["coopertitionCriteriaMet"]:
+                        count = 1
+                    means[color] = count
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -450,6 +494,7 @@ class PredictionHelper:
             "red": defaultdict(lambda: defaultdict(float)),
             "blue": defaultdict(lambda: defaultdict(float)),
         }
+
         for color in ALLIANCE_COLORS:
             for team in match.alliances[color]["teams"]:
                 for stat, mean_var in stat_mean_vars.items():
@@ -628,6 +673,57 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
                     prediction[color]["prob_hangar_bonus"] = prob
+                # 2023
+                if stat == "links":
+                    required_points = 5
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_sustainability_bonus"] = prob
+                if stat == "charge_station_points":
+                    required_points = 26
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_activation_bonus"] = prob
+                # 2024
+                if stat == "note_scored":
+                    required_points = 18
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+
+                    mu2 = mean_vars[color]["2024_coopertition_criteria"]["mean"] - 1
+                    prob2 = 1 - cls._normcdf(
+                        -mu2
+                        / np.sqrt(mean_vars[color]["2024_coopertition_criteria"]["var"])
+                    )
+
+                    mu3 = mean_vars[color][stat]["mean"] - 15
+                    prob3 = 1 - cls._normcdf(
+                        -mu3 / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+
+                    prediction[color]["prob_melody_bonus"] = prob + prob2 * prob3
+                if stat == "stage_points":
+                    required_points = 10
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    # Second condition for ranking point
+                    mu2 = mean_vars[color]["robot_on_stage"]["mean"] - 2
+                    prob2 = 1 - cls._normcdf(
+                        -mu2 / np.sqrt(mean_vars[color]["robot_on_stage"]["var"])
+                    )
+                    prediction[color]["prob_ensemble_bonus"] = prob * prob2
 
         # Prob win
         red_score = prediction["red"]["score"]
@@ -655,9 +751,7 @@ class PredictionHelper:
         )
 
     @classmethod
-    def get_match_predictions(
-        cls, matches: List[Match]
-    ) -> Tuple[
+    def get_match_predictions(cls, matches: List[Match]) -> Tuple[
         Optional[TMatchPredictions],
         Optional[TMatchPredictionStats],
         Optional[TEventStatMeanVars],
@@ -712,6 +806,18 @@ class PredictionHelper:
                 ("score", 0, 20**2),
                 ("cargo_scored", 0, 10**2),
                 ("endgame_points", 0, 10**2),
+            ]
+        elif event.year == 2023:
+            relevant_stats = [
+                ("score", 0, 20**2),
+                ("links", 0, 3**2),
+                ("charge_station_points", 0, 10**2),
+            ]
+        elif event.year == 2024:
+            relevant_stats = [
+                ("score", 0, 20**2),
+                ("note_scored", 0, 10**2),
+                ("stage_points", 0, 10**2),
             ]
         else:
             relevant_stats = []
@@ -819,18 +925,26 @@ class PredictionHelper:
                     brier_scores[stat] = brier_sum / (2 * played_matches)
 
             prediction_stats[level] = MatchPredictionStatsLevel(
-                wl_accuracy=None
-                if played_matches == 0
-                else 100 * float(correct_predictions) / played_matches,
-                wl_accuracy_75=None
-                if played_matches_75 == 0
-                else 100 * float(correct_predictions_75) / played_matches_75,
-                err_mean=float(np.mean(np.asarray(score_differences)))
-                if score_differences
-                else None,
-                err_var=float(np.var(np.asarray(score_differences)))
-                if score_differences
-                else None,
+                wl_accuracy=(
+                    None
+                    if played_matches == 0
+                    else 100 * float(correct_predictions) / played_matches
+                ),
+                wl_accuracy_75=(
+                    None
+                    if played_matches_75 == 0
+                    else 100 * float(correct_predictions_75) / played_matches_75
+                ),
+                err_mean=(
+                    float(np.mean(np.asarray(score_differences)))
+                    if score_differences
+                    else None
+                ),
+                err_var=(
+                    float(np.var(np.asarray(score_differences)))
+                    if score_differences
+                    else None
+                ),
                 brier_scores=brier_scores,
             )
 
@@ -868,6 +982,7 @@ class PredictionHelper:
         all_rankings = defaultdict(lambda: [0] * n)
         all_ranking_points = defaultdict(lambda: [0] * n)
         last_played_match = None
+        sampled_winner: TMatchWinner
         for i in range(n):
             team_ranking_points = defaultdict(int)
             team_rank_tiebreaker = defaultdict(int)
@@ -890,7 +1005,7 @@ class PredictionHelper:
                     "blue": 0,
                 }
                 # Get actual results or sampled results, depending if match has been played
-                sampled_winner: TMatchWinner = ""
+                sampled_winner = ""
                 if match.has_been_played:
                     score_breakdown = match.score_breakdown
                     if not score_breakdown:  # Can't do rankings without score breakdown
@@ -955,6 +1070,26 @@ class PredictionHelper:
                             sampled_rp2[alliance_color] = score_breakdown[
                                 alliance_color
                             ]["hangarBonusRankingPoint"]
+                            sampled_tiebreaker[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["totalPoints"]
+                        elif match.year == 2023:
+                            sampled_rp1[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["sustainabilityBonusAchieved"]
+                            sampled_rp2[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["activationBonusAchieved"]
+                            sampled_tiebreaker[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["totalPoints"]
+                        elif match.year == 2024:
+                            sampled_rp1[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["melodyBonusAchieved"]
+                            sampled_rp2[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["ensembleBonusAchieved"]
                             sampled_tiebreaker[alliance_color] = score_breakdown[
                                 alliance_color
                             ]["totalPoints"]
@@ -1039,6 +1174,30 @@ class PredictionHelper:
                             sampled_tiebreaker[alliance_color] = color_prediction[
                                 "score"
                             ]
+                        elif match.year == 2023:
+                            sampled_rp1[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_sustainability_bonus"]
+                            )
+                            sampled_rp2[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_activation_bonus"]
+                            )
+                            sampled_tiebreaker[alliance_color] = color_prediction[
+                                "score"
+                            ]
+                        elif match.year == 2024:
+                            sampled_rp1[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_melody_bonus"]
+                            )
+                            sampled_rp2[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_ensemble_bonus"]
+                            )
+                            sampled_tiebreaker[alliance_color] = color_prediction[
+                                "score"
+                            ]
 
                 # Using match results, update RP and tiebreaker
                 for alliance_color in ALLIANCE_COLORS:
@@ -1058,7 +1217,7 @@ class PredictionHelper:
                                 continue
                             team_ranking_points[team] += 1
                 else:
-                    sampled_winner = safe_cast(AllianceColor, sampled_winner)
+                    sampled_winner = sampled_winner
                     for team in match.alliances[sampled_winner]["teams"]:
                         if team in surrogate_teams and num_played[team] == 3:
                             continue

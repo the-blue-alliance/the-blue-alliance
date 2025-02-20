@@ -1,9 +1,15 @@
 import json
+from typing import Dict, Literal, Set
 
 from google.appengine.ext import ndb
 
+from backend.common.models.cached_model import CachedModel
 
-class Insight(ndb.Model):
+
+LeaderboardKeyType = Literal["team"] | Literal["event"] | Literal["match"]
+
+
+class Insight(CachedModel):
     """
     Insights are the end result of analyzing a batch of data, such as the
     average score for all matches in a year.
@@ -31,6 +37,21 @@ class Insight(ndb.Model):
     ELIM_MATCH_AVERAGE_MARGINS_BY_WEEK = 18
     WINNING_MARGIN_DISTRIBUTION = 19
     ELIM_WINNING_MARGIN_DISTRIBUTION = 20
+    EINSTEIN_STREAK = 21
+    MATCHES_PLAYED = 22
+    TYPED_LEADERBOARD_BLUE_BANNERS = 23
+    TYPED_LEADERBOARD_MOST_MATCHES_PLAYED = 24
+    TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT = 25
+    TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE = 26
+    TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE = 27
+    TYPED_LEADERBOARD_MOST_AWARDS = 28
+    TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS = 29
+    TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST = 30
+    TYPED_NOTABLES_DIVISION_WINNERS = 31
+    TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES = 32
+    TYPED_NOTABLES_WORLD_CHAMPIONS = 33
+    TYPED_NOTABLES_HALL_OF_FAME = 34
+    TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT = 35
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -57,8 +78,56 @@ class Insight(ndb.Model):
         ELIM_MATCH_AVERAGE_MARGINS_BY_WEEK: "elim_match_average_margins_by_week",
         WINNING_MARGIN_DISTRIBUTION: "winning_margin_distribution",
         ELIM_WINNING_MARGIN_DISTRIBUTION: "elim_winning_margin_distribution",
+        EINSTEIN_STREAK: "einstein_streak",
+        MATCHES_PLAYED: "matches_played",
+        TYPED_LEADERBOARD_BLUE_BANNERS: "typed_leaderboard_blue_banners",
+        TYPED_LEADERBOARD_MOST_MATCHES_PLAYED: "typed_leaderboard_most_matches_played",
+        TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "typed_leaderboard_highest_median_score_by_event",
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE: "typed_leaderboard_highest_match_clean_score",
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE: "typed_leaderboard_highest_match_clean_combined_score",
+        TYPED_LEADERBOARD_MOST_AWARDS: "typed_leaderboard_most_awards",
+        TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "typed_leaderboard_most_non_champs_event_wins",
+        TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "typed_leaderboard_most_unique_teams_played_with_against",
+        TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT: "typed_leaderboard_most_events_played_at",
+        TYPED_NOTABLES_DIVISION_WINNERS: "notables_division_winners",
+        TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES: "notables_division_finals_appearances",
+        TYPED_NOTABLES_WORLD_CHAMPIONS: "notables_world_champions",
+        TYPED_NOTABLES_HALL_OF_FAME: "notables_hall_of_fame",
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
+    }
+
+    TYPED_LEADERBOARD_MATCH_INSIGHTS = {
+        TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
+        TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT,
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE,
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE,
+        TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
+        TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT,
+    }
+    TYPED_LEADERBOARD_AWARD_INSIGHTS = {
+        TYPED_LEADERBOARD_BLUE_BANNERS,
+        TYPED_LEADERBOARD_MOST_AWARDS,
+        TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS,
+    }
+
+    TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
+        TYPED_LEADERBOARD_BLUE_BANNERS: "team",
+        TYPED_LEADERBOARD_MOST_MATCHES_PLAYED: "team",
+        TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "event",
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE: "match",
+        TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE: "match",
+        TYPED_LEADERBOARD_MOST_AWARDS: "team",
+        TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS: "team",
+        TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "team",
+        TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT: "team",
+    }
+
+    NOTABLE_INSIGHTS = {
+        TYPED_NOTABLES_DIVISION_WINNERS,
+        TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES,
+        TYPED_NOTABLES_WORLD_CHAMPIONS,
+        TYPED_NOTABLES_HALL_OF_FAME,
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting
@@ -72,7 +141,16 @@ class Insight(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
+    _json_attrs: Set[str] = {
+        "data_json",
+    }
+
     def __init__(self, *args, **kw):
+        # store set of affected references referenced keys for cache clearing
+        # keys must be model properties
+        self._affected_references = {
+            "year": set(),
+        }
         self._data = None
         super(Insight, self).__init__(*args, **kw)
 

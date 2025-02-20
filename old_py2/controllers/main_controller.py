@@ -179,34 +179,6 @@ class PredictionsHandler(CacheableHandler):
         return jinja2_engine.render('predictions.html', self.template_values)
 
 
-class SearchHandler(webapp2.RequestHandler):
-    def get(self):
-        try:
-            q = self.request.get("q")
-            logging.info("search query: %s" % q)
-            if q.isdigit():
-                team_id = "frc%s" % int(q)
-                team = Team.get_by_id(team_id)
-                if team:
-                    self.redirect(team.details_url)
-                    return None
-            elif q[:4].isdigit():  # Check for event key
-                event = Event.get_by_id(q)
-                if event:
-                    self.redirect(event.details_url)
-                    return None
-            else:  # Check for event short
-                year = datetime.datetime.now().year  # default to current year
-                event = Event.get_by_id('{}{}'.format(year, q))
-                if event:
-                    self.redirect(event.details_url)
-                    return None
-        except Exception, e:
-            logging.warning("warning: %s" % e)
-        finally:
-            self.response.out.write(render_static("search"))
-
-
 class WebcastsHandler(CacheableHandler):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "main_webcasts"

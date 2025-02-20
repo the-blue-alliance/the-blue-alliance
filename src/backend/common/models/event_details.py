@@ -1,7 +1,7 @@
-from typing import List, Optional, Set, TypedDict
+from typing import cast, List, Optional, Set, TypedDict
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts.ranking_sort_orders import (
     SORT_ORDER_INFO as RANKING_SORT_ORDERS,
@@ -31,26 +31,23 @@ class EventDetails(CachedModel):
     key_name is the event key, like '2010ct'
     """
 
-    alliance_selections: List[
-        EventAlliance
-    ] = (
+    alliance_selections: List[EventAlliance] = (
         ndb.JsonProperty()
     )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
-    district_points: EventDistrictPoints = safe_cast(
+    district_points: EventDistrictPoints = cast(EventDistrictPoints, ndb.JsonProperty())
+    regional_champs_pool_points: EventDistrictPoints = cast(
         EventDistrictPoints, ndb.JsonProperty()
     )
-    matchstats: EventMatchstats = safe_cast(
+    matchstats: EventMatchstats = cast(
         EventMatchstats, ndb.JsonProperty()
     )  # for OPR, DPR, CCWM, etc.
-    coprs: EventComponentOPRs = safe_cast(EventComponentOPRs, ndb.JsonProperty())
-    insights: EventInsights = safe_cast(EventInsights, ndb.JsonProperty())
-    predictions: Optional[EventPredictions] = safe_cast(
-        EventPredictions, ndb.JsonProperty()
-    )
+    coprs: EventComponentOPRs = cast(EventComponentOPRs, ndb.JsonProperty())
+    insights: EventInsights = cast(EventInsights, ndb.JsonProperty())
+    predictions: Optional[EventPredictions] = cast(EventPredictions, ndb.JsonProperty())
     rankings = ndb.JsonProperty()  # deprecated
     rankings2: List[EventRanking] = ndb.JsonProperty()
 
-    playoff_advancement: EventPlayoffAdvancement = safe_cast(
+    playoff_advancement: EventPlayoffAdvancement = cast(
         EventPlayoffAdvancement, ndb.JsonProperty()
     )
 
@@ -67,6 +64,7 @@ class EventDetails(CachedModel):
         "rankings",
         "rankings2",
         "playoff_advancement",
+        "regional_champs_pool_points",
     }
 
     def __init__(self, *args, **kw):
@@ -118,16 +116,20 @@ class EventDetails(CachedModel):
                 if game_year == 2021:
                     # 2021 did not have matches played for rankings
                     continue
-                elif game_year in {2017, 2018, 2019, 2020, 2021, 2022, 2023}:
+                elif not rank["sort_orders"]:
+                    continue
+                elif game_year >= 2017:
                     rank["extra_stats"] = [
                         int(round(rank["sort_orders"][0] * rank["matches_played"])),
                     ]
                     has_extra_stats = True
                 elif rank["qual_average"] is None:
                     rank["extra_stats"] = [
-                        rank["sort_orders"][0] / rank["matches_played"]
-                        if rank["matches_played"] > 0
-                        else 0,
+                        (
+                            rank["sort_orders"][0] / rank["matches_played"]
+                            if rank["matches_played"] > 0
+                            else 0
+                        ),
                     ]
                     has_extra_stats = True
 
@@ -138,7 +140,8 @@ class EventDetails(CachedModel):
             if game_year == 2021:
                 # 2021 did not have matches played for rankings
                 pass
-            elif game_year in {2017, 2018, 2019, 2020, 2021, 2022, 2023}:
+
+            elif game_year >= 2017:
                 extra_stats_info = [{"name": "Total Ranking Points", "precision": 0}]
             elif sort_order_info is not None:
                 extra_stats_info = [
@@ -176,10 +179,11 @@ class EventDetails(CachedModel):
             row = [rank["rank"], rank["team_key"][3:]]
             # for i, item in enumerate(rank['sort_orders']):
             for i, precision in enumerate(precisions):
-                # row.append('%.*f' % (precisions[i], round(item, precisions[i])))
-                row.append(
-                    "%.*f" % (precision, round(rank["sort_orders"][i], precision))
-                )
+                if i < len(rank["sort_orders"]):
+                    # row.append('%.*f' % (precisions[i], round(item, precisions[i])))
+                    row.append(
+                        "%.*f" % (precision, round(rank["sort_orders"][i], precision))
+                    )
             if rank["record"]:
                 record = none_throws(rank["record"])
                 row.append(f"{record['wins']}-{record['losses']}-{record['ties']}")

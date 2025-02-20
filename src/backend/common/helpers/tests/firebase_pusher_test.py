@@ -1,7 +1,6 @@
 import datetime
 import json
-from typing import Callable, Dict
-from urllib.parse import urlparse
+from typing import Dict
 
 import pytest
 import requests
@@ -9,12 +8,13 @@ import requests_mock
 import six
 from firebase_admin import exceptions as firebase_exceptions
 from freezegun import freeze_time
-from google.appengine.ext import deferred, ndb, testbed
-from pyre_extensions import none_throws, safe_cast
+from google.appengine.ext import ndb, testbed
+from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -41,25 +41,24 @@ class InMemoryRealtimeDb:
     def __init__(self) -> None:
         self.data = {}
 
-    def __call__(self, request: requests.models.PreparedRequest) -> requests.Response:
-        url_parts = urlparse(none_throws(request.url))
+    def __call__(self, request: "requests_mock.Request") -> requests.Response:
         if request.method == "GET":
-            data = self.data.get(url_parts.path)
+            data = self.data.get(request.path)
             if data is None:
                 return self._make_response(404, b"not found")
             return self._make_response(200, data)
         elif request.method == "PUT":
             body = six.ensure_binary(none_throws(request.body))
-            self.data[url_parts.path] = body
+            self.data[request.path] = body
             return self._make_response(200, body)
         elif request.method == "PATCH":
             body = six.ensure_binary(none_throws(request.body))
-            existing_data = json.loads(self.data.get(url_parts.path, "{}"))
+            existing_data = json.loads(self.data.get(request.path, "{}"))
             existing_data.update(json.loads(body))
-            self.data[url_parts.path] = json.dumps(existing_data).encode()
+            self.data[request.path] = json.dumps(existing_data).encode()
             return self._make_response(200, body)
         elif request.method == "DELETE":
-            self.data.pop(url_parts.path, None)
+            self.data.pop(request.path, None)
             return self._make_response(200, b"null")
 
         return self._make_response(400, f"not implemented {request.method}".encode())
@@ -79,14 +78,12 @@ def auto_add_stubs(
     monkeypatch.setenv("FIREBASE_DATABASE_EMULATOR_HOST", "localhost:9070")
 
     db = InMemoryRealtimeDb()
-    requests_mock.add_matcher(
-        safe_cast(Callable[[requests.Request], requests.Response], db)
-    )
+    requests_mock.add_matcher(db)
 
 
 def drain_deferred(taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub) -> None:
     for task in taskqueue_stub.get_filtered_tasks(queue_names="firebase"):
-        deferred.run(task.payload)
+        run_from_task(task)
 
 
 def test_update_live_events_none(
@@ -281,6 +278,7 @@ def test_update_special_webcast(
                 type=WebcastType.TWITCH,
                 channel="tbagameday",
                 name="TBA Gameday",
+                key_name="tbagameday",
             )
         ],
         "aliases": {},
@@ -295,6 +293,7 @@ def test_update_special_webcast(
             type=WebcastType.TWITCH,
             channel="tbagameday",
             name="TBA Gameday",
+            key_name="tbagameday",
             status=WebcastStatus.UNKNOWN,
             stream_title=None,
             viewer_count=None,

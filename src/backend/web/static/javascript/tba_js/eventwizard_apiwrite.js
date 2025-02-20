@@ -97,7 +97,7 @@ $('#schedule_file').change(function(){
 
         //parse the excel to array of matches
         //headers start on 5th row
-        var matches = XLSX.utils.sheet_to_json(sheet, {range:4});
+        var matches = XLSX.utils.sheet_to_json(sheet, {range:4, raw: false});
         var request_body = [];
 
         $('#schedule_preview').empty();
@@ -326,8 +326,13 @@ $('#rankings_file').change(function(){
         //var is_num = [true, true, true, true, true, false, true, true];
 
         // 2019 Headers
-        var headers = ['Rank', 'Team', 'RS', 'Cargo Pts', 'Panel Pts', 'HAB Pts', 'Sandstorm', 'W-L-T', 'DQ', 'Played'];
-        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo', 'Hatch Panel', 'HAB Climb', 'Sandstorm Bonus', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var headers = ['Rank', 'Team', 'RS', 'Cargo Pts', 'Panel Pts', 'HAB Pts', 'Sandstorm', 'W-L-T', 'DQ', 'Played'];
+        //var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo', 'Hatch Panel', 'HAB Climb', 'Sandstorm Bonus', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var is_num = [true, true, true, true, true, false, true, true];
+
+        // 2024 Headers
+        var headers = ['Rank', 'Team', 'RS', 'CO-OP', 'Match Pts', 'Auto Pts', 'Stage Pts', 'W-L-T', 'DQ', 'Played'];
+        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Avg Coop', 'Avg Match', 'Avg Auto', 'Avg Stage', 'Record (W-L-T)', 'DQ', 'Played'];
         var is_num = [true, true, true, true, true, false, true, true];
 
         $('#rankings_preview').empty();

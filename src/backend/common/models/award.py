@@ -1,8 +1,8 @@
 import json
-from typing import Dict, List, Optional
+from typing import cast, Dict, List, Optional
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws, safe_cast
+from pyre_extensions import none_throws
 
 from backend.common.consts import award_type, event_type
 from backend.common.consts.award_type import AwardType
@@ -25,7 +25,7 @@ class Award(CachedModel):
     name_str = ndb.TextProperty(
         required=True, indexed=False
     )  # award name that shows up on USFIRST Pages. May vary for the same award type.
-    award_type_enum: AwardType = safe_cast(
+    award_type_enum: AwardType = cast(
         AwardType, ndb.IntegerProperty(required=True, choices=award_type.AWARD_TYPES)
     )
     year: Year = ndb.IntegerProperty(required=True)  # year the award was awarded

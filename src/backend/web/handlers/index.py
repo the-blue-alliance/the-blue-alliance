@@ -4,6 +4,7 @@ from typing import Any, Callable, cast, Dict, Optional, Tuple
 from flask import abort, Response
 from google.appengine.ext import ndb
 
+from backend.common.consts.event_type import CMP_EVENT_TYPES
 from backend.common.consts.landing_type import LandingType
 from backend.common.consts.media_type import MediaType
 from backend.common.decorators import cached_public
@@ -13,6 +14,7 @@ from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.memcache import MemcacheClient
+from backend.common.models.event import Event
 from backend.common.models.insight import Insight
 from backend.common.models.keys import Year
 from backend.common.models.media import Media
@@ -47,6 +49,7 @@ def index_kickoff(template_values: Dict[str, Any]) -> str:
     effective_season_year = SeasonHelper.effective_season_year()
     template_values.update(
         {
+            "year": effective_season_year,
             "is_kickoff": SeasonHelper.is_kickoff_at_least_one_day_away(
                 year=effective_season_year
             ),
@@ -122,24 +125,19 @@ def index_competitionseason(template_values: Dict[str, Any]) -> str:
 
 
 def index_champs(template_values: Dict[str, Any]) -> str:
-    # year = datetime.datetime.now().year
-    # hou_event_keys_future = Event.query(
-    #     Event.year == year,
-    #     Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES),
-    #     Event.start_date <= datetime.datetime(2019, 4, 21)).fetch_async(keys_only=True)
-    # det_event_keys_future = Event.query(
-    #     Event.year == year,
-    #     Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES),
-    #     Event.start_date > datetime.datetime(2019, 4, 21)).fetch_async(keys_only=True)
-    #
-    # hou_events_futures = ndb.get_multi_async(hou_event_keys_future.get_result())
-    # det_events_futures = ndb.get_multi_async(det_event_keys_future.get_result())
-    #
-    # template_values.update({
-    #     "hou_events": [e.get_result() for e in hou_events_futures],
-    #     "det_events": [e.get_result() for e in det_events_futures],
-    #     "year": year,
-    # })
+    year = datetime.now().year
+    event_keys_future = Event.query(
+        Event.year == year, Event.event_type_enum.IN(CMP_EVENT_TYPES)
+    ).fetch_async(keys_only=True)
+
+    events_futures = ndb.get_multi_async(event_keys_future.get_result())
+
+    template_values.update(
+        {
+            "events": [e.get_result() for e in events_futures],
+            "year": year,
+        }
+    )
     return render_template("index/index_champs.html", template_values)
 
 
@@ -149,6 +147,7 @@ def index_offseason(template_values: Dict[str, Any]) -> str:
 
     template_values.update(
         {
+            "year": effective_season_year,
             "events": EventHelper.week_events(),
             "kickoff_datetime_utc": SeasonHelper.kickoff_datetime_utc(
                 effective_season_year
@@ -195,7 +194,7 @@ def about() -> str:
     return render_template("about.html")
 
 
-@cached_public
+@cached_public(ttl=timedelta(hours=24))
 def avatar_list(year: Optional[Year] = None) -> Response:
     year = year or SeasonHelper.get_current_season()
 

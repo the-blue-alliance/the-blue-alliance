@@ -3,7 +3,6 @@ from backend.common.models.team import Team
 
 
 class TeamTestCreator(object):
-
     TEAMS = [
         "Red Jaguars",
         "Blue Barracudas",

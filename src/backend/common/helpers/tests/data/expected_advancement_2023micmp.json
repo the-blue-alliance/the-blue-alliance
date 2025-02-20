@@ -1,0 +1,394 @@
+{
+  "advancement": {
+    "rounds": {
+      "Round 1": [
+        [
+          {
+            "complete_alliance": [
+              "5907",
+              "503",
+              "1189",
+              "5926"
+            ],
+            "alliance_name": "DTE Energy",
+            "record": {
+              "wins": 0,
+              "losses": 1,
+              "ties": 0
+            },
+            "eliminated": false
+          },
+          {
+            "complete_alliance": [
+              "7769",
+              "5166",
+              "5901"
+            ],
+            "alliance_name": "Aptiv",
+            "record": {
+              "wins": 1,
+              "losses": 0,
+              "ties": 0
+            },
+            "eliminated": false
+          },
+          {
+            "complete_alliance": [
+              "51",
+              "818",
+              "226"
+            ],
+            "alliance_name": "Consumers",
+            "record": {
+              "wins": 1,
+              "losses": 0,
+              "ties": 0
+            },
+            "eliminated": false
+          },
+          {
+            "complete_alliance": [
+              "6090",
+              "1506",
+              "217"
+            ],
+            "alliance_name": "Ford",
+            "record": {
+              "wins": 0,
+              "losses": 1,
+              "ties": 0
+            },
+            "eliminated": false
+          }
+        ],
+        true
+      ],
+      "Round 2": [
+        [
+          {
+            "complete_alliance": [
+              "7769",
+              "5166",
+              "5901"
+            ],
+            "alliance_name": "Aptiv",
+            "record": {
+              "wins": 0,
+              "losses": 1,
+              "ties": 0
+            },
+            "eliminated": false
+          },
+          {
+            "complete_alliance": [
+              "51",
+              "818",
+              "226"
+            ],
+            "alliance_name": "Consumers",
+            "record": {
+              "wins": 1,
+              "losses": 0,
+              "ties": 0
+            },
+            "eliminated": false
+          },
+          {
+            "complete_alliance": [
+              "5907",
+              "503",
+              "1189",
+              "5926"
+            ],
+            "alliance_name": "DTE Energy",
+            "record": {
+              "wins": 0,
+              "losses": 1,
+              "ties": 0
+            },
+            "eliminated": true
+          },
+          {
+            "complete_alliance": [
+              "6090",
+              "1506",
+              "217"
+            ],
+            "alliance_name": "Ford",
+            "record": {
+              "wins": 1,
+              "losses": 0,
+              "ties": 0
+            },
+            "eliminated": false
+          }
+        ],
+        true
+      ],
+      "Round 3": [
+        [
+          {
+            "complete_alliance": [
+              "7769",
+              "5166",
+              "5901"
+            ],
+            "alliance_name": "Aptiv",
+            "record": {
+              "wins": 0,
+              "losses": 1,
+              "ties": 0
+            },
+            "eliminated": true
+          },
+          {
+            "complete_alliance": [
+              "6090",
+              "1506",
+              "217"
+            ],
+            "alliance_name": "Ford",
+            "record": {
+              "wins": 1,
+              "losses": 0,
+              "ties": 0
+            },
+            "eliminated": false
+          }
+        ],
+        true
+      ],
+      "Finals": [
+        [
+          {
+            "complete_alliance": [
+              "51",
+              "818",
+              "226"
+            ],
+            "alliance_name": "Consumers",
+            "record": {
+              "wins": 0,
+              "losses": 2,
+              "ties": 0
+            },
+            "eliminated": false
+          },
+          {
+            "complete_alliance": [
+              "6090",
+              "1506",
+              "217"
+            ],
+            "alliance_name": "Ford",
+            "record": {
+              "wins": 2,
+              "losses": 0,
+              "ties": 0
+            },
+            "eliminated": false
+          },
+          {
+            "complete_alliance": [
+              "51",
+              "818",
+              "226"
+            ],
+            "alliance_name": "Consumers",
+            "record": {
+              "wins": 0,
+              "losses": 2,
+              "ties": 0
+            },
+            "eliminated": true
+          },
+          {
+            "complete_alliance": [
+              "6090",
+              "1506",
+              "217"
+            ],
+            "alliance_name": "Ford",
+            "record": {
+              "wins": 2,
+              "losses": 0,
+              "ties": 0
+            },
+            "eliminated": false
+          }
+        ],
+        true
+      ]
+    }
+  },
+  "bracket": {
+    "sf": {
+      "sf1": {
+        "red_alliance": [
+          "5907",
+          "503",
+          "1189",
+          "5926"
+        ],
+        "blue_alliance": [
+          "7769",
+          "5166",
+          "5901"
+        ],
+        "winning_alliance": "blue",
+        "red_wins": 0,
+        "blue_wins": 1,
+        "red_record": {
+          "wins": 0,
+          "losses": 1,
+          "ties": 0
+        },
+        "blue_record": {
+          "wins": 1,
+          "losses": 0,
+          "ties": 0
+        },
+        "red_name": "DTE Energy",
+        "blue_name": "Aptiv"
+      },
+      "sf2": {
+        "red_alliance": [
+          "51",
+          "818",
+          "226"
+        ],
+        "blue_alliance": [
+          "6090",
+          "1506",
+          "217"
+        ],
+        "winning_alliance": "red",
+        "red_wins": 1,
+        "blue_wins": 0,
+        "red_record": {
+          "wins": 1,
+          "losses": 0,
+          "ties": 0
+        },
+        "blue_record": {
+          "wins": 0,
+          "losses": 1,
+          "ties": 0
+        },
+        "red_name": "Consumers",
+        "blue_name": "Ford"
+      },
+      "sf3": {
+        "red_alliance": [
+          "7769",
+          "5166",
+          "5901"
+        ],
+        "blue_alliance": [
+          "51",
+          "818",
+          "226"
+        ],
+        "winning_alliance": "blue",
+        "red_wins": 0,
+        "blue_wins": 1,
+        "red_record": {
+          "wins": 0,
+          "losses": 1,
+          "ties": 0
+        },
+        "blue_record": {
+          "wins": 1,
+          "losses": 0,
+          "ties": 0
+        },
+        "red_name": "Aptiv",
+        "blue_name": "Consumers"
+      },
+      "sf4": {
+        "red_alliance": [
+          "5907",
+          "503",
+          "1189",
+          "5926"
+        ],
+        "blue_alliance": [
+          "6090",
+          "1506",
+          "217"
+        ],
+        "winning_alliance": "blue",
+        "red_wins": 0,
+        "blue_wins": 1,
+        "red_record": {
+          "wins": 0,
+          "losses": 1,
+          "ties": 0
+        },
+        "blue_record": {
+          "wins": 1,
+          "losses": 0,
+          "ties": 0
+        },
+        "red_name": "DTE Energy",
+        "blue_name": "Ford"
+      },
+      "sf5": {
+        "red_alliance": [
+          "7769",
+          "5166",
+          "5901"
+        ],
+        "blue_alliance": [
+          "6090",
+          "1506",
+          "217"
+        ],
+        "winning_alliance": "blue",
+        "red_wins": 0,
+        "blue_wins": 1,
+        "red_record": {
+          "wins": 0,
+          "losses": 1,
+          "ties": 0
+        },
+        "blue_record": {
+          "wins": 1,
+          "losses": 0,
+          "ties": 0
+        },
+        "red_name": "Aptiv",
+        "blue_name": "Ford"
+      }
+    },
+    "f": {
+      "f1": {
+        "red_alliance": [
+          "51",
+          "818",
+          "226"
+        ],
+        "blue_alliance": [
+          "6090",
+          "1506",
+          "217"
+        ],
+        "winning_alliance": "blue",
+        "red_wins": 0,
+        "blue_wins": 2,
+        "red_record": {
+          "wins": 0,
+          "losses": 2,
+          "ties": 0
+        },
+        "blue_record": {
+          "wins": 2,
+          "losses": 0,
+          "ties": 0
+        },
+        "red_name": "Consumers",
+        "blue_name": "Ford"
+      }
+    }
+  }
+}

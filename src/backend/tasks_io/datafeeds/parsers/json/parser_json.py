@@ -14,5 +14,4 @@ class ParserJSON(ParserBase[TParsedResponse]):
     """
 
     @abc.abstractmethod
-    def parse(self, response: Dict[str, Any]) -> Optional[TParsedResponse]:
-        ...
+    def parse(self, response: Dict[str, Any]) -> Optional[TParsedResponse]: ...

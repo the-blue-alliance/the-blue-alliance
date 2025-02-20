@@ -58,7 +58,12 @@ class JSONMatchesParser:
         time_string: String in the format "(H)H:MM AM/PM" for when the match will be played in the event's local timezone. ex: "9:15 AM"
         time: UTC time of the match as a string in ISO 8601 format (YYYY-MM-DDTHH:MM:SS).
         """
-        matches = safe_json.loads(matches_json, Sequence[MatchInput], validate=False)
+        VALID_BREAKDOWN_KEYS: set[str] = (
+            ScoreBreakdownKeys.get_valid_score_breakdown_keys(year)
+        )
+        matches: Sequence[MatchInput] = safe_json.loads(
+            matches_json, Sequence, validate=False
+        )
         if not isinstance(matches, list):
             raise ParserInputException("Invalid JSON. Please check input.")
 
@@ -148,14 +153,14 @@ class JSONMatchesParser:
                             raise ParserInputException(
                                 f"Alliance color '{color}' not recognized"
                             )
-                        for k in breakdown.keys():
-                            is_valid = ScoreBreakdownKeys.is_valid_score_breakdown_key(
-                                k, year
+                        invalid_breakdown_keys: set[str] = (
+                            set(breakdown.keys()) - VALID_BREAKDOWN_KEYS
+                        )
+                        if invalid_breakdown_keys:
+                            raise ParserInputException(
+                                f"Invalid score breakdown fields for {year}: {sorted(list(invalid_breakdown_keys))}. "
+                                f"Valid keys are: {sorted(list(VALID_BREAKDOWN_KEYS))}"
                             )
-                            if is_valid is not True:
-                                raise ParserInputException(
-                                    f"Valid score breakdowns for {year} are: {is_valid}"
-                                )
 
             datetime_utc = None
             if time_utc is not None:
@@ -191,9 +196,9 @@ class JSONMatchesParser:
                 "set_number": set_number,
                 "match_number": match_number,
                 "alliances_json": json.dumps(parsed_alliances),
-                "score_breakdown_json": json.dumps(score_breakdown)
-                if score_breakdown is not None
-                else None,
+                "score_breakdown_json": (
+                    json.dumps(score_breakdown) if score_breakdown is not None else None
+                ),
                 "time_string": time_string,
                 "time": datetime_utc,
                 "team_key_names": parsed_alliances[AllianceColor.RED]["teams"]

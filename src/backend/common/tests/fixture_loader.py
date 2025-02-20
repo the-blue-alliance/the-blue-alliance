@@ -110,7 +110,8 @@ def load_fixture(filename, kind, post_processor=None):
 
         return loaded
 
-    tree = json.load(open(filename))
+    with open(filename) as f:
+        tree = json.load(f)
 
     loaded = []
 

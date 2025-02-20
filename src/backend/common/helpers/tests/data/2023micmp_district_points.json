@@ -1,0 +1,110 @@
+{
+  "points": {
+    "frc1506": {
+      "alliance_points": 0,
+      "award_points": 0,
+      "elim_points": 60,
+      "qual_points": 0,
+      "total": 60
+    },
+    "frc201": {
+      "alliance_points": 0,
+      "award_points": 30,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 30
+    },
+    "frc217": {
+      "alliance_points": 0,
+      "award_points": 0,
+      "elim_points": 60,
+      "qual_points": 0,
+      "total": 60
+    },
+    "frc226": {
+      "alliance_points": 0,
+      "award_points": 30,
+      "elim_points": 30,
+      "qual_points": 0,
+      "total": 60
+    },
+    "frc245": {
+      "alliance_points": 0,
+      "award_points": 30,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 30
+    },
+    "frc3875": {
+      "alliance_points": 0,
+      "award_points": 24,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 24
+    },
+    "frc51": {
+      "alliance_points": 0,
+      "award_points": 0,
+      "elim_points": 30,
+      "qual_points": 0,
+      "total": 30
+    },
+    "frc5166": {
+      "alliance_points": 0,
+      "award_points": 30,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 30
+    },
+    "frc548": {
+      "alliance_points": 0,
+      "award_points": 30,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 30
+    },
+    "frc5901": {
+      "alliance_points": 0,
+      "award_points": 0,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 0
+    },
+    "frc6090": {
+      "alliance_points": 0,
+      "award_points": 0,
+      "elim_points": 60,
+      "qual_points": 0,
+      "total": 60
+    },
+    "frc7769": {
+      "alliance_points": 0,
+      "award_points": 0,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 0
+    },
+    "frc818": {
+      "alliance_points": 0,
+      "award_points": 0,
+      "elim_points": 30,
+      "qual_points": 0,
+      "total": 30
+    },
+    "frc9148": {
+      "alliance_points": 0,
+      "award_points": 24,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 24
+    },
+    "frc9312": {
+      "alliance_points": 0,
+      "award_points": 24,
+      "elim_points": 0,
+      "qual_points": 0,
+      "total": 24
+    }
+  },
+  "tiebreakers": {}
+}

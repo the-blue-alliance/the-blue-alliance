@@ -30,35 +30,33 @@ class FMSAPIAwardsParser(ParserJSON[List[Award]]):
             if award_type_enum is None:
                 continue
 
-            recipient_json = json.dumps(
-                {
-                    "team_number": team_number,
-                    "awardee": award["person"],
-                }
-            )
+            recipient = {
+                "team_number": team_number,
+                "awardee": award["person"],
+            }
 
             if award_type_enum in awards_by_type:
-                if team_number is not None:
-                    if (
-                        team_number
-                        in awards_by_type[award_type_enum]["team_number_list"]
-                    ):
-                        continue
-
+                # Only need to insert team_number once
+                if (
+                    team_number is not None
+                    and team_number
+                    not in awards_by_type[award_type_enum]["team_number_list"]
+                ):
                     awards_by_type[award_type_enum]["team_number_list"].append(
                         team_number
                     )
-                awards_by_type[award_type_enum]["recipient_json_list"].append(
-                    recipient_json
-                )
+
+                # Check for duplicates before appending to handle bad data
+                if recipient not in awards_by_type[award_type_enum]["recipient_list"]:
+                    awards_by_type[award_type_enum]["recipient_list"].append(recipient)
             else:
                 awards_by_type[award_type_enum] = {
                     "name_str": award["name"],
                     "award_type_enum": award_type_enum,
-                    "team_number_list": [team_number]
-                    if team_number is not None
-                    else [],
-                    "recipient_json_list": [recipient_json],
+                    "team_number_list": (
+                        [team_number] if team_number is not None else []
+                    ),
+                    "recipient_list": [recipient],
                 }
 
         awards = []
@@ -77,7 +75,9 @@ class FMSAPIAwardsParser(ParserJSON[List[Award]]):
                         ndb.Key(Team, "frc{}".format(team_number))
                         for team_number in award["team_number_list"]
                     ],
-                    recipient_json_list=award["recipient_json_list"],
+                    recipient_json_list=[
+                        json.dumps(recipient) for recipient in award["recipient_list"]
+                    ],
                 )
             )
 

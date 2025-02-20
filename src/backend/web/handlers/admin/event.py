@@ -14,6 +14,9 @@ from backend.common.consts.playoff_type import (
     PlayoffType,
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
 )
+from backend.common.consts.webcast_type import WebcastType
+from backend.common.helpers.event_webcast_adder import EventWebcastAdder
+from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -32,6 +35,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
+from backend.common.models.webcast import Webcast
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.web.profiled_render import render_template
 
@@ -64,7 +68,9 @@ def event_detail(event_key: EventKey) -> str:
     api_keys = ApiAuthAccess.query(
         ApiAuthAccess.event_list == ndb.Key(Event, event_key)
     ).fetch()
-    event_medias = Media.query(Media.references == event.key).fetch(500)
+    event_medias = Media.query(Media.references == event.key).fetch_async(500)
+    event_eventteams = EventTeam.query(EventTeam.event == event.key).fetch_async()
+
     playoff_template = PlayoffAdvancementHelper.playoff_template(event)
     elim_bracket_html = render_template(
         "bracket_partials/bracket_table.html",
@@ -106,7 +112,13 @@ def event_detail(event_key: EventKey) -> str:
 
     template_values = {
         "event": event,
-        "medias": event_medias,
+        "medias": event_medias.get_result(),
+        "eventteams": list(
+            sorted(
+                event_eventteams.get_result(),
+                key=lambda et: int(et.team.string_id()[3:]),
+            )
+        ),
         "flushed": request.args.get("flushed"),
         "playoff_types": PLAYOFF_TYPE_NAMES,
         "write_auths": api_keys,
@@ -252,9 +264,11 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         event_short=request.form.get("event_short"),
         first_code=first_code if first_code and first_code != "None" else None,
         event_type_enum=int(request.form.get("event_type", EventType.UNLABLED)),
-        district_key=ndb.Key(District, request.form.get("event_district_key"))
-        if district_key and district_key != "None"
-        else None,
+        district_key=(
+            ndb.Key(District, request.form.get("event_district_key"))
+            if district_key and district_key != "None"
+            else None
+        ),
         venue=request.form.get("venue"),
         venue_address=request.form.get("venue_address"),
         city=request.form.get("city"),
@@ -277,12 +291,14 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         custom_hashtag=request.form.get("custom_hashtag"),
         webcast_json=request.form.get("webcast_json"),
         playoff_type=int(request.form.get("playoff_type", PlayoffType.BRACKET_8_TEAM)),
-        parent_event=ndb.Key(Event, parent_key)
-        if parent_key and parent_key.lower() != "none"
-        else None,
+        parent_event=(
+            ndb.Key(Event, parent_key)
+            if parent_key and parent_key.lower() != "none"
+            else None
+        ),
         divisions=division_keys,
     )
-    event = EventManipulator.createOrUpdate(event)
+    event = EventManipulator.createOrUpdate(event, auto_union=False)
 
     if request.form.get("alliance_selections_json") or request.form.get(
         "rankings_json"
@@ -380,3 +396,86 @@ def event_remap_teams_post(event_key: EventKey) -> Response:
         method="GET",
     )
     return redirect(url_for("admin.event_detail", event_key=event.key_name))
+
+
+def event_update_location_get(event_key: EventKey) -> str:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    event.normalized_location = None
+    LocationHelper.update_event_location(event)
+    event = EventManipulator.createOrUpdate(event)
+
+    return f"New location: {event.normalized_location}"
+
+
+def event_update_location_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    place_id = request.form.get("place_id")
+    if not place_id:
+        abort(400)
+
+    # Construct a mostly empty input struct that'll get filled in
+    location_input = {
+        "place_id": place_id,
+        "geometry": {
+            "location": {
+                "lat": "",
+                "lng": "",
+            },
+        },
+        "name": "",
+        "types": [],
+    }
+    location_info = LocationHelper.construct_location_info(location_input)
+    event.normalized_location = LocationHelper.build_normalized_location(location_info)
+    EventManipulator.createOrUpdate(event)
+
+    return redirect(url_for("admin.event_detail", event_key=event.key_name))
+
+
+def event_add_webcast_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcast = Webcast(
+        type=WebcastType(request.form.get("webcast_type")),
+        channel=none_throws(request.form.get("webcast_channel")),
+    )
+    if request.form.get("webcast_file"):
+        webcast["file"] = none_throws(request.form.get("webcast_file"))
+    if request.form.get("webcast_date"):
+        webcast["date"] = none_throws(request.form.get("webcast_date"))
+
+    EventWebcastAdder.add_webcast(event, webcast)
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )
+
+
+def event_remove_webcast_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcast_type = WebcastType(request.form.get("type"))
+    webcast_channel = none_throws(request.form.get("channel"))
+    webcast_index = int(request.form.get("index")) - 1
+    if request.form.get("file"):
+        webcast_file = request.form.get("file")
+    else:
+        webcast_file = None
+
+    EventWebcastAdder.remove_webcast(
+        event, webcast_index, webcast_type, webcast_channel, webcast_file
+    )
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )

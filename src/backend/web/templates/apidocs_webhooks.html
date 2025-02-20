@@ -320,7 +320,7 @@
 
           <h4>Example JSON</h4>
             <pre class="example-json">
-            {"message_data": {"event_name": "New England FRC Region Championship", "event_key": "2014necmp", "event": {"key": "2014necmp", "website": "http://www.nefirst.org/", "official": true, "end_date": "2014-04-12", "name": "New England FRC Region Championship", "short_name": "New England", "facebook_eid": null, "event_district_string": "New England", "venue_address": "Boston University\nAgganis Arena\nBoston, MA 02215\nUSA", "event_district": 3, "location": "Boston, MA, USA", "event_code": "necmp", "year": 2014, "webcast": [], "alliances": [{"declines": [], "picks": ["frc195", "frc558", "frc5122"]}, {"declines": [], "picks": ["frc1153", "frc125", "frc4048"]}, {"declines": [], "picks": ["frc230", "frc177", "frc4055"]}, {"declines": [], "picks": ["frc716", "frc78", "frc811"]}, {"declines": [], "picks": ["frc1519", "frc3467", "frc58"]}, {"declines": [], "picks": ["frc131", "frc175", "frc1073"]}, {"declines": [], "picks": ["frc228", "frc3525", "frc2168"]}, {"declines": [], "picks": ["frc172", "frc1058", "frc2067"]}], "event_type_string": "District Championship", "start_date": "2014-04-10", "event_type": 2} }, "message_type": "alliance_selection"}
+            {"message_data": {"event_name": "New England FRC Region Championship", "event_key": "2014necmp", "event": {"address": "Boston, MA 02215, USA", "city": "Boston", "country": "USA", "district": {"abbreviation": "ne", "display_name": "New England", "key": "2014ne", "year": 2014}, "division_keys": [], "end_date": "2014-04-12", "event_code": "necmp", "event_type": 2, "event_type_string": "District Championship", "first_event_code": "necmp", "first_event_id": "10871", "gmaps_place_id": "ChIJFzjlY_B544kRyL6j4ABuNCs", "gmaps_url": "https://maps.google.com/?cid=3113234192467738312", "key": "2014necmp", "lat": 42.3504997, "lng": -71.1053991, "location_name": "Boston University", "name": "New England FRC Region Championship", "parent_event_key": null, "playoff_type": null, "playoff_type_string": null, "postal_code": "02215", "short_name": "New England", "start_date": "2014-04-10", "state_prov": "MA", "timezone": "America/New_York", "webcasts": [{"channel": "7031031", "file": "2797186", "type": "livestream"}, {"channel": "7234441", "file": "2797207", "type": "livestream"}], "website": "http://www.nefirst.org/", "week": 6, "year": 2014}}, "message_type": "alliance_selection"}
             </pre>
             {% with type=types.alliance_selection, event_key='2014necmp' %}
               {% include "apidocs_partials/apidocs_webhooks_test.html" %}
@@ -631,31 +631,25 @@ $( document ).ready(function() {
         $(this.form).find('.webhook-alert').removeClass('alert-success');
         $(this.form).find('.webhook-alert').removeClass('alert-danger');
 
-        $.post(this.form.action, $(this.form).serialize()).done(function (data) {
-            if (data === "ok") {
-                $(this.form).find('.webhook-alert').addClass('alert-success');
-            } else {
-                $(this.form).find('.webhook-alert').addClass('alert-danger');
-            }
+        $.post(this.form.action, $(this.form).serialize()).always(function (data) {
+            let responseText;
+            if (data === 'ok') responseText = 'Sent webhook!';
+            else if (data.responseJSON && data.responseJSON.Error) responseText = data.responseJSON.Error;
+            else if (data.status === 401) responseText = 'Please log in before sending test notifications.';
+            else responseText = 'Something went horribly wrong. Refresh the page and try again.';
+            
+            $(this.form).find('.webhook-alert')
+                .addClass(data === 'ok' ? 'alert-success' : 'alert-danger')
+                .css('display', 'block')
+                .text(responseText);
 
-            $(this.form).find('.webhook-alert').css('display', 'block');
-            $(this.form).find('.webhook-alert').text(data === "ok" ? "Sent webhook!" : data);
-
-            $(this).attr('disabled', false);
-            $(this).removeClass('disabled');
+            $(this).attr('disabled', false)
+                .removeClass('disabled');
 
             setTimeout(function() {
                 $(this.form).find('.webhook-alert').css('display', 'none');
             }.bind(this), 5000)
-        }.bind(this)).fail(function (error) {
-            if (error.status == 401) {
-              alert('Please login before sending test notifications.');
-            } else {
-              alert('Something went horribly wrong. Try again.');
-            }
-            $(this).attr('disabled', false);
-            $(this).removeClass('disabled');
-        });
+        }.bind(this));
     });
 
     $('.webhook-alert').hide();

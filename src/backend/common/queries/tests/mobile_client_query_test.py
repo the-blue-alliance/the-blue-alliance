@@ -102,7 +102,7 @@ def test_delete_for_messaging_id():
     user_id_two = "user_id_two"
     messaging_id_three = "messaging_id3"
 
-    for (user_id, messaging_ids) in [
+    for user_id, messaging_ids in [
         (user_id_one, [messaging_id_one, messaging_id_two]),
         (user_id_two, [messaging_id_three]),
     ]:

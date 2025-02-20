@@ -1,13 +1,14 @@
-from unittest.mock import call, Mock, patch
+from unittest.mock import call, patch
 
 import pytest
-from requests import Response
 
 from backend.common.frc_api import FRCAPI
+from backend.common.futures import InstantFuture
 from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
 )
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
+from backend.common.urlfetch import URLFetchResult
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_list_parser import (
     FMSAPIDistrictListParser,
@@ -23,21 +24,21 @@ def fms_api_secrets(ndb_stub):
 
 
 def test_get_district_list() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = (
-        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1",
+        200,
+        "",
     )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "district_list", return_value=response
+        FRCAPI, "district_list", return_value=InstantFuture(response)
     ) as mock_api, patch.object(
         FMSAPIDistrictListParser, "__init__", return_value=None
     ) as mock_init, patch.object(
         FMSAPIDistrictListParser, "parse"
     ) as mock_parse:
-        df.get_district_list(2020)
+        df.get_district_list(2020).get_result()
 
     mock_api.assert_called_once_with(2020)
     mock_init.assert_called_once_with(2020)
@@ -45,22 +46,22 @@ def test_get_district_list() -> None:
 
 
 def test_get_district_rankings() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = (
-        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1",
+        200,
+        "",
     )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "district_rankings", return_value=response
+        FRCAPI, "district_rankings", return_value=InstantFuture(response)
     ) as mock_api, patch.object(
         FMSAPIDistrictRankingsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
         FMSAPIDistrictRankingsParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = ({}, False)
-        df.get_district_rankings("2020ne")
+        df.get_district_rankings("2020ne").get_result()
 
     mock_api.assert_called_once_with(2020, "ne", 1)
     mock_init.assert_called_once_with()
@@ -68,22 +69,22 @@ def test_get_district_rankings() -> None:
 
 
 def test_get_district_rankings_paginated() -> None:
-    response = Mock(spec=Response)
-    response.status_code = 200
-    response.url = (
-        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1"
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/teams?eventCode=MIKET&page=1",
+        200,
+        "",
     )
 
     df = DatafeedFMSAPI()
     with patch.object(
-        FRCAPI, "district_rankings", return_value=response
+        FRCAPI, "district_rankings", return_value=InstantFuture(response)
     ) as mock_api, patch.object(
         FMSAPIDistrictRankingsParser, "__init__", return_value=None
     ) as mock_init, patch.object(
         FMSAPIDistrictRankingsParser, "parse"
     ) as mock_parse:
         mock_parse.side_effect = [({}, True), ({}, False)]
-        df.get_district_rankings("2020ne")
+        df.get_district_rankings("2020ne").get_result()
 
     mock_api.assert_has_calls([call(2020, "ne", 1), call(2020, "ne", 2)])
     mock_init.assert_called_once_with()

@@ -1,6 +1,5 @@
-from typing import Any, Dict
+from typing import Any, cast, Dict
 
-from pyre_extensions import safe_cast
 from typing_extensions import TypedDict
 
 from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
@@ -16,4 +15,4 @@ class RootInfo(TypedDict):
 
 class FMSAPIRootParser(ParserJSON[RootInfo]):
     def parse(self, response: Dict[str, Any]) -> RootInfo:
-        return safe_cast(RootInfo, response)
+        return cast(RootInfo, response)

@@ -37,9 +37,11 @@ class MediaCreator:
             media_type_enum=media_type_enum,
             details_json=suggestion.contents.get("details_json", None),
             private_details_json=suggestion.contents.get("private_details_json", None),
-            year=int(none_throws(suggestion.contents["year"]))
-            if not suggestion.contents.get("is_social", False)
-            else None,
+            year=(
+                int(none_throws(suggestion.contents["year"]))
+                if not suggestion.contents.get("is_social", False)
+                else None
+            ),
             references=[team_reference],
             preferred_references=preferred_references,
         )

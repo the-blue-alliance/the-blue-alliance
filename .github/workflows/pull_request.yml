@@ -12,129 +12,297 @@ concurrency:
 jobs:
   py3-type:
     name: "[py3] Type Check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements.txt'
+      - name: Set up Python 3.12
+        if: steps.changes.outputs.python == 'true'
+        uses: actions/setup-python@v5
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
+        if: steps.changes.outputs.python == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Type Check
+        if: steps.changes.outputs.python == 'true'
         run: ./ops/typecheck_py3.sh
   py3-lint:
     name: "[py3] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements.txt'
+      - name: Set up Python 3.12
+        if: steps.changes.outputs.python == 'true'
+        uses: actions/setup-python@v5
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
+        if: steps.changes.outputs.python == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Format & Lint
+        if: steps.changes.outputs.python == 'true'
         run: ./ops/lint_py3.sh
   py3-test:
     name: "[py3] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        group: [1, 2, 3]
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements.txt'
+      - name: Set up Python 3.12
+        if: steps.changes.outputs.python == 'true'
+        uses: actions/setup-python@v5
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
+        if: steps.changes.outputs.python == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r src/requirements.txt
       - name: Run Tests
-        run: ./ops/test_py3.sh
+        if: steps.changes.outputs.python == 'true'
+        run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
+      - name: Save coverage artifacts
+        if: steps.changes.outputs.python == 'true'
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: coverage${{ matrix.group }}
+          path: .coverage
+          include-hidden-files: true
+  py3-coverage:
+    name: "[py3] Coverage"
+    runs-on: ubuntu-22.04
+    needs: [py3-test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements.txt'
+      - name: Set up Python 3.12
+        if: steps.changes.outputs.python == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install Dependencies
+        if: steps.changes.outputs.python == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Download all artifacts
+        if: steps.changes.outputs.python == 'true'
+        uses: actions/download-artifact@v4
+      - name: Combine coverage
+        if: steps.changes.outputs.python == 'true'
+        run: |
+          coverage combine coverage*/.coverage*
+          coverage xml
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        if: steps.changes.outputs.python == 'true'
+        uses: codecov/codecov-action@v5.1.2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.xml
   node-lint:
     name: "[node] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            node:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
       - name: Set up Node
-        uses: actions/setup-node@v3.6.0
+        if: steps.changes.outputs.node == 'true'
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: "14"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Dependencies
+        if: steps.changes.outputs.node == 'true'
         run: npm ci
       - name: Run Format & Lint
+        if: steps.changes.outputs.node == 'true'
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            node:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
       - name: Set up Node
-        uses: actions/setup-node@v3.6.0
+        if: steps.changes.outputs.node == 'true'
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: "14"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Dependencies
+        if: steps.changes.outputs.node == 'true'
         run: npm ci
       - name: Run Tests
+        if: steps.changes.outputs.node == 'true'
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
+        if: steps.changes.outputs.node == 'true'
+        uses: codecov/codecov-action@v5.1.2
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
+  pwa-lint:
+    name: "[pwa] Format & Lint"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm --prefix pwa ci
+      - name: Run Format
+        run: npm --prefix pwa run format
+      - name: Run Lint
+        run: npm --prefix pwa run lint
+  pwa-type:
+    name: "[pwa] Type Check"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm --prefix pwa ci
+      - name: Run Type Check
+        run: npm --prefix pwa run typecheck
+  pwa-test:
+    name: "[pwa] Test"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm --prefix pwa ci
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
+      - name: Run Test
+        run: npm --prefix pwa test
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5.1.2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./pwa/coverage/
+  pwa-build:
+    name: "[pwa] Build"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm --prefix pwa ci
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
+      - name: Run Build
+        run: npm --prefix pwa run build
+  pwa-e2e:
+    name: "[pwa] E2E Tests"
+    if: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "20.16.0"
+          cache: "npm"
+
+      - name: Install Dependencies
+        working-directory: pwa
+        run: npm ci
+      
+      - name: Install Playwright Browsers
+        working-directory: pwa
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run Playwright tests
+        working-directory: pwa
+        run: npx playwright test
+        env:
+          VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+
   bash-lint:
     name: "[bash] Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Shellcheck
         run: |
           python -m pip install --upgrade pip
@@ -150,79 +318,94 @@ jobs:
 
   build-web:
     name: Build Web
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.10'
+          filters: |
+            buildweb:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
+      - name: Set up Python 3.12
+        if: steps.changes.outputs.buildweb == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Set up Node
-        uses: actions/setup-node@v3.6.0
+        if: steps.changes.outputs.buildweb == 'true'
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: "14"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Node Dependencies
+        if: steps.changes.outputs.buildweb == 'true'
         run: npm ci
       - name: Run Build
+        if: steps.changes.outputs.buildweb == 'true'
         run: ./ops/build/run_buildweb.sh --env
 
   ops-test:
     name: Ops Fullstack Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       registry:
         image: registry:2
         ports:
           - 5000:5000
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: '3.10'
-      - name: Cache pip
-        uses: actions/cache@v3.3.1
+          filters: |
+            web:
+              - 'ops/**'
+              - 'src/**'
+              - 'package.json'
+              - 'requirements.txt'
+      - name: Set up Python 3.12
+        if: steps.changes.outputs.web == 'true'
+        uses: actions/setup-python@v5
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Python Dependencies
+        if: steps.changes.outputs.web == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Set up Node
-        uses: actions/setup-node@v3.6.0
+        if: steps.changes.outputs.web == 'true'
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: "14"
-      - name: Cache node modules
-        uses: actions/cache@v3.3.1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: "18"
+          cache: "npm"
       - name: Install Node Dependencies
+        if: steps.changes.outputs.web == 'true'
         run: |
           npm ci
           npm install -g capture-website-cli
       - name: Install Vagrant
+        if: steps.changes.outputs.web == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install vagrant
       - name: Create keys file
+        if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
       - name: Set up Docker Buildx
+        if: steps.changes.outputs.web == 'true'
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       - name: Build Docker Image
-        uses: docker/build-push-action@v4.0.0
+        if: steps.changes.outputs.web == 'true'
+        uses: docker/build-push-action@v6.14.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker
@@ -233,15 +416,20 @@ jobs:
             ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
           cache-to: type=gha,mode=max
       - name: Start Container
+        if: steps.changes.outputs.web == 'true'
         run: vagrant up
       - name: Test Vagrant Startup
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/test_vagrant_startup.py
       - name: Test Ops Fullstack
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/test_ops.sh
       - name: Capture screenshots
+        if: steps.changes.outputs.web == 'true'
         run: ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
-        uses: actions/upload-artifact@v3
+        if: steps.changes.outputs.web == 'true'
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle

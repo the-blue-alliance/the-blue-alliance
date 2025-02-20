@@ -15,20 +15,22 @@ RUN apt-get update && apt-get install -y \
     vim \
     openssh-server
 
-# Needed for Python 3.10
+# Needed for Python 3.12
 RUN apt-get install software-properties-common -y
 RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN apt-get update
 
 # Setup python environment
-ENV PYTHON_VERSION python3.10
-RUN apt-get install -y \
+ENV PYTHON_VERSION python3.12
+# RUN apt-get remove -y $PYTHON_VERSION-minimal
+RUN apt-get update && apt-get install -y \
     "$PYTHON_VERSION" \
     "$PYTHON_VERSION-venv" \
     "$PYTHON_VERSION-dev" \
     python3-pip
 RUN update-alternatives --install /usr/bin/python python "/usr/bin/$PYTHON_VERSION" 1
+RUN update-alternatives --install /usr/bin/python3 python3 "/usr/bin/$PYTHON_VERSION" 1
 RUN echo 1 | update-alternatives --config python
+RUN echo 1 | update-alternatives --config python3
 
 # Add gcloud repository and Cloud SDK dependencies
 RUN apt-get update && apt-get install -y apt-transport-https curl
@@ -45,12 +47,14 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install default-jre -y
 
 # dev_appserver expects `python2` to exist
+RUN sudo apt update
+RUN sudo apt install python2 -y
 RUN update-alternatives --install /usr/bin/python2 python2 /usr/bin/python2.7 1
 RUN echo 1 | update-alternatives --config python2
 
 # Set up nvm and nodejs
 ENV NVM_DIR /nvm
-ENV NODE_VERSION 14
+ENV NODE_VERSION 18
 RUN mkdir -p $NVM_DIR  \
     && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
     && . $NVM_DIR/nvm.sh \

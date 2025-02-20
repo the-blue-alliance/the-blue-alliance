@@ -98,6 +98,9 @@ def test_render_legacy_double_elim(web_client: Client, test_data_importer) -> No
 def test_render_double_elim(web_client: Client, test_data_importer) -> None:
     test_data_importer.import_event(__file__, "data/2022cctest.json")
     test_data_importer.import_match_list(__file__, "data/2022cctest_matches.json")
+    test_data_importer.import_event_playoff_advancement(
+        __file__, "data/2022cctest_advancement.json", "2022cctest"
+    )
 
     resp = web_client.get("/event/2022cctest")
     assert resp.status_code == 200
