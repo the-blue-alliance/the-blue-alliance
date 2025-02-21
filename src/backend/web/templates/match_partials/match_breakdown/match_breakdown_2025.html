@@ -81,6 +81,48 @@
 {%if alliance_breakdown.techFoulCount%}{{alliance_breakdown.techFoulCount}}{%else%}0{%endif%}
 {% endmacro %}
 
+{% macro drawReef(alliance_breakdown, row_key, is_red) %}
+{% set transforms = {
+  "A": "matrix(1,0,0,-1,0,120.00208)",
+  "B": "",
+  "C": "matrix(0.5,-0.8660254,-0.8660254,-0.5,82.086452,142.17791)",
+  "D": "rotate(-60,60.248055,60.00104)",
+  "E": "matrix(-0.5,-0.8660254,-0.8660254,0.5,142.33451,82.176869)",
+  "F": "rotate(-120,60.248055,60.001041)",
+  "G": "matrix(-1,0,0,1,120.49611,0)",
+  "H": "rotate(180,60.248053,60.00104)",
+  "I": "matrix(-0.5,0.8660254,0.8660254,0.5,38.409658,-22.175826)",
+  "J": "rotate(120,60.248053,60.001041)",
+  "K": "matrix(0.5,0.8660254,0.8660254,-0.5,-21.838398,37.825214)",
+  "L": "rotate(60,60.248051,60.001042)",
+} %}
+<svg width="10em" height="10em" viewBox="0 0 120 120">
+  <style>
+    path {
+      fill: #ffffff;
+      fill-opacity: 1;
+      stroke: #000000;
+      stroke-width: 1;
+      stroke-linejoin: round;
+      stroke-dasharray: none;
+    }
+  </style>
+  <g id="layer1" transform="rotate({{0 if is_red else 180}},60,60)">
+    {% for position in transforms %}
+      <g transform="{{ transforms[position] }}">
+        <title>{{position}}</title>
+        <path d="M 9.9962468,60.002116 H 59.996243 L 9.9962468,88.872115 Z"
+          style="fill: #00ff00; fill-opacity: {{0.3 if alliance_breakdown.autoReef[row_key]["node"+position] else 0}};"/>
+        {% if alliance_breakdown.teleopReef[row_key]["node"+position] %}
+          <path d="m 14.999992,63.002636 h 17.49994 c 0,0 2.5163,-0.409849 2.499992,4.500002 -0.01631,4.909851 -2.499992,4.500001 -2.499992,4.500001 l -17.49994,-10e-7"/>
+          <path d="m 12.999687,67.503137 c 0.03259,5.970381 4.114967,6.029921 3.998307,-10e-4 -0.116661,-6.031091 -4.030895,-5.969221 -3.998307,10e-4 z"/>
+        {% endif %}
+      </g>
+    {% endfor %}
+  </g>
+</svg>
+{% endmacro %}
+
 <table class="match-table">
     <tbody>
     <!-- Autonomous -->
@@ -378,3 +420,78 @@
     </tr>
     </tbody>
 </table>
+
+{% if "teleopReef" in match.score_breakdown.red %}
+<h4>Scoring Location Breakdown</h4>
+<table class="match-table">
+  <tbody>
+    <tr>
+      <td class="red">
+        {{drawReef(match.score_breakdown.red, "topRow", True)}}
+      </td>
+      <td>
+        High (L4)
+      </td>
+      <td class="blue">
+        {{drawReef(match.score_breakdown.blue, "topRow", False)}}
+      </td>
+    </tr>
+    <tr>
+      <td class="red">
+        {{drawReef(match.score_breakdown.red, "midRow", True)}}
+      </td>
+      <td>
+        Mid (L3)
+      </td>
+      <td class="blue">
+        {{drawReef(match.score_breakdown.blue, "midRow", False)}}
+      </td>
+    </tr>
+    <tr>
+      <td class="red">
+        {{drawReef(match.score_breakdown.red, "botRow", True)}}
+      </td>
+      <td>
+        Low (L2)
+      </td>
+      <td class="blue">
+        {{drawReef(match.score_breakdown.blue, "botRow", False)}}
+      </td>
+    </tr>
+    <tr>
+      <td class="red">
+        {{match.score_breakdown.red.teleopReef.trough}}
+      </td>
+      <td>
+        Trough (L1)
+      </td>
+      <td class="blue">
+        {{match.score_breakdown.blue.teleopReef.trough}}
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div style="display: flex; flex-direction: row; align-items: center;">
+    <svg width="24px" height="24px" viewBox="12.5 62.5 25 10" style="margin-right: 8px;">
+        <style>
+        path {
+            fill: #ffffff;
+            fill-opacity: 1;
+            stroke: #000000;
+            stroke-width: 1;
+            stroke-linejoin: round;
+            stroke-dasharray: none;
+        }
+        </style>
+        <path d="m 14.999992,63.002636 h 17.49994 c 0,0 2.5163,-0.409849 2.499992,4.500002 -0.01631,4.909851 -2.499992,4.500001 -2.499992,4.500001 l -17.49994,-10e-7"/>
+        <path d="m 12.999687,67.503137 c 0.03259,5.970381 4.114967,6.029921 3.998307,-10e-4 -0.116661,-6.031091 -4.030895,-5.969221 -3.998307,10e-4 z"/>
+    </svg>
+    Coral
+</div>
+<div style="display: flex; flex-direction: row; align-items: center;">
+    <svg width="24px" height="24px" style="margin-right: 8px;">
+        <rect width="24" height="24" style="fill:rgb(0,255,0,0.3); stroke-width:1; stroke:rgb(0,0,0,0.2)" />
+    </svg>
+    Scored in auto
+</div>
+{% endif %}
