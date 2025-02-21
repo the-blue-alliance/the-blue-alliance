@@ -12,7 +12,7 @@ TReturn = TypeVar("TReturn")
 def typed_tasklet(
     f: Callable[
         TParams, Union[TReturn, Iterable[TReturn], Generator[TReturn, None, None]]
-    ]
+    ],
 ) -> Callable[TParams, TypedFuture[TReturn]]:
     @ndb.tasklet
     def inner(
