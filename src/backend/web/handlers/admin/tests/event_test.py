@@ -54,3 +54,8 @@ def test_event_detail(web_client: Client, login_gae_admin, setup_full_event) -> 
     setup_full_event("2019nyny")
     resp = web_client.get("/admin/event/2019nyny")
     assert resp.status_code == 200
+
+def test_invalid_event_delete(web_client: Client, login_gae_admin, taskqueue_stub) -> None:
+    helpers.preseed_event("2025tempclone-356125237")
+    resp = web_client.post("/admin/event/2025tempclone-356125237/delete")
+    assert resp.status_code == 302
