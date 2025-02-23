@@ -1,4 +1,4 @@
-import { useNavigate } from '@remix-run/react';
+import { useNavigate } from 'react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { SearchIndex } from '~/api/v3';

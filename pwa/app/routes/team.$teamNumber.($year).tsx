@@ -1,13 +1,6 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
-import {
-  ClientLoaderFunctionArgs,
-  MetaFunction,
-  Params,
-  useLoaderData,
-  useNavigate,
-} from '@remix-run/react';
 import { useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
+import { useLoaderData, useNavigate } from 'react-router';
 
 import {
   Award,
@@ -76,11 +69,9 @@ import {
   winrateFromRecord,
 } from '~/lib/utils';
 
-async function loadData(params: Params) {
-  if (params.teamNumber === undefined) {
-    throw new Error('missing team number');
-  }
+import { Route } from '.react-router/types/app/routes/+types/team.$teamNumber.($year)';
 
+async function loadData(params: Route.LoaderArgs['params']) {
   const teamKey = `frc${params.teamNumber}`;
   const year = await parseParamsForYearElseDefault(params);
   if (year === undefined) {
@@ -169,27 +160,27 @@ async function loadData(params: Params) {
   };
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   return await loadData(params);
 }
 
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   return await loadData(params);
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export function meta({ data }: Route.MetaArgs) {
   return [
     {
-      title: `${data?.team.nickname} - Team ${data?.team.team_number} - The Blue Alliance`,
+      title: `${data.team.nickname} - Team ${data.team.team_number} - The Blue Alliance`,
     },
     {
       name: 'description',
       content:
-        `From ${data?.team.city}, ${data?.team.state_prov} ${data?.team.postal_code}, ${data?.team.country}.` +
+        `From ${data.team.city}, ${data.team.state_prov} ${data.team.postal_code}, ${data.team.country}.` +
         ' Team information, match results, and match videos from the FIRST Robotics Competition.',
     },
   ];
-};
+}
 
 export default function TeamPage(): React.JSX.Element {
   const navigate = useNavigate();
@@ -241,7 +232,7 @@ export default function TeamPage(): React.JSX.Element {
           <Select
             value={String(year)}
             onValueChange={(value) => {
-              navigate(`/team/${team.team_number}/${value}`);
+              void navigate(`/team/${team.team_number}/${value}`);
             }}
           >
             <SelectTrigger className="w-[180px]">

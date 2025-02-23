@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 
 import BiBarChartLineFill from '~icons/bi/bar-chart-line-fill';
 import BiCameraVideoFill from '~icons/bi/camera-video-fill';

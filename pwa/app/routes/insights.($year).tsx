@@ -1,12 +1,5 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
-import {
-  ClientLoaderFunctionArgs,
-  Link,
-  MetaFunction,
-  Params,
-  useLoaderData,
-} from '@remix-run/react';
 import React, { ReactNode } from 'react';
+import { Link, useLoaderData } from 'react-router';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
@@ -48,7 +41,9 @@ import {
 } from '~/lib/insightUtils';
 import { joinComponents, pluralize } from '~/lib/utils';
 
-async function loadData(params: Params) {
+import { Route } from '.react-router/types/app/routes/+types/insights.($year)';
+
+async function loadData(params: Route.LoaderArgs['params']) {
   let numericYear = -1;
   if (params.year === undefined) {
     numericYear = 0;
@@ -89,25 +84,25 @@ async function loadData(params: Params) {
   };
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   return await loadData(params);
 }
 
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   return await loadData(params);
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export function meta({ data }: Route.MetaArgs) {
   return [
     {
-      title: `${(data?.year ?? 0) > 0 ? data?.year : 'Overall'} Insights - The Blue Alliance`,
+      title: `${data.year > 0 ? data.year : 'Overall'} Insights - The Blue Alliance`,
     },
     {
       name: 'description',
-      content: `${(data?.year ?? 0) > 0 ? data?.year : 'Overall'} insights for the FIRST Robotics Competition.`,
+      content: `${data.year > 0 ? data.year : 'Overall'} insights for the FIRST Robotics Competition.`,
     },
   ];
-};
+}
 
 export default function InsightsPage() {
   const { leaderboards, year, notables } = useLoaderData<typeof loader>();

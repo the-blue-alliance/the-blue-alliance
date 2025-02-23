@@ -1,5 +1,5 @@
-import { createRequestHandler } from '@remix-run/express';
-import * as Sentry from '@sentry/remix';
+import { createRequestHandler } from '@react-router/express';
+import * as Sentry from '@sentry/node';
 import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
@@ -23,7 +23,7 @@ const viteDevServer = isProd
 
 const remixHandler = createRequestHandler({
   build: viteDevServer
-    ? () => viteDevServer.ssrLoadModule('virtual:remix/server-build')
+    ? () => viteDevServer.ssrLoadModule('virtual:react-router/server-build')
     : // Ignore the eslint error since the ./build directory doesn't exist until the build script is run.
       // eslint-disable-next-line import/no-unresolved
       await import('./build/server/index.js'),

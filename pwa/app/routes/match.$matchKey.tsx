@@ -1,20 +1,12 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
-import {
-  type ClientLoaderFunctionArgs,
-  MetaFunction,
-  Params,
-  useLoaderData,
-} from '@remix-run/react';
+import { useLoaderData } from 'react-router';
 
 import { getEvent, getMatch } from '~/api/v3';
 import { EventLink } from '~/components/tba/links';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
 
-async function loadData(params: Params) {
-  if (params.matchKey === undefined) {
-    throw new Error('Missing matchKey');
-  }
+import { Route } from '.react-router/types/app/routes/+types/match.$matchKey';
 
+async function loadData(params: Route.LoaderArgs['params']) {
   if (!isValidMatchKey(params.matchKey)) {
     throw new Response(null, {
       status: 404,
@@ -46,20 +38,18 @@ async function loadData(params: Params) {
   };
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   return await loadData(params);
 }
 
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   return await loadData(params);
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  const match = data?.match;
-  const event = data?.event;
-  if (!match || !event) {
-    return;
-  }
+export function meta({ data }: Route.MetaArgs) {
+  const match = data.match;
+  const event = data.event;
+
   return [
     {
       title: `${matchTitleShort(match, event)} - ${event.name} (${event.year}) - The Blue Alliance`,
@@ -69,7 +59,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
       content: `${matchTitleShort(match, event)} at the ${event.year} ${event.name} FIRST Robotics Competition in ${event.city}, ${event.state_prov}, ${event.country}`,
     },
   ];
-};
+}
 
 export default function EventPage() {
   const { event, match } = useLoaderData<typeof loader>();

@@ -1,4 +1,4 @@
-import { useNavigation } from '@remix-run/react';
+import { useNavigation } from 'react-router';
 import { useEffect, useState } from 'react';
 
 import { Progress } from '~/components/ui/progress';

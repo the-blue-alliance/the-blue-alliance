@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import {
   Links,
   Meta,
@@ -7,8 +8,7 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   useRouteError,
-} from '@remix-run/react';
-import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
+} from 'react-router';
 
 import * as api from '~/api/v3';
 
@@ -239,11 +239,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function App() {
+export default function App() {
   return <Outlet />;
 }
-
-export default withSentry(App);
 
 export const meta: MetaFunction = ({ error }) => {
   const isRouteError = isRouteErrorResponse(error);
@@ -257,7 +255,7 @@ export function ErrorBoundary() {
   console.error(error);
 
   const isRouteError = isRouteErrorResponse(error);
-  captureRemixErrorBoundaryError(error);
+  Sentry.captureException(error);
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>
