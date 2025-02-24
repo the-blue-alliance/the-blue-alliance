@@ -82,7 +82,7 @@ class EventInfoTab extends Component {
         type: "",
         channel: "",
         url: webcastUrl,
-        date: webcastDate ? webcastDate : null,
+        date: webcastDate ? webcastDate : undefined,
       });
       this.setState({ eventInfo: currentInfo });
     }
