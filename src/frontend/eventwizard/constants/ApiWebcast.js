@@ -4,6 +4,7 @@ const WEBCAST_SHAPE = {
   type: PropTypes.string.isRequired,
   channel: PropTypes.string.isRequired,
   file: PropTypes.string,
+  date: PropTypes.string,
   url: PropTypes.string,
 };
 
