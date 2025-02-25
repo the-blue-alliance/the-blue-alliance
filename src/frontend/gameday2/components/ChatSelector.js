@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ReactTransitionGroup from "react-addons-transition-group";
+import ReactTransitionGroup from "react-transition-group/TransitionGroup";
 import { List, ListItem } from "material-ui/List";
 import Paper from "material-ui/Paper";
 import ActionHome from "material-ui/svg-icons/action/home";
