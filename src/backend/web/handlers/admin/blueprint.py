@@ -18,6 +18,7 @@ from backend.web.handlers.admin.awards import (
     award_edit,
     award_edit_post,
 )
+from backend.web.handlers.admin.cache import cached_query_list
 from backend.web.handlers.admin.districts import (
     district_create,
     district_delete,
@@ -181,7 +182,7 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/award/edit/<award_key>", methods=["POST"], view_func=award_edit_post
 )
-
+admin_routes.add_url_rule("/cache", view_func=cached_query_list)
 admin_routes.add_url_rule(
     "/districts", view_func=district_list, defaults={"year": None}
 )
