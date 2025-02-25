@@ -4,7 +4,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
-import thunk from "redux-thunk";
+import { thunk } from "redux-thunk";
 import EventWizardFrame from "./components/EventWizardFrame";
 import eventwizardReducer from "./reducers";
 
