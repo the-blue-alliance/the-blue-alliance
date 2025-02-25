@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import Paper from "material-ui/Paper";
 import { List, ListItem } from "material-ui/List";
-import EventListener from "react-event-listener";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import {
   NUM_LAYOUTS,
@@ -24,10 +23,12 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
   }
   componentDidMount() {
     this.updateSizing();
+    window.addEventListener('resize', this.updateSizing);
   }
 
   componentDidUpdate() {
     this.updateSizing();
+    window.removeEventListener('resize', this.updateSizing);
   }
 
   updateSizing() {
@@ -92,7 +93,6 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
         }}
       >
         <Paper style={containerStyles}>
-          <EventListener target="window" onResize={() => this.updateSizing()} />
           <h3 style={titleStyle}>Select a layout</h3>
           <div
             ref={(e) => {

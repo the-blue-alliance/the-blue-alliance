@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import Dialog from "material-ui/Dialog";
 import FlatButton from "material-ui/FlatButton";
-import EventListener from "react-event-listener";
 import SwapPositionPreviewCell from "./SwapPositionPreviewCell";
 import {
   NUM_VIEWS_FOR_LAYOUT,
@@ -20,10 +19,12 @@ export default class SwapPositionDialog extends React.Component {
 
   componentDidMount() {
     this.updateSizing();
+    window.addEventListener('resize', this.updateSizing);
   }
 
   componentDidUpdate() {
     this.updateSizing();
+    window.removeEventListener('resize', this.updateSizing);
   }
 
   onRequestSwap(targetPosition) {
@@ -95,7 +96,6 @@ export default class SwapPositionDialog extends React.Component {
         onRequestClose={() => this.onRequestClose()}
         autoScrollBodyContent
       >
-        <EventListener target="window" onResize={() => this.updateSizing()} />
         <div
           style={previewContainerStyle}
           ref={(e) => {
