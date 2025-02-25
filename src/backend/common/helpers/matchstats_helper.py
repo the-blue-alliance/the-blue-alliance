@@ -144,22 +144,13 @@ MANUAL_COMPONENTS = {
             + match.score_breakdown[color].get("teleopReef", {}).get("trough", 0)
         ),
         "L2 Coral Count": lambda match, color: (
-            match.score_breakdown[color].get("autoReef", {}).get("tba_botRowCount", 0)
-            + match.score_breakdown[color]
-            .get("teleopReef", {})
-            .get("tba_botRowCount", 0)
+            match.score_breakdown[color].get("teleopReef", {}).get("tba_botRowCount", 0)
         ),
         "L3 Coral Count": lambda match, color: (
-            match.score_breakdown[color].get("autoReef", {}).get("tba_midRowCount", 0)
-            + match.score_breakdown[color]
-            .get("teleopReef", {})
-            .get("tba_midRowCount", 0)
+            match.score_breakdown[color].get("teleopReef", {}).get("tba_midRowCount", 0)
         ),
         "L4 Coral Count": lambda match, color: (
-            match.score_breakdown[color].get("autoReef", {}).get("tba_topRowCount", 0)
-            + match.score_breakdown[color]
-            .get("teleopReef", {})
-            .get("tba_topRowCount", 0)
+            match.score_breakdown[color].get("teleopReef", {}).get("tba_topRowCount", 0)
         ),
         "Total Coral Count": lambda match, color: sum(
             [
