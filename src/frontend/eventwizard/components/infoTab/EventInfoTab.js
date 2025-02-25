@@ -75,13 +75,14 @@ class EventInfoTab extends Component {
       .then((data) => this.setState({ eventInfo: data, status: "" }));
   }
 
-  addWebcast(webcastUrl) {
+  addWebcast(webcastUrl, webcastDate) {
     const currentInfo = this.state.eventInfo;
     if (currentInfo !== null) {
       currentInfo.webcasts.push({
         type: "",
         channel: "",
         url: webcastUrl,
+        date: webcastDate ? webcastDate : undefined,
       });
       this.setState({ eventInfo: currentInfo });
     }

@@ -21,6 +21,10 @@ class WebcastItem extends Component {
       item = `${this.props.webcast.type} - ${this.props.webcast.channel}`;
     }
 
+    if (this.props.webcast.date) {
+      item += ` (${this.props.webcast.date})`;
+    }
+
     return (
       <p>
         {item} &nbsp;
