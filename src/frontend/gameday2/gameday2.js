@@ -7,9 +7,8 @@ import { thunk } from "redux-thunk";
 import { createStore, applyMiddleware, compose } from "redux";
 import ReactDOM from "react-dom";
 import queryString from "query-string";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import { indigo500, indigo700 } from "material-ui/styles/colors";
-import getMuiTheme from "material-ui/styles/getMuiTheme";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { indigo } from "@mui/material/colors";
 import GamedayFrame from "./components/GamedayFrame";
 import gamedayReducer, { firedux } from "./reducers";
 import {
@@ -38,10 +37,10 @@ const store = createStore(
 );
 firedux.dispatch = store.dispatch;
 
-const muiTheme = getMuiTheme({
+const muiTheme = createTheme({
   palette: {
-    primary1Color: indigo500,
-    primary2Color: indigo700,
+    primary1Color: indigo[500],
+    primary2Color: indigo[700],
   },
   layout: {
     appBarHeight: 36,
@@ -51,11 +50,11 @@ const muiTheme = getMuiTheme({
 });
 
 ReactDOM.render(
-  <MuiThemeProvider muiTheme={muiTheme}>
+  <ThemeProvider theme={muiTheme}>
     <Provider store={store}>
       <GamedayFrame />
     </Provider>
-  </MuiThemeProvider>,
+  </ThemeProvider>,
   document.getElementById("content")
 );
 

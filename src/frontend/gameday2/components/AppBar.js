@@ -1,9 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Toolbar, ToolbarTitle, ToolbarGroup } from "material-ui/Toolbar";
-import FlatButton from "material-ui/FlatButton";
-import IconButton from "material-ui/IconButton";
-import muiThemeable from "material-ui/styles/muiThemeable";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from '@mui/material/Typography';
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import { withTheme } from '@mui/styles';
 import LayoutDrawer from "./LayoutDrawer";
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import LampIcon from "./LampIcon";
@@ -13,53 +14,59 @@ const AppBar = (props) => {
     padding: 0,
     marginLeft: 8,
     marginRight: 8,
-    width: props.muiTheme.layout.appBarHeight,
-    height: props.muiTheme.layout.appBarHeight,
+    width: props.theme.layout.appBarHeight,
+    height: props.theme.layout.appBarHeight,
   };
 
+  /*
   const configureLayoutButtonStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: props.theme.appBar.textColor,
   };
+  */
 
+  /*
   const appBarStyle = {
-    height: props.muiTheme.layout.appBarHeight,
-    backgroundColor: props.muiTheme.palette.primary1Color,
+    height: props.theme.layout.appBarHeight,
+    backgroundColor: props.theme.palette.primary1Color,
     position: "relative",
-    zIndex: props.muiTheme.zIndex.appBar,
+    zIndex: props.theme.zIndex.appBar,
     paddingRight: 0,
   };
+  */
 
+  /*
   const appBarTitleStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: props.theme.appBar.textColor,
     fontSize: "24px",
     overflow: "visible",
   };
+  */
 
+  /*
   const appBarSubtitleStyle = {
-    color: props.muiTheme.appBar.textColor,
+    color: props.theme.appBar.textColor,
     textDecoration: "none",
     fontSize: 12,
   };
+  */
 
   const tbaBrandingButton = (
     <IconButton
       style={tbaBrandingButtonStyle}
       tooltip="Go to The Blue Alliance"
-      tooltipPosition="bottom-right"
+      tooltipposition="bottom-right"
       href="https://www.thebluealliance.com"
     >
       <LampIcon
-        width={props.muiTheme.layout.appBarHeight}
-        height={props.muiTheme.layout.appBarHeight}
+        width={props.theme.layout.appBarHeight}
+        height={props.theme.layout.appBarHeight}
       />
     </IconButton>
   );
 
   const configureLayoutButton = (
-    <FlatButton
+    <Button
       label="Configure Layout"
-      labelPosition="before"
-      style={configureLayoutButtonStyle}
       icon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
       onClick={() => props.setLayoutDrawerVisibility(true)}
     />
@@ -67,11 +74,10 @@ const AppBar = (props) => {
 
   return (
     <div>
-      <Toolbar style={appBarStyle}>
-        <ToolbarGroup firstChild>
+      <Toolbar>
           {tbaBrandingButton}
-          <ToolbarTitle text="GameDay" style={appBarTitleStyle} />
-          <a style={appBarSubtitleStyle} href="/">
+          <Typography>GameDay</Typography>
+          <a href="/">
             by The Blue Alliance
           </a>
           <div
@@ -83,8 +89,7 @@ const AppBar = (props) => {
             data-show-faces="false"
             data-share="false"
           />
-        </ToolbarGroup>
-        <ToolbarGroup lastChild>{configureLayoutButton}</ToolbarGroup>
+        {configureLayoutButton}
       </Toolbar>
       <LayoutDrawer
         setLayout={props.setLayout}
@@ -115,7 +120,7 @@ AppBar.propTypes = {
   layoutSet: PropTypes.bool.isRequired,
   layoutDrawerVisible: PropTypes.bool.isRequired,
   setLayoutDrawerVisibility: PropTypes.func.isRequired,
-  muiTheme: PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
-export default muiThemeable()(AppBar);
+export default withTheme(AppBar);

@@ -1,15 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Dialog from "material-ui/Dialog";
-import { green500, indigo500 } from "material-ui/styles/colors";
-import Divider from "material-ui/Divider";
-import FlatButton from "material-ui/FlatButton";
-import { List, ListItem } from "material-ui/List";
-import Subheader from "material-ui/Subheader";
-import ActionGrade from "material-ui/svg-icons/action/grade";
-import ActionHelp from "material-ui/svg-icons/action/help";
-import VideoCam from "material-ui/svg-icons/av/videocam";
-import VideoCamOff from "material-ui/svg-icons/av/videocam-off";
+import Dialog from "@mui/material/Dialog";
+import { green, indigo } from "@mui/material/colors";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListSubheader from "@mui/material/ListSubheader";
+import GradeIcon from '@mui/icons-material/Grade';
+import HelpIcon from '@mui/icons-material/Help';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import WebcastSelectionDialogItem from "./WebcastSelectionDialogItem";
 import { webcastPropType } from "../utils/webcastUtils";
 
@@ -32,7 +33,7 @@ export default class WebcastSelectionDialog extends React.Component {
 
   render() {
     const subheaderStyle = {
-      color: indigo500,
+      color: indigo[500],
     };
 
     // Construct list of webcasts
@@ -48,7 +49,7 @@ export default class WebcastSelectionDialog extends React.Component {
     availableWebcasts.forEach((webcastId) => {
       const webcast = this.props.webcastsById[webcastId];
 
-      let rightIcon = <ActionHelp />;
+      let rightIcon = <HelpIcon />;
       let secondaryText = null;
       if (webcast.status === "online") {
         rightIcon = (
@@ -72,14 +73,14 @@ export default class WebcastSelectionDialog extends React.Component {
                 Viewers
               </small>
             )}
-            <VideoCam color={green500} />
+            <VideocamIcon color={green[500]} />
           </div>
         );
         if (webcast.streamTitle) {
           secondaryText = webcast.streamTitle;
         }
       } else if (webcast.status === "offline") {
-        rightIcon = <VideoCamOff />;
+        rightIcon = <VideocamOffIcon />;
       }
 
       if (this.props.specialWebcastIds.has(webcast.id)) {
@@ -104,7 +105,7 @@ export default class WebcastSelectionDialog extends React.Component {
             webcast={webcast}
             webcastSelected={this.props.onWebcastSelected}
             secondaryText={"The best matches from across FRC"}
-            rightIcon={<ActionGrade color={indigo500} />}
+            rightIcon={<GradeIcon color={indigo[500]} />}
           />
         );
       } else {
@@ -128,9 +129,9 @@ export default class WebcastSelectionDialog extends React.Component {
     let allWebcastItems = [];
     if (specialWebcastItems.length !== 0 || bluezoneWebcastItems.length !== 0) {
       allWebcastItems.push(
-        <Subheader key="specialWebcastsHeader" style={subheaderStyle}>
+        <ListSubheader key="specialWebcastsHeader" style={subheaderStyle}>
           Special Webcasts
-        </Subheader>
+        </ListSubheader>
       );
       allWebcastItems = allWebcastItems.concat(bluezoneWebcastItems);
       allWebcastItems = allWebcastItems.concat(specialWebcastItems);
@@ -140,9 +141,9 @@ export default class WebcastSelectionDialog extends React.Component {
         allWebcastItems.push(<Divider key="eventWebcastsDivider" />);
       }
       allWebcastItems.push(
-        <Subheader key="eventWebcastsHeader" style={subheaderStyle}>
+        <ListSubheader key="eventWebcastsHeader" style={subheaderStyle}>
           Event Webcasts
-        </Subheader>
+        </ListSubheader>
       );
       allWebcastItems = allWebcastItems.concat(webcastItems);
     }
@@ -151,9 +152,9 @@ export default class WebcastSelectionDialog extends React.Component {
         allWebcastItems.push(<Divider key="offlineEventWebcastsDivider" />);
       }
       allWebcastItems.push(
-        <Subheader key="offlineWebcastsHeader" style={subheaderStyle}>
+        <ListSubheader key="offlineWebcastsHeader" style={subheaderStyle}>
           Offline Event Webcasts
-        </Subheader>
+        </ListSubheader>
       );
       allWebcastItems = allWebcastItems.concat(offlineWebcastItems);
     }
@@ -162,9 +163,9 @@ export default class WebcastSelectionDialog extends React.Component {
         allWebcastItems.push(<Divider key="offlineSpecialWebcastsDivider" />);
       }
       allWebcastItems.push(
-        <Subheader key="offlineSpecialWebcastsHeader" style={subheaderStyle}>
+        <ListSubheader key="offlineSpecialWebcastsHeader" style={subheaderStyle}>
           Offline Special Webcasts
-        </Subheader>
+        </ListSubheader>
       );
       allWebcastItems = allWebcastItems.concat(offlineSpecialWebcastItems);
     }
@@ -181,7 +182,7 @@ export default class WebcastSelectionDialog extends React.Component {
     }
 
     const actions = [
-      <FlatButton
+      <Button
         label="Cancel"
         onClick={() => this.onRequestClose()}
         primary

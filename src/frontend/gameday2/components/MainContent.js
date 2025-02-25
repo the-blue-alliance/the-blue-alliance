@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import muiThemeable from "material-ui/styles/muiThemeable";
+import { withTheme } from '@mui/styles';
 import VideoGridContainer from "../containers/VideoGridContainer";
 import LayoutSelectionPanel from "./LayoutSelectionPanel";
 import NoWebcasts from "./NoWebcasts";
@@ -33,15 +33,15 @@ const MainContent = (props) => {
 
   const contentStyles = {
     position: "absolute",
-    top: props.muiTheme.layout.appBarHeight,
+    top: props.theme.layout.appBarHeight,
     left: 0,
     right: 0,
     bottom: 0,
     marginRight: props.chatSidebarVisible
-      ? props.muiTheme.layout.chatPanelWidth
+      ? props.theme.layout.chatPanelWidth
       : 0,
     marginLeft: props.hashtagSidebarVisible
-      ? props.muiTheme.layout.socialPanelWidth
+      ? props.theme.layout.socialPanelWidth
       : 0,
   };
 
@@ -54,7 +54,7 @@ MainContent.propTypes = {
   chatSidebarVisible: PropTypes.bool.isRequired,
   layoutSet: PropTypes.bool.isRequired,
   setLayout: PropTypes.func.isRequired,
-  muiTheme: PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
-export default muiThemeable()(MainContent);
+export default withTheme(MainContent);

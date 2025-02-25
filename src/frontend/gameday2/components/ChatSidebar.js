@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import muiThemeable from "material-ui/styles/muiThemeable";
-import IconButton from "material-ui/IconButton";
-import ArrowDropUp from "material-ui/svg-icons/navigation/arrow-drop-up";
-import { Toolbar, ToolbarGroup, ToolbarTitle } from "material-ui/Toolbar";
-import { white } from "material-ui/styles/colors";
+import { withTheme } from '@mui/styles';
+import IconButton from "@mui/material/IconButton";
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import ChatAnalyticsTracker from "./ChatAnalyticsTracker";
 import TwitchChatEmbed from "./TwitchChatEmbed";
 import ChatSelector from "./ChatSelector";
@@ -20,9 +20,9 @@ class ChatSidebar extends React.Component {
     currentChat: PropTypes.string.isRequired,
     defaultChat: PropTypes.string.isRequired,
     setTwitchChat: PropTypes.func.isRequired,
-    muiTheme: PropTypes.object.isRequired,
-    setChatSidebarVisibility: PropTypes.object.isRequired,
-    setHashtagSidebarVisibility: PropTypes.object.isRequired,
+    theme: PropTypes.object.isRequired,
+    setChatSidebarVisibility: PropTypes.func.isRequired,
+    setHashtagSidebarVisibility: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -66,10 +66,10 @@ class ChatSidebar extends React.Component {
 
     const panelContainerStyle = {
       position: "absolute",
-      top: this.props.muiTheme.layout.appBarHeight,
+      top: this.props.theme.layout.appBarHeight,
       right: 0,
       bottom: 0,
-      width: this.props.muiTheme.layout.chatPanelWidth,
+      width: this.props.theme.layout.chatPanelWidth,
       background: "#EFEEF1",
       display: this.props.enabled ? null : "none",
       zIndex: 1000,
@@ -87,12 +87,12 @@ class ChatSidebar extends React.Component {
       bottom: 0,
       height: metrics.switcherHeight,
       width: "100%",
-      background: this.props.muiTheme.palette.primary1Color,
+      background: this.props.theme.palette.primary1Color,
       cursor: "pointer",
     };
 
     const toolbarTitleStyle = {
-      color: white,
+      color: 'white',
       fontSize: 16,
     };
 
@@ -141,17 +141,13 @@ class ChatSidebar extends React.Component {
             style={switcherToolbarStyle}
             onClick={() => this.onRequestOpenChatSelector()}
           >
-            <ToolbarGroup>
-              <ToolbarTitle text={currentChatName} style={toolbarTitleStyle} />
-            </ToolbarGroup>
-            <ToolbarGroup lastChild>
+              <Typography style={toolbarTitleStyle}>{currentChatName}</Typography>
               <IconButton
                 style={toolbarButtonStyle}
-                iconStyle={toolbarButtonIconStyle}
+                iconstyle={toolbarButtonIconStyle}
               >
-                <ArrowDropUp color={white} />
+                <ArrowDropUpIcon color='white' />
               </IconButton>
-            </ToolbarGroup>
           </Toolbar>
           <ChatSelector
             chats={this.props.displayOrderChats}
@@ -174,4 +170,4 @@ class ChatSidebar extends React.Component {
   }
 }
 
-export default muiThemeable()(ChatSidebar);
+export default withTheme(ChatSidebar);

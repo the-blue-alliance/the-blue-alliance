@@ -1,10 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { black, white } from "material-ui/styles/colors";
 
 const TickerMatch = (props) => {
   const matchStyle = {
-    backgroundColor: black,
+    backgroundColor: 'black',
     height: "100%",
     width: "auto",
     borderRadius: 2,
@@ -20,7 +19,7 @@ const TickerMatch = (props) => {
     BoxShadow: "rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px",
   };
   const matchLabelStyle = {
-    color: white,
+    color: 'white',
     fontSize: 16,
     width: "auto",
     display: "inline-block",
@@ -67,7 +66,7 @@ const TickerMatch = (props) => {
     matchStyle.backgroundColor = "#220022";
   } else if (props.hasFavorite) {
     matchStyle.backgroundColor = "#e6c100";
-    matchLabelStyle.color = black;
+    matchLabelStyle.color = 'black';
   }
 
   // Generate strings

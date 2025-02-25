@@ -1,14 +1,15 @@
 import React from "react";
 import PropTypes from "prop-types";
-import muiThemeable from "material-ui/styles/muiThemeable";
-import RaisedButton from "material-ui/RaisedButton";
-import Drawer from "material-ui/Drawer";
-import Divider from "material-ui/Divider";
-import { List, ListItem } from "material-ui/List";
-import Subheader from "material-ui/Subheader";
-import Toggle from "material-ui/Toggle";
-import { red500, fullWhite } from "material-ui/styles/colors";
-import CheckmarkIcon from "material-ui/svg-icons/navigation/check";
+import { withTheme } from '@mui/styles';
+import Button from "@mui/material/Button";
+import Drawer from "@mui/material/Drawer";
+import Divider from "@mui/material/Divider";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListSubheader from '@mui/material/ListSubheader';
+import Switch from '@mui/material/Switch';
+import { red } from "@mui/material/colors";
+import CheckIcon from '@mui/icons-material/Check';
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import {
   NUM_LAYOUTS,
@@ -29,7 +30,7 @@ class LayoutDrawer extends React.Component {
     toggleChatSidebarVisibility: PropTypes.func.isRequired,
     toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
     resetWebcasts: PropTypes.func.isRequired,
-    muiTheme: PropTypes.object.isRequired,
+    theme: PropTypes.object.isRequired,
   };
 
   handleResetWebcasts() {
@@ -45,7 +46,7 @@ class LayoutDrawer extends React.Component {
         const layoutNum = LAYOUT_DISPLAY_ORDER[i];
         const showCheck =
           layoutNum === this.props.selectedLayout && this.props.layoutSet;
-        const icon = showCheck ? <CheckmarkIcon /> : null;
+        const icon = showCheck ? <CheckIcon /> : null;
 
         layouts.push(
           <ListItem
@@ -69,20 +70,20 @@ class LayoutDrawer extends React.Component {
     }
 
     const chatToggle = (
-      <Toggle
-        onToggle={() => this.props.toggleChatSidebarVisibility()}
-        toggled={this.props.chatSidebarVisible}
+      <Switch
+        onChange={() => this.props.toggleChatSidebarVisibility()}
+        checked={this.props.chatSidebarVisible}
       />
     );
 
     const hashtagToggle = (
-      <Toggle
-        onToggle={() => this.props.toggleHashtagSidebarVisibility()}
-        toggled={this.props.hashtagSidebarVisible}
+      <Switch
+        onChange={() => this.props.toggleHashtagSidebarVisibility()}
+        checked={this.props.hashtagSidebarVisible}
       />
     );
 
-    const primaryColor = this.props.muiTheme.palette.primary1Color;
+    const primaryColor = this.props.theme.palette.primary1Color;
 
     return (
       <Drawer
@@ -94,16 +95,16 @@ class LayoutDrawer extends React.Component {
       >
         <div>
           <List>
-            <Subheader style={{ color: primaryColor }}>
+            <ListSubheader style={{ color: primaryColor }}>
               Select video grid layout
-            </Subheader>
+            </ListSubheader>
             {layouts}
           </List>
           <Divider />
           <List>
-            <Subheader style={{ color: primaryColor }}>
+            <ListSubheader style={{ color: primaryColor }}>
               Enable/disable sidebars
-            </Subheader>
+            </ListSubheader>
             <ListItem
               primaryText="Social Sidebar"
               rightToggle={hashtagToggle}
@@ -112,10 +113,11 @@ class LayoutDrawer extends React.Component {
           </List>
           <Divider />
           <div style={{ padding: 8 }}>
-            <RaisedButton
+            <Button
+              variant="contained"
               label="Reset Webcasts"
-              backgroundColor={red500}
-              labelColor={fullWhite}
+              backgroundColor={red[500]}
+              labelColor='white'
               fullWidth
               onClick={() => this.handleResetWebcasts()}
             />
@@ -126,4 +128,4 @@ class LayoutDrawer extends React.Component {
   }
 }
 
-export default muiThemeable()(LayoutDrawer);
+export default withTheme(LayoutDrawer);

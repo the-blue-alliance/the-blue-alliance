@@ -1,7 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Paper from "material-ui/Paper";
-import { List, ListItem } from "material-ui/List";
+import Paper from "@mui/material/Paper";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import {
   NUM_LAYOUTS,

@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Dialog from "material-ui/Dialog";
-import FlatButton from "material-ui/FlatButton";
+import Dialog from "@mui/material/Dialog";
+import Button from "@mui/material/Button";
 import SwapPositionPreviewCell from "./SwapPositionPreviewCell";
 import {
   NUM_VIEWS_FOR_LAYOUT,
@@ -70,7 +70,7 @@ export default class SwapPositionDialog extends React.Component {
     }
 
     const actions = [
-      <FlatButton
+      <Button
         label="Cancel"
         primary
         onClick={() => this.onRequestClose()}
