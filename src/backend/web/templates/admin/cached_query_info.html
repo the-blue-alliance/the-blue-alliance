@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{cache_key}} - TBA Admin{% endblock %}
+
+{% block content %}
+<p class="pull-right"><a class="btn btn-danger btn-small" href="/admin/cache/{{query_class_name}}/{{cache_key}}/delete"><span class="glyphicon glyphicon-trash"></span> Delete</a></p>
+
+<h1>CachedQueryResult: {{cache_key}}</h1>
+
+<div class="row">
+    <table class="table table-striped">
+        <tr>
+            <td>Query Type</td>
+            <td><a href="/admin/cache/{{query_class_name}}">{{query_class_name}}</a></td>
+        </tr>
+        <tr>
+            <td>Created</td>
+            <td><time datetime="{{ cached_query.created }}" class="tba-verbose-datetime-utc">{{ cached_query.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time></td>
+        </tr>
+        <tr>
+            <td>Updated</td>
+            <td><time datetime="{{ cached_query.updated }}" class="tba-verbose-datetime-utc">{{ cached_query.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time></td>
+        </tr>
+    </table>
+</div>
+
+{% endblock %}

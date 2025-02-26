@@ -18,7 +18,14 @@ from backend.web.handlers.admin.awards import (
     award_edit,
     award_edit_post,
 )
-from backend.web.handlers.admin.cache import cached_query_list
+from backend.web.handlers.admin.cache import (
+    cached_query_detail,
+    cached_query_delete,
+    cached_query_list,
+    cached_query_key_lookup_post,
+    cached_query_info,
+    cached_query_purge_version,
+)
 from backend.web.handlers.admin.districts import (
     district_create,
     district_delete,
@@ -183,6 +190,24 @@ admin_routes.add_url_rule(
     "/award/edit/<award_key>", methods=["POST"], view_func=award_edit_post
 )
 admin_routes.add_url_rule("/cache", view_func=cached_query_list)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>", methods=["GET"], view_func=cached_query_detail
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>",
+    methods=["POST"],
+    view_func=cached_query_key_lookup_post,
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>/<cache_key>", view_func=cached_query_info
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>/<cache_key>/delete", view_func=cached_query_delete
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>/purge/<int:db_version>/<int:query_version>",
+    view_func=cached_query_purge_version,
+)
 admin_routes.add_url_rule(
     "/districts", view_func=district_list, defaults={"year": None}
 )
