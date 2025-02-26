@@ -19,11 +19,11 @@ from backend.web.handlers.admin.awards import (
     award_edit_post,
 )
 from backend.web.handlers.admin.cache import (
-    cached_query_detail,
     cached_query_delete,
-    cached_query_list,
-    cached_query_key_lookup_post,
+    cached_query_detail,
     cached_query_info,
+    cached_query_key_lookup_post,
+    cached_query_list,
     cached_query_purge_version,
 )
 from backend.web.handlers.admin.districts import (
