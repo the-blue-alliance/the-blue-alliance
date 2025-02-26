@@ -342,11 +342,11 @@
     {% if "foulCount" in match.score_breakdown.red %}
     <tr>
         <td class="red" colspan="2">
-            {{fouls(match.score_breakdown.blue)}}
+            {{fouls(match.score_breakdown.red)}}
         </td>
         <td>Fouls / Tech Fouls</td>
         <td class="blue" colspan="2">
-            {{fouls(match.score_breakdown.red)}}
+            {{fouls(match.score_breakdown.blue)}}
         </td>
     </tr>
     {% endif %}
