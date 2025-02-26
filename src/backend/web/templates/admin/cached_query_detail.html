@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{query_class_name}} - TBA Admin{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <h1>{{query_class_name}}</h1>
+    <table class="table table-striped">
+        <tr>
+            <td>Key Format</td>
+            <td><pre>{{query_class.CACHE_KEY_FORMAT}}</pre></td>
+        </tr>
+        <tr>
+            <td>Current DB Cache Version</td>
+            <td>{{query_class.DATABASE_QUERY_VERSION}}</td>
+        </tr>
+        <tr>
+            <td>Current Query Version</td>
+            <td>{{query_class.CACHE_VERSION}}</td>
+        </tr>
+        <tr>
+            <td>Total Entries</td>
+            <td>{{total_records}}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="row">
+    <h2>Jump To CachedQueryResult</h2>
+    <form class="form-inline" method="post">
+        <div class="form-group">
+            <label for="cache_key">Cache Key: </label>
+            <input class="form-control" name="cache_key" />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Lookup</button>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    <h2>Breakdown By Version</h2>
+    <table class="table table-striped">
+        <tr>
+            <th>DB Version </th>
+            <th>Query Version</th>
+            <th>Number of Records</th>
+            <td></td>
+        </tr>
+        {% for (db_version, query_version), count in cached_items_by_version.items() %}
+            <tr>
+                <td>{{db_version}}</td>
+                <td>{{query_version}}</td>
+                <td>{{count}}</td>
+                <td><a class="btn btn-danger btn-small" href="/admin/cache/{{query_class_name}}/purge/{{db_version}}/{{query_version}}"><span class="glyphicon glyphicon-trash"></span> Purge</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
