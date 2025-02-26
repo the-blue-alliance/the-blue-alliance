@@ -76,6 +76,10 @@ export default function AllianceSelectionTable(props: {
             {[...Array(allianceSize - 1).keys()].map((i) => (
               <TableHead key={i}>Pick {i + 1}</TableHead>
             ))}
+            {allianceSize > 1 &&
+              [...Array(allianceSize - 1).keys()].map((i) => (
+                <TableHead key={i}>Pick {i + 1}</TableHead>
+              ))}
           </TableRow>
         </TableHeader>
         <TableBody>
