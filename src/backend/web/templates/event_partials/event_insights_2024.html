@@ -1,0 +1,138 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h3>Bonus Objective Statistics</h3>
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+          <tr>
+            <th class="text-right">Objective</th>
+            <th class="text-right">Count</th>
+            <th class="text-right"># Opportunities</th>
+            <th class="text-right">% Success</th>
+          </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mobility</td>
+          <td>{{event_insights.mobility_count[0]}}</td>
+          <td>{{event_insights.mobility_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.mobility_count[2])}}%</td>
+        </tr>
+        <tr>
+          <td>Auto Docked</td>
+          <td>{{event_insights.auto_docked_count[0]}}</td>
+          <td>{{event_insights.auto_docked_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.auto_docked_count[2])}}%</td>
+        </tr>
+        <tr>
+          <td>Auto Engaged</td>
+          <td>{{event_insights.auto_engaged_count[0]}}</td>
+          <td>{{event_insights.auto_engaged_count[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.auto_engaged_count[2])}}%</td>
+        </tr>
+        <tr>
+          <td>Coopertition Criteria Met</td>
+          <td>{{event_insights.coopertition[0]}}</td>
+          <td>{{event_insights.coopertition[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.coopertition[2])}}%</td>
+        </tr>
+        <tr>
+          <td><span rel="tooltip" title="Has no real meaning for Playoff matches">Sustainability Bonus RP Achieved *</span></td>
+          <td>{{event_insights.sustainability_bonus_rp[0]}}</td>
+          <td>{{event_insights.sustainability_bonus_rp[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.sustainability_bonus_rp[2])}}%</td>
+        </tr>
+        <tr>
+          <td><span rel="tooltip" title="Has no real meaning for Playoff matches">Activation Bonus RP Achieved *</span></td>
+          <td>{{event_insights.activation_bonus_rp[0]}}</td>
+          <td>{{event_insights.activation_bonus_rp[1]}}</td>
+          <td>{{'%0.2f' | format(event_insights.activation_bonus_rp[2])}}%</td>
+        </tr>
+        <tr>
+          <td>"Unicorn Matches"<br/>(Win + Sustainability Bonus + Activation Bonus)</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[0]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{event_insights.unicorn_matches[1]}}{% else %}--{% endif %}</td>
+          <td>{% if event_insights.unicorn_matches %}{{'%0.2f' | format(event_insights.unicorn_matches[2]|float)}}%{% else %}--{% endif %}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-xs-12">
+    <h3>Match Statistics</h3>
+    <table class="table table-condensed table-striped text-right">
+      <tbody>
+        <tr>
+          <td>High Score</td>
+          <td>{{event_insights.high_score[0]}} in <a href="/match/{{event_insights.high_score[1]}}">{{event_insights.high_score[2]}}</a></td>
+        </tr>
+        <tr>
+          <td>Average Match Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Winning Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Win Margin</td>
+          <td>{{'%0.2f' | format(event_insights.average_win_margin|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="table table-condensed table-striped text-right">
+      <thead>
+        <tr>
+            <th></th>
+            <th class="text-right">Auto</th>
+            <th class="text-right">Teleop</th>
+            <th class="text-right">Overall</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Average Mobility Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_mobility_points|float)}}</td>
+          <td>--</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Game Piece Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_piece_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_piece_points_teleop|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Park Points</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_park_points|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Charge Station Points</td>
+          <td>{{'%0.2f' | format(event_insights.average_charge_station_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_charge_station_points_teleop|float)}}</td>
+          <td>--</td>
+        </tr>
+        <tr>
+          <td>Average Link Points</td>
+          <td>--</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_link_points|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Foul Points</td>
+          <td>--</td>
+          <td>--</td>
+          <td>{{'%0.2f' | format(event_insights.average_foul_score|float)}}</td>
+        </tr>
+        <tr>
+          <td>Average Score</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_auto|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_points_teleop|float)}}</td>
+          <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

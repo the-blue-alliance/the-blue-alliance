@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
-    AllianceColor,
     OPPONENT,
+    AllianceColor,
 )
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
@@ -28,12 +28,253 @@ class EventInsightsHelper:
             2020: cls.calculate_event_insights_2020,
             2022: cls.calculate_event_insights_2022,
             2023: cls.calculate_event_insights_2023,
+            2024: cls.calculate_event_insights_2024,
         }
 
         if year in INSIGHTS_MAP:
             return INSIGHTS_MAP[year](matches)
         else:
             return None
+
+    @classmethod
+    def calculate_event_insights_2024(cls, matches: List[Match]) -> EventInsights:
+        qual_matches = []
+        playoff_matches = []
+        for match in matches:
+            if match.comp_level == CompLevel.QM:
+                qual_matches.append(match)
+            else:
+                playoff_matches.append(match)
+
+        qual_insights = cls._calculate_event_insights_2024_helper(qual_matches)
+        playoff_insights = cls._calculate_event_insights_2024_helper(playoff_matches)
+
+        return {
+            "qual": qual_insights,
+            "playoff": playoff_insights,
+        }
+
+    @classmethod
+    def _calculate_event_insights_2024_helper(
+        cls, matches: List[Match]
+    ) -> Optional[Dict[str, Any]]:
+        # Auto
+        mobility_count = 0
+        auto_top_count = 0
+        auto_mid_count = 0
+        auto_bot_count = 0
+        auto_docked_count = 0
+        auto_engaged_count = 0
+
+        mobility_points = 0
+        auto_piece_points = 0
+        auto_charge_station_points = 0
+        points_auto = 0
+
+        # Teleop
+        teleop_top_count = 0
+        teleop_mid_count = 0
+        teleop_bot_count = 0
+        teleop_docked_count = 0
+        teleop_engaged_count = 0
+        coopertition_count = 0
+
+        teleop_piece_points = 0
+        park_points = 0
+        teleop_charge_station_points = 0
+        points_teleop = 0
+
+        # Overall
+        link_points = 0
+        sustainability_bonus_count = 0
+        activation_bonus_count = 0
+        unicorn_matches = 0
+        winning_scores = 0
+        win_margins = 0
+        total_scores = 0
+        foul_scores = 0
+        high_score: Tuple[int, str, str] = (0, "", "")
+
+        finished_matches = 0
+        has_insights = False
+        for match in matches:
+            if not match.has_been_played:
+                continue
+
+            red_score = match.alliances[AllianceColor.RED]["score"]
+            blue_score = match.alliances[AllianceColor.BLUE]["score"]
+            win_score = max(red_score, blue_score)
+
+            winning_scores += win_score
+            win_margins += win_score - min(red_score, blue_score)
+            total_scores += red_score + blue_score
+
+            if win_score > high_score[0]:
+                high_score = (win_score, match.key_name, match.short_name)
+
+            score_breakdown = match.score_breakdown
+            if score_breakdown is None:
+                continue
+
+            for alliance_color in ALLIANCE_COLORS:
+                try:
+                    alliance_breakdown = score_breakdown[alliance_color]
+
+                    # Auto Points
+                    mobility_points += alliance_breakdown["autoMobilityPoints"]
+                    auto_piece_points += alliance_breakdown["autoGamePiecePoints"]
+                    auto_charge_station_points += alliance_breakdown[
+                        "autoChargeStationPoints"
+                    ]
+                    points_auto += alliance_breakdown["autoPoints"]
+
+                    # Teleop Points
+                    teleop_piece_points += alliance_breakdown["teleopGamePiecePoints"]
+                    park_points += alliance_breakdown["endGameParkPoints"]
+                    teleop_charge_station_points += alliance_breakdown[
+                        "endGameChargeStationPoints"
+                    ]
+                    points_teleop += alliance_breakdown["teleopPoints"]
+
+                    # Overall Points
+                    link_points += alliance_breakdown["linkPoints"]
+
+                    # Counts
+                    for i in range(3):
+                        if alliance_breakdown["mobilityRobot{}".format(i + 1)] == "Yes":
+                            mobility_count += 1
+
+                        if (
+                            alliance_breakdown[
+                                "endGameChargeStationRobot{}".format(i + 1)
+                            ]
+                            == "Docked"
+                        ):
+                            teleop_docked_count += 1
+                            if alliance_breakdown["endGameBridgeState"] == "Level":
+                                teleop_engaged_count += 1
+
+                    if alliance_breakdown["autoDocked"]:
+                        auto_docked_count += 1
+                        if alliance_breakdown["autoBridgeState"] == "Level":
+                            auto_engaged_count += 1
+
+                    auto_top_count += sum(
+                        x != "None" for x in alliance_breakdown["autoCommunity"]["T"]
+                    )
+                    auto_mid_count += sum(
+                        x != "None" for x in alliance_breakdown["autoCommunity"]["M"]
+                    )
+                    auto_bot_count += sum(
+                        x != "None" for x in alliance_breakdown["autoCommunity"]["B"]
+                    )
+
+                    teleop_top_count += sum(
+                        x != "None" for x in alliance_breakdown["teleopCommunity"]["T"]
+                    )
+                    teleop_mid_count += sum(
+                        x != "None" for x in alliance_breakdown["teleopCommunity"]["M"]
+                    )
+                    teleop_bot_count += sum(
+                        x != "None" for x in alliance_breakdown["teleopCommunity"]["B"]
+                    )
+
+                    coopertition_count += (
+                        1 if alliance_breakdown["coopertitionCriteriaMet"] else 0
+                    )
+                    sustainability_bonus_count += (
+                        1 if alliance_breakdown["sustainabilityBonusAchieved"] else 0
+                    )
+                    activation_bonus_count += (
+                        1 if alliance_breakdown["activationBonusAchieved"] else 0
+                    )
+
+                    alliance_win = alliance_color == match.winning_alliance
+                    unicorn_matches += (
+                        1
+                        if alliance_win
+                        and alliance_breakdown["sustainabilityBonusAchieved"]
+                        and alliance_breakdown["activationBonusAchieved"]
+                        else 0
+                    )
+                    foul_scores += alliance_breakdown["foulPoints"]
+                    has_insights = True
+                except Exception as e:
+                    msg = "Event insights failed for {}: {}".format(match.key.id(), e)
+                    # event.get() below should be cheap since it's backed by context cache
+                    if match.event.get().event_type_enum in SEASON_EVENT_TYPES:
+                        logging.warning(msg)
+                        logging.warning(traceback.format_exc())
+                    else:
+                        logging.info(msg)
+            finished_matches += 1
+
+        if not has_insights:
+            return None
+
+        if finished_matches == 0:
+            return {}
+
+        opportunities_1x = 2 * finished_matches
+        opportunities_3x = 6 * finished_matches
+        event_insights = {
+            # Auto
+            "mobility_count": [
+                mobility_count,
+                opportunities_3x,
+                100.0 * float(mobility_count) / opportunities_3x,
+            ],
+            "auto_docked_count": [
+                auto_docked_count,
+                opportunities_1x,
+                100.0 * float(auto_docked_count) / opportunities_1x,
+            ],
+            "auto_engaged_count": [
+                auto_engaged_count,
+                opportunities_1x,
+                100.0 * float(auto_engaged_count) / opportunities_1x,
+            ],
+            "average_mobility_points": float(mobility_points) / opportunities_1x,
+            "average_piece_points_auto": float(auto_piece_points) / opportunities_1x,
+            "average_charge_station_points_auto": float(auto_charge_station_points)
+            / opportunities_1x,
+            "average_points_auto": float(points_auto) / opportunities_1x,
+            # Teleop
+            "average_piece_points_teleop": float(teleop_piece_points)
+            / opportunities_1x,
+            "average_park_points": float(park_points) / opportunities_1x,
+            "average_charge_station_points_teleop": float(teleop_charge_station_points)
+            / opportunities_1x,
+            "average_points_teleop": float(points_teleop) / opportunities_1x,
+            # Overall
+            "average_link_points": float(link_points) / opportunities_1x,
+            "coopertition": [
+                coopertition_count,
+                opportunities_1x,
+                100.0 * float(coopertition_count) / opportunities_1x,
+            ],
+            "sustainability_bonus_rp": [
+                sustainability_bonus_count,
+                opportunities_1x,
+                100.0 * float(sustainability_bonus_count) / opportunities_1x,
+            ],
+            "activation_bonus_rp": [
+                activation_bonus_count,
+                opportunities_1x,
+                100.0 * float(activation_bonus_count) / opportunities_1x,
+            ],
+            "unicorn_matches": [
+                unicorn_matches,
+                opportunities_1x,
+                100.0 * float(unicorn_matches) / opportunities_1x,
+            ],
+            "average_win_score": float(winning_scores) / finished_matches,
+            "average_win_margin": float(win_margins) / finished_matches,
+            "average_score": float(total_scores) / opportunities_1x,
+            "average_foul_score": float(foul_scores) / opportunities_1x,
+            "high_score": list(high_score),
+        }
+        return event_insights
 
     @classmethod
     def calculate_event_insights_2023(cls, matches: List[Match]) -> EventInsights:
@@ -47,24 +288,6 @@ class EventInsightsHelper:
 
         qual_insights = cls._calculate_event_insights_2023_helper(qual_matches)
         playoff_insights = cls._calculate_event_insights_2023_helper(playoff_matches)
-
-        return {
-            "qual": qual_insights,
-            "playoff": playoff_insights,
-        }
-
-    @classmethod
-    def calculate_event_insights_2022(cls, matches: List[Match]) -> EventInsights:
-        qual_matches = []
-        playoff_matches = []
-        for match in matches:
-            if match.comp_level == CompLevel.QM:
-                qual_matches.append(match)
-            else:
-                playoff_matches.append(match)
-
-        qual_insights = cls._calculate_event_insights_2022_helper(qual_matches)
-        playoff_insights = cls._calculate_event_insights_2022_helper(playoff_matches)
 
         return {
             "qual": qual_insights,
@@ -292,6 +515,24 @@ class EventInsightsHelper:
             "high_score": list(high_score),
         }
         return event_insights
+
+    @classmethod
+    def calculate_event_insights_2022(cls, matches: List[Match]) -> EventInsights:
+        qual_matches = []
+        playoff_matches = []
+        for match in matches:
+            if match.comp_level == CompLevel.QM:
+                qual_matches.append(match)
+            else:
+                playoff_matches.append(match)
+
+        qual_insights = cls._calculate_event_insights_2022_helper(qual_matches)
+        playoff_insights = cls._calculate_event_insights_2022_helper(playoff_matches)
+
+        return {
+            "qual": qual_insights,
+            "playoff": playoff_insights,
+        }
 
     @classmethod
     def _calculate_event_insights_2022_helper(
