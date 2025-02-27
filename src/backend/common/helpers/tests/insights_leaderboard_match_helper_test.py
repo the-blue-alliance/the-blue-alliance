@@ -12,7 +12,10 @@ def test_highest_clean_score(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardMatchHelper._highest_match_clean_score(
         LeaderboardInsightArguments(
-            matches=Event.get_by_id("2019nyny").matches, year=2019
+            matches=Event.get_by_id("2019nyny").matches,
+            events=[Event.get_by_id("2019nyny")],
+            awards=[],
+            year=2019,
         )
     )
 
@@ -33,7 +36,10 @@ def test_highest_clean_combined_score(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardMatchHelper._highest_match_clean_combined_score(
         LeaderboardInsightArguments(
-            matches=Event.get_by_id("2019nyny").matches, year=2019
+            matches=Event.get_by_id("2019nyny").matches,
+            events=[Event.get_by_id("2019nyny")],
+            awards=[],
+            year=2019,
         )
     )
 
@@ -54,7 +60,10 @@ def test_2025_most_coral_scored(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardMatchHelper._2025_most_coral_scored(
         LeaderboardInsightArguments(
-            matches=Event.get_by_id("2025isde1").matches, year=2025
+            matches=Event.get_by_id("2025isde1").matches,
+            events=[Event.get_by_id("2025isde1")],
+            awards=[],
+            year=2025,
         )
     )
 

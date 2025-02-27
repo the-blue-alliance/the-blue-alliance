@@ -5,7 +5,6 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
-from backend.common.consts.insight_type import InsightType
 from backend.common.helpers.insights_helper import InsightsHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
@@ -116,92 +115,6 @@ def setup(ndb_stub):
     yield
 
 
-def test_blue_banner_leaderboard_single_year(ndb_stub):
-    award_futures = ndb.get_multi_async(
-        Award.query(Award.year == 2024).fetch_async(10000, keys_only=True).get_result()
-    )
-    insights = InsightsHelper._calculate_assorted_award_leaderboards(
-        award_futures, 2024
-    )
-    assert len(insights) == 3
-    banner_insight = next(
-        filter(
-            lambda x: x.name
-            == Insight.INSIGHT_NAMES[Insight.TYPED_LEADERBOARD_BLUE_BANNERS],
-            insights,
-        )
-    )
-    assert banner_insight is not None
-    assert banner_insight.year == 2024
-    assert banner_insight.data_json == json.dumps(
-        {
-            "rankings": [
-                {"keys": ["frc604"], "value": 3},
-                {"keys": ["frc1323"], "value": 2},
-            ],
-            "key_type": "team",
-        }
-    )
-
-
-def test_award_count_leaderboard_single_year(ndb_stub):
-    award_futures = ndb.get_multi_async(
-        Award.query(Award.year == 2024).fetch_async(10000, keys_only=True).get_result()
-    )
-    insights = InsightsHelper._calculate_assorted_award_leaderboards(
-        award_futures, 2024
-    )
-    assert len(insights) == 3
-    most_awards_insight = next(
-        filter(
-            lambda x: x.name
-            == Insight.INSIGHT_NAMES[Insight.TYPED_LEADERBOARD_MOST_AWARDS],
-            insights,
-        )
-    )
-    assert most_awards_insight is not None
-    assert most_awards_insight.year == 2024
-    assert most_awards_insight.data_json == json.dumps(
-        {
-            "rankings": [
-                {"keys": ["frc604"], "value": 4},
-                {"keys": ["frc1323"], "value": 2},
-                {"keys": ["frc2713"], "value": 1},
-            ],
-            "key_type": "team",
-        }
-    )
-
-
-def test_non_cmp_event_wins_leaderboard_single_year(ndb_stub):
-    award_futures = ndb.get_multi_async(
-        Award.query(Award.year == 2024).fetch_async(10000, keys_only=True).get_result()
-    )
-    insights = InsightsHelper._calculate_assorted_award_leaderboards(
-        award_futures, 2024
-    )
-    assert len(insights) == 3
-    non_cmp_event_wins_insight = next(
-        filter(
-            lambda x: x.name
-            == Insight.INSIGHT_NAMES[
-                Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS
-            ],
-            insights,
-        )
-    )
-    assert non_cmp_event_wins_insight is not None
-    assert non_cmp_event_wins_insight.year == 2024
-    assert non_cmp_event_wins_insight.data_json == json.dumps(
-        {
-            "rankings": [
-                {"keys": ["frc604", "frc1323"], "value": 1},
-            ],
-            "key_type": "team",
-        }
-    )
-
-
 def test_division_winner_notables_single_year(ndb_stub):
     award_futures = ndb.get_multi_async(
         Award.query(Award.year == 2024).fetch_async(10000, keys_only=True).get_result()
@@ -263,42 +176,13 @@ def test_division_finals_appearances_notables_single_year(ndb_stub):
     )
 
 
-def test_blue_banners_leaderboard_overall(ndb_stub):
-    for y in [2022, 2024]:
-        for i in InsightsHelper.doAwardInsights(y):
-            i.put()
-
-    insights = InsightsHelper.do_overall_leaderboard_insights(
-        insight_type=InsightType.AWARDS
-    )
-    assert len(insights) == 3
-    banner_insight = next(
-        filter(
-            lambda x: x.name
-            == Insight.INSIGHT_NAMES[Insight.TYPED_LEADERBOARD_BLUE_BANNERS],
-            insights,
-        )
-    )
-    assert banner_insight is not None
-    assert banner_insight.year == 0
-    assert banner_insight.data_json == json.dumps(
-        {
-            "rankings": [
-                {"keys": ["frc604"], "value": 4},
-                {"keys": ["frc1323"], "value": 3},
-            ],
-            "key_type": "team",
-        }
-    )
-
-
 def test_division_winner_notables_overall(ndb_stub):
     for y in [2022, 2024]:
         for i in InsightsHelper.doAwardInsights(y):
             i.put()
 
     insights = InsightsHelper.doOverallAwardInsights()
-    assert len(insights) == 12
+    assert len(insights) == 9
     div_winner_notables = next(
         filter(
             lambda x: x.name
