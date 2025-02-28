@@ -74,6 +74,11 @@ cron:
   schedule: every day 01:19
   timezone: America/Los_Angeles
 
+- description: Notable Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/notables
+  schedule: every day 01:21
+  timezone: America/Los_Angeles
+
 - description: Award Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/awards
   schedule: every day 01:10
