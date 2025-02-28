@@ -1,4 +1,5 @@
 import json
+import logging
 
 import requests
 
@@ -57,8 +58,8 @@ class WebhookRequest(Request):
                 self.defer_track_notification(1)
             elif response.status_code == 404:
                 valid_url = False
-        except Exception:
-            pass
+        except Exception as e:
+            logging.error(f"Sending FCM request: {e}")
 
         return valid_url
 
