@@ -59,7 +59,7 @@ class WebhookRequest(Request):
             elif response.status_code == 404:
                 valid_url = False
         except Exception as e:
-            logging.error(f"Sending FCM request: {e}")
+            logging.error(f"Failed to send webhook request: {e}")
 
         return valid_url
 
