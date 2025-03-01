@@ -8,9 +8,8 @@
 <script src="//gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="/py3_javascript/tba_combined_js.firebase.min.js"></script>
 <script>
-  // Setup auth emulator host if passed
-  if ({{ auth_emulator_host|tojson }}) {
-    auth.useEmulator("http://" + {{ auth_emulator_host|tojson }});
+  if (is_local()) {
+    auth.useEmulator("http://" + {{auth_emulator_host|tojson}});
   }
 </script>
 {% endblock %}

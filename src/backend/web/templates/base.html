@@ -195,7 +195,12 @@
 {% endblock %}
 
 {% block inline_javascript %}{% endblock %}
-
+<script>
+  if (!is_local()) {
+    // Not running on localhost - assumes prod keys
+    const perf = firebase.performance();
+  }
+</script>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
