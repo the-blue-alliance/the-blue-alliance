@@ -35,6 +35,14 @@ class TestAwardManipulator(unittest.TestCase):
         )
         self.event.put()
 
+        self.event2025 = Event(
+            id="2025casj",
+            event_short="casj",
+            year=2025,
+            event_type_enum=EventType.REGIONAL,
+        )
+        self.event2025.put()
+
         self.old_award = Award(
             id=Award.render_key_name(self.event.key_name, AwardType.WINNER),
             name_str="Regional Winner",
@@ -55,6 +63,17 @@ class TestAwardManipulator(unittest.TestCase):
             award_type_enum=AwardType.WINNER,
             year=2013,
             event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, "frc359")],
+            recipient_json_list=[json.dumps({"team_number": 359, "awardee": None})],
+        )
+
+        self.new_award2025 = Award(
+            id="2025casj_1",
+            name_str="Regional Champion",
+            award_type_enum=AwardType.WINNER,
+            year=2025,
+            event=self.event2025.key,
             event_type_enum=EventType.REGIONAL,
             team_list=[ndb.Key(Team, "frc359")],
             recipient_json_list=[json.dumps({"team_number": 359, "awardee": None})],
@@ -167,6 +186,24 @@ class TestAwardManipulator(unittest.TestCase):
 
         task = tasks[0]
         assert task.url == "/tasks/math/do/district_points_calc/2013casj"
+
+    def test_postUpdateHook_regionalChampsPoints(self):
+        AwardManipulator.createOrUpdate(self.new_award2025)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            run_from_task(task)
+
+        # Ensure we have a district_points_calc test enqueued
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="default"
+        )
+
+        task_urls = {t.url for t in tasks}
+        assert "/tasks/math/do/regional_champs_pool_points_calc/2025casj" in task_urls
 
     def test_postUpdateHook_notifications(self):
         import datetime

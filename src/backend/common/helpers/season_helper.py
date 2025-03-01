@@ -42,6 +42,10 @@ class SeasonHelper(object):
         max_year = cls.get_max_year()
         return range(cls.MIN_REGIONAL_CMP_POOL_YEAR, max_year + 1)
 
+    @classmethod
+    def is_valid_regional_pool_year(cls, year: Year) -> bool:
+        return year >= cls.MIN_REGIONAL_CMP_POOL_YEAR
+
     @staticmethod
     def effective_season_year(date=datetime.now()) -> Year:
         """

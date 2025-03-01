@@ -162,7 +162,10 @@ def regional_event_champs_pool_points_calc(event_key: EventKey) -> Response:
         abort(404)
 
     if event.year not in SeasonHelper.get_valid_regional_pool_years():
-        return make_response("")
+        return make_response(f"{event.year} is not a valid regional champs pool year", 400)
+
+    if event.event_type_enum != EventType.REGIONAL:
+        return make_response(f"{event.event_type_enum} is not a valid regional champs pool event type", 400)
 
     regional_pool_points = RegionalChampsPoolHelper.calculate_event_points(event)
     event_details = EventDetails(
@@ -170,14 +173,13 @@ def regional_event_champs_pool_points_calc(event_key: EventKey) -> Response:
     )
     EventDetailsManipulator.createOrUpdate(event_details)
 
-    if event.event_type_enum == EventType.REGIONAL:
-        taskqueue.add(
-            url=url_for("math.regional_champs_pool_rankings_calc", year=event.year),
-            method="GET",
-            target="py3-tasks-io",
-            queue_name="default",
-            # TODO: ^ new queue with a rate limit
-        )
+    taskqueue.add(
+        url=url_for("math.regional_champs_pool_rankings_calc", year=event.year),
+        method="GET",
+        target="py3-tasks-io",
+        queue_name="default",
+        # TODO: ^ new queue with a rate limit
+    )
 
     if (
         "X-Appengine-Taskname" not in request.headers
@@ -281,9 +283,13 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
 
 @blueprint.route("/tasks/math/do/regional_champs_pool_rankings_calc/<int:year>")
 def regional_champs_pool_rankings_calc(year: Year) -> Response:
-    regional_pool = RegionalChampsPool.get_for_year(year)
-    if not regional_pool:
-        return make_response(f"Regional champs pool not found for year {year}", 404)
+    if not SeasonHelper.is_valid_regional_pool_year(year):
+        abort(404)
+
+    regional_pool = RegionalChampsPool.get_or_insert(
+        RegionalChampsPool.render_key_name(year),
+        year=year,
+    )
 
     events_future: TypedFuture[List[Event]] = RegionalEventsQuery(year).fetch_async()
     teams_future: TypedFuture[List[Team]] = RegionalTeamsQuery(year).fetch_async()

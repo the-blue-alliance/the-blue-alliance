@@ -4,7 +4,9 @@ from typing import List
 from google.appengine.api import taskqueue
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.deferred import defer_safe
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
@@ -81,6 +83,24 @@ def event_details_post_update_hook(
                 )
             except Exception:
                 pass
+
+        if (
+            event
+            and SeasonHelper.is_valid_regional_pool_year(event.year)
+            and event.event_type_enum == EventType.REGIONAL
+        ):
+            try:
+                taskqueue.add(
+                    url=f"/tasks/math/do/regional_champs_pool_points_calc/{event_key}",
+                    method="GET",
+                    target="py3-tasks-io",
+                    queue_name="default",
+                    countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
+                )
+            except Exception:
+                logging.exception(
+                    f"Error enqueuing regional_champs_points_calc for {event_key}"
+                )
 
 
 """ndb
