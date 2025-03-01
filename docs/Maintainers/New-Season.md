@@ -77,15 +77,23 @@ The match breakdown JSON format should be communicated from FIRST before the fir
 
 Do not include the `alliance` field in the score breakdown keys.
 
-### Event Match Stats
-
-TODO, but add year to `tasks_io.handlers.math.event_matchstats_calc`
-
 ### Tiebreakers
 
 TODO
 
+### Awards
+
+New awards might be added for a given season. These will generally be communicated via [blog posts](https://community.firstinspires.org/award-updates-for-the-2025-season) before the season starts.
+
+An [`AwardType`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/award_type.py) definition might need to be added for the new award. Additionally, a [string(s) to match the name](https://github.com/ZachOrr/the-blue-alliance/blob/py3/src/backend/common/consts/award_matching_strings.py) of the new award type will need to be added. The comment above the `AWARD_MATCHING_STRINGS` has instructions for defining matching/exclusion strings.
+
+Here is an [example PR](https://github.com/the-blue-alliance/the-blue-alliance/pull/7203) for the Rising All-Star Award in 2025.
+
 ### Playoff Advancement
+
+TODO
+
+### COPRs
 
 TODO
 
@@ -101,14 +109,18 @@ TODO
 
 Here is an [example PR](https://github.com/the-blue-alliance/the-blue-alliance/pull/7115) for the example screenshot.
 
-### Predictions
-
-TODO
-
 ### Event Rankings
 
 TODO, but `EventDetails.renderable_rankings` needs updating and explain how/why
 Also update `ranking_sort_orders.py`.
+
+### Predictions
+
+TODO
+
+#### Event Match Stats
+
+TODO, part of predictions, but add year to `tasks_io.handlers.math.event_matchstats_calc`
 
 ## Championship Events
 
