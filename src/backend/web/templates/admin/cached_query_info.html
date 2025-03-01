@@ -21,6 +21,10 @@
             <td>Updated</td>
             <td><time datetime="{{ cached_query.updated }}" class="tba-verbose-datetime-utc">{{ cached_query.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time></td>
         </tr>
+        <tr>
+            <td>Data</td>
+            <td><pre style="white-space: pre-wrap">{{ cached_query.result or cached_query.result_dict|tojson(indent=2) }}</pre></td>
+        </tr>
     </table>
 </div>
 

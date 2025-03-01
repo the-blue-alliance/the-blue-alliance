@@ -90,7 +90,7 @@ def cached_query_detail(query_class_name: str) -> str:
     for item in cached_item_keys:
         key_split = item.string_id().split(":")
         query_version = int(key_split[1])
-        global_version = int(key_split[2])
+        global_version = key_split[2]
         cached_items_by_version[(global_version, query_version)] += 1
 
     template_args = {
@@ -127,7 +127,7 @@ def cached_query_delete(query_class_name: str, cache_key: str) -> Response:
 
 
 def cached_query_purge_version(
-    query_class_name: str, db_version: int, query_version: int
+    query_class_name: str, db_version: str, query_version: int
 ) -> Response:
     query_class = next(
         (
@@ -165,7 +165,7 @@ def cached_query_purge_version(
     for key in cached_item_keys:
         key_split = key.string_id().split(":")
         item_query_version = int(key_split[1])
-        item_db_version = int(key_split[2])
+        item_db_version = key_split[2]
         if query_version == item_query_version and item_db_version == db_version:
             keys_to_delete.add(key)
 

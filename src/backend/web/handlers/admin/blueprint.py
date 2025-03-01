@@ -205,7 +205,7 @@ admin_routes.add_url_rule(
     "/cache/<query_class_name>/<cache_key>/delete", view_func=cached_query_delete
 )
 admin_routes.add_url_rule(
-    "/cache/<query_class_name>/purge/<int:db_version>/<int:query_version>",
+    "/cache/<query_class_name>/purge/<db_version>/<int:query_version>",
     view_func=cached_query_purge_version,
 )
 admin_routes.add_url_rule(
