@@ -89,6 +89,10 @@ def test_organize_awards() -> None:
             AwardType.VISUALIZATION_RISING_STAR,
         ),
         ("Team Sustainability Award", AwardType.SUSTAINABILITY),
+        # zach: I've seein this in the manual as "Rising All Star" and on
+        # frc-events/API as "Rising All-Star" - making sure we support both
+        ("Rising All-Star Award", AwardType.RISING_ALL_STAR),
+        ("Rising All Star Award", AwardType.RISING_ALL_STAR),
         ("Some Random Award Winner", None),
         ("Random Champion", None),
         ("An Award", None),
