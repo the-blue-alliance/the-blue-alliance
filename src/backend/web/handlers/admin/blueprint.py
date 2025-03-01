@@ -302,8 +302,14 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/match/delete/<match_key>", view_func=match_delete_post, methods=["POST"]
 )
-admin_routes.add_url_rule("/regional_champs_pool", view_func=regional_champs_pool_list, defaults={"year": None})
-admin_routes.add_url_rule("/regional_champs_pool/<int:year>", view_func=regional_champs_pool_list)
+admin_routes.add_url_rule(
+    "/regional_champs_pool",
+    view_func=regional_champs_pool_list,
+    defaults={"year": None},
+)
+admin_routes.add_url_rule(
+    "/regional_champs_pool/<int:year>", view_func=regional_champs_pool_list
+)
 admin_routes.add_url_rule("/sitevars", view_func=sitevars_list)
 admin_routes.add_url_rule("/sitevar/create", view_func=sitevar_create, methods=["GET"])
 admin_routes.add_url_rule(
