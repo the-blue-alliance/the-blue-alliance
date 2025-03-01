@@ -205,6 +205,17 @@ def event_detail(event_key: EventKey) -> Response:
             key=lambda team_and_points: -team_and_points[1]["total"],
         )
 
+    is_regional_cmp_pool_eligible = (
+        SeasonHelper.is_valid_regional_pool_year(event.year)
+        and event.event_type_enum == EventType.REGIONAL
+    )
+    regional_champs_pool_points_sorted = None
+    if is_regional_cmp_pool_eligible and (points := event.regional_champs_pool_points):
+        regional_champs_pool_points_sorted = sorted(
+            none_throws(points["points"].items()),
+            key=lambda team_and_points: -team_and_points[1]["total"],
+        )
+
     event_insights = event.details.insights if event.details else None
     event_insights_template = None
     if event_insights:
@@ -244,6 +255,7 @@ def event_detail(event_key: EventKey) -> Response:
         "event_down": False,  # status_sitevar and event_key in status_sitevar.contents,
         "district_name": district.display_name if district else None,
         "district_abbrev": district.abbreviation if district else None,
+        "is_regional_cmp_eligible": is_regional_cmp_pool_eligible,
         "matches": matches,
         "match_count": match_count,
         "matches_recent": matches_recent,
@@ -261,6 +273,7 @@ def event_detail(event_key: EventKey) -> Response:
             event.year, []
         ),
         "district_points_sorted": district_points_sorted,
+        "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "event_insights_qual": event_insights["qual"] if event_insights else None,
         "event_insights_playoff": event_insights["playoff"] if event_insights else None,
         "event_insights_template": event_insights_template,

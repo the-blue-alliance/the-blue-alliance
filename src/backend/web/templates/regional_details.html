@@ -22,25 +22,25 @@
               <li><a href="/events/{{district_abbrev}}/{{valid_year}}">{{valid_year}}</a></li>
             {% endfor %}
           </ul>
-        </div>
+          </div>
 
-        <h1 class="visible-xs end_header" id="regional-header">{% if explicit_year %}{{year}} {% endif %}Regional Events{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
+          <h1 class="visible-xs end_header" id="regional-header">{% if explicit_year %}{{year}} {% endif %}Regional Events{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
 
-        <div class="btn-group">
-          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" style="white-space:normal; word-wrap: break-word; word-break: normal;" href="#">
-            Regional Events
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu tba-dropdown-menu-limited" id="valid-districts">
-            <li><a href="/events{% if explicit_year %}/{{year}}{% endif %}">All Events</a></li>
-            {% for valid_district in valid_districts %}
-              {% if district_name != valid_district.0 %}
-              <li><a href="/events/{{valid_district.1}}{% if explicit_year %}/{{year}}{% endif %}">{{valid_district.0}}</a></li>
-              {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-	</div>
+          <div class="btn-group">
+            <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" style="white-space:normal; word-wrap: break-word; word-break: normal;" href="#">
+              Regional Events
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu tba-dropdown-menu-limited" id="valid-districts">
+              <li><a href="/events{% if explicit_year %}/{{year}}{% endif %}">All Events</a></li>
+              {% for valid_district in valid_districts %}
+                {% if district_name != valid_district.0 %}
+                <li><a href="/events/{{valid_district.1}}{% if explicit_year %}/{{year}}{% endif %}">{{valid_district.0}}</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+	      </div>
 
         <div class="tba-sidebar">
           <ul class="nav tba-sidenav">
@@ -54,6 +54,14 @@
     <div class="col-xs-12 col-sm-9 col-lg-10">
       <h1 class="hidden-xs end_header">{% if explicit_year %}{{year}} {% endif %}Regional Events{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
 
+      {% if year >= 2025 and rankings %}
+        <!-- For years without the regional champs pool advancement, we don't need to show tabs -->
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+          <li class="active"><a href="#events" role="tab" data-toggle="tab">Events</a></li>
+          <li><a href="#rankings" role="tab" data-toggle="tab">Championship Qualification</a></li>
+        </ul>
+      {% endif %}
+
       <div class="tab-content">
         <div class="tab-pane active" id="events">
           {% for label, events in week_events.items() %}
@@ -63,6 +71,56 @@
             </div>
           {% endfor %}
         </div>
+
+      {% if year >= 2025 and rankings %}
+        <div class="tab-pane" id="rankings">
+          <table class="table table-striped table-condensed table-center">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Team</th>
+                <th>Event 1</th>
+                <th>Event 2</th>
+                <th>Rookie Bonus</th>
+                <th>Total Points</th>
+                <th>Qualified for CMP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in rankings %}
+              <tr>
+                <td>{{loop.index}}</td>
+                <td><a href="/team/{{item.team_key|digits}}/{{year}}">{{item.team_key|digits}}</a></td>
+                <td>
+                  {% if item.event_points[0] %}
+                  {{item.event_points[0].total}} <a href="/event/{{item.event_points[0].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[0].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.event_points[1] %}
+                  {{item.event_points[1].total}} <a href="/event/{{item.event_points[1].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[1].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.rookie_bonus %}
+                  {{item.rookie_bonus}}
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td><strong>{{item.point_total}}</strong></td>
+                <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].cmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+
       </div>
     </div>
   </div>

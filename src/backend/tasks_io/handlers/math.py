@@ -162,10 +162,15 @@ def regional_event_champs_pool_points_calc(event_key: EventKey) -> Response:
         abort(404)
 
     if event.year not in SeasonHelper.get_valid_regional_pool_years():
-        return make_response(f"{event.year} is not a valid regional champs pool year", 400)
+        return make_response(
+            f"{event.year} is not a valid regional champs pool year", 400
+        )
 
     if event.event_type_enum != EventType.REGIONAL:
-        return make_response(f"{event.event_type_enum} is not a valid regional champs pool event type", 400)
+        return make_response(
+            f"{event.event_type_enum} is not a valid regional champs pool event type",
+            400,
+        )
 
     regional_pool_points = RegionalChampsPoolHelper.calculate_event_points(event)
     event_details = EventDetails(
