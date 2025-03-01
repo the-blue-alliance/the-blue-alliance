@@ -103,8 +103,8 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
-class RegionalTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
-    CACHE_VERSION = 1
+class RegionalTeamsQuery(CachedDatabaseQuery[List[ndb.Key], List[str]]):
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "regional_teams_{year}"
     DICT_CONVERTER = TeamConverter
 
@@ -112,13 +112,12 @@ class RegionalTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         super().__init__(year=year)
 
     @typed_tasklet
-    def _query_async(self, year: Year) -> Generator[Any, Any, List[Team]]:
+    def _query_async(self, year: Year) -> Generator[Any, Any, List[ndb.Key]]:
         regional_teams = yield RegionalPoolTeam.query(
             RegionalPoolTeam.year == year
         ).fetch_async()
         team_keys = map(lambda t: t.team, regional_teams)
-        teams = yield ndb.get_multi_async(team_keys)
-        return list(teams)
+        return list(team_keys)
 
 
 class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):

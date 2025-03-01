@@ -297,15 +297,18 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
     )
 
     events_future: TypedFuture[List[Event]] = RegionalEventsQuery(year).fetch_async()
-    teams_future: TypedFuture[List[Team]] = RegionalTeamsQuery(year).fetch_async()
+    team_keys_future: TypedFuture[List[ndb.Key]] = RegionalTeamsQuery(
+        year
+    ).fetch_async()
 
     events = events_future.get_result()
     for event in events:
         event.prep_details
+    teams_future = ndb.get_multi_async(team_keys_future.get_result())
 
     events = EventHelper.sorted_events(events)
     team_totals = RegionalChampsPoolHelper.calculate_rankings(
-        events, teams_future, year
+        events, [t.get_result() for t in teams_future], year
     )
 
     rankings: List[RegionalPoolRanking] = []
@@ -322,7 +325,8 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
             event_points["event_key"] = event.key_name
             point_detail["event_points"].append(event_points)
 
-        rankings.append(point_detail)
+        if point_detail["point_total"] > 0:
+            rankings.append(point_detail)
         current_rank += 1
 
     if rankings:
