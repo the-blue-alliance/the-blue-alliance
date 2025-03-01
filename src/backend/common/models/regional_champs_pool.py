@@ -23,7 +23,7 @@ class RegionalChampsPool(CachedModel):
     rankings: List[RegionalPoolRanking] = ndb.JsonProperty()
 
     # Dict of team key -> advancement data
-    advancement: RegionalPoolAdvancement = ndb.JsonProperty()  # pyre-ignore[8]
+    advancement: RegionalPoolAdvancement = ndb.JsonProperty()
 
     _mutable_attrs: Set[str] = {
         "rankings",

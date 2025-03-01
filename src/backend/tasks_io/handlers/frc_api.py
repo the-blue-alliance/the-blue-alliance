@@ -1,6 +1,7 @@
 import datetime
 import logging
 import re
+from collections import defaultdict
 from typing import List, Optional, Set
 
 from flask import Blueprint, make_response, render_template, request, Response, url_for
@@ -29,6 +30,9 @@ from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
+from backend.common.manipulators.regional_champs_pool_manipulator import (
+    RegionalChampsPoolManipulator,
+)
 from backend.common.manipulators.regional_pool_team_manipulator import (
     RegionalPoolTeamManipulator,
 )
@@ -40,6 +44,11 @@ from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
+from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.regional_pool_advancement import (
+    RegionalPoolAdvancement,
+    TeamRegionalPoolAdvancement,
+)
 from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -382,6 +391,9 @@ def event_details(event_key: EventKey) -> Response:
     teams: List[Team] = []
     district_teams: List[DistrictTeam] = []
     regional_pool_teams: List[RegionalPoolTeam] = []
+    regional_cmp_advancement: RegionalPoolAdvancement = defaultdict(
+        lambda: TeamRegionalPoolAdvancement(cmp=False)
+    )
     robots: List[Robot] = []
     for group in models:
         # models is a list of tuples (team, districtTeam, robot)
@@ -394,7 +406,7 @@ def event_details(event_key: EventKey) -> Response:
             district_teams.append(district_team)
 
         if (
-            event.year in SeasonHelper.get_valid_regional_pool_years()
+            SeasonHelper.is_valid_regional_pool_year(event.year)
             and event.event_type_enum
             in {EventType.REGIONAL, EventType.CMP_DIVISION, EventType.CMP_FINALS}
             and team is not None
@@ -406,6 +418,11 @@ def event_details(event_key: EventKey) -> Response:
                 team=team.key,
             )
             regional_pool_teams.append(regional_pool_team)
+
+            regional_cmp_advancement[team.key_name]["cmp"] |= event.event_type_enum in {
+                EventType.CMP_DIVISION,
+                EventType.CMP_FINALS,
+            }
 
         robot = group[2]
         if isinstance(robot, Robot):
@@ -488,6 +505,14 @@ def event_details(event_key: EventKey) -> Response:
         if avatars:
             MediaManipulator.createOrUpdate(avatars)
         MediaManipulator.delete_keys(keys_to_delete)
+
+    if SeasonHelper.is_valid_regional_pool_year(event.year):
+        champs_pool_model = RegionalChampsPool.get_or_insert(
+            RegionalChampsPool.render_key_name(event.year),
+            year=event.year,
+        )
+        champs_pool_model.advancement = regional_cmp_advancement
+        RegionalChampsPoolManipulator.createOrUpdate(champs_pool_model)
 
     template_values = {
         "event": event,

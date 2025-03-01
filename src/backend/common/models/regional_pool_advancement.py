@@ -1,5 +1,10 @@
-from typing import TypedDict
+from typing import Dict, TypedDict
+
+from backend.common.models.keys import TeamKey
 
 
-class RegionalPoolAdvancement(TypedDict):
+class TeamRegionalPoolAdvancement(TypedDict):
     cmp: bool
+
+
+RegionalPoolAdvancement = Dict[TeamKey, TeamRegionalPoolAdvancement]
