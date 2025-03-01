@@ -355,11 +355,11 @@ jobs:
           filters: |
             queue:
               - 'src/queue.yaml'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.queue == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.queue == 'true'
         uses: google-github-actions/auth@v2
@@ -388,11 +388,11 @@ jobs:
           filters: |
             index:
               - 'src/index.yaml'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.index == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.index == 'true'
         uses: google-github-actions/auth@v2
@@ -424,11 +424,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.default == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.default == 'true'
         uses: google-github-actions/auth@v2
@@ -471,11 +471,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Download production artifacts
         if: steps.changes.outputs.web == 'true'
         uses: actions/download-artifact@v4
@@ -518,11 +518,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.api == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Update env_variables.yaml
         if: steps.changes.outputs.api == 'true'
         run: ./ops/deploy/update_env_variables_yaml.sh
@@ -559,11 +559,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.tasks-io == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-io == 'true'
         uses: google-github-actions/auth@v2
@@ -595,11 +595,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: google-github-actions/auth@v2
@@ -672,11 +672,11 @@ jobs:
           filters: |
             cron:
               - 'src/cron.yaml'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.cron == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.cron == 'true'
         uses: google-github-actions/auth@v2
@@ -714,11 +714,11 @@ jobs:
           filters: |
             dispatch:
               - 'src/dispatch.yaml'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.dispatch == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.dispatch == 'true'
         uses: google-github-actions/auth@v2
