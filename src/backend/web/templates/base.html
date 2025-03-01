@@ -223,20 +223,5 @@ ga('send', 'pageview');
 
 {% block ganalytics_timer %}{% endblock %}
 
-<script>
-  (function (sa, fbc) {
-    function load(f, c) {
-      var a = document.createElement('script');
-      a.async = 1; a.src = f; var s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(a, s);
-    } load(sa);
-    window.addEventListener('load', function () { firebase.initializeApp(fbc).performance() });
-  })('https://www.gstatic.com/firebasejs/8.10.0/firebase-performance-standalone.js', {
-    apiKey: "AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs",
-    projectId: "tbatv-prod-hrd",
-    appId: "1:836511118694:web:02272aa0400554c7"
-  });
-</script>
-
 </body>
 </html>
