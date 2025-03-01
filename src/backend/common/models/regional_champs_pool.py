@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from google.appengine.ext import ndb
 
@@ -24,6 +24,11 @@ class RegionalChampsPool(CachedModel):
 
     # Dict of team key -> advancement data
     advancement: RegionalPoolAdvancement = ndb.JsonProperty()  # pyre-ignore[8]
+
+    _mutable_attrs: Set[str] = {
+        "rankings",
+        "advancement",
+    }
 
     def __init__(self, *args, **kw) -> None:
         self._affected_references = {
