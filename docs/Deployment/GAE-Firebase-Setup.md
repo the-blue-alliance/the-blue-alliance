@@ -35,6 +35,8 @@ $ gcloud auth application-default login
 
 The [`push.yml` GitHub Action](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/.github/workflows/push.yml) contains the commands CI uses to deploy to production and can be used as a reference.
 
+TODO: Add notes about setting up a `src/env_variables.yaml` before deploying with a Flask secret key.
+
 1. Deploy the default service and any other necessary services for testing.
 
 ```bash
