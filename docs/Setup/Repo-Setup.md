@@ -12,7 +12,7 @@ If you have both a Python 2 and Python 3 interpreter on your machine, run the `p
 ```
 $ ls -l `which pip`
 ```
-If the path is a `2.7(.X)` path, run `pip3` instead of `pip`. If the path is a `3.8(.X)` path, run `pip`.
+If the path is a `2.7(.X)` path, run `pip3` instead of `pip`. If the path is a `3.12(.X)` path, run `pip`.
 
 ### virtualenv install
 [virtaulenv](https://virtualenv.pypa.io/en/latest/) can be used to keep these Python dependencies local to The Blue Alliance project.
