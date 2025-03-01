@@ -5,7 +5,7 @@
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if not is_canonical %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
 
-{% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team information, match results, and match videos from the{% if not is_canonical %} {{year}}{% endif %} FIRST Robotics Competition.{% endblock %}
+{% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team information, match results, and match videos from the{% if not is_canonical %} {{year}}{% endif %} FIRST Robotics Competition (FRC).{% endblock %}
 
 {% block more_head_tags %}
 {% include "team_partials/team_head_tags.html" %}
@@ -142,7 +142,7 @@
                   {% endif %}
                 </p>
 
-                {% if comp.alliance %} 
+                {% if comp.alliance %}
                 {% if comp.alliance_status %}
                 <p>
                 They {{comp.alliance_status|safe}}.
@@ -166,7 +166,7 @@
                         {% endif %}
                         {% if pick == team.key_name %}</b>{% endif %}
                       </td>
-                      <td>                 
+                      <td>
                         {% if pick == team.key_name %}<b>{% endif %}
                         <a href="/team/{{ pick|digits }}/{{year}}">{{ pick|strip_frc }}</a>
                         {% if pick == team.key_name %}</b>{% endif %}
