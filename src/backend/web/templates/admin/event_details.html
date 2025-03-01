@@ -695,8 +695,9 @@
           </tr>
         {% endfor %}
       </table>
+    {% endif %}
 
-    {% elif event.details.district_points %}
+    {% if event.details.district_points %}
       <h2>District Points</h2>
       <i>These may or may not be relevant, TBA always calculates district points</i>
       <table class="table table-striped table-hover table-condensed">

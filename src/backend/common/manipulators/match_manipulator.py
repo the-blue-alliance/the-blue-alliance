@@ -1,15 +1,20 @@
 import logging
-from typing import List
+from typing import List, Set, TYPE_CHECKING
 
 from google.appengine.api import taskqueue
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.firebase_pusher import FirebasePusher
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.match import Match
+
+if TYPE_CHECKING:
+    from backend.common.models.event import Event
 
 
 class MatchManipulator(ManipulatorBase[Match]):
@@ -49,7 +54,8 @@ def match_post_delete_hook(deleted_models: List[Match]) -> None:
 
 @MatchManipulator.register_post_update_hook
 def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
-    affected_stats_event_keys = set()
+    affected_stats_event_keys: Set[str] = set()
+    affected_stats_events: List[Event] = []
     for updated_model in updated_models:
         MatchPostUpdateHooks.firebase_update(updated_model)
 
@@ -61,11 +67,16 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
             )
             != set()
         ):
-            affected_stats_event_keys.add(updated_model.model.event.id())
+            event_key = updated_model.model.event.string_id()
+            event = updated_model.model.event.get()
+            print(f"{event_key} - {event}")
+            if event_key and event and event_key not in affected_stats_event_keys:
+                affected_stats_event_keys.add(event_key)
+                affected_stats_events.append(event)
 
     # Enqueue statistics
-    for event_key in affected_stats_event_keys:
-        MatchPostUpdateHooks.enqueue_stats(event_key)
+    for event in affected_stats_events:
+        MatchPostUpdateHooks.enqueue_stats(event)
 
     # Dispatch push notifications
     unplayed_match_events = []
@@ -171,7 +182,8 @@ class MatchPostUpdateHooks:
             logging.exception("Firebase update_match failed!")
 
     @staticmethod
-    def enqueue_stats(event_key: str) -> None:
+    def enqueue_stats(event: "Event") -> None:
+        event_key = event.key_name
         # Enqueue task to calculate district points
         try:
             taskqueue.add(
@@ -183,6 +195,23 @@ class MatchPostUpdateHooks:
             )
         except Exception:
             logging.exception(f"Error enqueuing district_points_calc for {event_key}")
+
+        if (
+            SeasonHelper.is_valid_regional_pool_year(event.year)
+            and event.event_type_enum == EventType.REGIONAL
+        ):
+            try:
+                taskqueue.add(
+                    url=f"/tasks/math/do/regional_champs_pool_points_calc/{event_key}",
+                    method="GET",
+                    target="py3-tasks-io",
+                    queue_name="stats",
+                    countdown=90,  # Wait ~1.5m so cache clearing can run before we attempt to recalculate district points
+                )
+            except Exception:
+                logging.exception(
+                    f"Error enqueuing regional_champs_pool_calc for {event_key}"
+                )
 
         # Enqueue task to calculate event team status
         try:

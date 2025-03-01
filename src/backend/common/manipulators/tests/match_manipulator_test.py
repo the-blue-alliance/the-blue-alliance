@@ -243,6 +243,9 @@ def test_updateHook_taskqueueThrows(
 
 
 def test_updateHook_enqueueStats(ndb_context, taskqueue_stub) -> None:
+    Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    ).put()
     test_match = Match(
         id="2012ct_qm1",
         alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
@@ -252,8 +255,7 @@ def test_updateHook_enqueueStats(ndb_context, taskqueue_stub) -> None:
         set_number=1,
         match_number=1,
     )
-    test_match._updated_attrs = ["alliances_json"]
-    MatchManipulator._run_post_update_hook([test_match])
+    MatchManipulator.createOrUpdate(test_match)
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
     assert len(tasks) == 1
@@ -267,6 +269,38 @@ def test_updateHook_enqueueStats(ndb_context, taskqueue_stub) -> None:
     assert "/tasks/math/do/playoff_advancement_update/2012ct" in tasks_urls
     assert "/tasks/math/do/event_team_status/2012ct" in tasks_urls
     assert "/tasks/math/do/district_points_calc/2012ct" in tasks_urls
+
+
+def test_updateHook_enqueueStatsRegionalChampsPoints(
+    ndb_context, taskqueue_stub
+) -> None:
+    Event(
+        id="2025ct", event_short="ct", year=2025, event_type_enum=EventType.REGIONAL
+    ).put()
+    test_match = Match(
+        id="2025ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2025ct"),
+        year=2025,
+        set_number=1,
+        match_number=1,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        run_from_task(task)
+
+    stats_tasks = taskqueue_stub.get_filtered_tasks(queue_names="stats")
+    assert len(stats_tasks) > 0
+
+    tasks_urls = [t.url for t in stats_tasks]
+    assert "/tasks/math/do/playoff_advancement_update/2025ct" in tasks_urls
+    assert "/tasks/math/do/event_team_status/2025ct" in tasks_urls
+    assert "/tasks/math/do/district_points_calc/2025ct" in tasks_urls
+    assert "/tasks/math/do/regional_champs_pool_points_calc/2025ct" in tasks_urls
 
 
 @mock.patch.object(FirebasePusher, "delete_match")
