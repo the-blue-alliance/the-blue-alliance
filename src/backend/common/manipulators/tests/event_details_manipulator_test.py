@@ -82,18 +82,9 @@ class TestEventDetailsManipulator(unittest.TestCase):
             },
         )
 
-        self.new_event_details2025 = EventDetails(
+        self.old_event_details2025 = EventDetails(
             id="2025ct",
-            alliance_selections=self.new_alliance_selections,
-            matchstats={
-                "oprs": {
-                    "4255": 7.4877151786460301,
-                    "2643": 27.285682906835952,
-                    "852": 10.452538750544525,
-                    "4159": 25.820137009871139,
-                    "581": 18.513816255143144,
-                }
-            },
+            alliance_selections=self.old_alliance_selections,
         )
 
     def assertMergedEventDetails(self, event_details):
@@ -156,7 +147,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
         assert tasks[1].url == "/tasks/math/do/district_points_calc/2011ct"
 
     def test_postUpdateHook_calcs_regionalChampsPoints(self):
-        EventDetailsManipulator.createOrUpdate(self.old_event_details)
+        EventDetailsManipulator.createOrUpdate(self.old_event_details2025)
 
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
             queue_names="post-update-hooks"
