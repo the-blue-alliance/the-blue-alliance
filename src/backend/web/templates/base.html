@@ -177,7 +177,6 @@
 {% endblock %}
 
 <script src="//gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="//gstatic.com/firebasejs/8.10.0/firebase-performance.js"></script>
 {% block main_javascript %}
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.3.1/jquery.cookie.min.js"></script>
@@ -195,12 +194,6 @@
 {% endblock %}
 
 {% block inline_javascript %}{% endblock %}
-<script>
-  if (!is_local()) {
-    // Not running on localhost - assumes prod keys
-    const perf = firebase.performance();
-  }
-</script>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
@@ -228,6 +221,21 @@ ga('send', 'pageview');
 </script>
 
 {% block ganalytics_timer %}{% endblock %}
+
+<script>
+  (function (sa, fbc) {
+    function load(f, c) {
+      var a = document.createElement('script');
+      a.async = 1; a.src = f; var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(a, s);
+    } load(sa);
+    window.addEventListener('load', function () { firebase.initializeApp(fbc).performance() });
+  })('https://www.gstatic.com/firebasejs/8.10.0/firebase-performance-standalone.js', {
+    apiKey: "AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs",
+    projectId: "tbatv-prod-hrd",
+    appId: "1:836511118694:web:02272aa0400554c7"
+  });
+</script>
 
 </body>
 </html>
