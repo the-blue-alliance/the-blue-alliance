@@ -287,7 +287,7 @@ export default function EventPage() {
             <div className="basis-full lg:basis-1/2">{leftSideMatches}</div>
 
             <div className="basis-full lg:basis-1/2">
-              {alliances && (
+              {alliances && alliances.length > 0 && (
                 <AllianceSelectionTable
                   alliances={alliances}
                   year={event.year}
