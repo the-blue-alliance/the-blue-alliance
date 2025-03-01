@@ -1,3 +1,7 @@
+function is_local() {
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '0.0.0.0';
+}
+
 // General JS for all pages
 $(document).ready(function(){
 	// Jumping to page section
