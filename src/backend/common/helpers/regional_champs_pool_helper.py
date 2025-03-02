@@ -1,6 +1,6 @@
 import logging
-from collections import defaultdict, namedtuple
-from typing import DefaultDict, Dict, List, Set, Union
+from collections import defaultdict
+from typing import DefaultDict, Dict, List, NamedTuple, Set, Union
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -22,14 +22,10 @@ from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.team import Team
 
 
-RegionalChampsPoolTiebreakers = namedtuple(
-    "RegionalChampsPoolTiebreakers",
-    [
-        "best_playoff_points",
-        "best_alliance_points",
-        "best_qual_points",
-    ],
-)
+class RegionalChampsPoolTiebreakers(NamedTuple):
+    best_playoff_points: int
+    best_alliance_points: int
+    best_qual_points: int
 
 
 class RegionalChampsPoolHelper(DistrictHelper):
@@ -122,12 +118,10 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 event_points=[],
                 point_total=0,
                 rookie_bonus=0,
-                tiebreakers=list(
-                    RegionalChampsPoolTiebreakers(
-                        best_playoff_points=0,
-                        best_alliance_points=0,
-                        best_qual_points=0,
-                    )
+                tiebreakers=RegionalChampsPoolTiebreakers(
+                    best_playoff_points=0,
+                    best_alliance_points=0,
+                    best_qual_points=0,
                 ),
                 qual_scores=[],
                 other_bonus=0,
@@ -177,7 +171,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
 
                 # TODO: this does not yet track "best match score" tiebreakers
 
-                team_totals[team_key]["tiebreakers"] = list(tiebreakers)
+                team_totals[team_key]["tiebreakers"] = tiebreakers
 
         valid_team_keys: Set[TeamKey] = set()
         if isinstance(teams, ndb.tasklets.Future):
