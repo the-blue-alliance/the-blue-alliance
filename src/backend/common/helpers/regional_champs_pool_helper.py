@@ -1,5 +1,5 @@
 import logging
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from typing import DefaultDict, Dict, List, Set, Union
 
 from google.appengine.ext import ndb
@@ -20,6 +20,16 @@ from backend.common.models.event_district_points import (
 )
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.team import Team
+
+
+RegionalChampsPoolTiebreakers = namedtuple(
+    "RegionalChampsPoolTiebreakers",
+    [
+        "best_playoff_points",
+        "best_alliance_points",
+        "best_qual_points",
+    ],
+)
 
 
 class RegionalChampsPoolHelper(DistrictHelper):
@@ -112,7 +122,13 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 event_points=[],
                 point_total=0,
                 rookie_bonus=0,
-                tiebreakers=5 * [0],
+                tiebreakers=list(
+                    RegionalChampsPoolTiebreakers(
+                        best_playoff_points=0,
+                        best_alliance_points=0,
+                        best_qual_points=0,
+                    )
+                ),
                 qual_scores=[],
                 other_bonus=0,
             )
@@ -131,6 +147,9 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 if len(team_attendance[team_key]) > 2:
                     continue
 
+                tiebreakers = RegionalChampsPoolTiebreakers(
+                    *team_totals[team_key]["tiebreakers"]
+                )
                 if team_key in event_regional_points["points"]:
                     team_totals[team_key]["event_points"].append(
                         (event, event_regional_points["points"][team_key])
@@ -139,8 +158,26 @@ class RegionalChampsPoolHelper(DistrictHelper):
                         "points"
                     ][team_key]["total"]
 
-                    # Add tiebreakers in order
-                    # TODO: implement tiebreakers
+                    tiebreakers = RegionalChampsPoolTiebreakers(
+                        best_playoff_points=max(
+                            tiebreakers.best_playoff_points,
+                            event_regional_points["points"][team_key]["elim_points"],
+                        ),
+                        best_alliance_points=max(
+                            tiebreakers.best_alliance_points,
+                            event_regional_points["points"][team_key][
+                                "alliance_points"
+                            ],
+                        ),
+                        best_qual_points=max(
+                            tiebreakers.best_qual_points,
+                            event_regional_points["points"][team_key]["qual_points"],
+                        ),
+                    )
+
+                # TODO: this does not yet track "best match score" tiebreakers
+
+                team_totals[team_key]["tiebreakers"] = list(tiebreakers)
 
         valid_team_keys: Set[TeamKey] = set()
         if isinstance(teams, ndb.tasklets.Future):
@@ -161,14 +198,9 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 team_totals.items(),
                 key=lambda item: [
                     -item[1]["point_total"],
-                    # TODO: also sort by tiebreakers
-                    # -item[1]["tiebreakers"][0],
-                    # -item[1]["tiebreakers"][1],
-                    # -item[1]["tiebreakers"][2],
-                    # -item[1]["tiebreakers"][3],
-                    # -item[1]["tiebreakers"][4],
-                ],
-                # + [-score for score in item[1]["qual_scores"]],
+                ]
+                + [-t for t in item[1]["tiebreakers"]]
+                + [-score for score in item[1]["qual_scores"]],
             )
         )
 
