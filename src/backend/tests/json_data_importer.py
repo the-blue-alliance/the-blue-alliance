@@ -91,6 +91,20 @@ class JsonDataImporter(object):
         detail.district_points = data
         detail.put()
 
+    def maybe_import_event_regional_champs_pool_points(
+        self, base_path: str, path: str, event_key: EventKey
+    ) -> None:
+        path = self._get_path(base_path, path)
+        if not os.path.exists(path):
+            return
+
+        with open(path, "r") as f:
+            data = json.load(f)
+
+        detail = EventDetails.get_or_insert(event_key)
+        detail.regional_champs_pool_points = data
+        detail.put()
+
     def import_event_rankings(
         self, base_path: str, path: str, event_key: EventKey
     ) -> None:

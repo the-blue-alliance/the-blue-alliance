@@ -21,5 +21,8 @@ def setup_full_event(test_data_importer):
         test_data_importer.import_event_district_points(
             __file__, f"data/{event_key}_district_points.json", event_key
         )
+        test_data_importer.maybe_import_event_regional_champs_pool_points(
+            __file__, f"data/{event_key}_regional_champs_pool_points.json", event_key
+        )
 
     return import_event

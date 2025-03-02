@@ -5,7 +5,9 @@ from pyre_extensions import none_throws
 
 from backend.common.helpers.district_helper import (
     DistrictHelper,
+    DistrictRankingTeamTotal,
     DistrictRankingTiebreakers,
+    TeamAtEventDistrictPoints,
 )
 from backend.common.models.event import Event
 from backend.common.models.keys import Year
@@ -84,54 +86,54 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
 
     rankings = DistrictHelper.calculate_rankings(events, teams, 2019)
     assert len(rankings) == 2  # should match the two teams we passed
-    assert rankings["frc694"] == {
-        "event_points": [
+    assert rankings["frc694"] == DistrictRankingTeamTotal(
+        event_points=[
             (
                 events[0],
-                {
-                    "alliance_points": 16,
-                    "award_points": 5,
-                    "elim_points": 30,
-                    "qual_points": 19,
-                    "total": 70,
-                },
+                TeamAtEventDistrictPoints(
+                    alliance_points=16,
+                    award_points=5,
+                    elim_points=30,
+                    qual_points=19,
+                    total=70,
+                ),
             )
         ],
-        "point_total": 70,
-        "qual_scores": [85, 71, 69],
-        "rookie_bonus": 0,
-        "other_bonus": 0,
-        "tiebreakers": DistrictRankingTiebreakers(*[30, 30, 16, 16, 19]),
-    }
-    assert rankings["frc4362"] == {
-        "event_points": [
+        point_total=70,
+        qual_scores=[85, 71, 69],
+        rookie_bonus=0,
+        other_bonus=0,
+        tiebreakers=DistrictRankingTiebreakers(*[30, 30, 16, 16, 19]),
+    )
+    assert rankings["frc4362"] == DistrictRankingTeamTotal(
+        event_points=[
             (
                 events[1],
-                {
-                    "alliance_points": 42,
-                    "award_points": 15,
-                    "elim_points": 90,
-                    "qual_points": 60,
-                    "total": 207,
-                },
+                TeamAtEventDistrictPoints(
+                    alliance_points=42,
+                    award_points=15,
+                    elim_points=90,
+                    qual_points=60,
+                    total=207,
+                ),
             ),
             (
                 events[2],
-                {
-                    "alliance_points": 0,
-                    "award_points": 0,
-                    "elim_points": 60,
-                    "qual_points": 0,
-                    "total": 60,
-                },
+                TeamAtEventDistrictPoints(
+                    alliance_points=0,
+                    award_points=0,
+                    elim_points=60,
+                    qual_points=0,
+                    total=60,
+                ),
             ),
         ],
-        "point_total": 267,
-        "qual_scores": [104, 97, 93],
-        "rookie_bonus": 0,
-        "other_bonus": 0,
-        "tiebreakers": DistrictRankingTiebreakers(*[150, 90, 42, 42, 60]),
-    }
+        point_total=267,
+        qual_scores=[104, 97, 93],
+        rookie_bonus=0,
+        other_bonus=0,
+        tiebreakers=DistrictRankingTiebreakers(*[150, 90, 42, 42, 60]),
+    )
 
 
 def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
@@ -150,73 +152,73 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
 
     rankings = DistrictHelper.calculate_rankings(events, teams, 2022)
     assert len(rankings) == 3
-    assert rankings["frc2200"] == {
-        "event_points": [
+    assert rankings["frc2200"] == DistrictRankingTeamTotal(
+        event_points=[
             (
                 events[0],
-                {
-                    "alliance_points": 16,
-                    "award_points": 0,
-                    "elim_points": 20,
-                    "qual_points": 22,
-                    "total": 58,
-                },
+                TeamAtEventDistrictPoints(
+                    alliance_points=16,
+                    award_points=0,
+                    elim_points=20,
+                    qual_points=22,
+                    total=58,
+                ),
             ),
             (
                 events[1],
-                {
-                    "alliance_points": 16,
-                    "award_points": 5,
-                    "elim_points": 20,
-                    "qual_points": 22,
-                    "total": 63,
-                },
+                TeamAtEventDistrictPoints(
+                    alliance_points=16,
+                    award_points=5,
+                    elim_points=20,
+                    qual_points=22,
+                    total=63,
+                ),
             ),
         ],
-        "point_total": 123,
-        "qual_scores": [93, 82, 82],
-        "rookie_bonus": 0,
-        "other_bonus": 2,
-        "tiebreakers": DistrictRankingTiebreakers(*[40, 20, 32, 16, 44]),
-    }
-    assert rankings["frc610"] == {
-        "event_points": [
+        point_total=123,
+        qual_scores=[93, 82, 82],
+        rookie_bonus=0,
+        other_bonus=2,
+        tiebreakers=DistrictRankingTiebreakers(*[40, 20, 32, 16, 44]),
+    )
+    assert rankings["frc610"] == DistrictRankingTeamTotal(
+        event_points=[
             (
                 events[0],
-                {
-                    "alliance_points": 16,
-                    "award_points": 5,
-                    "elim_points": 20,
-                    "qual_points": 18,
-                    "total": 59,
-                },
+                TeamAtEventDistrictPoints(
+                    alliance_points=16,
+                    award_points=5,
+                    elim_points=20,
+                    qual_points=18,
+                    total=59,
+                ),
             )
         ],
-        "point_total": 59,
-        "qual_scores": [52, 41, 40],
-        "rookie_bonus": 0,
-        "other_bonus": 0,
-        "tiebreakers": DistrictRankingTiebreakers(*[20, 20, 16, 16, 18]),
-    }
-    assert rankings["frc1241"] == {
-        "event_points": [
+        point_total=59,
+        qual_scores=[52, 41, 40],
+        rookie_bonus=0,
+        other_bonus=0,
+        tiebreakers=DistrictRankingTiebreakers(*[20, 20, 16, 16, 18]),
+    )
+    assert rankings["frc1241"] == DistrictRankingTeamTotal(
+        event_points=[
             (
                 events[1],
-                {
-                    "alliance_points": 14,
-                    "award_points": 5,
-                    "elim_points": 10,
-                    "qual_points": 12,
-                    "total": 41,
-                },
+                TeamAtEventDistrictPoints(
+                    alliance_points=14,
+                    award_points=5,
+                    elim_points=10,
+                    qual_points=12,
+                    total=41,
+                ),
             )
         ],
-        "point_total": 41,
-        "qual_scores": [67, 56, 45],
-        "rookie_bonus": 0,
-        "other_bonus": 0,
-        "tiebreakers": DistrictRankingTiebreakers(*[10, 10, 14, 14, 12]),
-    }
+        point_total=41,
+        qual_scores=[67, 56, 45],
+        rookie_bonus=0,
+        other_bonus=0,
+        tiebreakers=DistrictRankingTiebreakers(*[10, 10, 14, 14, 12]),
+    )
 
 
 @pytest.mark.parametrize(

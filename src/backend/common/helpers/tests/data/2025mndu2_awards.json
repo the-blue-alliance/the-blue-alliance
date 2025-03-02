@@ -1,0 +1,266 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2025mndu2",
+    "name": "Regional FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2383"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mndu2",
+    "name": "Regional Winners",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc111"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2240"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5253"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4360"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 10,
+    "event_key": "2025mndu2",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10173"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025mndu2",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5690"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025mndu2",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc525"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025mndu2",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5913"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025mndu2",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2240"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025mndu2",
+    "name": "Regional Finalists",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5913"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2383"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6132"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025mndu2",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3883"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025mndu2",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2491"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025mndu2",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6420"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025mndu2",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3061"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 3,
+    "event_key": "2025mndu2",
+    "name": "Woodie Flowers Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Laura Zimny",
+        "team_key": "frc5690"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025mndu2",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2177"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025mndu2",
+    "name": "FIRST Dean's List Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Andrew A",
+        "team_key": "frc2472"
+      },
+      {
+        "awardee": "Advika C",
+        "team_key": "frc3042"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 5,
+    "event_key": "2025mndu2",
+    "name": "Volunteer of the Year",
+    "recipient_list": [
+      {
+        "awardee": "Susan Wachtler",
+        "team_key": "frc6453"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025mndu2",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc111"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025mndu2",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1816"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025mndu2",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2512"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mndu2",
+    "name": "Regional Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7048"
+      }
+    ],
+    "year": 2025
+  }
+]
