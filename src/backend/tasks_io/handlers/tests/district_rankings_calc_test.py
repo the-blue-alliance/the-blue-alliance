@@ -137,7 +137,7 @@ def test_calc(
                 (
                     event,
                     TeamAtEventDistrictPoints(
-                        event_key="",
+                        event_key=event.key_name,
                         district_cmp=False,
                         qual_points=0,
                         elim_points=0,

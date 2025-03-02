@@ -56,7 +56,7 @@ def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 
-    if year in SeasonHelper.get_valid_regional_pool_years():
+    if SeasonHelper.is_valid_regional_pool_year(year):
         district_point_types = SEASON_EVENT_TYPES - {EventType.REGIONAL}
         regional_point_types = {EventType.REGIONAL}
     else:

@@ -111,6 +111,37 @@ def test_enqueue_event_skips_offseason(
     assert len(tasks) == 0
 
 
+def test_enqueue_skips_regionals_2025(
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    ndb_stub,
+) -> None:
+    Event(
+        id="2025event",
+        year=2025,
+        event_short="event",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Event(
+        id="2025districtevent",
+        year=2025,
+        event_short="event",
+        event_type_enum=EventType.DISTRICT,
+    ).put()
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/2025")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    task_urls = {t.url for t in tasks}
+    assert task_urls == {
+        "/tasks/math/do/district_points_calc/2025districtevent",
+        "/tasks/math/do/regional_champs_pool_points_calc/2025event",
+    }
+    for task in tasks:
+        task_resp = tasks_client.get(task.url)
+        assert task_resp.status_code == 200
+
+
 def test_calc_no_event(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
@@ -151,7 +182,7 @@ def test_calc_skips_offseason_override(tasks_client: Client) -> None:
 
 
 @mock.patch.object(DistrictHelper, "calculate_event_points")
-def test_calc_regional(
+def test_calc_regional_pre_2025(
     calc_mock: mock.Mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
@@ -198,7 +229,7 @@ def test_calc_regional(
 
 
 @mock.patch.object(DistrictHelper, "calculate_event_points")
-def test_calc_regional_no_output_in_taskqueue(
+def test_calc_regional_pre_2025_no_output_in_taskqueue(
     calc_mock: mock.Mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
