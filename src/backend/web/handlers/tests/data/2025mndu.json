@@ -1,0 +1,37 @@
+{
+  "address": "Harbor Dr, Duluth, MN 55802, USA",
+  "city": "Duluth",
+  "country": "USA",
+  "district": null,
+  "division_keys": [],
+  "end_date": "2025-03-01",
+  "event_code": "mndu",
+  "event_type": 0,
+  "event_type_string": "Regional",
+  "first_event_code": "mndu",
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJpx4gYZNSrlIRw5DJghdH__w",
+  "gmaps_url": "https://maps.google.com/?cid=18230367982923124931",
+  "key": "2025mndu",
+  "lat": 46.7816832,
+  "lng": -92.0973104,
+  "location_name": "Pioneer Hall",
+  "name": "Lake Superior Regional",
+  "parent_event_key": null,
+  "playoff_type": 10,
+  "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+  "postal_code": "55802",
+  "short_name": "Lake Superior",
+  "start_date": "2025-02-26",
+  "state_prov": "MN",
+  "timezone": "America/Chicago",
+  "webcasts": [
+    {
+      "channel": "firstinspires6",
+      "type": "twitch"
+    }
+  ],
+  "website": "https://www.frcnorthland.org",
+  "week": 0,
+  "year": 2025
+}

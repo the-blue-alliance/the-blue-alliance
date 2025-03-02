@@ -1,6 +1,5 @@
 from unittest import mock
 
-import pytest
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
@@ -21,15 +20,8 @@ def test_enqueue_bad_year(tasks_client: Client) -> None:
     assert resp.status_code == 404
 
 
-@pytest.mark.parametrize(
-    "is_taskqueue",
-    [
-        (True,),
-        (False,),
-    ],
-)
 @mock.patch.object(RegionalChampsPoolHelper, "calculate_rankings")
-def test_calc(calc_mock: mock.Mock, tasks_client: Client, is_taskqueue: bool) -> None:
+def test_calc(calc_mock: mock.Mock, tasks_client: Client) -> None:
     event = Event(
         id="2025event",
         year=2025,
@@ -61,21 +53,77 @@ def test_calc(calc_mock: mock.Mock, tasks_client: Client, is_taskqueue: bool) ->
         )
     }
 
-    headers = (
-        {
-            "X-Appengine-Taskname": "test",
-        }
-        if is_taskqueue
-        else {}
+    resp = tasks_client.get("/tasks/math/do/regional_champs_pool_rankings_calc/2025")
+    assert resp.status_code == 200
+    assert b"Finished calculating regional pool rankings for: 2025" in resp.data
+
+    regional_pool = RegionalChampsPool.get_by_id(
+        RegionalChampsPool.render_key_name(2025)
     )
+    assert regional_pool is not None
+    assert regional_pool.rankings == [
+        RegionalPoolRanking(
+            rank=1,
+            team_key="frc254",
+            event_points=[
+                TeamAtEventDistrictPoints(
+                    event_key="2025event",
+                    qual_points=10,
+                    elim_points=0,
+                    alliance_points=0,
+                    award_points=0,
+                    total=10,
+                ),
+            ],
+            rookie_bonus=0,
+            point_total=10,
+        ),
+    ]
+
+
+@mock.patch.object(RegionalChampsPoolHelper, "calculate_rankings")
+def test_calc_doesnt_write_out_in_taskqueue(
+    calc_mock: mock.Mock, tasks_client: Client
+) -> None:
+    event = Event(
+        id="2025event",
+        year=2025,
+        event_short="event",
+        event_type_enum=EventType.REGIONAL,
+    )
+    event.put()
+
+    calc_mock.return_value = {
+        "frc254": DistrictRankingTeamTotal(
+            event_points=[
+                (
+                    event,
+                    TeamAtEventDistrictPoints(
+                        event_key=event.key_name,
+                        qual_points=10,
+                        elim_points=0,
+                        alliance_points=0,
+                        award_points=0,
+                        total=10,
+                    ),
+                ),
+            ],
+            point_total=10,
+            tiebreakers=[],
+            qual_scores=[],
+            rookie_bonus=0,
+            other_bonus=0,
+        )
+    }
+
+    headers = {
+        "X-Appengine-Taskname": "test",
+    }
     resp = tasks_client.get(
         "/tasks/math/do/regional_champs_pool_rankings_calc/2025", headers=headers
     )
     assert resp.status_code == 200
-    if is_taskqueue:
-        assert len(resp.data) == 0
-    else:
-        assert b"Finished calculating regional pool rankings for: 2025" in resp.data
+    assert len(resp.data) == 0
 
     regional_pool = RegionalChampsPool.get_by_id(
         RegionalChampsPool.render_key_name(2025)

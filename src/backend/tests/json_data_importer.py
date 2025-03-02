@@ -54,6 +54,24 @@ class JsonDataImporter(object):
                 for e in data
             ]
 
+    def import_full_event(self, base_path: str, event_key: EventKey) -> None:
+        self.import_event(base_path, f"data/{event_key}.json")
+        self.import_match_list(base_path, f"data/{event_key}_matches.json")
+        self.import_event_alliances(
+            base_path, f"data/{event_key}_alliances.json", event_key
+        )
+        self.import_event_teams(base_path, f"data/{event_key}_teams.json", event_key)
+        self.import_event_rankings(
+            base_path, f"data/{event_key}_rankings.json", event_key
+        )
+        self.import_award_list(base_path, f"data/{event_key}_awards.json")
+        self.import_event_district_points(
+            base_path, f"data/{event_key}_district_points.json", event_key
+        )
+        self.maybe_import_event_regional_champs_pool_points(
+            base_path, f"data/{event_key}_regional_champs_pool_points.json", event_key
+        )
+
     def import_event(self, base_path: str, path: str) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
