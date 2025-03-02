@@ -675,7 +675,7 @@
   </div>
 
   <div class="tab-pane" id="district-points">
-    {% if event.details.regional_champs_pool_points %}
+    {% if regional_champs_pool_points_sorted %}
       <h2>Regional Championship Pool Points</h2>
       <table class="table table-striped table-hover table-condensed">
         <tr>
@@ -686,7 +686,7 @@
           <th>Award Points</th>
           <th>Total Points</th>
         </tr>
-        {% for team_key, points in event.details.regional_champs_pool_points.points.items() %}
+        {% for team_key, points in regional_champs_pool_points_sorted %}
           <tr>
             <td><a href="/team/{{team_key[3:]}}">{{team_key[3:]}}</a></td>
             <td>{{points.qual_points}}</td>
@@ -699,7 +699,7 @@
       </table>
     {% endif %}
 
-    {% if event.details.district_points %}
+    {% if district_points_sorted %}
       <h2>District Points</h2>
       <i>These may or may not be relevant, TBA always calculates district points</i>
       <table class="table table-striped table-hover table-condensed">
@@ -711,7 +711,7 @@
           <th>Award Points</th>
           <th>Total Points</th>
         </tr>
-        {% for team_key, points in event.details.district_points.points.items() %}
+        {% for team_key, points in district_points_sorted %}
           <tr>
             <td><a href="/team/{{team_key[3:]}}">{{team_key[3:]}}</a></td>
             <td>{{points.qual_points}}</td>

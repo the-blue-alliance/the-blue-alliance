@@ -15,6 +15,9 @@ from backend.common.consts.playoff_type import (
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
 )
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
+    DistrictPointTiebreakersSortingHelper,
+)
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
@@ -63,6 +66,7 @@ def event_detail(event_key: EventKey) -> str:
     if not event:
         abort(404)
     event.prep_awards_matches_teams()
+    event.prep_details()
 
     reg_sitevar = ChampsRegistrationHacks.get()
     api_keys = ApiAuthAccess.query(
@@ -110,6 +114,22 @@ def event_detail(event_key: EventKey) -> str:
             }
         )
 
+    district_points_sorted = None
+    if event.district_key and (points := event.district_points):
+        district_points_sorted = DistrictPointTiebreakersSortingHelper.sorted_points(
+            points
+        )
+
+    is_regional_cmp_pool_eligible = (
+        SeasonHelper.is_valid_regional_pool_year(event.year)
+        and event.event_type_enum == EventType.REGIONAL
+    )
+    regional_champs_pool_points_sorted = None
+    if is_regional_cmp_pool_eligible and (points := event.regional_champs_pool_points):
+        regional_champs_pool_points_sorted = (
+            DistrictPointTiebreakersSortingHelper.sorted_points(points)
+        )
+
     template_values = {
         "event": event,
         "medias": event_medias.get_result(),
@@ -138,6 +158,8 @@ def event_detail(event_key: EventKey) -> str:
         "advancement_html": advancement_html,
         "match_stats": match_stats,
         "deleted_count": request.args.get("deleted"),
+        "district_points_sorted": district_points_sorted,
+        "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
     }
 
     return render_template("admin/event_details.html", template_values)

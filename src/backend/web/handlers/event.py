@@ -16,6 +16,9 @@ from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.award_helper import AwardHelper
+from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
+    DistrictPointTiebreakersSortingHelper,
+)
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.media_helper import MediaHelper
@@ -199,10 +202,9 @@ def event_detail(event_key: EventKey) -> Response:
     playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
     district_points_sorted = None
-    if event.district_key and event.district_points:
-        district_points_sorted = sorted(
-            none_throws(event.district_points)["points"].items(),
-            key=lambda team_and_points: -team_and_points[1]["total"],
+    if event.district_key and (points := event.district_points):
+        district_points_sorted = DistrictPointTiebreakersSortingHelper.sorted_points(
+            points
         )
 
     is_regional_cmp_pool_eligible = (
@@ -211,9 +213,8 @@ def event_detail(event_key: EventKey) -> Response:
     )
     regional_champs_pool_points_sorted = None
     if is_regional_cmp_pool_eligible and (points := event.regional_champs_pool_points):
-        regional_champs_pool_points_sorted = sorted(
-            none_throws(points["points"].items()),
-            key=lambda team_and_points: -team_and_points[1]["total"],
+        regional_champs_pool_points_sorted = (
+            DistrictPointTiebreakersSortingHelper.sorted_points(points)
         )
 
     event_insights = event.details.insights if event.details else None
