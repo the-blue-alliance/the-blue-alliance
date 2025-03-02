@@ -1,3 +1,4 @@
+import heapq
 import logging
 from collections import defaultdict
 from typing import DefaultDict, Dict, List, NamedTuple, Set, Union
@@ -141,37 +142,45 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 if len(team_attendance[team_key]) > 2:
                     continue
 
-                tiebreakers = RegionalChampsPoolTiebreakers(
-                    *team_totals[team_key]["tiebreakers"]
-                )
                 if team_key in event_regional_points["points"]:
-                    team_totals[team_key]["event_points"].append(
-                        (event, event_regional_points["points"][team_key])
+                    tiebreakers = RegionalChampsPoolTiebreakers(
+                        *team_totals[team_key]["tiebreakers"]
                     )
-                    team_totals[team_key]["point_total"] += event_regional_points[
-                        "points"
-                    ][team_key]["total"]
 
+                    team_event_points: TeamAtEventDistrictPoints = (
+                        event_regional_points["points"][team_key]
+                    )
+                    team_totals[team_key]["event_points"].append(
+                        (event, team_event_points)
+                    )
+                    team_totals[team_key]["point_total"] += team_event_points["total"]
                     tiebreakers = RegionalChampsPoolTiebreakers(
                         best_playoff_points=max(
                             tiebreakers.best_playoff_points,
-                            event_regional_points["points"][team_key]["elim_points"],
+                            team_event_points["elim_points"],
                         ),
                         best_alliance_points=max(
                             tiebreakers.best_alliance_points,
-                            event_regional_points["points"][team_key][
-                                "alliance_points"
-                            ],
+                            team_event_points["alliance_points"],
                         ),
                         best_qual_points=max(
                             tiebreakers.best_qual_points,
-                            event_regional_points["points"][team_key]["qual_points"],
+                            team_event_points["qual_points"],
                         ),
                     )
 
-                # TODO: this does not yet track "best match score" tiebreakers
+                    team_totals[team_key]["tiebreakers"] = tiebreakers
 
-                team_totals[team_key]["tiebreakers"] = tiebreakers
+                if team_key in event_regional_points["tiebreakers"]:
+                    team_totals[team_key]["qual_scores"] = heapq.nlargest(
+                        3,
+                        [
+                            *event_regional_points["tiebreakers"][team_key][
+                                "highest_qual_scores"
+                            ],
+                            *team_totals[team_key]["qual_scores"],
+                        ],
+                    )
 
         valid_team_keys: Set[TeamKey] = set()
         if isinstance(teams, ndb.tasklets.Future):

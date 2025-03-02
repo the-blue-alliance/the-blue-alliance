@@ -246,11 +246,11 @@ class DistrictHelper:
                         or event.event_type_enum == EventType.DISTRICT_CMP
                         or event.event_type_enum == EventType.DISTRICT_CMP_DIVISION
                     ):
-                        tiebreakers = DistrictRankingTiebreakers(
-                            *team_totals[team_key]["tiebreakers"]
-                        )
-
                         if team_key in event_district_points["points"]:
+                            tiebreakers = DistrictRankingTiebreakers(
+                                *team_totals[team_key]["tiebreakers"]
+                            )
+
                             team_event_points: TeamAtEventDistrictPoints = (
                                 event_district_points["points"][team_key]
                             )
