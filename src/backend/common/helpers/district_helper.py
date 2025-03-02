@@ -3,7 +3,17 @@ import logging
 import math
 from collections import defaultdict
 from datetime import timedelta
-from typing import cast, DefaultDict, Dict, List, Set, Tuple, TypedDict, Union
+from typing import (
+    cast,
+    DefaultDict,
+    Dict,
+    List,
+    MutableSequence,
+    Set,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -40,7 +50,7 @@ class DistrictRankingTeamTotal(TypedDict):
 
     event_points: List[Tuple[Event, TeamAtEventDistrictPoints]]
     point_total: int
-    tiebreakers: List[int]
+    tiebreakers: MutableSequence[int]
     qual_scores: List[int]
     rookie_bonus: int
     other_bonus: int
