@@ -97,3 +97,15 @@ def test_2024_tiebreakers(test_data_importer) -> None:
     test_data_importer.import_match(__file__, "data/2024isde1_f1m2.json")
     match: Match = none_throws(Match.get_by_id("2024isde1_f1m2"))
     assert match.winning_alliance == ""
+
+
+def test_2025_tiebreakers(test_data_importer) -> None:
+    # Broken by tech fouls
+    test_data_importer.import_match(__file__, "data/2025nhsal_sf7m1.json")
+    match: Match = none_throws(Match.get_by_id("2025nhsal_sf7m1"))
+    assert match.winning_alliance == AllianceColor.BLUE
+
+    # Broken by auto points
+    test_data_importer.import_match(__file__, "data/2025vagle_sf8m1.json")
+    match: Match = none_throws(Match.get_by_id("2025vagle_sf8m1"))
+    assert match.winning_alliance == AllianceColor.BLUE
