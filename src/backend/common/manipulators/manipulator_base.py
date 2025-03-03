@@ -152,6 +152,22 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             self._run_post_delete_hook(models)
         self._clearCache(models)
 
+    @overload
+    @classmethod
+    def clearCache(cls, models: TModel) -> None: ...
+
+    @overload
+    @classmethod
+    def clearCache(cls, models: List[TModel]) -> None: ...
+
+    @classmethod
+    def clearCache(cls, models) -> None:
+        models = list(filter(None, listify(models)))
+        for model in models:
+            model._dirty = True
+            cls._computeAndSaveAffectedReferences(model)
+        cls._clearCache(models)
+
     """
     findOrSpawn will take either a singular model or a list of models and merge them
     with the (optionally present) existing versions

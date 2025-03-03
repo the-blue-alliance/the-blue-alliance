@@ -25,6 +25,7 @@ from backend.web.handlers.admin.cache import (
     cached_query_key_lookup_post,
     cached_query_list,
     cached_query_purge_version,
+    clear_model_cache,
 )
 from backend.web.handlers.admin.districts import (
     district_create,
@@ -208,6 +209,10 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/cache/<query_class_name>/purge/<db_version>/<int:query_version>",
     view_func=cached_query_purge_version,
+)
+admin_routes.add_url_rule(
+    "/cache/clear/<model_type>/<model_key>",
+    view_func=clear_model_cache,
 )
 admin_routes.add_url_rule(
     "/districts", view_func=district_list, defaults={"year": None}

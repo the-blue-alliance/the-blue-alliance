@@ -4,7 +4,17 @@ from flask import abort, redirect, request, url_for
 from google.appengine.ext import ndb
 from werkzeug import Response
 
+from backend.common.manipulators.event_details_manipulator import (
+    EventDetailsManipulator,
+)
+from backend.common.manipulators.event_manipulator import EventManipulator
+from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.cached_query_result import CachedQueryResult
+from backend.common.models.event import Event
+from backend.common.models.event import EventDetails
+from backend.common.models.match import Match
+from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.web.profiled_render import render_template
 
@@ -174,3 +184,32 @@ def cached_query_purge_version(
     return redirect(
         url_for("admin.cached_query_detail", query_class_name=query_class_name)
     )
+
+
+def clear_model_cache(model_type: str, model_key: str) -> Response:
+    match model_type:
+        case "event":
+            event = Event.get_by_id(model_key)
+            if not event:
+                abort(404)
+            EventManipulator.clearCache(event)
+
+            event_details = EventDetails.get_by_id(model_key)
+            if not event_details:
+                abort(404)
+            EventDetailsManipulator.clearCache(event_details)
+            return redirect(url_for("admin.event_detail", event_key=model_key))
+        case "match":
+            match = Match.get_by_id(model_key)
+            if not match:
+                abort(404)
+            MatchManipulator.clearCache(match)
+            return redirect(url_for("admin.match_detail", match_key=model_key))
+        case "team":
+            team = Team.get_by_id(model_key)
+            if not team:
+                abort(404)
+            TeamManipulator.clearCache(team)
+            return redirect(url_for("admin.team_detail", team_key=model_key))
+
+    return redirect(url_for("admin.admin_home"))
