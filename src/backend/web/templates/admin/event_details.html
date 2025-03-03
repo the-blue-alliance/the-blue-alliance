@@ -11,21 +11,8 @@
     Edit</a>
   <a href="/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on
     TBA</a>
-  <button class="btn btn-danger" form="event_cache_clear"><span class="glyphicon glyphicon-trash"></span> Clear
-    Cache</button>
+  <a href="/admin/cache/clear/event/{{event.key_name}}" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Clear Cache</a>
 </div>
-
-<form action="/admin/memcache" method="post" id="event_cache_clear">
-  <input name="event_key" value="{{event.key_name}}" type="hidden" />
-  <input name="return_url" value="/admin/event/{{ event.key_name }}" type="hidden" />
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-</form>
-
-{% if flushed %}
-<div class="row">
-  <p>Cleared cache keys {{ flushed }}</p>
-</div>
-{% endif %}
 
 <hr/>
 
