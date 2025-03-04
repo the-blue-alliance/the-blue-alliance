@@ -1,9 +1,8 @@
 import itertools
-import json
 import math
 import statistics
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, NamedTuple, Tuple, TypedDict
+from typing import DefaultDict, Dict, List, NamedTuple
 
 import numpy as np
 from google.appengine.ext import ndb
@@ -26,15 +25,22 @@ from backend.common.helpers.event_helper import (
     PRESEASON_EVENTS_LABEL,
 )
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
+from backend.common.helpers.insights_helper_utils import (
+    create_insight,
+    make_leaderboard_from_dict_counts,
+    sort_counter_dict,
+)
 from backend.common.models.award import Award
 from backend.common.models.event import Event
-from backend.common.models.insight import Insight, LeaderboardKeyType
-from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
+from backend.common.models.insight import (
+    Insight,
+    LeaderboardData,
+    NotableEntry,
+    NotablesData,
+)
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.team import Team
-
-
-CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float] | Dict[Any, int]
 
 
 class EventMatches(NamedTuple):
@@ -45,46 +51,6 @@ class EventMatches(NamedTuple):
 class WeekEventMatches(NamedTuple):
     week: str
     event_matches: List[EventMatches]
-
-
-class LeaderboardRanking(TypedDict):
-    keys: List[TeamKey | EventKey | MatchKey]
-    value: int | float
-
-
-class LeaderboardData(TypedDict):
-    rankings: List[LeaderboardRanking]
-    key_type: LeaderboardKeyType
-
-
-class LeaderboardInsight(TypedDict):
-    """This is the type that should be returned over the API!"""
-
-    data: LeaderboardData
-    name: str
-    year: int
-
-
-class NotableEntry(TypedDict):
-    team_key: TeamKey
-
-    # this needs to be a list to support overall
-    # in an individual year, this should probably always be len 1
-    context: List[EventKey]
-
-
-class NotablesData(TypedDict):
-    """In case we need more data in the future, we can add it here."""
-
-    entries: List[NotableEntry]
-
-
-class NotablesInsight(TypedDict):
-    """This is the type that should be returned over the API!"""
-
-    data: NotablesData
-    name: str
-    year: int
 
 
 class InsightsHelper(object):
@@ -136,9 +102,6 @@ class InsightsHelper(object):
             week_event_matches, year
         )
         insights += self._calculate_leaderboard_highest_median_score_by_event(
-            week_event_matches, year
-        )
-        insights += self._calculate_highest_clean_and_combined_scores(
             week_event_matches, year
         )
         insights += (
@@ -263,47 +226,8 @@ class InsightsHelper(object):
             data[level]["total_matches_count_cmp"] = total_matches_count_cmp[level]
 
         return [
-            self._createInsight(
-                data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year
-            )
+            create_insight(data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year)
         ]
-
-    @classmethod
-    def _createInsight(self, data: Any, name: str, year: Year) -> Insight:
-        """
-        Create Insight object given data, name, and year
-        """
-        return Insight(
-            id=Insight.render_key_name(year, name),
-            name=name,
-            year=year,
-            data_json=json.dumps(data),
-        )
-
-    @classmethod
-    def _create_leaderboard_from_dict_counts(
-        cls,
-        counter: CounterDictType,
-        insight_type: int,
-        year: int,
-    ) -> Insight:
-        sorted_leaderboard_tuples = cls._sort_counter_dict(
-            counter, key_type=Insight.TYPED_LEADERBOARD_KEY_TYPES[insight_type]
-        )
-        leaderboard_rankings: List[LeaderboardRanking] = [
-            LeaderboardRanking(keys=keys, value=value)
-            for (value, keys) in sorted_leaderboard_tuples[:25]
-        ]
-        leaderboard_data = LeaderboardData(
-            rankings=leaderboard_rankings,
-            key_type=Insight.TYPED_LEADERBOARD_KEY_TYPES[insight_type],
-        )
-
-        return cls._createInsight(
-            data=leaderboard_data,
-            name=Insight.INSIGHT_NAMES[insight_type],
-            year=year,
-        )
 
     @classmethod
     def _create_notable_insight(
@@ -312,7 +236,7 @@ class InsightsHelper(object):
         insight_type: int,
         year: int,
     ) -> Insight:
-        return cls._createInsight(
+        return create_insight(
             data=NotablesData(
                 entries=[
                     NotableEntry(team_key=team_key, context=context)
@@ -349,13 +273,13 @@ class InsightsHelper(object):
                     non_cmp_event_win_count[team_key.id()] += 1
 
         return [
-            cls._create_leaderboard_from_dict_counts(
+            make_leaderboard_from_dict_counts(
                 banner_count, Insight.TYPED_LEADERBOARD_BLUE_BANNERS, year
             ),
-            cls._create_leaderboard_from_dict_counts(
+            make_leaderboard_from_dict_counts(
                 award_count, Insight.TYPED_LEADERBOARD_MOST_AWARDS, year
             ),
-            cls._create_leaderboard_from_dict_counts(
+            make_leaderboard_from_dict_counts(
                 non_cmp_event_win_count,
                 Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS,
                 year,
@@ -376,7 +300,7 @@ class InsightsHelper(object):
                                 counter[tk] += 1
 
         return [
-            cls._create_leaderboard_from_dict_counts(
+            make_leaderboard_from_dict_counts(
                 counter,
                 Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
                 year,
@@ -398,51 +322,11 @@ class InsightsHelper(object):
 
         counts = {tk: len(events) for tk, events in events_played_at.items()}
         return [
-            cls._create_leaderboard_from_dict_counts(
+            make_leaderboard_from_dict_counts(
                 counts,
                 Insight.TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT,
                 year,
             )
-        ]
-
-    @classmethod
-    def _calculate_highest_clean_and_combined_scores(
-        cls, week_event_matches: List[WeekEventMatches], year: Year
-    ) -> List[Insight]:
-        """Core logic is pretty much the same for both insights, so do both in 1 method."""
-        match_winning_scores = defaultdict(int)
-        match_combined_scores = defaultdict(int)
-
-        for _, week_events in week_event_matches:
-            for _, matches in week_events:
-                for match in matches:
-                    if match.has_been_played:
-                        redScore = int(match.alliances[AllianceColor.RED]["score"])
-                        blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
-
-                        if year >= 2016:
-                            if match.score_breakdown:
-                                redScore -= none_throws(match.score_breakdown)[
-                                    AllianceColor.RED
-                                ].get("foulPoints", 0)
-                                blueScore -= none_throws(match.score_breakdown)[
-                                    AllianceColor.BLUE
-                                ].get("foulPoints", 0)
-
-                        match_winning_scores[match.key.id()] = max(redScore, blueScore)
-                        match_combined_scores[match.key.id()] = redScore + blueScore
-
-        return [
-            cls._create_leaderboard_from_dict_counts(
-                match_winning_scores,
-                Insight.TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_SCORE,
-                year,
-            ),
-            cls._create_leaderboard_from_dict_counts(
-                match_combined_scores,
-                Insight.TYPED_LEADERBOARD_HIGHEST_MATCH_CLEAN_COMBINED_SCORE,
-                year,
-            ),
         ]
 
     @classmethod
@@ -469,7 +353,7 @@ class InsightsHelper(object):
             medians[event_key] = statistics.median(sorted(scores_list))
 
         return [
-            cls._create_leaderboard_from_dict_counts(
+            make_leaderboard_from_dict_counts(
                 medians,
                 Insight.TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT,
                 year,
@@ -497,7 +381,7 @@ class InsightsHelper(object):
 
         counter = {tk: len(met_teams) for tk, met_teams in met_teams_set.items()}
         return [
-            cls._create_leaderboard_from_dict_counts(
+            make_leaderboard_from_dict_counts(
                 counter,
                 Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
                 year,
@@ -606,34 +490,6 @@ class InsightsHelper(object):
         }
 
     @classmethod
-    def _sort_counter_dict(
-        cls, count: CounterDictType, key_type: LeaderboardKeyType = "team"
-    ) -> List[Tuple[int | float, List[str]]]:
-        """
-        Takes an object that looks like: {"frc1": 5, "frc2": 5, "frc3": 3}
-        (may be match, event, or team keys) and returns a list of tuples that
-        are (magnitude, list of keys) grouped by magnitude, and then sorted by
-        magnitude, e.g. [(5, ["frc1", "frc2"]), (2, ["frc3"])].
-        """
-
-        # sort by:
-        #   team: team number
-        #   event & match: alphabetically by key
-        tuples = []
-        if key_type == "team":
-            tuples = sorted(count.items(), key=lambda pair: int(pair[0][3:]))
-        else:
-            tuples = sorted(count.items(), key=lambda pair: pair[4:])
-
-        # group by magnitude
-        temp = defaultdict(list)
-        for team, num in tuples:
-            temp[num].append(team)
-
-        # sort by magnitude
-        return sorted(temp.items(), key=lambda pair: float(pair[0]), reverse=True)
-
-    @classmethod
     def _sortTeamYearWinsDict(self, wins_dict):
         """
         Sorts dicts with key: number of wins, value: list of (team, years)
@@ -686,7 +542,7 @@ class InsightsHelper(object):
 
         insight = None
         if highscore_matches_by_week != []:
-            insight = self._createInsight(
+            insight = create_insight(
                 highscore_matches_by_week,
                 Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE_BY_WEEK],
                 year,
@@ -751,7 +607,7 @@ class InsightsHelper(object):
 
         insight = None
         if highscore_matches != []:
-            insight = self._createInsight(
+            insight = create_insight(
                 highscore_matches, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE], year
             )
         if insight is not None:
@@ -772,10 +628,10 @@ class InsightsHelper(object):
                             for tk in alliance["teams"]:
                                 counter[tk] += 1
 
-        grouped_by_win_count = self._sort_counter_dict(counter)
+        grouped_by_win_count = sort_counter_dict(counter)
 
         return [
-            self._createInsight(
+            create_insight(
                 data=grouped_by_win_count,
                 name=Insight.INSIGHT_NAMES[Insight.MATCHES_PLAYED],
                 year=year,
@@ -823,7 +679,7 @@ class InsightsHelper(object):
         insights = []
         if match_averages_by_week != []:
             insights.append(
-                self._createInsight(
+                create_insight(
                     match_averages_by_week,
                     Insight.INSIGHT_NAMES[Insight.MATCH_AVERAGES_BY_WEEK],
                     year,
@@ -831,7 +687,7 @@ class InsightsHelper(object):
             )
         if elim_match_averages_by_week != []:
             insights.append(
-                self._createInsight(
+                create_insight(
                     elim_match_averages_by_week,
                     Insight.INSIGHT_NAMES[Insight.ELIM_MATCH_AVERAGES_BY_WEEK],
                     year,
@@ -880,7 +736,7 @@ class InsightsHelper(object):
         insights = []
         if match_average_margins_by_week != []:
             insights.append(
-                self._createInsight(
+                create_insight(
                     match_average_margins_by_week,
                     Insight.INSIGHT_NAMES[Insight.MATCH_AVERAGE_MARGINS_BY_WEEK],
                     year,
@@ -888,7 +744,7 @@ class InsightsHelper(object):
             )
         if elim_match_average_margins_by_week != []:
             insights.append(
-                self._createInsight(
+                create_insight(
                     elim_match_average_margins_by_week,
                     Insight.INSIGHT_NAMES[Insight.ELIM_MATCH_AVERAGE_MARGINS_BY_WEEK],
                     year,
@@ -941,7 +797,7 @@ class InsightsHelper(object):
                 else:
                     score_distribution_normalized[roundedScore] = contribution
             insights.append(
-                self._createInsight(
+                create_insight(
                     score_distribution_normalized,
                     Insight.INSIGHT_NAMES[Insight.SCORE_DISTRIBUTION],
                     year,
@@ -960,7 +816,7 @@ class InsightsHelper(object):
                 else:
                     elim_score_distribution_normalized[roundedScore] = contribution
             insights.append(
-                self._createInsight(
+                create_insight(
                     elim_score_distribution_normalized,
                     Insight.INSIGHT_NAMES[Insight.ELIM_SCORE_DISTRIBUTION],
                     year,
@@ -1015,7 +871,7 @@ class InsightsHelper(object):
                     winning_margin_distribution_normalized[roundedScore] = contribution
 
             insights.append(
-                self._createInsight(
+                create_insight(
                     winning_margin_distribution_normalized,
                     Insight.INSIGHT_NAMES[Insight.WINNING_MARGIN_DISTRIBUTION],
                     year,
@@ -1040,7 +896,7 @@ class InsightsHelper(object):
                     )
 
             insights.append(
-                self._createInsight(
+                create_insight(
                     elim_winning_margin_distribution_normalized,
                     Insight.INSIGHT_NAMES[Insight.ELIM_WINNING_MARGIN_DISTRIBUTION],
                     year,
@@ -1062,9 +918,7 @@ class InsightsHelper(object):
                 numMatches += len(matches)
 
         return [
-            self._createInsight(
-                numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year
-            )
+            create_insight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)
         ]
 
     @classmethod
@@ -1092,7 +946,7 @@ class InsightsHelper(object):
         insights = []
         if event_insights_by_week != []:
             insights.append(
-                self._createInsight(
+                create_insight(
                     event_insights_by_week,
                     Insight.INSIGHT_NAMES[Insight.YEAR_SPECIFIC_BY_WEEK],
                     year,
@@ -1100,7 +954,7 @@ class InsightsHelper(object):
             )
         if total_insights:
             insights.append(
-                self._createInsight(
+                create_insight(
                     total_insights, Insight.INSIGHT_NAMES[Insight.YEAR_SPECIFIC], year
                 )
             )
@@ -1122,11 +976,11 @@ class InsightsHelper(object):
                 for team_key in award.team_list:
                     team_key_name = team_key.id()
                     blue_banner_winners[team_key_name] += 1
-        blue_banner_winners = self._sort_counter_dict(blue_banner_winners)
+        blue_banner_winners = sort_counter_dict(blue_banner_winners)
 
         insight = None
         if blue_banner_winners != []:
-            insight = self._createInsight(
+            insight = create_insight(
                 blue_banner_winners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], year
             )
         if insight is not None:
@@ -1172,13 +1026,13 @@ class InsightsHelper(object):
         insights = []
         if ca_winner is not None:
             insights += [
-                self._createInsight(
+                create_insight(
                     ca_winner, Insight.INSIGHT_NAMES[Insight.CA_WINNER], year
                 )
             ]
         if world_champions != []:
             insights += [
-                self._createInsight(
+                create_insight(
                     world_champions,
                     Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS],
                     year,
@@ -1186,7 +1040,7 @@ class InsightsHelper(object):
             ]
         if world_finalists != []:
             insights += [
-                self._createInsight(
+                create_insight(
                     world_finalists,
                     Insight.INSIGHT_NAMES[Insight.WORLD_FINALISTS],
                     year,
@@ -1194,7 +1048,7 @@ class InsightsHelper(object):
             ]
         if division_winners != []:
             insights += [
-                self._createInsight(
+                create_insight(
                     division_winners,
                     Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS],
                     year,
@@ -1202,7 +1056,7 @@ class InsightsHelper(object):
             ]
         if division_finalists != []:
             insights += [
-                self._createInsight(
+                create_insight(
                     division_finalists,
                     Insight.INSIGHT_NAMES[Insight.DIVISION_FINALISTS],
                     year,
@@ -1238,18 +1092,18 @@ class InsightsHelper(object):
                     regional_winners[team_key_name] += 1
 
         rca_winners = self._sortTeamList(rca_winners)
-        regional_winners = self._sort_counter_dict(regional_winners)
+        regional_winners = sort_counter_dict(regional_winners)
 
         insights = []
         if rca_winners != []:
             insights += [
-                self._createInsight(
+                create_insight(
                     rca_winners, Insight.INSIGHT_NAMES[Insight.RCA_WINNERS], year
                 )
             ]
         if regional_winners != []:
             insights += [
-                self._createInsight(
+                create_insight(
                     regional_winners,
                     Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS],
                     year,
@@ -1274,7 +1128,7 @@ class InsightsHelper(object):
 
         if successful_elim_teamups != []:
             return [
-                self._createInsight(
+                create_insight(
                     successful_elim_teamups,
                     Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
                     year,
@@ -1301,7 +1155,7 @@ class InsightsHelper(object):
         # Creating Insights
         if num_matches:
             insights.append(
-                self._createInsight(
+                create_insight(
                     num_matches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], 0
                 )
             )
@@ -1397,17 +1251,17 @@ class InsightsHelper(object):
         )
 
         # Sorting
-        regional_winners = self._sort_counter_dict(regional_winners)
-        blue_banners = self._sort_counter_dict(blue_banners)
-        rca_winners = self._sort_counter_dict(rca_winners)
+        regional_winners = sort_counter_dict(regional_winners)
+        blue_banners = sort_counter_dict(blue_banners)
+        rca_winners = sort_counter_dict(rca_winners)
         world_champions = self._sortTeamYearWinsDict(world_champions)
         division_winners = self._sortTeamYearWinsDict(division_winners)
-        einstein_streak = self._sort_counter_dict(einstein_streak)
+        einstein_streak = sort_counter_dict(einstein_streak)
 
         # Creating Insights
         if regional_winners:
             insights.append(
-                self._createInsight(
+                create_insight(
                     regional_winners,
                     Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS],
                     0,
@@ -1416,42 +1270,42 @@ class InsightsHelper(object):
 
         if blue_banners:
             insights.append(
-                self._createInsight(
+                create_insight(
                     blue_banners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], 0
                 )
             )
 
         if rca_winners:
             insights.append(
-                self._createInsight(
+                create_insight(
                     rca_winners, Insight.INSIGHT_NAMES[Insight.RCA_WINNERS], 0
                 )
             )
 
         if world_champions:
             insights.append(
-                self._createInsight(
+                create_insight(
                     world_champions, Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS], 0
                 )
             )
 
         if division_winners:
             insights.append(
-                self._createInsight(
+                create_insight(
                     division_winners, Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS], 0
                 )
             )
 
         if einstein_streak:
             insights.append(
-                self._createInsight(
+                create_insight(
                     einstein_streak, Insight.INSIGHT_NAMES[Insight.EINSTEIN_STREAK], 0
                 )
             )
 
         if year_successful_elim_teamups:
             insights.append(
-                self._createInsight(
+                create_insight(
                     successful_elim_teamups_sorted,
                     Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
                     0,
@@ -1498,7 +1352,7 @@ class InsightsHelper(object):
                         data[team] += leaderboard_ranking["value"]  # pyre-ignore[58]
 
             overall_insights.append(
-                cls._create_leaderboard_from_dict_counts(
+                make_leaderboard_from_dict_counts(
                     data,
                     insight_type,
                     year=0,
