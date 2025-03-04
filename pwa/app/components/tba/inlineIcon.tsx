@@ -9,7 +9,7 @@ const inlineIconVariants = cva('[&>*:first-child]:size-[1em]', {
   variants: {
     displayStyle: {
       flex: 'flex items-center text-center',
-      flexless: '[&>*]:inline',
+      flexless: '*:inline',
     },
   },
   defaultVariants: {

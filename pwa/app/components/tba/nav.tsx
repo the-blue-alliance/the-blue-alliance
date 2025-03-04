@@ -67,9 +67,9 @@ export const DropMenuItem = ({
     <NavigationMenuItem
       className={cn(
         `relative flex cursor-default select-none bg-primary items-center rounded-sm
-          text-md outline-none transition-colors focus:bg-background
-          focus:text-accent-foreground data-[disabled]:pointer-events-none
-          data-[disabled]:opacity-50`,
+          text-md outline-hidden transition-colors focus:bg-background
+          focus:text-accent-foreground data-disabled:pointer-events-none
+          data-disabled:opacity-50`,
         className,
       )}
     >
