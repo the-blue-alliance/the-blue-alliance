@@ -448,8 +448,8 @@ function StatsSection({
             // left-47.5 looks significantly better than left-1/2
             className={`relative flex flex-wrap before:absolute before:inset-y-0
           before:left-[47.5%]
-          before:hidden before:w-px before:bg-gray-200 sm:mt-0 before:lg:block
-          [&>*]:w-full [&>*]:lg:w-1/2`}
+          before:hidden before:w-px before:bg-gray-200 sm:mt-0 lg:before:block
+          *:w-full lg:*:w-1/2`}
           >
             <div className="grid grid-cols-2 items-center gap-y-4">
               <Stat

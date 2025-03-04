@@ -3,7 +3,7 @@ import { Link } from '@remix-run/react';
 export default function ApiDocs(): React.JSX.Element {
   return (
     <>
-      <div className="flex flex-col divide-y [&_*]:mt-4">
+      <div className="flex flex-col divide-y **:mt-4">
         <div>
           <h1 className="text-3xl font-medium">
             The Blue Alliance Developer APIs

@@ -207,18 +207,18 @@ function MatchResultsTableGroup({
   const gridStyle = cn(
     // always use these classes:
     'grid items-center justify-items-center',
-    '[&>*]:justify-self-stretch [&>*]:justify-center',
-    '[&>*]:text-center [&>*]:p-[5px] [&>*]:h-full [&>*]:content-center',
+    '*:justify-self-stretch *:justify-center',
+    '*:text-center *:p-[5px] *:h-full *:content-center',
     // use these classes on mobile:
     'grid-rows-2',
     'grid-cols-[calc(1.25em+10px)_8em_1fr_1fr_1fr_1fr]', // 6 columns of these sizes
     'border-[#000] border-b-[1px]',
-    '[&>*]:border-[#ddd] [&>*]:border-[1px]',
+    '*:border-[#ddd] *:border-[1px]',
     // use these on desktop:
     'lg:grid-rows-1',
     'lg:grid-cols-[calc(1.25em+6px*2)_10em_repeat(6,minmax(0,1fr))_0.9fr_0.9fr]',
     'lg:border-[#ddd] lg:border-b-[1px]',
-    '[&>*]:lg:border-0 [&>*]:lg:border-r-[1px]', // reset the border, then apply one to the right
+    'lg:*:border-0 lg:*:border-r-[1px]', // reset the border, then apply one to the right
   );
 
   return (

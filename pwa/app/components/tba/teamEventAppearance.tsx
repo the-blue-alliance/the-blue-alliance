@@ -42,7 +42,7 @@ export default function TeamEventAppearance({
   );
 
   return (
-    <div className="flex flex-wrap gap-x-8 [&>*]:sm:flex-1" id={event.key}>
+    <div className="flex flex-wrap gap-x-8 sm:*:flex-1" id={event.key}>
       <div className="w-full">
         <h2 className="text-2xl font-medium">
           <EventLink eventOrKey={event.key}>{event.name}</EventLink>

@@ -232,8 +232,8 @@ export default function EventPage() {
         className="mt-4"
       >
         <TabsList
-          className="flex h-auto flex-wrap items-center justify-evenly [&>*]:basis-1/2
-            lg:[&>*]:basis-1"
+          className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2
+            lg:*:basis-1"
         >
           {(matches.length > 0 || (alliances && alliances.length > 0)) && (
             <TabsTrigger value="results">
