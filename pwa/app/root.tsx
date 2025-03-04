@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLocation,
   useRouteError,
 } from '@remix-run/react';
 import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
@@ -54,10 +55,16 @@ api.defaults.headers = {
 // };
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
+        <meta name="robots" content="noindex" />
+        <link
+          rel="canonical"
+          href={`https://www.thebluealliance.com${location.pathname}`}
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
