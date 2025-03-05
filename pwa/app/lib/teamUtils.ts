@@ -10,6 +10,10 @@ export function sortTeamKeysComparator(a: string, b: string) {
   return Number(removeNonNumeric(a)) - Number(removeNonNumeric(b));
 }
 
+export function sortTeams(teams: Team[]) {
+  return teams.sort((a, b) => sortTeamsComparator(a, b));
+}
+
 // Known problem: Does not work when the final company listed has an ampersand in its name
 // For example: Company 1/Company 2 & 3&Public School
 // becomes ["Company 1", "Company 2"]
