@@ -29,6 +29,18 @@ function searchEvents(
     limit,
     keys: ['key', 'name'],
     threshold: 0.5,
+    scoreFn: (r) => {
+      // For current_year events, return score * 2
+      // For current_year-1 events, return score * (2 - 1 / (current_year - 1992))
+      // ...
+      // Down to score * 1
+      const eventYear = Number.parseInt(r.obj.key.slice(0, 4));
+      const currentYear = new Date().getFullYear();
+      const yearDiff = currentYear - eventYear;
+      const denominator = currentYear - 1992;
+
+      return r.score * Math.max(1, 2 - yearDiff / denominator);
+    },
   });
 
   return results.map((result) => result.obj);
