@@ -22,7 +22,6 @@ pkgs.mkShell {
 
     # Now you can use the VITE_TBA_API_READ_KEY variable
     echo "Using TBA API key: $VITE_TBA_API_READ_KEY"
-    echo ""sTtIJYjJzRjZCvZFAx4awDXI2lSwZQWZlWP72S9nQ8Pec2GjY254vQ2e09h8yDhh
     echo "The Blue Alliance Development Environment"
     echo "----------------------------------------"
     echo "1. Start Vagrant: vagrant up"
