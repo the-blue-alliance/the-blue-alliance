@@ -1,5 +1,6 @@
 import { Event, Match, MatchAlliance, WltRecord } from '~/api/v3';
 import { PlayoffType } from '~/lib/api/PlayoffType';
+import { median } from '~/lib/utils';
 
 const COMP_LEVEL_SORT_ORDER = {
   f: 5,
@@ -200,4 +201,33 @@ export function getTeamsUnpenalizedHighScore(
     .sort((a, b) => b.score - a.score)[0];
 
   return highScoreMatch;
+}
+
+export function getHighScoreMatch(matches: Match[]): Match {
+  const scores = matches.map((m) => ({
+    match: m,
+    score: Math.max(m.alliances.red.score, m.alliances.blue.score),
+  }));
+
+  scores.sort((a, b) => b.score - a.score);
+
+  return scores[0].match;
+}
+
+export function calculateMedianTurnaroundTime(
+  matches: Match[],
+): number | undefined {
+  const turnarounds = [];
+
+  for (let i = 1; i < matches.length; i++) {
+    const currTime = matches[i].actual_time;
+    const prevTime = matches[i - 1].actual_time;
+
+    if (currTime !== null && prevTime !== null) {
+      turnarounds.push(currTime - prevTime);
+    }
+  }
+
+  turnarounds.sort((a, b) => a - b);
+  return median(turnarounds);
 }

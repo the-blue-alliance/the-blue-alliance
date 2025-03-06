@@ -185,3 +185,21 @@ export const USA_STATE_ABBREVIATION_TO_FULL = new Map<string, string>([
   ['WI', 'Wisconsin'],
   ['WY', 'Wyoming'],
 ]);
+
+// https://stackoverflow.com/a/70806192
+export function median(arr: number[]): number | undefined {
+  if (!arr.length) {
+    return undefined;
+  }
+
+  const s = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+
+export function camelCaseToHumanReadable(camelCaseStr: string): string {
+  // Insert a space before each uppercase letter and convert the result to lowercase
+  const withSpaces = camelCaseStr.replace(/([A-Z])/g, ' $1');
+  // Capitalize the first letter and return the result
+  return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
+}
