@@ -152,6 +152,9 @@ jobs:
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa ci
+      - name: Generate react-router types
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run typecheck
       - name: Run Format
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa run format

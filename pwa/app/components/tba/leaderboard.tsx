@@ -1,5 +1,5 @@
-import { Link } from '@remix-run/react';
 import React, { ReactNode } from 'react';
+import { Link } from 'react-router';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';

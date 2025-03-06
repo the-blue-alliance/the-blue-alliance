@@ -1,13 +1,6 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
-import {
-  ClientLoaderFunctionArgs,
-  MetaFunction,
-  Params,
-  useLoaderData,
-  useNavigate,
-} from '@remix-run/react';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
+import { useLoaderData, useNavigate } from 'react-router';
 
 import { Event, getEventsByYear } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
@@ -32,7 +25,9 @@ import {
   slugify,
 } from '~/lib/utils';
 
-async function loadData(params: Params) {
+import { Route } from '.react-router/types/app/routes/+types/events.($year)';
+
+async function loadData(params: Route.LoaderArgs['params']) {
   const year = await parseParamsForYearElseDefault(params);
   if (year === undefined) {
     throw new Response(null, {
@@ -57,25 +52,25 @@ async function loadData(params: Params) {
   return { year, events: events.data };
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   return await loadData(params);
 }
 
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   return await loadData(params);
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export function meta({ data }: Route.MetaArgs) {
   return [
     {
-      title: `${data?.year} FIRST Robotics Events - The Blue Alliance`,
+      title: `${data.year} FIRST Robotics Events - The Blue Alliance`,
     },
     {
       name: 'description',
-      content: `Event list for the ${data?.year} FIRST Robotics Competition.`,
+      content: `Event list for the ${data.year} FIRST Robotics Competition.`,
     },
   ];
-};
+}
 
 interface EventGroup {
   groupName: string;
@@ -181,7 +176,7 @@ export default function YearEventsPage() {
           <Select
             value={String(year)}
             onValueChange={(value) => {
-              navigate(`/events/${value}`);
+              void navigate(`/events/${value}`);
             }}
           >
             <SelectTrigger className="w-[180px]">

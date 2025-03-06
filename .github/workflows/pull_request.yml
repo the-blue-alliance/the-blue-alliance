@@ -207,6 +207,8 @@ jobs:
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
+      - name: Generate react-router types
+        run: npm --prefix pwa run typecheck
       - name: Run Format
         run: npm --prefix pwa run format
       - name: Run Lint

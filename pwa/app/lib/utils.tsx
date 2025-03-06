@@ -1,6 +1,6 @@
-import { Params } from '@remix-run/react';
 import { type ClassValue, clsx } from 'clsx';
 import React from 'react';
+import { Params } from 'react-router';
 import { twMerge } from 'tailwind-merge';
 
 import { WltRecord, getStatus } from '~/api/v3';
