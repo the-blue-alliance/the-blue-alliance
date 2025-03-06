@@ -19,6 +19,9 @@ venv/
 .vscode
 .idea
 
+# TBA API Key file
+TBAKEY.txt
+
 # Compiled/Intermediate Files #
 ###############################
 src/build
