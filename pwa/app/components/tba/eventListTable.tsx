@@ -1,6 +1,10 @@
 import { Link } from 'react-router';
 
+import MdiVideo from '~icons/mdi/video';
+
 import { Event } from '~/api/v3';
+import InlineIcon from '~/components/tba/inlineIcon';
+import { Button } from '~/components/ui/button';
 import {
   Table,
   TableBody,
@@ -32,7 +36,22 @@ export default function EventListTable({ events }: { events: Event[] }) {
                 {event.city}, {event.state_prov}, {event.country}
               </div>
             </TableCell>
-            <TableCell>TODO</TableCell>
+            <TableCell>
+              {event.webcasts.length > 0 && (
+                <Button className="cursor-pointer" asChild variant="success">
+                  <Link
+                    to={`https://www.thebluealliance.com/gameday/${event.key}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <InlineIcon iconSize="large">
+                      <MdiVideo />
+                      Watch Now
+                    </InlineIcon>
+                  </Link>
+                </Button>
+              )}
+            </TableCell>
             <TableCell>{getEventDateString(event, 'short')}</TableCell>
           </TableRow>
         ))}
