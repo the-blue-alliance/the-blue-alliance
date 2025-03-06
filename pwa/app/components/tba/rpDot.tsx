@@ -26,6 +26,7 @@ function RpDot({
             className={cn('h-[4px] absolute top-[2px] left-[3px] w-[4px]', {
               'ml-0': rpIndex === 0,
               'ml-[6px]': rpIndex === 1,
+              'ml-[12px]': rpIndex === 2,
             })}
           >
             <circle cx={2} cy={2} r={2} />
