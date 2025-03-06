@@ -402,11 +402,17 @@ class ContributionCalculator:
                         ):
                             count += 1
                     means[color] = count
-                elif self._stat == "2024_coopertition_criteria":
+                elif self._stat == "coopertition_criteria":
                     count = 0
                     if score_breakdown[color]["coopertitionCriteriaMet"]:
                         count = 1
                     means[color] = count
+                elif self._stat == "auto_coral_scored":
+                    means[color] = score_breakdown[color]["autoCoralCount"]
+                elif self._stat == "coral_scored":
+                    means[color] = score_breakdown[color]["teleopCoralCount"]
+                elif self._stat == "barge_points":
+                    means[color] = score_breakdown[color]["endGameBargePoints"]
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -699,10 +705,9 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    mu2 = mean_vars[color]["2024_coopertition_criteria"]["mean"] - 1
+                    mu2 = mean_vars[color]["coopertition_criteria"]["mean"] - 1
                     prob2 = 1 - cls._normcdf(
-                        -mu2
-                        / np.sqrt(mean_vars[color]["2024_coopertition_criteria"]["var"])
+                        -mu2 / np.sqrt(mean_vars[color]["coopertition_criteria"]["var"])
                     )
 
                     mu3 = mean_vars[color][stat]["mean"] - 15
@@ -724,6 +729,43 @@ class PredictionHelper:
                         -mu2 / np.sqrt(mean_vars[color]["robot_on_stage"]["var"])
                     )
                     prediction[color]["prob_ensemble_bonus"] = prob * prob2
+                # 2025
+                if stat == "auto_coral_scored":
+                    required_coral = 1
+
+                    mu = mean_vars[color][stat]["mean"] - required_coral
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+
+                    prediction[color]["prob_auto_coral_bonus"] = prob
+                if stat == "coral_scored":
+                    required_coral = 20
+
+                    mu = mean_vars[color][stat]["mean"] - required_coral
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+
+                    mu2 = mean_vars[color]["coopertition_criteria"]["mean"] - 1
+                    prob2 = 1 - cls._normcdf(
+                        -mu2 / np.sqrt(mean_vars[color]["coopertition_criteria"]["var"])
+                    )
+
+                    mu3 = mean_vars[color][stat]["mean"] - 15
+                    prob3 = 1 - cls._normcdf(
+                        -mu3 / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+
+                    prediction[color]["prob_coral_bonus"] = prob + prob2 * prob3
+                if stat == "barge_points":
+                    required_points = 14
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_barge_bonus"] = prob
 
         # Prob win
         red_score = prediction["red"]["score"]
@@ -818,6 +860,13 @@ class PredictionHelper:
                 ("score", 0, 20**2),
                 ("note_scored", 0, 10**2),
                 ("stage_points", 0, 10**2),
+            ]
+        elif event.year == 2025:
+            relevant_stats = [
+                ("score", 0, 20**2),
+                ("auto_coral_scored", 0, 2**2),
+                ("coral_scored", 0, 10**2),
+                ("barge_points", 0, 10**2),
             ]
         else:
             relevant_stats = []
@@ -1000,6 +1049,10 @@ class PredictionHelper:
                     "red": False,
                     "blue": False,
                 }
+                sampled_rp3 = {
+                    "red": False,
+                    "blue": False,
+                }
                 sampled_tiebreaker = {
                     "red": 0,
                     "blue": 0,
@@ -1090,6 +1143,19 @@ class PredictionHelper:
                             sampled_rp2[alliance_color] = score_breakdown[
                                 alliance_color
                             ]["ensembleBonusAchieved"]
+                            sampled_tiebreaker[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["totalPoints"]
+                        elif match.year == 2025:
+                            sampled_rp1[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["autoBonusAchieved"]
+                            sampled_rp2[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["coralBonusAchieved"]
+                            sampled_rp3[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["bargeBonusAchieved"]
                             sampled_tiebreaker[alliance_color] = score_breakdown[
                                 alliance_color
                             ]["totalPoints"]
@@ -1198,6 +1264,22 @@ class PredictionHelper:
                             sampled_tiebreaker[alliance_color] = color_prediction[
                                 "score"
                             ]
+                        elif match.year == 2025:
+                            sampled_rp1[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_auto_coral_bonus"]
+                            )
+                            sampled_rp2[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_coral_bonus"]
+                            )
+                            sampled_rp3[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_barge_bonus"]
+                            )
+                            sampled_tiebreaker[alliance_color] = color_prediction[
+                                "score"
+                            ]
 
                 # Using match results, update RP and tiebreaker
                 for alliance_color in ALLIANCE_COLORS:
@@ -1207,6 +1289,8 @@ class PredictionHelper:
                         if sampled_rp1[alliance_color]:
                             team_ranking_points[team] += 1
                         if sampled_rp2[alliance_color]:
+                            team_ranking_points[team] += 1
+                        if sampled_rp3[alliance_color]:
                             team_ranking_points[team] += 1
                         team_rank_tiebreaker[team] += sampled_tiebreaker[alliance_color]
 
@@ -1221,7 +1305,7 @@ class PredictionHelper:
                     for team in match.alliances[sampled_winner]["teams"]:
                         if team in surrogate_teams and num_played[team] == 3:
                             continue
-                        team_ranking_points[team] += 2
+                        team_ranking_points[team] += 2 if match.year < 2025 else 3
 
                     sampled_loser = OPPONENT[sampled_winner]
                     for team in match.alliances[sampled_loser]["teams"]:
