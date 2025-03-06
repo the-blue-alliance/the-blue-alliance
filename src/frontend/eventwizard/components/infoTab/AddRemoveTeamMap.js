@@ -66,7 +66,7 @@ class AddRemoveTeamMap extends Component {
     }
 
     return (
-      <div className="form-group">
+      <div className="form-group row">
         <label htmlFor="team_mappings_list" className="col-sm-2 control-label">
           Team Mappings
           <br />
