@@ -9,7 +9,6 @@ import {
   RANKING_POINT_LABELS,
   getBonusRankingPoints,
 } from '~/lib/rankingPoints';
-import { cn } from '~/lib/utils';
 
 function RpDot({
   rpIndex,
@@ -23,10 +22,7 @@ function RpDot({
       <Tooltip>
         <TooltipTrigger asChild>
           <svg
-            className={cn('h-[4px] absolute top-[2px] left-[3px] w-[4px]', {
-              'ml-0': rpIndex === 0,
-              'ml-[6px]': rpIndex === 1,
-            })}
+            className={`h-[4px] absolute top-[2px] left-[3px] w-[4px] ml-[${6 * rpIndex}px]`}
           >
             <circle cx={2} cy={2} r={2} />
           </svg>
