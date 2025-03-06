@@ -102,7 +102,7 @@ export function isScoreBreakdown2025(
   scoreBreakdown: MatchScoreBreakdown,
 ): scoreBreakdown is MatchScoreBreakdown2025Alliance {
   return (
-    (scoreBreakdown as MatchScoreBreakdown2025Alliance).autoBonusAchieved !==
+    (scoreBreakdown as MatchScoreBreakdown2025Alliance).coralBonusAchieved !==
     undefined
   );
 }
