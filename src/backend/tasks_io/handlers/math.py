@@ -392,7 +392,7 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
 
     predictions_dict = None
     if (
-        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024}
+        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024, 2025}
         and event.event_type_enum in SEASON_EVENT_TYPES
     ) or event.enable_predictions:
         sorted_matches = MatchHelper.play_order_sorted_matches(event.matches)
