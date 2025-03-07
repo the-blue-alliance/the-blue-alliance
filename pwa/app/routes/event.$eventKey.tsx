@@ -533,29 +533,33 @@ function MatchStatsTable({
           <TableCell>Total Matches</TableCell>
           <TableCell>{matches.length}</TableCell>
         </TableRow>
-        <TableRow>
-          <TableCell>High Score (Quals)</TableCell>
-          <TableCell>
-            Qual {highScoreQual.match_number} -{' '}
-            {Math.max(
-              highScoreQual.alliances.red.score,
-              highScoreQual.alliances.blue.score,
-            )}{' '}
-            points
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>High Score (Playoffs)</TableCell>
-          <TableCell>
-            {highScorePlayoff.comp_level.toUpperCase()}
-            {highScorePlayoff.set_number}-{highScorePlayoff.match_number} -{' '}
-            {Math.max(
-              highScorePlayoff.alliances.red.score,
-              highScorePlayoff.alliances.blue.score,
-            )}{' '}
-            points
-          </TableCell>
-        </TableRow>
+        {highScoreQual && (
+          <TableRow>
+            <TableCell>High Score (Quals)</TableCell>
+            <TableCell>
+              Qual {highScoreQual.match_number} -{' '}
+              {Math.max(
+                highScoreQual.alliances.red.score,
+                highScoreQual.alliances.blue.score,
+              )}{' '}
+              points
+            </TableCell>
+          </TableRow>
+        )}
+        {highScorePlayoff && (
+          <TableRow>
+            <TableCell>High Score (Playoffs)</TableCell>
+            <TableCell>
+              {highScorePlayoff.comp_level.toUpperCase()}
+              {highScorePlayoff.set_number}-{highScorePlayoff.match_number} -{' '}
+              {Math.max(
+                highScorePlayoff.alliances.red.score,
+                highScorePlayoff.alliances.blue.score,
+              )}{' '}
+              points
+            </TableCell>
+          </TableRow>
+        )}
         {medianTurnaround !== undefined && (
           <TableRow>
             <TableCell>Median Turnaround Time</TableCell>
