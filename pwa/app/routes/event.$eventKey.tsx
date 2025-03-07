@@ -532,7 +532,7 @@ function MatchStatsTable({
 
   const rpPercentages = useMemo(
     () =>
-      range(0, RANKING_POINT_LABELS[year].length).map(
+      range(0, (RANKING_POINT_LABELS[year] ?? []).length).map(
         (i) =>
           matches
             .filter((m) => m.score_breakdown !== null)
