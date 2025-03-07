@@ -1,11 +1,5 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
-import {
-  ClientLoaderFunctionArgs,
-  MetaFunction,
-  Params,
-  useLoaderData,
-} from '@remix-run/react';
 import { groupBy, sumBy } from 'lodash-es';
+import { useLoaderData } from 'react-router';
 
 import {
   Award,
@@ -43,11 +37,9 @@ import {
   parseParamsForYearElseDefault,
 } from '~/lib/utils';
 
-async function loadData(params: Params) {
-  if (params.districtAbbreviation === undefined) {
-    throw new Error('missing abbreviation');
-  }
+import { Route } from '.react-router/types/app/routes/+types/events.$districtAbbreviation.($year)';
 
+async function loadData(params: Route.LoaderArgs['params']) {
   const year = await parseParamsForYearElseDefault(params);
   if (year === undefined) {
     throw new Error('invalid year');
@@ -107,21 +99,21 @@ async function loadData(params: Params) {
   };
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   return await loadData(params);
 }
 
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   return await loadData(params);
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export function meta({ data }: Route.MetaArgs) {
   return [
     {
-      title: `${data?.year} ${data?.districtHistory[data.districtHistory.length - 1].display_name} District - The Blue Alliance`,
+      title: `${data.year} ${data.districtHistory[data.districtHistory.length - 1].display_name} District - The Blue Alliance`,
     },
   ];
-};
+}
 
 export default function DistrictPage() {
   const { awards, districtHistory, events, rankings, teams, year } =

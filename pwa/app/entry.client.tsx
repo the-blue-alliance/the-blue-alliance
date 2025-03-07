@@ -5,10 +5,10 @@
  * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
  * For more information, see https://remix.run/file-conventions/entry.client
  */
-import { RemixBrowser, useLocation, useMatches } from '@remix-run/react';
-import * as Sentry from '@sentry/remix';
-import { StrictMode, startTransition, useEffect } from 'react';
+import * as Sentry from '@sentry/react-router';
+import { StrictMode, startTransition } from 'react';
 import { hydrateRoot } from 'react-dom/client';
+import { HydratedRouter } from 'react-router/dom';
 
 Sentry.init({
   dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
@@ -18,11 +18,7 @@ Sentry.init({
   profilesSampleRate: 1,
 
   integrations: [
-    Sentry.browserTracingIntegration({
-      useEffect,
-      useLocation,
-      useMatches,
-    }),
+    Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
     Sentry.browserProfilingIntegration(),
   ],
@@ -33,7 +29,7 @@ startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <RemixBrowser />
+      <HydratedRouter />
     </StrictMode>,
   );
 });

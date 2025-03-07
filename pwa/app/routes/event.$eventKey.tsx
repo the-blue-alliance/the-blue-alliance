@@ -1,14 +1,7 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
-import {
-  type ClientLoaderFunctionArgs,
-  Link,
-  MetaFunction,
-  Params,
-  useLoaderData,
-} from '@remix-run/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
 import { useMemo, useState } from 'react';
+import { Link, useLoaderData } from 'react-router';
 
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
@@ -89,11 +82,9 @@ import {
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import { camelCaseToHumanReadable } from '~/lib/utils';
 
-async function loadData(params: Params) {
-  if (params.eventKey === undefined) {
-    throw new Error('Missing eventKey');
-  }
+import { Route } from '.react-router/types/app/routes/+types/event.$eventKey';
 
+async function loadData(params: Route.LoaderArgs['params']) {
   if (!isValidEventKey(params.eventKey)) {
     throw new Response(null, {
       status: 404,
@@ -145,23 +136,23 @@ async function loadData(params: Params) {
   };
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   return await loadData(params);
 }
 
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   return await loadData(params);
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `${data?.event.name} (${data?.event.year}) - The Blue Alliance` },
+    { title: `${data.event.name} (${data.event.year}) - The Blue Alliance` },
     {
       name: 'description',
-      content: `Videos and match results for the ${data?.event.year} ${data?.event.name} FIRST Robotics Competition.`,
+      content: `Videos and match results for the ${data.event.year} ${data.event.name} FIRST Robotics Competition.`,
     },
   ];
-};
+}
 
 export default function EventPage() {
   const {

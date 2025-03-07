@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-router';
 import {
   Links,
   Meta,
@@ -8,8 +9,7 @@ import {
   isRouteErrorResponse,
   useLocation,
   useRouteError,
-} from '@remix-run/react';
-import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
+} from 'react-router';
 
 import * as api from '~/api/v3';
 
@@ -250,7 +250,7 @@ function App() {
   return <Outlet />;
 }
 
-export default withSentry(App);
+export default App;
 
 export const meta: MetaFunction = ({ error }) => {
   const isRouteError = isRouteErrorResponse(error);
@@ -264,7 +264,7 @@ export function ErrorBoundary() {
   console.error(error);
 
   const isRouteError = isRouteErrorResponse(error);
-  captureRemixErrorBoundaryError(error);
+  Sentry.captureException(error);
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>
