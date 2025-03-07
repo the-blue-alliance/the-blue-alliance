@@ -5,6 +5,7 @@ import {
   median,
   removeNonNumeric,
   slugify,
+  splitIntoNChunks,
 } from './utils';
 
 describe.concurrent('removeNonNumeric', () => {
@@ -37,5 +38,14 @@ describe.concurrent('camelCaseToHumanReadable', () => {
     );
     expect(camelCaseToHumanReadable('totalPoints')).toEqual('Total Points');
     expect(camelCaseToHumanReadable('rp')).toEqual('Rp');
+  });
+});
+
+describe.concurrent('splitIntoNChunks', () => {
+  test('basic', () => {
+    expect(splitIntoNChunks([1, 2, 3, 4, 5], 2)).toEqual([
+      [1, 2, 3],
+      [4, 5],
+    ]);
   });
 });

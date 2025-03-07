@@ -40,7 +40,7 @@ export default function TeamPageTeamInfo({
     <>
       <div>
         <h1 className="mb-2.5 text-4xl">
-          {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
+          {maybeAvatar && <TeamAvatar media={maybeAvatar} className="mr-3" />}
           Team {team.team_number} - {team.nickname}
         </h1>
         <InlineIcon>

@@ -186,6 +186,12 @@ export const USA_STATE_ABBREVIATION_TO_FULL = new Map<string, string>([
   ['WY', 'Wyoming'],
 ]);
 
+export const STATE_TO_ABBREVIATION = new Map<string, string>(
+  Array.from(USA_STATE_ABBREVIATION_TO_FULL.entries()).map(
+    ([abbr, fullName]) => [fullName, abbr],
+  ),
+);
+
 // https://stackoverflow.com/a/70806192
 export function median(arr: number[]): number | undefined {
   if (!arr.length) {
@@ -202,4 +208,31 @@ export function camelCaseToHumanReadable(camelCaseStr: string): string {
   const withSpaces = camelCaseStr.replace(/([A-Z])/g, ' $1');
   // Capitalize the first letter and return the result
   return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
+}
+
+export function splitIntoNChunks<T>(array: T[], numChunks: number): T[][] {
+  if (array.length === 0) {
+    return [];
+  }
+
+  const actualNumChunks = Math.min(numChunks, array.length);
+
+  // Calculate the base size of each chunk
+  const chunkSize = Math.floor(array.length / actualNumChunks);
+
+  // Calculate how many chunks need an extra element
+  const remainder = array.length % actualNumChunks;
+
+  const result: T[][] = [];
+  let currentIndex = 0;
+
+  for (let i = 0; i < actualNumChunks; i++) {
+    // Determine if this chunk needs an extra element
+    const currentChunkSize = i < remainder ? chunkSize + 1 : chunkSize;
+
+    result.push(array.slice(currentIndex, currentIndex + currentChunkSize));
+    currentIndex += currentChunkSize;
+  }
+
+  return result;
 }
