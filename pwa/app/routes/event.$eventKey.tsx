@@ -14,6 +14,7 @@ import MdiFolderMediaOutline from '~icons/mdi/folder-media-outline';
 import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
 import MdiRobot from '~icons/mdi/robot';
 import MdiTournament from '~icons/mdi/tournament';
+import MdiVideo from '~icons/mdi/video';
 
 import {
   Award,
@@ -68,7 +69,11 @@ import {
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortAwardsComparator } from '~/lib/awardUtils';
-import { getEventDateString, isValidEventKey } from '~/lib/eventUtils';
+import {
+  getCurrentWeekEvents,
+  getEventDateString,
+  isValidEventKey,
+} from '~/lib/eventUtils';
 import {
   calculateMedianTurnaroundTime,
   getHighScoreMatch,
@@ -256,6 +261,16 @@ export default function EventPage() {
           Statbotics
         </Link>
       </InlineIcon>
+
+      {event.webcasts.length > 0 &&
+        getCurrentWeekEvents([event]).length > 0 && (
+          <InlineIcon>
+            <MdiVideo />
+            <Link to={`https://www.thebluealliance.com/gameday/${event.key}`}>
+              GameDay
+            </Link>
+          </InlineIcon>
+        )}
 
       <Tabs
         defaultValue={matches.length > 0 ? 'results' : 'teams'}
