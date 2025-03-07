@@ -16,6 +16,7 @@ import MdiRobot from '~icons/mdi/robot';
 import MdiTournament from '~icons/mdi/tournament';
 import MdiVideo from '~icons/mdi/video';
 
+import { getEventColors } from '~/api/colors';
 import {
   Award,
   EventCopRs,
@@ -33,6 +34,7 @@ import {
 } from '~/api/v3';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
+import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { LocationLink, TeamLink } from '~/components/tba/links';
@@ -105,17 +107,27 @@ async function loadData(params: Route.LoaderArgs['params']) {
     });
   }
 
-  const [event, matches, alliances, rankings, awards, teams, teamMedia, coprs] =
-    await Promise.all([
-      getEvent({ eventKey: params.eventKey }),
-      getEventMatches({ eventKey: params.eventKey }),
-      getEventAlliances({ eventKey: params.eventKey }),
-      getEventRankings({ eventKey: params.eventKey }),
-      getEventAwards({ eventKey: params.eventKey }),
-      getEventTeams({ eventKey: params.eventKey }),
-      getEventTeamMedia({ eventKey: params.eventKey }),
-      getEventCopRs({ eventKey: params.eventKey }),
-    ]);
+  const [
+    event,
+    matches,
+    alliances,
+    rankings,
+    awards,
+    teams,
+    teamMedia,
+    coprs,
+    colors,
+  ] = await Promise.all([
+    getEvent({ eventKey: params.eventKey }),
+    getEventMatches({ eventKey: params.eventKey }),
+    getEventAlliances({ eventKey: params.eventKey }),
+    getEventRankings({ eventKey: params.eventKey }),
+    getEventAwards({ eventKey: params.eventKey }),
+    getEventTeams({ eventKey: params.eventKey }),
+    getEventTeamMedia({ eventKey: params.eventKey }),
+    getEventCopRs({ eventKey: params.eventKey }),
+    getEventColors({ eventKey: params.eventKey }),
+  ]);
 
   if (event.status == 404) {
     throw new Response(null, {
@@ -131,7 +143,8 @@ async function loadData(params: Route.LoaderArgs['params']) {
     awards.status !== 200 ||
     teams.status !== 200 ||
     teamMedia.status !== 200 ||
-    coprs.status !== 200
+    coprs.status !== 200 ||
+    colors.status !== 200
   ) {
     throw new Response(null, {
       status: 500,
@@ -147,6 +160,7 @@ async function loadData(params: Route.LoaderArgs['params']) {
     teams: teams.data,
     teamMedia: teamMedia.data,
     coprs: coprs.data,
+    colors: colors.data,
   };
 }
 
@@ -177,8 +191,9 @@ export default function EventPage() {
     awards,
     teams,
     teamMedia,
+    colors,
     coprs,
-  } = useLoaderData<typeof loader>();
+  } = useLoaderData<Awaited<ReturnType<typeof loadData>>>();
 
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
@@ -382,7 +397,10 @@ export default function EventPage() {
             year={event.year}
           />
           {coprs && Object.keys(coprs).length > 0 && (
-            <ComponentsTable coprs={coprs} year={event.year} />
+            <>
+              <CoprScatterChart colors={colors} coprs={coprs} />
+              <ComponentsTable coprs={coprs} year={event.year} />
+            </>
           )}
         </TabsContent>
 
