@@ -130,6 +130,9 @@ class EventInsightsHelper:
             total_win_margins += win_score - min(red_score, blue_score)
             total_winning_scores += win_score
 
+        if finished_matches == 0:
+            return None
+
         return {
             "auto_rp_count": [
                 auto_rp_count,
