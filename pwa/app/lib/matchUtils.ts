@@ -203,8 +203,14 @@ export function getTeamsUnpenalizedHighScore(
   return highScoreMatch;
 }
 
-export function getHighScoreMatch(matches: Match[]): Match {
-  const scores = matches.map((m) => ({
+export function getHighScoreMatch(matches: Match[]): Match | undefined {
+  const matchesWithScore = matches.filter((m) => m.alliances.red.score !== -1);
+
+  if (matchesWithScore.length === 0) {
+    return undefined;
+  }
+
+  const scores = matchesWithScore.map((m) => ({
     match: m,
     score: Math.max(m.alliances.red.score, m.alliances.blue.score),
   }));
