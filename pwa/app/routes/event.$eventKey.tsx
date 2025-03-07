@@ -370,7 +370,13 @@ export default function EventPage() {
         </TabsContent>
 
         <TabsContent value="insights">
-          <MatchStatsTable matches={sortedMatches} year={event.year} />
+          <MatchStatsTable
+            matches={sortedMatches.filter(
+              (m) =>
+                m.alliances.red.score !== -1 && m.alliances.blue.score !== -1,
+            )}
+            year={event.year}
+          />
           {coprs && Object.keys(coprs).length > 0 && (
             <ComponentsTable coprs={coprs} year={event.year} />
           )}
@@ -536,7 +542,7 @@ function MatchStatsTable({
             ])
             .map((rps) => (rps[0][i] ? 1 : 0) + (rps[1][i] ? 1 : 0))
             .reduce((prev, curr) => prev + curr, 0) /
-          (matches.length * 2),
+          Math.max(1, matches.length * 2),
       ),
     [matches, year],
   );
