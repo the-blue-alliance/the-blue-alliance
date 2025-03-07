@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import EVENT_SHAPE from "../../constants/ApiEvent";
 
 const SyncCodeInput = (props) => (
-  <div className="form-group">
+  <div className="form-group row">
     <label htmlFor="first_code" className="col-sm-2 control-label">
       FIRST Sync Code
     </label>

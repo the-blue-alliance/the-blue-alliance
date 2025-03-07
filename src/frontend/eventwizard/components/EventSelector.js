@@ -3,15 +3,23 @@ import PropTypes from "prop-types";
 import AsyncSelect from "react-select/async";
 
 class EventSelector extends Component {
-  static loadEvents() {
-    return fetch("/_/account/apiwrite_events", {
-      credentials: "same-origin",
-    })
-      .then((response) => response.json())
-      .then((events) => {
-        events.push({ value: "_other", label: "Other" });
-        return events;
-      });
+  static eventsCache;
+
+  static async loadEvents(search) {
+    if (!EventSelector.eventsCache) {
+      EventSelector.eventsCache = await fetch("/_/account/apiwrite_events", {
+        credentials: "same-origin",
+      })
+        .then((response) => response.json())
+        .then((events) => {
+          events.push({ value: "_other", label: "Other" });
+          return events;
+        });
+    }
+
+    return EventSelector.eventsCache.filter((e) =>
+      e.label.toLowerCase().includes(search.toLowerCase())
+    );
   }
 
   constructor(props) {
@@ -64,8 +72,6 @@ class EventSelector extends Component {
             name="selectEvent"
             placeholder="Select an Event..."
             loadingPlaceholder="Loading Events..."
-            clearable={false}
-            searchable={false}
             value={
               this.state.eventSelectLabel && {
                 label: this.state.eventSelectLabel,
