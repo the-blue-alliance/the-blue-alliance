@@ -426,3 +426,14 @@ def event_rss(event_key: EventKey) -> Response:
     response.headers["content-type"] = "application/xml; charset=UTF-8"
 
     return response
+
+
+def event_agenda(event_key: EventKey) -> Response:
+    if (
+        not Event.validate_key_name(event_key)
+        or not (event := Event.get_by_id(event_key))
+        or not (agenda_url := event.public_agenda_url)
+    ):
+        abort(404)
+
+    return redirect(agenda_url)

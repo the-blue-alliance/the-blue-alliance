@@ -10,7 +10,7 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts import event_type
-from backend.common.consts.event_type import EventType
+from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.futures import TypedFuture
 from backend.common.models.alliance import EventAlliance
@@ -699,6 +699,13 @@ class Event(CachedModel):
             return "/gameday/{}".format(self.key_name)
         else:
             return None
+
+    @property
+    def public_agenda_url(self) -> Optional[str]:
+        if self.event_type_enum not in SEASON_EVENT_TYPES:
+            return None
+
+        return f"http://firstinspires.org/sites/default/files/uploads/frc/{self.year}-events/{self.year}_{self.event_short.upper()}_Agenda.pdf"
 
     @property
     def hashtag(self) -> str:
