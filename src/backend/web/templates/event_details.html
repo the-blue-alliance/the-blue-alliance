@@ -66,6 +66,7 @@
           <span class="glyphicon glyphicon-circle-arrow-right"></span> Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a><br />
         {% endif %}
         {{ em.showEventDates(event) }}
+        {% if event.public_agenda_url and (event.within_a_day or event.future) %}<br><span class="glyphicon glyphicon-paperclip"></span> <a href="{{event.public_agenda_url}}" target="_blank" rel="noopener noreferrer">Public Agenda</a>{% endif %}
         {% if event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
           <span itemprop="location">
