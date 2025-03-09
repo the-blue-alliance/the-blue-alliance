@@ -319,6 +319,7 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
             team_key=key,
             event_points=[],
             rookie_bonus=points.get("rookie_bonus", 0),
+            single_event_bonus=points.get("single_event_bonus", 0),
             point_total=points["point_total"],
         )
         for event, event_points in points["event_points"]:

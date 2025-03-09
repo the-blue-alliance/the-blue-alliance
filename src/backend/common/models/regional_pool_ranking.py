@@ -9,4 +9,5 @@ class RegionalPoolRanking(TypedDict):
     team_key: TeamKey
     point_total: int
     rookie_bonus: int
+    single_event_bonus: int
     event_points: List[TeamAtEventDistrictPoints]

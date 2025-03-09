@@ -101,6 +101,8 @@
                 <td>
                   {% if item.event_points[1] %}
                   {{item.event_points[1].total}} <a href="/event/{{item.event_points[1].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[1].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% elif item.get("single_event_bonus", 0) > 0 %}
+                  <span href="#" rel="tooltip" title="Awarded based on first event performance">{{item.single_event_bonus}} <i>*</i></span>
                   {% else %}
                   --
                   {% endif %}
@@ -119,6 +121,8 @@
             </tbody>
           </table>
         </div>
+
+        <p><i>* For teams who have competed at one event, Event 2 points are awarded based on Event 1 performance. See section 12.3.1 of the <a href="https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf" target="_blank">2025 Game Manual</a> for details.</i></p>
       {% endif %}
 
       </div>

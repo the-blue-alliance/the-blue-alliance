@@ -54,6 +54,7 @@ class DistrictRankingTeamTotal(TypedDict):
     tiebreakers: Sequence[int]
     qual_scores: List[int]
     rookie_bonus: int
+    single_event_bonus: int
     other_bonus: int
 
 
@@ -231,6 +232,7 @@ class DistrictHelper:
                 ),
                 qual_scores=[],
                 other_bonus=0,
+                single_event_bonus=0,
             )
         )
         for event in events:
