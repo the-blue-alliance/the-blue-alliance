@@ -82,9 +82,10 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
                 ),
             )
         ],
-        point_total=71,
+        point_total=128,
         qual_scores=[180, 161, 153],
         rookie_bonus=0,
+        single_event_bonus=57,
         other_bonus=0,
         tiebreakers=RegionalChampsPoolTiebreakers(
             best_playoff_points=30,
@@ -105,9 +106,10 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
                 ),
             )
         ],
-        point_total=98,
+        point_total=171,
         qual_scores=[117, 101, 101],
         rookie_bonus=0,
+        single_event_bonus=73,
         other_bonus=0,
         tiebreakers=RegionalChampsPoolTiebreakers(
             best_playoff_points=20,
