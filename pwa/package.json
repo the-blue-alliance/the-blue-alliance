@@ -79,7 +79,7 @@
     "@vitest/coverage-v8": "3.0.8",
     "eslint": "8.57.0",
     "eslint-config-prettier": "10.0.2",
-    "eslint-import-resolver-typescript": "3.8.3",
+    "eslint-import-resolver-typescript": "3.8.4",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-no-relative-import-paths": "1.6.1",
