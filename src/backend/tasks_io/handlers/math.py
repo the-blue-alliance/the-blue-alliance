@@ -32,8 +32,11 @@ from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
-from backend.common.models.regional_pool_advancement import RegionalPoolAdvancement, TeamRegionalPoolAdvancement
 from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.regional_pool_advancement import (
+    RegionalPoolAdvancement,
+    TeamRegionalPoolAdvancement,
+)
 from backend.common.models.regional_pool_ranking import RegionalPoolRanking
 from backend.common.models.team import Team
 from backend.common.queries.district_query import DistrictsInYearQuery
@@ -299,7 +302,9 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
     )
 
     events_future: TypedFuture[List[Event]] = RegionalEventsQuery(year).fetch_async()
-    cmp_events_future: TypedFuture[List[Event]] = ChampionshipEventsAndDivisionsInYearQuery(year=year).fetch_async()
+    cmp_events_future: TypedFuture[List[Event]] = (
+        ChampionshipEventsAndDivisionsInYearQuery(year=year).fetch_async()
+    )
     team_keys_future: TypedFuture[List[ndb.Key]] = RegionalTeamsQuery(
         year
     ).fetch_async()

@@ -2,7 +2,11 @@ from typing import Any, Generator, List, Optional
 
 from google.appengine.ext import ndb
 
-from backend.common.consts.event_type import EventType, CMP_EVENT_TYPES, SEASON_EVENT_TYPES
+from backend.common.consts.event_type import (
+    CMP_EVENT_TYPES,
+    EventType,
+    SEASON_EVENT_TYPES,
+)
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -96,7 +100,9 @@ class DistrictChampsInYearQuery(CachedDatabaseQuery[List[Event], List[EventDict]
         return list(events)
 
 
-class ChampionshipEventsAndDivisionsInYearQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
+class ChampionshipEventsAndDivisionsInYearQuery(
+    CachedDatabaseQuery[List[Event], List[EventDict]]
+):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "championship_events_and_divisions_{year}"
     DICT_CONVERTER = EventConverter
