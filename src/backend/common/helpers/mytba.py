@@ -160,6 +160,14 @@ class MyTBA:
     @property
     def attendance_stats_helper(self) -> AttendanceStatsHelper:
         event_teams = self.event_teams
+        if event_teams is None:
+            return AttendanceStatsHelper(
+                event_teams=[],
+                events=[],
+                teams=[],
+                matches={},
+            )
+
         team_futures = ndb.get_multi_async(
             {event_team.team for event_team in event_teams}
         )
