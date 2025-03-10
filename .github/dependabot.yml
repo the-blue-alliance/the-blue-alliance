@@ -30,9 +30,10 @@ updates:
   labels:
     - PWA
   groups:
-    remix-run:
+    react-router:
       patterns:
-        - "@remix-run/*"
+        - "@react-router/*"
+        - "react-router"
     embla-carousel:
       patterns:
         - "embla-carousel-autoplay"
