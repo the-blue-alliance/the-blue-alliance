@@ -128,54 +128,33 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             "event_type_enum": {EventType.REGIONAL, EventType.DISTRICT},
             "award_type_enum": {AwardType.WINNER, AwardType.CHAIRMANS},
         }
-        cache_keys = [q[0] for q in get_affected_queries.award_updated(affected_refs)]
+        cache_keys = {q[0] for q in get_affected_queries.award_updated(affected_refs)}
 
-        self.assertEqual(len(cache_keys), 20)
-        self.assertTrue(
-            award_query.EventAwardsQuery("2015casj").cache_key in cache_keys
-        )
-        self.assertTrue(
-            award_query.EventAwardsQuery("2015cama").cache_key in cache_keys
-        )
-        self.assertTrue(award_query.TeamAwardsQuery("frc254").cache_key in cache_keys)
-        self.assertTrue(award_query.TeamAwardsQuery("frc604").cache_key in cache_keys)
-        self.assertTrue(
-            award_query.TeamYearAwardsQuery("frc254", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            award_query.TeamYearAwardsQuery("frc254", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            award_query.TeamYearAwardsQuery("frc604", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            award_query.TeamYearAwardsQuery("frc604", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            award_query.TeamEventAwardsQuery("frc254", "2015casj").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            award_query.TeamEventAwardsQuery("frc254", "2015cama").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            award_query.TeamEventAwardsQuery("frc604", "2015casj").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            award_query.TeamEventAwardsQuery("frc604", "2015cama").cache_key
-            in cache_keys
-        )
+        expected_keys = {
+            award_query.EventAwardsQuery("2015casj").cache_key,
+            award_query.EventAwardsQuery("2015cama").cache_key,
+            award_query.TeamAwardsQuery("frc254").cache_key,
+            award_query.TeamAwardsQuery("frc604").cache_key,
+            award_query.TeamYearAwardsQuery("frc254", 2014).cache_key,
+            award_query.TeamYearAwardsQuery("frc254", 2015).cache_key,
+            award_query.TeamYearAwardsQuery("frc604", 2014).cache_key,
+            award_query.TeamYearAwardsQuery("frc604", 2015).cache_key,
+            award_query.TeamEventAwardsQuery("frc254", "2015casj").cache_key,
+            award_query.TeamEventAwardsQuery("frc254", "2015cama").cache_key,
+            award_query.TeamEventAwardsQuery("frc604", "2015casj").cache_key,
+            award_query.TeamEventAwardsQuery("frc604", "2015cama").cache_key,
+        }
+
         for team_key in ["frc254", "frc604"]:
             for event_type in [EventType.REGIONAL, EventType.DISTRICT]:
                 for award_type in [AwardType.WINNER, AwardType.CHAIRMANS]:
-                    self.assertTrue(
+                    expected_keys.add(
                         award_query.TeamEventTypeAwardsQuery(
                             team_key, event_type, award_type
                         ).cache_key
-                        in cache_keys
                     )
+
+        assert cache_keys == expected_keys
 
     def test_event_updated(self) -> None:
         affected_refs = {
@@ -186,42 +165,29 @@ class TestDatabaseCacheClearer(unittest.TestCase):
                 ndb.Key(District, "2014mar"),
             },
         }
-        cache_keys = [q[0] for q in get_affected_queries.event_updated(affected_refs)]
+        cache_keys = {q[0] for q in get_affected_queries.event_updated(affected_refs)}
 
-        self.assertEqual(len(cache_keys), 15)
-        self.assertTrue(event_query.EventQuery("2015casj").cache_key in cache_keys)
-        self.assertTrue(event_query.EventQuery("2015cama").cache_key in cache_keys)
-        self.assertTrue(event_query.EventListQuery(2014).cache_key in cache_keys)
-        self.assertTrue(event_query.EventListQuery(2015).cache_key in cache_keys)
-        self.assertTrue(
-            event_query.DistrictEventsQuery("2015fim").cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.DistrictEventsQuery("2014mar").cache_key in cache_keys
-        )
-        self.assertTrue(event_query.TeamEventsQuery("frc254").cache_key in cache_keys)
-        self.assertTrue(event_query.TeamEventsQuery("frc604").cache_key in cache_keys)
-        self.assertTrue(
-            event_query.TeamYearEventsQuery("frc254", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventsQuery("frc604", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventTeamsQuery("frc254", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventTeamsQuery("frc604", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.EventDivisionsQuery("2015casj").cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.EventDivisionsQuery("2015cama").cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.EventDivisionsQuery("2015cafoo").cache_key in cache_keys
-        )
+        assert cache_keys == {
+            event_query.EventQuery("2015casj").cache_key,
+            event_query.EventQuery("2015cama").cache_key,
+            event_query.EventListQuery(2014).cache_key,
+            event_query.EventListQuery(2015).cache_key,
+            event_query.DistrictEventsQuery("2015fim").cache_key,
+            event_query.DistrictEventsQuery("2014mar").cache_key,
+            event_query.TeamEventsQuery("frc254").cache_key,
+            event_query.TeamEventsQuery("frc604").cache_key,
+            event_query.TeamYearEventsQuery("frc254", 2015).cache_key,
+            event_query.TeamYearEventsQuery("frc604", 2015).cache_key,
+            event_query.TeamYearEventTeamsQuery("frc254", 2015).cache_key,
+            event_query.TeamYearEventTeamsQuery("frc604", 2015).cache_key,
+            event_query.EventDivisionsQuery("2015casj").cache_key,
+            event_query.EventDivisionsQuery("2015cama").cache_key,
+            event_query.EventDivisionsQuery("2015cafoo").cache_key,
+            event_query.RegionalEventsQuery(2014).cache_key,
+            event_query.RegionalEventsQuery(2015).cache_key,
+            event_query.ChampionshipEventsAndDivisionsInYearQuery(2014).cache_key,
+            event_query.ChampionshipEventsAndDivisionsInYearQuery(2015).cache_key,
+        }
 
     def test_event_details_updated(self) -> None:
         affected_refs = {
@@ -230,17 +196,14 @@ class TestDatabaseCacheClearer(unittest.TestCase):
                 ndb.Key(EventDetails, "2015cama"),
             },
         }
-        cache_keys = [
+        cache_keys = {
             q[0] for q in get_affected_queries.event_details_updated(affected_refs)
-        ]
+        }
 
-        self.assertEqual(len(cache_keys), 2)
-        self.assertTrue(
-            event_details_query.EventDetailsQuery("2015casj").cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_details_query.EventDetailsQuery("2015cama").cache_key in cache_keys
-        )
+        assert cache_keys == {
+            event_details_query.EventDetailsQuery("2015casj").cache_key,
+            event_details_query.EventDetailsQuery("2015cama").cache_key,
+        }
 
     def test_match_updated(self) -> None:
         affected_refs = {
@@ -249,49 +212,26 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             "team_keys": {ndb.Key(Team, "frc254"), ndb.Key(Team, "frc604")},
             "year": {2014, 2015},
         }
-        cache_keys = [q[0] for q in get_affected_queries.match_updated(affected_refs)]
+        cache_keys = {q[0] for q in get_affected_queries.match_updated(affected_refs)}
 
-        self.assertEqual(len(cache_keys), 12)
-        self.assertTrue(match_query.MatchQuery("2015casj_qm1").cache_key in cache_keys)
-        self.assertTrue(match_query.MatchQuery("2015casj_qm2").cache_key in cache_keys)
-        # self.assertTrue(match_query.MatchGdcvDataQuery('2015casj_qm1').cache_key in cache_keys)
-        # self.assertTrue(match_query.MatchGdcvDataQuery('2015casj_qm2').cache_key in cache_keys)
-        self.assertTrue(
-            match_query.EventMatchesQuery("2015casj").cache_key in cache_keys
-        )
-        self.assertTrue(
-            match_query.EventMatchesQuery("2015cama").cache_key in cache_keys
-        )
-        # self.assertTrue(match_query.EventMatchesGdcvDataQuery('2015casj').cache_key in cache_keys)
-        # self.assertTrue(match_query.EventMatchesGdcvDataQuery('2015cama').cache_key in cache_keys)
-        self.assertTrue(
-            match_query.TeamEventMatchesQuery("frc254", "2015casj").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            match_query.TeamEventMatchesQuery("frc254", "2015cama").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            match_query.TeamEventMatchesQuery("frc604", "2015casj").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            match_query.TeamEventMatchesQuery("frc604", "2015cama").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            match_query.TeamYearMatchesQuery("frc254", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            match_query.TeamYearMatchesQuery("frc254", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            match_query.TeamYearMatchesQuery("frc604", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            match_query.TeamYearMatchesQuery("frc604", 2015).cache_key in cache_keys
-        )
+        assert cache_keys == {
+            match_query.MatchQuery("2015casj_qm1").cache_key,
+            match_query.MatchQuery("2015casj_qm2").cache_key,
+            # self.assertTrue(match_query.MatchGdcvDataQuery('2015casj_qm1').cache_key in cache_keys)
+            # self.assertTrue(match_query.MatchGdcvDataQuery('2015casj_qm2').cache_key in cache_keys)
+            match_query.EventMatchesQuery("2015casj").cache_key,
+            match_query.EventMatchesQuery("2015cama").cache_key,
+            # self.assertTrue(match_query.EventMatchesGdcvDataQuery('2015casj').cache_key in cache_keys)
+            # self.assertTrue(match_query.EventMatchesGdcvDataQuery('2015cama').cache_key in cache_keys)
+            match_query.TeamEventMatchesQuery("frc254", "2015casj").cache_key,
+            match_query.TeamEventMatchesQuery("frc254", "2015cama").cache_key,
+            match_query.TeamEventMatchesQuery("frc604", "2015casj").cache_key,
+            match_query.TeamEventMatchesQuery("frc604", "2015cama").cache_key,
+            match_query.TeamYearMatchesQuery("frc254", 2014).cache_key,
+            match_query.TeamYearMatchesQuery("frc254", 2015).cache_key,
+            match_query.TeamYearMatchesQuery("frc604", 2014).cache_key,
+            match_query.TeamYearMatchesQuery("frc604", 2015).cache_key,
+        }
 
     def test_media_updated_team(self) -> None:
         affected_refs = {
@@ -299,61 +239,56 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             "year": {2014, 2015},
             "media_tag_enum": {MediaTag.CHAIRMANS_ESSAY, MediaTag.CHAIRMANS_VIDEO},
         }
-        cache_keys = [q[0] for q in get_affected_queries.media_updated(affected_refs)]
+        cache_keys = {q[0] for q in get_affected_queries.media_updated(affected_refs)}
 
-        self.assertEqual(len(cache_keys), 22)
-        self.assertTrue(
-            media_query.TeamYearMediaQuery("frc254", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.TeamYearMediaQuery("frc254", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.TeamSocialMediaQuery("frc254").cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.TeamYearMediaQuery("frc604", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.TeamYearMediaQuery("frc604", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.TeamSocialMediaQuery("frc604").cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.EventTeamsMediasQuery("2015cama").cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.EventTeamsMediasQuery("2015casj").cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.EventTeamsPreferredMediasQuery("2015cama").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            media_query.EventTeamsPreferredMediasQuery("2015casj").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            media_query.TeamTagMediasQuery("frc254", MediaTag.CHAIRMANS_ESSAY).cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            media_query.TeamTagMediasQuery("frc604", MediaTag.CHAIRMANS_VIDEO).cache_key
-            in cache_keys
-        )
-        self.assertTrue(
+        assert cache_keys == {
+            media_query.TeamYearMediaQuery("frc254", 2014).cache_key,
+            media_query.TeamYearMediaQuery("frc254", 2015).cache_key,
+            media_query.TeamSocialMediaQuery("frc254").cache_key,
+            media_query.TeamYearMediaQuery("frc604", 2014).cache_key,
+            media_query.TeamYearMediaQuery("frc604", 2015).cache_key,
+            media_query.TeamSocialMediaQuery("frc604").cache_key,
+            media_query.EventTeamsMediasQuery("2015cama").cache_key,
+            media_query.EventTeamsMediasQuery("2015casj").cache_key,
+            media_query.EventTeamsPreferredMediasQuery("2015cama").cache_key,
+            media_query.EventTeamsPreferredMediasQuery("2015casj").cache_key,
+            media_query.TeamTagMediasQuery(
+                "frc254", MediaTag.CHAIRMANS_ESSAY
+            ).cache_key,
+            media_query.TeamTagMediasQuery(
+                "frc254", MediaTag.CHAIRMANS_VIDEO
+            ).cache_key,
+            media_query.TeamTagMediasQuery(
+                "frc604", MediaTag.CHAIRMANS_VIDEO
+            ).cache_key,
+            media_query.TeamTagMediasQuery(
+                "frc604", MediaTag.CHAIRMANS_ESSAY
+            ).cache_key,
             media_query.TeamYearTagMediasQuery(
                 "frc254", 2014, MediaTag.CHAIRMANS_ESSAY
-            ).cache_key
-            in cache_keys
-        )
-        self.assertTrue(
+            ).cache_key,
+            media_query.TeamYearTagMediasQuery(
+                "frc254", 2014, MediaTag.CHAIRMANS_VIDEO
+            ).cache_key,
+            media_query.TeamYearTagMediasQuery(
+                "frc254", 2015, MediaTag.CHAIRMANS_ESSAY
+            ).cache_key,
+            media_query.TeamYearTagMediasQuery(
+                "frc254", 2015, MediaTag.CHAIRMANS_VIDEO
+            ).cache_key,
+            media_query.TeamYearTagMediasQuery(
+                "frc604", 2014, MediaTag.CHAIRMANS_VIDEO
+            ).cache_key,
+            media_query.TeamYearTagMediasQuery(
+                "frc604", 2014, MediaTag.CHAIRMANS_ESSAY
+            ).cache_key,
             media_query.TeamYearTagMediasQuery(
                 "frc604", 2015, MediaTag.CHAIRMANS_VIDEO
-            ).cache_key
-            in cache_keys
-        )
+            ).cache_key,
+            media_query.TeamYearTagMediasQuery(
+                "frc604", 2015, MediaTag.CHAIRMANS_ESSAY
+            ).cache_key,
+        }
 
     def test_media_updated_event(self) -> None:
         affected_refs = {
@@ -361,56 +296,47 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             "year": {2016},
             "media_tag_enum": {None, None},
         }
-        cache_keys = [q[0] for q in get_affected_queries.media_updated(affected_refs)]
+        cache_keys = {q[0] for q in get_affected_queries.media_updated(affected_refs)}
 
-        self.assertEqual(len(cache_keys), 1)
-        self.assertTrue(
-            media_query.EventMediasQuery("2016necmp").cache_key in cache_keys
-        )
+        assert cache_keys == {
+            media_query.EventMediasQuery("2016necmp").cache_key,
+        }
 
     def test_robot_updated(self) -> None:
         affected_refs = {
             "team": {ndb.Key(Team, "frc254"), ndb.Key(Team, "frc604")},
         }
-        cache_keys = [q[0] for q in get_affected_queries.robot_updated(affected_refs)]
+        cache_keys = {q[0] for q in get_affected_queries.robot_updated(affected_refs)}
 
-        self.assertEqual(len(cache_keys), 2)
-        self.assertTrue(robot_query.TeamRobotsQuery("frc254").cache_key in cache_keys)
-        self.assertTrue(robot_query.TeamRobotsQuery("frc604").cache_key in cache_keys)
+        assert cache_keys == {
+            robot_query.TeamRobotsQuery("frc254").cache_key,
+            robot_query.TeamRobotsQuery("frc604").cache_key,
+        }
 
     def test_team_updated(self) -> None:
         affected_refs = {
             "key": {ndb.Key(Team, "frc254"), ndb.Key(Team, "frc604")},
         }
-        cache_keys = [q[0] for q in get_affected_queries.team_updated(affected_refs)]
+        cache_keys = {q[0] for q in get_affected_queries.team_updated(affected_refs)}
 
-        self.assertEqual(len(cache_keys), 16)
-        self.assertTrue(team_query.TeamQuery("frc254").cache_key in cache_keys)
-        self.assertTrue(team_query.TeamQuery("frc604").cache_key in cache_keys)
-        self.assertTrue(team_query.TeamListQuery(0).cache_key in cache_keys)
-        self.assertTrue(team_query.TeamListQuery(1).cache_key in cache_keys)
-        self.assertTrue(team_query.TeamListYearQuery(2015, 0).cache_key in cache_keys)
-        self.assertTrue(team_query.TeamListYearQuery(2015, 1).cache_key in cache_keys)
-        self.assertTrue(team_query.TeamListYearQuery(2010, 1).cache_key in cache_keys)
-        self.assertTrue(
-            team_query.DistrictTeamsQuery("2015fim").cache_key in cache_keys
-        )
-        self.assertTrue(
-            team_query.DistrictTeamsQuery("2015mar").cache_key in cache_keys
-        )
-        self.assertTrue(team_query.DistrictTeamsQuery("2016ne").cache_key in cache_keys)
-        self.assertTrue(team_query.EventTeamsQuery("2015casj").cache_key in cache_keys)
-        self.assertTrue(team_query.EventTeamsQuery("2015cama").cache_key in cache_keys)
-        self.assertTrue(team_query.EventTeamsQuery("2010cama").cache_key in cache_keys)
-        self.assertTrue(
-            team_query.EventEventTeamsQuery("2015casj").cache_key in cache_keys
-        )
-        self.assertTrue(
-            team_query.EventEventTeamsQuery("2015cama").cache_key in cache_keys
-        )
-        self.assertTrue(
-            team_query.EventEventTeamsQuery("2010cama").cache_key in cache_keys
-        )
+        assert cache_keys == {
+            team_query.TeamQuery("frc254").cache_key,
+            team_query.TeamQuery("frc604").cache_key,
+            team_query.TeamListQuery(0).cache_key,
+            team_query.TeamListQuery(1).cache_key,
+            team_query.TeamListYearQuery(2015, 0).cache_key,
+            team_query.TeamListYearQuery(2015, 1).cache_key,
+            team_query.TeamListYearQuery(2010, 1).cache_key,
+            team_query.DistrictTeamsQuery("2015fim").cache_key,
+            team_query.DistrictTeamsQuery("2015mar").cache_key,
+            team_query.DistrictTeamsQuery("2016ne").cache_key,
+            team_query.EventTeamsQuery("2015casj").cache_key,
+            team_query.EventTeamsQuery("2015cama").cache_key,
+            team_query.EventTeamsQuery("2010cama").cache_key,
+            team_query.EventEventTeamsQuery("2015casj").cache_key,
+            team_query.EventEventTeamsQuery("2015cama").cache_key,
+            team_query.EventEventTeamsQuery("2010cama").cache_key,
+        }
 
     def test_eventteam_updated(self) -> None:
         affected_refs = {
@@ -418,69 +344,36 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             "team": {ndb.Key(Team, "frc254"), ndb.Key(Team, "frc604")},
             "year": {2014, 2015},
         }
-        cache_keys = [
+        cache_keys = {
             q[0] for q in get_affected_queries.eventteam_updated(affected_refs)
-        ]
+        }
 
-        self.assertEqual(len(cache_keys), 24)
-        self.assertTrue(event_query.TeamEventsQuery("frc254").cache_key in cache_keys)
-        self.assertTrue(event_query.TeamEventsQuery("frc604").cache_key in cache_keys)
-        self.assertTrue(
-            team_query.TeamParticipationQuery("frc254").cache_key in cache_keys
-        )
-        self.assertTrue(
-            team_query.TeamParticipationQuery("frc604").cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventsQuery("frc254", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventsQuery("frc254", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventsQuery("frc604", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventsQuery("frc604", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventTeamsQuery("frc254", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventTeamsQuery("frc254", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventTeamsQuery("frc604", 2014).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventTeamsQuery("frc604", 2015).cache_key in cache_keys
-        )
-        self.assertTrue(team_query.TeamListYearQuery(2014, 0).cache_key in cache_keys)
-        self.assertTrue(team_query.TeamListYearQuery(2014, 1).cache_key in cache_keys)
-        self.assertTrue(team_query.TeamListYearQuery(2015, 0).cache_key in cache_keys)
-        self.assertTrue(team_query.TeamListYearQuery(2015, 1).cache_key in cache_keys)
-        self.assertTrue(team_query.EventTeamsQuery("2015casj").cache_key in cache_keys)
-        self.assertTrue(team_query.EventTeamsQuery("2015cama").cache_key in cache_keys)
-        self.assertTrue(
-            team_query.EventEventTeamsQuery("2015casj").cache_key in cache_keys
-        )
-        self.assertTrue(
-            team_query.EventEventTeamsQuery("2015cama").cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.EventTeamsMediasQuery("2015cama").cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.EventTeamsMediasQuery("2015casj").cache_key in cache_keys
-        )
-        self.assertTrue(
-            media_query.EventTeamsPreferredMediasQuery("2015cama").cache_key
-            in cache_keys
-        )
-        self.assertTrue(
-            media_query.EventTeamsPreferredMediasQuery("2015casj").cache_key
-            in cache_keys
-        )
+        assert cache_keys == {
+            event_query.TeamEventsQuery("frc254").cache_key,
+            event_query.TeamEventsQuery("frc604").cache_key,
+            team_query.TeamParticipationQuery("frc254").cache_key,
+            team_query.TeamParticipationQuery("frc604").cache_key,
+            event_query.TeamYearEventsQuery("frc254", 2014).cache_key,
+            event_query.TeamYearEventsQuery("frc254", 2015).cache_key,
+            event_query.TeamYearEventsQuery("frc604", 2014).cache_key,
+            event_query.TeamYearEventsQuery("frc604", 2015).cache_key,
+            event_query.TeamYearEventTeamsQuery("frc254", 2014).cache_key,
+            event_query.TeamYearEventTeamsQuery("frc254", 2015).cache_key,
+            event_query.TeamYearEventTeamsQuery("frc604", 2014).cache_key,
+            event_query.TeamYearEventTeamsQuery("frc604", 2015).cache_key,
+            team_query.TeamListYearQuery(2014, 0).cache_key,
+            team_query.TeamListYearQuery(2014, 1).cache_key,
+            team_query.TeamListYearQuery(2015, 0).cache_key,
+            team_query.TeamListYearQuery(2015, 1).cache_key,
+            team_query.EventTeamsQuery("2015casj").cache_key,
+            team_query.EventTeamsQuery("2015cama").cache_key,
+            team_query.EventEventTeamsQuery("2015casj").cache_key,
+            team_query.EventEventTeamsQuery("2015cama").cache_key,
+            media_query.EventTeamsMediasQuery("2015cama").cache_key,
+            media_query.EventTeamsMediasQuery("2015casj").cache_key,
+            media_query.EventTeamsPreferredMediasQuery("2015cama").cache_key,
+            media_query.EventTeamsPreferredMediasQuery("2015casj").cache_key,
+        }
 
     def test_districtteam_updated(self) -> None:
         affected_refs = {
@@ -490,23 +383,16 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             },
             "team": {ndb.Key(Team, "frc254"), ndb.Key(Team, "frc604")},
         }
-        cache_keys = [
+        cache_keys = {
             q[0] for q in get_affected_queries.districtteam_updated(affected_refs)
-        ]
+        }
 
-        self.assertEqual(len(cache_keys), 4)
-        self.assertTrue(
-            team_query.DistrictTeamsQuery("2015fim").cache_key in cache_keys
-        )
-        self.assertTrue(
-            team_query.DistrictTeamsQuery("2015mar").cache_key in cache_keys
-        )
-        self.assertTrue(
-            district_query.TeamDistrictsQuery("frc254").cache_key in cache_keys
-        )
-        self.assertTrue(
-            district_query.TeamDistrictsQuery("frc604").cache_key in cache_keys
-        )
+        assert cache_keys == {
+            team_query.DistrictTeamsQuery("2015fim").cache_key,
+            team_query.DistrictTeamsQuery("2015mar").cache_key,
+            district_query.TeamDistrictsQuery("frc254").cache_key,
+            district_query.TeamDistrictsQuery("frc604").cache_key,
+        }
 
     def test_district_updated(self) -> None:
         affected_refs = {
@@ -514,67 +400,40 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             "year": {2015, 2016},
             "abbreviation": {"ne", "chs"},
         }
-        cache_keys = [
+        cache_keys = {
             q[0] for q in get_affected_queries.district_updated(affected_refs)
-        ]
+        }
 
-        self.assertEqual(len(cache_keys), 13)
-        self.assertTrue(
-            district_query.DistrictsInYearQuery(2015).cache_key in cache_keys
-        )
-        self.assertTrue(
-            district_query.DistrictsInYearQuery(2016).cache_key in cache_keys
-        )
-        self.assertTrue(
-            district_query.DistrictHistoryQuery("ne").cache_key in cache_keys
-        )
-        self.assertTrue(
-            district_query.DistrictHistoryQuery("chs").cache_key in cache_keys
-        )
-        self.assertTrue(district_query.DistrictQuery("2016ne").cache_key in cache_keys)
-        self.assertTrue(
-            district_query.TeamDistrictsQuery("frc604").cache_key in cache_keys
-        )
-
-        # Necessary because APIv3 Event models include the District model
-        self.assertTrue(event_query.EventQuery("2016necmp").cache_key in cache_keys)
-        self.assertTrue(event_query.EventListQuery(2016).cache_key in cache_keys)
-        self.assertTrue(
-            event_query.DistrictEventsQuery("2016ne").cache_key in cache_keys
-        )
-        self.assertTrue(event_query.TeamEventsQuery("frc125").cache_key in cache_keys)
-        self.assertTrue(
-            event_query.TeamYearEventsQuery("frc125", 2016).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.TeamYearEventTeamsQuery("frc125", 2016).cache_key in cache_keys
-        )
-        self.assertTrue(
-            event_query.EventDivisionsQuery("2016necmp").cache_key in cache_keys
-        )
+        assert cache_keys == {
+            district_query.DistrictsInYearQuery(2015).cache_key,
+            district_query.DistrictsInYearQuery(2016).cache_key,
+            district_query.DistrictHistoryQuery("ne").cache_key,
+            district_query.DistrictHistoryQuery("chs").cache_key,
+            district_query.DistrictQuery("2016ne").cache_key,
+            district_query.TeamDistrictsQuery("frc604").cache_key,
+            # Necessary because APIv3 Event models include the District model
+            event_query.EventQuery("2016necmp").cache_key,
+            event_query.EventListQuery(2016).cache_key,
+            event_query.DistrictEventsQuery("2016ne").cache_key,
+            event_query.TeamEventsQuery("frc125").cache_key,
+            event_query.TeamYearEventsQuery("frc125", 2016).cache_key,
+            event_query.TeamYearEventTeamsQuery("frc125", 2016).cache_key,
+            event_query.EventDivisionsQuery("2016necmp").cache_key,
+            event_query.RegionalEventsQuery(2016).cache_key,
+            event_query.ChampionshipEventsAndDivisionsInYearQuery(2016).cache_key,
+        }
 
     def test_insight_updated(self) -> None:
         affected_refs = {
             "year": {0, 2023, 2024},
         }
-        cache_keys = [q[0] for q in get_affected_queries.insight_updated(affected_refs)]
+        cache_keys = {q[0] for q in get_affected_queries.insight_updated(affected_refs)}
 
-        self.assertEqual(len(cache_keys), 6)
-        self.assertTrue(
-            insight_query.InsightsLeaderboardsYearQuery(0).cache_key in cache_keys
-        )
-        self.assertTrue(
-            insight_query.InsightsLeaderboardsYearQuery(2023).cache_key in cache_keys
-        )
-        self.assertTrue(
-            insight_query.InsightsLeaderboardsYearQuery(2024).cache_key in cache_keys
-        )
-        self.assertTrue(
-            insight_query.InsightsNotablesYearQuery(0).cache_key in cache_keys
-        )
-        self.assertTrue(
-            insight_query.InsightsNotablesYearQuery(2023).cache_key in cache_keys
-        )
-        self.assertTrue(
-            insight_query.InsightsNotablesYearQuery(2024).cache_key in cache_keys
-        )
+        assert cache_keys == {
+            insight_query.InsightsLeaderboardsYearQuery(0).cache_key,
+            insight_query.InsightsLeaderboardsYearQuery(2023).cache_key,
+            insight_query.InsightsLeaderboardsYearQuery(2024).cache_key,
+            insight_query.InsightsNotablesYearQuery(0).cache_key,
+            insight_query.InsightsNotablesYearQuery(2023).cache_key,
+            insight_query.InsightsNotablesYearQuery(2024).cache_key,
+        }
