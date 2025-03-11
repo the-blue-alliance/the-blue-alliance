@@ -195,9 +195,6 @@ def event_delete(event_key: EventKey) -> Response:
 
         return redirect(url_for("admin.event_list"))
     else:
-        if not Event.validate_key_name(event_key):
-            abort(404)
-
         event = Event.get_by_id(event_key)
         if not event:
             abort(404)
