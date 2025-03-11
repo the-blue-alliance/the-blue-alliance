@@ -18,7 +18,6 @@ import MdiVideo from '~icons/mdi/video';
 
 import {
   Award,
-  Event,
   EventCopRs,
   Match,
   Media,
@@ -36,9 +35,11 @@ import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import { DataTable } from '~/components/tba/dataTable';
 import InlineIcon from '~/components/tba/inlineIcon';
-import { TeamLink } from '~/components/tba/links';
+import { LocationLink, TeamLink } from '~/components/tba/links';
 import MatchResultsTable from '~/components/tba/matchResultsTable';
 import RankingsTable from '~/components/tba/rankingsTable';
+import TeamAvatar from '~/components/tba/teamAvatar';
+import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import {
   Card,
@@ -48,17 +49,13 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import {
-  Credenza,
-  CredenzaBody,
-  CredenzaClose,
-  CredenzaContent,
-  CredenzaDescription,
-  CredenzaFooter,
-  CredenzaHeader,
-  CredenzaTitle,
-  CredenzaTrigger,
-} from '~/components/ui/credenza';
-import { ScrollArea } from '~/components/ui/scroll-area';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '~/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -66,7 +63,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
@@ -85,7 +89,12 @@ import {
   getBonusRankingPoints,
 } from '~/lib/rankingPoints';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
-import { camelCaseToHumanReadable } from '~/lib/utils';
+import {
+  STATE_TO_ABBREVIATION,
+  camelCaseToHumanReadable,
+  cn,
+  splitIntoNChunks,
+} from '~/lib/utils';
 
 import { Route } from '.react-router/types/app/routes/+types/event.$eventKey';
 
@@ -361,12 +370,7 @@ export default function EventPage() {
         </TabsContent>
 
         <TabsContent value="teams">
-          <TeamsTab
-            teams={teams}
-            matches={sortedMatches}
-            event={event}
-            media={teamMedia}
-          />
+          <TeamsTab teams={teams} media={teamMedia} />
         </TabsContent>
 
         <TabsContent value="insights">
@@ -427,84 +431,96 @@ function AwardsTab({ awards }: { awards: Award[] }) {
   );
 }
 
-function TeamsTab({
-  teams,
-  matches,
-  event,
-  media,
-}: {
-  teams: Team[];
-  matches: Match[];
-  event: Event;
-  media: Media[];
-}) {
+function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
   teams.sort(sortTeamsComparator);
 
-  // todo
-  // 1. add hover effects
-  // 2. split out CredenzaTrigger, so the same UI (Body) can be triggered by different UI elements
-  return (
-    <div className="md:columns-2">
-      {teams.map((t) => (
-        <Credenza key={t.key}>
-          <CredenzaTrigger asChild>
-            <Card className="content-visibility-auto my-0 mb-1 flex h-[150px] cursor-pointer items-center gap-4 rounded-lg bg-background p-4">
-              <div className="grid flex-1 gap-1">
-                <div className="font-medium">
-                  {t.team_number} - {t.nickname}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {t.city}, {t.state_prov}, {t.country}
-                </div>
-              </div>
-              {(() => {
-                const maybeImage = getTeamPreferredRobotPicMedium(
-                  media.filter((m) => m.team_keys.includes(t.key)),
-                );
+  const teamChunks = splitIntoNChunks(teams, 2);
 
-                return maybeImage === undefined ? null : (
-                  <img
-                    src={maybeImage}
-                    alt={`${t.team_number}'s robot`}
-                    className="h-full w-1/3 rounded-lg border-2 border-neutral-300 object-cover"
-                    loading="lazy"
-                  />
-                );
-              })()}
-            </Card>
-          </CredenzaTrigger>
-          <CredenzaContent className="md:max-w-[80%] 2xl:max-w-[50%]">
-            <CredenzaHeader>
-              <CredenzaTitle>
-                <TeamLink teamOrKey={t.key}>
-                  {t.team_number} - {t.nickname}
-                </TeamLink>{' '}
-                at {event.short_name}
-              </CredenzaTitle>
-              <CredenzaDescription>
-                From {t.city}, {t.state_prov}, {t.country}
-              </CredenzaDescription>
-            </CredenzaHeader>
-            <CredenzaBody>
-              <ScrollArea className="h-[70vh]">
-                <MatchResultsTable
-                  team={t}
-                  matches={matches.filter(
-                    (m) =>
-                      m.alliances.blue.team_keys.includes(t.key) ||
-                      m.alliances.red.team_keys.includes(t.key),
+  return (
+    <div className="flex flex-row flex-wrap md:flex-nowrap">
+      {teamChunks.map((chunk, idx) => (
+        <Table key={`chunk-${idx}`}>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[60px] text-center">Avatar</TableHead>
+              <TableHead className="w-[30ch]">Team</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Pic</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {chunk.map((t) => {
+              const teamMedia = media.filter((m) =>
+                m.team_keys.includes(t.key),
+              );
+
+              const maybeAvatar = teamMedia.find((m) => m.type === 'avatar');
+              const maybeRobotPic = getTeamPreferredRobotPicMedium(teamMedia);
+
+              const abbreviatedStateProv =
+                STATE_TO_ABBREVIATION.get(t.state_prov ?? '') ?? t.state_prov;
+
+              const teamLocation = `${t.city}, ${abbreviatedStateProv}, ${t.country}`;
+
+              return (
+                <TableRow key={t.key}>
+                  <TableCell
+                    className={cn({
+                      'h-[61px]': maybeAvatar === undefined,
+                    })}
+                  >
+                    {maybeAvatar && (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <TeamAvatar media={maybeAvatar} />
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="flex flex-col mt-1">
+                    <TeamLink teamOrKey={t.key}>{t.team_number}</TeamLink>
+                    <div>{t.nickname}</div>
+                  </TableCell>
+                  <TableCell className={'text-xs'}>
+                    <LocationLink
+                      city={t.city ?? ''}
+                      state_prov={t.state_prov ?? ''}
+                      country={t.country ?? ''}
+                    >
+                      {teamLocation}
+                    </LocationLink>
+                  </TableCell>
+                  {maybeRobotPic && (
+                    <TableCell>
+                      <Dialog>
+                        <DialogTrigger className="align-middle">
+                          <Avatar className="cursor-pointer size-12">
+                            <AvatarImage src={maybeRobotPic} />
+                          </Avatar>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>
+                              <TeamLink teamOrKey={t.key}>
+                                Team {t.team_number} - {t.nickname}
+                              </TeamLink>
+                            </DialogTitle>
+                            <DialogDescription>
+                              <img
+                                src={maybeRobotPic}
+                                alt=""
+                                className="max-h-[80vh] w-3xl rounded-lg object-cover"
+                                loading="lazy"
+                              />
+                            </DialogDescription>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
+                    </TableCell>
                   )}
-                  event={event}
-                />
-              </ScrollArea>
-            </CredenzaBody>
-            <CredenzaFooter>
-              <CredenzaClose asChild>
-                <button>Close</button>
-              </CredenzaClose>
-            </CredenzaFooter>
-          </CredenzaContent>
-        </Credenza>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
       ))}
     </div>
   );
