@@ -59,6 +59,22 @@
                 {% endfor %}
             </table>
         </div>
+        <div class="tab-pane" id="advancement">
+            <table class="table table-stripled table-hover">
+                <tr>
+                    <th>Team</th>
+                    <th>Qualified for CMP</th>
+                </tr>
+                {% for team_key, advancement in (pool_model.advancement or {}).items() %}
+                    <tr>
+                        <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
+                        <td>{% if advancement.cmp %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                    </tr>
+                {% else %}
+                    <tr><td>No advancement found</td></tr>
+                {% endfor %}
+            </table>
+        </div>
     </div>
 {% endif %}
 

@@ -84,6 +84,24 @@
             {% endfor %}
         </table>
     </div>
+    <div class="tab-pane" id="advancement">
+        <table class="table table-striped table-hover">
+            <th>
+                <td>Team</td>
+                <td>Qualified for DCMP</td>
+                <td>Qualified for CMP</td>
+            </th>
+            {% for team_key, advancement in (district.advancement or {}).items() %}
+                <tr>
+                    <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
+                    <td>{% if advancement.dcmp %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                    <td>{% if advancement.cmp %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                </tr>
+            {% else %}
+                <tr><td>No advancement found</td></tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
 {% endblock %}
