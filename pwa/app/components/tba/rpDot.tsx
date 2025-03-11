@@ -23,7 +23,7 @@ function RpDot({
       <Tooltip>
         <TooltipTrigger asChild>
           <svg
-            className={cn('h-[4px] absolute top-[2px] left-[3px] w-[4px]', {
+            className={cn('absolute top-[2px] left-[3px] h-[4px] w-[4px]', {
               'ml-0': rpIndex === 0,
               'ml-[6px]': rpIndex === 1,
               'ml-[12px]': rpIndex === 2,

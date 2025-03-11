@@ -218,7 +218,7 @@ export default function CoprScatterChart({
       </CardContent>
       <div className="flex flex-row justify-around pb-4">
         <div className="flex flex-row items-center">
-          <div className="font-bold pr-4">Y Axis</div>
+          <div className="pr-4 font-bold">Y Axis</div>
           <Select value={selectedYCopr} onValueChange={setSelectedYCopr}>
             <SelectTrigger className="w-auto">
               <SelectValue />
@@ -237,7 +237,7 @@ export default function CoprScatterChart({
         </div>
 
         <div className="flex flex-row items-center">
-          <div className="font-bold pr-4">X Axis</div>
+          <div className="pr-4 font-bold">X Axis</div>
           <Select value={selectedXCopr} onValueChange={setSelectedXCopr}>
             <SelectTrigger className="w-auto">
               <SelectValue />
@@ -273,7 +273,7 @@ const CustomTooltip = ({
     return (
       <div className="flex flex-col rounded-md bg-white shadow-xl">
         <div className="flex flex-col p-4">
-          <div className="text-xl pb-2">{teamKey}</div>
+          <div className="pb-2 text-xl">{teamKey}</div>
           <div className="">
             <div className="flex justify-between gap-4">
               <div>{yCopr}</div>

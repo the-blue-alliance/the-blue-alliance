@@ -300,10 +300,7 @@ export default function EventPage() {
         defaultValue={matches.length > 0 ? 'results' : 'teams'}
         className="mt-4"
       >
-        <TabsList
-          className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2
-            lg:*:basis-1"
-        >
+        <TabsList className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2 lg:*:basis-1">
           {(matches.length > 0 || (alliances && alliances.length > 0)) && (
             <TabsTrigger value="results">
               <InlineIcon>
@@ -493,7 +490,7 @@ function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="flex flex-col mt-1">
+                  <TableCell className="mt-1 flex flex-col">
                     <TeamLink teamOrKey={t.key}>{t.team_number}</TeamLink>
                     <div>{t.nickname}</div>
                   </TableCell>
@@ -510,7 +507,7 @@ function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
                     <TableCell>
                       <Dialog>
                         <DialogTrigger className="align-middle">
-                          <Avatar className="cursor-pointer size-12">
+                          <Avatar className="size-12 cursor-pointer">
                             <AvatarImage src={maybeRobotPic} />
                           </Avatar>
                         </DialogTrigger>

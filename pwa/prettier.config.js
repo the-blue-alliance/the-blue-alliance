@@ -4,13 +4,15 @@ export default {
   trailingComma: 'all',
   tabWidth: 2,
   plugins: [
+    '@trivago/prettier-plugin-sort-imports',
     'prettier-plugin-tailwindcss',
     'prettier-plugin-classnames',
-    '@trivago/prettier-plugin-sort-imports',
+    'prettier-plugin-merge',
   ],
   tailwindFunctions: ['clsx', 'cn'],
   customFunctions: ['clsx', 'cn'],
   importOrder: ['^@/(.*)$', '^~icons/(.*)$', '^~/(.*)$', '^[./]'],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
+  tailwindStylesheet: './app/tailwind.css',
 };

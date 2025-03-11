@@ -207,22 +207,22 @@ function MatchResultsTableGroup({
   const gridStyle = cn(
     // always use these classes:
     'grid items-center justify-items-center',
-    '*:justify-self-stretch *:justify-center',
-    '*:text-center *:p-[5px] *:h-full *:content-center',
+    '*:justify-center *:justify-self-stretch',
+    '*:h-full *:content-center *:p-[5px] *:text-center',
     // use these classes on mobile:
     'grid-rows-2',
     'grid-cols-[calc(1.25em+10px)_8em_1fr_1fr_1fr_1fr]', // 6 columns of these sizes
-    'border-[#000] border-b-[1px]',
-    '*:border-[#ddd] *:border-[1px]',
+    'border-b-[1px] border-[#000]',
+    '*:border-[1px] *:border-[#ddd]',
     // use these on desktop:
     'lg:grid-rows-1',
     'lg:grid-cols-[calc(1.25em+6px*2)_10em_repeat(6,minmax(0,1fr))_0.9fr_0.9fr]',
-    'lg:border-[#ddd] lg:border-b-[1px]',
+    'lg:border-b-[1px] lg:border-[#ddd]',
     'lg:*:border-0 lg:*:border-r-[1px]', // reset the border, then apply one to the right
   );
 
   return (
-    <div className="min-w-[25rem] border-l border-t border-[#ddd] md:min-w-[35rem]">
+    <div className="min-w-[25rem] border-t border-l border-[#ddd] md:min-w-[35rem]">
       <div className={cn(gridStyle, 'bg-[#f0f0f0] font-semibold')}>
         <div className="row-span-2 lg:row-span-1">
           <PlayCircle className="inline" />
@@ -335,7 +335,8 @@ function MatchResultsTableGroup({
             {/* unplayed match */}
             {m.alliances.red.score == -1 && m.alliances.blue.score == -1 && (
               <GridCell
-                className="relative col-start-6 row-span-2 row-start-1 lg:col-span-2 lg:col-start-9 lg:row-span-1"
+                className="relative col-start-6 row-span-2 row-start-1 lg:col-span-2 lg:col-start-9
+                  lg:row-span-1"
                 teamOrScore={'score'}
               >
                 {m.predicted_time && (
