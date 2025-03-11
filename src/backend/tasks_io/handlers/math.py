@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import List, Optional, Set
+from typing import List, Optional
 
 from flask import abort, Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
@@ -31,17 +31,12 @@ from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
-from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
+from backend.common.models.keys import DistrictKey, EventKey, Year
 from backend.common.models.regional_champs_pool import RegionalChampsPool
-from backend.common.models.regional_pool_advancement import (
-    RegionalPoolAdvancement,
-    TeamRegionalPoolAdvancement,
-)
 from backend.common.models.regional_pool_ranking import RegionalPoolRanking
 from backend.common.models.team import Team
 from backend.common.queries.district_query import DistrictsInYearQuery
 from backend.common.queries.event_query import (
-    ChampionshipEventsAndDivisionsInYearQuery,
     DistrictEventsQuery,
     EventListQuery,
     RegionalEventsQuery,
@@ -302,9 +297,6 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
     )
 
     events_future: TypedFuture[List[Event]] = RegionalEventsQuery(year).fetch_async()
-    cmp_events_future: TypedFuture[List[Event]] = (
-        ChampionshipEventsAndDivisionsInYearQuery(year=year).fetch_async()
-    )
     team_keys_future: TypedFuture[List[ndb.Key]] = RegionalTeamsQuery(
         year
     ).fetch_async()
@@ -312,9 +304,6 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
     events = events_future.get_result()
     for event in events:
         event.prep_details()
-    cmp_events = cmp_events_future.get_result()
-    for event in cmp_events:
-        event.prepTeams()
     teams_future = ndb.get_multi_async(team_keys_future.get_result())
 
     events = EventHelper.sorted_events(events)
@@ -322,13 +311,7 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
         events, [t.get_result() for t in teams_future], year
     )
 
-    cmp_registered_teams: Set[TeamKey] = set()
-    for event in cmp_events:
-        for team in event.teams:
-            cmp_registered_teams.add(team.key_name)
-
     rankings: List[RegionalPoolRanking] = []
-    advancement: RegionalPoolAdvancement = {}
     current_rank = 1
     for key, points in team_totals.items():
         point_detail = RegionalPoolRanking(
@@ -347,12 +330,8 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
             rankings.append(point_detail)
         current_rank += 1
 
-        if key in cmp_registered_teams:
-            advancement[key] = TeamRegionalPoolAdvancement(cmp=True)
-
     if rankings:
         regional_pool.rankings = rankings
-        regional_pool.advancement = advancement
         RegionalChampsPoolManipulator.createOrUpdate(regional_pool)
 
     if (
