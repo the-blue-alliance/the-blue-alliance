@@ -102,7 +102,7 @@ export default function Searchbar() {
 
       <CommandList
         className={cn(
-          'fixed top-14 z-50  w-64 border border-gray-200 bg-white shadow-lg',
+          'fixed top-14 z-50 w-64 border border-gray-200 bg-white shadow-lg',
           {
             hidden: !isOpen,
           },

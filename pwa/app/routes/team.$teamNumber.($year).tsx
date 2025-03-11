@@ -306,7 +306,7 @@ export default function TeamPage(): React.JSX.Element {
         )}
 
         <div>
-          <Separator className="mb-8 mt-4" />
+          <Separator className="mt-4 mb-8" />
 
           {events.map((e) => (
             <InView
@@ -437,10 +437,9 @@ function StatsSection({
           <div
             // The padding/margins make the separator not actually perfectly centered
             // left-47.5 looks significantly better than left-1/2
-            className={`relative flex flex-wrap before:absolute before:inset-y-0
-          before:left-[47.5%]
-          before:hidden before:w-px before:bg-gray-200 sm:mt-0 lg:before:block
-          *:w-full lg:*:w-1/2`}
+            className={`relative flex flex-wrap *:w-full before:absolute before:inset-y-0
+            before:left-[47.5%] before:hidden before:w-px before:bg-gray-200 sm:mt-0
+            lg:*:w-1/2 lg:before:block`}
           >
             <div className="grid grid-cols-2 items-center gap-y-4">
               <Stat

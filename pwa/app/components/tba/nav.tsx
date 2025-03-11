@@ -66,24 +66,25 @@ export const DropMenuItem = ({
   return (
     <NavigationMenuItem
       className={cn(
-        `relative flex cursor-default select-none bg-primary items-center rounded-sm
-          text-md outline-hidden transition-colors focus:bg-background
-          focus:text-accent-foreground data-disabled:pointer-events-none
-          data-disabled:opacity-50`,
+        `text-md relative flex cursor-default items-center rounded-sm bg-primary
+        outline-hidden transition-colors select-none focus:bg-background
+        focus:text-accent-foreground data-disabled:pointer-events-none
+        data-disabled:opacity-50`,
         className,
       )}
     >
       <NavigationMenuLink
         className={
           navigationMenuTriggerStyle() +
-          ' cursor-pointer w-full grow hover:no-underline'
+          ' w-full grow cursor-pointer hover:no-underline'
         }
         asChild
       >
         {route ? (
           <Link
             to={route}
-            className="flex grow flex-row flex-wrap content-between items-center justify-start px-2 text-white hover:no-underline"
+            className="flex grow flex-row flex-wrap content-between items-center justify-start px-2
+              text-white hover:no-underline"
           >
             {icon}
             <div className="pl-2 antialiased">{title}</div>
@@ -110,7 +111,7 @@ export const Nav = () => {
             className="size-6 max-w-none"
             alt="The Blue Alliance Logo"
           />
-          <div className="hidden whitespace-nowrap text-xl font-medium tracking-tight	 text-white lg:block">
+          <div className="hidden text-xl font-medium tracking-tight whitespace-nowrap text-white lg:block">
             The Blue Alliance
           </div>
         </Link>
@@ -142,8 +143,8 @@ export const Nav = () => {
               alignOffset={-2}
               align="start"
               className={cn(
-                `mt-6 bg-primary px-1 py-1 w-30 m-0 border-none drop-shadow-lg shadow-l
-                  rounded-md `,
+                `shadow-l m-0 mt-6 w-30 rounded-md border-none bg-primary px-1 py-1
+                drop-shadow-lg`,
               )}
             >
               <DropMenuItem

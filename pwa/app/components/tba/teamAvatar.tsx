@@ -29,7 +29,7 @@ export default function TeamAvatar({
       <img
         alt="Team Avatar"
         src={`data:image/png;base64, ${media.details.base64Image}`}
-        className={cn('size-12 rounded inline p-1', colorClass)}
+        className={cn('inline size-12 rounded p-1', colorClass)}
       />
     </button>
   );
