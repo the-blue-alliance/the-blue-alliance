@@ -5,6 +5,7 @@ from typing import Any, Callable, DefaultDict, Dict, List, Optional, Tuple
 
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.insight import (
     Insight,
@@ -23,6 +24,8 @@ CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float] | Dict[Any, in
 @dataclass
 class LeaderboardInsightArguments:
     matches: List[Match]
+    events: List[Event]
+    awards: List[Award]
     year: int
 
 
@@ -40,16 +43,31 @@ def make_leaderboard_args() -> List[LeaderboardInsightArguments]:
 
     args_list: List[LeaderboardInsightArguments] = []
     all_matches: List[Match] = []
+    all_awards: List[Award] = []
 
     # Build per-year args
     for year in SeasonHelper.get_valid_years():
         year_events = [e for e in all_events if e.year == year]
         year_matches = [m for e in year_events for m in e.matches]
+        year_awards = [a for e in year_events for a in e.awards]
+
+        all_awards.extend(year_awards)
         all_matches.extend(year_matches)
-        args_list.append(LeaderboardInsightArguments(matches=year_matches, year=year))
+        args_list.append(
+            LeaderboardInsightArguments(
+                matches=year_matches,
+                events=year_events,
+                awards=year_awards,
+                year=year,
+            )
+        )
 
     # Build overall args
-    args_list.append(LeaderboardInsightArguments(matches=all_matches, year=0))
+    args_list.append(
+        LeaderboardInsightArguments(
+            matches=all_matches, events=all_events, awards=all_awards, year=0
+        )
+    )
 
     # todo(tervay): add more args groups, e.g. by district
 

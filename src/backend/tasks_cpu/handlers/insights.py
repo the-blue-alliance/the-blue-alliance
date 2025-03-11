@@ -8,8 +8,14 @@ from werkzeug.wrappers import Response
 
 from backend.common.consts.insight_type import InsightType
 from backend.common.helpers.insights_helper import InsightsHelper
+from backend.common.helpers.insights_leaderboard_event_helper import (
+    InsightsLeaderboardEventHelper,
+)
 from backend.common.helpers.insights_leaderboard_match_helper import (
     InsightsLeaderboardMatchHelper,
+)
+from backend.common.helpers.insights_leaderboard_team_helper import (
+    InsightsLeaderboardTeamHelper,
 )
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.insight_manipulator import InsightManipulator
@@ -95,6 +101,10 @@ def do_leaderboard_year_insights(kind: LeaderboardKeyType, year: Year) -> Respon
     insights = []
     if kind == "match":
         insights = InsightsLeaderboardMatchHelper.make_insights(year)
+    elif kind == "team":
+        insights = InsightsLeaderboardTeamHelper.make_insights(year)
+    elif kind == "event":
+        insights = InsightsLeaderboardEventHelper.make_insights(year)
 
     if len(insights) > 0:
         InsightManipulator.createOrUpdate(insights)
