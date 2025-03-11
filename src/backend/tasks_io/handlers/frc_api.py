@@ -1,7 +1,6 @@
 import datetime
 import logging
 import re
-from collections import defaultdict
 from typing import List, Optional, Set
 
 from flask import Blueprint, make_response, render_template, request, Response, url_for
@@ -10,7 +9,7 @@ from google.appengine.ext import ndb
 from markupsafe import Markup
 from pyre_extensions import none_throws
 
-from backend.common.consts.event_type import EventType
+from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
@@ -382,18 +381,42 @@ def event_details(event_key: EventKey) -> Response:
         EventTeam.event == ndb.Key(Event, event_key)
     ).fetch_async()
 
+    if (year := int(event_key[:4])) and SeasonHelper.is_valid_regional_pool_year(year):
+        champs_pool_model_future = RegionalChampsPool.get_or_insert_async(
+            RegionalChampsPool.render_key_name(year),
+            year=year,
+        )
+    else:
+        champs_pool_model_future = None
+
     fmsapi_events, fmsapi_districts = event_details_future.get_result()
     event = EventManipulator.createOrUpdate(fmsapi_events[0])
 
     DistrictManipulator.createOrUpdate(fmsapi_districts)
 
     models = event_teams_future.get_result()
+    champs_pool_model: Optional[RegionalChampsPool] = (
+        champs_pool_model_future.get_result() if champs_pool_model_future else None
+    )
+
     teams: List[Team] = []
     district_teams: List[DistrictTeam] = []
     regional_pool_teams: List[RegionalPoolTeam] = []
-    regional_cmp_advancement: RegionalPoolAdvancement = defaultdict(
-        lambda: TeamRegionalPoolAdvancement(cmp=False)
-    )
+
+    event_cmp_advancement: RegionalPoolAdvancement = {}
+    initial_cmp_advancement: RegionalPoolAdvancement = {}
+    if champs_pool_model and champs_pool_model.advancement:
+        # This way, we can handle unregistering teams that
+        # are no longer coming from "this" event
+        initial_cmp_advancement = champs_pool_model.advancement
+        event_cmp_advancement.update(
+            {
+                team: TeamRegionalPoolAdvancement(cmp=False)
+                for team, advancement in champs_pool_model.advancement.items()
+                if advancement.get("cmp_event") == event.key_name
+            }
+        )
+
     robots: List[Robot] = []
     for group in models:
         # models is a list of tuples (team, districtTeam, robot)
@@ -412,17 +435,21 @@ def event_details(event_key: EventKey) -> Response:
             and team is not None
             and district_team is None
         ):
+            team_key = team.key_name
             regional_pool_team = RegionalPoolTeam(
-                id=RegionalPoolTeam.render_key_name(event.year, team.key_name),
+                id=RegionalPoolTeam.render_key_name(event.year, team_key),
                 year=event.year,
                 team=team.key,
             )
             regional_pool_teams.append(regional_pool_team)
 
-            regional_cmp_advancement[team.key_name]["cmp"] |= event.event_type_enum in {
-                EventType.CMP_DIVISION,
-                EventType.CMP_FINALS,
-            }
+            if event.event_type_enum in CMP_EVENT_TYPES:
+                event_cmp_advancement[team_key] = TeamRegionalPoolAdvancement(
+                    cmp=True,
+                    cmp_event=initial_cmp_advancement.get(team_key, {}).get(
+                        "cmp_event", event.key_name
+                    ),
+                )
 
         robot = group[2]
         if isinstance(robot, Robot):
@@ -436,8 +463,8 @@ def event_details(event_key: EventKey) -> Response:
 
     district_teams = DistrictTeamManipulator.createOrUpdate(district_teams)
     robots = RobotManipulator.createOrUpdate(robots)
-    regional_pool_teams = RegionalPoolTeamManipulator.createOrUpdate(
-        regional_pool_teams
+    regional_pool_teams = listify(
+        RegionalPoolTeamManipulator.createOrUpdate(regional_pool_teams)
     )
 
     if not teams:
@@ -506,12 +533,12 @@ def event_details(event_key: EventKey) -> Response:
             MediaManipulator.createOrUpdate(avatars)
         MediaManipulator.delete_keys(keys_to_delete)
 
-    if SeasonHelper.is_valid_regional_pool_year(event.year):
-        champs_pool_model = RegionalChampsPool.get_or_insert(
-            RegionalChampsPool.render_key_name(event.year),
-            year=event.year,
-        )
-        champs_pool_model.advancement = regional_cmp_advancement
+    if champs_pool_model is not None:
+        advancement = champs_pool_model.advancement or {}
+        advancement.update(event_cmp_advancement)
+        champs_pool_model.advancement = {
+            team: adv for team, adv in advancement.items() if adv["cmp"]
+        }
         RegionalChampsPoolManipulator.createOrUpdate(champs_pool_model)
 
     template_values = {

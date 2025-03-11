@@ -14,21 +14,27 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.keys import Year
 from backend.common.models.media import Media
+from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.regional_pool_advancement import TeamRegionalPoolAdvancement
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
-def create_event() -> Event:
+def create_event(
+    year: Year = 2019, event_type: EventType = EventType.REGIONAL
+) -> Event:
     e = Event(
-        id="2019casj",
-        year=2019,
+        id=f"{year}casj",
+        year=year,
         event_short="casj",
-        start_date=datetime.datetime(2019, 4, 1),
-        end_date=datetime.datetime(2019, 4, 3),
-        event_type_enum=EventType.REGIONAL,
+        start_date=datetime.datetime(year, 4, 1),
+        end_date=datetime.datetime(year, 4, 3),
+        event_type_enum=event_type,
     )
     return e
 
@@ -227,6 +233,179 @@ def test_get_event_details_skip_eventteams(
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(tasks) == 1
     assert tasks[0].url == "/tasks/math/do/eventteam_update/2019casj?allow_deletes=True"
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_writes_cmp_advancement(
+    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+) -> None:
+    event_mock.return_value = InstantFuture(
+        ([create_event(year=2025, event_type=EventType.CMP_DIVISION)], [])
+    )
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+    avatars_mock.return_value = InstantFuture(
+        (
+            [],
+            [],
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we write models
+    regional_pool_team = RegionalPoolTeam.get_by_id("2025_frc254")
+    assert regional_pool_team is not None
+
+    regional_pool = RegionalChampsPool.get_by_id("2025")
+    assert regional_pool is not None
+    assert regional_pool.advancement is not None
+    assert regional_pool.advancement == {
+        "frc254": TeamRegionalPoolAdvancement(cmp=True, cmp_event="2025casj")
+    }
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_ignores_other_event_cmp_advancement(
+    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+) -> None:
+    RegionalChampsPool.get_or_insert(
+        "2025",
+        year=2025,
+        advancement={
+            "frc254": TeamRegionalPoolAdvancement(cmp=True, cmp_event="2025other")
+        },
+    )
+
+    event_mock.return_value = InstantFuture(
+        ([create_event(year=2025, event_type=EventType.CMP_DIVISION)], [])
+    )
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+    avatars_mock.return_value = InstantFuture(
+        (
+            [],
+            [],
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we write models
+    regional_pool_team = RegionalPoolTeam.get_by_id("2025_frc254")
+    assert regional_pool_team is not None
+
+    regional_pool = RegionalChampsPool.get_by_id("2025")
+    assert regional_pool is not None
+    assert regional_pool.advancement is not None
+    assert regional_pool.advancement == {
+        "frc254": TeamRegionalPoolAdvancement(cmp=True, cmp_event="2025other")
+    }
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_removes_cmp_advancement_if_no_longer_registered(
+    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+) -> None:
+    RegionalChampsPool.get_or_insert(
+        "2025",
+        year=2025,
+        advancement={
+            "frc254": TeamRegionalPoolAdvancement(cmp=True, cmp_event="2025casj")
+        },
+    )
+
+    event_mock.return_value = InstantFuture(
+        ([create_event(year=2025, event_type=EventType.CMP_DIVISION)], [])
+    )
+    teams_mock.return_value = InstantFuture([])
+    avatars_mock.return_value = InstantFuture(([], []))
+    resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we write models
+    regional_pool_team = RegionalPoolTeam.get_by_id("2025_frc254")
+    assert regional_pool_team is None
+
+    regional_pool = RegionalChampsPool.get_by_id("2025")
+    assert regional_pool is not None
+    assert regional_pool.advancement is not None
+    assert regional_pool.advancement == {}
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_ignores_non_cmp_event(
+    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+) -> None:
+    RegionalChampsPool.get_or_insert(
+        "2025",
+        year=2025,
+        advancement={
+            "frc254": TeamRegionalPoolAdvancement(cmp=True, cmp_event="2025other")
+        },
+    )
+
+    event_mock.return_value = InstantFuture(
+        ([create_event(year=2025, event_type=EventType.REGIONAL)], [])
+    )
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+    avatars_mock.return_value = InstantFuture(
+        (
+            [],
+            [],
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    # Make sure we write models
+    regional_pool_team = RegionalPoolTeam.get_by_id("2025_frc254")
+    assert regional_pool_team is not None
+
+    regional_pool = RegionalChampsPool.get_by_id("2025")
+    assert regional_pool is not None
+    assert regional_pool.advancement is not None
+    assert regional_pool.advancement == {
+        "frc254": TeamRegionalPoolAdvancement(cmp=True, cmp_event="2025other")
+    }
 
 
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")

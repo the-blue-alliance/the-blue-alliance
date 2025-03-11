@@ -64,11 +64,13 @@
                 <tr>
                     <th>Team</th>
                     <th>Qualified for CMP</th>
+                    <th>Qualifying Event</th>
                 </tr>
                 {% for team_key, advancement in (pool_model.advancement or {}).items() %}
                     <tr>
                         <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
                         <td>{% if advancement.cmp %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                        <td>{% if advancement.cmp_event %}<a href="/admin/event/{{advancement.cmp_event}}">{{advancement.cmp_event}}</a>{% else %}--{% endif %}</td>
                     </tr>
                 {% else %}
                     <tr><td>No advancement found</td></tr>
