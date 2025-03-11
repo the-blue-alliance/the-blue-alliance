@@ -2,6 +2,7 @@ from typing import Any, List, Set, Tuple, Type
 
 from google.appengine.ext import ndb
 
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -309,10 +310,15 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
         queries.append(district_query.DistrictsInYearQuery(year))
 
     for abbrev in district_abbrevs:
-        queries.append(district_query.DistrictHistoryQuery(abbrev))
+        for alt_abbrev in RenamedDistricts.get_equivalent_codes(abbrev):
+            queries.append(district_query.DistrictHistoryQuery(abbreviation=alt_abbrev))
+            queries.append(
+                district_query.DistrictAbbreviationQuery(abbreviation=alt_abbrev)
+            )
 
     for key in district_keys:
-        queries.append(district_query.DistrictQuery(key.id()))
+        for alt_key in RenamedDistricts.get_equivalent_keys(key.string_id()):
+            queries.append(district_query.DistrictQuery(district_key=alt_key))
 
     for dt_key in district_team_keys_future.get_result():
         team_key = dt_key.id().split("_")[1]
