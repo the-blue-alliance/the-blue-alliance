@@ -115,7 +115,16 @@ def do_leaderboard_year_insights(kind: LeaderboardKeyType, year: Year) -> Respon
 @blueprint.route(
     "/backend-tasks-b2/math/enqueue/insights/leaderboards/<kind>/<int:year>"
 )
-def enqueue_leaderboard_year_insights(kind: LeaderboardKeyType, year: Year) -> Response:
+@blueprint.route(
+    "/backend-tasks-b2/math/enqueue/insights/leaderboards/<kind>",
+    defaults={"year": None},
+)
+def enqueue_leaderboard_year_insights(
+    kind: LeaderboardKeyType, year: Optional[Year] = None
+) -> Response:
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
     taskqueue.add(
         url=url_for("insights.do_leaderboard_year_insights", kind=kind, year=year),
         method="GET",
