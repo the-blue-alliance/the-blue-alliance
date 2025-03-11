@@ -59,9 +59,6 @@ def event_list(year: Optional[Year]) -> str:
 
 
 def event_detail(event_key: EventKey) -> str:
-    if not Event.validate_key_name(event_key):
-        abort(404)
-
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
@@ -166,9 +163,6 @@ def event_detail(event_key: EventKey) -> str:
 
 
 def event_edit(event_key: EventKey) -> Response:
-    if not Event.validate_key_name(event_key):
-        abort(404)
-
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
