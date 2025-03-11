@@ -36,7 +36,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
                 {event.city}, {event.state_prov}, {event.country}
               </div>
             </TableCell>
-            <TableCell>
+            <TableCell className="mt-2 flex justify-center md:mt-1">
               {event.webcasts.length > 0 && (
                 <Button className="cursor-pointer" asChild variant="success">
                   <Link
@@ -46,7 +46,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
                   >
                     <InlineIcon iconSize="large">
                       <MdiVideo />
-                      Watch Now
+                      <span className="hidden md:contents">Watch Now</span>
                     </InlineIcon>
                   </Link>
                 </Button>
