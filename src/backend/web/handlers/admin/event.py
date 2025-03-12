@@ -309,6 +309,9 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
             else None
         ),
         divisions=division_keys,
+        manual_attrs=[
+            x.strip() for x in request.form.get("manual_attrs_csv", "").split(",")
+        ],
     )
     event = EventManipulator.createOrUpdate(event, auto_union=False)
 

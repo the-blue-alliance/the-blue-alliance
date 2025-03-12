@@ -132,6 +132,10 @@
             <td>Rankings</td>
             <td><textarea name="rankings_json">{{rankings}}</textarea></td>
         </tr>
+        <tr>
+            <td>Manual Attrs (CSV)</td>
+            <td><textarea name="manual_attrs_csv">{{event.manual_attrs|join(",")}}</textarea></td>
+        </tr>
     </table>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 

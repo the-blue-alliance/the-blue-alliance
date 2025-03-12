@@ -12,6 +12,9 @@ class CachedModel(ndb.Model):
     for cache clearing and manipulators
     """
 
+    # Manually overwritten attributes that shoudln't be updated via automated processes (e.g. via FRC API).
+    manual_attrs = ndb.TextProperty(repeated=True)
+
     # This is set when the model is determined to need updating in ndb
     _dirty: bool = False
 
