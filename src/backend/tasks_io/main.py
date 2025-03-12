@@ -8,8 +8,8 @@ from backend.tasks_io.handlers.admin.blueprint import admin_routes as admin_blue
 from backend.tasks_io.handlers.cron_misc import blueprint as cron_misc_blueprint
 from backend.tasks_io.handlers.frc_api import blueprint as frc_api_blueprint
 from backend.tasks_io.handlers.live_events import blueprint as live_events_blueprint
-from backend.tasks_io.handlers.nexus_api import blueprint as nexus_api_blueprint
 from backend.tasks_io.handlers.math import blueprint as math_blueprint
+from backend.tasks_io.handlers.nexus_api import blueprint as nexus_api_blueprint
 from backend.tasks_io.handlers.tasks import blueprint as tasks_blueprint
 
 
