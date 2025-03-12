@@ -44,7 +44,7 @@ def enqueue_year_insights(kind: str, year: Optional[Year] = None) -> Response:
             url=url_for("insights.do_year_insights", kind=insight_type, year=year),
             method="GET",
             target="py3-tasks-cpu",
-            queue_name="default",
+            queue_name="run-in-order",
         )
     except ValueError:
         logging.warning(f"Unknown insight kind {kind}")
@@ -130,7 +130,7 @@ def enqueue_leaderboard_year_insights(
         url=url_for("insights.do_leaderboard_year_insights", kind=kind, year=year),
         method="GET",
         target="py3-tasks-cpu",
-        queue_name="default",
+        queue_name="run-in-order",
     )
 
     return make_response(
@@ -145,7 +145,7 @@ def enqueue_all_leaderboard_insights(kind: LeaderboardKeyType) -> Response:
             url=url_for("insights.do_leaderboard_year_insights", kind=kind, year=year),
             method="GET",
             target="py3-tasks-cpu",
-            queue_name="default",
+            queue_name="run-in-order",
         )
 
     return make_response(f"enqueued {escape(kind)} leaderboard insights for all years")
@@ -161,7 +161,7 @@ def enqueue_notables_year_insights(year: Optional[Year] = None) -> Response:
         url=url_for("insights.do_notables_year_insights", year=year),
         method="GET",
         target="py3-tasks-cpu",
-        queue_name="default",
+        queue_name="run-in-order",
     )
 
     return make_response(f"enqueued notable insights for year {escape(str(year))}")
@@ -174,7 +174,7 @@ def enqueue_all_notables_insights() -> Response:
             url=url_for("insights.do_notables_year_insights", year=year),
             method="GET",
             target="py3-tasks-cpu",
-            queue_name="default",
+            queue_name="run-in-order",
         )
 
     return make_response("enqueued all notable insights")
@@ -199,7 +199,7 @@ def enqueue_overall_insights(kind: str) -> Response:
         url=url_for("insights.do_overall_insights", kind=kind),
         method="GET",
         target="py3-tasks-cpu",
-        queue_name="default",
+        queue_name="run-in-order",
     )
 
     if (
