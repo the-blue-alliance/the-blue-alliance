@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
 import { useMemo, useState } from 'react';
@@ -74,6 +75,7 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
@@ -95,6 +97,7 @@ import {
   STATE_TO_ABBREVIATION,
   camelCaseToHumanReadable,
   cn,
+  queryFromAPI,
   splitIntoNChunks,
 } from '~/lib/utils';
 
@@ -107,26 +110,10 @@ async function loadData(params: Route.LoaderArgs['params']) {
     });
   }
 
-  const [
-    event,
-    matches,
-    alliances,
-    rankings,
-    awards,
-    teams,
-    teamMedia,
-    coprs,
-    colors,
-  ] = await Promise.all([
+  const [event, matches, alliances] = await Promise.all([
     getEvent({ eventKey: params.eventKey }),
     getEventMatches({ eventKey: params.eventKey }),
     getEventAlliances({ eventKey: params.eventKey }),
-    getEventRankings({ eventKey: params.eventKey }),
-    getEventAwards({ eventKey: params.eventKey }),
-    getEventTeams({ eventKey: params.eventKey }),
-    getEventTeamMedia({ eventKey: params.eventKey }),
-    getEventCopRs({ eventKey: params.eventKey }),
-    getEventColors({ eventKey: params.eventKey }),
   ]);
 
   if (event.status == 404) {
@@ -138,13 +125,7 @@ async function loadData(params: Route.LoaderArgs['params']) {
   if (
     event.status !== 200 ||
     matches.status !== 200 ||
-    alliances.status !== 200 ||
-    rankings.status !== 200 ||
-    awards.status !== 200 ||
-    teams.status !== 200 ||
-    teamMedia.status !== 200 ||
-    coprs.status !== 200 ||
-    colors.status !== 200
+    alliances.status !== 200
   ) {
     throw new Response(null, {
       status: 500,
@@ -155,12 +136,9 @@ async function loadData(params: Route.LoaderArgs['params']) {
     event: event.data,
     matches: matches.data,
     alliances: alliances.data,
-    rankings: rankings.data,
-    awards: awards.data,
-    teams: teams.data,
-    teamMedia: teamMedia.data,
-    coprs: coprs.data,
-    colors: colors.data,
+    shouldPreviewAwardsTab: SEASON_EVENT_TYPES.has(event.data.event_type),
+    shouldPreviewInsightsTab: matches.data.length > 0,
+    shouldPreviewRankingsTab: matches.data.length > 0,
   };
 }
 
@@ -187,13 +165,40 @@ export default function EventPage() {
     event,
     alliances,
     matches,
-    rankings,
-    awards,
-    teams,
-    teamMedia,
-    colors,
-    coprs,
+    shouldPreviewAwardsTab,
+    shouldPreviewInsightsTab,
+    shouldPreviewRankingsTab,
   } = useLoaderData<Awaited<ReturnType<typeof loadData>>>();
+
+  const awardsQuery = useQuery({
+    queryKey: ['eventAwards', event.key],
+    queryFn: () => queryFromAPI(getEventAwards({ eventKey: event.key })),
+  });
+
+  const coprsQuery = useQuery({
+    queryKey: ['eventCoprs', event.key],
+    queryFn: () => queryFromAPI(getEventCopRs({ eventKey: event.key })),
+  });
+
+  const colorsQuery = useQuery({
+    queryKey: ['eventColors', event.key],
+    queryFn: () => getEventColors({ eventKey: event.key }),
+  });
+
+  const rankingsQuery = useQuery({
+    queryKey: ['eventRankings', event.key],
+    queryFn: () => queryFromAPI(getEventRankings({ eventKey: event.key })),
+  });
+
+  const teamsQuery = useQuery({
+    queryKey: ['eventTeams', event.key],
+    queryFn: () => queryFromAPI(getEventTeams({ eventKey: event.key })),
+  });
+
+  const teamMediaQuery = useQuery({
+    queryKey: ['eventTeamMedia', event.key],
+    queryFn: () => queryFromAPI(getEventTeamMedia({ eventKey: event.key })),
+  });
 
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
@@ -309,7 +314,8 @@ export default function EventPage() {
               </InlineIcon>
             </TabsTrigger>
           )}
-          {rankings && rankings.rankings.length > 0 && (
+          {(shouldPreviewRankingsTab ||
+            (rankingsQuery.data && rankingsQuery.data.rankings.length > 0)) && (
             <TabsTrigger value="rankings">
               <InlineIcon>
                 <BiListOl />
@@ -317,7 +323,7 @@ export default function EventPage() {
               </InlineIcon>
             </TabsTrigger>
           )}
-          {awards.length > 0 && (
+          {(shouldPreviewAwardsTab || awardsQuery.data) && (
             <TabsTrigger value="awards">
               <InlineIcon>
                 <BiTrophy />
@@ -330,11 +336,12 @@ export default function EventPage() {
               <MdiRobot />
               Teams
               <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
-                {teams.length}
+                {teamsQuery.data?.length ?? '-'}
               </Badge>
             </InlineIcon>
           </TabsTrigger>
-          {matches.length > 0 && (
+          {(shouldPreviewInsightsTab ||
+            (coprsQuery.data && colorsQuery.data)) && (
             <TabsTrigger value="insights">
               <InlineIcon>
                 <MdiGraphBoxOutline />
@@ -366,10 +373,10 @@ export default function EventPage() {
           </div>
         </TabsContent>
 
-        {rankings && (
+        {rankingsQuery.data && (
           <TabsContent value="rankings">
             <RankingsTable
-              rankings={rankings}
+              rankings={rankingsQuery.data}
               winners={
                 alliances?.find((a) => a.status?.status === 'won')?.picks ?? []
               }
@@ -378,11 +385,13 @@ export default function EventPage() {
         )}
 
         <TabsContent value="awards">
-          <AwardsTab awards={awards} />
+          {awardsQuery.data && <AwardsTab awards={awardsQuery.data} />}
         </TabsContent>
 
         <TabsContent value="teams">
-          <TeamsTab teams={teams} media={teamMedia} />
+          {teamsQuery.data && teamMediaQuery.data && (
+            <TeamsTab teams={teamsQuery.data} media={teamMediaQuery.data} />
+          )}
         </TabsContent>
 
         <TabsContent value="insights">
@@ -393,10 +402,17 @@ export default function EventPage() {
             )}
             year={event.year}
           />
-          {coprs && Object.keys(coprs).length > 0 && (
+          {coprsQuery.data && Object.keys(coprsQuery.data).length > 0 && (
             <>
-              <CoprScatterChart colors={colors} coprs={coprs} />
-              <ComponentsTable coprs={coprs} year={event.year} />
+              <CoprScatterChart
+                colors={
+                  colorsQuery.data?.status === 200
+                    ? colorsQuery.data.data
+                    : { teams: {} }
+                }
+                coprs={coprsQuery.data}
+              />
+              <ComponentsTable coprs={coprsQuery.data} year={event.year} />
             </>
           )}
         </TabsContent>

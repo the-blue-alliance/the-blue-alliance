@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   Links,
   Meta,
@@ -53,6 +54,8 @@ api.defaults.headers = {
 //   }
 //   return response;
 // };
+
+const queryClient = new QueryClient();
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -236,7 +239,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Nav />
         <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
-            {children}
+            <QueryClientProvider client={queryClient}>
+              {children}
+            </QueryClientProvider>
           </div>
         </div>
         <ScrollRestoration />

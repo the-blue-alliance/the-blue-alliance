@@ -236,3 +236,33 @@ export function splitIntoNChunks<T>(array: T[], numChunks: number): T[][] {
 
   return result;
 }
+
+// Reduces boilerplate when using react-query and API functions.
+// Makes it so you don't have to call <response>.data.data, just <response>.data.
+export async function queryFromAPI<T>(
+  apiPromise: Promise<
+    | {
+        status: 200;
+        data: T;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >,
+): Promise<T> {
+  const resp = await apiPromise;
+  if (resp.status === 200) {
+    return Promise.resolve(resp.data);
+  }
+
+  return Promise.reject(new Error(resp.status.toString()));
+}
