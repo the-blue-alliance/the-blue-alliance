@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Literal, Set, TypedDict
+from typing import Dict, List, Literal, Set, TypeAlias, TypedDict
 
 from google.appengine.ext import ndb
 
@@ -8,6 +8,7 @@ from backend.common.models.keys import EventKey, MatchKey, TeamKey
 
 
 LeaderboardKeyType = Literal["team"] | Literal["event"] | Literal["match"]
+InsightEnumId: TypeAlias = int
 
 
 class Insight(CachedModel):
