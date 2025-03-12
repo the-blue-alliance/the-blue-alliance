@@ -78,11 +78,6 @@ cron:
   schedule: every day 01:17
   timezone: America/Los_Angeles
 
-- description: Match Leaderboard Insights Calculation
-  url: /backend-tasks-b2/math/enqueue/insights/leaderboards/match
-  schedule: every day 01:19
-  timezone: America/Los_Angeles
-
 - description: Notable Insights Calculation
   url: /backend-tasks-b2/math/enqueue/notables
   schedule: every day 01:21
