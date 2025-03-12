@@ -81,9 +81,7 @@ def setup(ndb_stub):
 def test_notables_hall_of_fame(ndb_stub):
     insight = InsightsNotableHelper._calculate_notables_hall_of_fame(
         LeaderboardInsightArguments(
-            matches=[],
             events=[Event.get_by_id("2024cmptx")],
-            awards=[Award.get_by_id("2024cmptx_1"), Award.get_by_id("2024cmptx_2")],
             year=2024,
         )
     )
@@ -97,9 +95,7 @@ def test_notables_hall_of_fame(ndb_stub):
 def test_notables_world_champions(ndb_stub):
     insight = InsightsNotableHelper._calculate_notables_world_champions(
         LeaderboardInsightArguments(
-            matches=[],
             events=[Event.get_by_id("2024cmptx")],
-            awards=[Award.get_by_id("2024cmptx_1"), Award.get_by_id("2024cmptx_2")],
             year=2024,
         )
     )
@@ -113,18 +109,10 @@ def test_notables_world_champions(ndb_stub):
 def test_notables_division_winners(ndb_stub):
     insight = InsightsNotableHelper._calculate_notables_division_winners(
         LeaderboardInsightArguments(
-            matches=[],
             events=[
                 Event.get_by_id("2024cmptx"),
                 Event.get_by_id("2024new"),
                 Event.get_by_id("2024mil"),
-            ],
-            awards=[
-                Award.get_by_id("2024cmptx_1"),
-                Award.get_by_id("2024cmptx_2"),
-                Award.get_by_id("2024new_1"),
-                Award.get_by_id("2024mil_1"),
-                Award.get_by_id("2024mil_2"),
             ],
             year=2024,
         )
@@ -140,18 +128,10 @@ def test_notables_division_winners(ndb_stub):
 def test_notables_division_finals_appearances(ndb_stub):
     insight = InsightsNotableHelper._calculate_notables_division_finals_appearances(
         LeaderboardInsightArguments(
-            matches=[],
             events=[
                 Event.get_by_id("2024cmptx"),
                 Event.get_by_id("2024new"),
                 Event.get_by_id("2024mil"),
-            ],
-            awards=[
-                Award.get_by_id("2024cmptx_1"),
-                Award.get_by_id("2024cmptx_2"),
-                Award.get_by_id("2024new_1"),
-                Award.get_by_id("2024mil_1"),
-                Award.get_by_id("2024mil_2"),
             ],
             year=2024,
         )
