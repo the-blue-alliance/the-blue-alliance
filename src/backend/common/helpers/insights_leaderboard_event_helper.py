@@ -29,7 +29,7 @@ class InsightsLeaderboardEventHelper:
     ) -> Optional[Insight]:
         clean_scores = defaultdict(list)
 
-        for match in arguments.matches:
+        for match in arguments.matches():
             if match.has_been_played:
                 redScore = int(match.alliances[AllianceColor.RED]["score"])
                 blueScore = int(match.alliances[AllianceColor.BLUE]["score"])

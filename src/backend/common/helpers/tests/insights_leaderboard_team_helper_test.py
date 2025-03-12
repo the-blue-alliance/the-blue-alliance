@@ -15,11 +15,7 @@ def test_most_blue_banners(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardTeamHelper._most_blue_banners(
         LeaderboardInsightArguments(
-            matches=Event.get_by_id("2019nyny").matches
-            + Event.get_by_id("2024nytr").matches,
             events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
-            awards=Event.get_by_id("2019nyny").awards
-            + Event.get_by_id("2024nytr").awards,
             year=0,
         )
     )
@@ -54,11 +50,7 @@ def test_most_awards(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardTeamHelper._most_awards(
         LeaderboardInsightArguments(
-            matches=Event.get_by_id("2019nyny").matches
-            + Event.get_by_id("2024nytr").matches,
             events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
-            awards=Event.get_by_id("2019nyny").awards
-            + Event.get_by_id("2024nytr").awards,
             year=0,
         )
     )
@@ -99,21 +91,11 @@ def test_most_non_champs_event_wins(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardTeamHelper._most_non_champs_event_wins(
         LeaderboardInsightArguments(
-            matches=(
-                Event.get_by_id("2019nyny").matches
-                + Event.get_by_id("2024nytr").matches
-                + Event.get_by_id("2024mil").matches
-            ),
             events=[
                 Event.get_by_id("2019nyny"),
                 Event.get_by_id("2024nytr"),
                 Event.get_by_id("2024mil"),
             ],
-            awards=(
-                Event.get_by_id("2019nyny").awards
-                + Event.get_by_id("2024nytr").awards
-                + Event.get_by_id("2024mil").awards
-            ),
             year=2024,
         )
     )
@@ -132,9 +114,7 @@ def test_most_matches_played(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardTeamHelper._most_matches_played(
         LeaderboardInsightArguments(
-            matches=Event.get_by_id("2019nyny").matches,
             events=[Event.get_by_id("2019nyny")],
-            awards=[],
             year=2019,
         )
     )
@@ -162,12 +142,7 @@ def test_most_events_played_at(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardTeamHelper._most_events_played_at(
         LeaderboardInsightArguments(
-            matches=(
-                Event.get_by_id("2019nyny").matches
-                + Event.get_by_id("2024nytr").matches
-            ),
             events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
-            awards=[],
             year=0,
         )
     )
@@ -186,9 +161,7 @@ def test_most_unique_teams_played_with_or_against(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardTeamHelper._most_unique_teams_played_with_or_against(
         LeaderboardInsightArguments(
-            matches=Event.get_by_id("2019nyny").matches,
             events=[Event.get_by_id("2019nyny")],
-            awards=[],
             year=2019,
         )
     )
@@ -220,14 +193,10 @@ def test_only_overall_and_year_are_computed(ndb_stub, test_data_importer):
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
     insights = InsightsLeaderboardTeamHelper.make_insights(2025)
-    assert len(insights) == 12
+    assert len(insights) == 6
 
-    overall_insights = [i for i in insights if i.year == 0]
     insights_2025 = [i for i in insights if i.year == 2025]
-
-    assert len(overall_insights) == 6
     assert len(insights_2025) == 6
-    assert len(overall_insights) + len(insights_2025) == len(insights)
 
 
 def test_only_official_events_are_included(ndb_stub, test_data_importer):
@@ -244,21 +213,7 @@ def test_only_official_events_are_included(ndb_stub, test_data_importer):
         == Insight.INSIGHT_NAMES[Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED]
     ]
 
-    most_matches_overall = next(i for i in most_matches_played_insights if i.year == 0)
     most_matches_2019 = next(i for i in most_matches_played_insights if i.year == 2019)
-
-    assert most_matches_overall is not None
-    assert most_matches_overall.year == 0
-    assert most_matches_overall.data["rankings"][:5] == [
-        {"keys": ["frc1155", "frc2869"], "value": 17},
-        {"keys": ["frc4122"], "value": 16},
-        {"keys": ["frc694", "frc1796", "frc2265"], "value": 15},
-        {
-            "keys": ["frc333", "frc334", "frc354", "frc1880", "frc2579", "frc3419"],
-            "value": 14,
-        },
-        {"keys": ["frc2344"], "value": 13},
-    ]
 
     assert most_matches_2019 is not None
     assert most_matches_2019.year == 2019

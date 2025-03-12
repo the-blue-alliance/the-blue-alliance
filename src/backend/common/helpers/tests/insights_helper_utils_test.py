@@ -88,21 +88,17 @@ def test_make_args_has_no_offseasons(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2019nyny.json")
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
-    args = make_leaderboard_args()
-    args_2019 = [a for a in args if a.year == 2019]
-
-    assert len(args_2019) == 1
-
+    args = make_leaderboard_args(year=2019)
     mttd_2019_matches = [
-        m for m in args_2019[0].matches if m.key.id().startswith("2019mttd")
+        m
+        for m in args.matches()
+        if m.key.id().startswith("2019mttd")
     ]
 
     assert len(mttd_2019_matches) == 0
 
 
-def test_make_insights_from_fns_only_computes_overall_and_year(
-    ndb_stub, test_data_importer
-):
+def test_make_insights_from_fns_only_computes_year(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2025isde1.json")
     test_data_importer.import_match_list(__file__, "data/2025isde1_matches.json")
     test_data_importer.import_event(__file__, "data/2019nyny.json")
@@ -112,9 +108,7 @@ def test_make_insights_from_fns_only_computes_overall_and_year(
         2019,
         [
             lambda _: create_insight(data={}, name="test_2019", year=2019),
-            lambda _: create_insight(data={}, name="test_overall", year=0),
         ],
     )
 
-    # If it created all the insights, there'd be 2 * len(valid_years)
-    assert len(insights) == 4
+    assert len(insights) == 1

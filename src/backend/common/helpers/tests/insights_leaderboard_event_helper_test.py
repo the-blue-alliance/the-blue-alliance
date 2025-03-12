@@ -14,12 +14,7 @@ def test_highest_median_score(ndb_stub, test_data_importer):
 
     insight = InsightsLeaderboardEventHelper._highest_median_score(
         LeaderboardInsightArguments(
-            matches=(
-                Event.get_by_id("2022on305").matches
-                + Event.get_by_id("2022on306").matches
-            ),
             events=[Event.get_by_id("2022on305"), Event.get_by_id("2022on306")],
-            awards=[],
             year=2022,
         )
     )

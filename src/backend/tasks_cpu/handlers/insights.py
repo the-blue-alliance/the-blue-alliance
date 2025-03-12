@@ -148,6 +148,13 @@ def enqueue_all_leaderboard_insights(kind: LeaderboardKeyType) -> Response:
             queue_name="run-in-order",
         )
 
+    taskqueue.add(
+        url=url_for("insights.do_leaderboard_year_insights", kind=kind, year=0),
+        method="GET",
+        target="py3-tasks-cpu",
+        queue_name="run-in-order",
+    )
+
     return make_response(f"enqueued {escape(kind)} leaderboard insights for all years")
 
 
@@ -176,6 +183,13 @@ def enqueue_all_notables_insights() -> Response:
             target="py3-tasks-cpu",
             queue_name="run-in-order",
         )
+
+    taskqueue.add(
+        url=url_for("insights.do_notables_year_insights", year=0),
+        method="GET",
+        target="py3-tasks-cpu",
+        queue_name="run-in-order",
+    )
 
     return make_response("enqueued all notable insights")
 

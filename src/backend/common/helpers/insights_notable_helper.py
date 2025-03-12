@@ -54,7 +54,7 @@ class InsightsNotableHelper:
         insight_type: InsightEnumId,
     ) -> Insight:
         team_context_map: Dict[TeamKey, List[EventKey]] = {}
-        for award in arguments.awards:
+        for award in arguments.awards():
             if (
                 award.event_type_enum == event_type
                 and award.award_type_enum == award_type
@@ -111,7 +111,7 @@ class InsightsNotableHelper:
         arguments: LeaderboardInsightArguments,
     ) -> Insight:
         team_context_map: Dict[TeamKey, List[EventKey]] = {}
-        for award in arguments.awards:
+        for award in arguments.awards():
             if (
                 award.event_type_enum == EventType.CMP_DIVISION
                 and award.award_type_enum in [AwardType.WINNER, AwardType.FINALIST]

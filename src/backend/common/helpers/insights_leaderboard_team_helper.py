@@ -30,7 +30,7 @@ class InsightsLeaderboardTeamHelper:
     def _most_blue_banners(arguments: LeaderboardInsightArguments) -> Optional[Insight]:
         count = defaultdict(int)
 
-        for award in arguments.awards:
+        for award in arguments.awards():
             if award.award_type_enum in BLUE_BANNER_AWARDS and award.count_banner:
                 for team_key in award.team_list:
                     count[team_key.id()] += 1
@@ -43,7 +43,7 @@ class InsightsLeaderboardTeamHelper:
     def _most_awards(arguments: LeaderboardInsightArguments) -> Optional[Insight]:
         count = defaultdict(int)
 
-        for award in arguments.awards:
+        for award in arguments.awards():
             if award.award_type_enum == AwardType.WILDCARD:
                 continue
 
@@ -60,7 +60,7 @@ class InsightsLeaderboardTeamHelper:
     ) -> Optional[Insight]:
         count = defaultdict(int)
 
-        for award in arguments.awards:
+        for award in arguments.awards():
             if (
                 award.award_type_enum == AwardType.WINNER
                 and award.event_type_enum in NON_CMP_EVENT_TYPES
@@ -78,7 +78,7 @@ class InsightsLeaderboardTeamHelper:
     ) -> Optional[Insight]:
         count = defaultdict(int)
 
-        for match in arguments.matches:
+        for match in arguments.matches():
             if match.has_been_played:
                 for team_key in match.team_keys:
                     count[team_key.id()] += 1
@@ -93,12 +93,13 @@ class InsightsLeaderboardTeamHelper:
     ) -> Optional[Insight]:
         played_at = defaultdict(set)
 
-        for match in arguments.matches:
+        for match in arguments.matches():
             if match.has_been_played:
                 for team_key in match.team_keys:
                     played_at[team_key.id()].add(match.event_key_name)
 
         counts = {tk: len(events) for tk, events in played_at.items()}
+
         return make_leaderboard_from_dict_counts(
             counts, Insight.TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT, arguments.year
         )
@@ -109,7 +110,7 @@ class InsightsLeaderboardTeamHelper:
     ) -> Optional[Insight]:
         seen_teams = defaultdict(set)
 
-        for match in arguments.matches:
+        for match in arguments.matches():
             if match.has_been_played:
                 for a in match.team_key_names:
                     for b in match.team_key_names:
