@@ -165,7 +165,11 @@ export const Nav = () => {
                 route="/insights"
               />
               <DropMenuItem icon={<BiPencilFill />} title="Blog" />
-              <DropMenuItem icon={<BiGearFill />} title="Account" />
+              <DropMenuItem
+                icon={<BiGearFill />}
+                title="Account"
+                route="/account"
+              />
             </PopoverContent>
           </Popover>
         </NavigationMenuList>

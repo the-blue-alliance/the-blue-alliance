@@ -45,6 +45,7 @@
     "embla-carousel-autoplay": "8.5.2",
     "embla-carousel-react": "8.5.2",
     "express": "4.21.2",
+    "firebase": "11.4.0",
     "fuzzysort": "3.1.0",
     "isbot": "5.1.23",
     "lodash-es": "4.17.21",
