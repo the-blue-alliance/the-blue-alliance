@@ -30,7 +30,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_matchstats import Component, TeamStatMap
 from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
-from backend.common.queries import district_query, event_query, media_query
+from backend.common.queries import district_query, event_query, media_query, team_query
 from backend.web.profiled_render import render_template
 
 
@@ -135,6 +135,7 @@ def event_detail(event_key: EventKey) -> Response:
         else None
     )
     event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
+    event_eventteams_future = team_query.EventEventTeamsQuery(event_key).fetch_async()
     # status_sitevar_future = Sitevar.get_by_id_async('apistatus.down_events')
 
     event_divisions_future = None
@@ -251,6 +252,13 @@ def event_detail(event_key: EventKey) -> Response:
         allow_levels=comp_level.ELIM_LEVELS,
     )
 
+    eventteams = event_eventteams_future.get_result()
+    nexus_pit_locations = {
+        et.team.string_id(): et.pit_location["location"]
+        for et in eventteams
+        if et.pit_location
+    }
+
     template_values = {
         "event": event,
         "event_down": False,  # status_sitevar and event_key in status_sitevar.contents,
@@ -291,6 +299,7 @@ def event_detail(event_key: EventKey) -> Response:
         "has_coprs": event.coprs is not None,
         "coprs_json": json.dumps(copr_leaders),
         "copr_items": copr_items,
+        "nexus_pit_locations": nexus_pit_locations,
     }
 
     return make_cached_response(

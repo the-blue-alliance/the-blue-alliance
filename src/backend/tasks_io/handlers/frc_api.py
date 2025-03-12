@@ -42,7 +42,6 @@ from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
-from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.regional_pool_advancement import (
@@ -488,7 +487,7 @@ def event_details(event_key: EventKey) -> Response:
                 team=team.key,
                 year=event.year,
                 pit_location=(
-                    EventTeamPitLocation(location=nexus_pit_locations[team.key_name])
+                    nexus_pit_locations[team.key_name]
                     if nexus_pit_locations and team.key_name in nexus_pit_locations
                     else None
                 ),
