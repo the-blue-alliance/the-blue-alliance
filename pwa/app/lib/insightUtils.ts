@@ -18,6 +18,8 @@ export const LEADERBOARD_NAME_TO_DISPLAY_NAME: Record<string, string> = {
     'Most Division Finals Appearances',
   typed_leaderboard_notables_world_champions: 'Most World Championship Wins',
   typed_leaderboard_notables_division_winners: 'Most Division Wins',
+  typed_leaderboard_most_events_played_at: 'Most Events Played At',
+  typed_leaderboard_2025_most_coral_scored: 'Most Coral Scored',
 };
 
 export const NOTABLE_NAME_TO_DISPLAY_NAME: Record<string, string> = {
