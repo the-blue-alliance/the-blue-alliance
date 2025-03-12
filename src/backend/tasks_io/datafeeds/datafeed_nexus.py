@@ -1,13 +1,14 @@
 import logging
-from typing import Any, cast, Dict, Generator, Optional
+from typing import Any, Dict, Generator, Optional
 
+from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.profiler import Span
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import URLFetchResult
 from backend.tasks_io.datafeeds.nexus_api import NexusAPI
-from backend.tasks_io.datafeeds.parsers.fms_api.simple_json_parser import (
-    FMSAPISimpleJsonParser,
+from backend.tasks_io.datafeeds.parsers.nexus_api.pit_location_parser import (
+    NexusAPIPitLocationParser,
 )
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
 
@@ -19,9 +20,9 @@ class DatafeedNexus:
     @typed_tasklet
     def get_event_team_pit_locations(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, Dict[TeamKey, str]]:
+    ) -> Generator[Any, Any, Optional[Dict[TeamKey, EventTeamPitLocation]]]:
         response = yield self.api.pit_locations(event_key)
-        return cast(Dict[TeamKey, str], self._parse(response, FMSAPISimpleJsonParser()))
+        return self._parse(response, NexusAPIPitLocationParser())
 
     def _parse(
         self, response: URLFetchResult, parser: ParserBase[TParsedResponse]
