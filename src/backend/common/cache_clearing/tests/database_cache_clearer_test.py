@@ -185,8 +185,6 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             event_query.EventDivisionsQuery("2015cafoo").cache_key,
             event_query.RegionalEventsQuery(2014).cache_key,
             event_query.RegionalEventsQuery(2015).cache_key,
-            event_query.ChampionshipEventsAndDivisionsInYearQuery(2014).cache_key,
-            event_query.ChampionshipEventsAndDivisionsInYearQuery(2015).cache_key,
         }
 
     def test_event_details_updated(self) -> None:
@@ -422,7 +420,6 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             event_query.TeamYearEventTeamsQuery("frc125", 2016).cache_key,
             event_query.EventDivisionsQuery("2016necmp").cache_key,
             event_query.RegionalEventsQuery(2016).cache_key,
-            event_query.ChampionshipEventsAndDivisionsInYearQuery(2016).cache_key,
         }
 
     def test_renamed_district_updated(self) -> None:

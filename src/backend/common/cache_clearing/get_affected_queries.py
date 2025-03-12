@@ -85,7 +85,6 @@ def event_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     for year in years:
         queries.append(event_query.EventListQuery(year))
         queries.append(event_query.RegionalEventsQuery(year))
-        queries.append(event_query.ChampionshipEventsAndDivisionsInYearQuery(year))
 
     for event_district_key in event_district_keys:
         queries.append(event_query.DistrictEventsQuery(event_district_key.id()))

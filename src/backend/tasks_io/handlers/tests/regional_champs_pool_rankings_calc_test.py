@@ -1,6 +1,5 @@
 from unittest import mock
 
-from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
@@ -10,11 +9,8 @@ from backend.common.helpers.district_helper import (
 from backend.common.helpers.regional_champs_pool_helper import RegionalChampsPoolHelper
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import TeamAtEventDistrictPoints
-from backend.common.models.event_team import EventTeam
 from backend.common.models.regional_champs_pool import RegionalChampsPool
-from backend.common.models.regional_pool_advancement import TeamRegionalPoolAdvancement
 from backend.common.models.regional_pool_ranking import RegionalPoolRanking
-from backend.common.models.team import Team
 
 
 def test_enqueue_bad_year(tasks_client: Client) -> None:
@@ -155,70 +151,3 @@ def test_calc_doesnt_write_out_in_taskqueue(
             point_total=10,
         ),
     ]
-
-
-@mock.patch.object(RegionalChampsPoolHelper, "calculate_rankings")
-def test_calc_with_advancement(calc_mock: mock.Mock, tasks_client: Client) -> None:
-    cmp_event = Event(
-        id="2025cmp",
-        year=2025,
-        event_short="cmp",
-        event_type_enum=EventType.CMP_FINALS,
-    )
-    cmp_event.put()
-
-    Team(
-        id="frc254",
-        team_number=254,
-    ).put()
-
-    cmp_eventteam = EventTeam(
-        id="2025cmp_frc254",
-        year=2025,
-        event=ndb.Key(Event, "2025cmp"),
-        team=ndb.Key(Team, "frc254"),
-    )
-    cmp_eventteam.put()
-
-    event = Event(
-        id="2025event",
-        year=2025,
-        event_short="event",
-        event_type_enum=EventType.REGIONAL,
-    )
-    event.put()
-
-    calc_mock.return_value = {
-        "frc254": DistrictRankingTeamTotal(
-            event_points=[
-                (
-                    event,
-                    TeamAtEventDistrictPoints(
-                        event_key=event.key_name,
-                        qual_points=10,
-                        elim_points=0,
-                        alliance_points=0,
-                        award_points=0,
-                        total=10,
-                    ),
-                ),
-            ],
-            point_total=10,
-            tiebreakers=[],
-            qual_scores=[],
-            rookie_bonus=0,
-            single_event_bonus=0,
-            other_bonus=0,
-        )
-    }
-
-    resp = tasks_client.get("/tasks/math/do/regional_champs_pool_rankings_calc/2025")
-    assert resp.status_code == 200
-
-    regional_pool = RegionalChampsPool.get_by_id(
-        RegionalChampsPool.render_key_name(2025)
-    )
-    assert regional_pool is not None
-    assert regional_pool.advancement is not None
-    assert "frc254" in regional_pool.advancement
-    assert regional_pool.advancement["frc254"] == TeamRegionalPoolAdvancement(cmp=True)

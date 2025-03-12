@@ -3,7 +3,6 @@ from typing import Any, Generator, List, Optional
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import (
-    CMP_EVENT_TYPES,
     EventType,
     SEASON_EVENT_TYPES,
 )
@@ -95,25 +94,6 @@ class DistrictChampsInYearQuery(CachedDatabaseQuery[List[Event], List[EventDict]
     def _query_async(self, year: Year) -> Generator[Any, Any, List[Event]]:
         all_cmp_event_keys = yield Event.query(
             Event.year == year, Event.event_type_enum == EventType.DISTRICT_CMP
-        ).fetch_async(keys_only=True)
-        events = yield ndb.get_multi_async(all_cmp_event_keys)
-        return list(events)
-
-
-class ChampionshipEventsAndDivisionsInYearQuery(
-    CachedDatabaseQuery[List[Event], List[EventDict]]
-):
-    CACHE_VERSION = 0
-    CACHE_KEY_FORMAT = "championship_events_and_divisions_{year}"
-    DICT_CONVERTER = EventConverter
-
-    def __init__(self, year: Year) -> None:
-        super().__init__(year=year)
-
-    @typed_tasklet
-    def _query_async(self, year: Year) -> Generator[Any, Any, List[Event]]:
-        all_cmp_event_keys = yield Event.query(
-            Event.year == year, Event.event_type_enum.IN(CMP_EVENT_TYPES)
         ).fetch_async(keys_only=True)
         events = yield ndb.get_multi_async(all_cmp_event_keys)
         return list(events)
