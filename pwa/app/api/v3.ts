@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.10
+ * 3.9.11
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -749,48 +749,54 @@ export type MatchScoreBreakdown2025Alliance = {
   autoPoints?: number;
   autoReef?: {
     topRow: {
-      NodeA: boolean;
-      NodeB: boolean;
-      NodeC: boolean;
-      NodeD: boolean;
-      NodeE: boolean;
-      NodeF: boolean;
-      NodeG: boolean;
-      NodeH: boolean;
-      NodeI: boolean;
-      NodeJ: boolean;
-      NodeK: boolean;
-      NodeL: boolean;
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
     };
     midRow: {
-      NodeA: boolean;
-      NodeB: boolean;
-      NodeC: boolean;
-      NodeD: boolean;
-      NodeE: boolean;
-      NodeF: boolean;
-      NodeG: boolean;
-      NodeH: boolean;
-      NodeI: boolean;
-      NodeJ: boolean;
-      NodeK: boolean;
-      NodeL: boolean;
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
     };
     botRow: {
-      NodeA: boolean;
-      NodeB: boolean;
-      NodeC: boolean;
-      NodeD: boolean;
-      NodeE: boolean;
-      NodeF: boolean;
-      NodeG: boolean;
-      NodeH: boolean;
-      NodeI: boolean;
-      NodeJ: boolean;
-      NodeK: boolean;
-      NodeL: boolean;
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
     };
     trough: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the botRow object. */
+    tba_botRowCount?: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the midRow object. */
+    tba_midRowCount?: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the topRow object. */
+    tba_topRowCount?: number;
   };
   bargeBonusAchieved?: boolean;
   coopertitionCriteriaMet?: boolean;
@@ -802,8 +808,9 @@ export type MatchScoreBreakdown2025Alliance = {
   foulCount?: number;
   foulPoints?: number;
   g206Penalty?: boolean;
-  g408Penalty?: boolean;
-  g424Penalty?: boolean;
+  g410Penalty?: boolean;
+  g418Penalty?: boolean;
+  g428Penalty?: boolean;
   netAlgaeCount?: number;
   rp?: number;
   techFoulCount?: number;
@@ -812,48 +819,54 @@ export type MatchScoreBreakdown2025Alliance = {
   teleopPoints?: number;
   teleopReef?: {
     topRow: {
-      NodeA: boolean;
-      NodeB: boolean;
-      NodeC: boolean;
-      NodeD: boolean;
-      NodeE: boolean;
-      NodeF: boolean;
-      NodeG: boolean;
-      NodeH: boolean;
-      NodeI: boolean;
-      NodeJ: boolean;
-      NodeK: boolean;
-      NodeL: boolean;
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
     };
     midRow: {
-      NodeA: boolean;
-      NodeB: boolean;
-      NodeC: boolean;
-      NodeD: boolean;
-      NodeE: boolean;
-      NodeF: boolean;
-      NodeG: boolean;
-      NodeH: boolean;
-      NodeI: boolean;
-      NodeJ: boolean;
-      NodeK: boolean;
-      NodeL: boolean;
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
     };
     botRow: {
-      NodeA: boolean;
-      NodeB: boolean;
-      NodeC: boolean;
-      NodeD: boolean;
-      NodeE: boolean;
-      NodeF: boolean;
-      NodeG: boolean;
-      NodeH: boolean;
-      NodeI: boolean;
-      NodeJ: boolean;
-      NodeK: boolean;
-      NodeL: boolean;
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
     };
     trough: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the botRow object. */
+    tba_botRowCount?: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the midRow object. */
+    tba_midRowCount?: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the topRow object. */
+    tba_topRowCount?: number;
   };
   totalPoints?: number;
   wallAlgaeCount?: number;
@@ -2951,7 +2964,7 @@ export function getEventRankings(
   });
 }
 /**
- * Gets a list of team rankings for the Event.
+ * Gets a list of district points for the Event. These are always calculated, regardless of event type, and may/may not be actually useful.
  */
 export function getEventDistrictPoints(
   {
@@ -2982,6 +2995,82 @@ export function getEventDistrictPoints(
         status: 404;
       }
   >(`/event/${encodeURIComponent(eventKey)}/district_points`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * For 2025+ Regional events, this will return points towards the Championship qualification pool.
+ */
+export function getRegionalChampsPoolPoints(
+  {
+    ifNoneMatch,
+    eventKey,
+  }: {
+    ifNoneMatch?: string;
+    eventKey: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventDistrictPoints | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/regional_champs_pool_points`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Depending on the type of event (district/regional), this will return either district points or regional CMP points
+ */
+export function getEventAdvancementPoints(
+  {
+    ifNoneMatch,
+    eventKey,
+  }: {
+    ifNoneMatch?: string;
+    eventKey: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventDistrictPoints | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/advancement_points`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
