@@ -21,6 +21,6 @@ class NexusApiSecrets(Sitevar[ContentType]):
         return "For accessing the Nexus API"
 
     @classmethod
-    def secret(cls) -> Optional[str]:
+    def auth_token(cls) -> Optional[str]:
         secret = cls.get().get("api_secret")
         return secret if secret else None  # drop empty strings
