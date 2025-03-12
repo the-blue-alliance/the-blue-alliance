@@ -30,6 +30,8 @@ class DatafeedNexus:
         if response.status_code == 200:
             with Span(f"nexus_api_parser:{type(parser).__name__}"):
                 return parser.parse(response.json())
+        elif response.status_code == 404:
+            return None
 
         logging.warning(
             f"Fetch for {response.url} failed; Error code {response.status_code}; {response.content}"
