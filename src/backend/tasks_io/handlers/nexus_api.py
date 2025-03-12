@@ -1,19 +1,40 @@
+from typing import List, Optional
+
 from flask import abort, Blueprint, make_response, request, Response, url_for
 from google.appengine.api import taskqueue
 
 from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey
+from backend.common.models.keys import EventKey, Year
+from backend.common.queries.event_query import EventListQuery
 from backend.common.queries.team_query import EventEventTeamsQuery
 from backend.tasks_io.datafeeds.datafeed_nexus import DatafeedNexus
 
 blueprint = Blueprint("nexus_api", __name__)
 
 
-@blueprint.route("/tasks/enqueue/nexus_pit_locations/now")
-def enqueue_nexus_pit_locations_current() -> Response:
-    events = EventHelper.events_within_a_day()
+@blueprint.route(
+    "/tasks/enqueue/nexus_pit_locations/current_year",
+    defaults={"year": None, "current_year": True},
+)
+@blueprint.route(
+    "/tasks/enqueue/nexus_pit_locations/now",
+    defaults={"year": None, "current_year": False},
+)
+@blueprint.route(
+    "/tasks/enqueue/nexus_pit_locations/<int:year>", defaults={"current_year": False}
+)
+def enqueue_nexus_pit_locations_current(
+    year: Optional[Year], current_year: bool
+) -> Response:
+    events: List[Event]
+    if year is None and not current_year:
+        events = EventHelper.events_within_a_day()
+    else:
+        events = EventListQuery(year=year or SeasonHelper.get_current_season()).fetch()
+
     events = list(filter(lambda e: e.official, events))
 
     for event in events:

@@ -55,7 +55,6 @@ from backend.common.sitevars.apistatus import ApiStatus
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
-from backend.tasks_io.datafeeds.datafeed_nexus import DatafeedNexus
 
 blueprint = Blueprint("frc_api", __name__)
 
@@ -373,7 +372,6 @@ def event_details(event_key: EventKey) -> Response:
         return make_response(f"Bad event key: {Markup.escape(event_key)}", 400)
 
     fms_df = DatafeedFMSAPI(save_response=True)
-    nexus_df = DatafeedNexus()
 
     # Update event
     event_details_future = fms_df.get_event_details(event_key)
@@ -382,7 +380,6 @@ def event_details(event_key: EventKey) -> Response:
     existing_event_teams_future = EventTeam.query(
         EventTeam.event == ndb.Key(Event, event_key)
     ).fetch_async()
-    nexus_pit_locations_future = nexus_df.get_event_team_pit_locations(event_key)
 
     if (year := int(event_key[:4])) and SeasonHelper.is_valid_regional_pool_year(year):
         champs_pool_model_future = RegionalChampsPool.get_or_insert_async(
@@ -477,7 +474,6 @@ def event_details(event_key: EventKey) -> Response:
         teams = [teams]
 
     # Build EventTeams
-    nexus_pit_locations = nexus_pit_locations_future.get_result()
     skip_eventteams = ChampsRegistrationHacks.should_skip_eventteams(event)
     event_teams = (
         [
@@ -486,11 +482,6 @@ def event_details(event_key: EventKey) -> Response:
                 event=event.key,
                 team=team.key,
                 year=event.year,
-                pit_location=(
-                    nexus_pit_locations[team.key_name]
-                    if nexus_pit_locations and team.key_name in nexus_pit_locations
-                    else None
-                ),
             )
             for team in teams
         ]

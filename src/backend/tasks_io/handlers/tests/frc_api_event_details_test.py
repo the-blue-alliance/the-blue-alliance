@@ -14,7 +14,6 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
-from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import Year
 from backend.common.models.media import Media
 from backend.common.models.regional_champs_pool import RegionalChampsPool
@@ -24,7 +23,6 @@ from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
-from backend.tasks_io.datafeeds.datafeed_nexus import DatafeedNexus
 
 
 def create_event(
@@ -91,17 +89,15 @@ def test_get_bad_key(tasks_client: Client) -> None:
     assert resp.status_code == 400
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details(
-    event_mock, teams_mock, avatars_mock, nexus_pit_mock, tasks_client: Client
+    event_mock, teams_mock, avatars_mock, tasks_client: Client
 ) -> None:
     event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
     teams_mock.return_value = InstantFuture([])
     avatars_mock.return_value = InstantFuture(([], []))
-    nexus_pit_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
@@ -112,7 +108,6 @@ def test_get_event_details(
     assert District.get_by_id("2019fim") is not None
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
@@ -122,7 +117,6 @@ def test_get_event_details_writes_teams(
     teams_mock,
     avatars_mock,
     max_year_mock,
-    nexus_pit_mock,
     tasks_client: Client,
 ) -> None:
     event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
@@ -145,8 +139,6 @@ def test_get_event_details_writes_teams(
             [],
         )
     )
-    pit_location = EventTeamPitLocation(location="A1")
-    nexus_pit_mock.return_value = InstantFuture({"frc254": pit_location})
 
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
@@ -155,15 +147,11 @@ def test_get_event_details_writes_teams(
     # Make sure we write models
     assert Team.get_by_id("frc254") is not None
     assert DistrictTeam.get_by_id("2019fim_frc254") is not None
+    assert EventTeam.get_by_id("2019casj_frc254") is not None
     assert Robot.get_by_id("frc254_2019") is not None
     assert Media.get_by_id("avatar_media") is not None
 
-    et = EventTeam.get_by_id("2019casj_frc254")
-    assert et is not None
-    assert et.pit_location == pit_location
 
-
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
@@ -173,7 +161,6 @@ def test_get_event_details_clears_eventteams(
     teams_mock,
     avatars_mock,
     max_year_mock,
-    nexus_pit_mock,
     tasks_client: Client,
 ) -> None:
     event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
@@ -187,7 +174,6 @@ def test_get_event_details_clears_eventteams(
             ),
         ]
     )
-    nexus_pit_mock.return_value = InstantFuture(None)
 
     EventTeam(
         id="2019casj_frc900",
@@ -220,7 +206,6 @@ def test_get_event_details_clears_eventteams(
     assert {"frc254", "frc9000"} == {et.team.string_id() for et in ets}
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
 @mock.patch.object(ChampsRegistrationHacks, "should_skip_eventteams", return_value=True)
 @mock.patch.object(
@@ -234,7 +219,6 @@ def test_get_event_details_skip_eventteams(
     avatars_mock,
     max_year_mock,
     sv_mock,
-    nexus_pit_mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
@@ -248,7 +232,6 @@ def test_get_event_details_skip_eventteams(
             ),
         ]
     )
-    nexus_pit_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
@@ -262,7 +245,6 @@ def test_get_event_details_skip_eventteams(
     assert tasks[0].url == "/tasks/math/do/eventteam_update/2019casj?allow_deletes=True"
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
@@ -272,7 +254,6 @@ def test_get_event_details_writes_cmp_advancement(
     teams_mock,
     avatars_mock,
     max_year_mock,
-    nexus_pit_mock,
     tasks_client: Client,
 ) -> None:
     event_mock.return_value = InstantFuture(
@@ -293,7 +274,6 @@ def test_get_event_details_writes_cmp_advancement(
             [],
         )
     )
-    nexus_pit_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
     assert resp.status_code == 200
@@ -311,7 +291,6 @@ def test_get_event_details_writes_cmp_advancement(
     }
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
@@ -321,7 +300,6 @@ def test_get_event_details_ignores_other_event_cmp_advancement(
     teams_mock,
     avatars_mock,
     max_year_mock,
-    nexus_pit_mock,
     tasks_client: Client,
 ) -> None:
     RegionalChampsPool.get_or_insert(
@@ -350,7 +328,6 @@ def test_get_event_details_ignores_other_event_cmp_advancement(
             [],
         )
     )
-    nexus_pit_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
     assert resp.status_code == 200
@@ -368,7 +345,6 @@ def test_get_event_details_ignores_other_event_cmp_advancement(
     }
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
@@ -378,7 +354,6 @@ def test_get_event_details_removes_cmp_advancement_if_no_longer_registered(
     teams_mock,
     avatars_mock,
     max_year_mock,
-    nexus_pit_mock,
     tasks_client: Client,
 ) -> None:
     RegionalChampsPool.get_or_insert(
@@ -394,7 +369,6 @@ def test_get_event_details_removes_cmp_advancement_if_no_longer_registered(
     )
     teams_mock.return_value = InstantFuture([])
     avatars_mock.return_value = InstantFuture(([], []))
-    nexus_pit_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
     assert resp.status_code == 200
@@ -410,7 +384,6 @@ def test_get_event_details_removes_cmp_advancement_if_no_longer_registered(
     assert regional_pool.advancement == {}
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
@@ -420,7 +393,6 @@ def test_get_event_details_ignores_non_cmp_event(
     teams_mock,
     avatars_mock,
     max_year_mock,
-    nexus_pit_mock,
     tasks_client: Client,
 ) -> None:
     RegionalChampsPool.get_or_insert(
@@ -449,7 +421,6 @@ def test_get_event_details_ignores_non_cmp_event(
             [],
         )
     )
-    nexus_pit_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
     assert resp.status_code == 200
@@ -467,17 +438,15 @@ def test_get_event_details_ignores_non_cmp_event(
     }
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_no_output_in_taskqueue(
-    event_mock, teams_mock, avatars_mock, nexus_pit_mock, tasks_client: Client
+    event_mock, teams_mock, avatars_mock, tasks_client: Client
 ) -> None:
     event_mock.return_value = InstantFuture(([create_event()], []))
     teams_mock.return_value = InstantFuture([])
     avatars_mock.return_value = InstantFuture(([], []))
-    nexus_pit_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get(
         "/backend-tasks/get/event_details/2019casj",
