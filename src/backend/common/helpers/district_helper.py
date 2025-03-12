@@ -3,7 +3,18 @@ import logging
 import math
 from collections import defaultdict
 from datetime import timedelta
-from typing import cast, DefaultDict, Dict, List, Set, Tuple, TypedDict, Union
+from typing import (
+    cast,
+    DefaultDict,
+    Dict,
+    List,
+    NamedTuple,
+    Sequence,
+    Set,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -40,10 +51,19 @@ class DistrictRankingTeamTotal(TypedDict):
 
     event_points: List[Tuple[Event, TeamAtEventDistrictPoints]]
     point_total: int
-    tiebreakers: List[int]
+    tiebreakers: Sequence[int]
     qual_scores: List[int]
     rookie_bonus: int
+    single_event_bonus: int
     other_bonus: int
+
+
+class DistrictRankingTiebreakers(NamedTuple):
+    total_playoff_points: int
+    best_playoff_points: int
+    total_alliance_points: int
+    best_alliance_points: int
+    total_qual_points: int
 
 
 class DistrictHelper:
@@ -203,9 +223,16 @@ class DistrictHelper:
                 event_points=[],
                 point_total=0,
                 rookie_bonus=0,
-                tiebreakers=5 * [0],
+                tiebreakers=DistrictRankingTiebreakers(
+                    total_playoff_points=0,
+                    best_playoff_points=0,
+                    total_alliance_points=0,
+                    best_alliance_points=0,
+                    total_qual_points=0,
+                ),
                 qual_scores=[],
                 other_bonus=0,
+                single_event_bonus=0,
             )
         )
         for event in events:
@@ -222,45 +249,48 @@ class DistrictHelper:
                         or event.event_type_enum == EventType.DISTRICT_CMP_DIVISION
                     ):
                         if team_key in event_district_points["points"]:
-                            team_totals[team_key]["event_points"].append(
-                                (event, event_district_points["points"][team_key])
+                            tiebreakers = DistrictRankingTiebreakers(
+                                *team_totals[team_key]["tiebreakers"]
                             )
-                            team_totals[team_key][
-                                "point_total"
-                            ] += event_district_points["points"][team_key]["total"]
+
+                            team_event_points: TeamAtEventDistrictPoints = (
+                                event_district_points["points"][team_key]
+                            )
+                            team_totals[team_key]["event_points"].append(
+                                (event, team_event_points)
+                            )
+                            team_totals[team_key]["point_total"] += team_event_points[
+                                "total"
+                            ]
 
                             # add tiebreakers in order
-                            team_totals[team_key]["tiebreakers"][
-                                0
-                            ] += event_district_points["points"][team_key][
-                                "elim_points"
-                            ]
-                            team_totals[team_key]["tiebreakers"][1] = max(
-                                event_district_points["points"][team_key][
-                                    "elim_points"
-                                ],
-                                team_totals[team_key]["tiebreakers"][1],
+                            tiebreakers = DistrictRankingTiebreakers(
+                                total_playoff_points=(
+                                    tiebreakers.total_playoff_points
+                                    + team_event_points["elim_points"]
+                                ),
+                                best_playoff_points=max(
+                                    tiebreakers.best_playoff_points,
+                                    team_event_points["elim_points"],
+                                ),
+                                total_alliance_points=(
+                                    tiebreakers.total_alliance_points
+                                    + team_event_points["alliance_points"]
+                                ),
+                                best_alliance_points=max(
+                                    tiebreakers.best_alliance_points,
+                                    team_event_points["alliance_points"],
+                                ),
+                                total_qual_points=(
+                                    tiebreakers.total_qual_points
+                                    + team_event_points["qual_points"]
+                                ),
                             )
-                            team_totals[team_key]["tiebreakers"][
-                                2
-                            ] += event_district_points["points"][team_key][
-                                "alliance_points"
-                            ]
-                            team_totals[team_key]["tiebreakers"][3] = max(
-                                event_district_points["points"][team_key][
-                                    "alliance_points"
-                                ],
-                                team_totals[team_key]["tiebreakers"][3],
-                            )
+                            team_totals[team_key]["tiebreakers"] = tiebreakers
 
                         if (
                             team_key in event_district_points["tiebreakers"]
                         ):  # add more tiebreakers
-                            team_totals[team_key]["tiebreakers"][
-                                4
-                            ] += event_district_points["tiebreakers"][team_key][
-                                "qual_wins"
-                            ]
                             team_totals[team_key]["qual_scores"] = heapq.nlargest(
                                 3,
                                 [
@@ -315,12 +345,8 @@ class DistrictHelper:
                 team_totals.items(),
                 key=lambda item: [
                     -item[1]["point_total"],
-                    -item[1]["tiebreakers"][0],
-                    -item[1]["tiebreakers"][1],
-                    -item[1]["tiebreakers"][2],
-                    -item[1]["tiebreakers"][3],
-                    -item[1]["tiebreakers"][4],
                 ]
+                + [-t for t in item[1]["tiebreakers"]]
                 + [-score for score in item[1]["qual_scores"]],
             )
         )
@@ -394,7 +420,6 @@ class DistrictHelper:
 
             winning_alliance = cast(AllianceColor, match.winning_alliance)
 
-            # Get alliance numbers
             winning_alliance_number = cls._get_alliance_number_from_teams(
                 alliance_selections,
                 match.alliances[winning_alliance]["teams"],

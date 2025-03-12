@@ -26,6 +26,7 @@ from backend.api.handlers.district import (
 from backend.api.handlers.error import handle_404
 from backend.api.handlers.event import (
     event,
+    event_advancement_points,
     event_awards,
     event_detail,
     event_list_all,
@@ -93,7 +94,7 @@ class ModelTypeConverter(BaseConverter):
 
 
 class EventDetailTypeConverter(BaseConverter):
-    regex = r"alliances|district_points|insights|oprs|coprs|predictions|rankings"
+    regex = r"alliances|district_points|insights|oprs|coprs|predictions|rankings|regional_champs_pool_points"
 
 
 configure_logging()
@@ -152,6 +153,10 @@ api_v3.add_url_rule(
 api_v3.add_url_rule(
     "/event/<string:event_key>/<event_detail_type:detail_type>",
     view_func=event_detail,
+)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/advancement_points",
+    view_func=event_advancement_points,
 )
 api_v3.add_url_rule("/event/<string:event_key>/teams", view_func=event_teams)
 api_v3.add_url_rule(

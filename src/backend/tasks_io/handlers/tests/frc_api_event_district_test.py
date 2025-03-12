@@ -2,6 +2,7 @@ from unittest import mock
 
 from werkzeug.test import Client
 
+from backend.common.futures import InstantFuture
 from backend.common.models.district import District
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
@@ -13,7 +14,9 @@ def test_district_list_bad_year(tasks_client: Client) -> None:
 
 @mock.patch.object(DatafeedFMSAPI, "get_district_list")
 def test_district_list_get_year(api_mock, tasks_client: Client) -> None:
-    api_mock.return_value = [District(id="2020ne", year=2020, abbreviation="ne")]
+    api_mock.return_value = InstantFuture(
+        [District(id="2020ne", year=2020, abbreviation="ne")]
+    )
 
     resp = tasks_client.get("/backend-tasks/get/district_list/2020")
     assert resp.status_code == 200
@@ -27,7 +30,9 @@ def test_district_list_get_year(api_mock, tasks_client: Client) -> None:
 def test_district_list_get_year_no_output_in_taskqueue(
     api_mock, tasks_client: Client
 ) -> None:
-    api_mock.return_value = [District(id="2020ne", year=2020, abbreviation="ne")]
+    api_mock.return_value = InstantFuture(
+        [District(id="2020ne", year=2020, abbreviation="ne")]
+    )
 
     resp = tasks_client.get(
         "/backend-tasks/get/district_list/2020",
@@ -54,7 +59,7 @@ def test_district_rankings_no_district(tasks_client: Client) -> None:
 def test_district_rankings(api_mock, tasks_client: Client) -> None:
     District(id="2020ne", year=2020, abbreviation="ne").put()
     advancement = {"frc254": {"dcmp": True, "cmp": True}}
-    api_mock.return_value = advancement
+    api_mock.return_value = InstantFuture(advancement)
 
     resp = tasks_client.get(
         "/backend-tasks/get/district_rankings/2020ne",
@@ -74,7 +79,7 @@ def test_district_rankings_no_output_in_taskqueue(
 ) -> None:
     District(id="2020ne", year=2020, abbreviation="ne").put()
     advancement = {"frc254": {"dcmp": True, "cmp": True}}
-    api_mock.return_value = advancement
+    api_mock.return_value = InstantFuture(advancement)
 
     resp = tasks_client.get(
         "/backend-tasks/get/district_rankings/2020ne",

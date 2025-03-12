@@ -305,7 +305,7 @@ class PlayoffAdvancementHelper:
                     bracket_table[comp_level][set_key][f"{winner}_record"]["wins"] + 1
                 )
 
-                loser = OPPONENT[cast(AllianceColor, winner)]
+                loser = OPPONENT[winner]
                 bracket_table[comp_level][set_key][f"{loser}_record"]["losses"] = (
                     bracket_table[comp_level][set_key][f"{loser}_record"]["losses"] + 1
                 )

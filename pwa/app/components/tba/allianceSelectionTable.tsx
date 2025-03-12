@@ -70,12 +70,13 @@ export default function AllianceSelectionTable(props: {
 
       <Table className="table-fixed">
         <TableHeader>
-          <TableRow className="*:h-8 *:font-bold">
+          <TableRow className="*:h-8 *:text-center *:font-bold">
             <TableHead>Alliance</TableHead>
             <TableHead>Captain</TableHead>
-            {[...Array(allianceSize - 1).keys()].map((i) => (
-              <TableHead key={i}>Pick {i + 1}</TableHead>
-            ))}
+            {allianceSize > 1 &&
+              [...Array(allianceSize - 1).keys()].map((i) => (
+                <TableHead key={i}>Pick {i + 1}</TableHead>
+              ))}
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -9,6 +9,7 @@ from backend.tasks_io.handlers.cron_misc import blueprint as cron_misc_blueprint
 from backend.tasks_io.handlers.frc_api import blueprint as frc_api_blueprint
 from backend.tasks_io.handlers.live_events import blueprint as live_events_blueprint
 from backend.tasks_io.handlers.math import blueprint as math_blueprint
+from backend.tasks_io.handlers.nexus_api import blueprint as nexus_api_blueprint
 from backend.tasks_io.handlers.tasks import blueprint as tasks_blueprint
 
 
@@ -25,3 +26,4 @@ app.register_blueprint(frc_api_blueprint)
 app.register_blueprint(live_events_blueprint)
 app.register_blueprint(math_blueprint)
 app.register_blueprint(tasks_blueprint)
+app.register_blueprint(nexus_api_blueprint)

@@ -65,6 +65,9 @@ class TeamRenderer:
         participation_future = team_query.TeamParticipationQuery(
             team_key=team.key_name
         ).fetch_async()
+        eventteams_future = event_query.TeamYearEventTeamsQuery(
+            team_key=team.key_name, year=year
+        ).fetch_async()
 
         hof_awards = hof_award_future.get_result()
         hof_video = hof_video_future.get_result()
@@ -116,6 +119,7 @@ class TeamRenderer:
                     )
                 break
 
+        event_teams = eventteams_future.get_result()
         participation = []
         season_wlt_list = []
         offseason_wlt_list = []
@@ -212,6 +216,10 @@ class TeamRenderer:
             else:
                 alliance_status = None
 
+            eventteam = next(
+                filter(lambda et: et.event == event.key, event_teams), None
+            )
+
             participation.append(
                 {
                     "alliance": alliance,
@@ -227,6 +235,11 @@ class TeamRenderer:
                     "awards": event_awards,
                     "playlist": playlist,
                     "district_points": district_points,
+                    "nexus_pit_location": (
+                        eventteam.pit_location["location"]
+                        if eventteam and eventteam.pit_location
+                        else None
+                    ),
                 }
             )
 
@@ -321,6 +334,12 @@ class TeamRenderer:
             "max_year": SeasonHelper.get_max_year(),
             "hof": hall_of_fame,
             "team_district_points": team_district_points,
+            "has_any_pit_location": any(
+                comp["event"].official
+                and (comp["event"].now or comp["event"].future)
+                and comp["nexus_pit_location"] is not None
+                for comp in participation
+            ),
         }
 
         return template_values, short_cache

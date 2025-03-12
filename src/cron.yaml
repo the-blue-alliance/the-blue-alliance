@@ -1,12 +1,12 @@
 cron:
 - description: FIRST event list scraping. Also includes event details/event teams/team details scraping.
   url: /backend-tasks/enqueue/event_list/current
-  schedule: every day 02:00
+  schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: FIRST team detail scraping
   url: /tasks/enqueue/fmsapi_team_details_rolling
-  schedule: every day 02:30
+  schedule: every day 03:30
   timezone: America/Los_Angeles
 
 - description: FIRST match scraping for current events
@@ -28,6 +28,15 @@ cron:
 - description: FIRST award scraping for current events
   url: /tasks/enqueue/fmsapi_awards/now
   schedule: every 1 hours
+
+- description: Nexus pit locations for current events
+  url: /tasks/enqueue/nexus_pit_locations/now
+  schedule: every 1 hours
+
+- description: Nexus pit locations for all season events
+  url: /tasks/enqueue/nexus_pit_locations/current_year
+  schedule: every day 02:00
+  timezone: America/Los_Angeles
 
 - description: Hall of Fame team list scraping
   url: /tasks/get/hof_teams
@@ -57,6 +66,26 @@ cron:
 - description: Match Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/matches
   schedule: every day 01:08
+  timezone: America/Los_Angeles
+
+- description: Team Leaderboard Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/leaderboards/team
+  schedule: every day 01:15
+  timezone: America/Los_Angeles
+
+- description: Event Leaderboard Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/leaderboards/event
+  schedule: every day 01:17
+  timezone: America/Los_Angeles
+
+- description: Match Leaderboard Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/leaderboards/match
+  schedule: every day 01:19
+  timezone: America/Los_Angeles
+
+- description: Notable Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/notables
+  schedule: every day 01:21
   timezone: America/Los_Angeles
 
 - description: Award Overall Insights Calculation
@@ -98,3 +127,7 @@ cron:
 - description: Update Team Search Indexes
   url: /tasks/enqueue/update_all_team_search_index
   schedule: every monday 04:00
+
+- description: Archive Old API Keys
+  url: /tasks/do/archive_api_keys
+  schedule: 1 of jan 1:00

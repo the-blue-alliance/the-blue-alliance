@@ -6,6 +6,7 @@ from pyre_extensions import none_throws
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.event import Event
+from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.event_team_status import (
     EventTeamStatus,
     EventTeamStatusStrings,
@@ -26,6 +27,7 @@ class EventTeam(CachedModel):
     year: Year = ndb.IntegerProperty(required=True)
 
     status: EventTeamStatus = cast(EventTeamStatus, ndb.JsonProperty())
+    pit_location: EventTeamPitLocation = cast(EventTeamPitLocation, ndb.JsonProperty())
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -33,6 +35,7 @@ class EventTeam(CachedModel):
     _mutable_attrs: Set[str] = {
         "status",
         "year",  # technically immutable, but corruptable and needs repair. See github issue #409
+        "pit_location",
     }
 
     def __init__(self, *args, **kw):

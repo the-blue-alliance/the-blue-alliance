@@ -1,11 +1,11 @@
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 
 import { Button } from '~/components/ui/button';
 
 export default function Donate(): React.JSX.Element {
   return (
     <>
-      <div className="flex flex-col divide-y [&_*]:mt-4">
+      <div className="flex flex-col divide-y **:mt-4">
         <div>
           <h1 className="text-3xl font-medium">Donate</h1>
           <p>

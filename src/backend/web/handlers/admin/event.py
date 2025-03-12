@@ -15,6 +15,9 @@ from backend.common.consts.playoff_type import (
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
 )
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
+    DistrictPointTiebreakersSortingHelper,
+)
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
@@ -56,13 +59,11 @@ def event_list(year: Optional[Year]) -> str:
 
 
 def event_detail(event_key: EventKey) -> str:
-    if not Event.validate_key_name(event_key):
-        abort(404)
-
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
     event.prep_awards_matches_teams()
+    event.prep_details()
 
     reg_sitevar = ChampsRegistrationHacks.get()
     api_keys = ApiAuthAccess.query(
@@ -110,6 +111,22 @@ def event_detail(event_key: EventKey) -> str:
             }
         )
 
+    district_points_sorted = None
+    if event.district_key and (points := event.district_points):
+        district_points_sorted = DistrictPointTiebreakersSortingHelper.sorted_points(
+            points
+        )
+
+    is_regional_cmp_pool_eligible = (
+        SeasonHelper.is_valid_regional_pool_year(event.year)
+        and event.event_type_enum == EventType.REGIONAL
+    )
+    regional_champs_pool_points_sorted = None
+    if is_regional_cmp_pool_eligible and (points := event.regional_champs_pool_points):
+        regional_champs_pool_points_sorted = (
+            DistrictPointTiebreakersSortingHelper.sorted_points(points)
+        )
+
     template_values = {
         "event": event,
         "medias": event_medias.get_result(),
@@ -138,15 +155,14 @@ def event_detail(event_key: EventKey) -> str:
         "advancement_html": advancement_html,
         "match_stats": match_stats,
         "deleted_count": request.args.get("deleted"),
+        "district_points_sorted": district_points_sorted,
+        "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
     }
 
     return render_template("admin/event_details.html", template_values)
 
 
 def event_edit(event_key: EventKey) -> Response:
-    if not Event.validate_key_name(event_key):
-        abort(404)
-
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
@@ -163,9 +179,8 @@ def event_edit(event_key: EventKey) -> Response:
 
 def event_delete(event_key: EventKey) -> Response:
     if request.method == "POST":
-        if not Event.validate_key_name(event_key):
-            abort(404)
-
+        # We do not check if the event key is valid due to the possibility of invalid events being written.
+        # See: https://github.com/the-blue-alliance/the-blue-alliance/issues/6735
         event = Event.get_by_id(event_key)
         if not event:
             abort(404)
@@ -180,9 +195,6 @@ def event_delete(event_key: EventKey) -> Response:
 
         return redirect(url_for("admin.event_list"))
     else:
-        if not Event.validate_key_name(event_key):
-            abort(404)
-
         event = Event.get_by_id(event_key)
         if not event:
             abort(404)
@@ -448,12 +460,12 @@ def event_add_webcast_post(event_key: EventKey) -> Response:
 
     webcast = Webcast(
         type=WebcastType(request.form.get("webcast_type")),
-        channel=request.form.get("webcast_channel"),
+        channel=none_throws(request.form.get("webcast_channel")),
     )
     if request.form.get("webcast_file"):
-        webcast["file"] = request.form.get("webcast_file")
+        webcast["file"] = none_throws(request.form.get("webcast_file"))
     if request.form.get("webcast_date"):
-        webcast["date"] = request.form.get("webcast_date")
+        webcast["date"] = none_throws(request.form.get("webcast_date"))
 
     EventWebcastAdder.add_webcast(event, webcast)
 
@@ -467,8 +479,8 @@ def event_remove_webcast_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    webcast_type = request.form.get("type")
-    webcast_channel = request.form.get("channel")
+    webcast_type = WebcastType(request.form.get("type"))
+    webcast_channel = none_throws(request.form.get("channel"))
     webcast_index = int(request.form.get("index")) - 1
     if request.form.get("file"):
         webcast_file = request.form.get("file")

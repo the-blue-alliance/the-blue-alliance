@@ -9,6 +9,7 @@ from werkzeug.test import Client
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -132,7 +133,7 @@ def test_get_event_not_found(tasks_client: Client) -> None:
 @mock.patch.object(DatafeedFMSAPI, "get_awards")
 def test_get_no_awards(api_mock: mock.Mock, tasks_client: Client) -> None:
     e = create_event(official=True)
-    api_mock.return_value = []
+    api_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get("/tasks/get/fmsapi_awards/2019casj")
     assert resp.status_code == 200
@@ -143,7 +144,7 @@ def test_get_no_awards(api_mock: mock.Mock, tasks_client: Client) -> None:
 @mock.patch.object(DatafeedFMSAPI, "get_awards")
 def test_get_no_output_in_taskqueue(api_mock: mock.Mock, tasks_client: Client) -> None:
     e = create_event(official=True)
-    api_mock.return_value = []
+    api_mock.return_value = InstantFuture([])
 
     resp = tasks_client.get(
         "/tasks/get/fmsapi_awards/2019casj", headers={"X-Appengine-Taskname": "test"}
@@ -156,17 +157,19 @@ def test_get_no_output_in_taskqueue(api_mock: mock.Mock, tasks_client: Client) -
 @mock.patch.object(DatafeedFMSAPI, "get_awards")
 def test_get_awards_single(api_mock: mock.Mock, tasks_client: Client) -> None:
     e = create_event(official=True)
-    api_mock.return_value = [
-        Award(
-            id="2019casj_1",
-            year=2019,
-            award_type_enum=AwardType.WINNER,
-            event_type_enum=EventType.REGIONAL,
-            event=ndb.Key(Event, "2019casj"),
-            name_str="Winner",
-            team_list=[ndb.Key(Team, "frc254")],
-        )
-    ]
+    api_mock.return_value = InstantFuture(
+        [
+            Award(
+                id="2019casj_1",
+                year=2019,
+                award_type_enum=AwardType.WINNER,
+                event_type_enum=EventType.REGIONAL,
+                event=ndb.Key(Event, "2019casj"),
+                name_str="Winner",
+                team_list=[ndb.Key(Team, "frc254")],
+            )
+        ]
+    )
 
     resp = tasks_client.get("/tasks/get/fmsapi_awards/2019casj")
     assert resp.status_code == 200
@@ -191,26 +194,28 @@ def test_get_awards_single(api_mock: mock.Mock, tasks_client: Client) -> None:
 @mock.patch.object(DatafeedFMSAPI, "get_awards")
 def test_get_awards_multiple(api_mock: mock.Mock, tasks_client: Client) -> None:
     e = create_event(official=True)
-    api_mock.return_value = [
-        Award(
-            id="2019casj_1",
-            year=2019,
-            award_type_enum=AwardType.WINNER,
-            event_type_enum=EventType.REGIONAL,
-            event=ndb.Key(Event, "2019casj"),
-            name_str="Winner",
-            team_list=[ndb.Key(Team, "frc254")],
-        ),
-        Award(
-            id="2019casj_0",
-            year=2019,
-            award_type_enum=AwardType.CHAIRMANS,
-            event_type_enum=EventType.REGIONAL,
-            event=ndb.Key(Event, "2019casj"),
-            name_str="Winner",
-            team_list=[ndb.Key(Team, "frc1337")],
-        ),
-    ]
+    api_mock.return_value = InstantFuture(
+        [
+            Award(
+                id="2019casj_1",
+                year=2019,
+                award_type_enum=AwardType.WINNER,
+                event_type_enum=EventType.REGIONAL,
+                event=ndb.Key(Event, "2019casj"),
+                name_str="Winner",
+                team_list=[ndb.Key(Team, "frc254")],
+            ),
+            Award(
+                id="2019casj_0",
+                year=2019,
+                award_type_enum=AwardType.CHAIRMANS,
+                event_type_enum=EventType.REGIONAL,
+                event=ndb.Key(Event, "2019casj"),
+                name_str="Winner",
+                team_list=[ndb.Key(Team, "frc1337")],
+            ),
+        ]
+    )
 
     resp = tasks_client.get("/tasks/get/fmsapi_awards/2019casj")
     assert resp.status_code == 200
@@ -232,26 +237,28 @@ def test_get_awards_multiple(api_mock: mock.Mock, tasks_client: Client) -> None:
 @mock.patch.object(DatafeedFMSAPI, "get_awards")
 def test_get_awards_team_dedup(api_mock: mock.Mock, tasks_client: Client) -> None:
     e = create_event(official=True)
-    api_mock.return_value = [
-        Award(
-            id="2019casj_1",
-            year=2019,
-            award_type_enum=AwardType.WINNER,
-            event_type_enum=EventType.REGIONAL,
-            event=ndb.Key(Event, "2019casj"),
-            name_str="Winner",
-            team_list=[ndb.Key(Team, "frc254")],
-        ),
-        Award(
-            id="2019casj_0",
-            year=2019,
-            award_type_enum=AwardType.CHAIRMANS,
-            event_type_enum=EventType.REGIONAL,
-            event=ndb.Key(Event, "2019casj"),
-            name_str="Winner",
-            team_list=[ndb.Key(Team, "frc254")],
-        ),
-    ]
+    api_mock.return_value = InstantFuture(
+        [
+            Award(
+                id="2019casj_1",
+                year=2019,
+                award_type_enum=AwardType.WINNER,
+                event_type_enum=EventType.REGIONAL,
+                event=ndb.Key(Event, "2019casj"),
+                name_str="Winner",
+                team_list=[ndb.Key(Team, "frc254")],
+            ),
+            Award(
+                id="2019casj_0",
+                year=2019,
+                award_type_enum=AwardType.CHAIRMANS,
+                event_type_enum=EventType.REGIONAL,
+                event=ndb.Key(Event, "2019casj"),
+                name_str="Winner",
+                team_list=[ndb.Key(Team, "frc254")],
+            ),
+        ]
+    )
 
     resp = tasks_client.get("/tasks/get/fmsapi_awards/2019casj")
     assert resp.status_code == 200
@@ -272,36 +279,38 @@ def test_get_awards_team_dedup(api_mock: mock.Mock, tasks_client: Client) -> Non
 @mock.patch.object(DatafeedFMSAPI, "get_awards")
 def test_get_awards_remapteams(api_mock: mock.Mock, tasks_client: Client) -> None:
     e = create_event(official=True, remap_teams={"frc9000": "frc254B"})
-    api_mock.return_value = [
-        Award(
-            id="2019casj_1",
-            year=2019,
-            award_type_enum=AwardType.WINNER,
-            event_type_enum=EventType.REGIONAL,
-            event=ndb.Key(Event, "2019casj"),
-            name_str="Winner",
-            recipient_json_list=[
-                json.dumps(
-                    {"name_str": "", "team_number": "254"},
-                )
-            ],
-            team_list=[ndb.Key(Team, "frc254")],
-        ),
-        Award(
-            id="2019casj_0",
-            year=2019,
-            award_type_enum=AwardType.CHAIRMANS,
-            event_type_enum=EventType.REGIONAL,
-            event=ndb.Key(Event, "2019casj"),
-            name_str="Winner",
-            recipient_json_list=[
-                json.dumps(
-                    {"name_str": "", "team_number": "9000"},
-                )
-            ],
-            team_list=[ndb.Key(Team, "frc9000")],
-        ),
-    ]
+    api_mock.return_value = InstantFuture(
+        [
+            Award(
+                id="2019casj_1",
+                year=2019,
+                award_type_enum=AwardType.WINNER,
+                event_type_enum=EventType.REGIONAL,
+                event=ndb.Key(Event, "2019casj"),
+                name_str="Winner",
+                recipient_json_list=[
+                    json.dumps(
+                        {"name_str": "", "team_number": "254"},
+                    )
+                ],
+                team_list=[ndb.Key(Team, "frc254")],
+            ),
+            Award(
+                id="2019casj_0",
+                year=2019,
+                award_type_enum=AwardType.CHAIRMANS,
+                event_type_enum=EventType.REGIONAL,
+                event=ndb.Key(Event, "2019casj"),
+                name_str="Winner",
+                recipient_json_list=[
+                    json.dumps(
+                        {"name_str": "", "team_number": "9000"},
+                    )
+                ],
+                team_list=[ndb.Key(Team, "frc9000")],
+            ),
+        ]
+    )
 
     resp = tasks_client.get("/tasks/get/fmsapi_awards/2019casj")
     assert resp.status_code == 200

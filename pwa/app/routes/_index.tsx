@@ -1,5 +1,5 @@
-import type { MetaFunction } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import type { MetaFunction } from 'react-router';
+import { useLoaderData } from 'react-router';
 
 import { getEventsByYear, getStatus } from '~/api/v3';
 import EventListTable from '~/components/tba/eventListTable';
@@ -68,11 +68,11 @@ export default function Index() {
 
       {events.length > 0 ? (
         <div>
-          <h1 className="mb-2.5 mt-5 text-4xl">This Week&apos;s Events</h1>
+          <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
           <EventListTable events={events} />
         </div>
       ) : (
-        <h1 className="mb-2.5 mt-5 text-4xl">No Events This Week</h1>
+        <h1 className="mt-5 mb-2.5 text-4xl">No Events This Week</h1>
       )}
 
       <a

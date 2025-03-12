@@ -30,7 +30,6 @@ class TurboMode(Sitevar[ContentType]):
     def cache_ttl(cls, request_path: str, default_ttl: int) -> int:
         cfg = cls.get()
         path_regex = cfg.get("regex", "")
-        print(f"view: {request_path}")
         if not path_regex or path_regex == "$^":
             return default_ttl
 

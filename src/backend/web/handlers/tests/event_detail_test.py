@@ -116,3 +116,21 @@ def test_render_double_elim(web_client: Client, test_data_importer) -> None:
 
     double_elim_bracket = soup.find(id="double-elim-bracket-table")
     assert double_elim_bracket is not None
+
+
+def test_render_regional_cmp_points(web_client: Client, test_data_importer) -> None:
+    test_data_importer.import_full_event(__file__, "2025mndu")
+
+    resp = web_client.get("/event/2025mndu")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert soup.find(id="event-name").string == "Lake Superior Regional 2025"
+    assert soup.find(itemprop="startDate").string == "February 26"
+    assert soup.find(itemprop="endDate").string == "March 1, 2025"
+
+    district_point_tab = soup.find("a", {"href": "#district_points"})
+    assert district_point_tab is None
+
+    regional_point_tab = soup.find("a", {"href": "#cmp-points"})
+    assert regional_point_tab is not None

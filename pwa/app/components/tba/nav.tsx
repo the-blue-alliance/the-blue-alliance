@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 
 import BiBarChartLineFill from '~icons/bi/bar-chart-line-fill';
 import BiCameraVideoFill from '~icons/bi/camera-video-fill';
@@ -8,9 +8,8 @@ import BiPeopleFill from '~icons/bi/people-fill';
 import BiStarFill from '~icons/bi/star-fill';
 import BiThreeDotsVertical from '~icons/bi/three-dots-vertical';
 import IonCalendar from '~icons/ion/calendar';
-import SearchIcon from '~icons/lucide/search';
 
-import { Input } from '~/components/ui/input';
+import Searchbar from '~/components/tba/searchbar';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -67,24 +66,25 @@ export const DropMenuItem = ({
   return (
     <NavigationMenuItem
       className={cn(
-        `relative flex cursor-default select-none bg-primary items-center rounded-sm
-          text-md outline-none transition-colors focus:bg-background
-          focus:text-accent-foreground data-[disabled]:pointer-events-none
-          data-[disabled]:opacity-50`,
+        `text-md relative flex cursor-default items-center rounded-sm bg-primary
+        outline-hidden transition-colors select-none focus:bg-background
+        focus:text-accent-foreground data-disabled:pointer-events-none
+        data-disabled:opacity-50`,
         className,
       )}
     >
       <NavigationMenuLink
         className={
           navigationMenuTriggerStyle() +
-          ' cursor-pointer w-full grow hover:no-underline'
+          ' w-full grow cursor-pointer hover:no-underline'
         }
         asChild
       >
         {route ? (
           <Link
             to={route}
-            className="flex grow flex-row flex-wrap content-between items-center justify-start px-2 text-white hover:no-underline"
+            className="flex grow flex-row flex-wrap content-between items-center justify-start px-2
+              text-white hover:no-underline"
           >
             {icon}
             <div className="pl-2 antialiased">{title}</div>
@@ -111,7 +111,7 @@ export const Nav = () => {
             className="size-6 max-w-none"
             alt="The Blue Alliance Logo"
           />
-          <div className="hidden whitespace-nowrap text-xl font-medium tracking-tight	 text-white lg:block">
+          <div className="hidden text-xl font-medium tracking-tight whitespace-nowrap text-white lg:block">
             The Blue Alliance
           </div>
         </Link>
@@ -143,8 +143,8 @@ export const Nav = () => {
               alignOffset={-2}
               align="start"
               className={cn(
-                `mt-6 bg-primary px-1 py-1 w-30 m-0 border-none drop-shadow-lg shadow-l
-                  rounded-md `,
+                `shadow-l m-0 mt-6 w-30 rounded-md border-none bg-primary px-1 py-1
+                drop-shadow-lg`,
               )}
             >
               <DropMenuItem
@@ -165,23 +165,15 @@ export const Nav = () => {
                 route="/insights"
               />
               <DropMenuItem icon={<BiPencilFill />} title="Blog" />
-              <DropMenuItem icon={<BiGearFill />} title="Account" />
+              <DropMenuItem
+                icon={<BiGearFill />}
+                title="Account"
+                route="/account"
+              />
             </PopoverContent>
           </Popover>
         </NavigationMenuList>
-        <div className="ml-auto">
-          <form>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="size-4 text-neutral-500" />
-              </div>
-              <Input
-                placeholder="Search"
-                className="bg-accent pl-9 text-sm transition-all hover:bg-white focus:bg-white"
-              />
-            </div>
-          </form>
-        </div>
+        <Searchbar />
       </NavigationMenu>
     </div>
   );

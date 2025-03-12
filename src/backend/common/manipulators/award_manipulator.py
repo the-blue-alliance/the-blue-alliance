@@ -2,11 +2,13 @@ import json
 from typing import List, Set
 
 from google.appengine.api import taskqueue
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing import get_affected_queries
+from backend.common.consts.event_type import EventType
+from backend.common.helpers.deferred import defer_safe
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.award import Award
@@ -92,7 +94,7 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
         if event and event.within_a_day:
             # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:
-                deferred.defer(
+                defer_safe(
                     TBANSHelper.awards,
                     event,
                     _name=f"{event.key_name}_awards",
@@ -102,3 +104,17 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
                 )
             except Exception:
                 pass
+
+        if (
+            event
+            and SeasonHelper.is_valid_regional_pool_year(event.year)
+            and event.event_type_enum == EventType.REGIONAL
+        ):
+            # For new regionals, enqueue regional champs pool points
+            taskqueue.add(
+                url=f"/tasks/math/do/regional_champs_pool_points_calc/{event.key_name}",
+                method="GET",
+                target="py3-tasks-io",
+                queue_name="default",
+                countdown=300,  # Wait ~5m so cache clearing can run before we attempt to recalculate district points
+            )

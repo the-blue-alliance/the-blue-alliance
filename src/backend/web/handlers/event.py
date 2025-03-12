@@ -16,6 +16,9 @@ from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.award_helper import AwardHelper
+from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
+    DistrictPointTiebreakersSortingHelper,
+)
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.media_helper import MediaHelper
@@ -27,7 +30,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_matchstats import Component, TeamStatMap
 from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
-from backend.common.queries import district_query, event_query, media_query
+from backend.common.queries import district_query, event_query, media_query, team_query
 from backend.web.profiled_render import render_template
 
 
@@ -132,6 +135,7 @@ def event_detail(event_key: EventKey) -> Response:
         else None
     )
     event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
+    event_eventteams_future = team_query.EventEventTeamsQuery(event_key).fetch_async()
     # status_sitevar_future = Sitevar.get_by_id_async('apistatus.down_events')
 
     event_divisions_future = None
@@ -199,10 +203,19 @@ def event_detail(event_key: EventKey) -> Response:
     playoff_template = PlayoffAdvancementHelper.playoff_template(event)
 
     district_points_sorted = None
-    if event.district_key and event.district_points:
-        district_points_sorted = sorted(
-            none_throws(event.district_points)["points"].items(),
-            key=lambda team_and_points: -team_and_points[1]["total"],
+    if event.district_key and (points := event.district_points):
+        district_points_sorted = DistrictPointTiebreakersSortingHelper.sorted_points(
+            points
+        )
+
+    is_regional_cmp_pool_eligible = (
+        SeasonHelper.is_valid_regional_pool_year(event.year)
+        and event.event_type_enum == EventType.REGIONAL
+    )
+    regional_champs_pool_points_sorted = None
+    if is_regional_cmp_pool_eligible and (points := event.regional_champs_pool_points):
+        regional_champs_pool_points_sorted = (
+            DistrictPointTiebreakersSortingHelper.sorted_points(points)
         )
 
     event_insights = event.details.insights if event.details else None
@@ -239,11 +252,19 @@ def event_detail(event_key: EventKey) -> Response:
         allow_levels=comp_level.ELIM_LEVELS,
     )
 
+    eventteams = event_eventteams_future.get_result()
+    nexus_pit_locations = {
+        et.team.string_id(): et.pit_location["location"]
+        for et in eventteams
+        if et.pit_location
+    }
+
     template_values = {
         "event": event,
         "event_down": False,  # status_sitevar and event_key in status_sitevar.contents,
         "district_name": district.display_name if district else None,
         "district_abbrev": district.abbreviation if district else None,
+        "is_regional_cmp_eligible": is_regional_cmp_pool_eligible,
         "matches": matches,
         "match_count": match_count,
         "matches_recent": matches_recent,
@@ -261,6 +282,7 @@ def event_detail(event_key: EventKey) -> Response:
             event.year, []
         ),
         "district_points_sorted": district_points_sorted,
+        "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "event_insights_qual": event_insights["qual"] if event_insights else None,
         "event_insights_playoff": event_insights["playoff"] if event_insights else None,
         "event_insights_template": event_insights_template,
@@ -277,6 +299,7 @@ def event_detail(event_key: EventKey) -> Response:
         "has_coprs": event.coprs is not None,
         "coprs_json": json.dumps(copr_leaders),
         "copr_items": copr_items,
+        "nexus_pit_locations": nexus_pit_locations,
     }
 
     return make_cached_response(
@@ -412,3 +435,14 @@ def event_rss(event_key: EventKey) -> Response:
     response.headers["content-type"] = "application/xml; charset=UTF-8"
 
     return response
+
+
+def event_agenda(event_key: EventKey) -> Response:
+    if (
+        not Event.validate_key_name(event_key)
+        or not (event := Event.get_by_id(event_key))
+        or not (agenda_url := event.public_agenda_url)
+    ):
+        abort(404)
+
+    return redirect(agenda_url)

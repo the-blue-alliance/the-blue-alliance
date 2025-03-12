@@ -12,7 +12,7 @@ concurrency:
 jobs:
   py3-type:
     name: "[py3] Type Check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -39,7 +39,7 @@ jobs:
         run: ./ops/typecheck_py3.sh
   py3-lint:
     name: "[py3] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -66,7 +66,7 @@ jobs:
         run: ./ops/lint_py3.sh
   py3-test:
     name: "[py3] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         group: [1, 2, 3]
@@ -96,14 +96,14 @@ jobs:
         run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
           include-hidden-files: true
   py3-coverage:
     name: "[py3] Coverage"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [py3-test]
     steps:
       - uses: actions/checkout@v4
@@ -114,11 +114,12 @@ jobs:
             python:
               - '**/*.py'
               - '**/requirements.txt'
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
+          cache: "pip"
       - name: Install Dependencies
         if: steps.changes.outputs.python == 'true'
         run: |
@@ -134,13 +135,13 @@ jobs:
           coverage xml
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.python == 'true'
-        uses: codecov/codecov-action@v5.1.2
+        uses: codecov/codecov-action@v5.4.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
   node-lint:
     name: "[node] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -153,7 +154,7 @@ jobs:
               - 'package.json'
       - name: Set up Node
         if: steps.changes.outputs.node == 'true'
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "18"
           cache: "npm"
@@ -165,7 +166,7 @@ jobs:
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -178,7 +179,7 @@ jobs:
               - 'package.json'
       - name: Set up Node
         if: steps.changes.outputs.node == 'true'
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "18"
           cache: "npm"
@@ -190,33 +191,35 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.node == 'true'
-        uses: codecov/codecov-action@v5.1.2
+        uses: codecov/codecov-action@v5.4.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
   pwa-lint:
     name: "[pwa] Format & Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "20"
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
+      - name: Generate react-router types
+        run: npm --prefix pwa run typecheck
       - name: Run Format
         run: npm --prefix pwa run format
       - name: Run Lint
         run: npm --prefix pwa run lint
   pwa-type:
     name: "[pwa] Type Check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "20"
           cache: "npm"
@@ -226,11 +229,11 @@ jobs:
         run: npm --prefix pwa run typecheck
   pwa-test:
     name: "[pwa] Test"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "20"
           cache: "npm"
@@ -243,17 +246,17 @@ jobs:
       - name: Run Test
         run: npm --prefix pwa test
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.1.2
+        uses: codecov/codecov-action@v5.4.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
   pwa-build:
     name: "[pwa] Build"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "20"
           cache: "npm"
@@ -268,12 +271,12 @@ jobs:
   pwa-e2e:
     name: "[pwa] E2E Tests"
     if: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "20.16.0"
           cache: "npm"
@@ -294,7 +297,7 @@ jobs:
 
   bash-lint:
     name: "[bash] Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.12
@@ -317,7 +320,7 @@ jobs:
 
   build-web:
     name: Build Web
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -336,7 +339,7 @@ jobs:
           python-version: "3.12"
       - name: Set up Node
         if: steps.changes.outputs.buildweb == 'true'
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "18"
           cache: "npm"
@@ -349,7 +352,7 @@ jobs:
 
   ops-test:
     name: Ops Fullstack Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       registry:
         image: registry:2
@@ -379,7 +382,7 @@ jobs:
           pip install -r requirements.txt
       - name: Set up Node
         if: steps.changes.outputs.web == 'true'
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: "18"
           cache: "npm"
@@ -404,7 +407,7 @@ jobs:
           driver-opts: network=host
       - name: Build Docker Image
         if: steps.changes.outputs.web == 'true'
-        uses: docker/build-push-action@v6.9.0
+        uses: docker/build-push-action@v6.15.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./ops/dev/docker
@@ -428,7 +431,7 @@ jobs:
         run: ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle

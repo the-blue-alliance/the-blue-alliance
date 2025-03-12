@@ -32,7 +32,7 @@
 
     {% for district in districts %}
     <tr>
-        <td><a href="/admin/district/edit/{{district.key_name}}">{{ district.key_name }}</a></td>
+        <td><a href="/admin/district/{{district.key_name}}">{{ district.key_name }}</a></td>
         <td>{{ district.year }}</td>
         <td>{{ district.abbreviation }}</td>
         <td>{{ district.display_name }}</td>

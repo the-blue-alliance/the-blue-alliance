@@ -1,14 +1,15 @@
 import { Tooltip } from '@radix-ui/react-tooltip';
-import { Link } from '@remix-run/react';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { groupBy } from 'lodash-es';
 import type React from 'react';
 import { Fragment, useMemo } from 'react';
+import { Link } from 'react-router';
 
 import PlayCircle from '~icons/bi/play-circle';
 
 import { Event, Match, Team } from '~/api/v3';
 import { TeamLink } from '~/components/tba/links';
+import RpDots from '~/components/tba/rpDot';
 import {
   TooltipContent,
   TooltipProvider,
@@ -58,6 +59,7 @@ interface CellProps
     VariantProps<typeof cellVariants> {
   dq?: boolean;
   surrogate?: boolean;
+  teamHighlight?: boolean;
 }
 function GridCell({
   className,
@@ -66,6 +68,7 @@ function GridCell({
   teamOrScore,
   dq,
   surrogate,
+  teamHighlight,
   ...props
 }: CellProps) {
   return (
@@ -76,6 +79,7 @@ function GridCell({
         {
           'line-through': dq,
           'underline decoration-dotted': surrogate,
+          underline: teamHighlight,
         },
       )}
       {...props}
@@ -195,26 +199,30 @@ export default function MatchResultsTable(props: MatchResultsTableProps) {
 }
 
 // todo: add support for specific-team underlines
-function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
+function MatchResultsTableGroup({
+  matches,
+  event,
+  team,
+}: MatchResultsTableProps) {
   const gridStyle = cn(
     // always use these classes:
     'grid items-center justify-items-center',
-    '[&>*]:justify-self-stretch [&>*]:justify-center',
-    '[&>*]:text-center [&>*]:p-[5px] [&>*]:h-full [&>*]:content-center',
+    '*:justify-center *:justify-self-stretch',
+    '*:h-full *:content-center *:p-[5px] *:text-center',
     // use these classes on mobile:
     'grid-rows-2',
     'grid-cols-[calc(1.25em+10px)_8em_1fr_1fr_1fr_1fr]', // 6 columns of these sizes
-    'border-[#000] border-b-[1px]',
-    '[&>*]:border-[#ddd] [&>*]:border-[1px]',
+    'border-b-[1px] border-[#000]',
+    '*:border-[1px] *:border-[#ddd]',
     // use these on desktop:
     'lg:grid-rows-1',
     'lg:grid-cols-[calc(1.25em+6px*2)_10em_repeat(6,minmax(0,1fr))_0.9fr_0.9fr]',
-    'lg:border-[#ddd] lg:border-b-[1px]',
-    '[&>*]:lg:border-0 [&>*]:lg:border-r-[1px]', // reset the border, then apply one to the right
+    'lg:border-b-[1px] lg:border-[#ddd]',
+    'lg:*:border-0 lg:*:border-r-[1px]', // reset the border, then apply one to the right
   );
 
   return (
-    <div className="min-w-[25rem] border-l border-t border-[#ddd] md:min-w-[35rem]">
+    <div className="min-w-[25rem] border-t border-l border-[#ddd] md:min-w-[35rem]">
       <div className={cn(gridStyle, 'bg-[#f0f0f0] font-semibold')}>
         <div className="row-span-2 lg:row-span-1">
           <PlayCircle className="inline" />
@@ -283,6 +291,7 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
                   }
                   dq={dq}
                   surrogate={surrogate}
+                  teamHighlight={team?.key === k}
                 >
                   <ConditionalTooltip dq={dq} surrogate={surrogate}>
                     <TeamLink teamOrKey={k} year={event.year}>
@@ -312,6 +321,7 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
                   className={x}
                   dq={dq}
                   surrogate={surrogate}
+                  teamHighlight={team?.key === k}
                 >
                   <ConditionalTooltip dq={dq} surrogate={surrogate}>
                     <TeamLink teamOrKey={k} year={event.year}>
@@ -322,23 +332,74 @@ function MatchResultsTableGroup({ matches, event }: MatchResultsTableProps) {
               );
             })}
 
-            {/* scores */}
-            <GridCell
-              className="col-start-6 row-start-1 lg:col-start-9"
-              allianceColor={'red'}
-              matchResult={m.winning_alliance === 'red' ? 'winner' : 'loser'}
-              teamOrScore={'score'}
-            >
-              {m.alliances.red.score}
-            </GridCell>
-            <GridCell
-              className="col-start-6 lg:col-start-10"
-              allianceColor={'blue'}
-              matchResult={m.winning_alliance === 'blue' ? 'winner' : 'loser'}
-              teamOrScore={'score'}
-            >
-              {m.alliances.blue.score}
-            </GridCell>
+            {/* unplayed match */}
+            {m.alliances.red.score == -1 && m.alliances.blue.score == -1 && (
+              <GridCell
+                className="relative col-start-6 row-span-2 row-start-1 lg:col-span-2 lg:col-start-9
+                  lg:row-span-1"
+                teamOrScore={'score'}
+              >
+                {m.predicted_time && (
+                  <div className="text-sm italic lg:text-xs">
+                    {new Date(m.predicted_time * 1000).toLocaleTimeString(
+                      'en-US',
+                      {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        weekday: 'short',
+                        hour12: true,
+                      },
+                    )}
+                  </div>
+                )}
+              </GridCell>
+            )}
+
+            {m.alliances.red.score !== -1 && m.alliances.blue.score !== -1 && (
+              <>
+                {/* scores */}
+                <GridCell
+                  className="relative col-start-6 row-start-1 lg:col-start-9"
+                  allianceColor={'red'}
+                  matchResult={
+                    m.winning_alliance === 'red' ? 'winner' : 'loser'
+                  }
+                  teamOrScore={'score'}
+                  teamHighlight={
+                    team !== undefined &&
+                    m.alliances.red.team_keys.includes(team.key)
+                  }
+                >
+                  {m.score_breakdown && (
+                    <RpDots
+                      score_breakdown={m.score_breakdown.red}
+                      year={Number(m.key.substring(0, 4))}
+                    />
+                  )}
+                  {m.alliances.red.score}
+                </GridCell>
+                <GridCell
+                  className="relative col-start-6 lg:col-start-10"
+                  allianceColor={'blue'}
+                  matchResult={
+                    m.winning_alliance === 'blue' ? 'winner' : 'loser'
+                  }
+                  teamOrScore={'score'}
+                  teamHighlight={
+                    team !== undefined &&
+                    m.alliances.blue.team_keys.includes(team.key)
+                  }
+                >
+                  {m.score_breakdown && (
+                    <RpDots
+                      score_breakdown={m.score_breakdown.blue}
+                      year={Number(m.key.substring(0, 4))}
+                    />
+                  )}
+                  {m.alliances.blue.score}
+                </GridCell>
+              </>
+            )}
           </div>
         </Fragment>
       ))}

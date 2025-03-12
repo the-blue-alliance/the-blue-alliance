@@ -30,9 +30,10 @@ updates:
   labels:
     - PWA
   groups:
-    remix-run:
+    react-router:
       patterns:
-        - "@remix-run/*"
+        - "@react-router/*"
+        - "react-router"
     embla-carousel:
       patterns:
         - "embla-carousel-autoplay"
@@ -40,6 +41,10 @@ updates:
     radix-ui:
       patterns:
         - "@radix-ui/*"
+    vitest:
+      patterns:
+        - "vitest"
+        - "@vitest/coverage-v8"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

@@ -3,7 +3,7 @@
 
 {% block title %}Advanced Insights - {{event.name}} ({{event.year}}) - The Blue Alliance{% endblock %}
 
-{% block meta_description %}Advanced insights for the {{event.year}} {{event.name}} FIRST Robotics Competition.{% endblock %}
+{% block meta_description %}Advanced insights for the {{event.year}} {{event.name}} FIRST Robotics Competition (FRC).{% endblock %}
 
 {% block more_head_tags %}
   <meta property="og:title" content="Advanced Insights: {{event.year}} {{event.name}}" />
@@ -217,7 +217,7 @@
         maxPlayoffScore = Math.max(maxPlayoffScore, redScore);
         maxPlayoffScore = Math.max(maxPlayoffScore, blueScore);
       } else {
-        minPlayoffScore = Math.min(minPlayoffScore, 
+        minPlayoffScore = Math.min(minPlayoffScore,
                                    predictions[key]['red_mean']
                                    - 2*Math.sqrt(predictions[key]['red_var']));
         minPlayoffScore = Math.min(minPlayoffScore,

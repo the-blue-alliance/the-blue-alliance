@@ -1,5 +1,5 @@
-import { Link } from '@remix-run/react';
 import type { ColumnDef } from '@tanstack/react-table';
+import { Link } from 'react-router';
 
 import BiTrophy from '~icons/bi/trophy';
 
@@ -102,7 +102,7 @@ export default function RankingsTable({
       data={rankings.rankings}
       conditionalRowStyling={(row) =>
         cn({
-          'bg-yellow-100 shadow-inner shadow-yellow-200 font-bold':
+          'bg-yellow-100 font-bold shadow-inner shadow-yellow-200':
             winners.includes(row.original.team_key),
         })
       }

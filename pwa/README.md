@@ -13,6 +13,7 @@ npm i
 Make sure you have your TBA APIv3 Read Key set in `.env`:
 
 ```sh
+$ cp default.env .env
 VITE_TBA_API_READ_KEY="myKey"
 ```
 

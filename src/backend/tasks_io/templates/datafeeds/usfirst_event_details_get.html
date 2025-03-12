@@ -18,5 +18,24 @@
     <li>Ends on: {{event.end_date}}</li>
     <li>Website: {{event.website}}</li>
     <li>Playoff type: {{event.playoff_type}}</li>
-    <li>Teams: {{event_teams|length}} registered - {% for event_team in event_teams %}{{event_team.team.id}} {% endfor %}</li>
+    <li>Teams: {{event_teams|length}} registered - {% for event_team in event_teams %}{{event_team.team.id()}} {% endfor %}</li>
 </ul>
+
+<h3>Other Models</h3>
+<p><b>DistrictTeams:</b> {% for dt in district_teams %}{{dt.key.string_id()}} {%endfor%}</p>
+<p><b>RegionalPoolTeams:</b> {% for rpt in regional_pool_teams %}{{rpt.key.string_id()}} {%endfor%}</p>
+<p><b>Nexus Pit Locations:</b></p>
+<table>
+    <tr>
+        <th>Team</th>
+        <th>Pit Location</th>
+    </tr>
+    {% for et in event_teams %}
+        {% if et.pit_location %}
+            <tr>
+                <td>{{et.team.id()}}</td>
+                <td><pre>{{et.pit_location}}</pre></td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+</table>

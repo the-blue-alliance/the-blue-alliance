@@ -75,13 +75,14 @@ class EventInfoTab extends Component {
       .then((data) => this.setState({ eventInfo: data, status: "" }));
   }
 
-  addWebcast(webcastUrl) {
+  addWebcast(webcastUrl, webcastDate) {
     const currentInfo = this.state.eventInfo;
     if (currentInfo !== null) {
       currentInfo.webcasts.push({
         type: "",
         channel: "",
         url: webcastUrl,
+        date: webcastDate ? webcastDate : undefined,
       });
       this.setState({ eventInfo: currentInfo });
     }
@@ -125,11 +126,11 @@ class EventInfoTab extends Component {
 
   render() {
     return (
-      <div className="tab-pane" id="info">
+      <div className="tab-pane active col-xs-12" id="info">
         <h3>Event Info</h3>
         {/*<Dialog ref={(dialog) => (this.dialog = dialog)} />*/}
         {this.state.status && <p>{this.state.status}</p>}
-        <div className="row">
+        <div className="row" style={{ marginInline: "0" }}>
           <PlayoffTypeDropdown
             eventInfo={this.state.eventInfo}
             setType={this.setPlayoffType}

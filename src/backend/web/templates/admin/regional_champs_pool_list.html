@@ -1,0 +1,83 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Regional Champs Pool List ({{selected_year}}){% endblock %}
+
+{% block content %}
+
+<h1>{{selected_year}} Regional CMP Qualitifcation Pool</h1>
+<div class="btn-group">
+  <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+    {{selected_year}}
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu tba-dropdown-menu-limited">
+    {% for year in valid_years %}
+      <li><a href="/admin/regional_champs_pool/{{year}}">{{year}}</a></li>
+    {% endfor %}
+  </ul>
+
+  <a href="/tasks/math/do/regional_champs_pool_rankings_calc/{{selected_year}}"
+        class="btn btn-warning"><span class="glyphicon glyphicon-tasks"></span> Calculate Rankings</a>
+</div>
+
+<hr/>
+{% if not pool_model %}
+    <div class="row">
+        <p>No pool model found</p>
+    </div>
+{% else %}
+    <div class="row">
+    <div class="col-sm-12">
+        <ul class="nav nav-tabs nav-justified">
+        <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
+        <li><a href="#advancement" data-toggle="tab">Advancement</a></li>
+        </ul>
+    </div>
+    </div>
+
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="rankings">
+            <table class="table table-striped table-hover">
+                <tr>
+                    <th>Rank</th>
+                    <th>Team</th>
+                    <th>Point Total</th>
+                    <th>Rookie Bonus</th>
+                    <th>Event Points</th>
+                </tr>
+                {% for rank in pool_model.rankings or []%}
+                    <tr>
+                        <td>{{rank.rank}}</td>
+                        <td><a href="/admin/team/{{rank.team_key[3:]}}">{{rank.team_key}}</a></td>
+                        <td>{{rank.point_total}}</td>
+                        <td>{{rank.rookie_bonus}}</td>
+                        <td><pre>{{rank.event_points}}</pre></td>
+                    </tr>
+                {% else %}
+                    <tr><td>No rankings found</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="tab-pane" id="advancement">
+            <table class="table table-stripled table-hover">
+                <tr>
+                    <th>Team</th>
+                    <th>Qualified for CMP</th>
+                    <th>Qualifying Event</th>
+                </tr>
+                {% for team_key, advancement in (pool_model.advancement or {}).items() %}
+                    <tr>
+                        <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
+                        <td>{% if advancement.cmp %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                        <td>{% if advancement.cmp_event %}<a href="/admin/event/{{advancement.cmp_event}}">{{advancement.cmp_event}}</a>{% else %}--{% endif %}</td>
+                    </tr>
+                {% else %}
+                    <tr><td>No advancement found</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}

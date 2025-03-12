@@ -75,7 +75,6 @@ def test_parse_avatars(test_data_importer, ndb_stub):
 
     # Spot check delete keys
     assert len(media_keys_to_delete) == 59
-    print(media_keys_to_delete)
     first_delete = next(
         iter(
             [

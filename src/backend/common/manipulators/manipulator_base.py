@@ -19,10 +19,10 @@ from typing import (
     TypeVar,
 )
 
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.listify import delistify, listify
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.queries.database_query import CachedDatabaseQuery
@@ -164,6 +164,22 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             self._run_post_delete_hook(models)
         self._clearCache(models)
 
+    @overload
+    @classmethod
+    def clearCache(cls, models: TModel) -> None: ...
+
+    @overload
+    @classmethod
+    def clearCache(cls, models: List[TModel]) -> None: ...
+
+    @classmethod
+    def clearCache(cls, models) -> None:
+        models = list(filter(None, listify(models)))
+        for model in models:
+            model._dirty = True
+            cls._computeAndSaveAffectedReferences(model)
+        cls._clearCache(models)
+
     """
     findOrSpawn will take either a singular model or a list of models and merge them
     with the (optionally present) existing versions
@@ -286,7 +302,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             return
 
         for hook in cls._post_delete_hooks:
-            deferred.defer(
+            defer_safe(
                 hook,
                 models,
                 _queue="post-update-hooks",
@@ -321,7 +337,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         )
         for batch_models in itertools.batched(updated_models, batch_size):
             for hook in cls._post_update_hooks:
-                deferred.defer(
+                defer_safe(
                     hook,
                     list(batch_models),
                     _queue="post-update-hooks",
@@ -423,7 +439,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 all_affected_references.append(model._affected_references)
 
         if all_affected_references:
-            deferred.defer(
+            defer_safe(
                 cls._clearCacheDeferred,
                 all_affected_references,
                 _queue="cache-clearing",

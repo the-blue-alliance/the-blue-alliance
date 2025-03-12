@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.7
+ * 3.9.11
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -296,9 +296,9 @@ export type TeamEventStatusPlayoff = {
   playoff_average?: number | null;
 } | null;
 export type TeamEventStatus = {
-  qual?: TeamEventStatusRank;
-  alliance?: TeamEventStatusAlliance;
-  playoff?: TeamEventStatusPlayoff;
+  qual?: TeamEventStatusRank | null;
+  alliance?: TeamEventStatusAlliance | null;
+  playoff?: TeamEventStatusPlayoff | null;
   /** An HTML formatted string suitable for display to the user containing the team's alliance pick status. */
   alliance_status_str?: string;
   /** An HTML formatter string suitable for display to the user containing the team's playoff status. */
@@ -306,9 +306,9 @@ export type TeamEventStatus = {
   /** An HTML formatted string suitable for display to the user containing the team's overall status summary of the event. */
   overall_status_str?: string;
   /** TBA match key for the next match the team is scheduled to play in at this event, or null. */
-  next_match_key?: string;
+  next_match_key?: string | null;
   /** TBA match key for the last match the team played in at this event, or null. */
-  last_match_key?: string;
+  last_match_key?: string | null;
 };
 export type MatchAlliance = {
   /** Score for this alliance. Will be null or -1 for an unplayed match. */
@@ -374,7 +374,7 @@ export type MatchScoreBreakdown2016Alliance = {
   teleopDefensesBreached?: boolean;
   teleopChallengePoints?: number;
   teleopScalePoints?: number;
-  teleopTowerCaptured?: number;
+  teleopTowerCaptured?: boolean;
   towerFaceA?: string;
   towerFaceB?: string;
   towerFaceC?: string;
@@ -736,6 +736,145 @@ export type MatchScoreBreakdown2024 = {
   blue: MatchScoreBreakdown2024Alliance;
   red: MatchScoreBreakdown2024Alliance;
 };
+export type MatchScoreBreakdown2025Alliance = {
+  adjustPoints?: number;
+  algaePoints?: number;
+  autoBonusAchieved?: boolean;
+  autoCoralCount?: number;
+  autoCoralPoints?: number;
+  autoLineRobot1?: 'No' | 'Yes';
+  autoLineRobot2?: 'No' | 'Yes';
+  autoLineRobot3?: 'No' | 'Yes';
+  autoMobilityPoints?: number;
+  autoPoints?: number;
+  autoReef?: {
+    topRow: {
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
+    };
+    midRow: {
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
+    };
+    botRow: {
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
+    };
+    trough: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the botRow object. */
+    tba_botRowCount?: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the midRow object. */
+    tba_midRowCount?: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the topRow object. */
+    tba_topRowCount?: number;
+  };
+  bargeBonusAchieved?: boolean;
+  coopertitionCriteriaMet?: boolean;
+  coralBonusAchieved?: boolean;
+  endGameBargePoints?: number;
+  endGameRobot1?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
+  endGameRobot2?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
+  endGameRobot3?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
+  foulCount?: number;
+  foulPoints?: number;
+  g206Penalty?: boolean;
+  g410Penalty?: boolean;
+  g418Penalty?: boolean;
+  g428Penalty?: boolean;
+  netAlgaeCount?: number;
+  rp?: number;
+  techFoulCount?: number;
+  teleopCoralCount?: number;
+  teleopCoralPoints?: number;
+  teleopPoints?: number;
+  teleopReef?: {
+    topRow: {
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
+    };
+    midRow: {
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
+    };
+    botRow: {
+      nodeA: boolean;
+      nodeB: boolean;
+      nodeC: boolean;
+      nodeD: boolean;
+      nodeE: boolean;
+      nodeF: boolean;
+      nodeG: boolean;
+      nodeH: boolean;
+      nodeI: boolean;
+      nodeJ: boolean;
+      nodeK: boolean;
+      nodeL: boolean;
+    };
+    trough: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the botRow object. */
+    tba_botRowCount?: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the midRow object. */
+    tba_midRowCount?: number;
+    /** Unofficial TBA-computed value that sums the total number of game pieces scored in the topRow object. */
+    tba_topRowCount?: number;
+  };
+  totalPoints?: number;
+  wallAlgaeCount?: number;
+};
+export type MatchScoreBreakdown2025 = {
+  blue: MatchScoreBreakdown2025Alliance;
+  red: MatchScoreBreakdown2025Alliance;
+};
 export type Match = {
   /** TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set. */
   key: string;
@@ -774,6 +913,7 @@ export type Match = {
         | MatchScoreBreakdown2022
         | MatchScoreBreakdown2023
         | MatchScoreBreakdown2024
+        | MatchScoreBreakdown2025
       )
     | null;
   /** Array of video objects associated with this match. */
@@ -2824,7 +2964,7 @@ export function getEventRankings(
   });
 }
 /**
- * Gets a list of team rankings for the Event.
+ * Gets a list of district points for the Event. These are always calculated, regardless of event type, and may/may not be actually useful.
  */
 export function getEventDistrictPoints(
   {
@@ -2855,6 +2995,82 @@ export function getEventDistrictPoints(
         status: 404;
       }
   >(`/event/${encodeURIComponent(eventKey)}/district_points`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * For 2025+ Regional events, this will return points towards the Championship qualification pool.
+ */
+export function getRegionalChampsPoolPoints(
+  {
+    ifNoneMatch,
+    eventKey,
+  }: {
+    ifNoneMatch?: string;
+    eventKey: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventDistrictPoints | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/regional_champs_pool_points`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Depending on the type of event (district/regional), this will return either district points or regional CMP points
+ */
+export function getEventAdvancementPoints(
+  {
+    ifNoneMatch,
+    eventKey,
+  }: {
+    ifNoneMatch?: string;
+    eventKey: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: EventDistrictPoints | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/event/${encodeURIComponent(eventKey)}/advancement_points`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
@@ -3861,10 +4077,8 @@ export function getInsightsNotablesYear(
 export function getSearchIndex(
   {
     ifNoneMatch,
-    year,
   }: {
     ifNoneMatch?: string;
-    year: number;
   },
   opts?: Oazapfts.RequestOpts,
 ) {

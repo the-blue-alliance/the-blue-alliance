@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   Links,
   Meta,
@@ -6,10 +8,9 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLocation,
   useRouteError,
-} from '@remix-run/react';
-import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
-import { pwaInfo } from 'virtual:pwa-info';
+} from 'react-router';
 
 import * as api from '~/api/v3';
 
@@ -54,11 +55,19 @@ api.defaults.headers = {
 //   return response;
 // };
 
+const queryClient = new QueryClient();
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
+        <meta name="robots" content="noindex" />
+        <link
+          rel="canonical"
+          href={`https://www.thebluealliance.com${location.pathname}`}
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -71,9 +80,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           rel="stylesheet"
         />
         <Meta />
-        {pwaInfo ? (
-          <link rel="manifest" href={pwaInfo.webManifest.href} />
-        ) : null}
+        <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
         <link
@@ -232,7 +239,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Nav />
         <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
-            {children}
+            <QueryClientProvider client={queryClient}>
+              {children}
+            </QueryClientProvider>
           </div>
         </div>
         <ScrollRestoration />
@@ -246,7 +255,7 @@ function App() {
   return <Outlet />;
 }
 
-export default withSentry(App);
+export default App;
 
 export const meta: MetaFunction = ({ error }) => {
   const isRouteError = isRouteErrorResponse(error);
@@ -257,8 +266,10 @@ export const meta: MetaFunction = ({ error }) => {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  console.error(error);
+
   const isRouteError = isRouteErrorResponse(error);
-  captureRemixErrorBoundaryError(error);
+  Sentry.captureException(error);
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>

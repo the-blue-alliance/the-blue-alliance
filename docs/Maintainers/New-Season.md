@@ -1,5 +1,13 @@
 ## Pre-Kickoff
 
+### Bump Year Configuration
+
+The `apistastus` sitevar (edited via `/admin/apistatus`) contains this configuration:
+ - Once events beging to get posted, bump `max_season` to start fetching data
+ - Once offseason events are complete, bump `current_season`
+
+### Team Admin Keys
+
 Each year, we've been generating "team media admin" keys to be distributed in the KOP. We generate one randomly for each team number, and then import them to TBA.
 
 To generate:
@@ -52,7 +60,9 @@ Once the game is announced, the landing page type should be changed to `Build Se
 
 ### Avatars
 
-TODO
+At some point during the build season avatar submissions will open. This is generally accompanied by a blog post from FIRST letting teams know submissions are open, and guiding teams on how to submit their avatars. We should add a link to this blog post from the [avatars page](https://github.com/rbgk/the-blue-alliance/blob/py3/src/backend/web/templates/avatars.html) at the top. See an [example PR from 2025](https://github.com/the-blue-alliance/the-blue-alliance/pull/7060).
+
+Optionally, the build season landing page `build_handler_show_avatars` property can be swapped to true. However, the avatars page attempts to load ALL team avatars in one go, which causes a 500 due to our request going OOM. This is a neat little page to look at, but we might not want to advertise it until optimizations have been made.
 
 ## Pre-First Event
 
@@ -67,34 +77,52 @@ The match breakdown JSON format should be communicated from FIRST before the fir
 
 Do not include the `alliance` field in the score breakdown keys.
 
-### Event Match Stats
-
-TODO, but add year to `tasks_io.handlers.math.event_matchstats_calc`
-
 ### Tiebreakers
 
 TODO
+
+### Awards
+
+New awards might be added for a given season. These will generally be communicated via [blog posts](https://community.firstinspires.org/award-updates-for-the-2025-season) before the season starts.
+
+An [`AwardType`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/award_type.py) definition might need to be added for the new award. Additionally, a [string(s) to match the name](https://github.com/ZachOrr/the-blue-alliance/blob/py3/src/backend/common/consts/award_matching_strings.py) of the new award type will need to be added. The comment above the `AWARD_MATCHING_STRINGS` has instructions for defining matching/exclusion strings.
+
+Here is an [example PR](https://github.com/the-blue-alliance/the-blue-alliance/pull/7203) for the Rising All-Star Award in 2025.
 
 ### Playoff Advancement
 
 TODO
 
+### COPRs
+
+Edit [`src/backend/common/helpers/matchstats_helper.py`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/helpers/matchstats_helper.py) and add a new key-value pair to `MANUAL_COMPONENTS`. The value is an object which contains key-value pairs where each key is the cOPR name, and the value is a lambda that returns a component value. The lambda accepts a match object and a color string ("red" or "blue).
+
 ### Insights
 
-TODO
+Create `src/backend/web/templates/event_partials/event_insights_<year>.html`.
+
+Add a new year + function to `src/backend/common/helpers/event_insights_helper.py`'s `calculate_event_insights`. Follow examples of previous years. The rest of the plumbing is handled for you. 
 
 ### Ranking Sort Orders
 
-TODO
+[Ranking sort orders](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/ranking_sort_orders.py) need to be updated to add the sort orders for the new year. This information can be found in the game manual, generally under some "Qualification Ranking" section. This is a pre-step for supporting Event Rankings.
 
-### Predictions
+[[/docs/images/ranking-sort-orders-example.png]]
 
-TODO
+Here is an [example PR](https://github.com/the-blue-alliance/the-blue-alliance/pull/7115) for the example screenshot.
 
 ### Event Rankings
 
 TODO, but `EventDetails.renderable_rankings` needs updating and explain how/why
 Also update `ranking_sort_orders.py`.
+
+### Predictions
+
+TODO
+
+#### Event Match Stats
+
+TODO, part of predictions, but add year to `tasks_io.handlers.math.event_matchstats_calc`
 
 ## Championship Events
 

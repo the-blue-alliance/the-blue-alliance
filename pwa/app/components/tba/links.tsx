@@ -1,5 +1,5 @@
-import { Link } from '@remix-run/react';
 import React from 'react';
+import { Link } from 'react-router';
 
 import { Event, Team } from '~/api/v3';
 import { removeNonNumeric } from '~/lib/utils';
@@ -35,4 +35,28 @@ const EventLink = React.forwardRef<
 });
 EventLink.displayName = 'EventLink';
 
-export { TeamLink, EventLink };
+const LocationLink = React.forwardRef<
+  HTMLAnchorElement,
+  React.PropsWithChildren<{
+    city: string;
+    state_prov: string;
+    country: string;
+    hideUSA?: boolean;
+  }>
+>(({ city, state_prov, country, hideUSA, children, ...props }, ref) => {
+  const url = `https://maps.google.com/?q=${city}, ${state_prov}, ${country}`;
+
+  return children ? (
+    <Link to={url} {...props} ref={ref}>
+      {children}
+    </Link>
+  ) : (
+    <Link to={url} {...props} ref={ref}>
+      {city}, {state_prov}
+      {hideUSA && country === 'USA' ? '' : `, ${country}`}
+    </Link>
+  );
+});
+LocationLink.displayName = 'LocationLink';
+
+export { TeamLink, EventLink, LocationLink };

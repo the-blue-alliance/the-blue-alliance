@@ -3,6 +3,7 @@ from werkzeug import Response
 
 from backend.common.consts.account_permission import AccountPermission, PERMISSIONS
 from backend.common.models.account import Account
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.web.profiled_render import render_template
 
 
@@ -34,8 +35,11 @@ def user_detail(user_id: str) -> str:
     if user is None:
         abort(404)
 
+    api_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user.key).fetch()
+
     template_values = {
         "user": user,
+        "api_keys": api_keys,
         "permissions": PERMISSIONS,
     }
     return render_template("admin/user_details.html", template_values)

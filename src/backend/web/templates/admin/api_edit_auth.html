@@ -11,12 +11,20 @@
 <form action="/admin/api_auth/edit/{{auth.key.id()}}" method="post">
     <table class="table table-striped table-hover table-condensed">
         <tr>
+            <td>Auth ID</td>
+            <td><input class="form-control" type="text" name="auth_id" value="{{auth.key.id()}}" disabled/></td>
+        </tr>
+        <tr>
+            <td>Auth Secret</td>
+            <td><input class="form-control" type="text" name="auth_id" value="{{auth.secret}}" disabled/></td>
+        </tr>
+        <tr>
             <td>Description</td>
-            <td><input type="text" name="description" value="{{auth.description}}" /></td>
+            <td><input class="form-control" type="text" name="description" value="{{auth.description}}" /></td>
         </tr>
         <tr>
             <td>Owner Email</td>
-            <td><input class="form-control" type="text" name="owner" placeholder="foo@bar.com" {% if auth.owner %}value="{{ auth.owner.get.email }}"{% endif %}/></td>
+            <td><input class="form-control" type="text" name="owner" placeholder="foo@bar.com" {% if auth.owner %}value="{{ auth.owner.get().email }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Expiration</td>
@@ -27,8 +35,12 @@
             <td><input type="checkbox" name="allow_admin" {% if auth.allow_admin %}checked{% endif %}></td>
         </tr>
         <tr>
+            <td>Districts</td>
+            <td><input class="form-control" type="text" name="district_list_str" value="{{auth.district_list_str}}" /></td>
+        </tr>
+        <tr>
             <td>Events</td>
-            <td><input type="text" name="event_list_str" value="{{auth.event_list_str}}" /></td>
+            <td><input class="form-control" type="text" name="event_list_str" value="{{auth.event_list_str}}" /></td>
         </tr>
         <tr>
             <td>All Official Events</td>

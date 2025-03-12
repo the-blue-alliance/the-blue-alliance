@@ -4,7 +4,7 @@
 
 {% block title %}{{event.name}} ({{event.year}}) - The Blue Alliance{% endblock %}
 
-{% block meta_description %}Videos and match results for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
+{% block meta_description %}Videos and match results for the {{event.year}} {{event.name}} FIRST Robotics Competition (FRC) in {{event.location}}.{% endblock %}
 
 {% block more_head_tags %}
   <meta property="og:title" content="{{ event.year }} {{ event.name }}"
@@ -66,6 +66,7 @@
           <span class="glyphicon glyphicon-circle-arrow-right"></span> Winners advance to the <a href="/event/{{ parent_event.key_name }}">{{ parent_event.name }}</a><br />
         {% endif %}
         {{ em.showEventDates(event) }}
+        {% if event.public_agenda_url and (event.within_a_day or event.future) %}<br><span class="glyphicon glyphicon-paperclip"></span> <a href="{{event.public_agenda_url}}" target="_blank" rel="noopener noreferrer">Public Agenda</a>{% endif %}
         {% if event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
           <span itemprop="location">
@@ -90,7 +91,8 @@
         {% if match_count > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
         {% if event.details and event.details.rankings_table %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
-        {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
+        {% if district_points_sorted and not regional_champs_pool_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
+        {% if regional_champs_pool_points_sorted %}<li><a href="#cmp-points" data-toggle="tab">Champs Qual Points</a></li>{% endif %}
         <li class="{% if match_count == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
         <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length}}</span></a></li>
@@ -271,66 +273,21 @@
     {% endif %}
 
     <div class="tab-pane {% if match_count == 0 %}active{% endif %}" id="teams">
+      {% set show_pit_locations = event.official and (event.future or event.within_a_day) and nexus_pit_locations %}
       <div class="row">
         {% if teams_a %}
-        <div class="col-sm-6">
-          <table class="table table-striped table-condensed table-center team-table">
-            <thead>
-              <tr><th>Team</th><th>Location</th><th>Image</th></tr>
-            </thead>
-            <tbody>
-              {% for team, image_medias in teams_a %}
-              <tr>
-                <td>
-                  <div class="team-name-container">
-                    <div class="favorite-team-icon" data-team="{{team.key.id()}}">
-                        <span class="favorite-team-icon-spacer"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                    </div>
-                    <div class="team-name">
-                      <a href="/team/{{ team.team_number }}/{{event.year}}">{{ team.team_number }}<br>{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a>
-                    </div>
-                  </div>
-                </td>
-                <td>{% if team.city_state_country %}{{ team.city_state_country }}{% else %}--{% endif %}</td>
-                <td>{% if image_medias %}{% set small_thumbnail = True %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+          {% with teams_and_medias=teams_a %} 
+            {% include "event_partials/event_team_list_table.html" %}
+          {% endwith %}
         {% else %}
-        <div class="col-sm-6">
-          <p>No teams yet.</p>
-        </div>
+          <div class="col-sm-6">
+              <p>No teams yet.</p>
+          </div>
         {% endif %}
         {% if teams_b %}
-        <div class="col-sm-6">
-          <table class="table table-striped table-condensed table-center team-table">
-            <thead>
-              <tr><th>Team</th><th>Location</th><th>Image</th></tr>
-            </thead>
-            <tbody>
-              {% for team, image_medias in teams_b %}
-              <tr>
-                <td>
-                  <div class="team-name-container">
-                    <div class="favorite-team-icon" data-team="{{team.key.id()}}">
-                        <span class="favorite-team-icon-spacer"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                    </div>
-                    <div class="team-name">
-                      <a href="/team/{{ team.team_number }}/{{event.year}}">{{ team.team_number }}<br>{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a>
-                    </div>
-                  </div>
-                </td>
-                <td>{% if team.city_state_country %}{{ team.city_state_country }}{% else %}--{% endif %}</td>
-                <td>{% if image_medias %}{% set small_thumbnail = True %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+          {% with teams_and_medias=teams_b %} 
+            {% include "event_partials/event_team_list_table.html" %}
+          {% endwith %}
         {% endif %}
       </div>
     </div>
@@ -375,7 +332,7 @@
     </div>
     {% endif %}
 
-    {% if district_points_sorted %}
+    {% if district_points_sorted and not regional_champs_pool_points_sorted %}
     <div class="tab-pane" id="district-points">
       <div class="row">
         <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
@@ -411,6 +368,40 @@
     </div>
     {% endif %}
 
+    {% if regional_champs_pool_points_sorted %}
+    <div class="tab-pane" id="cmp-points">
+      <div class="row">
+        <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+          <table class="table table-striped table-condensed table-center">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Team</th>
+                <th>Qual Points</th>
+                <th>Playoff Points</th>
+                <th>Alliance Points</th>
+                <th>Award Points</th>
+                <th>Total Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for team_key, breakdown in regional_champs_pool_points_sorted %}
+              <tr>
+                <td>{{loop.index}}</td>
+                <td><a href="/team/{{team_key|strip_frc}}/{{event.year}}">{{team_key|strip_frc}}</a></td>
+                <td>{{breakdown.qual_points}}</td>
+                <td>{{breakdown.elim_points}}</td>
+                <td>{{breakdown.alliance_points}}</td>
+                <td>{{breakdown.award_points}}</td>
+                <td><strong>{{breakdown.total}}<strong></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
     {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}
     <div class="tab-pane" id="event-insights">
       {% if has_coprs %}
@@ -474,9 +465,13 @@
 {% endblock %}
 
 {% block footer_content %}
+{% set show_pit_locations = event.official and (event.future or event.within_a_day) and nexus_pit_locations %}
 {% if event.official and event.year >= 2006 %}
 <div class="text-left col-xs-12" style="margin-bottom: 2rem;">
-  <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank" rel="noopener noreferrer"><em>FIRST</em><sup>®</sup> Events API</a>
+  <p><span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank" rel="noopener noreferrer"><em>FIRST</em><sup>®</sup> Events API</a></p>
+  {% if show_pit_locations %}
+    <p><img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Locations provided by the <a href="https://frc.nexus/en/api" target="_blank" rel="noopener noreferrer">Nexus API</a></p>
+  {% endif %}
 </div>
 {% endif %}
 {% endblock %}

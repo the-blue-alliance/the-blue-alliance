@@ -3,6 +3,8 @@ import traceback
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
+from pyre_extensions import none_throws
+
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
     AllianceColor,
@@ -28,12 +30,140 @@ class EventInsightsHelper:
             2020: cls.calculate_event_insights_2020,
             2022: cls.calculate_event_insights_2022,
             2023: cls.calculate_event_insights_2023,
+            2025: cls.calculate_event_insights_2025,
         }
 
         if year in INSIGHTS_MAP:
             return INSIGHTS_MAP[year](matches)
         else:
             return None
+
+    @classmethod
+    def calculate_event_insights_2025(cls, matches: List[Match]) -> EventInsights:
+        qual_matches = []
+        playoff_matches = []
+        for match in matches:
+            if match.comp_level == CompLevel.QM:
+                qual_matches.append(match)
+            else:
+                playoff_matches.append(match)
+
+        qual_insights = cls._calculate_event_insights_2025_helper(qual_matches)
+        playoff_insights = cls._calculate_event_insights_2025_helper(playoff_matches)
+
+        return {
+            "qual": qual_insights,
+            "playoff": playoff_insights,
+        }
+
+    @classmethod
+    def _calculate_event_insights_2025_helper(
+        cls, matches: List[Match]
+    ) -> Optional[Dict[str, Any]]:
+        auto_rp_count = 0
+        barge_rp_count = 0
+        coral_rp_count = 0
+        coopertition_count = 0
+        six_rp_count = 0
+
+        total_scores = 0
+        total_win_margins = 0
+        total_winning_scores = 0
+
+        high_score: Tuple[int, str, str] = (0, "", "")
+
+        finished_matches = 0
+
+        for match in matches:
+            if not match.has_been_played:
+                continue
+
+            finished_matches += 1
+
+            red_score = match.alliances[AllianceColor.RED]["score"]
+            blue_score = match.alliances[AllianceColor.BLUE]["score"]
+            win_score = max(red_score, blue_score)
+
+            if win_score > high_score[0]:
+                high_score = (win_score, match.key_name, match.short_name)
+
+            if match.score_breakdown is None:
+                continue
+
+            red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
+            blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+
+            if red_sb["autoBonusAchieved"]:
+                auto_rp_count += 1
+            if blue_sb["autoBonusAchieved"]:
+                auto_rp_count += 1
+
+            if red_sb["bargeBonusAchieved"]:
+                barge_rp_count += 1
+            if blue_sb["bargeBonusAchieved"]:
+                barge_rp_count += 1
+
+            if red_sb["coralBonusAchieved"]:
+                coral_rp_count += 1
+            if blue_sb["coralBonusAchieved"]:
+                coral_rp_count += 1
+
+            if red_sb["coopertitionCriteriaMet"]:
+                coopertition_count += 1
+            if blue_sb["coopertitionCriteriaMet"]:
+                coopertition_count += 1
+
+            if (
+                red_sb["autoBonusAchieved"]
+                and red_sb["bargeBonusAchieved"]
+                and red_sb["coralBonusAchieved"]
+            ):
+                six_rp_count += 1
+            if (
+                blue_sb["autoBonusAchieved"]
+                and blue_sb["bargeBonusAchieved"]
+                and blue_sb["coralBonusAchieved"]
+            ):
+                six_rp_count += 1
+
+            total_scores += red_score + blue_score
+            total_win_margins += win_score - min(red_score, blue_score)
+            total_winning_scores += win_score
+
+        if finished_matches == 0:
+            return None
+
+        return {
+            "auto_rp_count": [
+                auto_rp_count,
+                finished_matches * 2,
+                100.0 * auto_rp_count / (finished_matches * 2),
+            ],
+            "barge_rp_count": [
+                barge_rp_count,
+                finished_matches * 2,
+                100.0 * barge_rp_count / (finished_matches * 2),
+            ],
+            "coral_rp_count": [
+                coral_rp_count,
+                finished_matches * 2,
+                100.0 * coral_rp_count / (finished_matches * 2),
+            ],
+            "coopertition_count": [
+                coopertition_count,
+                finished_matches * 2,
+                100.0 * coopertition_count / (finished_matches * 2),
+            ],
+            "six_rp_count": [
+                six_rp_count,
+                finished_matches * 2,
+                100.0 * six_rp_count / (finished_matches * 2),
+            ],
+            "average_score": total_scores / len(matches),
+            "average_win_margin": total_win_margins / len(matches),
+            "average_winning_score": total_winning_scores / len(matches),
+            "high_score": high_score,
+        }
 
     @classmethod
     def calculate_event_insights_2023(cls, matches: List[Match]) -> EventInsights:

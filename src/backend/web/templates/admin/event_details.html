@@ -11,21 +11,8 @@
     Edit</a>
   <a href="/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on
     TBA</a>
-  <button class="btn btn-danger" form="event_cache_clear"><span class="glyphicon glyphicon-trash"></span> Clear
-    Cache</button>
+  <a href="/admin/cache/clear/event/{{event.key_name}}" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Clear Cache</a>
 </div>
-
-<form action="/admin/memcache" method="post" id="event_cache_clear">
-  <input name="event_key" value="{{event.key_name}}" type="hidden" />
-  <input name="return_url" value="/admin/event/{{ event.key_name }}" type="hidden" />
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-</form>
-
-{% if flushed %}
-<div class="row">
-  <p>Cleared cache keys {{ flushed }}</p>
-</div>
-{% endif %}
 
 <hr/>
 
@@ -42,6 +29,7 @@
       <li><a href="#advancement" data-toggle="tab">Playoff Advancement</a></li>
       <li><a href="#awards" data-toggle="tab">Awards</a></li>
       <li><a href="#matches" data-toggle="tab">Matches</a></li>
+      <li><a href="#district-points" data-toggle="tab">District Points</a></li>
       <li><a href="#media" data-toggle="tab">Media</a></li>
     </ul>
   </div>
@@ -172,7 +160,19 @@
       </tr>
       <tr>
         <td>Created - Updated</td>
-        <td><time datetime="{{ event.created|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time> - <time datetime="{{ event.updated|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.updated|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time></td>
+        <td>
+          {% if event.created %}
+          <time datetime="{{ event.created|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.created|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time>
+          {% else %}
+          ?
+          {% endif %}
+          -
+          {% if event.updated %}
+          <time datetime="{{ event.updated|utc_timezone_datetime }}" class="tba-verbose-datetime-utc">{{ event.updated|utc_timezone_datetime|strftime("%b. %d, %Y at %I:%M%p") }} UTC</time>
+          {% else %}
+          ?
+          {% endif %}
+        </td>
       </tr>
     </table>
   </div>
@@ -193,6 +193,10 @@
       <a href="/admin/event/update_location/{{event.key_name}}" class="btn btn-warning"><span
           class="glyphicon glyphicon-map-marker"></span> Geocode Location</a>
     </div>
+    <h2>Nexus API Tasks</h2>
+    <div class="btn-group">
+      <a href="/tasks/get/nexus_pit_locations/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Fetch Pit Locations</a>
+    </div>
     <h2>Math Tasks</h2>
     <div class="btn-group">
       <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span
@@ -209,6 +213,8 @@
           class="glyphicon glyphicon-stats"></span> MatchStats</a>
       <a href="/tasks/math/do/predict_match_times/{{event.key_name}}" class="btn btn-warning"><span
           class="glyphicon glyphicon-time"></span> Match Time Predictions</a>
+      <a href="/tasks/math/do/regional_champs_pool_points_calc/{{event.key_name}}"
+        class="btn btn-warning"><span class="glyphicon glyphicon-tasks"></span> Regional Champs Pool Points</a>
     </div>
     <h2>Remap Teams</h2>
     <div>
@@ -445,12 +451,16 @@
       <tr>
         <td>Team</td>
         <td>Event Status</td>
+        <td>Nexus Pit Location</td>
       </tr>
       {% for et in eventteams %}
       <tr>
         <td><a href="/admin/team/{{et.team.string_id()|strip_frc}}">{{et.team.string_id()|strip_frc}}</a></td>
         <td>
           <pre class="text-left">{{et.status|pprint_json}}</pre>
+        </td>
+        <td>
+          <pre class="text-left">{% if et.pit_location %}{{et.pit_location|pprint_json}}{%endif%}</pre>
         </td>
       </tr>
       {% endfor %}
@@ -661,6 +671,57 @@
       </p>
 
     </form>
+  </div>
+
+  <div class="tab-pane" id="district-points">
+    {% if regional_champs_pool_points_sorted %}
+      <h2>Regional Championship Pool Points</h2>
+      <table class="table table-striped table-hover table-condensed">
+        <tr>
+          <th>Team</th>
+          <th>Qual Points</th>
+          <th>Elim Points</th>
+          <th>Alliance Points</th>
+          <th>Award Points</th>
+          <th>Total Points</th>
+        </tr>
+        {% for team_key, points in regional_champs_pool_points_sorted %}
+          <tr>
+            <td><a href="/team/{{team_key[3:]}}">{{team_key[3:]}}</a></td>
+            <td>{{points.qual_points}}</td>
+            <td>{{points.elim_points}}</td>
+            <td>{{points.alliance_points}}</td>
+            <td>{{points.award_points}}</td>
+            <td>{{points.total}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+
+    {% if district_points_sorted %}
+      <h2>District Points</h2>
+      <i>These may or may not be relevant, TBA always calculates district points</i>
+      <table class="table table-striped table-hover table-condensed">
+        <tr>
+          <th>Team</th>
+          <th>Qual Points</th>
+          <th>Elim Points</th>
+          <th>Alliance Points</th>
+          <th>Award Points</th>
+          <th>Total Points</th>
+        </tr>
+        {% for team_key, points in district_points_sorted %}
+          <tr>
+            <td><a href="/team/{{team_key[3:]}}">{{team_key[3:]}}</a></td>
+            <td>{{points.qual_points}}</td>
+            <td>{{points.elim_points}}</td>
+            <td>{{points.alliance_points}}</td>
+            <td>{{points.award_points}}</td>
+            <td>{{points.total}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
   </div>
 
   <div class="tab-pane" id="media">

@@ -20,19 +20,34 @@ As a final note - **you may incur charges when deploying code to an upstream Goo
 $ gcloud config set project {project-name}
 ```
 
+4. Enable auth for your local `gcloud` project.
+
+```bash
+$ gcloud auth application-default login
+```
+
+5. Enable required (paid) APIs in your Google
+    * [Cloud Tasks](https://console.cloud.google.com/apis/library/cloudtasks.googleapis.com)
+    * [Cloud Scheduler](https://console.cloud.google.com/apis/library/cloudscheduler.googleapis.com)
 ## Deploying
 
 [NOTE: These steps should move to the `Manual Deployment` page and should go in to more detail. They're here now as a stop-gap.]
 
 The [`push.yml` GitHub Action](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/.github/workflows/push.yml) contains the commands CI uses to deploy to production and can be used as a reference.
 
+TODO: Add notes about setting up a `src/env_variables.yaml` before deploying with a Flask secret key.
+
 1. Deploy the default service and any other necessary services for testing.
 
 ```bash
 $ gcloud app deploy src/queue.yaml
+$ gcloud app deploy src/index.yaml
+$ gcloud app deploy src/cron.yaml
 $ gcloud app deploy src/default.yaml -v 1
 $ gcloud app deploy src/{service}.yaml -v 1
 ```
+
+**NOTE: Instructions for building + deploying the React apps for web (GameDay, EventWizard, etc.) are not listed here.**
 
 2. (Optional) Deploy `dispatch.yaml` for routing
 
@@ -41,12 +56,6 @@ $ gcloud app deploy src/dispatch.yaml
 ```
 
 `dispatch.yaml` will fail to deploy if not all services defined in `dispatch.yaml` are deployed upstream. The best workaround here is to modify `dispatch.yaml` locally to remove services not deployed upstream and then attempt to re-deploy `dispatch.yaml` with only the necessary routes.
-
-[TODO: Notes on deploying `cron.yaml`]
-
-## Configuring Flask Secrets
-
-The [`SECRET_KEY`](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY) for Flask apps is in the `flask.secrets` sitevar and configured for Flask apps during runtime. The default `secret_key` value must be changed when deploying to an upstream Google App Engine instance - there is validation in place to ensure the default key checked in to code/used for development is not the same key used in production. At the time of writing, the Admin interface is not supported in the py3 codebase, so there is no GUI for editing sitevars. Sitevars can be edited directly [in the Datastore interface](https://console.cloud.google.com/datastore/entities;kind=Sitevar) online when selecing `Sitevar` from the `Kind` dropdown, editing the `flask.secrets`, and updating the JSON accordingly.
 
 # Firebase Setup
 

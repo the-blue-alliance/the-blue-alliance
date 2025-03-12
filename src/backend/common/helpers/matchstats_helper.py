@@ -138,6 +138,47 @@ MANUAL_COMPONENTS = {
             + match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
         ),
     },
+    2025: {
+        "L1 Coral Count": lambda match, color: (
+            match.score_breakdown[color].get("autoReef", {}).get("trough", 0)
+            + match.score_breakdown[color].get("teleopReef", {}).get("trough", 0)
+        ),
+        "L2 Coral Count": lambda match, color: (
+            match.score_breakdown[color].get("teleopReef", {}).get("tba_botRowCount", 0)
+        ),
+        "L3 Coral Count": lambda match, color: (
+            match.score_breakdown[color].get("teleopReef", {}).get("tba_midRowCount", 0)
+        ),
+        "L4 Coral Count": lambda match, color: (
+            match.score_breakdown[color].get("teleopReef", {}).get("tba_topRowCount", 0)
+        ),
+        "Total Coral Count": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoCoralCount", 0),
+                match.score_breakdown[color].get("teleopCoralCount", 0),
+            ]
+        ),
+        "Total Coral Points": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoCoralPoints", 0),
+                match.score_breakdown[color].get("teleopCoralPoints", 0),
+            ]
+        ),
+        "Total Algae Count": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("wallAlgaeCount", 0),
+                match.score_breakdown[color].get("netAlgaeCount", 0),
+            ]
+        ),
+        "Total Game Piece Count": lambda match, color: sum(
+            [
+                match.score_breakdown[color].get("autoCoralCount", 0),
+                match.score_breakdown[color].get("teleopCoralCount", 0),
+                match.score_breakdown[color].get("wallAlgaeCount", 0),
+                match.score_breakdown[color].get("netAlgaeCount", 0),
+            ]
+        ),
+    },
 }
 
 

@@ -22,12 +22,11 @@ module.exports = {
   ignorePatterns: ['!**/.server', '!**/.client', 'app/api/v3.ts'],
 
   // Base config
-  extends: ['eslint:recommended', 'prettier', 'plugin:tailwindcss/recommended'],
+  extends: ['eslint:recommended', 'prettier'],
   plugins: ['no-relative-import-paths'],
   rules: {
     // Fix for eslint not knowing how to resolve unplugin icons
     'import/no-unresolved': ['error', { ignore: ['^~icons/', '^virtual:'] }],
-    'tailwindcss/no-custom-classname': 'off',
     'no-relative-import-paths/no-relative-import-paths': [
       'error',
       { allowSameFolder: true },
@@ -58,7 +57,10 @@ module.exports = {
           { name: 'NavLink', linkAttribute: 'to' },
         ],
         'import/resolver': {
-          typescript: {},
+          typescript: {
+            project: ['tsconfig.json'],
+            alwaysTryTypes: true,
+          },
         },
       },
       rules: {
@@ -83,6 +85,7 @@ module.exports = {
             extensions: ['.ts', '.tsx'],
           },
           typescript: {
+            project: ['tsconfig.json'],
             alwaysTryTypes: true,
           },
         },

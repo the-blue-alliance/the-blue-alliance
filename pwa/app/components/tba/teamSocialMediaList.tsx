@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 
 import LogosFacebook from '~icons/logos/facebook';
 import LogosGithubIcon from '~icons/logos/github-icon';

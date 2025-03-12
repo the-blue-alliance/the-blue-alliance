@@ -1,4 +1,5 @@
 import { Event } from '~/api/v3';
+import { EventType } from '~/lib/api/EventType';
 
 import { convertMsToDays } from './utils';
 
@@ -24,6 +25,22 @@ export function sortEventsComparator(a: Event, b: Event) {
   if (end_date_a > end_date_b) {
     return 1;
   }
+
+  // If one of the events is DCMP finals or CMP finals, put it last
+  // e.g.: [2024necmp1, 2024necmp2, 2024necmp]
+  if (
+    (a.event_type === EventType.CMP_FINALS ||
+      a.event_type === EventType.DISTRICT_CMP ||
+      b.event_type === EventType.CMP_FINALS ||
+      b.event_type === EventType.DISTRICT_CMP) &&
+    a.event_type !== b.event_type
+  ) {
+    return a.event_type === EventType.CMP_FINALS ||
+      a.event_type === EventType.DISTRICT_CMP
+      ? 1
+      : -1;
+  }
+
   // Then sort by name
   if (a.name < b.name) {
     return -1;

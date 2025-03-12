@@ -5,15 +5,20 @@ import { cn } from '~/lib/utils';
 
 // For very long text blocks, flex makes the icon really tiny. Use flexless for those.
 // Flex approach in general is easier to work with, so that's the default.
-const inlineIconVariants = cva('[&>*:first-child]:size-[1em]', {
+const inlineIconVariants = cva('', {
   variants: {
     displayStyle: {
       flex: 'flex items-center text-center',
-      flexless: '[&>*]:inline',
+      flexless: '*:inline',
+    },
+    iconSize: {
+      default: '[&>*:first-child]:size-[1em]',
+      large: '[&>*:first-child]:size-[1.5em]',
     },
   },
   defaultVariants: {
     displayStyle: 'flex',
+    iconSize: 'default',
   },
 });
 
@@ -35,11 +40,12 @@ export default function InlineIcon({
   className,
   children,
   displayStyle,
+  iconSize,
   ...props
 }: InlineIconProps) {
   return (
     <div
-      className={cn(inlineIconVariants({ displayStyle, className }))}
+      className={cn(inlineIconVariants({ displayStyle, iconSize, className }))}
       {...props}
     >
       {children[0]}

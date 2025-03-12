@@ -10,6 +10,7 @@ from backend.web.handlers.admin.api_auth import (
     api_auth_edit_post,
     api_auth_manage,
 )
+from backend.web.handlers.admin.apistatus import apistatus_get, apistatus_post
 from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
 from backend.web.handlers.admin.awards import (
     award_dashboard,
@@ -17,10 +18,20 @@ from backend.web.handlers.admin.awards import (
     award_edit,
     award_edit_post,
 )
+from backend.web.handlers.admin.cache import (
+    cached_query_delete,
+    cached_query_detail,
+    cached_query_info,
+    cached_query_key_lookup_post,
+    cached_query_list,
+    cached_query_purge_version,
+    clear_model_cache,
+)
 from backend.web.handlers.admin.districts import (
     district_create,
     district_delete,
     district_delete_post,
+    district_details,
     district_edit,
     district_edit_post,
     district_list,
@@ -61,6 +72,7 @@ from backend.web.handlers.admin.media import (
     media_make_preferred,
     media_remove_preferred,
 )
+from backend.web.handlers.admin.regional_champs_pool import regional_champs_pool_list
 from backend.web.handlers.admin.sitevars import (
     sitevar_create,
     sitevar_edit,
@@ -154,8 +166,18 @@ admin_routes.add_url_rule(
     "/api_auth/edit/<auth_id>", view_func=api_auth_edit_post, methods=["POST"]
 )
 admin_routes.add_url_rule(
-    "/api_auth/manage", view_func=api_auth_manage, methods=["GET"]
+    "/api_auth/manage",
+    view_func=api_auth_manage,
+    defaults={"key_type": None},
+    methods=["GET"],
 )
+admin_routes.add_url_rule(
+    "/api_auth/manage/<regex('(read|write|admin)'):key_type>",
+    view_func=api_auth_manage,
+    methods=["GET"],
+)
+admin_routes.add_url_rule("/apistatus", view_func=apistatus_get, methods=["GET"])
+admin_routes.add_url_rule("/apistatus", view_func=apistatus_post, methods=["POST"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_get, methods=["GET"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_post, methods=["POST"])
 
@@ -169,11 +191,34 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/award/edit/<award_key>", methods=["POST"], view_func=award_edit_post
 )
-
+admin_routes.add_url_rule("/cache", view_func=cached_query_list)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>", methods=["GET"], view_func=cached_query_detail
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>",
+    methods=["POST"],
+    view_func=cached_query_key_lookup_post,
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>/<cache_key>", view_func=cached_query_info
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>/<cache_key>/delete", view_func=cached_query_delete
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>/purge/<db_version>/<int:query_version>",
+    view_func=cached_query_purge_version,
+)
+admin_routes.add_url_rule(
+    "/cache/clear/<model_type>/<model_key>",
+    view_func=clear_model_cache,
+)
 admin_routes.add_url_rule(
     "/districts", view_func=district_list, defaults={"year": None}
 )
 admin_routes.add_url_rule("/districts/<int:year>", view_func=district_list)
+admin_routes.add_url_rule("/district/<district_key>", view_func=district_details)
 admin_routes.add_url_rule("/district/create", view_func=district_create)
 admin_routes.add_url_rule(
     "/district/delete/<district_key>", methods=["GET"], view_func=district_delete
@@ -262,10 +307,21 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/match/delete/<match_key>", view_func=match_delete_post, methods=["POST"]
 )
+admin_routes.add_url_rule(
+    "/regional_champs_pool",
+    view_func=regional_champs_pool_list,
+    defaults={"year": None},
+)
+admin_routes.add_url_rule(
+    "/regional_champs_pool/<int:year>", view_func=regional_champs_pool_list
+)
 admin_routes.add_url_rule("/sitevars", view_func=sitevars_list)
 admin_routes.add_url_rule("/sitevar/create", view_func=sitevar_create, methods=["GET"])
 admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/sitevar/edit", view_func=sitevar_edit_post, methods=["POST"]
 )
 admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit_post, methods=["POST"]
