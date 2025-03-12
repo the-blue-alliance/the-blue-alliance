@@ -23,6 +23,7 @@ class RegionalPoolTeamManipulator(ManipulatorBase[RegionalPoolTeam]):
         new_model: RegionalPoolTeam,
         old_model: RegionalPoolTeam,
         auto_union: bool = True,
+        update_manual_attrs: bool = True,
     ):
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
         return old_model
