@@ -371,12 +371,12 @@ def event_details(event_key: EventKey) -> Response:
     if not Event.validate_key_name(event_key):
         return make_response(f"Bad event key: {Markup.escape(event_key)}", 400)
 
-    df = DatafeedFMSAPI(save_response=True)
+    fms_df = DatafeedFMSAPI(save_response=True)
 
     # Update event
-    event_details_future = df.get_event_details(event_key)
-    event_teams_future = df.get_event_teams(event_key)
-    event_team_avatars_future = df.get_event_team_avatars(event_key)
+    event_details_future = fms_df.get_event_details(event_key)
+    event_teams_future = fms_df.get_event_teams(event_key)
+    event_team_avatars_future = fms_df.get_event_team_avatars(event_key)
     existing_event_teams_future = EventTeam.query(
         EventTeam.event == ndb.Key(Event, event_key)
     ).fetch_async()

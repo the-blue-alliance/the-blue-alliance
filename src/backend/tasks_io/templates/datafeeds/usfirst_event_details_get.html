@@ -24,3 +24,18 @@
 <h3>Other Models</h3>
 <p><b>DistrictTeams:</b> {% for dt in district_teams %}{{dt.key.string_id()}} {%endfor%}</p>
 <p><b>RegionalPoolTeams:</b> {% for rpt in regional_pool_teams %}{{rpt.key.string_id()}} {%endfor%}</p>
+<p><b>Nexus Pit Locations:</b></p>
+<table>
+    <tr>
+        <th>Team</th>
+        <th>Pit Location</th>
+    </tr>
+    {% for et in event_teams %}
+        {% if et.pit_location %}
+            <tr>
+                <td>{{et.team.id()}}</td>
+                <td><pre>{{et.pit_location}}</pre></td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+</table>

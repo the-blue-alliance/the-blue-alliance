@@ -29,6 +29,15 @@ cron:
   url: /tasks/enqueue/fmsapi_awards/now
   schedule: every 1 hours
 
+- description: Nexus pit locations for current events
+  url: /tasks/enqueue/nexus_pit_locations/now
+  schedule: every 1 hours
+
+- description: Nexus pit locations for all season events
+  url: /tasks/enqueue/nexus_pit_locations/current_year
+  schedule: every day 02:00
+  timezone: America/Los_Angeles
+
 - description: Hall of Fame team list scraping
   url: /tasks/get/hof_teams
   schedule: every thursday 01:00

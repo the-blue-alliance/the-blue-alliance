@@ -113,7 +113,11 @@ def test_get_event_details(
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_writes_teams(
-    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
 ) -> None:
     event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
     teams_mock.return_value = InstantFuture(
@@ -135,6 +139,7 @@ def test_get_event_details_writes_teams(
             [],
         )
     )
+
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
     assert len(resp.data) > 0
@@ -142,8 +147,8 @@ def test_get_event_details_writes_teams(
     # Make sure we write models
     assert Team.get_by_id("frc254") is not None
     assert DistrictTeam.get_by_id("2019fim_frc254") is not None
-    assert Robot.get_by_id("frc254_2019") is not None
     assert EventTeam.get_by_id("2019casj_frc254") is not None
+    assert Robot.get_by_id("frc254_2019") is not None
     assert Media.get_by_id("avatar_media") is not None
 
 
@@ -152,7 +157,11 @@ def test_get_event_details_writes_teams(
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_clears_eventteams(
-    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
 ) -> None:
     event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
     avatars_mock.return_value = InstantFuture(([], []))
@@ -223,6 +232,7 @@ def test_get_event_details_skip_eventteams(
             ),
         ]
     )
+
     resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
     assert resp.status_code == 200
 
@@ -240,7 +250,11 @@ def test_get_event_details_skip_eventteams(
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_writes_cmp_advancement(
-    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
 ) -> None:
     event_mock.return_value = InstantFuture(
         ([create_event(year=2025, event_type=EventType.CMP_DIVISION)], [])
@@ -260,6 +274,7 @@ def test_get_event_details_writes_cmp_advancement(
             [],
         )
     )
+
     resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
     assert resp.status_code == 200
     assert len(resp.data) > 0
@@ -281,7 +296,11 @@ def test_get_event_details_writes_cmp_advancement(
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_ignores_other_event_cmp_advancement(
-    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
 ) -> None:
     RegionalChampsPool.get_or_insert(
         "2025",
@@ -309,6 +328,7 @@ def test_get_event_details_ignores_other_event_cmp_advancement(
             [],
         )
     )
+
     resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
     assert resp.status_code == 200
     assert len(resp.data) > 0
@@ -330,7 +350,11 @@ def test_get_event_details_ignores_other_event_cmp_advancement(
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_removes_cmp_advancement_if_no_longer_registered(
-    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
 ) -> None:
     RegionalChampsPool.get_or_insert(
         "2025",
@@ -345,6 +369,7 @@ def test_get_event_details_removes_cmp_advancement_if_no_longer_registered(
     )
     teams_mock.return_value = InstantFuture([])
     avatars_mock.return_value = InstantFuture(([], []))
+
     resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
     assert resp.status_code == 200
     assert len(resp.data) > 0
@@ -364,7 +389,11 @@ def test_get_event_details_removes_cmp_advancement_if_no_longer_registered(
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_ignores_non_cmp_event(
-    event_mock, teams_mock, avatars_mock, max_year_mock, tasks_client: Client
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
 ) -> None:
     RegionalChampsPool.get_or_insert(
         "2025",
@@ -392,6 +421,7 @@ def test_get_event_details_ignores_non_cmp_event(
             [],
         )
     )
+
     resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
     assert resp.status_code == 200
     assert len(resp.data) > 0

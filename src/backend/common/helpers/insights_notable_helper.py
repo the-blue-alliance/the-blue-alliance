@@ -7,7 +7,12 @@ from backend.common.helpers.insights_helper_utils import (
     LeaderboardInsightArguments,
     make_insights_from_functions,
 )
-from backend.common.models.insight import Insight, InsightEnumId, NotableEntry, NotablesData
+from backend.common.models.insight import (
+    Insight,
+    InsightEnumId,
+    NotableEntry,
+    NotablesData,
+)
 from backend.common.models.keys import EventKey, TeamKey, Year
 
 
