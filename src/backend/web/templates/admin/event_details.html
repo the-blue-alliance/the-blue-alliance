@@ -447,12 +447,16 @@
       <tr>
         <td>Team</td>
         <td>Event Status</td>
+        <td>Nexus Pit Location</td>
       </tr>
       {% for et in eventteams %}
       <tr>
         <td><a href="/admin/team/{{et.team.string_id()|strip_frc}}">{{et.team.string_id()|strip_frc}}</a></td>
         <td>
           <pre class="text-left">{{et.status|pprint_json}}</pre>
+        </td>
+        <td>
+          <pre class="text-left">{% if et.pit_location %}{{et.pit_location|pprint_json}}{%endif%}</pre>
         </td>
       </tr>
       {% endfor %}
