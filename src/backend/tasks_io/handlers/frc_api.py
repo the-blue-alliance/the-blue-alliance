@@ -470,10 +470,14 @@ def event_details(event_key: EventKey) -> Response:
     ):  # Only update from latest year
         teams = TeamManipulator.createOrUpdate(teams, update_manual_attrs=False)
 
-    district_teams = DistrictTeamManipulator.createOrUpdate(district_teams, update_manual_attrs=False)
+    district_teams = DistrictTeamManipulator.createOrUpdate(
+        district_teams, update_manual_attrs=False
+    )
     robots = RobotManipulator.createOrUpdate(robots, update_manual_attrs=False)
     regional_pool_teams = listify(
-        RegionalPoolTeamManipulator.createOrUpdate(regional_pool_teams, update_manual_attrs=False)
+        RegionalPoolTeamManipulator.createOrUpdate(
+            regional_pool_teams, update_manual_attrs=False
+        )
     )
 
     if not teams:
@@ -899,7 +903,9 @@ def awards_event(event_key: EventKey) -> Response:
 def district_list(year: Year) -> Response:
     df = DatafeedFMSAPI()
     fmsapi_districts = df.get_district_list(year).get_result()
-    districts = DistrictManipulator.createOrUpdate(fmsapi_districts, update_manual_attrs=False)
+    districts = DistrictManipulator.createOrUpdate(
+        fmsapi_districts, update_manual_attrs=False
+    )
 
     template_values = {
         "districts": listify(districts),

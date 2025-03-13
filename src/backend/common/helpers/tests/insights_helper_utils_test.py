@@ -89,11 +89,7 @@ def test_make_args_has_no_offseasons(ndb_stub, test_data_importer):
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
     args = make_leaderboard_args(year=2019)
-    mttd_2019_matches = [
-        m
-        for m in args.matches()
-        if m.key.id().startswith("2019mttd")
-    ]
+    mttd_2019_matches = [m for m in args.matches() if m.key.id().startswith("2019mttd")]
 
     assert len(mttd_2019_matches) == 0
 
