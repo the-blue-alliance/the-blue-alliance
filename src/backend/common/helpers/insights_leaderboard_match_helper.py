@@ -28,6 +28,9 @@ class InsightsLeaderboardMatchHelper:
     def _highest_match_clean_score(
         arguments: LeaderboardInsightArguments,
     ) -> Optional[Insight]:
+        if arguments.year == 0:
+            return None
+
         clean_scores = defaultdict(int)
 
         for match in arguments.matches():
@@ -55,6 +58,9 @@ class InsightsLeaderboardMatchHelper:
     def _highest_match_clean_combined_score(
         arguments: LeaderboardInsightArguments,
     ) -> Optional[Insight]:
+        if arguments.year == 0:
+            return None
+
         clean_scores = defaultdict(int)
 
         for match in arguments.matches():
