@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.11
+ * 3.9.13
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -648,9 +648,9 @@ export type MatchScoreBreakdown2023Alliance = {
   coopertitionCriteriaMet?: boolean;
   endGameBridgeState?: 'NotLevel' | 'Level';
   endGameChargeStationPoints?: number;
-  endGameChargeStationRobot1?: 'None' | 'Docked';
-  endGameChargeStationRobot2?: 'None' | 'Docked';
-  endGameChargeStationRobot3?: 'None' | 'Docked';
+  endGameChargeStationRobot1?: 'None' | 'Docked' | 'Park';
+  endGameChargeStationRobot2?: 'None' | 'Docked' | 'Park';
+  endGameChargeStationRobot3?: 'None' | 'Docked' | 'Park';
   endGameParkPoints?: number;
   extraGamePieceCount?: number;
   foulCount?: number;
