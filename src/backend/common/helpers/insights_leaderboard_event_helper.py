@@ -27,6 +27,9 @@ class InsightsLeaderboardEventHelper:
     def _highest_median_score(
         arguments: LeaderboardInsightArguments,
     ) -> Optional[Insight]:
+        if arguments.year == 0:
+            return None
+
         clean_scores = defaultdict(list)
 
         for match in arguments.matches():
