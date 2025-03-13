@@ -9,7 +9,7 @@ from google.appengine.ext import ndb
 from markupsafe import Markup
 from pyre_extensions import none_throws
 
-from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
+from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
@@ -29,9 +29,6 @@ from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
-from backend.common.manipulators.regional_champs_pool_manipulator import (
-    RegionalChampsPoolManipulator,
-)
 from backend.common.manipulators.regional_pool_team_manipulator import (
     RegionalPoolTeamManipulator,
 )
@@ -43,11 +40,6 @@ from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
-from backend.common.models.regional_champs_pool import RegionalChampsPool
-from backend.common.models.regional_pool_advancement import (
-    RegionalPoolAdvancement,
-    TeamRegionalPoolAdvancement,
-)
 from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -390,41 +382,16 @@ def event_details(event_key: EventKey) -> Response:
         EventTeam.event == ndb.Key(Event, event_key)
     ).fetch_async()
 
-    if (year := int(event_key[:4])) and SeasonHelper.is_valid_regional_pool_year(year):
-        champs_pool_model_future = RegionalChampsPool.get_or_insert_async(
-            RegionalChampsPool.render_key_name(year),
-            year=year,
-        )
-    else:
-        champs_pool_model_future = None
-
     fmsapi_events, fmsapi_districts = event_details_future.get_result()
     event = EventManipulator.createOrUpdate(fmsapi_events[0], update_manual_attrs=False)
 
     DistrictManipulator.createOrUpdate(fmsapi_districts, update_manual_attrs=False)
 
     models = event_teams_future.get_result()
-    champs_pool_model: Optional[RegionalChampsPool] = (
-        champs_pool_model_future.get_result() if champs_pool_model_future else None
-    )
 
     teams: List[Team] = []
     district_teams: List[DistrictTeam] = []
     regional_pool_teams: List[RegionalPoolTeam] = []
-
-    event_cmp_advancement: RegionalPoolAdvancement = {}
-    initial_cmp_advancement: RegionalPoolAdvancement = {}
-    if champs_pool_model and champs_pool_model.advancement:
-        # This way, we can handle unregistering teams that
-        # are no longer coming from "this" event
-        initial_cmp_advancement = champs_pool_model.advancement
-        event_cmp_advancement.update(
-            {
-                team: TeamRegionalPoolAdvancement(cmp=False)
-                for team, advancement in champs_pool_model.advancement.items()
-                if advancement.get("cmp_event") == event.key_name
-            }
-        )
 
     robots: List[Robot] = []
     for group in models:
@@ -451,14 +418,6 @@ def event_details(event_key: EventKey) -> Response:
                 team=team.key,
             )
             regional_pool_teams.append(regional_pool_team)
-
-            if event.event_type_enum in CMP_EVENT_TYPES:
-                event_cmp_advancement[team_key] = TeamRegionalPoolAdvancement(
-                    cmp=True,
-                    cmp_event=initial_cmp_advancement.get(team_key, {}).get(
-                        "cmp_event", event.key_name
-                    ),
-                )
 
         robot = group[2]
         if isinstance(robot, Robot):
@@ -547,14 +506,6 @@ def event_details(event_key: EventKey) -> Response:
         if avatars:
             MediaManipulator.createOrUpdate(avatars, update_manual_attrs=False)
         MediaManipulator.delete_keys(keys_to_delete)
-
-    if champs_pool_model is not None:
-        advancement = champs_pool_model.advancement or {}
-        advancement.update(event_cmp_advancement)
-        champs_pool_model.advancement = {
-            team: adv for team, adv in advancement.items() if adv["cmp"]
-        }
-        RegionalChampsPoolManipulator.createOrUpdate(champs_pool_model)
 
     template_values = {
         "event": event,
@@ -811,7 +762,10 @@ def event_matches(event_key: EventKey) -> Response:
 # @blueprint.route("/awards/<int:from backend.common.helpers.listify import delistify, listifyyear>")
 # TODO: Drop support for this "now" and just use an empty year
 @blueprint.route("/tasks/enqueue/fmsapi_awards/now", defaults={"year": None})
-@blueprint.route("/tasks/enqueue/fmsapi_awards/last_day_only", defaults={"year": None, "when": "last_day_only"})
+@blueprint.route(
+    "/tasks/enqueue/fmsapi_awards/last_day_only",
+    defaults={"year": None, "when": "last_day_only"},
+)
 @blueprint.route("/tasks/enqueue/fmsapi_awards/<int:year>")
 def awards_year(year: Optional[int], when: Optional[str] = None) -> Response:
     events: List[Event]
