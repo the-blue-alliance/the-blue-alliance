@@ -83,6 +83,21 @@ cron:
   schedule: every day 01:19
   timezone: America/Los_Angeles
 
+- description: Team Overall Leaderboard Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/leaderboards/team/0
+  schedule: every day 01:25
+  timezone: America/Los_Angeles
+
+- description: Event Overall Leaderboard Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/leaderboards/event/0
+  schedule: every day 01:30
+  timezone: America/Los_Angeles
+
+- description: Match Overall Leaderboard Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/leaderboards/match/0
+  schedule: every day 01:35
+  timezone: America/Los_Angeles
+
 - description: Notable Insights Calculation
   url: /backend-tasks-b2/math/enqueue/notables
   schedule: every day 01:21
