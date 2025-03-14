@@ -143,3 +143,85 @@ def test_notables_division_finals_appearances(ndb_stub):
         {"team_key": "frc604", "context": ["2024mil"]},
         {"team_key": "frc2713", "context": ["2024mil"]},
     ]
+
+
+def test_notables_dcmp_winner(ndb_stub):
+    # Set up DCMPs
+    events = []
+    for event_short, years in [
+        ("necmp", [2018, 2019, 2020, 2021, 2022]),
+        ("micmp", [2018, 2019, 2020, 2021, 2022]),
+    ]:
+        for year in years:
+            Event(
+                id=f"{year}{event_short}",
+                year=year,
+                event_short=event_short,
+                event_type_enum=EventType.DISTRICT_CMP,
+            ).put()
+            events.append(Event.get_by_id(f"{year}{event_short}"))
+
+            Award(
+                id=f"{year}{event_short}_winner",
+                year=year,
+                award_type_enum=AwardType.WINNER,
+                event_type_enum=EventType.DISTRICT_CMP,
+                event=ndb.Key(Event, f"{year}{event_short}"),
+                name_str="Winner",
+                team_list=[
+                    ndb.Key(Team, "frc2713" if event_short == "necmp" else "frc1")
+                ],
+            ).put()
+
+            # Set up divisions to make sure we don't count them
+            for div in range(1, 3):
+                Event(
+                    id=f"{year}{event_short}{div}",
+                    year=year,
+                    event_short=f"{event_short}{div}",
+                    event_type_enum=EventType.DISTRICT_CMP_DIVISION,
+                ).put()
+                events.append(Event.get_by_id(f"{year}{event_short}{div}"))
+
+                Award(
+                    id=f"{year}{event_short}{div}_winner",
+                    year=year,
+                    award_type_enum=AwardType.WINNER,
+                    event_type_enum=EventType.DISTRICT_CMP_DIVISION,
+                    event=ndb.Key(Event, f"{year}{event_short}{div}"),
+                    name_str="Winner",
+                    team_list=[
+                        ndb.Key(Team, "frc2713" if event_short == "necmp" else "frc1")
+                    ],
+                ).put()
+
+    insight = InsightsNotableHelper._calculate_notables_dcmp_winner(
+        LeaderboardInsightArguments(
+            events=events,
+            year=2024,
+        )
+    )
+
+    assert insight is not None
+    assert insight.data["entries"] == [
+        {
+            "team_key": "frc2713",
+            "context": [
+                "2018necmp",
+                "2019necmp",
+                "2020necmp",
+                "2021necmp",
+                "2022necmp",
+            ],
+        },
+        {
+            "team_key": "frc1",
+            "context": [
+                "2018micmp",
+                "2019micmp",
+                "2020micmp",
+                "2021micmp",
+                "2022micmp",
+            ],
+        },
+    ]

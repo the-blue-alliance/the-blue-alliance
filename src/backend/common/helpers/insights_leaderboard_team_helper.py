@@ -1,14 +1,15 @@
 from collections import defaultdict
-from typing import List, Optional
+from typing import DefaultDict, List, Optional
 
 from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
-from backend.common.consts.event_type import NON_CMP_EVENT_TYPES
+from backend.common.consts.event_type import EventType, NON_CMP_EVENT_TYPES
 from backend.common.helpers.insights_helper_utils import (
     LeaderboardInsightArguments,
     make_insights_from_functions,
     make_leaderboard_from_dict_counts,
 )
 from backend.common.models.insight import Insight
+from backend.common.models.keys import Year
 
 
 class InsightsLeaderboardTeamHelper:
@@ -23,6 +24,7 @@ class InsightsLeaderboardTeamHelper:
                 InsightsLeaderboardTeamHelper._most_matches_played,
                 InsightsLeaderboardTeamHelper._most_events_played_at,
                 InsightsLeaderboardTeamHelper._most_unique_teams_played_with_or_against,
+                InsightsLeaderboardTeamHelper._longest_einstein_streak,
             ],
         )
 
@@ -121,5 +123,60 @@ class InsightsLeaderboardTeamHelper:
         return make_leaderboard_from_dict_counts(
             counts,
             Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
+            arguments.year,
+        )
+
+    @staticmethod
+    def _longest_einstein_streak(
+        arguments: LeaderboardInsightArguments,
+    ) -> Optional[Insight]:
+        if arguments.year != 0:
+            return None
+
+        einstein_appearances: DefaultDict[str, List[int]] = defaultdict(list)
+
+        for award in arguments.awards():
+            if (
+                award.award_type_enum == AwardType.WINNER
+                and award.event_type_enum == EventType.CMP_DIVISION
+            ):
+                for team_key in award.team_list:
+                    year = int(str(award.event.string_id())[:4])
+                    einstein_appearances[str(team_key.string_id())].append(year)
+
+        def are_years_consecutive(a: Year, b: Year) -> bool:
+            # 2020, 2021 divisions didn't happen because COVID
+            if a in [2019, 2022] and b in [2019, 2022] and a != b:
+                return True
+
+            return a == b + 1 or a == b - 1
+
+        def get_streaks(appearances: List[int]) -> List[int]:
+            streaks = []
+            current_streak = 0
+
+            for i, appearance in enumerate(appearances):
+                if current_streak == 0:
+                    current_streak += 1
+                else:
+                    if are_years_consecutive(appearance, appearances[i - 1]):
+                        current_streak += 1
+                    else:
+                        streaks.append(current_streak)
+                        current_streak = 1
+
+            streaks.append(current_streak)
+            return streaks
+
+        streaks = {
+            tk: get_streaks(appearances)
+            for tk, appearances in einstein_appearances.items()
+        }
+
+        longest_streaks = {tk: max(streaks) for tk, streaks in streaks.items()}
+
+        return make_leaderboard_from_dict_counts(
+            longest_streaks,
+            Insight.TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK,
             arguments.year,
         )

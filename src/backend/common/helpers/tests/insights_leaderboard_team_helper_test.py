@@ -1,9 +1,15 @@
+from google.appengine.ext import ndb
+
+from backend.common.consts.award_type import AwardType
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.insights_leaderboard_team_helper import (
     InsightsLeaderboardTeamHelper,
     LeaderboardInsightArguments,
 )
+from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.insight import Insight
+from backend.common.models.team import Team
 
 
 def test_most_blue_banners(ndb_stub, test_data_importer):
@@ -227,3 +233,69 @@ def test_only_official_events_are_included(ndb_stub, test_data_importer):
         },
         {"keys": ["frc2344"], "value": 13},
     ]
+
+
+def test_longest_einstein_streak_across_covid(ndb_stub):
+    Team(id="frc254", team_number=254).put()
+    Event(
+        id="2018hop",
+        year=2018,
+        event_short="hop",
+        event_type_enum=EventType.CMP_DIVISION,
+    ).put()
+    Award(
+        id="2018hop_1",
+        year=2018,
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.CMP_DIVISION,
+        event=ndb.Key(Event, "2018hop"),
+        name_str="Winner",
+        team_list=[ndb.Key(Team, "frc254")],
+    ).put()
+    Event(
+        id="2019tur",
+        year=2019,
+        event_short="tur",
+        event_type_enum=EventType.CMP_DIVISION,
+    ).put()
+    Award(
+        id="2019tur_1",
+        year=2019,
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.CMP_DIVISION,
+        event=ndb.Key(Event, "2019tur"),
+        name_str="Winner",
+        team_list=[ndb.Key(Team, "frc254")],
+    ).put()
+    Event(
+        id="2022gal",
+        year=2022,
+        event_short="gal",
+        event_type_enum=EventType.CMP_DIVISION,
+    ).put()
+    Award(
+        id="2022gal_1",
+        year=2022,
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.CMP_DIVISION,
+        event=ndb.Key(Event, "2022gal"),
+        name_str="Winner",
+        team_list=[ndb.Key(Team, "frc254")],
+    ).put()
+
+    insight = InsightsLeaderboardTeamHelper._longest_einstein_streak(
+        LeaderboardInsightArguments(
+            events=[
+                Event.get_by_id("2018hop"),
+                Event.get_by_id("2019tur"),
+                Event.get_by_id("2022gal"),
+            ],
+            year=0,
+        )
+    )
+
+    assert insight is not None
+    assert insight.data["rankings"][:3] == [
+        {"keys": ["frc254"], "value": 3},
+    ]
+    assert insight.data["key_type"] == "team"

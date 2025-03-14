@@ -26,6 +26,7 @@ class InsightsNotableHelper:
                 InsightsNotableHelper._calculate_notables_world_champions,
                 InsightsNotableHelper._calculate_notables_division_winners,
                 InsightsNotableHelper._calculate_notables_division_finals_appearances,
+                InsightsNotableHelper._calculate_notables_dcmp_winner,
             ],
         )
 
@@ -128,4 +129,15 @@ class InsightsNotableHelper:
             team_context_map,
             Insight.TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES,
             arguments.year,
+        )
+
+    @staticmethod
+    def _calculate_notables_dcmp_winner(
+        arguments: LeaderboardInsightArguments,
+    ) -> Insight:
+        return InsightsNotableHelper.__make_notable_from_award_type_at_event_type(
+            arguments,
+            AwardType.WINNER,
+            EventType.DISTRICT_CMP,
+            Insight.TYPED_NOTABLES_DCMP_WINNER,
         )
