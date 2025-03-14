@@ -38,6 +38,10 @@
       "description": "Calls that return district, or district-related information."
     },
     {
+      "name": "regional_advancement",
+      "description": "Calls that return information about regional teams advancing to CMP, starting in 2025"
+    },
+    {
       "name": "insight",
       "description": "Calls that return insights, or insight-related information."
     }
@@ -4482,6 +4486,68 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/District_Ranking"
+                  },
+                  "nullable": "true"
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/regional_advancement/{year}/rankings": {
+      "get": {
+        "tags": [
+          "regional_advancement",
+          "list"
+        ],
+        "description": "Gets the team rankings in the regional pool for a specific year.",
+        "operationId": "getRegionalRankings",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Regional_Ranking"
                   },
                   "nullable": "true"
                 }
@@ -9021,6 +9087,78 @@
           }
         },
         "description": "Rank of a team in a district."
+      },
+      "Regional_Ranking": {
+        "required": [
+          "point_total",
+          "rank",
+          "team_key"
+        ],
+        "type": "object",
+        "properties": {
+          "team_key": {
+            "type": "string",
+            "description": "TBA team key for the team."
+          },
+          "rank": {
+            "type": "integer",
+            "description": "Numerical rank of the team, 1 being top rank."
+          },
+          "rookie_bonus": {
+            "type": "integer",
+            "description": "Any points added to a team as a result of the rookie bonus."
+          },
+          "single_event_bonus": {
+            "type": "integer",
+            "description": "Additional points awarded in lieu of a second event, based on first event performance"
+          },
+          "point_total": {
+            "type": "integer",
+            "description": "Total district points for the team."
+          },
+          "event_points": {
+            "type": "array",
+            "description": "List of events that contributed to the point total for the team.",
+            "items": {
+              "required": [
+                "alliance_points",
+                "award_points",
+                "elim_points",
+                "event_key",
+                "qual_points",
+                "total"
+              ],
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "description": "Total points awarded at this event."
+                },
+                "alliance_points": {
+                  "type": "integer",
+                  "description": "Points awarded for alliance selection."
+                },
+                "elim_points": {
+                  "type": "integer",
+                  "description": "Points awarded for elimination match performance."
+                },
+                "award_points": {
+                  "type": "integer",
+                  "description": "Points awarded for event awards."
+                },
+                "event_key": {
+                  "type": "string",
+                  "description": "TBA Event key for this event."
+                },
+                "qual_points": {
+                  "type": "integer",
+                  "description": "Points awarded for qualification match performance."
+                }
+              }
+            }
+          }
+        },
+        "description": "Rank of a team in the regional pool."
       },
       "WLT_Record": {
         "required": [
