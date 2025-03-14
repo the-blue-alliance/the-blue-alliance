@@ -44,6 +44,7 @@ from backend.api.handlers.insights import (
 )
 from backend.api.handlers.match import match, zebra_motionworks
 from backend.api.handlers.media import media_tags
+from backend.api.handlers.regional_advancement import regional_rankings
 from backend.api.handlers.search import search_index
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
@@ -204,6 +205,11 @@ api_v3.add_url_rule("/media/tags", view_func=media_tags)
 api_v3.add_url_rule("/team/<string:team_key>", view_func=team)
 api_v3.add_url_rule(
     "/team/<string:team_key>/<simple_model_type:model_type>", view_func=team
+)
+
+# Regional Advancement
+api_v3.add_url_rule(
+    "/regional_advancement/<int:year>/rankings", view_func=regional_rankings
 )
 
 # Team History
