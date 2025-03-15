@@ -13,7 +13,7 @@ from backend.common.tasklets import typed_tasklet
 class InsightsLeaderboardsYearQuery(
     CachedDatabaseQuery[List[Insight], List[InsightDict]]
 ):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "insights_leaderboards_{year}"
     DICT_CONVERTER = InsightConverter
 
