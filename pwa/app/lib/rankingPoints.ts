@@ -8,6 +8,7 @@ import {
   MatchScoreBreakdown2022Alliance,
   MatchScoreBreakdown2023Alliance,
   MatchScoreBreakdown2024Alliance,
+  MatchScoreBreakdown2025Alliance,
 } from '~/api/v3';
 
 export const RANKING_POINT_LABELS: Record<number, string[]> = {
@@ -20,6 +21,7 @@ export const RANKING_POINT_LABELS: Record<number, string[]> = {
   2022: ['Cargo Bonus', 'Hangar Bonus'],
   2023: ['Sustainability Bonus', 'Activation Bonus'],
   2024: ['Melody Bonus', 'Ensemble Bonus'],
+  2025: ['Auto Bonus', 'Coral Bonus', 'Barge Bonus'],
 };
 
 export type MatchScoreBreakdown = NonNullable<Match['score_breakdown']>['red'];
@@ -96,6 +98,15 @@ export function isScoreBreakdown2024(
   );
 }
 
+export function isScoreBreakdown2025(
+  scoreBreakdown: MatchScoreBreakdown,
+): scoreBreakdown is MatchScoreBreakdown2025Alliance {
+  return (
+    (scoreBreakdown as MatchScoreBreakdown2025Alliance).coralBonusAchieved !==
+    undefined
+  );
+}
+
 export function getBonusRankingPoints(
   scoreBreakdown: MatchScoreBreakdown,
 ): boolean[] {
@@ -152,6 +163,14 @@ export function getBonusRankingPoints(
     return [
       scoreBreakdown.melodyBonusAchieved ?? false,
       scoreBreakdown.ensembleBonusAchieved ?? false,
+    ];
+  }
+
+  if (isScoreBreakdown2025(scoreBreakdown)) {
+    return [
+      scoreBreakdown.autoBonusAchieved ?? false,
+      scoreBreakdown.coralBonusAchieved ?? false,
+      scoreBreakdown.bargeBonusAchieved ?? false,
     ];
   }
 

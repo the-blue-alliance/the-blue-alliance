@@ -23,9 +23,7 @@ class InsightsLeaderboardsYearQuery(
     @typed_tasklet
     def _query_async(self, year: Year) -> Generator[Any, Any, List[Insight]]:
         insight_names = []
-        for insight_type in Insight.TYPED_LEADERBOARD_MATCH_INSIGHTS.union(
-            Insight.TYPED_LEADERBOARD_AWARD_INSIGHTS
-        ):
+        for insight_type in Insight.TYPED_LEADERBOARD_KEY_TYPES.keys():
             insight_names.append(Insight.INSIGHT_NAMES[insight_type])
 
         insights = yield Insight.query(

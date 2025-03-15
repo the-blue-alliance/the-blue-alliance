@@ -13,7 +13,7 @@ class PlayoffTypeDropdown extends Component {
 
   render() {
     return (
-      <div className="form-group">
+      <div className="form-group row">
         <label htmlFor="selectType" className="col-sm-2 control-label">
           Playoff Type
         </label>

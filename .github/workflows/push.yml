@@ -152,6 +152,9 @@ jobs:
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa ci
+      - name: Generate react-router types
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npm --prefix pwa run typecheck
       - name: Run Format
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa run format
@@ -217,6 +220,8 @@ jobs:
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Run Build
         run: npm --prefix pwa run build
         env:

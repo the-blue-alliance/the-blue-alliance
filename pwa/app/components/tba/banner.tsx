@@ -42,7 +42,8 @@ export function Banner({
   return (
     <div
       className={cn(
-        'flex h-64 w-40 flex-col items-center justify-between bg-blue-600 px-4 py-6 text-center tracking-tight text-white',
+        `flex h-64 w-40 flex-col items-center justify-between bg-blue-600 px-4 py-6
+        text-center tracking-tight text-white`,
         className,
       )}
     >

@@ -2,7 +2,7 @@ from typing import Any, List, Set, Tuple, Type
 
 from google.appengine.ext import ndb
 
-from backend.common.consts.event_type import EventType
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -84,6 +84,7 @@ def event_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
 
     for year in years:
         queries.append(event_query.EventListQuery(year))
+        queries.append(event_query.RegionalEventsQuery(year))
 
     for event_district_key in event_district_keys:
         queries.append(event_query.DistrictEventsQuery(event_district_key.id()))
@@ -104,17 +105,6 @@ def event_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     parent_keys = set([e.get_result().parent_event for e in events_with_parents])
     for parent_key in parent_keys:
         queries.append(event_query.EventDivisionsQuery(parent_key.id()))
-
-    regional_event_years = set(
-        [
-            e.get_result().year
-            for e in events_with_parents
-            if e.get_result() is not None
-            and e.get_result().event_type_enum == EventType.REGIONAL
-        ]
-    )
-    for year in regional_event_years:
-        queries.extend([event_query.RegionalEventsQuery(year) for year in years])
 
     return _queries_to_cache_keys_and_queries(queries)
 
@@ -319,10 +309,15 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
         queries.append(district_query.DistrictsInYearQuery(year))
 
     for abbrev in district_abbrevs:
-        queries.append(district_query.DistrictHistoryQuery(abbrev))
+        for alt_abbrev in RenamedDistricts.get_equivalent_codes(abbrev):
+            queries.append(district_query.DistrictHistoryQuery(abbreviation=alt_abbrev))
+            queries.append(
+                district_query.DistrictAbbreviationQuery(abbreviation=alt_abbrev)
+            )
 
     for key in district_keys:
-        queries.append(district_query.DistrictQuery(key.id()))
+        for alt_key in RenamedDistricts.get_equivalent_keys(key.string_id()):
+            queries.append(district_query.DistrictQuery(district_key=alt_key))
 
     for dt_key in district_team_keys_future.get_result():
         team_key = dt_key.id().split("_")[1]

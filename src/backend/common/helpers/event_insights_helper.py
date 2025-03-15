@@ -130,6 +130,9 @@ class EventInsightsHelper:
             total_win_margins += win_score - min(red_score, blue_score)
             total_winning_scores += win_score
 
+        if finished_matches == 0:
+            return None
+
         return {
             "auto_rp_count": [
                 auto_rp_count,
@@ -156,9 +159,9 @@ class EventInsightsHelper:
                 finished_matches * 2,
                 100.0 * six_rp_count / (finished_matches * 2),
             ],
-            "average_score": total_scores / len(matches),
-            "average_win_margin": total_win_margins / len(matches),
-            "average_winning_score": total_winning_scores / len(matches),
+            "average_score": total_scores / (finished_matches * 2),
+            "average_win_margin": total_win_margins / finished_matches,
+            "average_winning_score": total_winning_scores / finished_matches,
             "high_score": high_score,
         }
 

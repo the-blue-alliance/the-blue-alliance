@@ -1,5 +1,5 @@
-import { Link } from '@remix-run/react';
 import * as React from 'react';
+import { Link } from 'react-router';
 
 import { cn } from '~/lib/utils';
 
@@ -61,8 +61,8 @@ const TableOfContentsLink = React.forwardRef<
   <Link
     ref={ref}
     className={cn(
-      'text-foreground hover:text-primary text-sm font-medium transition-colors',
-      isActive ? 'text-foreground font-medium' : 'text-muted-foreground',
+      'text-sm font-medium text-foreground transition-colors hover:text-primary',
+      isActive ? 'font-medium text-foreground' : 'text-muted-foreground',
       className,
     )}
     {...props}

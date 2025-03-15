@@ -95,11 +95,13 @@ TODO
 
 ### COPRs
 
-TODO
+Edit [`src/backend/common/helpers/matchstats_helper.py`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/helpers/matchstats_helper.py) and add a new key-value pair to `MANUAL_COMPONENTS`. The value is an object which contains key-value pairs where each key is the cOPR name, and the value is a lambda that returns a component value. The lambda accepts a match object and a color string ("red" or "blue).
 
 ### Insights
 
-TODO
+Create `src/backend/web/templates/event_partials/event_insights_<year>.html`.
+
+Add a new year + function to `src/backend/common/helpers/event_insights_helper.py`'s `calculate_event_insights`. Follow examples of previous years. The rest of the plumbing is handled for you. 
 
 ### Ranking Sort Orders
 

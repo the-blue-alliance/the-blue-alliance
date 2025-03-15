@@ -2,7 +2,10 @@ from typing import Any, Generator, List, Optional
 
 from google.appengine.ext import ndb
 
-from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
+from backend.common.consts.event_type import (
+    EventType,
+    SEASON_EVENT_TYPES,
+)
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam

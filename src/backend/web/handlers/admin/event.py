@@ -59,9 +59,6 @@ def event_list(year: Optional[Year]) -> str:
 
 
 def event_detail(event_key: EventKey) -> str:
-    if not Event.validate_key_name(event_key):
-        abort(404)
-
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
@@ -166,9 +163,6 @@ def event_detail(event_key: EventKey) -> str:
 
 
 def event_edit(event_key: EventKey) -> Response:
-    if not Event.validate_key_name(event_key):
-        abort(404)
-
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
@@ -201,9 +195,6 @@ def event_delete(event_key: EventKey) -> Response:
 
         return redirect(url_for("admin.event_list"))
     else:
-        if not Event.validate_key_name(event_key):
-            abort(404)
-
         event = Event.get_by_id(event_key)
         if not event:
             abort(404)
@@ -318,6 +309,9 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
             else None
         ),
         divisions=division_keys,
+        manual_attrs=[
+            x.strip() for x in request.form.get("manual_attrs_csv", "").split(",")
+        ],
     )
     event = EventManipulator.createOrUpdate(event, auto_union=False)
 

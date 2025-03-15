@@ -20,6 +20,7 @@ class RegionalChampsPoolManipulator(ManipulatorBase[RegionalChampsPool]):
         new_model: RegionalChampsPool,
         old_model: RegionalChampsPool,
         auto_union: bool = True,
+        update_manual_attrs: bool = True,
     ) -> RegionalChampsPool:
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
         return old_model

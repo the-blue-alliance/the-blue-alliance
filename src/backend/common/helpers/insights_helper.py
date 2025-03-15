@@ -1,8 +1,7 @@
 import itertools
 import math
-import statistics
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, NamedTuple
+from typing import Dict, List, NamedTuple
 
 import numpy as np
 from google.appengine.ext import ndb
@@ -14,10 +13,8 @@ from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.consts.event_type import (
     CMP_EVENT_TYPES,
     EventType,
-    NON_CMP_EVENT_TYPES,
     SEASON_EVENT_TYPES,
 )
-from backend.common.consts.insight_type import InsightType
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_helper import (
     EventHelper,
@@ -27,18 +24,12 @@ from backend.common.helpers.event_helper import (
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
 from backend.common.helpers.insights_helper_utils import (
     create_insight,
-    make_leaderboard_from_dict_counts,
     sort_counter_dict,
 )
 from backend.common.models.award import Award
 from backend.common.models.event import Event
-from backend.common.models.insight import (
-    Insight,
-    LeaderboardData,
-    NotableEntry,
-    NotablesData,
-)
-from backend.common.models.keys import EventKey, TeamKey, Year
+from backend.common.models.insight import Insight
+from backend.common.models.keys import Year
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 
@@ -94,22 +85,6 @@ class InsightsHelper(object):
         insights += self._calculateYearSpecific(week_event_matches, year)
         insights += self._calculateMatchesByTeam(week_event_matches, year)
 
-        # leaderboard (exposed in API)
-        insights += self._calculate_leaderboard_most_matches_played_by_team(
-            week_event_matches, year
-        )
-        insights += self._calculate_leaderboard_most_events_played_at(
-            week_event_matches, year
-        )
-        insights += self._calculate_leaderboard_highest_median_score_by_event(
-            week_event_matches, year
-        )
-        insights += (
-            self._calculate_leaderboard_most_unique_teams_played_with_or_against(
-                week_event_matches, year
-            )
-        )
-
         return insights
 
     @classmethod
@@ -130,15 +105,6 @@ class InsightsHelper(object):
         insights += self._calculateChampionshipStats(award_futures, year)
         insights += self._calculateRegionalStats(award_futures, year)
         insights += self._calculateSuccessfulElimTeamups(award_futures, year)
-
-        # leaderboards (exposed in API)
-        insights += self._calculate_assorted_award_leaderboards(award_futures, year)
-
-        insights += self._calculate_notables_hall_of_fame(award_futures, year)
-        insights += self._calculate_notables_division_winners_and_finals_appearances(
-            award_futures, year
-        )
-        insights += self._calculate_notables_world_champions(award_futures, year)
 
         return insights
 
@@ -227,250 +193,6 @@ class InsightsHelper(object):
 
         return [
             create_insight(data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year)
-        ]
-
-    @classmethod
-    def _create_notable_insight(
-        cls,
-        teams: Dict[TeamKey, List[EventKey]] | DefaultDict[TeamKey, List[EventKey]],
-        insight_type: int,
-        year: int,
-    ) -> Insight:
-        return create_insight(
-            data=NotablesData(
-                entries=[
-                    NotableEntry(team_key=team_key, context=context)
-                    for team_key, context in teams.items()
-                ]
-            ),
-            name=Insight.INSIGHT_NAMES[insight_type],
-            year=year,
-        )
-
-    @classmethod
-    def _calculate_assorted_award_leaderboards(
-        cls, award_futures: List[TypedFuture[Award]], year: Year
-    ) -> List[Insight]:
-        banner_count = defaultdict(int)
-        award_count = defaultdict(int)
-        non_cmp_event_win_count = defaultdict(int)
-
-        for award_future in award_futures:
-            award = award_future.get_result()
-            if award.award_type_enum == AwardType.WILDCARD:
-                continue
-
-            for team_key in award.team_list:
-                award_count[team_key.id()] += 1
-
-                if award.award_type_enum in BLUE_BANNER_AWARDS and award.count_banner:
-                    banner_count[team_key.id()] += 1
-
-                if (
-                    award.award_type_enum == AwardType.WINNER
-                    and award.event_type_enum in NON_CMP_EVENT_TYPES
-                ):
-                    non_cmp_event_win_count[team_key.id()] += 1
-
-        return [
-            make_leaderboard_from_dict_counts(
-                banner_count, Insight.TYPED_LEADERBOARD_BLUE_BANNERS, year
-            ),
-            make_leaderboard_from_dict_counts(
-                award_count, Insight.TYPED_LEADERBOARD_MOST_AWARDS, year
-            ),
-            make_leaderboard_from_dict_counts(
-                non_cmp_event_win_count,
-                Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS,
-                year,
-            ),
-        ]
-
-    @classmethod
-    def _calculate_leaderboard_most_matches_played_by_team(
-        cls, week_event_matches: List[WeekEventMatches], year: Year
-    ) -> List[Insight]:
-        counter = defaultdict(lambda: 0)
-        for _, week_events in week_event_matches:
-            for _, matches in week_events:
-                for match in matches:
-                    if match.has_been_played:
-                        for alliance in match.alliances.values():
-                            for tk in alliance["teams"]:
-                                counter[tk] += 1
-
-        return [
-            make_leaderboard_from_dict_counts(
-                counter,
-                Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
-                year,
-            )
-        ]
-
-    @classmethod
-    def _calculate_leaderboard_most_events_played_at(
-        cls, week_event_matches: List[WeekEventMatches], year: Year
-    ) -> List[Insight]:
-        events_played_at = defaultdict(set)
-        for _, week_events in week_event_matches:
-            for event, matches in week_events:
-                for match in matches:
-                    if match.has_been_played:
-                        for alliance in match.alliances.values():
-                            for tk in alliance["teams"]:
-                                events_played_at[tk].add(event.key.id())
-
-        counts = {tk: len(events) for tk, events in events_played_at.items()}
-        return [
-            make_leaderboard_from_dict_counts(
-                counts,
-                Insight.TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT,
-                year,
-            )
-        ]
-
-    @classmethod
-    def _calculate_leaderboard_highest_median_score_by_event(
-        cls, week_event_matches: List[WeekEventMatches], year: Year
-    ) -> List[Insight]:
-        scores = defaultdict(list)
-        for _, week_events in week_event_matches:
-            for event, matches in week_events:
-                for match in matches:
-                    if match.has_been_played:
-                        scores[event.key.id()].append(
-                            match.alliances[AllianceColor.RED]["score"]
-                        )
-                        scores[event.key.id()].append(
-                            match.alliances[AllianceColor.BLUE]["score"]
-                        )
-
-        medians = defaultdict(int)
-        for event_key, scores_list in scores.items():
-            if len(scores_list) < 10:
-                continue
-
-            medians[event_key] = statistics.median(sorted(scores_list))
-
-        return [
-            make_leaderboard_from_dict_counts(
-                medians,
-                Insight.TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT,
-                year,
-            )
-        ]
-
-    @classmethod
-    def _calculate_leaderboard_most_unique_teams_played_with_or_against(
-        cls, week_event_matches: List[WeekEventMatches], year: Year
-    ) -> List[Insight]:
-        met_teams_set = defaultdict(set)
-        for _, week_events in week_event_matches:
-            for _, matches in week_events:
-                for match in matches:
-                    if match.has_been_played:
-                        all_teams = (
-                            match.alliances[AllianceColor.RED]["teams"]
-                            + match.alliances[AllianceColor.BLUE]["teams"]
-                        )
-
-                        for team in all_teams:
-                            for other_team in all_teams:
-                                if team != other_team:
-                                    met_teams_set[team].add(other_team)
-
-        counter = {tk: len(met_teams) for tk, met_teams in met_teams_set.items()}
-        return [
-            make_leaderboard_from_dict_counts(
-                counter,
-                Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
-                year,
-            )
-        ]
-
-    @classmethod
-    def _calculate_notables_from_einstein_award(
-        cls,
-        award_futures: List[TypedFuture[Award]],
-        year: Year,
-        award_type: AwardType,
-        insight_type: int,
-    ) -> List[Insight]:
-        team_context_map: Dict[TeamKey, List[EventKey]] = {}
-        for award_future in award_futures:
-            award = award_future.get_result()
-            if (
-                award.event_type_enum == EventType.CMP_FINALS
-                and award.award_type_enum == award_type
-            ):
-                for tk in award.team_list:
-                    team_context_map[str(tk.id())] = [str(award.event.id())]
-
-        return [
-            cls._create_notable_insight(
-                team_context_map,
-                insight_type,
-                year,
-            )
-        ]
-
-    @classmethod
-    def _calculate_notables_hall_of_fame(
-        cls, award_futures: List[TypedFuture[Award]], year: Year
-    ):
-        return cls._calculate_notables_from_einstein_award(
-            award_futures,
-            year,
-            AwardType.CHAIRMANS,
-            Insight.TYPED_NOTABLES_HALL_OF_FAME,
-        )
-
-    @classmethod
-    def _calculate_notables_world_champions(
-        cls, award_futures: List[TypedFuture[Award]], year: Year
-    ) -> List[Insight]:
-        return cls._calculate_notables_from_einstein_award(
-            award_futures,
-            year,
-            AwardType.WINNER,
-            Insight.TYPED_NOTABLES_WORLD_CHAMPIONS,
-        )
-
-    @classmethod
-    def _calculate_notables_division_winners_and_finals_appearances(
-        cls, award_futures: List[TypedFuture[Award]], year: Year
-    ):
-        winner_context_map: Dict[TeamKey, List[EventKey]] = {}
-        finals_appearance_map: Dict[TeamKey, List[EventKey]] = {}
-
-        for award_future in award_futures:
-            award = award_future.get_result()
-            if (
-                award.event_type_enum == EventType.CMP_DIVISION
-                and award.award_type_enum == AwardType.WINNER
-            ):
-                for tk in award.team_list:
-                    winner_context_map[str(tk.id())] = [str(award.event.id())]
-                    finals_appearance_map[str(tk.id())] = [str(award.event.id())]
-
-            if (
-                award.event_type_enum == EventType.CMP_DIVISION
-                and award.award_type_enum == AwardType.FINALIST
-            ):
-                for tk in award.team_list:
-                    finals_appearance_map[str(tk.id())] = [str(award.event.id())]
-
-        return [
-            cls._create_notable_insight(
-                winner_context_map,
-                Insight.TYPED_NOTABLES_DIVISION_WINNERS,
-                year,
-            ),
-            cls._create_notable_insight(
-                finals_appearance_map,
-                Insight.TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES,
-                year,
-            ),
         ]
 
     @classmethod
@@ -1160,10 +882,6 @@ class InsightsHelper(object):
                 )
             )
 
-        insights.extend(
-            self.do_overall_leaderboard_insights(insight_type=InsightType.MATCHES)
-        )
-
         return insights
 
     @classmethod
@@ -1312,72 +1030,4 @@ class InsightsHelper(object):
                 )
             )
 
-        insights.extend(
-            self.do_overall_leaderboard_insights(insight_type=InsightType.AWARDS)
-        )
-        insights.extend(self._do_overall_notable_insights())
-
         return insights
-
-    @classmethod
-    def do_overall_leaderboard_insights(
-        cls, insight_type: InsightType
-    ) -> List[Insight]:
-        insight_types: set[int] = set()
-        if insight_type == InsightType.AWARDS:
-            insight_types = Insight.TYPED_LEADERBOARD_AWARD_INSIGHTS
-        elif insight_type == InsightType.MATCHES:
-            insight_types = Insight.TYPED_LEADERBOARD_MATCH_INSIGHTS
-
-        overall_insights = []
-        for insight_type in insight_types:
-            # Skip most unique teams overall insight since we aren't tracking *which* teams are unique
-            if (
-                insight_type
-                == Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST
-            ):
-                continue
-
-            insights = Insight.query(
-                Insight.name == Insight.INSIGHT_NAMES[insight_type],
-                Insight.year != 0,
-            ).fetch(1000)
-
-            data = defaultdict(int)
-            for insight in insights:
-                leaderboard_data: LeaderboardData = insight.data
-                for leaderboard_ranking in leaderboard_data["rankings"]:
-                    for team in leaderboard_ranking["keys"]:
-                        # pyre says we can't add a possible float to an int, but it doesn't matter here
-                        data[team] += leaderboard_ranking["value"]  # pyre-ignore[58]
-
-            overall_insights.append(
-                make_leaderboard_from_dict_counts(
-                    data,
-                    insight_type,
-                    year=0,
-                )
-            )
-
-        return overall_insights
-
-    @classmethod
-    def _do_overall_notable_insights(cls) -> List[Insight]:
-        overall_insights = []
-
-        for insight_type in Insight.NOTABLE_INSIGHTS:
-            insights = Insight.query(
-                Insight.name == Insight.INSIGHT_NAMES[insight_type],
-                Insight.year != 0,
-            ).fetch(1000)
-
-            team_context_map: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
-            for insight in insights:
-                for entry in insight.data["entries"]:
-                    team_context_map[entry["team_key"]].extend(entry["context"])
-
-            overall_insights.append(
-                cls._create_notable_insight(team_context_map, insight_type, year=0)
-            )
-
-        return overall_insights

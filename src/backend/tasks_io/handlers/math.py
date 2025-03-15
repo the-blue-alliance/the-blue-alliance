@@ -303,7 +303,7 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
 
     events = events_future.get_result()
     for event in events:
-        event.prep_details
+        event.prep_details()
     teams_future = ndb.get_multi_async(team_keys_future.get_result())
 
     events = EventHelper.sorted_events(events)
@@ -319,6 +319,7 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
             team_key=key,
             event_points=[],
             rookie_bonus=points.get("rookie_bonus", 0),
+            single_event_bonus=points.get("single_event_bonus", 0),
             point_total=points["point_total"],
         )
         for event, event_points in points["event_points"]:
@@ -332,6 +333,7 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
     if rankings:
         regional_pool.rankings = rankings
         RegionalChampsPoolManipulator.createOrUpdate(regional_pool)
+
     if (
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
@@ -392,7 +394,7 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
 
     predictions_dict = None
     if (
-        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024}
+        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024, 2025}
         and event.event_type_enum in SEASON_EVENT_TYPES
     ) or event.enable_predictions:
         sorted_matches = MatchHelper.play_order_sorted_matches(event.matches)

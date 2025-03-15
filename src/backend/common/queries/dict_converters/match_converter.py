@@ -16,7 +16,7 @@ MatchDict = NewType("MatchDict", Dict)
 
 class MatchConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 6,
+        ApiMajorVersion.API_V3: 7,
     }
 
     @classmethod

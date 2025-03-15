@@ -47,7 +47,7 @@ class AddRemoveWebcast extends Component {
     }
 
     return (
-      <div className="form-group">
+      <div className="form-group row">
         <label htmlFor="webcast_list" className="col-sm-2 control-label">
           Webcasts
         </label>

@@ -1,17 +1,11 @@
 import { Schema, ValidateEnv } from '@julr/vite-plugin-validate-env';
-import { vitePlugin as remix } from '@remix-run/dev';
+import { reactRouter } from '@react-router/dev/vite';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-declare module '@remix-run/node' {
-  // or cloudflare, deno, etc.
-  interface Future {
-    v3_singleFetch: true;
-  }
-}
 function getCommitHash(): string {
   try {
     return child.execSync('git rev-parse --short HEAD').toString();
@@ -22,17 +16,7 @@ function getCommitHash(): string {
 
 export default defineConfig({
   plugins: [
-    remix({
-      future: {
-        v3_fetcherPersist: true,
-        v3_relativeSplatPath: true,
-        v3_throwAbortReason: true,
-        v3_lazyRouteDiscovery: true,
-        v3_singleFetch: true,
-        v3_routeConfig: true,
-      },
-      presets: [],
-    }),
+    reactRouter(),
     tsconfigPaths(),
     Icons({
       compiler: 'jsx',

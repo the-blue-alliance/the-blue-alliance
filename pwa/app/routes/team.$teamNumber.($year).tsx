@@ -1,13 +1,6 @@
-import { LoaderFunctionArgs } from '@remix-run/node';
-import {
-  ClientLoaderFunctionArgs,
-  MetaFunction,
-  Params,
-  useLoaderData,
-  useNavigate,
-} from '@remix-run/react';
 import { useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
+import { useLoaderData, useNavigate } from 'react-router';
 
 import {
   Award,
@@ -76,11 +69,9 @@ import {
   winrateFromRecord,
 } from '~/lib/utils';
 
-async function loadData(params: Params) {
-  if (params.teamNumber === undefined) {
-    throw new Error('missing team number');
-  }
+import { Route } from '.react-router/types/app/routes/+types/team.$teamNumber.($year)';
 
+async function loadData(params: Route.LoaderArgs['params']) {
   const teamKey = `frc${params.teamNumber}`;
   const year = await parseParamsForYearElseDefault(params);
   if (year === undefined) {
@@ -169,27 +160,27 @@ async function loadData(params: Params) {
   };
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   return await loadData(params);
 }
 
-export async function clientLoader({ params }: ClientLoaderFunctionArgs) {
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   return await loadData(params);
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export function meta({ data }: Route.MetaArgs) {
   return [
     {
-      title: `${data?.team.nickname} - Team ${data?.team.team_number} - The Blue Alliance`,
+      title: `${data.team.nickname} - Team ${data.team.team_number} - The Blue Alliance`,
     },
     {
       name: 'description',
       content:
-        `From ${data?.team.city}, ${data?.team.state_prov} ${data?.team.postal_code}, ${data?.team.country}.` +
+        `From ${data.team.city}, ${data.team.state_prov} ${data.team.postal_code}, ${data.team.country}.` +
         ' Team information, match results, and match videos from the FIRST Robotics Competition.',
     },
   ];
-};
+}
 
 export default function TeamPage(): React.JSX.Element {
   const navigate = useNavigate();
@@ -241,7 +232,7 @@ export default function TeamPage(): React.JSX.Element {
           <Select
             value={String(year)}
             onValueChange={(value) => {
-              navigate(`/team/${team.team_number}/${value}`);
+              void navigate(`/team/${team.team_number}/${value}`);
             }}
           >
             <SelectTrigger className="w-[180px]">
@@ -315,7 +306,7 @@ export default function TeamPage(): React.JSX.Element {
         )}
 
         <div>
-          <Separator className="mb-8 mt-4" />
+          <Separator className="mt-4 mb-8" />
 
           {events.map((e) => (
             <InView
@@ -446,10 +437,9 @@ function StatsSection({
           <div
             // The padding/margins make the separator not actually perfectly centered
             // left-47.5 looks significantly better than left-1/2
-            className={`relative flex flex-wrap before:absolute before:inset-y-0
-          before:left-[47.5%]
-          before:hidden before:w-px before:bg-gray-200 sm:mt-0 lg:before:block
-          *:w-full lg:*:w-1/2`}
+            className={`relative flex flex-wrap *:w-full before:absolute before:inset-y-0
+            before:left-[47.5%] before:hidden before:w-px before:bg-gray-200 sm:mt-0
+            lg:*:w-1/2 lg:before:block`}
           >
             <div className="grid grid-cols-2 items-center gap-y-4">
               <Stat

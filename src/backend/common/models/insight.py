@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Literal, Set, TypedDict
+from typing import Dict, List, Literal, Set, TypeAlias, TypedDict
 
 from google.appengine.ext import ndb
 
@@ -8,6 +8,7 @@ from backend.common.models.keys import EventKey, MatchKey, TeamKey
 
 
 LeaderboardKeyType = Literal["team"] | Literal["event"] | Literal["match"]
+InsightEnumId: TypeAlias = int
 
 
 class Insight(CachedModel):
@@ -54,6 +55,8 @@ class Insight(CachedModel):
     TYPED_NOTABLES_HALL_OF_FAME = 34
     TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT = 35
     TYPED_LEADERBOARD_2025_MOST_CORAL_SCORED = 36
+    TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK = 37
+    TYPED_NOTABLES_DCMP_WINNER = 35
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -98,18 +101,8 @@ class Insight(CachedModel):
         YEAR_SPECIFIC_BY_WEEK: "year_specific_by_week",
         YEAR_SPECIFIC: "year_specific",
         TYPED_LEADERBOARD_2025_MOST_CORAL_SCORED: "typed_leaderboard_2025_most_coral_scored",
-    }
-
-    TYPED_LEADERBOARD_MATCH_INSIGHTS = {
-        TYPED_LEADERBOARD_MOST_MATCHES_PLAYED,
-        TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT,
-        TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
-        TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT,
-    }
-    TYPED_LEADERBOARD_AWARD_INSIGHTS = {
-        TYPED_LEADERBOARD_BLUE_BANNERS,
-        TYPED_LEADERBOARD_MOST_AWARDS,
-        TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS,
+        TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK: "typed_leaderboard_longest_einstein_streak",
+        TYPED_NOTABLES_DCMP_WINNER: "notables_dcmp_winner",
     }
 
     TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
@@ -123,6 +116,7 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST: "team",
         TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT: "team",
         TYPED_LEADERBOARD_2025_MOST_CORAL_SCORED: "match",
+        TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK: "team",
     }
 
     NOTABLE_INSIGHTS = {
@@ -130,6 +124,7 @@ class Insight(CachedModel):
         TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES,
         TYPED_NOTABLES_WORLD_CHAMPIONS,
         TYPED_NOTABLES_HALL_OF_FAME,
+        TYPED_NOTABLES_DCMP_WINNER,
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting

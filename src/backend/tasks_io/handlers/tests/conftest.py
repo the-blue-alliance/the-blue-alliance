@@ -7,6 +7,10 @@ from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
     FMSApiSecrets,
 )
+from backend.common.sitevars.nexus_api_secret import (
+    ContentType as NexusApiSecretsContentType,
+    NexusApiSecrets,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -31,3 +35,8 @@ def always_drain_taskqueue(
 @pytest.fixture(autouse=True)
 def fms_api_secrets(ndb_stub):
     FMSApiSecrets.put(FMSApiSecretsContentType(username="zach", authkey="authkey"))
+
+
+@pytest.fixture(autouse=True)
+def nexus_api_secrets(ndb_stub):
+    NexusApiSecrets.put(NexusApiSecretsContentType(api_secret="authkey"))

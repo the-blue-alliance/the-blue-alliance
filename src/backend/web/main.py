@@ -26,6 +26,7 @@ from backend.web.handlers.district import district_detail, regional_detail
 from backend.web.handlers.embed import avatar_png, instagram_oembed
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import (
+    event_agenda,
     event_detail,
     event_insights,
     event_list,
@@ -95,6 +96,7 @@ app.add_url_rule("/gameday/<alias>", view_func=gameday_redirect)
 app.add_url_rule("/gameday", view_func=gameday)
 
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
+app.add_url_rule("/event/<event_key>/agenda", view_func=event_agenda)
 app.add_url_rule("/event/<event_key>/feed", view_func=event_rss)
 app.add_url_rule("/event/<event_key>/insights", view_func=event_insights)
 app.add_url_rule("/events/<int:year>", view_func=event_list)

@@ -1,10 +1,11 @@
 import json
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Callable, DefaultDict, Dict, List, Optional, Tuple
+from typing import Any, Callable, DefaultDict, Dict, Generator, List, Optional, Tuple
 
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.insight import (
     Insight,
@@ -22,54 +23,53 @@ CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float] | Dict[Any, in
 
 @dataclass
 class LeaderboardInsightArguments:
-    matches: List[Match]
+    events: List[Event]
     year: int
 
+    def matches(self) -> Generator[Match, None, None]:
+        """
+        It's not feasible to store every match in memory, so create a reusable generator
+        that yields one match at a time given a list of events.
+        """
+        for event in self.events:
+            for match in event.matches:
+                yield match
 
-def make_leaderboard_args() -> List[LeaderboardInsightArguments]:
+    def awards(self) -> Generator[Award, None, None]:
+        """
+        It's not feasible to store every award in memory, so create a reusable generator
+        that yields one award at a time given a list of events.
+        """
+        for event in self.events:
+            for award in event.awards:
+                yield award
+
+
+def make_leaderboard_args(year: Year) -> LeaderboardInsightArguments:
     all_events: List[Event] = []
 
-    event_futures = []
-    for year in SeasonHelper.get_valid_years():
-        event_futures.append(EventListQuery(year=year).fetch_async())
-
-    for future in event_futures:
-        all_events.extend(future.get_result())
+    if year == 0:
+        for yr in SeasonHelper.get_valid_years():
+            all_events.extend(EventListQuery(year=yr).fetch())
+    else:
+        all_events.extend(EventListQuery(year=year).fetch())
 
     all_events = [e for e in all_events if e.event_type_enum in SEASON_EVENT_TYPES]
-
-    args_list: List[LeaderboardInsightArguments] = []
-    all_matches: List[Match] = []
-
-    # Build per-year args
-    for year in SeasonHelper.get_valid_years():
-        year_events = [e for e in all_events if e.year == year]
-        year_matches = [m for e in year_events for m in e.matches]
-        all_matches.extend(year_matches)
-        args_list.append(LeaderboardInsightArguments(matches=year_matches, year=year))
-
-    # Build overall args
-    args_list.append(LeaderboardInsightArguments(matches=all_matches, year=0))
-
-    # todo(tervay): add more args groups, e.g. by district
-
-    return args_list
+    return LeaderboardInsightArguments(
+        events=all_events,
+        year=year,
+    )
 
 
 def make_insights_from_functions(
     year: Year, fns: List[Callable[[LeaderboardInsightArguments], Optional[Insight]]]
 ) -> List[Insight]:
-    args_list = make_leaderboard_args()
+    args = make_leaderboard_args(year=year)
 
     insights: List[Insight] = []
-    for args in args_list:
-        # Only compute overall and the given year
-        if args.year not in [0, year]:
-            continue
-
-        for fn in fns:
-            if maybe_insight := fn(args):
-                insights.append(maybe_insight)
+    for fn in fns:
+        if maybe_insight := fn(args):
+            insights.append(maybe_insight)
 
     return insights
 

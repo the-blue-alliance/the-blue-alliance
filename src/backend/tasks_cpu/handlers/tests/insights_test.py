@@ -23,7 +23,9 @@ def test_enqueue(
     resp = tasks_cpu_client.get("/backend-tasks-b2/math/enqueue/insights/matches/2023")
     assert resp.status_code == 200
 
-    tasks = tasks_cpu_client = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    tasks = tasks_cpu_client = taskqueue_stub.get_filtered_tasks(
+        queue_names="run-in-order"
+    )
     assert len(tasks) == 1
     assert tasks[0].url == "/backend-tasks-b2/math/do/insights/matches/2023"
 
@@ -47,7 +49,9 @@ def test_enqueue_defaults_to_current_season(
     resp = tasks_cpu_client.get("/backend-tasks-b2/math/enqueue/insights/matches")
     assert resp.status_code == 200
 
-    tasks = tasks_cpu_client = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    tasks = tasks_cpu_client = taskqueue_stub.get_filtered_tasks(
+        queue_names="run-in-order"
+    )
     assert len(tasks) == 1
     assert tasks[0].url == "/backend-tasks-b2/math/do/insights/matches/2020"
 

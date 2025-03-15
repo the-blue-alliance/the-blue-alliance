@@ -101,10 +101,12 @@
           {% for comp in participation %}
             <div class="row" id="{{ comp.event.key_name }}">
               <div class="col-sm-4">
+                {% set show_pit_locations = comp.event.official and (comp.event.future or comp.event.within_a_day) and comp.nexus_pit_location %}
                 <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
                 <p>
                   {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}" target="_blank" rel="noopener noreferrer">{{ comp.event.location }}</a><br />{% endif %}
                   {{ em.showEventDates(comp.event) }}
+                  {% if show_pit_locations %}<br/><img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Location: <a href="https://frc.nexus/en/event/{{comp.event.key_name}}/team/{{team.team_number}}/map" target="_blank" rel="noopener noreferrer">{{comp.nexus_pit_location}}</a>{% endif %}
                 </p>
 
                 {% if comp.wlt or comp.rank or comp.awards or comp.qual_avg or comp.elim_avg %}
@@ -325,7 +327,10 @@
 {% block footer_content %}
 {% if year and year >= 2015 %}
 <div class="text-left col-sm-9 col-lg-10 col-sm-offset-3 col-lg-offset-2" style="margin-bottom: 2rem;">
-  <span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank" rel="noopener noreferrer"><em>FIRST</em><sup>®</sup> Events API</a><br>
+  <p><span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank" rel="noopener noreferrer"><em>FIRST</em><sup>®</sup> Events API</a></p>
+  {% if has_any_pit_location %}
+    <p><img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Locations provided by the <a href="https://frc.nexus/en/api" target="_blank" rel="noopener noreferrer">Nexus API</a></p>
+  {% endif %}
 </div>
 {% endif %}
 {% endblock %}

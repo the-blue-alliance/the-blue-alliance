@@ -30,12 +30,16 @@ class MatchManipulator(ManipulatorBase[Match]):
 
     @classmethod
     def updateMerge(
-        cls, new_model: Match, old_model: Match, auto_union: bool = True
+        cls,
+        new_model: Match,
+        old_model: Match,
+        auto_union: bool = True,
+        update_manual_attrs: bool = True,
     ) -> Match:
         # Lets postUpdateHook know if videos went from 0 to >0
         added_video = not old_model.has_video and new_model.has_video
 
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
 
         if added_video:
             old_model._updated_attrs.add("_video_added")

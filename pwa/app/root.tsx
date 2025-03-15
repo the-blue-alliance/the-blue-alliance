@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   Links,
   Meta,
@@ -8,8 +10,7 @@ import {
   isRouteErrorResponse,
   useLocation,
   useRouteError,
-} from '@remix-run/react';
-import { captureRemixErrorBoundaryError, withSentry } from '@sentry/remix';
+} from 'react-router';
 
 import * as api from '~/api/v3';
 
@@ -53,6 +54,8 @@ api.defaults.headers = {
 //   }
 //   return response;
 // };
+
+const queryClient = new QueryClient();
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -236,7 +239,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Nav />
         <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
-            {children}
+            <QueryClientProvider client={queryClient}>
+              {children}
+            </QueryClientProvider>
           </div>
         </div>
         <ScrollRestoration />
@@ -250,7 +255,7 @@ function App() {
   return <Outlet />;
 }
 
-export default withSentry(App);
+export default App;
 
 export const meta: MetaFunction = ({ error }) => {
   const isRouteError = isRouteErrorResponse(error);
@@ -264,7 +269,7 @@ export function ErrorBoundary() {
   console.error(error);
 
   const isRouteError = isRouteErrorResponse(error);
-  captureRemixErrorBoundaryError(error);
+  Sentry.captureException(error);
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>

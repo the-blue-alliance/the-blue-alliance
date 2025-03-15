@@ -1,5 +1,5 @@
-import { useNavigate } from '@remix-run/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import { SearchIndex } from '~/api/v3';
 import { EventLink, TeamLink } from '~/components/tba/links';
@@ -102,7 +102,7 @@ export default function Searchbar() {
 
       <CommandList
         className={cn(
-          'fixed top-14 z-50  w-64 border border-gray-200 bg-white shadow-lg',
+          'fixed top-14 z-50 w-64 border border-gray-200 bg-white shadow-lg',
           {
             hidden: !isOpen,
           },
@@ -114,7 +114,7 @@ export default function Searchbar() {
               <CommandItem
                 key={team.key}
                 onSelect={() => {
-                  navigate(`/team/${team.key.substring(3)}`);
+                  void navigate(`/team/${team.key.substring(3)}`);
                   setIsOpen(false);
                 }}
                 asChild
@@ -133,7 +133,7 @@ export default function Searchbar() {
               <CommandItem
                 key={event.key}
                 onSelect={() => {
-                  navigate(`/event/${event.key}`);
+                  void navigate(`/event/${event.key}`);
                   setIsOpen(false);
                 }}
               >

@@ -28,21 +28,23 @@ class InsightsLeaderboardMatchHelper:
     def _highest_match_clean_score(
         arguments: LeaderboardInsightArguments,
     ) -> Optional[Insight]:
+        if arguments.year == 0:
+            return None
+
         clean_scores = defaultdict(int)
 
-        for match in arguments.matches:
+        for match in arguments.matches():
             if match.has_been_played:
                 redScore = int(match.alliances[AllianceColor.RED]["score"])
                 blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
 
-                if match.year >= 2016:
-                    if match.score_breakdown:
-                        redScore -= none_throws(match.score_breakdown)[
-                            AllianceColor.RED
-                        ].get("foulPoints", 0)
-                        blueScore -= none_throws(match.score_breakdown)[
-                            AllianceColor.BLUE
-                        ].get("foulPoints", 0)
+                if match.year >= 2016 and match.score_breakdown is not None:
+                    redScore -= none_throws(match.score_breakdown)[
+                        AllianceColor.RED
+                    ].get("foulPoints", 0)
+                    blueScore -= none_throws(match.score_breakdown)[
+                        AllianceColor.BLUE
+                    ].get("foulPoints", 0)
 
                 clean_scores[match.key.id()] = max(redScore, blueScore)
 
@@ -56,21 +58,23 @@ class InsightsLeaderboardMatchHelper:
     def _highest_match_clean_combined_score(
         arguments: LeaderboardInsightArguments,
     ) -> Optional[Insight]:
+        if arguments.year == 0:
+            return None
+
         clean_scores = defaultdict(int)
 
-        for match in arguments.matches:
+        for match in arguments.matches():
             if match.has_been_played:
                 redScore = int(match.alliances[AllianceColor.RED]["score"])
                 blueScore = int(match.alliances[AllianceColor.BLUE]["score"])
 
-                if match.year >= 2016:
-                    if match.score_breakdown:
-                        redScore -= none_throws(match.score_breakdown)[
-                            AllianceColor.RED
-                        ].get("foulPoints", 0)
-                        blueScore -= none_throws(match.score_breakdown)[
-                            AllianceColor.BLUE
-                        ].get("foulPoints", 0)
+                if match.year >= 2016 and match.score_breakdown is not None:
+                    redScore -= none_throws(match.score_breakdown)[
+                        AllianceColor.RED
+                    ].get("foulPoints", 0)
+                    blueScore -= none_throws(match.score_breakdown)[
+                        AllianceColor.BLUE
+                    ].get("foulPoints", 0)
 
                 clean_scores[match.key.id()] = redScore + blueScore
 
@@ -89,8 +93,8 @@ class InsightsLeaderboardMatchHelper:
 
         coral_scores = defaultdict(int)
 
-        for match in arguments.matches:
-            if match.has_been_played:
+        for match in arguments.matches():
+            if match.has_been_played and match.score_breakdown is not None:
                 red_coral = (
                     none_throws(match.score_breakdown)[AllianceColor.RED][
                         "teleopCoralCount"

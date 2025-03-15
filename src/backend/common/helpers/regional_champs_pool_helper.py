@@ -114,6 +114,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
         # aggregate points from first two regional events
         events_by_key: Dict[EventKey, Event] = {}
         team_attendance: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
+        single_event_teams: Set[TeamKey] = set()
         team_totals: Dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
             lambda: DistrictRankingTeamTotal(
                 event_points=[],
@@ -126,6 +127,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 ),
                 qual_scores=[],
                 other_bonus=0,
+                single_event_bonus=0,
             )
         )
 
@@ -139,7 +141,14 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 set(event_regional_points["tiebreakers"].keys())
             ):
                 team_attendance[team_key].append(event.key_name)
-                if len(team_attendance[team_key]) > 2:
+
+                num_events = len(team_attendance[team_key])
+                if num_events == 1:
+                    single_event_teams.add(team_key)
+                else:
+                    single_event_teams.discard(team_key)
+
+                if num_events > 2:
                     continue
 
                 if team_key in event_regional_points["points"]:
@@ -182,10 +191,27 @@ class RegionalChampsPoolHelper(DistrictHelper):
                         ],
                     )
 
-        valid_team_keys: Set[TeamKey] = set()
+        # Single-Event regional teams are award additional points
+        # based on event 1 performance
+        # E2 points = 0.6 * (E1 points) + 14
+        # See section 12.3.1 of the 2025 game manual
+        for team_key in single_event_teams:
+            team_total = team_totals[team_key]
+            if len(team_total["event_points"]) != 1:
+                logging.warning(
+                    f"Team {team_key} has regional cmp point event count mismatch"
+                )
+                continue
+
+            first_event_points = team_total["event_points"][0][1]
+            bonus = round(0.6 * first_event_points["total"]) + 14
+            team_totals[team_key]["single_event_bonus"] = bonus
+            team_totals[team_key]["point_total"] += bonus
+
         if isinstance(teams, ndb.tasklets.Future):
             teams = teams.get_result()
 
+        valid_team_keys: Set[TeamKey] = set()
         for team in teams:
             if isinstance(teams, ndb.tasklets.Future):
                 team = team.get_result()

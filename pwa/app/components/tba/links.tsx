@@ -1,5 +1,5 @@
-import { Link } from '@remix-run/react';
 import React from 'react';
+import { Link } from 'react-router';
 
 import { Event, Team } from '~/api/v3';
 import { removeNonNumeric } from '~/lib/utils';

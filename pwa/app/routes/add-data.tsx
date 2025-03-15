@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 
 export default function Add_Data(): React.JSX.Element {
   return (

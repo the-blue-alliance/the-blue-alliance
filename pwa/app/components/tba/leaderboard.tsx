@@ -1,5 +1,5 @@
-import { Link } from '@remix-run/react';
 import React, { ReactNode } from 'react';
+import { Link } from 'react-router';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
@@ -50,7 +50,7 @@ export function Leaderboard({
 
   return (
     <Card className="border-gray-300">
-      <CardHeader className="px-6 pb-1 pt-4">
+      <CardHeader className="px-6 pt-4 pb-1">
         <CardTitle>
           <div className="flex justify-between align-middle">
             <div className="self-center">{displayName}</div>
@@ -143,7 +143,7 @@ function LeaderboardKeyList({
               &nbsp;(and{' '}
               {pluralize(keyVals.length - cutoffSize, 'other', 'others')})
             </TooltipTrigger>
-            <TooltipContent className="max-w-[500px] whitespace-normal break-words text-center">
+            <TooltipContent className="max-w-[500px] text-center break-words whitespace-normal">
               <p>
                 {keyVals.map((k, i) => (
                   <React.Fragment key={k}>

@@ -179,6 +179,24 @@
      {% elif match.score_breakdown.get(alliance_color).get('ensembleBonusAchieved') %}E
      {% else %}--{% endif %}
    {% endif %}
+  {% elif match.year == 2025 and match.has_been_played and match.score_breakdown %}
+    {% if match.score_breakdown.get(alliance_color).get('autoBonusAchieved') %}
+    A
+    {% else %}
+    --
+    {% endif %}
+    /
+    {% if match.score_breakdown.get(alliance_color).get('coralBonusAchieved') %}
+    C
+    {% else %}
+    --
+    {% endif %}
+    /
+    {% if match.score_breakdown.get(alliance_color).get('bargeBonusAchieved') %}
+    B
+    {% else %}
+    --
+    {% endif %}
   {% else %}
     ?
   {% endif %}
@@ -199,6 +217,8 @@
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_sustainability_bonus)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_activation_bonus)|limit_prob}}%</em>
   {% elif match.year == 2024 %}
   <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_melody_bonus)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_ensemble_bonus)|limit_prob}}%</em>
+  {% elif match.year == 2025 %}
+  <em>{{(predictions.get(match.key.id()).get(alliance_color).prob_auto_coral_bonus)|limit_prob}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_coral_bonus)|limit_prob}}%  / {{(predictions.get(match.key.id()).get(alliance_color).prob_barge_bonus)|limit_prob}}%</em>
   {% endif %}
 </td>
 {% endmacro %}

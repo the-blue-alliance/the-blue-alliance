@@ -5,8 +5,10 @@ import { cn } from '~/lib/utils';
 
 export default function TeamAvatar({
   media,
+  className,
 }: {
   media: Media;
+  className?: string;
 }): React.JSX.Element {
   const [colorClass, setColorClass] = useState('bg-first-avatar-blue');
 
@@ -23,11 +25,11 @@ export default function TeamAvatar({
   };
 
   return (
-    <button className="mr-3" onClick={handler} onKeyDown={handler}>
+    <button onClick={handler} onKeyDown={handler} className={className}>
       <img
         alt="Team Avatar"
         src={`data:image/png;base64, ${media.details.base64Image}`}
-        className={cn('size-12 rounded inline p-1', colorClass)}
+        className={cn('inline size-12 rounded p-1', colorClass)}
       />
     </button>
   );

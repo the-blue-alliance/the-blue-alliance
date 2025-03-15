@@ -1,7 +1,6 @@
 import datetime
 import logging
 import re
-from collections import defaultdict
 from typing import List, Optional, Set
 
 from flask import Blueprint, make_response, render_template, request, Response, url_for
@@ -10,7 +9,7 @@ from google.appengine.ext import ndb
 from markupsafe import Markup
 from pyre_extensions import none_throws
 
-from backend.common.consts.event_type import EventType
+from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
@@ -137,10 +136,12 @@ def team_details(team_key: TeamKey) -> Response:
     regional_pool_team: Optional[RegionalPoolTeam] = None
 
     if team:
-        team = TeamManipulator.createOrUpdate(team)
+        team = TeamManipulator.createOrUpdate(team, update_manual_attrs=False)
 
     if district_team:
-        district_team = DistrictTeamManipulator.createOrUpdate(district_team)
+        district_team = DistrictTeamManipulator.createOrUpdate(
+            district_team, update_manual_attrs=False
+        )
 
         if year in SeasonHelper.get_valid_regional_pool_years():
             regional_pool_key = ndb.Key(
@@ -189,7 +190,7 @@ def team_details(team_key: TeamKey) -> Response:
     DistrictTeamManipulator.delete_keys(keys_to_delete)
 
     if robot:
-        robot = RobotManipulator.createOrUpdate(robot)
+        robot = RobotManipulator.createOrUpdate(robot, update_manual_attrs=False)
 
     template_values = {
         "key_name": team_key,
@@ -224,7 +225,7 @@ def team_avatar(team_key: TeamKey) -> Response:
     avatar, keys_to_delete = fms_df.get_team_avatar(year, team_key).get_result()
 
     if avatar:
-        MediaManipulator.createOrUpdate(avatar)
+        MediaManipulator.createOrUpdate(avatar, update_manual_attrs=False)
 
     MediaManipulator.delete_keys(keys_to_delete)
 
@@ -308,13 +309,20 @@ def event_list(year: Year) -> Response:
     # For all new offseason events we can't automatically match, create suggestions
     SuggestionCreator.createDummyOffseasonSuggestions(new_offseason_events)
 
-    events = listify(EventManipulator.createOrUpdate(events_to_put)) or []
+    events = (
+        listify(
+            EventManipulator.createOrUpdate(events_to_put, update_manual_attrs=False)
+        )
+        or []
+    )
 
     fmsapi_districts = district_list_future.get_result()
     merged_districts = DistrictManipulator.mergeModels(
         fmsapi_districts, event_list_districts
     )
-    districts = listify(DistrictManipulator.createOrUpdate(merged_districts))
+    districts = listify(
+        DistrictManipulator.createOrUpdate(merged_districts, update_manual_attrs=False)
+    )
 
     # Fetch event details for each event
     is_taskqueue = "X-Appengine-Taskname" in request.headers
@@ -372,28 +380,52 @@ def event_details(event_key: EventKey) -> Response:
     if not Event.validate_key_name(event_key):
         return make_response(f"Bad event key: {Markup.escape(event_key)}", 400)
 
-    df = DatafeedFMSAPI(save_response=True)
+    fms_df = DatafeedFMSAPI(save_response=True)
 
     # Update event
-    event_details_future = df.get_event_details(event_key)
-    event_teams_future = df.get_event_teams(event_key)
-    event_team_avatars_future = df.get_event_team_avatars(event_key)
+    event_details_future = fms_df.get_event_details(event_key)
+    event_teams_future = fms_df.get_event_teams(event_key)
+    event_team_avatars_future = fms_df.get_event_team_avatars(event_key)
     existing_event_teams_future = EventTeam.query(
         EventTeam.event == ndb.Key(Event, event_key)
     ).fetch_async()
 
-    fmsapi_events, fmsapi_districts = event_details_future.get_result()
-    event = EventManipulator.createOrUpdate(fmsapi_events[0])
+    if (year := int(event_key[:4])) and SeasonHelper.is_valid_regional_pool_year(year):
+        champs_pool_model_future = RegionalChampsPool.get_or_insert_async(
+            RegionalChampsPool.render_key_name(year),
+            year=year,
+        )
+    else:
+        champs_pool_model_future = None
 
-    DistrictManipulator.createOrUpdate(fmsapi_districts)
+    fmsapi_events, fmsapi_districts = event_details_future.get_result()
+    event = EventManipulator.createOrUpdate(fmsapi_events[0], update_manual_attrs=False)
+
+    DistrictManipulator.createOrUpdate(fmsapi_districts, update_manual_attrs=False)
 
     models = event_teams_future.get_result()
+    champs_pool_model: Optional[RegionalChampsPool] = (
+        champs_pool_model_future.get_result() if champs_pool_model_future else None
+    )
+
     teams: List[Team] = []
     district_teams: List[DistrictTeam] = []
     regional_pool_teams: List[RegionalPoolTeam] = []
-    regional_cmp_advancement: RegionalPoolAdvancement = defaultdict(
-        lambda: TeamRegionalPoolAdvancement(cmp=False)
-    )
+
+    event_cmp_advancement: RegionalPoolAdvancement = {}
+    initial_cmp_advancement: RegionalPoolAdvancement = {}
+    if champs_pool_model and champs_pool_model.advancement:
+        # This way, we can handle unregistering teams that
+        # are no longer coming from "this" event
+        initial_cmp_advancement = champs_pool_model.advancement
+        event_cmp_advancement.update(
+            {
+                team: TeamRegionalPoolAdvancement(cmp=False)
+                for team, advancement in champs_pool_model.advancement.items()
+                if advancement.get("cmp_event") == event.key_name
+            }
+        )
+
     robots: List[Robot] = []
     for group in models:
         # models is a list of tuples (team, districtTeam, robot)
@@ -412,17 +444,21 @@ def event_details(event_key: EventKey) -> Response:
             and team is not None
             and district_team is None
         ):
+            team_key = team.key_name
             regional_pool_team = RegionalPoolTeam(
-                id=RegionalPoolTeam.render_key_name(event.year, team.key_name),
+                id=RegionalPoolTeam.render_key_name(event.year, team_key),
                 year=event.year,
                 team=team.key,
             )
             regional_pool_teams.append(regional_pool_team)
 
-            regional_cmp_advancement[team.key_name]["cmp"] |= event.event_type_enum in {
-                EventType.CMP_DIVISION,
-                EventType.CMP_FINALS,
-            }
+            if event.event_type_enum in CMP_EVENT_TYPES:
+                event_cmp_advancement[team_key] = TeamRegionalPoolAdvancement(
+                    cmp=True,
+                    cmp_event=initial_cmp_advancement.get(team_key, {}).get(
+                        "cmp_event", event.key_name
+                    ),
+                )
 
         robot = group[2]
         if isinstance(robot, Robot):
@@ -432,12 +468,16 @@ def event_details(event_key: EventKey) -> Response:
     if (
         teams and event.year == SeasonHelper.get_max_year() or Environment.is_dev()
     ):  # Only update from latest year
-        teams = TeamManipulator.createOrUpdate(teams)
+        teams = TeamManipulator.createOrUpdate(teams, update_manual_attrs=False)
 
-    district_teams = DistrictTeamManipulator.createOrUpdate(district_teams)
-    robots = RobotManipulator.createOrUpdate(robots)
-    regional_pool_teams = RegionalPoolTeamManipulator.createOrUpdate(
-        regional_pool_teams
+    district_teams = DistrictTeamManipulator.createOrUpdate(
+        district_teams, update_manual_attrs=False
+    )
+    robots = RobotManipulator.createOrUpdate(robots, update_manual_attrs=False)
+    regional_pool_teams = listify(
+        RegionalPoolTeamManipulator.createOrUpdate(
+            regional_pool_teams, update_manual_attrs=False
+        )
     )
 
     if not teams:
@@ -496,22 +536,24 @@ def event_details(event_key: EventKey) -> Response:
             params={"allow_deletes": True},
         )
 
-    event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+    event_teams = EventTeamManipulator.createOrUpdate(
+        event_teams, update_manual_attrs=False
+    )
     if type(event_teams) is not list:
         event_teams = [event_teams]
 
     if event.year >= 2018:
         avatars, keys_to_delete = event_team_avatars_future.get_result()
         if avatars:
-            MediaManipulator.createOrUpdate(avatars)
+            MediaManipulator.createOrUpdate(avatars, update_manual_attrs=False)
         MediaManipulator.delete_keys(keys_to_delete)
 
-    if SeasonHelper.is_valid_regional_pool_year(event.year):
-        champs_pool_model = RegionalChampsPool.get_or_insert(
-            RegionalChampsPool.render_key_name(event.year),
-            year=event.year,
-        )
-        champs_pool_model.advancement = regional_cmp_advancement
+    if champs_pool_model is not None:
+        advancement = champs_pool_model.advancement or {}
+        advancement.update(event_cmp_advancement)
+        champs_pool_model.advancement = {
+            team: adv for team, adv in advancement.items() if adv["cmp"]
+        }
         RegionalChampsPoolManipulator.createOrUpdate(champs_pool_model)
 
     template_values = {
@@ -596,7 +638,7 @@ def event_alliances(event_key: EventKey) -> Response:
         )
 
     event_details = EventDetails(id=event_key, alliance_selections=alliance_selections)
-    EventDetailsManipulator.createOrUpdate(event_details)
+    EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
 
     template_values = {
         "alliance_selections": alliance_selections,
@@ -666,7 +708,7 @@ def event_rankings(event_key: EventKey) -> Response:
         EventRemapTeamsHelper.remapteams_rankings2(rankings2, event.remap_teams)
 
     event_details = EventDetails(id=event_key, rankings2=rankings2)
-    EventDetailsManipulator.createOrUpdate(event_details)
+    EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
 
     template_values = {"rankings": rankings2, "event_name": event_details.key.id()}
 
@@ -749,7 +791,9 @@ def event_matches(event_key: EventKey) -> Response:
         EventRemapTeamsHelper.remapteams_matches(matches, event.remap_teams)
 
     MatchManipulator.delete_keys(keys_to_delete)
-    new_matches = listify(MatchManipulator.createOrUpdate(matches))
+    new_matches = listify(
+        MatchManipulator.createOrUpdate(matches, update_manual_attrs=False)
+    )
 
     template_values = {"matches": new_matches, "deleted_keys": keys_to_delete}
 
@@ -812,7 +856,7 @@ def awards_event(event_key: EventKey) -> Response:
     if event.remap_teams:
         EventRemapTeamsHelper.remapteams_awards(awards, event.remap_teams)
 
-    new_awards = AwardManipulator.createOrUpdate(awards)
+    new_awards = AwardManipulator.createOrUpdate(awards, update_manual_attrs=False)
     # new_awards could be a single object or None
     new_awards = listify(new_awards)
 
@@ -825,7 +869,8 @@ def awards_event(event_key: EventKey) -> Response:
             team_ids.add("frc" + re.sub("[^0-9]", "", team_id))
 
     teams = TeamManipulator.createOrUpdate(
-        [Team(id=team_id, team_number=int(team_id[3:])) for team_id in team_ids]
+        [Team(id=team_id, team_number=int(team_id[3:])) for team_id in team_ids],
+        update_manual_attrs=False,
     )
 
     if teams:
@@ -841,7 +886,8 @@ def awards_event(event_key: EventKey) -> Response:
                     year=event.year,
                 )
                 for team in teams
-            ]
+            ],
+            update_manual_attrs=False,
         )
 
     # Only write out if not in taskqueue
@@ -857,7 +903,9 @@ def awards_event(event_key: EventKey) -> Response:
 def district_list(year: Year) -> Response:
     df = DatafeedFMSAPI()
     fmsapi_districts = df.get_district_list(year).get_result()
-    districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
+    districts = DistrictManipulator.createOrUpdate(
+        fmsapi_districts, update_manual_attrs=False
+    )
 
     template_values = {
         "districts": listify(districts),
@@ -887,7 +935,9 @@ def district_rankings(district_key: DistrictKey) -> Response:
     advancement = df.get_district_rankings(district_key).get_result()
     if advancement:
         district.advancement = advancement
-        district = DistrictManipulator.createOrUpdate(district)
+        district = DistrictManipulator.createOrUpdate(
+            district, update_manual_attrs=False
+        )
 
     template_values = {
         "districts": listify(district),
