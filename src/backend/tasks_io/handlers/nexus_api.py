@@ -7,7 +7,7 @@ from google.appengine.api import taskqueue
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
-from backend.common.memcache import MemcacheClient
+from backend.common.memcache_models.event_nexus_queue_status_memcache import EventNexusQueueStatusMemcache
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, Year
 from backend.common.queries.event_query import EventListQuery
@@ -102,7 +102,7 @@ def event_queue_status(event_key: EventKey) -> Response:
 
     event_queue_status = event_queue_status_future.get_result()
 
-    memcache = MemcacheClient.get()
-    memcache_key = f"nexus_queue_status:{event_key}".encode()
-    memcache.set(memcache_key, event_queue_status, 60 * 5)
+    mc_model = EventNexusQueueStatusMemcache(event.key_name)
+    mc_model.put(event_queue_status)
+
     return make_response(f"Fetched nexus queue data:\n{json.dumps(event_queue_status)}")

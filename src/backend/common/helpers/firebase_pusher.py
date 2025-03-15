@@ -1,4 +1,3 @@
-import logging
 from typing import Dict, List, Set
 
 from firebase_admin import db as firebase_db
@@ -9,7 +8,7 @@ from backend.common.firebase import app as get_firebase_app
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
-from backend.common.memcache import MemcacheClient
+from backend.common.memcache_models.event_nexus_queue_status_memcache import EventNexusQueueStatusMemcache
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
@@ -212,7 +211,6 @@ class FirebasePusher:
         """
         Updates live_events and special webcasts
         """
-        mc_client = MemcacheClient.get()
         events_by_key: Dict[EventKey, Dict] = {}
         for event_key, event in cls._update_live_events_helper().items():
             converted_event = EventConverter.eventConverter_v3(event)
@@ -227,8 +225,7 @@ class FirebasePusher:
                     event.district_key.id()[4:].upper(), partial_event["short_name"]
                 )
 
-            nexus_status = mc_client.get(f"nexus_queue_status:{event.key_name}".encode())
-            logging.info(f"NEXUS MC: {nexus_status}")
+            nexus_status = EventNexusQueueStatusMemcache(event.key_name).get()
             if nexus_status and (now_queuing := nexus_status.get("now_queueing")):
                 partial_event["now_queuing"] = {
                     "name": now_queuing["match_name"],
