@@ -1,3 +1,4 @@
+import json
 from typing import List, Optional
 
 from flask import abort, Blueprint, make_response, request, Response, url_for
@@ -6,6 +7,7 @@ from google.appengine.api import taskqueue
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
+from backend.common.memcache import MemcacheClient
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, Year
 from backend.common.queries.event_query import EventListQuery
@@ -82,3 +84,26 @@ def event_pit_locations(event_key: EventKey) -> Response:
         return make_response(f"Fetched pit locations: {eventteams}")
 
     return make_response("")
+
+
+@blueprint.route("/tasks/get/nexus_queue_status/<event_key>")
+def event_queue_status(event_key: EventKey) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(400)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    event.prep_matches()
+
+    nexus_df = DatafeedNexus()
+    event_queue_status_future = nexus_df.get_event_queue_status(event)
+
+    event_queue_status = event_queue_status_future.get_result()
+    status_data = json.dumps(event_queue_status)
+
+    memcache = MemcacheClient.get()
+    memcache_key = f"nexus_queue_status:{event_key}".encode()
+    memcache.set(memcache_key, status_data, 60 * 5)
+    return make_response(f"Fetched nexus queue data:\n{status_data}")
