@@ -18,6 +18,7 @@ from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
@@ -320,6 +321,14 @@ class TeamRenderer:
             "year_qual_avg": year_qual_avg,
             "year_elim_avg": year_elim_avg,
             "current_event": current_event,
+            "current_event_pit_location": next(
+                (
+                    comp["nexus_pit_location"]
+                    for comp in participation
+                    if comp["event"].now
+                ),
+                None,
+            ),
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname,
             "avatar": avatar,
@@ -401,6 +410,7 @@ class TeamRenderer:
 
         event_awards = []
         current_event = None
+        current_event_pit = None
         matches_upcoming = None
         short_cache = False
         years = set()
@@ -408,10 +418,20 @@ class TeamRenderer:
             years.add(event.year)
             if event.now:
                 current_event = event
-                matches = match_query.TeamEventMatchesQuery(
+
+                matches_future = match_query.TeamEventMatchesQuery(
                     team.key_name, event.key_name
-                ).fetch()
-                matches_upcoming = MatchHelper.upcoming_matches(matches)
+                ).fetch_async()
+                eventteam_future = EventTeam.get_by_id_async(
+                    f"{event.key_name}_{team.key_name}"
+                )
+
+                matches_upcoming = MatchHelper.upcoming_matches(
+                    matches_future.get_result()
+                )
+                event_team = eventteam_future.get_result()
+                if event_team and (loc := event_team.pit_location):
+                    current_event_pit = loc["location"]
 
             if event.within_a_day:
                 short_cache = True
@@ -449,6 +469,7 @@ class TeamRenderer:
             "years": sorted(years),
             "social_medias": social_medias,
             "current_event": current_event,
+            "current_event_pit_location": current_event_pit,
             "matches_upcoming": matches_upcoming,
             "last_competed": last_competed,
             "current_year": current_year,

@@ -66,6 +66,9 @@
       {% else %}
         No upcoming matches.
       {% endif %}
+      {% if current_event_pit_location %}
+        <img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Location: <a href="https://frc.nexus/en/event/{{current_event.key_name}}/team/{{team.team_number}}/map" target="_blank" rel="noopener noreferrer">{{current_event_pit_location}}</a>
+      {% endif %}
       </div>
     </div>
   {% else %}
