@@ -93,6 +93,17 @@
 </div>
 {% endblock %}
 
+{% block footer_content %}
+{% if years and years|min >= 2015 %}
+<div class="text-left col-sm-9 col-lg-10 col-sm-offset-3 col-lg-offset-2" style="margin-bottom: 2rem;">
+  <p><span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank" rel="noopener noreferrer"><em>FIRST</em><sup>®</sup> Events API</a></p>
+  {% if current_event_pit_location %}
+    <p><img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Locations provided by the <a href="https://frc.nexus/en/api" target="_blank" rel="noopener noreferrer">Nexus API</a></p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
 {% block inline_javascript %}
 {% if team.team_number == 148 %}
 <script>
