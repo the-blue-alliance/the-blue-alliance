@@ -8,7 +8,9 @@ from backend.common.firebase import app as get_firebase_app
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
-from backend.common.memcache_models.event_nexus_queue_status_memcache import EventNexusQueueStatusMemcache
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    EventNexusQueueStatusMemcache,
+)
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match

@@ -20,7 +20,9 @@ from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
 
-    MATCH_LABEL_PATTERN: re.Pattern = re.compile(r"(Practice|Qualification|Qualification|Playoff|Final) (\d+)( Replay)?")
+    MATCH_LABEL_PATTERN: re.Pattern = re.compile(
+        r"(Practice|Qualification|Qualification|Playoff|Final) (\d+)( Replay)?"
+    )
 
     def __init__(self, event: Event) -> None:
         super().__init__()

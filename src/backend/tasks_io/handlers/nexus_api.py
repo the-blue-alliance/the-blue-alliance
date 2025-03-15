@@ -7,7 +7,9 @@ from google.appengine.api import taskqueue
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
-from backend.common.memcache_models.event_nexus_queue_status_memcache import EventNexusQueueStatusMemcache
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    EventNexusQueueStatusMemcache,
+)
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, Year
 from backend.common.queries.event_query import EventListQuery

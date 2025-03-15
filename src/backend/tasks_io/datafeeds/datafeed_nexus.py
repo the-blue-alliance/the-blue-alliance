@@ -31,7 +31,8 @@ class DatafeedNexus:
 
     @typed_tasklet
     def get_event_queue_status(
-        self, event: Event,
+        self,
+        event: Event,
     ) -> Generator[Any, Any, Optional[EventQueueStatus]]:
         response = yield self.api.queue_status(event.key_name)
         return self._parse(response, NexusAPIQueueStatusParser(event))
