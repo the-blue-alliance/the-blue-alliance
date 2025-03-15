@@ -11,17 +11,17 @@ from backend.common.memcache import MemcacheClient
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 from backend.common.sitevars.twitch_secrets import TwitchSecrets
+from backend.common.tasklets import typed_tasklet, typed_toplevel
 
 
 class WebcastOnlineHelper:
     @classmethod
-    @ndb.toplevel
+    @typed_toplevel
     def add_online_status(cls, webcasts: List[Webcast]) -> Generator[Any, Any, None]:
-        for webcast in webcasts:
-            yield cls.add_online_status_async(webcast)
+        yield (cls.add_online_status_async(webcast) for webcast in webcasts)
 
     @classmethod
-    @ndb.tasklet
+    @typed_tasklet
     def add_online_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
         memcache = MemcacheClient.get()
         memcache_key = "webcast_status:{}:{}:{}".format(
@@ -54,7 +54,7 @@ class WebcastOnlineHelper:
         memcache.set(memcache_key, webcast, 60 * 5)
 
     @classmethod
-    @ndb.tasklet
+    @typed_tasklet
     def _add_twitch_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
         client_id = TwitchSecrets.client_id()
         client_secret = TwitchSecrets.client_secret()
@@ -120,7 +120,7 @@ class WebcastOnlineHelper:
         return None
 
     @classmethod
-    @ndb.tasklet
+    @typed_tasklet
     def _add_ustream_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
         url = "https://api.ustream.tv/channels/{}.json".format(webcast["channel"])
         try:
@@ -150,7 +150,7 @@ class WebcastOnlineHelper:
         return None
 
     @classmethod
-    @ndb.tasklet
+    @typed_tasklet
     def _add_youtube_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
         api_key = GoogleApiSecret.secret_key()
         if api_key:

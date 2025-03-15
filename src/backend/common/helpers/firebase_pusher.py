@@ -251,11 +251,6 @@ class FirebasePusher:
                 partial_event["short_name"],
             )
 
-        # Hack in current webcasts (only)
-        event._webcast = event.current_webcasts
-        for webcast in event.webcast:
-            WebcastOnlineHelper.add_online_status_async(webcast)
-
         # Hack in nexus queueing status
         nexus_status = EventNexusQueueStatusMemcache(event.key_name).get()
         if nexus_status and (now_queuing := nexus_status.get("now_queueing")):
@@ -302,6 +297,9 @@ class FirebasePusher:
         live_events: List[Event] = []
         for event in week_events:
             if event.now:
+                event._webcast = event.current_webcasts  # Only show current webcasts
+                for webcast in event.webcast:
+                    WebcastOnlineHelper.add_online_status_async(webcast)
                 events_by_key[event.key.id()] = event
             if event.within_a_day:
                 live_events.append(event)
@@ -311,6 +309,9 @@ class FirebasePusher:
         for event in ndb.get_multi(
             [ndb.Key(Event, ekey) for ekey in forced_live_events]
         ):
+            if event.webcast:
+                for webcast in event.webcast:
+                    WebcastOnlineHelper.add_online_status_async(webcast)
             events_by_key[event.key.id()] = event
 
         # # Add in the Fake TBA BlueZone event (watch for circular imports)

@@ -12,12 +12,19 @@ from google.appengine.ext import ndb, testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
+from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.event_queue_status import (
+    EventQueueStatus,
+    NexusCurrentlyQueueing,
+    NexusMatch,
+    NexusMatchTiming,
+)
 from backend.common.models.match import Match
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.forced_live_events import ForcedLiveEvents
@@ -315,7 +322,7 @@ def test_update_match(
         match_number=1,
     )
 
-    FirebasePusher.update_match(match, set())
+    FirebasePusher.update_match(match, set(), nexus_status=None)
     drain_deferred(taskqueue_stub)
 
     expected = {
@@ -346,7 +353,7 @@ def test_update_match_skips_pre_2017(
         match_number=1,
     )
 
-    FirebasePusher.update_match(match, set())
+    FirebasePusher.update_match(match, set(), nexus_status=None)
     drain_deferred(taskqueue_stub)
 
     with pytest.raises(firebase_exceptions.NotFoundError):
@@ -366,7 +373,7 @@ def test_update_match_merges_predicted_time(
         match_number=1,
     )
 
-    FirebasePusher.update_match(match, set())
+    FirebasePusher.update_match(match, set(), nexus_status=None)
     drain_deferred(taskqueue_stub)
 
     # Make a change to the alliance dict, so that the test will fail we it not for the hack
@@ -374,7 +381,7 @@ def test_update_match_merges_predicted_time(
     match.predicted_time = predicted_time
     match.alliances_json = """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}"""
     match._alliances = None
-    FirebasePusher.update_match(match, {"predicted_time"})
+    FirebasePusher.update_match(match, {"predicted_time"}, nexus_status=None)
     drain_deferred(taskqueue_stub)
 
     expected = {
@@ -388,6 +395,60 @@ def test_update_match_merges_predicted_time(
         "t": None,
         "pt": predicted_time.timestamp(),
         "w": "red",
+    }
+    assert FirebasePusher._get_reference("e/2018ct/m/qm1").get() == expected
+
+
+def test_update_match_merges_nexus_status(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    match = Match(
+        id="2018ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2018ct"),
+        year=2018,
+        set_number=1,
+        match_number=1,
+    )
+
+    FirebasePusher.update_match(match, set(), nexus_status=None)
+    drain_deferred(taskqueue_stub)
+
+    nexus_status = EventQueueStatus(
+        data_as_of_ms=0,
+        now_queueing=NexusCurrentlyQueueing(
+            match_key="2018ct_qm1",
+            match_name="Quals 1",
+        ),
+        matches={
+            "2018ct_qm1": NexusMatch(
+                label="Quals 1",
+                status=NexusMatchStatus.NOW_QUEUING,
+                played=False,
+                times=NexusMatchTiming(
+                    estimated_queue_time_ms=None,
+                    estimated_start_time_ms=None,
+                ),
+            ),
+        },
+    )
+
+    FirebasePusher.update_match(match, set(), nexus_status=nexus_status)
+    drain_deferred(taskqueue_stub)
+
+    expected = {
+        "c": "qm",
+        "s": 1,
+        "m": 1,
+        "r": 74,
+        "rt": ["frc69", "frc571", "frc176"],
+        "b": 57,
+        "bt": ["frc3464", "frc20", "frc1073"],
+        "t": None,
+        "pt": None,
+        "w": "red",
+        "q": "Now queuing",
     }
     assert FirebasePusher._get_reference("e/2018ct/m/qm1").get() == expected
 

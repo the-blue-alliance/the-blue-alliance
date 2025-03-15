@@ -21,3 +21,17 @@ def typed_tasklet(
         return f(*args, **kwargs)
 
     return cast(Callable[TParams, TypedFuture[TReturn]], inner)
+
+
+def typed_toplevel(
+    f: Callable[
+        TParams, Union[TReturn, Iterable[TReturn], Generator[TReturn, None, None]]
+    ],
+) -> Callable[TParams, TReturn]:
+    @ndb.toplevel
+    def inner(
+        *args: TParams.args, **kwargs: TParams.kwargs
+    ) -> Union[TReturn, Iterable[TReturn], Generator[TReturn, None, None]]:
+        return f(*args, **kwargs)
+
+    return cast(Callable[TParams, TReturn], inner)

@@ -10,8 +10,8 @@ class NexusCurrentlyQueueing(TypedDict):
 
 
 class NexusMatchTiming(TypedDict):
-    estimated_queue_time_ms: int
-    estimated_start_time_ms: int
+    estimated_queue_time_ms: Optional[int]
+    estimated_start_time_ms: Optional[int]
 
 
 class NexusMatch(TypedDict):
