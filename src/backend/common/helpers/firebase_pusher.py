@@ -1,8 +1,10 @@
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 
 from firebase_admin import db as firebase_db
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
+from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.environment import Environment
 from backend.common.firebase import app as get_firebase_app
 from backend.common.helpers.deferred import defer_safe
@@ -12,6 +14,7 @@ from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
 from backend.common.models.event import Event
+from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
 from backend.common.models.webcast import Webcast
@@ -128,7 +131,12 @@ class FirebasePusher:
     """
 
     @classmethod
-    def update_match(cls, match: Match, updated_attrs: Set[str]) -> None:
+    def update_match(
+        cls,
+        match: Match,
+        updated_attrs: Set[str],
+        nexus_status: Optional[EventQueueStatus],
+    ) -> None:
         """
         Updates a match in an event and event/team
         """
@@ -144,6 +152,11 @@ class FirebasePusher:
             match_dict = cls._construct_match_dict(
                 MatchConverter.matchConverter_v3(match)
             )
+
+            if nexus_status and (
+                match_status := nexus_status["matches"].get(match.key_name)
+            ):
+                match_dict["q"] = NexusMatchStatus(match_status["status"]).to_string()
 
         defer_safe(
             cls._patch_data,
@@ -209,31 +222,58 @@ class FirebasePusher:
     """
 
     @classmethod
+    def update_live_event(cls, event: Event) -> None:
+        events_by_key: Dict[EventKey, Dict] = {
+            event.key_name: cls._convert_event(event),
+        }
+
+        defer_safe(
+            cls._put_data,
+            "live_events",
+            events_by_key,
+            _queue="firebase",
+            _target="py3-tasks-io",
+            _url="/_ah/queue/deferred_firebase_update_live_events",
+        )
+
+    @classmethod
+    def _convert_event(cls, event: Event) -> Dict:
+        converted_event = EventConverter.eventConverter_v3(event)
+        # Only what's needed to render webcast
+        partial_event = {
+            key: converted_event[key]
+            for key in ["key", "name", "short_name", "webcasts"]
+        }
+        # Hack in district code
+        if (district_key := event.district_key) and partial_event.get("short_name"):
+            partial_event["short_name"] = "[{}] {}".format(
+                none_throws(district_key.string_id())[4:].upper(),
+                partial_event["short_name"],
+            )
+
+        # Hack in current webcasts (only)
+        event._webcast = event.current_webcasts
+        for webcast in event.webcast:
+            WebcastOnlineHelper.add_online_status_async(webcast)
+
+        # Hack in nexus queueing status
+        nexus_status = EventNexusQueueStatusMemcache(event.key_name).get()
+        if nexus_status and (now_queuing := nexus_status.get("now_queueing")):
+            partial_event["now_queuing"] = {
+                "name": now_queuing["match_name"],
+                "key": now_queuing["match_key"],
+            }
+
+        return partial_event
+
+    @classmethod
     def update_live_events(cls) -> None:
         """
         Updates live_events and special webcasts
         """
         events_by_key: Dict[EventKey, Dict] = {}
         for event_key, event in cls._update_live_events_helper().items():
-            converted_event = EventConverter.eventConverter_v3(event)
-            # Only what's needed to render webcast
-            partial_event = {
-                key: converted_event[key]
-                for key in ["key", "name", "short_name", "webcasts"]
-            }
-            # Hack in district code
-            if event.district_key and partial_event.get("short_name"):
-                partial_event["short_name"] = "[{}] {}".format(
-                    event.district_key.id()[4:].upper(), partial_event["short_name"]
-                )
-
-            nexus_status = EventNexusQueueStatusMemcache(event.key_name).get()
-            if nexus_status and (now_queuing := nexus_status.get("now_queueing")):
-                partial_event["now_queuing"] = {
-                    "name": now_queuing["match_name"],
-                    "key": now_queuing["match_key"],
-                }
-
+            partial_event = cls._convert_event(event)
             events_by_key[event_key] = partial_event
 
         defer_safe(
@@ -262,9 +302,6 @@ class FirebasePusher:
         live_events: List[Event] = []
         for event in week_events:
             if event.now:
-                event._webcast = event.current_webcasts  # Only show current webcasts
-                for webcast in event.webcast:
-                    WebcastOnlineHelper.add_online_status_async(webcast)
                 events_by_key[event.key.id()] = event
             if event.within_a_day:
                 live_events.append(event)
@@ -274,9 +311,6 @@ class FirebasePusher:
         for event in ndb.get_multi(
             [ndb.Key(Event, ekey) for ekey in forced_live_events]
         ):
-            if event.webcast:
-                for webcast in event.webcast:
-                    WebcastOnlineHelper.add_online_status_async(webcast)
             events_by_key[event.key.id()] = event
 
         # # Add in the Fake TBA BlueZone event (watch for circular imports)

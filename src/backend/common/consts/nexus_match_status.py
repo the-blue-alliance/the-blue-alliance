@@ -20,3 +20,16 @@ class NexusMatchStatus(enum.IntEnum):
             case "On field":
                 return cls.ON_FIELD
         raise ValueError(f"Unknown value for NexusMatchStatus: {name}")
+
+    def to_string(self) -> str:
+        match self:
+            case self.QUEUING_SOON:
+                return "Queuing soon"
+            case self.NOW_QUEUING:
+                return "Now queuing"
+            case self.ON_DECK:
+                return "On deck"
+            case self.ON_FIELD:
+                return "On field"
+
+        raise ValueError(f"Unknown value for NexusMatchStatus: {self}")

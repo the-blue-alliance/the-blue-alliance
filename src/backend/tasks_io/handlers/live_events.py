@@ -21,6 +21,9 @@ from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    EventNexusQueueStatusMemcache,
+)
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
@@ -281,3 +284,30 @@ def update_match_time_predictions(event_key: EventKey) -> str:
     # Clear API Response cache
     # ApiStatusController.clear_cache_if_needed(old_status, new_status)
     return ""
+
+
+@blueprint.route("/tasks/do/update_firebase_event/<event_key>")
+def update_firebase_event(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    FirebasePusher.update_live_event(event)
+    return make_response("")
+
+
+@blueprint.route("/tasks/do/update_firebase_matches/<event_key>")
+def update_firebase_matches(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    event.prep_matches()
+    nexus_data_model = EventNexusQueueStatusMemcache(event_key).get()
+
+    for match in event.matches:
+        FirebasePusher.update_match(
+            match, updated_attrs=set(), nexus_status=nexus_data_model
+        )
+
+    return make_response("")
