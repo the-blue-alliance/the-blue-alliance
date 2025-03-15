@@ -101,9 +101,8 @@ def event_queue_status(event_key: EventKey) -> Response:
     event_queue_status_future = nexus_df.get_event_queue_status(event)
 
     event_queue_status = event_queue_status_future.get_result()
-    status_data = json.dumps(event_queue_status)
 
     memcache = MemcacheClient.get()
     memcache_key = f"nexus_queue_status:{event_key}".encode()
-    memcache.set(memcache_key, status_data, 60 * 5)
-    return make_response(f"Fetched nexus queue data:\n{status_data}")
+    memcache.set(memcache_key, event_queue_status, 60 * 5)
+    return make_response(f"Fetched nexus queue data:\n{json.dumps(event_queue_status)}")
