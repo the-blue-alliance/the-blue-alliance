@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Set, TYPE_CHECKING
+from typing import List, Set, TYPE_CHECKING
 
 from google.appengine.api import taskqueue
 from pyre_extensions import none_throws
@@ -11,11 +11,7 @@ from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
-from backend.common.memcache_models.event_nexus_queue_status_memcache import (
-    EventNexusQueueStatusMemcache,
-)
 from backend.common.models.cached_model import TAffectedReferences
-from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
 
@@ -67,20 +63,9 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     affected_stats_event_keys: Set[EventKey] = set()
     affected_stats_events: List[Event] = []
 
-    all_affected_event_keys: Set[EventKey] = {
-        none_throws(m.model.event.string_id())
-        for m in updated_models
-        if m.model.event.string_id() is not None
-    }
-    event_nexus_status = {
-        ek: EventNexusQueueStatusMemcache(ek).get() for ek in all_affected_event_keys
-    }
-
     for updated_model in updated_models:
         event_key: EventKey = none_throws(updated_model.model.event.string_id())
-        MatchPostUpdateHooks.firebase_update(
-            updated_model, event_nexus_status.get(event_key)
-        )
+        MatchPostUpdateHooks.firebase_update(updated_model)
 
         # Only attrs that affect stats
         if (
@@ -193,14 +178,12 @@ class MatchPostUpdateHooks:
     """
 
     @staticmethod
-    def firebase_update(
-        model: TUpdatedModel[Match], nexus_status: Optional[EventQueueStatus]
-    ) -> None:
+    def firebase_update(model: TUpdatedModel[Match]) -> None:
         """
         Enqueue firebase push
         """
         try:
-            FirebasePusher.update_match(model.model, model.updated_attrs, nexus_status)
+            FirebasePusher.update_match(model.model, model.updated_attrs)
         except Exception:
             logging.exception("Firebase update_match failed!")
 

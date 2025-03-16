@@ -5,6 +5,7 @@ from flask import abort, Blueprint, make_response, request, Response, url_for
 from google.appengine.api import taskqueue
 
 from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
@@ -125,7 +126,12 @@ def event_queue_status(event_key: EventKey) -> Response:
 
     event_queue_status = event_queue_status_future.get_result()
 
+    # Write the results to memcache
     mc_model = EventNexusQueueStatusMemcache(event.key_name)
     mc_model.put(event_queue_status)
+
+    # Write the results to firebase
+    for match in event.matches:
+        FirebasePusher.update_match_queue_status(match, event_queue_status)
 
     return make_response(f"Fetched nexus queue data:\n{json.dumps(event_queue_status)}")
