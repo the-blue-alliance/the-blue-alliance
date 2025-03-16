@@ -12,6 +12,7 @@ from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
 from backend.common.models.event import Event
+from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey, Year
 from backend.common.queries.event_query import EventListQuery
 from backend.common.queries.team_query import EventEventTeamsQuery
@@ -125,21 +126,27 @@ def event_queue_status(event_key: EventKey) -> Response:
     nexus_df = DatafeedNexus()
     event_queue_status_future = nexus_df.get_event_queue_status(event)
 
-    event_queue_status = event_queue_status_future.get_result()
+    event_queue_status: Optional[EventQueueStatus] = (
+        event_queue_status_future.get_result()
+    )
 
-    # Write the results to memcache
-    mc_model = EventNexusQueueStatusMemcache(event.key_name)
-    mc_model.put(event_queue_status)
+    if event_queue_status:
+        # Write the results to memcache
+        mc_model = EventNexusQueueStatusMemcache(event.key_name)
+        mc_model.put(event_queue_status)
 
-    # Write the results to firebase
-    for match in event.matches:
-        FirebasePusher.update_match_queue_status(match, event_queue_status)
+        # Update 'now queuing' in firebase
+        FirebasePusher.update_event_queue_status(event, event_queue_status)
+
+        # Write match statuses to firebase
+        for match in event.matches:
+            FirebasePusher.update_match_queue_status(match, event_queue_status)
 
     if (
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(
-            f"Fetched nexus queue data:\n{json.dumps(event_queue_status)}"
+            f"Fetched nexus queue data:\n{json.dumps(event_queue_status) if event_queue_status else None}"
         )
 
     return make_response("")

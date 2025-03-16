@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Dict
+from typing import Dict, Optional
 
 import pytest
 import requests
@@ -16,9 +16,6 @@ from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.firebase_pusher import FirebasePusher
-from backend.common.memcache_models.event_nexus_queue_status_memcache import (
-    EventNexusQueueStatusMemcache,
-)
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import (
@@ -63,15 +60,86 @@ class InMemoryRealtimeDb:
             return self._make_response(200, body)
         elif request.method == "PATCH":
             body = six.ensure_binary(none_throws(request.body))
-            existing_data = json.loads(self.data.get(request.path, "{}"))
-            existing_data.update(json.loads(body))
-            self.data[request.path] = json.dumps(existing_data).encode()
-            return self._make_response(200, body)
+            return self._patch(request.path, body)
         elif request.method == "DELETE":
-            self.data.pop(request.path, None)
-            return self._make_response(200, b"null")
+            return self._delete(request.path)
 
         return self._make_response(400, f"not implemented {request.method}".encode())
+
+    """
+    These helpers functions are real ugly (and don't work with greater depth of what
+    we are already using). Someday we can rewrite them to be "correct" and completely
+    recursive. Until then, this is fine...
+    """
+
+    def _patch(
+        self, path: str, body: bytes, prefix: Optional[str] = None
+    ) -> requests.Response:
+        if prefix is None and path in self.data:
+            existing_data = json.loads(self.data[path])
+            existing_data.update(json.loads(body))
+            self.data[path] = json.dumps(existing_data).encode()
+            return self._make_response(200, body)
+
+        if prefix:
+            prefix_data = json.loads(self.data[prefix])
+            if path in prefix_data:
+                new_body = json.loads(body)
+                updated_data = prefix_data.get(path, {})
+                updated_data.update(new_body)
+                prefix_data[path] = updated_data
+                self.data[prefix] = json.dumps(prefix_data).encode()
+                return self._make_response(200, body)
+
+        clean_path = path.rstrip(".json")
+        for prefix in self.data.keys():
+            original_prefix = prefix
+            if prefix.endswith(".json"):
+                prefix = prefix.replace(".json", "")
+
+            if prefix in path:
+                remaining_path = clean_path.replace(prefix, "")
+                if remaining_path.startswith("/"):
+                    remaining_path = remaining_path[1:]
+                return self._patch(remaining_path, body, prefix=original_prefix)
+
+        self.data[path] = body
+        return self._make_response(200, body)
+
+    def _delete(self, path: str, prefix: Optional[str] = None) -> requests.Response:
+        if path in self.data:
+            self.data.pop(path, None)
+            return self._make_response(200, b"null")
+
+        if prefix:
+            prefix_data = json.loads(self.data[prefix])
+            if path in prefix_data:
+                prefix_data.pop(path)
+                self.data[prefix] = json.dumps(prefix_data).encode()
+                return self._make_response(200, b"null")
+            else:
+                path_split = path.split("/")
+                if (
+                    path_split[0] in prefix_data
+                    and path_split[1] in prefix_data[path_split[0]]
+                ):
+                    del prefix_data[path_split[0]][path_split[1]]
+                self.data[prefix] = json.dumps(prefix_data).encode()
+                return self._make_response(200, b"null")
+
+        clean_path = path.rstrip(".json")
+        for prefix in self.data.keys():
+            original_prefix = prefix
+            if prefix.endswith(".json"):
+                prefix = prefix.replace(".json", "")
+
+            if prefix in path:
+                remaining_path = clean_path.replace(prefix, "")
+                if remaining_path.startswith("/"):
+                    remaining_path = remaining_path[1:]
+                return self._delete(remaining_path, prefix=original_prefix)
+
+        return self._make_response(200, b"null")
 
     def _make_response(self, status: int, data: bytes) -> requests.Response:
         resp = requests.Response()
@@ -279,10 +347,10 @@ def test_update_live_event_forced_with_webcast(
 
 
 @freeze_time("2020-04-01")
-def test_update_live_event_with_queue_status(
+def test_patch_live_event_queue_status(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
-    Event(
+    e = Event(
         id="2020nyny",
         year=2020,
         event_short="nyny",
@@ -291,7 +359,8 @@ def test_update_live_event_with_queue_status(
         end_date=datetime.datetime(2020, 4, 1),
         name="Test Event",
         short_name="Test",
-    ).put()
+    )
+    e.put()
     nexus_status = EventQueueStatus(
         data_as_of_ms=0,
         now_queueing=NexusCurrentlyQueueing(
@@ -300,9 +369,11 @@ def test_update_live_event_with_queue_status(
         ),
         matches={},
     )
-    EventNexusQueueStatusMemcache("2020nyny").put(nexus_status)
 
     FirebasePusher.update_live_events()
+    drain_deferred(taskqueue_stub)
+
+    FirebasePusher.update_event_queue_status(e, nexus_status)
     drain_deferred(taskqueue_stub)
 
     expected = {
@@ -315,6 +386,55 @@ def test_update_live_event_with_queue_status(
                 "key": "2020nyny_qm1",
                 "name": "Quals 1",
             },
+        }
+    }
+    assert FirebasePusher._get_reference("live_events").get() == expected
+
+
+@freeze_time("2020-04-01")
+def test_patch_live_event_queue_status_deletes_when_nothing_queued(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    e = Event(
+        id="2020nyny",
+        year=2020,
+        event_short="nyny",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime.datetime(2020, 4, 1),
+        end_date=datetime.datetime(2020, 4, 1),
+        name="Test Event",
+        short_name="Test",
+    )
+    e.put()
+    nexus_status = EventQueueStatus(
+        data_as_of_ms=0,
+        now_queueing=NexusCurrentlyQueueing(
+            match_key="2020nyny_qm1",
+            match_name="Quals 1",
+        ),
+        matches={},
+    )
+    nexus_status2 = EventQueueStatus(
+        data_as_of_ms=0,
+        now_queueing=None,
+        matches={},
+    )
+
+    FirebasePusher.update_live_events()
+    drain_deferred(taskqueue_stub)
+
+    FirebasePusher.update_event_queue_status(e, nexus_status)
+    drain_deferred(taskqueue_stub)
+
+    FirebasePusher.update_event_queue_status(e, nexus_status2)
+    drain_deferred(taskqueue_stub)
+
+    expected = {
+        "2020nyny": {
+            "key": "2020nyny",
+            "name": "Test Event",
+            "short_name": "Test",
+            "webcasts": [],
         }
     }
     assert FirebasePusher._get_reference("live_events").get() == expected
