@@ -20,7 +20,9 @@ venv/
 .idea
 
 # TBA API Key file
-TBAKEY.txt
+APIKEYS.txt
+tba-key-setup.sh
+shell.nix
 
 # Compiled/Intermediate Files #
 ###############################

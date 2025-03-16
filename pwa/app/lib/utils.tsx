@@ -47,6 +47,21 @@ export async function parseParamsForYearElseDefault(
   return year;
 }
 
+export async function parseParamsForTeamPgNumElseDefault(
+  params: Params,
+): Promise<number | undefined> {
+  if (params.pgNum === undefined) {
+    return 0; 
+  }
+
+  const pgNum = Number(params.pgNum);
+  if (Number.isNaN(pgNum) || pgNum < 0 || pgNum > 21) {
+    return 0;
+  }
+
+  return pgNum;
+}
+
 export function timestampsAreOnDifferentDays(
   timestamp1: number,
   timestamp2: number,
