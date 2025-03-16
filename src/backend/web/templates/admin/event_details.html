@@ -647,6 +647,7 @@
         <th>Match Key</th>
         <th>Scheduled Time</th>
         <th>Predicted Time</th>
+        {% if event.within_a_day %}<th>Nexus Predicted Time</th>{%endif%}
         <th>Actual Time</th>
         <th>Post Result Time</th>
         <th>Alliances JSON</th>
@@ -659,9 +660,20 @@
             datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% endif %}
         </td>
         <td>{% if match.predicted_time %}<time class="tba-match-time-utc"
-            datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{%
+            datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.predicted_time|strftime("%a %I:%M%p UTC")}}</time>{%
           endif %}
           {% if match.prediction_error_str %}<br>({{ match.prediction_error_str}}){% endif %}</td>
+        {% if event.within_a_day %}
+        <td>
+          {% if nexus_queue_status and match.key_name in nexus_queue_status.matches %}
+            {% with nexus_time = nexus_queue_status.matches.get(match.key_name).times.estimated_start_time_ms|from_ms_timestamp %}
+              {% if nexus_time %}
+                <time class="tba-match-time-utc" datetime="{{nexus_time.isoformat()}}+00:00">{{nexus_time|strftime("%a %I:%M%p UTC")}}</time>
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+        </td>
+        {% endif %}
         <td>{% if match.actual_time %}<time class="tba-match-time-utc"
             datetime="{{match.actual_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{%
           endif %}

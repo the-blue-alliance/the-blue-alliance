@@ -59,6 +59,12 @@ def limit_prob(prob: float) -> int:
     return int(round(prob))
 
 
+def from_ms_timestamp(timestamp: Optional[int]) -> Optional[datetime]:
+    if timestamp is None:
+        return None
+    return datetime.fromtimestamp(timestamp / 1000)
+
+
 def strftime(dt: datetime, formatstr: str) -> str:
     """
     Uses Python's strftime with some tweaks
@@ -162,6 +168,7 @@ _filters = {
     "sort_by": sort_by,
     "get_item": get_item,
     "pprint_json": pprint_json,
+    "from_ms_timestamp": from_ms_timestamp,
 }
 
 
