@@ -11,9 +11,6 @@ from backend.common.futures import TypedFuture
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
-from backend.common.memcache_models.event_nexus_queue_status_memcache import (
-    EventNexusQueueStatusMemcache,
-)
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
@@ -264,14 +261,6 @@ class FirebasePusher:
                 partial_event["short_name"],
             )
 
-        # Hack in nexus queueing status
-        nexus_status = EventNexusQueueStatusMemcache(event.key_name).get()
-        if nexus_status and (now_queuing := nexus_status.get("now_queueing")):
-            partial_event["now_queuing"] = {
-                "name": now_queuing["match_name"],
-                "key": now_queuing["match_key"],
-            }
-
         return partial_event
 
     @classmethod
@@ -342,6 +331,34 @@ class FirebasePusher:
 
         yield webcast_status_futures
         return events_by_key
+
+    @classmethod
+    def update_event_queue_status(
+        cls, event: Event, queue_status: EventQueueStatus
+    ) -> None:
+        if now_queuing := queue_status.get("now_queueing"):
+            update_data = {
+                "now_queuing": {
+                    "name": now_queuing["match_name"],
+                    "key": now_queuing["match_key"],
+                }
+            }
+            defer_safe(
+                cls._patch_data,
+                f"live_events/{event.key_name}",
+                update_data,
+                _queue="firebase",
+                _target="py3-tasks-io",
+                _url="/_ah/queue/deferred_firebase_update_live_events",
+            )
+        else:
+            defer_safe(
+                cls._delete_data,
+                f"live_events/{event.key_name}/now_queuing",
+                _queue="firebase",
+                _target="py3-tasks-io",
+                _url="/_ah/queue/deferred_firebase_update_live_events",
+            )
 
     @classmethod
     @typed_toplevel
