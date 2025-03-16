@@ -18,7 +18,7 @@ class WebcastOnlineHelper:
     @classmethod
     @typed_toplevel
     def add_online_status(cls, webcasts: List[Webcast]) -> Generator[Any, Any, None]:
-        yield (cls.add_online_status_async(webcast) for webcast in webcasts)
+        yield tuple(cls.add_online_status_async(webcast) for webcast in webcasts)
 
     @classmethod
     @typed_tasklet

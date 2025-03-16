@@ -196,7 +196,7 @@ def test_updateHook(mock_firebase, ndb_context, taskqueue_stub) -> None:
     for task in tasks:
         run_from_task(task)
 
-    mock_firebase.assert_called_once_with(test_match, set())
+    mock_firebase.assert_called_once_with(test_match, set(), None)
 
 
 @mock.patch.object(FirebasePusher, "update_match")
