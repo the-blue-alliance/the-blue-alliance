@@ -3,6 +3,8 @@ from __future__ import annotations
 import abc
 from typing import Any, Dict, List, Optional, TypedDict
 
+from backend.common.futures import TypedFuture
+
 """
 A shim for the Legacy GAE memcache module
 
@@ -37,6 +39,11 @@ class CacheIf(abc.ABC):
         Returns:
         True if set.  False on error.
         """
+
+    @abc.abstractmethod
+    def set_async(
+        self, key: bytes, value: Any, time: Optional[int] = None
+    ) -> TypedFuture[bool]: ...
 
     @abc.abstractmethod
     def set_multi(
@@ -76,6 +83,9 @@ class CacheIf(abc.ABC):
         Returns:
         The value of the key, if found in memcache, else None.
         """
+
+    @abc.abstractmethod
+    def get_async(self, key: bytes) -> TypedFuture[Optional[Any]]: ...
 
     @abc.abstractmethod
     def get_multi(

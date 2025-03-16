@@ -436,6 +436,31 @@
       <p>No webcasts found</p>
       {% endfor %}
     </ul>
+    <h2>Webcast Online Status</h2>
+    <a href="/tasks/do/update_webcast_online_status/{{event.key_name}}"><button class="btn btn-info"><span class="glyphicon glyphicon-refresh"></span> Refresh Online Status</button></a>
+    {% if webcast_online_status %}
+    <p>Fetched from memcache:</p>
+    <table class="table">
+      <tr>
+        <th>Type</th>
+        <th>Channel</th>
+        <th>Status</th>
+        <th>Stream Title</th>
+        <th>Viewer Count</th>
+      </tr>
+      {% for webcast in webcast_online_status %}
+        <tr>
+          <td>{{webcast.type}}</td>
+          <td>{{webcast.channel}}</td>
+          <td>{{webcast.status.value}}</td>
+          <td>{{webcast.stream_title}}</td>
+          <td>{{webcast.viewer_count}}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+      <p>No online webcast data found</p>
+    {% endif %}
     {% include "suggestions/partials/webcast_add_instructions_partial.html" %}
     <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
       {% include "suggestions/partials/webcast_add_form_partial.html" %}

@@ -11,11 +11,16 @@ def mc(memcache_stub) -> memcache.Client:
 
 @pytest.fixture
 def cache(mc: memcache.Client) -> AppEngineBuiltinCache:
-    return AppEngineBuiltinCache(memcache)
+    return AppEngineBuiltinCache(mc)
 
 
 def test_set(mc: memcache.Client, cache: AppEngineBuiltinCache) -> None:
     assert cache.set(b"foo", "bar") is True
+    assert mc.get(b"foo") == "bar"
+
+
+def test_set_async(mc: memcache.Client, cache: AppEngineBuiltinCache) -> None:
+    assert cache.set_async(b"foo", "bar").get_result() is True
     assert mc.get(b"foo") == "bar"
 
 
@@ -27,6 +32,11 @@ def test_set_multi(mc: memcache.Client, cache: AppEngineBuiltinCache) -> None:
 def test_get(mc: memcache.Client, cache: AppEngineBuiltinCache) -> None:
     mc.set(b"foo", "bar")
     assert cache.get(b"foo") == "bar"
+
+
+def test_get_async(mc: memcache.Client, cache: AppEngineBuiltinCache) -> None:
+    mc.set(b"foo", "bar")
+    assert cache.get_async(b"foo").get_result() == "bar"
 
 
 def test_get_multi(mc: memcache.Client, cache: AppEngineBuiltinCache) -> None:
