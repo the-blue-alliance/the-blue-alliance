@@ -59,8 +59,12 @@ class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
                 status=NexusMatchStatus.from_string(api_match["status"]),
                 played=match.has_been_played,
                 times=NexusMatchTiming(
-                    estimated_queue_time_ms=api_match["times"]["estimatedQueueTime"],
-                    estimated_start_time_ms=api_match["times"]["estimatedStartTime"],
+                    estimated_queue_time_ms=api_match["times"].get(
+                        "estimatedQueueTime"
+                    ),
+                    estimated_start_time_ms=api_match["times"].get(
+                        "estimatedStartTime"
+                    ),
                 ),
             )
             if response.get("nowQueuing") == api_match["label"]:
