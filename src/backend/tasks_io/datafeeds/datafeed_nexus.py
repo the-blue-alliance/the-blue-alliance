@@ -8,7 +8,7 @@ from backend.common.models.keys import EventKey, TeamKey
 from backend.common.profiler import Span
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import URLFetchResult
-from backend.tasks_io.datafeeds.nexus_api import NexusAPI
+from backend.tasks_io.api.nexus_api import NexusAPI
 from backend.tasks_io.datafeeds.parsers.nexus_api.pit_location_parser import (
     NexusAPIPitLocationParser,
 )
