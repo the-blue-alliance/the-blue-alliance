@@ -8,6 +8,7 @@ from flask.helpers import make_response
 from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
+from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.helpers.firebase_pusher import FirebasePusher
@@ -251,14 +252,16 @@ def update_match_time_predictions(event_key: EventKey) -> str:
     played_matches = MatchHelper.recent_matches(matches, num=0)
     unplayed_matches = MatchHelper.upcoming_matches(matches, num=len(matches))
     nexus_queue_info = EventNexusQueueStatusMemcache(event_key).get()
-    if nexus_queue_info:
-        nexus_data_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(
-            nexus_queue_info["data_as_of_ms"] / 1000.0,
-        )
-        if nexus_data_age > datetime.timedelta(minutes=15):
-            # This is a sanity check, in case something breaks with the event's
-            # Nexus setup, then we'll fall back to "regular" time predictions
-            nexus_queue_info = None
+    if (
+        nexus_queue_info
+        and played_matches
+        and (most_recent_match := played_matches[-1])
+        and (nexus_match := nexus_queue_info["matches"].get(most_recent_match.key_name))
+        and nexus_match["status"] != NexusMatchStatus.ON_FIELD
+    ):
+        # If the most recent match isnt' set to "on field", then we assume
+        # the data is stale, or there is an issue, so do not use the data
+        nexus_queue_info = None
 
     MatchTimePredictionHelper.predict_future_matches(
         event_key,
