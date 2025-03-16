@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Generator, List, Optional
 
 from google.appengine.api import memcache
 
 from backend.common.cache.cache_if import CacheIf, CacheStats
+from backend.common.tasklets import typed_tasklet
 
 
 class AppEngineBuiltinCache(CacheIf):
@@ -20,6 +21,17 @@ class AppEngineBuiltinCache(CacheIf):
     def set(self, key: bytes, value: Any, time: Optional[int] = None) -> bool:
         return self.memcache_client.set(key, value, time or 0)
 
+    @typed_tasklet
+    def set_async(
+        self, key: bytes, value: Any, time: Optional[int] = None
+    ) -> Generator[Any, Any, bool]:
+        status_dict = yield self.memcache_client.set_multi_async(
+            {key: value}, time or 0
+        )
+        return (
+            status_dict and status_dict.get(key) == memcache.MemcacheSetResponse.STORED
+        )
+
     def set_multi(
         self,
         mapping: Dict[bytes, Any],
@@ -30,6 +42,11 @@ class AppEngineBuiltinCache(CacheIf):
 
     def get(self, key: bytes) -> Optional[Any]:
         return self.memcache_client.get(key)
+
+    @typed_tasklet
+    def get_async(self, key: bytes) -> Generator[Any, Any, Any]:
+        results = yield self.memcache_client.get_multi_async([key])
+        return results.get(key)
 
     def get_multi(
         self, keys: List[bytes], namespace: Optional[str] = None

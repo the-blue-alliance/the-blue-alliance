@@ -33,6 +33,10 @@ cron:
   url: /tasks/enqueue/nexus_pit_locations/now
   schedule: every 1 hours
 
+- description: Nexus queue status current events
+  url: /tasks/enqueue/nexus_queue_status/now
+  schedule: every 1 minutes
+
 - description: Nexus pit locations for all season events
   url: /tasks/enqueue/nexus_pit_locations/current_year
   schedule: every day 02:00
@@ -101,6 +105,11 @@ cron:
 - description: Notable Insights Calculation
   url: /backend-tasks-b2/math/enqueue/notables
   schedule: every day 01:21
+  timezone: America/Los_Angeles
+
+- description: Notable Overall Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/notables/0
+  schedule: every day 01:23
   timezone: America/Los_Angeles
 
 - description: Award Overall Insights Calculation

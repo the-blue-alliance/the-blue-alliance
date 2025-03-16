@@ -436,6 +436,31 @@
       <p>No webcasts found</p>
       {% endfor %}
     </ul>
+    <h2>Webcast Online Status</h2>
+    <a href="/tasks/do/update_webcast_online_status/{{event.key_name}}"><button class="btn btn-info"><span class="glyphicon glyphicon-refresh"></span> Refresh Online Status</button></a>
+    {% if webcast_online_status %}
+    <p>Fetched from memcache:</p>
+    <table class="table">
+      <tr>
+        <th>Type</th>
+        <th>Channel</th>
+        <th>Status</th>
+        <th>Stream Title</th>
+        <th>Viewer Count</th>
+      </tr>
+      {% for webcast in webcast_online_status %}
+        <tr>
+          <td>{{webcast.type}}</td>
+          <td>{{webcast.channel}}</td>
+          <td>{{webcast.status.value}}</td>
+          <td>{{webcast.stream_title}}</td>
+          <td>{{webcast.viewer_count}}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+      <p>No online webcast data found</p>
+    {% endif %}
     {% include "suggestions/partials/webcast_add_instructions_partial.html" %}
     <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
       {% include "suggestions/partials/webcast_add_form_partial.html" %}
@@ -622,6 +647,7 @@
         <th>Match Key</th>
         <th>Scheduled Time</th>
         <th>Predicted Time</th>
+        {% if event.within_a_day %}<th>Nexus Predicted Time</th>{%endif%}
         <th>Actual Time</th>
         <th>Post Result Time</th>
         <th>Alliances JSON</th>
@@ -634,9 +660,20 @@
             datetime="{{match.time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{% endif %}
         </td>
         <td>{% if match.predicted_time %}<time class="tba-match-time-utc"
-            datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{%
+            datetime="{{match.predicted_time.isoformat()}}+00:00">{{match.predicted_time|strftime("%a %I:%M%p UTC")}}</time>{%
           endif %}
           {% if match.prediction_error_str %}<br>({{ match.prediction_error_str}}){% endif %}</td>
+        {% if event.within_a_day %}
+        <td>
+          {% if nexus_queue_status and match.key_name in nexus_queue_status.matches %}
+            {% with nexus_time = nexus_queue_status.matches.get(match.key_name).times.estimated_start_time_ms|from_ms_timestamp %}
+              {% if nexus_time %}
+                <time class="tba-match-time-utc" datetime="{{nexus_time.isoformat()}}+00:00">{{nexus_time|strftime("%a %I:%M%p UTC")}}</time>
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+        </td>
+        {% endif %}
         <td>{% if match.actual_time %}<time class="tba-match-time-utc"
             datetime="{{match.actual_time.isoformat()}}+00:00">{{match.time|strftime("%a %I:%M%p UTC")}}</time>{%
           endif %}

@@ -2,6 +2,7 @@ import logging
 from typing import List, Set, TYPE_CHECKING
 
 from google.appengine.api import taskqueue
+from pyre_extensions import none_throws
 
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.consts.event_type import EventType
@@ -11,6 +12,7 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
+from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
 
 if TYPE_CHECKING:
@@ -58,9 +60,11 @@ def match_post_delete_hook(deleted_models: List[Match]) -> None:
 
 @MatchManipulator.register_post_update_hook
 def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
-    affected_stats_event_keys: Set[str] = set()
+    affected_stats_event_keys: Set[EventKey] = set()
     affected_stats_events: List[Event] = []
+
     for updated_model in updated_models:
+        event_key: EventKey = none_throws(updated_model.model.event.string_id())
         MatchPostUpdateHooks.firebase_update(updated_model)
 
         # Only attrs that affect stats
@@ -71,9 +75,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
             )
             != set()
         ):
-            event_key = updated_model.model.event.string_id()
             event = updated_model.model.event.get()
-            print(f"{event_key} - {event}")
             if event_key and event and event_key not in affected_stats_event_keys:
                 affected_stats_event_keys.add(event_key)
                 affected_stats_events.append(event)

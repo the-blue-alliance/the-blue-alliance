@@ -30,6 +30,12 @@ from backend.common.manipulators.event_details_manipulator import (
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    EventNexusQueueStatusMemcache,
+)
+from backend.common.memcache_models.webcast_online_status_memcache import (
+    WebcastOnlineStatusMemcache,
+)
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -127,6 +133,13 @@ def event_detail(event_key: EventKey) -> str:
             DistrictPointTiebreakersSortingHelper.sorted_points(points)
         )
 
+    webcast_online_status = [
+        WebcastOnlineStatusMemcache(webcast).get() for webcast in event.webcast
+    ]
+    webcast_online_status = [w for w in webcast_online_status if w is not None]
+
+    nexus_queue_status = EventNexusQueueStatusMemcache(event.key_name).get()
+
     template_values = {
         "event": event,
         "medias": event_medias.get_result(),
@@ -157,6 +170,8 @@ def event_detail(event_key: EventKey) -> str:
         "deleted_count": request.args.get("deleted"),
         "district_points_sorted": district_points_sorted,
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
+        "webcast_online_status": webcast_online_status,
+        "nexus_queue_status": nexus_queue_status,
     }
 
     return render_template("admin/event_details.html", template_values)

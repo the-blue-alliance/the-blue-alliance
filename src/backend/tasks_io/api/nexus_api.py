@@ -28,6 +28,10 @@ class NexusAPI:
         endpoint = f"/event/{event_key}/pits"
         return self._get(endpoint)
 
+    def queue_status(self, event_key: EventKey) -> TypedFuture[URLFetchResult]:
+        endpoint = f"/event/{event_key}"
+        return self._get(endpoint)
+
     @typed_tasklet
     def _get(
         self, endpoint: str, version: str = "v1"

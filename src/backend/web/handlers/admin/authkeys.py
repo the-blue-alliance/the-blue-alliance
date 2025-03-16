@@ -35,7 +35,8 @@ def authkeys_get() -> str:
         "android_client_id": clientIds.get("android", ""),
         "ios_client_id": clientIds.get("ios", ""),
         "gcm_key": gcm_serverKey.get("gcm_key", ""),
-        "twitch_secret": twitch_secrets.get("client_id", ""),
+        "twitch_client_id": twitch_secrets.get("client_id", ""),
+        "twitch_secret": twitch_secrets.get("client_secret", ""),
         "livestream_secret": livestream_secrets.get("api_key", ""),
         "instagram_secret": instagram_secrets.get("api_key", ""),
         "nexus_secret": nexus_secrets.get("api_secret", ""),
@@ -53,7 +54,8 @@ def authkeys_post() -> Response:
     android_client_id = request.form.get("android_client_id", "")
     ios_client_id = request.form.get("ios_client_id", "")
     gcm_key = request.form.get("gcm_key", "")
-    twitch_client_id = request.form.get("twitch_secret", "")
+    twitch_client_id = request.form.get("twitch_client_id", "")
+    twitch_secret = request.form.get("twitch_secret", "")
     livestream_key = request.form.get("livestream_secret", "")
     instagram_key = request.form.get("instagram_secret", "")
     apiv3_key = request.form.get("apiv3_key", "")
@@ -75,6 +77,7 @@ def authkeys_post() -> Response:
 
     twitch_secrets = TwitchSecrets.get()
     twitch_secrets["client_id"] = twitch_client_id
+    twitch_secrets["client_secret"] = twitch_secret
     TwitchSecrets.put(twitch_secrets)
 
     LivestreamSecrets.put({"api_key": livestream_key})
