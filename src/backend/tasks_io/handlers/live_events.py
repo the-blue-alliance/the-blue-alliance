@@ -21,9 +21,6 @@ from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
-from backend.common.memcache_models.event_nexus_queue_status_memcache import (
-    EventNexusQueueStatusMemcache,
-)
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
@@ -303,11 +300,8 @@ def update_firebase_matches(event_key: EventKey) -> Response:
         abort(404)
 
     event.prep_matches()
-    nexus_data_model = EventNexusQueueStatusMemcache(event_key).get()
 
     for match in event.matches:
-        FirebasePusher.update_match(
-            match, updated_attrs=set(), nexus_status=nexus_data_model
-        )
+        FirebasePusher.update_match(match, updated_attrs=set())
 
     return make_response("")

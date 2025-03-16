@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Set
 
 from firebase_admin import db as firebase_db
 from google.appengine.ext import ndb
@@ -135,7 +135,6 @@ class FirebasePusher:
         cls,
         match: Match,
         updated_attrs: Set[str],
-        nexus_status: Optional[EventQueueStatus],
     ) -> None:
         """
         Updates a match in an event and event/team
@@ -153,11 +152,6 @@ class FirebasePusher:
                 MatchConverter.matchConverter_v3(match)
             )
 
-            if nexus_status and (
-                match_status := nexus_status["matches"].get(match.key_name)
-            ):
-                match_dict["q"] = NexusMatchStatus(match_status["status"]).to_string()
-
         defer_safe(
             cls._patch_data,
             "e/{}/m/{}".format(match.event.id(), match.short_key),
@@ -173,6 +167,23 @@ class FirebasePusher:
         #         'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
         #         match_data_json,
         #         _queue="firebase")
+
+    @classmethod
+    def update_match_queue_status(
+        cls, match: Match, nexus_status: EventQueueStatus
+    ) -> None:
+        if match_status := nexus_status["matches"].get(match.key_name):
+            event_key = none_throws(match.event.string_id())
+            match_short = match.short_key
+            update_dict = {"q": NexusMatchStatus(match_status["status"]).to_string()}
+            defer_safe(
+                cls._patch_data,
+                f"e/{event_key}/m/{match_short}",
+                update_dict,
+                _queue="firebase",
+                _target="py3-tasks-io",
+                _url="/_ah/queue/deferred_firebase_update_match",
+            )
 
     """
     @classmethod
