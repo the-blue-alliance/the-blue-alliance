@@ -1,4 +1,4 @@
-from typing import Dict, List, Set
+from typing import Any, Dict, Generator, List, Set
 
 from firebase_admin import db as firebase_db
 from google.appengine.ext import ndb
@@ -7,6 +7,7 @@ from pyre_extensions import none_throws
 from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.environment import Environment
 from backend.common.firebase import app as get_firebase_app
+from backend.common.futures import TypedFuture
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
@@ -25,6 +26,7 @@ from backend.common.queries.dict_converters.match_converter import (
 )
 from backend.common.sitevars.forced_live_events import ForcedLiveEvents
 from backend.common.sitevars.gameday_special_webcasts import GamedaySpecialWebcasts
+from backend.common.tasklets import typed_toplevel
 
 
 class FirebasePusher:
@@ -301,16 +303,19 @@ class FirebasePusher:
         )
 
     @classmethod
-    @ndb.toplevel
-    def _update_live_events_helper(cls) -> Dict[EventKey, Dict]:
+    @typed_toplevel
+    def _update_live_events_helper(cls) -> Generator[Any, Any, Dict[EventKey, Dict]]:
         week_events = EventHelper.week_events()
         events_by_key: Dict[EventKey, Dict] = {}
         live_events: List[Event] = []
+        webcast_status_futures: List[TypedFuture[None]] = []
         for event in week_events:
             if event.now:
                 event._webcast = event.current_webcasts  # Only show current webcasts
                 for webcast in event.webcast:
-                    WebcastOnlineHelper.add_online_status_async(webcast)
+                    webcast_status_futures.append(
+                        WebcastOnlineHelper.add_online_status_async(webcast)
+                    )
                 events_by_key[event.key.id()] = event
             if event.within_a_day:
                 live_events.append(event)
@@ -322,7 +327,9 @@ class FirebasePusher:
         ):
             if event.webcast:
                 for webcast in event.webcast:
-                    WebcastOnlineHelper.add_online_status_async(webcast)
+                    webcast_status_futures.append(
+                        WebcastOnlineHelper.add_online_status_async(webcast)
+                    )
             events_by_key[event.key.id()] = event
 
         # # Add in the Fake TBA BlueZone event (watch for circular imports)
@@ -333,18 +340,25 @@ class FirebasePusher:
         #         WebcastOnlineHelper.add_online_status_async(webcast)
         #     events_by_key[bluezone_event.key_name] = bluezone_event
 
+        yield webcast_status_futures
         return events_by_key
 
     @classmethod
-    @ndb.toplevel
+    @typed_toplevel
     def get_special_webcasts(
         cls,
-    ) -> List[Webcast]:  # TODO: Break this out of FirebasePusher 2017-03-01 -fangeugene
+    ) -> Generator[
+        Any, Any, List[Webcast]
+    ]:  # TODO: Break this out of FirebasePusher 2017-03-01 -fangeugene
         special_webcasts: List[Webcast] = []
+        webcast_status_futures: List[TypedFuture[None]] = []
         for webcast in GamedaySpecialWebcasts.webcasts():
-            WebcastOnlineHelper.add_online_status_async(webcast)
+            webcast_status_futures.append(
+                WebcastOnlineHelper.add_online_status_async(webcast)
+            )
             special_webcasts.append(webcast)
 
+        yield webcast_status_futures
         return special_webcasts
 
     """

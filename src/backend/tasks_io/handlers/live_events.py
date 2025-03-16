@@ -17,6 +17,7 @@ from backend.common.helpers.match_time_prediction_helper import (
 )
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
@@ -281,6 +282,16 @@ def update_match_time_predictions(event_key: EventKey) -> str:
     # Clear API Response cache
     # ApiStatusController.clear_cache_if_needed(old_status, new_status)
     return ""
+
+
+@blueprint.route("/tasks/do/update_webcast_online_status/<event_key>")
+def update_event_webcast_status(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    WebcastOnlineHelper.add_online_status(event.webcast)
+    return make_response(f"Updated event webcasts: {event.webcast}")
 
 
 @blueprint.route("/tasks/do/update_firebase_event/<event_key>")

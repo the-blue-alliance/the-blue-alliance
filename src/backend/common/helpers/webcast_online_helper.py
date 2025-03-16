@@ -1,13 +1,15 @@
 import json
 import logging
-from typing import Any, Generator, List, Optional
+from typing import Any, Generator, List
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
-from backend.common.memcache import MemcacheClient
+from backend.common.memcache_models.webcast_online_status_memcache import (
+    WebcastOnlineStatusMemcache,
+)
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 from backend.common.sitevars.twitch_secrets import TwitchSecrets
@@ -23,11 +25,8 @@ class WebcastOnlineHelper:
     @classmethod
     @typed_tasklet
     def add_online_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
-        memcache = MemcacheClient.get()
-        memcache_key = "webcast_status:{}:{}:{}".format(
-            webcast["type"], webcast.get("channel"), webcast.get("file")
-        ).encode()
-        cached_webcast: Optional[Webcast] = memcache.get(memcache_key)
+        online_status_mc = WebcastOnlineStatusMemcache(webcast)
+        cached_webcast = yield online_status_mc.get_async()
         if cached_webcast:
             if "status" in cached_webcast:
                 webcast["status"] = cached_webcast.get("status", WebcastStatus.UNKNOWN)
@@ -51,7 +50,7 @@ class WebcastOnlineHelper:
         # elif webcast['type'] == 'livestream':
         #     yield cls._add_livestream_status_async(webcast)
 
-        memcache.set(memcache_key, webcast, 60 * 5)
+        yield online_status_mc.put_async(webcast)
 
     @classmethod
     @typed_tasklet

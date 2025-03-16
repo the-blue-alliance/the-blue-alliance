@@ -3,12 +3,14 @@ from urllib.parse import urlparse
 
 import pytest
 
-from google.appengine.api import memcache
 from google.appengine.ext import testbed
 
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
+from backend.common.memcache_models.webcast_online_status_memcache import (
+    WebcastOnlineStatusMemcache,
+)
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 from backend.common.sitevars.twitch_secrets import TwitchSecrets
@@ -135,7 +137,7 @@ def test_add_online_status_not_in_cache() -> None:
     assert webcast.get("viewer_count") is None
 
     # Check we write the updated dict back to cache
-    cache_data = memcache.Client().get("webcast_status:html5:test_stream.m4v:None")
+    cache_data = WebcastOnlineStatusMemcache(webcast).get()
     assert webcast == cache_data
 
 
@@ -151,9 +153,8 @@ def test_add_online_status_in_cache() -> None:
         stream_title="A Stream",
         viewer_count=1337,
     )
-    memcache.Client().set(
-        "webcast_status:html5:test_stream.m4v:None", webcast_with_status
-    )
+
+    WebcastOnlineStatusMemcache(webcast).put(webcast_with_status)
 
     WebcastOnlineHelper.add_online_status([webcast])
     assert webcast == webcast_with_status

@@ -24,6 +24,7 @@ def test_update_authkeys(login_gae_admin, web_client: Client) -> None:
         "android_client_id": "android_client_id",
         "ios_client_id": "ios_client_id",
         "gcm_key": "gcm_key",
+        "twitch_client_id": "twitch_client_id",
         "twitch_secret": "twitch_secret",
         "livestream_secret": "livestream_secret",
     }
@@ -48,7 +49,8 @@ def test_update_authkeys(login_gae_admin, web_client: Client) -> None:
         "android_client_id": clientIds.get("android", ""),
         "ios_client_id": clientIds.get("ios", ""),
         "gcm_key": gcm_serverKey.get("gcm_key", ""),
-        "twitch_secret": twitch_secrets.get("client_id", ""),
+        "twitch_secret": twitch_secrets.get("client_secret", ""),
+        "twitch_client_id": twitch_secrets.get("client_id", ""),
         "livestream_secret": livestream_secrets.get("api_key", ""),
     }
     assert data == check_data
