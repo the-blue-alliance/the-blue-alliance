@@ -27,6 +27,7 @@ export default function TeamListTable({ teams }: { teams: TeamSimple[] }) {
         </TableHeader>
         <TableBody>
           {teams.map((team) => (
+          
             <TableRow key={team.key}>
               <TableCell className="w-3/12">
                 <Link className="text-base" to={`/team/${team.team_number}`}>
@@ -39,9 +40,9 @@ export default function TeamListTable({ teams }: { teams: TeamSimple[] }) {
                 </div>
               </TableCell>
               <TableCell className="w-4/12">
-                <div className="text-sm text-neutral-600">
+                {team.city != null && <div className="text-sm text-neutral-600">
                   {team.city}, {team.state_prov}, {team.country}
-                </div>
+                </div>}
               </TableCell>
             </TableRow>
           ))}

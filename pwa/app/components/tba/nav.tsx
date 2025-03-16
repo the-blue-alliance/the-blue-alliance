@@ -122,6 +122,7 @@ export const Nav = () => {
             className="hidden md:block"
             icon={<BiPeopleFill />}
             title="Teams"
+            route="/teams"
           />
           <MenuItem
             className="hidden md:block"
