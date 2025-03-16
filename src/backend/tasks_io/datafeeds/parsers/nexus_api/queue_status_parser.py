@@ -5,6 +5,7 @@ from typing import Dict, Optional
 from pyre_extensions import JSON
 
 from backend.common.consts.nexus_match_status import NexusMatchStatus
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import (
@@ -21,7 +22,7 @@ from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
 
     MATCH_LABEL_PATTERN: re.Pattern = re.compile(
-        r"(Practice|Qualification|Qualification|Playoff|Final) (\d+)( Replay)?"
+        r"(Practice|Qualification|Playoff|Final) (\d+)( Replay)?"
     )
 
     def __init__(self, event: Event) -> None:
@@ -30,6 +31,11 @@ class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
         self.matches = event.matches
 
     def parse(self, response: JSON) -> Optional[EventQueueStatus]:
+        if self.event.playoff_type != PlayoffType.DOUBLE_ELIM_8_TEAM:
+            logging.warning(
+                f"Unable to parse nexus status for {self.event.key_name}, playoff type is {self.event.playoff_type}"
+            )
+
         if not isinstance(response, dict):
             return None
 
@@ -85,9 +91,16 @@ class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
             # Practice matches aren't currently supported
             return None
 
+        if level == "Final":
+            # Nexus will report "Final 1, 2, 3"
+            # While FMS match nubmering does not reset for finals
+            # This assumes a double elim format
+            level_number += 13
+
         comp_level = PlayoffTypeHelper.get_comp_level(
             self.event.playoff_type, level, level_number
         )
+
         set_number, match_number = PlayoffTypeHelper.get_set_match_number(
             self.event.playoff_type, comp_level, level_number
         )

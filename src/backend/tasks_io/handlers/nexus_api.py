@@ -92,6 +92,7 @@ def event_pit_locations(event_key: EventKey) -> Response:
 @blueprint.route("/tasks/enqueue/nexus_queue_status/now")
 def current_event_queue_status() -> Response:
     events = EventHelper.events_within_a_day()
+    events = list(filter(lambda e: e.official, events))
     for event in events:
         taskqueue.add(
             queue_name="datafeed",
@@ -134,4 +135,11 @@ def event_queue_status(event_key: EventKey) -> Response:
     for match in event.matches:
         FirebasePusher.update_match_queue_status(match, event_queue_status)
 
-    return make_response(f"Fetched nexus queue data:\n{json.dumps(event_queue_status)}")
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            f"Fetched nexus queue data:\n{json.dumps(event_queue_status)}"
+        )
+
+    return make_response("")
