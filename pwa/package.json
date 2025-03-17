@@ -48,7 +48,7 @@
     "express": "4.21.2",
     "firebase": "11.4.0",
     "fuzzysort": "3.1.0",
-    "isbot": "5.1.23",
+    "isbot": "5.1.25",
     "lodash-es": "4.17.21",
     "lru-cache": "11.0.2",
     "lucide-react": "0.482.0",
