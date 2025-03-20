@@ -1,10 +1,7 @@
 import { Link } from 'react-router';
 
-import MdiVideo from '~icons/mdi/video';
 
 import { TeamSimple } from '~/api/v3';
-import InlineIcon from '~/components/tba/inlineIcon';
-import { Button } from '~/components/ui/button';
 import {
   Table,
   TableBody,
@@ -13,14 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { getEventDateString } from '~/lib/eventUtils';
 
 export default function TeamListTable({ teams }: { teams: TeamSimple[] }) {
   return (
-      <Table className="">
-        <TableHeader>
+      <Table>
+        <TableHeader className="">
           <TableRow>
-            <TableHead>Team Number</TableHead>
+            <TableHead>Number</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Location</TableHead>
           </TableRow>
@@ -29,14 +25,14 @@ export default function TeamListTable({ teams }: { teams: TeamSimple[] }) {
           {teams.map((team) => (
           
             <TableRow key={team.key}>
-              <TableCell className="w-3/12">
-                <Link className="text-base" to={`/team/${team.team_number}`}>
+              <TableCell className="w-2/12 flex justify-center">
+                <Link className="text-base w-full" to={`/team/${team.team_number}`}>
                   {team.team_number}
                 </Link>
               </TableCell>
               <TableCell className="w-5/12">
                 <div>
-                  {team.nickname}
+                  {(team.nickname.length > 52)? team.nickname.slice(0, 52).concat("..."): team.nickname}
                 </div>
               </TableCell>
               <TableCell className="w-4/12">
