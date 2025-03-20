@@ -142,7 +142,7 @@ export default function TeamsPage() {
       </div>
       <div className="basis-full lg:py-8 lg:basis-5/6 overflow-x-auto">
         {<h1 className="mb-3 text-3xl font-medium">
-          {} <em>FIRST</em> Robotics Teams {TeamPageNumberToRange(pageNum)}{' '}
+          <em>FIRST</em> Robotics Teams {TeamPageNumberToRange(pageNum)}{' '}
           <small className="text-xl text-slate-500">
             {teams.length} Teams
           </small>
