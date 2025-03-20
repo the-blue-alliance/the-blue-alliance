@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 import pytest
@@ -8,6 +9,7 @@ from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
 )
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
+from backend.common.storage.clients.in_memory_client import InMemoryClient
 
 
 @pytest.fixture(autouse=True)
@@ -15,6 +17,12 @@ def auto_add_urlfetch_stub(
     urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
 ) -> None:
     pass
+
+
+@pytest.fixture(autouse=True)
+def reset_gcs_client():
+    yield
+    InMemoryClient.CLIENT = None
 
 
 def test_init_no_fmsapi_secrets(ndb_stub) -> None:
@@ -197,3 +205,124 @@ def test_get(
 
     called_headers = {h.Key: h.Value for h in called_request.header}
     assert called_headers == expected_headers
+
+
+def test_save_response(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+    content = {
+        "currentSeason": 2021,
+        "maxSeason": 2021,
+        "name": "FIRST ROBOTICS COMPETITION API",
+        "apiVersion": "3.0",
+        "status": "normal",
+    }
+
+    def mock_fetch_fn(request, response):
+        response.StatusCode = 200
+        response.Content = json.dumps(content).encode()
+
+    api = FRCAPI("zach", save_response=True)
+    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
+        mock_fetch.side_effect = mock_fetch_fn
+        api.root().get_result()
+
+    client = InMemoryClient.get()
+    files = client.get_files()
+    assert len(files) == 1
+
+    f = client.read(files[0])
+    assert f is not None
+    assert f == json.dumps(content).encode()
+
+
+def test_save_response_unchanged(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+    content = {
+        "currentSeason": 2021,
+        "maxSeason": 2021,
+        "name": "FIRST ROBOTICS COMPETITION API",
+        "apiVersion": "3.0",
+        "status": "normal",
+    }
+
+    def mock_fetch_fn(request, response):
+        response.StatusCode = 200
+        response.Content = json.dumps(content).encode()
+
+    api = FRCAPI("zach", save_response=True)
+    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
+        mock_fetch.side_effect = mock_fetch_fn
+        api.root().get_result()
+
+    client = InMemoryClient.get()
+    files = client.get_files()
+    assert len(files) == 1
+    f_name = files[0]
+
+    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
+        mock_fetch.side_effect = mock_fetch_fn
+        api.root().get_result()
+
+    # Since the content didn't change, we shouldn't have written another
+    assert client.get_files() == [f_name]
+
+
+def test_save_response_updated(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+    content = {
+        "currentSeason": 2021,
+        "maxSeason": 2021,
+        "name": "FIRST ROBOTICS COMPETITION API",
+        "apiVersion": "3.0",
+        "status": "normal",
+    }
+
+    def mock_fetch_fn(request, response):
+        response.StatusCode = 200
+        response.Content = json.dumps(content).encode()
+
+    api = FRCAPI("zach", save_response=True)
+    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
+        mock_fetch.side_effect = mock_fetch_fn
+        api.root().get_result()
+
+    client = InMemoryClient.get()
+    files = client.get_files()
+    assert len(files) == 1
+
+    content2 = {
+        "currentSeason": 2021,
+        "maxSeason": 2021,
+        "name": "SECOND ROBOTICS COMPETITION API",
+        "apiVersion": "3.0",
+        "status": "normal",
+    }
+
+    def mock_fetch_fn2(request, response):
+        response.StatusCode = 200
+        response.Content = json.dumps(content2).encode()
+
+    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
+        mock_fetch.side_effect = mock_fetch_fn2
+        api.root().get_result()
+
+    # Since the content is different, we should have two items
+    files = client.get_files()
+    assert len(files) == 2
+
+    f = client.read(files[0])
+    assert f is not None
+    assert f == json.dumps(content).encode()
+
+    f2 = client.read(files[1])
+    assert f2 is not None
+    assert f2 == json.dumps(content2).encode()

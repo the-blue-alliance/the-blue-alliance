@@ -8,6 +8,7 @@ from typing import Any, cast, Dict, Generator, Literal, Optional
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
+from backend.common.environment import Environment
 from backend.common.futures import TypedFuture
 from backend.common.models.keys import Year
 from backend.common.profiler import Span
@@ -20,6 +21,7 @@ TCompLevel = Literal["qual", "playoff"]
 
 
 class FRCAPI:
+    BASE_URL = "https://frc-api.firstinspires.org"
     STORAGE_BUCKET_PATH = "tbatv-prod-hrd.appspot.com"
     STORAGE_BUCKET_BASE_DIR = "frc-api-response"
 
@@ -36,6 +38,7 @@ class FRCAPI:
         auth_token: Optional[str] = None,
         sim_time: Optional[datetime.datetime] = None,
         sim_api_version: Optional[str] = None,
+        save_response: bool = False,
     ):
         # Load auth_token from Sitevar if not specified
         if not auth_token:
@@ -50,6 +53,7 @@ class FRCAPI:
         self.auth_token = auth_token
         self._sim_time = sim_time
         self._sim_api_version = sim_api_version
+        self._save_response = save_response
 
     def root(self) -> TypedFuture[URLFetchResult]:
         return self._get("/")
@@ -166,7 +170,7 @@ class FRCAPI:
         if self._sim_time is not None:
             return self._get_simulated(endpoint, self._sim_api_version or version)
 
-        url = f"https://frc-api.firstinspires.org/{versioned_endpoint}"
+        url = f"{self.BASE_URL}/{versioned_endpoint}"
         headers = {
             "Accept": "application/json",
             "Cache-Control": "no-cache, max-age=10",
@@ -175,8 +179,44 @@ class FRCAPI:
         }
 
         with Span(f"frc_api_fetch:{endpoint}"):
-            resp = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
-            return URLFetchResult(url, resp)
+            r = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
+            response = URLFetchResult(url, r)
+            if response.status_code == 200:
+                with Span(f"maybe_save_fmsapi_response:{response.url}"):
+                    self._maybe_save_response(response.url, response.content)
+
+            return response
+
+    def _maybe_save_response(self, url: str, content: str) -> None:
+        if not Environment.save_frc_api_response() or not self._save_response:
+            return
+
+        endpoint = url.replace(f"{self.BASE_URL}/", "")
+        gcs_dir_name = f"{FRCAPI.STORAGE_BUCKET_BASE_DIR}/{endpoint}/"
+
+        from backend.common.storage import (
+            get_files as cloud_storage_get_files,
+            read as cloud_storage_read,
+            write as cloud_storage_write,
+        )
+
+        # Check to see if the last saved response is the same as the current response
+        try:
+            # Check for last response
+            gcs_files = cloud_storage_get_files(gcs_dir_name)
+            last_item_filename = gcs_files[-1] if len(gcs_files) > 0 else None
+
+            write_new = True
+            if last_item_filename is not None:
+                last_json_file = cloud_storage_read(last_item_filename)
+                if last_json_file == content:
+                    write_new = False  # Do not write if content didn't change
+
+            if write_new:
+                file_name = gcs_dir_name + "{}.json".format(datetime.datetime.now())
+                cloud_storage_write(file_name, content)
+        except Exception:
+            logging.exception("Error saving API response for: {}".format(url))
 
     @staticmethod
     def get_cached_gcs_files(gcs_dir_name: str):
@@ -249,14 +289,14 @@ class FRCAPI:
         )
 
         versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
-        hybrid_url = f"https://frc-api.firstinspires.org/{versioned_endpoint}"
+        hybrid_url = f"{self.BASE_URL}/{versioned_endpoint}"
         return URLFetchResult.mock_for_content(
             hybrid_url, 200, json.dumps(merged_content)
         )
 
     def _get_api_response_from_gcs(self, endpoint: str, version: str) -> URLFetchResult:
         versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
-        url = f"https://frc-api.firstinspires.org/{versioned_endpoint}"
+        url = f"{self.BASE_URL}/{versioned_endpoint}"
         try:
             gcs_dir_name = (
                 f"{self.STORAGE_BUCKET_BASE_DIR}/{version}/{endpoint.lstrip('/')}/"

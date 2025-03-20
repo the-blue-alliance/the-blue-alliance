@@ -171,7 +171,9 @@ class FirebasePusher:
     def update_match_queue_status(
         cls, match: Match, nexus_status: EventQueueStatus
     ) -> None:
-        if match_status := nexus_status["matches"].get(match.key_name):
+        if nexus_status and (
+            match_status := nexus_status["matches"].get(match.key_name)
+        ):
             event_key = none_throws(match.event.string_id())
             match_short = match.short_key
             update_dict = {"q": NexusMatchStatus(match_status["status"]).to_string()}

@@ -6,7 +6,6 @@ from typing import Any, Generator, List, Optional, Set, Tuple
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
-from backend.common.environment import Environment
 from backend.common.frc_api import FRCAPI
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.award import Award
@@ -93,8 +92,11 @@ class DatafeedFMSAPI:
         sim_api_version: Optional[str] = None,
         save_response: bool = False,
     ) -> None:
-        self._save_response = save_response and sim_time is None
-        self.api = FRCAPI(sim_time=sim_time, sim_api_version=sim_api_version)
+        self.api = FRCAPI(
+            sim_time=sim_time,
+            sim_api_version=sim_api_version,
+            save_response=save_response,
+        )
 
     @typed_tasklet
     def get_root_info(self) -> Generator[Any, Any, Optional[RootInfo]]:
@@ -388,8 +390,6 @@ class DatafeedFMSAPI:
     ) -> Optional[TParsedResponse]:
         if response.status_code == 200:
             ApiStatusFMSApiDown.set_down(False)
-            with Span(f"maybe_save_fmsapi_response:{response.url}"):
-                self._maybe_save_response(response.url, response.content)
 
             with Span(f"datafeed_fmsapi_parser:{type(parser).__name__}"):
                 return parser.parse(response.json())
@@ -402,34 +402,3 @@ class DatafeedFMSAPI:
             f"Fetch for {response.url} failed; Error code {response.status_code}; {response.content}"
         )
         return None
-
-    def _maybe_save_response(self, url: str, content: str) -> None:
-        if not Environment.save_frc_api_response() or not self._save_response:
-            return
-
-        endpoint = url.replace("https://frc-api.firstinspires.org/", "")
-        gcs_dir_name = f"{FRCAPI.STORAGE_BUCKET_BASE_DIR}/{endpoint}/"
-
-        from backend.common.storage import (
-            get_files as cloud_storage_get_files,
-            read as cloud_storage_read,
-            write as cloud_storage_write,
-        )
-
-        # Check to see if the last saved response is the same as the current response
-        try:
-            # Check for last response
-            gcs_files = cloud_storage_get_files(gcs_dir_name)
-            last_item_filename = gcs_files[-1] if len(gcs_files) > 0 else None
-
-            write_new = True
-            if last_item_filename is not None:
-                last_json_file = cloud_storage_read(last_item_filename)
-                if last_json_file == content:
-                    write_new = False  # Do not write if content didn't change
-
-            if write_new:
-                file_name = gcs_dir_name + "{}.json".format(datetime.datetime.now())
-                cloud_storage_write(file_name, content)
-        except Exception:
-            logging.exception("Error saving API response for: {}".format(url))

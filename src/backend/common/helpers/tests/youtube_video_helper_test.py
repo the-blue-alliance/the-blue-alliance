@@ -180,6 +180,7 @@ def test_parse_id_from_url() -> None:
         ("2020ctwat Q4", "qm4"),
         ("CTWAT QM4", "qm4"),
         ("2020ctwat sf1m2", "sf1m2"),
+        ("2020ctwat sf10m1", "sf10m1"),
         ("2020ctwat QF2M3", "qf2m3"),
         ("CTWAT F1M3", "f1m3"),
         ("asdf", ""),
