@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import { InView } from 'react-intersection-observer';
 import { useLoaderData, useNavigate } from 'react-router';
 
-import { TeamSimple, getTeamsSimple } from '~/api/v3';
-import EventListTable from '~/components/tba/eventListTable';
+import { getTeamsSimple } from '~/api/v3';
 import {
   Select,
   SelectContent,
@@ -13,12 +10,9 @@ import {
 } from '~/components/ui/select';
 import {
   parseParamsForTeamPgNumElseDefault,
-  pluralize,
-  slugify,
 } from '~/lib/utils';
 
 import { Route } from '.react-router/types/app/routes/+types/teams.($pgNum)';
-import { i } from 'node_modules/@react-router/dev/dist/routes-DHIOx0R9';
 import TeamListTable from '~/components/tba/teamListTable';
 
 async function loadData(params: Route.LoaderArgs['params']) {
