@@ -73,7 +73,7 @@
     "@tailwindcss/postcss": "4.0.14",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/compression": "1.7.5",
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/morgan": "1.9.9",
     "@types/node": "20.17.24",
     "@types/react": "18.3.13",
