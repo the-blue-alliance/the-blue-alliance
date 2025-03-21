@@ -70,7 +70,7 @@
     "@sentry/vite-plugin": "3.2.2",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
-    "@tailwindcss/postcss": "4.0.14",
+    "@tailwindcss/postcss": "4.0.15",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/compression": "1.7.5",
     "@types/express": "5.0.1",
