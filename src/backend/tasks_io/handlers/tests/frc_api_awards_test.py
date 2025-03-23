@@ -16,11 +16,12 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.team import Team
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
+
 def create_event(
     official: bool,
     end_date: Optional[datetime.datetime] = None,
     remap_teams: Optional[Dict[str, str]] = None,
-) -> None:
+) -> Event:
     e = Event(
         id="2019casj",
         year=2019,
@@ -33,6 +34,7 @@ def create_event(
     )
     e.put()
     return e
+
 
 def test_enqueue_bad_when(tasks_client: Client) -> None:
     create_event(official=True)
@@ -81,6 +83,7 @@ def test_enqueue_current_official_only(
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
     assert len(tasks) == 0
 
+
 @freeze_time("2019-04-01")
 def test_enqueue_last_day_only(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
@@ -98,6 +101,7 @@ def test_enqueue_last_day_only(
         t.url for t in tasks
     ]
 
+
 @freeze_time("2019-04-01")
 def test_enqueue_last_day_only_false(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
@@ -109,6 +113,7 @@ def test_enqueue_last_day_only_false(
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
     assert len(tasks) == 0
+
 
 @freeze_time("2019-04-01")
 def test_enqueue_last_day_only_skips_unofficial(
