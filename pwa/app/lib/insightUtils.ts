@@ -20,6 +20,8 @@ export const LEADERBOARD_NAME_TO_DISPLAY_NAME: Record<string, string> = {
   typed_leaderboard_notables_division_winners: 'Most Division Wins',
   typed_leaderboard_most_events_played_at: 'Most Events Played At',
   typed_leaderboard_2025_most_coral_scored: 'Most Coral Scored',
+  typed_leaderboard_notables_dcmp_winner: 'Most District Championship Wins',
+  typed_leaderboard_longest_einstein_streak: 'Longest Einstein Streak',
 };
 
 export const NOTABLE_NAME_TO_DISPLAY_NAME: Record<string, string> = {
