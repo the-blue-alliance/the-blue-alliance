@@ -811,10 +811,14 @@ def event_matches(event_key: EventKey) -> Response:
 # @blueprint.route("/awards/<int:from backend.common.helpers.listify import delistify, listifyyear>")
 # TODO: Drop support for this "now" and just use an empty year
 @blueprint.route("/tasks/enqueue/fmsapi_awards/now", defaults={"year": None})
+@blueprint.route("/tasks/enqueue/fmsapi_awards/last_day_only", defaults={"year": None, "when": "last_day_only"})
 @blueprint.route("/tasks/enqueue/fmsapi_awards/<int:year>")
-def awards_year(year: Optional[int]) -> Response:
+def awards_year(year: Optional[int], when: Optional[str] = None) -> Response:
     events: List[Event]
-    if year is None:
+    if when == "last_day_only":
+        events = EventHelper.events_within_a_day()
+        events = list(filter(lambda e: e.official and e.ends_today, events))
+    elif year is None:
         events = EventHelper.events_within_a_day()
         events = list(filter(lambda e: e.official, events))
     else:
