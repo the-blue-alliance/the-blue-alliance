@@ -76,6 +76,15 @@ def setup(ndb_stub):
         name_str="Chairman's Award",
         team_list=[ndb.Key(Team, "frc5254")],
     ).put()
+    Award(
+        id="2024cmptx_3",
+        year=2024,
+        award_type_enum=AwardType.FINALIST,
+        event_type_enum=EventType.CMP_FINALS,
+        event=ndb.Key(Event, "2024cmptx"),
+        name_str="Finalist",
+        team_list=[ndb.Key(Team, "frc2713")],
+    ).put()
 
 
 def test_notables_hall_of_fame(ndb_stub):
@@ -142,6 +151,25 @@ def test_notables_division_finals_appearances(ndb_stub):
         {"team_key": "frc1323", "context": ["2024new"]},
         {"team_key": "frc604", "context": ["2024mil"]},
         {"team_key": "frc2713", "context": ["2024mil"]},
+    ]
+
+
+def test_notables_worlds_finals_appearances(ndb_stub):
+    insight = InsightsNotableHelper._calculate_notables_cmp_finals_appearances(
+        LeaderboardInsightArguments(
+            events=[
+                Event.get_by_id("2024cmptx"),
+                Event.get_by_id("2024new"),
+                Event.get_by_id("2024mil"),
+            ],
+            year=2024,
+        )
+    )
+
+    assert insight is not None
+    assert insight.data["entries"] == [
+        {"team_key": "frc2791", "context": ["2024cmptx"]},
+        {"team_key": "frc2713", "context": ["2024cmptx"]},
     ]
 
 
