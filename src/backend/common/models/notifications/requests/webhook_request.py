@@ -1,5 +1,4 @@
 import json
-import logging
 
 import requests
 
@@ -58,7 +57,7 @@ class WebhookRequest(Request):
                 self.defer_track_notification(1)
             elif response.status_code == 404:
                 valid_url = False
-        except Exception as e:
+        except Exception:
             # logging.error(f"Failed to send webhook request: {e}")
             pass
 
