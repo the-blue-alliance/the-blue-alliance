@@ -23,7 +23,7 @@ class RegionalAdvancementParser(ParserBase[RegionalPoolAdvancement]):
             if not isinstance(team, dict):
                 continue
 
-            cmp_status = ChampionshipStatus.from_api_string(team["championshipStatus"])
+            cmp_status = ChampionshipStatus(team["championshipStatus"])
             if not cmp_status or cmp_status == ChampionshipStatus.NOT_INVITED:
                 continue
 
@@ -33,7 +33,7 @@ class RegionalAdvancementParser(ParserBase[RegionalPoolAdvancement]):
             qualifying_pool_week = team["championshipQualifyingPoolWeek"]
 
             team_advancement = TeamRegionalPoolAdvancement(
-                cmp=True,
+                cmp=(cmp_status != ChampionshipStatus.DECLINED),
                 cmp_status=cmp_status,
             )
             if qualifying_event_code:

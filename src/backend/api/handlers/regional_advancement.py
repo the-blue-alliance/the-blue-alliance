@@ -26,3 +26,24 @@ def regional_rankings(year: Year) -> Response:
         return make_response({"Error": f"No regional rankings found for {year}"}, 404)
 
     return profiled_jsonify(pool.rankings)
+
+
+@api_authenticated
+@cached_public
+def regional_advancement(year: Year) -> Response:
+    """
+    Returns the regional advancement qualification info
+    """
+    if not SeasonHelper.is_valid_regional_pool_year(year):
+        return make_response(
+            {"Error": f"{year} is not a valid year for regional advancement"}, 404
+        )
+
+    track_call_after_response("regional_rankings", f"{year}")
+    pool = RegionalChampsPool.get_by_id(RegionalChampsPool.render_key_name(year))
+    if not pool:
+        return make_response(
+            {"Error": f"No regional advancement found for {year}"}, 404
+        )
+
+    return profiled_jsonify(pool.advancement)

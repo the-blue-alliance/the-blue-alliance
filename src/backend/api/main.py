@@ -16,6 +16,7 @@ from backend.api.handlers.client_api import (
     update_model_preferences,
 )
 from backend.api.handlers.district import (
+    district_advancement,
     district_awards,
     district_events,
     district_history,
@@ -44,7 +45,10 @@ from backend.api.handlers.insights import (
 )
 from backend.api.handlers.match import match, zebra_motionworks
 from backend.api.handlers.media import media_tags
-from backend.api.handlers.regional_advancement import regional_rankings
+from backend.api.handlers.regional_advancement import (
+    regional_advancement,
+    regional_rankings,
+)
 from backend.api.handlers.search import search_index
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
@@ -142,6 +146,9 @@ api_v3.add_url_rule(
 api_v3.add_url_rule(
     "/district/<string:district_key>/rankings", view_func=district_rankings
 )
+api_v3.add_url_rule(
+    "/district/<string:district_key>/advancement", view_func=district_advancement
+)
 
 # District List
 api_v3.add_url_rule("/districts/<int:year>", view_func=district_list_year)
@@ -208,6 +215,7 @@ api_v3.add_url_rule(
 )
 
 # Regional Advancement
+api_v3.add_url_rule("/regional_advancement/<int:year>/", view_func=regional_advancement)
 api_v3.add_url_rule(
     "/regional_advancement/<int:year>/rankings", view_func=regional_rankings
 )
