@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { isValidMatchKey } from './matchUtils';
+import { isValidMatchKey } from '~/lib/matchUtils';
 
 describe.concurrent('isValidMatchKey', () => {
   test.each([

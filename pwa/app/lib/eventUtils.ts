@@ -1,7 +1,6 @@
 import { Event } from '~/api/v3';
 import { EventType } from '~/lib/api/EventType';
-
-import { convertMsToDays } from './utils';
+import { convertMsToDays } from '~/lib/utils';
 
 export function isValidEventKey(key: string) {
   return /^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,3}$/.test(key);

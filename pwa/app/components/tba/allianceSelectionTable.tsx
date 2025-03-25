@@ -4,6 +4,7 @@ import type React from 'react';
 import BiTrophy from '~icons/bi/trophy';
 
 import { EliminationAlliance } from '~/api/v3';
+import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLink } from '~/components/tba/links';
 import {
   Table,
@@ -14,8 +15,6 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { cn } from '~/lib/utils';
-
-import InlineIcon from './inlineIcon';
 
 const rowVariants = cva('text-center', {
   variants: {

@@ -5,9 +5,8 @@ import BiTrophy from '~icons/bi/trophy';
 
 import { EventRanking } from '~/api/v3';
 import { DataTable } from '~/components/tba/dataTable';
+import InlineIcon from '~/components/tba/inlineIcon';
 import { cn } from '~/lib/utils';
-
-import InlineIcon from './inlineIcon';
 
 type RankingColumnType = ColumnDef<EventRanking['rankings'][number]>[];
 

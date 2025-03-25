@@ -45,6 +45,20 @@ updates:
       patterns:
         - "vitest"
         - "@vitest/coverage-v8"
+    linting:
+      patterns:
+        - "@eslint/*"
+        - "eslint"
+        - "eslint-config-prettier"
+        - "eslint-import-resolver-typescript"
+        - "eslint-plugin-import"
+        - "eslint-plugin-jsx-a11y"
+        - "eslint-plugin-no-relative-import-paths"
+        - "eslint-plugin-react"
+        - "eslint-plugin-react-hooks"
+        - "globals"
+        - "typescript-eslint"
+        - "@typescript-eslint/*"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

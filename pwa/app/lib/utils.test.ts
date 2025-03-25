@@ -6,7 +6,7 @@ import {
   removeNonNumeric,
   slugify,
   splitIntoNChunks,
-} from './utils';
+} from '~/lib/utils';
 
 describe.concurrent('removeNonNumeric', () => {
   test('basic', () => {

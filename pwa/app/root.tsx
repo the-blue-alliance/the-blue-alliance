@@ -13,9 +13,8 @@ import {
 } from 'react-router';
 
 import * as api from '~/api/v3';
-
-import { Nav } from './components/tba/nav';
-import './tailwind.css';
+import { Nav } from '~/components/tba/nav';
+import '~/tailwind.css';
 
 api.defaults.baseUrl = 'https://www.thebluealliance.com/api/v3/';
 api.defaults.headers = {
