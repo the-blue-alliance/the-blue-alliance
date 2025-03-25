@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useNavigate } from 'react-router';
 
 import {
   LeaderboardInsight,
@@ -11,10 +11,17 @@ import { TitledCard } from '~/components/tba/cards';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
+import {
   NOTABLE_NAME_TO_DISPLAY_NAME,
   leaderboardFromNotable,
 } from '~/lib/insightUtils';
-import { joinComponents } from '~/lib/utils';
+import { VALID_YEARS, joinComponents } from '~/lib/utils';
 
 import { Route } from '.react-router/types/app/routes/+types/insights.($year)';
 
@@ -102,6 +109,8 @@ function SingleYearInsights({
   leaderboards: LeaderboardInsight[];
   notables: NotablesInsight[];
 }) {
+  const navigate = useNavigate();
+
   const notableDiv =
     year !== 0 ? (
       <NotablesYearSpecific notables={notables} />
@@ -114,9 +123,31 @@ function SingleYearInsights({
 
   return (
     <div className="py-8">
-      <h1 className="mb-3 text-3xl font-medium">
-        Insights ({year > 0 ? year : 'Overall'})
-      </h1>
+      <div className="flex flex-wrap justify-between">
+        <h1 className="mb-3 text-3xl font-medium">
+          Insights ({year > 0 ? year : 'Overall'})
+        </h1>
+
+        <Select
+          onValueChange={(value) => {
+            void navigate(`/insights/${value === 'Overall' ? '' : value}`);
+          }}
+        >
+          <SelectTrigger className="w-[180px] cursor-pointer">
+            <SelectValue placeholder={'Overall'} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Overall" className="cursor-pointer">
+              Overall
+            </SelectItem>
+            {VALID_YEARS.map((y) => (
+              <SelectItem key={y} value={`${y}`} className="cursor-pointer">
+                {y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <h3 className="mb-4 text-xl font-medium">Notables</h3>
       {notableDiv}
