@@ -111,17 +111,20 @@
         <div class="tab-pane" id="rankings">
           {% if rankings %}
               <div class="row" style="padding-top: 5px">
-                  <div class="col-sm-3">
-                    <div class="form-group">
-                      <input class="form-control" id="team-filter" placeholder="Filter By Team Number"/>
-                    </div>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <input class="form-control" id="team-filter" placeholder="Filter By Team Number"/>
                   </div>
-                  <div class="col-sm-3">
-                    <div name="qualified-toggle" class="btn-group btn-toggle">
-                      <button class="btn btn-sm btn-primary active" id="filter-all-teams">All Teams</button>
-                      <button class="btn btn-sm btn-default" id="filter-not-qualified">Not Qualified</button>
-                    </div>
+                </div>
+                <div class="col-sm-3">
+                  <div name="qualified-toggle" class="btn-group btn-toggle">
+                    <button class="btn btn-sm btn-primary active" id="filter-all-teams">All Teams</button>
+                    <button class="btn btn-sm btn-default" id="filter-not-qualified">Not Qualified</button>
                   </div>
+                </div>
+                <div class="col-sm-6">
+                  <span><i>Complete details on <a href="https://frc-events.firstinspires.org/ra/" target="_blank" rel="noopener noreferrer">firstinspires.org</a></i></span>
+                </div>
               </div>
           {% endif %}
           <table class="table table-striped table-condensed table-center" id="advancement-table">
