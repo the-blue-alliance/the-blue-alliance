@@ -86,11 +86,11 @@
     </div>
     <div class="tab-pane" id="advancement">
         <table class="table table-striped table-hover">
-            <th>
+            <tr>
                 <td>Team</td>
                 <td>Qualified for DCMP</td>
                 <td>Qualified for CMP</td>
-            </th>
+            </tr>
             {% for team_key, advancement in (district.advancement or {}).items() %}
                 <tr>
                     <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
