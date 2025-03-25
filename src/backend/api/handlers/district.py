@@ -126,3 +126,15 @@ def district_awards(district_key: DistrictKey) -> Response:
         awards += partial_awards
 
     return profiled_jsonify(awards)
+
+
+@api_authenticated
+@cached_public
+def district_advancement(district_key: DistrictKey) -> Response:
+    """
+    Returns DCMP/CMP advancement information for a given DistrictKey
+    """
+    track_call_after_response("district/advancement", district_key)
+
+    district = DistrictQuery(district_key=district_key).fetch()
+    return profiled_jsonify(district.advancement)

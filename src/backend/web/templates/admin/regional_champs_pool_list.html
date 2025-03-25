@@ -76,10 +76,7 @@
                         <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
                         <td>{% if advancement.cmp %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
                         <td>
-                            {% if advancement.cmp_status == 0 %}NotInvited
-                            {% elif advancement.cmp_status == 1 %}PreQualified
-                            {% elif advancement.cmp_status == 2 %}EventQualified
-                            {% elif advancement.cmp_status == 3 %}PoolQualified
+                            {% if advancement.cmp_status %}{{advancement.cmp_status}}
                             {% else %}--{%endif%}</td>
                         <td>{% if advancement.qualifying_event %}{{advancement.qualifying_event}}{%else%}--{%endif%}</td>
                         <td>{% if advancement.qualifying_award_name %}{{advancement.qualifying_award_name}}{%else%}--{%endif%}</td>
