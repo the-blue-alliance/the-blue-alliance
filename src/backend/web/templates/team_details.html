@@ -229,6 +229,39 @@
                     </tbody>
                   </table>
                 {% endif %}
+                {% if comp.regional_champs_points %}
+                  <h4>Regional Pool Points Earned</h4>
+                  <table class="table table-condensed table-striped">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Qual Points</td>
+                        <td>{{comp.regional_champs_points.qual_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Alliance Points</td>
+                        <td>{{comp.regional_champs_points.alliance_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Playoff Points</td>
+                        <td>{{comp.regional_champs_points.elim_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Award Points</td>
+                        <td>{{comp.regional_champs_points.award_points}}</td>
+                      </tr>
+                      <tr>
+                        <th>Total Points</th>
+                        <th>{{comp.regional_champs_points.total}}</th>
+                      </tr>
+                    </tbody>
+                  </table>
+                {% endif %}
                 {% if comp.playlist %}
                 <a class="btn btn-default" href="{{comp.playlist}}" target="_blank" rel="noopener noreferrer">
                   <span class="glyphicon glyphicon-play-circle"></span> Watch All Matches</a>

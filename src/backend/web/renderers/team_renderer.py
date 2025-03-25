@@ -216,6 +216,18 @@ class TeamRenderer:
                     None,
                 )
 
+            regional_champs_points = None
+            if team_regional_champs_pool_points:
+                regional_champs_points = next(
+                    iter(
+                        filter(
+                            lambda e: e["event_key"] == event.key_name,
+                            team_regional_champs_pool_points["event_points"],
+                        )
+                    ),
+                    None,
+                )
+
             alliance, alliance_pick, alliance_size = (
                 AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
             )
@@ -262,6 +274,7 @@ class TeamRenderer:
                     "awards": event_awards,
                     "playlist": playlist,
                     "district_points": district_points,
+                    "regional_champs_points": regional_champs_points,
                     "nexus_pit_location": (
                         eventteam.pit_location["location"]
                         if eventteam and eventteam.pit_location
