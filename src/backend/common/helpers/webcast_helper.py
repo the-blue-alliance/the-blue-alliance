@@ -105,12 +105,12 @@ class WebcastParser:
     def _parse_youtube_channel(cls, url: str) -> Optional[str]:
         youtube_id = None
         # youtu.be/video-id or youtube.com/live/video-id
-        regex1 = re.match(r".*(?:youtu\.be|youtube.com\/live)\/([a-zA-Z0-9_-]*)", url)
+        regex1 = re.match(r".*(?:youtu\.be|youtube.com\/live)\/([a-zA-Z0-9_-]{11})", url)
         if regex1 is not None:
             youtube_id = regex1.group(1)
         else:
             # youtube.com/watch?v=video-id
-            regex2 = re.match(r".*v=([a-zA-Z0-9_-]*)", url)
+            regex2 = re.match(r".*v=([a-zA-Z0-9_-]{11})", url)
             if regex2 is not None:
                 youtube_id = regex2.group(1)
 
