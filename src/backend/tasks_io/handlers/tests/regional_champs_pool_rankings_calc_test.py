@@ -51,6 +51,7 @@ def test_calc(calc_mock: mock.Mock, tasks_client: Client) -> None:
             rookie_bonus=0,
             single_event_bonus=0,
             other_bonus=0,
+            adjustments=0,
         )
     }
 
@@ -116,6 +117,7 @@ def test_calc_doesnt_write_out_in_taskqueue(
             rookie_bonus=0,
             single_event_bonus=0,
             other_bonus=0,
+            adjustments=0,
         )
     }
 

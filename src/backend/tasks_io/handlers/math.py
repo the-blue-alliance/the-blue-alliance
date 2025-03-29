@@ -207,12 +207,8 @@ def enqueue_district_rankings_calc(year: Optional[Year]) -> Response:
     districts = DistrictsInYearQuery(int(year)).fetch()
     district_keys = [district.key.id() for district in districts]
     for district_key in district_keys:
-        taskqueue.add(
-            url=url_for("math.district_rankings_calc", district_key=district_key),
-            method="GET",
-            target="py3-tasks-io",
-            queue_name="default",
-        )
+        # This will hit the FRC API for adjustment points, and then
+        # call back into district_rankings_calc below
         taskqueue.add(
             url=url_for("frc_api.district_rankings", district_key=district_key),
             method="GET",
@@ -247,7 +243,12 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
     for event in events:
         event.prep_details()
     events = EventHelper.sorted_events(events)
-    team_totals = DistrictHelper.calculate_rankings(events, teams_future, district.year)
+    team_totals = DistrictHelper.calculate_rankings(
+        events,
+        teams_future,
+        district.year,
+        adjustments=district.adjustments,
+    )
 
     rankings: List[DistrictRanking] = []
     current_rank = 1
@@ -257,6 +258,7 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
             team_key=key,
             event_points=[],
             rookie_bonus=points.get("rookie_bonus", 0),
+            adjustments=points.get("adjustments", 0),
             point_total=points["point_total"],
         )
         for event, event_points in points["event_points"]:
@@ -291,16 +293,16 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
     if not SeasonHelper.is_valid_regional_pool_year(year):
         abort(404)
 
-    regional_pool = RegionalChampsPool.get_or_insert(
+    regional_pool_future = RegionalChampsPool.get_or_insert_async(
         RegionalChampsPool.render_key_name(year),
         year=year,
     )
-
     events_future: TypedFuture[List[Event]] = RegionalEventsQuery(year).fetch_async()
     team_keys_future: TypedFuture[List[ndb.Key]] = RegionalTeamsQuery(
         year
     ).fetch_async()
 
+    regional_pool = regional_pool_future.get_result()
     events = events_future.get_result()
     for event in events:
         event.prep_details()
@@ -308,7 +310,10 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
 
     events = EventHelper.sorted_events(events)
     team_totals = RegionalChampsPoolHelper.calculate_rankings(
-        events, [t.get_result() for t in teams_future], year
+        events,
+        teams_future,
+        year,
+        regional_pool.adjustments,
     )
 
     rankings: List[RegionalPoolRanking] = []
@@ -320,6 +325,7 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
             event_points=[],
             rookie_bonus=points.get("rookie_bonus", 0),
             single_event_bonus=points.get("single_event_bonus", 0),
+            adjustments=points.get("adjustments", 0),
             point_total=points["point_total"],
         )
         for event, event_points in points["event_points"]:
@@ -338,7 +344,7 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(
-            f"Finished calculating regional pool rankings for: {year}:\n{rankings}"
+            f"Finished calculating regional pool rankings for {year}:<pre>{json.dumps(rankings, indent=2)}</pre>"
         )
     return make_response("")
 

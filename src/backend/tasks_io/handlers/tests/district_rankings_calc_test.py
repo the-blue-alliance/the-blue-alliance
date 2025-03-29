@@ -153,6 +153,7 @@ def test_calc(
             rookie_bonus=0,
             single_event_bonus=0,
             other_bonus=0,
+            adjustments=0,
         )
     }
 
@@ -201,6 +202,7 @@ def test_calc_no_output_in_taskqueue(
             rookie_bonus=0,
             single_event_bonus=0,
             other_bonus=0,
+            adjustments=0,
         )
     }
 

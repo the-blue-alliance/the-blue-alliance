@@ -1,7 +1,7 @@
 import heapq
 import logging
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, NamedTuple, Set, Union
+from typing import DefaultDict, Dict, List, NamedTuple, Optional, Set, Union
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -110,6 +110,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
         events: List[Event],
         teams: Union[List[Team], TypedFuture[List[Team]]],
         year: Year,
+        adjustments: Optional[Dict[TeamKey, int]],
     ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two regional events
         events_by_key: Dict[EventKey, Event] = {}
@@ -128,6 +129,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 qual_scores=[],
                 other_bonus=0,
                 single_event_bonus=0,
+                adjustments=0,
             )
         )
 
@@ -212,13 +214,20 @@ class RegionalChampsPoolHelper(DistrictHelper):
             teams = teams.get_result()
 
         valid_team_keys: Set[TeamKey] = set()
-        for team in teams:
-            if isinstance(teams, ndb.tasklets.Future):
-                team = team.get_result()
+        for team_f in teams:
+            if isinstance(team_f, ndb.tasklets.Future):
+                team = team_f.get_result()
+            else:
+                team = team_f
             bonus = cls._get_rookie_bonus(year, team.rookie_year)
 
             team_totals[team.key_name]["rookie_bonus"] = bonus
             team_totals[team.key_name]["point_total"] += bonus
+
+            # For other adjustments made by HQ
+            if adjustments and (team_adjustment := adjustments.get(team.key_name)):
+                team_totals[team.key_name]["adjustments"] = team_adjustment
+                team_totals[team.key_name]["point_total"] += team_adjustment
 
             valid_team_keys.add(team.key_name)
 

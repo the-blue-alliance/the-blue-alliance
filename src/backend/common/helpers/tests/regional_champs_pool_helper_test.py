@@ -49,7 +49,7 @@ def test_calc_multi_event_rankings_all_teams_filtered(setup_full_event) -> None:
         none_throws(Event.get_by_id("2025mndu2")),
     ]
 
-    rankings = RegionalChampsPoolHelper.calculate_rankings(events, [], 2025)
+    rankings = RegionalChampsPoolHelper.calculate_rankings(events, [], 2025, None)
     assert rankings == {}
 
 
@@ -67,7 +67,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
         none_throws(Team.get_by_id("frc2383")),
     ]
 
-    rankings = RegionalChampsPoolHelper.calculate_rankings(events, teams, 2025)
+    rankings = RegionalChampsPoolHelper.calculate_rankings(events, teams, 2025, None)
     assert len(rankings) == 2
     assert rankings["frc2847"] == DistrictRankingTeamTotal(
         event_points=[
@@ -87,6 +87,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
         rookie_bonus=0,
         single_event_bonus=57,
         other_bonus=0,
+        adjustments=0,
         tiebreakers=RegionalChampsPoolTiebreakers(
             best_playoff_points=30,
             best_alliance_points=15,
@@ -111,6 +112,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
         rookie_bonus=0,
         single_event_bonus=73,
         other_bonus=0,
+        adjustments=0,
         tiebreakers=RegionalChampsPoolTiebreakers(
             best_playoff_points=20,
             best_alliance_points=14,
