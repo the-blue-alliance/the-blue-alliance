@@ -4,7 +4,11 @@ from werkzeug.test import Client
 
 from backend.common.futures import InstantFuture
 from backend.common.models.district import District
+from backend.common.models.district_advancement import TeamDistrictAdvancement
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
+    TParsedDistrictAdvancement,
+)
 
 
 def test_district_list_bad_year(tasks_client: Client) -> None:
@@ -58,8 +62,11 @@ def test_district_rankings_no_district(tasks_client: Client) -> None:
 @mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
 def test_district_rankings(api_mock, tasks_client: Client) -> None:
     District(id="2020ne", year=2020, abbreviation="ne").put()
-    advancement = {"frc254": {"dcmp": True, "cmp": True}}
-    api_mock.return_value = InstantFuture(advancement)
+    advancement = {"frc254": TeamDistrictAdvancement(dcmp=True, cmp=True)}
+    adjustemnts = {"frc254": 5}
+    api_mock.return_value = InstantFuture(
+        TParsedDistrictAdvancement(advancement=advancement, adjustments=adjustemnts)
+    )
 
     resp = tasks_client.get(
         "/backend-tasks/get/district_rankings/2020ne",
@@ -71,6 +78,7 @@ def test_district_rankings(api_mock, tasks_client: Client) -> None:
     d = District.get_by_id("2020ne")
     assert d is not None
     assert d.advancement == advancement
+    assert d.adjustments == adjustemnts
 
 
 @mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
@@ -78,8 +86,11 @@ def test_district_rankings_no_output_in_taskqueue(
     api_mock, tasks_client: Client
 ) -> None:
     District(id="2020ne", year=2020, abbreviation="ne").put()
-    advancement = {"frc254": {"dcmp": True, "cmp": True}}
-    api_mock.return_value = InstantFuture(advancement)
+    advancement = {"frc254": TeamDistrictAdvancement(dcmp=True, cmp=True)}
+    adjustemnts = {"frc254": 5}
+    api_mock.return_value = InstantFuture(
+        TParsedDistrictAdvancement(advancement=advancement, adjustments=adjustemnts)
+    )
 
     resp = tasks_client.get(
         "/backend-tasks/get/district_rankings/2020ne",
@@ -92,3 +103,4 @@ def test_district_rankings_no_output_in_taskqueue(
     d = District.get_by_id("2020ne")
     assert d is not None
     assert d.advancement == advancement
+    assert d.adjustments == adjustemnts

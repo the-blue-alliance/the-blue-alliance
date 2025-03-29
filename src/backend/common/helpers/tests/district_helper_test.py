@@ -249,3 +249,41 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
 )
 def test_pandemic_rookie_edge_cases(year: Year, rookie_year: Year, bonus: int) -> None:
     assert DistrictHelper._get_rookie_bonus(year, rookie_year) == bonus
+
+
+def test_hq_adjustments(setup_full_event) -> None:
+    setup_full_event("2019nyny")
+
+    events = [
+        none_throws(Event.get_by_id("2019nyny")),
+    ]
+    teams = [
+        none_throws(Team.get_by_id("frc694")),
+    ]
+
+    rankings = DistrictHelper.calculate_rankings(
+        events, teams, 2022, adjustments={"frc694": 5}
+    )
+    assert len(rankings) == 1
+
+    assert rankings["frc694"] == DistrictRankingTeamTotal(
+        event_points=[
+            (
+                events[0],
+                TeamAtEventDistrictPoints(
+                    alliance_points=16,
+                    award_points=5,
+                    elim_points=30,
+                    qual_points=19,
+                    total=70,
+                ),
+            )
+        ],
+        point_total=75,
+        qual_scores=[85, 71, 69],
+        rookie_bonus=0,
+        other_bonus=0,
+        single_event_bonus=0,
+        adjustments=5,
+        tiebreakers=DistrictRankingTiebreakers(*[30, 30, 16, 16, 19]),
+    )
