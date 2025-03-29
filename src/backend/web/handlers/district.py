@@ -138,7 +138,7 @@ def district_detail(
         rankings = None
 
     if rankings:
-        has_adjustments = any(r["adjustments"] > 0 for r in rankings)
+        has_adjustments = any(r.get("adjustments", 0) > 0 for r in rankings)
     else:
         has_adjustments = False
 
