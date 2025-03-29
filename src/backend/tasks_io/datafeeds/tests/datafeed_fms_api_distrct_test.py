@@ -15,6 +15,7 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_list_parser imp
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
     FMSAPIDistrictRankingsParser,
+    TParsedDistrictAdvancement,
 )
 
 
@@ -83,7 +84,10 @@ def test_get_district_rankings_paginated() -> None:
     ) as mock_init, patch.object(
         FMSAPIDistrictRankingsParser, "parse"
     ) as mock_parse:
-        mock_parse.side_effect = [({}, True), ({}, False)]
+        mock_parse.side_effect = [
+            (TParsedDistrictAdvancement(advancement={}, adjustments={}), True),
+            (TParsedDistrictAdvancement(advancement={}, adjustments={}), False),
+        ]
         df.get_district_rankings("2020ne").get_result()
 
     mock_api.assert_has_calls([call(2020, "ne", 1), call(2020, "ne", 2)])

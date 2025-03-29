@@ -57,7 +57,7 @@ def test_calc(calc_mock: mock.Mock, tasks_client: Client) -> None:
 
     resp = tasks_client.get("/tasks/math/do/regional_champs_pool_rankings_calc/2025")
     assert resp.status_code == 200
-    assert b"Finished calculating regional pool rankings for: 2025" in resp.data
+    assert b"Finished calculating regional pool rankings for 2025" in resp.data
 
     regional_pool = RegionalChampsPool.get_by_id(
         RegionalChampsPool.render_key_name(2025)
@@ -80,6 +80,7 @@ def test_calc(calc_mock: mock.Mock, tasks_client: Client) -> None:
             rookie_bonus=0,
             single_event_bonus=0,
             point_total=10,
+            adjustments=0,
         ),
     ]
 
@@ -151,6 +152,7 @@ def test_calc_doesnt_write_out_in_taskqueue(
             rookie_bonus=0,
             single_event_bonus=0,
             point_total=10,
+            adjustments=0,
         ),
     ]
 
@@ -158,7 +160,7 @@ def test_calc_doesnt_write_out_in_taskqueue(
 @mock.patch.object(RegionalChampsPoolHelper, "calculate_rankings")
 def test_calc_with_adjustments(calc_mock: mock.Mock, tasks_client: Client) -> None:
     RegionalChampsPool(
-        RegionalChampsPool.render_key_name(2025),
+        id=RegionalChampsPool.render_key_name(2025),
         year=2025,
         adjustments={"frc254": 5},
     ).put()
@@ -204,9 +206,7 @@ def test_calc_with_adjustments(calc_mock: mock.Mock, tasks_client: Client) -> No
     assert resp.status_code == 200
     assert len(resp.data) == 0
 
-    calc_mock.assert_called_once_with(
-        mock.ANY, mock.ANY, mock.ANY, adjustments={"frc254": 5}
-    )
+    calc_mock.assert_called_once_with(mock.ANY, mock.ANY, mock.ANY, {"frc254": 5})
 
     regional_pool = RegionalChampsPool.get_by_id(
         RegionalChampsPool.render_key_name(2025)
