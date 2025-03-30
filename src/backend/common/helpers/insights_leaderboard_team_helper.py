@@ -25,6 +25,8 @@ class InsightsLeaderboardTeamHelper:
                 InsightsLeaderboardTeamHelper._most_events_played_at,
                 InsightsLeaderboardTeamHelper._most_unique_teams_played_with_or_against,
                 InsightsLeaderboardTeamHelper._longest_einstein_streak,
+                InsightsLeaderboardTeamHelper._most_non_champs_impact_wins,
+                InsightsLeaderboardTeamHelper._most_wffas,
             ],
         )
 
@@ -72,6 +74,40 @@ class InsightsLeaderboardTeamHelper:
 
         return make_leaderboard_from_dict_counts(
             count, Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS, arguments.year
+        )
+
+    @staticmethod
+    def _most_non_champs_impact_wins(
+        arguments: LeaderboardInsightArguments,
+    ) -> Optional[Insight]:
+        count = defaultdict(int)
+
+        for award in arguments.awards():
+            if (
+                award.award_type_enum == AwardType.CHAIRMANS
+                and award.event_type_enum in NON_CMP_EVENT_TYPES
+            ):
+                for team_key in award.team_list:
+                    count[team_key.id()] += 1
+
+        return make_leaderboard_from_dict_counts(
+            count, Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS, arguments.year
+        )
+
+    @staticmethod
+    def _most_wffas(arguments: LeaderboardInsightArguments) -> Optional[Insight]:
+        count = defaultdict(int)
+
+        for award in arguments.awards():
+            if (
+                award.award_type_enum == AwardType.WOODIE_FLOWERS
+                and award.event_type_enum in NON_CMP_EVENT_TYPES
+            ):
+                for team_key in award.team_list:
+                    count[team_key.id()] += 1
+
+        return make_leaderboard_from_dict_counts(
+            count, Insight.TYPED_LEADERBOARD_MOST_WFFAS, arguments.year
         )
 
     @staticmethod
