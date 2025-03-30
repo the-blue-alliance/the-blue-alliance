@@ -31,6 +31,11 @@ def test_init_requires_secret(ndb_stub) -> None:
         DatafeedRegionalAdvancement(2025)
 
 
+def test_init_bad_year(ndb_stub) -> None:
+    with pytest.raises(Exception):
+        DatafeedRegionalAdvancement(2019)
+
+
 @mock.patch.object(RegionalAdvancementParser, "parse")
 @mock.patch.object(RegionalAdvancementApi, "cmp_advancement")
 def test_get_adancement(
