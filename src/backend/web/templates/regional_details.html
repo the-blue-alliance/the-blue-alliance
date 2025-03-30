@@ -135,6 +135,9 @@
                 <th>Event 1</th>
                 <th>Event 2</th>
                 <th>Rookie Bonus</th>
+                {% if has_adjustments %}
+                  <th>Adjustments</th>
+                {% endif %}
                 <th>Total Points</th>
                 <th>Qualified for CMP</th>
               </tr>
@@ -167,6 +170,15 @@
                   --
                   {% endif %}
                 </td>
+                {% if has_adjustments %}
+                  <td>
+                    {% if item.adjustments %}
+                      {{ item.adjustments }}
+                    {% else %}
+                      --
+                    {% endif %}
+                  </td>
+                {% endif %}
                 <td><strong>{{item.point_total}}</strong></td>
                 <td>
                   {% if advancement and item.team_key in advancement %}

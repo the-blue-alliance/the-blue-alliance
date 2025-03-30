@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, Generator, List, Optional, Set, Tuple
+from typing import Any, Dict, Generator, List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
 
@@ -32,6 +32,7 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_list_parser imp
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
     FMSAPIDistrictRankingsParser,
+    TParsedDistrictAdvancement,
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_alliances_parser import (
     FMSAPIEventAlliancesParser,
@@ -356,10 +357,11 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_district_rankings(
         self, district_key: DistrictKey
-    ) -> Generator[Any, Any, DistrictAdvancement]:
+    ) -> Generator[Any, Any, TParsedDistrictAdvancement]:
         year = int(district_key[:4])
         district_short = district_key[4:]
         advancement: DistrictAdvancement = {}
+        adjustments: Dict[TeamKey, int] = {}
 
         more_pages = True
         page = 1
@@ -372,10 +374,14 @@ class DatafeedFMSAPI:
                 break
 
             advancement_page, more_pages = result
-            advancement.update(advancement_page)
+            advancement.update(advancement_page.advancement)
+            adjustments.update(advancement_page.adjustments)
             page = page + 1
 
-        return advancement
+        return TParsedDistrictAdvancement(
+            advancement=advancement,
+            adjustments=adjustments,
+        )
 
     @classmethod
     def _get_event_short(

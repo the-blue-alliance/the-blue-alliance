@@ -47,6 +47,9 @@ from backend.common.sitevars.apistatus import ApiStatus
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
+    TParsedDistrictAdvancement,
+)
 
 blueprint = Blueprint("frc_api", __name__)
 
@@ -890,12 +893,12 @@ def district_rankings(district_key: DistrictKey) -> Response:
         return make_response(f"No District for key: {Markup.escape(district_key)}", 404)
 
     df = DatafeedFMSAPI()
-    advancement = df.get_district_rankings(district_key).get_result()
-    if advancement:
-        district.advancement = advancement
-        district = DistrictManipulator.createOrUpdate(
-            district, update_manual_attrs=False
-        )
+    data: TParsedDistrictAdvancement = df.get_district_rankings(
+        district_key
+    ).get_result()
+    district.advancement = data.advancement
+    district.adjustments = data.adjustments
+    district = DistrictManipulator.createOrUpdate(district, update_manual_attrs=False)
 
     template_values = {
         "districts": listify(district),
@@ -908,4 +911,10 @@ def district_rankings(district_key: DistrictKey) -> Response:
             render_template("datafeeds/fms_district_list_get.html", **template_values)
         )
 
+    taskqueue.add(
+        url=url_for("math.district_rankings_calc", district_key=district_key),
+        method="GET",
+        target="py3-tasks-io",
+        queue_name="default",
+    )
     return make_response("")

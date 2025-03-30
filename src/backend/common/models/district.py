@@ -1,5 +1,5 @@
 import re
-from typing import List, Set
+from typing import Dict, List, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
@@ -7,7 +7,7 @@ from pyre_extensions import safe_cast
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.district_advancement import DistrictAdvancement
 from backend.common.models.district_ranking import DistrictRanking
-from backend.common.models.keys import DistrictAbbreviation, DistrictKey, Year
+from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
 
 
 ALL_KNOWN_DISTRICT_ABBREVIATIONS: Set[DistrictAbbreviation] = {
@@ -52,14 +52,18 @@ class District(CachedModel):
         DistrictAdvancement, ndb.JsonProperty()
     )
 
+    # other changes from FIRST to correct errors
+    adjustments: Dict[TeamKey, int] = ndb.JsonProperty()
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     _mutable_attrs: Set[str] = {
+        "adjustments",
+        "advancement",
         "display_name",
         "elasticsearch_name",
         "rankings",
-        "advancement",
     }
 
     def __init__(self, *args, **kw):

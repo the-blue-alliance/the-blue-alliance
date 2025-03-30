@@ -19,6 +19,7 @@
       <li><a href="#events" data-toggle="tab">Events</a></li>
       <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
       <li><a href="#advancement" data-toggle="tab">Advancement</a></li>
+      <li><a href="#adjustments" data-toggle="tab">HQ Adjustments</a></li>
     </ul>
   </div>
 </div>
@@ -69,6 +70,7 @@
                 <th>Team</th>
                 <th>Point Total</th>
                 <th>Rookie Bonus</th>
+                <th>Adjustments</th>
                 <th>Event Points</th>
             </tr>
             {% for rank in district.rankings or []%}
@@ -77,6 +79,7 @@
                     <td><a href="/admin/team/{{rank.team_key[3:]}}">{{rank.team_key}}</a></td>
                     <td>{{rank.point_total}}</td>
                     <td>{{rank.rookie_bonus}}</td>
+                    <td>{% if rank.adjustments %}{{rank.adjustments}}{% endif %}</td>
                     <td><pre>{% if rank.event_points %}{{rank.event_points|pprint_json}}{%endif%}</pre></td>
                 </tr>
             {% else %}
@@ -99,6 +102,20 @@
                 </tr>
             {% else %}
                 <tr><td>No advancement found</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="tab-pane" id="adjustments">
+        <table class="table table-stripled table-hover">
+            <tr>
+                <th>Team</th>
+                <th>Adjustment</th>
+            </tr>
+            {% for team_key, adjustment in (district.adjustments or {}).items() %}
+                <tr>
+                    <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
+                    <td>{{adjustment}}</td>
+                </tr>
             {% endfor %}
         </table>
     </div>
