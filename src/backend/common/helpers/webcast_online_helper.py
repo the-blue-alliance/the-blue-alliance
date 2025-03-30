@@ -153,7 +153,7 @@ class WebcastOnlineHelper:
     def _add_youtube_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
         api_key = GoogleApiSecret.secret_key()
         if api_key:
-            url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id={}&key={}".format(
+            url = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id={}&key={}".format(
                 webcast["channel"], api_key
             )
             try:
@@ -169,12 +169,18 @@ class WebcastOnlineHelper:
         if result.status_code == 200:
             response = json.loads(result.content)
             if response["items"]:
+                yt_item = response["items"][0]
                 webcast["status"] = (
                     WebcastStatus.ONLINE
-                    if response["items"][0]["snippet"]["liveBroadcastContent"] == "live"
+                    if yt_item["snippet"]["liveBroadcastContent"] == "live"
                     else WebcastStatus.OFFLINE
                 )
-                webcast["stream_title"] = response["items"][0]["snippet"]["title"]
+                webcast["stream_title"] = yt_item["snippet"]["title"]
+
+                if viewer_count := yt_item["liveStreamingDetails"].get(
+                    "concurrentViewers"
+                ):
+                    webcast["viewer_count"] = int(viewer_count)
             else:
                 webcast["status"] = WebcastStatus.OFFLINE
         else:
