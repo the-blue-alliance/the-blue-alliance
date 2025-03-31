@@ -13,6 +13,7 @@ from backend.tasks_io.datafeeds.parsers.ra.regional_advancement_parser import (
 class _DatafeedRegionalAdvancement(DatafeedBase[TReturn]):
 
     def __init__(self, year: Year) -> None:
+        super().__init__()
         if not SeasonHelper.is_valid_regional_pool_year(year):
             raise Exception(f"Invalid year for regional pool: {year}")
         self.year = year
