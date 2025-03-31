@@ -13,7 +13,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
-from backend.tasks_io.datafeeds.datafeed_nexus import DatafeedNexus
+from backend.tasks_io.datafeeds.datafeed_nexus import NexusPitLocations
 
 
 def create_event(official: bool) -> Event:
@@ -166,7 +166,7 @@ def test_fetch_missing_event(
     assert resp.status_code == 404
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
+@mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam(
     nexus_api_mock,
     tasks_client: Client,
@@ -187,7 +187,7 @@ def test_fetch_updates_eventteam(
     assert et.pit_location == pit_location
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
+@mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam_skip_missing(
     nexus_api_mock,
     tasks_client: Client,
@@ -207,7 +207,7 @@ def test_fetch_updates_eventteam_skip_missing(
     assert et.pit_location is None
 
 
-@mock.patch.object(DatafeedNexus, "get_event_team_pit_locations")
+@mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam_no_write_in_taskqueue(
     nexus_api_mock,
     tasks_client: Client,

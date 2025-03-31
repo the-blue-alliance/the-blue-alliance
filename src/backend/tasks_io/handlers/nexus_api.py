@@ -16,7 +16,10 @@ from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey, Year
 from backend.common.queries.event_query import EventListQuery
 from backend.common.queries.team_query import EventEventTeamsQuery
-from backend.tasks_io.datafeeds.datafeed_nexus import DatafeedNexus
+from backend.tasks_io.datafeeds.datafeed_nexus import (
+    NexusEventQueueStatus,
+    NexusPitLocations,
+)
 
 blueprint = Blueprint("nexus_api", __name__)
 
@@ -67,9 +70,8 @@ def event_pit_locations(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    nexus_df = DatafeedNexus()
     eventteams_future = EventEventTeamsQuery(event_key).fetch_async()
-    nexus_pit_locations_future = nexus_df.get_event_team_pit_locations(event_key)
+    nexus_pit_locations_future = NexusPitLocations(event_key).fetch_async()
 
     eventteams = eventteams_future.get_result()
     nexus_pit_locations = nexus_pit_locations_future.get_result()
@@ -123,9 +125,7 @@ def event_queue_status(event_key: EventKey) -> Response:
 
     event.prep_matches()
 
-    nexus_df = DatafeedNexus()
-    event_queue_status_future = nexus_df.get_event_queue_status(event)
-
+    event_queue_status_future = NexusEventQueueStatus(event).fetch_async()
     event_queue_status: Optional[EventQueueStatus] = (
         event_queue_status_future.get_result()
     )

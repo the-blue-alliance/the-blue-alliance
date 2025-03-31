@@ -12,7 +12,7 @@ from backend.common.sitevars.regional_advancement_api_secrets import (
     RegionalAdvancementApiSecret,
 )
 from backend.tasks_io.datafeeds.datafeed_regional_advancement import (
-    DatafeedRegionalAdvancement,
+    RegionalChampsAdvancement,
 )
 from backend.tasks_io.datafeeds.parsers.ra.regional_advancement_parser import (
     TParsedRegionalAdvancement,
@@ -26,7 +26,7 @@ def ra_api_secrets(ndb_stub) -> None:
     )
 
 
-@mock.patch.object(DatafeedRegionalAdvancement, "cmp_advancement")
+@mock.patch.object(RegionalChampsAdvancement, "fetch_async")
 def test_get_bad_season(
     ra_api_mock: mock.Mock,
     tasks_client: Client,
@@ -38,7 +38,7 @@ def test_get_bad_season(
 
 
 @freeze_time("2025-04-01")
-@mock.patch.object(DatafeedRegionalAdvancement, "cmp_advancement")
+@mock.patch.object(RegionalChampsAdvancement, "fetch_async")
 def test_get_current_season(
     ra_api_mock: mock.Mock,
     tasks_client: Client,
@@ -66,7 +66,7 @@ def test_get_current_season(
         assert r.status_code == 200
 
 
-@mock.patch.object(DatafeedRegionalAdvancement, "cmp_advancement")
+@mock.patch.object(RegionalChampsAdvancement, "fetch_async")
 def test_get_explicit_season(
     ra_api_mock: mock.Mock,
     tasks_client: Client,
@@ -94,7 +94,7 @@ def test_get_explicit_season(
         assert r.status_code == 200
 
 
-@mock.patch.object(DatafeedRegionalAdvancement, "cmp_advancement")
+@mock.patch.object(RegionalChampsAdvancement, "fetch_async")
 def test_get_explicit_season_doest_write_out_in_taskqueue(
     ra_api_mock: mock.Mock,
     tasks_client: Client,

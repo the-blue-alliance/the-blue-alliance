@@ -12,7 +12,7 @@ from backend.common.manipulators.regional_champs_pool_manipulator import (
 from backend.common.models.keys import Year
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.tasks_io.datafeeds.datafeed_regional_advancement import (
-    DatafeedRegionalAdvancement,
+    RegionalChampsAdvancement,
 )
 
 blueprint = Blueprint("ra_api", __name__)
@@ -27,8 +27,7 @@ def get_regional_advancement(year: Optional[Year]) -> Response:
     if not SeasonHelper.is_valid_regional_pool_year(year):
         abort(400)
 
-    df = DatafeedRegionalAdvancement(year)
-    ra_future = df.cmp_advancement()
+    ra_future = RegionalChampsAdvancement(year).fetch_async()
     pool_future = RegionalChampsPool.get_or_insert_async(
         RegionalChampsPool.render_key_name(year)
     )
