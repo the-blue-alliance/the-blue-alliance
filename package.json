@@ -20,7 +20,7 @@
     "react-bootstrap": "^2.10.7",
     "react-bootstrap-typeahead": "^6.3.4",
     "react-countup": "^6.5.3",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.1.0",
     "react-event-listener": "^0.6.6",
     "react-file-input": "^0.2.5",
     "react-ga": "^3.3.1",
