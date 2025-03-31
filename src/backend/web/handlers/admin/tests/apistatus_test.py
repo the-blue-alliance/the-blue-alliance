@@ -49,6 +49,7 @@ def test_get_apistatus_non_default(
             },
             "current_season": 2020,
             "max_season": 2020,
+            "max_team_page": 1,
         }
     )
     TrustedApiConfig.put(

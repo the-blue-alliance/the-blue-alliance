@@ -27,6 +27,7 @@ def test_enqueue_current(
             "android": None,
             "ios": None,
             "web": None,
+            "max_team_page": 0
         }
     )
     resp = tasks_client.get("/backend-tasks/enqueue/event_list/current")
@@ -52,6 +53,7 @@ def test_enqueue_current_no_output_in_taskqueue(
             "android": None,
             "ios": None,
             "web": None,
+            "max_team_page": 0,
         }
     )
     resp = tasks_client.get(

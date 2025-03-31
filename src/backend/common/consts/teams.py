@@ -1,0 +1,1 @@
+TEAM_PAGE_SIZE = 500
