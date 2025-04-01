@@ -60,6 +60,8 @@ class EventShortNameHelper:
                 "".join(item[0].upper() for item in event_name.split()),
                 division_name,
             )
+            # Remove "presented by"
+            short_name = short_name.split("presented by")[0].strip()
             return short_name
 
         all_district_codes = cls._get_all_district_codes()
