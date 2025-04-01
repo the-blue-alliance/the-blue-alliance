@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.14
+ * 3.9.15
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -967,7 +967,8 @@ export type Media = {
     | 'grabcad'
     | 'instagram-image'
     | 'external-link'
-    | 'avatar';
+    | 'avatar'
+    | 'onshape';
   /** The key used to identify this media on the media site. */
   foreign_key: string;
   /** If required, a JSON dict of additional media information. */
