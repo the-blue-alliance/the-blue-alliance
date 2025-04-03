@@ -295,9 +295,9 @@ class FirebasePusher:
 
     @classmethod
     @typed_toplevel
-    def _update_live_events_helper(cls) -> Generator[Any, Any, Dict[EventKey, Dict]]:
+    def _update_live_events_helper(cls) -> Generator[Any, Any, Dict[EventKey, Event]]:
         week_events = EventHelper.week_events()
-        events_by_key: Dict[EventKey, Dict] = {}
+        events_by_key: Dict[EventKey, Event] = {}
         live_events: List[Event] = []
         webcast_status_futures: List[TypedFuture[None]] = []
         for event in week_events:

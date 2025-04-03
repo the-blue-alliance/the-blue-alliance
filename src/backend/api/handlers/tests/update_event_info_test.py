@@ -96,7 +96,7 @@ def test_update_event_info(
         "first_event_code": "abc123",
         "playoff_type": int(PlayoffType.ROUND_ROBIN_6_TEAM),
         "webcasts": [
-            {"url": "https://youtu.be/abc123"},
+            {"url": "https://youtu.be/abc12312312"},
             {"type": "youtube", "channel": "cde456", "date": "2024-01-03"},
         ],
         "remap_teams": {
@@ -126,7 +126,7 @@ def test_update_event_info(
 
     webcast = webcasts[0]
     assert webcast["type"] == "youtube"
-    assert webcast["channel"] == "abc123"
+    assert webcast["channel"] == "abc12312312"
     assert "date" not in webcast
 
     webcast = webcasts[1]

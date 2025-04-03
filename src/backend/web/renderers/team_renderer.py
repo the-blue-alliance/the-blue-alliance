@@ -22,6 +22,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
+from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.queries import (
@@ -69,6 +70,12 @@ class TeamRenderer:
         eventteams_future = event_query.TeamYearEventTeamsQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
+        if SeasonHelper.is_valid_regional_pool_year(year):
+            regional_champs_pool_future = RegionalChampsPool.get_by_id_async(
+                RegionalChampsPool.render_key_name(year)
+            )
+        else:
+            regional_champs_pool_future = None
 
         hof_awards = hof_award_future.get_result()
         hof_video = hof_video_future.get_result()
@@ -98,6 +105,7 @@ class TeamRenderer:
         if not events_sorted:
             return None, False
 
+        has_valid_district = False
         district_name = None
         district_abbrev = None
         team_district_points = None
@@ -106,6 +114,7 @@ class TeamRenderer:
         for district in team_districts:
             # Do not show District Points information for 2021 pages
             if district and district.year == year and district.year != 2021:
+                has_valid_district = True
                 district_abbrev = district.abbreviation
                 district_name = district.display_name
                 if district.rankings:
@@ -119,6 +128,23 @@ class TeamRenderer:
                         None,
                     )
                 break
+
+        team_regional_champs_pool_points = None
+        if (
+            not has_valid_district
+            and regional_champs_pool_future
+            and (regional_champs_pool := regional_champs_pool_future.get_result())
+            and (regional_rankings := regional_champs_pool.rankings)
+        ):
+            team_regional_champs_pool_points = next(
+                iter(
+                    filter(
+                        lambda r: r["team_key"] == team.key_name,
+                        regional_rankings,
+                    )
+                ),
+                None,
+            )
 
         event_teams = eventteams_future.get_result()
         participation = []
@@ -190,6 +216,18 @@ class TeamRenderer:
                     None,
                 )
 
+            regional_champs_points = None
+            if team_regional_champs_pool_points:
+                regional_champs_points = next(
+                    iter(
+                        filter(
+                            lambda e: e["event_key"] == event.key_name,
+                            team_regional_champs_pool_points["event_points"],
+                        )
+                    ),
+                    None,
+                )
+
             alliance, alliance_pick, alliance_size = (
                 AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
             )
@@ -236,6 +274,7 @@ class TeamRenderer:
                     "awards": event_awards,
                     "playlist": playlist,
                     "district_points": district_points,
+                    "regional_champs_points": regional_champs_points,
                     "nexus_pit_location": (
                         eventteam.pit_location["location"]
                         if eventteam and eventteam.pit_location
@@ -343,6 +382,7 @@ class TeamRenderer:
             "max_year": SeasonHelper.get_max_year(),
             "hof": hall_of_fame,
             "team_district_points": team_district_points,
+            "team_regional_champs_pool_points": team_regional_champs_pool_points,
             "has_any_pit_location": any(
                 comp["event"].official
                 and (comp["event"].now or comp["event"].future)

@@ -21,7 +21,7 @@ from backend.common.models.event_queue_status import (
     NexusMatchTiming,
 )
 from backend.common.models.match import Match
-from backend.tasks_io.datafeeds.datafeed_nexus import DatafeedNexus
+from backend.tasks_io.datafeeds.datafeed_nexus import NexusEventQueueStatus
 
 
 def create_event(official: bool) -> Event:
@@ -114,7 +114,7 @@ def test_fetch_missing_event(
 
 
 @mock.patch.object(FirebasePusher, "update_match_queue_status")
-@mock.patch.object(DatafeedNexus, "get_event_queue_status")
+@mock.patch.object(NexusEventQueueStatus, "fetch_async")
 def test_fetch_updates_downstream(
     nexus_mock: mock.Mock,
     firebase_mock: mock.Mock,
@@ -158,7 +158,7 @@ def test_fetch_updates_downstream(
 
 
 @mock.patch.object(FirebasePusher, "update_match_queue_status")
-@mock.patch.object(DatafeedNexus, "get_event_queue_status")
+@mock.patch.object(NexusEventQueueStatus, "fetch_async")
 def test_fetch_no_write_in_taskqueue(
     nexus_mock: mock.Mock,
     firebase_mock: mock.Mock,

@@ -18,6 +18,8 @@
 
   <a href="/tasks/math/do/regional_champs_pool_rankings_calc/{{selected_year}}"
         class="btn btn-warning"><span class="glyphicon glyphicon-tasks"></span> Calculate Rankings</a>
+  <a href="/tasks/get/regional_advancement/{{selected_year}}"
+        class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Fetch Advancement</a>
 </div>
 
 <hr/>
@@ -31,6 +33,7 @@
         <ul class="nav nav-tabs nav-justified">
         <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
         <li><a href="#advancement" data-toggle="tab">Advancement</a></li>
+        <li><a href="#adjustments" data-toggle="tab">HQ Adjustments</a></li>
         </ul>
     </div>
     </div>
@@ -44,6 +47,7 @@
                     <th>Team</th>
                     <th>Point Total</th>
                     <th>Rookie Bonus</th>
+                    <th>Adjustments</th>
                     <th>Event Points</th>
                 </tr>
                 {% for rank in pool_model.rankings or []%}
@@ -52,6 +56,7 @@
                         <td><a href="/admin/team/{{rank.team_key[3:]}}">{{rank.team_key}}</a></td>
                         <td>{{rank.point_total}}</td>
                         <td>{{rank.rookie_bonus}}</td>
+                        <td>{{rank.adjustments}}</td>
                         <td><pre>{{rank.event_points}}</pre></td>
                     </tr>
                 {% else %}
@@ -64,16 +69,38 @@
                 <tr>
                     <th>Team</th>
                     <th>Qualified for CMP</th>
+                    <th>CMP Status</th>
                     <th>Qualifying Event</th>
+                    <th>Qualifying Award</th>
+                    <th>Qualifying Pool Week</th>
                 </tr>
                 {% for team_key, advancement in (pool_model.advancement or {}).items() %}
                     <tr>
                         <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
                         <td>{% if advancement.cmp %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
-                        <td>{% if advancement.cmp_event %}<a href="/admin/event/{{advancement.cmp_event}}">{{advancement.cmp_event}}</a>{% else %}--{% endif %}</td>
+                        <td>
+                            {% if advancement.cmp_status %}{{advancement.cmp_status}}
+                            {% else %}--{%endif%}</td>
+                        <td>{% if advancement.qualifying_event %}{{advancement.qualifying_event}}{%else%}--{%endif%}</td>
+                        <td>{% if advancement.qualifying_award_name %}{{advancement.qualifying_award_name}}{%else%}--{%endif%}</td>
+                        <td>{% if advancement.qualifying_pool_week%}{{advancement.qualifying_pool_week}}{%else%}--{%endif%}</td>
                     </tr>
                 {% else %}
                     <tr><td>No advancement found</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="tab-pane" id="adjustments">
+            <table class="table table-stripled table-hover">
+                <tr>
+                    <th>Team</th>
+                    <th>Adjustment</th>
+                </tr>
+                {% for team_key, adjustment in (pool_model.adjustments or {}).items() %}
+                    <tr>
+                        <td><a href="/admin/team/{{team_key}}">{{team_key}}</a></td>
+                        <td>{{adjustment}}</td>
+                    </tr>
                 {% endfor %}
             </table>
         </div>

@@ -57,6 +57,9 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_2025_MOST_CORAL_SCORED = 36
     TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK = 37
     TYPED_NOTABLES_DCMP_WINNER = 38
+    TYPED_NOTABLES_CMP_FINALS_APPEARANCES = 39
+    TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS = 40
+    TYPED_LEADERBOARD_MOST_WFFAS = 41
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -103,6 +106,9 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_2025_MOST_CORAL_SCORED: "typed_leaderboard_2025_most_coral_scored",
         TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK: "typed_leaderboard_longest_einstein_streak",
         TYPED_NOTABLES_DCMP_WINNER: "notables_dcmp_winner",
+        TYPED_NOTABLES_CMP_FINALS_APPEARANCES: "notables_cmp_finals_appearances",
+        TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS: "typed_leaderboard_most_non_champs_impact_wins",
+        TYPED_LEADERBOARD_MOST_WFFAS: "typed_leaderboard_most_wffas",
     }
 
     TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
@@ -117,6 +123,8 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT: "team",
         TYPED_LEADERBOARD_2025_MOST_CORAL_SCORED: "match",
         TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK: "team",
+        TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS: "team",
+        TYPED_LEADERBOARD_MOST_WFFAS: "team",
     }
 
     NOTABLE_INSIGHTS = {
@@ -125,6 +133,7 @@ class Insight(CachedModel):
         TYPED_NOTABLES_WORLD_CHAMPIONS,
         TYPED_NOTABLES_HALL_OF_FAME,
         TYPED_NOTABLES_DCMP_WINNER,
+        TYPED_NOTABLES_CMP_FINALS_APPEARANCES,
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting

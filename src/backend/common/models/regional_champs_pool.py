@@ -1,10 +1,10 @@
-from typing import List, Optional, Set
+from typing import Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
 
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.cached_model import CachedModel
-from backend.common.models.keys import RegionalChampsPoolKey, Year
+from backend.common.models.keys import RegionalChampsPoolKey, TeamKey, Year
 from backend.common.models.regional_pool_advancement import RegionalPoolAdvancement
 from backend.common.models.regional_pool_ranking import RegionalPoolRanking
 
@@ -25,9 +25,13 @@ class RegionalChampsPool(CachedModel):
     # Dict of team key -> advancement data
     advancement: RegionalPoolAdvancement = ndb.JsonProperty()
 
+    # other changes from FIRST to correct errors
+    adjustments: Dict[TeamKey, int] = ndb.JsonProperty()
+
     _mutable_attrs: Set[str] = {
-        "rankings",
+        "adjustments",
         "advancement",
+        "rankings",
     }
 
     def __init__(self, *args, **kw) -> None:

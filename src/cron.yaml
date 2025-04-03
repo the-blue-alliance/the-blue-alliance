@@ -29,6 +29,14 @@ cron:
   url: /tasks/enqueue/fmsapi_awards/now
   schedule: every 1 hours
 
+- description: FIRST award scraping for current events on their last day
+  url: /tasks/enqueue/fmsapi_awards/last_day_only
+  schedule: every 5 minutes
+
+- description: Regional Championship Advancement fetch for current season
+  url: /tasks/get/regional_advancement/
+  schedule: every day 03:00
+
 - description: Nexus pit locations for current events
   url: /tasks/enqueue/nexus_pit_locations/now
   schedule: every 1 hours

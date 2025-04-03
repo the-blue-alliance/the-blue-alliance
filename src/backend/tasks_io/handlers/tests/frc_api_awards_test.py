@@ -17,14 +17,18 @@ from backend.common.models.team import Team
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
-def create_event(official: bool, remap_teams: Optional[Dict[str, str]] = None) -> Event:
+def create_event(
+    official: bool,
+    end_date: Optional[datetime.datetime] = None,
+    remap_teams: Optional[Dict[str, str]] = None,
+) -> Event:
     e = Event(
         id="2019casj",
         year=2019,
         event_short="casj",
-        start_date=datetime.datetime(2019, 4, 1),
-        end_date=datetime.datetime(2019, 4, 3),
         event_type_enum=EventType.REGIONAL,
+        start_date=datetime.datetime(2019, 4, 1),
+        end_date=end_date or datetime.datetime(2019, 4, 3),
         official=official,
         remap_teams=remap_teams,
     )
@@ -75,6 +79,50 @@ def test_enqueue_current_official_only(
     resp = tasks_client.get("/tasks/enqueue/fmsapi_awards/now")
     assert resp.status_code == 200
     assert resp.data != ""
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert len(tasks) == 0
+
+
+@freeze_time("2019-04-01")
+def test_enqueue_last_day_only(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    create_event(official=True, end_date=datetime.datetime(2019, 4, 1))
+    resp = tasks_client.get("/tasks/enqueue/fmsapi_awards/last_day_only")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert len(tasks) == 1
+
+    expected_keys = ["2019casj"]
+    assert [f"/tasks/get/fmsapi_awards/{k}" for k in expected_keys] == [
+        t.url for t in tasks
+    ]
+
+
+@freeze_time("2019-04-01")
+def test_enqueue_last_day_only_false(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    create_event(official=True, end_date=datetime.datetime(2019, 4, 3))
+    resp = tasks_client.get("/tasks/enqueue/fmsapi_awards/last_day_only")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert len(tasks) == 0
+
+
+@freeze_time("2019-04-01")
+def test_enqueue_last_day_only_skips_unofficial(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    create_event(official=False, end_date=datetime.datetime(2019, 4, 1))
+    resp = tasks_client.get("/tasks/enqueue/fmsapi_awards/last_day_only")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
     assert len(tasks) == 0

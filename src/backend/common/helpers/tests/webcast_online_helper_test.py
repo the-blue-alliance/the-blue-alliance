@@ -74,9 +74,12 @@ class MockTwitchApi:
 
 
 class MockYoutubeApi:
-    def __init__(self, online=True, status="live", fail=False, throw=False) -> None:
+    def __init__(
+        self, online=True, status="live", viewers=None, fail=False, throw=False
+    ) -> None:
         self.online = online
         self.status = status
+        self.viewers = viewers
         self.fail = fail
         self.throw = throw
 
@@ -85,6 +88,13 @@ class MockYoutubeApi:
             raise Exception
         response.StatusCode = 200 if not self.fail else 500
         if self.online:
+            live_details = {
+                "actualStartTime": "2025-03-29T14:33:11Z",
+                "actualEndTime": "2025-03-29T22:04:00Z",
+                "scheduledStartTime": "2025-03-29T14:30:00Z",
+            }
+            if self.status == "live":
+                live_details["concurrentViewers"] = f"{self.viewers}"
             response.Content = json.dumps(
                 {
                     "items": [
@@ -92,7 +102,8 @@ class MockYoutubeApi:
                             "snippet": {
                                 "liveBroadcastContent": self.status,
                                 "title": "A Stream",
-                            }
+                            },
+                            "liveStreamingDetails": live_details,
                         }
                     ]
                 }
@@ -328,7 +339,7 @@ def test_add_online_status_youtube(
         urlmatchers=[
             (
                 lambda url: urlparse(url).netloc == "www.googleapis.com",
-                MockYoutubeApi(),
+                MockYoutubeApi(viewers=100),
             ),
         ]
     )
@@ -340,7 +351,7 @@ def test_add_online_status_youtube(
 
     assert webcast["status"] == WebcastStatus.ONLINE
     assert webcast["stream_title"] == "A Stream"
-    assert webcast["viewer_count"] is None
+    assert webcast["viewer_count"] == 100
 
 
 def test_add_online_status_youtube_stream_upcoming(

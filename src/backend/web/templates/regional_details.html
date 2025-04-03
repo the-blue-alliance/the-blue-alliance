@@ -6,6 +6,41 @@
 
 {% block events_active %}active{% endblock %}
 
+{% block inline_javascript %}
+<script>
+  function filterTeams() {
+    var teamFilter = $("#team-filter").val().toLowerCase();
+    var notQualifiedOnly = $("#filter-not-qualified").hasClass("active");
+    $("#advancement-table tr").filter(function() {
+      var isHeader = $(this).attr('id') == 'advancement-header';
+      var matchesFilter = $(this).attr('id').indexOf(teamFilter) > -1;
+      var shouldShow = (isHeader || matchesFilter);
+
+      var isQualified = $(this).attr('data-qualified')
+      if (notQualifiedOnly) {
+        shouldShow = (isHeader || (matchesFilter && isQualified == "False"));
+      }
+
+      $(this).toggle(shouldShow);
+    });
+  }
+
+  $('.btn-toggle').click(function() {
+    $(this).find('.btn').toggleClass('active');
+
+    if ($(this).find('.btn-primary').size() > 0) {
+      $(this).find('.btn').toggleClass('btn-primary');
+    }
+
+    $(this).find('.btn').toggleClass('btn-default');
+    filterTeams();
+  });
+  $("#team-filter").on("keyup", function() {
+    filterTeams();
+  });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container">
   <div class="row">
@@ -74,21 +109,42 @@
 
       {% if year >= 2025 and rankings %}
         <div class="tab-pane" id="rankings">
-          <table class="table table-striped table-condensed table-center">
+          {% if rankings %}
+              <div class="row" style="padding-top: 5px">
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <input class="form-control" id="team-filter" placeholder="Filter By Team Number"/>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div name="qualified-toggle" class="btn-group btn-toggle">
+                    <button class="btn btn-sm btn-primary active" id="filter-all-teams">All Teams</button>
+                    <button class="btn btn-sm btn-default" id="filter-not-qualified">Not Qualified</button>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <span><i>Details on <a href="https://frc-events.firstinspires.org/ra/" target="_blank" rel="noopener noreferrer">firstinspires.org</a></i></span>
+                </div>
+              </div>
+          {% endif %}
+          <table class="table table-striped table-condensed table-center" id="advancement-table">
             <thead>
-              <tr>
+              <tr id="advancement-header">
                 <th>Rank</th>
                 <th>Team</th>
                 <th>Event 1</th>
                 <th>Event 2</th>
                 <th>Rookie Bonus</th>
+                {% if has_adjustments %}
+                  <th>Adjustments</th>
+                {% endif %}
                 <th>Total Points</th>
                 <th>Qualified for CMP</th>
               </tr>
             </thead>
             <tbody>
               {% for item in rankings %}
-              <tr>
+              <tr id="advancement-{{item.team_key}}" data-qualified="{{item.team_key in advancement and advancement[item.team_key].cmp}}">
                 <td>{{loop.index}}</td>
                 <td><a href="/team/{{item.team_key|digits}}/{{year}}">{{item.team_key|digits}}</a></td>
                 <td>
@@ -114,8 +170,26 @@
                   --
                   {% endif %}
                 </td>
+                {% if has_adjustments %}
+                  <td>
+                    {% if item.adjustments %}
+                      {{ item.adjustments }}
+                    {% else %}
+                      --
+                    {% endif %}
+                  </td>
+                {% endif %}
                 <td><strong>{{item.point_total}}</strong></td>
-                <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].cmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
+                <td>
+                  {% if advancement and item.team_key in advancement %}
+                    {% with team_advancement = advancement[item.team_key] %}
+                      {% if team_advancement.cmp_status == "PreQualified" %}<span class="label label-info">Pre-Qualified</span>{% endif %}
+                      {% if team_advancement.cmp_status == "EventQualified" %}<a href="/event/{{team_advancement.qualifying_event}}"><span class="label label-warning">{{team_advancement.qualifying_award_name}} at {{events_by_key[team_advancement.qualifying_event].short_name}}</span></a>{% endif %}
+                      {% if team_advancement.cmp_status == "PoolQualified" %}<span class="label label-success">Regional Pool Week {{team_advancement.qualifying_pool_week}}</span>{% endif %}
+                      {% if team_advancement.cmp_status == "Declined" %}<span class="label label-default">Declined</span>{% endif %}
+                    {% endwith %}
+                  {%endif%}
+                </td>
               </tr>
               {% endfor %}
             </tbody>

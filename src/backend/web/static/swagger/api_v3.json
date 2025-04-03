@@ -4509,6 +4509,132 @@
         ]
       }
     },
+    "/district/{district_key}/advancement": {
+      "get": {
+        "tags": [
+          "district",
+          "team",
+          "list"
+        ],
+        "description": "Gets a list of advancement information per team in a district.",
+        "operationId": "getDistrictAdvancement",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/district_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "type": "object",
+                  "description": "A mapping of team key to District_Advancement",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/District_Advancement"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/regional_advancement/{year}": {
+      "get": {
+        "tags": [
+          "regional_advancement",
+          "list"
+        ],
+        "description": "Gets information about per-team advancement to the FIRST Championship.",
+        "operationId": "getRegionalAdvancement",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "nullable": "true",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/Regional_Advancement"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/regional_advancement/{year}/rankings": {
       "get": {
         "tags": [
@@ -9087,6 +9213,54 @@
           }
         },
         "description": "Rank of a team in a district."
+      },
+      "District_Advancement": {
+        "required": [
+          "cmp",
+          "dcmp"
+        ],
+        "type": "object",
+        "properties": {
+          "dcmp": {
+            "type": "boolean",
+            "description": "Whether or not the team qualified for their District Championship"
+          },
+          "cmp": {
+            "type": "boolean",
+            "description": "Whether or not the team qualified for the FIRST Championship"
+          }
+        },
+        "description": "Advancement status of a team in a district."
+      },
+      "Regional_Advancement": {
+        "required": [
+          "cmp",
+          "cmp_status"
+        ],
+        "type": "object",
+        "properties": {
+          "cmp": {
+            "type": "boolean",
+            "description": "Whether or not the team qualified for Championship."
+          },
+          "cmp_status": {
+            "type": "string",
+            "enum": ["NotInvited", "PreQualified", "EventQualified", "PoolQualified", "Declined"]
+          },
+          "qualifying_event": {
+            "type": "string",
+            "description": "The event key at which the team qualified"
+          },
+          "qualifying_award_name": {
+            "type": "string",
+            "description": "The name of the award which qualified the team"
+          },
+          "qualifying_pool_week": {
+            "type": "integer",
+            "description": "Which week number's regional pool invitation the team got"
+          }
+        },
+        "description": "Information about how a regional team qualified for FIRST Championship."
       },
       "Regional_Ranking": {
         "required": [

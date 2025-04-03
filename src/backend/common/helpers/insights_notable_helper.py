@@ -27,6 +27,7 @@ class InsightsNotableHelper:
                 InsightsNotableHelper._calculate_notables_division_winners,
                 InsightsNotableHelper._calculate_notables_division_finals_appearances,
                 InsightsNotableHelper._calculate_notables_dcmp_winner,
+                InsightsNotableHelper._calculate_notables_cmp_finals_appearances,
             ],
         )
 
@@ -128,6 +129,30 @@ class InsightsNotableHelper:
         return InsightsNotableHelper._create_notable_insight(
             team_context_map,
             Insight.TYPED_NOTABLES_DIVISION_FINALS_APPEARANCES,
+            arguments.year,
+        )
+
+    @staticmethod
+    def _calculate_notables_cmp_finals_appearances(
+        arguments: LeaderboardInsightArguments,
+    ) -> Insight:
+        team_context_map: Dict[TeamKey, List[EventKey]] = {}
+        for award in arguments.awards():
+            if (
+                award.event_type_enum == EventType.CMP_FINALS
+                and award.award_type_enum in [AwardType.WINNER, AwardType.FINALIST]
+            ):
+                for tk in award.team_list:
+                    if str(tk.string_id()) not in team_context_map:
+                        team_context_map[str(tk.string_id())] = []
+
+                    team_context_map[str(tk.string_id())].append(
+                        str(award.event.string_id())
+                    )
+
+        return InsightsNotableHelper._create_notable_insight(
+            team_context_map,
+            Insight.TYPED_NOTABLES_CMP_FINALS_APPEARANCES,
             arguments.year,
         )
 

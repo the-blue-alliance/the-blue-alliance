@@ -9,6 +9,7 @@ from typing import (
     Dict,
     List,
     NamedTuple,
+    Optional,
     Sequence,
     Set,
     Tuple,
@@ -56,6 +57,7 @@ class DistrictRankingTeamTotal(TypedDict):
     rookie_bonus: int
     single_event_bonus: int
     other_bonus: int
+    adjustments: int
 
 
 class DistrictRankingTiebreakers(NamedTuple):
@@ -214,6 +216,7 @@ class DistrictHelper:
         events: List[Event],
         teams: Union[List[Team], TypedFuture[List[Team]]],
         year: Year,
+        adjustments: Optional[Dict[TeamKey, int]],
     ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two events and district championship
         events_by_key: Dict[EventKey, Event] = {}
@@ -232,6 +235,7 @@ class DistrictHelper:
                 ),
                 qual_scores=[],
                 other_bonus=0,
+                adjustments=0,
                 single_event_bonus=0,
             )
         )
@@ -314,6 +318,11 @@ class DistrictHelper:
 
             team_totals[team.key_name]["rookie_bonus"] = bonus
             team_totals[team.key_name]["point_total"] += bonus
+
+            # For other adjustments made by HQ
+            if adjustments and (team_adjustment := adjustments.get(team.key_name)):
+                team_totals[team.key_name]["adjustments"] = team_adjustment
+                team_totals[team.key_name]["point_total"] += team_adjustment
 
             valid_team_keys.add(team.key_name)
 

@@ -75,8 +75,11 @@
               in {{year}}.</p>
             {% endif %}
           {% endif %}
-          {% if team_district_points and district_name %}
-            <p>As a member of the {{district_name}} district, Team {{team.team_number}} ranked <b>{{team_district_points.rank}}</b> having earned <b>{{team_district_points.point_total}}</b> points.</p>
+          {% if team_district_points and district_name and district_abbrev %}
+            <p>As a member of the <a href="/events/{{district_abbrev}}/{{year}}#rankings">{{district_name}} district</a>, Team {{team.team_number}} ranked <b>#{{team_district_points.rank}}</b> having earned <b>{{team_district_points.point_total}}</b> points.</p>
+          {% endif %}
+          {% if team_regional_champs_pool_points %}
+            <p>In the <a href="/events/regional/{{year}}#rankings">Regional Championship Pool</a>, Team {{team.team_number}} ranked <b>#{{team_regional_champs_pool_points.rank}}</b> having earned <b>{{team_regional_champs_pool_points.point_total}}</b> points.</p>
           {% endif %}
 
           <div class="text-center">
@@ -222,6 +225,39 @@
                       <tr>
                         <th>Total Points</th>
                         <th>{{comp.district_points.total}}</th>
+                      </tr>
+                    </tbody>
+                  </table>
+                {% endif %}
+                {% if comp.regional_champs_points %}
+                  <h4>Regional Pool Points Earned</h4>
+                  <table class="table table-condensed table-striped">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Qual Points</td>
+                        <td>{{comp.regional_champs_points.qual_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Alliance Points</td>
+                        <td>{{comp.regional_champs_points.alliance_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Playoff Points</td>
+                        <td>{{comp.regional_champs_points.elim_points}}</td>
+                      </tr>
+                      <tr>
+                        <td>Award Points</td>
+                        <td>{{comp.regional_champs_points.award_points}}</td>
+                      </tr>
+                      <tr>
+                        <th>Total Points</th>
+                        <th>{{comp.regional_champs_points.total}}</th>
                       </tr>
                     </tbody>
                   </table>

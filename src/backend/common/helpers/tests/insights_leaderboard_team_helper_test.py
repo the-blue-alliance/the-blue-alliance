@@ -199,10 +199,10 @@ def test_only_overall_and_year_are_computed(ndb_stub, test_data_importer):
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
     insights = InsightsLeaderboardTeamHelper.make_insights(2025)
-    assert len(insights) == 6
+    assert len(insights) == 8
 
     insights_2025 = [i for i in insights if i.year == 2025]
-    assert len(insights_2025) == 6
+    assert len(insights_2025) == 8
 
 
 def test_only_official_events_are_included(ndb_stub, test_data_importer):
@@ -298,4 +298,42 @@ def test_longest_einstein_streak_across_covid(ndb_stub):
     assert insight.data["rankings"][:3] == [
         {"keys": ["frc254"], "value": 3},
     ]
+    assert insight.data["key_type"] == "team"
+
+
+def test_most_non_champs_impact_wins(ndb_stub, test_data_importer):
+    test_data_importer.import_event(__file__, "data/2019nyny.json")
+    test_data_importer.import_award_list(__file__, "data/2019nyny_awards.json")
+
+    test_data_importer.import_event(__file__, "data/2024nytr.json")
+    test_data_importer.import_award_list(__file__, "data/2024nytr_awards.json")
+
+    insight = InsightsLeaderboardTeamHelper._most_non_champs_impact_wins(
+        LeaderboardInsightArguments(
+            events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
+            year=0,
+        )
+    )
+
+    assert insight is not None
+    assert insight.data["rankings"] == [{"keys": ["frc1660", "frc5993"], "value": 1}]
+    assert insight.data["key_type"] == "team"
+
+
+def test_most_wffas(ndb_stub, test_data_importer):
+    test_data_importer.import_event(__file__, "data/2019nyny.json")
+    test_data_importer.import_award_list(__file__, "data/2019nyny_awards.json")
+
+    test_data_importer.import_event(__file__, "data/2024nytr.json")
+    test_data_importer.import_award_list(__file__, "data/2024nytr_awards.json")
+
+    insight = InsightsLeaderboardTeamHelper._most_wffas(
+        LeaderboardInsightArguments(
+            events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
+            year=0,
+        )
+    )
+
+    assert insight is not None
+    assert insight.data["rankings"] == [{"keys": ["frc250", "frc395"], "value": 1}]
     assert insight.data["key_type"] == "team"
