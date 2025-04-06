@@ -1170,6 +1170,26 @@ export const zAward = z.object({
   year: z.number().int(),
 });
 
+export const zDistrictInsight = z.object({
+  district_data: z.object({
+    yearly_active_team_count: z.object({}),
+    yearly_event_count: z.object({}),
+    yearly_gained_teams: z.object({}),
+    yearly_lost_teams: z.object({}),
+  }),
+  team_data: z.object({
+    district_seasons: z.number().int(),
+    total_district_points: z.number().int(),
+    total_pre_dcmp_district_points: z.number().int(),
+    district_event_wins: z.number().int(),
+    dcmp_wins: z.number().int(),
+    team_awards: z.number().int(),
+    individual_awards: z.number().int(),
+    quals_record: zWltRecord,
+    elims_record: zWltRecord,
+  }),
+});
+
 /**
  * Rank of a team in a district.
  */
@@ -2405,6 +2425,21 @@ export const zGetDistrictHistoryParameterDistrictAbbreviation = z.string();
  * Successful response
  */
 export const zGetDistrictHistoryResponse = z.array(zDistrict);
+
+/**
+ * Value of the `ETag` header in the most recently cached response by the client.
+ */
+export const zGetDistrictInsightsParameterIfNoneMatch = z.string();
+
+/**
+ * District abbreviation, eg `ne` or `fim`
+ */
+export const zGetDistrictInsightsParameterDistrictAbbreviation = z.string();
+
+/**
+ * Successful response
+ */
+export const zGetDistrictInsightsResponse = zDistrictInsight;
 
 /**
  * Value of the `ETag` header in the most recently cached response by the client.

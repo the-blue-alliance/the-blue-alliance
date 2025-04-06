@@ -15,6 +15,7 @@ from backend.common.consts.event_type import (
     EventType,
     SEASON_EVENT_TYPES,
 )
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_helper import (
     EventHelper,
@@ -22,6 +23,7 @@ from backend.common.helpers.event_helper import (
     PRESEASON_EVENTS_LABEL,
 )
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
+from backend.common.helpers.insights_districts_helper import InsightsDistrictsHelper
 from backend.common.helpers.insights_helper_utils import (
     create_insight,
     sort_counter_dict,
@@ -196,6 +198,30 @@ class InsightsHelper(object):
 
         return [
             create_insight(data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year)
+        ]
+
+    @classmethod
+    def doDistrictInsights(cls) -> List[Insight]:
+        """
+        Calculate district insights for a given year. Returns a list of Insights.
+        """
+
+        return [
+            create_insight(
+                data=InsightsDistrictsHelper.make_insight_team_data(abbr),
+                name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+                year=0,
+                district_abbreviation=abbr,
+            )
+            for abbr in RenamedDistricts.get_latest_codes()
+        ] + [
+            create_insight(
+                data=InsightsDistrictsHelper.make_insight_district_data(abbr),
+                name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+                year=0,
+                district_abbreviation=abbr,
+            )
+            for abbr in RenamedDistricts.get_latest_codes()
         ]
 
     @classmethod

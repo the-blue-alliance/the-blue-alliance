@@ -10,6 +10,7 @@ import {
   getDistrictEventsKeys,
   getDistrictEventsSimple,
   getDistrictHistory,
+  getDistrictInsights,
   getDistrictRankings,
   getDistrictTeams,
   getDistrictTeamsKeys,
@@ -91,6 +92,7 @@ import type {
   GetDistrictEventsKeysData,
   GetDistrictEventsSimpleData,
   GetDistrictHistoryData,
+  GetDistrictInsightsData,
   GetDistrictRankingsData,
   GetDistrictTeamsData,
   GetDistrictTeamsKeysData,
@@ -1676,6 +1678,30 @@ export const getDistrictHistoryOptions = (
       return data;
     },
     queryKey: getDistrictHistoryQueryKey(options),
+  });
+};
+
+export const getDistrictInsightsQueryKey = (
+  options: Options<GetDistrictInsightsData>,
+) => createQueryKey('getDistrictInsights', options);
+
+/**
+ * Gets insights for a given district.
+ */
+export const getDistrictInsightsOptions = (
+  options: Options<GetDistrictInsightsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDistrictInsights({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDistrictInsightsQueryKey(options),
   });
 };
 

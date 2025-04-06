@@ -80,6 +80,8 @@ def do_year_insights(kind: str, year: Year) -> Response:
         insights = InsightsHelper.doAwardInsights(year)
     elif insight_kind == InsightType.PREDICTIONS:
         insights = InsightsHelper.doPredictionInsights(year)
+    elif insight_kind == InsightType.DISTRICTS and year == 0:
+        insights = InsightsHelper.doDistrictInsights()
 
     if insights is not None:
         InsightManipulator.createOrUpdate(insights)
@@ -88,7 +90,9 @@ def do_year_insights(kind: str, year: Year) -> Response:
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(
-            render_template("math/year_insights_do.html", kind=kind, insights=insights)
+            render_template(
+                "math/year_insights_do.html", kind=kind, insights=insights or []
+            )
         )
 
     return make_response("")

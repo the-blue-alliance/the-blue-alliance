@@ -3991,6 +3991,63 @@
         ]
       }
     },
+    "/district/{district_abbreviation}/insights": {
+      "get": {
+        "tags": [
+          "district"
+        ],
+        "description": "Gets insights for a given district.",
+        "operationId": "getDistrictInsights",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/district_abbreviation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/District_Insight"
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/district/{district_key}/events": {
       "get": {
         "tags": [
@@ -9394,6 +9451,105 @@
             "description": "Year this district participated."
           }
         }
+      },
+      "District_Insight": {
+        "type": "object",
+        "properties": {
+          "district_data": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "yearly_active_team_count": {
+                "type": "object",
+                "description": "Map of year to number of active teams",
+                "additionalProperties": {
+                  "type": "integer"
+                }
+              },
+              "yearly_event_count": {
+                "type": "object",
+                "description": "Map of year to number of events",
+                "additionalProperties": {
+                  "type": "integer"
+                }
+              },
+              "yearly_gained_teams": {
+                "type": "object",
+                "description": "Map of year to list of team keys gained",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "yearly_lost_teams": {
+                "type": "object",
+                "description": "Map of year to list of team keys lost",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "yearly_active_team_count",
+              "yearly_event_count",
+              "yearly_gained_teams",
+              "yearly_lost_teams"
+            ]
+          },
+          "team_data": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "district_seasons": {
+                "type": "integer"
+              },
+              "total_district_points": {
+                "type": "integer"
+              },
+              "total_pre_dcmp_district_points": {
+                "type": "integer"
+              },
+              "district_event_wins": {
+                "type": "integer"
+              },
+              "dcmp_wins": {
+                "type": "integer"
+              },
+              "team_awards": {
+                "type": "integer"
+              },
+              "individual_awards": {
+                "type": "integer"
+              },
+              "quals_record": {
+                "$ref": "#/components/schemas/WLT_Record"
+              },
+              "elims_record": {
+                "$ref": "#/components/schemas/WLT_Record"
+              }
+            },
+            "required": [
+              "district_seasons",
+              "total_district_points",
+              "total_pre_dcmp_district_points",
+              "district_event_wins",
+              "dcmp_wins",
+              "team_awards",
+              "individual_awards",
+              "quals_record",
+              "elims_record"
+            ]
+          }
+        },
+        "required": [
+          "team_data",
+          "district_data"
+        ]
       },
       "District_Ranking": {
         "required": [
