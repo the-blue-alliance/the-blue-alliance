@@ -1134,6 +1134,55 @@ export type DistrictRanking = {
     qual_points: number;
   }[];
 };
+export type DistrictAdvancement = {
+  /** Whether or not the team qualified for their District Championship */
+  dcmp: boolean;
+  /** Whether or not the team qualified for the FIRST Championship */
+  cmp: boolean;
+};
+export type RegionalAdvancement = {
+  /** Whether or not the team qualified for Championship. */
+  cmp: boolean;
+  cmp_status:
+    | 'NotInvited'
+    | 'PreQualified'
+    | 'EventQualified'
+    | 'PoolQualified'
+    | 'Declined';
+  /** The event key at which the team qualified */
+  qualifying_event?: string;
+  /** The name of the award which qualified the team */
+  qualifying_award_name?: string;
+  /** Which week number's regional pool invitation the team got */
+  qualifying_pool_week?: number;
+};
+export type RegionalRanking = {
+  /** TBA team key for the team. */
+  team_key: string;
+  /** Numerical rank of the team, 1 being top rank. */
+  rank: number;
+  /** Any points added to a team as a result of the rookie bonus. */
+  rookie_bonus?: number;
+  /** Additional points awarded in lieu of a second event, based on first event performance */
+  single_event_bonus?: number;
+  /** Total district points for the team. */
+  point_total: number;
+  /** List of events that contributed to the point total for the team. */
+  event_points?: {
+    /** Total points awarded at this event. */
+    total: number;
+    /** Points awarded for alliance selection. */
+    alliance_points: number;
+    /** Points awarded for elimination match performance. */
+    elim_points: number;
+    /** Points awarded for event awards. */
+    award_points: number;
+    /** TBA Event key for this event. */
+    event_key: string;
+    /** Points awarded for qualification match performance. */
+    qual_points: number;
+  }[];
+};
 export type LeaderboardInsight = {
   data: {
     rankings: {
@@ -3989,6 +4038,124 @@ export function getDistrictRankings(
         status: 404;
       }
   >(`/district/${encodeURIComponent(districtKey)}/rankings`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets a list of advancement information per team in a district.
+ */
+export function getDistrictAdvancement(
+  {
+    ifNoneMatch,
+    districtKey,
+  }: {
+    ifNoneMatch?: string;
+    districtKey: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: {
+          [key: string]: DistrictAdvancement;
+        } | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtKey)}/advancement`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets information about per-team advancement to the FIRST Championship.
+ */
+export function getRegionalAdvancement(
+  {
+    ifNoneMatch,
+    year,
+  }: {
+    ifNoneMatch?: string;
+    year: number;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: {
+          [key: string]: RegionalAdvancement;
+        } | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/regional_advancement/${encodeURIComponent(year)}`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
+ * Gets the team rankings in the regional pool for a specific year.
+ */
+export function getRegionalRankings(
+  {
+    ifNoneMatch,
+    year,
+  }: {
+    ifNoneMatch?: string;
+    year: number;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: RegionalRanking[] | null;
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/regional_advancement/${encodeURIComponent(year)}/rankings`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
