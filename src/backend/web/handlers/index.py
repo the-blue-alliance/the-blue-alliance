@@ -10,8 +10,8 @@ from backend.common.consts.media_type import MediaType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
-from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.helpers.special_webcast_helper import SpecialWebcastHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.memcache import MemcacheClient
 from backend.common.models.event import Event
@@ -68,7 +68,7 @@ def index_kickoff(template_values: Dict[str, Any]) -> str:
 
 
 def index_buildseason(template_values: Dict[str, Any]) -> str:
-    special_webcasts = FirebasePusher.get_special_webcasts()
+    special_webcasts = SpecialWebcastHelper.get_special_webcasts_with_online_status()
     effective_season_year = SeasonHelper.effective_season_year()
     template_values.update(
         {
@@ -92,7 +92,9 @@ def index_competitionseason(template_values: Dict[str, Any]) -> str:
 
     # Only show special webcasts that aren't also hosting an event
     special_webcasts = []
-    for special_webcast in FirebasePusher.get_special_webcasts():
+    for (
+        special_webcast
+    ) in SpecialWebcastHelper.get_special_webcasts_with_online_status():
         add = True
         for event in week_events:
             if event.now and event.webcast:
@@ -142,7 +144,7 @@ def index_champs(template_values: Dict[str, Any]) -> str:
 
 
 def index_offseason(template_values: Dict[str, Any]) -> str:
-    special_webcasts = FirebasePusher.get_special_webcasts()
+    special_webcasts = SpecialWebcastHelper.get_special_webcasts_with_online_status()
     effective_season_year = SeasonHelper.effective_season_year()
 
     template_values.update(
@@ -164,7 +166,7 @@ def index_offseason(template_values: Dict[str, Any]) -> str:
 def index_insights(template_values: Dict[str, Any]) -> str:
     week_events = EventHelper.week_events()
     year = datetime.now().year
-    special_webcasts = FirebasePusher.get_special_webcasts()
+    special_webcasts = SpecialWebcastHelper.get_special_webcasts_with_online_status()
     template_values.update(
         {
             "events": week_events,
