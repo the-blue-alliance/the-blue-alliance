@@ -5,7 +5,6 @@ from google.appengine.ext import ndb
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.special_webcast_helper import SpecialWebcastHelper
-from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.sitevars.forced_live_events import ForcedLiveEvents
@@ -13,6 +12,7 @@ from backend.common.sitevars.gameday_special_webcasts import (
     WebcastType as TSpecialWebcast,
 )
 from backend.common.tasklets import typed_toplevel
+from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
 
 class LiveEventHelper:

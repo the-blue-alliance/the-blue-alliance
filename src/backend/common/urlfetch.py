@@ -5,6 +5,17 @@ from google.appengine.api import urlfetch_service_pb2
 from google.appengine.api.urlfetch import _URLFetchResult
 from pyre_extensions import JSON
 
+from backend.common.consts.string_enum import StrEnum
+
+
+class URLFetchMethod(StrEnum):
+    GET = "GET"
+    POST = "POST"
+    HEAD = "HEAD"
+    PUT = "PUT"
+    DELETE = "DELETE"
+    PATCH = "PATCH"
+
 
 class URLFetchResult:
     """
