@@ -65,6 +65,7 @@ class EventInsightsHelper:
         coral_rp_count = 0
         coopertition_count = 0
         six_rp_count = 0
+        nine_rp_count = 0
 
         total_scores = 0
         total_win_margins = 0
@@ -113,18 +114,13 @@ class EventInsightsHelper:
             if blue_sb["coopertitionCriteriaMet"]:
                 coopertition_count += 1
 
-            if (
-                red_sb["autoBonusAchieved"]
-                and red_sb["bargeBonusAchieved"]
-                and red_sb["coralBonusAchieved"]
-            ):
+            red_all_rp = red_sb["autoBonusAchieved"] and red_sb["bargeBonusAchieved"] and red_sb["coralBonusAchieved"]
+            blue_all_rp = blue_sb["autoBonusAchieved"] and blue_sb["bargeBonusAchieved"] and blue_sb["coralBonusAchieved"]
+
+            if (red_score > blue_score and red_all_rp) or (blue_score > red_score and blue_all_rp):
                 six_rp_count += 1
-            if (
-                blue_sb["autoBonusAchieved"]
-                and blue_sb["bargeBonusAchieved"]
-                and blue_sb["coralBonusAchieved"]
-            ):
-                six_rp_count += 1
+                if (red_all_rp and blue_all_rp):
+                    nine_rp_count += 1
 
             total_scores += red_score + blue_score
             total_win_margins += win_score - min(red_score, blue_score)
@@ -156,8 +152,13 @@ class EventInsightsHelper:
             ],
             "six_rp_count": [
                 six_rp_count,
-                finished_matches * 2,
-                100.0 * six_rp_count / (finished_matches * 2),
+                finished_matches,
+                100.0 * six_rp_count / finished_matches,
+            ],
+            "nine_rp_count": [
+                nine_rp_count,
+                finished_matches,
+                100.0 * nine_rp_count / finished_matches,
             ],
             "average_score": total_scores / (finished_matches * 2),
             "average_win_margin": total_win_margins / finished_matches,
