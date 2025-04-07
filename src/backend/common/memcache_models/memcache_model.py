@@ -40,10 +40,10 @@ class MemcacheModel(abc.ABC, Generic[DT]):
         return self.get_async().get_result()
 
     @typed_tasklet  # pyre-ignore[56]
-    def _get_async(self) -> Generator[Any, Any, DT]:
+    def _get_async(self) -> Generator[Any, Any, Optional[DT]]:
         mc_key = self.key()
         ret = yield self.mc_client.get_async(mc_key)
         return ret
 
-    def get_async(self) -> TypedFuture[DT]:
+    def get_async(self) -> TypedFuture[Optional[DT]]:
         return self._get_async()
