@@ -67,7 +67,7 @@
     "@playwright/test": "1.51.1",
     "@react-router/dev": "7.5.0",
     "@react-router/fs-routes": "7.5.0",
-    "@sentry/vite-plugin": "3.2.4",
+    "@sentry/vite-plugin": "3.3.1",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/postcss": "4.1.2",
