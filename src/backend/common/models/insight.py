@@ -61,6 +61,7 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS = 40
     TYPED_LEADERBOARD_MOST_WFFAS = 41
     SUCCESSFUL_EINSTEIN_TEAMUPS = 42
+    TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK = 43
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -111,6 +112,7 @@ class Insight(CachedModel):
         TYPED_NOTABLES_CMP_FINALS_APPEARANCES: "notables_cmp_finals_appearances",
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS: "typed_leaderboard_most_non_champs_impact_wins",
         TYPED_LEADERBOARD_MOST_WFFAS: "typed_leaderboard_most_wffas",
+        TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK: "typed_leaderboard_longest_qualifying_event_streak",
     }
 
     TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
@@ -127,6 +129,7 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK: "team",
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS: "team",
         TYPED_LEADERBOARD_MOST_WFFAS: "team",
+        TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK: "team",
     }
 
     NOTABLE_INSIGHTS = {
