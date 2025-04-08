@@ -54,6 +54,7 @@ def apistatus_post() -> Response:
         },
         "max_season": int(request.form.get("max_year", current_year)),
         "current_season": int(request.form.get("current_year", current_year)),
+        "max_team_page": int(request.form.get("max_team_page", 0)),
     }
     ApiStatus.put(status)
 

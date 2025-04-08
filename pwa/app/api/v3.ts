@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.13
+ * 3.9.14
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -35,6 +35,8 @@ export type ApiStatus = {
   down_events: string[];
   ios: ApiStatusAppVersion;
   android: ApiStatusAppVersion;
+  /** Maximum team page number for valid queries. */
+  max_team_page: number;
 };
 export type Team = {
   /** TBA team key with the format `frcXXXX` with `XXXX` representing the team number. */
