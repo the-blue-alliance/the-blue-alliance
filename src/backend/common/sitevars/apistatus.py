@@ -29,6 +29,7 @@ class ContentType(TypedDict):
     web: NotRequired[Optional[WebConfig]]
     android: Optional[AndroidConfig]
     ios: Optional[IOSConfig]
+    max_team_page: int
 
 
 class ApiStatus(Sitevar[ContentType]):
@@ -49,6 +50,7 @@ class ApiStatus(Sitevar[ContentType]):
             web=None,
             android=None,
             ios=None,
+            max_team_page=0,
         )
 
     @classmethod

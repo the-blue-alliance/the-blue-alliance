@@ -12,7 +12,6 @@ from google.appengine.ext import ndb, testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
-from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.firebase_pusher import FirebasePusher
@@ -27,7 +26,6 @@ from backend.common.models.event_queue_status import (
 )
 from backend.common.models.match import Match
 from backend.common.models.webcast import Webcast
-from backend.common.sitevars.forced_live_events import ForcedLiveEvents
 from backend.common.sitevars.gameday_special_webcasts import (
     ContentType as TSpecialWebcasts,
     GamedaySpecialWebcasts,
@@ -167,7 +165,7 @@ def drain_deferred(taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub) 
 def test_update_live_events_none(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
-    FirebasePusher.update_live_events()
+    FirebasePusher.update_live_events(events={}, special_webcasts=[])
     drain_deferred(taskqueue_stub)
 
     assert FirebasePusher._get_reference("live_events").get() == {}
@@ -178,7 +176,7 @@ def test_update_live_events_none(
 def test_update_live_event(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
-    Event(
+    e = Event(
         id="2020nyny",
         year=2020,
         event_short="nyny",
@@ -187,9 +185,9 @@ def test_update_live_event(
         end_date=datetime.datetime(2020, 4, 1),
         name="Test Event",
         short_name="Test",
-    ).put()
+    )
 
-    FirebasePusher.update_live_events()
+    FirebasePusher.update_live_events(events={e.key_name: e}, special_webcasts=[])
     drain_deferred(taskqueue_stub)
 
     expected = {
@@ -207,7 +205,7 @@ def test_update_live_event(
 def test_update_live_event_with_webcast(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
-    Event(
+    e = Event(
         id="2020nyny",
         year=2020,
         event_short="nyny",
@@ -219,9 +217,9 @@ def test_update_live_event_with_webcast(
         webcast_json=json.dumps(
             [Webcast(type=WebcastType.TWITCH, channel="tbagameday")]
         ),
-    ).put()
+    )
 
-    FirebasePusher.update_live_events()
+    FirebasePusher.update_live_events(events={e.key_name: e}, special_webcasts=[])
     drain_deferred(taskqueue_stub)
 
     expected = {
@@ -231,11 +229,8 @@ def test_update_live_event_with_webcast(
             "short_name": "Test",
             "webcasts": [
                 {
-                    "type": "twitch",
+                    "type": WebcastType.TWITCH,
                     "channel": "tbagameday",
-                    "status": "unknown",
-                    "stream_title": None,
-                    "viewer_count": None,
                 }
             ],
         }
@@ -247,7 +242,7 @@ def test_update_live_event_with_webcast(
 def test_update_live_district_event(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
-    Event(
+    e = Event(
         id="2020nyny",
         year=2020,
         event_short="nyny",
@@ -257,9 +252,9 @@ def test_update_live_district_event(
         name="Test Event",
         short_name="Test",
         district_key=ndb.Key(District, "2020ne"),
-    ).put()
+    )
 
-    FirebasePusher.update_live_events()
+    FirebasePusher.update_live_events(events={e.key_name: e}, special_webcasts=[])
     drain_deferred(taskqueue_stub)
 
     expected = {
@@ -268,79 +263,6 @@ def test_update_live_district_event(
             "name": "Test Event",
             "short_name": "[NE] Test",
             "webcasts": [],
-        }
-    }
-    assert FirebasePusher._get_reference("live_events").get() == expected
-
-
-@freeze_time("2020-04-01")
-def test_update_live_event_forced(
-    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
-) -> None:
-    Event(
-        id="2020nyny",
-        year=2020,
-        event_short="nyny",
-        event_type_enum=EventType.REGIONAL,
-        start_date=datetime.datetime(2020, 5, 1),
-        end_date=datetime.datetime(2020, 5, 1),
-        name="Test Event",
-        short_name="Test",
-    ).put()
-
-    ForcedLiveEvents.put(["2020nyny"])
-
-    FirebasePusher.update_live_events()
-    drain_deferred(taskqueue_stub)
-
-    expected = {
-        "2020nyny": {
-            "key": "2020nyny",
-            "name": "Test Event",
-            "short_name": "Test",
-            "webcasts": [],
-        }
-    }
-    assert FirebasePusher._get_reference("live_events").get() == expected
-
-
-@freeze_time("2020-04-01")
-def test_update_live_event_forced_with_webcast(
-    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
-) -> None:
-    Event(
-        id="2020nyny",
-        year=2020,
-        event_short="nyny",
-        event_type_enum=EventType.REGIONAL,
-        start_date=datetime.datetime(2020, 5, 1),
-        end_date=datetime.datetime(2020, 5, 1),
-        name="Test Event",
-        short_name="Test",
-        webcast_json=json.dumps(
-            [Webcast(type=WebcastType.TWITCH, channel="tbagameday")]
-        ),
-    ).put()
-
-    ForcedLiveEvents.put(["2020nyny"])
-
-    FirebasePusher.update_live_events()
-    drain_deferred(taskqueue_stub)
-
-    expected = {
-        "2020nyny": {
-            "key": "2020nyny",
-            "name": "Test Event",
-            "short_name": "Test",
-            "webcasts": [
-                {
-                    "type": "twitch",
-                    "channel": "tbagameday",
-                    "status": "unknown",
-                    "stream_title": None,
-                    "viewer_count": None,
-                }
-            ],
         }
     }
     assert FirebasePusher._get_reference("live_events").get() == expected
@@ -370,7 +292,7 @@ def test_patch_live_event_queue_status(
         matches={},
     )
 
-    FirebasePusher.update_live_events()
+    FirebasePusher.update_live_events(events={e.key_name: e}, special_webcasts=[])
     drain_deferred(taskqueue_stub)
 
     FirebasePusher.update_event_queue_status(e, nexus_status)
@@ -420,7 +342,7 @@ def test_patch_live_event_queue_status_deletes_when_nothing_queued(
         matches={},
     )
 
-    FirebasePusher.update_live_events()
+    FirebasePusher.update_live_events(events={e.key_name: e}, special_webcasts=[])
     drain_deferred(taskqueue_stub)
 
     FirebasePusher.update_event_queue_status(e, nexus_status)
@@ -457,7 +379,7 @@ def test_update_special_webcast(
     }
     GamedaySpecialWebcasts.put(data)
 
-    FirebasePusher.update_live_events()
+    FirebasePusher.update_live_events(events={}, special_webcasts=data["webcasts"])
     drain_deferred(taskqueue_stub)
 
     expected = [
@@ -466,9 +388,6 @@ def test_update_special_webcast(
             channel="tbagameday",
             name="TBA Gameday",
             key_name="tbagameday",
-            status=WebcastStatus.UNKNOWN,
-            stream_title=None,
-            viewer_count=None,
         )
     ]
     assert FirebasePusher._get_reference("special_webcasts").get() == expected

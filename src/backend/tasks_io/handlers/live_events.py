@@ -34,13 +34,15 @@ from backend.common.models.keys import EventKey, Year
 from backend.common.models.match import Match
 from backend.common.queries.match_query import EventMatchesQuery
 from backend.common.sitevars.apistatus_down_events import ApiStatusDownEvents
+from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
 
 blueprint = Blueprint("live_events", __name__)
 
 
 @blueprint.route("/tasks/do/update_live_events")
 def update_live_events() -> str:
-    FirebasePusher.update_live_events()
+    (events, special_webcasts) = LiveEventHelper.get_live_events_with_current_webcasts()
+    FirebasePusher.update_live_events(events, special_webcasts)
     return ""
 
 

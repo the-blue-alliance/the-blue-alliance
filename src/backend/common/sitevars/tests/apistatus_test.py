@@ -28,6 +28,7 @@ def test_default_sitevar():
         "ios": None,
         "max_season": year,
         "web": None,
+        "max_team_page": 0,
     }
     assert default_sitevar.contents == default_json
     assert default_sitevar.description == "For setting max year, min app versions, etc."
@@ -41,6 +42,7 @@ def test_status_empty():
         "ios": None,
         "max_season": year,
         "web": None,
+        "max_team_page": 0,
     }
 
 
@@ -62,6 +64,7 @@ def test_status_full():
             "endpoints_sha": "abc",
             "commit_time": "abc",
         },
+        "max_team_page": 0,
     }
     ApiStatus.put(
         ContentType(
@@ -77,6 +80,7 @@ def test_status_full():
             ),
             android=AndroidConfig(min_app_version=1, latest_app_version=2),
             ios=IOSConfig(min_app_version=3, latest_app_version=4),
+            max_team_page=0,
         )
     )
     assert ApiStatus.status() == values_json
