@@ -3,7 +3,6 @@ import { useNavigation } from 'react-router';
 
 import { Progress } from '~/components/ui/progress';
 
-// TODO: Integrate with nav bar
 export default function GlobalLoadingProgress() {
   const [hidden, setHidden] = useState(true);
   const [progress, setProgress] = useState(0);

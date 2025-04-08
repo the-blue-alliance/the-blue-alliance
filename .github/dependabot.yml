@@ -81,6 +81,13 @@ updates:
         - "@iconify/json"
         - "lucide-react"
         - "unplugin-icons"
+    react:
+      patterns:
+        - "react"
+        - "react-dom"
+        - "react-is"
+        - "@types/react"
+        - "@types/react-dom"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

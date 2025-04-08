@@ -8,67 +8,64 @@ interface TableOfContentsListProps
   indent?: boolean;
 }
 
-const TableOfContentsList = React.forwardRef<
-  React.ElementRef<'ul'>,
-  TableOfContentsListProps
->(({ className, indent, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn('m-0 list-none', indent && 'pl-4', className)}
-    {...props}
-  />
-));
-TableOfContentsList.displayName = 'TableOfContentsList';
-
-const TableOfContentsTitle = React.forwardRef<
-  React.ElementRef<'li'>,
-  React.ComponentPropsWithoutRef<'li'>
->(({ className, ...props }, ref) => (
-  <li
-    ref={ref}
-    className={cn('mb-2 text-sm font-medium', className)}
-    {...props}
-  />
-));
-TableOfContentsTitle.displayName = 'TableOfContentsTitle';
-
 interface TableOfContentsItemProps
   extends React.ComponentPropsWithoutRef<'li'> {
   indent?: boolean;
 }
-
-const TableOfContentsItem = React.forwardRef<
-  React.ElementRef<'li'>,
-  TableOfContentsItemProps
->(({ className, indent, ...props }, ref) => (
-  <li
-    ref={ref}
-    className={cn('mt-0 pt-2', indent && 'ml-4', className)}
-    {...props}
-  />
-));
-TableOfContentsItem.displayName = 'TableOfContentsItem';
 
 interface TableOfContentsLinkProps
   extends React.ComponentPropsWithoutRef<typeof Link> {
   isActive?: boolean;
 }
 
-const TableOfContentsLink = React.forwardRef<
-  React.ElementRef<typeof Link>,
-  TableOfContentsLinkProps
->(({ className, isActive, ...props }, ref) => (
-  <Link
-    ref={ref}
-    className={cn(
-      'text-sm font-medium text-foreground transition-colors hover:text-primary',
-      isActive ? 'font-medium text-foreground' : 'text-muted-foreground',
-      className,
-    )}
-    {...props}
-  />
-));
-TableOfContentsLink.displayName = 'TableOfContentsLink';
+function TableOfContentsList({
+  className,
+  indent,
+  ...props
+}: TableOfContentsListProps) {
+  return (
+    <ul
+      className={cn('m-0 list-none', indent && 'pl-4', className)}
+      {...props}
+    />
+  );
+}
+
+function TableOfContentsTitle({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<'li'>) {
+  return (
+    <li className={cn('mb-2 text-sm font-medium', className)} {...props} />
+  );
+}
+
+function TableOfContentsItem({
+  className,
+  indent,
+  ...props
+}: TableOfContentsItemProps) {
+  return (
+    <li className={cn('mt-0 pt-2', indent && 'ml-4', className)} {...props} />
+  );
+}
+
+function TableOfContentsLink({
+  className,
+  isActive,
+  ...props
+}: TableOfContentsLinkProps) {
+  return (
+    <Link
+      className={cn(
+        'text-sm font-medium text-foreground transition-colors hover:text-primary',
+        isActive ? 'font-medium text-foreground' : 'text-muted-foreground',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 
 export {
   TableOfContentsList,

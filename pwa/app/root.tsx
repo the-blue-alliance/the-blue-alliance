@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Nav } from 'app/components/tba/nav';
+import Navbar from 'app/components/tba/nav';
 import 'app/tailwind.css';
 import {
   Links,
@@ -235,7 +235,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Nav />
+        <Navbar />
         <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
             <QueryClientProvider client={queryClient}>
