@@ -4881,7 +4881,8 @@
           "down_events",
           "ios",
           "is_datafeed_down",
-          "max_season"
+          "max_season",
+          "max_team_page"
         ],
         "type": "object",
         "properties": {
@@ -4892,6 +4893,10 @@
           "max_season": {
             "type": "integer",
             "description": "Maximum FRC season year for valid queries."
+          },
+          "max_team_page": {
+            "type": "integer",
+            "description": "Maximum FRC team page."
           },
           "is_datafeed_down": {
             "type": "boolean",

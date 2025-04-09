@@ -1,6 +1,7 @@
 import { useLoaderData, useNavigate } from 'react-router';
 
-import { getTeamsSimple } from '~/api/v3';
+import { getStatus, getTeamsSimple } from '~/api/v3';
+import TeamListTable from '~/components/tba/teamListTable';
 import {
   Select,
   SelectContent,
@@ -8,56 +9,78 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import {
-  parseParamsForTeamPgNumElseDefault,
-} from '~/lib/utils';
+import { parseParamsForTeamPgNumElseDefault } from '~/lib/utils';
 
 import { Route } from '.react-router/types/app/routes/+types/teams.($pgNum)';
-import TeamListTable from '~/components/tba/teamListTable';
 
 async function loadData(params: Route.LoaderArgs['params']) {
   const pageNum = await parseParamsForTeamPgNumElseDefault(params);
-  
+
   if (pageNum === undefined) {
     throw new Response(null, {
       status: 404,
+      statusText: "Page Number was not specified in request"
     });
   }
 
-  const teamsSetOne = await getTeamsSimple({pageNum: pageNum}) ;
+  const teamsSetOne = await getTeamsSimple({ pageNum: pageNum });
+  //TODO: Cache
+  const apiStatus = await getStatus({});
+
+  if (apiStatus.status !== 200) {
+    throw new Response(null, {
+      status: 500,
+      statusText: "Server failed to respond with API Status"
+    });
+  }
+
+  if (apiStatus.data.max_team_page === 0) {
+    throw new Response(null, {
+      status: 404,
+      statusText: "Data for Max Team Page was missing or incorrect"
+    });
+  }
+
+
+  const maxPageNum = apiStatus.data.max_team_page;
 
   if (teamsSetOne.status !== 200) {
     throw new Response(null, {
       status: 500,
+      statusText: "Server failed to respond with Team Data (Set 1/2)"
     });
   }
 
   if (teamsSetOne.data.length === 0) {
     throw new Response(null, {
       status: 404,
+      statusText: "Team Data (Set 1/2) was missing"
     });
   }
 
+  let teams = teamsSetOne.data;
 
-  var teams = teamsSetOne.data;
-  if (pageNum < 21) {
-    const teamsSetTwo = await getTeamsSimple({pageNum: pageNum + 1}) ;
+  if (pageNum < maxPageNum) {
+    const teamsSetTwo = await getTeamsSimple({ pageNum: pageNum + 1 });
 
     if (teamsSetTwo.status !== 200) {
       throw new Response(null, {
         status: 500,
+        statusText: "Server failed to respond with Team Data (Set 2/2)"
       });
     }
 
     if (teamsSetTwo.data.length === 0) {
       throw new Response(null, {
         status: 404,
+        statusText: "Team Data (Set 2/2) was missing"
       });
     }
+
     teams = teamsSetOne.data.concat(teamsSetTwo.data);
   }
 
-  return { pageNum, teams: teams };
+  return { pageNum, teams, maxPageNum };
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -86,29 +109,28 @@ interface EventGroup {
   events: Event[];
 }
 
-function TeamPageNumberToRange(pageNum: number): string {
-  if (pageNum === 0) return "1-999";
-  
+function TeamPageNumberToRange(pageNum: number, maxPageNum: number): string {
+  if (pageNum === 0) return '1-999';
+
   if (pageNum % 2 === 0) {
-    let start = (pageNum) * 500;
+    let start = pageNum * 500;
     return `${start}s`;
   }
-  
-  let start = pageNum * 500;
-  let end = start + 1000;
 
-  return `${start}-${end}`
+  let start = pageNum * 500;
+  let end = start + ((maxPageNum === pageNum) ? 500 : 1000);
+
+  return `${start}-${end}`;
 }
 
-
 export default function TeamsPage() {
-  const { pageNum, teams } = useLoaderData<typeof loader>();
+  const { pageNum, teams, maxPageNum } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <div className="basis-full lg:basis-1/6">
-        <div className="lg:sticky top-14 pt-8">
+        <div className="top-14 pt-8 lg:sticky">
           <Select
             value={String(pageNum)}
             onValueChange={(value) => {
@@ -116,32 +138,36 @@ export default function TeamsPage() {
             }}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={TeamPageNumberToRange(pageNum)} />
+              <SelectValue placeholder={TeamPageNumberToRange(pageNum, maxPageNum)} />
             </SelectTrigger>
             <SelectContent>
               {pageNum % 2 === 1 && (
                 <SelectItem key={pageNum} value={String(pageNum)}>
-                  {TeamPageNumberToRange(pageNum)}
+                  {TeamPageNumberToRange(pageNum, maxPageNum)}
                 </SelectItem>
               )}
 
-              {Array.from({ length: Math.ceil(22 / 2) }, (_, i) => i * 2).map(page => (
-                <SelectItem key={page} value={String(page)}>
-                  {TeamPageNumberToRange(page)}
-                </SelectItem>
-              ))}
+              {Array.from({ length: Math.ceil(maxPageNum / 2) + ((maxPageNum % 2 === 0) ? 1 : 0) }, (_, i) => i * 2).map(
+                (page) => (
+                  <SelectItem key={page} value={String(page)}>
+                    {TeamPageNumberToRange(page, maxPageNum)}
+                  </SelectItem>
+                ),
+              )}
             </SelectContent>
           </Select>
         </div>
       </div>
-      <div className="basis-full lg:py-8 lg:basis-5/6 overflow-x-auto">
-        {<h1 className="mb-3 text-3xl font-medium">
-          <em>FIRST</em> Robotics Teams {TeamPageNumberToRange(pageNum)}{' '}
-          <small className="text-xl text-slate-500">
-            {teams.length} Teams
-          </small>
-        </h1>}
-        <TeamListTable teams={teams}/>
+      <div className="basis-full overflow-x-auto lg:basis-5/6 lg:py-8">
+        {
+          <h1 className="mb-3 text-3xl font-medium">
+            <em>FIRST</em> Robotics Teams {TeamPageNumberToRange(pageNum, maxPageNum)}{' '}
+            <small className="text-xl text-slate-500">
+              {teams.length} Teams
+            </small>
+          </h1>
+        }
+        <TeamListTable teams={teams} />
       </div>
     </div>
   );
