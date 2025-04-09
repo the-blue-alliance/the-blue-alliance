@@ -12,6 +12,7 @@ import VideoCam from "material-ui/svg-icons/av/videocam";
 import VideoCamOff from "material-ui/svg-icons/av/videocam-off";
 import WebcastSelectionDialogItem from "./WebcastSelectionDialogItem";
 import { webcastPropType } from "../utils/webcastUtils";
+import PlatformIcon from "./PlatformIcon";
 
 export default class WebcastSelectionDialog extends React.Component {
   static propTypes = {
@@ -48,6 +49,7 @@ export default class WebcastSelectionDialog extends React.Component {
     availableWebcasts.forEach((webcastId) => {
       const webcast = this.props.webcastsById[webcastId];
 
+      let leftIcon = <PlatformIcon platform={webcast.type} />;
       let rightIcon = <ActionHelp />;
       let secondaryText = null;
       if (webcast.status === "online") {
@@ -89,6 +91,7 @@ export default class WebcastSelectionDialog extends React.Component {
             webcast={webcast}
             webcastSelected={this.props.onWebcastSelected}
             secondaryText={secondaryText}
+            leftIcon={leftIcon}
             rightIcon={rightIcon}
           />
         );
@@ -104,6 +107,7 @@ export default class WebcastSelectionDialog extends React.Component {
             webcast={webcast}
             webcastSelected={this.props.onWebcastSelected}
             secondaryText={"The best matches from across FRC"}
+            leftIcon={leftIcon}
             rightIcon={<ActionGrade color={indigo500} />}
           />
         );
@@ -114,6 +118,7 @@ export default class WebcastSelectionDialog extends React.Component {
             webcast={webcast}
             webcastSelected={this.props.onWebcastSelected}
             secondaryText={secondaryText}
+            leftIcon={leftIcon}
             rightIcon={rightIcon}
           />
         );
