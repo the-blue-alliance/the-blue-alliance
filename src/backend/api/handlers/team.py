@@ -16,6 +16,7 @@ from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_tag import get_enum_from_url
+from backend.common.consts.teams import TEAM_PAGE_SIZE
 from backend.common.decorators import cached_public
 from backend.common.models.event_team import EventTeam
 from backend.common.models.history import History
@@ -362,7 +363,7 @@ def team_list_all(model_type: Optional[ModelType] = None) -> Response:
 
     max_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
     max_team_num = int(max_team_key.id()[3:])
-    max_team_page = int(max_team_num / 500)
+    max_team_page = int(max_team_num / TEAM_PAGE_SIZE)
 
     futures = []
     for page_num in range(max_team_page + 1):
