@@ -1,19 +1,22 @@
-import json
-import logging
-from typing import Any, Generator, List
-
-from google.appengine.api import urlfetch
-from google.appengine.ext import ndb
+import datetime
+from typing import Any, Generator, List, Optional
 
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.memcache_models.twitch_oauth_token_memcache import (
+    TwitchOauthTokenMemcache,
+)
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
+from backend.common.models.twitch_access_token import TwitchAccessToken
 from backend.common.models.webcast import Webcast
-from backend.common.sitevars.google_api_secret import GoogleApiSecret
-from backend.common.sitevars.twitch_secrets import TwitchSecrets
 from backend.common.tasklets import typed_tasklet, typed_toplevel
+from backend.tasks_io.datafeeds.datafeed_twitch import (
+    TwitchGetAccessToken,
+    TwitchWebcastStatus,
+)
+from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeWebcastStatus
 
 
 class WebcastOnlineHelper:
@@ -42,10 +45,10 @@ class WebcastOnlineHelper:
         webcast["viewer_count"] = None
         if webcast["type"] == WebcastType.TWITCH:
             yield cls._add_twitch_status_async(webcast)
-        elif webcast["type"] == WebcastType.USTREAM:
-            yield cls._add_ustream_status_async(webcast)
         elif webcast["type"] == WebcastType.YOUTUBE:
             yield cls._add_youtube_status_async(webcast)
+        # elif webcast["type"] == WebcastType.USTREAM:
+        #    yield cls._add_ustream_status_async(webcast)
         # Livestream charges for their API. Go figure.
         # elif webcast['type'] == 'livestream':
         #     yield cls._add_livestream_status_async(webcast)
@@ -55,69 +58,40 @@ class WebcastOnlineHelper:
     @classmethod
     @typed_tasklet
     def _add_twitch_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
-        client_id = TwitchSecrets.client_id()
-        client_secret = TwitchSecrets.client_secret()
-        if client_id and client_secret:
-            # Get auth token
-            auth_url = "https://id.twitch.tv/oauth2/token?client_id={}&client_secret={}&grant_type=client_credentials".format(
-                client_id, client_secret
+        token_mc = TwitchOauthTokenMemcache()
+        maybe_twitch_token: Optional[TwitchAccessToken] = yield token_mc.get_async()
+        if maybe_twitch_token is not None:
+            now = datetime.datetime.now()
+            token_expiration = datetime.datetime.fromtimestamp(
+                maybe_twitch_token["expires_at"]
             )
-            try:
-                rpc = urlfetch.create_rpc()
-                result = yield urlfetch.make_fetch_call(rpc, auth_url, method="POST")
-            except Exception as e:
-                logging.error("URLFetch failed when getting Twitch auth token.")
-                logging.error(e)
-                raise ndb.Return(None)
-
-            if result.status_code == 200:
-                response = json.loads(result.content)
-                token = response["access_token"]
-            else:
-                logging.warning(
-                    "Twitch auth failed with status code: {}".format(result.status_code)
-                )
-                logging.warning(result.content)
-                raise ndb.Return(None)
-
-            # Get webcast status
-            status_url = "https://api.twitch.tv/helix/streams?user_login={}".format(
-                webcast["channel"]
-            )
-            try:
-                rpc = urlfetch.create_rpc()
-                result = yield urlfetch.make_fetch_call(
-                    rpc,
-                    status_url,
-                    headers={
-                        "Authorization": "Bearer {}".format(token),
-                        "Client-ID": client_id,
-                    },
-                )
-            except Exception as e:
-                logging.exception("URLFetch failed for: {}".format(status_url))
-                logging.error(e)
-                return None
+            needs_refresh = now > token_expiration
         else:
-            logging.warning("Must have Twitch Client ID & Secret")
-            return None
+            needs_refresh = False
 
-        if result.status_code == 200:
-            response = json.loads(result.content)
-            if response["data"]:
-                webcast["status"] = WebcastStatus.ONLINE
-                webcast["stream_title"] = response["data"][0]["title"]
-                webcast["viewer_count"] = response["data"][0]["viewer_count"]
-            else:
-                webcast["status"] = WebcastStatus.OFFLINE
-        else:
-            logging.warning(
-                "Twitch status failed with code: {}".format(result.status_code)
+        twitch_token: TwitchAccessToken
+        if maybe_twitch_token is None or needs_refresh:
+            refresh_token = (
+                maybe_twitch_token["access_token"]
+                if maybe_twitch_token and needs_refresh
+                else None
             )
-            logging.warning(result.content)
+            twitch_token = yield TwitchGetAccessToken(
+                refresh_token=refresh_token
+            ).fetch_async()
+            token_mc.expires(twitch_token["expires_in"])
+            yield token_mc.put_async(twitch_token)
+        else:
+            twitch_token = maybe_twitch_token
 
-        return None
+        yield TwitchWebcastStatus(twitch_token, webcast).fetch_async()
 
+    @classmethod
+    @typed_tasklet
+    def _add_youtube_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
+        yield YoutubeWebcastStatus(webcast).fetch_async()
+
+    """
     @classmethod
     @typed_tasklet
     def _add_ustream_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
@@ -147,49 +121,7 @@ class WebcastOnlineHelper:
             logging.warning(result.content)
 
         return None
-
-    @classmethod
-    @typed_tasklet
-    def _add_youtube_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
-        api_key = GoogleApiSecret.secret_key()
-        if api_key:
-            url = "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id={}&key={}".format(
-                webcast["channel"], api_key
-            )
-            try:
-                rpc = urlfetch.create_rpc()
-                result = yield urlfetch.make_fetch_call(rpc, url)
-            except Exception:
-                logging.exception("URLFetch failed for: {}".format(url))
-                return None
-        else:
-            logging.warning("Must have Google API key")
-            return None
-
-        if result.status_code == 200:
-            response = json.loads(result.content)
-            if response["items"]:
-                yt_item = response["items"][0]
-                webcast["status"] = (
-                    WebcastStatus.ONLINE
-                    if yt_item["snippet"]["liveBroadcastContent"] == "live"
-                    else WebcastStatus.OFFLINE
-                )
-                webcast["stream_title"] = yt_item["snippet"]["title"]
-
-                if viewer_count := yt_item["liveStreamingDetails"].get(
-                    "concurrentViewers"
-                ):
-                    webcast["viewer_count"] = int(viewer_count)
-            else:
-                webcast["status"] = WebcastStatus.OFFLINE
-        else:
-            logging.warning(
-                "YouTube status failed with code: {}".format(result.status_code)
-            )
-            logging.warning(result.content)
-
-        return None
+    """
 
     """
     @classmethod

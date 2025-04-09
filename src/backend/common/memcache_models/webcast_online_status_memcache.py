@@ -16,4 +16,5 @@ class WebcastOnlineStatusMemcache(MemcacheModel[Webcast]):
         return f"webcast_status:{self.type}:{self.channel}:{self.file}".encode()
 
     def ttl(self) -> timedelta:
-        return timedelta(minutes=5)
+        # This should be longer than the live_events update cronjob interval
+        return timedelta(minutes=10)

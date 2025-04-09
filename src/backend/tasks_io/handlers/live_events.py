@@ -18,7 +18,6 @@ from backend.common.helpers.match_time_prediction_helper import (
 )
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
-from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
@@ -35,6 +34,7 @@ from backend.common.models.match import Match
 from backend.common.queries.match_query import EventMatchesQuery
 from backend.common.sitevars.apistatus_down_events import ApiStatusDownEvents
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
+from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
 blueprint = Blueprint("live_events", __name__)
 
