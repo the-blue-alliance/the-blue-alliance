@@ -1,4 +1,5 @@
 import { SvgIcon } from "material-ui";
+import PropTypes from "prop-types";
 import React from "react";
 
 // Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.

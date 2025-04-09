@@ -49,7 +49,18 @@ export default class WebcastSelectionDialog extends React.Component {
     availableWebcasts.forEach((webcastId) => {
       const webcast = this.props.webcastsById[webcastId];
 
-      let leftIcon = <PlatformIcon platform={webcast.type} />;
+      let leftIcon = (
+        <div
+          className="test12323"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+          }}
+        >
+          <PlatformIcon platform={webcast.type} />
+        </div>
+      );
       let rightIcon = <ActionHelp />;
       let secondaryText = null;
       if (webcast.status === "online") {
