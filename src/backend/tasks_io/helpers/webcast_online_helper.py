@@ -1,6 +1,8 @@
 import datetime
 from typing import Any, Generator, List, Optional
 
+from pyre_extensions import none_throws
+
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.memcache_models.twitch_oauth_token_memcache import (
@@ -67,22 +69,21 @@ class WebcastOnlineHelper:
             )
             needs_refresh = now > token_expiration
         else:
-            needs_refresh = False
+            needs_refresh = True
 
         twitch_token: TwitchAccessToken
-        if maybe_twitch_token is None or needs_refresh:
-            refresh_token = (
-                maybe_twitch_token["access_token"]
-                if maybe_twitch_token and needs_refresh
-                else None
-            )
+        refresh_token = None
+        if maybe_twitch_token and needs_refresh:
+            refresh_token = maybe_twitch_token.get("refresh_token")
+
+        if needs_refresh:
             twitch_token = yield TwitchGetAccessToken(
                 refresh_token=refresh_token
             ).fetch_async()
             token_mc.expires(twitch_token["expires_in"])
             yield token_mc.put_async(twitch_token)
         else:
-            twitch_token = maybe_twitch_token
+            twitch_token = none_throws(maybe_twitch_token)
 
         yield TwitchWebcastStatus(twitch_token, webcast).fetch_async()
 

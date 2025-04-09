@@ -19,8 +19,8 @@ class TwitchAccessTokenParser(ParserBase[TwitchAccessToken]):
         return TwitchAccessToken(
             access_token=response["access_token"],
             expires_in=expires_in,
-            refresh_token=response["refresh_token"],
-            scope=response["scope"],
+            refresh_token=response.get("refresh_token"),
+            scope=response.get("scope"),
             token_type=response["token_type"],
             client_id=self.client_id,
             expires_at=int(current_time) + expires_in,
