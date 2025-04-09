@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pyre_extensions import none_throws
 
@@ -91,25 +91,26 @@ class InsightsLeaderboardMatchHelper:
         if arguments.year != 2025:
             return None
 
+        def get_coral_count(sb: Dict) -> int:
+            return sum(
+                [
+                    sb["teleopReef"]["tba_botRowCount"],
+                    sb["teleopReef"]["tba_midRowCount"],
+                    sb["teleopReef"]["tba_topRowCount"],
+                    sb["teleopReef"]["trough"],
+                    sb["autoReef"]["trough"],
+                ]
+            )
+
         coral_scores = defaultdict(int)
 
         for match in arguments.matches():
             if match.has_been_played and match.score_breakdown is not None:
-                red_coral = (
-                    none_throws(match.score_breakdown)[AllianceColor.RED][
-                        "teleopCoralCount"
-                    ]
-                    + none_throws(match.score_breakdown)[AllianceColor.RED][
-                        "autoCoralCount"
-                    ]
+                red_coral = get_coral_count(
+                    none_throws(match.score_breakdown)[AllianceColor.RED]
                 )
-                blue_coral = (
-                    none_throws(match.score_breakdown)[AllianceColor.BLUE][
-                        "teleopCoralCount"
-                    ]
-                    + none_throws(match.score_breakdown)[AllianceColor.BLUE][
-                        "autoCoralCount"
-                    ]
+                blue_coral = get_coral_count(
+                    none_throws(match.score_breakdown)[AllianceColor.BLUE]
                 )
 
                 coral_scores[match.key.id()] = max(red_coral, blue_coral)

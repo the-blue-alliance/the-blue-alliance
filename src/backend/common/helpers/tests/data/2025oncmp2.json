@@ -1,0 +1,52 @@
+{
+    "address": "6900 Airport Rd, Mississauga, ON L4V 1E8, Canada",
+    "city": "Mississauga",
+    "country": "Canada",
+    "district": {
+        "abbreviation": "ont",
+        "display_name": "Ontario",
+        "key": "2025ont",
+        "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-04-05",
+    "event_code": "oncmp2",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "oncmp2",
+    "first_event_id": null,
+    "gmaps_place_id": "ChIJryG3suI7K4gR8Fx4QyOOVOU",
+    "gmaps_url": "https://maps.google.com/?cid=16524989214836153584",
+    "key": "2025oncmp2",
+    "lat": 43.70310620000001,
+    "lng": -79.6366377,
+    "location_name": "The International Centre",
+    "name": "FIRST Ontario Provincial Championship - Technology Division",
+    "parent_event_key": "2025oncmp",
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "L4V 1E8",
+    "short_name": "OPC - Technology",
+    "start_date": "2025-04-02",
+    "state_prov": "ON",
+    "timezone": "America/Toronto",
+    "webcasts": [
+        {
+            "channel": "FIRSTCanada",
+            "date": "2025-04-04",
+            "type": "twitch"
+        },
+        {
+            "channel": "FIRSTOntario3",
+            "date": "2025-04-03",
+            "type": "twitch"
+        },
+        {
+            "channel": "FIRSTOntario4",
+            "type": "twitch"
+        }
+    ],
+    "website": "https://firstroboticscanada.org/frc/championship/",
+    "week": 5,
+    "year": 2025
+}
