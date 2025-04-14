@@ -198,27 +198,159 @@ export default function MatchResultsTable(props: MatchResultsTableProps) {
   );
 }
 
+function MatchRow({
+  matchName,
+  redAlliance,
+  blueAlliance,
+  scores,
+  isHeader = false,
+}: {
+  matchName: React.ReactNode;
+  redAlliance: React.ReactNode;
+  blueAlliance: React.ReactNode;
+  scores: React.ReactNode;
+  isHeader?: boolean;
+}) {
+  const gridStyle = cn(
+    // always use these classes:
+    'grid items-center justify-items-center',
+    '*:justify-center *:justify-self-stretch',
+    '*:h-full *:content-center *:text-center',
+    // use these classes on mobile:
+    'grid-rows-2',
+    'grid-cols-[calc(1.25em+10px)_8em_1fr_1fr_1fr_1fr]', // 6 columns of these sizes
+    'border-b-[1px] border-[#ddd] last:border-b-0',
+    // '*:border-[1px] *:border-[#ddd]',
+    // use these on desktop:
+    'xl:grid-rows-1',
+    'xl:grid-cols-[calc(1.25em+6px*2)_10em_repeat(6,minmax(0,1fr))_0.9fr_0.9fr]',
+    // 'xl:border-b-[1px] xl:border-[#ddd]',
+    // 'xl:*:border-0 xl:*:border-r-[1px]', // reset the border, then apply one to the right
+  );
+
+  return (
+    <div
+      className={cn(gridStyle, 'px-1 py-0.5', {
+        'bg-[#f6f6f6]': isHeader,
+        'bg-[#ffffff]': !isHeader,
+      })}
+    >
+      <div className="row-span-2 xl:row-span-1">
+        <PlayCircle className="inline" />
+      </div>
+      <div className="row-span-2 xl:row-span-1">{matchName}</div>
+      <div
+        className="col-span-3 overflow-hidden rounded-tl-md border-1 border-transparent
+          xl:rounded-l-md"
+      >
+        <div className="flex justify-around bg-alliance-red-light p-[5px]">
+          {redAlliance}
+        </div>
+      </div>
+      <div
+        className="col-span-3 col-start-3 overflow-hidden rounded-bl-md border-1 border-transparent
+          xl:col-start-6 xl:rounded-none"
+      >
+        <div className="flex justify-around bg-alliance-blue-light p-[5px]">
+          {blueAlliance}
+        </div>
+      </div>
+      <div
+        className="col-start-6 row-span-2 row-start-1 overflow-hidden rounded-r-md border-1
+          border-transparent xl:col-span-2 xl:col-start-9"
+      >
+        <div className="flex h-full items-center justify-center bg-[#f0f0f0] p-[5px]">
+          {scores}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // todo: add support for specific-team underlines
 function MatchResultsTableGroup({
   matches,
   event,
   team,
 }: MatchResultsTableProps) {
-  const gridStyle = cn(
-    // always use these classes:
-    'grid items-center justify-items-center',
-    '*:justify-center *:justify-self-stretch',
-    '*:h-full *:content-center *:p-[5px] *:text-center',
-    // use these classes on mobile:
-    'grid-rows-2',
-    'grid-cols-[calc(1.25em+10px)_8em_1fr_1fr_1fr_1fr]', // 6 columns of these sizes
-    'border-b-[1px] border-[#000]',
-    '*:border-[1px] *:border-[#ddd]',
-    // use these on desktop:
-    'lg:grid-rows-1',
-    'lg:grid-cols-[calc(1.25em+6px*2)_10em_repeat(6,minmax(0,1fr))_0.9fr_0.9fr]',
-    'lg:border-b-[1px] lg:border-[#ddd]',
-    'lg:*:border-0 lg:*:border-r-[1px]', // reset the border, then apply one to the right
+  return (
+    <div>
+      <MatchRow
+        matchName={<span className="font-semibold">Match</span>}
+        redAlliance={<span className="font-semibold">Red Alliance</span>}
+        blueAlliance={<span className="font-semibold">Blue Alliance</span>}
+        scores={<span className="font-semibold">Scores</span>}
+        isHeader
+      />
+      {matches.map((match) => (
+        <MatchRow
+          key={match.key}
+          matchName={matchTitleShort(match, event)}
+          redAlliance={match.alliances.red.team_keys.map((teamKey) => {
+            const dq = match.alliances.red.dq_team_keys.includes(teamKey);
+            const surrogate =
+              match.alliances.red.surrogate_team_keys.includes(teamKey);
+            return (
+              <div
+                key={teamKey}
+                className={cn('grow basis-0', {
+                  'font-semibold': match.winning_alliance === 'red',
+                  'line-through': dq,
+                  'underline decoration-dotted': surrogate,
+                  underline: team?.key === teamKey,
+                })}
+              >
+                <ConditionalTooltip dq={dq} surrogate={surrogate}>
+                  <TeamLink teamOrKey={teamKey} year={event.year}>
+                    {teamKey.substring(3)}
+                  </TeamLink>
+                </ConditionalTooltip>
+              </div>
+            );
+          })}
+          blueAlliance={match.alliances.blue.team_keys.map((teamKey) => {
+            const dq = match.alliances.blue.dq_team_keys.includes(teamKey);
+            const surrogate =
+              match.alliances.blue.surrogate_team_keys.includes(teamKey);
+            return (
+              <div
+                key={teamKey}
+                className={cn('grow basis-0', {
+                  'font-semibold': match.winning_alliance === 'blue',
+                  'line-through': dq,
+                  'underline decoration-dotted': surrogate,
+                  underline: team?.key === teamKey,
+                })}
+              >
+                <ConditionalTooltip dq={dq} surrogate={surrogate}>
+                  <TeamLink teamOrKey={teamKey} year={event.year}>
+                    {teamKey.substring(3)}
+                  </TeamLink>
+                </ConditionalTooltip>
+              </div>
+            );
+          })}
+          scores={
+            <>
+              <div
+                className={cn('grow basis-0 bg-alliance-red-dark', {
+                  'font-semibold': match.winning_alliance === 'red',
+                })}
+              >
+                {match.alliances.red.score}
+              </div>
+              <div
+                className={cn('grow basis-0 bg-alliance-blue-dark', {
+                  'font-semibold': match.winning_alliance === 'blue',
+                })}
+              >
+                {match.alliances.blue.score}
+              </div>
+            </>
+          }
+        />
+      ))}
+    </div>
   );
 
   return (
