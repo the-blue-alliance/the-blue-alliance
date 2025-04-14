@@ -71,7 +71,7 @@ def event_pit_locations(event_key: EventKey) -> Response:
         abort(404)
 
     eventteams_future = EventEventTeamsQuery(event_key).fetch_async()
-    nexus_pit_locations_future = NexusPitLocations(event_key).fetch_async()
+    nexus_pit_locations_future = NexusPitLocations(event).fetch_async()
 
     eventteams = eventteams_future.get_result()
     nexus_pit_locations = nexus_pit_locations_future.get_result()

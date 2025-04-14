@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
-from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.keys import TeamKey
 from backend.common.sitevars.nexus_api_secret import NexusApiSecrets
 from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase, TReturn
 from backend.tasks_io.datafeeds.parsers.nexus_api.pit_location_parser import (
@@ -45,12 +45,12 @@ class _DatafeedNexus(DatafeedBase[TReturn]):
 
 class NexusPitLocations(_DatafeedNexus[Dict[TeamKey, EventTeamPitLocation]]):
 
-    def __init__(self, event_key: EventKey) -> None:
+    def __init__(self, event: Event) -> None:
         super().__init__()
-        self.event_key = event_key
+        self.event = event
 
     def endpoint(self) -> str:
-        return f"/event/{self.event_key}/pits"
+        return f"/event/{self.event.year}{self.event.first_api_code}/pits"
 
     def parser(self) -> NexusAPIPitLocationParser:
         return NexusAPIPitLocationParser()
@@ -62,7 +62,7 @@ class NexusEventQueueStatus(_DatafeedNexus[Optional[EventQueueStatus]]):
         self.event = event
 
     def endpoint(self) -> str:
-        return f"/event/{self.event.key_name}"
+        return f"/event/{self.event.year}{self.event.first_api_code}"
 
     def parser(self) -> NexusAPIQueueStatusParser:
         return NexusAPIQueueStatusParser(self.event)

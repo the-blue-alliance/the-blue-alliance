@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any
+from typing import Any, Optional
 from unittest import mock
 
 import pytest
@@ -45,11 +45,12 @@ def nexus_api_secrets(ndb_stub) -> None:
     NexusApiSecrets.put(NexusAPISecretsContentType(api_secret="abc123"))
 
 
-def create_event() -> Event:
+def create_event(api_short: Optional[str] = None) -> Event:
     e = Event(
         id="2019casj",
         year=2019,
         event_short="casj",
+        first_code=api_short,
         start_date=datetime.datetime(2019, 4, 1),
         end_date=datetime.datetime(2019, 4, 3),
         event_type_enum=EventType.REGIONAL,
@@ -97,21 +98,33 @@ def test_request(api_mock: mock.Mock, ndb_stub, nexus_api_secrets) -> None:
 
 @mock.patch.object(NexusAPIPitLocationParser, "parse")
 @mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_locations_different_api_short(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(api_short="test")
+
+    endpoint = NexusPitLocations(e).endpoint()
+    assert endpoint == "/event/2019test/pits"
+
+
+@mock.patch.object(NexusAPIPitLocationParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
 def test_get_pit_locations(
     api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
 ) -> None:
+    e = create_event()
     api_content = {
         "100": "A1",
     }
     api_response = URLFetchResult.mock_for_content(
-        "https://frc.nexus/api/v3/event/2025casj/pits",
+        "https://frc.nexus/api/v3/event/2019casj/pits",
         200,
         json.dumps(api_content),
     )
     api_mock.return_value = InstantFuture(api_response)
     parser_mock.return_value = api_content
 
-    response = NexusPitLocations("2019casj").fetch_async()
+    response = NexusPitLocations(e).fetch_async()
     assert response.get_result() == api_content
 
 
@@ -120,6 +133,7 @@ def test_get_pit_locations(
 def test_get_pit_locations_missing(
     api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
 ) -> None:
+    e = create_event()
     api_content = "No pits"
     api_response = URLFetchResult.mock_for_content(
         "https://frc.nexus/api/v3/event/2025casj/pits",
@@ -128,7 +142,7 @@ def test_get_pit_locations_missing(
     )
     api_mock.return_value = InstantFuture(api_response)
 
-    response = NexusPitLocations("2019casj").fetch_async()
+    response = NexusPitLocations(e).fetch_async()
     assert response.get_result() is None
     parser_mock.assert_not_called()
 
@@ -138,6 +152,7 @@ def test_get_pit_locations_missing(
 def test_get_pit_locations_error(
     api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
 ) -> None:
+    e = create_event()
     api_content = ""
     api_response = URLFetchResult.mock_for_content(
         "https://frc.nexus/api/v3/event/2025casj/pits",
@@ -146,7 +161,7 @@ def test_get_pit_locations_error(
     )
     api_mock.return_value = InstantFuture(api_response)
 
-    response = NexusPitLocations("2019casj").fetch_async()
+    response = NexusPitLocations(e).fetch_async()
     assert response.get_result() is None
     parser_mock.assert_not_called()
 
@@ -168,3 +183,14 @@ def test_get_event_queue_status(
 
     response = NexusEventQueueStatus(e).fetch_async()
     assert response.get_result() == api_content
+
+
+@mock.patch.object(NexusAPIQueueStatusParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_event_queue_status_different_api_short(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(api_short="test")
+
+    endpoint = NexusEventQueueStatus(e).endpoint()
+    assert endpoint == "/event/2019test"
