@@ -19,7 +19,7 @@ async function loadData(params: Route.LoaderArgs['params']) {
   if (pageNum === undefined) {
     throw new Response(null, {
       status: 404,
-      statusText: "Page Number was not specified in request"
+      statusText: 'Page Number was not specified in request',
     });
   }
 
@@ -30,31 +30,30 @@ async function loadData(params: Route.LoaderArgs['params']) {
   if (apiStatus.status !== 200) {
     throw new Response(null, {
       status: 500,
-      statusText: "Server failed to respond with API Status"
+      statusText: 'Server failed to respond with API Status',
     });
   }
 
   if (apiStatus.data.max_team_page === 0) {
     throw new Response(null, {
       status: 404,
-      statusText: "Data for Max Team Page was missing or incorrect"
+      statusText: 'Data for Max Team Page was missing or incorrect',
     });
   }
-
 
   const maxPageNum = apiStatus.data.max_team_page;
 
   if (teamsSetOne.status !== 200) {
     throw new Response(null, {
       status: 500,
-      statusText: "Server failed to respond with Team Data (Set 1/2)"
+      statusText: 'Server failed to respond with Team Data (Set 1/2)',
     });
   }
 
   if (teamsSetOne.data.length === 0) {
     throw new Response(null, {
       status: 404,
-      statusText: "Team Data (Set 1/2) was missing"
+      statusText: 'Team Data (Set 1/2) was missing',
     });
   }
 
@@ -66,14 +65,14 @@ async function loadData(params: Route.LoaderArgs['params']) {
     if (teamsSetTwo.status !== 200) {
       throw new Response(null, {
         status: 500,
-        statusText: "Server failed to respond with Team Data (Set 2/2)"
+        statusText: 'Server failed to respond with Team Data (Set 2/2)',
       });
     }
 
     if (teamsSetTwo.data.length === 0) {
       throw new Response(null, {
         status: 404,
-        statusText: "Team Data (Set 2/2) was missing"
+        statusText: 'Team Data (Set 2/2) was missing',
       });
     }
 
@@ -118,7 +117,7 @@ function TeamPageNumberToRange(pageNum: number, maxPageNum: number): string {
   }
 
   let start = pageNum * 500;
-  let end = start + ((maxPageNum === pageNum) ? 500 : 1000);
+  let end = start + (maxPageNum === pageNum ? 500 : 1000);
 
   return `${start}-${end}`;
 }
@@ -138,7 +137,9 @@ export default function TeamsPage() {
             }}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={TeamPageNumberToRange(pageNum, maxPageNum)} />
+              <SelectValue
+                placeholder={TeamPageNumberToRange(pageNum, maxPageNum)}
+              />
             </SelectTrigger>
             <SelectContent>
               {pageNum % 2 === 1 && (
@@ -147,13 +148,17 @@ export default function TeamsPage() {
                 </SelectItem>
               )}
 
-              {Array.from({ length: Math.ceil(maxPageNum / 2) + ((maxPageNum % 2 === 0) ? 1 : 0) }, (_, i) => i * 2).map(
-                (page) => (
-                  <SelectItem key={page} value={String(page)}>
-                    {TeamPageNumberToRange(page, maxPageNum)}
-                  </SelectItem>
-                ),
-              )}
+              {Array.from(
+                {
+                  length:
+                    Math.ceil(maxPageNum / 2) + (maxPageNum % 2 === 0 ? 1 : 0),
+                },
+                (_, i) => i * 2,
+              ).map((page) => (
+                <SelectItem key={page} value={String(page)}>
+                  {TeamPageNumberToRange(page, maxPageNum)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -161,7 +166,8 @@ export default function TeamsPage() {
       <div className="basis-full overflow-x-auto lg:basis-5/6 lg:py-8">
         {
           <h1 className="mb-3 text-3xl font-medium">
-            <em>FIRST</em> Robotics Teams {TeamPageNumberToRange(pageNum, maxPageNum)}{' '}
+            <em>FIRST</em> Robotics Teams{' '}
+            {TeamPageNumberToRange(pageNum, maxPageNum)}{' '}
             <small className="text-xl text-slate-500">
               {teams.length} Teams
             </small>

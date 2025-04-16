@@ -4894,10 +4894,6 @@
             "type": "integer",
             "description": "Maximum FRC season year for valid queries."
           },
-          "max_team_page": {
-            "type": "integer",
-            "description": "Maximum FRC team page."
-          },
           "is_datafeed_down": {
             "type": "boolean",
             "description": "True if the entire FMS API provided by FIRST is down."
