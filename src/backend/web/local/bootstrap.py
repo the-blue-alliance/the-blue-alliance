@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, cast, Dict, List, Optional, Union
 
 import requests
 from google.appengine.ext import ndb
@@ -20,6 +20,7 @@ from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.award import Award
 from backend.common.models.district import ALL_KNOWN_DISTRICT_ABBREVIATIONS, District
+from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
@@ -124,7 +125,7 @@ class LocalDataBootstrap:
         return AwardManipulator.createOrUpdate(award)
 
     @classmethod
-    def fetch_endpoint(cls, endpoint: str, auth_token: str) -> Dict:
+    def fetch_endpoint(cls, endpoint: str, auth_token: str) -> Union[Dict, List]:
         full_url = f"https://www.thebluealliance.com/api/v3/{endpoint}"
         r = requests.get(
             full_url, headers={cls.AUTH_HEADER: auth_token, "User-agent": "Mozilla/5.0"}
@@ -133,35 +134,62 @@ class LocalDataBootstrap:
 
     @classmethod
     def fetch_team(cls, team_key: TeamKey, auth_token: str) -> Dict:
-        return cls.fetch_endpoint(f"team/{team_key}", auth_token)
+        return cast(Dict, cls.fetch_endpoint(f"team/{team_key}", auth_token))
 
     @classmethod
     def fetch_team_media(cls, team_key: TeamKey, year: int, auth_token: str) -> Dict:
-        return cls.fetch_endpoint(f"team/{team_key}/media/{year}", auth_token)
+        return cast(
+            Dict, cls.fetch_endpoint(f"team/{team_key}/media/{year}", auth_token)
+        )
 
     @classmethod
     def fetch_event(cls, event_key: EventKey, auth_token: str) -> Dict:
-        return cls.fetch_endpoint(f"event/{event_key}", auth_token)
+        return cast(Dict, cls.fetch_endpoint(f"event/{event_key}", auth_token))
 
     @classmethod
     def fetch_match(cls, match_key: MatchKey, auth_token: str) -> Dict:
-        return cls.fetch_endpoint(f"match/{match_key}", auth_token)
+        return cast(Dict, cls.fetch_endpoint(f"match/{match_key}", auth_token))
 
     @classmethod
     def fetch_district_history(
         cls, district_abbr: DistrictAbbreviation, auth_token: str
     ) -> Dict:
-        return cls.fetch_endpoint(f"district/{district_abbr}/history", auth_token)
+        return cast(
+            Dict, cls.fetch_endpoint(f"district/{district_abbr}/history", auth_token)
+        )
+
+    @classmethod
+    def fetch_district_events(cls, district_key: DistrictKey, auth_token: str) -> Dict:
+        return cast(
+            Dict, cls.fetch_endpoint(f"district/{district_key}/events", auth_token)
+        )
 
     @classmethod
     def fetch_match_zebra(cls, match_key: MatchKey, auth_token: str) -> Dict:
-        return cls.fetch_endpoint(f"match/{match_key}/zebra_motionworks", auth_token)
+        return cast(
+            Dict, cls.fetch_endpoint(f"match/{match_key}/zebra_motionworks", auth_token)
+        )
+
+    @classmethod
+    def fetch_district_rankings(
+        cls, district_key: DistrictKey, auth_token: str
+    ) -> List[Dict]:
+        return cast(
+            List[Dict],
+            cls.fetch_endpoint(f"district/{district_key}/rankings", auth_token),
+        )
 
     @classmethod
     def fetch_event_detail(
         cls, event_key: EventKey, detail: str, auth_token: str
     ) -> Dict:
-        return cls.fetch_endpoint(f"event/{event_key}/{detail}", auth_token)
+        return cast(Dict, cls.fetch_endpoint(f"event/{event_key}/{detail}", auth_token))
+
+    @classmethod
+    def fetch_district_teams(cls, district_key: DistrictKey, auth_token: str) -> Dict:
+        return cast(
+            Dict, cls.fetch_endpoint(f"district/{district_key}/teams", auth_token)
+        )
 
     @classmethod
     def update_events(cls, keys: List[EventKey], auth_token: str) -> None:
@@ -212,10 +240,6 @@ class LocalDataBootstrap:
         cls.store_match_zebra(zebra_data)
 
     @classmethod
-    def fetch_district_teams(cls, district_key: DistrictKey, auth_token: str) -> Dict:
-        return cls.fetch_endpoint(f"district/{district_key}/teams", auth_token)
-
-    @classmethod
     def update_district(cls, district_data: Dict, auth_token: str) -> None:
         district = cls.store_district(district_data)
 
@@ -224,6 +248,16 @@ class LocalDataBootstrap:
 
         for team in teams:
             cls.store_district_team(team, district)
+
+        district_events = cls.fetch_district_events(district.key_name, auth_token)
+        for event in district_events:
+            defer_safe(cls.update_event, event["key"], auth_token)
+
+        district.rankings = cast(
+            List[DistrictRanking],
+            cls.fetch_district_rankings(district.key_name, auth_token),
+        )
+        DistrictManipulator.createOrUpdate(district, update_manual_attrs=False)
 
     @classmethod
     def bootstrap_key(cls, key: str, apiv3_key: str) -> Optional[str]:

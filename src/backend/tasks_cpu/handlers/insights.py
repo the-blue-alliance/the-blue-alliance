@@ -280,3 +280,15 @@ def enqueue_all_insights_of_kind(kind: str) -> Response:
         )
 
     return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/math/do/insights/delete/<name>")
+def do_insights_delete(name: str) -> Response:
+    """
+    Deletes an insight from the datastore.
+    """
+
+    old_insight_keys = Insight.query(Insight.name == name).fetch(keys_only=True)
+    InsightManipulator.delete_keys(old_insight_keys)
+
+    return make_response("")

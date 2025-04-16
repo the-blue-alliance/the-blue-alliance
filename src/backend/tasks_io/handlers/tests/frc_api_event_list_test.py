@@ -27,7 +27,7 @@ def test_enqueue_current(
             "android": None,
             "ios": None,
             "web": None,
-            "max_team_page": 0
+            "max_team_page": 0,
         }
     )
     resp = tasks_client.get("/backend-tasks/enqueue/event_list/current")

@@ -1,6 +1,12 @@
 from freezegun import freeze_time
 from werkzeug.test import Client
 
+from backend.common.consts.webcast_status import WebcastStatus
+from backend.common.consts.webcast_type import WebcastType
+from backend.common.memcache_models.webcast_online_status_memcache import (
+    WebcastOnlineStatusMemcache,
+)
+from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
 
 
@@ -71,6 +77,15 @@ def test_team_info(web_client: Client, setup_full_team) -> None:
 def test_team_info_live_event_no_upcoming_matches(
     web_client: Client, setup_full_team
 ) -> None:
+    webcast_status = Webcast(
+        type=WebcastType.TWITCH,
+        channel="firstintexasevents",
+        status=WebcastStatus.ONLINE,
+        stream_title="Live Stream",
+        viewer_count=100,
+    )
+    WebcastOnlineStatusMemcache(webcast_status).put(webcast_status)
+
     resp = web_client.get("/team/148/2019")
     assert resp.status_code == 200
     assert "max-age=61" in resp.headers["Cache-Control"]

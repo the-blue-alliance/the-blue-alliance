@@ -10,9 +10,12 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts import event_type
-from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
+from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType, SEASON_EVENT_TYPES
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.futures import TypedFuture
+from backend.common.memcache_models.webcast_online_status_memcache import (
+    WebcastOnlineStatusMemcache,
+)
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
@@ -25,7 +28,8 @@ from backend.common.models.event_playoff_advancement import (
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.location import Location
-from backend.common.models.webcast import Webcast
+from backend.common.models.webcast import Webcast, WebcastOnlineStatus
+from backend.common.tasklets import typed_toplevel
 
 # To avoid circular dependencies from type hints
 if typing.TYPE_CHECKING:
@@ -607,15 +611,33 @@ class Event(CachedModel):
                 self._webcast = None
         return self._webcast or []
 
-    @property
-    def webcast_status(self):
-        from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
+    @typed_toplevel
+    def _patch_webcast_online_status(self) -> Generator[Any, Any, None]:
+        status_futures = [
+            WebcastOnlineStatusMemcache(webcast).get_async()
+            for webcast in self.current_webcasts
+        ]
+        statuses: List[Optional[Webcast]] = yield status_futures
 
-        WebcastOnlineHelper.add_online_status(self.current_webcasts)
+        for webcast, with_status in zip(self.current_webcasts, statuses):
+            if with_status is not None:
+                webcast.update(
+                    WebcastOnlineStatus(
+                        status=with_status["status"],
+                        stream_title=with_status["stream_title"],
+                        viewer_count=with_status["viewer_count"],
+                    )
+                )
+
+    @property
+    def webcast_status(self) -> str:
+        self._patch_webcast_online_status()
 
         overall_status = "offline"
-        for webcast in self.current_webcasts:
-            status = webcast.get("status")
+        for webcast_with_status in self.current_webcasts:
+            if webcast_with_status is None:
+                continue
+            status = webcast_with_status.get("status")
             if status == "online":
                 overall_status = "online"
                 break
@@ -643,12 +665,8 @@ class Event(CachedModel):
 
     @property
     def online_webcasts(self):
+        self._patch_webcast_online_status()
         current_webcasts = self.current_webcasts
-
-        from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
-
-        WebcastOnlineHelper.add_online_status(current_webcasts)
-
         return list(
             filter(
                 lambda x: x.get("status", "") != "offline",
@@ -704,6 +722,9 @@ class Event(CachedModel):
     def public_agenda_url(self) -> Optional[str]:
         if self.event_type_enum not in SEASON_EVENT_TYPES:
             return None
+
+        if self.event_type_enum in CMP_EVENT_TYPES:
+            return f"https://www.firstchampionship.org/sites/default/files/{self.year}/{self.year}-FIRST-Robotics-Competition-Addendum.pdf"
 
         return f"http://firstinspires.org/sites/default/files/uploads/frc/{self.year}-events/{self.year}_{self.event_short.upper()}_Agenda.pdf"
 

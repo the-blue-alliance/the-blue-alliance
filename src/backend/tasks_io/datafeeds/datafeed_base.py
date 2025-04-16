@@ -1,13 +1,14 @@
 import abc
 import logging
 from typing import Any, Dict, Generator, Generic, Optional, TypeVar
+from urllib.parse import urlencode
 
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb.context import Context
 
 from backend.common.futures import TypedFuture
 from backend.common.profiler import Span
-from backend.common.urlfetch import URLFetchResult
+from backend.common.urlfetch import URLFetchMethod, URLFetchResult
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
 
 
@@ -24,11 +25,18 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
     @abc.abstractmethod
     def url(self) -> str: ...
 
-    @abc.abstractmethod
-    def headers(self) -> Dict[str, str]: ...
+    def headers(self) -> Dict[str, str]:
+        return {}
 
     @abc.abstractmethod
     def parser(self) -> ParserBase[TReturn]: ...
+
+    @property
+    def method(self) -> URLFetchMethod:
+        return URLFetchMethod.GET
+
+    def payload(self) -> Optional[Dict[str, str]]:
+        return None
 
     def fetch_async(self) -> TypedFuture[Optional[TReturn]]:
         # Work around a pyre limitation where we can't combine
@@ -51,7 +59,18 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
         self, url: str, headers: Dict[str, str]
     ) -> Generator[Any, Any, URLFetchResult]:
         with Span(f"api_fetch:{type(self).__name__}"):
-            resp = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
+            if payload_data := self.payload():
+                payload = urlencode(payload_data).encode()
+            else:
+                payload = None
+
+            resp = yield self.ndb_context.urlfetch(
+                url,
+                headers=headers,
+                deadline=30,
+                method=self.method,
+                payload=payload,
+            )
             return URLFetchResult(url, resp)
 
     def _parse(

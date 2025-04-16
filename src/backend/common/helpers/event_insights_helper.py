@@ -114,12 +114,22 @@ class EventInsightsHelper:
             if blue_sb["coopertitionCriteriaMet"]:
                 coopertition_count += 1
 
-            red_all_rp = red_sb["autoBonusAchieved"] and red_sb["bargeBonusAchieved"] and red_sb["coralBonusAchieved"]
-            blue_all_rp = blue_sb["autoBonusAchieved"] and blue_sb["bargeBonusAchieved"] and blue_sb["coralBonusAchieved"]
+            red_all_rp = (
+                red_sb["autoBonusAchieved"]
+                and red_sb["bargeBonusAchieved"]
+                and red_sb["coralBonusAchieved"]
+            )
+            blue_all_rp = (
+                blue_sb["autoBonusAchieved"]
+                and blue_sb["bargeBonusAchieved"]
+                and blue_sb["coralBonusAchieved"]
+            )
 
-            if (red_score > blue_score and red_all_rp) or (blue_score > red_score and blue_all_rp):
+            if (red_score > blue_score and red_all_rp) or (
+                blue_score > red_score and blue_all_rp
+            ):
                 six_rp_count += 1
-                if (red_all_rp and blue_all_rp):
+                if red_all_rp and blue_all_rp:
                     nine_rp_count += 1
 
             total_scores += red_score + blue_score

@@ -7,6 +7,7 @@ export default class WebcastSelectionDialogItem extends React.Component {
     webcast: PropTypes.object.isRequired,
     webcastSelected: PropTypes.func.isRequired,
     secondaryText: PropTypes.string,
+    leftIcon: PropTypes.element,
     rightIcon: PropTypes.any,
   };
 
@@ -20,7 +21,11 @@ export default class WebcastSelectionDialogItem extends React.Component {
         primaryText={this.props.webcast.name}
         secondaryText={this.props.secondaryText}
         onClick={() => this.handleClick()}
+        leftIcon={this.props.leftIcon}
         rightIcon={this.props.rightIcon}
+        innerDivStyle={{
+          paddingLeft: "50px", // Leave room for the left icon
+        }}
       />
     );
   }
