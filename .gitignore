@@ -19,8 +19,6 @@ venv/
 .vscode
 .idea
 
-# TBA API Key file
-APIKEYS.txt
 tba-key-setup.sh
 shell.nix
 
