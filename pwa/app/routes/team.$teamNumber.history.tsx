@@ -1,4 +1,5 @@
 import { useLoaderData, useNavigate } from 'react-router';
+import { Fragment } from 'react/jsx-runtime';
 
 import {
   getTeam,
@@ -141,39 +142,50 @@ export default function TeamPage(): React.JSX.Element {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {history.events.map((e) => (
-              <TableRow key={e.key}>
-                <TableCell>
-                  <TeamLink teamOrKey={team} year={e.year}>
-                    {e.year}
-                  </TeamLink>
-                </TableCell>
-                <TableCell>
-                  <EventLink eventOrKey={e}>{e.name}</EventLink>
-                </TableCell>
-                <TableCell>
-                  {joinComponents(
-                    history.awards
-                      .filter((a) => a.event_key === e.key)
-                      .map((a) => {
-                        const teamRecipients = a.recipient_list
-                          .filter((r) => r.awardee !== null)
-                          .filter((r) => r.awardee !== '')
-                          .filter((r) => r.team_key === team.key)
-                          .map((r) => r.awardee);
+            {history.events.map((e, i) => (
+              <Fragment key={e.key}>
+                {(i == 0 || history.events[i - 1].year !== e.year) && (
+                  <TableRow>
+                    <TableCell
+                      rowSpan={
+                        history.events.filter((e2) => e2.year === e.year)
+                          .length + 1
+                      }
+                    >
+                      <TeamLink teamOrKey={team} year={e.year}>
+                        {e.year}
+                      </TeamLink>
+                    </TableCell>
+                  </TableRow>
+                )}
+                <TableRow>
+                  <TableCell>
+                    <EventLink eventOrKey={e}>{e.name}</EventLink>
+                  </TableCell>
+                  <TableCell>
+                    {joinComponents(
+                      history.awards
+                        .filter((a) => a.event_key === e.key)
+                        .map((a) => {
+                          const teamRecipients = a.recipient_list
+                            .filter((r) => r.awardee !== null)
+                            .filter((r) => r.awardee !== '')
+                            .filter((r) => r.team_key === team.key)
+                            .map((r) => r.awardee);
 
-                        return (
-                          <span key={`${a.event_key}_${a.award_type}`}>
-                            {a.name}
-                            {teamRecipients.length > 0 &&
-                              ` (${teamRecipients.join(', ')})`}
-                          </span>
-                        );
-                      }),
-                    <br />,
-                  )}
-                </TableCell>
-              </TableRow>
+                          return (
+                            <span key={`${a.event_key}_${a.award_type}`}>
+                              {a.name}
+                              {teamRecipients.length > 0 &&
+                                ` (${teamRecipients.join(', ')})`}
+                            </span>
+                          );
+                        }),
+                      <br />,
+                    )}
+                  </TableCell>
+                </TableRow>
+              </Fragment>
             ))}
           </TableBody>
         </Table>
