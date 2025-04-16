@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.15
+ * 3.9.13
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -35,8 +35,6 @@ export type ApiStatus = {
   down_events: string[];
   ios: ApiStatusAppVersion;
   android: ApiStatusAppVersion;
-  /** Maximum team page number for valid queries. */
-  max_team_page: number;
 };
 export type Team = {
   /** TBA team key with the format `frcXXXX` with `XXXX` representing the team number. */
@@ -103,18 +101,18 @@ export type DistrictList = {
 export type Webcast = {
   /** Type of webcast, typically descriptive of the streaming provider. */
   type:
-  | 'youtube'
-  | 'twitch'
-  | 'ustream'
-  | 'iframe'
-  | 'html5'
-  | 'rtmp'
-  | 'livestream'
-  | 'direct_link'
-  | 'mms'
-  | 'justin'
-  | 'stemtv'
-  | 'dacast';
+    | 'youtube'
+    | 'twitch'
+    | 'ustream'
+    | 'iframe'
+    | 'html5'
+    | 'rtmp'
+    | 'livestream'
+    | 'direct_link'
+    | 'mms'
+    | 'justin'
+    | 'stemtv'
+    | 'dacast';
   /** Type specific channel information. May be the YouTube stream, or Twitch channel name. In the case of iframe types, contains HTML to embed the stream in an HTML iframe. */
   channel: string;
   /** The date for the webcast in `yyyy-mm-dd` format. May be null. */
@@ -905,19 +903,19 @@ export type Match = {
   post_result_time: number | null;
   /** Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null. */
   score_breakdown:
-  | (
-    | MatchScoreBreakdown2015
-    | MatchScoreBreakdown2016
-    | MatchScoreBreakdown2017
-    | MatchScoreBreakdown2018
-    | MatchScoreBreakdown2019
-    | MatchScoreBreakdown2020
-    | MatchScoreBreakdown2022
-    | MatchScoreBreakdown2023
-    | MatchScoreBreakdown2024
-    | MatchScoreBreakdown2025
-  )
-  | null;
+    | (
+        | MatchScoreBreakdown2015
+        | MatchScoreBreakdown2016
+        | MatchScoreBreakdown2017
+        | MatchScoreBreakdown2018
+        | MatchScoreBreakdown2019
+        | MatchScoreBreakdown2020
+        | MatchScoreBreakdown2022
+        | MatchScoreBreakdown2023
+        | MatchScoreBreakdown2024
+        | MatchScoreBreakdown2025
+      )
+    | null;
   /** Array of video objects associated with this match. */
   videos: {
     /** Can be one of 'youtube' or 'tba' */
@@ -954,21 +952,20 @@ export type MatchSimple = {
 export type Media = {
   /** String type of the media element. */
   type:
-  | 'youtube'
-  | 'cdphotothread'
-  | 'imgur'
-  | 'facebook-profile'
-  | 'youtube-channel'
-  | 'twitter-profile'
-  | 'github-profile'
-  | 'instagram-profile'
-  | 'periscope-profile'
-  | 'gitlab-profile'
-  | 'grabcad'
-  | 'instagram-image'
-  | 'external-link'
-  | 'avatar'
-  | 'onshape';
+    | 'youtube'
+    | 'cdphotothread'
+    | 'imgur'
+    | 'facebook-profile'
+    | 'youtube-channel'
+    | 'twitter-profile'
+    | 'github-profile'
+    | 'instagram-profile'
+    | 'periscope-profile'
+    | 'gitlab-profile'
+    | 'grabcad'
+    | 'instagram-image'
+    | 'external-link'
+    | 'avatar';
   /** The key used to identify this media on the media site. */
   foreign_key: string;
   /** If required, a JSON dict of additional media information. */
@@ -1137,55 +1134,6 @@ export type DistrictRanking = {
     qual_points: number;
   }[];
 };
-export type DistrictAdvancement = {
-  /** Whether or not the team qualified for their District Championship */
-  dcmp: boolean;
-  /** Whether or not the team qualified for the FIRST Championship */
-  cmp: boolean;
-};
-export type RegionalAdvancement = {
-  /** Whether or not the team qualified for Championship. */
-  cmp: boolean;
-  cmp_status:
-  | 'NotInvited'
-  | 'PreQualified'
-  | 'EventQualified'
-  | 'PoolQualified'
-  | 'Declined';
-  /** The event key at which the team qualified */
-  qualifying_event?: string;
-  /** The name of the award which qualified the team */
-  qualifying_award_name?: string;
-  /** Which week number's regional pool invitation the team got */
-  qualifying_pool_week?: number;
-};
-export type RegionalRanking = {
-  /** TBA team key for the team. */
-  team_key: string;
-  /** Numerical rank of the team, 1 being top rank. */
-  rank: number;
-  /** Any points added to a team as a result of the rookie bonus. */
-  rookie_bonus?: number;
-  /** Additional points awarded in lieu of a second event, based on first event performance */
-  single_event_bonus?: number;
-  /** Total district points for the team. */
-  point_total: number;
-  /** List of events that contributed to the point total for the team. */
-  event_points?: {
-    /** Total points awarded at this event. */
-    total: number;
-    /** Points awarded for alliance selection. */
-    alliance_points: number;
-    /** Points awarded for elimination match performance. */
-    elim_points: number;
-    /** Points awarded for event awards. */
-    award_points: number;
-    /** TBA Event key for this event. */
-    event_key: string;
-    /** Points awarded for qualification match performance. */
-    qual_points: number;
-  }[];
-};
 export type LeaderboardInsight = {
   data: {
     rankings: {
@@ -1236,22 +1184,22 @@ export function getStatus(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: ApiStatus;
-    }
+        status: 200;
+        data: ApiStatus;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >('/status', {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1274,22 +1222,22 @@ export function getTeams(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Team[];
-    }
+        status: 200;
+        data: Team[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/teams/${encodeURIComponent(pageNum)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1312,22 +1260,22 @@ export function getTeamsSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: TeamSimple[];
-    }
+        status: 200;
+        data: TeamSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/teams/${encodeURIComponent(pageNum)}/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1350,22 +1298,22 @@ export function getTeamsKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/teams/${encodeURIComponent(pageNum)}/keys`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1390,22 +1338,22 @@ export function getTeamsByYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Team[];
-    }
+        status: 200;
+        data: Team[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1430,22 +1378,22 @@ export function getTeamsByYearSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: TeamSimple[];
-    }
+        status: 200;
+        data: TeamSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}/simple`,
     {
@@ -1473,22 +1421,22 @@ export function getTeamsByYearKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/teams/${encodeURIComponent(year)}/${encodeURIComponent(pageNum)}/keys`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1511,22 +1459,22 @@ export function getTeam(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Team;
-    }
+        status: 200;
+        data: Team;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1549,22 +1497,22 @@ export function getTeamSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: TeamSimple;
-    }
+        status: 200;
+        data: TeamSimple;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1587,22 +1535,22 @@ export function getTeamHistory(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: History;
-    }
+        status: 200;
+        data: History;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/history`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1625,22 +1573,22 @@ export function getTeamYearsParticipated(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: number[];
-    }
+        status: 200;
+        data: number[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/years_participated`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1663,22 +1611,22 @@ export function getTeamDistricts(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: DistrictList[];
-    }
+        status: 200;
+        data: DistrictList[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/districts`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1701,22 +1649,22 @@ export function getTeamRobots(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: TeamRobot[];
-    }
+        status: 200;
+        data: TeamRobot[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/robots`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1739,22 +1687,22 @@ export function getTeamEvents(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Event[];
-    }
+        status: 200;
+        data: Event[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/events`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1777,22 +1725,22 @@ export function getTeamEventsSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventSimple[];
-    }
+        status: 200;
+        data: EventSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/events/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1815,22 +1763,22 @@ export function getTeamEventsKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/events/keys`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1855,22 +1803,22 @@ export function getTeamEventsByYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Event[];
-    }
+        status: 200;
+        data: Event[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -1895,22 +1843,22 @@ export function getTeamEventsByYearSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventSimple[];
-    }
+        status: 200;
+        data: EventSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/simple`,
     {
@@ -1938,22 +1886,22 @@ export function getTeamEventsByYearKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/keys`,
     {
@@ -1981,24 +1929,24 @@ export function getTeamEventsStatusesByYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: {
-        [key: string]: TeamEventStatus | null;
-      };
-    }
+        status: 200;
+        data: {
+          [key: string]: TeamEventStatus | null;
+        };
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/events/${encodeURIComponent(year)}/statuses`,
     {
@@ -2026,22 +1974,22 @@ export function getTeamEventMatches(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Match[];
-    }
+        status: 200;
+        data: Match[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches`,
     {
@@ -2069,22 +2017,22 @@ export function getTeamEventMatchesSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Match[];
-    }
+        status: 200;
+        data: Match[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches/simple`,
     {
@@ -2112,22 +2060,22 @@ export function getTeamEventMatchesKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/matches/keys`,
     {
@@ -2155,22 +2103,22 @@ export function getTeamEventAwards(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Award[];
-    }
+        status: 200;
+        data: Award[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/awards`,
     {
@@ -2198,22 +2146,22 @@ export function getTeamEventStatus(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: TeamEventStatus | null;
-    }
+        status: 200;
+        data: TeamEventStatus | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/event/${encodeURIComponent(eventKey)}/status`,
     {
@@ -2239,22 +2187,22 @@ export function getTeamAwards(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Award[];
-    }
+        status: 200;
+        data: Award[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/awards`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2279,22 +2227,22 @@ export function getTeamAwardsByYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Award[];
-    }
+        status: 200;
+        data: Award[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/awards/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2319,22 +2267,22 @@ export function getTeamMatchesByYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Match[];
-    }
+        status: 200;
+        data: Match[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}`,
     {
@@ -2362,22 +2310,22 @@ export function getTeamMatchesByYearSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: MatchSimple[];
-    }
+        status: 200;
+        data: MatchSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}/simple`,
     {
@@ -2405,22 +2353,22 @@ export function getTeamMatchesByYearKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/matches/${encodeURIComponent(year)}/keys`,
     {
@@ -2448,22 +2396,22 @@ export function getTeamMediaByYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Media[];
-    }
+        status: 200;
+        data: Media[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/media/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2488,22 +2436,22 @@ export function getTeamMediaByTag(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Media[];
-    }
+        status: 200;
+        data: Media[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/media/tag/${encodeURIComponent(mediaTag)}`,
     {
@@ -2533,22 +2481,22 @@ export function getTeamMediaByTagYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Media[];
-    }
+        status: 200;
+        data: Media[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(
     `/team/${encodeURIComponent(teamKey)}/media/tag/${encodeURIComponent(mediaTag)}/${encodeURIComponent(year)}`,
     {
@@ -2574,22 +2522,22 @@ export function getTeamSocialMedia(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Media[];
-    }
+        status: 200;
+        data: Media[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/team/${encodeURIComponent(teamKey)}/social_media`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2612,22 +2560,22 @@ export function getEventsByYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Event[];
-    }
+        status: 200;
+        data: Event[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/events/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2650,22 +2598,22 @@ export function getEventsByYearSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventSimple[];
-    }
+        status: 200;
+        data: EventSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/events/${encodeURIComponent(year)}/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2688,22 +2636,22 @@ export function getEventsByYearKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/events/${encodeURIComponent(year)}/keys`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2726,22 +2674,22 @@ export function getEvent(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Event;
-    }
+        status: 200;
+        data: Event;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2764,22 +2712,22 @@ export function getEventSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventSimple;
-    }
+        status: 200;
+        data: EventSimple;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2802,22 +2750,22 @@ export function getEventAlliances(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EliminationAlliance[] | null;
-    }
+        status: 200;
+        data: EliminationAlliance[] | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/alliances`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2840,22 +2788,22 @@ export function getEventInsights(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventInsights | null;
-    }
+        status: 200;
+        data: EventInsights | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/insights`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2878,22 +2826,22 @@ export function getEventOpRs(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventOpRs | null;
-    }
+        status: 200;
+        data: EventOpRs | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/oprs`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2916,22 +2864,22 @@ export function getEventCopRs(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventCopRs | null;
-    }
+        status: 200;
+        data: EventCopRs | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/coprs`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2954,22 +2902,22 @@ export function getEventPredictions(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventPredictions | null;
-    }
+        status: 200;
+        data: EventPredictions | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/predictions`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -2992,22 +2940,22 @@ export function getEventRankings(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventRanking | null;
-    }
+        status: 200;
+        data: EventRanking | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/rankings`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3030,22 +2978,22 @@ export function getEventDistrictPoints(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventDistrictPoints | null;
-    }
+        status: 200;
+        data: EventDistrictPoints | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/district_points`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3068,22 +3016,22 @@ export function getRegionalChampsPoolPoints(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventDistrictPoints | null;
-    }
+        status: 200;
+        data: EventDistrictPoints | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/regional_champs_pool_points`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3106,22 +3054,22 @@ export function getEventAdvancementPoints(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventDistrictPoints | null;
-    }
+        status: 200;
+        data: EventDistrictPoints | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/advancement_points`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3144,22 +3092,22 @@ export function getEventTeams(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Team[];
-    }
+        status: 200;
+        data: Team[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/teams`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3182,22 +3130,22 @@ export function getEventTeamsSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: TeamSimple[];
-    }
+        status: 200;
+        data: TeamSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/teams/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3220,22 +3168,22 @@ export function getEventTeamsKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/teams/keys`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3258,24 +3206,24 @@ export function getEventTeamsStatuses(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: {
-        [key: string]: TeamEventStatus | null;
-      };
-    }
+        status: 200;
+        data: {
+          [key: string]: TeamEventStatus | null;
+        };
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/teams/statuses`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3298,22 +3246,22 @@ export function getEventMatches(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Match[];
-    }
+        status: 200;
+        data: Match[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/matches`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3336,22 +3284,22 @@ export function getEventMatchesSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: MatchSimple[];
-    }
+        status: 200;
+        data: MatchSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/matches/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3374,22 +3322,22 @@ export function getEventMatchesKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/matches/keys`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3414,22 +3362,22 @@ export function getEventMatchTimeseries(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/matches/timeseries`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3452,22 +3400,22 @@ export function getEventAwards(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Award[];
-    }
+        status: 200;
+        data: Award[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/awards`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3490,22 +3438,22 @@ export function getEventTeamMedia(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Media[];
-    }
+        status: 200;
+        data: Media[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/event/${encodeURIComponent(eventKey)}/team_media`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3528,22 +3476,22 @@ export function getMatch(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Match;
-    }
+        status: 200;
+        data: Match;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/match/${encodeURIComponent(matchKey)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3566,22 +3514,22 @@ export function getMatchSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: MatchSimple;
-    }
+        status: 200;
+        data: MatchSimple;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/match/${encodeURIComponent(matchKey)}/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3606,22 +3554,22 @@ export function getMatchTimeseries(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: {}[];
-    }
+        status: 200;
+        data: {}[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/match/${encodeURIComponent(matchKey)}/timeseries`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3644,22 +3592,22 @@ export function getMatchZebra(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Zebra;
-    }
+        status: 200;
+        data: Zebra;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/match/${encodeURIComponent(matchKey)}/zebra_motionworks`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3682,22 +3630,22 @@ export function getDistrictsByYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: DistrictList[];
-    }
+        status: 200;
+        data: DistrictList[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/districts/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3720,22 +3668,22 @@ export function getDistrictHistory(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: DistrictList[];
-    }
+        status: 200;
+        data: DistrictList[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtAbbreviation)}/history`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3758,22 +3706,22 @@ export function getDistrictEvents(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Event[];
-    }
+        status: 200;
+        data: Event[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtKey)}/events`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3796,22 +3744,22 @@ export function getDistrictAwards(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Award[];
-    }
+        status: 200;
+        data: Award[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtKey)}/awards`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3834,22 +3782,22 @@ export function getDistrictEventsSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: EventSimple[];
-    }
+        status: 200;
+        data: EventSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtKey)}/events/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3872,22 +3820,22 @@ export function getDistrictEventsKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtKey)}/events/keys`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3910,22 +3858,22 @@ export function getDistrictTeams(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: Team[];
-    }
+        status: 200;
+        data: Team[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtKey)}/teams`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3948,22 +3896,22 @@ export function getDistrictTeamsSimple(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: TeamSimple[];
-    }
+        status: 200;
+        data: TeamSimple[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtKey)}/teams/simple`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -3986,22 +3934,22 @@ export function getDistrictTeamsKeys(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: string[];
-    }
+        status: 200;
+        data: string[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtKey)}/teams/keys`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -4024,141 +3972,23 @@ export function getDistrictRankings(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: DistrictRanking[] | null;
-    }
+        status: 200;
+        data: DistrictRanking[] | null;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/district/${encodeURIComponent(districtKey)}/rankings`, {
-    ...opts,
-    headers: oazapfts.mergeHeaders(opts?.headers, {
-      'If-None-Match': ifNoneMatch,
-    }),
-  });
-}
-/**
- * Gets a list of advancement information per team in a district.
- */
-export function getDistrictAdvancement(
-  {
-    ifNoneMatch,
-    districtKey,
-  }: {
-    ifNoneMatch?: string;
-    districtKey: string;
-  },
-  opts?: Oazapfts.RequestOpts,
-) {
-  return oazapfts.fetchJson<
-    | {
-      status: 200;
-      data: {
-        [key: string]: DistrictAdvancement;
-      } | null;
-    }
-    | {
-      status: 304;
-    }
-    | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
-    | {
-      status: 404;
-    }
-  >(`/district/${encodeURIComponent(districtKey)}/advancement`, {
-    ...opts,
-    headers: oazapfts.mergeHeaders(opts?.headers, {
-      'If-None-Match': ifNoneMatch,
-    }),
-  });
-}
-/**
- * Gets information about per-team advancement to the FIRST Championship.
- */
-export function getRegionalAdvancement(
-  {
-    ifNoneMatch,
-    year,
-  }: {
-    ifNoneMatch?: string;
-    year: number;
-  },
-  opts?: Oazapfts.RequestOpts,
-) {
-  return oazapfts.fetchJson<
-    | {
-      status: 200;
-      data: {
-        [key: string]: RegionalAdvancement;
-      } | null;
-    }
-    | {
-      status: 304;
-    }
-    | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
-    | {
-      status: 404;
-    }
-  >(`/regional_advancement/${encodeURIComponent(year)}`, {
-    ...opts,
-    headers: oazapfts.mergeHeaders(opts?.headers, {
-      'If-None-Match': ifNoneMatch,
-    }),
-  });
-}
-/**
- * Gets the team rankings in the regional pool for a specific year.
- */
-export function getRegionalRankings(
-  {
-    ifNoneMatch,
-    year,
-  }: {
-    ifNoneMatch?: string;
-    year: number;
-  },
-  opts?: Oazapfts.RequestOpts,
-) {
-  return oazapfts.fetchJson<
-    | {
-      status: 200;
-      data: RegionalRanking[] | null;
-    }
-    | {
-      status: 304;
-    }
-    | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
-    | {
-      status: 404;
-    }
-  >(`/regional_advancement/${encodeURIComponent(year)}/rankings`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
       'If-None-Match': ifNoneMatch,
@@ -4180,22 +4010,22 @@ export function getInsightsLeaderboardsYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: LeaderboardInsight[];
-    }
+        status: 200;
+        data: LeaderboardInsight[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/insights/leaderboards/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -4218,22 +4048,22 @@ export function getInsightsNotablesYear(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: NotablesInsight[];
-    }
+        status: 200;
+        data: NotablesInsight[];
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >(`/insights/notables/${encodeURIComponent(year)}`, {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
@@ -4254,22 +4084,22 @@ export function getSearchIndex(
 ) {
   return oazapfts.fetchJson<
     | {
-      status: 200;
-      data: SearchIndex;
-    }
+        status: 200;
+        data: SearchIndex;
+      }
     | {
-      status: 304;
-    }
+        status: 304;
+      }
     | {
-      status: 401;
-      data: {
-        /** Authorization error description. */
-        Error: string;
-      };
-    }
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
     | {
-      status: 404;
-    }
+        status: 404;
+      }
   >('/search_index', {
     ...opts,
     headers: oazapfts.mergeHeaders(opts?.headers, {
