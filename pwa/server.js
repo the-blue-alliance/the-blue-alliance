@@ -62,7 +62,7 @@ if (viteDevServer) {
 app.use(morgan('tiny'));
 
 // handle SSR requests
-app.all('*', remixHandler);
+app.all(/(.*)/, remixHandler);
 
 const port = process.env.PORT || (isProd ? 3000 : 5173);
 app.listen(port, () =>
