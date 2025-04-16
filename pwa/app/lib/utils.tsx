@@ -49,13 +49,14 @@ export async function parseParamsForYearElseDefault(
 
 export async function parseParamsForTeamPgNumElseDefault(
   params: Params,
+  maxPgNum: number,
 ): Promise<number | undefined> {
   if (params.pgNum === undefined) {
     return 0;
   }
 
   const pgNum = Number(params.pgNum);
-  if (Number.isNaN(pgNum) || pgNum < 0 || pgNum > 21) {
+  if (Number.isNaN(pgNum) || pgNum < 0 || pgNum > maxPgNum) {
     return 0;
   }
 
@@ -257,21 +258,21 @@ export function splitIntoNChunks<T>(array: T[], numChunks: number): T[][] {
 export async function queryFromAPI<T>(
   apiPromise: Promise<
     | {
-        status: 200;
-        data: T;
-      }
+      status: 200;
+      data: T;
+    }
     | {
-        status: 304;
-      }
+      status: 304;
+    }
     | {
-        status: 401;
-        data: {
-          Error: string;
-        };
-      }
+      status: 401;
+      data: {
+        Error: string;
+      };
+    }
     | {
-        status: 404;
-      }
+      status: 404;
+    }
   >,
 ): Promise<T> {
   const resp = await apiPromise;

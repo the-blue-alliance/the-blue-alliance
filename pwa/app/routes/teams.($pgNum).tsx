@@ -14,16 +14,7 @@ import { parseParamsForTeamPgNumElseDefault } from '~/lib/utils';
 import { Route } from '.react-router/types/app/routes/+types/teams.($pgNum)';
 
 async function loadData(params: Route.LoaderArgs['params']) {
-  const pageNum = await parseParamsForTeamPgNumElseDefault(params);
 
-  if (pageNum === undefined) {
-    throw new Response(null, {
-      status: 404,
-      statusText: 'Page Number was not specified in request',
-    });
-  }
-
-  const teamsSetOne = await getTeamsSimple({ pageNum: pageNum });
   //TODO: Cache
   const apiStatus = await getStatus({});
 
@@ -34,14 +25,24 @@ async function loadData(params: Route.LoaderArgs['params']) {
     });
   }
 
+  const maxPageNum = apiStatus.data.max_team_page;
+  const pageNum = await parseParamsForTeamPgNumElseDefault(params, maxPageNum);
+
+  if (pageNum === undefined) {
+    throw new Response(null, {
+      status: 404,
+      statusText: 'Page Number was not specified in request',
+    });
+  }
+
+  const teamsSetOne = await getTeamsSimple({ pageNum: pageNum });
+
   if (apiStatus.data.max_team_page === 0) {
     throw new Response(null, {
       status: 404,
       statusText: 'Data for Max Team Page was missing or incorrect',
     });
   }
-
-  const maxPageNum = apiStatus.data.max_team_page;
 
   if (teamsSetOne.status !== 200) {
     throw new Response(null, {
