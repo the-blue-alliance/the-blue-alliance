@@ -196,7 +196,7 @@ function TeamDetails({
   }
 
   return (
-    <div className={cn('text-left', className)} colSpan={2}>
+    <div className={cn('text-left', className)}>
       <div className="text-lg">
         Team {teamQuery.data.team_number} - {teamQuery.data.nickname}
       </div>
