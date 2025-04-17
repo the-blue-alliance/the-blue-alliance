@@ -195,7 +195,7 @@ function TeamDetails({
   }
 
   return (
-    <td className={cn('text-left', className)} colSpan={2}>
+    <div className={cn('text-left', className)} colSpan={2}>
       <div className="text-lg">
         Team {teamQuery.data.team_number} - {teamQuery.data.nickname}
       </div>
@@ -224,6 +224,11 @@ function TeamDetails({
         </div>
       </div>
       <hr />
+      <div>
+        <b>Past Einstein:</b>{' '}
+        {divisionWins.length > 0 ? divisionWins.join(', ') : 'N/A'}
+      </div>
+      <hr />
       {statuses.map((status) => (
         <div key={status.event} className="py-2">
           <div>
@@ -240,12 +245,7 @@ function TeamDetails({
           </div>
         </div>
       ))}
-      <hr />
-      <div>
-        <b>Past Einstein:</b>{' '}
-        {divisionWins.length > 0 ? divisionWins.join(', ') : 'N/A'}
-      </div>
-    </td>
+    </div>
   );
 }
 
@@ -356,23 +356,24 @@ function MatchSuggestionRow({
       </tr>
       {showDetails && (
         <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          {match.alliances.red.team_keys.map((k) => (
-            <TeamDetails
-              key={k}
-              teamKey={k}
-              className="bg-alliance-red-light"
-            />
-          ))}
-          {match.alliances.blue.team_keys.map((k) => (
-            <TeamDetails
-              key={k}
-              teamKey={k}
-              className="bg-alliance-blue-light"
-            />
-          ))}
+          <td colSpan={17}>
+            <div className="grid grid-cols-6 gap-4">
+              {match.alliances.red.team_keys.map((k) => (
+                <TeamDetails
+                  key={k}
+                  teamKey={k}
+                  className="bg-alliance-red-light"
+                />
+              ))}
+              {match.alliances.blue.team_keys.map((k) => (
+                <TeamDetails
+                  key={k}
+                  teamKey={k}
+                  className="bg-alliance-blue-light"
+                />
+              ))}
+            </div>
+          </td>
         </tr>
       )}
     </>
