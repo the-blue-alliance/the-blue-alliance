@@ -11,6 +11,7 @@ import {
   getEvent,
   getEventCopRs,
   getEventMatches,
+  getEventPredictions,
   getEventRankings,
   getEventsByYear,
   getStatus,
@@ -51,11 +52,37 @@ export async function loader() {
   };
 }
 
+// TODO: Fix this typing
+type EventPredictions = {
+  match_predictions: {
+    qual: {
+      [key: string]: {
+        red: {
+          score: number;
+          coral_scored: number;
+          barge_points: number;
+        };
+        blue: {
+          score: number;
+          coral_scored: number;
+          barge_points: number;
+        };
+      };
+    };
+    playoff: {
+      [key: string]: {
+        red: { score: number; coral_scored: number; barge_points: number };
+        blue: { score: number; coral_scored: number; barge_points: number };
+      };
+    };
+  };
+};
+
 interface MatchInfo {
   match: Match;
   event: Event;
   eventRankings?: EventRanking | null;
-  eventCoprs?: EventCopRs | null;
+  eventPredictions?: EventPredictions | null;
 }
 
 const Progress = React.forwardRef<
@@ -186,53 +213,22 @@ function MatchSuggestionRow({
   match,
   event,
   eventRankings,
-  eventCoprs,
+  eventPredictions,
 }: MatchInfo) {
   const [showDetails, setShowDetails] = useState(false);
 
-  const predictedRedScore = match.alliances.red.team_keys
-    .map((teamKey) =>
-      eventCoprs?.totalPoints ? eventCoprs.totalPoints[teamKey] : 0.0,
-    )
-    .reduce((partialSum, a) => partialSum + a, 0.0);
+  const prediction =
+    eventPredictions?.match_predictions.qual[match.key] ||
+    eventPredictions?.match_predictions.playoff[match.key];
 
-  const predictedBlueScore = match.alliances.blue.team_keys
-    .map((teamKey) =>
-      eventCoprs?.totalPoints ? eventCoprs.totalPoints[teamKey] : 0.0,
-    )
-    .reduce((partialSum, a) => partialSum + a, 0.0);
+  const predictedRedScore = prediction ? prediction.red.score : 0.0;
+  const predictedBlueScore = prediction ? prediction.blue.score : 0.0;
 
-  const redGamePieceCount = match.alliances.red.team_keys
-    .map((teamKey) =>
-      eventCoprs?.['Total Game Piece Count']
-        ? eventCoprs['Total Game Piece Count'][teamKey]
-        : 0.0,
-    )
-    .reduce((partialSum, a) => partialSum + a, 0.0);
+  const redGamePieceCount = prediction ? prediction.red.coral_scored : 0.0;
+  const blueGamePieceCount = prediction ? prediction.blue.coral_scored : 0.0;
 
-  const blueGamePieceCount = match.alliances.blue.team_keys
-    .map((teamKey) =>
-      eventCoprs?.['Total Game Piece Count']
-        ? eventCoprs['Total Game Piece Count'][teamKey]
-        : 0.0,
-    )
-    .reduce((partialSum, a) => partialSum + a, 0.0);
-
-  const redEndGamePoints = match.alliances.red.team_keys
-    .map((teamKey) =>
-      eventCoprs?.endGameBargePoints
-        ? eventCoprs.endGameBargePoints[teamKey]
-        : 0.0,
-    )
-    .reduce((partialSum, a) => partialSum + a, 0.0);
-
-  const blueEndGamePoints = match.alliances.blue.team_keys
-    .map((teamKey) =>
-      eventCoprs?.endGameBargePoints
-        ? eventCoprs.endGameBargePoints[teamKey]
-        : 0.0,
-    )
-    .reduce((partialSum, a) => partialSum + a, 0.0);
+  const redEndGamePoints = prediction ? prediction.red.barge_points : 0.0;
+  const blueEndGamePoints = prediction ? prediction.blue.barge_points : 0.0;
 
   const blueZoneScore =
     100 *
@@ -286,19 +282,19 @@ function MatchSuggestionRow({
           {predictedBlueScore.toFixed(0)}
         </td>
         <td className="border bg-alliance-red-light">
-          {redGamePieceCount.toFixed(1)}
+          {redGamePieceCount.toFixed(0)}
           <Progress value={(redGamePieceCount / 69.0) * 100.0} />
         </td>
         <td className="border bg-alliance-blue-light">
-          {blueGamePieceCount.toFixed(1)}
+          {blueGamePieceCount.toFixed(0)}
           <Progress value={(blueGamePieceCount / 69.0) * 100.0} />
         </td>
         <td className="border bg-alliance-red-light">
-          {redEndGamePoints.toFixed(1)}
+          {redEndGamePoints.toFixed(0)}
           <Progress value={(redEndGamePoints / 36.0) * 100.0} />
         </td>
         <td className="border bg-alliance-blue-light">
-          {blueEndGamePoints.toFixed(1)}
+          {blueEndGamePoints.toFixed(0)}
           <Progress value={(blueEndGamePoints / 36.0) * 100.0} />
         </td>
         <td className="border">
@@ -367,13 +363,13 @@ export default function MatchSuggestion(): React.JSX.Element {
       ),
   });
 
-  const eventCoprsQuery = useQuery({
-    queryKey: ['eventCoprs', events],
+  const eventPredictionsQuery = useQuery({
+    queryKey: ['eventPredictions', events],
     queryFn: () =>
       Promise.all(
         events.map(
           async (event) =>
-            await queryFromAPI(getEventCopRs({ eventKey: event.key })),
+            await queryFromAPI(getEventPredictions({ eventKey: event.key })),
         ),
       ),
   });
@@ -408,14 +404,18 @@ export default function MatchSuggestion(): React.JSX.Element {
           match,
           event: events[eventIdx],
           eventRankings: eventRankingsQuery.data?.[eventIdx],
-          eventCoprs: eventCoprsQuery.data?.[eventIdx],
+          eventPredictions: eventPredictionsQuery.data?.[
+            eventIdx
+          ] as EventPredictions,
         });
       } else {
         upcomingMatches.push({
           match,
           event: events[eventIdx],
           eventRankings: eventRankingsQuery.data?.[eventIdx],
-          eventCoprs: eventCoprsQuery.data?.[eventIdx],
+          eventPredictions: eventPredictionsQuery.data?.[
+            eventIdx
+          ] as EventPredictions,
         });
       }
     });
@@ -445,7 +445,7 @@ export default function MatchSuggestion(): React.JSX.Element {
             await Promise.all([
               eventMatchesQuery.refetch(),
               eventRankingsQuery.refetch(),
-              eventCoprsQuery.refetch(),
+              eventPredictionsQuery.refetch(),
             ]);
           })();
         }}
