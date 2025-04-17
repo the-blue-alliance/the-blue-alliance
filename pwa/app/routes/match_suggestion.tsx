@@ -140,6 +140,16 @@ function TeamDetails({
       .find((insight) => insight.name == 'notables_division_winners')
       ?.data.entries.find((notable) => notable.team_key == teamKey);
 
+  const epaQuery = useQuery({
+    queryKey: ['epaQuery', teamKey],
+    queryFn: async () => {
+      const response = await fetch(
+        `https://api.statbotics.io/v3/team_year/${teamKey.substring(3)}/2025`,
+      );
+      return response.json();
+    },
+  });
+
   if (
     !teamQuery.data ||
     !eventStatusesQuery.data ||
@@ -182,6 +192,29 @@ function TeamDetails({
       <div>
         {teamQuery.data.city}, {teamQuery.data.state_prov},{' '}
         {teamQuery.data.country}
+      </div>
+      <hr />
+      <div>
+        <div>
+          <b>EPA:</b>{' '}
+          {epaQuery.data ? epaQuery.data.epa.breakdown.total_points : '?'}
+        </div>
+        <div>
+          <b>Auto Coral:</b>{' '}
+          {epaQuery.data ? epaQuery.data.epa.breakdown.auto_coral : '?'}
+        </div>
+        <div>
+          <b>Teleop Coral:</b>{' '}
+          {epaQuery.data ? epaQuery.data.epa.breakdown.teleop_coral : '?'}
+        </div>
+        <div>
+          <b>Processor Algae:</b>{' '}
+          {epaQuery.data ? epaQuery.data.epa.breakdown.processor_algae : '?'}
+        </div>
+        <div>
+          <b>Net Algae:</b>{' '}
+          {epaQuery.data ? epaQuery.data.epa.breakdown.net_algae : '?'}
+        </div>
       </div>
       <hr />
       {statuses.map((status) => (
