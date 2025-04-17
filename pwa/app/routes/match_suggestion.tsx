@@ -50,10 +50,11 @@ export async function loader() {
 }
 
 // TODO: Fix this typing
-type EventPredictions = {
+interface EventPredictions {
   match_predictions: {
-    qual: {
-      [key: string]: {
+    qual: Record<
+      string,
+      {
         red: {
           score: number;
           coral_scored: number;
@@ -64,16 +65,17 @@ type EventPredictions = {
           coral_scored: number;
           barge_points: number;
         };
-      };
-    };
-    playoff: {
-      [key: string]: {
+      }
+    >;
+    playoff: Record<
+      string,
+      {
         red: { score: number; coral_scored: number; barge_points: number };
         blue: { score: number; coral_scored: number; barge_points: number };
-      };
-    };
+      }
+    >;
   };
-};
+}
 
 interface MatchInfo {
   match: Match;
@@ -134,11 +136,9 @@ function TeamDetails({
     queryKey: ['insightNotablesYear', 0],
     queryFn: () => queryFromAPI(getInsightsNotablesYear({ year: 0 })),
   });
-  const divisionWinnersNotable =
-    insightNotablesYearQuery.data &&
-    insightNotablesYearQuery.data
-      .find((insight) => insight.name == 'notables_division_winners')
-      ?.data.entries.find((notable) => notable.team_key == teamKey);
+  const divisionWinnersNotable = insightNotablesYearQuery.data
+    ?.find((insight) => insight.name == 'notables_division_winners')
+    ?.data.entries.find((notable) => notable.team_key == teamKey);
 
   const epaQuery = useQuery({
     queryKey: ['epaQuery', teamKey],
@@ -146,9 +146,20 @@ function TeamDetails({
       const response = await fetch(
         `https://api.statbotics.io/v3/team_year/${teamKey.substring(3)}/2025`,
       );
+      // eslint-disable-next-line
       return response.json();
     },
   });
+
+  // eslint-disable-next-line
+  const epaBreakdown: {
+    total_points: number;
+    auto_coral: number;
+    teleop_coral: number;
+    processor_algae: number;
+    net_algae: number;
+  } | null = // eslint-disable-next-line
+    epaQuery.data ? epaQuery.data.epa.breakdown : null;
 
   if (
     !teamQuery.data ||
@@ -196,24 +207,20 @@ function TeamDetails({
       <hr />
       <div>
         <div>
-          <b>EPA:</b>{' '}
-          {epaQuery.data ? epaQuery.data.epa.breakdown.total_points : '?'}
+          <b>EPA:</b> {epaBreakdown ? epaBreakdown.total_points : '?'}
         </div>
         <div>
-          <b>Auto Coral:</b>{' '}
-          {epaQuery.data ? epaQuery.data.epa.breakdown.auto_coral : '?'}
+          <b>Auto Coral:</b> {epaBreakdown ? epaBreakdown.auto_coral : '?'}
         </div>
         <div>
-          <b>Teleop Coral:</b>{' '}
-          {epaQuery.data ? epaQuery.data.epa.breakdown.teleop_coral : '?'}
+          <b>Teleop Coral:</b> {epaBreakdown ? epaBreakdown.teleop_coral : '?'}
         </div>
         <div>
           <b>Processor Algae:</b>{' '}
-          {epaQuery.data ? epaQuery.data.epa.breakdown.processor_algae : '?'}
+          {epaBreakdown ? epaBreakdown.processor_algae : '?'}
         </div>
         <div>
-          <b>Net Algae:</b>{' '}
-          {epaQuery.data ? epaQuery.data.epa.breakdown.net_algae : '?'}
+          <b>Net Algae:</b> {epaBreakdown ? epaBreakdown.net_algae : '?'}
         </div>
       </div>
       <hr />
@@ -251,7 +258,7 @@ function MatchSuggestionRow({
   const [showDetails, setShowDetails] = useState(false);
 
   const prediction =
-    eventPredictions?.match_predictions.qual[match.key] ||
+    eventPredictions?.match_predictions.qual[match.key] ??
     eventPredictions?.match_predictions.playoff[match.key];
 
   const predictedRedScore = prediction ? prediction.red.score : 0.0;
