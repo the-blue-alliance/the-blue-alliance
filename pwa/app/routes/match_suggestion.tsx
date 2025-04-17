@@ -304,7 +304,8 @@ function MatchSuggestionRow({
             <TeamLink teamOrKey={k} year={event.year}>
               {k.substring(3)}
             </TeamLink>
-            <br />({eventRankings?.rankings.find((r) => r.team_key == k)?.rank})
+            <br />(
+            {eventRankings?.rankings.find((r) => r.team_key == k)?.rank ?? '?'})
           </td>
         ))}
         {match.alliances.blue.team_keys.map((k) => (
@@ -312,7 +313,8 @@ function MatchSuggestionRow({
             <TeamLink teamOrKey={k} year={event.year}>
               {k.substring(3)}
             </TeamLink>
-            <br />({eventRankings?.rankings.find((r) => r.team_key == k)?.rank})
+            <br />(
+            {eventRankings?.rankings.find((r) => r.team_key == k)?.rank ?? '?'})
           </td>
         ))}
         <td className="border bg-alliance-red-dark">
