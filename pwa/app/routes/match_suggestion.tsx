@@ -158,6 +158,7 @@ function TeamDetails({
     teleop_coral: number;
     processor_algae: number;
     net_algae: number;
+    barge_points: number;
   } | null = // eslint-disable-next-line
     epaQuery.data ? epaQuery.data.epa.breakdown : null;
 
@@ -221,6 +222,9 @@ function TeamDetails({
         </div>
         <div>
           <b>Net Algae:</b> {epaBreakdown ? epaBreakdown.net_algae : '?'}
+        </div>
+        <div>
+          <b>Barge Points:</b> {epaBreakdown ? epaBreakdown.barge_points : '?'}
         </div>
       </div>
       <hr />
