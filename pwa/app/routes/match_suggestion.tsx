@@ -5,24 +5,21 @@ import { useLoaderData } from 'react-router';
 
 import {
   Event,
-  EventCopRs,
   EventRanking,
   Match,
   getEvent,
-  getEventCopRs,
   getEventMatches,
   getEventPredictions,
   getEventRankings,
   getEventsByYear,
+  getInsightsNotablesYear,
   getStatus,
   getTeam,
-  getTeamAwards,
   getTeamEventsStatusesByYear,
 } from '~/api/v3';
 import { TeamLink } from '~/components/tba/links';
 import { MatchResultsTableGroup } from '~/components/tba/matchResultsTable';
 import { Badge } from '~/components/ui/badge';
-import { AwardType } from '~/lib/api/AwardType';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, queryFromAPI } from '~/lib/utils';
@@ -132,12 +129,22 @@ function TeamDetails({
     queryFn: () =>
       queryFromAPI(getTeamEventsStatusesByYear({ teamKey, year: 2025 })),
   });
-  const teamAwards = useQuery({
-    queryKey: ['teamAwards', teamKey],
-    queryFn: () => queryFromAPI(getTeamAwards({ teamKey })),
-  });
 
-  if (!teamQuery.data || !eventStatusesQuery.data || !teamAwards.data) {
+  const insightNotablesYearQuery = useQuery({
+    queryKey: ['insightNotablesYear', 0],
+    queryFn: () => queryFromAPI(getInsightsNotablesYear({ year: 0 })),
+  });
+  const divisionWinnersNotable =
+    insightNotablesYearQuery.data &&
+    insightNotablesYearQuery.data
+      .find((insight) => insight.name == 'notables_division_winners')
+      ?.data.entries.find((notable) => notable.team_key == teamKey);
+
+  if (
+    !teamQuery.data ||
+    !eventStatusesQuery.data ||
+    !insightNotablesYearQuery.data
+  ) {
     return (
       <td className={cn('text-left', className)} colSpan={2}>
         Loading...
@@ -145,14 +152,9 @@ function TeamDetails({
     );
   }
 
-  // Slightly hacky because we don't have access to event type
-  const divisionWins = teamAwards.data
-    .filter(
-      (award) =>
-        award.award_type == AwardType.WINNER &&
-        award.name.toLowerCase().includes('division'),
-    )
-    .sort((a, b) => a.year - b.year);
+  const divisionWins = divisionWinnersNotable
+    ? divisionWinnersNotable.context.map((eventKey) => eventKey.substring(0, 4))
+    : [];
 
   const statuses = [];
   for (const [key, value] of Object.entries(eventStatusesQuery.data)) {
@@ -201,9 +203,7 @@ function TeamDetails({
       <hr />
       <div>
         <b>Past Einstein:</b>{' '}
-        {divisionWins.length > 0
-          ? divisionWins.map((award) => award.year).join(', ')
-          : 'N/A'}
+        {divisionWins.length > 0 ? divisionWins.join(', ') : 'N/A'}
       </div>
     </td>
   );
