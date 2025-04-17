@@ -9,6 +9,7 @@ from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
+from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.event_type import EventType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
@@ -28,6 +29,7 @@ class TrustedApiAuthHelper:
     def do_trusted_api_auth(
         cls, event_key: EventKey, required_auth_types: Set[AuthType]
     ) -> None:
+        event_key = EventCodeExceptions.resolve(event_key)
         event = Event.get_by_id(event_key)
         if not event:
             abort(
