@@ -44,10 +44,7 @@ export async function loader() {
     });
   }
 
-  // const filteredEvents = getCurrentWeekEvents(events.data);
-  const filteredEvents = events.data.filter((event) =>
-    new Set(['2025nccmp', '2025cafr', '2025cabe']).has(event.key),
-  );
+  const filteredEvents = getCurrentWeekEvents(events.data);
 
   return {
     events: filteredEvents,
@@ -400,9 +397,8 @@ export default function MatchSuggestion(): React.JSX.Element {
 
     const unplayedMatches = eventMatches.filter(
       (match) =>
-        match.alliances.red.score != -1 && match.alliances.blue.score != -1,
+        match.alliances.red.score == -1 || match.alliances.blue.score == -1,
     );
-    // const unplayedMatches = eventMatches.filter(match => match.alliances.red.score == -1 || match.alliances.blue.score == -1);
     unplayedMatches.forEach((match, i) => {
       if (i > 2) {
         return;
