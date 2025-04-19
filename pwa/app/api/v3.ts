@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.16
+ * 3.10.0
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -987,7 +987,6 @@ export type Media = {
 export type EliminationAlliance = {
   /** Alliance name, may be null. */
   name?: string | null;
-  /** Backup team called in, may be null. */
   backup?: {
     /** Team key that was called in as the backup. */
     in: string;
