@@ -89,6 +89,8 @@ export const getEventMatches = createSelector(
       // if (match.pt) {
       //   time = match.pt
       // }
+      if (!match.c || !match.m || !match.s || !compLevelsPlayOrder[match.c])
+        return 0;
       return compLevelsPlayOrder[match.c] * 100000 + match.m * 100 + match.s;
     }
 

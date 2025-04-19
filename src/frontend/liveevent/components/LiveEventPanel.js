@@ -17,6 +17,8 @@ const compLevelsPlayOrder = {
 };
 
 function playOrder(match) {
+  if (!match.c || !match.m || !match.s || !compLevelsPlayOrder[match.c])
+    return 0;
   return compLevelsPlayOrder[match.c] * 100000 + match.m * 100 + match.s;
 }
 
