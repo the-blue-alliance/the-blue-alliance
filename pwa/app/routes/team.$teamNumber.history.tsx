@@ -6,7 +6,7 @@ import {
   getTeamHistory,
   getTeamSocialMedia,
   getTeamYearsParticipated,
-} from '~/api/v3';
+} from '~/api/tba';
 import { AwardBanner } from '~/components/tba/banner';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
@@ -38,21 +38,20 @@ async function loadData(params: Route.LoaderArgs['params']) {
   const teamKey = `frc${params.teamNumber}`;
 
   const [team, history, yearsParticipated, socials] = await Promise.all([
-    getTeam({ teamKey }),
-    getTeamHistory({ teamKey }),
-    getTeamYearsParticipated({ teamKey }),
-    getTeamSocialMedia({ teamKey }),
+    getTeam({ path: { team_key: teamKey } }),
+    getTeamHistory({ path: { team_key: teamKey } }),
+    getTeamYearsParticipated({ path: { team_key: teamKey } }),
+    getTeamSocialMedia({ path: { team_key: teamKey } }),
   ]);
 
-  if (team.status === 404) {
+  if (team.data === undefined) {
     throw new Response(null, { status: 404 });
   }
 
   if (
-    team.status !== 200 ||
-    history.status !== 200 ||
-    yearsParticipated.status !== 200 ||
-    socials.status !== 200
+    history.data === undefined ||
+    yearsParticipated.data === undefined ||
+    socials.data === undefined
   ) {
     throw new Response(null, { status: 500 });
   }

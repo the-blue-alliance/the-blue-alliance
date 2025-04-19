@@ -1,4 +1,4 @@
-import { Event } from '~/api/v3';
+import { Event } from '~/api/tba/types.gen';
 import { EventType } from '~/lib/api/EventType';
 import { convertMsToDays } from '~/lib/utils';
 

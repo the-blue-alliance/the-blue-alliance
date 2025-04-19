@@ -9,7 +9,7 @@ import {
   MatchScoreBreakdown2023Alliance,
   MatchScoreBreakdown2024Alliance,
   MatchScoreBreakdown2025Alliance,
-} from '~/api/v3';
+} from '~/api/tba';
 
 export const RANKING_POINT_LABELS: Record<number, string[]> = {
   2016: ['Defenses Breached', 'Tower Captured'],

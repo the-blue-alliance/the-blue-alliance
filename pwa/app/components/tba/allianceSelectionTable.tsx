@@ -3,7 +3,7 @@ import type React from 'react';
 
 import BiTrophy from '~icons/bi/trophy';
 
-import { EliminationAlliance } from '~/api/v3';
+import { EliminationAlliance } from '~/api/tba';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLink } from '~/components/tba/links';
 import {

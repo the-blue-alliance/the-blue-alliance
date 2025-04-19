@@ -11,7 +11,7 @@ import {
   getDistrictHistory,
   getDistrictRankings,
   getDistrictTeams,
-} from '~/api/v3';
+} from '~/api/tba';
 import { TitledCard } from '~/components/tba/cards';
 import { DataTable } from '~/components/tba/dataTable';
 import { EventLink, LocationLink, TeamLink } from '~/components/tba/links';
@@ -47,28 +47,38 @@ async function loadData(params: Route.LoaderArgs['params']) {
 
   const [districtHistory, rankings, teams, events, awards] = await Promise.all([
     await getDistrictHistory({
-      districtAbbreviation: params.districtAbbreviation,
+      path: {
+        district_abbreviation: params.districtAbbreviation,
+      },
     }),
     await getDistrictRankings({
-      districtKey: `${year}${params.districtAbbreviation}`,
+      path: {
+        district_key: `${year}${params.districtAbbreviation}`,
+      },
     }),
     await getDistrictTeams({
-      districtKey: `${year}${params.districtAbbreviation}`,
+      path: {
+        district_key: `${year}${params.districtAbbreviation}`,
+      },
     }),
     await getDistrictEvents({
-      districtKey: `${year}${params.districtAbbreviation}`,
+      path: {
+        district_key: `${year}${params.districtAbbreviation}`,
+      },
     }),
     await getDistrictAwards({
-      districtKey: `${year}${params.districtAbbreviation}`,
+      path: {
+        district_key: `${year}${params.districtAbbreviation}`,
+      },
     }),
   ]);
 
   if (
-    districtHistory.status !== 200 ||
-    rankings.status !== 200 ||
-    teams.status !== 200 ||
-    events.status !== 200 ||
-    awards.status !== 200
+    districtHistory.data === undefined ||
+    rankings.data === undefined ||
+    teams.data === undefined ||
+    events.data === undefined ||
+    awards.data === undefined
   ) {
     throw new Response(null, { status: 404 });
   }

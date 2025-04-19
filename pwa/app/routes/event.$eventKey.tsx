@@ -20,19 +20,21 @@ import MdiVideo from '~icons/mdi/video';
 import { getEventColors } from '~/api/colors';
 import {
   Award,
-  EventCopRs,
+  EventCoprs,
   Match,
   Media,
   Team,
   getEvent,
   getEventAlliances,
-  getEventAwards,
-  getEventCopRs,
   getEventMatches,
-  getEventRankings,
-  getEventTeamMedia,
-  getEventTeams,
-} from '~/api/v3';
+} from '~/api/tba';
+import {
+  getEventAwardsOptions,
+  getEventCoprsOptions,
+  getEventRankingsOptions,
+  getEventTeamMediaOptions,
+  getEventTeamsOptions,
+} from '~/api/tba/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
@@ -97,7 +99,6 @@ import {
   STATE_TO_ABBREVIATION,
   camelCaseToHumanReadable,
   cn,
-  queryFromAPI,
   splitIntoNChunks,
 } from '~/lib/utils';
 
@@ -111,22 +112,18 @@ async function loadData(params: Route.LoaderArgs['params']) {
   }
 
   const [event, matches, alliances] = await Promise.all([
-    getEvent({ eventKey: params.eventKey }),
-    getEventMatches({ eventKey: params.eventKey }),
-    getEventAlliances({ eventKey: params.eventKey }),
+    getEvent({ path: { event_key: params.eventKey } }),
+    getEventMatches({ path: { event_key: params.eventKey } }),
+    getEventAlliances({ path: { event_key: params.eventKey } }),
   ]);
 
-  if (event.status == 404) {
+  if (event.data == undefined) {
     throw new Response(null, {
       status: 404,
     });
   }
 
-  if (
-    event.status !== 200 ||
-    matches.status !== 200 ||
-    alliances.status !== 200
-  ) {
+  if (matches.data == undefined || alliances.data == undefined) {
     throw new Response(null, {
       status: 500,
     });
@@ -171,13 +168,11 @@ export default function EventPage() {
   } = useLoaderData<Awaited<ReturnType<typeof loadData>>>();
 
   const awardsQuery = useQuery({
-    queryKey: ['eventAwards', event.key],
-    queryFn: () => queryFromAPI(getEventAwards({ eventKey: event.key })),
+    ...getEventAwardsOptions({ path: { event_key: event.key } }),
   });
 
   const coprsQuery = useQuery({
-    queryKey: ['eventCoprs', event.key],
-    queryFn: () => queryFromAPI(getEventCopRs({ eventKey: event.key })),
+    ...getEventCoprsOptions({ path: { event_key: event.key } }),
   });
 
   const colorsQuery = useQuery({
@@ -186,18 +181,15 @@ export default function EventPage() {
   });
 
   const rankingsQuery = useQuery({
-    queryKey: ['eventRankings', event.key],
-    queryFn: () => queryFromAPI(getEventRankings({ eventKey: event.key })),
+    ...getEventRankingsOptions({ path: { event_key: event.key } }),
   });
 
   const teamsQuery = useQuery({
-    queryKey: ['eventTeams', event.key],
-    queryFn: () => queryFromAPI(getEventTeams({ eventKey: event.key })),
+    ...getEventTeamsOptions({ path: { event_key: event.key } }),
   });
 
   const teamMediaQuery = useQuery({
-    queryKey: ['eventTeamMedia', event.key],
-    queryFn: () => queryFromAPI(getEventTeamMedia({ eventKey: event.key })),
+    ...getEventTeamMediaOptions({ path: { event_key: event.key } }),
   });
 
   const sortedMatches = useMemo(
@@ -306,7 +298,7 @@ export default function EventPage() {
         className="mt-4"
       >
         <TabsList className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2 lg:*:basis-1">
-          {(matches.length > 0 || (alliances && alliances.length > 0)) && (
+          {(matches.length > 0 || alliances.length > 0) && (
             <TabsTrigger value="results">
               <InlineIcon>
                 <MdiTournament />
@@ -366,7 +358,7 @@ export default function EventPage() {
             <div className="basis-full lg:basis-1/2">{leftSideMatches}</div>
 
             <div className="basis-full lg:basis-1/2">
-              {alliances && alliances.length > 0 && (
+              {alliances.length > 0 && (
                 <AllianceSelectionTable
                   alliances={alliances}
                   year={event.year}
@@ -382,7 +374,7 @@ export default function EventPage() {
             <RankingsTable
               rankings={rankingsQuery.data}
               winners={
-                alliances?.find((a) => a.status?.status === 'won')?.picks ?? []
+                alliances.find((a) => a.status?.status === 'won')?.picks ?? []
               }
             />
           </TabsContent>
@@ -649,7 +641,7 @@ function MatchStatsTable({
   );
 }
 
-function ComponentsTable({ coprs, year }: { coprs: EventCopRs; year: number }) {
+function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
   const [component, setComponent] = useState('totalPoints');
 
   // filter any components that are just all zeros

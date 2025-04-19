@@ -1,11 +1,11 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.1",
   "info": {
     "title": "The Blue Alliance API v3",
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.9.16",
+    "version": "3.10.0",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "servers": [
     {
@@ -1248,14 +1248,11 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/components/schemas/Team_Event_Status"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
+                    "type": [
+                      "null",
+                      "object"
+                    ],
+                    "$ref": "#/components/schemas/Team_Event_Status"
                   },
                   "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key."
                 }
@@ -1578,12 +1575,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Team_Event_Status"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "$ref": "#/components/schemas/Team_Event_Status"
                 }
               }
             }
@@ -2506,11 +2502,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/Elimination_Alliance"
-                  },
-                  "nullable": true
+                  }
                 }
               }
             }
@@ -2567,11 +2565,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_Insights"
-                    }
+                  "$ref": "#/components/schemas/Event_Insights",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -2629,12 +2626,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_OPRs"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "$ref": "#/components/schemas/Event_OPRs"
                 }
               }
             }
@@ -2691,12 +2687,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_COPRs"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "$ref": "#/components/schemas/Event_COPRs"
                 }
               }
             }
@@ -2753,11 +2748,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_Predictions"
-                    }
+                  "$ref": "#/components/schemas/Event_Predictions",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -2815,11 +2809,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_Ranking"
-                    }
+                  "$ref": "#/components/schemas/Event_Ranking",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -2878,11 +2871,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_District_Points"
-                    }
+                  "$ref": "#/components/schemas/Event_District_Points",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -2940,12 +2932,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_District_Points"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "$ref": "#/components/schemas/Event_District_Points"
                 }
               }
             }
@@ -3002,11 +2993,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_District_Points"
-                    }
+                  "$ref": "#/components/schemas/Event_District_Points",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -3255,13 +3245,10 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/components/schemas/Team_Event_Status"
-                      },
-                      {
-                        "type": "null"
-                      }
+                    "$ref": "#/components/schemas/Team_Event_Status",
+                    "type": [
+                      "null",
+                      "object"
                     ]
                   },
                   "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key."
@@ -4483,11 +4470,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/District_Ranking"
-                  },
-                  "nullable": "true"
+                  }
                 }
               }
             }
@@ -4546,8 +4535,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "nullable": true,
-                  "type": "object",
+                  "type": [
+                    "null",
+                    "object"
+                  ],
                   "description": "A mapping of team key to District_Advancement",
                   "additionalProperties": {
                     "$ref": "#/components/schemas/District_Advancement"
@@ -4680,8 +4671,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "nullable": "true",
+                  "type": [
+                    "null",
+                    "object"
+                  ],
                   "additionalProperties": {
                     "$ref": "#/components/schemas/Regional_Advancement"
                   }
@@ -4742,11 +4735,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/Regional_Ranking"
-                  },
-                  "nullable": "true"
+                  }
                 }
               }
             }
@@ -5034,18 +5029,24 @@
             "description": "Official long name registered with FIRST."
           },
           "city": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "City of team derived from parsing the address registered with FIRST."
           },
           "state_prov": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "State of team derived from parsing the address registered with FIRST."
           },
           "country": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Country of team derived from parsing the address registered with FIRST."
           }
         }
@@ -5088,72 +5089,98 @@
             "description": "Official long name registered with FIRST."
           },
           "school_name": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Name of team school or affilited group registered with FIRST."
           },
           "city": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "City of team derived from parsing the address registered with FIRST."
           },
           "state_prov": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "State of team derived from parsing the address registered with FIRST."
           },
           "country": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Country of team derived from parsing the address registered with FIRST."
           },
           "address": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Will be NULL, for future development."
           },
           "postal_code": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Postal code from the team address."
           },
           "gmaps_place_id": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Will be NULL, for future development."
           },
           "gmaps_url": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Will be NULL, for future development.",
             "format": "url"
           },
           "lat": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "description": "Will be NULL, for future development.",
             "format": "double"
           },
           "lng": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "description": "Will be NULL, for future development.",
             "format": "double"
           },
           "location_name": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Will be NULL, for future development."
           },
           "website": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Official website associated with the team.",
             "format": "url"
           },
           "rookie_year": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "First year the team officially competed."
           }
         }
@@ -5218,28 +5245,31 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/District"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/District",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "city": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "City, town, village, etc. the event is located in."
           },
           "state_prov": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "State or Province the event is located in."
           },
           "country": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Country the event is located in."
           },
           "start_date": {
@@ -5310,28 +5340,31 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/District"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/District",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "city": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "City, town, village, etc. the event is located in."
           },
           "state_prov": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "State or Province the event is located in."
           },
           "country": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Country the event is located in."
           },
           "start_date": {
@@ -5349,8 +5382,10 @@
             "description": "Year the event data is for."
           },
           "short_name": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
           },
           "event_type_string": {
@@ -5358,66 +5393,90 @@
             "description": "Event Type, eg Regional, District, or Offseason."
           },
           "week": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.)"
           },
           "address": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Address of the event's venue, if available."
           },
           "postal_code": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Postal code from the event address."
           },
           "gmaps_place_id": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Google Maps Place ID for the event address."
           },
           "gmaps_url": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Link to address location on Google Maps.",
             "format": "url"
           },
           "lat": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "description": "Latitude for the event address.",
             "format": "double"
           },
           "lng": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "description": "Longitude for the event address.",
             "format": "double"
           },
           "location_name": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Name of the location at the address for the event, eg. Blue Alliance High School."
           },
           "timezone": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Timezone name."
           },
           "website": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The event's website, if any."
           },
           "first_event_id": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
           },
           "first_event_code": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Public facing event code used by FIRST (on frc-events.firstinspires.org, for example)"
           },
           "webcasts": {
@@ -5434,18 +5493,24 @@
             }
           },
           "parent_event_key": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`."
           },
           "playoff_type": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null."
           },
           "playoff_type_string": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "String representation of the `playoff_type`, or null."
           }
         }
@@ -5454,33 +5519,24 @@
         "type": "object",
         "properties": {
           "qual": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Team_Event_Status_rank"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/Team_Event_Status_rank",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "alliance": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Team_Event_Status_alliance"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/Team_Event_Status_alliance",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "playoff": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Team_Event_Status_playoff"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/Team_Event_Status_playoff",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "alliance_status_str": {
@@ -5496,13 +5552,17 @@
             "description": "An HTML formatted string suitable for display to the user containing the team's overall status summary of the event."
           },
           "next_match_key": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "TBA match key for the next match the team is scheduled to play in at this event, or null."
           },
           "last_match_key": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "TBA match key for the last match the team played in at this event, or null."
           }
         }
@@ -5535,13 +5595,10 @@
                 }
               },
               "record": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/WLT_Record"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "$ref": "#/components/schemas/WLT_Record",
+                "type": [
+                  "null",
+                  "object"
                 ]
               },
               "rank": {
@@ -5588,8 +5645,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Alliance name, may be null."
           },
           "number": {
@@ -5606,8 +5665,10 @@
         }
       },
       "Team_Event_Status_alliance_backup": {
-        "type": "object",
-        "nullable": true,
+        "type": [
+          "null",
+          "object"
+        ],
         "properties": {
           "out": {
             "type": "string",
@@ -5621,8 +5682,10 @@
         "description": "Backup status, may be null."
       },
       "Team_Event_Status_playoff": {
-        "type": "object",
-        "nullable": true,
+        "type": [
+          "null",
+          "object"
+        ],
         "properties": {
           "level": {
             "type": "string",
@@ -5636,24 +5699,18 @@
             ]
           },
           "current_level_record": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/WLT_Record"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": [
+              "null",
+              "object"
+            ],
+            "$ref": "#/components/schemas/WLT_Record"
           },
           "record": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/WLT_Record"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": [
+              "null",
+              "object"
+            ],
+            "$ref": "#/components/schemas/WLT_Record"
           },
           "status": {
             "type": "string",
@@ -5665,9 +5722,11 @@
             ]
           },
           "playoff_average": {
-            "type": "number",
+            "type": [
+              "null",
+              "number"
+            ],
             "format": "double",
-            "nullable": true,
             "description": "The average match score during playoffs. Year specific. May be null if not relevant for a given year."
           }
         },
@@ -5702,8 +5761,10 @@
                   "description": "Number of matches played by this team."
                 },
                 "qual_average": {
-                  "type": "integer",
-                  "nullable": true,
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
                   "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
                 },
                 "extra_stats": {
@@ -5714,23 +5775,22 @@
                   }
                 },
                 "sort_orders": {
-                  "type": "array",
-                  "nullable": true,
-                  "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
+                  "type": [
+                    "array",
+                    "null"
+                  ],
                   "items": {
                     "type": "number",
                     "format": "double"
-                  }
+                  },
+                  "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details."
                 },
                 "record": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/WLT_Record"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "$ref": "#/components/schemas/WLT_Record"
                 },
                 "rank": {
                   "type": "integer",
@@ -6671,20 +6731,26 @@
             "description": "Event key of the event the match was played at."
           },
           "time": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.",
             "format": "int64"
           },
           "predicted_time": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.",
             "format": "int64"
           },
           "actual_time": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.",
             "format": "int64"
           }
@@ -6761,30 +6827,42 @@
             "description": "Event key of the event the match was played at."
           },
           "time": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.",
             "format": "int64"
           },
           "actual_time": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.",
             "format": "int64"
           },
           "predicted_time": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.",
             "format": "int64"
           },
           "post_result_time": {
-            "type": "integer",
-            "nullable": true,
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result was posted.",
             "format": "int64"
           },
           "score_breakdown": {
+            "type": [
+              "object",
+              "null"
+            ],
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Match_Score_Breakdown_2015"
@@ -6817,7 +6895,6 @@
                 "$ref": "#/components/schemas/Match_Score_Breakdown_2025"
               }
             ],
-            "nullable": true,
             "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
           },
           "videos": {
@@ -6899,7 +6976,7 @@
             "items": {
               "type": "number",
               "format": "double",
-              "example": [
+              "examples": [
                 0,
                 0.1,
                 0.2
@@ -6938,7 +7015,9 @@
           "team_key": {
             "type": "string",
             "description": "The TBA team key for the Zebra MotionWorks data.",
-            "example": "frc7332"
+            "examples": [
+              "frc7332"
+            ]
           },
           "xs": {
             "type": "array",
@@ -6946,7 +7025,7 @@
             "items": {
               "type": "number",
               "format": "double",
-              "example": [
+              "examples": [
                 2.73,
                 2.7,
                 null
@@ -6959,7 +7038,7 @@
             "items": {
               "type": "number",
               "format": "double",
-              "example": [
+              "examples": [
                 2.73,
                 2.7,
                 null
@@ -9149,20 +9228,24 @@
         "description": "The `Media` object contains a reference for most any media associated with a team or event on TBA."
       },
       "Elimination_Alliance": {
+        "type": "object",
         "required": [
           "picks",
           "declines"
         ],
-        "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Alliance name, may be null."
           },
           "backup": {
-            "type": "object",
-            "nullable": true,
+            "type": [
+              "object",
+              "null"
+            ],
             "required": [
               "in",
               "out"
@@ -9206,24 +9289,18 @@
                 "type": "string"
               },
               "record": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/WLT_Record"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "$ref": "#/components/schemas/WLT_Record"
               },
               "current_level_record": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/WLT_Record"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "$ref": "#/components/schemas/WLT_Record"
               },
               "status": {
                 "type": "string"
@@ -9275,13 +9352,17 @@
         ],
         "properties": {
           "team_key": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The TBA team key for the team that was given the award. May be null."
           },
           "awardee": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The name of the individual given the award. May be null."
           }
         },
@@ -9566,13 +9647,17 @@
             "description": "Type specific channel information. May be the YouTube stream, or Twitch channel name. In the case of iframe types, contains HTML to embed the stream in an HTML iframe."
           },
           "date": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "The date for the webcast in `yyyy-mm-dd` format. May be null."
           },
           "file": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "File identification as may be required for some types. May be null."
           }
         }

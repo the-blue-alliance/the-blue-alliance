@@ -7,16 +7,18 @@ import {
   Event,
   EventRanking,
   Match,
-  getEvent,
   getEventMatches,
   getEventPredictions,
   getEventRankings,
   getEventsByYear,
   getInsightsNotablesYear,
   getStatus,
-  getTeam,
   getTeamEventsStatusesByYear,
-} from '~/api/v3';
+} from '~/api/tba';
+import {
+  getEventOptions,
+  getTeamOptions,
+} from '~/api/tba/@tanstack/react-query.gen';
 import { TeamLink } from '~/components/tba/links';
 import { MatchResultsTableGroup } from '~/components/tba/matchResultsTable';
 import { Badge } from '~/components/ui/badge';
@@ -25,18 +27,18 @@ import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, queryFromAPI } from '~/lib/utils';
 
 export async function loader() {
-  const status = await getStatus({});
+  const status = await getStatus();
 
-  if (status.status !== 200) {
+  if (status.data === undefined) {
     throw new Response(null, {
       status: 500,
     });
   }
 
   const year = status.data.current_season;
-  const events = await getEventsByYear({ year });
+  const events = await getEventsByYear({ path: { year } });
 
-  if (events.status !== 200) {
+  if (events.data === undefined) {
     throw new Response(null, {
       status: 500,
     });
@@ -51,7 +53,7 @@ export async function loader() {
 
 // TODO: Fix this typing
 interface EventPredictions {
-  match_predictions: {
+  match_predictions?: {
     qual: Record<
       string,
       {
@@ -105,14 +107,13 @@ const Progress = React.forwardRef<
 Progress.displayName = ProgressPrimitive.Root.displayName;
 
 function EventName({ eventKey }: { eventKey: string }) {
-  const eventQuery = useQuery({
-    queryKey: ['event', eventKey],
-    queryFn: () => queryFromAPI(getEvent({ eventKey })),
-  });
+  const eventQuery = useQuery(
+    getEventOptions({ path: { event_key: eventKey } }),
+  );
   if (!eventQuery.data) {
     return eventKey;
   }
-  return eventQuery.data.name;
+  return <>{eventQuery.data.name}</>;
 }
 
 function TeamDetails({
@@ -122,19 +123,20 @@ function TeamDetails({
   teamKey: string;
   className: string;
 }) {
-  const teamQuery = useQuery({
-    queryKey: ['team', teamKey],
-    queryFn: () => queryFromAPI(getTeam({ teamKey })),
-  });
+  const teamQuery = useQuery(getTeamOptions({ path: { team_key: teamKey } }));
   const eventStatusesQuery = useQuery({
     queryKey: ['teamEventStatusByYear', teamKey, 2025],
     queryFn: () =>
-      queryFromAPI(getTeamEventsStatusesByYear({ teamKey, year: 2025 })),
+      queryFromAPI(
+        getTeamEventsStatusesByYear({
+          path: { team_key: teamKey, year: 2025 },
+        }),
+      ),
   });
 
   const insightNotablesYearQuery = useQuery({
     queryKey: ['insightNotablesYear', 0],
-    queryFn: () => queryFromAPI(getInsightsNotablesYear({ year: 0 })),
+    queryFn: () => queryFromAPI(getInsightsNotablesYear({ path: { year: 0 } })),
   });
   const divisionWinnersNotable = insightNotablesYearQuery.data
     ?.find((insight) => insight.name == 'notables_division_winners')
@@ -184,7 +186,7 @@ function TeamDetails({
       event: key,
       rank: value?.qual?.ranking?.rank,
       alliance: value?.alliance
-        ? `A${value.alliance.number}P${value.alliance.pick || 'C'}`
+        ? `A${value.alliance.number}P${value.alliance.pick ?? 'C'}`
         : 'DNP',
       finish:
         value?.playoff?.status == 'won'
@@ -262,8 +264,8 @@ function MatchSuggestionRow({
   const [showDetails, setShowDetails] = useState(false);
 
   const prediction =
-    eventPredictions?.match_predictions.qual[match.key] ??
-    eventPredictions?.match_predictions.playoff[match.key];
+    eventPredictions?.match_predictions?.qual[match.key] ??
+    eventPredictions?.match_predictions?.playoff[match.key];
 
   const predictedRedScore = prediction ? prediction.red.score : 0.0;
   const predictedBlueScore = prediction ? prediction.blue.score : 0.0;
@@ -392,9 +394,11 @@ export default function MatchSuggestion(): React.JSX.Element {
     queryFn: () =>
       Promise.all(
         events.map(async (event) =>
-          (await queryFromAPI(getEventMatches({ eventKey: event.key }))).sort(
-            sortMatchComparator,
-          ),
+          (
+            await queryFromAPI(
+              getEventMatches({ path: { event_key: event.key } }),
+            )
+          ).sort(sortMatchComparator),
         ),
       ),
   });
@@ -403,10 +407,14 @@ export default function MatchSuggestion(): React.JSX.Element {
     queryKey: ['eventRankings', events],
     queryFn: () =>
       Promise.all(
-        events.map(
-          async (event) =>
-            await queryFromAPI(getEventRankings({ eventKey: event.key })),
-        ),
+        events.map(async (event) => {
+          const x = await getEventRankings({ path: { event_key: event.key } });
+          if (x.data === undefined) {
+            return null;
+          }
+
+          return x.data;
+        }),
       ),
   });
 
@@ -416,7 +424,9 @@ export default function MatchSuggestion(): React.JSX.Element {
       Promise.all(
         events.map(
           async (event) =>
-            await queryFromAPI(getEventPredictions({ eventKey: event.key })),
+            await queryFromAPI(
+              getEventPredictions({ path: { event_key: event.key } }),
+            ),
         ),
       ),
   });
@@ -451,9 +461,7 @@ export default function MatchSuggestion(): React.JSX.Element {
           match,
           event: events[eventIdx],
           eventRankings: eventRankingsQuery.data?.[eventIdx],
-          eventPredictions: eventPredictionsQuery.data?.[
-            eventIdx
-          ] as EventPredictions,
+          eventPredictions: eventPredictionsQuery.data?.[eventIdx] ?? null,
         });
       } else {
         upcomingMatches.push({
