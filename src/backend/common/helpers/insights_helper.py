@@ -105,6 +105,7 @@ class InsightsHelper(object):
         insights += self._calculateChampionshipStats(award_futures, year)
         insights += self._calculateRegionalStats(award_futures, year)
         insights += self._calculateSuccessfulElimTeamups(award_futures, year)
+        insights += self._calculateSuccessfulElimTeamups(award_futures, year, isEinstein=True)
 
         return insights
 
@@ -835,7 +836,7 @@ class InsightsHelper(object):
 
     @classmethod
     def _calculateSuccessfulElimTeamups(
-        self, award_futures: List[TypedFuture[Award]], year: Year
+        self, award_futures: List[TypedFuture[Award]], year: Year, isEinstein: bool = False
     ) -> List[Insight]:
         """
         Returns an Insight where the data is a list of list of teams that won an event together
@@ -843,7 +844,7 @@ class InsightsHelper(object):
         successful_elim_teamups = []
         for award_future in award_futures:
             award = award_future.get_result()
-            if award.award_type_enum == AwardType.WINNER:
+            if award.award_type_enum == AwardType.WINNER and (not isEinstein or award.event_type_enum == EventType.CMP_FINALS):
                 successful_elim_teamups.append(
                     [team_key.id() for team_key in award.team_list]
                 )
@@ -852,7 +853,7 @@ class InsightsHelper(object):
             return [
                 create_insight(
                     successful_elim_teamups,
-                    Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
+                    Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_EINSTEIN_TEAMUPS if isEinstein else Insight.SUCCESSFUL_ELIM_TEAMUPS],
                     year,
                 )
             ]
@@ -968,6 +969,23 @@ class InsightsHelper(object):
             successful_elim_teamups_sorted.items(), key=lambda x: -x[0]
         )
 
+        year_successful_einstein_teamups = Insight.query(
+            Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_EINSTEIN_TEAMUPS],
+            Insight.year != 0,
+        ).fetch(1000)
+        successful_einstein_teamups = defaultdict(int)
+        for insight in year_successful_einstein_teamups:
+            for teams in insight.data:
+                for pairs in itertools.combinations(teams, 2):
+                    successful_einstein_teamups[tuple(sorted(pairs))] += 1
+        successful_einstein_teamups_sorted = defaultdict(list)
+        for teams, num_wins in successful_einstein_teamups.items():
+            sorted_teams = sorted(teams, key=lambda team_key: int(team_key[3:]))
+            successful_einstein_teamups_sorted[num_wins].append(sorted_teams)
+        successful_einstein_teamups_sorted = sorted(
+            successful_einstein_teamups_sorted.items(), key=lambda x: -x[0]
+        )
+
         # Sorting
         regional_winners = sort_counter_dict(regional_winners)
         blue_banners = sort_counter_dict(blue_banners)
@@ -1026,6 +1044,15 @@ class InsightsHelper(object):
                 create_insight(
                     successful_elim_teamups_sorted,
                     Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
+                    0,
+                )
+            )
+
+        if year_successful_einstein_teamups:
+            insights.append(
+                create_insight(
+                    successful_einstein_teamups_sorted,
+                    Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_EINSTEIN_TEAMUPS],
                     0,
                 )
             )
