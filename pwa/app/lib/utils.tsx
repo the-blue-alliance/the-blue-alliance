@@ -50,13 +50,13 @@ export async function parseParamsForYearElseDefault(
 export function timestampsAreOnDifferentDays(
   timestamp1: number,
   timestamp2: number,
-  timezone: string,
+  timezone: string | null,
 ): boolean {
   const date1 = new Date(timestamp1 * 1000);
   const date2 = new Date(timestamp2 * 1000);
 
   const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
+    timeZone: timezone ?? 'UTC',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

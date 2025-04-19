@@ -1,6 +1,6 @@
 /**
  * The Blue Alliance API v3
- * 3.9.15
+ * 3.9.16
  * DO NOT MODIFY - This file has been generated using oazapfts.
  * See https://www.npmjs.com/package/oazapfts
  */
@@ -90,7 +90,7 @@ export type TeamSimple = {
   /** Country of team derived from parsing the address registered with FIRST. */
   country: string | null;
 };
-export type DistrictList = {
+export type District = {
   /** The short identifier for the district. */
   abbreviation: string;
   /** The long name for the district. */
@@ -131,7 +131,7 @@ export type Event = {
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
   event_type: EventType;
-  district: DistrictList | null;
+  district: District | null;
   /** City, town, village, etc. the event is located in. */
   city: string | null;
   /** State or Province the event is located in. */
@@ -165,7 +165,7 @@ export type Event = {
   /** Name of the location at the address for the event, eg. Blue Alliance High School. */
   location_name: string | null;
   /** Timezone name. */
-  timezone: string;
+  timezone: string | null;
   /** The event's website, if any. */
   website: string | null;
   /** The FIRST internal Event ID, used to link to the event on the FRC webpage. */
@@ -223,7 +223,7 @@ export type EventSimple = {
   event_code: string;
   /** Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2 */
   event_type: EventType;
-  district: DistrictList | null;
+  district: District | null;
   /** City, town, village, etc. the event is located in. */
   city: string | null;
   /** State or Province the event is located in. */
@@ -1664,7 +1664,7 @@ export function getTeamDistricts(
   return oazapfts.fetchJson<
     | {
         status: 200;
-        data: DistrictList[];
+        data: District[];
       }
     | {
         status: 304;
@@ -3683,7 +3683,7 @@ export function getDistrictsByYear(
   return oazapfts.fetchJson<
     | {
         status: 200;
-        data: DistrictList[];
+        data: District[];
       }
     | {
         status: 304;
@@ -3721,7 +3721,7 @@ export function getDistrictHistory(
   return oazapfts.fetchJson<
     | {
         status: 200;
-        data: DistrictList[];
+        data: District[];
       }
     | {
         status: 304;
