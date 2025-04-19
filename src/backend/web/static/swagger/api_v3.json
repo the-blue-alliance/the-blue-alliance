@@ -1248,14 +1248,11 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/components/schemas/Team_Event_Status"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
+                    "type": [
+                      "null",
+                      "object"
+                    ],
+                    "$ref": "#/components/schemas/Team_Event_Status"
                   },
                   "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key."
                 }
@@ -1578,14 +1575,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Team_Event_Status"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "$ref": "#/components/schemas/Team_Event_Status"
                 }
               }
             }
@@ -2508,17 +2502,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Elimination_Alliance"
-                      }
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/Elimination_Alliance"
+                  }
                 }
               }
             }
@@ -2575,13 +2565,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_Insights"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "$ref": "#/components/schemas/Event_Insights",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -2639,14 +2626,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_OPRs"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "$ref": "#/components/schemas/Event_OPRs"
                 }
               }
             }
@@ -2703,14 +2687,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_COPRs"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "$ref": "#/components/schemas/Event_COPRs"
                 }
               }
             }
@@ -2767,13 +2748,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_Predictions"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "$ref": "#/components/schemas/Event_Predictions",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -2831,13 +2809,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_Ranking"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "$ref": "#/components/schemas/Event_Ranking",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -2896,13 +2871,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_District_Points"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "$ref": "#/components/schemas/Event_District_Points",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -2960,14 +2932,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_District_Points"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "$ref": "#/components/schemas/Event_District_Points"
                 }
               }
             }
@@ -3024,13 +2993,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Event_District_Points"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "$ref": "#/components/schemas/Event_District_Points",
+                  "type": [
+                    "null",
+                    "object"
                   ]
                 }
               }
@@ -3279,13 +3245,10 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/components/schemas/Team_Event_Status"
-                      },
-                      {
-                        "type": "null"
-                      }
+                    "$ref": "#/components/schemas/Team_Event_Status",
+                    "type": [
+                      "null",
+                      "object"
                     ]
                   },
                   "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key."
@@ -4507,17 +4470,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/District_Ranking"
-                      }
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/District_Ranking"
+                  }
                 }
               }
             }
@@ -4576,18 +4535,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "type": "object",
-                      "description": "A mapping of team key to District_Advancement",
-                      "additionalProperties": {
-                        "$ref": "#/components/schemas/District_Advancement"
-                      }
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "description": "A mapping of team key to District_Advancement",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/District_Advancement"
+                  }
                 }
               }
             }
@@ -4716,17 +4671,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "type": "object",
-                      "additionalProperties": {
-                        "$ref": "#/components/schemas/Regional_Advancement"
-                      }
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/Regional_Advancement"
+                  }
                 }
               }
             }
@@ -4784,17 +4735,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Regional_Ranking"
-                      }
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/Regional_Ranking"
+                  }
                 }
               }
             }
@@ -5298,13 +5245,10 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/District"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/District",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "city": {
@@ -5396,13 +5340,10 @@
             "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
           },
           "district": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/District"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/District",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "city": {
@@ -5578,33 +5519,24 @@
         "type": "object",
         "properties": {
           "qual": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Team_Event_Status_rank"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/Team_Event_Status_rank",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "alliance": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Team_Event_Status_alliance"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/Team_Event_Status_alliance",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "playoff": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Team_Event_Status_playoff"
-              },
-              {
-                "type": "null"
-              }
+            "$ref": "#/components/schemas/Team_Event_Status_playoff",
+            "type": [
+              "null",
+              "object"
             ]
           },
           "alliance_status_str": {
@@ -5663,13 +5595,10 @@
                 }
               },
               "record": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/WLT_Record"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "$ref": "#/components/schemas/WLT_Record",
+                "type": [
+                  "null",
+                  "object"
                 ]
               },
               "rank": {
@@ -5736,90 +5665,72 @@
         }
       },
       "Team_Event_Status_alliance_backup": {
-        "anyOf": [
-          {
-            "type": "object",
-            "properties": {
-              "out": {
-                "type": "string",
-                "description": "TBA key for the team replaced by the backup."
-              },
-              "in": {
-                "type": "string",
-                "description": "TBA key for the backup team called in."
-              }
-            },
-            "description": "Backup status, may be null."
+        "type": [
+          "null",
+          "object"
+        ],
+        "properties": {
+          "out": {
+            "type": "string",
+            "description": "TBA key for the team replaced by the backup."
           },
-          {
-            "type": "null"
+          "in": {
+            "type": "string",
+            "description": "TBA key for the backup team called in."
           }
-        ]
+        },
+        "description": "Backup status, may be null."
       },
       "Team_Event_Status_playoff": {
-        "anyOf": [
-          {
-            "type": "object",
-            "properties": {
-              "level": {
-                "type": "string",
-                "description": "The highest playoff level the team reached.",
-                "enum": [
-                  "qm",
-                  "ef",
-                  "qf",
-                  "sf",
-                  "f"
-                ]
-              },
-              "current_level_record": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/WLT_Record"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "record": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/WLT_Record"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "status": {
-                "type": "string",
-                "description": "Current competition status for the playoffs.",
-                "enum": [
-                  "won",
-                  "eliminated",
-                  "playing"
-                ]
-              },
-              "playoff_average": {
-                "anyOf": [
-                  {
-                    "type": "number",
-                    "format": "double"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "The average match score during playoffs. Year specific. May be null if not relevant for a given year."
-              }
-            },
-            "description": "Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun."
+        "type": [
+          "null",
+          "object"
+        ],
+        "properties": {
+          "level": {
+            "type": "string",
+            "description": "The highest playoff level the team reached.",
+            "enum": [
+              "qm",
+              "ef",
+              "qf",
+              "sf",
+              "f"
+            ]
           },
-          {
-            "type": "null"
+          "current_level_record": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "$ref": "#/components/schemas/WLT_Record"
+          },
+          "record": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "$ref": "#/components/schemas/WLT_Record"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current competition status for the playoffs.",
+            "enum": [
+              "won",
+              "eliminated",
+              "playing"
+            ]
+          },
+          "playoff_average": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double",
+            "description": "The average match score during playoffs. Year specific. May be null if not relevant for a given year."
           }
-        ]
+        },
+        "description": "Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun."
       },
       "Event_Ranking": {
         "required": [
@@ -5864,29 +5775,22 @@
                   }
                 },
                 "sort_orders": {
-                  "anyOf": [
-                    {
-                      "type": "array",
-                      "items": {
-                        "type": "number",
-                        "format": "double"
-                      }
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "array",
+                    "null"
                   ],
+                  "items": {
+                    "type": "number",
+                    "format": "double"
+                  },
                   "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details."
                 },
                 "record": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/WLT_Record"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "$ref": "#/components/schemas/WLT_Record"
                 },
                 "rank": {
                   "type": "integer",
@@ -6955,43 +6859,40 @@
             "format": "int64"
           },
           "score_breakdown": {
-            "anyOf": [
+            "type": [
+              "object",
+              "null"
+            ],
+            "oneOf": [
               {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2015"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2016"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2017"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2018"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2019"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2020"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2022"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2023"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2024"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Match_Score_Breakdown_2025"
-                  }
-                ]
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2015"
               },
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2016"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2017"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2018"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2019"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2020"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2022"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2023"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2024"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2025"
               }
             ],
             "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
@@ -9334,40 +9235,32 @@
         ],
         "properties": {
           "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ],
             "description": "Alliance name, may be null."
           },
           "backup": {
-            "anyOf": [
-              {
-                "type": "object",
-                "required": [
-                  "in",
-                  "out"
-                ],
-                "properties": {
-                  "in": {
-                    "type": "string",
-                    "description": "Team key that was called in as the backup."
-                  },
-                  "out": {
-                    "type": "string",
-                    "description": "Team key that was replaced by the backup team."
-                  }
-                },
-                "description": "Backup team called in, may be null."
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [
+              "in",
+              "out"
+            ],
+            "properties": {
+              "in": {
+                "type": "string",
+                "description": "Team key that was called in as the backup."
               },
-              {
-                "type": "null"
+              "out": {
+                "type": "string",
+                "description": "Team key that was replaced by the backup team."
               }
-            ]
+            },
+            "description": "Backup team called in, may be null."
           },
           "declines": {
             "type": "array",
@@ -9396,24 +9289,18 @@
                 "type": "string"
               },
               "record": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/WLT_Record"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "$ref": "#/components/schemas/WLT_Record"
               },
               "current_level_record": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/WLT_Record"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "$ref": "#/components/schemas/WLT_Record"
               },
               "status": {
                 "type": "string"
