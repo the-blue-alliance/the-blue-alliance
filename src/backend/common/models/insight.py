@@ -60,6 +60,7 @@ class Insight(CachedModel):
     TYPED_NOTABLES_CMP_FINALS_APPEARANCES = 39
     TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS = 40
     TYPED_LEADERBOARD_MOST_WFFAS = 41
+    SUCCESSFUL_EINSTEIN_TEAMUPS = 42
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -81,6 +82,7 @@ class Insight(CachedModel):
         DIVISION_FINALISTS: "division_finalists",
         REGIONAL_DISTRICT_WINNERS: "regional_district_winners",
         SUCCESSFUL_ELIM_TEAMUPS: "successful_elim_teamups",
+        SUCCESSFUL_EINSTEIN_TEAMUPS: "successful_einstein_teamups",
         MATCH_PREDICTIONS: "match_predictions",
         MATCH_AVERAGE_MARGINS_BY_WEEK: "match_average_margins_by_week",
         ELIM_MATCH_AVERAGE_MARGINS_BY_WEEK: "elim_match_average_margins_by_week",
