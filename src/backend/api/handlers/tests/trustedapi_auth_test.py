@@ -35,6 +35,16 @@ def setup_event(
     ).put()
 
 
+def setup_cmp_event() -> None:
+    Event(
+        id="2019cur",
+        year=2019,
+        event_short="cur",
+        event_type_enum=EventType.CMP_DIVISION,
+        official=True,
+    ).put()
+
+
 def setup_user(
     monkeypatch: MonkeyPatch,
     permissions: List[AccountPermission] = [],
@@ -546,6 +556,41 @@ def test_explicit_auth_all_official_events(
     with api_client.application.test_request_context():  # pyre-ignore[16]
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 200, resp.data
+    assert "Success" in resp.json
+
+
+@freeze_time("2019-06-01")
+def test_explicit_auth_with_event_code_override(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    Ensure we can support requests being made with full CMP division names
+    and resolve them to the correct events
+    """
+    setup_cmp_event()
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        None,
+        auth_types=[AuthType.EVENT_TEAMS],
+        expiration=None,
+        all_official_events=True,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019curie/team_list/update"
         resp = api_client.post(
             request_path,
             headers={

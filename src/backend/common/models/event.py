@@ -10,7 +10,11 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts import event_type
-from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType, SEASON_EVENT_TYPES
+from backend.common.consts.event_type import (
+    CMP_EVENT_TYPES,
+    EventType,
+    SEASON_EVENT_TYPES,
+)
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.futures import TypedFuture
 from backend.common.memcache_models.webcast_online_status_memcache import (

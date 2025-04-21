@@ -8,6 +8,7 @@ from backend.api.client_api_types import VoidRequest
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
@@ -131,6 +132,7 @@ def validate_keys(func):
 
             event_future = None
             if event_key:
+                event_key = EventCodeExceptions.resolve(event_key)
                 event_future = Event.get_by_id_async(event_key)
 
             match_future = None
