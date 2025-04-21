@@ -105,7 +105,9 @@ class InsightsHelper(object):
         insights += self._calculateChampionshipStats(award_futures, year)
         insights += self._calculateRegionalStats(award_futures, year)
         insights += self._calculateSuccessfulElimTeamups(award_futures, year)
-        insights += self._calculateSuccessfulElimTeamups(award_futures, year, isEinstein=True)
+        insights += self._calculateSuccessfulElimTeamups(
+            award_futures, year, isEinstein=True
+        )
 
         return insights
 
@@ -836,7 +838,10 @@ class InsightsHelper(object):
 
     @classmethod
     def _calculateSuccessfulElimTeamups(
-        self, award_futures: List[TypedFuture[Award]], year: Year, isEinstein: bool = False
+        self,
+        award_futures: List[TypedFuture[Award]],
+        year: Year,
+        isEinstein: bool = False,
     ) -> List[Insight]:
         """
         Returns an Insight where the data is a list of list of teams that won an event together
@@ -844,7 +849,9 @@ class InsightsHelper(object):
         successful_elim_teamups = []
         for award_future in award_futures:
             award = award_future.get_result()
-            if award.award_type_enum == AwardType.WINNER and (not isEinstein or award.event_type_enum == EventType.CMP_FINALS):
+            if award.award_type_enum == AwardType.WINNER and (
+                not isEinstein or award.event_type_enum == EventType.CMP_FINALS
+            ):
                 successful_elim_teamups.append(
                     [team_key.id() for team_key in award.team_list]
                 )
@@ -853,7 +860,13 @@ class InsightsHelper(object):
             return [
                 create_insight(
                     successful_elim_teamups,
-                    Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_EINSTEIN_TEAMUPS if isEinstein else Insight.SUCCESSFUL_ELIM_TEAMUPS],
+                    Insight.INSIGHT_NAMES[
+                        (
+                            Insight.SUCCESSFUL_EINSTEIN_TEAMUPS
+                            if isEinstein
+                            else Insight.SUCCESSFUL_ELIM_TEAMUPS
+                        )
+                    ],
                     year,
                 )
             ]
