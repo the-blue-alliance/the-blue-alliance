@@ -323,7 +323,9 @@ export default function EventPage() {
               </InlineIcon>
             </TabsTrigger>
           )}
-          {(shouldPreviewAwardsTab || awardsQuery.data) && (
+          {((shouldPreviewAwardsTab && awardsQuery.isPending) ||
+            (awardsQuery.data !== undefined &&
+              awardsQuery.data.length > 0)) && (
             <TabsTrigger value="awards">
               <InlineIcon>
                 <BiTrophy />
@@ -340,15 +342,17 @@ export default function EventPage() {
               </Badge>
             </InlineIcon>
           </TabsTrigger>
-          {(shouldPreviewInsightsTab ||
-            (coprsQuery.data && colorsQuery.data)) && (
-            <TabsTrigger value="insights">
-              <InlineIcon>
-                <MdiGraphBoxOutline />
-                Insights
-              </InlineIcon>
-            </TabsTrigger>
-          )}
+          {((shouldPreviewInsightsTab &&
+            (coprsQuery.isPending || colorsQuery.isPending)) ||
+            (coprsQuery.data && colorsQuery.data)) &&
+            matches.length > 0 && (
+              <TabsTrigger value="insights">
+                <InlineIcon>
+                  <MdiGraphBoxOutline />
+                  Insights
+                </InlineIcon>
+              </TabsTrigger>
+            )}
           <TabsTrigger value="media">
             <InlineIcon>
               <MdiFolderMediaOutline />
