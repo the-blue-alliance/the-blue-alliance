@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import { sortEventsComparator } from '~/lib/eventUtils';
 import { joinComponents } from '~/lib/utils';
 
 import { Route } from '.react-router/types/app/routes/+types/team.$teamNumber.history';
@@ -97,6 +98,7 @@ export default function TeamPage(): React.JSX.Element {
     useLoaderData<typeof loader>();
 
   yearsParticipated.sort((a, b) => b - a);
+  history.events.sort(sortEventsComparator).reverse();
 
   return (
     <div className="flex flex-wrap sm:flex-nowrap">
