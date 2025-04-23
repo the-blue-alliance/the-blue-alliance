@@ -45,7 +45,7 @@
     "cross-env": "7.0.3",
     "embla-carousel-autoplay": "8.6.0",
     "embla-carousel-react": "8.6.0",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "firebase": "11.6.0",
     "fuzzysort": "3.1.0",
     "isbot": "5.1.26",
