@@ -80,6 +80,9 @@ class InsightsLeaderboardTeamHelper:
     def _most_non_champs_impact_wins(
         arguments: LeaderboardInsightArguments,
     ) -> Optional[Insight]:
+        if arguments.year != 0:
+            return None
+
         count = defaultdict(int)
 
         for award in arguments.awards():
@@ -96,6 +99,9 @@ class InsightsLeaderboardTeamHelper:
 
     @staticmethod
     def _most_wffas(arguments: LeaderboardInsightArguments) -> Optional[Insight]:
+        if arguments.year != 0:
+            return None
+
         count = defaultdict(int)
 
         for award in arguments.awards():
