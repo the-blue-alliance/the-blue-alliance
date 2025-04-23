@@ -27,6 +27,7 @@ class InsightsLeaderboardTeamHelper:
                 InsightsLeaderboardTeamHelper._longest_einstein_streak,
                 InsightsLeaderboardTeamHelper._most_non_champs_impact_wins,
                 InsightsLeaderboardTeamHelper._most_wffas,
+                InsightsLeaderboardTeamHelper._longest_qualifying_event_streak,
             ],
         )
 
@@ -220,5 +221,42 @@ class InsightsLeaderboardTeamHelper:
         return make_leaderboard_from_dict_counts(
             longest_streaks,
             Insight.TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK,
+            arguments.year,
+        )
+
+    @staticmethod
+    def _longest_qualifying_event_streak(
+        arguments: LeaderboardInsightArguments,
+    ) -> Optional[Insight]:
+        if arguments.year != 0:
+            return None
+
+        arguments.events.sort(key=lambda e: e.start_date)
+
+        active_streaks = defaultdict(int)
+        longest_streaks = defaultdict(int)
+
+        for event in arguments.events:
+            if event.event_type_enum not in [EventType.DISTRICT, EventType.REGIONAL]:
+                continue
+
+            winners = set()
+            for award in event.awards:
+                if award.award_type_enum == AwardType.WINNER:
+                    for team_key in award.team_list:
+                        active_streaks[team_key.string_id()] += 1
+                        longest_streaks[team_key.string_id()] = max(
+                            longest_streaks[team_key.string_id()],
+                            active_streaks[team_key.string_id()],
+                        )
+                        winners.add(team_key.string_id())
+
+            for team in event.teams:
+                if team.key_name not in winners and active_streaks[team.key_name] > 0:
+                    active_streaks[team.key_name] = 0
+
+        return make_leaderboard_from_dict_counts(
+            {k: v for k, v in longest_streaks.items() if v > 1},
+            Insight.TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK,
             arguments.year,
         )
