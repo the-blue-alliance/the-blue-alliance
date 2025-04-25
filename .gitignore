@@ -19,9 +19,6 @@ venv/
 .vscode
 .idea
 
-tba-key-setup.sh
-shell.nix
-
 # Compiled/Intermediate Files #
 ###############################
 src/build
