@@ -11,6 +11,7 @@ from backend.api.handlers.helpers.model_properties import (
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey
 from backend.common.queries.award_query import EventAwardsQuery
@@ -138,3 +139,54 @@ def district_advancement(district_key: DistrictKey) -> Response:
 
     district = DistrictQuery(district_key=district_key).fetch()
     return profiled_jsonify(district.advancement)
+
+
+@api_authenticated
+@cached_public
+def dcmp_history(district_abbreviation: DistrictAbbreviation) -> Response:
+    """
+    Returns DCMP awards/events for a given DistrictAbbreviation
+    """
+    track_call_after_response("district/dcmp_history", district_abbreviation)
+
+    districts = DistrictAbbreviationQuery(
+        abbreviation=district_abbreviation
+    ).fetch_dict(ApiMajorVersion.API_V3)
+
+    dcmp_event_futures = []
+    for district in districts:
+        dcmp_event_futures.append(
+            DistrictEventsQuery(district_key=district["key"]).fetch_dict_async(
+                ApiMajorVersion.API_V3
+            )
+        )
+
+    dcmp_events = {}
+    for future in dcmp_event_futures:
+        result = future.get_result()
+        for event in result:
+            if event["event_type"] in [
+                EventType.DISTRICT_CMP,
+                EventType.DISTRICT_CMP_DIVISION,
+            ]:
+                dcmp_events[event["key"]] = event
+
+    dcmp_award_futures = {}
+    for event_key in dcmp_events:
+        dcmp_award_futures[event_key] = EventAwardsQuery(
+            event_key=event_key
+        ).fetch_dict_async(ApiMajorVersion.API_V3)
+
+    dcmp_awards = {}
+    for event_key, future in dcmp_award_futures.items():
+        dcmp_awards[event_key] = future.get_result()
+
+    ret = [
+        {
+            "event": dcmp_events[event_key],
+            "awards": dcmp_awards[event_key],
+        }
+        for event_key in dcmp_events
+    ]
+
+    return profiled_jsonify(ret)
