@@ -7,6 +7,7 @@ import {
   getTeamSocialMedia,
   getTeamYearsParticipated,
 } from '~/api/v3';
+import { AwardBanner } from '~/components/tba/banner';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import {
@@ -25,6 +26,9 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
+import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import { joinComponents } from '~/lib/utils';
 
@@ -99,6 +103,18 @@ export default function TeamPage(): React.JSX.Element {
 
   yearsParticipated.sort((a, b) => b - a);
   history.events.sort(sortEventsComparator).reverse();
+  const awardsSortedByEventDate = sortAwardsByEventDate(
+    history.awards,
+    history.events,
+  ).toReversed();
+
+  const bannerAwards = awardsSortedByEventDate
+    .filter((a) => BLUE_BANNER_AWARDS.has(a.award_type))
+    .filter((a) =>
+      SEASON_EVENT_TYPES.has(
+        history.events.find((e) => e.key === a.event_key)?.event_type ?? -1,
+      ),
+    );
 
   return (
     <div className="flex flex-wrap sm:flex-nowrap">
@@ -135,62 +151,78 @@ export default function TeamPage(): React.JSX.Element {
 
         <Separator className="my-4" />
 
-        <Table className="w-auto">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[6ch]">Year</TableHead>
-              <TableHead className="w-[40ch]">Event</TableHead>
-              <TableHead className="w-[40ch]">Awards</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {history.events.map((e, i) => (
-              <Fragment key={e.key}>
-                {(i == 0 || history.events[i - 1].year !== e.year) && (
+        <div className="flex flex-row gap-4">
+          <Table className="w-auto">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[6ch]">Year</TableHead>
+                <TableHead className="w-[40ch]">Event</TableHead>
+                <TableHead className="w-[40ch]">Awards</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {history.events.map((e, i) => (
+                <Fragment key={e.key}>
+                  {(i == 0 || history.events[i - 1].year !== e.year) && (
+                    <TableRow>
+                      <TableCell
+                        rowSpan={
+                          history.events.filter((e2) => e2.year === e.year)
+                            .length + 1
+                        }
+                      >
+                        <TeamLink teamOrKey={team} year={e.year}>
+                          {e.year}
+                        </TeamLink>
+                      </TableCell>
+                    </TableRow>
+                  )}
                   <TableRow>
-                    <TableCell
-                      rowSpan={
-                        history.events.filter((e2) => e2.year === e.year)
-                          .length + 1
-                      }
-                    >
-                      <TeamLink teamOrKey={team} year={e.year}>
-                        {e.year}
-                      </TeamLink>
+                    <TableCell>
+                      <EventLink eventOrKey={e}>{e.name}</EventLink>
+                    </TableCell>
+                    <TableCell>
+                      {joinComponents(
+                        history.awards
+                          .filter((a) => a.event_key === e.key)
+                          .map((a) => {
+                            const teamRecipients = a.recipient_list
+                              .filter((r) => r.awardee !== null)
+                              .filter((r) => r.awardee !== '')
+                              .filter((r) => r.team_key === team.key)
+                              .map((r) => r.awardee);
+
+                            return (
+                              <span key={`${a.event_key}_${a.award_type}`}>
+                                {a.name}
+                                {teamRecipients.length > 0 &&
+                                  ` (${teamRecipients.join(', ')})`}
+                              </span>
+                            );
+                          }),
+                        <br />,
+                      )}
                     </TableCell>
                   </TableRow>
-                )}
-                <TableRow>
-                  <TableCell>
-                    <EventLink eventOrKey={e}>{e.name}</EventLink>
-                  </TableCell>
-                  <TableCell>
-                    {joinComponents(
-                      history.awards
-                        .filter((a) => a.event_key === e.key)
-                        .map((a) => {
-                          const teamRecipients = a.recipient_list
-                            .filter((r) => r.awardee !== null)
-                            .filter((r) => r.awardee !== '')
-                            .filter((r) => r.team_key === team.key)
-                            .map((r) => r.awardee);
-
-                          return (
-                            <span key={`${a.event_key}_${a.award_type}`}>
-                              {a.name}
-                              {teamRecipients.length > 0 &&
-                                ` (${teamRecipients.join(', ')})`}
-                            </span>
-                          );
-                        }),
-                      <br />,
-                    )}
-                  </TableCell>
-                </TableRow>
-              </Fragment>
-            ))}
-          </TableBody>
-        </Table>
+                </Fragment>
+              ))}
+            </TableBody>
+          </Table>
+          <div>
+            {bannerAwards.length > 0 && (
+              <div className="flex w-96 flex-row flex-wrap justify-center gap-2">
+                {bannerAwards.map((a) => (
+                  <AwardBanner
+                    key={`${a.award_type}-${a.event_key}`}
+                    award={a}
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    event={history.events.find((e) => e.key === a.event_key)!}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
