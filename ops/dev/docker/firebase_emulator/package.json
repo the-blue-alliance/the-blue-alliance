@@ -1,0 +1,11 @@
+{
+  "name": "tba_firebase_emulator",
+  "version": "1.0.0",
+  "main": "create_firebase_emulator_auth_accounts.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

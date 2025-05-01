@@ -1,5 +1,5 @@
 FROM ubuntu:22.04
-MAINTAINER The Blue Alliance
+LABEL maintainer="The Blue Alliance"
 
 # Set debconf to run non-interactively
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -43,9 +43,6 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk-datastore-emulator \
     google-cloud-sdk-pubsub-emulator
 
-# Install JDK 11 for firebase-tools
-RUN apt-get install default-jre -y
-
 # dev_appserver expects `python2` to exist
 RUN sudo apt update
 RUN sudo apt install python2 -y
@@ -70,14 +67,6 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
-
-# Expose Firebase emulator
-EXPOSE 4000
-EXPOSE 4400
-EXPOSE 4500
-EXPOSE 9005
-EXPOSE 9000
-EXPOSE 9099
 
 # Expose ports for TBA
 EXPOSE 8000

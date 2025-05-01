@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   tba:
     # image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
@@ -11,13 +9,6 @@ services:
     tty: true
     stdin_open: true
     ports:
-      # Firebase
-      - "4000:4000"
-      - "4400:4400"
-      - "4500:4500"
-      - "9005:9005"
-      - "9000:9000"
-      - "9099:9099"
       # GAE
       - "8080:8080"
       - "8081:8081"
@@ -31,11 +22,48 @@ services:
       - "8089:8089"
       # GAE Admin
       - "8000:8000"
-      # RQ Dashboard
-      - "9181:9181"
     entrypoint: [ "sh", "/tba/ops/dev/docker/docker-entry.sh" ]
     command: [ "/usr/sbin/sshd", "-D" ]
     working_dir: /tba
     hostname: tba
     environment:
       - PUPPETEER_SKIP_DOWNLOAD=true
+  firebase:
+    build:
+      context: ./ops/dev/docker/firebase_emulator
+      dockerfile: Dockerfile
+      args:
+        - FIREBASE_VERSION=13.3.0
+    stop_grace_period: 1m
+    environment:
+      FIREBASE_PROJECT: "demo-test"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -s http://localhost:9099 | jq -e '.authEmulator.ready'"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+    ports:
+      # Firebase
+      - "4000:4000"
+      - "4400:4400"
+      - "4500:4500"
+      - "9005:9005"
+      - "9000:9000"
+      - "9099:9099"
+    hostname: firebase
+    command: ["/firebase/run_firebase_emulator.sh"]
+  firebase-bootstrap:
+    build:
+      context: ./ops/dev/docker/firebase_emulator
+      dockerfile: Dockerfile
+      args:
+        - FIREBASE_VERSION=13.3.0
+    environment:
+      FIREBASE_PROJECT: "demo-test"
+    depends_on:
+      firebase:
+        condition: service_healthy
+    restart: "no"
+    hostname: firebase-bootstrap
+    command: ["node", "/firebase/create_firebase_emulator_auth_accounts.js"]
