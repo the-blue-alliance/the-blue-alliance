@@ -96,6 +96,7 @@ dev_appserver.py \
     --runtime_python_path=/usr/bin/python3 \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \
+    --max_module_instances=1 \
     --runtime="$runtime_version" \
     --application="$application" \
     "${env[@]}" \
