@@ -625,7 +625,9 @@ def test_mytba(
     assert context["year"] == mock_year
 
 
-@pytest.mark.parametrize("ping_sent, expected", [(True, "1"), (False, "0")])
+@pytest.mark.parametrize(
+    "ping_sent, expected", [((True, True), "1"), ((False, True), "0")]
+)
 def test_ping_client(
     ping_sent,
     expected,
@@ -677,7 +679,9 @@ def test_ping_not_our_client(
     )
     c1.put()
 
-    with web_client, patch.object(TBANSHelper, "ping", return_value=True) as mock_ping:
+    with web_client, patch.object(
+        TBANSHelper, "ping", return_value=(True, True)
+    ) as mock_ping:
         response = web_client.post(
             "/account/ping", data={"mobile_client_id": c1.key.id()}
         )

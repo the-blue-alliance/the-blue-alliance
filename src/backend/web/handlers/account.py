@@ -545,7 +545,7 @@ def ping():
 
     from backend.common.helpers.tbans_helper import TBANSHelper
 
-    success = TBANSHelper.ping(client)
+    success, valid_url = TBANSHelper.ping(client)
     if success:
         session["ping_sent"] = "1"
     else:
