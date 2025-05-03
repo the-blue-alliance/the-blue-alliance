@@ -1,4 +1,4 @@
-from unittest.mock import ANY, Mock, patch
+from unittest.mock import ANY, patch
 
 import pytest
 from google.appengine.api import urlfetch

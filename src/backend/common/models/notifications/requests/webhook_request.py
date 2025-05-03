@@ -57,7 +57,7 @@ class WebhookRequest(Request):
             )
             if response.status_code != 200:
                 valid_url = False
-        except:
+        except Exception:
             success = False
 
         return success, valid_url
