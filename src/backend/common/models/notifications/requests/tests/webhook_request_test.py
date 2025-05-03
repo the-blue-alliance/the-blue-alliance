@@ -1,6 +1,8 @@
 from unittest.mock import ANY, Mock, patch
 
 import pytest
+from google.appengine.api import urlfetch
+from google.appengine.ext import testbed
 
 from backend.common.models.notifications.requests.request import Request
 from backend.common.models.notifications.requests.webhook_request import (
@@ -9,6 +11,13 @@ from backend.common.models.notifications.requests.webhook_request import (
 from backend.common.models.notifications.tests.mocks.notifications.mock_notification import (
     MockNotification,
 )
+
+
+@pytest.fixture(autouse=True)
+def auto_add_urlfetch_stub(
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    pass
 
 
 def test_subclass():
@@ -79,7 +88,10 @@ def test_generate_webhook_checksum_hmac_unicode_nonascii():
     )
 
 
-def test_send_headers():
+@patch("google.appengine.api.urlfetch.fetch")
+def test_send_headers(mock_fetch):
+    mock_fetch.return_value.status_code = 200
+
     message = WebhookRequest(
         MockNotification(webhook_message_data={"data": "value"}),
         "https://www.thebluealliance.com",
@@ -93,91 +105,99 @@ def test_send_headers():
         "X-TBA-HMAC": "a143b493f9a31077f7ff742dc3f59c8d73e6e2c2f09dde5f1a73c33059b77151",
     }
 
-    with patch("requests.post") as mock_post:
-        message.send()
-    mock_post.assert_called_once_with(
-        "https://www.thebluealliance.com", data=ANY, headers=headers
+    success, valid_url = message.send()
+
+    mock_fetch.assert_called_once_with(
+        "https://www.thebluealliance.com",
+        payload=ANY,
+        method=urlfetch.POST,
+        headers=headers,
     )
+    assert success
+    assert valid_url
 
 
-def test_send():
+@patch("google.appengine.api.urlfetch.fetch")
+def test_send(mock_fetch):
+    mock_fetch.return_value.status_code = 200
+
     message = WebhookRequest(
         MockNotification(webhook_message_data={"data": "value"}),
         "https://www.thebluealliance.com",
         "secret",
     )
 
-    with patch(
-        "requests.post", return_value=Mock(status_code=200)
-    ) as mock_post, patch.object(message, "defer_track_notification") as mock_track:
-        success = message.send()
-    mock_post.assert_called_once()
-    mock_track.assert_called_once_with(1)
+    success, valid_url = message.send()
+
+    mock_fetch.assert_called_once()
     assert success
+    assert valid_url
 
 
+@patch("google.appengine.api.urlfetch.fetch")
 @pytest.mark.parametrize("code", [400, 401, 500])
-def test_send_errors(code):
+def test_send_errors(mock_fetch, code):
+    mock_fetch.return_value.status_code = code
+
     message = WebhookRequest(
         MockNotification(webhook_message_data={"data": "value"}),
         "https://www.thebluealliance.com",
         "secret",
     )
 
-    with patch(
-        "requests.post", return_value=Mock(status_code=code)
-    ) as mock_post, patch.object(message, "defer_track_notification") as mock_track:
-        success = message.send()
-    mock_post.assert_called_once()
-    mock_track.assert_not_called()
+    success, valid_url = message.send()
+
+    mock_fetch.assert_called_once()
     assert success
+    assert not valid_url
 
 
-def test_send_error_unknown():
+@patch("google.appengine.api.urlfetch.fetch")
+def test_send_error_unknown(mock_fetch):
+    mock_fetch.return_value.status_code = -1
+
     message = WebhookRequest(
         MockNotification(webhook_message_data={"data": "value"}),
         "https://www.thebluealliance.com",
         "secret",
     )
 
-    with patch(
-        "requests.post", return_value=Mock(status_code=-1)
-    ) as mock_post, patch.object(message, "defer_track_notification") as mock_track:
-        success = message.send()
-    mock_post.assert_called_once()
-    mock_track.assert_not_called()
+    success, valid_url = message.send()
+
+    mock_fetch.assert_called_once()
     assert success
+    assert not valid_url
 
 
-def test_send_fail_404():
+@patch("google.appengine.api.urlfetch.fetch")
+def test_send_fail_404(mock_fetch):
+    mock_fetch.return_value.status_code = 404
+
     message = WebhookRequest(
         MockNotification(webhook_message_data={"data": "value"}),
         "https://www.thebluealliance.com",
         "secret",
     )
 
-    with patch(
-        "requests.post", return_value=Mock(status_code=404)
-    ) as mock_post, patch.object(message, "defer_track_notification") as mock_track:
-        success = message.send()
-    mock_post.assert_called_once()
-    mock_track.assert_not_called()
+    success, valid_url = message.send()
+
+    mock_fetch.assert_called_once()
+    assert success
+    assert not valid_url
+
+
+@patch("google.appengine.api.urlfetch.fetch")
+def test_send_error_other(mock_fetch):
+    mock_fetch.side_effect = urlfetch.Error("testing")
+
+    message = WebhookRequest(
+        MockNotification(webhook_message_data={"data": "value"}),
+        "https://www.thebluealliance.com",
+        "secret",
+    )
+
+    success, valid_url = message.send()
+
+    mock_fetch.assert_called_once()
     assert not success
-
-
-def test_send_error_other():
-    message = WebhookRequest(
-        MockNotification(webhook_message_data={"data": "value"}),
-        "https://www.thebluealliance.com",
-        "secret",
-    )
-
-    error_mock = Mock()
-    error_mock.side_effect = Exception("testing")
-
-    with patch("requests.post", error_mock) as mock_post, patch.object(
-        message, "defer_track_notification"
-    ) as mock_track:
-        message.send()
-    mock_post.assert_called_once()
-    mock_track.assert_not_called()
+    assert valid_url
