@@ -1,3 +1,5 @@
+import pytest
+
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
@@ -389,3 +391,41 @@ def test_district_awards(ndb_stub, api_client: Client) -> None:
             "year": 2024,
         }
     ]
+
+
+@pytest.mark.parametrize(
+    "endpoint", ["advancement", "awards", "rankings", "teams", "events"]
+)
+def test_district_endpoints_validate(endpoint, ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    # Invalid district endpoint
+    resp = api_client.get(
+        f"/api/v3/district/2024Minnesota/{endpoint}",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 404
+    assert resp.json == {"Error": "2024Minnesota is not a valid district key"}
+
+    # Missing district
+    resp = api_client.get(
+        f"/api/v3/district/2024ne/{endpoint}",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 404
+    assert resp.json == {"Error": "district key: 2024ne does not exist"}
+
+    District(
+        id="2024ne",
+        year=2024,
+        abbreviation="ne",
+    ).put()
+
+    resp = api_client.get(
+        f"/api/v3/district/2024ne/{endpoint}",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
