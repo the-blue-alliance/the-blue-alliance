@@ -31,6 +31,10 @@ fi
 echo "Running npm install... this may take a while..."
 npm ci
 
+# Install the Firebase tools for the Firebase emulator
+if [ -z "${IS_DOCKER}" ]; then
+    npm install -g firebase-tools
+fi
 npm install -g uglify-js@3.17.4
 
 ./ops/build/run_buildweb.sh

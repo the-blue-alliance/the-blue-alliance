@@ -1,6 +1,8 @@
-FROM node:lts-alpine
+FROM node:lts
 ARG FIREBASE_VERSION=13.3.0
-RUN apk --no-cache add openjdk11-jre bash curl jq && \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    default-jre bash curl jq && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
     npm cache clean --force && \
     npm i -g firebase-tools@$FIREBASE_VERSION
 WORKDIR /firebase

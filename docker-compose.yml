@@ -1,3 +1,6 @@
+x-shared_environment: &shared_environment
+  IS_DOCKER: true
+
 services:
   tba:
     # image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
@@ -27,7 +30,8 @@ services:
     working_dir: /tba
     hostname: tba
     environment:
-      - PUPPETEER_SKIP_DOWNLOAD=true
+      <<: *shared_environment
+      PUPPETEER_SKIP_DOWNLOAD: "true"
   firebase:
     build:
       context: ./ops/dev/docker/firebase_emulator
@@ -36,6 +40,7 @@ services:
         - FIREBASE_VERSION=13.3.0
     stop_grace_period: 1m
     environment:
+      <<: *shared_environment
       FIREBASE_PROJECT: "demo-test"
     healthcheck:
       test: ["CMD-SHELL", "curl -f -s http://localhost:9099 | jq -e '.authEmulator.ready'"]
@@ -60,7 +65,8 @@ services:
       args:
         - FIREBASE_VERSION=13.3.0
     environment:
-      FIREBASE_PROJECT: "demo-test"
+      <<: *shared_environment
+      FIREBASE_PROJECT: "demo-test" # TODO: Needs to be not hardcoded
     depends_on:
       firebase:
         condition: service_healthy
