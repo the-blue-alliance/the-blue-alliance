@@ -97,11 +97,12 @@ def district_list_year(year: int) -> Response:
     """
     track_call_after_response("district/list", str(year))
 
-    district = DistrictsInYearQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
-    return profiled_jsonify(district)
+    districts = DistrictsInYearQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
+    return profiled_jsonify(districts)
 
 
 @api_authenticated
+@validate_keys
 @cached_public
 def district_awards(district_key: DistrictKey) -> Response:
     """
@@ -129,6 +130,7 @@ def district_awards(district_key: DistrictKey) -> Response:
 
 
 @api_authenticated
+@validate_keys
 @cached_public
 def district_advancement(district_key: DistrictKey) -> Response:
     """
