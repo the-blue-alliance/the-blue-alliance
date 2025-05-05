@@ -49,7 +49,7 @@ $('#teams-ok').click(function(){
     var teams = $('#team_list').val().split("\n");
     for(var i=0; i<teams.length; i++){
         var teamNum = parseInt(teams[i]);
-        if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999){
+        if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 99999){
             alert("Invalid team "+teams[i]);
             return true;
         }
