@@ -23,7 +23,7 @@ jobs:
       - name: Generate merge bot token
         id: generate_token
         if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
-        uses: actions/create-github-app-token@v2.0.5
+        uses: actions/create-github-app-token@v2.0.6
         with:
           app-id: ${{ secrets.MERGE_BOT_APP_ID }}
           private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
