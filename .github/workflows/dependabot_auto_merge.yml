@@ -25,8 +25,8 @@ jobs:
         if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
         uses: actions/create-github-app-token@v2.0.5
         with:
-          app_id: ${{ secrets.MERGE_BOT_APP_ID }}
-          private_key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+          app-id: ${{ secrets.MERGE_BOT_APP_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
       - name: Dependabot metadata
         id: dependabot_metadata
         if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
