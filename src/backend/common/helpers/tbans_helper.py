@@ -33,6 +33,8 @@ MATCH_UPCOMING_MINUTES = datetime.timedelta(minutes=-7)
 def _firebase_app():
     from firebase_admin import credentials
 
+    print("Hello world")
+
     try:
         creds = credentials.Certificate("service-account-key.json")
     except Exception:
