@@ -74,7 +74,7 @@
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/postcss": "4.1.7",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
-    "@types/compression": "1.7.5",
+    "@types/compression": "1.8.0",
     "@types/express": "5.0.2",
     "@types/morgan": "1.9.9",
     "@types/node": "20.17.50",
