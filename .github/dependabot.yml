@@ -1,4 +1,6 @@
 version: 2
+ignore:
+- dependency-name: "@sentry/*"
 updates:
 - package-ecosystem: pip
   directory: "/"
