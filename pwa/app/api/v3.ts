@@ -4088,6 +4088,47 @@ export function getDistrictAdvancement(
   });
 }
 /**
+ * Gets a list of DCMP events and awards for the given district abbreviation.
+ */
+export function getDistrictDcmpHistory(
+  {
+    ifNoneMatch,
+    districtAbbreviation,
+  }: {
+    ifNoneMatch?: string;
+    districtAbbreviation: string;
+  },
+  opts?: Oazapfts.RequestOpts,
+) {
+  return oazapfts.fetchJson<
+    | {
+        status: 200;
+        data: {
+          awards?: Award[];
+          event?: Event;
+        }[];
+      }
+    | {
+        status: 304;
+      }
+    | {
+        status: 401;
+        data: {
+          /** Authorization error description. */
+          Error: string;
+        };
+      }
+    | {
+        status: 404;
+      }
+  >(`/district/${encodeURIComponent(districtAbbreviation)}/dcmp_history`, {
+    ...opts,
+    headers: oazapfts.mergeHeaders(opts?.headers, {
+      'If-None-Match': ifNoneMatch,
+    }),
+  });
+}
+/**
  * Gets information about per-team advancement to the FIRST Championship.
  */
 export function getRegionalAdvancement(
