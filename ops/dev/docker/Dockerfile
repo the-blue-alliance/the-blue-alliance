@@ -42,6 +42,7 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk-app-engine-python-extras \
     google-cloud-sdk-datastore-emulator \
     google-cloud-sdk-pubsub-emulator
+ENV HTTPLIB2_CA_CERTS /usr/lib/google-cloud-sdk/platform/google_appengine/lib/httplib2/httplib2/cacerts.txt
 
 # Install JDK 11 for firebase-tools
 RUN apt-get install default-jre -y
