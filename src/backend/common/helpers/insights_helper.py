@@ -8,24 +8,17 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
-from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
-from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
-from backend.common.consts.event_type import (
-    CMP_EVENT_TYPES,
-    EventType,
-    SEASON_EVENT_TYPES,
-)
+from backend.common.consts.award_type import BLUE_BANNER_AWARDS, AwardType
+from backend.common.consts.comp_level import ELIM_LEVELS, CompLevel
+from backend.common.consts.event_type import (CMP_EVENT_TYPES,
+                                              SEASON_EVENT_TYPES, EventType)
 from backend.common.futures import TypedFuture
-from backend.common.helpers.event_helper import (
-    EventHelper,
-    OFFSEASON_EVENTS_LABEL,
-    PRESEASON_EVENTS_LABEL,
-)
+from backend.common.helpers.event_helper import (OFFSEASON_EVENTS_LABEL,
+                                                 PRESEASON_EVENTS_LABEL,
+                                                 EventHelper)
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
-from backend.common.helpers.insights_helper_utils import (
-    create_insight,
-    sort_counter_dict,
-)
+from backend.common.helpers.insights_helper_utils import (create_insight,
+                                                          sort_counter_dict)
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.insight import Insight
@@ -612,9 +605,7 @@ class InsightsHelper(object):
                 roundedScore = margin - int(margin % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_winning_margin_distribution_normalized:
-                    elim_winning_margin_distribution_normalized[
-                        roundedScore
-                    ] += contribution
+                    elim_winning_margin_distribution_normalized[roundedScore] += contribution
                 else:
                     elim_winning_margin_distribution_normalized[roundedScore] = (
                         contribution
@@ -899,6 +890,47 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
+    def _calculate_einstein_streaks(cls, division_winners_map: Dict[str, List[int]]) -> Dict[str, int]:
+        from collections import defaultdict  # Ensure defaultdict is available
+
+        einstein_streak_output = defaultdict(int)
+        for team_key, unsorted_years_list in division_winners_map.items():
+            years = sorted(unsorted_years_list)
+
+            if not years:
+                einstein_streak_output[team_key] = 0
+                continue
+
+            # Initialize streaks
+            # Every team with at least one year has a max streak of at least 1
+            max_streak_for_team = 1
+            current_streak = 1
+            last_year_in_streak = years[0]
+
+            # Iterate starting from the second year
+            for i in range(1, len(years)):
+                current_year = years[i]
+                # A streak continues if current_year is last_year_in_streak + 1
+                # OR if last_year_in_streak was 2019 and current_year is 2022 (COVID gap)
+                is_consecutive = (current_year == last_year_in_streak + 1) or \
+                                 (last_year_in_streak == 2019 and current_year == 2022)
+
+                if is_consecutive:
+                    current_streak += 1
+                else:
+                    # Streak broken, current_streak for the new potential streak starts at 1
+                    current_streak = 1
+
+                if current_streak > max_streak_for_team:
+                    max_streak_for_team = current_streak
+
+                last_year_in_streak = current_year
+
+            einstein_streak_output[team_key] = max_streak_for_team
+
+        return einstein_streak_output
+
+    @classmethod
     def doOverallAwardInsights(self) -> List[Insight]:
         """
         Calculate award insights across all years. Returns a list of Insights.
@@ -952,18 +984,7 @@ class InsightsHelper(object):
             for team in insight.data:
                 division_winners[team].append(insight.year)
 
-        einstein_streak = defaultdict(int)
-        for team, years in division_winners.items():
-            streak = 1
-            last_year = years[0]
-            for year in years[1:]:
-                if year == last_year + 1:
-                    streak += 1
-                else:
-                    streak = 1
-                # There was no championship in 2020 and 2021
-                last_year = 2021 if year == 2019 else year
-            einstein_streak[team] = streak
+        einstein_streak = self._calculate_einstein_streaks(division_winners)
 
         year_successful_elim_teamups = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
