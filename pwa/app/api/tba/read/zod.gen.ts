@@ -1123,7 +1123,39 @@ export const zMedia = z.object({
     'onshape',
   ]),
   foreign_key: z.string(),
-  details: z.object({}).optional(),
+  details: z
+    .union([
+      z.object({
+        base64Image: z.string(),
+      }),
+      z.object({
+        author_id: z.number().int(),
+        author_name: z.string(),
+        author_url: z.string().url(),
+        height: z.union([z.number().int(), z.null()]),
+        html: z.string(),
+        media_id: z.string(),
+        provider_name: z.string(),
+        provider_url: z.string().url(),
+        thumbnail_height: z.number().int(),
+        thumbnail_url: z.string().url(),
+        thumbnail_width: z.number().int(),
+        title: z.string(),
+        type: z.string(),
+        version: z.string(),
+        width: z.number().int(),
+      }),
+      z.object({
+        model_created: z.string().datetime(),
+        model_description: z.union([z.string(), z.null()]),
+        model_image: z.string().url(),
+        model_name: z.string(),
+      }),
+      z.object({
+        image_partial: z.string(),
+      }),
+    ])
+    .optional(),
   preferred: z.boolean().optional(),
   team_keys: z.array(z.string()),
   direct_url: z.string().optional(),

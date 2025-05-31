@@ -9,7 +9,7 @@ export default function TeamAvatar({
 }: {
   media: Media;
   className?: string;
-}): React.JSX.Element {
+}) {
   const [colorClass, setColorClass] = useState('bg-first-avatar-blue');
 
   if (!media.details) {
@@ -24,13 +24,17 @@ export default function TeamAvatar({
     }
   };
 
-  return (
-    <button onClick={handler} onKeyDown={handler} className={className}>
-      <img
-        alt="Team Avatar"
-        src={`data:image/png;base64, ${media.details.base64Image}`}
-        className={cn('inline size-12 rounded p-1', colorClass)}
-      />
-    </button>
-  );
+  if ('base64Image' in media.details) {
+    return (
+      <button onClick={handler} onKeyDown={handler} className={className}>
+        <img
+          alt="Team Avatar"
+          src={`data:image/png;base64, ${media.details.base64Image}`}
+          className={cn('inline size-12 rounded p-1', colorClass)}
+        />
+      </button>
+    );
+  }
+
+  return null;
 }

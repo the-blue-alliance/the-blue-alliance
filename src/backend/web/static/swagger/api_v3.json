@@ -9258,8 +9258,126 @@
           },
           "details": {
             "type": "object",
-            "additionalProperties": true,
-            "description": "If required, a JSON dict of additional media information."
+            "description": "If required, a JSON dict of additional media information.",
+            "oneOf": [
+              {
+                "properties": {
+                  "base64Image": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "base64Image"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "author_id": {
+                    "type": "integer"
+                  },
+                  "author_name": {
+                    "type": "string"
+                  },
+                  "author_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "height": {
+                    "type": ["integer", "null"]
+                  },
+                  "html": {
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "type": "string"
+                  },
+                  "provider_name": {
+                    "type": "string"
+                  },
+                  "provider_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "thumbnail_height": {
+                    "type": "integer"
+                  },
+                  "thumbnail_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "thumbnail_width": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "width": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "author_id",
+                  "author_name",
+                  "author_url",
+                  "height",
+                  "html",
+                  "media_id",
+                  "provider_name",
+                  "provider_url",
+                  "thumbnail_height",
+                  "thumbnail_url",
+                  "thumbnail_width",
+                  "title",
+                  "type",
+                  "version",
+                  "width"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "model_created": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "model_description": {
+                    "type": ["string", "null"]
+                  },
+                  "model_image": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "model_name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "model_created",
+                  "model_description",
+                  "model_image",
+                  "model_name"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "image_partial": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "image_partial"
+                ]
+              }
+            ]
           },
           "preferred": {
             "type": "boolean",
