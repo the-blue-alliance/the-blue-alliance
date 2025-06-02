@@ -20,7 +20,7 @@ import {
   getTeamMediaByYear,
   getTeamSocialMedia,
   getTeamYearsParticipated,
-} from '~/api/v3';
+} from '~/api/tba';
 import { AwardBanner } from '~/components/tba/banner';
 import TeamEventAppearance from '~/components/tba/teamEventAppearance';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
@@ -88,29 +88,28 @@ async function loadData(params: Route.LoaderArgs['params']) {
     statuses,
     awards,
   ] = await Promise.all([
-    getTeam({ teamKey }),
-    getTeamMediaByYear({ teamKey, year }),
-    getTeamSocialMedia({ teamKey }),
-    getTeamYearsParticipated({ teamKey }),
-    getTeamEventsByYear({ teamKey, year }),
-    getTeamMatchesByYear({ teamKey, year }),
-    getTeamEventsStatusesByYear({ teamKey, year }),
-    getTeamAwardsByYear({ teamKey, year }),
+    getTeam({ path: { team_key: teamKey } }),
+    getTeamMediaByYear({ path: { team_key: teamKey, year } }),
+    getTeamSocialMedia({ path: { team_key: teamKey } }),
+    getTeamYearsParticipated({ path: { team_key: teamKey } }),
+    getTeamEventsByYear({ path: { team_key: teamKey, year } }),
+    getTeamMatchesByYear({ path: { team_key: teamKey, year } }),
+    getTeamEventsStatusesByYear({ path: { team_key: teamKey, year } }),
+    getTeamAwardsByYear({ path: { team_key: teamKey, year } }),
   ]);
 
-  if (team.status === 404) {
+  if (team.data === undefined) {
     throw new Response(null, { status: 404 });
   }
 
   if (
-    team.status !== 200 ||
-    media.status !== 200 ||
-    socials.status !== 200 ||
-    yearsParticipated.status !== 200 ||
-    events.status !== 200 ||
-    matches.status !== 200 ||
-    statuses.status !== 200 ||
-    awards.status !== 200
+    media.data === undefined ||
+    socials.data === undefined ||
+    yearsParticipated.data === undefined ||
+    events.data === undefined ||
+    matches.data === undefined ||
+    statuses.data === undefined ||
+    awards.data === undefined
   ) {
     throw new Response(null, { status: 500 });
   }
@@ -130,8 +129,10 @@ async function loadData(params: Route.LoaderArgs['params']) {
           EventType.DISTRICT_CMP_DIVISION,
         ].includes(e.event_type)
       ) {
-        const resp = await getEventDistrictPoints({ eventKey: e.key });
-        eventDistrictPts[e.key] = resp.status === 200 ? resp.data : null;
+        const resp = await getEventDistrictPoints({
+          path: { event_key: e.key },
+        });
+        eventDistrictPts[e.key] = resp.data ?? null;
       } else {
         eventDistrictPts[e.key] = null;
       }
@@ -140,8 +141,8 @@ async function loadData(params: Route.LoaderArgs['params']) {
   const eventAlliances: Record<string, EliminationAlliance[] | null> = {};
   await Promise.all(
     events.data.map(async (e) => {
-      const resp = await getEventAlliances({ eventKey: e.key });
-      eventAlliances[e.key] = resp.status === 200 ? resp.data : null;
+      const resp = await getEventAlliances({ path: { event_key: e.key } });
+      eventAlliances[e.key] = resp.data ?? null;
     }),
   );
 

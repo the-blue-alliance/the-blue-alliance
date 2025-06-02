@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 
 import PlayCircle from '~icons/bi/play-circle';
 
-import { Event, Match, Team } from '~/api/v3';
+import { Event, Match, Team } from '~/api/tba';
 import { TeamLink } from '~/components/tba/links';
 import RpDots from '~/components/tba/rpDot';
 import {

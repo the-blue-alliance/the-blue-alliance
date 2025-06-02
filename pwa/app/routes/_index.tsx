@@ -1,23 +1,23 @@
 import type { MetaFunction } from 'react-router';
 import { useLoaderData } from 'react-router';
 
-import { getEventsByYear, getStatus } from '~/api/v3';
+import { getEventsByYear, getStatus } from '~/api/tba';
 import EventListTable from '~/components/tba/eventListTable';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 
 export async function loader() {
-  const status = await getStatus({});
+  const status = await getStatus();
 
-  if (status.status !== 200) {
+  if (status.data === undefined) {
     throw new Response(null, {
       status: 500,
     });
   }
 
   const year = status.data.current_season;
-  const events = await getEventsByYear({ year });
+  const events = await getEventsByYear({ path: { year } });
 
-  if (events.status !== 200) {
+  if (events.data === undefined) {
     throw new Response(null, {
       status: 500,
     });

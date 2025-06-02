@@ -1,9 +1,10 @@
+import { RequestResult } from '@hey-api/client-fetch';
 import { type ClassValue, clsx } from 'clsx';
 import React from 'react';
 import { Params } from 'react-router';
 import { twMerge } from 'tailwind-merge';
 
-import { WltRecord, getStatus } from '~/api/v3';
+import { WltRecord, getStatus } from '~/api/tba';
 
 // TODO: Generate this from the API
 const VALID_YEARS: number[] = [];
@@ -33,8 +34,8 @@ export async function parseParamsForYearElseDefault(
 ): Promise<number | undefined> {
   if (params.year === undefined) {
     // TODO: Cache this call
-    const status = await getStatus({});
-    return status.status === 200
+    const status = await getStatus();
+    return status.data !== undefined
       ? status.data.current_season
       : new Date().getFullYear();
   }
@@ -240,29 +241,12 @@ export function splitIntoNChunks<T>(array: T[], numChunks: number): T[][] {
 // Reduces boilerplate when using react-query and API functions.
 // Makes it so you don't have to call <response>.data.data, just <response>.data.
 export async function queryFromAPI<T>(
-  apiPromise: Promise<
-    | {
-        status: 200;
-        data: T;
-      }
-    | {
-        status: 304;
-      }
-    | {
-        status: 401;
-        data: {
-          Error: string;
-        };
-      }
-    | {
-        status: 404;
-      }
-  >,
+  apiPromise: RequestResult<T, unknown, false>,
 ): Promise<T> {
   const resp = await apiPromise;
-  if (resp.status === 200) {
-    return Promise.resolve(resp.data);
+  if (resp.data !== undefined) {
+    return Promise.resolve(resp.data as T);
   }
 
-  return Promise.reject(new Error(resp.status.toString()));
+  return Promise.reject(new Error(resp.response.status.toString()));
 }

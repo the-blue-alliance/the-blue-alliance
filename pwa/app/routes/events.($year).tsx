@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useLoaderData, useNavigate } from 'react-router';
 
-import { Event, getEventsByYear } from '~/api/v3';
+import { Event, getEventsByYear } from '~/api/tba';
 import EventListTable from '~/components/tba/eventListTable';
 import {
   Select,
@@ -35,9 +35,9 @@ async function loadData(params: Route.LoaderArgs['params']) {
     });
   }
 
-  const events = await getEventsByYear({ year });
+  const events = await getEventsByYear({ path: { year } });
 
-  if (events.status !== 200) {
+  if (events.data === undefined) {
     throw new Response(null, {
       status: 500,
     });
@@ -131,7 +131,7 @@ function groupBySections(events: Event[]): EventGroup[] {
     }
 
     // FOC
-    if (event.event_type == EventType.FOC) {
+    if (event.event_type === EventType.FOC) {
       FOCEvents.events.push(event);
     }
 

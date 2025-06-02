@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Media } from '~/api/v3';
+import { Media } from '~/api/tba';
 import { cn } from '~/lib/utils';
 
 export default function TeamAvatar({

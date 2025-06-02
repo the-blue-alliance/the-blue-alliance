@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 
 import MdiVideo from '~icons/mdi/video';
 
-import { Event } from '~/api/v3';
+import { Event } from '~/api/tba';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { Button } from '~/components/ui/button';
 import {

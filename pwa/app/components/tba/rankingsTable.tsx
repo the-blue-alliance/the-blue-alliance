@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 
 import BiTrophy from '~icons/bi/trophy';
 
-import { EventRanking } from '~/api/v3';
+import { EventRanking } from '~/api/tba';
 import { DataTable } from '~/components/tba/dataTable';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { cn } from '~/lib/utils';

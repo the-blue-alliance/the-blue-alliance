@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router';
 
-import { getEvent, getMatch } from '~/api/v3';
+import { getEvent, getMatch } from '~/api/tba';
 import { EventLink } from '~/components/tba/links';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
 
@@ -16,19 +16,13 @@ async function loadData(params: Route.LoaderArgs['params']) {
   const eventKey = params.matchKey.split('_')[0];
 
   const [event, match] = await Promise.all([
-    getEvent({ eventKey }),
-    getMatch({ matchKey: params.matchKey }),
+    getEvent({ path: { event_key: eventKey } }),
+    getMatch({ path: { match_key: params.matchKey } }),
   ]);
 
-  if (event.status == 404 || match.status == 404) {
+  if (event.data === undefined || match.data === undefined) {
     throw new Response(null, {
       status: 404,
-    });
-  }
-
-  if (event.status !== 200 || match.status !== 200) {
-    throw new Response(null, {
-      status: 500,
     });
   }
 
