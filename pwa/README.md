@@ -1,6 +1,14 @@
-# Welcome to Remix!
+# The Blue Alliance PWA (beta)
 
-- 📖 [Remix docs](https://remix.run/docs)
+## Development - Optional
+
+You can optionally use [devbox](https://www.jetify.com/devbox) to set up a reproducible shell. Follow the instructions on the devbox website to install it, then:
+
+```sh
+devbox shell
+```
+
+to enter a shell with system dependencies preinstalled. Otherwise, you'll need Node v20 (we specifically pin to 20.16, but others will work).
 
 ## Development
 
