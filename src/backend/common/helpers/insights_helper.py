@@ -928,7 +928,7 @@ class InsightsHelper(object):
 
             einstein_streak_output[team_key] = max_streak_for_team
 
-        return einstein_streak_output
+        return dict(einstein_streak_output)
 
     @classmethod
     def doOverallAwardInsights(self) -> List[Insight]:
