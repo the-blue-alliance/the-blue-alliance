@@ -13,6 +13,7 @@ from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
+from backend.common.models.insight import Insight
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey
 from backend.common.queries.award_query import EventAwardsQuery
 from backend.common.queries.district_query import (
@@ -21,6 +22,7 @@ from backend.common.queries.district_query import (
     DistrictsInYearQuery,
 )
 from backend.common.queries.event_query import DistrictEventsQuery
+from backend.common.queries.insight_query import DistrictInsightQuery
 from backend.common.queries.team_query import DistrictTeamsQuery
 
 
@@ -192,3 +194,33 @@ def dcmp_history(district_abbreviation: DistrictAbbreviation) -> Response:
     ]
 
     return profiled_jsonify(ret)
+
+
+@api_authenticated
+@cached_public
+def district_insights(district_abbreviation: DistrictAbbreviation) -> Response:
+    """
+    Returns insights for a given DistrictAbbreviation.
+    """
+    track_call_after_response("district/insights", district_abbreviation)
+
+    team_insight = DistrictInsightQuery(
+        insight_name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+        year=0,
+        district_abbreviation=district_abbreviation,
+    ).fetch_dict(ApiMajorVersion.API_V3)
+
+    district_insight = DistrictInsightQuery(
+        insight_name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+        year=0,
+        district_abbreviation=district_abbreviation,
+    ).fetch_dict(ApiMajorVersion.API_V3)
+
+    return profiled_jsonify(
+        {
+            "team_data": None if len(team_insight) == 0 else team_insight[0]["data"],
+            "district_data": (
+                None if len(district_insight) == 0 else district_insight[0]["data"]
+            ),
+        }
+    )

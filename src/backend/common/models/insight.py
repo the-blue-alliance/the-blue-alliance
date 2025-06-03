@@ -1,10 +1,17 @@
 import json
-from typing import Dict, List, Literal, Set, TypeAlias, TypedDict
+from typing import Dict, List, Literal, Optional, Set, TypeAlias, TypedDict
 
 from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
-from backend.common.models.keys import EventKey, MatchKey, TeamKey
+from backend.common.models.keys import (
+    DistrictAbbreviation,
+    EventKey,
+    MatchKey,
+    TeamKey,
+    Year,
+)
+from backend.common.models.wlt import WLTRecord
 
 
 LeaderboardKeyType = Literal["team"] | Literal["event"] | Literal["match"]
@@ -62,6 +69,8 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_MOST_WFFAS = 41
     SUCCESSFUL_EINSTEIN_TEAMUPS = 42
     TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK = 43
+    DISTRICT_INSIGHTS_TEAM_DATA = 44
+    DISTRICT_INSIGHT_DISTRICT_DATA = 45
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -113,6 +122,8 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS: "typed_leaderboard_most_non_champs_impact_wins",
         TYPED_LEADERBOARD_MOST_WFFAS: "typed_leaderboard_most_wffas",
         TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK: "typed_leaderboard_longest_qualifying_event_streak",
+        DISTRICT_INSIGHTS_TEAM_DATA: "district_insights_team_data",
+        DISTRICT_INSIGHT_DISTRICT_DATA: "district_insights_district_data",
     }
 
     TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
@@ -149,11 +160,17 @@ class Insight(CachedModel):
         required=True, indexed=False
     )  # JSON dictionary of the data of the insight
 
+    district_abbreviation = ndb.StringProperty(required=False, indexed=True)
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     _json_attrs: Set[str] = {
         "data_json",
+    }
+
+    _mutable_attrs: Set[str] = {
+        "district_abbreviation",
     }
 
     def __init__(self, *args, **kw):
@@ -179,14 +196,18 @@ class Insight(CachedModel):
         """
         Returns the string of the key_name of the Insight object before writing it.
         """
-        return self.render_key_name(self.year, self.name)
+        return self.render_key_name(self.year, self.name, self.district_abbreviation)
 
     @classmethod
-    def render_key_name(cls, year, name):
-        if year == 0:
-            return "insights" + "_" + str(name)
-        else:
-            return str(year) + "insights" + "_" + str(name)
+    def render_key_name(
+        cls,
+        year: int,
+        name: str,
+        district_abbreviation: Optional[DistrictAbbreviation] = None,
+    ) -> str:
+        prefix = f"{year}insights" if year != 0 else "insights"
+        suffix = f"_{district_abbreviation}" if district_abbreviation else ""
+        return f"{prefix}_{name}{suffix}"
 
 
 class LeaderboardRanking(TypedDict):
@@ -227,3 +248,22 @@ class NotablesInsight(TypedDict):
     data: NotablesData
     name: str
     year: int
+
+
+class DistrictInsightTeamData(TypedDict):
+    district_seasons: int
+    total_district_points: int
+    total_pre_dcmp_district_points: int
+    district_event_wins: int
+    dcmp_wins: int
+    team_awards: int
+    individual_awards: int
+    quals_record: WLTRecord
+    elims_record: WLTRecord
+
+
+class DistrictInsightDistrictData(TypedDict):
+    yearly_active_team_count: Dict[Year, int]
+    yearly_gained_teams: Dict[Year, List[TeamKey]]
+    yearly_lost_teams: Dict[Year, List[TeamKey]]
+    yearly_event_count: Dict[Year, int]

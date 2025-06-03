@@ -1,7 +1,7 @@
 from typing import Any, Generator, List
 
 from backend.common.models.insight import Insight
-from backend.common.models.keys import Year
+from backend.common.models.keys import DistrictAbbreviation, Year
 from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.insight_converter import (
     InsightConverter,
@@ -52,3 +52,30 @@ class InsightsNotablesYearQuery(CachedDatabaseQuery[List[Insight], List[InsightD
             Insight.year == year,
         ).fetch_async()
         return insights
+
+
+class DistrictInsightQuery(CachedDatabaseQuery[Insight, InsightDict]):
+    CACHE_VERSION = 9
+    CACHE_KEY_FORMAT = "insight_{insight_name}_{year}_{district_abbreviation}"
+    DICT_CONVERTER = InsightConverter
+
+    def __init__(
+        self, insight_name: str, year: Year, district_abbreviation: DistrictAbbreviation
+    ) -> None:
+        super().__init__(
+            insight_name=insight_name,
+            year=year,
+            district_abbreviation=district_abbreviation,
+        )
+
+    @typed_tasklet
+    def _query_async(
+        self, insight_name: str, year: Year, district_abbreviation: DistrictAbbreviation
+    ) -> Generator[Any, Any, Insight]:
+        insight = yield Insight.query(
+            Insight.name == insight_name,
+            Insight.year == year,
+            Insight.district_abbreviation == district_abbreviation,
+        ).fetch_async()
+
+        return insight

@@ -2,19 +2,28 @@ from typing import Any, Dict, Generator, List
 
 from google.appengine.ext import ndb
 
+from backend.common.models.district import ALL_KNOWN_DISTRICT_ABBREVIATIONS
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey
 
-CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
+OLD_TO_NEW_CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
     # Old to new
     "mar": "fma",
     "nc": "fnc",
     "in": "fin",
     "tx": "fit",
+}
+
+NEW_TO_OLD_CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
     # New to old
     "fma": "mar",
     "fnc": "nc",
     "fin": "in",
     "fit": "tx",
+}
+
+CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
+    **OLD_TO_NEW_CODE_MAP,
+    **NEW_TO_OLD_CODE_MAP,
 }
 
 
@@ -35,6 +44,14 @@ class RenamedDistricts:
             "{}{}".format(year, equiv_code)
             for equiv_code in cls.get_equivalent_codes(code)
         ]
+
+    @classmethod
+    def get_latest_codes(cls) -> List[DistrictAbbreviation]:
+        seen = set()
+        for abbr in ALL_KNOWN_DISTRICT_ABBREVIATIONS:
+            seen.add(OLD_TO_NEW_CODE_MAP.get(abbr, abbr))
+
+        return list(seen)
 
     @classmethod
     @ndb.tasklet

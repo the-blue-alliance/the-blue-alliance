@@ -8,3 +8,4 @@ class InsightType(StrEnum):
     MATCHES = "matches"
     AWARDS = "awards"
     PREDICTIONS = "predictions"
+    DISTRICTS = "districts"

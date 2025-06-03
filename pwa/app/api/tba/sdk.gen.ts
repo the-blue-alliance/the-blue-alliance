@@ -27,6 +27,9 @@ import type {
   GetDistrictHistoryData,
   GetDistrictHistoryErrors,
   GetDistrictHistoryResponses,
+  GetDistrictInsightsData,
+  GetDistrictInsightsErrors,
+  GetDistrictInsightsResponses,
   GetDistrictRankingsData,
   GetDistrictRankingsErrors,
   GetDistrictRankingsResponses,
@@ -252,6 +255,7 @@ import {
   zGetDistrictEventsResponse,
   zGetDistrictEventsSimpleResponse,
   zGetDistrictHistoryResponse,
+  zGetDistrictInsightsResponse,
   zGetDistrictRankingsResponse,
   zGetDistrictTeamsKeysResponse,
   zGetDistrictTeamsResponse,
@@ -1949,6 +1953,31 @@ export const getDistrictHistory = <ThrowOnError extends boolean = false>(
       return await zGetDistrictHistoryResponse.parseAsync(data);
     },
     url: '/district/{district_abbreviation}/history',
+    ...options,
+  });
+};
+
+/**
+ * Gets insights for a given district.
+ */
+export const getDistrictInsights = <ThrowOnError extends boolean = false>(
+  options: Options<GetDistrictInsightsData, ThrowOnError>,
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetDistrictInsightsResponses,
+    GetDistrictInsightsErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        name: 'X-TBA-Auth-Key',
+        type: 'apiKey',
+      },
+    ],
+    responseValidator: async (data) => {
+      return await zGetDistrictInsightsResponse.parseAsync(data);
+    },
+    url: '/district/{district_abbreviation}/insights',
     ...options,
   });
 };

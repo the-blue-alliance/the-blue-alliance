@@ -2066,6 +2066,46 @@ export type District = {
   year: number;
 };
 
+export type DistrictInsight = {
+  district_data: {
+    /**
+     * Map of year to number of active teams
+     */
+    yearly_active_team_count: {
+      [key: string]: number;
+    };
+    /**
+     * Map of year to number of events
+     */
+    yearly_event_count: {
+      [key: string]: number;
+    };
+    /**
+     * Map of year to list of team keys gained
+     */
+    yearly_gained_teams: {
+      [key: string]: Array<string>;
+    };
+    /**
+     * Map of year to list of team keys lost
+     */
+    yearly_lost_teams: {
+      [key: string]: Array<string>;
+    };
+  };
+  team_data: {
+    district_seasons: number;
+    total_district_points: number;
+    total_pre_dcmp_district_points: number;
+    district_event_wins: number;
+    dcmp_wins: number;
+    team_awards: number;
+    individual_awards: number;
+    quals_record: WltRecord;
+    elims_record: WltRecord;
+  };
+};
+
 /**
  * Rank of a team in a district.
  */
@@ -5438,6 +5478,53 @@ export type GetDistrictHistoryResponses = {
 
 export type GetDistrictHistoryResponse =
   GetDistrictHistoryResponses[keyof GetDistrictHistoryResponses];
+
+export type GetDistrictInsightsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * District abbreviation, eg `ne` or `fim`
+     */
+    district_abbreviation: string;
+  };
+  query?: never;
+  url: '/district/{district_abbreviation}/insights';
+};
+
+export type GetDistrictInsightsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetDistrictInsightsError =
+  GetDistrictInsightsErrors[keyof GetDistrictInsightsErrors];
+
+export type GetDistrictInsightsResponses = {
+  /**
+   * Successful response
+   */
+  200: DistrictInsight;
+};
+
+export type GetDistrictInsightsResponse =
+  GetDistrictInsightsResponses[keyof GetDistrictInsightsResponses];
 
 export type GetDistrictEventsData = {
   body?: never;

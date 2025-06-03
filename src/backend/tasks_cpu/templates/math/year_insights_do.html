@@ -1,5 +1,5 @@
 <h2>Calculated the following Insights for {{year}} {{kinds}}:</h2>
 {% for insight in insights %}
     <h3>{{insight.name}}</h3>
-    <p>{{insight.data_json}}</p>
+    <code>{{insight.data_json}}</code>
 {% endfor %}
