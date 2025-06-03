@@ -9339,8 +9339,18 @@
             "type": "object",
             "properties": {
               "playoff_average": {
-                "type": "number",
+                "type": [
+                  "number",
+                  "null"
+                ],
                 "format": "double"
+              },
+              "playoff_type": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "format": "int64"
               },
               "level": {
                 "type": "string"
