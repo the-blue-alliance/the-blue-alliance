@@ -2093,18 +2093,20 @@ export type DistrictInsight = {
     yearly_lost_teams: {
       [key: string]: Array<string>;
     };
-  };
+  } | null;
   team_data: {
-    district_seasons: number;
-    total_district_points: number;
-    total_pre_dcmp_district_points: number;
-    district_event_wins: number;
-    dcmp_wins: number;
-    team_awards: number;
-    individual_awards: number;
-    quals_record: WltRecord;
-    elims_record: WltRecord;
-  };
+    [key: string]: {
+      district_seasons: number;
+      total_district_points: number;
+      total_pre_dcmp_district_points: number;
+      district_event_wins: number;
+      dcmp_wins: number;
+      team_awards: number;
+      individual_awards: number;
+      quals_record: WltRecord;
+      elims_record: WltRecord;
+    };
+  } | null;
 };
 
 /**
