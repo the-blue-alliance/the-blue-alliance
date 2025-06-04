@@ -8,17 +8,24 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
-from backend.common.consts.award_type import BLUE_BANNER_AWARDS, AwardType
-from backend.common.consts.comp_level import ELIM_LEVELS, CompLevel
-from backend.common.consts.event_type import (CMP_EVENT_TYPES,
-                                              SEASON_EVENT_TYPES, EventType)
+from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
+from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
+from backend.common.consts.event_type import (
+    CMP_EVENT_TYPES,
+    EventType,
+    SEASON_EVENT_TYPES,
+)
 from backend.common.futures import TypedFuture
-from backend.common.helpers.event_helper import (OFFSEASON_EVENTS_LABEL,
-                                                 PRESEASON_EVENTS_LABEL,
-                                                 EventHelper)
+from backend.common.helpers.event_helper import (
+    EventHelper,
+    OFFSEASON_EVENTS_LABEL,
+    PRESEASON_EVENTS_LABEL,
+)
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
-from backend.common.helpers.insights_helper_utils import (create_insight,
-                                                          sort_counter_dict)
+from backend.common.helpers.insights_helper_utils import (
+    create_insight,
+    sort_counter_dict,
+)
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.insight import Insight
@@ -891,7 +898,6 @@ class InsightsHelper(object):
 
     @classmethod
     def _calculate_einstein_streaks(cls, division_winners_map: Dict[str, List[int]]) -> Dict[str, int]:
-        from collections import defaultdict  # Ensure defaultdict is available
 
         einstein_streak_output = defaultdict(int)
         for team_key, unsorted_years_list in division_winners_map.items():
