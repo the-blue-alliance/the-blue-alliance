@@ -638,9 +638,7 @@ class InsightsHelper(object):
                 roundedScore = margin - int(margin % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_winning_margin_distribution_normalized:
-                    elim_winning_margin_distribution_normalized[
-                        roundedScore
-                    ] += contribution
+                    elim_winning_margin_distribution_normalized[roundedScore] += contribution
                 else:
                     elim_winning_margin_distribution_normalized[roundedScore] = (
                         contribution
@@ -925,6 +923,40 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
+    def _calculate_einstein_streaks(cls, division_winners_map: Dict[str, List[int]]) -> Dict[str, int]:
+
+        einstein_streak_output = defaultdict(int)
+        for team_key, unsorted_years_list in division_winners_map.items():
+            einstein_streak_output[team_key] = 0
+
+            years = sorted(unsorted_years_list)
+            if not years:
+                continue
+
+            # Initialize streaks
+            # Every team with at least one year has a max streak of at least 1
+            max_streak_for_team = 1
+            current_streak = 1
+            last_year_in_streak = years[0]
+
+            # Iterate starting from the second year
+            for i in range(1, len(years)):
+                current_year = years[i]
+                # A streak continues if current_year is last_year_in_streak + 1
+                # OR if last_year_in_streak was 2019 and current_year is 2022 (COVID gap)
+                is_consecutive = (current_year == last_year_in_streak + 1) or \
+                                 (last_year_in_streak == 2019 and current_year == 2022)
+
+                # Streak broken, current_streak for the new potential streak starts at 1
+                current_streak = current_streak + 1 if is_consecutive else 1
+                max_streak_for_team = max(current_streak, max_streak_for_team)
+                last_year_in_streak = current_year
+
+            einstein_streak_output[team_key] = max_streak_for_team
+
+        return dict(einstein_streak_output)
+
+    @classmethod
     def doOverallAwardInsights(self) -> List[Insight]:
         """
         Calculate award insights across all years. Returns a list of Insights.
@@ -978,18 +1010,7 @@ class InsightsHelper(object):
             for team in insight.data:
                 division_winners[team].append(insight.year)
 
-        einstein_streak = defaultdict(int)
-        for team, years in division_winners.items():
-            streak = 1
-            last_year = years[0]
-            for year in years[1:]:
-                if year == last_year + 1:
-                    streak += 1
-                else:
-                    streak = 1
-                # There was no championship in 2020 and 2021
-                last_year = 2021 if year == 2019 else year
-            einstein_streak[team] = streak
+        einstein_streak = self._calculate_einstein_streaks(division_winners)
 
         year_successful_elim_teamups = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
