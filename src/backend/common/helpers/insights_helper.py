@@ -921,14 +921,9 @@ class InsightsHelper(object):
                 is_consecutive = (current_year == last_year_in_streak + 1) or \
                                  (last_year_in_streak == 2019 and current_year == 2022)
 
-                if is_consecutive:
-                    current_streak += 1
-                else:
-                    # Streak broken, current_streak for the new potential streak starts at 1
-                    current_streak = 1
-
+                # Streak broken, current_streak for the new potential streak starts at 1
+                current_streak = current_streak + 1 if is_consecutive else 1
                 max_streak_for_team = max(current_streak, max_streak_for_team)
-
                 last_year_in_streak = current_year
 
             einstein_streak_output[team_key] = max_streak_for_team
