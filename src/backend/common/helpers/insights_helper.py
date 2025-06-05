@@ -901,10 +901,10 @@ class InsightsHelper(object):
 
         einstein_streak_output = defaultdict(int)
         for team_key, unsorted_years_list in division_winners_map.items():
-            years = sorted(unsorted_years_list)
+            einstein_streak_output[team_key] = 0
 
+            years = sorted(unsorted_years_list)
             if not years:
-                einstein_streak_output[team_key] = 0
                 continue
 
             # Initialize streaks
