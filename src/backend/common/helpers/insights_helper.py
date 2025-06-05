@@ -927,8 +927,7 @@ class InsightsHelper(object):
                     # Streak broken, current_streak for the new potential streak starts at 1
                     current_streak = 1
 
-                if current_streak > max_streak_for_team:
-                    max_streak_for_team = current_streak
+                max_streak_for_team = max(current_streak, max_streak_for_team)
 
                 last_year_in_streak = current_year
 
