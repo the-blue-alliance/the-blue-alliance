@@ -120,6 +120,11 @@ cron:
   schedule: every day 01:23
   timezone: America/Los_Angeles
 
+- description: District Insights Calculation
+  url: /backend-tasks-b2/math/enqueue/insights/districts/0
+  schedule: every day 01:40
+  timezone: America/Los_Angeles
+
 - description: Award Overall Insights Calculation
   url: /backend-tasks-b2/math/enqueue/overallinsights/awards
   schedule: every day 01:10
