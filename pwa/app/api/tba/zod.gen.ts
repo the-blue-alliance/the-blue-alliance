@@ -1145,7 +1145,8 @@ export const zEliminationAlliance = z.object({
   picks: z.array(z.string()),
   status: z
     .object({
-      playoff_average: z.number().optional(),
+      playoff_average: z.union([z.number(), z.null()]).optional(),
+      playoff_type: z.union([z.number(), z.null()]).optional(),
       level: z.string().optional(),
       record: z.union([zWltRecord, z.null()]).optional(),
       current_level_record: z.union([zWltRecord, z.null()]).optional(),

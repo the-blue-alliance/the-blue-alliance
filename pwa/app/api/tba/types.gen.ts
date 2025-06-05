@@ -2002,7 +2002,8 @@ export type EliminationAlliance = {
    */
   picks: Array<string>;
   status?: {
-    playoff_average?: number;
+    playoff_average?: number | null;
+    playoff_type?: number | null;
     level?: string;
     record?: WltRecord | null;
     current_level_record?: WltRecord | null;
