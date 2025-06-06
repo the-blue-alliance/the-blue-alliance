@@ -315,6 +315,37 @@ jobs:
         env:
           VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
 
+  check-pwa-api:
+    name: "[pwa] Check API regeneration"
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.16.0"
+
+      - name: Install Dependencies
+        working-directory: pwa
+        run: npm ci
+
+      - name: Run generate-api.sh
+        working-directory: ./pwa
+        run: ./generate-api.sh
+
+      - name: Detect changes in pwa/app/api
+        run: |
+          CHANGED_FILES=$(git diff --name-only pwa/app/api)
+          if [[ -n "$CHANGED_FILES" ]]; then
+            echo "::error title=API Mismatch::Files changed in pwa/app/api:"
+            echo "$CHANGED_FILES"
+            exit 1
+          else
+            echo "No changes detected in pwa/app/api."
+          fi
+
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-22.04
