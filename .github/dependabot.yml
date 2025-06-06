@@ -76,6 +76,7 @@ updates:
         - "@tailwindcss/*"
         - "tailwindcss"
         - "tailwind-merge"
+        - "tw-animate-css"
     icons:
       patterns:
         - "@iconify/json"
