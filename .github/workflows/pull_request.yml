@@ -250,6 +250,26 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
+  pwa-test-devbox:
+    name: "[pwa] Test w/ Devbox"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.13.0
+        with:
+          project-path: pwa
+          enable-cache: true
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
+      - name: Install dependencies
+        run: devbox run -- npm ci
+        working-directory: pwa
+      - name: Run tests
+        run: devbox run -- npm test
+        working-directory: pwa
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-22.04
@@ -284,11 +304,11 @@ jobs:
       - name: Install Dependencies
         working-directory: pwa
         run: npm ci
-      
+
       - name: Install Playwright Browsers
         working-directory: pwa
         run: npx playwright install --with-deps chromium
-      
+
       - name: Run Playwright tests
         working-directory: pwa
         run: npx playwright test
