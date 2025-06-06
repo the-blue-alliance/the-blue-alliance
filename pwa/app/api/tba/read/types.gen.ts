@@ -2069,31 +2069,11 @@ export type District = {
 
 export type DistrictInsight = {
   district_data: {
-    /**
-     * Map of year to number of active teams
-     */
-    yearly_active_team_count: {
-      [key: string]: number;
-    };
-    /**
-     * Map of year to number of events
-     */
-    yearly_event_count: {
-      [key: string]: number;
-    };
-    /**
-     * Map of year to list of team keys gained
-     */
-    yearly_gained_teams: {
-      [key: string]: Array<string>;
-    };
-    /**
-     * Map of year to list of team keys lost
-     */
-    yearly_lost_teams: {
-      [key: string]: Array<string>;
-    };
-  } | null;
+    region_data: {
+      [key: string]: DistrictInsightRegionData;
+    } | null;
+    district_wide_data: DistrictInsightRegionData | null;
+  };
   team_data: {
     [key: string]: {
       district_seasons: number;
@@ -2105,8 +2085,39 @@ export type DistrictInsight = {
       individual_awards: number;
       quals_record: WltRecord;
       elims_record: WltRecord;
+      in_district_extra_play_count: number;
+      total_matches_played: number;
+      dcmp_appearances: number;
+      cmp_appearances: number;
     };
   } | null;
+};
+
+export type DistrictInsightRegionData = {
+  /**
+   * Map of year to number of active teams
+   */
+  yearly_active_team_count: {
+    [key: string]: number;
+  };
+  /**
+   * Map of year to number of events
+   */
+  yearly_event_count: {
+    [key: string]: number;
+  };
+  /**
+   * Map of year to list of team keys gained
+   */
+  yearly_gained_teams: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Map of year to list of team keys lost
+   */
+  yearly_lost_teams: {
+    [key: string]: Array<string>;
+  };
 };
 
 /**

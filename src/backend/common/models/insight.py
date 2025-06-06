@@ -260,10 +260,22 @@ class DistrictInsightTeamData(TypedDict):
     individual_awards: int
     quals_record: WLTRecord
     elims_record: WLTRecord
+    blue_banners: int
+    in_district_extra_play_count: int
+    total_matches_played: int
+    dcmp_appearances: int
+    cmp_appearances: int
 
 
-class DistrictInsightDistrictData(TypedDict):
+class DistrictInsightDistrictRegionData(TypedDict):
     yearly_active_team_count: Dict[Year, int]
     yearly_gained_teams: Dict[Year, List[TeamKey]]
     yearly_lost_teams: Dict[Year, List[TeamKey]]
     yearly_event_count: Dict[Year, int]
+
+
+class DistrictInsightDistrictData(TypedDict):
+    # Grouped by region (state or country)
+    region_data: Dict[str, DistrictInsightDistrictRegionData]
+    # Full district-wide data
+    district_wide_data: DistrictInsightDistrictRegionData

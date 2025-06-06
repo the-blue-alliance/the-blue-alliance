@@ -1171,16 +1171,18 @@ export const zAward = z.object({
   year: z.number().int(),
 });
 
+export const zDistrictInsightRegionData = z.object({
+  yearly_active_team_count: z.object({}),
+  yearly_event_count: z.object({}),
+  yearly_gained_teams: z.object({}),
+  yearly_lost_teams: z.object({}),
+});
+
 export const zDistrictInsight = z.object({
-  district_data: z.union([
-    z.object({
-      yearly_active_team_count: z.object({}),
-      yearly_event_count: z.object({}),
-      yearly_gained_teams: z.object({}),
-      yearly_lost_teams: z.object({}),
-    }),
-    z.null(),
-  ]),
+  district_data: z.object({
+    region_data: z.union([z.object({}), z.null()]),
+    district_wide_data: z.union([zDistrictInsightRegionData, z.null()]),
+  }),
   team_data: z.union([z.object({}), z.null()]),
 });
 
