@@ -1,13 +1,80 @@
-import React from 'react';
+import { useLoaderData } from 'react-router';
 
 import BiBellFill from '~icons/bi/bell-fill';
 import BiStarFill from '~icons/bi/star-fill';
 
+import { listFavorites } from '~/api/tba/mobile';
+import { client } from '~/api/tba/mobile/client.gen';
 import SignInWithAppleButton from '~/components/tba/auth/signInWithAppleButton';
 import SignInWithGoogleButton from '~/components/tba/auth/signInWithGoogleButton';
+import SignOutButton from '~/components/tba/auth/signOutButton';
+import AddFavoriteForm from '~/components/tba/forms/addFavorite';
 import InlineIcon from '~/components/tba/inlineIcon';
+import { adminAuth } from '~/firebase/firebase.server';
+import { getSession } from '~/lib/session.server';
 
-export default function Account(): React.JSX.Element {
+import { Route } from '.react-router/types/app/routes/+types/account';
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+  const uid = session.get('uid') as string;
+  const token = session.get('token') as string;
+
+  if (!uid) {
+    return { uid: undefined, user: undefined, favorites: undefined };
+  }
+
+  const user = await adminAuth?.getUser(uid);
+
+  client.interceptors.request.use((request) => {
+    request.headers.set('Authorization', `Bearer ${token}`);
+    return request;
+  });
+
+  const favorites = await listFavorites();
+
+  return { uid, user, favorites: favorites.data };
+}
+
+export default function Account() {
+  const { uid } = useLoaderData<typeof loader>();
+
+  if (uid) {
+    return <AccountPage />;
+  }
+
+  return <LoginPage />;
+}
+
+function AccountPage() {
+  const { user, favorites } = useLoaderData<typeof loader>();
+
+  if (!user || !favorites) {
+    return null;
+  }
+
+  return (
+    <div className="pt-4">
+      <div className="flex flex-row justify-between align-middle">
+        <h1 className="text-3xl">Welcome back, {user.displayName}!</h1>
+        <SignOutButton />
+      </div>
+      <div className="mt-4 flex flex-row justify-around align-middle">
+        <AddFavoriteForm />
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-medium">Favorites</h2>
+          <ul>
+            {favorites.favorites?.map((favorite) => (
+              <li key={favorite.model_key}>{favorite.model_key}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LoginPage() {
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-medium">

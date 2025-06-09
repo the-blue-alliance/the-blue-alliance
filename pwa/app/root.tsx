@@ -14,11 +14,18 @@ import {
   useRouteError,
 } from 'react-router';
 
-import { client } from '~/api/tba/read/client.gen';
+import { client as mobileClient } from '~/api/tba/mobile/client.gen';
+import { client as readClient } from '~/api/tba/read/client.gen';
 
-client.interceptors.request.use((request) => {
+readClient.interceptors.request.use((request) => {
   request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
   return request;
+});
+
+mobileClient.setConfig({
+  baseUrl: import.meta.env.DEV
+    ? 'http://localhost:8080/clientapi/tbaClient/v9'
+    : 'https://www.thebluealliance.com/clientapi/tbaClient/v9',
 });
 
 // Disabled on 11/12/24 due to clone() issues:
@@ -58,6 +65,7 @@ const queryClient = new QueryClient();
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+
   return (
     <html lang="en">
       <head>

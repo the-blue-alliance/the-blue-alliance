@@ -109,3 +109,27 @@ npx playwright codegen
 # Auto generate tests with a specific device
 npx playwright codegen --device="Pixel 7"
 ```
+
+## Auth
+
+Currently, the emulator suite doesn't work; this means you'll have to set up a prod Firebase project and tell the py3 codebase to use it.
+
+1. Go to https://console.firebase.google.com/
+2. Create project
+3. Enter a project name, such as `tba-dev`
+4. Disable Google Analytics, hit Create Project
+5. Go to Project Settings
+6. Create a web platform App
+7. Enter a name, such as `tba-dev`
+8. Hit Register app
+9. Copy the API key, auth domain, project ID, storage bucket, messaging sender ID, and app ID to `src/backend/web/static/javascript/tba_js/tba_keys.js`. You may need to `chmod` this depending on your local environment and how the file was made.
+10. Copy the API key, auth domain, and project ID to `pwa/.env`.
+11. Go to Project Settings -> Service Accounts
+12. Click `Generate new private key` to download a JSON file
+13. Move the json file to `ops/dev/keys/key.json` (specific filename and path do not matter, just an example)
+14. From the json file, copy the project ID, client email, and private key to `pwa/.env`.
+15. Open `tba_dev_config.json`
+16. Add `"auth_use_prod": true` and `"google_application_credentials": "ops/dev/keys/key.json"` (or wherever you put the key file)
+17. Run `./ops/build/run_buildweb.sh` to rebuild JS bundles.
+18. Go to http://localhost:8080/account/login and Sign in with Google.
+19. Go to http://localhost:5173/account and Sign in with Google.

@@ -1,4 +1,11 @@
-import { AuthProvider, signInWithPopup } from 'firebase/auth';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import {
+  AuthProvider,
+  browserLocalPersistence,
+  setPersistence,
+  signInWithPopup,
+} from 'firebase/auth';
+import { useNavigate } from 'react-router';
 
 import { auth } from '~/firebase/firebaseConfig';
 import { cn } from '~/lib/utils';
@@ -14,10 +21,27 @@ export default function SignInButton({
   text: string;
   className: string;
 }) {
+  const navigate = useNavigate();
+
   const handleSignIn = () => {
-    signInWithPopup(auth, provider)
+    setPersistence(auth!, browserLocalPersistence)
+      .then(() => signInWithPopup(auth!, provider))
       .then((result) => {
-        console.log('User signed in:', result.user);
+        return result.user.getIdToken();
+      })
+      .then((idToken) => {
+        return idToken;
+      })
+      .then((idToken) => {
+        return fetch('/auth/session', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+      })
+      .then(() => {
+        return navigate('/account');
       })
       .catch((error: unknown) => {
         console.error('Error during sign-in:', error);
