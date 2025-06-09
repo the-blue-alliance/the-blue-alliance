@@ -1,7 +1,11 @@
 import { defineConfig } from '@hey-api/openapi-ts';
+import path from 'path';
 
 export default defineConfig({
-  input: '../src/backend/web/static/swagger/api_v3.json',
+  input: path.resolve(
+    __dirname,
+    '../../src/backend/web/static/swagger/api_v3.json',
+  ),
   output: {
     format: 'prettier',
     path: 'app/api/tba/',

@@ -1,5 +1,6 @@
 #!/bin/bash
-npx @hey-api/openapi-ts -f openapi-ts.config.ts
+npx @hey-api/openapi-ts -f openapi-ts/read.config.ts
+npx @hey-api/openapi-ts -f openapi-ts/write.config.ts
 
 # Define a function to run sed in Docker
 docker_sed() {
