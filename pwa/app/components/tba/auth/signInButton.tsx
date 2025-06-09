@@ -1,4 +1,9 @@
-import { AuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  AuthProvider,
+  browserLocalPersistence,
+  setPersistence,
+  signInWithPopup,
+} from 'firebase/auth';
 
 import { auth } from '~/firebase/firebaseConfig';
 import { cn } from '~/lib/utils';
@@ -15,9 +20,10 @@ export default function SignInButton({
   className: string;
 }) {
   const handleSignIn = () => {
-    signInWithPopup(auth, provider)
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => signInWithPopup(auth, provider))
       .then((result) => {
-        console.log('User signed in:', result.user);
+        console.log('User signed in:', result);
       })
       .catch((error: unknown) => {
         console.error('Error during sign-in:', error);

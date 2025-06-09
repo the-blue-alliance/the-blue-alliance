@@ -3,11 +3,36 @@ import React from 'react';
 import BiBellFill from '~icons/bi/bell-fill';
 import BiStarFill from '~icons/bi/star-fill';
 
+import { useAuth } from '~/components/tba/auth/context';
 import SignInWithAppleButton from '~/components/tba/auth/signInWithAppleButton';
 import SignInWithGoogleButton from '~/components/tba/auth/signInWithGoogleButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 
 export default function Account(): React.JSX.Element {
+  const { user } = useAuth();
+
+  if (user === undefined) {
+    return <LoginPage />;
+  }
+
+  return <AccountPage />;
+}
+
+function AccountPage() {
+  const { user } = useAuth();
+
+  if (user === undefined) {
+    return <LoginPage />;
+  }
+
+  return (
+    <div className="container max-w-4xl py-8">
+      <h1 className="text-3xl">Welcome back, {user.displayName}!</h1>
+    </div>
+  );
+}
+
+function LoginPage() {
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-medium">

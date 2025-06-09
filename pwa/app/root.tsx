@@ -15,6 +15,7 @@ import {
 } from 'react-router';
 
 import { client } from '~/api/tba/client.gen';
+import { AuthProvider } from '~/components/tba/auth/context';
 
 client.interceptors.request.use((request) => {
   request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
@@ -58,6 +59,7 @@ const queryClient = new QueryClient();
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+
   return (
     <html lang="en">
       <head>
@@ -239,7 +241,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
             <QueryClientProvider client={queryClient}>
-              {children}
+              <AuthProvider>{children}</AuthProvider>
             </QueryClientProvider>
           </div>
         </div>
