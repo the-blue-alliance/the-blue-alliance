@@ -16,3 +16,5 @@ import { AwardType } from \"~/lib/api/AwardType\";\
 import { EventType } from \"~/lib/api/EventType\";' app/api/tba/types.gen.ts"
 
 npx prettier --write app/api/tba/
+
+cp -r ../src/backend/web/static/swagger/ ./public/swagger/
