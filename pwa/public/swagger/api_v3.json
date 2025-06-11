@@ -49,9 +49,7 @@
   "paths": {
     "/status": {
       "get": {
-        "tags": [
-          "TBA"
-        ],
+        "tags": ["TBA"],
         "description": "Returns API status, and TBA status information.",
         "operationId": "getStatus",
         "parameters": [
@@ -103,10 +101,7 @@
     },
     "/teams/{page_num}": {
       "get": {
-        "tags": [
-          "team",
-          "list"
-        ],
+        "tags": ["team", "list"],
         "description": "Gets a list of `Team` objects, paginated in groups of 500.",
         "operationId": "getTeams",
         "parameters": [
@@ -164,10 +159,7 @@
     },
     "/teams/{page_num}/simple": {
       "get": {
-        "tags": [
-          "team",
-          "list"
-        ],
+        "tags": ["team", "list"],
         "description": "Gets a list of short form `Team_Simple` objects, paginated in groups of 500.",
         "operationId": "getTeamsSimple",
         "parameters": [
@@ -225,10 +217,7 @@
     },
     "/teams/{page_num}/keys": {
       "get": {
-        "tags": [
-          "team",
-          "list"
-        ],
+        "tags": ["team", "list"],
         "description": "Gets a list of Team keys, paginated in groups of 500. (Note, each page will not have 500 teams, but will include the teams within that range of 500.)",
         "operationId": "getTeamsKeys",
         "parameters": [
@@ -286,10 +275,7 @@
     },
     "/teams/{year}/{page_num}": {
       "get": {
-        "tags": [
-          "team",
-          "list"
-        ],
+        "tags": ["team", "list"],
         "description": "Gets a list of `Team` objects that competed in the given year, paginated in groups of 500.",
         "operationId": "getTeamsByYear",
         "parameters": [
@@ -350,10 +336,7 @@
     },
     "/teams/{year}/{page_num}/simple": {
       "get": {
-        "tags": [
-          "team",
-          "list"
-        ],
+        "tags": ["team", "list"],
         "description": "Gets a list of short form `Team_Simple` objects that competed in the given year, paginated in groups of 500.",
         "operationId": "getTeamsByYearSimple",
         "parameters": [
@@ -414,10 +397,7 @@
     },
     "/teams/{year}/{page_num}/keys": {
       "get": {
-        "tags": [
-          "team",
-          "list"
-        ],
+        "tags": ["team", "list"],
         "description": "Gets a list Team Keys that competed in the given year, paginated in groups of 500.",
         "operationId": "getTeamsByYearKeys",
         "parameters": [
@@ -479,9 +459,7 @@
     },
     "/team/{team_key}": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a `Team` object for the team referenced by the given key.",
         "operationId": "getTeam",
         "parameters": [
@@ -536,9 +514,7 @@
     },
     "/team/{team_key}/simple": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a `Team_Simple` object for the team referenced by the given key.",
         "operationId": "getTeamSimple",
         "parameters": [
@@ -593,9 +569,7 @@
     },
     "/team/{team_key}/history": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets the history for the team referenced by the given key, including their events and awards.",
         "operationId": "getTeamHistory",
         "parameters": [
@@ -650,9 +624,7 @@
     },
     "/team/{team_key}/years_participated": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a list of years in which the team participated in at least one competition.",
         "operationId": "getTeamYearsParticipated",
         "parameters": [
@@ -710,10 +682,7 @@
     },
     "/team/{team_key}/districts": {
       "get": {
-        "tags": [
-          "team",
-          "district"
-        ],
+        "tags": ["team", "district"],
         "description": "Gets an array of districts representing each year the team was in a district. Will return an empty array if the team was never in a district.",
         "operationId": "getTeamDistricts",
         "parameters": [
@@ -771,9 +740,7 @@
     },
     "/team/{team_key}/robots": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a list of year and robot name pairs for each year that a robot name was provided. Will return an empty array if the team has never named a robot.",
         "operationId": "getTeamRobots",
         "parameters": [
@@ -831,10 +798,7 @@
     },
     "/team/{team_key}/events": {
       "get": {
-        "tags": [
-          "team",
-          "event"
-        ],
+        "tags": ["team", "event"],
         "description": "Gets a list of all events this team has competed at.",
         "operationId": "getTeamEvents",
         "parameters": [
@@ -892,10 +856,7 @@
     },
     "/team/{team_key}/events/simple": {
       "get": {
-        "tags": [
-          "team",
-          "event"
-        ],
+        "tags": ["team", "event"],
         "description": "Gets a short-form list of all events this team has competed at.",
         "operationId": "getTeamEventsSimple",
         "parameters": [
@@ -953,10 +914,7 @@
     },
     "/team/{team_key}/events/keys": {
       "get": {
-        "tags": [
-          "team",
-          "event"
-        ],
+        "tags": ["team", "event"],
         "description": "Gets a list of the event keys for all events this team has competed at.",
         "operationId": "getTeamEventsKeys",
         "parameters": [
@@ -1015,10 +973,7 @@
     },
     "/team/{team_key}/events/{year}": {
       "get": {
-        "tags": [
-          "team",
-          "event"
-        ],
+        "tags": ["team", "event"],
         "description": "Gets a list of events this team has competed at in the given year.",
         "operationId": "getTeamEventsByYear",
         "parameters": [
@@ -1079,10 +1034,7 @@
     },
     "/team/{team_key}/events/{year}/simple": {
       "get": {
-        "tags": [
-          "team",
-          "event"
-        ],
+        "tags": ["team", "event"],
         "description": "Gets a short-form list of events this team has competed at in the given year.",
         "operationId": "getTeamEventsByYearSimple",
         "parameters": [
@@ -1143,10 +1095,7 @@
     },
     "/team/{team_key}/events/{year}/keys": {
       "get": {
-        "tags": [
-          "team",
-          "event"
-        ],
+        "tags": ["team", "event"],
         "description": "Gets a list of the event keys for events this team has competed at in the given year.",
         "operationId": "getTeamEventsByYearKeys",
         "parameters": [
@@ -1208,11 +1157,7 @@
     },
     "/team/{team_key}/events/{year}/statuses": {
       "get": {
-        "tags": [
-          "list",
-          "team",
-          "event"
-        ],
+        "tags": ["list", "team", "event"],
         "description": "Gets a key-value list of the event statuses for events this team has competed at in the given year.",
         "operationId": "getTeamEventsStatusesByYear",
         "parameters": [
@@ -1248,10 +1193,7 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "type": [
-                      "null",
-                      "object"
-                    ],
+                    "type": ["null", "object"],
                     "$ref": "#/components/schemas/Team_Event_Status"
                   },
                   "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key."
@@ -1278,11 +1220,7 @@
     },
     "/team/{team_key}/event/{event_key}/matches": {
       "get": {
-        "tags": [
-          "team",
-          "event",
-          "match"
-        ],
+        "tags": ["team", "event", "match"],
         "description": "Gets a list of matches for the given team and event.",
         "operationId": "getTeamEventMatches",
         "parameters": [
@@ -1343,11 +1281,7 @@
     },
     "/team/{team_key}/event/{event_key}/matches/simple": {
       "get": {
-        "tags": [
-          "team",
-          "event",
-          "match"
-        ],
+        "tags": ["team", "event", "match"],
         "description": "Gets a short-form list of matches for the given team and event.",
         "operationId": "getTeamEventMatchesSimple",
         "parameters": [
@@ -1408,11 +1342,7 @@
     },
     "/team/{team_key}/event/{event_key}/matches/keys": {
       "get": {
-        "tags": [
-          "team",
-          "event",
-          "match"
-        ],
+        "tags": ["team", "event", "match"],
         "description": "Gets a list of match keys for matches for the given team and event.",
         "operationId": "getTeamEventMatchesKeys",
         "parameters": [
@@ -1474,10 +1404,7 @@
     },
     "/team/{team_key}/event/{event_key}/awards": {
       "get": {
-        "tags": [
-          "team",
-          "event"
-        ],
+        "tags": ["team", "event"],
         "description": "Gets a list of awards the given team won at the given event.",
         "operationId": "getTeamEventAwards",
         "parameters": [
@@ -1538,10 +1465,7 @@
     },
     "/team/{team_key}/event/{event_key}/status": {
       "get": {
-        "tags": [
-          "team",
-          "event"
-        ],
+        "tags": ["team", "event"],
         "description": "Gets the competition rank and status of the team at the given event.",
         "operationId": "getTeamEventStatus",
         "parameters": [
@@ -1575,10 +1499,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
+                  "type": ["null", "object"],
                   "$ref": "#/components/schemas/Team_Event_Status"
                 }
               }
@@ -1603,9 +1524,7 @@
     },
     "/team/{team_key}/awards": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a list of awards the given team has won.",
         "operationId": "getTeamAwards",
         "parameters": [
@@ -1663,9 +1582,7 @@
     },
     "/team/{team_key}/awards/{year}": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a list of awards the given team has won in a given year.",
         "operationId": "getTeamAwardsByYear",
         "parameters": [
@@ -1726,10 +1643,7 @@
     },
     "/team/{team_key}/matches/{year}": {
       "get": {
-        "tags": [
-          "team",
-          "match"
-        ],
+        "tags": ["team", "match"],
         "description": "Gets a list of matches for the given team and year.",
         "operationId": "getTeamMatchesByYear",
         "parameters": [
@@ -1790,10 +1704,7 @@
     },
     "/team/{team_key}/matches/{year}/simple": {
       "get": {
-        "tags": [
-          "team",
-          "match"
-        ],
+        "tags": ["team", "match"],
         "description": "Gets a short-form list of matches for the given team and year.",
         "operationId": "getTeamMatchesByYearSimple",
         "parameters": [
@@ -1854,10 +1765,7 @@
     },
     "/team/{team_key}/matches/{year}/keys": {
       "get": {
-        "tags": [
-          "team",
-          "match"
-        ],
+        "tags": ["team", "match"],
         "description": "Gets a list of match keys for matches for the given team and year.",
         "operationId": "getTeamMatchesByYearKeys",
         "parameters": [
@@ -1919,9 +1827,7 @@
     },
     "/team/{team_key}/media/{year}": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a list of Media (videos / pictures) for the given team and year.",
         "operationId": "getTeamMediaByYear",
         "parameters": [
@@ -1982,9 +1888,7 @@
     },
     "/team/{team_key}/media/tag/{media_tag}": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a list of Media (videos / pictures) for the given team and tag.",
         "operationId": "getTeamMediaByTag",
         "parameters": [
@@ -2045,9 +1949,7 @@
     },
     "/team/{team_key}/media/tag/{media_tag}/{year}": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a list of Media (videos / pictures) for the given team, tag and year.",
         "operationId": "getTeamMediaByTagYear",
         "parameters": [
@@ -2111,9 +2013,7 @@
     },
     "/team/{team_key}/social_media": {
       "get": {
-        "tags": [
-          "team"
-        ],
+        "tags": ["team"],
         "description": "Gets a list of Media (social media) for the given team.",
         "operationId": "getTeamSocialMedia",
         "parameters": [
@@ -2171,10 +2071,7 @@
     },
     "/events/{year}": {
       "get": {
-        "tags": [
-          "event",
-          "list"
-        ],
+        "tags": ["event", "list"],
         "description": "Gets a list of events in the given year.",
         "operationId": "getEventsByYear",
         "parameters": [
@@ -2232,10 +2129,7 @@
     },
     "/events/{year}/simple": {
       "get": {
-        "tags": [
-          "event",
-          "list"
-        ],
+        "tags": ["event", "list"],
         "description": "Gets a short-form list of events in the given year.",
         "operationId": "getEventsByYearSimple",
         "parameters": [
@@ -2293,10 +2187,7 @@
     },
     "/events/{year}/keys": {
       "get": {
-        "tags": [
-          "event",
-          "list"
-        ],
+        "tags": ["event", "list"],
         "description": "Gets a list of event keys in the given year.",
         "operationId": "getEventsByYearKeys",
         "parameters": [
@@ -2355,9 +2246,7 @@
     },
     "/event/{event_key}": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets an Event.",
         "operationId": "getEvent",
         "parameters": [
@@ -2412,9 +2301,7 @@
     },
     "/event/{event_key}/simple": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets a short-form Event.",
         "operationId": "getEventSimple",
         "parameters": [
@@ -2469,9 +2356,7 @@
     },
     "/event/{event_key}/alliances": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets a list of Elimination Alliances for the given Event.",
         "operationId": "getEventAlliances",
         "parameters": [
@@ -2502,10 +2387,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
+                  "type": ["null", "array"],
                   "items": {
                     "$ref": "#/components/schemas/Elimination_Alliance"
                   }
@@ -2532,9 +2414,7 @@
     },
     "/event/{event_key}/insights": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets a set of Event-specific insights for the given Event.",
         "operationId": "getEventInsights",
         "parameters": [
@@ -2566,10 +2446,7 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Event_Insights",
-                  "type": [
-                    "null",
-                    "object"
-                  ]
+                  "type": ["null", "object"]
                 }
               }
             }
@@ -2593,9 +2470,7 @@
     },
     "/event/{event_key}/oprs": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets a set of Event OPRs (including OPR, DPR, and CCWM) for the given Event.",
         "operationId": "getEventOPRs",
         "parameters": [
@@ -2626,10 +2501,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
+                  "type": ["null", "object"],
                   "$ref": "#/components/schemas/Event_OPRs"
                 }
               }
@@ -2654,9 +2526,7 @@
     },
     "/event/{event_key}/coprs": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets a set of Event Component OPRs for the given Event.",
         "operationId": "getEventCOPRs",
         "parameters": [
@@ -2687,10 +2557,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
+                  "type": ["null", "object"],
                   "$ref": "#/components/schemas/Event_COPRs"
                 }
               }
@@ -2715,9 +2582,7 @@
     },
     "/event/{event_key}/predictions": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets information on TBA-generated predictions for the given Event. Contains year-specific information. *WARNING* This endpoint is currently under development and may change at any time.",
         "operationId": "getEventPredictions",
         "parameters": [
@@ -2749,10 +2614,7 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Event_Predictions",
-                  "type": [
-                    "null",
-                    "object"
-                  ]
+                  "type": ["null", "object"]
                 }
               }
             }
@@ -2776,9 +2638,7 @@
     },
     "/event/{event_key}/rankings": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets a list of team rankings for the Event.",
         "operationId": "getEventRankings",
         "parameters": [
@@ -2810,10 +2670,7 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Event_Ranking",
-                  "type": [
-                    "null",
-                    "object"
-                  ]
+                  "type": ["null", "object"]
                 }
               }
             }
@@ -2837,10 +2694,7 @@
     },
     "/event/{event_key}/district_points": {
       "get": {
-        "tags": [
-          "event",
-          "district"
-        ],
+        "tags": ["event", "district"],
         "description": "Gets a list of district points for the Event. These are always calculated, regardless of event type, and may/may not be actually useful.",
         "operationId": "getEventDistrictPoints",
         "parameters": [
@@ -2872,10 +2726,7 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Event_District_Points",
-                  "type": [
-                    "null",
-                    "object"
-                  ]
+                  "type": ["null", "object"]
                 }
               }
             }
@@ -2899,9 +2750,7 @@
     },
     "/event/{event_key}/regional_champs_pool_points": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "For 2025+ Regional events, this will return points towards the Championship qualification pool.",
         "operationId": "getRegionalChampsPoolPoints",
         "parameters": [
@@ -2932,10 +2781,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
+                  "type": ["null", "object"],
                   "$ref": "#/components/schemas/Event_District_Points"
                 }
               }
@@ -2960,9 +2806,7 @@
     },
     "/event/{event_key}/advancement_points": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Depending on the type of event (district/regional), this will return either district points or regional CMP points",
         "operationId": "getEventAdvancementPoints",
         "parameters": [
@@ -2994,10 +2838,7 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Event_District_Points",
-                  "type": [
-                    "null",
-                    "object"
-                  ]
+                  "type": ["null", "object"]
                 }
               }
             }
@@ -3021,11 +2862,7 @@
     },
     "/event/{event_key}/teams": {
       "get": {
-        "tags": [
-          "event",
-          "team",
-          "list"
-        ],
+        "tags": ["event", "team", "list"],
         "description": "Gets a list of `Team` objects that competed in the given event.",
         "operationId": "getEventTeams",
         "parameters": [
@@ -3083,11 +2920,7 @@
     },
     "/event/{event_key}/teams/simple": {
       "get": {
-        "tags": [
-          "event",
-          "team",
-          "list"
-        ],
+        "tags": ["event", "team", "list"],
         "description": "Gets a short-form list of `Team` objects that competed in the given event.",
         "operationId": "getEventTeamsSimple",
         "parameters": [
@@ -3145,11 +2978,7 @@
     },
     "/event/{event_key}/teams/keys": {
       "get": {
-        "tags": [
-          "event",
-          "team",
-          "list"
-        ],
+        "tags": ["event", "team", "list"],
         "description": "Gets a list of `Team` keys that competed in the given event.",
         "operationId": "getEventTeamsKeys",
         "parameters": [
@@ -3208,11 +3037,7 @@
     },
     "/event/{event_key}/teams/statuses": {
       "get": {
-        "tags": [
-          "event",
-          "team",
-          "list"
-        ],
+        "tags": ["event", "team", "list"],
         "description": "Gets a key-value list of the event statuses for teams competing at the given event.",
         "operationId": "getEventTeamsStatuses",
         "parameters": [
@@ -3246,10 +3071,7 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "#/components/schemas/Team_Event_Status",
-                    "type": [
-                      "null",
-                      "object"
-                    ]
+                    "type": ["null", "object"]
                   },
                   "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key."
                 }
@@ -3275,10 +3097,7 @@
     },
     "/event/{event_key}/matches": {
       "get": {
-        "tags": [
-          "event",
-          "match"
-        ],
+        "tags": ["event", "match"],
         "description": "Gets a list of matches for the given event.",
         "operationId": "getEventMatches",
         "parameters": [
@@ -3336,10 +3155,7 @@
     },
     "/event/{event_key}/matches/simple": {
       "get": {
-        "tags": [
-          "event",
-          "match"
-        ],
+        "tags": ["event", "match"],
         "description": "Gets a short-form list of matches for the given event.",
         "operationId": "getEventMatchesSimple",
         "parameters": [
@@ -3397,10 +3213,7 @@
     },
     "/event/{event_key}/matches/keys": {
       "get": {
-        "tags": [
-          "event",
-          "match"
-        ],
+        "tags": ["event", "match"],
         "description": "Gets a list of match keys for the given event.",
         "operationId": "getEventMatchesKeys",
         "parameters": [
@@ -3459,10 +3272,7 @@
     },
     "/event/{event_key}/matches/timeseries": {
       "get": {
-        "tags": [
-          "event",
-          "match"
-        ],
+        "tags": ["event", "match"],
         "description": "Gets an array of Match Keys for the given event key that have timeseries data. Returns an empty array if no matches have timeseries data.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.",
         "operationId": "getEventMatchTimeseries",
         "parameters": [
@@ -3521,9 +3331,7 @@
     },
     "/event/{event_key}/awards": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets a list of awards from the given event.",
         "operationId": "getEventAwards",
         "parameters": [
@@ -3581,9 +3389,7 @@
     },
     "/event/{event_key}/team_media": {
       "get": {
-        "tags": [
-          "event"
-        ],
+        "tags": ["event"],
         "description": "Gets a list of media objects that correspond to teams at this event.",
         "operationId": "getEventTeamMedia",
         "parameters": [
@@ -3641,9 +3447,7 @@
     },
     "/match/{match_key}": {
       "get": {
-        "tags": [
-          "match"
-        ],
+        "tags": ["match"],
         "description": "Gets a `Match` object for the given match key.",
         "operationId": "getMatch",
         "parameters": [
@@ -3698,9 +3502,7 @@
     },
     "/match/{match_key}/simple": {
       "get": {
-        "tags": [
-          "match"
-        ],
+        "tags": ["match"],
         "description": "Gets a short-form `Match` object for the given match key.",
         "operationId": "getMatchSimple",
         "parameters": [
@@ -3755,9 +3557,7 @@
     },
     "/match/{match_key}/timeseries": {
       "get": {
-        "tags": [
-          "match"
-        ],
+        "tags": ["match"],
         "description": "Gets an array of game-specific Match Timeseries objects for the given match key or an empty array if not available.\n*WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.\n*WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.",
         "operationId": "getMatchTimeseries",
         "parameters": [
@@ -3816,9 +3616,7 @@
     },
     "/match/{match_key}/zebra_motionworks": {
       "get": {
-        "tags": [
-          "match"
-        ],
+        "tags": ["match"],
         "description": "Gets Zebra MotionWorks data for a Match for the given match key.",
         "operationId": "getMatchZebra",
         "parameters": [
@@ -3873,9 +3671,7 @@
     },
     "/districts/{year}": {
       "get": {
-        "tags": [
-          "district"
-        ],
+        "tags": ["district"],
         "description": "Gets a list of districts and their corresponding district key, for the given year.",
         "operationId": "getDistrictsByYear",
         "parameters": [
@@ -3933,9 +3729,7 @@
     },
     "/district/{district_abbreviation}/history": {
       "get": {
-        "tags": [
-          "district"
-        ],
+        "tags": ["district"],
         "description": "Gets a list of District objects with the given district abbreviation. This accounts for district abbreviation changes, such as MAR to FMA.",
         "operationId": "getDistrictHistory",
         "parameters": [
@@ -3993,9 +3787,7 @@
     },
     "/district/{district_abbreviation}/insights": {
       "get": {
-        "tags": [
-          "district"
-        ],
+        "tags": ["district"],
         "description": "Gets insights for a given district.",
         "operationId": "getDistrictInsights",
         "parameters": [
@@ -4050,11 +3842,7 @@
     },
     "/district/{district_key}/events": {
       "get": {
-        "tags": [
-          "district",
-          "event",
-          "list"
-        ],
+        "tags": ["district", "event", "list"],
         "description": "Gets a list of events in the given district.",
         "operationId": "getDistrictEvents",
         "parameters": [
@@ -4112,11 +3900,7 @@
     },
     "/district/{district_key}/awards": {
       "get": {
-        "tags": [
-          "district",
-          "event",
-          "list"
-        ],
+        "tags": ["district", "event", "list"],
         "description": "Gets a list of awards in the given district.",
         "operationId": "getDistrictAwards",
         "parameters": [
@@ -4174,11 +3958,7 @@
     },
     "/district/{district_key}/events/simple": {
       "get": {
-        "tags": [
-          "district",
-          "event",
-          "list"
-        ],
+        "tags": ["district", "event", "list"],
         "description": "Gets a short-form list of events in the given district.",
         "operationId": "getDistrictEventsSimple",
         "parameters": [
@@ -4242,11 +4022,7 @@
     },
     "/district/{district_key}/events/keys": {
       "get": {
-        "tags": [
-          "district",
-          "event",
-          "list"
-        ],
+        "tags": ["district", "event", "list"],
         "description": "Gets a list of event keys for events in the given district.",
         "operationId": "getDistrictEventsKeys",
         "parameters": [
@@ -4305,11 +4081,7 @@
     },
     "/district/{district_key}/teams": {
       "get": {
-        "tags": [
-          "district",
-          "team",
-          "list"
-        ],
+        "tags": ["district", "team", "list"],
         "description": "Gets a list of `Team` objects that competed in events in the given district.",
         "operationId": "getDistrictTeams",
         "parameters": [
@@ -4367,11 +4139,7 @@
     },
     "/district/{district_key}/teams/simple": {
       "get": {
-        "tags": [
-          "district",
-          "team",
-          "list"
-        ],
+        "tags": ["district", "team", "list"],
         "description": "Gets a short-form list of `Team` objects that competed in events in the given district.",
         "operationId": "getDistrictTeamsSimple",
         "parameters": [
@@ -4429,11 +4197,7 @@
     },
     "/district/{district_key}/teams/keys": {
       "get": {
-        "tags": [
-          "district",
-          "team",
-          "list"
-        ],
+        "tags": ["district", "team", "list"],
         "description": "Gets a list of `Team` objects that competed in events in the given district.",
         "operationId": "getDistrictTeamsKeys",
         "parameters": [
@@ -4492,11 +4256,7 @@
     },
     "/district/{district_key}/rankings": {
       "get": {
-        "tags": [
-          "district",
-          "team",
-          "list"
-        ],
+        "tags": ["district", "team", "list"],
         "description": "Gets a list of team district rankings for the given district.",
         "operationId": "getDistrictRankings",
         "parameters": [
@@ -4527,10 +4287,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
+                  "type": ["null", "array"],
                   "items": {
                     "$ref": "#/components/schemas/District_Ranking"
                   }
@@ -4557,11 +4314,7 @@
     },
     "/district/{district_key}/advancement": {
       "get": {
-        "tags": [
-          "district",
-          "team",
-          "list"
-        ],
+        "tags": ["district", "team", "list"],
         "description": "Gets a list of advancement information per team in a district.",
         "operationId": "getDistrictAdvancement",
         "parameters": [
@@ -4592,10 +4345,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
+                  "type": ["null", "object"],
                   "description": "A mapping of team key to District_Advancement",
                   "additionalProperties": {
                     "$ref": "#/components/schemas/District_Advancement"
@@ -4623,9 +4373,7 @@
     },
     "/district/{district_abbreviation}/dcmp_history": {
       "get": {
-        "tags": [
-          "district"
-        ],
+        "tags": ["district"],
         "description": "Gets a list of DCMP events and awards for the given district abbreviation.",
         "operationId": "getDistrictDCMPHistory",
         "parameters": [
@@ -4694,10 +4442,7 @@
     },
     "/regional_advancement/{year}": {
       "get": {
-        "tags": [
-          "regional_advancement",
-          "list"
-        ],
+        "tags": ["regional_advancement", "list"],
         "description": "Gets information about per-team advancement to the FIRST Championship.",
         "operationId": "getRegionalAdvancement",
         "parameters": [
@@ -4728,10 +4473,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
+                  "type": ["null", "object"],
                   "additionalProperties": {
                     "$ref": "#/components/schemas/Regional_Advancement"
                   }
@@ -4758,10 +4500,7 @@
     },
     "/regional_advancement/{year}/rankings": {
       "get": {
-        "tags": [
-          "regional_advancement",
-          "list"
-        ],
+        "tags": ["regional_advancement", "list"],
         "description": "Gets the team rankings in the regional pool for a specific year.",
         "operationId": "getRegionalRankings",
         "parameters": [
@@ -4792,10 +4531,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "array"
-                  ],
+                  "type": ["null", "array"],
                   "items": {
                     "$ref": "#/components/schemas/Regional_Ranking"
                   }
@@ -4822,10 +4558,7 @@
     },
     "/insights/leaderboards/{year}": {
       "get": {
-        "tags": [
-          "insight",
-          "list"
-        ],
+        "tags": ["insight", "list"],
         "description": "Gets a list of `LeaderboardInsight` objects from a specific year. Use year=0 for overall.",
         "operationId": "getInsightsLeaderboardsYear",
         "parameters": [
@@ -4883,10 +4616,7 @@
     },
     "/insights/notables/{year}": {
       "get": {
-        "tags": [
-          "insight",
-          "list"
-        ],
+        "tags": ["insight", "list"],
         "description": "Gets a list of `NotablesInsight` objects from a specific year. Use year=0 for overall.",
         "operationId": "getInsightsNotablesYear",
         "parameters": [
@@ -5041,10 +4771,7 @@
         }
       },
       "API_Status_App_Version": {
-        "required": [
-          "latest_app_version",
-          "min_app_version"
-        ],
+        "required": ["latest_app_version", "min_app_version"],
         "type": "object",
         "properties": {
           "min_app_version": {
@@ -5086,24 +4813,15 @@
             "description": "Official long name registered with FIRST."
           },
           "city": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "City of team derived from parsing the address registered with FIRST."
           },
           "state_prov": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "State of team derived from parsing the address registered with FIRST."
           },
           "country": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Country of team derived from parsing the address registered with FIRST."
           }
         }
@@ -5146,109 +4864,65 @@
             "description": "Official long name registered with FIRST."
           },
           "school_name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Name of team school or affilited group registered with FIRST."
           },
           "city": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "City of team derived from parsing the address registered with FIRST."
           },
           "state_prov": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "State of team derived from parsing the address registered with FIRST."
           },
           "country": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Country of team derived from parsing the address registered with FIRST."
           },
           "address": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Will be NULL, for future development."
           },
           "postal_code": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Postal code from the team address."
           },
           "gmaps_place_id": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Will be NULL, for future development."
           },
           "gmaps_url": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Will be NULL, for future development.",
             "format": "url"
           },
           "lat": {
-            "type": [
-              "number",
-              "null"
-            ],
+            "type": ["number", "null"],
             "description": "Will be NULL, for future development.",
             "format": "double"
           },
           "lng": {
-            "type": [
-              "number",
-              "null"
-            ],
+            "type": ["number", "null"],
             "description": "Will be NULL, for future development.",
             "format": "double"
           },
           "location_name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Will be NULL, for future development."
           },
           "website": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Official website associated with the team.",
             "format": "url"
           },
           "rookie_year": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "First year the team officially competed."
           }
         }
       },
       "Team_Robot": {
-        "required": [
-          "key",
-          "robot_name",
-          "team_key",
-          "year"
-        ],
+        "required": ["key", "robot_name", "team_key", "year"],
         "type": "object",
         "properties": {
           "year": {
@@ -5303,30 +4977,18 @@
           },
           "district": {
             "$ref": "#/components/schemas/District",
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": ["null", "object"]
           },
           "city": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "City, town, village, etc. the event is located in."
           },
           "state_prov": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "State or Province the event is located in."
           },
           "country": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Country the event is located in."
           },
           "start_date": {
@@ -5398,30 +5060,18 @@
           },
           "district": {
             "$ref": "#/components/schemas/District",
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": ["null", "object"]
           },
           "city": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "City, town, village, etc. the event is located in."
           },
           "state_prov": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "State or Province the event is located in."
           },
           "country": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Country the event is located in."
           },
           "start_date": {
@@ -5439,10 +5089,7 @@
             "description": "Year the event data is for."
           },
           "short_name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Same as `name` but doesn't include event specifiers, such as 'Regional' or 'District'. May be null."
           },
           "event_type_string": {
@@ -5450,90 +5097,54 @@
             "description": "Event Type, eg Regional, District, or Offseason."
           },
           "week": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "Week of the event relative to the first official season event, zero-indexed. Only valid for Regionals, Districts, and District Championships. Null otherwise. (Eg. A season with a week 0 'preseason' event does not count, and week 1 events will show 0 here. Seasons with a week 0.5 regional event will show week 0 for those event(s) and week 1 for week 1 events and so on.)"
           },
           "address": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Address of the event's venue, if available."
           },
           "postal_code": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Postal code from the event address."
           },
           "gmaps_place_id": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Google Maps Place ID for the event address."
           },
           "gmaps_url": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Link to address location on Google Maps.",
             "format": "url"
           },
           "lat": {
-            "type": [
-              "number",
-              "null"
-            ],
+            "type": ["number", "null"],
             "description": "Latitude for the event address.",
             "format": "double"
           },
           "lng": {
-            "type": [
-              "number",
-              "null"
-            ],
+            "type": ["number", "null"],
             "description": "Longitude for the event address.",
             "format": "double"
           },
           "location_name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Name of the location at the address for the event, eg. Blue Alliance High School."
           },
           "timezone": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Timezone name."
           },
           "website": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "The event's website, if any."
           },
           "first_event_id": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
           },
           "first_event_code": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Public facing event code used by FIRST (on frc-events.firstinspires.org, for example)"
           },
           "webcasts": {
@@ -5550,24 +5161,15 @@
             }
           },
           "parent_event_key": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`."
           },
           "playoff_type": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null."
           },
           "playoff_type_string": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "String representation of the `playoff_type`, or null."
           }
         }
@@ -5577,24 +5179,15 @@
         "properties": {
           "qual": {
             "$ref": "#/components/schemas/Team_Event_Status_rank",
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": ["null", "object"]
           },
           "alliance": {
             "$ref": "#/components/schemas/Team_Event_Status_alliance",
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": ["null", "object"]
           },
           "playoff": {
             "$ref": "#/components/schemas/Team_Event_Status_playoff",
-            "type": [
-              "null",
-              "object"
-            ]
+            "type": ["null", "object"]
           },
           "alliance_status_str": {
             "type": "string",
@@ -5609,17 +5202,11 @@
             "description": "An HTML formatted string suitable for display to the user containing the team's overall status summary of the event."
           },
           "next_match_key": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "TBA match key for the next match the team is scheduled to play in at this event, or null."
           },
           "last_match_key": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "TBA match key for the last match the team played in at this event, or null."
           }
         }
@@ -5653,10 +5240,7 @@
               },
               "record": {
                 "$ref": "#/components/schemas/WLT_Record",
-                "type": [
-                  "null",
-                  "object"
-                ]
+                "type": ["null", "object"]
               },
               "rank": {
                 "type": "integer",
@@ -5695,17 +5279,11 @@
         }
       },
       "Team_Event_Status_alliance": {
-        "required": [
-          "number",
-          "pick"
-        ],
+        "required": ["number", "pick"],
         "type": "object",
         "properties": {
           "name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Alliance name, may be null."
           },
           "number": {
@@ -5722,10 +5300,7 @@
         }
       },
       "Team_Event_Status_alliance_backup": {
-        "type": [
-          "null",
-          "object"
-        ],
+        "type": ["null", "object"],
         "properties": {
           "out": {
             "type": "string",
@@ -5739,50 +5314,28 @@
         "description": "Backup status, may be null."
       },
       "Team_Event_Status_playoff": {
-        "type": [
-          "null",
-          "object"
-        ],
+        "type": ["null", "object"],
         "properties": {
           "level": {
             "type": "string",
             "description": "The highest playoff level the team reached.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "enum": ["qm", "ef", "qf", "sf", "f"]
           },
           "current_level_record": {
-            "type": [
-              "null",
-              "object"
-            ],
+            "type": ["null", "object"],
             "$ref": "#/components/schemas/WLT_Record"
           },
           "record": {
-            "type": [
-              "null",
-              "object"
-            ],
+            "type": ["null", "object"],
             "$ref": "#/components/schemas/WLT_Record"
           },
           "status": {
             "type": "string",
             "description": "Current competition status for the playoffs.",
-            "enum": [
-              "won",
-              "eliminated",
-              "playing"
-            ]
+            "enum": ["won", "eliminated", "playing"]
           },
           "playoff_average": {
-            "type": [
-              "null",
-              "number"
-            ],
+            "type": ["null", "number"],
             "format": "double",
             "description": "The average match score during playoffs. Year specific. May be null if not relevant for a given year."
           }
@@ -5790,11 +5343,7 @@
         "description": "Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun."
       },
       "Event_Ranking": {
-        "required": [
-          "rankings",
-          "sort_order_info",
-          "extra_stats_info"
-        ],
+        "required": ["rankings", "sort_order_info", "extra_stats_info"],
         "type": "object",
         "properties": {
           "rankings": {
@@ -5818,10 +5367,7 @@
                   "description": "Number of matches played by this team."
                 },
                 "qual_average": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ],
+                  "type": ["integer", "null"],
                   "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
                 },
                 "extra_stats": {
@@ -5832,10 +5378,7 @@
                   }
                 },
                 "sort_orders": {
-                  "type": [
-                    "array",
-                    "null"
-                  ],
+                  "type": ["array", "null"],
                   "items": {
                     "type": "number",
                     "format": "double"
@@ -5843,10 +5386,7 @@
                   "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details."
                 },
                 "record": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
+                  "type": ["object", "null"],
                   "$ref": "#/components/schemas/WLT_Record"
                 },
                 "rank": {
@@ -5868,10 +5408,7 @@
             "type": "array",
             "description": "List of special TBA-generated values provided in the `extra_stats` array for each item.",
             "items": {
-              "required": [
-                "name",
-                "precision"
-              ],
+              "required": ["name", "precision"],
               "type": "object",
               "properties": {
                 "precision": {
@@ -5889,10 +5426,7 @@
             "type": "array",
             "description": "List of year-specific values provided in the `sort_orders` array for each team.",
             "items": {
-              "required": [
-                "name",
-                "precision"
-              ],
+              "required": ["name", "precision"],
               "type": "object",
               "properties": {
                 "precision": {
@@ -5909,9 +5443,7 @@
         }
       },
       "Event_District_Points": {
-        "required": [
-          "points"
-        ],
+        "required": ["points"],
         "type": "object",
         "properties": {
           "points": {
@@ -6742,13 +6274,7 @@
           "comp_level": {
             "type": "string",
             "description": "The competition level the match was played at.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "enum": ["qm", "ef", "qf", "sf", "f"]
           },
           "set_number": {
             "type": "integer",
@@ -6760,10 +6286,7 @@
           },
           "alliances": {
             "type": "object",
-            "required": [
-              "red",
-              "blue"
-            ],
+            "required": ["red", "blue"],
             "properties": {
               "red": {
                 "$ref": "#/components/schemas/Match_alliance"
@@ -6777,37 +6300,24 @@
           "winning_alliance": {
             "type": "string",
             "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
-            "enum": [
-              "red",
-              "blue",
-              ""
-            ]
+            "enum": ["red", "blue", ""]
           },
           "event_key": {
             "type": "string",
             "description": "Event key of the event the match was played at."
           },
           "time": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.",
             "format": "int64"
           },
           "predicted_time": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.",
             "format": "int64"
           },
           "actual_time": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.",
             "format": "int64"
           }
@@ -6838,13 +6348,7 @@
           "comp_level": {
             "type": "string",
             "description": "The competition level the match was played at.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "enum": ["qm", "ef", "qf", "sf", "f"]
           },
           "set_number": {
             "type": "integer",
@@ -6856,10 +6360,7 @@
           },
           "alliances": {
             "type": "object",
-            "required": [
-              "red",
-              "blue"
-            ],
+            "required": ["red", "blue"],
             "properties": {
               "red": {
                 "$ref": "#/components/schemas/Match_alliance"
@@ -6873,53 +6374,34 @@
           "winning_alliance": {
             "type": "string",
             "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
-            "enum": [
-              "red",
-              "blue",
-              ""
-            ]
+            "enum": ["red", "blue", ""]
           },
           "event_key": {
             "type": "string",
             "description": "Event key of the event the match was played at."
           },
           "time": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.",
             "format": "int64"
           },
           "actual_time": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.",
             "format": "int64"
           },
           "predicted_time": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.",
             "format": "int64"
           },
           "post_result_time": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": ["integer", "null"],
             "description": "UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result was posted.",
             "format": "int64"
           },
           "score_breakdown": {
-            "type": [
-              "object",
-              "null"
-            ],
+            "type": ["object", "null"],
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Match_Score_Breakdown_2015"
@@ -6959,10 +6441,7 @@
             "description": "Array of video objects associated with this match.",
             "items": {
               "type": "object",
-              "required": [
-                "type",
-                "key"
-              ],
+              "required": ["type", "key"],
               "properties": {
                 "type": {
                   "type": "string",
@@ -7016,11 +6495,7 @@
         }
       },
       "Zebra": {
-        "required": [
-          "key",
-          "times",
-          "alliances"
-        ],
+        "required": ["key", "times", "alliances"],
         "type": "object",
         "properties": {
           "key": {
@@ -7033,11 +6508,7 @@
             "items": {
               "type": "number",
               "format": "double",
-              "examples": [
-                0,
-                0.1,
-                0.2
-              ]
+              "examples": [0, 0.1, 0.2]
             }
           },
           "alliances": {
@@ -7062,19 +6533,13 @@
         }
       },
       "Zebra_team": {
-        "required": [
-          "team_key",
-          "xs",
-          "ys"
-        ],
+        "required": ["team_key", "xs", "ys"],
         "type": "object",
         "properties": {
           "team_key": {
             "type": "string",
             "description": "The TBA team key for the Zebra MotionWorks data.",
-            "examples": [
-              "frc7332"
-            ]
+            "examples": ["frc7332"]
           },
           "xs": {
             "type": "array",
@@ -7082,11 +6547,7 @@
             "items": {
               "type": "number",
               "format": "double",
-              "examples": [
-                2.73,
-                2.7,
-                null
-              ]
+              "examples": [2.73, 2.7, null]
             }
           },
           "ys": {
@@ -7095,23 +6556,14 @@
             "items": {
               "type": "number",
               "format": "double",
-              "examples": [
-                2.73,
-                2.7,
-                null
-              ]
+              "examples": [2.73, 2.7, null]
             }
           }
         }
       },
       "Match_Score_Breakdown_2015": {
         "type": "object",
-        "required": [
-          "blue",
-          "red",
-          "coopertition",
-          "coopertition_points"
-        ],
+        "required": ["blue", "red", "coopertition", "coopertition_points"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2015_Alliance"
@@ -7121,11 +6573,7 @@
           },
           "coopertition": {
             "type": "string",
-            "enum": [
-              "None",
-              "Unknown",
-              "Stack"
-            ]
+            "enum": ["None", "Unknown", "Stack"]
           },
           "coopertition_points": {
             "type": "integer"
@@ -7212,10 +6660,7 @@
       },
       "Match_Score_Breakdown_2016": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2016_Alliance"
@@ -7252,27 +6697,15 @@
           },
           "robot1Auto": {
             "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
-            ]
+            "enum": ["Crossed", "Reached", "None"]
           },
           "robot2Auto": {
             "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
-            ]
+            "enum": ["Crossed", "Reached", "None"]
           },
           "robot3Auto": {
             "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
-            ]
+            "enum": ["Crossed", "Reached", "None"]
           },
           "autoReachPoints": {
             "type": "integer"
@@ -7362,10 +6795,7 @@
       },
       "Match_Score_Breakdown_2017": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2017_Alliance"
@@ -7396,27 +6826,15 @@
           },
           "robot1Auto": {
             "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "enum": ["Unknown", "Mobility", "None"]
           },
           "robot2Auto": {
             "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "enum": ["Unknown", "Mobility", "None"]
           },
           "robot3Auto": {
             "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "enum": ["Unknown", "Mobility", "None"]
           },
           "rotor1Auto": {
             "type": "boolean"
@@ -7497,10 +6915,7 @@
       },
       "Match_Score_Breakdown_2018": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2018_Alliance"
@@ -7759,10 +7174,7 @@
       },
       "Match_Score_Breakdown_2019": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2019_Alliance"
@@ -7933,10 +7345,7 @@
       },
       "Match_Score_Breakdown_2020": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2020_Alliance"
@@ -8058,10 +7467,7 @@
       },
       "Match_Score_Breakdown_2022": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2022_Alliance"
@@ -8077,54 +7483,27 @@
         "properties": {
           "taxiRobot1": {
             "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "enum": ["Yes", "No"]
           },
           "endgameRobot1": {
             "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "enum": ["Traversal", "High", "Mid", "Low", "None"]
           },
           "taxiRobot2": {
             "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "enum": ["Yes", "No"]
           },
           "endgameRobot2": {
             "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "enum": ["Traversal", "High", "Mid", "Low", "None"]
           },
           "taxiRobot3": {
             "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "enum": ["Yes", "No"]
           },
           "endgameRobot3": {
             "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "enum": ["Traversal", "High", "Mid", "Low", "None"]
           },
           "autoCargoLowerNear": {
             "type": "integer"
@@ -8232,10 +7611,7 @@
       },
       "Match_Score_Breakdown_2023": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2023_Alliance"
@@ -8257,77 +7633,49 @@
           },
           "autoBridgeState": {
             "type": "string",
-            "enum": [
-              "NotLevel",
-              "Level"
-            ]
+            "enum": ["NotLevel", "Level"]
           },
           "autoChargeStationPoints": {
             "type": "integer"
           },
           "autoChargeStationRobot1": {
             "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "enum": ["None", "Docked"]
           },
           "autoChargeStationRobot2": {
             "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "enum": ["None", "Docked"]
           },
           "autoChargeStationRobot3": {
             "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "enum": ["None", "Docked"]
           },
           "autoDocked": {
             "type": "boolean"
           },
           "autoCommunity": {
             "type": "object",
-            "required": [
-              "B",
-              "M",
-              "T"
-            ],
+            "required": ["B", "M", "T"],
             "properties": {
               "B": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": [
-                    "None",
-                    "Cone",
-                    "Cube"
-                  ]
+                  "enum": ["None", "Cone", "Cube"]
                 }
               },
               "M": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": [
-                    "None",
-                    "Cone",
-                    "Cube"
-                  ]
+                  "enum": ["None", "Cone", "Cube"]
                 }
               },
               "T": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": [
-                    "None",
-                    "Cone",
-                    "Cube"
-                  ]
+                  "enum": ["None", "Cone", "Cube"]
                 }
               }
             }
@@ -8343,24 +7691,15 @@
           },
           "mobilityRobot1": {
             "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "enum": ["Yes", "No"]
           },
           "mobilityRobot2": {
             "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "enum": ["Yes", "No"]
           },
           "mobilityRobot3": {
             "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "enum": ["Yes", "No"]
           },
           "autoPoints": {
             "type": "integer"
@@ -8373,37 +7712,22 @@
           },
           "endGameBridgeState": {
             "type": "string",
-            "enum": [
-              "NotLevel",
-              "Level"
-            ]
+            "enum": ["NotLevel", "Level"]
           },
           "endGameChargeStationPoints": {
             "type": "integer"
           },
           "endGameChargeStationRobot1": {
             "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "enum": ["None", "Docked", "Park"]
           },
           "endGameChargeStationRobot2": {
             "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "enum": ["None", "Docked", "Park"]
           },
           "endGameChargeStationRobot3": {
             "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "enum": ["None", "Docked", "Park"]
           },
           "endGameParkPoints": {
             "type": "integer"
@@ -8427,29 +7751,18 @@
             "type": "array",
             "items": {
               "type": "object",
-              "required": [
-                "nodes",
-                "row"
-              ],
+              "required": ["nodes", "row"],
               "properties": {
                 "nodes": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "None",
-                      "Cone",
-                      "Cube"
-                    ]
+                    "enum": ["None", "Cone", "Cube"]
                   }
                 },
                 "row": {
                   "type": "string",
-                  "enum": [
-                    "Bottom",
-                    "Mid",
-                    "Top"
-                  ]
+                  "enum": ["Bottom", "Mid", "Top"]
                 }
               }
             }
@@ -8459,43 +7772,27 @@
           },
           "teleopCommunity": {
             "type": "object",
-            "required": [
-              "B",
-              "M",
-              "T"
-            ],
+            "required": ["B", "M", "T"],
             "properties": {
               "B": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": [
-                    "None",
-                    "Cone",
-                    "Cube"
-                  ]
+                  "enum": ["None", "Cone", "Cube"]
                 }
               },
               "M": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": [
-                    "None",
-                    "Cone",
-                    "Cube"
-                  ]
+                  "enum": ["None", "Cone", "Cube"]
                 }
               },
               "T": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": [
-                    "None",
-                    "Cone",
-                    "Cube"
-                  ]
+                  "enum": ["None", "Cone", "Cube"]
                 }
               }
             }
@@ -8522,10 +7819,7 @@
       },
       "Match_Score_Breakdown_2024": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2024_Alliance"
@@ -8699,10 +7993,7 @@
       },
       "Match_Score_Breakdown_2025": {
         "type": "object",
-        "required": [
-          "blue",
-          "red"
-        ],
+        "required": ["blue", "red"],
         "properties": {
           "blue": {
             "$ref": "#/components/schemas/Match_Score_Breakdown_2025_Alliance"
@@ -8733,24 +8024,15 @@
           },
           "autoLineRobot1": {
             "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "enum": ["No", "Yes"]
           },
           "autoLineRobot2": {
             "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "enum": ["No", "Yes"]
           },
           "autoLineRobot3": {
             "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "enum": ["No", "Yes"]
           },
           "autoMobilityPoints": {
             "type": "integer"
@@ -8760,12 +8042,7 @@
           },
           "autoReef": {
             "type": "object",
-            "required": [
-              "topRow",
-              "midRow",
-              "botRow",
-              "trough"
-            ],
+            "required": ["topRow", "midRow", "botRow", "trough"],
             "properties": {
               "topRow": {
                 "type": "object",
@@ -8963,30 +8240,15 @@
           },
           "endGameRobot1": {
             "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "enum": ["None", "Parked", "ShallowCage", "DeepCage"]
           },
           "endGameRobot2": {
             "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "enum": ["None", "Parked", "ShallowCage", "DeepCage"]
           },
           "endGameRobot3": {
             "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "enum": ["None", "Parked", "ShallowCage", "DeepCage"]
           },
           "foulCount": {
             "type": "integer"
@@ -9026,12 +8288,7 @@
           },
           "teleopReef": {
             "type": "object",
-            "required": [
-              "topRow",
-              "midRow",
-              "botRow",
-              "trough"
-            ],
+            "required": ["topRow", "midRow", "botRow", "trough"],
             "properties": {
               "topRow": {
                 "type": "object",
@@ -9224,11 +8481,7 @@
         }
       },
       "Media": {
-        "required": [
-          "type",
-          "foreign_key",
-          "team_keys"
-        ],
+        "required": ["type", "foreign_key", "team_keys"],
         "type": "object",
         "properties": {
           "type": {
@@ -9286,27 +8539,15 @@
       },
       "Elimination_Alliance": {
         "type": "object",
-        "required": [
-          "picks",
-          "declines"
-        ],
+        "required": ["picks", "declines"],
         "properties": {
           "name": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "Alliance name, may be null."
           },
           "backup": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "required": [
-              "in",
-              "out"
-            ],
+            "type": ["object", "null"],
+            "required": ["in", "out"],
             "properties": {
               "in": {
                 "type": "string",
@@ -9339,34 +8580,22 @@
             "type": "object",
             "properties": {
               "playoff_average": {
-                "type": [
-                  "number",
-                  "null"
-                ],
+                "type": ["number", "null"],
                 "format": "double"
               },
               "playoff_type": {
-                "type": [
-                  "number",
-                  "null"
-                ],
+                "type": ["number", "null"],
                 "format": "int64"
               },
               "level": {
                 "type": "string"
               },
               "record": {
-                "type": [
-                  "object",
-                  "null"
-                ],
+                "type": ["object", "null"],
                 "$ref": "#/components/schemas/WLT_Record"
               },
               "current_level_record": {
-                "type": [
-                  "object",
-                  "null"
-                ],
+                "type": ["object", "null"],
                 "$ref": "#/components/schemas/WLT_Record"
               },
               "status": {
@@ -9413,35 +8642,21 @@
       },
       "Award_Recipient": {
         "type": "object",
-        "required": [
-          "team_key",
-          "awardee"
-        ],
+        "required": ["team_key", "awardee"],
         "properties": {
           "team_key": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "The TBA team key for the team that was given the award. May be null."
           },
           "awardee": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "The name of the individual given the award. May be null."
           }
         },
         "description": "An `Award_Recipient` object represents the team and/or person who received an award at an event."
       },
       "District": {
-        "required": [
-          "abbreviation",
-          "display_name",
-          "key",
-          "year"
-        ],
+        "required": ["abbreviation", "display_name", "key", "year"],
         "type": "object",
         "properties": {
           "abbreviation": {
@@ -9571,17 +8786,10 @@
             ]
           }
         },
-        "required": [
-          "team_data",
-          "district_data"
-        ]
+        "required": ["team_data", "district_data"]
       },
       "District_Ranking": {
-        "required": [
-          "point_total",
-          "rank",
-          "team_key"
-        ],
+        "required": ["point_total", "rank", "team_key"],
         "type": "object",
         "properties": {
           "team_key": {
@@ -9650,10 +8858,7 @@
         "description": "Rank of a team in a district."
       },
       "District_Advancement": {
-        "required": [
-          "cmp",
-          "dcmp"
-        ],
+        "required": ["cmp", "dcmp"],
         "type": "object",
         "properties": {
           "dcmp": {
@@ -9668,10 +8873,7 @@
         "description": "Advancement status of a team in a district."
       },
       "Regional_Advancement": {
-        "required": [
-          "cmp",
-          "cmp_status"
-        ],
+        "required": ["cmp", "cmp_status"],
         "type": "object",
         "properties": {
           "cmp": {
@@ -9704,11 +8906,7 @@
         "description": "Information about how a regional team qualified for FIRST Championship."
       },
       "Regional_Ranking": {
-        "required": [
-          "point_total",
-          "rank",
-          "team_key"
-        ],
+        "required": ["point_total", "rank", "team_key"],
         "type": "object",
         "properties": {
           "team_key": {
@@ -9776,11 +8974,7 @@
         "description": "Rank of a team in the regional pool."
       },
       "WLT_Record": {
-        "required": [
-          "losses",
-          "ties",
-          "wins"
-        ],
+        "required": ["losses", "ties", "wins"],
         "type": "object",
         "properties": {
           "losses": {
@@ -9799,10 +8993,7 @@
         "description": "A Win-Loss-Tie record for a team, or an alliance."
       },
       "Webcast": {
-        "required": [
-          "channel",
-          "type"
-        ],
+        "required": ["channel", "type"],
         "type": "object",
         "properties": {
           "type": {
@@ -9828,17 +9019,11 @@
             "description": "Type specific channel information. May be the YouTube stream, or Twitch channel name. In the case of iframe types, contains HTML to embed the stream in an HTML iframe."
           },
           "date": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "The date for the webcast in `yyyy-mm-dd` format. May be null."
           },
           "file": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "description": "File identification as may be required for some types. May be null."
           }
         }
@@ -9866,26 +9051,16 @@
                       "description": "Team/Event/Match keys that have the corresponding value."
                     }
                   },
-                  "required": [
-                    "value",
-                    "keys"
-                  ]
+                  "required": ["value", "keys"]
                 }
               },
               "key_type": {
                 "type": "string",
-                "enum": [
-                  "team",
-                  "event",
-                  "match"
-                ],
+                "enum": ["team", "event", "match"],
                 "description": "What type of key is used in the rankings; either 'team', 'event', or 'match'."
               }
             },
-            "required": [
-              "rankings",
-              "key_type"
-            ]
+            "required": ["rankings", "key_type"]
           },
           "name": {
             "type": "string",
@@ -9896,11 +9071,7 @@
             "description": "Year the insight was measured in (year=0 for overall insights)."
           }
         },
-        "required": [
-          "data",
-          "name",
-          "year"
-        ]
+        "required": ["data", "name", "year"]
       },
       "NotablesInsight": {
         "type": "object",
@@ -9924,16 +9095,11 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "context",
-                    "team_key"
-                  ]
+                  "required": ["context", "team_key"]
                 }
               }
             },
-            "required": [
-              "entries"
-            ]
+            "required": ["entries"]
           },
           "name": {
             "type": "string"
@@ -9942,11 +9108,7 @@
             "type": "integer"
           }
         },
-        "required": [
-          "data",
-          "name",
-          "year"
-        ]
+        "required": ["data", "name", "year"]
       },
       "History": {
         "type": "object",
@@ -9964,10 +9126,7 @@
             }
           }
         },
-        "required": [
-          "events",
-          "awards"
-        ]
+        "required": ["events", "awards"]
       },
       "SearchIndex": {
         "type": "object",
@@ -9984,10 +9143,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "key",
-                "nickname"
-              ]
+              "required": ["key", "nickname"]
             }
           },
           "events": {
@@ -10002,17 +9158,11 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "key",
-                "name"
-              ]
+              "required": ["key", "name"]
             }
           }
         },
-        "required": [
-          "teams",
-          "events"
-        ]
+        "required": ["teams", "events"]
       }
     },
     "responses": {
@@ -10022,9 +9172,7 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "required": [
-                "Error"
-              ],
+              "required": ["Error"],
               "properties": {
                 "Error": {
                   "type": "string",

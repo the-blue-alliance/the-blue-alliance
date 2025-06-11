@@ -16,9 +16,7 @@
   "paths": {
     "/event/{eventKey}/info/update": {
       "post": {
-        "tags": [
-          "Event Details"
-        ],
+        "tags": ["Event Details"],
         "summary": "Update top-level properties for the event",
         "description": "An endpoint to overwrite certain event fields. All fields are optional, set only the ones you wish to update",
         "operationId": "updateEventInfo",
@@ -53,9 +51,7 @@
     },
     "/event/{eventKey}/alliance_selections/update": {
       "post": {
-        "tags": [
-          "Event Alliances"
-        ],
+        "tags": ["Event Alliances"],
         "summary": "Update the alliance selections at an event",
         "description": "Overwrite the event's alliance selections.",
         "operationId": "updateAlliances",
@@ -90,9 +86,7 @@
     },
     "/event/{eventKey}/awards/update": {
       "post": {
-        "tags": [
-          "Event Awards"
-        ],
+        "tags": ["Event Awards"],
         "summary": "Update the award listing at an event",
         "description": "Overwrite the event's award listing.",
         "operationId": "updateAwards",
@@ -130,9 +124,7 @@
     },
     "/event/{eventKey}/matches/update": {
       "post": {
-        "tags": [
-          "Event Matches"
-        ],
+        "tags": ["Event Matches"],
         "summary": "Update matches at an event",
         "description": "Add/Update one or more matches under an event.",
         "operationId": "updateMatches",
@@ -170,9 +162,7 @@
     },
     "/event/{eventKey}/matches/delete": {
       "post": {
-        "tags": [
-          "Event Matches"
-        ],
+        "tags": ["Event Matches"],
         "summary": "Delete matches at an event",
         "description": "Delete one or more matches under an event.",
         "operationId": "deleteMatches",
@@ -212,9 +202,7 @@
     },
     "/event/{eventKey}/rankings/update": {
       "post": {
-        "tags": [
-          "Event Rankings"
-        ],
+        "tags": ["Event Rankings"],
         "summary": "Update team rankings at an event",
         "description": "Update rankings at an event",
         "operationId": "updateRankings",
@@ -228,10 +216,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "breakdowns",
-                  "rankings"
-                ],
+                "required": ["breakdowns", "rankings"],
                 "properties": {
                   "breakdowns": {
                     "type": "array",
@@ -313,9 +298,7 @@
     },
     "/event/{eventKey}/team_list/update": {
       "post": {
-        "tags": [
-          "Team List"
-        ],
+        "tags": ["Team List"],
         "summary": "Update the list of teams attending an event",
         "description": "Replaces the list of teams attending",
         "operationId": "updateTeamList",
@@ -355,9 +338,7 @@
     },
     "/event/{eventKey}/match_videos/add": {
       "post": {
-        "tags": [
-          "Match Videos"
-        ],
+        "tags": ["Match Videos"],
         "summary": "Add match videos",
         "description": "Link YouTube videos to a match",
         "operationId": "updateMatchVideos",
@@ -396,9 +377,7 @@
     },
     "/event/{eventKey}/media/add": {
       "post": {
-        "tags": [
-          "Event Media"
-        ],
+        "tags": ["Event Media"],
         "summary": "Add event videos",
         "description": "Link YouTube videos to an event",
         "operationId": "updateEventMedia",
@@ -492,9 +471,7 @@
       },
       "Award": {
         "type": "object",
-        "required": [
-          "name_str"
-        ],
+        "required": ["name_str"],
         "properties": {
           "type_enum": {
             "type": "integer",
@@ -560,10 +537,7 @@
       },
       "MatchAlliance": {
         "type": "object",
-        "required": [
-          "teams",
-          "score"
-        ],
+        "required": ["teams", "score"],
         "properties": {
           "teams": {
             "type": "array",
@@ -599,22 +573,11 @@
       },
       "Match": {
         "type": "object",
-        "required": [
-          "comp_level",
-          "match_number",
-          "set_number",
-          "alliances"
-        ],
+        "required": ["comp_level", "match_number", "set_number", "alliances"],
         "properties": {
           "comp_level": {
             "type": "string",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ],
+            "enum": ["qm", "ef", "qf", "sf", "f"],
             "description": "Competition level of the match",
             "example": "qm"
           },
@@ -635,10 +598,7 @@
           "alliances": {
             "type": "object",
             "description": "Competing teams and score info for this match",
-            "required": [
-              "red",
-              "blue"
-            ],
+            "required": ["red", "blue"],
             "properties": {
               "red": {
                 "$ref": "#/components/schemas/MatchAlliance"
