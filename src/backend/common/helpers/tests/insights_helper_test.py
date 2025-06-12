@@ -3,9 +3,7 @@ from typing import Dict, List
 from backend.common.helpers.insights_helper import InsightsHelper
 
 
-def call_calc_streaks(
-    division_winners_map: Dict[str, List[int]]
-) -> Dict[str, int]:
+def call_calc_streaks(division_winners_map: Dict[str, List[int]]) -> Dict[str, int]:
     # Helper to call the static method.
     # The _calculate_einstein_streaks method returns a dict.
     return InsightsHelper._calculate_einstein_streaks(division_winners_map)
@@ -24,9 +22,7 @@ def test_unsorted_input_years():
 
 
 def test_streak_broken_by_normal_gap():
-    data = {
-        "frc456": [2015, 2016, 2018]
-    }
+    data = {"frc456": [2015, 2016, 2018]}
     # Streak from 2015-2016 (length 2). 2018 is a new streak of 1. The longest streak is 2.
     expected = {"frc456": 2}
     assert call_calc_streaks(data) == expected
@@ -92,9 +88,7 @@ def test_longer_streak_bridging_covid_gap():
 
 
 def test_streak_broken_before_covid_gap_then_win_in_2022():
-    data = {
-        "frc666": [2016, 2017, 2022]
-    }
+    data = {"frc666": [2016, 2017, 2022]}
     # Streak from 2016-2017 (length 2). 2022 is a new streak of 1. The longest streak is 2.
     expected = {"frc666": 2}
     assert call_calc_streaks(data) == expected
