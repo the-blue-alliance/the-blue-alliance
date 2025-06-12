@@ -1,5 +1,5 @@
 service: pwa
-runtime: nodejs20
+runtime: nodejs22
 
 instance_class: F1
 automatic_scaling:

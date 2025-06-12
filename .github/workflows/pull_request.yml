@@ -203,7 +203,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20"
+          node-version: "22.14.0"
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
@@ -221,7 +221,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20"
+          node-version: "22.14.0"
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
@@ -235,7 +235,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20"
+          node-version: "22.14.0"
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
@@ -278,7 +278,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20"
+          node-version: "22.14.0"
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
@@ -298,7 +298,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20.16.0"
+          node-version: "22.14.0"
           cache: "npm"
 
       - name: Install Dependencies
@@ -325,7 +325,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20.16.0"
+          node-version: "22.14.0"
 
       - name: Install Dependencies
         working-directory: pwa
