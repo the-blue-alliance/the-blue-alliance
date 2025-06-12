@@ -638,7 +638,9 @@ class InsightsHelper(object):
                 roundedScore = margin - int(margin % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_winning_margin_distribution_normalized:
-                    elim_winning_margin_distribution_normalized[roundedScore] += contribution
+                    elim_winning_margin_distribution_normalized[
+                        roundedScore
+                    ] += contribution
                 else:
                     elim_winning_margin_distribution_normalized[roundedScore] = (
                         contribution
@@ -923,7 +925,9 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculate_einstein_streaks(cls, division_winners_map: Dict[str, List[int]]) -> Dict[str, int]:
+    def _calculate_einstein_streaks(
+        cls, division_winners_map: Dict[str, List[int]]
+    ) -> Dict[str, int]:
 
         einstein_streak_output = defaultdict(int)
         for team_key, unsorted_years_list in division_winners_map.items():
@@ -944,8 +948,9 @@ class InsightsHelper(object):
                 current_year = years[i]
                 # A streak continues if current_year is last_year_in_streak + 1
                 # OR if last_year_in_streak was 2019 and current_year is 2022 (COVID gap)
-                is_consecutive = (current_year == last_year_in_streak + 1) or \
-                                 (last_year_in_streak == 2019 and current_year == 2022)
+                is_consecutive = (current_year == last_year_in_streak + 1) or (
+                    last_year_in_streak == 2019 and current_year == 2022
+                )
 
                 # Streak broken, current_streak for the new potential streak starts at 1
                 current_streak = current_streak + 1 if is_consecutive else 1
