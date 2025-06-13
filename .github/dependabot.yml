@@ -29,6 +29,9 @@ updates:
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: "@sentry/*"
+  - dependency-name: "@types/node"
+    versions:
+    - ">=23.0.0"
   labels:
     - PWA
   groups:
