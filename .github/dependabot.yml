@@ -88,6 +88,15 @@ updates:
         - "react-dom"
         - "@types/react"
         - "@types/react-dom"
+    forms-and-validation:
+      patterns:
+        - "react-hook-form"
+        - "@hookform/resolvers"
+        - "zod"
+    firebase:
+      patterns:
+        - "firebase"
+        - "firebase-admin"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
