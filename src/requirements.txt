@@ -8,7 +8,7 @@ google-api-core==2.24.2
 google-api-python-client==2.169.0
 google-cloud-logging==3.12.1
 google-cloud-storage==3.1.0
-grpcio==1.72.1
+grpcio==1.73.0
 Jinja2==3.1.6
 MarkupSafe==3.0.2
 numpy==2.1.2
