@@ -8,6 +8,11 @@ export default defineConfig({
     lint: 'eslint',
   },
   plugins: [
+    {
+      name: '@hey-api/typescript',
+      enums: 'typescript',
+      exportInlineEnums: true,
+    },
     '@hey-api/client-fetch',
     '@tanstack/react-query',
     'zod',

@@ -426,6 +426,26 @@ export type TeamEventStatusAllianceBackup = null | {
 };
 
 /**
+ * The highest playoff level the team reached.
+ */
+export enum Level {
+  QM = 'qm',
+  EF = 'ef',
+  QF = 'qf',
+  SF = 'sf',
+  F = 'f',
+}
+
+/**
+ * Current competition status for the playoffs.
+ */
+export enum Status {
+  WON = 'won',
+  ELIMINATED = 'eliminated',
+  PLAYING = 'playing',
+}
+
+/**
  * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
  */
 export type TeamEventStatusPlayoff = null | {
@@ -995,6 +1015,26 @@ export type EventPredictions = {
   [key: string]: unknown;
 };
 
+/**
+ * The competition level the match was played at.
+ */
+export enum CompLevel {
+  QM = 'qm',
+  EF = 'ef',
+  QF = 'qf',
+  SF = 'sf',
+  F = 'f',
+}
+
+/**
+ * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
+ */
+export enum WinningAlliance {
+  RED = 'red',
+  BLUE = 'blue',
+  '' = '',
+}
+
 export type MatchSimple = {
   /**
    * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
@@ -1040,6 +1080,26 @@ export type MatchSimple = {
    */
   actual_time: number | null;
 };
+
+/**
+ * The competition level the match was played at.
+ */
+export enum CompLevel {
+  QM = 'qm',
+  EF = 'ef',
+  QF = 'qf',
+  SF = 'sf',
+  F = 'f',
+}
+
+/**
+ * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
+ */
+export enum WinningAlliance {
+  RED = 'red',
+  BLUE = 'blue',
+  '' = '',
+}
 
 export type Match = {
   /**
@@ -1171,6 +1231,12 @@ export type ZebraTeam = {
   ys: Array<number>;
 };
 
+export enum Coopertition {
+  NONE = 'None',
+  UNKNOWN = 'Unknown',
+  STACK = 'Stack',
+}
+
 /**
  * See the 2015 FMS API documentation for a description of each value
  */
@@ -1215,6 +1281,24 @@ export type MatchScoreBreakdown2016 = {
   blue: MatchScoreBreakdown2016Alliance;
   red: MatchScoreBreakdown2016Alliance;
 };
+
+export enum Robot1Auto {
+  CROSSED = 'Crossed',
+  REACHED = 'Reached',
+  NONE = 'None',
+}
+
+export enum Robot2Auto {
+  CROSSED = 'Crossed',
+  REACHED = 'Reached',
+  NONE = 'None',
+}
+
+export enum Robot3Auto {
+  CROSSED = 'Crossed',
+  REACHED = 'Reached',
+  NONE = 'None',
+}
 
 export type MatchScoreBreakdown2016Alliance = {
   autoPoints?: number;
@@ -1264,6 +1348,24 @@ export type MatchScoreBreakdown2017 = {
   blue: MatchScoreBreakdown2017Alliance;
   red: MatchScoreBreakdown2017Alliance;
 };
+
+export enum Robot1Auto {
+  UNKNOWN = 'Unknown',
+  MOBILITY = 'Mobility',
+  NONE = 'None',
+}
+
+export enum Robot2Auto {
+  UNKNOWN = 'Unknown',
+  MOBILITY = 'Mobility',
+  NONE = 'None',
+}
+
+export enum Robot3Auto {
+  UNKNOWN = 'Unknown',
+  MOBILITY = 'Mobility',
+  NONE = 'None',
+}
 
 export type MatchScoreBreakdown2017Alliance = {
   autoPoints?: number;
@@ -1602,6 +1704,45 @@ export type MatchScoreBreakdown2022 = {
   red: MatchScoreBreakdown2022Alliance;
 };
 
+export enum TaxiRobot1 {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum EndgameRobot1 {
+  TRAVERSAL = 'Traversal',
+  HIGH = 'High',
+  MID = 'Mid',
+  LOW = 'Low',
+  NONE = 'None',
+}
+
+export enum TaxiRobot2 {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum EndgameRobot2 {
+  TRAVERSAL = 'Traversal',
+  HIGH = 'High',
+  MID = 'Mid',
+  LOW = 'Low',
+  NONE = 'None',
+}
+
+export enum TaxiRobot3 {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum EndgameRobot3 {
+  TRAVERSAL = 'Traversal',
+  HIGH = 'High',
+  MID = 'Mid',
+  LOW = 'Low',
+  NONE = 'None',
+}
+
 export type MatchScoreBreakdown2022Alliance = {
   taxiRobot1?: 'Yes' | 'No';
   endgameRobot1?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
@@ -1652,6 +1793,70 @@ export type MatchScoreBreakdown2023 = {
   blue: MatchScoreBreakdown2023Alliance;
   red: MatchScoreBreakdown2023Alliance;
 };
+
+export enum AutoBridgeState {
+  NOT_LEVEL = 'NotLevel',
+  LEVEL = 'Level',
+}
+
+export enum AutoChargeStationRobot1 {
+  NONE = 'None',
+  DOCKED = 'Docked',
+}
+
+export enum AutoChargeStationRobot2 {
+  NONE = 'None',
+  DOCKED = 'Docked',
+}
+
+export enum AutoChargeStationRobot3 {
+  NONE = 'None',
+  DOCKED = 'Docked',
+}
+
+export enum MobilityRobot1 {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum MobilityRobot2 {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum MobilityRobot3 {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum EndGameBridgeState {
+  NOT_LEVEL = 'NotLevel',
+  LEVEL = 'Level',
+}
+
+export enum EndGameChargeStationRobot1 {
+  NONE = 'None',
+  DOCKED = 'Docked',
+  PARK = 'Park',
+}
+
+export enum EndGameChargeStationRobot2 {
+  NONE = 'None',
+  DOCKED = 'Docked',
+  PARK = 'Park',
+}
+
+export enum EndGameChargeStationRobot3 {
+  NONE = 'None',
+  DOCKED = 'Docked',
+  PARK = 'Park',
+}
+
+export enum Row {
+  BOTTOM = 'Bottom',
+  MID = 'Mid',
+  TOP = 'Top',
+}
 
 export type MatchScoreBreakdown2023Alliance = {
   activationBonusAchieved?: boolean;
@@ -1775,6 +1980,42 @@ export type MatchScoreBreakdown2025 = {
   blue: MatchScoreBreakdown2025Alliance;
   red: MatchScoreBreakdown2025Alliance;
 };
+
+export enum AutoLineRobot1 {
+  NO = 'No',
+  YES = 'Yes',
+}
+
+export enum AutoLineRobot2 {
+  NO = 'No',
+  YES = 'Yes',
+}
+
+export enum AutoLineRobot3 {
+  NO = 'No',
+  YES = 'Yes',
+}
+
+export enum EndGameRobot1 {
+  NONE = 'None',
+  PARKED = 'Parked',
+  SHALLOW_CAGE = 'ShallowCage',
+  DEEP_CAGE = 'DeepCage',
+}
+
+export enum EndGameRobot2 {
+  NONE = 'None',
+  PARKED = 'Parked',
+  SHALLOW_CAGE = 'ShallowCage',
+  DEEP_CAGE = 'DeepCage',
+}
+
+export enum EndGameRobot3 {
+  NONE = 'None',
+  PARKED = 'Parked',
+  SHALLOW_CAGE = 'ShallowCage',
+  DEEP_CAGE = 'DeepCage',
+}
 
 export type MatchScoreBreakdown2025Alliance = {
   adjustPoints?: number;
@@ -1923,6 +2164,27 @@ export type MatchScoreBreakdown2025Alliance = {
   totalPoints?: number;
   wallAlgaeCount?: number;
 };
+
+/**
+ * String type of the media element.
+ */
+export enum Type {
+  YOUTUBE = 'youtube',
+  CDPHOTOTHREAD = 'cdphotothread',
+  IMGUR = 'imgur',
+  FACEBOOK_PROFILE = 'facebook-profile',
+  YOUTUBE_CHANNEL = 'youtube-channel',
+  TWITTER_PROFILE = 'twitter-profile',
+  GITHUB_PROFILE = 'github-profile',
+  INSTAGRAM_PROFILE = 'instagram-profile',
+  PERISCOPE_PROFILE = 'periscope-profile',
+  GITLAB_PROFILE = 'gitlab-profile',
+  GRABCAD = 'grabcad',
+  INSTAGRAM_IMAGE = 'instagram-image',
+  EXTERNAL_LINK = 'external-link',
+  AVATAR = 'avatar',
+  ONSHAPE = 'onshape',
+}
 
 /**
  * The `Media` object contains a reference for most any media associated with a team or event on TBA.
@@ -2178,6 +2440,14 @@ export type DistrictAdvancement = {
   cmp: boolean;
 };
 
+export enum CmpStatus {
+  NOT_INVITED = 'NotInvited',
+  PRE_QUALIFIED = 'PreQualified',
+  EVENT_QUALIFIED = 'EventQualified',
+  POOL_QUALIFIED = 'PoolQualified',
+  DECLINED = 'Declined',
+}
+
 /**
  * Information about how a regional team qualified for FIRST Championship.
  */
@@ -2279,6 +2549,24 @@ export type WltRecord = {
   ties: number;
 };
 
+/**
+ * Type of webcast, typically descriptive of the streaming provider.
+ */
+export enum Type {
+  YOUTUBE = 'youtube',
+  TWITCH = 'twitch',
+  USTREAM = 'ustream',
+  IFRAME = 'iframe',
+  HTML5 = 'html5',
+  RTMP = 'rtmp',
+  LIVESTREAM = 'livestream',
+  DIRECT_LINK = 'direct_link',
+  MMS = 'mms',
+  JUSTIN = 'justin',
+  STEMTV = 'stemtv',
+  DACAST = 'dacast',
+}
+
 export type Webcast = {
   /**
    * Type of webcast, typically descriptive of the streaming provider.
@@ -2309,6 +2597,15 @@ export type Webcast = {
    */
   file?: string | null;
 };
+
+/**
+ * What type of key is used in the rankings; either 'team', 'event', or 'match'.
+ */
+export enum KeyType {
+  TEAM = 'team',
+  EVENT = 'event',
+  MATCH = 'match',
+}
 
 export type LeaderboardInsight = {
   data: {
