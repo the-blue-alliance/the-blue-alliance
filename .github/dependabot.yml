@@ -29,6 +29,9 @@ updates:
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: "@sentry/*"
+  - dependency-name: "@types/node"
+    versions:
+    - ">=23.0.0"
   labels:
     - PWA
   groups:
@@ -88,6 +91,15 @@ updates:
         - "react-dom"
         - "@types/react"
         - "@types/react-dom"
+    forms-and-validation:
+      patterns:
+        - "react-hook-form"
+        - "@hookform/resolvers"
+        - "zod"
+    firebase:
+      patterns:
+        - "firebase"
+        - "firebase-admin"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
