@@ -1,6 +1,6 @@
 import fuzzysort from 'fuzzysort';
 
-import { SearchIndex } from '~/api/tba';
+import { SearchIndex } from '~/api/tba/read';
 import { SearchDataFilterer } from '~/lib/search/api';
 
 type SearchableTeam = SearchIndex['teams'][number];

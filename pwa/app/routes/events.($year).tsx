@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useLoaderData, useNavigate } from 'react-router';
 
-import { Event, getEventsByYear } from '~/api/tba';
+import { Event, getEventsByYear } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
 import {
   Select,

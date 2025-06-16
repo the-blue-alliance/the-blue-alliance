@@ -1,4 +1,4 @@
-import { Event, Match, MatchAlliance, WltRecord } from '~/api/tba';
+import { Event, Match, MatchAlliance, WltRecord } from '~/api/tba/read';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { median } from '~/lib/utils';
 

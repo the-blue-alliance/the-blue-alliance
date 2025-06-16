@@ -4,13 +4,14 @@ import {
   type UseMutationOptions,
   queryOptions,
 } from '@tanstack/react-query';
-import { client as _heyApiClient } from 'app/api/tba/client/client.gen';
+
+import { client as _heyApiClient } from '../client.gen';
 import {
   type Options,
   listFavorites,
   listSubscriptions,
   setModelPreferences,
-} from 'app/api/tba/client/sdk.gen';
+} from '../sdk.gen';
 import type {
   ListFavoritesData,
   ListFavoritesResponse,
@@ -18,7 +19,7 @@ import type {
   ListSubscriptionsResponse,
   SetModelPreferencesData,
   SetModelPreferencesResponse,
-} from 'app/api/tba/client/types.gen';
+} from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
   Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {

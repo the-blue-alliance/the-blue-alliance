@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 
-import { LeaderboardInsight } from '~/api/tba';
+import { LeaderboardInsight } from '~/api/tba/read';
 import { TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {

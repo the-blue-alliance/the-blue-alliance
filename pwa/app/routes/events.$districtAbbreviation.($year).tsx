@@ -11,7 +11,7 @@ import {
   getDistrictHistory,
   getDistrictRankings,
   getDistrictTeams,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { DataTable } from '~/components/tba/dataTable';
 import { EventLink, LocationLink, TeamLink } from '~/components/tba/links';

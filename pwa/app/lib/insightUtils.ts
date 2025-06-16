@@ -1,6 +1,6 @@
 import { groupBy, map } from 'lodash-es';
 
-import { LeaderboardInsight, NotablesInsight } from '~/api/tba';
+import { LeaderboardInsight, NotablesInsight } from '~/api/tba/read';
 
 export const LEADERBOARD_NAME_TO_DISPLAY_NAME: Record<string, string> = {
   typed_leaderboard_blue_banners: 'Most Blue Banners',

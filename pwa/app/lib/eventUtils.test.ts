@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { Event } from '~/api/tba';
+import { Event } from '~/api/tba/read';
 import {
   getEventDateString,
   getEventWeekString,

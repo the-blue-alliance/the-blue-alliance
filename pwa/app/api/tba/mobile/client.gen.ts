@@ -4,8 +4,8 @@ import {
   type ClientOptions as DefaultClientOptions,
   createClient,
   createConfig,
-} from '@hey-api/client-fetch';
-import type { ClientOptions } from 'app/api/tba/types.gen';
+} from './client';
+import type { ClientOptions } from './types.gen';
 
 /**
  * The `createClientConfig()` function will be called on client initialization
@@ -20,8 +20,4 @@ export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> =
     override?: Config<DefaultClientOptions & T>,
   ) => Config<Required<DefaultClientOptions> & T>;
 
-export const client = createClient(
-  createConfig<ClientOptions>({
-    baseUrl: 'https://www.thebluealliance.com/api/v3',
-  }),
-);
+export const client = createClient(createConfig<ClientOptions>());

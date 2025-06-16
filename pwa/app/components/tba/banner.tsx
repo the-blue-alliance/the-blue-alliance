@@ -1,4 +1,4 @@
-import { Award, Event } from '~/api/tba';
+import { Award, Event } from '~/api/tba/read';
 import { getNormalizedName } from '~/lib/api/AwardType';
 import { cn } from '~/lib/utils';
 

@@ -6,7 +6,7 @@ import {
   getTeamHistory,
   getTeamSocialMedia,
   getTeamYearsParticipated,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { AwardBanner } from '~/components/tba/banner';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
