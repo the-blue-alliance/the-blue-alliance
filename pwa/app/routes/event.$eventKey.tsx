@@ -148,6 +148,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `Event Not Found - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `Videos and match results for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     { title: `${data.event.name} (${data.event.year}) - The Blue Alliance` },
     {
