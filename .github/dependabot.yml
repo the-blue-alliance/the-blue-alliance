@@ -27,6 +27,11 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@sentry/*"
+  - dependency-name: "@types/node"
+    versions:
+    - ">=23.0.0"
   labels:
     - PWA
   groups:
@@ -41,10 +46,60 @@ updates:
     radix-ui:
       patterns:
         - "@radix-ui/*"
-    vitest:
+    vite:
       patterns:
+        - "vite"
+        - "vite-tsconfig-paths"
         - "vitest"
         - "@vitest/coverage-v8"
+        - "@julr/vite-plugin-validate-env"
+    linting:
+      patterns:
+        - "@eslint/*"
+        - "eslint"
+        - "eslint-config-prettier"
+        - "eslint-import-resolver-typescript"
+        - "eslint-plugin-import"
+        - "eslint-plugin-jsx-a11y"
+        - "eslint-plugin-no-relative-import-paths"
+        - "eslint-plugin-react"
+        - "eslint-plugin-react-hooks"
+        - "globals"
+        - "typescript-eslint"
+        - "@typescript-eslint/*"
+        - "prettier"
+        - "prettier-plugin-classnames"
+        - "prettier-plugin-merge"
+        - "prettier-plugin-tailwindcss"
+    sentry:
+      patterns:
+        - "@sentry/*"
+    tailwind:
+      patterns:
+        - "@tailwindcss/*"
+        - "tailwindcss"
+        - "tailwind-merge"
+        - "tw-animate-css"
+    icons:
+      patterns:
+        - "@iconify/json"
+        - "lucide-react"
+        - "unplugin-icons"
+    react:
+      patterns:
+        - "react"
+        - "react-dom"
+        - "@types/react"
+        - "@types/react-dom"
+    forms-and-validation:
+      patterns:
+        - "react-hook-form"
+        - "@hookform/resolvers"
+        - "zod"
+    firebase:
+      patterns:
+        - "firebase"
+        - "firebase-admin"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

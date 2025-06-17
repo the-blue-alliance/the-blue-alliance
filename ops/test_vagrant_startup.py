@@ -49,4 +49,8 @@ while time.time() - start_time < TIME_LIMIT:
         sys.exit(0)
 
 print("Fail: Didn't start up in time")
+container_logs = subprocess.run(
+    ["vagrant", "ssh", "--", "-t", "cat /var/log/tba.log"], stdout=subprocess.PIPE
+)
+print(f"Container Logs:\n{container_logs.stdout.decode()}")
 sys.exit(1)

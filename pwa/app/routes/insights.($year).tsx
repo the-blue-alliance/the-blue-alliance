@@ -6,7 +6,7 @@ import {
   NotablesInsight,
   getInsightsLeaderboardsYear,
   getInsightsNotablesYear,
-} from '~/api/v3';
+} from '~/api/tba';
 import { TitledCard } from '~/components/tba/cards';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { EventLink, TeamLink } from '~/components/tba/links';
@@ -43,11 +43,11 @@ async function loadData(params: Route.LoaderArgs['params']) {
   }
 
   const [leaderboards, notables] = await Promise.all([
-    getInsightsLeaderboardsYear({ year: numericYear }),
-    getInsightsNotablesYear({ year: numericYear }),
+    getInsightsLeaderboardsYear({ path: { year: numericYear } }),
+    getInsightsNotablesYear({ path: { year: numericYear } }),
   ]);
 
-  if (leaderboards.status !== 200 || notables.status !== 200) {
+  if (leaderboards.data === undefined || notables.data === undefined) {
     throw new Response(null, {
       status: 500,
     });

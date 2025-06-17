@@ -7,7 +7,7 @@ import LogosInstagramIcon from '~icons/logos/instagram-icon';
 import LogosYoutubeIcon from '~icons/logos/youtube-icon';
 import SimpleIconsX from '~icons/simple-icons/x';
 
-import { Media } from '~/api/v3';
+import { Media } from '~/api/tba';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { badgeVariants } from '~/components/ui/badge';
 import { cn } from '~/lib/utils';

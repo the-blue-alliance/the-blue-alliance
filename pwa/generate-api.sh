@@ -1,8 +1,19 @@
 #!/bin/bash
-npx oazapfts ../src/backend/web/static/swagger/api_v3.json --argumentStyle=object > app/api/v3.ts
-sed -i 's/award_type: number/award_type: AwardType/g' app/api/v3.ts
-sed -i 's/event_type: number/event_type: EventType/g' app/api/v3.ts
-sed -i '1i\
-import { AwardType } from '"'"'~/lib/api/AwardType'"'"';\
-import { EventType } from '"'"'~/lib/api/EventType'"'"';' app/api/v3.ts
-npm run format:fix
+npx @hey-api/openapi-ts -f openapi-ts/read.config.ts
+npx @hey-api/openapi-ts -f openapi-ts/client.config.ts
+
+# Define a function to run sed in Docker
+docker_sed() {
+  docker run --rm -v "$PWD":/work -w /work alpine sed -i "$@"
+}
+
+# Replace types using Dockerized sed
+docker_sed 's/award_type: number/award_type: AwardType/g' app/api/tba/types.gen.ts
+docker_sed 's/event_type: number/event_type: EventType/g' app/api/tba/types.gen.ts
+
+docker run --rm -v "$PWD":/work -w /work alpine sh -c \
+  "sed -i '1i\
+import { AwardType } from \"~/lib/api/AwardType\";\
+import { EventType } from \"~/lib/api/EventType\";' app/api/tba/types.gen.ts"
+
+npx prettier --write app/api/tba/

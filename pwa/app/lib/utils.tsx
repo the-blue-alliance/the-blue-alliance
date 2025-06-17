@@ -1,9 +1,10 @@
+import { RequestResult } from '@hey-api/client-fetch';
 import { type ClassValue, clsx } from 'clsx';
 import React from 'react';
 import { Params } from 'react-router';
 import { twMerge } from 'tailwind-merge';
 
-import { WltRecord, getStatus } from '~/api/v3';
+import { WltRecord, getStatus } from '~/api/tba';
 
 // TODO: Generate this from the API
 const VALID_YEARS: number[] = [];
@@ -33,8 +34,8 @@ export async function parseParamsForYearElseDefault(
 ): Promise<number | undefined> {
   if (params.year === undefined) {
     // TODO: Cache this call
-    const status = await getStatus({});
-    return status.status === 200
+    const status = await getStatus();
+    return status.data !== undefined
       ? status.data.current_season
       : new Date().getFullYear();
   }
@@ -66,13 +67,13 @@ export async function parseParamsForTeamPgNumElseDefault(
 export function timestampsAreOnDifferentDays(
   timestamp1: number,
   timestamp2: number,
-  timezone: string,
+  timezone: string | null,
 ): boolean {
   const date1 = new Date(timestamp1 * 1000);
   const date2 = new Date(timestamp2 * 1000);
 
   const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
+    timeZone: timezone ?? 'UTC',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -274,11 +275,29 @@ export async function queryFromAPI<T>(
       status: 404;
     }
   >,
+
 ): Promise<T> {
   const resp = await apiPromise;
-  if (resp.status === 200) {
-    return Promise.resolve(resp.data);
+  if (resp.data !== undefined) {
+    return Promise.resolve(resp.data as T);
   }
 
-  return Promise.reject(new Error(resp.status.toString()));
+  return Promise.reject(new Error(resp.response.status.toString()));
+}
+
+// https://web.archive.org/web/20250409124545/https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
+// Typically used for sorting WLTRecords
+export function confidence(ups: number, downs: number, z = 1.96): number {
+  const n = ups + downs;
+  if (n === 0) {
+    return 0;
+  }
+
+  const phat = ups / n;
+  return (
+    (phat +
+      (z * z) / (2 * n) -
+      z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
+    (1 + (z * z) / n)
+  );
 }

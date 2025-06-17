@@ -199,10 +199,10 @@ def test_only_overall_and_year_are_computed(ndb_stub, test_data_importer):
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
     insights = InsightsLeaderboardTeamHelper.make_insights(2025)
-    assert len(insights) == 8
+    assert len(insights) == 6
 
     insights_2025 = [i for i in insights if i.year == 2025]
-    assert len(insights_2025) == 8
+    assert len(insights_2025) == 6
 
 
 def test_only_official_events_are_included(ndb_stub, test_data_importer):

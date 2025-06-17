@@ -17,7 +17,7 @@ import {
 } from 'recharts/types/component/DefaultTooltipContent';
 
 import { EventColors, TeamWithColor } from '~/api/colors';
-import type { EventCopRs } from '~/api/v3';
+import { EventCoprs } from '~/api/tba';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { ChartContainer } from '~/components/ui/chart';
 import {
@@ -94,7 +94,7 @@ export default function CoprScatterChart({
   coprs,
   colors,
 }: {
-  coprs: EventCopRs;
+  coprs: EventCoprs;
   colors: EventColors;
 }) {
   const [selectedXCopr, setSelectedXCopr] = useState('teleopPoints');

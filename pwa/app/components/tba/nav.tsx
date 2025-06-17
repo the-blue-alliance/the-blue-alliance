@@ -9,6 +9,7 @@ import BiStarFill from '~icons/bi/star-fill';
 import BiThreeDotsVertical from '~icons/bi/three-dots-vertical';
 import IonCalendar from '~icons/ion/calendar';
 
+import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
 import Searchbar from '~/components/tba/searchbar';
 import {
   NavigationMenu,
@@ -24,8 +25,6 @@ import {
 } from '~/components/ui/popover';
 import lamp from '~/images/tba/tba-lamp.svg';
 import { cn } from '~/lib/utils';
-
-import GlobalLoadingProgress from './globalLoadingProgress';
 
 interface MenuItemProps {
   className?: string;

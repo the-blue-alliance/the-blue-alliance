@@ -239,4 +239,37 @@
   </div>
   {% endif %}
 
+  {% if successful_einstein_teamups %}
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>Most Successful Einstein Teamups</h3>
+      <table class="table table-striped table-condensed table-center insights-table">
+        <thead>
+          <tr>
+            <th>Wins</th>
+            <th>Teams</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for number, pairs in successful_einstein_teamups.data %}
+          {% if number > 1 %}
+          <tr>
+            <td>{{number}}</td>
+            <td>
+              {% for pair in pairs %}
+                {% for team in pair %}
+                  <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
+                {% endfor %}
+                {% if not loop.last %}<br>{% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
 {% endblock %}

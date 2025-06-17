@@ -6,7 +6,7 @@ if [ -n "$CI" ]; then
 fi
 
 if ! command -v watchman &>/dev/null; then
-    pyre check
+    pyre --version none check
 else
-    pyre incremental
+    pyre --version none incremental
 fi

@@ -102,15 +102,18 @@ def sort_counter_dict(
     return sorted(temp.items(), key=lambda pair: float(pair[0]), reverse=True)
 
 
-def create_insight(data: Any, name: str, year: int) -> Insight:
+def create_insight(
+    data: Any, name: str, year: int, district_abbreviation: Optional[str] = None
+) -> Insight:
     """
     Create Insight object given data, name, and year
     """
     return Insight(
-        id=Insight.render_key_name(year, name),
+        id=Insight.render_key_name(year, name, district_abbreviation),
         name=name,
         year=year,
         data_json=json.dumps(data),
+        district_abbreviation=district_abbreviation,
     )
 
 

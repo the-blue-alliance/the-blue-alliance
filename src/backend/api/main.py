@@ -16,10 +16,12 @@ from backend.api.handlers.client_api import (
     update_model_preferences,
 )
 from backend.api.handlers.district import (
+    dcmp_history,
     district_advancement,
     district_awards,
     district_events,
     district_history,
+    district_insights,
     district_list_year,
     district_rankings,
     district_teams,
@@ -148,6 +150,14 @@ api_v3.add_url_rule(
 )
 api_v3.add_url_rule(
     "/district/<string:district_key>/advancement", view_func=district_advancement
+)
+api_v3.add_url_rule(
+    "/district/<string:district_abbreviation>/dcmp_history",
+    view_func=dcmp_history,
+)
+api_v3.add_url_rule(
+    "/district/<string:district_abbreviation>/insights",
+    view_func=district_insights,
 )
 
 # District List

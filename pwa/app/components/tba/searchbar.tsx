@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { SearchIndex } from '~/api/v3';
+import { SearchIndex } from '~/api/tba';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import {
   Command,
@@ -30,7 +30,7 @@ export default function Searchbar() {
   useEffect(() => {
     provider
       .provide()
-      .then((data) => {
+      .then((data: SearchIndex) => {
         setFullSearchData(data);
       })
       .catch(() => {

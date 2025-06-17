@@ -1,5 +1,7 @@
 import * as Sentry from '@sentry/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Nav } from 'app/components/tba/nav';
+import 'app/tailwind.css';
 import {
   Links,
   Meta,
@@ -12,15 +14,12 @@ import {
   useRouteError,
 } from 'react-router';
 
-import * as api from '~/api/v3';
+import { client } from '~/api/tba/client.gen';
 
-import { Nav } from './components/tba/nav';
-import './tailwind.css';
-
-api.defaults.baseUrl = 'https://www.thebluealliance.com/api/v3/';
-api.defaults.headers = {
-  'X-TBA-Auth-Key': import.meta.env.VITE_TBA_API_READ_KEY,
-};
+client.interceptors.request.use((request) => {
+  request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
+  return request;
+});
 
 // Disabled on 11/12/24 due to clone() issues:
 // https://the-blue-alliance.sentry.io/issues/6042521923

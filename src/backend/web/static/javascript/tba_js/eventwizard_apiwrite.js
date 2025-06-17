@@ -49,7 +49,7 @@ $('#teams-ok').click(function(){
     var teams = $('#team_list').val().split("\n");
     for(var i=0; i<teams.length; i++){
         var teamNum = parseInt(teams[i]);
-        if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999){
+        if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 99999){
             alert("Invalid team "+teams[i]);
             return true;
         }
@@ -223,14 +223,13 @@ $('#results_file').change(function(){
 
             var compLevel, setNumber, matchNumber;
             var matchKey;
-            var has_octo = $('input[name="alliance-count-results"]:checked').val() == "16";
             if (match['Match'].includes("Qualification")) {
                 matchNumber = parseInt(match['Match'].split(" ")[1]);
                 compLevel = "qm";
                 setNumber = 1;
                 matchKey = "qm" + matchNumber;
             } else {
-                var levelSetAndMatch = playoffTypeMatchAndSet(has_octo, match['Match'], last_match_type);
+                var levelSetAndMatch = playoffTypeMatchAndSet(good_matches);
                 compLevel = levelSetAndMatch[0];
                 setNumber = levelSetAndMatch[1];
                 matchNumber = levelSetAndMatch[2];

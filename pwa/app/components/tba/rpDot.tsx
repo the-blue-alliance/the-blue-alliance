@@ -1,4 +1,4 @@
-import { Match } from '~/api/v3';
+import { Match } from '~/api/tba';
 import {
   Tooltip,
   TooltipContent,

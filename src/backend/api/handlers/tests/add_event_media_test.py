@@ -10,6 +10,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
+from backend.common.models.keys import EventKey
 from backend.common.models.media import Media
 
 AUTH_ID = "tEsT_id_0"
@@ -27,11 +28,21 @@ def setup_event(remap_teams: Optional[Dict[str, str]] = None) -> None:
     ).put()
 
 
-def setup_auth(access_types: List[AuthType]) -> None:
+def setup_cmp() -> None:
+    Event(
+        id="2014cur",
+        year=2014,
+        event_short="cur",
+        event_type_enum=EventType.CMP_DIVISION,
+        official=True,
+    ).put()
+
+
+def setup_auth(access_types: List[AuthType], event_key: EventKey = "2014casj") -> None:
     ApiAuthAccess(
         id=AUTH_ID,
         secret=AUTH_SECRET,
-        event_list=[ndb.Key(Event, "2014casj")],
+        event_list=[ndb.Key(Event, event_key)],
         auth_types_enum=access_types,
     ).put()
 
@@ -105,6 +116,30 @@ def test_add_media(api_client: Client) -> None:
 
     medias: List[Media] = Media.query(
         Media.references == ndb.Key(Event, "2014casj")
+    ).fetch()
+    assert len(medias) == 1
+
+    media = medias[0]
+    assert media.foreign_key == "abc123"
+    assert media.year == 2014
+    assert media.media_type_enum == MediaType.YOUTUBE_VIDEO
+
+
+def test_add_media_cmp_remap(api_client: Client) -> None:
+    setup_cmp()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO], event_key="2014cur")
+
+    path = "/api/trusted/v1/event/2014curie/media/add"
+    request_body = json.dumps(["abc123"])
+    resp = api_client.post(
+        path,
+        headers=get_auth_headers(path, request_body),
+        data=request_body,
+    )
+    assert resp.status_code == 200
+
+    medias: List[Media] = Media.query(
+        Media.references == ndb.Key(Event, "2014cur")
     ).fetch()
     assert len(medias) == 1
 

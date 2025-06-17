@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.2/.schema/devbox.schema.json",
+  "packages": [
+    "jujutsu@latest",
+    "git@latest",
+    "gh@latest",
+    "act@latest",
+    "nodejs@22.14"
+  ],
+  "shell": {
+    "init_hook": [],
+    "scripts": {}
+  }
+}

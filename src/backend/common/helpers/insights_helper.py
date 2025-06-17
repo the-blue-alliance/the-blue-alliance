@@ -15,6 +15,7 @@ from backend.common.consts.event_type import (
     EventType,
     SEASON_EVENT_TYPES,
 )
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.futures import TypedFuture
 from backend.common.helpers.event_helper import (
     EventHelper,
@@ -22,6 +23,7 @@ from backend.common.helpers.event_helper import (
     PRESEASON_EVENTS_LABEL,
 )
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
+from backend.common.helpers.insights_districts_helper import InsightsDistrictsHelper
 from backend.common.helpers.insights_helper_utils import (
     create_insight,
     sort_counter_dict,
@@ -105,6 +107,9 @@ class InsightsHelper(object):
         insights += self._calculateChampionshipStats(award_futures, year)
         insights += self._calculateRegionalStats(award_futures, year)
         insights += self._calculateSuccessfulElimTeamups(award_futures, year)
+        insights += self._calculateSuccessfulElimTeamups(
+            award_futures, year, isEinstein=True
+        )
 
         return insights
 
@@ -193,6 +198,30 @@ class InsightsHelper(object):
 
         return [
             create_insight(data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year)
+        ]
+
+    @classmethod
+    def doDistrictInsights(cls) -> List[Insight]:
+        """
+        Calculate district insights for a given year. Returns a list of Insights.
+        """
+
+        return [
+            create_insight(
+                data=InsightsDistrictsHelper.make_insight_team_data(abbr),
+                name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+                year=0,
+                district_abbreviation=abbr,
+            )
+            for abbr in RenamedDistricts.get_latest_codes()
+        ] + [
+            create_insight(
+                data=InsightsDistrictsHelper.make_insight_district_data(abbr),
+                name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+                year=0,
+                district_abbreviation=abbr,
+            )
+            for abbr in RenamedDistricts.get_latest_codes()
         ]
 
     @classmethod
@@ -835,7 +864,10 @@ class InsightsHelper(object):
 
     @classmethod
     def _calculateSuccessfulElimTeamups(
-        self, award_futures: List[TypedFuture[Award]], year: Year
+        self,
+        award_futures: List[TypedFuture[Award]],
+        year: Year,
+        isEinstein: bool = False,
     ) -> List[Insight]:
         """
         Returns an Insight where the data is a list of list of teams that won an event together
@@ -843,7 +875,9 @@ class InsightsHelper(object):
         successful_elim_teamups = []
         for award_future in award_futures:
             award = award_future.get_result()
-            if award.award_type_enum == AwardType.WINNER:
+            if award.award_type_enum == AwardType.WINNER and (
+                not isEinstein or award.event_type_enum == EventType.CMP_FINALS
+            ):
                 successful_elim_teamups.append(
                     [team_key.id() for team_key in award.team_list]
                 )
@@ -852,7 +886,13 @@ class InsightsHelper(object):
             return [
                 create_insight(
                     successful_elim_teamups,
-                    Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
+                    Insight.INSIGHT_NAMES[
+                        (
+                            Insight.SUCCESSFUL_EINSTEIN_TEAMUPS
+                            if isEinstein
+                            else Insight.SUCCESSFUL_ELIM_TEAMUPS
+                        )
+                    ],
                     year,
                 )
             ]
@@ -883,6 +923,43 @@ class InsightsHelper(object):
             )
 
         return insights
+
+    @classmethod
+    def _calculate_einstein_streaks(
+        cls, division_winners_map: Dict[str, List[int]]
+    ) -> Dict[str, int]:
+
+        einstein_streak_output = defaultdict(int)
+        for team_key, unsorted_years_list in division_winners_map.items():
+            einstein_streak_output[team_key] = 0
+
+            years = sorted(unsorted_years_list)
+            if not years:
+                continue
+
+            # Initialize streaks
+            # Every team with at least one year has a max streak of at least 1
+            max_streak_for_team = 1
+            current_streak = 1
+            last_year_in_streak = years[0]
+
+            # Iterate starting from the second year
+            for i in range(1, len(years)):
+                current_year = years[i]
+                # A streak continues if current_year is last_year_in_streak + 1
+                # OR if last_year_in_streak was 2019 and current_year is 2022 (COVID gap)
+                is_consecutive = (current_year == last_year_in_streak + 1) or (
+                    last_year_in_streak == 2019 and current_year == 2022
+                )
+
+                # Streak broken, current_streak for the new potential streak starts at 1
+                current_streak = current_streak + 1 if is_consecutive else 1
+                max_streak_for_team = max(current_streak, max_streak_for_team)
+                last_year_in_streak = current_year
+
+            einstein_streak_output[team_key] = max_streak_for_team
+
+        return dict(einstein_streak_output)
 
     @classmethod
     def doOverallAwardInsights(self) -> List[Insight]:
@@ -938,18 +1015,7 @@ class InsightsHelper(object):
             for team in insight.data:
                 division_winners[team].append(insight.year)
 
-        einstein_streak = defaultdict(int)
-        for team, years in division_winners.items():
-            streak = 1
-            last_year = years[0]
-            for year in years[1:]:
-                if year == last_year + 1:
-                    streak += 1
-                else:
-                    streak = 1
-                # There was no championship in 2020 and 2021
-                last_year = 2021 if year == 2019 else year
-            einstein_streak[team] = streak
+        einstein_streak = self._calculate_einstein_streaks(division_winners)
 
         year_successful_elim_teamups = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
@@ -966,6 +1032,23 @@ class InsightsHelper(object):
             successful_elim_teamups_sorted[num_wins].append(sorted_teams)
         successful_elim_teamups_sorted = sorted(
             successful_elim_teamups_sorted.items(), key=lambda x: -x[0]
+        )
+
+        year_successful_einstein_teamups = Insight.query(
+            Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_EINSTEIN_TEAMUPS],
+            Insight.year != 0,
+        ).fetch(1000)
+        successful_einstein_teamups = defaultdict(int)
+        for insight in year_successful_einstein_teamups:
+            for teams in insight.data:
+                for pairs in itertools.combinations(teams, 2):
+                    successful_einstein_teamups[tuple(sorted(pairs))] += 1
+        successful_einstein_teamups_sorted = defaultdict(list)
+        for teams, num_wins in successful_einstein_teamups.items():
+            sorted_teams = sorted(teams, key=lambda team_key: int(team_key[3:]))
+            successful_einstein_teamups_sorted[num_wins].append(sorted_teams)
+        successful_einstein_teamups_sorted = sorted(
+            successful_einstein_teamups_sorted.items(), key=lambda x: -x[0]
         )
 
         # Sorting
@@ -1026,6 +1109,15 @@ class InsightsHelper(object):
                 create_insight(
                     successful_elim_teamups_sorted,
                     Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
+                    0,
+                )
+            )
+
+        if year_successful_einstein_teamups:
+            insights.append(
+                create_insight(
+                    successful_einstein_teamups_sorted,
+                    Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_EINSTEIN_TEAMUPS],
                     0,
                 )
             )

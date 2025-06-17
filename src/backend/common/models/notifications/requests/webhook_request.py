@@ -1,6 +1,6 @@
 import json
 
-import requests
+from google.appengine.api import urlfetch
 
 from backend.common.models.notifications.requests.request import Request
 
@@ -34,7 +34,7 @@ class WebhookRequest(Request):
             str(self.notification), self.url
         )
 
-    def send(self) -> bool:
+    def send(self) -> tuple[bool, bool]:
         """Attempt to send the notification."""
         # Build the request
         headers = {
@@ -49,19 +49,18 @@ class WebhookRequest(Request):
 
         # TODO: Consider more useful way to surface error messages
         # https://github.com/the-blue-alliance/the-blue-alliance/issues/2576
-        valid_url = True
+        success, valid_url = True, True
 
         try:
-            response = requests.post(self.url, data=payload, headers=headers)
-            if response.status_code == requests.codes.ok:
-                self.defer_track_notification(1)
-            elif response.status_code == 404:
+            response = urlfetch.fetch(
+                self.url, payload=payload, method=urlfetch.POST, headers=headers
+            )
+            if response.status_code != 200:
                 valid_url = False
         except Exception:
-            # logging.error(f"Failed to send webhook request: {e}")
-            pass
+            success = False
 
-        return valid_url
+        return success, valid_url
 
     def _json_string(self) -> str:
         """JSON dict representation of an WebhookRequest object.

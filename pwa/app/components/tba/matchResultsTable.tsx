@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 
 import PlayCircle from '~icons/bi/play-circle';
 
-import { Event, Match, Team } from '~/api/v3';
+import { Event, Match, Team } from '~/api/tba';
 import { TeamLink } from '~/components/tba/links';
 import RpDots from '~/components/tba/rpDot';
 import {
@@ -125,6 +125,7 @@ interface MatchResultsTableProps {
   matches: Match[];
   team?: Team;
   event: Event;
+  showEvent?: boolean;
 }
 
 export default function MatchResultsTable(props: MatchResultsTableProps) {
@@ -199,10 +200,11 @@ export default function MatchResultsTable(props: MatchResultsTableProps) {
 }
 
 // todo: add support for specific-team underlines
-function MatchResultsTableGroup({
+export function MatchResultsTableGroup({
   matches,
   event,
   team,
+  showEvent = false,
 }: MatchResultsTableProps) {
   const gridStyle = cn(
     // always use these classes:
@@ -275,6 +277,9 @@ function MatchResultsTableGroup({
               )}
             </GridCell>
             <GridCell className="row-span-2">
+              {showEvent
+                ? `[${m.key.split('_')[0].substring(4).toUpperCase()}] `
+                : ''}
               {matchTitleShort(m, event)}
             </GridCell>
 

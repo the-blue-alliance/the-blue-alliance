@@ -1,6 +1,34 @@
 var ALLIANCE_PICKS_MAX = 3;
 var NUM_ALLIANCES = 8;
 
+DOUBLE_ELIM_MAPPING = {
+    // round 1
+    1: ["sf", 1, 1],
+    2: ["sf", 2, 1],
+    3: ["sf", 3, 1],
+    4: ["sf", 4, 1],
+    // round 2
+    5: ["sf", 5, 1],
+    6: ["sf", 6, 1],
+    7: ["sf", 7, 1],
+    8: ["sf", 8, 1],
+    // round 3
+    9: ["sf", 9, 1],
+    10: ["sf", 10, 1],
+    // round 4
+    11: ["sf", 11, 1],
+    12: ["sf", 12, 1],
+    // round 5
+    13: ["sf", 13, 1],
+    // finals
+    14: ["f", 1, 1],
+    15: ["f", 1, 2],
+    16: ["f", 1, 3],
+    17: ["f", 1, 4], // Overtime 1
+    18: ["f", 1, 5], // Overtime 2
+    19: ["f", 1, 6], // Overtime 3
+}
+
 ELIM_MAPPING = {
     1: [1, 1],  // (set, match)
     2: [2, 1],
@@ -128,17 +156,9 @@ function getCookie(name) {
     return "";
 }
 
-function playoffTypeFromNumber(matchNum, is_octo){
-    if (is_octo) {
-        if (matchNum > 0 && matchNum <= 24) return "ef";
-        if (matchNum > 24 && matchNum <= 36) return "qf";
-        if (matchNum > 36 && matchNum <= 42) return "sf";
-        return "f";
-    } else {
-        if (matchNum > 0 && matchNum <= 12) return "qf";
-        if (matchNum > 12 && matchNum <= 18) return "sf";
-        return "f";
-    }
+function playoffTypeFromNumber(matchNum){
+   const match_info = DOUBLE_ELIM_MAPPING[matchNum];
+   return match_info[0]; 
 }
 
 /* Returns one of {ef, qf, sf, f}
@@ -149,6 +169,7 @@ function playoffTypeFromMatchString(matchString){
     if(matchString.includes("Quarterfinal")) return "qf";
     if(matchString.includes("Semifinal")) return "sf";
     if(matchString.includes("Final")) return "f";
+    if(matchString.includes("Match")) return "sf";
     return null;
 }
 
@@ -156,30 +177,14 @@ function playoffTypeFromMatchString(matchString){
  * For use when some reports don't give the match number in the grid
  * ASSUMES 2016 label format, Quarter 1, Quarter 2, ..., Tiebreaker 1, Semi 1, ...
  */
-function playoffTypeMatchAndSet(is_octo, match_string, last_type) {
-    var set_num, match_num;
-    var match_type = playoffTypeFromMatchString(match_string);
-    if (match_type == null) {
-        // We've found a "Tiebreaker X" match, assume type is the same as the previous
-        match_type = last_type;
-        set_num = parseInt(match_string.split(" ")[1]);
-        match_num = 3;
-        return [match_type, set_num, match_num];
-    } else {
-        var schedule_number = parseInt(match_string.split(" ")[1]);
-        var overall_match_num = (is_octo ? OCTO_FIRST_MATCH[match_type] : FIRST_MATCH[match_type]) + schedule_number;
-        var match_and_set = playoffMatchAndSet(overall_match_num, is_octo);
-        return [match_type, match_and_set[0], match_and_set[1]]
-    }
+function playoffTypeMatchAndSet(match_num) {
+    return DOUBLE_ELIM_MAPPING[match_num];
 }
 
 /* Return [set #, match #] */
-function playoffMatchAndSet(totalMatchNum, is_octo){
-    if (is_octo) {
-        return OCTO_ELIM_MAPPING[totalMatchNum];
-    } else {
-        return ELIM_MAPPING[totalMatchNum];
-    }
+function playoffMatchAndSet(totalMatchNum){
+    const match_and_set = DOUBLE_ELIM_MAPPING[totalMatchNum];
+    return [match_and_set[1], match_and_set[2]];
 }
 
 /* Load all valid events for this user */

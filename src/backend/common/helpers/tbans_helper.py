@@ -194,7 +194,8 @@ class TBANSHelper:
                 MobileClient.client_type == ClientType.WEBHOOK
             ).fetch()
             if clients:
-                cls._defer_webhook(clients, notification)
+                for client in clients:
+                    cls._defer_webhook(client, notification)
 
     @classmethod
     def event_level(cls, match: Match, user_id: Optional[str] = None) -> None:
@@ -484,7 +485,7 @@ class TBANSHelper:
         )
 
     @staticmethod
-    def ping(client: MobileClient) -> bool:
+    def ping(client: MobileClient) -> tuple[bool, bool]:
         """Immediately dispatch a Ping to either FCM or a webhook"""
         if client.client_type == ClientType.WEBHOOK:
             return TBANSHelper._ping_webhook(client)
@@ -492,7 +493,7 @@ class TBANSHelper:
             return TBANSHelper._ping_client(client)
 
     @staticmethod
-    def _ping_client(client: MobileClient) -> bool:
+    def _ping_client(client: MobileClient) -> tuple[bool, bool]:
         client_type = client.client_type
         if client_type in FCM_CLIENTS:
             from backend.common.models.notifications.ping import (
@@ -513,14 +514,14 @@ class TBANSHelper:
 
             batch_response = fcm_request.send()
             if batch_response.failure_count > 0:
-                return False
+                return (False, False)
         else:
             raise Exception("Unsupported FCM client type: {}".format(client_type))
 
-        return True
+        return (True, True)
 
     @staticmethod
-    def _ping_webhook(client: MobileClient) -> bool:
+    def _ping_webhook(client: MobileClient) -> tuple[bool, bool]:
         from backend.common.models.notifications.ping import PingNotification
 
         notification = PingNotification()
@@ -661,7 +662,8 @@ class TBANSHelper:
         # Send to webhooks
         webhook_clients = webhook_clients_future.get_result()
         if webhook_clients:
-            cls._defer_webhook(webhook_clients, notification)
+            for webhook in webhook_clients:
+                cls._defer_webhook(webhook, notification)
 
     @classmethod
     def _defer_fcm(
@@ -677,9 +679,7 @@ class TBANSHelper:
         )
 
     @classmethod
-    def _defer_webhook(
-        cls, clients: List[MobileClient], notification: Notification
-    ) -> None:
+    def _defer_webhook(cls, clients: MobileClient, notification: Notification) -> None:
         defer_safe(
             cls._send_webhook,
             clients,
@@ -810,31 +810,26 @@ class TBANSHelper:
         return
 
     @classmethod
-    def _send_webhook(
-        cls, clients: List[MobileClient], notification: Notification
-    ) -> None:
+    def _send_webhook(cls, client: MobileClient, notification: Notification) -> None:
         # Only send to webhooks if notifications are enabled
         if not cls._notifications_enabled():
             return
 
-        # Make sure we're only sending to webhook clients
-        clients = [
-            client
-            for client in clients
-            if client.client_type == ClientType.WEBHOOK
-            and client.verified
-            and notification.should_send_to_client(client)
-        ]
+        # Make sure we're only sending to verified webhook clients
+        if client.client_type != ClientType.WEBHOOK or not client.verified:
+            return
+
+        if not notification.should_send_to_client(client):
+            return
 
         from backend.common.models.notifications.requests.webhook_request import (
             WebhookRequest,
         )
 
-        for client in clients:
-            webhook_request = WebhookRequest(
-                notification, client.messaging_id, client.secret
-            )
-            webhook_request.send()
+        webhook_request = WebhookRequest(
+            notification, client.messaging_id, client.secret
+        )
+        webhook_request.send()
 
         return
 

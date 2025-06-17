@@ -371,7 +371,7 @@ class TestTBANSHelper(unittest.TestCase):
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_webhook") as mock_send_webhook:
             run_from_task(tasks[0])
-            mock_send_webhook.assert_called_once_with([client], ANY)
+            mock_send_webhook.assert_called_once_with(client, ANY)
             # Make sure the notification is a BroadcastNotification
             notification = mock_send_webhook.call_args[0][1]
             assert isinstance(notification, BroadcastNotification)
@@ -799,9 +799,10 @@ class TestTBANSHelper(unittest.TestCase):
             [messaging.SendResponse(None, FirebaseError(500, "testing"))]
         )
         with patch.object(FCMRequest, "send", return_value=batch_response) as mock_send:
-            success = TBANSHelper._ping_client(client)
+            success, is_valid = TBANSHelper._ping_client(client)
             mock_send.assert_called_once()
             assert not success
+            assert not is_valid
 
     def test_ping_webhook_success(self):
         client = MobileClient(
@@ -817,10 +818,13 @@ class TestTBANSHelper(unittest.TestCase):
             WebhookRequest,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=True) as mock_send:
-            success = TBANSHelper._ping_webhook(client)
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
+            success, is_valid = TBANSHelper._ping_webhook(client)
             mock_send.assert_called_once()
             assert success
+            assert is_valid
 
     def test_ping_webhook_failure(self):
         client = MobileClient(
@@ -1007,7 +1011,7 @@ class TestTBANSHelper(unittest.TestCase):
             c.put()
 
         expected_fcm = [c for c in clients if c.client_type in FCM_CLIENTS]
-        expected_webhook = [c for c in clients if c.client_type == ClientType.WEBHOOK]
+        expected_webhooks = [c for c in clients if c.client_type == ClientType.WEBHOOK]
 
         notification = MockNotification()
         with patch.object(TBANSHelper, "_defer_fcm") as mock_fcm, patch.object(
@@ -1015,7 +1019,8 @@ class TestTBANSHelper(unittest.TestCase):
         ) as mock_webhook:
             TBANSHelper._send(["user_id"], notification)
             mock_fcm.assert_called_once_with(expected_fcm, notification)
-            mock_webhook.assert_called_once_with(expected_webhook, notification)
+            for webhook in expected_webhooks:
+                mock_webhook.assert_called_once_with(webhook, notification)
 
     def test_defer_fcm(self):
         client = MobileClient(
@@ -1455,7 +1460,8 @@ class TestTBANSHelper(unittest.TestCase):
             "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
             autospec=True,
         ) as mock_init:
-            TBANSHelper._send_webhook(clients, MockNotification())
+            for client in clients:
+                TBANSHelper._send_webhook(client, MockNotification())
             mock_init.assert_called_once_with(ANY, expected, ANY)
 
     def test_send_webhook_filter_webhook_clients_verified(self):
@@ -1480,7 +1486,8 @@ class TestTBANSHelper(unittest.TestCase):
             "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
             autospec=True,
         ) as mock_init:
-            TBANSHelper._send_webhook(clients, MockNotification())
+            for client in clients:
+                TBANSHelper._send_webhook(client, MockNotification())
             mock_init.assert_called_once_with(ANY, "verified", ANY)
 
     def test_send_webhook_filter_webhook_clients_from_notification(self):
@@ -1505,8 +1512,9 @@ class TestTBANSHelper(unittest.TestCase):
             "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
             autospec=True,
         ) as mock_init:
-            TBANSHelper._send_webhook(clients, MockNotification(should_send=False))
-            mock_init.assert_not_called()
+            for client in clients:
+                TBANSHelper._send_webhook(client, MockNotification(should_send=False))
+                mock_init.assert_not_called()
 
     def test_send_webhook_multiple(self):
         clients = [
@@ -1523,7 +1531,8 @@ class TestTBANSHelper(unittest.TestCase):
         with patch.object(
             WebhookRequest, "send", return_value=batch_response
         ) as mock_send:
-            TBANSHelper._send_webhook(clients, MockNotification())
+            for client in clients:
+                TBANSHelper._send_webhook(client, MockNotification())
             assert mock_send.call_count == 3
 
     def test_debug_string(self):
