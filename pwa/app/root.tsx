@@ -14,7 +14,7 @@ import {
   useRouteError,
 } from 'react-router';
 
-import { client } from '~/api/tba/client.gen';
+import { client } from '~/api/tba/read/client.gen';
 
 client.interceptors.request.use((request) => {
   request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);

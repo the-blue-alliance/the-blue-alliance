@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router';
 
-import { getEvent, getMatch } from '~/api/tba';
+import { getEvent, getMatch } from '~/api/tba/read';
 import { EventLink } from '~/components/tba/links';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
 

@@ -1,4 +1,4 @@
-import { Award, Event } from '~/api/tba';
+import { Award, Event } from '~/api/tba/read';
 import { SORT_ORDER } from '~/lib/api/AwardType';
 
 export function sortAwardsComparator(a: Award, b: Award) {

@@ -14,7 +14,7 @@ import {
   DistrictInsight,
   getDistrictHistory,
   getDistrictInsights,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { TeamLink } from '~/components/tba/links';
 import {
   ChartContainer,

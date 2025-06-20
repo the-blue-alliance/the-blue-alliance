@@ -7,9 +7,7 @@ export default defineConfig({
     '../../src/backend/web/static/swagger/client_v9.json',
   ),
   output: {
-    format: 'prettier',
-    path: 'app/api/tba/client/',
-    lint: 'eslint',
+    path: 'app/api/tba/mobile/',
   },
   plugins: ['@hey-api/client-fetch', '@tanstack/react-query'],
 });

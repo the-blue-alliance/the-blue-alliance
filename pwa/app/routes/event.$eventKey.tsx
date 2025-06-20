@@ -27,14 +27,14 @@ import {
   getEvent,
   getEventAlliances,
   getEventMatches,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import {
   getEventAwardsOptions,
   getEventCoprsOptions,
   getEventRankingsOptions,
   getEventTeamMediaOptions,
   getEventTeamsOptions,
-} from '~/api/tba/@tanstack/react-query.gen';
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';

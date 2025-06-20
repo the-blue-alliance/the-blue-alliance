@@ -1,7 +1,7 @@
 import type { MetaFunction } from 'react-router';
 import { useLoaderData } from 'react-router';
 
-import { getEventsByYear, getStatus } from '~/api/tba';
+import { getEventsByYear, getStatus } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 

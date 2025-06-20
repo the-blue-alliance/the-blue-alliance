@@ -1,4 +1,4 @@
-import { SearchIndex } from '~/api/tba';
+import { SearchIndex } from '~/api/tba/read';
 
 export interface SearchDataProvider {
   provide(): Promise<SearchIndex>;

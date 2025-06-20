@@ -14,11 +14,11 @@ import {
   getInsightsNotablesYear,
   getStatus,
   getTeamEventsStatusesByYear,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import {
   getEventOptions,
   getTeamOptions,
-} from '~/api/tba/@tanstack/react-query.gen';
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { TeamLink } from '~/components/tba/links';
 import { MatchResultsTableGroup } from '~/components/tba/matchResultsTable';
 import { Badge } from '~/components/ui/badge';

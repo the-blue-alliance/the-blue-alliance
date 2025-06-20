@@ -1,4 +1,4 @@
-import { Media } from '~/api/tba';
+import { Media } from '~/api/tba/read';
 
 export function getTeamPreferredRobotPicMedium(
   media: Media[],

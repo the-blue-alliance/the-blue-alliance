@@ -6,7 +6,7 @@ import {
   NotablesInsight,
   getInsightsLeaderboardsYear,
   getInsightsNotablesYear,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { EventLink, TeamLink } from '~/components/tba/links';

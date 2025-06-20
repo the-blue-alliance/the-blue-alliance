@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import { Event, Team } from '~/api/tba';
+import { Event, Team } from '~/api/tba/read';
 import { removeNonNumeric } from '~/lib/utils';
 
 const TeamLink = React.forwardRef<

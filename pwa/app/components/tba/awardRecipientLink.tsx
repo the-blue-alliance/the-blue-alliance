@@ -1,4 +1,4 @@
-import { AwardRecipient } from '~/api/tba';
+import { AwardRecipient } from '~/api/tba/read';
 import { TeamLink } from '~/components/tba/links';
 
 export default function AwardRecipientLink({

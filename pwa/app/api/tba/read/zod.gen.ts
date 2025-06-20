@@ -1347,430 +1347,412 @@ export const zEventKey = z.string();
  */
 export const zDistrictAbbreviation = z.string();
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetStatusParameterIfNoneMatch = z.string();
+export const zGetStatusData = z.object({
+  body: z.never().optional(),
+  headers: z
+    .object({
+      'If-None-Match': z.string().optional(),
+    })
+    .optional(),
+  path: z.never().optional(),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetStatusResponse = zApiStatus;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamsParameterIfNoneMatch = z.string();
-
-/**
- * Page number of results to return, zero-indexed
- */
-export const zGetTeamsParameterPageNum = z.number().int();
+export const zGetTeamsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    page_num: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamsResponse = z.array(zTeam);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamsSimpleParameterIfNoneMatch = z.string();
-
-/**
- * Page number of results to return, zero-indexed
- */
-export const zGetTeamsSimpleParameterPageNum = z.number().int();
+export const zGetTeamsSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    page_num: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamsSimpleResponse = z.array(zTeamSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamsKeysParameterIfNoneMatch = z.string();
-
-/**
- * Page number of results to return, zero-indexed
- */
-export const zGetTeamsKeysParameterPageNum = z.number().int();
+export const zGetTeamsKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    page_num: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamsKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamsByYearParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamsByYearParameterYear = z.number().int();
-
-/**
- * Page number of results to return, zero-indexed
- */
-export const zGetTeamsByYearParameterPageNum = z.number().int();
+export const zGetTeamsByYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+    page_num: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamsByYearResponse = z.array(zTeam);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamsByYearSimpleParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamsByYearSimpleParameterYear = z.number().int();
-
-/**
- * Page number of results to return, zero-indexed
- */
-export const zGetTeamsByYearSimpleParameterPageNum = z.number().int();
+export const zGetTeamsByYearSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+    page_num: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamsByYearSimpleResponse = z.array(zTeamSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamsByYearKeysParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamsByYearKeysParameterYear = z.number().int();
-
-/**
- * Page number of results to return, zero-indexed
- */
-export const zGetTeamsByYearKeysParameterPageNum = z.number().int();
+export const zGetTeamsByYearKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+    page_num: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Team Keys
  */
 export const zGetTeamsByYearKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamParameterTeamKey = z.string();
+export const zGetTeamData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamResponse = zTeam;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamSimpleParameterTeamKey = z.string();
+export const zGetTeamSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamSimpleResponse = zTeamSimple;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamHistoryParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamHistoryParameterTeamKey = z.string();
+export const zGetTeamHistoryData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response with team's history including events and awards.
  */
 export const zGetTeamHistoryResponse = zHistory;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamYearsParticipatedParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamYearsParticipatedParameterTeamKey = z.string();
+export const zGetTeamYearsParticipatedData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamYearsParticipatedResponse = z.array(z.number().int());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamDistrictsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamDistrictsParameterTeamKey = z.string();
+export const zGetTeamDistrictsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamDistrictsResponse = z.array(zDistrict);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamRobotsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamRobotsParameterTeamKey = z.string();
+export const zGetTeamRobotsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamRobotsResponse = z.array(zTeamRobot);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventsParameterTeamKey = z.string();
+export const zGetTeamEventsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamEventsResponse = z.array(zEvent);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventsSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventsSimpleParameterTeamKey = z.string();
+export const zGetTeamEventsSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamEventsSimpleResponse = z.array(zEventSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventsKeysParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventsKeysParameterTeamKey = z.string();
+export const zGetTeamEventsKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Event Keys
  */
 export const zGetTeamEventsKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventsByYearParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventsByYearParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamEventsByYearParameterYear = z.number().int();
+export const zGetTeamEventsByYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamEventsByYearResponse = z.array(zEvent);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventsByYearSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventsByYearSimpleParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamEventsByYearSimpleParameterYear = z.number().int();
+export const zGetTeamEventsByYearSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamEventsByYearSimpleResponse = z.array(zEventSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventsByYearKeysParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventsByYearKeysParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamEventsByYearKeysParameterYear = z.number().int();
+export const zGetTeamEventsByYearKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Event Keys
  */
 export const zGetTeamEventsByYearKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventsStatusesByYearParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventsStatusesByYearParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamEventsStatusesByYearParameterYear = z.number().int();
+export const zGetTeamEventsStatusesByYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * A key-value pair of `Team_Event_Status` objects with the event key as the key.
  */
 export const zGetTeamEventsStatusesByYearResponse = z.object({});
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventMatchesParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventMatchesParameterTeamKey = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetTeamEventMatchesParameterEventKey = z.string();
+export const zGetTeamEventMatchesData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamEventMatchesResponse = z.array(zMatch);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventMatchesSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventMatchesSimpleParameterTeamKey = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetTeamEventMatchesSimpleParameterEventKey = z.string();
+export const zGetTeamEventMatchesSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamEventMatchesSimpleResponse = z.array(zMatch);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventMatchesKeysParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventMatchesKeysParameterTeamKey = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetTeamEventMatchesKeysParameterEventKey = z.string();
+export const zGetTeamEventMatchesKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Match Keys
  */
 export const zGetTeamEventMatchesKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventAwardsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventAwardsParameterTeamKey = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetTeamEventAwardsParameterEventKey = z.string();
+export const zGetTeamEventAwardsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamEventAwardsResponse = z.array(zAward);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamEventStatusParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamEventStatusParameterTeamKey = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetTeamEventStatusParameterEventKey = z.string();
+export const zGetTeamEventStatusData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -1780,265 +1762,248 @@ export const zGetTeamEventStatusResponse = z.union([
   z.null(),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamAwardsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamAwardsParameterTeamKey = z.string();
+export const zGetTeamAwardsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamAwardsResponse = z.array(zAward);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamAwardsByYearParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamAwardsByYearParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamAwardsByYearParameterYear = z.number().int();
+export const zGetTeamAwardsByYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamAwardsByYearResponse = z.array(zAward);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamMatchesByYearParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamMatchesByYearParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamMatchesByYearParameterYear = z.number().int();
+export const zGetTeamMatchesByYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamMatchesByYearResponse = z.array(zMatch);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamMatchesByYearSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamMatchesByYearSimpleParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamMatchesByYearSimpleParameterYear = z.number().int();
+export const zGetTeamMatchesByYearSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamMatchesByYearSimpleResponse = z.array(zMatchSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamMatchesByYearKeysParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamMatchesByYearKeysParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamMatchesByYearKeysParameterYear = z.number().int();
+export const zGetTeamMatchesByYearKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Match Keys
  */
 export const zGetTeamMatchesByYearKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamMediaByYearParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamMediaByYearParameterTeamKey = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamMediaByYearParameterYear = z.number().int();
+export const zGetTeamMediaByYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamMediaByYearResponse = z.array(zMedia);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamMediaByTagParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamMediaByTagParameterTeamKey = z.string();
-
-/**
- * Media Tag which describes the Media.
- */
-export const zGetTeamMediaByTagParameterMediaTag = z.string();
+export const zGetTeamMediaByTagData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    media_tag: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamMediaByTagResponse = z.array(zMedia);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamMediaByTagYearParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamMediaByTagYearParameterTeamKey = z.string();
-
-/**
- * Media Tag which describes the Media.
- */
-export const zGetTeamMediaByTagYearParameterMediaTag = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetTeamMediaByTagYearParameterYear = z.number().int();
+export const zGetTeamMediaByTagYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+    media_tag: z.string(),
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamMediaByTagYearResponse = z.array(zMedia);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetTeamSocialMediaParameterIfNoneMatch = z.string();
-
-/**
- * TBA Team Key, eg `frc254`
- */
-export const zGetTeamSocialMediaParameterTeamKey = z.string();
+export const zGetTeamSocialMediaData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    team_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetTeamSocialMediaResponse = z.array(zMedia);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventsByYearParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetEventsByYearParameterYear = z.number().int();
+export const zGetEventsByYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventsByYearResponse = z.array(zEvent);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventsByYearSimpleParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetEventsByYearSimpleParameterYear = z.number().int();
+export const zGetEventsByYearSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventsByYearSimpleResponse = z.array(zEventSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventsByYearKeysParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetEventsByYearKeysParameterYear = z.number().int();
+export const zGetEventsByYearKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Event Keys
  */
 export const zGetEventsByYearKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventParameterEventKey = z.string();
+export const zGetEventData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventResponse = zEvent;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventSimpleParameterEventKey = z.string();
+export const zGetEventSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventSimpleResponse = zEventSimple;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventAlliancesParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventAlliancesParameterEventKey = z.string();
+export const zGetEventAlliancesData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2048,60 +2013,64 @@ export const zGetEventAlliancesResponse = z.union([
   z.array(zEliminationAlliance),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventInsightsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventInsightsParameterEventKey = z.string();
+export const zGetEventInsightsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventInsightsResponse = z.union([zEventInsights, z.null()]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventOprsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventOprsParameterEventKey = z.string();
+export const zGetEventOprsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventOprsResponse = z.union([zEventOprs, z.null()]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventCoprsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventCoprsParameterEventKey = z.string();
+export const zGetEventCoprsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventCoprsResponse = z.union([zEventCoprs, z.null()]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventPredictionsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventPredictionsParameterEventKey = z.string();
+export const zGetEventPredictionsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2111,30 +2080,32 @@ export const zGetEventPredictionsResponse = z.union([
   z.null(),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventRankingsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventRankingsParameterEventKey = z.string();
+export const zGetEventRankingsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventRankingsResponse = z.union([zEventRanking, z.null()]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventDistrictPointsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventDistrictPointsParameterEventKey = z.string();
+export const zGetEventDistrictPointsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2144,15 +2115,16 @@ export const zGetEventDistrictPointsResponse = z.union([
   z.null(),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetRegionalChampsPoolPointsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetRegionalChampsPoolPointsParameterEventKey = z.string();
+export const zGetRegionalChampsPoolPointsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2162,15 +2134,16 @@ export const zGetRegionalChampsPoolPointsResponse = z.union([
   z.null(),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventAdvancementPointsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventAdvancementPointsParameterEventKey = z.string();
+export const zGetEventAdvancementPointsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2180,375 +2153,400 @@ export const zGetEventAdvancementPointsResponse = z.union([
   z.null(),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventTeamsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventTeamsParameterEventKey = z.string();
+export const zGetEventTeamsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventTeamsResponse = z.array(zTeam);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventTeamsSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventTeamsSimpleParameterEventKey = z.string();
+export const zGetEventTeamsSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventTeamsSimpleResponse = z.array(zTeamSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventTeamsKeysParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventTeamsKeysParameterEventKey = z.string();
+export const zGetEventTeamsKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Team Keys
  */
 export const zGetEventTeamsKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventTeamsStatusesParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventTeamsStatusesParameterEventKey = z.string();
+export const zGetEventTeamsStatusesData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * A key-value pair of `Team_Event_Status` objects with the event key as the key.
  */
 export const zGetEventTeamsStatusesResponse = z.object({});
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventMatchesParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventMatchesParameterEventKey = z.string();
+export const zGetEventMatchesData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventMatchesResponse = z.array(zMatch);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventMatchesSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventMatchesSimpleParameterEventKey = z.string();
+export const zGetEventMatchesSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventMatchesSimpleResponse = z.array(zMatchSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventMatchesKeysParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventMatchesKeysParameterEventKey = z.string();
+export const zGetEventMatchesKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Match Keys
  */
 export const zGetEventMatchesKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventMatchTimeseriesParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventMatchTimeseriesParameterEventKey = z.string();
+export const zGetEventMatchTimeseriesData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventMatchTimeseriesResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventAwardsParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventAwardsParameterEventKey = z.string();
+export const zGetEventAwardsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventAwardsResponse = z.array(zAward);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetEventTeamMediaParameterIfNoneMatch = z.string();
-
-/**
- * TBA Event Key, eg `2016nytr`
- */
-export const zGetEventTeamMediaParameterEventKey = z.string();
+export const zGetEventTeamMediaData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    event_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetEventTeamMediaResponse = z.array(zMedia);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetMatchParameterIfNoneMatch = z.string();
-
-/**
- * TBA Match Key, eg `2016nytr_qm1`
- */
-export const zGetMatchParameterMatchKey = z.string();
+export const zGetMatchData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    match_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetMatchResponse = zMatch;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetMatchSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA Match Key, eg `2016nytr_qm1`
- */
-export const zGetMatchSimpleParameterMatchKey = z.string();
+export const zGetMatchSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    match_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetMatchSimpleResponse = zMatchSimple;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetMatchTimeseriesParameterIfNoneMatch = z.string();
-
-/**
- * TBA Match Key, eg `2016nytr_qm1`
- */
-export const zGetMatchTimeseriesParameterMatchKey = z.string();
+export const zGetMatchTimeseriesData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    match_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetMatchTimeseriesResponse = z.array(z.object({}));
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetMatchZebraParameterIfNoneMatch = z.string();
-
-/**
- * TBA Match Key, eg `2016nytr_qm1`
- */
-export const zGetMatchZebraParameterMatchKey = z.string();
+export const zGetMatchZebraData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    match_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetMatchZebraResponse = zZebra;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictsByYearParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetDistrictsByYearParameterYear = z.number().int();
+export const zGetDistrictsByYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetDistrictsByYearResponse = z.array(zDistrict);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictHistoryParameterIfNoneMatch = z.string();
-
-/**
- * District abbreviation, eg `ne` or `fim`
- */
-export const zGetDistrictHistoryParameterDistrictAbbreviation = z.string();
+export const zGetDistrictHistoryData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_abbreviation: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetDistrictHistoryResponse = z.array(zDistrict);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictInsightsParameterIfNoneMatch = z.string();
-
-/**
- * District abbreviation, eg `ne` or `fim`
- */
-export const zGetDistrictInsightsParameterDistrictAbbreviation = z.string();
+export const zGetDistrictInsightsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_abbreviation: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetDistrictInsightsResponse = zDistrictInsight;
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictEventsParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictEventsParameterDistrictKey = z.string();
+export const zGetDistrictEventsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetDistrictEventsResponse = z.array(zEvent);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictAwardsParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictAwardsParameterDistrictKey = z.string();
+export const zGetDistrictAwardsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetDistrictAwardsResponse = z.array(zAward);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictEventsSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictEventsSimpleParameterDistrictKey = z.string();
+export const zGetDistrictEventsSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetDistrictEventsSimpleResponse = z.array(zEventSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictEventsKeysParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictEventsKeysParameterDistrictKey = z.string();
+export const zGetDistrictEventsKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Event Keys
  */
 export const zGetDistrictEventsKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictTeamsParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictTeamsParameterDistrictKey = z.string();
+export const zGetDistrictTeamsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetDistrictTeamsResponse = z.array(zTeam);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictTeamsSimpleParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictTeamsSimpleParameterDistrictKey = z.string();
+export const zGetDistrictTeamsSimpleData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetDistrictTeamsSimpleResponse = z.array(zTeamSimple);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictTeamsKeysParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictTeamsKeysParameterDistrictKey = z.string();
+export const zGetDistrictTeamsKeysData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Array of Team Keys
  */
 export const zGetDistrictTeamsKeysResponse = z.array(z.string());
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictRankingsParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictRankingsParameterDistrictKey = z.string();
+export const zGetDistrictRankingsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2558,15 +2556,16 @@ export const zGetDistrictRankingsResponse = z.union([
   z.array(zDistrictRanking),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictAdvancementParameterIfNoneMatch = z.string();
-
-/**
- * TBA District Key, eg `2016fim`
- */
-export const zGetDistrictAdvancementParameterDistrictKey = z.string();
+export const zGetDistrictAdvancementData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_key: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * A mapping of team key to District_Advancement
@@ -2576,15 +2575,16 @@ export const zGetDistrictAdvancementResponse = z.union([
   z.object({}),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetDistrictDcmpHistoryParameterIfNoneMatch = z.string();
-
-/**
- * District abbreviation, eg `ne` or `fim`
- */
-export const zGetDistrictDcmpHistoryParameterDistrictAbbreviation = z.string();
+export const zGetDistrictDcmpHistoryData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    district_abbreviation: z.string(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2596,15 +2596,16 @@ export const zGetDistrictDcmpHistoryResponse = z.array(
   }),
 );
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetRegionalAdvancementParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetRegionalAdvancementParameterYear = z.number().int();
+export const zGetRegionalAdvancementData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2614,15 +2615,16 @@ export const zGetRegionalAdvancementResponse = z.union([
   z.object({}),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetRegionalRankingsParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetRegionalRankingsParameterYear = z.number().int();
+export const zGetRegionalRankingsData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2632,15 +2634,16 @@ export const zGetRegionalRankingsResponse = z.union([
   z.array(zRegionalRanking),
 ]);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetInsightsLeaderboardsYearParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetInsightsLeaderboardsYearParameterYear = z.number().int();
+export const zGetInsightsLeaderboardsYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
@@ -2648,25 +2651,32 @@ export const zGetInsightsLeaderboardsYearParameterYear = z.number().int();
 export const zGetInsightsLeaderboardsYearResponse =
   z.array(zLeaderboardInsight);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetInsightsNotablesYearParameterIfNoneMatch = z.string();
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export const zGetInsightsNotablesYearParameterYear = z.number().int();
+export const zGetInsightsNotablesYearData = z.object({
+  body: z.never().optional(),
+  headers: z.object({
+    'If-None-Match': z.string().optional(),
+  }),
+  path: z.object({
+    year: z.number().int(),
+  }),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
  */
 export const zGetInsightsNotablesYearResponse = z.array(zNotablesInsight);
 
-/**
- * Value of the `ETag` header in the most recently cached response by the client.
- */
-export const zGetSearchIndexParameterIfNoneMatch = z.string();
+export const zGetSearchIndexData = z.object({
+  body: z.never().optional(),
+  headers: z
+    .object({
+      'If-None-Match': z.string().optional(),
+    })
+    .optional(),
+  path: z.never().optional(),
+  query: z.never().optional(),
+});
 
 /**
  * Successful response
