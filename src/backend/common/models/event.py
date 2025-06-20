@@ -35,11 +35,10 @@ from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast, WebcastOnlineStatus
 from backend.common.tasklets import typed_toplevel
 
-# To avoid circular dependencies from type hints
 if typing.TYPE_CHECKING:
     from backend.common.models.award import Award
-    from backend.common.models.team import Team
     from backend.common.models.match import Match
+    from backend.common.models.team import Team
 
 
 class Event(CachedModel):
