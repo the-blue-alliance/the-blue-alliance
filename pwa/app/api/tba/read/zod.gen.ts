@@ -231,8 +231,23 @@ export const zEventRanking = z.object({
 });
 
 export const zEventDistrictPoints = z.object({
-  points: z.object({}),
-  tiebreakers: z.object({}).optional(),
+  points: z.record(
+    z.object({
+      total: z.number().int(),
+      alliance_points: z.number().int(),
+      elim_points: z.number().int(),
+      award_points: z.number().int(),
+      qual_points: z.number().int(),
+    }),
+  ),
+  tiebreakers: z
+    .record(
+      z.object({
+        highest_qual_scores: z.array(z.number().int()).optional(),
+        qual_wins: z.number().int().optional(),
+      }),
+    )
+    .optional(),
 });
 
 /**
@@ -366,7 +381,7 @@ export const zEventOprs = z.object({
 /**
  * Component OPRs for teams at the event.
  */
-export const zEventCoprs = z.object({});
+export const zEventCoprs = z.record(z.object({}));
 
 /**
  * JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.
@@ -1181,7 +1196,22 @@ export const zDistrictInsight = z.object({
     }),
     z.null(),
   ]),
-  team_data: z.union([z.object({}), z.null()]),
+  team_data: z.union([
+    z.record(
+      z.object({
+        district_seasons: z.number().int(),
+        total_district_points: z.number().int(),
+        total_pre_dcmp_district_points: z.number().int(),
+        district_event_wins: z.number().int(),
+        dcmp_wins: z.number().int(),
+        team_awards: z.number().int(),
+        individual_awards: z.number().int(),
+        quals_record: zWltRecord,
+        elims_record: zWltRecord,
+      }),
+    ),
+    z.null(),
+  ]),
 });
 
 /**
