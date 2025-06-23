@@ -204,6 +204,26 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
+  pwa-test-devbox:
+    name: "[pwa] Test w/ Devbox"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.13.0
+        with:
+          project-path: pwa
+          enable-cache: true
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
+      - name: Install dependencies
+        run: devbox run -- npm ci
+        working-directory: pwa
+      - name: Run tests
+        run: devbox run -- npm test
+        working-directory: pwa
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-22.04
@@ -231,6 +251,69 @@ jobs:
         with:
           name: pwa-build
           path: pwa/build
+  pwa-e2e:
+    name: "[pwa] E2E Tests"
+    if: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: "22.14.0"
+          cache: "npm"
+
+      - name: Install Dependencies
+        working-directory: pwa
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        working-directory: pwa
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        working-directory: pwa
+        run: npx playwright test
+        env:
+          VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+
+  check-pwa-api:
+    name: "[pwa] Check API regeneration"
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.0"
+
+      - name: Install Dependencies
+        working-directory: pwa
+        run: npm ci
+
+      - name: Generate react-router types
+        working-directory: pwa
+        run: npm run typecheck
+
+      - name: Run generate-api.sh
+        working-directory: ./pwa
+        run: ./generate-api.sh
+
+      - name: Detect changes in pwa/app/api
+        run: |
+          CHANGED_FILES=$(git diff --name-only pwa/app/api)
+          if [[ -n "$CHANGED_FILES" ]]; then
+            echo "::error title=API Mismatch::Files changed in pwa/app/api:"
+            echo "$CHANGED_FILES"
+            exit 1
+          else
+            echo "No changes detected in pwa/app/api."
+          fi
+
+
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-22.04
@@ -622,7 +705,7 @@ jobs:
   deploy-pwa:
     name: Deploy PWA Service
     runs-on: ubuntu-22.04
-    needs: [pwa-lint, pwa-type, pwa-test, pwa-build]
+    needs: [pwa-lint, pwa-type, pwa-test, pwa-build, pwa-e2e, check-pwa-api]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-pwa-${{ github.ref }}
     steps:
