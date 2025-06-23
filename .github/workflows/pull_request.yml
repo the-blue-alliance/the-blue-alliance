@@ -331,6 +331,10 @@ jobs:
         working-directory: pwa
         run: npm ci
 
+      - name: Generate react-router types
+        working-directory: pwa
+        run: npm run typecheck
+
       - name: Run generate-api.sh
         working-directory: ./pwa
         run: ./generate-api.sh
