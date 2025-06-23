@@ -117,12 +117,12 @@ function DistrictDataView({
           <h1 className="mb-2 text-center text-xl">Yearly Active Team Count</h1>
           <ChartContainer config={{}} className="min-h-[100px] w-full">
             <BarChart
-              data={Object.entries(districtData.yearly_active_team_count).map(
-                ([year, count]) => ({
-                  year: Number(year),
-                  count,
-                }),
-              )}
+              data={Object.entries(
+                districtData.district_wide_data?.yearly_active_team_count ?? {},
+              ).map(([year, count]) => ({
+                year: Number(year),
+                count,
+              }))}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />
@@ -141,12 +141,12 @@ function DistrictDataView({
           <h1 className="mb-2 text-center text-xl">Yearly Event Count</h1>
           <ChartContainer config={{}} className="min-h-[100px] w-full">
             <BarChart
-              data={Object.entries(districtData.yearly_event_count).map(
-                ([year, count]) => ({
-                  year: Number(year),
-                  count,
-                }),
-              )}
+              data={Object.entries(
+                districtData.district_wide_data?.yearly_event_count ?? {},
+              ).map(([year, count]) => ({
+                year: Number(year),
+                count,
+              }))}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />

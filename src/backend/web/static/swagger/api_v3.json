@@ -9584,55 +9584,35 @@
         "type": "object",
         "properties": {
           "district_data": {
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "yearly_active_team_count": {
+            "type": "object",
+            "properties": {
+              "region_data": {
+                "oneOf": [
+                  {
                     "type": "object",
-                    "description": "Map of year to number of active teams",
                     "additionalProperties": {
-                      "type": "integer"
+                      "$ref": "#/components/schemas/DistrictInsightRegionData"
                     }
                   },
-                  "yearly_event_count": {
-                    "type": "object",
-                    "description": "Map of year to number of events",
-                    "additionalProperties": {
-                      "type": "integer"
-                    }
-                  },
-                  "yearly_gained_teams": {
-                    "type": "object",
-                    "description": "Map of year to list of team keys gained",
-                    "additionalProperties": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "yearly_lost_teams": {
-                    "type": "object",
-                    "description": "Map of year to list of team keys lost",
-                    "additionalProperties": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
+                  {
+                    "type": "null"
                   }
-                },
-                "required": [
-                  "yearly_active_team_count",
-                  "yearly_event_count",
-                  "yearly_gained_teams",
-                  "yearly_lost_teams"
                 ]
               },
-              {
-                "type": "null"
+              "district_wide_data": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DistrictInsightRegionData"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
+            },
+            "required": [
+              "region_data",
+              "district_wide_data"
             ]
           },
           "team_data": {
@@ -9668,6 +9648,18 @@
                     },
                     "elims_record": {
                       "$ref": "#/components/schemas/WLT_Record"
+                    },
+                    "in_district_extra_play_count": {
+                      "type": "integer"
+                    },
+                    "total_matches_played": {
+                      "type": "integer"
+                    },
+                    "dcmp_appearances": {
+                      "type": "integer"
+                    },
+                    "cmp_appearances": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -9679,7 +9671,11 @@
                     "team_awards",
                     "individual_awards",
                     "quals_record",
-                    "elims_record"
+                    "elims_record",
+                    "in_district_extra_play_count",
+                    "total_matches_played",
+                    "dcmp_appearances",
+                    "cmp_appearances"
                   ]
                 }
               },
@@ -9692,6 +9688,51 @@
         "required": [
           "team_data",
           "district_data"
+        ]
+      },
+      "DistrictInsightRegionData": {
+        "type": "object",
+        "properties": {
+          "yearly_active_team_count": {
+            "type": "object",
+            "description": "Map of year to number of active teams",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "yearly_event_count": {
+            "type": "object",
+            "description": "Map of year to number of events",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "yearly_gained_teams": {
+            "type": "object",
+            "description": "Map of year to list of team keys gained",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "yearly_lost_teams": {
+            "type": "object",
+            "description": "Map of year to list of team keys lost",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "yearly_active_team_count",
+          "yearly_event_count",
+          "yearly_gained_teams",
+          "yearly_lost_teams"
         ]
       },
       "District_Ranking": {
