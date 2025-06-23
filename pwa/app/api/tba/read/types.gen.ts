@@ -1954,9 +1954,36 @@ export type Media = {
   /**
    * If required, a JSON dict of additional media information.
    */
-  details?: {
-    [key: string]: unknown;
-  };
+  details?:
+    | {
+        base64Image: string;
+      }
+    | {
+        author_id: number;
+        author_name: string;
+        author_url: string;
+        height: number | null;
+        html: string;
+        media_id: string;
+        provider_name: string;
+        provider_url: string;
+        thumbnail_height: number;
+        thumbnail_url: string;
+        thumbnail_width: number;
+        title: string;
+        type: string;
+        version: string;
+        width: number;
+      }
+    | {
+        model_created: string;
+        model_description: string | null;
+        model_image: string;
+        model_name: string;
+      }
+    | {
+        image_partial: string;
+      };
   /**
    * True if the media is of high quality.
    */
