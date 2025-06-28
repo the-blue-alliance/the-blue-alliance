@@ -41,6 +41,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: 'Match Information - The Blue Alliance',
+      },
+      {
+        name: 'description',
+        content: `Match information for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${matchTitleShort(data.match, data.event)} - ${data.event.name} (${data.event.year}) - The Blue Alliance`,

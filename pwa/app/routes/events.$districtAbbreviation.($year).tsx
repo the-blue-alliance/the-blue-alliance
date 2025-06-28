@@ -118,9 +118,25 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `District information for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.year} ${data.districtHistory[data.districtHistory.length - 1].display_name} District - The Blue Alliance`,
+    },
+    {
+      name: 'description',
+      content: `District information for the ${data.year} ${data.districtHistory[data.districtHistory.length - 1].display_name} District.`,
     },
   ];
 }

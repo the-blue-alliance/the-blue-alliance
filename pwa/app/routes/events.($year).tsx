@@ -61,6 +61,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `FIRST Robotics Events - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `Event list for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.year} FIRST Robotics Events - The Blue Alliance`,

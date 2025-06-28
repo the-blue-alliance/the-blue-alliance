@@ -82,6 +82,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `Team History - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `Team history for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.team.nickname} - Team ${data.team.team_number} (History) - The Blue Alliance`,
