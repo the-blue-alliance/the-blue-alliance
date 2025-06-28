@@ -19,7 +19,7 @@ dispatch:
     service: py3-tasks-io
 
   - url: "*/backend-tasks-b2/*"
-    service: py3-tasks-cpu
+    service: py3-tasks-io
 
   - url: "*/*"
     service: py3-web
