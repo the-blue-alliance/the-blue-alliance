@@ -1956,6 +1956,9 @@ export type Media = {
    */
   details?:
     | {
+        [key: string]: unknown;
+      }
+    | {
         base64Image: string;
       }
     | {
