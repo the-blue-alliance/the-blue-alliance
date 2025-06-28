@@ -9261,6 +9261,10 @@
             "description": "If required, a JSON dict of additional media information.",
             "oneOf": [
               {
+                "type": "object",
+                "properties": {}
+              },
+              {
                 "properties": {
                   "base64Image": {
                     "type": "string"
