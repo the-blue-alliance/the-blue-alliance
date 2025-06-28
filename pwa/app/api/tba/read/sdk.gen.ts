@@ -244,85 +244,165 @@ import type {
   GetTeamsSimpleResponses,
 } from './types.gen';
 import {
+  zGetDistrictAdvancementData,
   zGetDistrictAdvancementResponse,
+  zGetDistrictAwardsData,
   zGetDistrictAwardsResponse,
+  zGetDistrictDcmpHistoryData,
   zGetDistrictDcmpHistoryResponse,
+  zGetDistrictEventsData,
+  zGetDistrictEventsKeysData,
   zGetDistrictEventsKeysResponse,
   zGetDistrictEventsResponse,
+  zGetDistrictEventsSimpleData,
   zGetDistrictEventsSimpleResponse,
+  zGetDistrictHistoryData,
   zGetDistrictHistoryResponse,
+  zGetDistrictInsightsData,
   zGetDistrictInsightsResponse,
+  zGetDistrictRankingsData,
   zGetDistrictRankingsResponse,
+  zGetDistrictTeamsData,
+  zGetDistrictTeamsKeysData,
   zGetDistrictTeamsKeysResponse,
   zGetDistrictTeamsResponse,
+  zGetDistrictTeamsSimpleData,
   zGetDistrictTeamsSimpleResponse,
+  zGetDistrictsByYearData,
   zGetDistrictsByYearResponse,
+  zGetEventAdvancementPointsData,
   zGetEventAdvancementPointsResponse,
+  zGetEventAlliancesData,
   zGetEventAlliancesResponse,
+  zGetEventAwardsData,
   zGetEventAwardsResponse,
+  zGetEventCoprsData,
   zGetEventCoprsResponse,
+  zGetEventData,
+  zGetEventDistrictPointsData,
   zGetEventDistrictPointsResponse,
+  zGetEventInsightsData,
   zGetEventInsightsResponse,
+  zGetEventMatchTimeseriesData,
   zGetEventMatchTimeseriesResponse,
+  zGetEventMatchesData,
+  zGetEventMatchesKeysData,
   zGetEventMatchesKeysResponse,
   zGetEventMatchesResponse,
+  zGetEventMatchesSimpleData,
   zGetEventMatchesSimpleResponse,
+  zGetEventOprsData,
   zGetEventOprsResponse,
+  zGetEventPredictionsData,
   zGetEventPredictionsResponse,
+  zGetEventRankingsData,
   zGetEventRankingsResponse,
   zGetEventResponse,
+  zGetEventSimpleData,
   zGetEventSimpleResponse,
+  zGetEventTeamMediaData,
   zGetEventTeamMediaResponse,
+  zGetEventTeamsData,
+  zGetEventTeamsKeysData,
   zGetEventTeamsKeysResponse,
   zGetEventTeamsResponse,
+  zGetEventTeamsSimpleData,
   zGetEventTeamsSimpleResponse,
+  zGetEventTeamsStatusesData,
   zGetEventTeamsStatusesResponse,
+  zGetEventsByYearData,
+  zGetEventsByYearKeysData,
   zGetEventsByYearKeysResponse,
   zGetEventsByYearResponse,
+  zGetEventsByYearSimpleData,
   zGetEventsByYearSimpleResponse,
+  zGetInsightsLeaderboardsYearData,
   zGetInsightsLeaderboardsYearResponse,
+  zGetInsightsNotablesYearData,
   zGetInsightsNotablesYearResponse,
+  zGetMatchData,
   zGetMatchResponse,
+  zGetMatchSimpleData,
   zGetMatchSimpleResponse,
+  zGetMatchTimeseriesData,
   zGetMatchTimeseriesResponse,
+  zGetMatchZebraData,
   zGetMatchZebraResponse,
+  zGetRegionalAdvancementData,
   zGetRegionalAdvancementResponse,
+  zGetRegionalChampsPoolPointsData,
   zGetRegionalChampsPoolPointsResponse,
+  zGetRegionalRankingsData,
   zGetRegionalRankingsResponse,
+  zGetSearchIndexData,
   zGetSearchIndexResponse,
+  zGetStatusData,
   zGetStatusResponse,
+  zGetTeamAwardsByYearData,
   zGetTeamAwardsByYearResponse,
+  zGetTeamAwardsData,
   zGetTeamAwardsResponse,
+  zGetTeamData,
+  zGetTeamDistrictsData,
   zGetTeamDistrictsResponse,
+  zGetTeamEventAwardsData,
   zGetTeamEventAwardsResponse,
+  zGetTeamEventMatchesData,
+  zGetTeamEventMatchesKeysData,
   zGetTeamEventMatchesKeysResponse,
   zGetTeamEventMatchesResponse,
+  zGetTeamEventMatchesSimpleData,
   zGetTeamEventMatchesSimpleResponse,
+  zGetTeamEventStatusData,
   zGetTeamEventStatusResponse,
+  zGetTeamEventsByYearData,
+  zGetTeamEventsByYearKeysData,
   zGetTeamEventsByYearKeysResponse,
   zGetTeamEventsByYearResponse,
+  zGetTeamEventsByYearSimpleData,
   zGetTeamEventsByYearSimpleResponse,
+  zGetTeamEventsData,
+  zGetTeamEventsKeysData,
   zGetTeamEventsKeysResponse,
   zGetTeamEventsResponse,
+  zGetTeamEventsSimpleData,
   zGetTeamEventsSimpleResponse,
+  zGetTeamEventsStatusesByYearData,
   zGetTeamEventsStatusesByYearResponse,
+  zGetTeamHistoryData,
   zGetTeamHistoryResponse,
+  zGetTeamMatchesByYearData,
+  zGetTeamMatchesByYearKeysData,
   zGetTeamMatchesByYearKeysResponse,
   zGetTeamMatchesByYearResponse,
+  zGetTeamMatchesByYearSimpleData,
   zGetTeamMatchesByYearSimpleResponse,
+  zGetTeamMediaByTagData,
   zGetTeamMediaByTagResponse,
+  zGetTeamMediaByTagYearData,
   zGetTeamMediaByTagYearResponse,
+  zGetTeamMediaByYearData,
   zGetTeamMediaByYearResponse,
   zGetTeamResponse,
+  zGetTeamRobotsData,
   zGetTeamRobotsResponse,
+  zGetTeamSimpleData,
   zGetTeamSimpleResponse,
+  zGetTeamSocialMediaData,
   zGetTeamSocialMediaResponse,
+  zGetTeamYearsParticipatedData,
   zGetTeamYearsParticipatedResponse,
+  zGetTeamsByYearData,
+  zGetTeamsByYearKeysData,
   zGetTeamsByYearKeysResponse,
   zGetTeamsByYearResponse,
+  zGetTeamsByYearSimpleData,
   zGetTeamsByYearSimpleResponse,
+  zGetTeamsData,
+  zGetTeamsKeysData,
   zGetTeamsKeysResponse,
   zGetTeamsResponse,
+  zGetTeamsSimpleData,
   zGetTeamsSimpleResponse,
 } from './zod.gen';
 
@@ -354,15 +434,18 @@ export const getStatus = <ThrowOnError extends boolean = false>(
     GetStatusErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetStatusData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetStatusResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetStatusResponse.parseAsync(data);
-    },
     url: '/status',
     ...options,
   });
@@ -379,15 +462,18 @@ export const getTeams = <ThrowOnError extends boolean = false>(
     GetTeamsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamsResponse.parseAsync(data);
-    },
     url: '/teams/{page_num}',
     ...options,
   });
@@ -404,15 +490,18 @@ export const getTeamsSimple = <ThrowOnError extends boolean = false>(
     GetTeamsSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamsSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamsSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamsSimpleResponse.parseAsync(data);
-    },
     url: '/teams/{page_num}/simple',
     ...options,
   });
@@ -429,15 +518,18 @@ export const getTeamsKeys = <ThrowOnError extends boolean = false>(
     GetTeamsKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamsKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamsKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamsKeysResponse.parseAsync(data);
-    },
     url: '/teams/{page_num}/keys',
     ...options,
   });
@@ -454,15 +546,18 @@ export const getTeamsByYear = <ThrowOnError extends boolean = false>(
     GetTeamsByYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamsByYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamsByYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamsByYearResponse.parseAsync(data);
-    },
     url: '/teams/{year}/{page_num}',
     ...options,
   });
@@ -479,15 +574,18 @@ export const getTeamsByYearSimple = <ThrowOnError extends boolean = false>(
     GetTeamsByYearSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamsByYearSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamsByYearSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamsByYearSimpleResponse.parseAsync(data);
-    },
     url: '/teams/{year}/{page_num}/simple',
     ...options,
   });
@@ -504,15 +602,18 @@ export const getTeamsByYearKeys = <ThrowOnError extends boolean = false>(
     GetTeamsByYearKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamsByYearKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamsByYearKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamsByYearKeysResponse.parseAsync(data);
-    },
     url: '/teams/{year}/{page_num}/keys',
     ...options,
   });
@@ -529,15 +630,18 @@ export const getTeam = <ThrowOnError extends boolean = false>(
     GetTeamErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamResponse.parseAsync(data);
-    },
     url: '/team/{team_key}',
     ...options,
   });
@@ -554,15 +658,18 @@ export const getTeamSimple = <ThrowOnError extends boolean = false>(
     GetTeamSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamSimpleResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/simple',
     ...options,
   });
@@ -579,15 +686,18 @@ export const getTeamHistory = <ThrowOnError extends boolean = false>(
     GetTeamHistoryErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamHistoryData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamHistoryResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamHistoryResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/history',
     ...options,
   });
@@ -604,15 +714,18 @@ export const getTeamYearsParticipated = <ThrowOnError extends boolean = false>(
     GetTeamYearsParticipatedErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamYearsParticipatedData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamYearsParticipatedResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamYearsParticipatedResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/years_participated',
     ...options,
   });
@@ -629,15 +742,18 @@ export const getTeamDistricts = <ThrowOnError extends boolean = false>(
     GetTeamDistrictsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamDistrictsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamDistrictsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamDistrictsResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/districts',
     ...options,
   });
@@ -654,15 +770,18 @@ export const getTeamRobots = <ThrowOnError extends boolean = false>(
     GetTeamRobotsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamRobotsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamRobotsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamRobotsResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/robots',
     ...options,
   });
@@ -679,15 +798,18 @@ export const getTeamEvents = <ThrowOnError extends boolean = false>(
     GetTeamEventsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventsResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/events',
     ...options,
   });
@@ -704,15 +826,18 @@ export const getTeamEventsSimple = <ThrowOnError extends boolean = false>(
     GetTeamEventsSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventsSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventsSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventsSimpleResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/events/simple',
     ...options,
   });
@@ -729,15 +854,18 @@ export const getTeamEventsKeys = <ThrowOnError extends boolean = false>(
     GetTeamEventsKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventsKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventsKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventsKeysResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/events/keys',
     ...options,
   });
@@ -754,15 +882,18 @@ export const getTeamEventsByYear = <ThrowOnError extends boolean = false>(
     GetTeamEventsByYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventsByYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventsByYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventsByYearResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/events/{year}',
     ...options,
   });
@@ -779,15 +910,18 @@ export const getTeamEventsByYearSimple = <ThrowOnError extends boolean = false>(
     GetTeamEventsByYearSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventsByYearSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventsByYearSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventsByYearSimpleResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/events/{year}/simple',
     ...options,
   });
@@ -804,15 +938,18 @@ export const getTeamEventsByYearKeys = <ThrowOnError extends boolean = false>(
     GetTeamEventsByYearKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventsByYearKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventsByYearKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventsByYearKeysResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/events/{year}/keys',
     ...options,
   });
@@ -831,15 +968,18 @@ export const getTeamEventsStatusesByYear = <
     GetTeamEventsStatusesByYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventsStatusesByYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventsStatusesByYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventsStatusesByYearResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/events/{year}/statuses',
     ...options,
   });
@@ -856,15 +996,18 @@ export const getTeamEventMatches = <ThrowOnError extends boolean = false>(
     GetTeamEventMatchesErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventMatchesData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventMatchesResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventMatchesResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/event/{event_key}/matches',
     ...options,
   });
@@ -881,15 +1024,18 @@ export const getTeamEventMatchesSimple = <ThrowOnError extends boolean = false>(
     GetTeamEventMatchesSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventMatchesSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventMatchesSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventMatchesSimpleResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/event/{event_key}/matches/simple',
     ...options,
   });
@@ -906,15 +1052,18 @@ export const getTeamEventMatchesKeys = <ThrowOnError extends boolean = false>(
     GetTeamEventMatchesKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventMatchesKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventMatchesKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventMatchesKeysResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/event/{event_key}/matches/keys',
     ...options,
   });
@@ -931,15 +1080,18 @@ export const getTeamEventAwards = <ThrowOnError extends boolean = false>(
     GetTeamEventAwardsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventAwardsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventAwardsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventAwardsResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/event/{event_key}/awards',
     ...options,
   });
@@ -956,15 +1108,18 @@ export const getTeamEventStatus = <ThrowOnError extends boolean = false>(
     GetTeamEventStatusErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamEventStatusData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamEventStatusResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamEventStatusResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/event/{event_key}/status',
     ...options,
   });
@@ -981,15 +1136,18 @@ export const getTeamAwards = <ThrowOnError extends boolean = false>(
     GetTeamAwardsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamAwardsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamAwardsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamAwardsResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/awards',
     ...options,
   });
@@ -1006,15 +1164,18 @@ export const getTeamAwardsByYear = <ThrowOnError extends boolean = false>(
     GetTeamAwardsByYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamAwardsByYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamAwardsByYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamAwardsByYearResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/awards/{year}',
     ...options,
   });
@@ -1031,15 +1192,18 @@ export const getTeamMatchesByYear = <ThrowOnError extends boolean = false>(
     GetTeamMatchesByYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamMatchesByYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamMatchesByYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamMatchesByYearResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/matches/{year}',
     ...options,
   });
@@ -1058,15 +1222,18 @@ export const getTeamMatchesByYearSimple = <
     GetTeamMatchesByYearSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamMatchesByYearSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamMatchesByYearSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamMatchesByYearSimpleResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/matches/{year}/simple',
     ...options,
   });
@@ -1083,15 +1250,18 @@ export const getTeamMatchesByYearKeys = <ThrowOnError extends boolean = false>(
     GetTeamMatchesByYearKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamMatchesByYearKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamMatchesByYearKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamMatchesByYearKeysResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/matches/{year}/keys',
     ...options,
   });
@@ -1108,15 +1278,18 @@ export const getTeamMediaByYear = <ThrowOnError extends boolean = false>(
     GetTeamMediaByYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamMediaByYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamMediaByYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamMediaByYearResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/media/{year}',
     ...options,
   });
@@ -1133,15 +1306,18 @@ export const getTeamMediaByTag = <ThrowOnError extends boolean = false>(
     GetTeamMediaByTagErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamMediaByTagData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamMediaByTagResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamMediaByTagResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/media/tag/{media_tag}',
     ...options,
   });
@@ -1158,15 +1334,18 @@ export const getTeamMediaByTagYear = <ThrowOnError extends boolean = false>(
     GetTeamMediaByTagYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamMediaByTagYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamMediaByTagYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamMediaByTagYearResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/media/tag/{media_tag}/{year}',
     ...options,
   });
@@ -1183,15 +1362,18 @@ export const getTeamSocialMedia = <ThrowOnError extends boolean = false>(
     GetTeamSocialMediaErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetTeamSocialMediaData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetTeamSocialMediaResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetTeamSocialMediaResponse.parseAsync(data);
-    },
     url: '/team/{team_key}/social_media',
     ...options,
   });
@@ -1208,15 +1390,18 @@ export const getEventsByYear = <ThrowOnError extends boolean = false>(
     GetEventsByYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventsByYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventsByYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventsByYearResponse.parseAsync(data);
-    },
     url: '/events/{year}',
     ...options,
   });
@@ -1233,15 +1418,18 @@ export const getEventsByYearSimple = <ThrowOnError extends boolean = false>(
     GetEventsByYearSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventsByYearSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventsByYearSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventsByYearSimpleResponse.parseAsync(data);
-    },
     url: '/events/{year}/simple',
     ...options,
   });
@@ -1258,15 +1446,18 @@ export const getEventsByYearKeys = <ThrowOnError extends boolean = false>(
     GetEventsByYearKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventsByYearKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventsByYearKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventsByYearKeysResponse.parseAsync(data);
-    },
     url: '/events/{year}/keys',
     ...options,
   });
@@ -1283,15 +1474,18 @@ export const getEvent = <ThrowOnError extends boolean = false>(
     GetEventErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventResponse.parseAsync(data);
-    },
     url: '/event/{event_key}',
     ...options,
   });
@@ -1308,15 +1502,18 @@ export const getEventSimple = <ThrowOnError extends boolean = false>(
     GetEventSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventSimpleResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/simple',
     ...options,
   });
@@ -1333,15 +1530,18 @@ export const getEventAlliances = <ThrowOnError extends boolean = false>(
     GetEventAlliancesErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventAlliancesData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventAlliancesResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventAlliancesResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/alliances',
     ...options,
   });
@@ -1358,15 +1558,18 @@ export const getEventInsights = <ThrowOnError extends boolean = false>(
     GetEventInsightsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventInsightsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventInsightsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventInsightsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/insights',
     ...options,
   });
@@ -1383,15 +1586,18 @@ export const getEventOprs = <ThrowOnError extends boolean = false>(
     GetEventOprsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventOprsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventOprsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventOprsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/oprs',
     ...options,
   });
@@ -1408,15 +1614,18 @@ export const getEventCoprs = <ThrowOnError extends boolean = false>(
     GetEventCoprsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventCoprsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventCoprsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventCoprsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/coprs',
     ...options,
   });
@@ -1433,15 +1642,18 @@ export const getEventPredictions = <ThrowOnError extends boolean = false>(
     GetEventPredictionsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventPredictionsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventPredictionsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventPredictionsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/predictions',
     ...options,
   });
@@ -1458,15 +1670,18 @@ export const getEventRankings = <ThrowOnError extends boolean = false>(
     GetEventRankingsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventRankingsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventRankingsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventRankingsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/rankings',
     ...options,
   });
@@ -1483,15 +1698,18 @@ export const getEventDistrictPoints = <ThrowOnError extends boolean = false>(
     GetEventDistrictPointsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventDistrictPointsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventDistrictPointsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventDistrictPointsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/district_points',
     ...options,
   });
@@ -1510,15 +1728,18 @@ export const getRegionalChampsPoolPoints = <
     GetRegionalChampsPoolPointsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetRegionalChampsPoolPointsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetRegionalChampsPoolPointsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetRegionalChampsPoolPointsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/regional_champs_pool_points',
     ...options,
   });
@@ -1535,15 +1756,18 @@ export const getEventAdvancementPoints = <ThrowOnError extends boolean = false>(
     GetEventAdvancementPointsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventAdvancementPointsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventAdvancementPointsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventAdvancementPointsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/advancement_points',
     ...options,
   });
@@ -1560,15 +1784,18 @@ export const getEventTeams = <ThrowOnError extends boolean = false>(
     GetEventTeamsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventTeamsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventTeamsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventTeamsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/teams',
     ...options,
   });
@@ -1585,15 +1812,18 @@ export const getEventTeamsSimple = <ThrowOnError extends boolean = false>(
     GetEventTeamsSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventTeamsSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventTeamsSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventTeamsSimpleResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/teams/simple',
     ...options,
   });
@@ -1610,15 +1840,18 @@ export const getEventTeamsKeys = <ThrowOnError extends boolean = false>(
     GetEventTeamsKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventTeamsKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventTeamsKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventTeamsKeysResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/teams/keys',
     ...options,
   });
@@ -1635,15 +1868,18 @@ export const getEventTeamsStatuses = <ThrowOnError extends boolean = false>(
     GetEventTeamsStatusesErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventTeamsStatusesData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventTeamsStatusesResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventTeamsStatusesResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/teams/statuses',
     ...options,
   });
@@ -1660,15 +1896,18 @@ export const getEventMatches = <ThrowOnError extends boolean = false>(
     GetEventMatchesErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventMatchesData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventMatchesResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventMatchesResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/matches',
     ...options,
   });
@@ -1685,15 +1924,18 @@ export const getEventMatchesSimple = <ThrowOnError extends boolean = false>(
     GetEventMatchesSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventMatchesSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventMatchesSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventMatchesSimpleResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/matches/simple',
     ...options,
   });
@@ -1710,15 +1952,18 @@ export const getEventMatchesKeys = <ThrowOnError extends boolean = false>(
     GetEventMatchesKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventMatchesKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventMatchesKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventMatchesKeysResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/matches/keys',
     ...options,
   });
@@ -1737,15 +1982,18 @@ export const getEventMatchTimeseries = <ThrowOnError extends boolean = false>(
     GetEventMatchTimeseriesErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventMatchTimeseriesData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventMatchTimeseriesResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventMatchTimeseriesResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/matches/timeseries',
     ...options,
   });
@@ -1762,15 +2010,18 @@ export const getEventAwards = <ThrowOnError extends boolean = false>(
     GetEventAwardsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventAwardsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventAwardsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventAwardsResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/awards',
     ...options,
   });
@@ -1787,15 +2038,18 @@ export const getEventTeamMedia = <ThrowOnError extends boolean = false>(
     GetEventTeamMediaErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetEventTeamMediaData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetEventTeamMediaResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetEventTeamMediaResponse.parseAsync(data);
-    },
     url: '/event/{event_key}/team_media',
     ...options,
   });
@@ -1812,15 +2066,18 @@ export const getMatch = <ThrowOnError extends boolean = false>(
     GetMatchErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetMatchData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetMatchResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetMatchResponse.parseAsync(data);
-    },
     url: '/match/{match_key}',
     ...options,
   });
@@ -1837,15 +2094,18 @@ export const getMatchSimple = <ThrowOnError extends boolean = false>(
     GetMatchSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetMatchSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetMatchSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetMatchSimpleResponse.parseAsync(data);
-    },
     url: '/match/{match_key}/simple',
     ...options,
   });
@@ -1864,15 +2124,18 @@ export const getMatchTimeseries = <ThrowOnError extends boolean = false>(
     GetMatchTimeseriesErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetMatchTimeseriesData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetMatchTimeseriesResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetMatchTimeseriesResponse.parseAsync(data);
-    },
     url: '/match/{match_key}/timeseries',
     ...options,
   });
@@ -1889,15 +2152,18 @@ export const getMatchZebra = <ThrowOnError extends boolean = false>(
     GetMatchZebraErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetMatchZebraData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetMatchZebraResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetMatchZebraResponse.parseAsync(data);
-    },
     url: '/match/{match_key}/zebra_motionworks',
     ...options,
   });
@@ -1914,15 +2180,18 @@ export const getDistrictsByYear = <ThrowOnError extends boolean = false>(
     GetDistrictsByYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictsByYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictsByYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictsByYearResponse.parseAsync(data);
-    },
     url: '/districts/{year}',
     ...options,
   });
@@ -1939,15 +2208,18 @@ export const getDistrictHistory = <ThrowOnError extends boolean = false>(
     GetDistrictHistoryErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictHistoryData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictHistoryResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictHistoryResponse.parseAsync(data);
-    },
     url: '/district/{district_abbreviation}/history',
     ...options,
   });
@@ -1964,15 +2236,18 @@ export const getDistrictInsights = <ThrowOnError extends boolean = false>(
     GetDistrictInsightsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictInsightsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictInsightsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictInsightsResponse.parseAsync(data);
-    },
     url: '/district/{district_abbreviation}/insights',
     ...options,
   });
@@ -1989,15 +2264,18 @@ export const getDistrictEvents = <ThrowOnError extends boolean = false>(
     GetDistrictEventsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictEventsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictEventsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictEventsResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/events',
     ...options,
   });
@@ -2014,15 +2292,18 @@ export const getDistrictAwards = <ThrowOnError extends boolean = false>(
     GetDistrictAwardsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictAwardsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictAwardsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictAwardsResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/awards',
     ...options,
   });
@@ -2039,15 +2320,18 @@ export const getDistrictEventsSimple = <ThrowOnError extends boolean = false>(
     GetDistrictEventsSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictEventsSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictEventsSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictEventsSimpleResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/events/simple',
     ...options,
   });
@@ -2064,15 +2348,18 @@ export const getDistrictEventsKeys = <ThrowOnError extends boolean = false>(
     GetDistrictEventsKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictEventsKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictEventsKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictEventsKeysResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/events/keys',
     ...options,
   });
@@ -2089,15 +2376,18 @@ export const getDistrictTeams = <ThrowOnError extends boolean = false>(
     GetDistrictTeamsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictTeamsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictTeamsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictTeamsResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/teams',
     ...options,
   });
@@ -2114,15 +2404,18 @@ export const getDistrictTeamsSimple = <ThrowOnError extends boolean = false>(
     GetDistrictTeamsSimpleErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictTeamsSimpleData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictTeamsSimpleResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictTeamsSimpleResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/teams/simple',
     ...options,
   });
@@ -2139,15 +2432,18 @@ export const getDistrictTeamsKeys = <ThrowOnError extends boolean = false>(
     GetDistrictTeamsKeysErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictTeamsKeysData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictTeamsKeysResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictTeamsKeysResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/teams/keys',
     ...options,
   });
@@ -2164,15 +2460,18 @@ export const getDistrictRankings = <ThrowOnError extends boolean = false>(
     GetDistrictRankingsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictRankingsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictRankingsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictRankingsResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/rankings',
     ...options,
   });
@@ -2189,15 +2488,18 @@ export const getDistrictAdvancement = <ThrowOnError extends boolean = false>(
     GetDistrictAdvancementErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictAdvancementData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictAdvancementResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictAdvancementResponse.parseAsync(data);
-    },
     url: '/district/{district_key}/advancement',
     ...options,
   });
@@ -2214,15 +2516,18 @@ export const getDistrictDcmpHistory = <ThrowOnError extends boolean = false>(
     GetDistrictDcmpHistoryErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetDistrictDcmpHistoryData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetDistrictDcmpHistoryResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetDistrictDcmpHistoryResponse.parseAsync(data);
-    },
     url: '/district/{district_abbreviation}/dcmp_history',
     ...options,
   });
@@ -2239,15 +2544,18 @@ export const getRegionalAdvancement = <ThrowOnError extends boolean = false>(
     GetRegionalAdvancementErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetRegionalAdvancementData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetRegionalAdvancementResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetRegionalAdvancementResponse.parseAsync(data);
-    },
     url: '/regional_advancement/{year}',
     ...options,
   });
@@ -2264,15 +2572,18 @@ export const getRegionalRankings = <ThrowOnError extends boolean = false>(
     GetRegionalRankingsErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetRegionalRankingsData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetRegionalRankingsResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetRegionalRankingsResponse.parseAsync(data);
-    },
     url: '/regional_advancement/{year}/rankings',
     ...options,
   });
@@ -2291,15 +2602,18 @@ export const getInsightsLeaderboardsYear = <
     GetInsightsLeaderboardsYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetInsightsLeaderboardsYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetInsightsLeaderboardsYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetInsightsLeaderboardsYearResponse.parseAsync(data);
-    },
     url: '/insights/leaderboards/{year}',
     ...options,
   });
@@ -2316,15 +2630,18 @@ export const getInsightsNotablesYear = <ThrowOnError extends boolean = false>(
     GetInsightsNotablesYearErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetInsightsNotablesYearData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetInsightsNotablesYearResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetInsightsNotablesYearResponse.parseAsync(data);
-    },
     url: '/insights/notables/{year}',
     ...options,
   });
@@ -2341,15 +2658,18 @@ export const getSearchIndex = <ThrowOnError extends boolean = false>(
     GetSearchIndexErrors,
     ThrowOnError
   >({
+    requestValidator: async (data) => {
+      return await zGetSearchIndexData.parseAsync(data);
+    },
+    responseValidator: async (data) => {
+      return await zGetSearchIndexResponse.parseAsync(data);
+    },
     security: [
       {
         name: 'X-TBA-Auth-Key',
         type: 'apiKey',
       },
     ],
-    responseValidator: async (data) => {
-      return await zGetSearchIndexResponse.parseAsync(data);
-    },
     url: '/search_index',
     ...options,
   });
