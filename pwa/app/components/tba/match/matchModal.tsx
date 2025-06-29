@@ -46,7 +46,7 @@ export function MatchModal() {
 
   return (
     <Credenza open={isOpen} onOpenChange={handleOpenChange}>
-      <CredenzaContent className="max-w-3xl">
+      <CredenzaContent className="max-w-5xl sm:max-w-5xl">
         {displayMatchKey && (
           <Suspense fallback={<MatchModalSpinner />}>
             <MatchModalContent matchKey={displayMatchKey} />
@@ -95,7 +95,7 @@ function MatchModalContent({ matchKey }: { matchKey: string }) {
           {event.name} {event.year}
         </CredenzaTitle>
       </CredenzaHeader>
-      <CredenzaBody>
+      <CredenzaBody className="max-h-[80vh] overflow-y-auto">
         <MatchDetails match={match} event={event} />
       </CredenzaBody>
     </>
