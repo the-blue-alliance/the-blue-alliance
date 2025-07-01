@@ -48,7 +48,7 @@
     "embla-carousel-autoplay": "8.6.0",
     "embla-carousel-react": "8.6.0",
     "express": "5.1.0",
-    "firebase": "11.9.1",
+    "firebase": "11.10.0",
     "firebase-admin": "13.4.0",
     "fuzzysort": "3.1.0",
     "isbot": "5.1.28",
