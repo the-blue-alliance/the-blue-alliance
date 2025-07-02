@@ -290,7 +290,6 @@ jobs:
         run: npm --prefix pwa run build
   pwa-e2e:
     name: "[pwa] E2E Tests"
-    if: false
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -307,13 +306,16 @@ jobs:
 
       - name: Install Playwright Browsers
         working-directory: pwa
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Run Playwright tests
         working-directory: pwa
         run: npx playwright test
         env:
           VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+          VITE_FIREBASE_API_KEY: "fake-api-key"
+          VITE_FIREBASE_AUTH_DOMAIN: "demo-test"
+          VITE_FIREBASE_PROJECT_ID: "demo-test"
 
   check-pwa-api:
     name: "[pwa] Check API regeneration"
