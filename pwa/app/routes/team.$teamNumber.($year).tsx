@@ -493,23 +493,50 @@ function StatsSection({
               <TableBody>
                 <TableRow>
                   <TableHead>Official</TableHead>
-                  <RecordCell record={officialRecords.quals} />
-                  <RecordCell record={officialRecords.playoff} />
-                  <RecordCell record={officialRecord} />
+                  <RecordCell
+                    record={officialRecords.quals}
+                    dataTestId="official_quals"
+                  />
+                  <RecordCell
+                    record={officialRecords.playoff}
+                    dataTestId="official_playoff"
+                  />
+                  <RecordCell
+                    record={officialRecord}
+                    dataTestId="official_overall"
+                  />
                 </TableRow>
 
                 <TableRow>
                   <TableHead>Unofficial</TableHead>
-                  <RecordCell record={unofficialRecords.quals} />
-                  <RecordCell record={unofficialRecords.playoff} />
-                  <RecordCell record={unofficialRecord} />
+                  <RecordCell
+                    record={unofficialRecords.quals}
+                    dataTestId="unofficial_quals"
+                  />
+                  <RecordCell
+                    record={unofficialRecords.playoff}
+                    dataTestId="unofficial_playoff"
+                  />
+                  <RecordCell
+                    record={unofficialRecord}
+                    dataTestId="unofficial_overall"
+                  />
                 </TableRow>
 
                 <TableRow>
                   <TableHead>Combined</TableHead>
-                  <RecordCell record={combinedQuals} />
-                  <RecordCell record={combinedPlayoff} />
-                  <RecordCell record={combinedRecord} />
+                  <RecordCell
+                    record={combinedQuals}
+                    dataTestId="combined_quals"
+                  />
+                  <RecordCell
+                    record={combinedPlayoff}
+                    dataTestId="combined_playoff"
+                  />
+                  <RecordCell
+                    record={combinedRecord}
+                    dataTestId="combined_overall"
+                  />
                 </TableRow>
               </TableBody>
             </Table>
@@ -520,15 +547,23 @@ function StatsSection({
   );
 }
 
-function RecordCell({ record }: { record: WltRecord }) {
+function RecordCell({
+  record,
+  dataTestId,
+}: {
+  record: WltRecord;
+  dataTestId: string;
+}) {
   return (
     <TableCell className="text-center">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="cursor-pointer">{stringifyRecord(record)}</div>
+            <div className="cursor-pointer" data-testid={`${dataTestId}_cell`}>
+              {stringifyRecord(record)}
+            </div>
           </TooltipTrigger>
-          <TooltipContent side="top">
+          <TooltipContent side="top" data-testid={`${dataTestId}_tooltip`}>
             {(winrateFromRecord(record) * 100).toFixed(0)}% winrate
           </TooltipContent>
         </Tooltip>
@@ -539,7 +574,10 @@ function RecordCell({ record }: { record: WltRecord }) {
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="mx-auto flex min-w-[16ch] flex-col text-center">
+    <div
+      className="mx-auto flex min-w-[16ch] flex-col text-center"
+      data-testid={`test_${label}`}
+    >
       <dt className="text-gray-500">{label}</dt>
       <dd className="order-first text-2xl font-semibold tracking-tight text-gray-900">
         {value}
