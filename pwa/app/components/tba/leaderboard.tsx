@@ -143,7 +143,10 @@ function LeaderboardKeyList({
               &nbsp;(and{' '}
               {pluralize(keyVals.length - cutoffSize, 'other', 'others')})
             </TooltipTrigger>
-            <TooltipContent className="max-w-[500px] text-center break-words whitespace-normal">
+            <TooltipContent
+              className="max-w-[500px] text-center break-words
+                whitespace-normal"
+            >
               <p>
                 {keyVals.map((k, i) => (
                   <React.Fragment key={k}>

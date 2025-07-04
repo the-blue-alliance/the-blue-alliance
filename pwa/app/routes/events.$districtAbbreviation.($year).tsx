@@ -185,8 +185,8 @@ export default function DistrictPage() {
 
       <Tabs defaultValue={'overview'} className="mt-4">
         <TabsList
-          className="flex h-auto flex-wrap items-center justify-evenly [&>*]:basis-1/2
-            lg:[&>*]:basis-1"
+          className="flex h-auto flex-wrap items-center justify-evenly
+            [&>*]:basis-1/2 lg:[&>*]:basis-1"
         >
           <TabsTrigger value="overview">Overview</TabsTrigger>
           {hasRankings && <TabsTrigger value="rankings">Rankings</TabsTrigger>}

@@ -309,7 +309,10 @@ export default function EventPage() {
         defaultValue={matches.length > 0 ? 'results' : 'teams'}
         className="mt-4"
       >
-        <TabsList className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2 lg:*:basis-1">
+        <TabsList
+          className="flex h-auto flex-wrap items-center justify-evenly
+            *:basis-1/2 lg:*:basis-1"
+        >
           {(matches.length > 0 || alliances.length > 0) && (
             <TabsTrigger value="results">
               <InlineIcon>
@@ -440,7 +443,8 @@ function AwardsTab({ awards }: { awards: Award[] }) {
           {awards.map((award) => (
             <div
               key={award.name}
-              className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4 sm:px-10"
+              className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4
+                sm:px-10"
             >
               <dt className="font-medium text-gray-900 sm:col-span-2">
                 {award.name}
@@ -509,7 +513,10 @@ function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
                     })}
                   >
                     {maybeAvatar && (
-                      <div className="flex h-full w-full items-center justify-center">
+                      <div
+                        className="flex h-full w-full items-center
+                          justify-center"
+                      >
                         <TeamAvatar media={maybeAvatar} />
                       </div>
                     )}
@@ -546,7 +553,8 @@ function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
                               <img
                                 src={maybeRobotPic}
                                 alt=""
-                                className="max-h-[80vh] w-3xl rounded-lg object-cover"
+                                className="max-h-[80vh] w-3xl rounded-lg
+                                  object-cover"
                                 loading="lazy"
                               />
                             </DialogDescription>

@@ -53,7 +53,10 @@ export default function Index() {
     <div>
       <div className="px-6 py-10 sm:py-8 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+          <h2
+            className="mt-2 text-4xl font-bold tracking-tight text-gray-900
+              sm:text-6xl"
+          >
             The Blue Alliance
           </h2>
           <p className="mt-6 text-lg leading-5 text-gray-600">

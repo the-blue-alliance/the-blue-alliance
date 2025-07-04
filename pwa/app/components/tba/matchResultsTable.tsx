@@ -224,7 +224,9 @@ export function MatchResultsTableGroup({
   );
 
   return (
-    <div className="min-w-[25rem] border-t border-l border-[#ddd] md:min-w-[35rem]">
+    <div
+      className="min-w-[25rem] border-t border-l border-[#ddd] md:min-w-[35rem]"
+    >
       <div className={cn(gridStyle, 'bg-[#f0f0f0] font-semibold')}>
         <div className="row-span-2 lg:row-span-1">
           <PlayCircle className="inline" />
@@ -234,7 +236,10 @@ export function MatchResultsTableGroup({
         <div className="col-span-3 col-start-3 lg:col-start-6">
           Blue Alliance
         </div>
-        <div className="col-start-6 row-span-2 row-start-1 lg:col-span-2 lg:col-start-9">
+        <div
+          className="col-start-6 row-span-2 row-start-1 lg:col-span-2
+            lg:col-start-9"
+        >
           Scores
         </div>
       </div>
@@ -340,8 +345,8 @@ export function MatchResultsTableGroup({
             {/* unplayed match */}
             {m.alliances.red.score == -1 && m.alliances.blue.score == -1 && (
               <GridCell
-                className="relative col-start-6 row-span-2 row-start-1 lg:col-span-2 lg:col-start-9
-                  lg:row-span-1"
+                className="relative col-start-6 row-span-2 row-start-1
+                  lg:col-span-2 lg:col-start-9 lg:row-span-1"
                 teamOrScore={'score'}
               >
                 {m.predicted_time && (
