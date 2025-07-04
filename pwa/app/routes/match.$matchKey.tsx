@@ -66,6 +66,7 @@ export function meta({ data }: Route.MetaArgs) {
 
 export default function MatchPage() {
   const { event, match } = useLoaderData<typeof loader>();
+
   return (
     <div>
       <h1 className="mt-5 text-4xl">
