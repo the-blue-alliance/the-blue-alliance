@@ -27,7 +27,8 @@ export default function SignInButton({
   return (
     <button
       className={cn(
-        'flex h-10 w-full cursor-pointer items-center justify-center rounded text-base',
+        `flex h-10 w-full cursor-pointer items-center justify-center rounded
+        text-base`,
         className,
       )}
       onClick={handleSignIn}

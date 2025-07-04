@@ -82,14 +82,17 @@ export const DropMenuItem = ({
         {route ? (
           <Link
             to={route}
-            className="flex grow flex-row flex-wrap content-between items-center justify-start px-2
-              text-white hover:no-underline"
+            className="flex grow flex-row flex-wrap content-between items-center
+              justify-start px-2 text-white hover:no-underline"
           >
             {icon}
             <div className="pl-2 antialiased">{title}</div>
           </Link>
         ) : (
-          <div className="flex grow flex-row flex-wrap content-between items-center justify-start px-2">
+          <div
+            className="flex grow flex-row flex-wrap content-between items-center
+              justify-start px-2"
+          >
             {icon}
             <div className="pl-2 antialiased">{title}</div>
           </div>
@@ -101,7 +104,10 @@ export const DropMenuItem = ({
 
 export const Nav = () => {
   return (
-    <div className="fixed z-10 flex w-full grow justify-center bg-primary shadow-md">
+    <div
+      className="fixed z-10 flex w-full grow justify-center bg-primary
+        shadow-md"
+    >
       <GlobalLoadingProgress />
       <NavigationMenu className="gap-6 px-4 py-2.5">
         <Link to="/" className="flex items-center gap-3 hover:no-underline">
@@ -110,7 +116,10 @@ export const Nav = () => {
             className="size-6 max-w-none"
             alt="The Blue Alliance Logo"
           />
-          <div className="hidden text-xl font-medium tracking-tight whitespace-nowrap text-white lg:block">
+          <div
+            className="hidden text-xl font-medium tracking-tight
+              whitespace-nowrap text-white lg:block"
+          >
             The Blue Alliance
           </div>
         </Link>
@@ -142,8 +151,8 @@ export const Nav = () => {
               alignOffset={-2}
               align="start"
               className={cn(
-                `shadow-l m-0 mt-6 w-30 rounded-md border-none bg-primary px-1 py-1
-                drop-shadow-lg`,
+                `shadow-l m-0 mt-6 w-30 rounded-md border-none bg-primary px-1
+                py-1 drop-shadow-lg`,
               )}
             >
               <DropMenuItem
