@@ -1,6 +1,6 @@
 import { useLoaderData, useNavigate } from 'react-router';
 
-import { getStatus, getTeamsSimple } from '~/api/v3';
+import { getStatus, getTeamsSimple } from '~/api/tba';
 import TeamListTable from '~/components/tba/teamListTable';
 import {
   Select,
@@ -18,10 +18,10 @@ async function loadData(params: Route.LoaderArgs['params']) {
   //TODO: Cache
   const apiStatus = await getStatus({});
 
-  if (apiStatus.status !== 200) {
+  if (apiStatus.data === undefined) {
     throw new Response(null, {
       status: 500,
-      statusText: 'Server failed to respond with API Status',
+      statusText: 'Server failed to report status'
     });
   }
 
@@ -35,7 +35,7 @@ async function loadData(params: Route.LoaderArgs['params']) {
     });
   }
 
-  const teamsSetOne = await getTeamsSimple({ pageNum: pageNum });
+  const teamsSetOne = await getTeamsSimple({ path: { page_num: pageNum } })
 
   if (apiStatus.data.max_team_page === 0) {
     throw new Response(null, {
@@ -44,14 +44,14 @@ async function loadData(params: Route.LoaderArgs['params']) {
     });
   }
 
-  if (teamsSetOne.status !== 200) {
+  if (teamsSetOne === undefined) {
     throw new Response(null, {
       status: 500,
       statusText: 'Server failed to respond with Team Data (Set 1/2)',
     });
   }
 
-  if (teamsSetOne.data.length === 0) {
+  if (teamsSetOne.data === undefined || teamsSetOne.data.length === 0) {
     throw new Response(null, {
       status: 404,
       statusText: 'Team Data (Set 1/2) was missing',
@@ -61,16 +61,16 @@ async function loadData(params: Route.LoaderArgs['params']) {
   let teams = teamsSetOne.data;
 
   if (pageNum < maxPageNum) {
-    const teamsSetTwo = await getTeamsSimple({ pageNum: pageNum + 1 });
+    const teamsSetTwo = await getTeamsSimple({ path: { page_num: pageNum + 1 } });
 
-    if (teamsSetTwo.status !== 200) {
+    if (teamsSetTwo === undefined) {
       throw new Response(null, {
         status: 500,
         statusText: 'Server failed to respond with Team Data (Set 2/2)',
       });
     }
 
-    if (teamsSetTwo.data.length === 0) {
+    if (teamsSetTwo.data === undefined || teamsSetTwo.data.length === 0) {
       throw new Response(null, {
         status: 404,
         statusText: 'Team Data (Set 2/2) was missing',
