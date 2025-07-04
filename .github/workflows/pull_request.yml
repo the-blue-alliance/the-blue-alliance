@@ -291,6 +291,7 @@ jobs:
   pwa-e2e:
     name: "[pwa] E2E Tests"
     runs-on: ubuntu-22.04
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - uses: actions/checkout@v4
 

@@ -1,0 +1,41 @@
+name: On pull request target
+
+on:
+  pull_request_target:
+    branches:
+      - py3
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  pwa-e2e:
+    name: "[pwa] E2E Tests (dependabot)"
+    runs-on: ubuntu-22.04
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: "22.14.0"
+          cache: "npm"
+
+      - name: Install Dependencies
+        working-directory: pwa
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        working-directory: pwa
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Run Playwright tests
+        working-directory: pwa
+        run: npx playwright test
+        env:
+          VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+          VITE_FIREBASE_API_KEY: "fake-api-key"
+          VITE_FIREBASE_AUTH_DOMAIN: "demo-test"
+          VITE_FIREBASE_PROJECT_ID: "demo-test"
