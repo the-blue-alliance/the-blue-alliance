@@ -288,6 +288,15 @@ class Event(CachedModel):
         if self._matches is None:
             self.get_matches_async()
 
+    def clear_matches(self) -> None:
+        self._matches = None
+
+    def clear_awards(self) -> None:
+        self._awards = None
+
+    def clear_teams(self) -> None:
+        self._teams = None
+
     @property
     def matches(self) -> List["Match"]:
         if self._matches is None:
