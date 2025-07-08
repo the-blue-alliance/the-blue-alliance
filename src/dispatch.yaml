@@ -18,7 +18,10 @@ dispatch:
   - url: "*/_ah/queue/deferred*"
     service: py3-tasks-io
 
-  - url: "*/backend-tasks-b2/*"
+  - url: "*/backend-tasks-b2/enqueue/*"
+    service: py3-tasks-cpu-enqueue
+
+  - url: "*/backend-tasks-b2/do/*"
     service: py3-tasks-cpu
 
   - url: "*/*"

@@ -27,9 +27,9 @@ from backend.common.models.keys import Year
 blueprint = Blueprint("insights", __name__)
 
 
-@blueprint.route("/backend-tasks-b2/math/enqueue/insights/<kind>/<int:year>")
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights/<kind>/<int:year>")
 @blueprint.route(
-    "/backend-tasks-b2/math/enqueue/insights/<kind>", defaults={"year": None}
+    "/backend-tasks-b2/enqueue/math/insights/<kind>", defaults={"year": None}
 )
 def enqueue_year_insights(kind: str, year: Optional[Year] = None) -> Response:
     if year is None:
@@ -60,7 +60,7 @@ def enqueue_year_insights(kind: str, year: Optional[Year] = None) -> Response:
     return make_response("")
 
 
-@blueprint.route("/backend-tasks-b2/math/do/insights/<kind>/<int:year>")
+@blueprint.route("/backend-tasks-b2/do/math/insights/<kind>/<int:year>")
 def do_year_insights(kind: str, year: Year) -> Response:
     """
     Calculates insights of a given kind for a given year.
@@ -98,7 +98,7 @@ def do_year_insights(kind: str, year: Year) -> Response:
     return make_response("")
 
 
-@blueprint.route("/backend-tasks-b2/math/do/insights/leaderboards/<kind>/<int:year>")
+@blueprint.route("/backend-tasks-b2/do/math/insights/leaderboards/<kind>/<int:year>")
 def do_leaderboard_year_insights(kind: LeaderboardKeyType, year: Year) -> Response:
     if kind not in Insight.TYPED_LEADERBOARD_KEY_TYPES.values():
         return make_response(f"Unknown leaderboard kind {escape(kind)}")
@@ -118,10 +118,10 @@ def do_leaderboard_year_insights(kind: LeaderboardKeyType, year: Year) -> Respon
 
 
 @blueprint.route(
-    "/backend-tasks-b2/math/enqueue/insights/leaderboards/<kind>/<int:year>"
+    "/backend-tasks-b2/enqueue/math/insights/leaderboards/<kind>/<int:year>"
 )
 @blueprint.route(
-    "/backend-tasks-b2/math/enqueue/insights/leaderboards/<kind>",
+    "/backend-tasks-b2/enqueue/math/insights/leaderboards/<kind>",
     defaults={"year": None},
 )
 def enqueue_leaderboard_year_insights(
@@ -142,7 +142,7 @@ def enqueue_leaderboard_year_insights(
     )
 
 
-@blueprint.route("/backend-tasks-b2/math/enqueue/insights/leaderboards/<kind>/all")
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights/leaderboards/<kind>/all")
 def enqueue_all_leaderboard_insights(kind: LeaderboardKeyType) -> Response:
     for year in SeasonHelper.get_valid_years():
         taskqueue.add(
@@ -162,8 +162,8 @@ def enqueue_all_leaderboard_insights(kind: LeaderboardKeyType) -> Response:
     return make_response(f"enqueued {escape(kind)} leaderboard insights for all years")
 
 
-@blueprint.route("/backend-tasks-b2/math/enqueue/notables/<int:year>")
-@blueprint.route("/backend-tasks-b2/math/enqueue/notables", defaults={"year": None})
+@blueprint.route("/backend-tasks-b2/enqueue/math/notables/<int:year>")
+@blueprint.route("/backend-tasks-b2/enqueue/math/notables", defaults={"year": None})
 def enqueue_notables_year_insights(year: Optional[Year] = None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
@@ -178,7 +178,7 @@ def enqueue_notables_year_insights(year: Optional[Year] = None) -> Response:
     return make_response(f"enqueued notable insights for year {escape(str(year))}")
 
 
-@blueprint.route("/backend-tasks-b2/math/enqueue/notables/all")
+@blueprint.route("/backend-tasks-b2/enqueue/math/notables/all")
 def enqueue_all_notables_insights() -> Response:
     for year in SeasonHelper.get_valid_years():
         taskqueue.add(
@@ -198,7 +198,7 @@ def enqueue_all_notables_insights() -> Response:
     return make_response("enqueued all notable insights")
 
 
-@blueprint.route("/backend-tasks-b2/math/do/notables/<int:year>")
+@blueprint.route("/backend-tasks-b2/do/math/notables/<int:year>")
 def do_notables_year_insights(year: Year) -> Response:
     insights = InsightsNotableHelper.make_insights(year)
 
@@ -208,7 +208,7 @@ def do_notables_year_insights(year: Year) -> Response:
     return make_response(repr(insights))
 
 
-@blueprint.route("/backend-tasks-b2/math/enqueue/overallinsights/<kind>")
+@blueprint.route("/backend-tasks-b2/enqueue/math/overallinsights/<kind>")
 def enqueue_overall_insights(kind: str) -> Response:
     """
     Enqueues Overall Insights calculation for a given kind.
@@ -230,7 +230,7 @@ def enqueue_overall_insights(kind: str) -> Response:
     return make_response("")
 
 
-@blueprint.route("/backend-tasks-b2/math/do/overallinsights/<kind>")
+@blueprint.route("/backend-tasks-b2/do/math/overallinsights/<kind>")
 def do_overall_insights(kind: str) -> Response:
     """
     Calculates overall insights of a given kind.
@@ -256,7 +256,7 @@ def do_overall_insights(kind: str) -> Response:
     return make_response("")
 
 
-@blueprint.route("/backend-tasks-b2/math/enqueue/insights/<kind>/all")
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights/<kind>/all")
 def enqueue_all_insights_of_kind(kind: str) -> Response:
     """
     Enqueues all insights (all valid years) of a given kind.
@@ -286,7 +286,7 @@ def enqueue_all_insights_of_kind(kind: str) -> Response:
     return make_response("")
 
 
-@blueprint.route("/backend-tasks-b2/math/do/insights/delete/<name>")
+@blueprint.route("/backend-tasks-b2/do/math/insights/delete/<name>")
 def do_insights_delete(name: str) -> Response:
     """
     Deletes an insight from the datastore.

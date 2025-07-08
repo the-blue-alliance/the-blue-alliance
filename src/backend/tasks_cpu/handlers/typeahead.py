@@ -14,7 +14,7 @@ from backend.common.models.typeahead_entry import TypeaheadEntry
 blueprint = Blueprint("typeahead", __name__)
 
 
-@blueprint.route("/backend-tasks-b2/math/enqueue/typeaheadcalc")
+@blueprint.route("/backend-tasks-b2/enqueue/math/typeaheadcalc")
 def enqueue_typeahead() -> Response:
     """
     Enqueues typeahead calculation
@@ -33,7 +33,7 @@ def enqueue_typeahead() -> Response:
     return make_response("")
 
 
-@blueprint.route("/backend-tasks-b2/math/do/typeaheadcalc")
+@blueprint.route("/backend-tasks-b2/do/math/typeaheadcalc")
 def do_typeahead() -> Response:
     """
     Calculates typeahead entries
