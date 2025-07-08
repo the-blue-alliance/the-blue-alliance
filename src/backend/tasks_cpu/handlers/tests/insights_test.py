@@ -24,7 +24,7 @@ def test_enqueue(
     assert resp.status_code == 200
 
     tasks = tasks_cpu_client = taskqueue_stub.get_filtered_tasks(
-        queue_names="run-in-order"
+        queue_names="backend-tasks"
     )
     assert len(tasks) == 1
     assert tasks[0].url == "/backend-tasks-b2/math/do/insights/matches/2023"
@@ -50,7 +50,7 @@ def test_enqueue_defaults_to_current_season(
     assert resp.status_code == 200
 
     tasks = tasks_cpu_client = taskqueue_stub.get_filtered_tasks(
-        queue_names="run-in-order"
+        queue_names="backend-tasks"
     )
     assert len(tasks) == 1
     assert tasks[0].url == "/backend-tasks-b2/math/do/insights/matches/2020"
