@@ -315,7 +315,6 @@ jobs:
             echo "No changes detected in pwa/app/api."
           fi
 
-
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-22.04
@@ -704,6 +703,9 @@ jobs:
       - name: Deploy
         if: steps.changes.outputs.tasks-cpu == 'true'
         run: ./ops/deploy/deploy_module.sh src/tasks_cpu.yaml
+      - name: Deploy Enqueue
+        if: steps.changes.outputs.tasks-cpu == 'true'
+        run: ./ops/deploy/deploy_module.sh src/tasks_cpu_enqueue.yaml
   deploy-pwa:
     name: Deploy PWA Service
     runs-on: ubuntu-22.04

@@ -1,0 +1,13 @@
+service: py3-tasks-cpu-enqueue
+runtime: python312
+entrypoint: gunicorn -t 0 -b :$PORT backend.tasks_cpu.main:app
+app_engine_apis: true
+
+instance_class: F1
+automatic_scaling:
+  max_idle_instances: 1
+
+handlers:
+  - url: .*
+    script: auto
+    login: admin
