@@ -23,7 +23,7 @@ def enqueue_typeahead() -> Response:
         url=url_for("typeahead.do_typeahead"),
         method="GET",
         target="py3-tasks-cpu",
-        queue_name="default",
+        queue_name="backend-tasks",
     )
 
     if (
