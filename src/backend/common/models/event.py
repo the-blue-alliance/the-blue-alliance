@@ -4,7 +4,7 @@ import datetime
 import json
 import re
 import typing
-from typing import Any, cast, Dict, Generator, List, Optional, Set, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -175,27 +175,17 @@ class Event(CachedModel):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {"key": set(), "year": set(), "district_key": set()}
-        self._awards = None
-        self._details = None
+        self._awards_future: Optional[TypedFuture[List[Award]]] = None
+        self._details_future: Optional[TypedFuture[EventDetails]] = None
         self._location = None
         self._city_state_country = None
-        self._matches = None
-        self._teams = None
+        self._matches_future: Optional[TypedFuture[List[Match]]] = None
+        self._teams_future: Optional[TypedFuture[List[Team]]] = None
         self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
         self._week = None
         super(Event, self).__init__(*args, **kw)
-
-    @ndb.tasklet
-    def get_awards_async(self) -> Generator[Any, Any, List["Award"]]:
-        if self._awards is None:
-            from backend.common.queries import award_query
-
-            self._awards = yield award_query.EventAwardsQuery(
-                event_key=self.key_name
-            ).fetch_async()
-        return none_throws(self._awards)
 
     @property
     def alliance_selections(self) -> Optional[List[EventAlliance]]:
@@ -220,23 +210,31 @@ class Event(CachedModel):
                 teams.append(backup["in"])
         return teams
 
+    def prep_awards(self) -> None:
+        if self._awards_future is None:
+            from backend.common.queries import award_query
+
+            self._awards_future = award_query.EventAwardsQuery(
+                event_key=self.key_name
+            ).fetch_async()
+
     @property
     def awards(self) -> List["Award"]:
-        if self._awards is None:
-            return self.get_awards_async().get_result()
-        return none_throws(self._awards)
+        if self._awards_future is None:
+            self.prep_awards()
+        return none_throws(self._awards_future).get_result()
+
+    def prep_details(self) -> None:
+        if self._details_future is None:
+            self._details_future = ndb.Key(EventDetails, self.key.id()).get_async()
 
     @property
     def details(self) -> EventDetails:
-        if self._details is None:
+        if self._details_future is None:
             self.prep_details()
-        if not none_throws(self._details).done():
-            none_throws(self._details).wait()
-        return none_throws(self._details).get_result()
-
-    def prep_details(self) -> None:
-        if self._details is None:
-            self._details = ndb.Key(EventDetails, self.key.id()).get_async()
+        if not none_throws(self._details_future).done():
+            none_throws(self._details_future).wait()
+        return none_throws(self._details_future).get_result()
 
     @property
     def district_points(self) -> Optional[EventDistrictPoints]:
@@ -274,34 +272,28 @@ class Event(CachedModel):
                 else None
             )
 
-    @ndb.tasklet
-    def get_matches_async(self) -> Generator[Any, Any, List["Match"]]:
-        if self._matches is None:
-            from backend.common.queries import match_query
-
-            self._matches = yield match_query.EventMatchesQuery(
-                event_key=self.key_name
-            ).fetch_async()
-        return none_throws(self._matches)
-
-    def prep_matches(self) -> None:
-        if self._matches is None:
-            self.get_matches_async()
-
     def clear_matches(self) -> None:
-        self._matches = None
+        self._matches_future = None
 
     def clear_awards(self) -> None:
-        self._awards = None
+        self._awards_future = None
 
     def clear_teams(self) -> None:
-        self._teams = None
+        self._teams_future = None
+
+    def prep_matches(self) -> None:
+        if self._matches_future is None:
+            from backend.common.queries import match_query
+
+            self._matches_future = match_query.EventMatchesQuery(
+                event_key=self.key_name
+            ).fetch_async()
 
     @property
     def matches(self) -> List["Match"]:
-        if self._matches is None:
-            self.get_matches_async().wait()
-        return none_throws(self._matches)
+        if self._matches_future is None:
+            self.prep_matches()
+        return none_throws(self._matches_future).get_result()
 
     def time_as_utc(self, time: datetime.datetime) -> datetime.datetime:
         import pytz
@@ -458,48 +450,19 @@ class Event(CachedModel):
                 return "Awards"
         return "Week {}".format(week + 1)
 
-    @ndb.tasklet
-    def get_teams_async(self) -> Generator[Any, Any, TypedFuture[List["Team"]]]:
-        from backend.common.queries import team_query
+    def prep_teams(self) -> None:
+        if self._teams_future is None:
+            from backend.common.queries import team_query
 
-        self._teams = yield team_query.EventTeamsQuery(
-            event_key=self.key_name
-        ).fetch_async()
-        return none_throws(self._teams)
+            self._teams_future = team_query.EventTeamsQuery(
+                event_key=self.key_name
+            ).fetch_async()
 
     @property
     def teams(self) -> List["Team"]:
-        if self._teams is None:
-            self.get_teams_async().wait()
-        return none_throws(self._teams)
-
-    @ndb.toplevel
-    def prep_awards_matches_teams(
-        self,
-    ) -> Generator[
-        Tuple[
-            TypedFuture[List["Award"]],
-            TypedFuture[List["Match"]],
-            TypedFuture[List["Team"]],
-        ],
-        None,
-        None,
-    ]:
-        yield self.get_awards_async(), self.get_matches_async(), self.get_teams_async()
-
-    @ndb.toplevel
-    def prepTeams(self) -> Generator[TypedFuture[List["Team"]], None, None]:
-        yield self.get_teams_async()
-
-    @ndb.toplevel
-    def prepTeamsMatches(
-        self,
-    ) -> Generator[
-        Tuple[TypedFuture[List["Match"]], TypedFuture[List["Team"]]],
-        None,
-        None,
-    ]:
-        yield self.get_matches_async(), self.get_teams_async()
+        if self._teams_future is None:
+            self.prep_teams()
+        return none_throws(self._teams_future).get_result()
 
     @property
     def matchstats(self):

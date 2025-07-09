@@ -98,8 +98,8 @@ class DistrictHelper:
 
     @classmethod
     def calculate_event_points(cls, event: Event) -> EventDistrictPoints:
-        event.get_awards_async()
-        event.get_matches_async()
+        event.prep_awards()
+        event.prep_matches()
 
         # Typically 3 for District CMP, 1 otherwise
         use_dcmp_multiplier = (

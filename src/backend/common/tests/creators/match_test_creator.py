@@ -9,7 +9,7 @@ from backend.common.models.match import Match
 class MatchTestCreator(object):
     def __init__(self, event):
         self.event = event
-        self.event.prepTeams()
+        self.event.prep_teams()
 
     def buildTestMatch(self, comp_level, set_number, match_number, complete):
         teams = random.sample(self.event.teams, 6)

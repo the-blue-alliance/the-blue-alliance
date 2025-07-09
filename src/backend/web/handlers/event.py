@@ -124,7 +124,9 @@ def event_detail(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    event.prep_awards_matches_teams()
+    event.prep_awards()
+    event.prep_matches()
+    event.prep_teams()
     event.prep_details()
     medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
     district_future = (
@@ -315,7 +317,7 @@ def event_insights(event_key: EventKey) -> Response:
     if not event or event.year < 2016:
         abort(404)
 
-    event.get_matches_async()
+    event.prep_matches()
 
     event_details = event.details
     event_predictions = event_details.predictions if event_details else None
