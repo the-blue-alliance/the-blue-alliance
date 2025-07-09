@@ -248,6 +248,10 @@ class LongestQualifyingEventStreakCalculator(AbstractLeaderboardCalculator):
         if event.event_type_enum not in [EventType.DISTRICT, EventType.REGIONAL]:
             return
 
+        # Check for cancelled regionals with no matches (2020)
+        if len(event.matches) == 0:
+            return
+
         winners = set()
         for award in event.awards:
             if award.award_type_enum == AwardType.WINNER:
