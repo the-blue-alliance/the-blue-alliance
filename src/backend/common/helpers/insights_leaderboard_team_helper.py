@@ -2,6 +2,8 @@ from abc import ABC
 from collections import defaultdict
 from typing import List, Optional
 
+from google.appengine.ext import ndb
+
 from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
 from backend.common.consts.event_type import (
     EventType,
@@ -313,6 +315,8 @@ class InsightsLeaderboardTeamCalculator:
                 event.clear_awards()
                 event.clear_matches()
                 event.clear_teams()
+
+                ndb.get_context().clear_cache()
 
         insights = []
         for calculator in calculators:
