@@ -15,7 +15,7 @@ from backend.common.helpers.insights_leaderboard_match_helper import (
     InsightsLeaderboardMatchHelper,
 )
 from backend.common.helpers.insights_leaderboard_team_helper import (
-    InsightsLeaderboardTeamHelper,
+    InsightsLeaderboardTeamCalculator,
 )
 from backend.common.helpers.insights_notable_helper import InsightsNotableHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -107,7 +107,7 @@ def do_leaderboard_year_insights(kind: LeaderboardKeyType, year: Year) -> Respon
     if kind == "match":
         insights = InsightsLeaderboardMatchHelper.make_insights(year)
     elif kind == "team":
-        insights = InsightsLeaderboardTeamHelper.make_insights(year)
+        insights = InsightsLeaderboardTeamCalculator.make_insights(year)
     elif kind == "event":
         insights = InsightsLeaderboardEventHelper.make_insights(year)
 

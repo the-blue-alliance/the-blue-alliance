@@ -1,219 +1,231 @@
+from abc import ABC
 from collections import defaultdict
-from typing import DefaultDict, List, Optional
+from typing import List, Optional
 
 from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
-from backend.common.consts.event_type import EventType, NON_CMP_EVENT_TYPES
+from backend.common.consts.event_type import (
+    EventType,
+    NON_CMP_EVENT_TYPES,
+    SEASON_EVENT_TYPES,
+)
 from backend.common.helpers.insights_helper_utils import (
-    LeaderboardInsightArguments,
-    make_insights_from_functions,
     make_leaderboard_from_dict_counts,
 )
+from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.models.event import Event
 from backend.common.models.insight import Insight
 from backend.common.models.keys import Year
+from backend.common.queries.event_query import EventListQuery
 
 
-class InsightsLeaderboardTeamHelper:
-    @staticmethod
-    def make_insights(year: int) -> List[Insight]:
-        return make_insights_from_functions(
-            year,
-            [
-                InsightsLeaderboardTeamHelper._most_blue_banners,
-                InsightsLeaderboardTeamHelper._most_awards,
-                InsightsLeaderboardTeamHelper._most_non_champs_event_wins,
-                InsightsLeaderboardTeamHelper._most_matches_played,
-                InsightsLeaderboardTeamHelper._most_events_played_at,
-                InsightsLeaderboardTeamHelper._most_unique_teams_played_with_or_against,
-                InsightsLeaderboardTeamHelper._longest_einstein_streak,
-                InsightsLeaderboardTeamHelper._most_non_champs_impact_wins,
-                InsightsLeaderboardTeamHelper._most_wffas,
-                InsightsLeaderboardTeamHelper._longest_qualifying_event_streak,
-            ],
-        )
+class AbstractLeaderboardCalculator(ABC):
+    def on_event(self, event: Event) -> None:
+        pass
 
-    @staticmethod
-    def _most_blue_banners(arguments: LeaderboardInsightArguments) -> Optional[Insight]:
-        count = defaultdict(int)
+    def make_insight(self, year: Year) -> Optional[Insight]:
+        pass
 
-        for award in arguments.awards():
+
+class MostBlueBannersCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.count = defaultdict(int)
+
+    def on_event(self, event: Event) -> None:
+        for award in event.awards:
             if award.award_type_enum in BLUE_BANNER_AWARDS and award.count_banner:
                 for team_key in award.team_list:
-                    count[team_key.id()] += 1
+                    self.count[team_key.id()] += 1
 
+    def make_insight(self, year: Year) -> Optional[Insight]:
         return make_leaderboard_from_dict_counts(
-            count, Insight.TYPED_LEADERBOARD_BLUE_BANNERS, arguments.year
+            self.count, Insight.TYPED_LEADERBOARD_BLUE_BANNERS, year
         )
 
-    @staticmethod
-    def _most_awards(arguments: LeaderboardInsightArguments) -> Optional[Insight]:
-        count = defaultdict(int)
 
-        for award in arguments.awards():
+class MostAwardsCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.count = defaultdict(int)
+
+    def on_event(self, event: Event) -> None:
+        for award in event.awards:
             if award.award_type_enum == AwardType.WILDCARD:
                 continue
 
             for team_key in award.team_list:
-                count[team_key.id()] += 1
+                self.count[team_key.id()] += 1
 
+    def make_insight(self, year: Year) -> Optional[Insight]:
         return make_leaderboard_from_dict_counts(
-            count, Insight.TYPED_LEADERBOARD_MOST_AWARDS, arguments.year
+            self.count, Insight.TYPED_LEADERBOARD_MOST_AWARDS, year
         )
 
-    @staticmethod
-    def _most_non_champs_event_wins(
-        arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
-        count = defaultdict(int)
 
-        for award in arguments.awards():
+class MostNonChampsEventWinsCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.count = defaultdict(int)
+
+    def on_event(self, event: Event) -> None:
+        for award in event.awards:
             if (
                 award.award_type_enum == AwardType.WINNER
                 and award.event_type_enum in NON_CMP_EVENT_TYPES
             ):
                 for team_key in award.team_list:
-                    count[team_key.id()] += 1
+                    self.count[team_key.id()] += 1
 
+    def make_insight(self, year: Year) -> Optional[Insight]:
         return make_leaderboard_from_dict_counts(
-            count, Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS, arguments.year
+            self.count, Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS, year
         )
 
-    @staticmethod
-    def _most_non_champs_impact_wins(
-        arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
-        if arguments.year != 0:
-            return None
 
-        count = defaultdict(int)
+class MostMatchesPlayedCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.count = defaultdict(int)
 
-        for award in arguments.awards():
+    def on_event(self, event: Event) -> None:
+        for match in event.matches:
+            if match.has_been_played:
+                for team_key in match.team_keys:
+                    self.count[team_key.id()] += 1
+
+    def make_insight(self, year: Year) -> Optional[Insight]:
+        return make_leaderboard_from_dict_counts(
+            self.count, Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED, year
+        )
+
+
+class MostEventsPlayedAtCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.events_played = defaultdict(set)
+
+    def on_event(self, event: Event) -> None:
+        for match in event.matches:
+            if match.has_been_played:
+                for team_key in match.team_keys:
+                    self.events_played[team_key.id()].add(event.key_name)
+
+    def make_insight(self, year: Year) -> Optional[Insight]:
+        return make_leaderboard_from_dict_counts(
+            {tk: len(events) for tk, events in self.events_played.items()},
+            Insight.TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT,
+            year,
+        )
+
+
+class MostUniqueTeamsPlayedWithOrAgainstCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.seen_teams = defaultdict(set)
+
+    def on_event(self, event: Event) -> None:
+        for match in event.matches:
+            if match.has_been_played:
+                for a in match.team_key_names:
+                    for b in match.team_key_names:
+                        if a != b:
+                            self.seen_teams[a].add(b)
+                            self.seen_teams[b].add(a)
+
+    def make_insight(self, year: Year) -> Optional[Insight]:
+        return make_leaderboard_from_dict_counts(
+            {tk: len(teams) for tk, teams in self.seen_teams.items()},
+            Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
+            year,
+        )
+
+
+class MostNonChampsImpactWinsCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.count = defaultdict(int)
+
+    def on_event(self, event: Event) -> None:
+        for award in event.awards:
             if (
                 award.award_type_enum == AwardType.CHAIRMANS
                 and award.event_type_enum in NON_CMP_EVENT_TYPES
             ):
                 for team_key in award.team_list:
-                    count[team_key.id()] += 1
+                    self.count[team_key.id()] += 1
 
-        return make_leaderboard_from_dict_counts(
-            count, Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS, arguments.year
-        )
-
-    @staticmethod
-    def _most_wffas(arguments: LeaderboardInsightArguments) -> Optional[Insight]:
-        if arguments.year != 0:
+    def make_insight(self, year: Year) -> Optional[Insight]:
+        if year != 0:
             return None
 
-        count = defaultdict(int)
+        return make_leaderboard_from_dict_counts(
+            self.count, Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_IMPACT_WINS, year
+        )
 
-        for award in arguments.awards():
+
+class MostWffasCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.count = defaultdict(int)
+
+    def on_event(self, event: Event) -> None:
+        for award in event.awards:
             if (
                 award.award_type_enum == AwardType.WOODIE_FLOWERS
                 and award.event_type_enum in NON_CMP_EVENT_TYPES
             ):
                 for team_key in award.team_list:
-                    count[team_key.id()] += 1
+                    self.count[team_key.id()] += 1
 
-        return make_leaderboard_from_dict_counts(
-            count, Insight.TYPED_LEADERBOARD_MOST_WFFAS, arguments.year
-        )
-
-    @staticmethod
-    def _most_matches_played(
-        arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
-        count = defaultdict(int)
-
-        for match in arguments.matches():
-            if match.has_been_played:
-                for team_key in match.team_keys:
-                    count[team_key.id()] += 1
-
-        return make_leaderboard_from_dict_counts(
-            count, Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED, arguments.year
-        )
-
-    @staticmethod
-    def _most_events_played_at(
-        arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
-        played_at = defaultdict(set)
-
-        for match in arguments.matches():
-            if match.has_been_played:
-                for team_key in match.team_keys:
-                    played_at[team_key.id()].add(match.event_key_name)
-
-        counts = {tk: len(events) for tk, events in played_at.items()}
-
-        return make_leaderboard_from_dict_counts(
-            counts, Insight.TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT, arguments.year
-        )
-
-    @staticmethod
-    def _most_unique_teams_played_with_or_against(
-        arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
-        seen_teams = defaultdict(set)
-
-        for match in arguments.matches():
-            if match.has_been_played:
-                for a in match.team_key_names:
-                    for b in match.team_key_names:
-                        if a != b:
-                            seen_teams[a].add(b)
-
-        counts = {tk: len(teams) for tk, teams in seen_teams.items()}
-        return make_leaderboard_from_dict_counts(
-            counts,
-            Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
-            arguments.year,
-        )
-
-    @staticmethod
-    def _longest_einstein_streak(
-        arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
-        if arguments.year != 0:
+    def make_insight(self, year: Year) -> Optional[Insight]:
+        if year != 0:
             return None
 
-        einstein_appearances: DefaultDict[str, List[int]] = defaultdict(list)
+        return make_leaderboard_from_dict_counts(
+            self.count, Insight.TYPED_LEADERBOARD_MOST_WFFAS, year
+        )
 
-        for award in arguments.awards():
+
+class LongestEinsteinStreakCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.einstein_appearances = defaultdict(list)
+
+    def on_event(self, event: Event) -> None:
+        for award in event.awards:
             if (
                 award.award_type_enum == AwardType.WINNER
                 and award.event_type_enum == EventType.CMP_DIVISION
             ):
                 for team_key in award.team_list:
-                    year = int(str(award.event.string_id())[:4])
-                    einstein_appearances[str(team_key.string_id())].append(year)
+                    self.einstein_appearances[team_key.id()].append(event.year)
 
-        def are_years_consecutive(a: Year, b: Year) -> bool:
-            # 2020, 2021 divisions didn't happen because COVID
-            if a in [2019, 2022] and b in [2019, 2022] and a != b:
-                return True
+    @staticmethod
+    def are_years_consecutive(a: Year, b: Year) -> bool:
+        # 2020, 2021 divisions didn't happen because COVID
+        if a in [2019, 2022] and b in [2019, 2022] and a != b:
+            return True
 
-            return a == b + 1 or a == b - 1
+        return a == b + 1 or a == b - 1
 
-        def get_streaks(appearances: List[int]) -> List[int]:
-            streaks = []
-            current_streak = 0
+    @staticmethod
+    def get_streaks(appearances: List[int]) -> List[int]:
+        streaks = []
+        current_streak = 0
 
-            for i, appearance in enumerate(appearances):
-                if current_streak == 0:
+        for i, appearance in enumerate(appearances):
+            if current_streak == 0:
+                current_streak += 1
+            else:
+                if LongestEinsteinStreakCalculator.are_years_consecutive(
+                    appearance, appearances[i - 1]
+                ):
                     current_streak += 1
                 else:
-                    if are_years_consecutive(appearance, appearances[i - 1]):
-                        current_streak += 1
-                    else:
-                        streaks.append(current_streak)
-                        current_streak = 1
+                    streaks.append(current_streak)
+                    current_streak = 1
 
-            streaks.append(current_streak)
-            return streaks
+        streaks.append(current_streak)
+        return streaks
+
+    def make_insight(self, year: Year) -> Optional[Insight]:
+        if year != 0:
+            return None
 
         streaks = {
-            tk: get_streaks(appearances)
-            for tk, appearances in einstein_appearances.items()
+            tk: LongestEinsteinStreakCalculator.get_streaks(appearances)
+            for tk, appearances in self.einstein_appearances.items()
         }
 
         longest_streaks = {tk: max(streaks) for tk, streaks in streaks.items()}
@@ -221,42 +233,87 @@ class InsightsLeaderboardTeamHelper:
         return make_leaderboard_from_dict_counts(
             longest_streaks,
             Insight.TYPED_LEADERBOARD_LONGEST_EINSTEIN_STREAK,
-            arguments.year,
+            year,
         )
 
-    @staticmethod
-    def _longest_qualifying_event_streak(
-        arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
-        if arguments.year != 0:
+
+class LongestQualifyingEventStreakCalculator(AbstractLeaderboardCalculator):
+    def __init__(self):
+        self.active_streaks = defaultdict(int)
+        self.longest_streaks = defaultdict(int)
+
+    def on_event(self, event: Event) -> None:
+        if event.event_type_enum not in [EventType.DISTRICT, EventType.REGIONAL]:
+            return
+
+        winners = set()
+        for award in event.awards:
+            if award.award_type_enum == AwardType.WINNER:
+                for team_key in award.team_list:
+                    self.active_streaks[team_key.string_id()] += 1
+                    self.longest_streaks[team_key.string_id()] = max(
+                        self.longest_streaks[team_key.string_id()],
+                        self.active_streaks[team_key.string_id()],
+                    )
+                    winners.add(team_key.string_id())
+
+        for team in event.teams:
+            if team.key_name not in winners and self.active_streaks[team.key_name] > 0:
+                self.active_streaks[team.key_name] = 0
+
+    def make_insight(self, year: Year) -> Optional[Insight]:
+        if year != 0:
             return None
 
-        arguments.events.sort(key=lambda e: e.start_date)
-
-        active_streaks = defaultdict(int)
-        longest_streaks = defaultdict(int)
-
-        for event in arguments.events:
-            if event.event_type_enum not in [EventType.DISTRICT, EventType.REGIONAL]:
-                continue
-
-            winners = set()
-            for award in event.awards:
-                if award.award_type_enum == AwardType.WINNER:
-                    for team_key in award.team_list:
-                        active_streaks[team_key.string_id()] += 1
-                        longest_streaks[team_key.string_id()] = max(
-                            longest_streaks[team_key.string_id()],
-                            active_streaks[team_key.string_id()],
-                        )
-                        winners.add(team_key.string_id())
-
-            for team in event.teams:
-                if team.key_name not in winners and active_streaks[team.key_name] > 0:
-                    active_streaks[team.key_name] = 0
+        for team_key, active_streak in self.active_streaks.items():
+            if active_streak > 0:
+                self.longest_streaks[team_key] = max(
+                    self.longest_streaks[team_key], active_streak
+                )
 
         return make_leaderboard_from_dict_counts(
-            {k: v for k, v in longest_streaks.items() if v > 1},
+            {k: v for k, v in self.longest_streaks.items() if v > 1},
             Insight.TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK,
-            arguments.year,
+            year,
         )
+
+
+class InsightsLeaderboardTeamCalculator:
+    @staticmethod
+    def make_insights(
+        year: Year, calculators: Optional[List[AbstractLeaderboardCalculator]] = None
+    ) -> List[Insight]:
+        if calculators is None:
+            calculators = [
+                MostBlueBannersCalculator(),
+                MostAwardsCalculator(),
+                MostNonChampsEventWinsCalculator(),
+                MostMatchesPlayedCalculator(),
+                MostEventsPlayedAtCalculator(),
+                MostUniqueTeamsPlayedWithOrAgainstCalculator(),
+                MostNonChampsImpactWinsCalculator(),
+                MostWffasCalculator(),
+                LongestEinsteinStreakCalculator(),
+                LongestQualifyingEventStreakCalculator(),
+            ]
+
+        event_years = [year] if year != 0 else SeasonHelper.get_valid_years()
+        for event_year in event_years:
+            for event in EventListQuery(year=event_year).fetch():
+                if event.event_type_enum not in SEASON_EVENT_TYPES:
+                    continue
+
+                event.prep_awards_matches_teams()
+                for calculator in calculators:
+                    calculator.on_event(event)
+
+                event.clear_matches()
+                event.clear_awards()
+                event.clear_teams()
+
+        insights = []
+        for calculator in calculators:
+            if insight := calculator.make_insight(year):
+                insights.append(insight)
+
+        return insights
