@@ -299,11 +299,15 @@ class InsightsLeaderboardTeamCalculator:
 
         event_years = [year] if year != 0 else SeasonHelper.get_valid_years()
         for event_year in event_years:
+            events = []
             for event in EventListQuery(year=event_year).fetch():
                 if event.event_type_enum not in SEASON_EVENT_TYPES:
                     continue
 
                 event.prep_awards_matches_teams()
+                events.append(event)
+
+            for event in events:
                 for calculator in calculators:
                     calculator.on_event(event)
 
