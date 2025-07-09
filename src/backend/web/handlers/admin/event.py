@@ -68,7 +68,9 @@ def event_detail(event_key: EventKey) -> str:
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
-    event.prep_awards_matches_teams()
+    event.prep_awards()
+    event.prep_matches()
+    event.prep_teams()
     event.prep_details()
 
     reg_sitevar = ChampsRegistrationHacks.get()

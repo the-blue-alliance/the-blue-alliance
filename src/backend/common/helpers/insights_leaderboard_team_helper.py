@@ -304,15 +304,17 @@ class InsightsLeaderboardTeamCalculator:
                 if event.event_type_enum not in SEASON_EVENT_TYPES:
                     continue
 
-                event.prep_awards_matches_teams()
+                event.prep_awards()
+                event.prep_matches()
+                event.prep_teams()
                 events.append(event)
 
             for event in events:
                 for calculator in calculators:
                     calculator.on_event(event)
 
-                event.clear_matches()
                 event.clear_awards()
+                event.clear_matches()
                 event.clear_teams()
 
         insights = []
