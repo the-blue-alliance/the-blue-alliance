@@ -169,15 +169,15 @@ class Insight(CachedModel):
         "data_json",
     }
 
-    _mutable_attrs: Set[str] = {
-        "district_abbreviation",
-    }
+    _mutable_attrs: Set[str] = set()
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
+            "name": set(),
             "year": set(),
+            "district_abbreviation": set(),
         }
         self._data = None
         super(Insight, self).__init__(*args, **kw)
