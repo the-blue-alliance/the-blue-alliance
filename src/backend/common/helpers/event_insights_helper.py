@@ -247,13 +247,9 @@ class EventInsightsHelper:
             if blue_sb["coopertitionCriteriaMet"]:
                 coopertition_count += 1
 
-            red_all_rp = (
-                red_sb["melodyBonusAchieved"]
-                and red_sb["melodyBonusAchieved"]
-            )
+            red_all_rp = red_sb["melodyBonusAchieved"] and red_sb["melodyBonusAchieved"]
             blue_all_rp = (
-                blue_sb["melodyBonusAchieved"]
-                and blue_sb["melodyBonusAchieved"]
+                blue_sb["melodyBonusAchieved"] and blue_sb["melodyBonusAchieved"]
             )
 
             if (red_score > blue_score and red_all_rp) or (
