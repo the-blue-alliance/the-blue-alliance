@@ -245,6 +245,14 @@ function TeamDataView({
       accessorKey: 'district_event_wins',
     },
     {
+      header: 'CMP Appearances',
+      accessorKey: 'cmp_appearances',
+    },
+    {
+      header: 'DCMP Appearances',
+      accessorKey: 'dcmp_appearances',
+    },
+    {
       header: 'DCMP Wins',
       accessorKey: 'dcmp_wins',
     },
@@ -314,6 +322,14 @@ function TeamDataView({
           )
         );
       },
+    },
+    {
+      header: 'Total Matches',
+      accessorKey: 'total_matches_played',
+    },
+    {
+      header: 'Third Plays',
+      accessorKey: 'in_district_extra_play_count',
     },
   ];
 
