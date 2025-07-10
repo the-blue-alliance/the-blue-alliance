@@ -41,7 +41,14 @@ import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { LocationLink, TeamLink } from '~/components/tba/links';
-import MatchResultsTable from '~/components/tba/matchResultsTable';
+import {
+  CHANGE_IN_COMP_LEVEL_BREAKER,
+  CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
+  END_OF_DAY_BREAKER,
+  START_OF_ELIMS_BREAKER,
+  START_OF_QUALS_BREAKER,
+} from '~/components/tba/match/breakers';
+import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import RankingsTable from '~/components/tba/rankingsTable';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
@@ -219,25 +226,30 @@ export default function EventPage() {
     [sortedMatches],
   );
 
-  const leftSideMatches =
-    matches.length > 0 ? (
-      <>
-        <h2 className="text-xl">
-          {quals.length > 0 ? 'Quals' : 'Elims'} Results
-        </h2>
-        <MatchResultsTable
-          matches={quals.length > 0 ? quals : elims}
-          event={event}
-        />
-      </>
-    ) : null;
+  const leftSideMatches = (
+    <SimpleMatchRowsWithBreaks
+      matches={quals.length > 0 ? quals : elims}
+      event={event}
+      breakers={[
+        END_OF_DAY_BREAKER,
+        START_OF_QUALS_BREAKER,
+        CHANGE_IN_COMP_LEVEL_BREAKER,
+      ]}
+    />
+  );
 
   const rightSideElims =
-    quals.length > 0 && elims.length > 0 ? (
-      <>
-        <h2 className="mt-4 text-xl">Playoff Results</h2>
-        <MatchResultsTable matches={elims} event={event} />
-      </>
+    elims.length > 0 ? (
+      <SimpleMatchRowsWithBreaks
+        matches={elims}
+        event={event}
+        breakers={[
+          END_OF_DAY_BREAKER,
+          START_OF_ELIMS_BREAKER,
+          CHANGE_IN_COMP_LEVEL_BREAKER,
+          CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
+        ]}
+      />
     ) : null;
 
   return (

@@ -20,8 +20,9 @@ import {
   getTeamOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { TeamLink } from '~/components/tba/links';
-import { MatchResultsTableGroup } from '~/components/tba/matchResultsTable';
+import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
+import { PlayoffType } from '~/lib/api/PlayoffType';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, queryFromAPI } from '~/lib/utils';
@@ -289,7 +290,9 @@ function MatchSuggestionRow({
     <>
       <tr key={match.key} className="text-center">
         <td className="border">{event.key.substring(4).toUpperCase()}</td>
-        <td className="border">{matchTitleShort(match, event)}</td>
+        <td className="border">
+          {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}
+        </td>
         <td className="border">
           {match.predicted_time && (
             <span>
@@ -509,10 +512,10 @@ export default function MatchSuggestion(): React.JSX.Element {
       </Badge>
       <h2 className="text-2xl font-medium">Finished Matches</h2>
       {/* This is a hack for now. */}
-      <MatchResultsTableGroup
-        event={events[0]}
+      <SimpleMatchRowsWithBreaks
         matches={finishedMatches}
-        showEvent
+        event={events[0]}
+        breakers={[]}
       />
       <h2 className="text-2xl font-medium">Current Matches</h2>
       <table className="w-[100%]">
