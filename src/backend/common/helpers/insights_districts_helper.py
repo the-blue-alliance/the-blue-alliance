@@ -25,6 +25,20 @@ from backend.common.queries.event_query import (
 from backend.common.queries.team_query import DistrictTeamsQuery
 
 
+# Exclude these teams from these districts in these years. They are one-off exceptions that mess up region growth insights.
+# Generally, these teams have current locations that are dramatically different than where they were in these years.
+TEAM_YEAR_EXCEPTIONS = [
+    # FTC team in PA reclaimed a team number from a retired FIM team
+    (8393, 2020),
+    (8393, 2021),
+    # Afghan Dreamers
+    (7329, 2018),
+    (7329, 2019),
+    # PNW team retired and number was claimed as a JV team for an FMA team
+    (4652, 2014),
+]
+
+
 class InsightsDistrictsHelper:
     @staticmethod
     def make_insight_team_data(
@@ -223,6 +237,9 @@ class InsightsDistrictsHelper:
             ).fetch()
 
             for team in district_teams:
+                if (team.team_number, district_year.year) in TEAM_YEAR_EXCEPTIONS:
+                    continue
+
                 district_yearly_teams[district_year.year].append(team)
                 region_yearly_teams[get_state_or_country_if_international(team)][
                     district_year.year
