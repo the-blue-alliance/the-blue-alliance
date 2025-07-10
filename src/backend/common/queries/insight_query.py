@@ -55,7 +55,7 @@ class InsightsNotablesYearQuery(CachedDatabaseQuery[List[Insight], List[InsightD
 
 
 class DistrictInsightQuery(CachedDatabaseQuery[Insight, InsightDict]):
-    CACHE_VERSION = 9
+    CACHE_VERSION = 10
     CACHE_KEY_FORMAT = "insight_{insight_name}_{year}_{district_abbreviation}"
     DICT_CONVERTER = InsightConverter
 
