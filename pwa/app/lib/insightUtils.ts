@@ -22,6 +22,13 @@ export const LEADERBOARD_NAME_TO_DISPLAY_NAME: Record<string, string> = {
   typed_leaderboard_2025_most_coral_scored: 'Most Coral Scored',
   typed_leaderboard_notables_dcmp_winner: 'Most District Championship Wins',
   typed_leaderboard_longest_einstein_streak: 'Longest Einstein Streak',
+  typed_leaderboard_notables_cmp_finals_appearances:
+    'Most CMP Finals Appearances',
+  typed_leaderboard_most_non_champs_impact_wins:
+    'Most Non-Championship Impact Wins',
+  typed_leaderboard_most_wffas: 'Most WFFAs',
+  typed_leaderboard_longest_qualifying_event_streak:
+    'Longest Qualifying Event Streak',
 };
 
 export const NOTABLE_NAME_TO_DISPLAY_NAME: Record<string, string> = {
