@@ -74,7 +74,7 @@ class FirebasePusher:
             f"e/{match.event_key_name}/m/{match.short_key}",
             _target="py3-tasks-io",
             _queue="firebase",
-            _url=f"/_ah/queue/deferred_firebase_delete_match/{match.key_name}",
+            _url=f"/_ah/queue/deferred_firebase_delete_match:{match.key_name}",
         )
 
         # for team_key_name in match.team_key_names:
@@ -152,7 +152,7 @@ class FirebasePusher:
             match_dict,
             _queue="firebase",
             _target="py3-tasks-io",
-            _url=f"/_ah/queue/deferred_firebase_update_match/{match.key_name}",
+            _url=f"/_ah/queue/deferred_firebase_update_match:{match.key_name}",
         )
 
         # for team_key_name in match.team_key_names:
@@ -178,7 +178,7 @@ class FirebasePusher:
                 update_dict,
                 _queue="firebase",
                 _target="py3-tasks-io",
-                _url=f"/_ah/queue/deferred_firebase_update_match_queue_status/{match.key_name}",
+                _url=f"/_ah/queue/deferred_firebase_update_match_queue_status:{match.key_name}",
             )
 
     """
@@ -240,7 +240,7 @@ class FirebasePusher:
             events_by_key,
             _queue="firebase",
             _target="py3-tasks-io",
-            _url=f"/_ah/queue/deferred_firebase_update_live_events/{event.key_name}",
+            _url=f"/_ah/queue/deferred_firebase_update_live_events:{event.key_name}",
         )
 
     @classmethod
@@ -307,7 +307,7 @@ class FirebasePusher:
                 update_data,
                 _queue="firebase",
                 _target="py3-tasks-io",
-                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status/{event.key_name}",
+                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status:{event.key_name}",
             )
         else:
             defer_safe(
@@ -315,7 +315,7 @@ class FirebasePusher:
                 f"live_events/{event.key_name}/now_queuing",
                 _queue="firebase",
                 _target="py3-tasks-io",
-                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status/{event.key_name}",
+                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status:{event.key_name}",
             )
 
     """
