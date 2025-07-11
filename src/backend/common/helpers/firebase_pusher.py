@@ -7,6 +7,9 @@ from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.environment import Environment
 from backend.common.firebase import app as get_firebase_app
 from backend.common.helpers.deferred import defer_safe
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    NexusMatchStatusMemcache,
+)
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
@@ -74,7 +77,7 @@ class FirebasePusher:
             f"e/{match.event_key_name}/m/{match.short_key}",
             _target="py3-tasks-io",
             _queue="firebase",
-            _url=f"/_ah/queue/deferred_firebase_delete_match/{match.key_name}",
+            _url=f"/_ah/queue/deferred_firebase_delete_match:{match.key_name}",
         )
 
         # for team_key_name in match.team_key_names:
@@ -152,7 +155,7 @@ class FirebasePusher:
             match_dict,
             _queue="firebase",
             _target="py3-tasks-io",
-            _url=f"/_ah/queue/deferred_firebase_update_match/{match.key_name}",
+            _url=f"/_ah/queue/deferred_firebase_update_match:{match.key_name}",
         )
 
         # for team_key_name in match.team_key_names:
@@ -166,19 +169,25 @@ class FirebasePusher:
     def update_match_queue_status(
         cls, match: Match, nexus_status: EventQueueStatus
     ) -> None:
-        if nexus_status and (
-            match_status := nexus_status["matches"].get(match.key_name)
-        ):
+        if match_status := nexus_status["matches"].get(match.key_name):
+            mc = NexusMatchStatusMemcache(match.key_name)
+            old_status = mc.get()
+            new_status = NexusMatchStatus(match_status["status"])
+            mc.put(new_status)
+
+            if old_status == new_status:
+                return
+
             event_key = none_throws(match.event.string_id())
             match_short = match.short_key
-            update_dict = {"q": NexusMatchStatus(match_status["status"]).to_string()}
+            update_dict = {"q": new_status.to_string()}
             defer_safe(
                 cls._patch_data,
                 f"e/{event_key}/m/{match_short}",
                 update_dict,
                 _queue="firebase",
                 _target="py3-tasks-io",
-                _url=f"/_ah/queue/deferred_firebase_update_match_queue_status/{match.key_name}",
+                _url=f"/_ah/queue/deferred_firebase_update_match_queue_status:{match.key_name}",
             )
 
     """
@@ -240,7 +249,7 @@ class FirebasePusher:
             events_by_key,
             _queue="firebase",
             _target="py3-tasks-io",
-            _url=f"/_ah/queue/deferred_firebase_update_live_events/{event.key_name}",
+            _url=f"/_ah/queue/deferred_firebase_update_live_events:{event.key_name}",
         )
 
     @classmethod
@@ -307,7 +316,7 @@ class FirebasePusher:
                 update_data,
                 _queue="firebase",
                 _target="py3-tasks-io",
-                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status/{event.key_name}",
+                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status:{event.key_name}",
             )
         else:
             defer_safe(
@@ -315,7 +324,7 @@ class FirebasePusher:
                 f"live_events/{event.key_name}/now_queuing",
                 _queue="firebase",
                 _target="py3-tasks-io",
-                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status/{event.key_name}",
+                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status:{event.key_name}",
             )
 
     """
