@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 from typing import AnyStr, Dict, List, Optional, TypedDict
 
+import pytz
 from pyre_extensions import safe_json
 
 from backend.common.consts.playoff_type import PlayoffType
@@ -33,6 +34,7 @@ class EventInfoParsed(TypedDict, total=False):
     playoff_type: PlayoffType
     webcasts: List[Webcast]
     remap_teams: Dict[TeamKey, TeamKey]
+    timezone: str
 
 
 class JSONEventInfoParser:
@@ -100,5 +102,10 @@ class JSONEventInfoParser:
 
         if "first_event_code" in info_dict:
             parsed_info["first_event_code"] = info_dict["first_event_code"]
+
+        if timezone := info_dict.get("timezone"):
+            if timezone not in pytz.all_timezones_set:
+                raise ParserInputException(f"Unknown timezone {timezone}")
+            parsed_info["timezone"] = timezone
 
         return parsed_info
