@@ -341,3 +341,71 @@ def test_rankings_update_remapteams(api_client: Client) -> None:
         "dq": 0,
         "sort_orders": [20.0, 500.0, 500.0, 200.0],
     }
+
+
+def test_rankings_generic_update(api_client: Client) -> None:
+    """
+    This mirrors posting results as the "generic" format, as stored
+    by FMS, to ensure that we properly remap the values back onto their
+    "real" keys server-side
+    """
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_RANKINGS])
+
+    rankings = {
+        "breakdowns": ["sort1", "sort2", "sort3", "sort4", "sort5", "sort6"],
+        "rankings": [
+            {
+                "team_key": "frc254",
+                "rank": 1,
+                "wins": 10,
+                "losses": 0,
+                "ties": 0,
+                "played": 10,
+                "dqs": 0,
+                "sort1": 1,
+                "sort2": 2,
+                "sort3": 3,
+                "sort4": 4,
+                "sort5": 5,
+                "sort6": 6,
+            },
+            {
+                "team_key": "frc971",
+                "rank": 2,
+                "wins": 10,
+                "losses": 0,
+                "ties": 0,
+                "played": 10,
+                "dqs": 0,
+                "sort1": 11,
+                "sort2": 12,
+                "sort3": 13,
+                "sort4": 14,
+                "sort5": 15,
+                "sort6": 16,
+            },
+        ],
+    }
+    request_body = json.dumps(rankings)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+
+    event_rankings = event.rankings
+    assert event_rankings is not None
+    assert event_rankings[0] == {
+        "rank": 1,
+        "team_key": "frc254",
+        "record": {"wins": 10, "losses": 0, "ties": 0},
+        "qual_average": None,
+        "matches_played": 10,
+        "dq": 0,
+        "sort_orders": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+    }

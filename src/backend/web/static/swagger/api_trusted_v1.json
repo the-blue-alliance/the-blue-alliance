@@ -555,6 +555,11 @@
             "example": {
               "frc1337": "frc337B"
             }
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Timezone name for the event",
+            "example": "America/New_York"
           }
         }
       },
