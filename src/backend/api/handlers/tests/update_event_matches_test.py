@@ -217,6 +217,24 @@ def test_no_auth(api_client: Client) -> None:
                 "time_utc": "foo",
             }
         ],
+        [
+            {
+                "comp_level": "qf",
+                "set_number": 1,
+                "match_number": 1,
+                "alliances": {},
+                "actual_start_time_utc": "foo",
+            }
+        ],
+        [
+            {
+                "comp_level": "qf",
+                "set_number": 1,
+                "match_number": 1,
+                "alliances": {},
+                "post_results_time_utc": "foo",
+            }
+        ],
     ],
 )
 def test_bad_json(api_client: Client, request_data: Any) -> None:
@@ -294,6 +312,8 @@ def test_matches_update(api_client: Client) -> None:
             },
             "time_string": "10:00 AM",
             "time_utc": "2014-08-31T17:00:00",
+            "actual_start_time_utc": "2014-08-31T17:01:00",
+            "post_results_time_utc": "2014-08-31T17:05:00",
         }
     ]
     request_body = json.dumps(matches)
@@ -314,6 +334,8 @@ def test_matches_update(api_client: Client) -> None:
     assert match is not None
     assert match.time == datetime.datetime(2014, 8, 31, 17, 0)
     assert match.time_string == "10:00 AM"
+    assert match.actual_time == datetime.datetime(2014, 8, 31, 17, 1)
+    assert match.post_result_time == datetime.datetime(2014, 8, 31, 17, 5)
     assert match.alliances[AllianceColor.RED]["teams"] == ["frc1", "frc2", "frc3"]
     assert match.alliances[AllianceColor.RED]["score"] == 250
     assert match.alliances[AllianceColor.RED]["surrogates"] == ["frc1"]

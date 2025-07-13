@@ -234,6 +234,8 @@ def update_event_matches(event_key: EventKey) -> Response:
             score_breakdown_json=match["score_breakdown_json"],
             time_string=match["time_string"],
             time=match["time"],
+            actual_time=match["actual_start_time"],
+            post_result_time=match["post_results_time"],
             display_name=match["display_name"],
         )
 
