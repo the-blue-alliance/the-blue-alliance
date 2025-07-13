@@ -665,7 +665,17 @@
           },
           "time_utc": {
             "type": "string",
-            "description": "UTC time of match in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
+            "description": "UTC time of the match's scheduled time in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
+            "example": "2008-01-02T10:30:00.000Z"
+          },
+          "actual_start_time_utc": {
+            "type": "string",
+            "description": "UTC time of when the match actually started in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
+            "example": "2008-01-02T10:30:00.000Z"
+          },
+          "post_results_time_utc": {
+            "type": "string",
+            "description": "UTC time of when the match results were shown to the audience in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
             "example": "2008-01-02T10:30:00.000Z"
           },
           "display_name": {
