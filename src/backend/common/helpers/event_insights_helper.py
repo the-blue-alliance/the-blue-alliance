@@ -232,24 +232,26 @@ class EventInsightsHelper:
             red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
             blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]
 
-            if red_sb["melodyBonusAchieved"]:
+            if red_sb.get("melodyBonusAchieved", False):
                 melody_rp_count += 1
-            if blue_sb["melodyBonusAchieved"]:
+            if blue_sb.get("melodyBonusAchieved", False):
                 melody_rp_count += 1
 
-            if red_sb["ensembleBonusAchieved"]:
+            if red_sb.get("ensembleBonusAchieved", False):
                 ensemble_rp_count += 1
-            if blue_sb["ensembleBonusAchieved"]:
+            if blue_sb.get("ensembleBonusAchieved", False):
                 ensemble_rp_count += 1
 
-            if red_sb["coopertitionCriteriaMet"]:
+            if red_sb.get("coopertitionCriteriaMet", False):
                 coopertition_count += 1
-            if blue_sb["coopertitionCriteriaMet"]:
+            if blue_sb.get("coopertitionCriteriaMet", False):
                 coopertition_count += 1
 
-            red_all_rp = red_sb["melodyBonusAchieved"] and red_sb["melodyBonusAchieved"]
-            blue_all_rp = (
-                blue_sb["melodyBonusAchieved"] and blue_sb["melodyBonusAchieved"]
+            red_all_rp = red_sb.get("melodyBonusAchieved", False) and red_sb.get(
+                "melodyBonusAchieved", False
+            )
+            blue_all_rp = blue_sb.get("melodyBonusAchieved", False) and blue_sb.get(
+                "melodyBonusAchieved", False
             )
 
             if (red_score > blue_score and red_all_rp) or (
