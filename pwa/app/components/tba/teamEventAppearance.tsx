@@ -13,11 +13,17 @@ import {
 import { AwardBanner } from '~/components/tba/banner';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { EventLink, TeamLink } from '~/components/tba/links';
-import MatchResultsTable from '~/components/tba/matchResultsTable';
+import {
+  CHANGE_IN_COMP_LEVEL_BREAKER,
+  END_OF_DAY_BREAKER,
+  START_OF_QUALS_BREAKER,
+} from '~/components/tba/match/breakers';
+import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
+import { sortMatchComparator } from '~/lib/matchUtils';
 import { cn, joinComponents, pluralize } from '~/lib/utils';
 
 export default function TeamEventAppearance({
@@ -41,9 +47,11 @@ export default function TeamEventAppearance({
     BLUE_BANNER_AWARDS.has(a.award_type),
   );
 
+  matches.sort(sortMatchComparator);
+
   return (
-    <div className="flex flex-wrap gap-x-8 sm:*:flex-1" id={event.key}>
-      <div className="w-full">
+    <div className="flex flex-wrap gap-x-8" id={event.key}>
+      <div className="w-full md:w-[30%]">
         <h2 className="text-2xl font-medium">
           <EventLink eventOrKey={event.key}>{event.name}</EventLink>
         </h2>
@@ -84,8 +92,16 @@ export default function TeamEventAppearance({
             </div>
           )}
       </div>
-      <div>
-        <MatchResultsTable matches={matches} event={event} team={team} />
+      <div className="grow">
+        <SimpleMatchRowsWithBreaks
+          matches={matches}
+          event={event}
+          breakers={[
+            START_OF_QUALS_BREAKER,
+            END_OF_DAY_BREAKER,
+            CHANGE_IN_COMP_LEVEL_BREAKER,
+          ]}
+        />
       </div>
     </div>
   );

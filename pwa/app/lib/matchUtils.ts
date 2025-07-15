@@ -1,4 +1,4 @@
-import { Event, Match, MatchAlliance, WltRecord } from '~/api/tba/read';
+import { Match, MatchAlliance, WltRecord } from '~/api/tba/read';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { median } from '~/lib/utils';
 
@@ -10,7 +10,7 @@ const COMP_LEVEL_SORT_ORDER = {
   qm: 1,
 };
 
-const COMP_LEVEL_SHORT_STRINGS = {
+export const COMP_LEVEL_SHORT_STRINGS = {
   f: 'Finals',
   sf: 'Semis',
   qf: 'Quarters',
@@ -33,7 +33,10 @@ export function sortMatchComparator(a: Match, b: Match) {
   return a.set_number - b.set_number || a.match_number - b.match_number;
 }
 
-export function matchTitleShort(match: Match, event: Event): string {
+export function matchTitleShort(
+  match: Match,
+  playoffType: PlayoffType,
+): string {
   if (match.comp_level === 'qm' || match.comp_level === 'f') {
     return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.match_number}`;
   }
@@ -41,14 +44,14 @@ export function matchTitleShort(match: Match, event: Event): string {
   // 2023+ double elim brackets
   // 4 team example is 2024micmp
   if (
-    event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM ||
-    event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM
+    playoffType == PlayoffType.DOUBLE_ELIM_4_TEAM ||
+    playoffType == PlayoffType.DOUBLE_ELIM_8_TEAM
   ) {
     return `Match ${match.set_number}`;
   }
 
   // 2015
-  if (event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM) {
+  if (playoffType == PlayoffType.AVG_SCORE_8_TEAM) {
     return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.match_number}`;
   }
 
@@ -56,23 +59,7 @@ export function matchTitleShort(match: Match, event: Event): string {
   // round robin also obeys this rule
   // null playoff type is 2022 and prior standard single elim
   // this seems like a reasonable fallback for custom brackets
-  if (
-    [
-      PlayoffType.BRACKET_2_TEAM,
-      PlayoffType.BRACKET_4_TEAM,
-      PlayoffType.BRACKET_8_TEAM,
-      PlayoffType.BRACKET_16_TEAM,
-      PlayoffType.ROUND_ROBIN_6_TEAM,
-      PlayoffType.CUSTOM,
-      null,
-    ].includes(event.playoff_type)
-  ) {
-    return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.set_number} Match ${match.match_number}`;
-  }
-
-  // todo later in development: replace this with reasonable fallback
-  console.log(match.key, event);
-  return 'IF YOU SEE THIS PLEASE PING JUSTIN/EUGENE WITH EVENT KEY';
+  return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.set_number} Match ${match.match_number}`;
 }
 
 function matchHasBeenPlayed(match: Match) {
