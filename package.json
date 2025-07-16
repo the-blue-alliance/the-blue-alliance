@@ -47,7 +47,7 @@
     "eslint-plugin-react": "^7.37.4",
     "jest-cli": "^29.7.0",
     "jest-puppeteer": "^11.0.0",
-    "less": "4.2.1",
+    "less": "4.4.0",
     "md5": "^2.3.0",
     "mini-css-extract-plugin": "^2.9.2",
     "node-fetch": "^2.7.0",
