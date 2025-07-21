@@ -36,6 +36,7 @@ import {
   getEventTeamsOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
+import EliminationBracket from '~/components/tba/eliminationBracket';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
@@ -394,6 +395,14 @@ export default function EventPage() {
               {rightSideElims}
             </div>
           </div>
+          
+          {alliances.length > 0 && (
+            <EliminationBracket
+              alliances={alliances}
+              matches={elims}
+              year={event.year}
+            />
+          )}
         </TabsContent>
 
         {rankingsQuery.data && (
