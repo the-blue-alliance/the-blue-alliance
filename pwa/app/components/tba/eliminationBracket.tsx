@@ -330,7 +330,7 @@ export default function EliminationBracket({
       <h2 className="text-2xl font-bold mb-4">Playoff Bracket</h2>
       
       <div className="overflow-x-auto overflow-y-hidden">
-        <div className="flex gap-8 justify-start items-start min-w-max px-4">
+        <div className="relative flex gap-8 justify-start items-start min-w-max px-4">
         
         {/* Left Side: Upper and Lower Brackets */}
         <div className="space-y-4">
@@ -390,9 +390,9 @@ export default function EliminationBracket({
                 </div>
               </div>
 
-              {/* Round 2 */}
+              {/* Round 3 */}
               <div className="flex flex-col items-center">
-                <h3 className="font-bold mb-4 text-center">Round 2</h3>
+                <h3 className="font-bold mb-4 text-center">Round 3</h3>
                 <div className="space-y-4">
                   {renderMatch(10, 'Match 10')}
                   <div className="h-6"></div>
