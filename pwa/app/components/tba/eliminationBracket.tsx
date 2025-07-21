@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router';
 import PlayCircle from '~icons/bi/play-circle';
 
@@ -16,8 +16,10 @@ export default function EliminationBracket({
   matches,
   year,
 }: EliminationBracketProps): React.JSX.Element {
+  const [hoveredAlliance, setHoveredAlliance] = useState<number | null>(null);
+  
   if (!alliances || alliances.length === 0 || !matches || matches.length === 0) {
-    return null;
+    return <div></div>;
   }
 
   // Group matches by set_number
@@ -69,31 +71,9 @@ export default function EliminationBracket({
     const redTeams = redAllianceNumber ? alliances[redAllianceNumber - 1].picks.map(pick => pick.substring(3)) : matchRedTeams;
     const blueTeams = blueAllianceNumber ? alliances[blueAllianceNumber - 1].picks.map(pick => pick.substring(3)) : matchBlueTeams;
     
-    let redWins = 0;
-    let blueWins = 0;
-    
-    // For series, count wins
-    if (setMatches.length > 1) {
-      setMatches.forEach(match => {
-        if (match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {
-          if (match.alliances.red.score > match.alliances.blue.score) {
-            redWins++;
-          } else {
-            blueWins++;
-          }
-        }
-      });
-    } else {
-      // For single matches, use actual scores
-      if (firstMatch.alliances.red.score !== -1 && firstMatch.alliances.blue.score !== -1) {
-        redWins = firstMatch.alliances.red.score;
-        blueWins = firstMatch.alliances.blue.score;
-      }
-    }
+    // For series, count wins (not used in this function but kept for potential future use)
 
 
-    const redWon = setMatches.length > 1 ? redWins > blueWins : firstMatch.alliances.red.score > firstMatch.alliances.blue.score;
-    const blueWon = setMatches.length > 1 ? blueWins > redWins : firstMatch.alliances.blue.score > firstMatch.alliances.red.score;
     const matchPlayed = firstMatch.alliances.red.score !== -1 && firstMatch.alliances.blue.score !== -1;
 
     return {
@@ -116,8 +96,14 @@ export default function EliminationBracket({
     const result = getMatchResult(setNumber);
     if (!result) return null;
 
+    const isRedHighlighted = hoveredAlliance === result.redAllianceNumber;
+    const isBlueHighlighted = hoveredAlliance === result.blueAllianceNumber;
+    const isHighlighted = isRedHighlighted || isBlueHighlighted;
+
     return (
-      <div className="border border-gray-300 rounded bg-white mb-2 min-w-fit">
+      <div className={`border border-gray-300 rounded bg-white mb-2 min-w-fit transition-all duration-200 ${
+        isHighlighted ? 'ring-2 ring-yellow-400 shadow-lg' : ''
+      }`}>
         <div className="bg-gray-100 px-2 py-1 text-sm font-bold border-b flex items-center justify-between">
           <div className="flex items-center gap-1">
             <span>{matchLabel}</span>
@@ -140,23 +126,29 @@ export default function EliminationBracket({
             return null;
           })()}
         </div>
-        <div className="px-1 py-1 flex justify-between items-center bg-alliance-red-light">
+        <div 
+          className={`px-1 py-1 flex justify-between items-center bg-alliance-red-light cursor-pointer transition-colors duration-200 ${
+            isRedHighlighted ? 'bg-red-300' : 'hover:bg-red-200'
+          }`}
+          onMouseEnter={() => result.redAllianceNumber && setHoveredAlliance(result.redAllianceNumber)}
+          onMouseLeave={() => setHoveredAlliance(null)}
+        >
           <div className="flex items-center justify-start flex-1">
             <div className="flex">
-              {result.redTeams.map((team, idx) => {
+              {result.redTeams.map((team) => {
                   const teamPlayed = result.matchRedTeams.includes(team);
                   const showUnderlines = result.redTeams.length > 3; // Only show underlines if there are backup teams
                   return (
-                    <TeamLink
-                      key={team}
-                      teamOrKey={`frc${team}`}
-                      year={year}
-                      className={`text-sm ${result.redWon ? 'font-bold' : ''} w-12 text-left text-red-600 ${
+                    <span key={team} className={`text-sm ${result.redWon ? 'font-bold' : ''} w-12 text-left text-red-600 ${
                         showUnderlines && teamPlayed ? 'underline decoration-dotted decoration-red-600' : ''
-                      }`}
-                    >
-                      {team}
-                    </TeamLink>
+                      }`}>
+                      <TeamLink
+                        teamOrKey={`frc${team}`}
+                        year={year}
+                      >
+                        {team}
+                      </TeamLink>
+                    </span>
                   );
                 })}
             </div>
@@ -165,23 +157,29 @@ export default function EliminationBracket({
             <span className={`text-sm ${result.redWon ? 'font-bold' : ''}`}>{result.redScore}</span>
           </div>
         </div>
-        <div className="px-1 py-1 flex justify-between items-center bg-alliance-blue-light">
+        <div 
+          className={`px-1 py-1 flex justify-between items-center bg-alliance-blue-light cursor-pointer transition-colors duration-200 ${
+            isBlueHighlighted ? 'bg-blue-300' : 'hover:bg-blue-200'
+          }`}
+          onMouseEnter={() => result.blueAllianceNumber && setHoveredAlliance(result.blueAllianceNumber)}
+          onMouseLeave={() => setHoveredAlliance(null)}
+        >
           <div className="flex items-center justify-start flex-1">
             <div className="flex">
-              {result.blueTeams.map((team, idx) => {
+              {result.blueTeams.map((team) => {
                   const teamPlayed = result.matchBlueTeams.includes(team);
                   const showUnderlines = result.blueTeams.length > 3; // Only show underlines if there are backup teams
                   return (
-                    <TeamLink
-                      key={team}
-                      teamOrKey={`frc${team}`}
-                      year={year}
-                      className={`text-sm ${result.blueWon ? 'font-bold' : ''} w-12 text-left text-blue-600 ${
+                    <span key={team} className={`text-sm ${result.blueWon ? 'font-bold' : ''} w-12 text-left text-blue-600 ${
                         showUnderlines && teamPlayed ? 'underline decoration-dotted decoration-blue-600' : ''
-                      }`}
-                    >
-                      {team}
-                    </TeamLink>
+                      }`}>
+                      <TeamLink
+                        teamOrKey={`frc${team}`}
+                        year={year}
+                      >
+                        {team}
+                      </TeamLink>
+                    </span>
                   );
                 })}
             </div>
@@ -229,8 +227,14 @@ export default function EliminationBracket({
     const redWonSeries = redWins > blueWins;
     const blueWonSeries = blueWins > redWins;
 
+    const isRedHighlighted = hoveredAlliance === redAllianceNumber;
+    const isBlueHighlighted = hoveredAlliance === blueAllianceNumber;
+    const isHighlighted = isRedHighlighted || isBlueHighlighted;
+
     return (
-      <div className="border border-gray-300 rounded bg-white mb-2 min-w-fit">
+      <div className={`border border-gray-300 rounded bg-white mb-2 min-w-fit transition-all duration-200 ${
+        isHighlighted ? 'ring-2 ring-yellow-400 shadow-lg' : ''
+      }`}>
         <div className="bg-gray-100 px-2 py-1 text-sm font-bold border-b flex justify-between items-center">
           <div className="flex items-center gap-1">
             <span>Finals</span>
@@ -253,23 +257,29 @@ export default function EliminationBracket({
             })}
           </div>
         </div>
-        <div className="px-1 py-1 flex justify-between items-center bg-alliance-red-light">
+        <div 
+          className={`px-1 py-1 flex justify-between items-center bg-alliance-red-light cursor-pointer transition-colors duration-200 ${
+            isRedHighlighted ? 'bg-red-300' : 'hover:bg-red-200'
+          }`}
+          onMouseEnter={() => redAllianceNumber && setHoveredAlliance(redAllianceNumber)}
+          onMouseLeave={() => setHoveredAlliance(null)}
+        >
           <div className="flex items-center justify-start flex-1">
             <div className="flex">
-              {redTeams.map((team, idx) => {
+              {redTeams.map((team) => {
                   const teamPlayed = matchRedTeams.includes(team);
                   const showUnderlines = redTeams.length > 3; // Only show underlines if there are backup teams
                   return (
-                    <TeamLink
-                      key={team}
-                      teamOrKey={`frc${team}`}
-                      year={year}
-                      className={`text-sm ${redWonSeries ? 'font-bold' : ''} w-12 text-left text-red-600 ${
+                    <span key={team} className={`text-sm ${redWonSeries ? 'font-bold' : ''} w-12 text-left text-red-600 ${
                         showUnderlines && teamPlayed ? 'underline decoration-dotted decoration-red-600' : ''
-                      }`}
-                    >
-                      {team}
-                    </TeamLink>
+                      }`}>
+                      <TeamLink
+                        teamOrKey={`frc${team}`}
+                        year={year}
+                      >
+                        {team}
+                      </TeamLink>
+                    </span>
                   );
                 })}
             </div>
@@ -284,23 +294,29 @@ export default function EliminationBracket({
             </div>
           </div>
         </div>
-        <div className="px-1 py-1 flex justify-between items-center bg-alliance-blue-light">
+        <div 
+          className={`px-1 py-1 flex justify-between items-center bg-alliance-blue-light cursor-pointer transition-colors duration-200 ${
+            isBlueHighlighted ? 'bg-blue-300' : 'hover:bg-blue-200'
+          }`}
+          onMouseEnter={() => blueAllianceNumber && setHoveredAlliance(blueAllianceNumber)}
+          onMouseLeave={() => setHoveredAlliance(null)}
+        >
           <div className="flex items-center justify-start flex-1">
             <div className="flex">
-              {blueTeams.map((team, idx) => {
+              {blueTeams.map((team) => {
                   const teamPlayed = matchBlueTeams.includes(team);
                   const showUnderlines = blueTeams.length > 3; // Only show underlines if there are backup teams
                   return (
-                    <TeamLink
-                      key={team}
-                      teamOrKey={`frc${team}`}
-                      year={year}
-                      className={`text-sm ${blueWonSeries ? 'font-bold' : ''} w-12 text-left text-blue-600 ${
+                    <span key={team} className={`text-sm ${blueWonSeries ? 'font-bold' : ''} w-12 text-left text-blue-600 ${
                         showUnderlines && teamPlayed ? 'underline decoration-dotted decoration-blue-600' : ''
-                      }`}
-                    >
-                      {team}
-                    </TeamLink>
+                      }`}>
+                      <TeamLink
+                        teamOrKey={`frc${team}`}
+                        year={year}
+                      >
+                        {team}
+                      </TeamLink>
+                    </span>
                   );
                 })}
             </div>
