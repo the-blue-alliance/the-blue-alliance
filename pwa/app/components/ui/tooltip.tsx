@@ -61,8 +61,8 @@ function TooltipContent({
         {...props}
       >
         <div
-          className="max-h-60 overflow-x-hidden overflow-y-auto px-3 py-1.5
-            text-center text-balance [&::-webkit-scrollbar]:w-2
+          className="relative z-10 max-h-60 overflow-x-hidden overflow-y-auto
+            px-3 py-1.5 text-center text-balance [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-thumb]:rounded-full
             [&::-webkit-scrollbar-thumb]:bg-muted-foreground/30
             [&::-webkit-scrollbar-track]:bg-transparent"
@@ -70,8 +70,8 @@ function TooltipContent({
           {children}
         </div>
         <TooltipPrimitive.Arrow
-          className="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45
-            rounded-[2px] bg-popover fill-popover"
+          className="relative -z-10 size-3 translate-y-[calc(-50%_-_2px)]
+            rotate-45 rounded-[2px] bg-popover fill-popover"
         />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
