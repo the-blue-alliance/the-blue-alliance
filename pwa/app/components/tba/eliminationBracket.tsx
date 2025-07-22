@@ -141,26 +141,49 @@ export default function EliminationBracket({
       ? alliances[blueAllianceNumber - 1].picks.map((pick) => pick.substring(3))
       : matchBlueTeams;
 
-    // For series, count wins (not used in this function but kept for potential future use)
-
-    const matchPlayed =
+    // Check if first match is a true tie
+    const firstMatchPlayed =
       firstMatch.alliances.red.score !== -1 &&
       firstMatch.alliances.blue.score !== -1;
+    const isFirstMatchTie =
+      firstMatchPlayed && firstMatch.winning_alliance === '';
+
+    // For true ties, show both matches if second match exists
+    const showBothMatches = isFirstMatchTie && sortedMatches.length > 1;
+    const secondMatch = showBothMatches ? sortedMatches[1] : null;
+
+    const matchPlayed = firstMatchPlayed;
+
+    // Determine overall winner from the series
+    let redWon = false;
+    let blueWon = false;
+
+    if (showBothMatches && secondMatch) {
+      const secondMatchPlayed =
+        secondMatch.alliances.red.score !== -1 &&
+        secondMatch.alliances.blue.score !== -1;
+      if (secondMatchPlayed) {
+        redWon = secondMatch.winning_alliance === 'red';
+        blueWon = secondMatch.winning_alliance === 'blue';
+      }
+    } else {
+      redWon = firstMatch.winning_alliance === 'red' && matchPlayed;
+      blueWon = firstMatch.winning_alliance === 'blue' && matchPlayed;
+    }
 
     return {
       redTeams,
       blueTeams,
       redAllianceNumber,
       blueAllianceNumber,
-      redScore: firstMatch.alliances.red.score, // Always show actual match score
-      blueScore: firstMatch.alliances.blue.score, // Always show actual match score
-      redWon:
-        firstMatch.alliances.red.score > firstMatch.alliances.blue.score &&
-        matchPlayed,
-      blueWon:
-        firstMatch.alliances.blue.score > firstMatch.alliances.red.score &&
-        matchPlayed,
+      redScore: firstMatch.alliances.red.score, // First match score
+      blueScore: firstMatch.alliances.blue.score, // First match score
+      redScore2: secondMatch?.alliances.red.score ?? null, // Second match score
+      blueScore2: secondMatch?.alliances.blue.score ?? null, // Second match score
+      redWon,
+      blueWon,
       matchPlayed,
+      showBothMatches,
       matchRedTeams, // Teams that actually played
       matchBlueTeams, // Teams that actually played
     };
@@ -177,7 +200,7 @@ export default function EliminationBracket({
 
     return (
       <div
-        className={`mb-2 min-w-fit rounded border border-gray-300 bg-white
+        className={`mb-2 min-w-[180px] rounded border border-gray-300 bg-white
           transition-all duration-200 ${
             isHighlighted ? 'shadow-lg ring-2 ring-yellow-400' : ''
           }`}
@@ -245,7 +268,7 @@ export default function EliminationBracket({
                 return (
                   <span
                     key={team}
-                    className={`text-sm ${result.redWon ? 'font-bold' : ''} w-12
+                    className={`text-sm ${result.redWon ? 'font-bold' : ''} w-10
                     text-left text-red-600 ${
                       showUnderlines && teamPlayed
                         ? 'underline decoration-red-600 decoration-dotted'
@@ -261,9 +284,27 @@ export default function EliminationBracket({
             </div>
           </div>
           <div className="flex items-center">
-            <span className={`text-sm ${result.redWon ? 'font-bold' : ''}`}>
-              {result.redScore}
-            </span>
+            {result.showBothMatches ? (
+              <div className="flex min-w-0 gap-1">
+                <span
+                  className="w-8 flex-shrink-0 text-center text-sm underline
+                    decoration-dotted decoration-2 [&:hover]:delay-0"
+                  title="True tie"
+                >
+                  {result.redScore}
+                </span>
+                <span
+                  className={`w-8 flex-shrink-0 text-center text-sm
+                    ${result.redWon ? 'font-bold' : ''}`}
+                >
+                  {result.redScore2}
+                </span>
+              </div>
+            ) : (
+              <span className={`text-sm ${result.redWon ? 'font-bold' : ''}`}>
+                {result.redScore}
+              </span>
+            )}
           </div>
         </div>
         <div
@@ -286,7 +327,7 @@ export default function EliminationBracket({
                   <span
                     key={team}
                     className={`text-sm ${result.blueWon ? 'font-bold' : ''}
-                    w-12 text-left text-blue-600 ${
+                    w-10 text-left text-blue-600 ${
                       showUnderlines && teamPlayed
                         ? 'underline decoration-blue-600 decoration-dotted'
                         : ''
@@ -301,9 +342,27 @@ export default function EliminationBracket({
             </div>
           </div>
           <div className="flex items-center">
-            <span className={`text-sm ${result.blueWon ? 'font-bold' : ''}`}>
-              {result.blueScore}
-            </span>
+            {result.showBothMatches ? (
+              <div className="flex min-w-0 gap-1">
+                <span
+                  className="w-8 flex-shrink-0 text-center text-sm underline
+                    decoration-dotted decoration-2 [&:hover]:delay-0"
+                  title="True tie"
+                >
+                  {result.blueScore}
+                </span>
+                <span
+                  className={`w-8 flex-shrink-0 text-center text-sm
+                    ${result.blueWon ? 'font-bold' : ''}`}
+                >
+                  {result.blueScore2}
+                </span>
+              </div>
+            ) : (
+              <span className={`text-sm ${result.blueWon ? 'font-bold' : ''}`}>
+                {result.blueScore}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -347,9 +406,9 @@ export default function EliminationBracket({
         match.alliances.red.score !== -1 &&
         match.alliances.blue.score !== -1
       ) {
-        if (match.alliances.red.score > match.alliances.blue.score) {
+        if (match.winning_alliance === 'red') {
           redWins++;
-        } else if (match.alliances.blue.score > match.alliances.red.score) {
+        } else if (match.winning_alliance === 'blue') {
           blueWins++;
         }
       }
@@ -364,7 +423,7 @@ export default function EliminationBracket({
 
     return (
       <div
-        className={`mb-2 min-w-fit rounded border border-gray-300 bg-white
+        className={`mb-2 min-w-[180px] rounded border border-gray-300 bg-white
           transition-all duration-200 ${
             isHighlighted ? 'shadow-lg ring-2 ring-yellow-400' : ''
           }`}
@@ -436,7 +495,7 @@ export default function EliminationBracket({
                 return (
                   <span
                     key={team}
-                    className={`text-sm ${redWonSeries ? 'font-bold' : ''} w-12
+                    className={`text-sm ${redWonSeries ? 'font-bold' : ''} w-10
                     text-left text-red-600 ${
                       showUnderlines && teamPlayed
                         ? 'underline decoration-red-600 decoration-dotted'
@@ -457,8 +516,8 @@ export default function EliminationBracket({
                 <span
                   key={idx}
                   className={`text-sm
-                  ${match.alliances.red.score > match.alliances.blue.score ? 'font-bold' : ''}
-                  w-8 flex-shrink-0 text-center`}
+                  ${match.winning_alliance === 'red' ? 'font-bold' : ''} w-8
+                  flex-shrink-0 text-center`}
                 >
                   {match.alliances.red.score !== -1
                     ? match.alliances.red.score
@@ -486,7 +545,7 @@ export default function EliminationBracket({
                 return (
                   <span
                     key={team}
-                    className={`text-sm ${blueWonSeries ? 'font-bold' : ''} w-12
+                    className={`text-sm ${blueWonSeries ? 'font-bold' : ''} w-10
                     text-left text-blue-600 ${
                       showUnderlines && teamPlayed
                         ? 'underline decoration-blue-600 decoration-dotted'
@@ -507,8 +566,8 @@ export default function EliminationBracket({
                 <span
                   key={idx}
                   className={`text-sm
-                  ${match.alliances.blue.score > match.alliances.red.score ? 'font-bold' : ''}
-                  w-8 flex-shrink-0 text-center`}
+                  ${match.winning_alliance === 'blue' ? 'font-bold' : ''} w-8
+                  flex-shrink-0 text-center`}
                 >
                   {match.alliances.blue.score !== -1
                     ? match.alliances.blue.score
@@ -528,7 +587,7 @@ export default function EliminationBracket({
 
       <div className="overflow-x-auto overflow-y-hidden">
         <div
-          className="relative flex min-w-max items-start justify-start gap-8
+          className="relative flex min-w-max items-start justify-start gap-6
             px-4"
         >
           {/* Left Side: Upper and Lower Brackets */}
@@ -536,7 +595,7 @@ export default function EliminationBracket({
             {/* Upper Bracket */}
             <div className="space-y-4">
               <h2 className="text-center text-xl font-bold">Upper Bracket</h2>
-              <div className="flex items-start gap-6">
+              <div className="flex items-start gap-4">
                 {/* Round 1 */}
                 <div className="flex flex-col items-center">
                   <h3 className="mb-4 text-center font-bold">Round 1</h3>
@@ -574,7 +633,7 @@ export default function EliminationBracket({
             {/* Lower Bracket */}
             <div className="space-y-4">
               <h2 className="text-center text-xl font-bold">Lower Bracket</h2>
-              <div className="flex items-start gap-6">
+              <div className="flex items-start gap-4">
                 {/* Round 2 */}
                 <div className="flex flex-col items-center">
                   <h3 className="mb-4 text-center font-bold">Round 2</h3>
@@ -617,11 +676,18 @@ export default function EliminationBracket({
           </div>
 
           {/* Right Side: Grand Finals */}
-          <div className="flex flex-col items-center">
-            <h3 className="mb-4 text-center font-bold">Finals</h3>
+          <div className="space-y-4">
             <div className="space-y-4">
-              <div className="h-48"></div>
-              {renderFinalsSection()}
+              <h2 className="text-center text-xl font-bold">&nbsp;</h2>
+              <div className="flex items-start gap-4">
+                <div className="flex flex-col items-center">
+                  <h3 className="mb-4 text-center font-bold">Finals</h3>
+                  <div className="space-y-4">
+                    <div className="h-32"></div>
+                    {renderFinalsSection()}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
