@@ -3,21 +3,72 @@ import { Link } from 'react-router';
 
 import PlayCircle from '~icons/bi/play-circle';
 
-import { EliminationAlliance, Match } from '~/api/tba/read';
+import { EliminationAlliance, Event, Match } from '~/api/tba/read';
 import { TeamLink } from '~/components/tba/links';
+import { EventType } from '~/lib/api/EventType';
 
 export interface EliminationBracketProps {
   alliances: EliminationAlliance[];
   matches: Match[];
   year?: number;
+  event?: Event;
 }
 
 export default function EliminationBracket({
   alliances,
   matches,
   year,
+  event,
 }: EliminationBracketProps): React.JSX.Element {
   const [hoveredAlliance, setHoveredAlliance] = useState<number | null>(null);
+
+  // Check if this is an Einstein event (CMP_FINALS)
+  const isEinsteinEvent = event?.event_type === EventType.CMP_FINALS;
+
+  // Helper to get division shortform (e.g., "Newton Division" -> "New")
+  const getDivisionShortform = (divisionName: string): string => {
+    // Common division names and their shortforms
+    const divisionShortforms: Record<string, string> = {
+      Newton: 'New',
+      Einstein: 'Ein',
+      Curie: 'Cur',
+      Galileo: 'Gal',
+      Hopper: 'Hop',
+      Tesla: 'Tes',
+      Turing: 'Tur',
+      Archimedes: 'Arc',
+      Carson: 'Car',
+      Carver: 'Crv',
+      Daly: 'Dal',
+      Darwin: 'Dar',
+      Johnson: 'Joh',
+      Milstein: 'Mil',
+      Roebling: 'Roe',
+    };
+
+    // Try to match the division name
+    for (const [fullName, shortForm] of Object.entries(divisionShortforms)) {
+      if (divisionName.includes(fullName)) {
+        return shortForm;
+      }
+    }
+
+    // If no match found, take first 3 letters
+    return divisionName.substring(0, 3);
+  };
+
+  // Helper to get alliance display name
+  const getAllianceDisplayName = (allianceNumber: number): string => {
+    if (!allianceNumber || allianceNumber > alliances.length) return '';
+
+    const alliance = alliances[allianceNumber - 1];
+    if (isEinsteinEvent && alliance.name) {
+      // For Einstein events, use division shortform if available
+      return getDivisionShortform(alliance.name);
+    }
+    // Default to alliance number
+    return `#${allianceNumber}`;
+  };
 
   if (
     !alliances ||
@@ -140,16 +191,20 @@ export default function EliminationBracket({
             {result.redAllianceNumber && result.blueAllianceNumber && (
               <span className="text-xs font-normal">
                 (
-                <span className={`text-red-600 transition-all duration-200 ${
-                  isRedHighlighted ? 'bg-red-100 px-1 rounded text-sm' : ''
-                }`}>
-                  #{result.redAllianceNumber}
+                <span
+                  className={`text-red-600 transition-all duration-200 ${
+                    isRedHighlighted ? 'rounded bg-red-100 px-1 text-sm' : ''
+                  }`}
+                >
+                  {getAllianceDisplayName(result.redAllianceNumber)}
                 </span>{' '}
                 vs{' '}
-                <span className={`text-blue-600 transition-all duration-200 ${
-                  isBlueHighlighted ? 'bg-blue-100 px-1 rounded text-sm' : ''
-                }`}>
-                  #{result.blueAllianceNumber}
+                <span
+                  className={`text-blue-600 transition-all duration-200 ${
+                    isBlueHighlighted ? 'rounded bg-blue-100 px-1 text-sm' : ''
+                  }`}
+                >
+                  {getAllianceDisplayName(result.blueAllianceNumber)}
                 </span>
                 )
               </span>
@@ -322,12 +377,23 @@ export default function EliminationBracket({
             <span>Finals</span>
             {redAllianceNumber && blueAllianceNumber && (
               <span className="text-xs font-normal">
-                (<span className={`text-red-600 transition-all duration-200 ${
-                  isRedHighlighted ? 'bg-red-100 px-1 rounded text-sm' : ''
-                }`}>#{redAllianceNumber}</span> vs{' '}
-                <span className={`text-blue-600 transition-all duration-200 ${
-                  isBlueHighlighted ? 'bg-blue-100 px-1 rounded text-sm' : ''
-                }`}>#{blueAllianceNumber}</span>)
+                (
+                <span
+                  className={`text-red-600 transition-all duration-200 ${
+                    isRedHighlighted ? 'rounded bg-red-100 px-1 text-sm' : ''
+                  }`}
+                >
+                  {getAllianceDisplayName(redAllianceNumber)}
+                </span>{' '}
+                vs{' '}
+                <span
+                  className={`text-blue-600 transition-all duration-200 ${
+                    isBlueHighlighted ? 'rounded bg-blue-100 px-1 text-sm' : ''
+                  }`}
+                >
+                  {getAllianceDisplayName(blueAllianceNumber)}
+                </span>
+                )
               </span>
             )}
           </div>

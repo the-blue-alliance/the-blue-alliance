@@ -426,6 +426,7 @@ export default function EventPage() {
                 alliances={alliances}
                 matches={elims}
                 year={event.year}
+                event={event}
               />
             </div>
           )}
