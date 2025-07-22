@@ -36,11 +36,10 @@ import {
   getEventTeamsOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
-import EliminationBracket from '~/components/tba/eliminationBracket';
-import { Button } from '~/components/ui/button';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
+import EliminationBracket from '~/components/tba/eliminationBracket';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { LocationLink, TeamLink } from '~/components/tba/links';
 import {
@@ -55,6 +54,7 @@ import RankingsTable from '~/components/tba/rankingsTable';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -393,14 +393,19 @@ export default function EventPage() {
                   year={event.year}
                 />
               )}
-              
+
               {alliances.length > 0 && (
                 <div className="my-4">
-                  <Button 
+                  <Button
                     onClick={() => {
-                      const bracketElement = document.querySelector('[data-bracket-section]');
+                      const bracketElement = document.querySelector(
+                        '[data-bracket-section]',
+                      );
                       if (bracketElement) {
-                        bracketElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        bracketElement.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
                       }
                     }}
                     variant="secondary"
@@ -410,11 +415,11 @@ export default function EventPage() {
                   </Button>
                 </div>
               )}
-              
+
               {rightSideElims}
             </div>
           </div>
-          
+
           {alliances.length > 0 && (
             <div data-bracket-section>
               <EliminationBracket
