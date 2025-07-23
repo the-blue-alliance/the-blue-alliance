@@ -35,7 +35,9 @@ const createQueryKey = <TOptions extends Options>(
 ): [QueryKey<TOptions>[0]] => {
   const params: QueryKey<TOptions>[0] = {
     _id: id,
-    baseUrl: (options?.client ?? _heyApiClient).getConfig().baseUrl,
+    baseUrl:
+      options?.baseUrl ||
+      (options?.client ?? _heyApiClient).getConfig().baseUrl,
   } as QueryKey<TOptions>[0];
   if (infinite) {
     params._infinite = infinite;
