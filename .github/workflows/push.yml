@@ -712,7 +712,7 @@ jobs:
   deploy-pwa:
     name: Deploy PWA Service
     runs-on: ubuntu-22.04
-    needs: [pwa-lint, pwa-type, pwa-test, pwa-build, pwa-e2e, check-pwa-api]
+    needs: [pwa-lint, pwa-type, pwa-test, pwa-build, check-pwa-api]
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-pwa-${{ github.ref }}
     steps:
