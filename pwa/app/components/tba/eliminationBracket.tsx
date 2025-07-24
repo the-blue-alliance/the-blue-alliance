@@ -6,6 +6,9 @@ import PlayCircle from '~icons/bi/play-circle';
 import { EliminationAlliance, Event, Match } from '~/api/tba/read';
 import { TeamLink } from '~/components/tba/links';
 import { EventType } from '~/lib/api/EventType';
+import { getDivisionShortform } from '~/lib/eventUtils';
+import { maybeGetFirstMatchVideoURL } from '~/lib/matchUtils';
+import { cn } from '~/lib/utils';
 
 export interface EliminationBracketProps {
   alliances: EliminationAlliance[];
@@ -25,44 +28,12 @@ export default function EliminationBracket({
   // Check if this is an Einstein event (CMP_FINALS)
   const isEinsteinEvent = event?.event_type === EventType.CMP_FINALS;
 
-  // Helper to get division shortform (e.g., "Newton Division" -> "New")
-  const getDivisionShortform = (divisionName: string): string => {
-    // Common division names and their shortforms
-    const divisionShortforms: Record<string, string> = {
-      Newton: 'New',
-      Einstein: 'Ein',
-      Curie: 'Cur',
-      Galileo: 'Gal',
-      Hopper: 'Hop',
-      Tesla: 'Tes',
-      Turing: 'Tur',
-      Archimedes: 'Arc',
-      Carson: 'Car',
-      Carver: 'Crv',
-      Daly: 'Dal',
-      Darwin: 'Dar',
-      Johnson: 'Joh',
-      Milstein: 'Mil',
-      Roebling: 'Roe',
-    };
-
-    // Try to match the division name
-    for (const [fullName, shortForm] of Object.entries(divisionShortforms)) {
-      if (divisionName.includes(fullName)) {
-        return shortForm;
-      }
-    }
-
-    // If no match found, take first 3 letters
-    return divisionName.substring(0, 3);
-  };
-
   // Helper to get alliance display name
   const getAllianceDisplayName = (allianceNumber: number): string => {
     if (!allianceNumber || allianceNumber > alliances.length) return '';
 
     const alliance = alliances[allianceNumber - 1];
-    if (isEinsteinEvent && alliance.name) {
+    if (isEinsteinEvent && alliance.name && typeof alliance.name === 'string') {
       // For Einstein events, use division shortform if available
       return getDivisionShortform(alliance.name);
     }
@@ -80,7 +51,7 @@ export default function EliminationBracket({
   }
 
   // Group matches by set_number
-  const matchesBySet = matches.reduce(
+  const matchesBySet: Record<number, Match[]> = matches.reduce(
     (acc, match) => {
       if (!acc[match.set_number]) acc[match.set_number] = [];
       acc[match.set_number].push(match);
@@ -88,14 +59,6 @@ export default function EliminationBracket({
     },
     {} as Record<number, Match[]>,
   );
-
-  // Helper to get first match video URL
-  const maybeGetFirstMatchVideoURL = (match: Match): string | undefined => {
-    if (match.videos.length === 0) {
-      return undefined;
-    }
-    return `https://www.youtube.com/watch?v=${match.videos[0].key}`;
-  };
 
   // Helper to get alliance numbers for teams
   const getAllianceNumber = (teamKeys: string[]) => {
@@ -200,10 +163,11 @@ export default function EliminationBracket({
 
     return (
       <div
-        className={`mb-2 min-w-[180px] rounded border border-gray-300 bg-white
-          transition-all duration-200 ${
-            isHighlighted ? 'shadow-lg ring-2 ring-yellow-400' : ''
-          }`}
+        className={cn(
+          `mb-2 min-w-[180px] rounded border border-gray-300 bg-white
+          transition-all duration-200`,
+          isHighlighted && 'shadow-lg ring-2 ring-yellow-400',
+        )}
       >
         <div
           className="flex items-center justify-between border-b bg-gray-100 px-2
@@ -215,17 +179,19 @@ export default function EliminationBracket({
               <span className="text-xs font-normal">
                 (
                 <span
-                  className={`text-red-600 transition-all duration-200 ${
-                    isRedHighlighted ? 'rounded bg-red-100 px-1 text-sm' : ''
-                  }`}
+                  className={cn(
+                    'text-red-600 transition-all duration-200',
+                    isRedHighlighted && 'rounded bg-red-100 px-1 text-sm',
+                  )}
                 >
                   {getAllianceDisplayName(result.redAllianceNumber)}
                 </span>{' '}
                 vs{' '}
                 <span
-                  className={`text-blue-600 transition-all duration-200 ${
-                    isBlueHighlighted ? 'rounded bg-blue-100 px-1 text-sm' : ''
-                  }`}
+                  className={cn(
+                    'text-blue-600 transition-all duration-200',
+                    isBlueHighlighted && 'rounded bg-blue-100 px-1 text-sm',
+                  )}
                 >
                   {getAllianceDisplayName(result.blueAllianceNumber)}
                 </span>
@@ -236,24 +202,31 @@ export default function EliminationBracket({
           {(() => {
             const setMatches = matchesBySet[setNumber];
             if (setMatches && setMatches.length > 0) {
-              const videoURL = maybeGetFirstMatchVideoURL(setMatches[0]);
-              return videoURL ? (
-                <Link
-                  to={videoURL}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  <PlayCircle className="inline h-4 w-4" />
-                </Link>
-              ) : null;
+              const firstMatch: Match | undefined = setMatches[0];
+              if (firstMatch) {
+                const videoURL: string | undefined =
+                  maybeGetFirstMatchVideoURL(firstMatch);
+                if (videoURL) {
+                  return (
+                    <Link
+                      to={videoURL}
+                      className="text-gray-600 hover:text-gray-800"
+                    >
+                      <PlayCircle className="inline h-4 w-4" />
+                    </Link>
+                  );
+                }
+              }
             }
             return null;
           })()}
         </div>
         <div
-          className={`flex cursor-pointer items-center justify-between
-            bg-alliance-red-light px-1 py-1 transition-colors duration-200 ${
-              isRedHighlighted ? 'bg-red-300' : 'hover:bg-red-200'
-            }`}
+          className={cn(
+            `flex cursor-pointer items-center justify-between
+            bg-alliance-red-light px-1 py-1 transition-colors duration-200`,
+            isRedHighlighted ? 'bg-red-300' : 'hover:bg-red-200',
+          )}
           onMouseEnter={() =>
             result.redAllianceNumber &&
             setHoveredAlliance(result.redAllianceNumber)
@@ -268,12 +241,13 @@ export default function EliminationBracket({
                 return (
                   <span
                     key={team}
-                    className={`text-sm ${result.redWon ? 'font-bold' : ''} w-10
-                    text-left text-red-600 ${
-                      showUnderlines && teamPlayed
-                        ? 'underline decoration-red-600 decoration-dotted'
-                        : ''
-                    }`}
+                    className={cn(
+                      'w-10 text-left text-sm text-red-600',
+                      result.redWon && 'font-bold',
+                      showUnderlines &&
+                        teamPlayed &&
+                        'underline decoration-red-600 decoration-dotted',
+                    )}
                   >
                     <TeamLink teamOrKey={`frc${team}`} year={year}>
                       {team}
@@ -294,24 +268,27 @@ export default function EliminationBracket({
                   {result.redScore}
                 </span>
                 <span
-                  className={`w-8 flex-shrink-0 text-center text-sm
-                    ${result.redWon ? 'font-bold' : ''}`}
+                  className={cn(
+                    'w-8 flex-shrink-0 text-center text-sm',
+                    result.redWon && 'font-bold',
+                  )}
                 >
                   {result.redScore2}
                 </span>
               </div>
             ) : (
-              <span className={`text-sm ${result.redWon ? 'font-bold' : ''}`}>
+              <span className={cn('text-sm', result.redWon && 'font-bold')}>
                 {result.redScore}
               </span>
             )}
           </div>
         </div>
         <div
-          className={`flex cursor-pointer items-center justify-between
-            bg-alliance-blue-light px-1 py-1 transition-colors duration-200 ${
-              isBlueHighlighted ? 'bg-blue-300' : 'hover:bg-blue-200'
-            }`}
+          className={cn(
+            `flex cursor-pointer items-center justify-between
+            bg-alliance-blue-light px-1 py-1 transition-colors duration-200`,
+            isBlueHighlighted ? 'bg-blue-300' : 'hover:bg-blue-200',
+          )}
           onMouseEnter={() =>
             result.blueAllianceNumber &&
             setHoveredAlliance(result.blueAllianceNumber)
@@ -326,12 +303,13 @@ export default function EliminationBracket({
                 return (
                   <span
                     key={team}
-                    className={`text-sm ${result.blueWon ? 'font-bold' : ''}
-                    w-10 text-left text-blue-600 ${
-                      showUnderlines && teamPlayed
-                        ? 'underline decoration-blue-600 decoration-dotted'
-                        : ''
-                    }`}
+                    className={cn(
+                      'w-10 text-left text-sm text-blue-600',
+                      result.blueWon && 'font-bold',
+                      showUnderlines &&
+                        teamPlayed &&
+                        'underline decoration-blue-600 decoration-dotted',
+                    )}
                   >
                     <TeamLink teamOrKey={`frc${team}`} year={year}>
                       {team}
@@ -352,14 +330,16 @@ export default function EliminationBracket({
                   {result.blueScore}
                 </span>
                 <span
-                  className={`w-8 flex-shrink-0 text-center text-sm
-                    ${result.blueWon ? 'font-bold' : ''}`}
+                  className={cn(
+                    'w-8 flex-shrink-0 text-center text-sm',
+                    result.blueWon && 'font-bold',
+                  )}
                 >
                   {result.blueScore2}
                 </span>
               </div>
             ) : (
-              <span className={`text-sm ${result.blueWon ? 'font-bold' : ''}`}>
+              <span className={cn('text-sm', result.blueWon && 'font-bold')}>
                 {result.blueScore}
               </span>
             )}
@@ -378,6 +358,8 @@ export default function EliminationBracket({
 
     // Get the two competing alliances from the first finals match
     const firstMatch = finalsMatches[0];
+    if (!firstMatch) return null;
+
     const matchRedTeams = firstMatch.alliances.red.team_keys.map((t) =>
       t.substring(3),
     );
@@ -423,10 +405,11 @@ export default function EliminationBracket({
 
     return (
       <div
-        className={`mb-2 min-w-[180px] rounded border border-gray-300 bg-white
-          transition-all duration-200 ${
-            isHighlighted ? 'shadow-lg ring-2 ring-yellow-400' : ''
-          }`}
+        className={cn(
+          `mb-2 min-w-[180px] rounded border border-gray-300 bg-white
+          transition-all duration-200`,
+          isHighlighted && 'shadow-lg ring-2 ring-yellow-400',
+        )}
       >
         <div
           className="flex items-center justify-between border-b bg-gray-100 px-2
@@ -438,17 +421,19 @@ export default function EliminationBracket({
               <span className="text-xs font-normal">
                 (
                 <span
-                  className={`text-red-600 transition-all duration-200 ${
-                    isRedHighlighted ? 'rounded bg-red-100 px-1 text-sm' : ''
-                  }`}
+                  className={cn(
+                    'text-red-600 transition-all duration-200',
+                    isRedHighlighted && 'rounded bg-red-100 px-1 text-sm',
+                  )}
                 >
                   {getAllianceDisplayName(redAllianceNumber)}
                 </span>{' '}
                 vs{' '}
                 <span
-                  className={`text-blue-600 transition-all duration-200 ${
-                    isBlueHighlighted ? 'rounded bg-blue-100 px-1 text-sm' : ''
-                  }`}
+                  className={cn(
+                    'text-blue-600 transition-all duration-200',
+                    isBlueHighlighted && 'rounded bg-blue-100 px-1 text-sm',
+                  )}
                 >
                   {getAllianceDisplayName(blueAllianceNumber)}
                 </span>
@@ -458,7 +443,8 @@ export default function EliminationBracket({
           </div>
           <div className="flex items-center gap-1">
             {finalsMatches.map((match, idx) => {
-              const videoURL = maybeGetFirstMatchVideoURL(match);
+              const videoURL: string | undefined =
+                maybeGetFirstMatchVideoURL(match);
               return videoURL ? (
                 <Link
                   key={idx}
@@ -478,10 +464,11 @@ export default function EliminationBracket({
           </div>
         </div>
         <div
-          className={`flex cursor-pointer items-center justify-between
-            bg-alliance-red-light px-1 py-1 transition-colors duration-200 ${
-              isRedHighlighted ? 'bg-red-300' : 'hover:bg-red-200'
-            }`}
+          className={cn(
+            `flex cursor-pointer items-center justify-between
+            bg-alliance-red-light px-1 py-1 transition-colors duration-200`,
+            isRedHighlighted ? 'bg-red-300' : 'hover:bg-red-200',
+          )}
           onMouseEnter={() =>
             redAllianceNumber && setHoveredAlliance(redAllianceNumber)
           }
@@ -495,12 +482,13 @@ export default function EliminationBracket({
                 return (
                   <span
                     key={team}
-                    className={`text-sm ${redWonSeries ? 'font-bold' : ''} w-10
-                    text-left text-red-600 ${
-                      showUnderlines && teamPlayed
-                        ? 'underline decoration-red-600 decoration-dotted'
-                        : ''
-                    }`}
+                    className={cn(
+                      'w-10 text-left text-sm text-red-600',
+                      redWonSeries && 'font-bold',
+                      showUnderlines &&
+                        teamPlayed &&
+                        'underline decoration-red-600 decoration-dotted',
+                    )}
                   >
                     <TeamLink teamOrKey={`frc${team}`} year={year}>
                       {team}
@@ -515,9 +503,10 @@ export default function EliminationBracket({
               {finalsMatches.map((match, idx) => (
                 <span
                   key={idx}
-                  className={`text-sm
-                  ${match.winning_alliance === 'red' ? 'font-bold' : ''} w-8
-                  flex-shrink-0 text-center`}
+                  className={cn(
+                    'w-8 flex-shrink-0 text-center text-sm',
+                    match.winning_alliance === 'red' && 'font-bold',
+                  )}
                 >
                   {match.alliances.red.score !== -1
                     ? match.alliances.red.score
@@ -528,10 +517,11 @@ export default function EliminationBracket({
           </div>
         </div>
         <div
-          className={`flex cursor-pointer items-center justify-between
-            bg-alliance-blue-light px-1 py-1 transition-colors duration-200 ${
-              isBlueHighlighted ? 'bg-blue-300' : 'hover:bg-blue-200'
-            }`}
+          className={cn(
+            `flex cursor-pointer items-center justify-between
+            bg-alliance-blue-light px-1 py-1 transition-colors duration-200`,
+            isBlueHighlighted ? 'bg-blue-300' : 'hover:bg-blue-200',
+          )}
           onMouseEnter={() =>
             blueAllianceNumber && setHoveredAlliance(blueAllianceNumber)
           }
@@ -545,12 +535,13 @@ export default function EliminationBracket({
                 return (
                   <span
                     key={team}
-                    className={`text-sm ${blueWonSeries ? 'font-bold' : ''} w-10
-                    text-left text-blue-600 ${
-                      showUnderlines && teamPlayed
-                        ? 'underline decoration-blue-600 decoration-dotted'
-                        : ''
-                    }`}
+                    className={cn(
+                      'w-10 text-left text-sm text-blue-600',
+                      blueWonSeries && 'font-bold',
+                      showUnderlines &&
+                        teamPlayed &&
+                        'underline decoration-blue-600 decoration-dotted',
+                    )}
                   >
                     <TeamLink teamOrKey={`frc${team}`} year={year}>
                       {team}
@@ -565,9 +556,10 @@ export default function EliminationBracket({
               {finalsMatches.map((match, idx) => (
                 <span
                   key={idx}
-                  className={`text-sm
-                  ${match.winning_alliance === 'blue' ? 'font-bold' : ''} w-8
-                  flex-shrink-0 text-center`}
+                  className={cn(
+                    'w-8 flex-shrink-0 text-center text-sm',
+                    match.winning_alliance === 'blue' && 'font-bold',
+                  )}
                 >
                   {match.alliances.blue.score !== -1
                     ? match.alliances.blue.score

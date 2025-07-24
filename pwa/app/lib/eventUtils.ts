@@ -133,3 +133,35 @@ export function getCurrentWeekEvents(events: Event[]) {
 export function sortEvents(events: Event[]) {
   return events.sort((a, b) => sortEventsComparator(a, b));
 }
+
+// Common division names and their shortforms for Einstein events
+export const DIVISION_SHORTFORMS: Record<string, string> = {
+  Newton: 'New',
+  Einstein: 'Ein',
+  Curie: 'Cur',
+  Galileo: 'Gal',
+  Hopper: 'Hop',
+  Tesla: 'Tes',
+  Turing: 'Tur',
+  Archimedes: 'Arc',
+  Carson: 'Car',
+  Carver: 'Crv',
+  Daly: 'Dal',
+  Darwin: 'Dar',
+  Johnson: 'Joh',
+  Milstein: 'Mil',
+  Roebling: 'Roe',
+};
+
+// Helper to get division shortform (e.g., "Newton Division" -> "New")
+export function getDivisionShortform(divisionName: string): string {
+  // Try to match the division name
+  for (const [fullName, shortForm] of Object.entries(DIVISION_SHORTFORMS)) {
+    if (divisionName.includes(fullName)) {
+      return shortForm;
+    }
+  }
+
+  // If no match found, take first 3 letters
+  return divisionName.substring(0, 3);
+}

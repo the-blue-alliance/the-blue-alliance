@@ -7,7 +7,7 @@ import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
 import ScoreCell from '~/components/tba/match/scoreCell';
 import TeamListSubgrid from '~/components/tba/match/teamListSubgrid';
 import { PlayoffType } from '~/lib/api/PlayoffType';
-import { matchTitleShort } from '~/lib/matchUtils';
+import { matchTitleShort, maybeGetFirstMatchVideoURL } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
 
 export default function SimpleMatchRowsWithBreaks({
@@ -172,14 +172,6 @@ export function MatchRow({
       </div>
     </div>
   );
-}
-
-function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
-  if (match.videos.length === 0) {
-    return undefined;
-  }
-
-  return `https://www.youtube.com/watch?v=${match.videos[0].key}`;
 }
 
 interface BreakRowProps extends React.HTMLAttributes<HTMLDivElement> {
