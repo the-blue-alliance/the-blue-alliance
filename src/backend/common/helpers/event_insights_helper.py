@@ -110,9 +110,9 @@ class EventInsightsHelper:
             if blue_sb["coralBonusAchieved"]:
                 coral_rp_count += 1
 
-            if red_sb["coopertitionCriteriaMet"]:
+            if red_sb.get("coopertitionCriteriaMet"):
                 coopertition_count += 1
-            if blue_sb["coopertitionCriteriaMet"]:
+            if blue_sb.get("coopertitionCriteriaMet"):
                 coopertition_count += 1
 
             red_all_rp = (
