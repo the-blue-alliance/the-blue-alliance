@@ -2,6 +2,7 @@ import React from "react";
 import EventInfoContainer from "../containers/EventInfoContainer";
 import TeamListContainer from "../containers/TeamListContainer";
 import AwardsTabContainer from "../containers/AwardsTabContainer";
+import MatchVideosContainer from "../containers/MatchVideosContainer";
 
 const NotAvailableMessage = () => (
   <p>
@@ -55,6 +56,11 @@ const EventWizardTabFrame = () => (
               Alliance Selection
             </a>
           </li>
+          <li>
+            <a href="#match-videos" data-toggle="tab">
+              Match Videos
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -62,6 +68,7 @@ const EventWizardTabFrame = () => (
       <EventInfoContainer />
       <TeamListContainer />
       <AwardsTabContainer />
+      <MatchVideosContainer />
       <div className="tab-pane" id="schedule">
         <h3>FMS Schedule</h3>
         <NotAvailableMessage />
