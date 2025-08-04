@@ -5376,7 +5376,8 @@
           "division_keys",
           "parent_event_key",
           "playoff_type",
-          "playoff_type_string"
+          "playoff_type_string",
+          "remap_teams"
         ],
         "type": "object",
         "properties": {
@@ -5569,6 +5570,17 @@
               "null"
             ],
             "description": "String representation of the `playoff_type`, or null."
+          },
+          "remap_teams": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Map of temporary \"off-season demo\" team numbers to pre-rookie and B teams. Both keys and values are team keys in the format 'frc####'. Key is the old team key, value is the new team key.",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Team key in the format 'frc####'"
+            }
           }
         }
       },

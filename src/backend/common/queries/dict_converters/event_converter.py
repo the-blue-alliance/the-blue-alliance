@@ -20,7 +20,7 @@ class EventConverter(ConverterBase):
     EVENT_DATE_FORMAT_STR = "%Y-%m-%d"
 
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 6,
+        ApiMajorVersion.API_V3: 7,
     }
 
     @classmethod
@@ -75,6 +75,7 @@ class EventConverter(ConverterBase):
             "timezone": event.timezone_id,
             "week": event.week,
             "website": event.website,
+            "remap_teams": event.remap_teams,
         }
         event_dict.update(cls.constructLocation_v3(event))
 

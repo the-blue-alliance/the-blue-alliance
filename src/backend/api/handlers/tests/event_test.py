@@ -66,6 +66,59 @@ def test_event(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 404
 
 
+def test_event_remap_teams(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    # Create an event with remap_teams data
+    remap_teams = {"frc9999": "frc254B", "frc9998": "frc118"}
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+        remap_teams=remap_teams,
+    ).put()
+
+    # Test that remap_teams is included in nominal response
+    resp = api_client.get(
+        "/api/v3/event/2019casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.json["key"] == "2019casj"
+    assert "remap_teams" in resp.json
+    assert resp.json["remap_teams"] == remap_teams
+    validate_nominal_event_keys(resp.json)
+
+    # Test that remap_teams is NOT included in simple response
+    resp = api_client.get(
+        "/api/v3/event/2019casj/simple", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.json["key"] == "2019casj"
+    assert "remap_teams" not in resp.json
+    validate_simple_event_keys(resp.json)
+
+    # Test event with null remap_teams
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+        remap_teams=None,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2020casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.json["key"] == "2020casj"
+    assert "remap_teams" in resp.json
+    assert resp.json["remap_teams"] is None
+
+
 def test_event_list_all(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
