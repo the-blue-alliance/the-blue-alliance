@@ -125,6 +125,7 @@ export const zEvent = z.object({
   parent_event_key: z.union([z.string(), z.null()]),
   playoff_type: z.union([z.number().int(), z.null()]),
   playoff_type_string: z.union([z.string(), z.null()]),
+  remap_teams: z.union([z.object({}), z.null()]),
 });
 
 /**

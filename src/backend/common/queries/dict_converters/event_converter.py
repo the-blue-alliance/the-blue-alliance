@@ -137,6 +137,6 @@ class EventConverter(ConverterBase):
             ndb.Key(District, data["district"]["key"]) if data["district"] else None
         )
 
-        event.remap_teams = data["remap_teams"]
+        event.remap_teams = data.get("remap_teams")
 
         return event

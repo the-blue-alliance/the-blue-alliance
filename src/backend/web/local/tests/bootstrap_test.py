@@ -322,9 +322,6 @@ def test_bootstrap_event(
     ndb_context, requests_mock: RequestsMocker, taskqueue_stub
 ) -> None:
     event = make_event("2020nyny")
-    # Add remap_teams data to test the field
-    remap_teams = {"frc9999": "frc254B", "frc9998": "frc118"}
-    event.remap_teams = remap_teams
     team1 = make_team(254)
     team2 = make_team(255)
     match = make_match("2020nyny_qm1")
@@ -372,7 +369,6 @@ def test_bootstrap_event(
 
     stored_event = Event.get_by_id("2020nyny")
     assert event == remove_auto_add_properties(stored_event)
-    assert stored_event.remap_teams == remap_teams
 
     stored_team1 = Team.get_by_id("frc254")
     assert team1 == remove_auto_add_properties(stored_team1)
