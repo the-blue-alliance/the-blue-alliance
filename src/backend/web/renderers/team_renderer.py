@@ -23,6 +23,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -55,9 +56,7 @@ class TeamRenderer:
         media_future = media_query.TeamYearMediaQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
-        social_media_future = media_query.TeamSocialMediaQuery(
-            team_key=team.key_name
-        ).fetch_async()
+        social_media_future = cls._fetch_social_medias_async(team)
         robot_future = Robot.get_by_id_async("{}_{}".format(team.key.id(), year))
         team_districts_future = district_query.TeamDistrictsQuery(
             team_key=team.key_name
@@ -325,9 +324,6 @@ class TeamRenderer:
         )
         avatar = MediaHelper.get_avatar(media_future.get_result())
         image_medias = MediaHelper.get_images(media_future.get_result())
-        social_medias = sorted(
-            social_media_future.get_result(), key=MediaHelper.social_media_sorter
-        )
         preferred_image_medias = list(
             filter(lambda x: team.key in x.preferred_references, image_medias)
         )
@@ -360,7 +356,7 @@ class TeamRenderer:
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname,
             "avatar": avatar,
-            "social_medias": social_medias,
+            "social_medias": social_media_future.get_result(),
             "image_medias": image_medias,
             "preferred_image_medias": preferred_image_medias,
             "robot": robot_future.get_result(),
@@ -391,9 +387,7 @@ class TeamRenderer:
         participation_future = team_query.TeamParticipationQuery(
             team_key=team.key_name
         ).fetch_async()
-        social_media_future = media_query.TeamSocialMediaQuery(
-            team_key=team.key_name
-        ).fetch_async()
+        social_media_future = cls._fetch_social_medias_async(team)
 
         hall_of_fame_future = cls._fetch_hof_async(team)
 
@@ -441,16 +435,12 @@ class TeamRenderer:
             last_competed = max(participation_years)
         current_year = datetime.date.today().year
 
-        social_medias = sorted(
-            social_media_future.get_result(), key=MediaHelper.social_media_sorter
-        )
-
         template_values = {
             "is_canonical": is_canonical,
             "team": team,
             "event_awards": event_awards,
             "years": sorted(years),
-            "social_medias": social_medias,
+            "social_medias": social_media_future.get_result(),
             "current_event": current_event,
             "current_event_pit_location": current_event_pit,
             "matches_upcoming": matches_upcoming,
@@ -484,6 +474,16 @@ class TeamRenderer:
             awards_by_event_key[event_key] = AwardHelper.organize_awards(event_awards)
 
         return awards_by_event_key
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_social_medias_async(cls, team: Team) -> List[Media]:
+        social_medias = yield media_query.TeamSocialMediaQuery(
+            team_key=team.key_name
+        ).fetch_async()
+        return sorted(
+            social_medias, key=MediaHelper.social_media_sorter
+        )
 
     @classmethod
     @ndb.tasklet
