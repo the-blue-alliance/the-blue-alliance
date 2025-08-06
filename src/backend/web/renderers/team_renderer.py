@@ -76,7 +76,7 @@ class TeamRenderer:
         else:
             regional_champs_pool_future = None
 
-        hall_of_fame = cls._fetch_hof(team)
+        hall_of_fame_future = cls._fetch_hof_async(team)
 
         events_sorted = sorted(
             events_future.get_result(),
@@ -379,7 +379,7 @@ class TeamRenderer:
             "last_competed": last_competed,
             "current_year": current_year,
             "max_year": SeasonHelper.get_max_year(),
-            "hof": hall_of_fame,
+            "hof": hall_of_fame_future.get_result(),
             "team_district_points": team_district_points,
             "team_regional_champs_pool_points": team_regional_champs_pool_points,
             "has_any_pit_location": any(
@@ -407,7 +407,7 @@ class TeamRenderer:
             team_key=team.key_name
         ).fetch_async()
 
-        hall_of_fame = cls._fetch_hof(team)
+        hall_of_fame_future = cls._fetch_hof_async(team)
 
         awards_by_event = {}
         for award in award_futures.get_result():
@@ -482,32 +482,33 @@ class TeamRenderer:
             "last_competed": last_competed,
             "current_year": current_year,
             "max_year": SeasonHelper.get_max_year(),
-            "hof": hall_of_fame,
+            "hof": hall_of_fame_future.get_result(),
         }
 
         return template_values, short_cache
 
     @classmethod
-    def _fetch_hof(cls, team: Team) -> Dict:
-        hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team_key=team.key_name,
-            event_type=EventType.CMP_FINALS,
-            award_type=AwardType.CHAIRMANS,
-        ).fetch_async()
-        hof_video_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_VIDEO
-        ).fetch_async()
-        hof_presentation_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_PRESENTATION
-        ).fetch_async()
-        hof_essay_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_ESSAY
-        ).fetch_async()
-
-        hof_awards = hof_award_future.get_result()
-        hof_video = hof_video_future.get_result()
-        hof_presentation = hof_presentation_future.get_result()
-        hof_essay = hof_essay_future.get_result()
+    @ndb.tasklet
+    def _fetch_hof_async(cls, team: Team) -> Dict:
+        hof_awards, hof_video, hof_presentation, hof_essay = yield (
+            award_query.TeamEventTypeAwardsQuery(
+                team_key=team.key_name,
+                event_type=EventType.CMP_FINALS,
+                award_type=AwardType.CHAIRMANS,
+            ).fetch_async(),
+            media_query.TeamTagMediasQuery(
+                team_key=team.key_name,
+                media_tag=MediaTag.CHAIRMANS_VIDEO,
+            ).fetch_async(),
+            media_query.TeamTagMediasQuery(
+                team_key=team.key_name,
+                media_tag=MediaTag.CHAIRMANS_PRESENTATION,
+            ).fetch_async(),
+            media_query.TeamTagMediasQuery(
+                team_key=team.key_name,
+                media_tag=MediaTag.CHAIRMANS_ESSAY,
+            ).fetch_async(),
+        )
 
         return {
             "is_hof": len(hof_awards) > 0,
