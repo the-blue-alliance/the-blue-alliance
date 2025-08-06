@@ -40,6 +40,19 @@ class TeamRenderer:
     def render_team_details(
         cls, team: Team, year: Year, is_canonical: bool
     ) -> Tuple[Optional[Dict], bool]:
+        awards_future = award_query.TeamYearAwardsQuery(
+            team_key=team.key_name, year=year
+        ).fetch_async()
+        events_future = event_query.TeamYearEventsQuery(
+            team_key=team.key_name, year=year
+        ).fetch_async()
+        matches_future = match_query.TeamYearMatchesQuery(
+            team_key=team.key_name, year=year
+        ).fetch_async()
+        valid_years_future = team_query.TeamParticipationQuery(
+            team_key=team.key_name
+        ).fetch_async()
+
         hof_award_future = award_query.TeamEventTypeAwardsQuery(
             team_key=team.key_name,
             event_type=EventType.CMP_FINALS,
@@ -96,14 +109,31 @@ class TeamRenderer:
             },
         }
 
-        (
-            events_sorted,
-            matches_by_event_key,
-            awards_by_event_key,
-            valid_years,
-        ) = cls._fetch_data(team, year, return_valid_years=True)
+        events_sorted = sorted(
+            events_future.get_result(),
+            key=lambda e: (
+                e.start_date if e.start_date else datetime.datetime(year, 12, 31)
+            ),
+        )  # unknown goes last
+
         if not events_sorted:
             return None, False
+
+        matches_by_event_key: Dict[ndb.Key, List[Match]] = {}
+        for match in matches_future.get_result():
+            if match.event in matches_by_event_key:
+                matches_by_event_key[match.event].append(match)
+            else:
+                matches_by_event_key[match.event] = [match]
+
+        awards_by_event_key: Dict[ndb.Key, List[Award]] = {}
+        for award in awards_future.get_result():
+            if award.event in awards_by_event_key:
+                awards_by_event_key[award.event].append(award)
+            else:
+                awards_by_event_key[award.event] = [award]
+
+        valid_years = sorted(valid_years_future.get_result())
 
         has_valid_district = False
         district_name = None
@@ -518,60 +548,3 @@ class TeamRenderer:
         }
 
         return template_values, short_cache
-
-    @classmethod
-    def _fetch_data(
-        cls, team: Team, year: Year, return_valid_years: bool = False
-    ) -> Tuple[
-        List[Event],
-        Dict[ndb.Key, List[Match]],
-        Dict[ndb.Key, List[Award]],
-        List[Year],
-    ]:
-        """
-        returns: events_sorted, matches_by_event_key, awards_by_event_key, valid_years
-        of a team for a given year
-        """
-        awards_future = award_query.TeamYearAwardsQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
-        events_future = event_query.TeamYearEventsQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
-        matches_future = match_query.TeamYearMatchesQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
-        if return_valid_years:
-            valid_years_future = team_query.TeamParticipationQuery(
-                team_key=team.key_name
-            ).fetch_async()
-        else:
-            valid_years_future = None
-
-        events_sorted = sorted(
-            events_future.get_result(),
-            key=lambda e: (
-                e.start_date if e.start_date else datetime.datetime(year, 12, 31)
-            ),
-        )  # unknown goes last
-
-        matches_by_event_key: Dict[ndb.Key, List[Match]] = {}
-        for match in matches_future.get_result():
-            if match.event in matches_by_event_key:
-                matches_by_event_key[match.event].append(match)
-            else:
-                matches_by_event_key[match.event] = [match]
-
-        awards_by_event_key: Dict[ndb.Key, List[Award]] = {}
-        for award in awards_future.get_result():
-            if award.event in awards_by_event_key:
-                awards_by_event_key[award.event].append(award)
-            else:
-                awards_by_event_key[award.event] = [award]
-
-        if return_valid_years and valid_years_future:
-            valid_years = sorted(valid_years_future.get_result())
-        else:
-            valid_years = []
-
-        return events_sorted, matches_by_event_key, awards_by_event_key, valid_years
