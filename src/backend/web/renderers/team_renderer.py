@@ -53,20 +53,6 @@ class TeamRenderer:
             team_key=team.key_name
         ).fetch_async()
 
-        hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team_key=team.key_name,
-            event_type=EventType.CMP_FINALS,
-            award_type=AwardType.CHAIRMANS,
-        ).fetch_async()
-        hof_video_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_VIDEO
-        ).fetch_async()
-        hof_presentation_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_PRESENTATION
-        ).fetch_async()
-        hof_essay_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_ESSAY
-        ).fetch_async()
         media_future = media_query.TeamYearMediaQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
@@ -90,24 +76,7 @@ class TeamRenderer:
         else:
             regional_champs_pool_future = None
 
-        hof_awards = hof_award_future.get_result()
-        hof_video = hof_video_future.get_result()
-        hof_presentation = hof_presentation_future.get_result()
-        hof_essay = hof_essay_future.get_result()
-
-        hall_of_fame = {
-            "is_hof": len(hof_awards) > 0,
-            "years": [award.year for award in hof_awards],
-            "media": {
-                "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
-                "presentation": (
-                    hof_presentation[0].youtube_url_link
-                    if len(hof_presentation) > 0
-                    else None
-                ),
-                "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
-            },
-        }
+        hall_of_fame = cls._fetch_hof(team)
 
         events_sorted = sorted(
             events_future.get_result(),
@@ -425,20 +394,6 @@ class TeamRenderer:
 
     @classmethod
     def render_team_history(cls, team: Team, is_canonical: bool) -> Tuple[Dict, bool]:
-        hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team_key=team.key_name,
-            event_type=EventType.CMP_FINALS,
-            award_type=AwardType.CHAIRMANS,
-        ).fetch_async()
-        hof_video_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_VIDEO
-        ).fetch_async()
-        hof_presentation_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_PRESENTATION
-        ).fetch_async()
-        hof_essay_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_ESSAY
-        ).fetch_async()
         award_futures = award_query.TeamAwardsQuery(
             team_key=team.key_name
         ).fetch_async()
@@ -452,24 +407,7 @@ class TeamRenderer:
             team_key=team.key_name
         ).fetch_async()
 
-        hof_awards = hof_award_future.get_result()
-        hof_video = hof_video_future.get_result()
-        hof_presentation = hof_presentation_future.get_result()
-        hof_essay = hof_essay_future.get_result()
-
-        hall_of_fame = {
-            "is_hof": len(hof_awards) > 0,
-            "years": [award.year for award in hof_awards],
-            "media": {
-                "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
-                "presentation": (
-                    hof_presentation[0].youtube_url_link
-                    if len(hof_presentation) > 0
-                    else None
-                ),
-                "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
-            },
-        }
+        hall_of_fame = cls._fetch_hof(team)
 
         awards_by_event = {}
         for award in award_futures.get_result():
@@ -548,3 +486,39 @@ class TeamRenderer:
         }
 
         return template_values, short_cache
+
+    @classmethod
+    def _fetch_hof(cls, team: Team) -> Dict:
+        hof_award_future = award_query.TeamEventTypeAwardsQuery(
+            team_key=team.key_name,
+            event_type=EventType.CMP_FINALS,
+            award_type=AwardType.CHAIRMANS,
+        ).fetch_async()
+        hof_video_future = media_query.TeamTagMediasQuery(
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_VIDEO
+        ).fetch_async()
+        hof_presentation_future = media_query.TeamTagMediasQuery(
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_PRESENTATION
+        ).fetch_async()
+        hof_essay_future = media_query.TeamTagMediasQuery(
+            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_ESSAY
+        ).fetch_async()
+
+        hof_awards = hof_award_future.get_result()
+        hof_video = hof_video_future.get_result()
+        hof_presentation = hof_presentation_future.get_result()
+        hof_essay = hof_essay_future.get_result()
+
+        return {
+            "is_hof": len(hof_awards) > 0,
+            "years": [award.year for award in hof_awards],
+            "media": {
+                "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
+                "presentation": (
+                    hof_presentation[0].youtube_url_link
+                    if len(hof_presentation) > 0
+                    else None
+                ),
+                "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
+            },
+        }
