@@ -1,4 +1,5 @@
 import datetime
+from collections import defaultdict
 from typing import cast, Dict, List, Optional, Tuple
 
 from google.appengine.ext import ndb
@@ -40,9 +41,7 @@ class TeamRenderer:
     def render_team_details(
         cls, team: Team, year: Year, is_canonical: bool
     ) -> Tuple[Optional[Dict], bool]:
-        awards_future = award_query.TeamYearAwardsQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
+        awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team, year)
         events_future = event_query.TeamYearEventsQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
@@ -94,13 +93,6 @@ class TeamRenderer:
                 matches_by_event_key[match.event].append(match)
             else:
                 matches_by_event_key[match.event] = [match]
-
-        awards_by_event_key: Dict[ndb.Key, List[Award]] = {}
-        for award in awards_future.get_result():
-            if award.event in awards_by_event_key:
-                awards_by_event_key[award.event].append(award)
-            else:
-                awards_by_event_key[award.event] = [award]
 
         valid_years = sorted(valid_years_future.get_result())
 
@@ -156,9 +148,7 @@ class TeamRenderer:
         short_cache = False
         for event in events_sorted:
             event_matches = matches_by_event_key.get(event.key, [])
-            event_awards = AwardHelper.organize_awards(
-                awards_by_event_key.get(event.key, [])
-            )
+            event_awards = awards_by_event_key_future.get_result().get(event.key, [])
             match_count, matches_organized = MatchHelper.organized_matches(
                 event_matches
             )
@@ -394,9 +384,7 @@ class TeamRenderer:
 
     @classmethod
     def render_team_history(cls, team: Team, is_canonical: bool) -> Tuple[Dict, bool]:
-        award_futures = award_query.TeamAwardsQuery(
-            team_key=team.key_name
-        ).fetch_async()
+        awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team)
         event_futures = event_query.TeamEventsQuery(
             team_key=team.key_name
         ).fetch_async()
@@ -408,13 +396,6 @@ class TeamRenderer:
         ).fetch_async()
 
         hall_of_fame_future = cls._fetch_hof_async(team)
-
-        awards_by_event = {}
-        for award in award_futures.get_result():
-            if award.event.id() not in awards_by_event:
-                awards_by_event[award.event.id()] = [award]
-            else:
-                awards_by_event[award.event.id()].append(award)
 
         event_awards = []
         current_event = None
@@ -444,13 +425,7 @@ class TeamRenderer:
             if event.within_a_day:
                 short_cache = True
 
-            if event.key_name in awards_by_event:
-                sorted_awards = AwardHelper.organize_awards(
-                    awards_by_event[event.key_name]
-                )
-            else:
-                sorted_awards = []
-            event_awards.append((event, sorted_awards))
+            event_awards.append((event, awards_by_event_key_future.get_result().get(event.key, [])))
         event_awards = sorted(
             event_awards,
             key=lambda e_a: (
@@ -486,6 +461,29 @@ class TeamRenderer:
         }
 
         return template_values, short_cache
+        
+    @classmethod
+    @ndb.tasklet
+    def _fetch_awards_by_event_key_async(cls, team: Team, year:Optional[Year] = None) -> Dict[ndb.Key, List[Award]]:
+        if year is None:
+            awards = yield award_query.TeamAwardsQuery(
+                team_key=team.key_name
+            ).fetch_async()
+        else:
+            awards = yield award_query.TeamYearAwardsQuery(
+                team_key=team.key_name, year=year
+            ).fetch_async()
+
+        # Group awards by event key
+        awards_by_event_key: Dict[ndb.Key, List[Award]] = defaultdict(list)
+        for award in awards:
+            awards_by_event_key[award.event].append(award)
+
+        # Organize awards per event
+        for event_key, event_awards in awards_by_event_key.items():
+            awards_by_event_key[event_key] = AwardHelper.organize_awards(event_awards)
+
+        return awards_by_event_key
 
     @classmethod
     @ndb.tasklet
