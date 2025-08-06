@@ -319,6 +319,12 @@ export type Event = {
    * String representation of the `playoff_type`, or null.
    */
   playoff_type_string: string | null;
+  /**
+   * Map of temporary "off-season demo" team numbers to pre-rookie and B teams. Both keys and values are team keys in the format 'frc####'. Key is the old team key ('frc' + numeric only), value is the new team key ('frc' + numeric + may include a letter suffix).
+   */
+  remap_teams: {
+    [key: string]: string;
+  } | null;
 };
 
 export type TeamEventStatus = {
