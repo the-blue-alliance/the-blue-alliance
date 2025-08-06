@@ -306,7 +306,7 @@ def event_detail(event_key: EventKey) -> Response:
 
     return make_cached_response(
         render_template("event_details.html", template_values),
-        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
     )
 
 
@@ -410,7 +410,7 @@ def event_insights(event_key: EventKey) -> Response:
 
     return make_cached_response(
         render_template("event_insights.html", template_values),
-        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
     )
 
 
@@ -432,7 +432,7 @@ def event_rss(event_key: EventKey) -> Response:
 
     response = make_cached_response(
         render_template("event_rss.xml", template_values),
-        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(days=1),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
     )
     response.headers["content-type"] = "application/xml; charset=UTF-8"
 

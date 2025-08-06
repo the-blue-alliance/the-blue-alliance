@@ -18,7 +18,7 @@ def test_team_found_no_events(web_client: Client, ndb_stub) -> None:
     helpers.preseed_team(254)
     resp = web_client.get("/team/254")
     assert resp.status_code == 200
-    assert "max-age=86400" in resp.headers["Cache-Control"]
+    assert "max-age=21600" in resp.headers["Cache-Control"]
     assert (
         helpers.get_page_title(resp.data)
         == "The 254 Team - Team 254 (History) - The Blue Alliance"
