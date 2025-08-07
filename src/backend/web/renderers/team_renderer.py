@@ -49,9 +49,6 @@ class TeamRenderer:
         matches_future = match_query.TeamYearMatchesQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
-        valid_years_future = team_query.TeamParticipationQuery(
-            team_key=team.key_name
-        ).fetch_async()
 
         media_future = media_query.TeamYearMediaQuery(
             team_key=team.key_name, year=year
@@ -61,9 +58,7 @@ class TeamRenderer:
         team_districts_future = district_query.TeamDistrictsQuery(
             team_key=team.key_name
         ).fetch_async()
-        participation_future = team_query.TeamParticipationQuery(
-            team_key=team.key_name
-        ).fetch_async()
+        participation_future = cls._fetch_participation_async(team)
         eventteams_future = event_query.TeamYearEventTeamsQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
@@ -92,8 +87,6 @@ class TeamRenderer:
                 matches_by_event_key[match.event].append(match)
             else:
                 matches_by_event_key[match.event] = [match]
-
-        valid_years = sorted(valid_years_future.get_result())
 
         has_valid_district = False
         district_name = None
@@ -328,18 +321,14 @@ class TeamRenderer:
             filter(lambda x: team.key in x.preferred_references, image_medias)
         )
 
-        last_competed = None
-        participation_years = participation_future.get_result()
-        if len(participation_years) > 0:
-            last_competed = max(participation_years)
-        current_year = datetime.date.today().year
+        participation_years, last_competed, current_year = participation_future.get_result()
 
         template_values = {
             "is_canonical": is_canonical,
             "team": team,
             "participation": participation,
             "year": year,
-            "years": valid_years,
+            "years": participation_years,
             "season_wlt": season_wlt if total_season_matches > 0 else None,
             "offseason_wlt": offseason_wlt if total_offseason_matches > 0 else None,
             "year_qual_avg": year_qual_avg,
@@ -384,11 +373,8 @@ class TeamRenderer:
         event_futures = event_query.TeamEventsQuery(
             team_key=team.key_name
         ).fetch_async()
-        participation_future = team_query.TeamParticipationQuery(
-            team_key=team.key_name
-        ).fetch_async()
+        participation_future = cls._fetch_participation_async(team)
         social_media_future = cls._fetch_social_medias_async(team)
-
         hall_of_fame_future = cls._fetch_hof_async(team)
 
         event_awards = []
@@ -396,9 +382,7 @@ class TeamRenderer:
         current_event_pit = None
         matches_upcoming = None
         short_cache = False
-        years = set()
         for event in event_futures.get_result():
-            years.add(event.year)
             if event.now:
                 current_event = event
 
@@ -429,17 +413,13 @@ class TeamRenderer:
             ),
         )
 
-        last_competed = None
-        participation_years = participation_future.get_result()
-        if len(participation_years) > 0:
-            last_competed = max(participation_years)
-        current_year = datetime.date.today().year
+        participation_years, last_competed, current_year = participation_future.get_result()
 
         template_values = {
             "is_canonical": is_canonical,
             "team": team,
             "event_awards": event_awards,
-            "years": sorted(years),
+            "years": participation_years,
             "social_medias": social_media_future.get_result(),
             "current_event": current_event,
             "current_event_pit_location": current_event_pit,
@@ -451,7 +431,21 @@ class TeamRenderer:
         }
 
         return template_values, short_cache
-        
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_participation_async(cls, team: Team):
+        participation_years = yield team_query.TeamParticipationQuery(
+                team_key=team.key_name
+            ).fetch_async()
+
+        last_competed = None
+        if len(participation_years) > 0:
+            last_competed = max(participation_years)
+        current_year = datetime.date.today().year
+
+        return sorted(participation_years), last_competed, current_year
+
     @classmethod
     @ndb.tasklet
     def _fetch_awards_by_event_key_async(cls, team: Team, year:Optional[Year] = None) -> Dict[ndb.Key, List[Award]]:
