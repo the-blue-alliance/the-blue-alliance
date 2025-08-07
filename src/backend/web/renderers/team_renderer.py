@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-from typing import cast, Dict, List, Optional, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
@@ -421,7 +421,9 @@ class TeamRenderer:
 
     @classmethod
     @ndb.tasklet
-    def _fetch_participation_async(cls, team: Team):
+    def _fetch_participation_async(
+        cls, team: Team
+    ) -> Generator[Any, Any, Tuple[List[Year], Optional[Year], Year]]:
         participation_years = yield team_query.TeamParticipationQuery(
             team_key=team.key_name
         ).fetch_async()
@@ -437,7 +439,7 @@ class TeamRenderer:
     @ndb.tasklet
     def _fetch_events_async(
         cls, team: Team, year: Optional[Year] = None
-    ) -> List[Event]:
+    ) -> Generator[Any, Any, List[Event]]:
         if year is None:
             events = yield event_query.TeamEventsQuery(
                 team_key=team.key_name
@@ -460,7 +462,7 @@ class TeamRenderer:
     @ndb.tasklet
     def _fetch_awards_by_event_key_async(
         cls, team: Team, year: Optional[Year] = None
-    ) -> Dict[ndb.Key, List[Award]]:
+    ) -> Generator[Any, Any, Dict[ndb.Key, List[Award]]]:
         if year is None:
             awards = yield award_query.TeamAwardsQuery(
                 team_key=team.key_name
@@ -483,7 +485,7 @@ class TeamRenderer:
 
     @classmethod
     @ndb.tasklet
-    def _fetch_social_medias_async(cls, team: Team) -> List[Media]:
+    def _fetch_social_medias_async(cls, team: Team) -> Generator[Any, Any, List[Media]]:
         social_medias = yield media_query.TeamSocialMediaQuery(
             team_key=team.key_name
         ).fetch_async()
@@ -491,7 +493,7 @@ class TeamRenderer:
 
     @classmethod
     @ndb.tasklet
-    def _fetch_hof_async(cls, team: Team) -> Dict:
+    def _fetch_hof_async(cls, team: Team) -> Generator[Any, Any, Dict]:
         hof_awards, hof_video, hof_presentation, hof_essay = yield (
             award_query.TeamEventTypeAwardsQuery(
                 team_key=team.key_name,
