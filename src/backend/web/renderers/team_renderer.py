@@ -369,27 +369,13 @@ class TeamRenderer:
         hall_of_fame_future = cls._fetch_hof_async(team)
 
         event_awards = []
-        current_event = None
-        current_event_pit = None
-        matches_upcoming = None
+        current_event_info_future = None
         short_cache = False
         for event in events_future.get_result():
             if event.now:
-                current_event = event
-
-                matches_future = match_query.TeamEventMatchesQuery(
-                    team.key_name, event.key_name
-                ).fetch_async()
-                eventteam_future = EventTeam.get_by_id_async(
-                    f"{event.key_name}_{team.key_name}"
+                current_event_info_future = cls._fetch_current_event_info_async(
+                    team, event
                 )
-
-                matches_upcoming = MatchHelper.upcoming_matches(
-                    matches_future.get_result()
-                )
-                event_team = eventteam_future.get_result()
-                if event_team and (loc := event_team.pit_location):
-                    current_event_pit = loc["location"]
 
             if event.within_a_day:
                 short_cache = True
@@ -400,6 +386,11 @@ class TeamRenderer:
 
         participation_years, last_competed, current_year = (
             participation_future.get_result()
+        )
+        current_event, matches_upcoming, current_event_pit = (
+            (None, None, None)
+            if current_event_info_future is None
+            else (current_event_info_future.get_result())
         )
 
         template_values = {
@@ -482,6 +473,25 @@ class TeamRenderer:
             awards_by_event_key[event_key] = AwardHelper.organize_awards(event_awards)
 
         return awards_by_event_key
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_current_event_info_async(
+        cls, team: Team, event: Event
+    ) -> Generator[Any, Any, Tuple[Event, List[Match], Optional[str]]]:
+        matches, event_team = yield (
+            match_query.TeamEventMatchesQuery(
+                team.key_name, event.key_name
+            ).fetch_async(),
+            EventTeam.get_by_id_async(f"{event.key_name}_{team.key_name}"),
+        )
+
+        matches_upcoming = MatchHelper.upcoming_matches(matches)
+        current_event_pit = None
+        if event_team and (loc := event_team.pit_location):
+            current_event_pit = loc["location"]
+
+        return event, matches_upcoming, current_event_pit
 
     @classmethod
     @ndb.tasklet
