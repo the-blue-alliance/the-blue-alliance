@@ -16,7 +16,6 @@ from backend.common.consts.event_type import (
     SEASON_EVENT_TYPES,
 )
 from backend.common.consts.playoff_type import PlayoffType
-from backend.common.futures import TypedFuture
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
@@ -33,7 +32,7 @@ from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast, WebcastOnlineStatus
-from backend.common.tasklets import typed_toplevel
+from backend.common.tasklets import typed_tasklet, typed_toplevel
 
 if typing.TYPE_CHECKING:
     from backend.common.models.award import Award
@@ -175,12 +174,12 @@ class Event(CachedModel):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {"key": set(), "year": set(), "district_key": set()}
-        self._awards_future: Optional[TypedFuture[List[Award]]] = None
-        self._details_future: Optional[TypedFuture[EventDetails]] = None
+        self._awards: Optional[List[Award]] = None
+        self._details: Optional[EventDetails] = None
         self._location = None
         self._city_state_country = None
-        self._matches_future: Optional[TypedFuture[List[Match]]] = None
-        self._teams_future: Optional[TypedFuture[List[Team]]] = None
+        self._matches: Optional[List[Match]] = None
+        self._teams: Optional[List[Team]] = None
         self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
@@ -210,31 +209,37 @@ class Event(CachedModel):
                 teams.append(backup["in"])
         return teams
 
-    def prep_awards(self) -> None:
-        if self._awards_future is None:
+    @typed_tasklet
+    def prep_awards_async(self) -> Generator[Any, Any, None]:
+        if self._awards is None:
             from backend.common.queries import award_query
 
-            self._awards_future = award_query.EventAwardsQuery(
+            self._awards = yield award_query.EventAwardsQuery(
                 event_key=self.key_name
             ).fetch_async()
 
+    def prep_awards(self) -> None:
+        self.prep_awards_async().get_result()
+
     @property
     def awards(self) -> List["Award"]:
-        if self._awards_future is None:
+        if self._awards is None:
             self.prep_awards()
-        return none_throws(self._awards_future).get_result()
+        return none_throws(self._awards)
+
+    @typed_tasklet
+    def prep_details_async(self) -> Generator[Any, Any, None]:
+        if self._details is None:
+            self._details = yield ndb.Key(EventDetails, self.key.id()).get_async()
 
     def prep_details(self) -> None:
-        if self._details_future is None:
-            self._details_future = ndb.Key(EventDetails, self.key.id()).get_async()
+        self.prep_details_async().get_result()
 
     @property
-    def details(self) -> EventDetails:
-        if self._details_future is None:
+    def details(self) -> Optional[EventDetails]:
+        if self._details is None:
             self.prep_details()
-        if not none_throws(self._details_future).done():
-            none_throws(self._details_future).wait()
-        return none_throws(self._details_future).get_result()
+        return self._details
 
     @property
     def district_points(self) -> Optional[EventDistrictPoints]:
@@ -273,27 +278,31 @@ class Event(CachedModel):
             )
 
     def clear_matches(self) -> None:
-        self._matches_future = None
+        self._matches = None
 
     def clear_awards(self) -> None:
-        self._awards_future = None
+        self._awards = None
 
     def clear_teams(self) -> None:
-        self._teams_future = None
+        self._teams = None
 
-    def prep_matches(self) -> None:
-        if self._matches_future is None:
+    @typed_tasklet
+    def prep_matches_async(self) -> Generator[Any, Any, None]:
+        if self._matches is None:
             from backend.common.queries import match_query
 
-            self._matches_future = match_query.EventMatchesQuery(
+            self._matches = yield match_query.EventMatchesQuery(
                 event_key=self.key_name
             ).fetch_async()
 
+    def prep_matches(self) -> None:
+        self.prep_matches_async().get_result()
+
     @property
     def matches(self) -> List["Match"]:
-        if self._matches_future is None:
+        if self._matches is None:
             self.prep_matches()
-        return none_throws(self._matches_future).get_result()
+        return none_throws(self._matches)
 
     def time_as_utc(self, time: datetime.datetime) -> datetime.datetime:
         import pytz
@@ -450,19 +459,23 @@ class Event(CachedModel):
                 return "Awards"
         return "Week {}".format(week + 1)
 
-    def prep_teams(self) -> None:
-        if self._teams_future is None:
+    @typed_tasklet
+    def prep_teams_async(self) -> Generator[Any, Any, None]:
+        if self._teams is None:
             from backend.common.queries import team_query
 
-            self._teams_future = team_query.EventTeamsQuery(
+            self._teams = yield team_query.EventTeamsQuery(
                 event_key=self.key_name
             ).fetch_async()
 
+    def prep_teams(self) -> None:
+        self.prep_teams_async().get_result()
+
     @property
     def teams(self) -> List["Team"]:
-        if self._teams_future is None:
+        if self._teams is None:
             self.prep_teams()
-        return none_throws(self._teams_future).get_result()
+        return none_throws(self._teams)
 
     @property
     def matchstats(self):

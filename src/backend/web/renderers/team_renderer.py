@@ -191,42 +191,15 @@ class TeamRenderer:
                     None,
                 )
 
-            alliance, alliance_pick, alliance_size = (
-                AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
-            )
-
-            if alliance and "name" in alliance:
-                alliance_status = EventTeamStatusHelper._build_playoff_info(
-                    team.key_name,
-                    event.details,
-                    MatchHelper.organized_matches(event.matches)[1],
-                    event.year,
-                    event.playoff_type,
-                )
-                if alliance_status:
-                    alliance_status = " and ".join(
-                        AllianceHelper.generate_playoff_status_string(
-                            alliance_status,
-                            alliance_pick,
-                            alliance["name"],
-                            plural=True,
-                            include_record=False,
-                        )
-                    )
-                else:
-                    alliance_status = None
-            else:
-                alliance_status = None
-
             eventteam = next(
                 filter(lambda et: et.event == event.key, event_teams), None
             )
 
+            alliance_info_future = cls._fetch_alliance_info_async(team, event)
+
             participation.append(
                 {
-                    "alliance": alliance,
-                    "alliance_status": alliance_status,
-                    "alliance_size": alliance_size,
+                    "alliance_info_future": alliance_info_future,
                     "event": event,
                     "matches": matches_organized,
                     "match_count": match_count,
@@ -306,6 +279,9 @@ class TeamRenderer:
         participation_years, last_competed, current_year = (
             participation_future.get_result()
         )
+
+        for p in participation:
+            p.update(p["alliance_info_future"].get_result())
 
         template_values = {
             "is_canonical": is_canonical,
@@ -543,4 +519,45 @@ class TeamRenderer:
                 ),
                 "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
             },
+        }
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_alliance_info_async(
+        cls, team: Team, event: Event
+    ) -> Generator[Any, Any, Dict]:
+        yield event.prep_details_async()
+
+        alliance, alliance_pick, alliance_size = (
+            AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
+        )
+
+        if alliance and "name" in alliance:
+            yield event.prep_matches_async()
+            alliance_status = EventTeamStatusHelper._build_playoff_info(
+                team.key_name,
+                event.details,
+                MatchHelper.organized_matches(event.matches)[1],
+                event.year,
+                event.playoff_type,
+            )
+            if alliance_status:
+                alliance_status = " and ".join(
+                    AllianceHelper.generate_playoff_status_string(
+                        alliance_status,
+                        alliance_pick,
+                        alliance["name"],
+                        plural=True,
+                        include_record=False,
+                    )
+                )
+            else:
+                alliance_status = None
+        else:
+            alliance_status = None
+
+        return {
+            "alliance": alliance,
+            "alliance_status": alliance_status,
+            "alliance_size": alliance_size,
         }

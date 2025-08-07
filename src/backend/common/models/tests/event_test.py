@@ -340,11 +340,11 @@ def test_get_awards() -> None:
     )
     a.put()
 
-    event._awards_future = None
+    event._awards = None
     clear_cached_queries()
     assert event.awards == [a]
 
-    event._awards_future = None
+    event._awards = None
     clear_cached_queries()
     assert event.awards == [a]
 
@@ -358,7 +358,7 @@ def test_details() -> None:
 
     assert event.details == d
 
-    event._details_future = None
+    event._details = None
     assert event.details == d
 
 
@@ -393,7 +393,7 @@ def test_get_alliances() -> None:
         alliance_selections=alliances,
     ).put()
 
-    event._details_future = None
+    event._details = None
     assert event.alliance_selections == alliances
     assert event.alliance_teams == teams
 
@@ -411,7 +411,7 @@ def test_get_alliances_with_backup() -> None:
         alliance_selections=alliances,
     ).put()
 
-    event._details_future = None
+    event._details = None
     assert event.alliance_selections == alliances
     assert event.alliance_teams == (teams + ["frc4"])
 
@@ -426,7 +426,7 @@ def test_district_points() -> None:
         district_points=points,
     ).put()
 
-    event._details_future = None
+    event._details = None
     assert event.district_points == points
 
 
@@ -434,7 +434,7 @@ def test_matches() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
     assert event.matches == []
 
-    event._matches_future = None
+    event._matches = None
     assert event.matches == []
 
     m = Match(
@@ -448,7 +448,7 @@ def test_matches() -> None:
     )
     m.put()
 
-    event._matches_future = None
+    event._matches = None
     clear_cached_queries()
     assert event.matches == [m]
 
@@ -469,7 +469,7 @@ def test_teams() -> None:
     )
     t.put()
 
-    event._teams_future = None
+    event._teams = None
     clear_cached_queries()
     assert event.teams == [t]
 
@@ -492,7 +492,7 @@ def test_rankings() -> None:
 
     EventDetails(id="2019ct", rankings2=rankings).put()
 
-    event._details_future = None
+    event._details = None
     assert event.rankings == rankings
 
 
