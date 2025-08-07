@@ -42,11 +42,9 @@ class TeamRenderer:
     def render_team_details(
         cls, team: Team, year: Year, is_canonical: bool
     ) -> Tuple[Optional[Dict], bool]:
-        awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team, year)
         events_future = cls._fetch_events_async(team, year)
-        matches_future = match_query.TeamYearMatchesQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
+        matches_by_event_key_future = cls._fetch_matches_by_event_key_async(team, year)
+        awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team, year)
 
         media_future = media_query.TeamYearMediaQuery(
             team_key=team.key_name, year=year
@@ -71,13 +69,6 @@ class TeamRenderer:
 
         if not events_future.get_result():
             return None, False
-
-        matches_by_event_key: Dict[ndb.Key, List[Match]] = {}
-        for match in matches_future.get_result():
-            if match.event in matches_by_event_key:
-                matches_by_event_key[match.event].append(match)
-            else:
-                matches_by_event_key[match.event] = [match]
 
         has_valid_district = False
         district_name = None
@@ -130,7 +121,7 @@ class TeamRenderer:
         matches_upcoming = None
         short_cache = False
         for event in events_future.get_result():
-            event_matches = matches_by_event_key.get(event.key, [])
+            event_matches = matches_by_event_key_future.get_result().get(event.key, [])
             event_awards = awards_by_event_key_future.get_result().get(event.key, [])
             match_count, matches_organized = MatchHelper.organized_matches(
                 event_matches
@@ -362,8 +353,8 @@ class TeamRenderer:
 
     @classmethod
     def render_team_history(cls, team: Team, is_canonical: bool) -> Tuple[Dict, bool]:
-        awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team)
         events_future = cls._fetch_events_async(team)
+        awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team)
         participation_future = cls._fetch_participation_async(team)
         social_media_future = cls._fetch_social_medias_async(team)
         hall_of_fame_future = cls._fetch_hof_async(team)
@@ -448,6 +439,22 @@ class TeamRenderer:
         )  # unknown goes last
 
         return events_sorted
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_matches_by_event_key_async(
+        cls, team: Team, year: Year
+    ) -> Generator[Any, Any, Dict[ndb.Key, List[Match]]]:
+        matches = yield match_query.TeamYearMatchesQuery(
+            team_key=team.key_name, year=year
+        ).fetch_async()
+
+        # Group matches by event key
+        matches_by_event_key: Dict[ndb.Key, List[Match]] = defaultdict(list)
+        for match in matches:
+            matches_by_event_key[match.event].append(match)
+
+        return matches_by_event_key
 
     @classmethod
     @ndb.tasklet
