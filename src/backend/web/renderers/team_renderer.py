@@ -1,5 +1,6 @@
 import datetime
-from typing import cast, Dict, List, Optional, Tuple
+from collections import defaultdict
+from typing import Any, cast, Dict, Generator, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
@@ -22,6 +23,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -40,33 +42,19 @@ class TeamRenderer:
     def render_team_details(
         cls, team: Team, year: Year, is_canonical: bool
     ) -> Tuple[Optional[Dict], bool]:
-        hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team_key=team.key_name,
-            event_type=EventType.CMP_FINALS,
-            award_type=AwardType.CHAIRMANS,
-        ).fetch_async()
-        hof_video_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_VIDEO
-        ).fetch_async()
-        hof_presentation_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_PRESENTATION
-        ).fetch_async()
-        hof_essay_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_ESSAY
-        ).fetch_async()
+        events_future = cls._fetch_events_async(team, year)
+        matches_by_event_key_future = cls._fetch_matches_by_event_key_async(team, year)
+        awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team, year)
+
         media_future = media_query.TeamYearMediaQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
-        social_media_future = media_query.TeamSocialMediaQuery(
-            team_key=team.key_name
-        ).fetch_async()
+        social_media_future = cls._fetch_social_medias_async(team)
         robot_future = Robot.get_by_id_async("{}_{}".format(team.key.id(), year))
         team_districts_future = district_query.TeamDistrictsQuery(
             team_key=team.key_name
         ).fetch_async()
-        participation_future = team_query.TeamParticipationQuery(
-            team_key=team.key_name
-        ).fetch_async()
+        participation_future = cls._fetch_participation_async(team)
         eventteams_future = event_query.TeamYearEventTeamsQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
@@ -77,32 +65,9 @@ class TeamRenderer:
         else:
             regional_champs_pool_future = None
 
-        hof_awards = hof_award_future.get_result()
-        hof_video = hof_video_future.get_result()
-        hof_presentation = hof_presentation_future.get_result()
-        hof_essay = hof_essay_future.get_result()
+        hall_of_fame_future = cls._fetch_hof_async(team)
 
-        hall_of_fame = {
-            "is_hof": len(hof_awards) > 0,
-            "years": [award.year for award in hof_awards],
-            "media": {
-                "video": hof_video[0].youtube_url_link if len(hof_video) > 0 else None,
-                "presentation": (
-                    hof_presentation[0].youtube_url_link
-                    if len(hof_presentation) > 0
-                    else None
-                ),
-                "essay": hof_essay[0].external_link if len(hof_essay) > 0 else None,
-            },
-        }
-
-        (
-            events_sorted,
-            matches_by_event_key,
-            awards_by_event_key,
-            valid_years,
-        ) = cls._fetch_data(team, year, return_valid_years=True)
-        if not events_sorted:
+        if not events_future.get_result():
             return None, False
 
         has_valid_district = False
@@ -155,11 +120,9 @@ class TeamRenderer:
         current_event = None
         matches_upcoming = None
         short_cache = False
-        for event in events_sorted:
-            event_matches = matches_by_event_key.get(event.key, [])
-            event_awards = AwardHelper.organize_awards(
-                awards_by_event_key.get(event.key, [])
-            )
+        for event in events_future.get_result():
+            event_matches = matches_by_event_key_future.get_result().get(event.key, [])
+            event_awards = awards_by_event_key_future.get_result().get(event.key, [])
             match_count, matches_organized = MatchHelper.organized_matches(
                 event_matches
             )
@@ -228,42 +191,15 @@ class TeamRenderer:
                     None,
                 )
 
-            alliance, alliance_pick, alliance_size = (
-                AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
-            )
-
-            if alliance and "name" in alliance:
-                alliance_status = EventTeamStatusHelper._build_playoff_info(
-                    team.key_name,
-                    event.details,
-                    MatchHelper.organized_matches(event.matches)[1],
-                    event.year,
-                    event.playoff_type,
-                )
-                if alliance_status:
-                    alliance_status = " and ".join(
-                        AllianceHelper.generate_playoff_status_string(
-                            alliance_status,
-                            alliance_pick,
-                            alliance["name"],
-                            plural=True,
-                            include_record=False,
-                        )
-                    )
-                else:
-                    alliance_status = None
-            else:
-                alliance_status = None
-
             eventteam = next(
                 filter(lambda et: et.event == event.key, event_teams), None
             )
 
+            alliance_info_future = cls._fetch_alliance_info_async(team, event)
+
             participation.append(
                 {
-                    "alliance": alliance,
-                    "alliance_status": alliance_status,
-                    "alliance_size": alliance_size,
+                    "alliance_info_future": alliance_info_future,
                     "event": event,
                     "matches": matches_organized,
                     "match_count": match_count,
@@ -336,25 +272,23 @@ class TeamRenderer:
         )
         avatar = MediaHelper.get_avatar(media_future.get_result())
         image_medias = MediaHelper.get_images(media_future.get_result())
-        social_medias = sorted(
-            social_media_future.get_result(), key=MediaHelper.social_media_sorter
-        )
         preferred_image_medias = list(
             filter(lambda x: team.key in x.preferred_references, image_medias)
         )
 
-        last_competed = None
-        participation_years = participation_future.get_result()
-        if len(participation_years) > 0:
-            last_competed = max(participation_years)
-        current_year = datetime.date.today().year
+        participation_years, last_competed, current_year = (
+            participation_future.get_result()
+        )
+
+        for p in participation:
+            p.update(p["alliance_info_future"].get_result())
 
         template_values = {
             "is_canonical": is_canonical,
             "team": team,
             "participation": participation,
             "year": year,
-            "years": valid_years,
+            "years": participation_years,
             "season_wlt": season_wlt if total_season_matches > 0 else None,
             "offseason_wlt": offseason_wlt if total_offseason_matches > 0 else None,
             "year_qual_avg": year_qual_avg,
@@ -371,7 +305,7 @@ class TeamRenderer:
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname,
             "avatar": avatar,
-            "social_medias": social_medias,
+            "social_medias": social_media_future.get_result(),
             "image_medias": image_medias,
             "preferred_image_medias": preferred_image_medias,
             "robot": robot_future.get_result(),
@@ -380,7 +314,7 @@ class TeamRenderer:
             "last_competed": last_competed,
             "current_year": current_year,
             "max_year": SeasonHelper.get_max_year(),
-            "hof": hall_of_fame,
+            "hof": hall_of_fame_future.get_result(),
             "team_district_points": team_district_points,
             "team_regional_champs_pool_points": team_regional_champs_pool_points,
             "has_any_pit_location": any(
@@ -395,39 +329,185 @@ class TeamRenderer:
 
     @classmethod
     def render_team_history(cls, team: Team, is_canonical: bool) -> Tuple[Dict, bool]:
-        hof_award_future = award_query.TeamEventTypeAwardsQuery(
-            team_key=team.key_name,
-            event_type=EventType.CMP_FINALS,
-            award_type=AwardType.CHAIRMANS,
-        ).fetch_async()
-        hof_video_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_VIDEO
-        ).fetch_async()
-        hof_presentation_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_PRESENTATION
-        ).fetch_async()
-        hof_essay_future = media_query.TeamTagMediasQuery(
-            team_key=team.key_name, media_tag=MediaTag.CHAIRMANS_ESSAY
-        ).fetch_async()
-        award_futures = award_query.TeamAwardsQuery(
-            team_key=team.key_name
-        ).fetch_async()
-        event_futures = event_query.TeamEventsQuery(
-            team_key=team.key_name
-        ).fetch_async()
-        participation_future = team_query.TeamParticipationQuery(
-            team_key=team.key_name
-        ).fetch_async()
-        social_media_future = media_query.TeamSocialMediaQuery(
+        events_future = cls._fetch_events_async(team)
+        awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team)
+        participation_future = cls._fetch_participation_async(team)
+        social_media_future = cls._fetch_social_medias_async(team)
+        hall_of_fame_future = cls._fetch_hof_async(team)
+
+        event_awards = []
+        current_event_info_future = None
+        short_cache = False
+        for event in events_future.get_result():
+            if event.now:
+                current_event_info_future = cls._fetch_current_event_info_async(
+                    team, event
+                )
+
+            if event.within_a_day:
+                short_cache = True
+
+            event_awards.append(
+                (event, awards_by_event_key_future.get_result().get(event.key, []))
+            )
+
+        participation_years, last_competed, current_year = (
+            participation_future.get_result()
+        )
+        current_event, matches_upcoming, current_event_pit = (
+            (None, None, None)
+            if current_event_info_future is None
+            else (current_event_info_future.get_result())
+        )
+
+        template_values = {
+            "is_canonical": is_canonical,
+            "team": team,
+            "event_awards": event_awards,
+            "years": participation_years,
+            "social_medias": social_media_future.get_result(),
+            "current_event": current_event,
+            "current_event_pit_location": current_event_pit,
+            "matches_upcoming": matches_upcoming,
+            "last_competed": last_competed,
+            "current_year": current_year,
+            "max_year": SeasonHelper.get_max_year(),
+            "hof": hall_of_fame_future.get_result(),
+        }
+
+        return template_values, short_cache
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_participation_async(
+        cls, team: Team
+    ) -> Generator[Any, Any, Tuple[List[Year], Optional[Year], Year]]:
+        participation_years = yield team_query.TeamParticipationQuery(
             team_key=team.key_name
         ).fetch_async()
 
-        hof_awards = hof_award_future.get_result()
-        hof_video = hof_video_future.get_result()
-        hof_presentation = hof_presentation_future.get_result()
-        hof_essay = hof_essay_future.get_result()
+        last_competed = None
+        if len(participation_years) > 0:
+            last_competed = max(participation_years)
+        current_year = datetime.date.today().year
 
-        hall_of_fame = {
+        return sorted(participation_years), last_competed, current_year
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_events_async(
+        cls, team: Team, year: Optional[Year] = None
+    ) -> Generator[Any, Any, List[Event]]:
+        if year is None:
+            events = yield event_query.TeamEventsQuery(
+                team_key=team.key_name
+            ).fetch_async()
+        else:
+            events = yield event_query.TeamYearEventsQuery(
+                team_key=team.key_name, year=year
+            ).fetch_async()
+
+        events_sorted = sorted(
+            events,
+            key=lambda e: (
+                e.start_date if e.start_date else datetime.datetime(e.year, 12, 31)
+            ),
+        )  # unknown goes last
+
+        return events_sorted
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_matches_by_event_key_async(
+        cls, team: Team, year: Year
+    ) -> Generator[Any, Any, Dict[ndb.Key, List[Match]]]:
+        matches = yield match_query.TeamYearMatchesQuery(
+            team_key=team.key_name, year=year
+        ).fetch_async()
+
+        # Group matches by event key
+        matches_by_event_key: Dict[ndb.Key, List[Match]] = defaultdict(list)
+        for match in matches:
+            matches_by_event_key[match.event].append(match)
+
+        return matches_by_event_key
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_awards_by_event_key_async(
+        cls, team: Team, year: Optional[Year] = None
+    ) -> Generator[Any, Any, Dict[ndb.Key, List[Award]]]:
+        if year is None:
+            awards = yield award_query.TeamAwardsQuery(
+                team_key=team.key_name
+            ).fetch_async()
+        else:
+            awards = yield award_query.TeamYearAwardsQuery(
+                team_key=team.key_name, year=year
+            ).fetch_async()
+
+        # Group awards by event key
+        awards_by_event_key: Dict[ndb.Key, List[Award]] = defaultdict(list)
+        for award in awards:
+            awards_by_event_key[award.event].append(award)
+
+        # Organize awards per event
+        for event_key, event_awards in awards_by_event_key.items():
+            awards_by_event_key[event_key] = AwardHelper.organize_awards(event_awards)
+
+        return awards_by_event_key
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_current_event_info_async(
+        cls, team: Team, event: Event
+    ) -> Generator[Any, Any, Tuple[Event, List[Match], Optional[str]]]:
+        matches, event_team = yield (
+            match_query.TeamEventMatchesQuery(
+                team.key_name, event.key_name
+            ).fetch_async(),
+            EventTeam.get_by_id_async(f"{event.key_name}_{team.key_name}"),
+        )
+
+        matches_upcoming = MatchHelper.upcoming_matches(matches)
+        current_event_pit = None
+        if event_team and (loc := event_team.pit_location):
+            current_event_pit = loc["location"]
+
+        return event, matches_upcoming, current_event_pit
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_social_medias_async(cls, team: Team) -> Generator[Any, Any, List[Media]]:
+        social_medias = yield media_query.TeamSocialMediaQuery(
+            team_key=team.key_name
+        ).fetch_async()
+        return sorted(social_medias, key=MediaHelper.social_media_sorter)
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_hof_async(cls, team: Team) -> Generator[Any, Any, Dict]:
+        hof_awards, hof_video, hof_presentation, hof_essay = yield (
+            award_query.TeamEventTypeAwardsQuery(
+                team_key=team.key_name,
+                event_type=EventType.CMP_FINALS,
+                award_type=AwardType.CHAIRMANS,
+            ).fetch_async(),
+            media_query.TeamTagMediasQuery(
+                team_key=team.key_name,
+                media_tag=MediaTag.CHAIRMANS_VIDEO,
+            ).fetch_async(),
+            media_query.TeamTagMediasQuery(
+                team_key=team.key_name,
+                media_tag=MediaTag.CHAIRMANS_PRESENTATION,
+            ).fetch_async(),
+            media_query.TeamTagMediasQuery(
+                team_key=team.key_name,
+                media_tag=MediaTag.CHAIRMANS_ESSAY,
+            ).fetch_async(),
+        )
+
+        return {
             "is_hof": len(hof_awards) > 0,
             "years": [award.year for award in hof_awards],
             "media": {
@@ -441,137 +521,42 @@ class TeamRenderer:
             },
         }
 
-        awards_by_event = {}
-        for award in award_futures.get_result():
-            if award.event.id() not in awards_by_event:
-                awards_by_event[award.event.id()] = [award]
-            else:
-                awards_by_event[award.event.id()].append(award)
-
-        event_awards = []
-        current_event = None
-        current_event_pit = None
-        matches_upcoming = None
-        short_cache = False
-        years = set()
-        for event in event_futures.get_result():
-            years.add(event.year)
-            if event.now:
-                current_event = event
-
-                matches_future = match_query.TeamEventMatchesQuery(
-                    team.key_name, event.key_name
-                ).fetch_async()
-                eventteam_future = EventTeam.get_by_id_async(
-                    f"{event.key_name}_{team.key_name}"
-                )
-
-                matches_upcoming = MatchHelper.upcoming_matches(
-                    matches_future.get_result()
-                )
-                event_team = eventteam_future.get_result()
-                if event_team and (loc := event_team.pit_location):
-                    current_event_pit = loc["location"]
-
-            if event.within_a_day:
-                short_cache = True
-
-            if event.key_name in awards_by_event:
-                sorted_awards = AwardHelper.organize_awards(
-                    awards_by_event[event.key_name]
-                )
-            else:
-                sorted_awards = []
-            event_awards.append((event, sorted_awards))
-        event_awards = sorted(
-            event_awards,
-            key=lambda e_a: (
-                e_a[0].start_date
-                if e_a[0].start_date
-                else datetime.datetime(e_a[0].year, 12, 31)
-            ),
-        )
-
-        last_competed = None
-        participation_years = participation_future.get_result()
-        if len(participation_years) > 0:
-            last_competed = max(participation_years)
-        current_year = datetime.date.today().year
-
-        social_medias = sorted(
-            social_media_future.get_result(), key=MediaHelper.social_media_sorter
-        )
-
-        template_values = {
-            "is_canonical": is_canonical,
-            "team": team,
-            "event_awards": event_awards,
-            "years": sorted(years),
-            "social_medias": social_medias,
-            "current_event": current_event,
-            "current_event_pit_location": current_event_pit,
-            "matches_upcoming": matches_upcoming,
-            "last_competed": last_competed,
-            "current_year": current_year,
-            "max_year": SeasonHelper.get_max_year(),
-            "hof": hall_of_fame,
-        }
-
-        return template_values, short_cache
-
     @classmethod
-    def _fetch_data(
-        cls, team: Team, year: Year, return_valid_years: bool = False
-    ) -> Tuple[
-        List[Event],
-        Dict[ndb.Key, List[Match]],
-        Dict[ndb.Key, List[Award]],
-        List[Year],
-    ]:
-        """
-        returns: events_sorted, matches_by_event_key, awards_by_event_key, valid_years
-        of a team for a given year
-        """
-        awards_future = award_query.TeamYearAwardsQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
-        events_future = event_query.TeamYearEventsQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
-        matches_future = match_query.TeamYearMatchesQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
-        if return_valid_years:
-            valid_years_future = team_query.TeamParticipationQuery(
-                team_key=team.key_name
-            ).fetch_async()
-        else:
-            valid_years_future = None
+    @ndb.tasklet
+    def _fetch_alliance_info_async(
+        cls, team: Team, event: Event
+    ) -> Generator[Any, Any, Dict]:
+        yield event.prep_details()
+        alliance, alliance_pick, alliance_size = (
+            AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
+        )
 
-        events_sorted = sorted(
-            events_future.get_result(),
-            key=lambda e: (
-                e.start_date if e.start_date else datetime.datetime(year, 12, 31)
-            ),
-        )  # unknown goes last
-
-        matches_by_event_key: Dict[ndb.Key, List[Match]] = {}
-        for match in matches_future.get_result():
-            if match.event in matches_by_event_key:
-                matches_by_event_key[match.event].append(match)
+        if alliance and "name" in alliance:
+            yield event.prep_matches()
+            alliance_status = EventTeamStatusHelper._build_playoff_info(
+                team.key_name,
+                event.details,
+                MatchHelper.organized_matches(event.matches)[1],
+                event.year,
+                event.playoff_type,
+            )
+            if alliance_status:
+                alliance_status = " and ".join(
+                    AllianceHelper.generate_playoff_status_string(
+                        alliance_status,
+                        alliance_pick,
+                        alliance["name"],
+                        plural=True,
+                        include_record=False,
+                    )
+                )
             else:
-                matches_by_event_key[match.event] = [match]
-
-        awards_by_event_key: Dict[ndb.Key, List[Award]] = {}
-        for award in awards_future.get_result():
-            if award.event in awards_by_event_key:
-                awards_by_event_key[award.event].append(award)
-            else:
-                awards_by_event_key[award.event] = [award]
-
-        if return_valid_years and valid_years_future:
-            valid_years = sorted(valid_years_future.get_result())
+                alliance_status = None
         else:
-            valid_years = []
+            alliance_status = None
 
-        return events_sorted, matches_by_event_key, awards_by_event_key, valid_years
+        return {
+            "alliance": alliance,
+            "alliance_status": alliance_status,
+            "alliance_size": alliance_size,
+        }
