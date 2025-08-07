@@ -67,8 +67,13 @@ class TeamRenderer:
 
         hall_of_fame_future = cls._fetch_hof_async(team)
 
-        if not events_future.get_result():
+        events = events_future.get_result()
+        if not events:
             return None, False
+
+        alliance_info_by_event_future = cls._fetch_alliance_info_by_event_key_async(
+            team, events
+        )
 
         has_valid_district = False
         district_name = None
@@ -120,7 +125,7 @@ class TeamRenderer:
         current_event = None
         matches_upcoming = None
         short_cache = False
-        for event in events_future.get_result():
+        for event in events:
             event_matches = matches_by_event_key_future.get_result().get(event.key, [])
             event_awards = awards_by_event_key_future.get_result().get(event.key, [])
             match_count, matches_organized = MatchHelper.organized_matches(
@@ -195,11 +200,13 @@ class TeamRenderer:
                 filter(lambda et: et.event == event.key, event_teams), None
             )
 
-            alliance_info_future = cls._fetch_alliance_info_async(team, event)
+            alliance_info = alliance_info_by_event_future.get_result()[event.key]
 
             participation.append(
                 {
-                    "alliance_info_future": alliance_info_future,
+                    "alliance": alliance_info["alliance"],
+                    "alliance_status": alliance_info["alliance_status"],
+                    "alliance_size": alliance_info["alliance_size"],
                     "event": event,
                     "matches": matches_organized,
                     "match_count": match_count,
@@ -279,9 +286,6 @@ class TeamRenderer:
         participation_years, last_competed, current_year = (
             participation_future.get_result()
         )
-
-        for p in participation:
-            p.update(p["alliance_info_future"].get_result())
 
         template_values = {
             "is_canonical": is_canonical,
@@ -523,16 +527,37 @@ class TeamRenderer:
 
     @classmethod
     @ndb.tasklet
-    def _fetch_alliance_info_async(
-        cls, team: Team, event: Event
-    ) -> Generator[Any, Any, Dict]:
-        yield event.prep_details()
-        alliance, alliance_pick, alliance_size = (
-            AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
-        )
+    def _fetch_alliance_info_by_event_key_async(
+        cls, team: Team, events: List[Event]
+    ) -> Generator[Any, Any, Dict[ndb.Key, Dict]]:
+        """Fetch alliance info for all events in parallel."""
+        # Prepare all event details in parallel
+        yield [event.prep_details() for event in events]
 
-        if alliance and "name" in alliance:
-            yield event.prep_matches()
+        # Build alliance info for each event
+        alliance_info_by_event = {}
+        events_needing_matches = []
+
+        for event in events:
+            alliance, alliance_pick, alliance_size = (
+                AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
+            )
+
+            alliance_info_by_event[event.key] = {
+                "alliance": alliance,
+                "alliance_pick": alliance_pick,
+                "alliance_size": alliance_size,
+                "alliance_status": None,  # Will be set later if needed
+            }
+
+            if alliance and "name" in alliance:
+                events_needing_matches.append(event)
+
+        # Prepare matches for events that need them in parallel
+        yield [event.prep_matches() for event in events_needing_matches]
+
+        # Build alliance statuses
+        for event in events_needing_matches:
             alliance_status = EventTeamStatusHelper._build_playoff_info(
                 team.key_name,
                 event.details,
@@ -541,22 +566,15 @@ class TeamRenderer:
                 event.playoff_type,
             )
             if alliance_status:
-                alliance_status = " and ".join(
+                alliance_info = alliance_info_by_event[event.key]
+                alliance_info["alliance_status"] = " and ".join(
                     AllianceHelper.generate_playoff_status_string(
                         alliance_status,
-                        alliance_pick,
-                        alliance["name"],
+                        alliance_info["alliance_pick"],
+                        alliance_info["alliance"]["name"],
                         plural=True,
                         include_record=False,
                     )
                 )
-            else:
-                alliance_status = None
-        else:
-            alliance_status = None
 
-        return {
-            "alliance": alliance,
-            "alliance_status": alliance_status,
-            "alliance_size": alliance_size,
-        }
+        return alliance_info_by_event
