@@ -526,14 +526,13 @@ class TeamRenderer:
     def _fetch_alliance_info_async(
         cls, team: Team, event: Event
     ) -> Generator[Any, Any, Dict]:
-        yield event.prep_details_async()
-
+        yield event.prep_details()
         alliance, alliance_pick, alliance_size = (
             AllianceHelper.get_alliance_details_and_pick_name(event, team.key_name)
         )
 
         if alliance and "name" in alliance:
-            yield event.prep_matches_async()
+            yield event.prep_matches()
             alliance_status = EventTeamStatusHelper._build_playoff_info(
                 team.key_name,
                 event.details,

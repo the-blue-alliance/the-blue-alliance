@@ -289,7 +289,7 @@ class EventTeamStatusHelper:
     def _build_qual_info(
         cls,
         team_key: TeamKey,
-        event_details: Optional[EventDetails],
+        event_details: EventDetails,
         matches: TOrganizedMatches,
         year: Year,
     ) -> Optional[EventTeamStatusQual]:
@@ -383,10 +383,7 @@ class EventTeamStatusHelper:
 
     @classmethod
     def _build_alliance_info(
-        cls,
-        team_key: TeamKey,
-        event_details: Optional[EventDetails],
-        matches: TOrganizedMatches,
+        cls, team_key: TeamKey, event_details: EventDetails, matches: TOrganizedMatches
     ) -> Optional[EventTeamStatusAlliance]:
         if not event_details or not event_details.alliance_selections:
             return None
@@ -413,7 +410,7 @@ class EventTeamStatusHelper:
     def _build_playoff_info(
         cls,
         team_key: TeamKey,
-        event_details: Optional[EventDetails],
+        event_details: EventDetails,
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
@@ -436,7 +433,7 @@ class EventTeamStatusHelper:
                 matches,
                 year,
                 playoff_type,
-                event_details.alliance_selections if event_details else None,
+                event_details.alliance_selections,
             )
 
         elif playoff_type in [
@@ -668,7 +665,7 @@ class EventTeamStatusHelper:
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
-        alliance_selections: Optional[List[EventAlliance]],
+        alliance_selections: List[EventAlliance],
     ) -> Optional[PlayoffAllianceStatus]:
         round_robin_rank = None
         round_robin_record = WLTRecord(wins=0, losses=0, ties=0)
@@ -772,10 +769,7 @@ class EventTeamStatusHelper:
 
     @classmethod
     def _get_alliance(
-        cls,
-        team_key: TeamKey,
-        event_details: Optional[EventDetails],
-        matches: TOrganizedMatches,
+        cls, team_key: TeamKey, event_details: EventDetails, matches: TOrganizedMatches
     ) -> Tuple[
         Optional[EventAlliance], Optional[int]
     ]:  # Tuple of (Alliance, Alliance Number)
