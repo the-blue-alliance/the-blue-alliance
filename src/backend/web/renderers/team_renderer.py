@@ -18,6 +18,7 @@ from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.award import Award
+from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import Year
@@ -42,9 +43,7 @@ class TeamRenderer:
         cls, team: Team, year: Year, is_canonical: bool
     ) -> Tuple[Optional[Dict], bool]:
         awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team, year)
-        events_future = event_query.TeamYearEventsQuery(
-            team_key=team.key_name, year=year
-        ).fetch_async()
+        events_future = cls._fetch_events_async(team, year)
         matches_future = match_query.TeamYearMatchesQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
@@ -70,14 +69,7 @@ class TeamRenderer:
 
         hall_of_fame_future = cls._fetch_hof_async(team)
 
-        events_sorted = sorted(
-            events_future.get_result(),
-            key=lambda e: (
-                e.start_date if e.start_date else datetime.datetime(year, 12, 31)
-            ),
-        )  # unknown goes last
-
-        if not events_sorted:
+        if not events_future.get_result():
             return None, False
 
         matches_by_event_key: Dict[ndb.Key, List[Match]] = {}
@@ -137,7 +129,7 @@ class TeamRenderer:
         current_event = None
         matches_upcoming = None
         short_cache = False
-        for event in events_sorted:
+        for event in events_future.get_result():
             event_matches = matches_by_event_key.get(event.key, [])
             event_awards = awards_by_event_key_future.get_result().get(event.key, [])
             match_count, matches_organized = MatchHelper.organized_matches(
@@ -371,9 +363,7 @@ class TeamRenderer:
     @classmethod
     def render_team_history(cls, team: Team, is_canonical: bool) -> Tuple[Dict, bool]:
         awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team)
-        event_futures = event_query.TeamEventsQuery(
-            team_key=team.key_name
-        ).fetch_async()
+        events_future = cls._fetch_events_async(team)
         participation_future = cls._fetch_participation_async(team)
         social_media_future = cls._fetch_social_medias_async(team)
         hall_of_fame_future = cls._fetch_hof_async(team)
@@ -383,7 +373,7 @@ class TeamRenderer:
         current_event_pit = None
         matches_upcoming = None
         short_cache = False
-        for event in event_futures.get_result():
+        for event in events_future.get_result():
             if event.now:
                 current_event = event
 
@@ -407,14 +397,6 @@ class TeamRenderer:
             event_awards.append(
                 (event, awards_by_event_key_future.get_result().get(event.key, []))
             )
-        event_awards = sorted(
-            event_awards,
-            key=lambda e_a: (
-                e_a[0].start_date
-                if e_a[0].start_date
-                else datetime.datetime(e_a[0].year, 12, 31)
-            ),
-        )
 
         participation_years, last_competed, current_year = (
             participation_future.get_result()
@@ -450,6 +432,29 @@ class TeamRenderer:
         current_year = datetime.date.today().year
 
         return sorted(participation_years), last_competed, current_year
+
+    @classmethod
+    @ndb.tasklet
+    def _fetch_events_async(
+        cls, team: Team, year: Optional[Year] = None
+    ) -> List[Event]:
+        if year is None:
+            events = yield event_query.TeamEventsQuery(
+                team_key=team.key_name
+            ).fetch_async()
+        else:
+            events = yield event_query.TeamYearEventsQuery(
+                team_key=team.key_name, year=year
+            ).fetch_async()
+
+        events_sorted = sorted(
+            events,
+            key=lambda e: (
+                e.start_date if e.start_date else datetime.datetime(e.year, 12, 31)
+            ),
+        )  # unknown goes last
+
+        return events_sorted
 
     @classmethod
     @ndb.tasklet
