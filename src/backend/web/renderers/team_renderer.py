@@ -18,7 +18,6 @@ from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.award import Award
-from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import Year
@@ -321,7 +320,9 @@ class TeamRenderer:
             filter(lambda x: team.key in x.preferred_references, image_medias)
         )
 
-        participation_years, last_competed, current_year = participation_future.get_result()
+        participation_years, last_competed, current_year = (
+            participation_future.get_result()
+        )
 
         template_values = {
             "is_canonical": is_canonical,
@@ -403,7 +404,9 @@ class TeamRenderer:
             if event.within_a_day:
                 short_cache = True
 
-            event_awards.append((event, awards_by_event_key_future.get_result().get(event.key, [])))
+            event_awards.append(
+                (event, awards_by_event_key_future.get_result().get(event.key, []))
+            )
         event_awards = sorted(
             event_awards,
             key=lambda e_a: (
@@ -413,7 +416,9 @@ class TeamRenderer:
             ),
         )
 
-        participation_years, last_competed, current_year = participation_future.get_result()
+        participation_years, last_competed, current_year = (
+            participation_future.get_result()
+        )
 
         template_values = {
             "is_canonical": is_canonical,
@@ -436,8 +441,8 @@ class TeamRenderer:
     @ndb.tasklet
     def _fetch_participation_async(cls, team: Team):
         participation_years = yield team_query.TeamParticipationQuery(
-                team_key=team.key_name
-            ).fetch_async()
+            team_key=team.key_name
+        ).fetch_async()
 
         last_competed = None
         if len(participation_years) > 0:
@@ -448,7 +453,9 @@ class TeamRenderer:
 
     @classmethod
     @ndb.tasklet
-    def _fetch_awards_by_event_key_async(cls, team: Team, year:Optional[Year] = None) -> Dict[ndb.Key, List[Award]]:
+    def _fetch_awards_by_event_key_async(
+        cls, team: Team, year: Optional[Year] = None
+    ) -> Dict[ndb.Key, List[Award]]:
         if year is None:
             awards = yield award_query.TeamAwardsQuery(
                 team_key=team.key_name
@@ -475,9 +482,7 @@ class TeamRenderer:
         social_medias = yield media_query.TeamSocialMediaQuery(
             team_key=team.key_name
         ).fetch_async()
-        return sorted(
-            social_medias, key=MediaHelper.social_media_sorter
-        )
+        return sorted(social_medias, key=MediaHelper.social_media_sorter)
 
     @classmethod
     @ndb.tasklet
