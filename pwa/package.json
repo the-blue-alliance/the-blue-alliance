@@ -37,7 +37,7 @@
     "@react-router/node": "7.8.0",
     "@sentry/profiling-node": "9.8.0",
     "@sentry/react-router": "9.8.0",
-    "@tanstack/react-query": "5.84.1",
+    "@tanstack/react-query": "5.84.2",
     "@tanstack/react-table": "8.21.3",
     "@types/lodash-es": "4.17.12",
     "class-variance-authority": "0.7.1",
