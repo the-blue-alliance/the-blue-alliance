@@ -16,6 +16,12 @@ def track_call_after_response(
     if model_type is not None:
         api_action += f"/{model_type}"
 
+    params = {
+        "client_id": auth_owner_id,
+        "action": api_action,
+        "label": api_label,
+    }
+
     GoogleAnalytics.track_event(
-        auth_owner_id, "api-v03", api_action, event_label=api_label, run_after=True
+        auth_owner_id, "api_v03", params, run_after=True
     )

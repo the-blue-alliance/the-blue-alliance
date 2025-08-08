@@ -1,6 +1,6 @@
 import logging
-import time
-from typing import Optional
+import requests
+import uuid
 
 from backend.common.run_after_response import run_after_response
 
@@ -17,10 +17,8 @@ class GoogleAnalytics:
     def track_event(
         cls,
         client_id: str,
-        event_category: str,
-        event_action: str,
-        event_label: Optional[str] = None,
-        event_value: Optional[int] = None,
+        event_name: str,
+        event_params: dict,
         run_after: bool = False,
     ) -> None:
         from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
@@ -39,36 +37,17 @@ class GoogleAnalytics:
             )
             return
 
-        import uuid
-
-        cid = uuid.uuid3(uuid.NAMESPACE_X500, str(client_id))
-
-        # GA4 requires a different payload structure
-        event_params = {
-            "event_category": event_category,
-            "event_action": event_action,
-            "client_id_raw": client_id,  # custom parameter for raw client ID
-        }
-        if event_label:
-            event_params["event_label"] = event_label
-        if event_value:
-            event_params["event_value"] = event_value
-
         payload = {
-            "client_id": str(cid),
+            "client_id": str(uuid.uuid3(uuid.NAMESPACE_X500, str(client_id))),
             "events": [
                 {
-                    "name": f"{event_category}_{event_action}",
+                    "name": event_name,
                     "params": event_params,
-                    "timestamp_micros": int(time.time() * 1000000),
                 }
             ],
-            "non_personalized_ads": True,  # Equivalent to ni=1 in UA
         }
 
         def make_request():
-            import requests
-
             requests.post(
                 f"https://www.google-analytics.com/mp/collect?measurement_id={google_analytics_id}&api_secret={api_secret}",
                 json=payload,
