@@ -17,7 +17,7 @@ def track_call_after_response(
         api_action += f"/{model_type}"
 
     params = {
-        "client_id": str(auth_owner_id),
+        "client_id": f"_{auth_owner_id}",  # Force this to be non-numeric so GA doesn't try to handle it as a number
         "action": api_action,
         "label": api_label,
     }
