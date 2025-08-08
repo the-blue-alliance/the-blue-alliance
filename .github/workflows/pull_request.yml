@@ -79,6 +79,7 @@ jobs:
             python:
               - '**/*.py'
               - '**/requirements.txt'
+              - '.test_durations'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
@@ -114,6 +115,7 @@ jobs:
             python:
               - '**/*.py'
               - '**/requirements.txt'
+              - '.test_durations'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v5
