@@ -1,13 +1,12 @@
 import logging
-from typing import Callable, Iterable, Optional
+from typing import Callable
 
 from werkzeug.local import Local
 
+from backend.common.profiler import Span
 
 # Request-local context that survives after Flask app context teardown
 response_context = Local()
-
-from backend.common.profiler import Span
 
 
 def run_after_response(callback: Callable[[], None]) -> None:
@@ -31,15 +30,11 @@ def run_after_response(callback: Callable[[], None]) -> None:
 
 
 def execute_callbacks() -> None:
-    callbacks = getattr(response_context, "after_response_callbacks", None)
-    if not callbacks:
-        return
+    callbacks = getattr(response_context, "after_response_callbacks", [])
 
     for callback in callbacks:
-        callback_name = callback.__name__ if hasattr(callback, '__name__') else None
-        logging.info(
-            f"Running callback after response: {callback_name}"
-        )
+        callback_name = callback.__name__ if hasattr(callback, "__name__") else None
+        logging.info(f"Running callback after response: {callback_name}")
         with Span(f"execute_callback:{callback_name}"):
             try:
                 callback()

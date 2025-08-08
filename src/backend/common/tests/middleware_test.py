@@ -2,11 +2,10 @@ from typing import cast
 from unittest.mock import Mock, patch
 from wsgiref.types import WSGIApplication
 
-import flask
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-from flask import Flask, g
-from werkzeug.test import run_wsgi_app, create_environ
+from flask import Flask
+from werkzeug.test import create_environ, run_wsgi_app
 from werkzeug.wrappers import Request
 
 import backend
