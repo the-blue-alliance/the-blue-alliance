@@ -17,7 +17,7 @@ def track_call_after_response(
         api_action += f"/{model_type}"
 
     params = {
-        "client_id": auth_owner_id,
+        "client_id": str(auth_owner_id),
         "action": api_action,
         "label": api_label,
     }
