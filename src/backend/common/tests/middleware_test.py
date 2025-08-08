@@ -2,11 +2,10 @@ from typing import cast
 from unittest.mock import Mock, patch
 from wsgiref.types import WSGIApplication
 
-import flask
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from flask import Flask
-from werkzeug.test import run_wsgi_app
+from werkzeug.test import create_environ, run_wsgi_app
 from werkzeug.wrappers import Request
 
 import backend
@@ -32,8 +31,8 @@ def test_TraceRequestMiddleware_callable(app: Flask) -> None:
     def start_response(status, headers):
         pass
 
-    with app.test_request_context("/"):
-        middleware(flask.request.environ, start_response)
+    environ = create_environ(path="/", base_url="http://localhost")
+    middleware(environ, start_response)
 
     assert isinstance(trace_context.request, Request)
 
@@ -65,24 +64,24 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     # Test no callback.
     callback1.assert_not_called()
     callback2.assert_not_called()
-    with app.test_request_context("/0"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)
+    environ = create_environ(path="/0", base_url="http://localhost")
+    run_wsgi_app(middleware, environ, buffered=True)
     callback1.assert_not_called()
     callback2.assert_not_called()
 
     # Test first callback.
     callback1.assert_not_called()
     callback2.assert_not_called()
-    with app.test_request_context("/1"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)
+    environ = create_environ(path="/1", base_url="http://localhost")
+    run_wsgi_app(middleware, environ, buffered=True)
     callback1.assert_called_once()
     callback2.assert_not_called()
 
     # Ensure a second call doesn't call the first callback again.
     callback1.assert_called_once()
     callback2.assert_not_called()
-    with app.test_request_context("/2"):
-        run_wsgi_app(middleware, flask.request.environ, buffered=True)
+    environ = create_environ(path="/2", base_url="http://localhost")
+    run_wsgi_app(middleware, environ, buffered=True)
     callback1.assert_called_once()
     callback2.assert_called_once()
 

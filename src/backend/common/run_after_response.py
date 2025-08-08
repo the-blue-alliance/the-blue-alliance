@@ -1,9 +1,12 @@
 import logging
 from typing import Callable
 
-from flask import g
+from werkzeug.local import Local
 
 from backend.common.profiler import Span
+
+# Request-local context that survives after Flask app context teardown
+response_context = Local()
 
 
 def run_after_response(callback: Callable[[], None]) -> None:
@@ -21,22 +24,22 @@ def run_after_response(callback: Callable[[], None]) -> None:
     def function_to_run():
         ...
     """
-    if "after_response_callbacks" not in g:
-        g.after_response_callbacks = []
-    g.after_response_callbacks.append(callback)
+    if not hasattr(response_context, "after_response_callbacks"):
+        response_context.after_response_callbacks = []
+    response_context.after_response_callbacks.append(callback)
 
 
 def execute_callbacks() -> None:
-    if not g or "after_response_callbacks" not in g:
-        return
+    callbacks = getattr(response_context, "after_response_callbacks", [])
 
-    for callback in g.after_response_callbacks:
-        callback_name = callback.__name__ if hasattr(callback, '__name__') else None
-        logging.info(
-            f"Running callback after response: {callback_name}"
-        )
+    for callback in callbacks:
+        callback_name = callback.__name__ if hasattr(callback, "__name__") else None
+        logging.info(f"Running callback after response: {callback_name}")
         with Span(f"execute_callback:{callback_name}"):
             try:
                 callback()
             except Exception as e:
                 logging.info(f"Callback failed: {e}")
+
+    if hasattr(response_context, "after_response_callbacks"):
+        delattr(response_context, "after_response_callbacks")
