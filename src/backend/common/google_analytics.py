@@ -54,11 +54,11 @@ class GoogleAnalytics:
             params["ev"] = event_value
 
         def make_request():
-            from urllib.parse import urlencode
-            from google.appengine.ext import ndb
+            import requests
 
-            url = "https://www.google-analytics.com/collect?" + urlencode(params)
-            ndb.get_context().urlfetch(url, method="GET", deadline=10).get_result()
+            requests.get(
+                "https://www.google-analytics.com/collect", params=params, timeout=10
+            )
 
         if run_after:
             run_after_response(make_request)
