@@ -7,7 +7,7 @@ from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
-from backend.common.run_after_response import execute_callbacks
+from backend.common.run_after_response import execute_callbacks, response_context
 
 
 class TraceRequestMiddleware:
@@ -37,6 +37,7 @@ class AfterResponseMiddleware:
 
     @ndb.toplevel
     def __call__(self, environ: Any, start_response: Any):
+        response_context.request = Request(environ)
         return ClosingIterator(self.app(environ, start_response), self._run_after)
 
     def _run_after(self):
