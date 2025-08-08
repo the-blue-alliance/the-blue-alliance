@@ -34,6 +34,4 @@ class GoogleAnalyticsID(Sitevar[ContentType]):
     @classmethod
     def api_secret(cls) -> Optional[str]:
         api_secret = cls.get().get("API_SECRET")
-        return (
-            api_secret if api_secret else None
-        )  # Drop empty strings
+        return api_secret if api_secret else None  # Drop empty strings

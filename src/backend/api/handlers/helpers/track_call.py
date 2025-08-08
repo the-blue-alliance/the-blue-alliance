@@ -22,6 +22,4 @@ def track_call_after_response(
         "label": api_label,
     }
 
-    GoogleAnalytics.track_event(
-        auth_owner_id, "api_v03", params, run_after=True
-    )
+    GoogleAnalytics.track_event(auth_owner_id, "api_v03", params, run_after=True)

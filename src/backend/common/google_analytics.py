@@ -1,6 +1,7 @@
 import logging
-import requests
 import uuid
+
+import requests
 
 from backend.common.run_after_response import run_after_response
 

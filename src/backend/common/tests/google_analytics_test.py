@@ -1,4 +1,3 @@
-import itertools
 from typing import Generator
 from unittest.mock import patch
 
@@ -71,7 +70,10 @@ def test_GoogleAnalytics_track_event(run_after) -> None:
 
     assert len(args) == 1
     assert len(kwargs) == 2
-    assert args[0] == "https://www.google-analytics.com/mp/collect?measurement_id=G-ABC123DEF4&api_secret=test_secret"
+    assert (
+        args[0]
+        == "https://www.google-analytics.com/mp/collect?measurement_id=G-ABC123DEF4&api_secret=test_secret"
+    )
     assert kwargs["timeout"] == 10
 
     # Check the payload structure for GA4
@@ -79,12 +81,13 @@ def test_GoogleAnalytics_track_event(run_after) -> None:
     assert "client_id" in payload
     assert "events" in payload
     assert len(payload["events"]) == 1
-    
+
     event = payload["events"][0]
     assert event["name"] == "test_event"
     assert event["params"] == {"test_param": "test_value", "another_param": 123}
-    
+
     # Verify client_id is a UUID (should be deterministic based on the input)
     import uuid
+
     expected_client_id = str(uuid.uuid3(uuid.NAMESPACE_X500, "testbed"))
     assert payload["client_id"] == expected_client_id
