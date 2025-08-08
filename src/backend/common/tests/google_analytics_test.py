@@ -42,50 +42,41 @@ def test_GoogleAnalytics_track_event(run_after, el, ev) -> None:
     # Ensure response_context has a request object so run_after callbacks can be queued
     response_context.request = Request(create_environ(path="/"))
 
-    with patch("requests.post") as mock_post, patch("time.time", return_value=12345.0):
+    with patch("requests.get") as mock_get:
         GoogleAnalytics.track_event(
             "testbed",
-            "test_category",
-            "test_action",
+            "test",
+            "test",
             event_label=el,
             event_value=ev,
             run_after=run_after,
         )
         if run_after:
-            mock_post.assert_not_called()
+            mock_get.assert_not_called()
         execute_callbacks()
 
-    mock_post.assert_called()
-    args, kwargs = mock_post.call_args
+    mock_get.assert_called()
+    args, kwargs = mock_get.call_args
 
     assert len(args) == 1
-    assert len(kwargs) == 2  # json and timeout
-    assert (
-        args[0]
-        == "https://www.google-analytics.com/mp/collect?measurement_id=abc&api_secret=REPLACE_WITH_API_SECRET"
-    )
+    assert len(kwargs) == 2
+    assert args[0] == "https://www.google-analytics.com/collect"
     assert kwargs["timeout"] == 10
 
-    event_params = {
-        "event_category": "test_category",
-        "event_action": "test_action",
-        "client_id_raw": "testbed",  # This should match the first parameter to track_event
+    query_components_expected = {
+        "v": 1,
+        "tid": "abc",
+        "cid": "6dcf939a-da96-33c4-acd1-51208db9ceaa",
+        "t": "event",
+        "ec": "test",
+        "ea": "test",
+        "cd1": "testbed",
+        "ni": 1,
+        "sc": "end",
     }
     if el:
-        event_params["event_label"] = el
+        query_components_expected["el"] = el
     if ev:
-        event_params["event_value"] = ev
+        query_components_expected["ev"] = ev
 
-    expected_payload = {
-        "client_id": "6dcf939a-da96-33c4-acd1-51208db9ceaa",
-        "events": [
-            {
-                "name": "test_category_test_action",
-                "params": event_params,
-                "timestamp_micros": 12345000000,
-            }
-        ],
-        "non_personalized_ads": True,
-    }
-
-    assert kwargs["json"] == expected_payload
+    assert kwargs["params"] == query_components_expected
