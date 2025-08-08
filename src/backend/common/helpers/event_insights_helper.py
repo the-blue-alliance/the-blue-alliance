@@ -95,19 +95,19 @@ class EventInsightsHelper:
             red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
             blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]
 
-            if red_sb["autoBonusAchieved"]:
+            if red_sb.get("autoBonusAchieved"):
                 auto_rp_count += 1
-            if blue_sb["autoBonusAchieved"]:
+            if blue_sb.get("autoBonusAchieved"):
                 auto_rp_count += 1
 
-            if red_sb["bargeBonusAchieved"]:
+            if red_sb.get("bargeBonusAchieved"):
                 barge_rp_count += 1
-            if blue_sb["bargeBonusAchieved"]:
+            if blue_sb.get("bargeBonusAchieved"):
                 barge_rp_count += 1
 
-            if red_sb["coralBonusAchieved"]:
+            if red_sb.get("coralBonusAchieved"):
                 coral_rp_count += 1
-            if blue_sb["coralBonusAchieved"]:
+            if blue_sb.get("coralBonusAchieved"):
                 coral_rp_count += 1
 
             if red_sb.get("coopertitionCriteriaMet"):
@@ -116,14 +116,14 @@ class EventInsightsHelper:
                 coopertition_count += 1
 
             red_all_rp = (
-                red_sb["autoBonusAchieved"]
-                and red_sb["bargeBonusAchieved"]
-                and red_sb["coralBonusAchieved"]
+                red_sb.get("autoBonusAchieved")
+                and red_sb.get("bargeBonusAchieved")
+                and red_sb.get("coralBonusAchieved")
             )
             blue_all_rp = (
-                blue_sb["autoBonusAchieved"]
-                and blue_sb["bargeBonusAchieved"]
-                and blue_sb["coralBonusAchieved"]
+                blue_sb.get("autoBonusAchieved")
+                and blue_sb.get("bargeBonusAchieved")
+                and blue_sb.get("coralBonusAchieved")
             )
 
             if (red_score > blue_score and red_all_rp) or (
