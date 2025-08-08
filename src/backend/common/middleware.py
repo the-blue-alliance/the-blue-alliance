@@ -41,9 +41,8 @@ class AfterResponseMiddleware:
 
     def _run_after(self):
         with Span("Running AfterResponseMiddleware"):
-            pass
+            execute_callbacks()
         send_traces()
-        execute_callbacks()
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = False) -> None:

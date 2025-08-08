@@ -3,6 +3,8 @@ from typing import Callable
 
 from flask import g
 
+from backend.common.profiler import Span
+
 
 def run_after_response(callback: Callable[[], None]) -> None:
     """
@@ -29,10 +31,12 @@ def execute_callbacks() -> None:
         return
 
     for callback in g.after_response_callbacks:
+        callback_name = callback.__name__ if hasattr(callback, '__name__') else None
         logging.info(
-            f"Running callback after response: {callback.__name__ if hasattr(callback, '__name__') else None}"
+            f"Running callback after response: {callback_name}"
         )
-        try:
-            callback()
-        except Exception as e:
-            logging.info(f"Callback failed: {e}")
+        with Span(f"execute_callback:{callback_name}"):
+            try:
+                callback()
+            except Exception as e:
+                logging.info(f"Callback failed: {e}")
