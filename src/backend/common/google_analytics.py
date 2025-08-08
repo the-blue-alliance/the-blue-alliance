@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import Optional
 
@@ -25,12 +26,16 @@ class GoogleAnalytics:
         from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
 
         google_analytics_id = GoogleAnalyticsID.google_analytics_id()
-
         if not google_analytics_id:
-            import logging
-
             logging.warning(
-                "Missing sitevar: google_analytics.id. Can't track API usage."
+                "Missing sitevar: google_analytics.id GOOGLE_ANALYTICS_ID. Can't track API usage."
+            )
+            return
+
+        api_secret = GoogleAnalyticsID.api_secret()
+        if not api_secret:
+            logging.warning(
+                "Missing sitevar: google_analytics.id API_SECRET. Can't track API usage."
             )
             return
 
@@ -65,7 +70,7 @@ class GoogleAnalytics:
             import requests
 
             requests.post(
-                f"https://www.google-analytics.com/mp/collect?measurement_id={google_analytics_id}&api_secret=REPLACE_WITH_API_SECRET",
+                f"https://www.google-analytics.com/mp/collect?measurement_id={google_analytics_id}&api_secret={api_secret}",
                 json=payload,
                 timeout=10,
             )
