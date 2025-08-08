@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        group: [1, 2, 3]
+        group: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -93,7 +93,7 @@ jobs:
           pip install -r src/requirements.txt
       - name: Run Tests
         if: steps.changes.outputs.python == 'true'
-        run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
+        run: ./ops/test_py3.sh --cov --splits 5 --group ${{ matrix.group }}
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
         uses: actions/upload-artifact@v4.6.2

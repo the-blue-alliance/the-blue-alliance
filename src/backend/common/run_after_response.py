@@ -39,9 +39,9 @@ def execute_callbacks() -> None:
     callbacks = getattr(response_context.request, "after_response_callbacks", [])
 
     for callback in callbacks:
-        callback_name = callback.__name__ if hasattr(callback, "__name__") else None
-        logging.info(f"Running callback after response: {callback_name}")
-        with Span(f"execute_callback:{callback_name}"):
+        with Span(
+            f"execute_callback:{callback.__name__ if hasattr(callback, "__name__") else None}"
+        ):
             try:
                 callback()
             except Exception as e:

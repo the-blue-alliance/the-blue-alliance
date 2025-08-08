@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        group: [1, 2, 3]
+        group: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.12
@@ -65,7 +65,7 @@ jobs:
           pip install -r src/requirements.txt
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/test_py3.sh --cov --splits 3 --group ${{ matrix.group }}
+        run: ./ops/test_py3.sh --cov --splits 5 --group ${{ matrix.group }}
       - name: Save coverage artifacts
         uses: actions/upload-artifact@v4.6.2
         with:
