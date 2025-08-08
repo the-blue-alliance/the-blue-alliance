@@ -53,8 +53,8 @@ def install_middleware(app: Flask, configure_secret_key: bool = False) -> None:
     # This means, the last one in this list is the "outermost" middleware that runs
     # _first_ for a given request, for the cases when order matters
     middlewares = [
-        AfterResponseMiddleware,
         TraceRequestMiddleware,
+        AfterResponseMiddleware,
     ]
     for middleware in middlewares:
         app.wsgi_app = middleware(app.wsgi_app)  # type: ignore[override]

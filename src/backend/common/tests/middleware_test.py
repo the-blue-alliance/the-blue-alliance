@@ -88,14 +88,14 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
 
 
 def test_install_middleware(app: Flask) -> None:
-    assert not type(app.wsgi_app) is TraceRequestMiddleware
+    assert not type(app.wsgi_app) is AfterResponseMiddleware
     with patch.object(
         backend.common.middleware, "_set_secret_key"
     ) as mock_set_secret_key:
         install_middleware(app, configure_secret_key=True)
         assert len(app.before_request_funcs) == 0
     mock_set_secret_key.assert_called_once_with(app)
-    assert type(app.wsgi_app) is TraceRequestMiddleware
+    assert type(app.wsgi_app) is AfterResponseMiddleware
 
 
 def test_set_secret_key_default(app: Flask) -> None:
