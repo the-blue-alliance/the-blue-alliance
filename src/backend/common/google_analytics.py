@@ -1,6 +1,5 @@
-import json
-from typing import Optional
 import time
+from typing import Optional
 
 from backend.common.run_after_response import run_after_response
 
@@ -52,12 +51,14 @@ class GoogleAnalytics:
 
         payload = {
             "client_id": str(cid),
-            "events": [{
-                "name": f"{event_category}_{event_action}",
-                "params": event_params,
-                "timestamp_micros": int(time.time() * 1000000)
-            }],
-            "non_personalized_ads": True  # Equivalent to ni=1 in UA
+            "events": [
+                {
+                    "name": f"{event_category}_{event_action}",
+                    "params": event_params,
+                    "timestamp_micros": int(time.time() * 1000000),
+                }
+            ],
+            "non_personalized_ads": True,  # Equivalent to ni=1 in UA
         }
 
         def make_request():
@@ -66,7 +67,7 @@ class GoogleAnalytics:
             requests.post(
                 f"https://www.google-analytics.com/mp/collect?measurement_id={google_analytics_id}&api_secret=REPLACE_WITH_API_SECRET",
                 json=payload,
-                timeout=10
+                timeout=10,
             )
 
         if run_after:

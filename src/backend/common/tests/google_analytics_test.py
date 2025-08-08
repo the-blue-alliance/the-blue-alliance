@@ -1,7 +1,6 @@
 import itertools
-import time
 from typing import Generator
-from unittest.mock import patch, ANY
+from unittest.mock import patch
 
 import pytest
 from flask import Flask
@@ -61,7 +60,10 @@ def test_GoogleAnalytics_track_event(run_after, el, ev) -> None:
 
     assert len(args) == 1
     assert len(kwargs) == 2  # json and timeout
-    assert args[0] == "https://www.google-analytics.com/mp/collect?measurement_id=abc&api_secret=REPLACE_WITH_API_SECRET"
+    assert (
+        args[0]
+        == "https://www.google-analytics.com/mp/collect?measurement_id=abc&api_secret=REPLACE_WITH_API_SECRET"
+    )
     assert kwargs["timeout"] == 10
 
     event_params = {
@@ -76,12 +78,14 @@ def test_GoogleAnalytics_track_event(run_after, el, ev) -> None:
 
     expected_payload = {
         "client_id": "6dcf939a-da96-33c4-acd1-51208db9ceaa",
-        "events": [{
-            "name": "test_category_test_action",
-            "params": event_params,
-            "timestamp_micros": 12345000000
-        }],
-        "non_personalized_ads": True
+        "events": [
+            {
+                "name": "test_category_test_action",
+                "params": event_params,
+                "timestamp_micros": 12345000000,
+            }
+        ],
+        "non_personalized_ads": True,
     }
 
     assert kwargs["json"] == expected_payload
