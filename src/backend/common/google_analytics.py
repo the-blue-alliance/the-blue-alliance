@@ -1,14 +1,16 @@
+import json
 from typing import Optional
+import time
 
 from backend.common.run_after_response import run_after_response
 
 
 class GoogleAnalytics:
     """
-    Class that manages sending information to Google Analytics
+    Class that manages sending information to Google Analytics 4 (GA4)
 
-    For more information about GAnalytics Protocol Parameters, visit
-    https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
+    For more information about GA4 Measurement Protocol, visit
+    https://developers.google.com/analytics/devguides/collection/protocol/ga4
     """
 
     @classmethod
@@ -37,27 +39,34 @@ class GoogleAnalytics:
 
         cid = uuid.uuid3(uuid.NAMESPACE_X500, str(client_id))
 
-        params = {
-            "v": 1,
-            "tid": google_analytics_id,
-            "cid": str(cid),
-            "t": "event",
-            "ec": event_category,
-            "ea": event_action,
-            "cd1": client_id,  # custom dimension 1 is the raw client ID
-            "ni": 1,
-            "sc": "end",  # forces tracking session to end
+        # GA4 requires a different payload structure
+        event_params = {
+            "event_category": event_category,
+            "event_action": event_action,
+            "client_id_raw": client_id,  # custom parameter for raw client ID
         }
         if event_label:
-            params["el"] = event_label
+            event_params["event_label"] = event_label
         if event_value:
-            params["ev"] = event_value
+            event_params["event_value"] = event_value
+
+        payload = {
+            "client_id": str(cid),
+            "events": [{
+                "name": f"{event_category}_{event_action}",
+                "params": event_params,
+                "timestamp_micros": int(time.time() * 1000000)
+            }],
+            "non_personalized_ads": True  # Equivalent to ni=1 in UA
+        }
 
         def make_request():
             import requests
 
-            requests.get(
-                "https://www.google-analytics.com/collect", params=params, timeout=10
+            requests.post(
+                f"https://www.google-analytics.com/mp/collect?measurement_id={google_analytics_id}&api_secret=REPLACE_WITH_API_SECRET",
+                json=payload,
+                timeout=10
             )
 
         if run_after:
