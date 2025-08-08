@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from flask import Flask
+from google.appengine.ext import ndb
 from werkzeug.test import create_environ
 from werkzeug.wrappers import Request
 
