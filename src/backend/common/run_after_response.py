@@ -24,13 +24,19 @@ def run_after_response(callback: Callable[[], None]) -> None:
     def function_to_run():
         ...
     """
-    if not hasattr(response_context, "after_response_callbacks"):
-        response_context.after_response_callbacks = []
-    response_context.after_response_callbacks.append(callback)
+    if not hasattr(response_context, "request"):
+        return
+
+    if not hasattr(response_context.request, "after_response_callbacks"):
+        response_context.request.after_response_callbacks = []
+    response_context.request.after_response_callbacks.append(callback)
 
 
 def execute_callbacks() -> None:
-    callbacks = getattr(response_context, "after_response_callbacks", [])
+    if not hasattr(response_context, "request"):
+        return
+
+    callbacks = getattr(response_context.request, "after_response_callbacks", [])
 
     for callback in callbacks:
         callback_name = callback.__name__ if hasattr(callback, "__name__") else None
@@ -40,6 +46,3 @@ def execute_callbacks() -> None:
                 callback()
             except Exception as e:
                 logging.info(f"Callback failed: {e}")
-
-    if hasattr(response_context, "after_response_callbacks"):
-        delattr(response_context, "after_response_callbacks")

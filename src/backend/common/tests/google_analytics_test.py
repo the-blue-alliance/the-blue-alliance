@@ -6,9 +6,11 @@ from urllib.parse import parse_qs, urlparse
 import pytest
 from flask import Flask
 from google.appengine.ext import ndb
+from werkzeug.test import create_environ
+from werkzeug.wrappers import Request
 
 from backend.common.google_analytics import GoogleAnalytics
-from backend.common.run_after_response import execute_callbacks
+from backend.common.run_after_response import execute_callbacks, response_context
 
 
 @pytest.fixture(autouse=True)
@@ -38,6 +40,9 @@ def test_GoogleAnalytics_track_event(run_after, el, ev) -> None:
 
     sitevar = GoogleAnalyticsID._fetch_sitevar()
     sitevar.contents["GOOGLE_ANALYTICS_ID"] = "abc"
+
+    # Ensure response_context has a request object so run_after callbacks can be queued
+    response_context.request = Request(create_environ(path="/"))
 
     # Patch the current NDB context's urlfetch to capture calls
     with patch.object(ndb.get_context(), "urlfetch") as mock_fetch:
