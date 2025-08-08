@@ -7,7 +7,7 @@ from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
-from backend.common.run_after_response import execute_callbacks
+from backend.common.run_after_response import execute_callbacks, response_context
 
 
 class TraceRequestMiddleware:
@@ -37,13 +37,13 @@ class AfterResponseMiddleware:
 
     @ndb.toplevel
     def __call__(self, environ: Any, start_response: Any):
+        response_context.request = Request(environ)
         return ClosingIterator(self.app(environ, start_response), self._run_after)
 
     def _run_after(self):
         with Span("Running AfterResponseMiddleware"):
-            pass
+            execute_callbacks()
         send_traces()
-        execute_callbacks()
 
 
 def install_middleware(app: Flask, configure_secret_key: bool = False) -> None:
@@ -54,8 +54,8 @@ def install_middleware(app: Flask, configure_secret_key: bool = False) -> None:
     # This means, the last one in this list is the "outermost" middleware that runs
     # _first_ for a given request, for the cases when order matters
     middlewares = [
-        AfterResponseMiddleware,
         TraceRequestMiddleware,
+        AfterResponseMiddleware,
     ]
     for middleware in middlewares:
         app.wsgi_app = middleware(app.wsgi_app)  # type: ignore[override]
