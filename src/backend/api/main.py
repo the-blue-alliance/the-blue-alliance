@@ -1,6 +1,7 @@
 from json import JSONDecodeError
 
 from flask import Blueprint, Flask, make_response, Response
+from flask_compress import Compress
 from flask_cors import CORS
 from google.appengine.api import wrap_wsgi_app
 from werkzeug.routing import BaseConverter
@@ -111,6 +112,9 @@ app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
 install_middleware(app, configure_secret_key=True)
 install_url_converters(app)
 configure_flask_cache(app)
+
+# Enable gzip compression
+Compress(app)
 
 app.json.compact = False  # pyre-ignore[16]
 app.url_map.converters["simple_model_type"] = SimpleModelTypeConverter

@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_compress import Compress
 from flask_wtf.csrf import CSRFProtect
 from google.appengine.api import wrap_wsgi_app
 
@@ -81,6 +82,9 @@ app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
 install_middleware(app, configure_secret_key=True)
 install_url_converters(app)
 configure_flask_cache(app)
+
+# Enable gzip compression
+Compress(app)
 
 csrf = CSRFProtect()
 csrf.init_app(app)
