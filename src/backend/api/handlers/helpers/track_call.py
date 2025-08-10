@@ -20,7 +20,7 @@ def track_call_after_response(
 
     params = {
         "client_id": f"_{auth_owner_id}",  # Force this to be non-numeric so GA doesn't try to handle it as a number
-        "onwer_description": f"{auth_owner_id}:{auth_description}",
+        "owner_description": f"{auth_owner_id}:{auth_description}",
         "action": api_action,
         "label": api_label,
     }
