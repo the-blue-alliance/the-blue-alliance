@@ -56,6 +56,36 @@ def test_AppspotRedirectMiddleware_redirect_appspot_no_query(app: Flask) -> None
     assert location_header == "https://www.thebluealliance.com/events"
 
 
+def test_AppspotRedirectMiddleware_redirect_www_appspot(app: Flask) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    # Test redirect for www.tbatv-prod-hrd.appspot.com host
+    environ = create_environ(
+        path="/team/254",
+        query_string="year=2023",
+        base_url="https://www.tbatv-prod-hrd.appspot.com",
+    )
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "301 MOVED PERMANENTLY"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header == "https://www.thebluealliance.com/team/254?year=2023"
+
+
+def test_AppspotRedirectMiddleware_redirect_www_appspot_no_query(app: Flask) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    # Test redirect for www.tbatv-prod-hrd.appspot.com host without query string
+    environ = create_environ(
+        path="/events", base_url="https://www.tbatv-prod-hrd.appspot.com"
+    )
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "301 MOVED PERMANENTLY"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header == "https://www.thebluealliance.com/events"
+
+
 def test_AppspotRedirectMiddleware_no_redirect_thebluealliance(app: Flask) -> None:
     middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
 
