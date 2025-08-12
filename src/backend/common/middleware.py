@@ -1,13 +1,37 @@
-from typing import Any, Callable
+from typing import Any, Callable, Type, Union
 
 from flask import Flask
 from google.appengine.ext import ndb
-from werkzeug.wrappers import Request
+from werkzeug.wrappers import Request, Response
 from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
 from backend.common.profiler import send_traces, Span, trace_context
 from backend.common.run_after_response import execute_callbacks, response_context
+
+
+class AppspotRedirectMiddleware:
+    """
+    A middleware that redirects requests from tbatv-prod-hrd.appspot.com hosts to www.thebluealliance.com
+    """
+
+    app: Callable[[Any, Any], Any]
+
+    def __init__(self, app: Callable[[Any, Any], Any]):
+        self.app = app
+
+    def __call__(self, environ: Any, start_response: Any):
+        request = Request(environ)
+        host = request.host.lower()
+
+        if host == "tbatv-prod-hrd.appspot.com":
+            redirect_url = f"https://www.thebluealliance.com{request.full_path}"
+
+            # Create a 301 (permanent) redirect response
+            response = Response(status=301, headers=[("Location", redirect_url)])
+            return response(environ, start_response)
+
+        return self.app(environ, start_response)
 
 
 class TraceRequestMiddleware:
@@ -46,17 +70,31 @@ class AfterResponseMiddleware:
         send_traces()
 
 
-def install_middleware(app: Flask, configure_secret_key: bool = False) -> None:
+def install_middleware(
+    app: Flask,
+    configure_secret_key: bool = False,
+    include_appspot_redirect: bool = False,
+) -> None:
     if configure_secret_key:
         _set_secret_key(app)
 
     # The middlewares get added in order of this last, and each wraps the previous
     # This means, the last one in this list is the "outermost" middleware that runs
     # _first_ for a given request, for the cases when order matters
-    middlewares = [
+    middlewares: list[
+        Type[
+            Union[
+                TraceRequestMiddleware,
+                AfterResponseMiddleware,
+                AppspotRedirectMiddleware,
+            ]
+        ]
+    ] = [
         TraceRequestMiddleware,
         AfterResponseMiddleware,
     ]
+    if include_appspot_redirect:
+        middlewares.append(AppspotRedirectMiddleware)
     for middleware in middlewares:
         app.wsgi_app = middleware(app.wsgi_app)  # type: ignore[override]
 
