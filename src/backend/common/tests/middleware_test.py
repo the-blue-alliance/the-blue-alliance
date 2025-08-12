@@ -13,11 +13,79 @@ from backend.common.environment import Environment
 from backend.common.middleware import (
     _set_secret_key,
     AfterResponseMiddleware,
+    AppspotRedirectMiddleware,
     install_middleware,
     TraceRequestMiddleware,
 )
 from backend.common.profiler import trace_context
 from backend.common.run_after_response import run_after_response
+
+
+def test_AppspotRedirectMiddleware_init(app: Flask) -> None:
+    middleware = AppspotRedirectMiddleware(app)
+    assert middleware.app is app
+
+
+def test_AppspotRedirectMiddleware_redirect_appspot(app: Flask) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    # Test redirect for appspot.com host
+    environ = create_environ(
+        path="/team/254",
+        query_string="year=2023",
+        base_url="https://tbatv-prod-hrd.appspot.com",
+    )
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "301 MOVED PERMANENTLY"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header == "https://www.thebluealliance.com/team/254?year=2023"
+
+
+def test_AppspotRedirectMiddleware_redirect_appspot_no_query(app: Flask) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    # Test redirect for appspot.com host without query string
+    environ = create_environ(
+        path="/events", base_url="https://tbatv-prod-hrd.appspot.com"
+    )
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "301 MOVED PERMANENTLY"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header == "https://www.thebluealliance.com/events"
+
+
+def test_AppspotRedirectMiddleware_no_redirect_thebluealliance(app: Flask) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    @app.route("/test")
+    def test_handler():
+        return "Hello!"
+
+    # Test no redirect for thebluealliance.com host
+    environ = create_environ(path="/test", base_url="https://thebluealliance.com")
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "200 OK"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header is None
+
+
+def test_AppspotRedirectMiddleware_no_redirect_localhost(app: Flask) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    @app.route("/test")
+    def test_handler():
+        return "Hello!"
+
+    # Test no redirect for localhost
+    environ = create_environ(path="/test", base_url="http://localhost:8080")
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "200 OK"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header is None
 
 
 def test_TraceRequestMiddleware_init(app: Flask) -> None:
@@ -95,6 +163,19 @@ def test_install_middleware(app: Flask) -> None:
         assert len(app.before_request_funcs) == 0
     mock_set_secret_key.assert_called_once_with(app)
     assert type(app.wsgi_app) is AfterResponseMiddleware
+
+
+def test_install_middleware_with_appspot_redirect(app: Flask) -> None:
+    assert not type(app.wsgi_app) is AppspotRedirectMiddleware
+    with patch.object(
+        backend.common.middleware, "_set_secret_key"
+    ) as mock_set_secret_key:
+        install_middleware(
+            app, configure_secret_key=True, include_appspot_redirect=True
+        )
+        assert len(app.before_request_funcs) == 0
+    mock_set_secret_key.assert_called_once_with(app)
+    assert type(app.wsgi_app) is AppspotRedirectMiddleware
 
 
 def test_set_secret_key_default(app: Flask) -> None:
