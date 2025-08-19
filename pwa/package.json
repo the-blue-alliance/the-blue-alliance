@@ -103,7 +103,7 @@
     "prettier-plugin-merge": "0.8.0",
     "prettier-plugin-tailwindcss": "0.6.14",
     "tailwindcss": "4.1.12",
-    "tw-animate-css": "1.3.6",
+    "tw-animate-css": "1.3.7",
     "typescript": "5.9.2",
     "typescript-eslint": "8.39.1",
     "unplugin-icons": "22.2.0",
