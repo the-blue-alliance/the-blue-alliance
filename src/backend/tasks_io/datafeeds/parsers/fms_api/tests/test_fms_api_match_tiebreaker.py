@@ -48,6 +48,7 @@ def test_2017flwp_sequence(ndb_stub, taskqueue_stub) -> None:
         event_short="flwp",
         year=2017,
         event_type_enum=0,
+        official=True,
         timezone_id="America/New_York",
     )
     event.put()
@@ -134,6 +135,7 @@ def test_2017flwp(ndb_stub, taskqueue_stub) -> None:
         event_short="flwp",
         year=2017,
         event_type_enum=0,
+        official=True,
         timezone_id="America/New_York",
     )
     event.put()
@@ -202,6 +204,7 @@ def test_2017pahat(ndb_stub, taskqueue_stub) -> None:
         event_short="pahat",
         year=2017,
         event_type_enum=0,
+        official=True,
         timezone_id="America/New_York",
     )
     event.put()
@@ -270,6 +273,7 @@ def test_2017scmb_sequence(ndb_stub, taskqueue_stub) -> None:
         event_short="scmb",
         year=2017,
         event_type_enum=0,
+        official=True,
         timezone_id="America/New_York",
     )
     event.put()
@@ -356,6 +360,7 @@ def test_2017scmb(ndb_stub, taskqueue_stub) -> None:
         event_short="scmb",
         year=2017,
         event_type_enum=0,
+        official=True,
         timezone_id="America/New_York",
     )
     event.put()
@@ -533,6 +538,7 @@ def test_2017ncwin(ndb_stub, taskqueue_stub) -> None:
         event_short="ncwin",
         year=2017,
         event_type_enum=0,
+        official=True,
         timezone_id="America/New_York",
     )
     event.put()
@@ -711,6 +717,7 @@ def test_2023ncash_double_elim(ndb_stub, taskqueue_stub) -> None:
         year=2023,
         event_type_enum=EventType.DISTRICT,
         playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+        official=True,
         timezone_id="America/New_York",
     )
     event.put()

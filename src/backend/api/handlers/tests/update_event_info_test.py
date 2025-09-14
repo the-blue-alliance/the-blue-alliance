@@ -7,6 +7,7 @@ from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -106,6 +107,9 @@ def test_update_event_info(
             "frc9000": "frc6000",
         },
         "timezone": "America/New_York",
+        "disable_sync": {
+            "event_playoff_matches": True,
+        },
         "someother": "randomstuff",  # This should be ignored
     }
     request_body = json.dumps(request)
@@ -142,6 +146,8 @@ def test_update_event_info(
         "frc8254": "frc254C",
         "frc9000": "frc6000",
     }
+
+    assert event.is_sync_enabled(EventSyncType.EVENT_PLAYOFF_MATCHES) is False
 
     # We should have a job enqueued to remap data
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 1
@@ -348,4 +354,46 @@ def test_invalid_event_timezone(
     event: Optional[Event] = Event.get_by_id("2014casj")
     assert event is not None
     assert event.timezone_id is None
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_invalid_sync_disable_flags(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {"disable_sync": True}
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 400
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.disable_sync_flags is None
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_invalid_sync_disable_flags_key(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {"disable_sync": {"invalid_sync_type": True}}
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 400
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.disable_sync_flags is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0

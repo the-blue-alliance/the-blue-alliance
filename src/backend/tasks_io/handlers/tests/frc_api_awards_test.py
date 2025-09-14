@@ -8,6 +8,7 @@ from google.appengine.ext import ndb, testbed
 from werkzeug.test import Client
 
 from backend.common.consts.award_type import AwardType
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.futures import InstantFuture
 from backend.common.models.award import Award
@@ -21,6 +22,7 @@ def create_event(
     official: bool,
     end_date: Optional[datetime.datetime] = None,
     remap_teams: Optional[Dict[str, str]] = None,
+    disable_sync_flags: int = 0,
 ) -> Event:
     e = Event(
         id="2019casj",
@@ -30,6 +32,7 @@ def create_event(
         start_date=datetime.datetime(2019, 4, 1),
         end_date=end_date or datetime.datetime(2019, 4, 3),
         official=official,
+        disable_sync_flags=disable_sync_flags,
         remap_teams=remap_teams,
     )
     e.put()
@@ -75,6 +78,20 @@ def test_enqueue_current_official_only(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
     create_event(official=False)
+
+    resp = tasks_client.get("/tasks/enqueue/fmsapi_awards/now")
+    assert resp.status_code == 200
+    assert resp.data != ""
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert len(tasks) == 0
+
+
+@freeze_time("2019-04-01")
+def test_enqueue_skip_sync_disabled(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    create_event(official=True, disable_sync_flags=EventSyncType.EVENT_AWARDS)
 
     resp = tasks_client.get("/tasks/enqueue/fmsapi_awards/now")
     assert resp.status_code == 200

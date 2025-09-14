@@ -560,6 +560,27 @@
             "type": "string",
             "description": "Timezone name for the event",
             "example": "America/New_York"
+          },
+          "disable_sync": {
+            "type": "object",
+            "description": "flags controlling disabling certain aspects of sync",
+            "properties": {
+              "event_alliances": {
+                "type": "boolean"
+              },
+              "event_rankings": {
+                "type": "boolean"
+              },
+              "event_qual_matches": {
+                "type": "boolean"
+              },
+              "event_playoff_matches": {
+                "type": "boolean"
+              },
+              "event_awards": {
+                "type": "boolean"
+              }
+            }
           }
         }
       },

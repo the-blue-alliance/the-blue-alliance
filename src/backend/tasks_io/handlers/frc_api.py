@@ -9,6 +9,7 @@ from google.appengine.ext import ndb
 from markupsafe import Markup
 from pyre_extensions import none_throws
 
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.helpers.event_helper import EventHelper
@@ -556,6 +557,8 @@ def enqueue_event_alliances(
         events = ndb.get_multi(event_keys)
 
     for event in events:
+        if not event.is_sync_enabled(EventSyncType.EVENT_ALLIANCES):
+            continue
         taskqueue.add(
             queue_name="datafeed",
             target="py3-tasks-io",
@@ -626,6 +629,8 @@ def enqueue_event_rankings(year: Optional[Year]) -> Response:
         events = ndb.get_multi(event_keys)
 
     for event in events:
+        if not event.is_sync_enabled(EventSyncType.EVENT_RANKINGS):
+            continue
         taskqueue.add(
             queue_name="datafeed",
             target="py3-tasks-io",
@@ -694,6 +699,10 @@ def enqueue_event_matches(year: Optional[Year]) -> Response:
         events = ndb.get_multi(event_keys)
 
     for event in events:
+        if not event.is_sync_enabled(
+            EventSyncType.EVENT_QUAL_MATCHES
+        ) and not event.is_sync_enabled(EventSyncType.EVENT_PLAYOFF_MATCHES):
+            continue
         taskqueue.add(
             queue_name="datafeed",
             target="py3-tasks-io",
@@ -787,6 +796,8 @@ def awards_year(year: Optional[int], when: Optional[str] = None) -> Response:
         events = ndb.get_multi(event_keys)
 
     for event in events:
+        if not event.is_sync_enabled(EventSyncType.EVENT_AWARDS):
+            continue
         taskqueue.add(
             queue_name="datafeed",
             target="py3-tasks-io",

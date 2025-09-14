@@ -10,6 +10,7 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts import event_type
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import (
     CMP_EVENT_TYPES,
     EventType,
@@ -114,6 +115,9 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official: bool = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
+    disable_sync_flags: int = (
+        ndb.IntegerProperty()
+    )  # Turn off a particular type of sync
     first_eid = ndb.StringProperty()  # from USFIRST
     parent_event: Optional[ndb.Key] = (
         ndb.KeyProperty()
@@ -139,6 +143,7 @@ class Event(CachedModel):
         "event_short",
         "event_type_enum",
         "district_key",
+        "disable_sync_flags",
         "custom_hashtag",
         "enable_predictions",
         "facebook_eid",
@@ -832,3 +837,12 @@ class Event(CachedModel):
                 a.append(award)
                 team_awards[team_key] = a
         return team_awards
+
+    def is_sync_enabled(self, sync_type: EventSyncType) -> bool:
+        if not self.official:
+            return False
+
+        if self.disable_sync_flags is None:
+            return True
+
+        return (self.disable_sync_flags & sync_type) == 0

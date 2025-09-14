@@ -5,6 +5,7 @@ from typing import AnyStr, Dict, List, Optional, TypedDict
 import pytz
 from pyre_extensions import safe_json
 
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.datafeed_parsers.exceptions import ParserInputException
@@ -27,6 +28,7 @@ class EventInfoInput(TypedDict, total=False):
     playoff_type: int
     webcasts: List[_WebcastUrlDict]
     remap_teams: Dict[str, str]
+    disable_sync: Dict[str, bool]
 
 
 class EventInfoParsed(TypedDict, total=False):
@@ -35,6 +37,7 @@ class EventInfoParsed(TypedDict, total=False):
     webcasts: List[Webcast]
     remap_teams: Dict[TeamKey, TeamKey]
     timezone: str
+    sync_disabled_flags: int
 
 
 class JSONEventInfoParser:
@@ -107,5 +110,23 @@ class JSONEventInfoParser:
             if timezone not in pytz.all_timezones_set:
                 raise ParserInputException(f"Unknown timezone {timezone}")
             parsed_info["timezone"] = timezone
+
+        if sync_disabled_dict := info_dict.get("disable_sync"):
+            if not isinstance(sync_disabled_dict, dict):
+                raise ParserInputException("disable_sync must be a dict")
+            sync_types = EventSyncType.__members__.items()
+            dict_keys = set(sync_disabled_dict.keys())
+            valid_keys = {name.lower() for name, _ in sync_types}
+            invalid_keys = dict_keys - valid_keys
+            if invalid_keys:
+                raise ParserInputException(
+                    f"Invalid keys in disable_sync dict: {invalid_keys}. Valid keys: {valid_keys}"
+                )
+
+            sync_flags = 0
+            for name, val in sync_types:
+                if sync_disabled_dict.get(name.lower()):
+                    sync_flags |= val
+            parsed_info["sync_disabled_flags"] = sync_flags
 
         return parsed_info
