@@ -6,6 +6,7 @@ from freezegun import freeze_time
 from google.appengine.ext import testbed
 from werkzeug.test import Client
 
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.futures import InstantFuture
 from backend.common.models.event import Event
@@ -14,7 +15,11 @@ from backend.common.models.event_ranking import EventRanking
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
-def create_event(official: bool, remap_teams: Optional[Dict[str, str]] = None) -> None:
+def create_event(
+    official: bool,
+    remap_teams: Optional[Dict[str, str]] = None,
+    disable_sync_flags: int = 0,
+) -> None:
     Event(
         id="2020nyny",
         year=2020,
@@ -23,6 +28,7 @@ def create_event(official: bool, remap_teams: Optional[Dict[str, str]] = None) -
         start_date=datetime.datetime(2020, 4, 1),
         end_date=datetime.datetime(2020, 4, 2),
         official=official,
+        disable_sync_flags=disable_sync_flags,
         remap_teams=remap_teams,
     ).put()
 
@@ -55,6 +61,19 @@ def test_enqueue_current_skips_unofficial(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
     create_event(official=False)
+    resp = tasks_client.get("/tasks/enqueue/fmsapi_event_rankings/now")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert len(tasks) == 0
+
+
+@freeze_time("2020-4-1")
+def test_enqueue_current_skips_sync_disabled(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    create_event(official=True, disable_sync_flags=EventSyncType.EVENT_RANKINGS)
     resp = tasks_client.get("/tasks/enqueue/fmsapi_event_rankings/now")
     assert resp.status_code == 200
     assert len(resp.data) > 0

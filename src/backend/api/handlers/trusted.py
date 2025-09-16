@@ -150,6 +150,9 @@ def update_event_info(event_key: EventKey) -> Response:
     if "timezone" in parsed_info:
         event.timezone_id = parsed_info["timezone"]
 
+    if "sync_disabled_flags" in parsed_info:
+        event.disable_sync_flags = parsed_info["sync_disabled_flags"]
+
     EventManipulator.createOrUpdate(event, auto_union=False)
     return profiled_jsonify({"Success": f"Event {event_key} updated"})
 

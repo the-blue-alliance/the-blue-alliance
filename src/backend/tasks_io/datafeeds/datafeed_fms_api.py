@@ -5,6 +5,7 @@ from typing import Any, Dict, Generator, List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
 
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.frc_api import FRCAPI
 from backend.common.models.alliance import EventAlliance
@@ -268,18 +269,41 @@ class DatafeedFMSAPI:
         detail_parser = FMSAPIMatchDetailsParser(year, event_short)
 
         api_event_short = DatafeedFMSAPI._get_event_short(year, event_short, event)
+        sync_quals = event is None or event.is_sync_enabled(
+            EventSyncType.EVENT_QUAL_MATCHES
+        )
+        sync_playoffs = event is None or event.is_sync_enabled(
+            EventSyncType.EVENT_PLAYOFF_MATCHES
+        )
+
+        if sync_quals:
+            qual_fetches = (
+                self.api.hybrid_schedule(year, api_event_short, "qual"),
+                self.api.match_scores(year, api_event_short, "qual"),
+            )
+        else:
+            qual_fetches = (
+                self._stub_fetch_hybrid_schedule(),
+                self._stub_fetch_match_scores(),
+            )
+
+        if sync_playoffs:
+            playoff_fetches = (
+                self.api.hybrid_schedule(year, api_event_short, "playoff"),
+                self.api.match_scores(year, api_event_short, "playoff"),
+            )
+        else:
+            playoff_fetches = (
+                self._stub_fetch_hybrid_schedule(),
+                self._stub_fetch_match_scores(),
+            )
 
         (
             qual_hybrid_schedule_result,
-            playoff_hybrid_schedule_result,
             qual_scores_result,
+            playoff_hybrid_schedule_result,
             playoff_scores_result,
-        ) = yield (
-            self.api.hybrid_schedule(year, api_event_short, "qual"),
-            self.api.hybrid_schedule(year, api_event_short, "playoff"),
-            self.api.match_scores(year, api_event_short, "qual"),
-            self.api.match_scores(year, api_event_short, "playoff"),
-        )
+        ) = yield (qual_fetches + playoff_fetches)
 
         qual_matches_merged = self._parse(qual_hybrid_schedule_result, hs_parser)
         playoff_matches_merged = self._parse(playoff_hybrid_schedule_result, hs_parser)
@@ -408,3 +432,19 @@ class DatafeedFMSAPI:
             f"Fetch for {response.url} failed; Error code {response.status_code}; {response.content}"
         )
         return None
+
+    @ndb.tasklet
+    def _stub_fetch_hybrid_schedule(self):
+        return URLFetchResult.mock_for_content(
+            url="",
+            status_code=200,
+            content=json.dumps({"Schedule": []}),
+        )
+
+    @ndb.tasklet
+    def _stub_fetch_match_scores(self):
+        return URLFetchResult.mock_for_content(
+            url="",
+            status_code=200,
+            content=json.dumps({"MatchScores": []}),
+        )

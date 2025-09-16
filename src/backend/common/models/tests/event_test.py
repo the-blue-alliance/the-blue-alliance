@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.alliance import EventAlliance
@@ -528,3 +529,63 @@ def test_venue_address():
         event.venue_address_safe
         == "Berkeley High School\n1980 Allston Way\nBerkeley, CA, USA"
     )
+
+
+def test_sync_never_enabled_when_unofficial() -> None:
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        official=False,
+    )
+
+    for sync_type in EventSyncType:
+        assert (
+            event.is_sync_enabled(sync_type) is False
+        ), f"Sync should not be enabled for {sync_type} when not official"
+
+
+def test_sync_always_enabled_with_null_mask() -> None:
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        official=True,
+        disable_sync_flags=None,
+    )
+
+    for sync_type in EventSyncType:
+        assert (
+            event.is_sync_enabled(sync_type) is True
+        ), f"Sync should be enabled for {sync_type} when official"
+
+
+def test_sync_always_enabled_with_zero_mask() -> None:
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        official=True,
+        disable_sync_flags=0,
+    )
+
+    for sync_type in EventSyncType:
+        assert (
+            event.is_sync_enabled(sync_type) is True
+        ), f"Sync should be enabled for {sync_type} when official"
+
+
+def test_disable_sync_by_mask() -> None:
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        official=True,
+        disable_sync_flags=(0 | EventSyncType.EVENT_ALLIANCES),
+    )
+
+    for sync_type in EventSyncType:
+        expected = sync_type != EventSyncType.EVENT_ALLIANCES
+        assert (
+            event.is_sync_enabled(sync_type) == expected
+        ), f"Sync should be {expected} for {sync_type} when official"
