@@ -33,7 +33,7 @@ class EventInfoInput(TypedDict, total=False):
 
 class EventInfoParsed(TypedDict, total=False):
     first_event_code: Optional[str]
-    playoff_type: PlayoffType
+    playoff_type: Optional[PlayoffType]
     webcasts: List[Webcast]
     remap_teams: Dict[TeamKey, TeamKey]
     timezone: str
@@ -97,11 +97,19 @@ class JSONEventInfoParser:
             parsed_info["remap_teams"] = info_dict["remap_teams"]
 
         if "playoff_type" in info_dict:
-            if info_dict["playoff_type"] not in PlayoffType._value2member_map_:
+            playoff_type = info_dict.get("playoff_type")
+            if (
+                playoff_type is not None
+                and playoff_type not in PlayoffType._value2member_map_
+            ):
                 raise ParserInputException(
                     f"Bad playoff type: {info_dict['playoff_type']}"
                 )
-            parsed_info["playoff_type"] = PlayoffType(info_dict["playoff_type"])
+            parsed_info["playoff_type"] = (
+                PlayoffType(info_dict["playoff_type"])
+                if playoff_type is not None
+                else None
+            )
 
         if "first_event_code" in info_dict:
             parsed_info["first_event_code"] = info_dict["first_event_code"]
