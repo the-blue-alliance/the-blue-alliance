@@ -145,7 +145,17 @@ def update_event_info(event_key: EventKey) -> Response:
         event.first_code = parsed_info["first_event_code"]
 
     if "playoff_type" in parsed_info:
-        event.playoff_type = parsed_info["playoff_type"]
+        playoff_type = parsed_info["playoff_type"]
+        if playoff_type is not None:
+            event.playoff_type = playoff_type
+            if event.official:
+                # If this event is pulling info from the FRC API, we want to prevent it from being clobbered
+                event.manual_attrs = list(set(event.manual_attrs) | {"playoff_type"})
+        else:
+            # We can clear the "manual attr" (and allow the API to re-clobber) by setting
+            # a None value in the API
+            if event.official:
+                event.manual_attrs = list(set(event.manual_attrs) - {"playoff_type"})
 
     if "timezone" in parsed_info:
         event.timezone_id = parsed_info["timezone"]
