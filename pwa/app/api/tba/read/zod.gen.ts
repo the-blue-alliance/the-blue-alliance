@@ -125,7 +125,7 @@ export const zEvent = z.object({
   parent_event_key: z.union([z.string(), z.null()]),
   playoff_type: z.union([z.number().int(), z.null()]),
   playoff_type_string: z.union([z.string(), z.null()]),
-  remap_teams: z.union([z.object({}), z.null()]),
+  remap_teams: z.union([z.record(z.string()), z.null()]),
 });
 
 /**
@@ -255,8 +255,8 @@ export const zEventDistrictPoints = z.object({
  * A year-specific event insight object expressed as a JSON string, separated in to `qual` and `playoff` fields. See also Event_Insights_2016, Event_Insights_2017, etc.
  */
 export const zEventInsights = z.object({
-  qual: z.object({}).optional(),
-  playoff: z.object({}).optional(),
+  qual: z.record(z.unknown()).optional(),
+  playoff: z.record(z.unknown()).optional(),
 });
 
 /**
@@ -374,20 +374,20 @@ export const zEventInsights2018 = z.object({
  * OPR, DPR, and CCWM for teams at the event.
  */
 export const zEventOprs = z.object({
-  oprs: z.object({}).optional(),
-  dprs: z.object({}).optional(),
-  ccwms: z.object({}).optional(),
+  oprs: z.record(z.number()).optional(),
+  dprs: z.record(z.number()).optional(),
+  ccwms: z.record(z.number()).optional(),
 });
 
 /**
  * Component OPRs for teams at the event.
  */
-export const zEventCoprs = z.record(z.object({}));
+export const zEventCoprs = z.record(z.record(z.number()));
 
 /**
  * JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.
  */
-export const zEventPredictions = z.object({});
+export const zEventPredictions = z.record(z.unknown());
 
 export const zMatchAlliance = z.object({
   score: z.number().int(),
@@ -1141,7 +1141,7 @@ export const zMedia = z.object({
   foreign_key: z.string(),
   details: z
     .union([
-      z.object({}),
+      z.record(z.unknown()),
       z.object({
         base64Image: z.string(),
       }),
@@ -1221,15 +1221,15 @@ export const zAward = z.object({
 });
 
 export const zDistrictInsightRegionData = z.object({
-  yearly_active_team_count: z.object({}),
-  yearly_event_count: z.object({}),
-  yearly_gained_teams: z.object({}),
-  yearly_lost_teams: z.object({}),
+  yearly_active_team_count: z.record(z.number().int()),
+  yearly_event_count: z.record(z.number().int()),
+  yearly_gained_teams: z.record(z.array(z.string())),
+  yearly_lost_teams: z.record(z.array(z.string())),
 });
 
 export const zDistrictInsight = z.object({
   district_data: z.object({
-    region_data: z.union([z.object({}), z.null()]),
+    region_data: z.union([z.record(zDistrictInsightRegionData), z.null()]),
     district_wide_data: z.union([zDistrictInsightRegionData, z.null()]),
   }),
   team_data: z.union([
@@ -1780,7 +1780,9 @@ export const zGetTeamEventsStatusesByYearData = z.object({
 /**
  * A key-value pair of `Team_Event_Status` objects with the event key as the key.
  */
-export const zGetTeamEventsStatusesByYearResponse = z.object({});
+export const zGetTeamEventsStatusesByYearResponse = z.record(
+  z.union([zTeamEventStatus, z.null()]),
+);
 
 export const zGetTeamEventMatchesData = z.object({
   body: z.never().optional(),
@@ -2387,7 +2389,9 @@ export const zGetEventTeamsStatusesData = z.object({
 /**
  * A key-value pair of `Team_Event_Status` objects with the event key as the key.
  */
-export const zGetEventTeamsStatusesResponse = z.object({});
+export const zGetEventTeamsStatusesResponse = z.record(
+  z.union([zTeamEventStatus, z.null()]),
+);
 
 export const zGetEventMatchesData = z.object({
   body: z.never().optional(),
@@ -2549,7 +2553,7 @@ export const zGetMatchTimeseriesData = z.object({
 /**
  * Successful response
  */
-export const zGetMatchTimeseriesResponse = z.array(z.object({}));
+export const zGetMatchTimeseriesResponse = z.array(z.record(z.unknown()));
 
 export const zGetMatchZebraData = z.object({
   body: z.never().optional(),
@@ -2788,7 +2792,7 @@ export const zGetDistrictAdvancementData = z.object({
  */
 export const zGetDistrictAdvancementResponse = z.union([
   z.null(),
-  z.object({}),
+  z.record(zDistrictAdvancement),
 ]);
 
 export const zGetDistrictDcmpHistoryData = z.object({
@@ -2832,7 +2836,7 @@ export const zGetRegionalAdvancementData = z.object({
  */
 export const zGetRegionalAdvancementResponse = z.union([
   z.null(),
-  z.object({}),
+  z.record(zRegionalAdvancement),
 ]);
 
 export const zGetRegionalRankingsData = z.object({
