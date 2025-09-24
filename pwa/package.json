@@ -53,7 +53,7 @@
     "fuzzysort": "3.1.0",
     "isbot": "5.1.31",
     "lodash-es": "4.17.21",
-    "lru-cache": "11.2.1",
+    "lru-cache": "11.2.2",
     "lucide-react": "0.544.0",
     "morgan": "1.10.1",
     "react": "19.1.1",
