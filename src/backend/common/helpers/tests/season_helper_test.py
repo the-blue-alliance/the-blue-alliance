@@ -12,7 +12,40 @@ EST = timezone("US/Eastern")
 
 
 def test_kickoff_datetime() -> None:
-    # 2021 - Saturday the 9th, 12:00am EST (https://www.firstinspires.org/robotics/frc/blog/2021-kickoff)
+    # For folks looking at this test later to confirm everything is right
+    # 2026 = Jan 10th
+    # 2025 = Jan 4th
+    # 2024 = Jan 6th
+    # 2023 = Jan 7th
+    # 2022 = Jan 8th
+    # 2021 = Jan 9th
+    # 2020 = Jan 4th
+    # 2019 = Jan 5th
+    # 2018 = Jan 6th
+    # 2017 = Jan 7th
+    # 2016 = Jan 9th
+    # 2015 = Jan 3rd
+    # 2014 = Jan 4th
+    # 2013 = Jan 5th
+    # 2012 = Jan 7th
+    # 2011 = Jan 8th
+    # 2010 = Jan 9th
+    # 2009 = Jan 3rd
+    # 2008 = Jan 5th
+    # 2007 = Jan 6th
+    # 2006 = Jan 7th
+    # 2005 = Jan 8th
+    # After this, things start to get hard to confirm online
+    # I'm sure I could dig through Chief posts
+    # ~zach
+
+    # 2026 - Saturday the 10th, 12:00pm (noon) EST
+    kickoff_2026 = datetime(2026, 1, 10, 12, 00, 00, tzinfo=EST)
+    kickoff_2026_utc = kickoff_2026.astimezone(UTC)
+    assert SeasonHelper.kickoff_datetime_est(year=2026) == kickoff_2026
+    assert SeasonHelper.kickoff_datetime_utc(year=2026) == kickoff_2026_utc
+
+    # 2021 - Saturday the 9th, 12:00pm (noon) EST (https://www.firstinspires.org/robotics/frc/blog/2021-kickoff)
     kickoff_2021 = datetime(2021, 1, 9, 12, 00, 00, tzinfo=EST)
     kickoff_2021_utc = kickoff_2021.astimezone(UTC)
     assert SeasonHelper.kickoff_datetime_est(year=2021) == kickoff_2021
