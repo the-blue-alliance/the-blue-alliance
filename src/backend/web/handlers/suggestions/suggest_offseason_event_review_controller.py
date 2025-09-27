@@ -38,11 +38,12 @@ class SuggestOffseasonEventReviewController(
     def create_target_model(
         self, suggestion: Suggestion
     ) -> Optional[SuggestOffseasonTargetModel]:
-        event_id = request.form.get("event_short", None)
-        event_key = str(request.form.get("year")) + str.lower(
-            str(request.form.get("event_short"))
-        )
-        if not event_id:
+        year = int(request.form.get("year", 0))
+        event_short = request.form.get("event_short", None)
+        if event_short:
+            event_short = event_short.lower()
+        event_key = f"{year}{event_short}"
+        if not event_short:
             # Need to supply a key :(
             return SuggestOffseasonTargetModel(status="missing_key", event_key=None)
         if not Event.validate_key_name(event_key):
@@ -62,10 +63,12 @@ class SuggestOffseasonEventReviewController(
             return SuggestOffseasonTargetModel(status="duplicate_key", event_key=None)
 
         first_code = request.form.get("first_code")
+        if first_code:
+            first_code = first_code.upper()
         event = Event(
             id=event_key,
             end_date=end_date,
-            event_short=request.form.get("event_short"),
+            event_short=event_short,
             event_type_enum=EventType.OFFSEASON,
             district_key=None,
             venue=request.form.get("venue"),
@@ -77,7 +80,7 @@ class SuggestOffseasonEventReviewController(
             short_name=request.form.get("short_name"),
             start_date=start_date,
             website=request.form.get("website"),
-            year=int(request.form.get("year", "")),
+            year=year,
             first_code=first_code,
             official=(first_code is not None and first_code != ""),
         )
