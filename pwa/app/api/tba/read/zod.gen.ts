@@ -2,23 +2,23 @@
 import { z } from 'zod';
 
 export const zApiStatusAppVersion = z.object({
-  min_app_version: z.number().int(),
-  latest_app_version: z.number().int(),
+  min_app_version: z.int(),
+  latest_app_version: z.int(),
 });
 
 export const zApiStatus = z.object({
-  current_season: z.number().int(),
-  max_season: z.number().int(),
+  current_season: z.int(),
+  max_season: z.int(),
   is_datafeed_down: z.boolean(),
   down_events: z.array(z.string()),
   ios: zApiStatusAppVersion,
   android: zApiStatusAppVersion,
-  max_team_page: z.number().int(),
+  max_team_page: z.int(),
 });
 
 export const zTeamSimple = z.object({
   key: z.string(),
-  team_number: z.number().int(),
+  team_number: z.int(),
   nickname: z.string(),
   name: z.string(),
   city: z.union([z.string(), z.null()]),
@@ -28,7 +28,7 @@ export const zTeamSimple = z.object({
 
 export const zTeam = z.object({
   key: z.string(),
-  team_number: z.number().int(),
+  team_number: z.int(),
   nickname: z.string(),
   name: z.string(),
   school_name: z.union([z.string(), z.null()]),
@@ -42,12 +42,12 @@ export const zTeam = z.object({
   lat: z.union([z.number(), z.null()]),
   lng: z.union([z.number(), z.null()]),
   location_name: z.union([z.string(), z.null()]),
-  website: z.union([z.string(), z.null()]).optional(),
-  rookie_year: z.union([z.number().int(), z.null()]),
+  website: z.optional(z.union([z.string(), z.null()])),
+  rookie_year: z.union([z.int(), z.null()]),
 });
 
 export const zTeamRobot = z.object({
-  year: z.number().int(),
+  year: z.int(),
   robot_name: z.string(),
   key: z.string(),
   team_key: z.string(),
@@ -57,21 +57,21 @@ export const zDistrict = z.object({
   abbreviation: z.string(),
   display_name: z.string(),
   key: z.string(),
-  year: z.number().int(),
+  year: z.int(),
 });
 
 export const zEventSimple = z.object({
   key: z.string(),
   name: z.string(),
   event_code: z.string(),
-  event_type: z.number().int(),
+  event_type: z.int(),
   district: z.union([zDistrict, z.null()]),
   city: z.union([z.string(), z.null()]),
   state_prov: z.union([z.string(), z.null()]),
   country: z.union([z.string(), z.null()]),
-  start_date: z.string().date(),
-  end_date: z.string().date(),
-  year: z.number().int(),
+  start_date: z.iso.date(),
+  end_date: z.iso.date(),
+  year: z.int(),
 });
 
 export const zWebcast = z.object({
@@ -90,25 +90,25 @@ export const zWebcast = z.object({
     'dacast',
   ]),
   channel: z.string(),
-  date: z.union([z.string(), z.null()]).optional(),
-  file: z.union([z.string(), z.null()]).optional(),
+  date: z.optional(z.union([z.string(), z.null()])),
+  file: z.optional(z.union([z.string(), z.null()])),
 });
 
 export const zEvent = z.object({
   key: z.string(),
   name: z.string(),
   event_code: z.string(),
-  event_type: z.number().int(),
+  event_type: z.int(),
   district: z.union([zDistrict, z.null()]),
   city: z.union([z.string(), z.null()]),
   state_prov: z.union([z.string(), z.null()]),
   country: z.union([z.string(), z.null()]),
-  start_date: z.string().date(),
-  end_date: z.string().date(),
-  year: z.number().int(),
+  start_date: z.iso.date(),
+  end_date: z.iso.date(),
+  year: z.int(),
   short_name: z.union([z.string(), z.null()]),
   event_type_string: z.string(),
-  week: z.union([z.number().int(), z.null()]),
+  week: z.union([z.int(), z.null()]),
   address: z.union([z.string(), z.null()]),
   postal_code: z.union([z.string(), z.null()]),
   gmaps_place_id: z.union([z.string(), z.null()]),
@@ -123,42 +123,42 @@ export const zEvent = z.object({
   webcasts: z.array(zWebcast),
   division_keys: z.array(z.string()),
   parent_event_key: z.union([z.string(), z.null()]),
-  playoff_type: z.union([z.number().int(), z.null()]),
+  playoff_type: z.union([z.int(), z.null()]),
   playoff_type_string: z.union([z.string(), z.null()]),
-  remap_teams: z.union([z.record(z.string()), z.null()]),
+  remap_teams: z.union([z.record(z.string(), z.string()), z.null()]),
 });
 
 /**
  * A Win-Loss-Tie record for a team, or an alliance.
  */
 export const zWltRecord = z.object({
-  losses: z.number().int(),
-  wins: z.number().int(),
-  ties: z.number().int(),
+  losses: z.int(),
+  wins: z.int(),
+  ties: z.int(),
 });
 
 export const zTeamEventStatusRank = z.object({
-  num_teams: z.number().int().optional(),
-  ranking: z
-    .object({
-      matches_played: z.number().int().optional(),
-      qual_average: z.number().optional(),
-      sort_orders: z.array(z.number()).optional(),
-      record: z.union([zWltRecord, z.null()]).optional(),
-      rank: z.number().int().optional(),
-      dq: z.number().int().optional(),
-      team_key: z.string().optional(),
-    })
-    .optional(),
-  sort_order_info: z
-    .array(
+  num_teams: z.optional(z.int()),
+  ranking: z.optional(
+    z.object({
+      matches_played: z.optional(z.int()),
+      qual_average: z.optional(z.number()),
+      sort_orders: z.optional(z.array(z.number())),
+      record: z.optional(z.union([zWltRecord, z.null()])),
+      rank: z.optional(z.int()),
+      dq: z.optional(z.int()),
+      team_key: z.optional(z.string()),
+    }),
+  ),
+  sort_order_info: z.optional(
+    z.array(
       z.object({
-        precision: z.number().int().optional(),
-        name: z.string().optional(),
+        precision: z.optional(z.int()),
+        name: z.optional(z.string()),
       }),
-    )
-    .optional(),
-  status: z.string().optional(),
+    ),
+  ),
+  status: z.optional(z.string()),
 });
 
 /**
@@ -167,16 +167,16 @@ export const zTeamEventStatusRank = z.object({
 export const zTeamEventStatusAllianceBackup = z.union([
   z.null(),
   z.object({
-    out: z.string().optional(),
-    in: z.string().optional(),
+    out: z.optional(z.string()),
+    in: z.optional(z.string()),
   }),
 ]);
 
 export const zTeamEventStatusAlliance = z.object({
-  name: z.union([z.string(), z.null()]).optional(),
-  number: z.number().int(),
-  backup: zTeamEventStatusAllianceBackup.optional(),
-  pick: z.number().int(),
+  name: z.optional(z.union([z.string(), z.null()])),
+  number: z.int(),
+  backup: z.optional(zTeamEventStatusAllianceBackup),
+  pick: z.int(),
 });
 
 /**
@@ -185,35 +185,35 @@ export const zTeamEventStatusAlliance = z.object({
 export const zTeamEventStatusPlayoff = z.union([
   z.null(),
   z.object({
-    level: z.enum(['qm', 'ef', 'qf', 'sf', 'f']).optional(),
-    current_level_record: z.union([zWltRecord, z.null()]).optional(),
-    record: z.union([zWltRecord, z.null()]).optional(),
-    status: z.enum(['won', 'eliminated', 'playing']).optional(),
-    playoff_average: z.union([z.null(), z.number()]).optional(),
+    level: z.optional(z.enum(['qm', 'ef', 'qf', 'sf', 'f'])),
+    current_level_record: z.optional(z.union([zWltRecord, z.null()])),
+    record: z.optional(z.union([zWltRecord, z.null()])),
+    status: z.optional(z.enum(['won', 'eliminated', 'playing'])),
+    playoff_average: z.optional(z.union([z.null(), z.number()])),
   }),
 ]);
 
 export const zTeamEventStatus = z.object({
-  qual: z.union([zTeamEventStatusRank, z.null()]).optional(),
-  alliance: z.union([zTeamEventStatusAlliance, z.null()]).optional(),
-  playoff: z.union([zTeamEventStatusPlayoff, z.null()]).optional(),
-  alliance_status_str: z.string().optional(),
-  playoff_status_str: z.string().optional(),
-  overall_status_str: z.string().optional(),
-  next_match_key: z.union([z.string(), z.null()]).optional(),
-  last_match_key: z.union([z.string(), z.null()]).optional(),
+  qual: z.optional(z.union([zTeamEventStatusRank, z.null()])),
+  alliance: z.optional(z.union([zTeamEventStatusAlliance, z.null()])),
+  playoff: z.optional(z.union([zTeamEventStatusPlayoff, z.null()])),
+  alliance_status_str: z.optional(z.string()),
+  playoff_status_str: z.optional(z.string()),
+  overall_status_str: z.optional(z.string()),
+  next_match_key: z.optional(z.union([z.string(), z.null()])),
+  last_match_key: z.optional(z.union([z.string(), z.null()])),
 });
 
 export const zEventRanking = z.object({
   rankings: z.array(
     z.object({
-      matches_played: z.number().int(),
-      qual_average: z.union([z.number().int(), z.null()]),
+      matches_played: z.int(),
+      qual_average: z.union([z.int(), z.null()]),
       extra_stats: z.array(z.number()),
       sort_orders: z.union([z.array(z.number()), z.null()]),
       record: z.union([zWltRecord, z.null()]),
-      rank: z.number().int(),
-      dq: z.number().int(),
+      rank: z.int(),
+      dq: z.int(),
       team_key: z.string(),
     }),
   ),
@@ -225,7 +225,7 @@ export const zEventRanking = z.object({
   ),
   sort_order_info: z.array(
     z.object({
-      precision: z.number().int(),
+      precision: z.int(),
       name: z.string(),
     }),
   ),
@@ -233,30 +233,32 @@ export const zEventRanking = z.object({
 
 export const zEventDistrictPoints = z.object({
   points: z.record(
+    z.string(),
     z.object({
-      total: z.number().int(),
-      alliance_points: z.number().int(),
-      elim_points: z.number().int(),
-      award_points: z.number().int(),
-      qual_points: z.number().int(),
+      total: z.int(),
+      alliance_points: z.int(),
+      elim_points: z.int(),
+      award_points: z.int(),
+      qual_points: z.int(),
     }),
   ),
-  tiebreakers: z
-    .record(
+  tiebreakers: z.optional(
+    z.record(
+      z.string(),
       z.object({
-        highest_qual_scores: z.array(z.number().int()).optional(),
-        qual_wins: z.number().int().optional(),
+        highest_qual_scores: z.optional(z.array(z.int())),
+        qual_wins: z.optional(z.int()),
       }),
-    )
-    .optional(),
+    ),
+  ),
 });
 
 /**
  * A year-specific event insight object expressed as a JSON string, separated in to `qual` and `playoff` fields. See also Event_Insights_2016, Event_Insights_2017, etc.
  */
 export const zEventInsights = z.object({
-  qual: z.record(z.unknown()).optional(),
-  playoff: z.record(z.unknown()).optional(),
+  qual: z.optional(z.record(z.string(), z.unknown())),
+  playoff: z.optional(z.record(z.string(), z.unknown())),
 });
 
 /**
@@ -374,23 +376,26 @@ export const zEventInsights2018 = z.object({
  * OPR, DPR, and CCWM for teams at the event.
  */
 export const zEventOprs = z.object({
-  oprs: z.record(z.number()).optional(),
-  dprs: z.record(z.number()).optional(),
-  ccwms: z.record(z.number()).optional(),
+  oprs: z.optional(z.record(z.string(), z.number())),
+  dprs: z.optional(z.record(z.string(), z.number())),
+  ccwms: z.optional(z.record(z.string(), z.number())),
 });
 
 /**
  * Component OPRs for teams at the event.
  */
-export const zEventCoprs = z.record(z.record(z.number()));
+export const zEventCoprs = z.record(
+  z.string(),
+  z.record(z.string(), z.number()),
+);
 
 /**
  * JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.
  */
-export const zEventPredictions = z.record(z.unknown());
+export const zEventPredictions = z.record(z.string(), z.unknown());
 
 export const zMatchAlliance = z.object({
-  score: z.number().int(),
+  score: z.int(),
   team_keys: z.array(z.string()),
   surrogate_team_keys: z.array(z.string()),
   dq_team_keys: z.array(z.string()),
@@ -399,8 +404,8 @@ export const zMatchAlliance = z.object({
 export const zMatchSimple = z.object({
   key: z.string(),
   comp_level: z.enum(['qm', 'ef', 'qf', 'sf', 'f']),
-  set_number: z.number().int(),
-  match_number: z.number().int(),
+  set_number: z.int(),
+  match_number: z.int(),
   alliances: z.object({
     red: zMatchAlliance,
     blue: zMatchAlliance,
@@ -413,30 +418,30 @@ export const zMatchSimple = z.object({
 });
 
 export const zMatchScoreBreakdown2015Alliance = z.object({
-  auto_points: z.number().int().optional(),
-  teleop_points: z.number().int().optional(),
-  container_points: z.number().int().optional(),
-  tote_points: z.number().int().optional(),
-  litter_points: z.number().int().optional(),
-  foul_points: z.number().int().optional(),
-  adjust_points: z.number().int().optional(),
-  total_points: z.number().int().optional(),
-  foul_count: z.number().int().optional(),
-  tote_count_far: z.number().int().optional(),
-  tote_count_near: z.number().int().optional(),
-  tote_set: z.boolean().optional(),
-  tote_stack: z.boolean().optional(),
-  container_count_level1: z.number().int().optional(),
-  container_count_level2: z.number().int().optional(),
-  container_count_level3: z.number().int().optional(),
-  container_count_level4: z.number().int().optional(),
-  container_count_level5: z.number().int().optional(),
-  container_count_level6: z.number().int().optional(),
-  container_set: z.boolean().optional(),
-  litter_count_container: z.number().int().optional(),
-  litter_count_landfill: z.number().int().optional(),
-  litter_count_unprocessed: z.number().int().optional(),
-  robot_set: z.boolean().optional(),
+  auto_points: z.optional(z.int()),
+  teleop_points: z.optional(z.int()),
+  container_points: z.optional(z.int()),
+  tote_points: z.optional(z.int()),
+  litter_points: z.optional(z.int()),
+  foul_points: z.optional(z.int()),
+  adjust_points: z.optional(z.int()),
+  total_points: z.optional(z.int()),
+  foul_count: z.optional(z.int()),
+  tote_count_far: z.optional(z.int()),
+  tote_count_near: z.optional(z.int()),
+  tote_set: z.optional(z.boolean()),
+  tote_stack: z.optional(z.boolean()),
+  container_count_level1: z.optional(z.int()),
+  container_count_level2: z.optional(z.int()),
+  container_count_level3: z.optional(z.int()),
+  container_count_level4: z.optional(z.int()),
+  container_count_level5: z.optional(z.int()),
+  container_count_level6: z.optional(z.int()),
+  container_set: z.optional(z.boolean()),
+  litter_count_container: z.optional(z.int()),
+  litter_count_landfill: z.optional(z.int()),
+  litter_count_unprocessed: z.optional(z.int()),
+  robot_set: z.optional(z.boolean()),
 });
 
 /**
@@ -446,48 +451,48 @@ export const zMatchScoreBreakdown2015 = z.object({
   blue: zMatchScoreBreakdown2015Alliance,
   red: zMatchScoreBreakdown2015Alliance,
   coopertition: z.enum(['None', 'Unknown', 'Stack']),
-  coopertition_points: z.number().int(),
+  coopertition_points: z.int(),
 });
 
 export const zMatchScoreBreakdown2016Alliance = z.object({
-  autoPoints: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  breachPoints: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  capturePoints: z.number().int().optional(),
-  adjustPoints: z.number().int().optional(),
-  totalPoints: z.number().int().optional(),
-  robot1Auto: z.enum(['Crossed', 'Reached', 'None']).optional(),
-  robot2Auto: z.enum(['Crossed', 'Reached', 'None']).optional(),
-  robot3Auto: z.enum(['Crossed', 'Reached', 'None']).optional(),
-  autoReachPoints: z.number().int().optional(),
-  autoCrossingPoints: z.number().int().optional(),
-  autoBouldersLow: z.number().int().optional(),
-  autoBouldersHigh: z.number().int().optional(),
-  autoBoulderPoints: z.number().int().optional(),
-  teleopCrossingPoints: z.number().int().optional(),
-  teleopBouldersLow: z.number().int().optional(),
-  teleopBouldersHigh: z.number().int().optional(),
-  teleopBoulderPoints: z.number().int().optional(),
-  teleopDefensesBreached: z.boolean().optional(),
-  teleopChallengePoints: z.number().int().optional(),
-  teleopScalePoints: z.number().int().optional(),
-  teleopTowerCaptured: z.boolean().optional(),
-  towerFaceA: z.string().optional(),
-  towerFaceB: z.string().optional(),
-  towerFaceC: z.string().optional(),
-  towerEndStrength: z.number().int().optional(),
-  techFoulCount: z.number().int().optional(),
-  foulCount: z.number().int().optional(),
-  position2: z.string().optional(),
-  position3: z.string().optional(),
-  position4: z.string().optional(),
-  position5: z.string().optional(),
-  position1crossings: z.number().int().optional(),
-  position2crossings: z.number().int().optional(),
-  position3crossings: z.number().int().optional(),
-  position4crossings: z.number().int().optional(),
-  position5crossings: z.number().int().optional(),
+  autoPoints: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  breachPoints: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  capturePoints: z.optional(z.int()),
+  adjustPoints: z.optional(z.int()),
+  totalPoints: z.optional(z.int()),
+  robot1Auto: z.optional(z.enum(['Crossed', 'Reached', 'None'])),
+  robot2Auto: z.optional(z.enum(['Crossed', 'Reached', 'None'])),
+  robot3Auto: z.optional(z.enum(['Crossed', 'Reached', 'None'])),
+  autoReachPoints: z.optional(z.int()),
+  autoCrossingPoints: z.optional(z.int()),
+  autoBouldersLow: z.optional(z.int()),
+  autoBouldersHigh: z.optional(z.int()),
+  autoBoulderPoints: z.optional(z.int()),
+  teleopCrossingPoints: z.optional(z.int()),
+  teleopBouldersLow: z.optional(z.int()),
+  teleopBouldersHigh: z.optional(z.int()),
+  teleopBoulderPoints: z.optional(z.int()),
+  teleopDefensesBreached: z.optional(z.boolean()),
+  teleopChallengePoints: z.optional(z.int()),
+  teleopScalePoints: z.optional(z.int()),
+  teleopTowerCaptured: z.optional(z.boolean()),
+  towerFaceA: z.optional(z.string()),
+  towerFaceB: z.optional(z.string()),
+  towerFaceC: z.optional(z.string()),
+  towerEndStrength: z.optional(z.int()),
+  techFoulCount: z.optional(z.int()),
+  foulCount: z.optional(z.int()),
+  position2: z.optional(z.string()),
+  position3: z.optional(z.string()),
+  position4: z.optional(z.string()),
+  position5: z.optional(z.string()),
+  position1crossings: z.optional(z.int()),
+  position2crossings: z.optional(z.int()),
+  position3crossings: z.optional(z.int()),
+  position4crossings: z.optional(z.int()),
+  position5crossings: z.optional(z.int()),
 });
 
 /**
@@ -499,39 +504,39 @@ export const zMatchScoreBreakdown2016 = z.object({
 });
 
 export const zMatchScoreBreakdown2017Alliance = z.object({
-  autoPoints: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  adjustPoints: z.number().int().optional(),
-  totalPoints: z.number().int().optional(),
-  robot1Auto: z.enum(['Unknown', 'Mobility', 'None']).optional(),
-  robot2Auto: z.enum(['Unknown', 'Mobility', 'None']).optional(),
-  robot3Auto: z.enum(['Unknown', 'Mobility', 'None']).optional(),
-  rotor1Auto: z.boolean().optional(),
-  rotor2Auto: z.boolean().optional(),
-  autoFuelLow: z.number().int().optional(),
-  autoFuelHigh: z.number().int().optional(),
-  autoMobilityPoints: z.number().int().optional(),
-  autoRotorPoints: z.number().int().optional(),
-  autoFuelPoints: z.number().int().optional(),
-  teleopFuelPoints: z.number().int().optional(),
-  teleopFuelLow: z.number().int().optional(),
-  teleopFuelHigh: z.number().int().optional(),
-  teleopRotorPoints: z.number().int().optional(),
-  kPaRankingPointAchieved: z.boolean().optional(),
-  teleopTakeoffPoints: z.number().int().optional(),
-  kPaBonusPoints: z.number().int().optional(),
-  rotorBonusPoints: z.number().int().optional(),
-  rotor1Engaged: z.boolean().optional(),
-  rotor2Engaged: z.boolean().optional(),
-  rotor3Engaged: z.boolean().optional(),
-  rotor4Engaged: z.boolean().optional(),
-  rotorRankingPointAchieved: z.boolean().optional(),
-  techFoulCount: z.number().int().optional(),
-  foulCount: z.number().int().optional(),
-  touchpadNear: z.string().optional(),
-  touchpadMiddle: z.string().optional(),
-  touchpadFar: z.string().optional(),
+  autoPoints: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  adjustPoints: z.optional(z.int()),
+  totalPoints: z.optional(z.int()),
+  robot1Auto: z.optional(z.enum(['Unknown', 'Mobility', 'None'])),
+  robot2Auto: z.optional(z.enum(['Unknown', 'Mobility', 'None'])),
+  robot3Auto: z.optional(z.enum(['Unknown', 'Mobility', 'None'])),
+  rotor1Auto: z.optional(z.boolean()),
+  rotor2Auto: z.optional(z.boolean()),
+  autoFuelLow: z.optional(z.int()),
+  autoFuelHigh: z.optional(z.int()),
+  autoMobilityPoints: z.optional(z.int()),
+  autoRotorPoints: z.optional(z.int()),
+  autoFuelPoints: z.optional(z.int()),
+  teleopFuelPoints: z.optional(z.int()),
+  teleopFuelLow: z.optional(z.int()),
+  teleopFuelHigh: z.optional(z.int()),
+  teleopRotorPoints: z.optional(z.int()),
+  kPaRankingPointAchieved: z.optional(z.boolean()),
+  teleopTakeoffPoints: z.optional(z.int()),
+  kPaBonusPoints: z.optional(z.int()),
+  rotorBonusPoints: z.optional(z.int()),
+  rotor1Engaged: z.optional(z.boolean()),
+  rotor2Engaged: z.optional(z.boolean()),
+  rotor3Engaged: z.optional(z.boolean()),
+  rotor4Engaged: z.optional(z.boolean()),
+  rotorRankingPointAchieved: z.optional(z.boolean()),
+  techFoulCount: z.optional(z.int()),
+  foulCount: z.optional(z.int()),
+  touchpadNear: z.optional(z.string()),
+  touchpadMiddle: z.optional(z.string()),
+  touchpadFar: z.optional(z.string()),
 });
 
 /**
@@ -543,43 +548,43 @@ export const zMatchScoreBreakdown2017 = z.object({
 });
 
 export const zMatchScoreBreakdown2018Alliance = z.object({
-  adjustPoints: z.number().int().optional(),
-  autoOwnershipPoints: z.number().int().optional(),
-  autoPoints: z.number().int().optional(),
-  autoQuestRankingPoint: z.boolean().optional(),
-  autoRobot1: z.string().optional(),
-  autoRobot2: z.string().optional(),
-  autoRobot3: z.string().optional(),
-  autoRunPoints: z.number().int().optional(),
-  autoScaleOwnershipSec: z.number().int().optional(),
-  autoSwitchAtZero: z.boolean().optional(),
-  autoSwitchOwnershipSec: z.number().int().optional(),
-  endgamePoints: z.number().int().optional(),
-  endgameRobot1: z.string().optional(),
-  endgameRobot2: z.string().optional(),
-  endgameRobot3: z.string().optional(),
-  faceTheBossRankingPoint: z.boolean().optional(),
-  foulCount: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  rp: z.number().int().optional(),
-  techFoulCount: z.number().int().optional(),
-  teleopOwnershipPoints: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  teleopScaleBoostSec: z.number().int().optional(),
-  teleopScaleForceSec: z.number().int().optional(),
-  teleopScaleOwnershipSec: z.number().int().optional(),
-  teleopSwitchBoostSec: z.number().int().optional(),
-  teleopSwitchForceSec: z.number().int().optional(),
-  teleopSwitchOwnershipSec: z.number().int().optional(),
-  totalPoints: z.number().int().optional(),
-  vaultBoostPlayed: z.number().int().optional(),
-  vaultBoostTotal: z.number().int().optional(),
-  vaultForcePlayed: z.number().int().optional(),
-  vaultForceTotal: z.number().int().optional(),
-  vaultLevitatePlayed: z.number().int().optional(),
-  vaultLevitateTotal: z.number().int().optional(),
-  vaultPoints: z.number().int().optional(),
-  tba_gameData: z.string().optional(),
+  adjustPoints: z.optional(z.int()),
+  autoOwnershipPoints: z.optional(z.int()),
+  autoPoints: z.optional(z.int()),
+  autoQuestRankingPoint: z.optional(z.boolean()),
+  autoRobot1: z.optional(z.string()),
+  autoRobot2: z.optional(z.string()),
+  autoRobot3: z.optional(z.string()),
+  autoRunPoints: z.optional(z.int()),
+  autoScaleOwnershipSec: z.optional(z.int()),
+  autoSwitchAtZero: z.optional(z.boolean()),
+  autoSwitchOwnershipSec: z.optional(z.int()),
+  endgamePoints: z.optional(z.int()),
+  endgameRobot1: z.optional(z.string()),
+  endgameRobot2: z.optional(z.string()),
+  endgameRobot3: z.optional(z.string()),
+  faceTheBossRankingPoint: z.optional(z.boolean()),
+  foulCount: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  rp: z.optional(z.int()),
+  techFoulCount: z.optional(z.int()),
+  teleopOwnershipPoints: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  teleopScaleBoostSec: z.optional(z.int()),
+  teleopScaleForceSec: z.optional(z.int()),
+  teleopScaleOwnershipSec: z.optional(z.int()),
+  teleopSwitchBoostSec: z.optional(z.int()),
+  teleopSwitchForceSec: z.optional(z.int()),
+  teleopSwitchOwnershipSec: z.optional(z.int()),
+  totalPoints: z.optional(z.int()),
+  vaultBoostPlayed: z.optional(z.int()),
+  vaultBoostTotal: z.optional(z.int()),
+  vaultForcePlayed: z.optional(z.int()),
+  vaultForceTotal: z.optional(z.int()),
+  vaultLevitatePlayed: z.optional(z.int()),
+  vaultLevitateTotal: z.optional(z.int()),
+  vaultPoints: z.optional(z.int()),
+  tba_gameData: z.optional(z.string()),
 });
 
 /**
@@ -591,57 +596,57 @@ export const zMatchScoreBreakdown2018 = z.object({
 });
 
 export const zMatchScoreBreakdown2019Alliance = z.object({
-  adjustPoints: z.number().int().optional(),
-  autoPoints: z.number().int().optional(),
-  bay1: z.string().optional(),
-  bay2: z.string().optional(),
-  bay3: z.string().optional(),
-  bay4: z.string().optional(),
-  bay5: z.string().optional(),
-  bay6: z.string().optional(),
-  bay7: z.string().optional(),
-  bay8: z.string().optional(),
-  cargoPoints: z.number().int().optional(),
-  completeRocketRankingPoint: z.boolean().optional(),
-  completedRocketFar: z.boolean().optional(),
-  completedRocketNear: z.boolean().optional(),
-  endgameRobot1: z.string().optional(),
-  endgameRobot2: z.string().optional(),
-  endgameRobot3: z.string().optional(),
-  foulCount: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  habClimbPoints: z.number().int().optional(),
-  habDockingRankingPoint: z.boolean().optional(),
-  habLineRobot1: z.string().optional(),
-  habLineRobot2: z.string().optional(),
-  habLineRobot3: z.string().optional(),
-  hatchPanelPoints: z.number().int().optional(),
-  lowLeftRocketFar: z.string().optional(),
-  lowLeftRocketNear: z.string().optional(),
-  lowRightRocketFar: z.string().optional(),
-  lowRightRocketNear: z.string().optional(),
-  midLeftRocketFar: z.string().optional(),
-  midLeftRocketNear: z.string().optional(),
-  midRightRocketFar: z.string().optional(),
-  midRightRocketNear: z.string().optional(),
-  preMatchBay1: z.string().optional(),
-  preMatchBay2: z.string().optional(),
-  preMatchBay3: z.string().optional(),
-  preMatchBay6: z.string().optional(),
-  preMatchBay7: z.string().optional(),
-  preMatchBay8: z.string().optional(),
-  preMatchLevelRobot1: z.string().optional(),
-  preMatchLevelRobot2: z.string().optional(),
-  preMatchLevelRobot3: z.string().optional(),
-  rp: z.number().int().optional(),
-  sandStormBonusPoints: z.number().int().optional(),
-  techFoulCount: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  topLeftRocketFar: z.string().optional(),
-  topLeftRocketNear: z.string().optional(),
-  topRightRocketFar: z.string().optional(),
-  topRightRocketNear: z.string().optional(),
-  totalPoints: z.number().int().optional(),
+  adjustPoints: z.optional(z.int()),
+  autoPoints: z.optional(z.int()),
+  bay1: z.optional(z.string()),
+  bay2: z.optional(z.string()),
+  bay3: z.optional(z.string()),
+  bay4: z.optional(z.string()),
+  bay5: z.optional(z.string()),
+  bay6: z.optional(z.string()),
+  bay7: z.optional(z.string()),
+  bay8: z.optional(z.string()),
+  cargoPoints: z.optional(z.int()),
+  completeRocketRankingPoint: z.optional(z.boolean()),
+  completedRocketFar: z.optional(z.boolean()),
+  completedRocketNear: z.optional(z.boolean()),
+  endgameRobot1: z.optional(z.string()),
+  endgameRobot2: z.optional(z.string()),
+  endgameRobot3: z.optional(z.string()),
+  foulCount: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  habClimbPoints: z.optional(z.int()),
+  habDockingRankingPoint: z.optional(z.boolean()),
+  habLineRobot1: z.optional(z.string()),
+  habLineRobot2: z.optional(z.string()),
+  habLineRobot3: z.optional(z.string()),
+  hatchPanelPoints: z.optional(z.int()),
+  lowLeftRocketFar: z.optional(z.string()),
+  lowLeftRocketNear: z.optional(z.string()),
+  lowRightRocketFar: z.optional(z.string()),
+  lowRightRocketNear: z.optional(z.string()),
+  midLeftRocketFar: z.optional(z.string()),
+  midLeftRocketNear: z.optional(z.string()),
+  midRightRocketFar: z.optional(z.string()),
+  midRightRocketNear: z.optional(z.string()),
+  preMatchBay1: z.optional(z.string()),
+  preMatchBay2: z.optional(z.string()),
+  preMatchBay3: z.optional(z.string()),
+  preMatchBay6: z.optional(z.string()),
+  preMatchBay7: z.optional(z.string()),
+  preMatchBay8: z.optional(z.string()),
+  preMatchLevelRobot1: z.optional(z.string()),
+  preMatchLevelRobot2: z.optional(z.string()),
+  preMatchLevelRobot3: z.optional(z.string()),
+  rp: z.optional(z.int()),
+  sandStormBonusPoints: z.optional(z.int()),
+  techFoulCount: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  topLeftRocketFar: z.optional(z.string()),
+  topLeftRocketNear: z.optional(z.string()),
+  topRightRocketFar: z.optional(z.string()),
+  topRightRocketNear: z.optional(z.string()),
+  totalPoints: z.optional(z.int()),
 });
 
 /**
@@ -653,40 +658,40 @@ export const zMatchScoreBreakdown2019 = z.object({
 });
 
 export const zMatchScoreBreakdown2020Alliance = z.object({
-  initLineRobot1: z.string().optional(),
-  endgameRobot1: z.string().optional(),
-  initLineRobot2: z.string().optional(),
-  endgameRobot2: z.string().optional(),
-  initLineRobot3: z.string().optional(),
-  endgameRobot3: z.string().optional(),
-  autoCellsBottom: z.number().int().optional(),
-  autoCellsOuter: z.number().int().optional(),
-  autoCellsInner: z.number().int().optional(),
-  teleopCellsBottom: z.number().int().optional(),
-  teleopCellsOuter: z.number().int().optional(),
-  teleopCellsInner: z.number().int().optional(),
-  stage1Activated: z.boolean().optional(),
-  stage2Activated: z.boolean().optional(),
-  stage3Activated: z.boolean().optional(),
-  stage3TargetColor: z.string().optional(),
-  endgameRungIsLevel: z.string().optional(),
-  autoInitLinePoints: z.number().int().optional(),
-  autoCellPoints: z.number().int().optional(),
-  autoPoints: z.number().int().optional(),
-  teleopCellPoints: z.number().int().optional(),
-  controlPanelPoints: z.number().int().optional(),
-  endgamePoints: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  shieldOperationalRankingPoint: z.boolean().optional(),
-  shieldEnergizedRankingPoint: z.boolean().optional(),
-  tba_shieldEnergizedRankingPointFromFoul: z.boolean().optional(),
-  tba_numRobotsHanging: z.number().int().optional(),
-  foulCount: z.number().int().optional(),
-  techFoulCount: z.number().int().optional(),
-  adjustPoints: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  rp: z.number().int().optional(),
-  totalPoints: z.number().int().optional(),
+  initLineRobot1: z.optional(z.string()),
+  endgameRobot1: z.optional(z.string()),
+  initLineRobot2: z.optional(z.string()),
+  endgameRobot2: z.optional(z.string()),
+  initLineRobot3: z.optional(z.string()),
+  endgameRobot3: z.optional(z.string()),
+  autoCellsBottom: z.optional(z.int()),
+  autoCellsOuter: z.optional(z.int()),
+  autoCellsInner: z.optional(z.int()),
+  teleopCellsBottom: z.optional(z.int()),
+  teleopCellsOuter: z.optional(z.int()),
+  teleopCellsInner: z.optional(z.int()),
+  stage1Activated: z.optional(z.boolean()),
+  stage2Activated: z.optional(z.boolean()),
+  stage3Activated: z.optional(z.boolean()),
+  stage3TargetColor: z.optional(z.string()),
+  endgameRungIsLevel: z.optional(z.string()),
+  autoInitLinePoints: z.optional(z.int()),
+  autoCellPoints: z.optional(z.int()),
+  autoPoints: z.optional(z.int()),
+  teleopCellPoints: z.optional(z.int()),
+  controlPanelPoints: z.optional(z.int()),
+  endgamePoints: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  shieldOperationalRankingPoint: z.optional(z.boolean()),
+  shieldEnergizedRankingPoint: z.optional(z.boolean()),
+  tba_shieldEnergizedRankingPointFromFoul: z.optional(z.boolean()),
+  tba_numRobotsHanging: z.optional(z.int()),
+  foulCount: z.optional(z.int()),
+  techFoulCount: z.optional(z.int()),
+  adjustPoints: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  rp: z.optional(z.int()),
+  totalPoints: z.optional(z.int()),
 });
 
 /**
@@ -698,46 +703,52 @@ export const zMatchScoreBreakdown2020 = z.object({
 });
 
 export const zMatchScoreBreakdown2022Alliance = z.object({
-  taxiRobot1: z.enum(['Yes', 'No']).optional(),
-  endgameRobot1: z.enum(['Traversal', 'High', 'Mid', 'Low', 'None']).optional(),
-  taxiRobot2: z.enum(['Yes', 'No']).optional(),
-  endgameRobot2: z.enum(['Traversal', 'High', 'Mid', 'Low', 'None']).optional(),
-  taxiRobot3: z.enum(['Yes', 'No']).optional(),
-  endgameRobot3: z.enum(['Traversal', 'High', 'Mid', 'Low', 'None']).optional(),
-  autoCargoLowerNear: z.number().int().optional(),
-  autoCargoLowerFar: z.number().int().optional(),
-  autoCargoLowerBlue: z.number().int().optional(),
-  autoCargoLowerRed: z.number().int().optional(),
-  autoCargoUpperNear: z.number().int().optional(),
-  autoCargoUpperFar: z.number().int().optional(),
-  autoCargoUpperBlue: z.number().int().optional(),
-  autoCargoUpperRed: z.number().int().optional(),
-  autoCargoTotal: z.number().int().optional(),
-  teleopCargoLowerNear: z.number().int().optional(),
-  teleopCargoLowerFar: z.number().int().optional(),
-  teleopCargoLowerBlue: z.number().int().optional(),
-  teleopCargoLowerRed: z.number().int().optional(),
-  teleopCargoUpperNear: z.number().int().optional(),
-  teleopCargoUpperFar: z.number().int().optional(),
-  teleopCargoUpperBlue: z.number().int().optional(),
-  teleopCargoUpperRed: z.number().int().optional(),
-  teleopCargoTotal: z.number().int().optional(),
-  matchCargoTotal: z.number().int().optional(),
-  autoTaxiPoints: z.number().int().optional(),
-  autoCargoPoints: z.number().int().optional(),
-  autoPoints: z.number().int().optional(),
-  quintetAchieved: z.boolean().optional(),
-  teleopCargoPoints: z.number().int().optional(),
-  endgamePoints: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  cargoBonusRankingPoint: z.boolean().optional(),
-  hangarBonusRankingPoint: z.boolean().optional(),
-  foulCount: z.number().int().optional(),
-  techFoulCount: z.number().int().optional(),
-  adjustPoints: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  rp: z.number().int().optional(),
-  totalPoints: z.number().int().optional(),
+  taxiRobot1: z.optional(z.enum(['Yes', 'No'])),
+  endgameRobot1: z.optional(
+    z.enum(['Traversal', 'High', 'Mid', 'Low', 'None']),
+  ),
+  taxiRobot2: z.optional(z.enum(['Yes', 'No'])),
+  endgameRobot2: z.optional(
+    z.enum(['Traversal', 'High', 'Mid', 'Low', 'None']),
+  ),
+  taxiRobot3: z.optional(z.enum(['Yes', 'No'])),
+  endgameRobot3: z.optional(
+    z.enum(['Traversal', 'High', 'Mid', 'Low', 'None']),
+  ),
+  autoCargoLowerNear: z.optional(z.int()),
+  autoCargoLowerFar: z.optional(z.int()),
+  autoCargoLowerBlue: z.optional(z.int()),
+  autoCargoLowerRed: z.optional(z.int()),
+  autoCargoUpperNear: z.optional(z.int()),
+  autoCargoUpperFar: z.optional(z.int()),
+  autoCargoUpperBlue: z.optional(z.int()),
+  autoCargoUpperRed: z.optional(z.int()),
+  autoCargoTotal: z.optional(z.int()),
+  teleopCargoLowerNear: z.optional(z.int()),
+  teleopCargoLowerFar: z.optional(z.int()),
+  teleopCargoLowerBlue: z.optional(z.int()),
+  teleopCargoLowerRed: z.optional(z.int()),
+  teleopCargoUpperNear: z.optional(z.int()),
+  teleopCargoUpperFar: z.optional(z.int()),
+  teleopCargoUpperBlue: z.optional(z.int()),
+  teleopCargoUpperRed: z.optional(z.int()),
+  teleopCargoTotal: z.optional(z.int()),
+  matchCargoTotal: z.optional(z.int()),
+  autoTaxiPoints: z.optional(z.int()),
+  autoCargoPoints: z.optional(z.int()),
+  autoPoints: z.optional(z.int()),
+  quintetAchieved: z.optional(z.boolean()),
+  teleopCargoPoints: z.optional(z.int()),
+  endgamePoints: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  cargoBonusRankingPoint: z.optional(z.boolean()),
+  hangarBonusRankingPoint: z.optional(z.boolean()),
+  foulCount: z.optional(z.int()),
+  techFoulCount: z.optional(z.int()),
+  adjustPoints: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  rp: z.optional(z.int()),
+  totalPoints: z.optional(z.int()),
 });
 
 /**
@@ -749,63 +760,63 @@ export const zMatchScoreBreakdown2022 = z.object({
 });
 
 export const zMatchScoreBreakdown2023Alliance = z.object({
-  activationBonusAchieved: z.boolean().optional(),
-  adjustPoints: z.number().int().optional(),
-  autoBridgeState: z.enum(['NotLevel', 'Level']).optional(),
-  autoChargeStationPoints: z.number().int().optional(),
-  autoChargeStationRobot1: z.enum(['None', 'Docked']).optional(),
-  autoChargeStationRobot2: z.enum(['None', 'Docked']).optional(),
-  autoChargeStationRobot3: z.enum(['None', 'Docked']).optional(),
-  autoDocked: z.boolean().optional(),
-  autoCommunity: z
-    .object({
+  activationBonusAchieved: z.optional(z.boolean()),
+  adjustPoints: z.optional(z.int()),
+  autoBridgeState: z.optional(z.enum(['NotLevel', 'Level'])),
+  autoChargeStationPoints: z.optional(z.int()),
+  autoChargeStationRobot1: z.optional(z.enum(['None', 'Docked'])),
+  autoChargeStationRobot2: z.optional(z.enum(['None', 'Docked'])),
+  autoChargeStationRobot3: z.optional(z.enum(['None', 'Docked'])),
+  autoDocked: z.optional(z.boolean()),
+  autoCommunity: z.optional(
+    z.object({
       B: z.array(z.enum(['None', 'Cone', 'Cube'])),
       M: z.array(z.enum(['None', 'Cone', 'Cube'])),
       T: z.array(z.enum(['None', 'Cone', 'Cube'])),
-    })
-    .optional(),
-  autoGamePieceCount: z.number().int().optional(),
-  autoGamePiecePoints: z.number().int().optional(),
-  autoMobilityPoints: z.number().int().optional(),
-  mobilityRobot1: z.enum(['Yes', 'No']).optional(),
-  mobilityRobot2: z.enum(['Yes', 'No']).optional(),
-  mobilityRobot3: z.enum(['Yes', 'No']).optional(),
-  autoPoints: z.number().int().optional(),
-  coopGamePieceCount: z.number().int().optional(),
-  coopertitionCriteriaMet: z.boolean().optional(),
-  endGameBridgeState: z.enum(['NotLevel', 'Level']).optional(),
-  endGameChargeStationPoints: z.number().int().optional(),
-  endGameChargeStationRobot1: z.enum(['None', 'Docked', 'Park']).optional(),
-  endGameChargeStationRobot2: z.enum(['None', 'Docked', 'Park']).optional(),
-  endGameChargeStationRobot3: z.enum(['None', 'Docked', 'Park']).optional(),
-  endGameParkPoints: z.number().int().optional(),
-  extraGamePieceCount: z.number().int().optional(),
-  foulCount: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  techFoulCount: z.number().int().optional(),
-  linkPoints: z.number().int().optional(),
-  links: z
-    .array(
+    }),
+  ),
+  autoGamePieceCount: z.optional(z.int()),
+  autoGamePiecePoints: z.optional(z.int()),
+  autoMobilityPoints: z.optional(z.int()),
+  mobilityRobot1: z.optional(z.enum(['Yes', 'No'])),
+  mobilityRobot2: z.optional(z.enum(['Yes', 'No'])),
+  mobilityRobot3: z.optional(z.enum(['Yes', 'No'])),
+  autoPoints: z.optional(z.int()),
+  coopGamePieceCount: z.optional(z.int()),
+  coopertitionCriteriaMet: z.optional(z.boolean()),
+  endGameBridgeState: z.optional(z.enum(['NotLevel', 'Level'])),
+  endGameChargeStationPoints: z.optional(z.int()),
+  endGameChargeStationRobot1: z.optional(z.enum(['None', 'Docked', 'Park'])),
+  endGameChargeStationRobot2: z.optional(z.enum(['None', 'Docked', 'Park'])),
+  endGameChargeStationRobot3: z.optional(z.enum(['None', 'Docked', 'Park'])),
+  endGameParkPoints: z.optional(z.int()),
+  extraGamePieceCount: z.optional(z.int()),
+  foulCount: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  techFoulCount: z.optional(z.int()),
+  linkPoints: z.optional(z.int()),
+  links: z.optional(
+    z.array(
       z.object({
         nodes: z.array(z.enum(['None', 'Cone', 'Cube'])),
         row: z.enum(['Bottom', 'Mid', 'Top']),
       }),
-    )
-    .optional(),
-  sustainabilityBonusAchieved: z.boolean().optional(),
-  teleopCommunity: z
-    .object({
+    ),
+  ),
+  sustainabilityBonusAchieved: z.optional(z.boolean()),
+  teleopCommunity: z.optional(
+    z.object({
       B: z.array(z.enum(['None', 'Cone', 'Cube'])),
       M: z.array(z.enum(['None', 'Cone', 'Cube'])),
       T: z.array(z.enum(['None', 'Cone', 'Cube'])),
-    })
-    .optional(),
-  teleopGamePieceCount: z.number().int().optional(),
-  teleopGamePiecePoints: z.number().int().optional(),
-  totalChargeStationPoints: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  rp: z.number().int().optional(),
-  totalPoints: z.number().int().optional(),
+    }),
+  ),
+  teleopGamePieceCount: z.optional(z.int()),
+  teleopGamePiecePoints: z.optional(z.int()),
+  totalChargeStationPoints: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  rp: z.optional(z.int()),
+  totalPoints: z.optional(z.int()),
 });
 
 /**
@@ -817,58 +828,58 @@ export const zMatchScoreBreakdown2023 = z.object({
 });
 
 export const zMatchScoreBreakdown2024Alliance = z.object({
-  adjustPoints: z.number().int().optional(),
-  autoAmpNoteCount: z.number().int().optional(),
-  autoAmpNotePoints: z.number().int().optional(),
-  autoLeavePoints: z.number().int().optional(),
-  autoLineRobot1: z.string().optional(),
-  autoLineRobot2: z.string().optional(),
-  autoLineRobot3: z.string().optional(),
-  autoPoints: z.number().int().optional(),
-  autoSpeakerNoteCount: z.number().int().optional(),
-  autoSpeakerNotePoints: z.number().int().optional(),
-  autoTotalNotePoints: z.number().int().optional(),
-  coopNotePlayed: z.boolean().optional(),
-  coopertitionBonusAchieved: z.boolean().optional(),
-  coopertitionCriteriaMet: z.boolean().optional(),
-  endGameHarmonyPoints: z.number().int().optional(),
-  endGameNoteInTrapPoints: z.number().int().optional(),
-  endGameOnStagePoints: z.number().int().optional(),
-  endGameParkPoints: z.number().int().optional(),
-  endGameRobot1: z.string().optional(),
-  endGameRobot2: z.string().optional(),
-  endGameRobot3: z.string().optional(),
-  endGameSpotLightBonusPoints: z.number().int().optional(),
-  endGameTotalStagePoints: z.number().int().optional(),
-  ensembleBonusAchieved: z.boolean().optional(),
-  ensembleBonusOnStageRobotsThreshold: z.number().int().optional(),
-  ensembleBonusStagePointsThreshold: z.number().int().optional(),
-  foulCount: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  g206Penalty: z.boolean().optional(),
-  g408Penalty: z.boolean().optional(),
-  g424Penalty: z.boolean().optional(),
-  melodyBonusAchieved: z.boolean().optional(),
-  melodyBonusThreshold: z.number().int().optional(),
-  melodyBonusThresholdCoop: z.number().int().optional(),
-  melodyBonusThresholdNonCoop: z.number().int().optional(),
-  micCenterStage: z.boolean().optional(),
-  micStageLeft: z.boolean().optional(),
-  micStageRight: z.boolean().optional(),
-  rp: z.number().int().optional(),
-  techFoulCount: z.number().int().optional(),
-  teleopAmpNoteCount: z.number().int().optional(),
-  teleopAmpNotePoints: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  teleopSpeakerNoteAmplifiedCount: z.number().int().optional(),
-  teleopSpeakerNoteAmplifiedPoints: z.number().int().optional(),
-  teleopSpeakerNoteCount: z.number().int().optional(),
-  teleopSpeakerNotePoints: z.number().int().optional(),
-  teleopTotalNotePoints: z.number().int().optional(),
-  totalPoints: z.number().int().optional(),
-  trapCenterStage: z.boolean().optional(),
-  trapStageLeft: z.boolean().optional(),
-  trapStageRight: z.boolean().optional(),
+  adjustPoints: z.optional(z.int()),
+  autoAmpNoteCount: z.optional(z.int()),
+  autoAmpNotePoints: z.optional(z.int()),
+  autoLeavePoints: z.optional(z.int()),
+  autoLineRobot1: z.optional(z.string()),
+  autoLineRobot2: z.optional(z.string()),
+  autoLineRobot3: z.optional(z.string()),
+  autoPoints: z.optional(z.int()),
+  autoSpeakerNoteCount: z.optional(z.int()),
+  autoSpeakerNotePoints: z.optional(z.int()),
+  autoTotalNotePoints: z.optional(z.int()),
+  coopNotePlayed: z.optional(z.boolean()),
+  coopertitionBonusAchieved: z.optional(z.boolean()),
+  coopertitionCriteriaMet: z.optional(z.boolean()),
+  endGameHarmonyPoints: z.optional(z.int()),
+  endGameNoteInTrapPoints: z.optional(z.int()),
+  endGameOnStagePoints: z.optional(z.int()),
+  endGameParkPoints: z.optional(z.int()),
+  endGameRobot1: z.optional(z.string()),
+  endGameRobot2: z.optional(z.string()),
+  endGameRobot3: z.optional(z.string()),
+  endGameSpotLightBonusPoints: z.optional(z.int()),
+  endGameTotalStagePoints: z.optional(z.int()),
+  ensembleBonusAchieved: z.optional(z.boolean()),
+  ensembleBonusOnStageRobotsThreshold: z.optional(z.int()),
+  ensembleBonusStagePointsThreshold: z.optional(z.int()),
+  foulCount: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  g206Penalty: z.optional(z.boolean()),
+  g408Penalty: z.optional(z.boolean()),
+  g424Penalty: z.optional(z.boolean()),
+  melodyBonusAchieved: z.optional(z.boolean()),
+  melodyBonusThreshold: z.optional(z.int()),
+  melodyBonusThresholdCoop: z.optional(z.int()),
+  melodyBonusThresholdNonCoop: z.optional(z.int()),
+  micCenterStage: z.optional(z.boolean()),
+  micStageLeft: z.optional(z.boolean()),
+  micStageRight: z.optional(z.boolean()),
+  rp: z.optional(z.int()),
+  techFoulCount: z.optional(z.int()),
+  teleopAmpNoteCount: z.optional(z.int()),
+  teleopAmpNotePoints: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  teleopSpeakerNoteAmplifiedCount: z.optional(z.int()),
+  teleopSpeakerNoteAmplifiedPoints: z.optional(z.int()),
+  teleopSpeakerNoteCount: z.optional(z.int()),
+  teleopSpeakerNotePoints: z.optional(z.int()),
+  teleopTotalNotePoints: z.optional(z.int()),
+  totalPoints: z.optional(z.int()),
+  trapCenterStage: z.optional(z.boolean()),
+  trapStageLeft: z.optional(z.boolean()),
+  trapStageRight: z.optional(z.boolean()),
 });
 
 /**
@@ -880,18 +891,18 @@ export const zMatchScoreBreakdown2024 = z.object({
 });
 
 export const zMatchScoreBreakdown2025Alliance = z.object({
-  adjustPoints: z.number().int().optional(),
-  algaePoints: z.number().int().optional(),
-  autoBonusAchieved: z.boolean().optional(),
-  autoCoralCount: z.number().int().optional(),
-  autoCoralPoints: z.number().int().optional(),
-  autoLineRobot1: z.enum(['No', 'Yes']).optional(),
-  autoLineRobot2: z.enum(['No', 'Yes']).optional(),
-  autoLineRobot3: z.enum(['No', 'Yes']).optional(),
-  autoMobilityPoints: z.number().int().optional(),
-  autoPoints: z.number().int().optional(),
-  autoReef: z
-    .object({
+  adjustPoints: z.optional(z.int()),
+  algaePoints: z.optional(z.int()),
+  autoBonusAchieved: z.optional(z.boolean()),
+  autoCoralCount: z.optional(z.int()),
+  autoCoralPoints: z.optional(z.int()),
+  autoLineRobot1: z.optional(z.enum(['No', 'Yes'])),
+  autoLineRobot2: z.optional(z.enum(['No', 'Yes'])),
+  autoLineRobot3: z.optional(z.enum(['No', 'Yes'])),
+  autoMobilityPoints: z.optional(z.int()),
+  autoPoints: z.optional(z.int()),
+  autoReef: z.optional(
+    z.object({
       topRow: z.object({
         nodeA: z.boolean(),
         nodeB: z.boolean(),
@@ -934,39 +945,39 @@ export const zMatchScoreBreakdown2025Alliance = z.object({
         nodeK: z.boolean(),
         nodeL: z.boolean(),
       }),
-      trough: z.number().int(),
-      tba_botRowCount: z.number().int().optional(),
-      tba_midRowCount: z.number().int().optional(),
-      tba_topRowCount: z.number().int().optional(),
-    })
-    .optional(),
-  bargeBonusAchieved: z.boolean().optional(),
-  coopertitionCriteriaMet: z.boolean().optional(),
-  coralBonusAchieved: z.boolean().optional(),
-  endGameBargePoints: z.number().int().optional(),
-  endGameRobot1: z
-    .enum(['None', 'Parked', 'ShallowCage', 'DeepCage'])
-    .optional(),
-  endGameRobot2: z
-    .enum(['None', 'Parked', 'ShallowCage', 'DeepCage'])
-    .optional(),
-  endGameRobot3: z
-    .enum(['None', 'Parked', 'ShallowCage', 'DeepCage'])
-    .optional(),
-  foulCount: z.number().int().optional(),
-  foulPoints: z.number().int().optional(),
-  g206Penalty: z.boolean().optional(),
-  g410Penalty: z.boolean().optional(),
-  g418Penalty: z.boolean().optional(),
-  g428Penalty: z.boolean().optional(),
-  netAlgaeCount: z.number().int().optional(),
-  rp: z.number().int().optional(),
-  techFoulCount: z.number().int().optional(),
-  teleopCoralCount: z.number().int().optional(),
-  teleopCoralPoints: z.number().int().optional(),
-  teleopPoints: z.number().int().optional(),
-  teleopReef: z
-    .object({
+      trough: z.int(),
+      tba_botRowCount: z.optional(z.int()),
+      tba_midRowCount: z.optional(z.int()),
+      tba_topRowCount: z.optional(z.int()),
+    }),
+  ),
+  bargeBonusAchieved: z.optional(z.boolean()),
+  coopertitionCriteriaMet: z.optional(z.boolean()),
+  coralBonusAchieved: z.optional(z.boolean()),
+  endGameBargePoints: z.optional(z.int()),
+  endGameRobot1: z.optional(
+    z.enum(['None', 'Parked', 'ShallowCage', 'DeepCage']),
+  ),
+  endGameRobot2: z.optional(
+    z.enum(['None', 'Parked', 'ShallowCage', 'DeepCage']),
+  ),
+  endGameRobot3: z.optional(
+    z.enum(['None', 'Parked', 'ShallowCage', 'DeepCage']),
+  ),
+  foulCount: z.optional(z.int()),
+  foulPoints: z.optional(z.int()),
+  g206Penalty: z.optional(z.boolean()),
+  g410Penalty: z.optional(z.boolean()),
+  g418Penalty: z.optional(z.boolean()),
+  g428Penalty: z.optional(z.boolean()),
+  netAlgaeCount: z.optional(z.int()),
+  rp: z.optional(z.int()),
+  techFoulCount: z.optional(z.int()),
+  teleopCoralCount: z.optional(z.int()),
+  teleopCoralPoints: z.optional(z.int()),
+  teleopPoints: z.optional(z.int()),
+  teleopReef: z.optional(
+    z.object({
       topRow: z.object({
         nodeA: z.boolean(),
         nodeB: z.boolean(),
@@ -1009,14 +1020,14 @@ export const zMatchScoreBreakdown2025Alliance = z.object({
         nodeK: z.boolean(),
         nodeL: z.boolean(),
       }),
-      trough: z.number().int(),
-      tba_botRowCount: z.number().int().optional(),
-      tba_midRowCount: z.number().int().optional(),
-      tba_topRowCount: z.number().int().optional(),
-    })
-    .optional(),
-  totalPoints: z.number().int().optional(),
-  wallAlgaeCount: z.number().int().optional(),
+      trough: z.int(),
+      tba_botRowCount: z.optional(z.int()),
+      tba_midRowCount: z.optional(z.int()),
+      tba_topRowCount: z.optional(z.int()),
+    }),
+  ),
+  totalPoints: z.optional(z.int()),
+  wallAlgaeCount: z.optional(z.int()),
 });
 
 /**
@@ -1030,8 +1041,8 @@ export const zMatchScoreBreakdown2025 = z.object({
 export const zMatch = z.object({
   key: z.string(),
   comp_level: z.enum(['qm', 'ef', 'qf', 'sf', 'f']),
-  set_number: z.number().int(),
-  match_number: z.number().int(),
+  set_number: z.int(),
+  match_number: z.int(),
   alliances: z.object({
     red: zMatchAlliance,
     blue: zMatchAlliance,
@@ -1073,8 +1084,8 @@ export const zZebra = z.object({
   key: z.string(),
   times: z.array(z.number()),
   alliances: z.object({
-    red: z.array(zZebraTeam).optional(),
-    blue: z.array(zZebraTeam).optional(),
+    red: z.optional(z.array(zZebraTeam)),
+    blue: z.optional(z.array(zZebraTeam)),
   }),
 });
 
@@ -1084,37 +1095,37 @@ export const zZebra = z.object({
  * *WARNING:* This model is currently under active development and may change at any time, including in breaking ways.
  */
 export const zMatchTimeseries2018 = z.object({
-  event_key: z.string().optional(),
-  match_id: z.string().optional(),
-  mode: z.string().optional(),
-  play: z.number().int().optional(),
-  time_remaining: z.number().int().optional(),
-  blue_auto_quest: z.number().int().optional(),
-  blue_boost_count: z.number().int().optional(),
-  blue_boost_played: z.number().int().optional(),
-  blue_current_powerup: z.string().optional(),
-  blue_face_the_boss: z.number().int().optional(),
-  blue_force_count: z.number().int().optional(),
-  blue_force_played: z.number().int().optional(),
-  blue_levitate_count: z.number().int().optional(),
-  blue_levitate_played: z.number().int().optional(),
-  blue_powerup_time_remaining: z.string().optional(),
-  blue_scale_owned: z.number().int().optional(),
-  blue_score: z.number().int().optional(),
-  blue_switch_owned: z.number().int().optional(),
-  red_auto_quest: z.number().int().optional(),
-  red_boost_count: z.number().int().optional(),
-  red_boost_played: z.number().int().optional(),
-  red_current_powerup: z.string().optional(),
-  red_face_the_boss: z.number().int().optional(),
-  red_force_count: z.number().int().optional(),
-  red_force_played: z.number().int().optional(),
-  red_levitate_count: z.number().int().optional(),
-  red_levitate_played: z.number().int().optional(),
-  red_powerup_time_remaining: z.string().optional(),
-  red_scale_owned: z.number().int().optional(),
-  red_score: z.number().int().optional(),
-  red_switch_owned: z.number().int().optional(),
+  event_key: z.optional(z.string()),
+  match_id: z.optional(z.string()),
+  mode: z.optional(z.string()),
+  play: z.optional(z.int()),
+  time_remaining: z.optional(z.int()),
+  blue_auto_quest: z.optional(z.int()),
+  blue_boost_count: z.optional(z.int()),
+  blue_boost_played: z.optional(z.int()),
+  blue_current_powerup: z.optional(z.string()),
+  blue_face_the_boss: z.optional(z.int()),
+  blue_force_count: z.optional(z.int()),
+  blue_force_played: z.optional(z.int()),
+  blue_levitate_count: z.optional(z.int()),
+  blue_levitate_played: z.optional(z.int()),
+  blue_powerup_time_remaining: z.optional(z.string()),
+  blue_scale_owned: z.optional(z.int()),
+  blue_score: z.optional(z.int()),
+  blue_switch_owned: z.optional(z.int()),
+  red_auto_quest: z.optional(z.int()),
+  red_boost_count: z.optional(z.int()),
+  red_boost_played: z.optional(z.int()),
+  red_current_powerup: z.optional(z.string()),
+  red_face_the_boss: z.optional(z.int()),
+  red_force_count: z.optional(z.int()),
+  red_force_played: z.optional(z.int()),
+  red_levitate_count: z.optional(z.int()),
+  red_levitate_played: z.optional(z.int()),
+  red_powerup_time_remaining: z.optional(z.string()),
+  red_scale_owned: z.optional(z.int()),
+  red_score: z.optional(z.int()),
+  red_switch_owned: z.optional(z.int()),
 });
 
 /**
@@ -1139,69 +1150,69 @@ export const zMedia = z.object({
     'onshape',
   ]),
   foreign_key: z.string(),
-  details: z
-    .union([
-      z.record(z.unknown()),
+  details: z.optional(
+    z.union([
+      z.record(z.string(), z.unknown()),
       z.object({
         base64Image: z.string(),
       }),
       z.object({
-        author_id: z.number().int(),
+        author_id: z.int(),
         author_name: z.string(),
-        author_url: z.string().url(),
-        height: z.union([z.number().int(), z.null()]),
+        author_url: z.url(),
+        height: z.union([z.int(), z.null()]),
         html: z.string(),
         media_id: z.string(),
         provider_name: z.string(),
-        provider_url: z.string().url(),
-        thumbnail_height: z.number().int(),
-        thumbnail_url: z.string().url(),
-        thumbnail_width: z.number().int(),
+        provider_url: z.url(),
+        thumbnail_height: z.int(),
+        thumbnail_url: z.url(),
+        thumbnail_width: z.int(),
         title: z.string(),
         type: z.string(),
         version: z.string(),
-        width: z.number().int(),
+        width: z.int(),
       }),
       z.object({
-        model_created: z.string().datetime(),
+        model_created: z.iso.datetime(),
         model_description: z.union([z.string(), z.null()]),
-        model_image: z.string().url(),
+        model_image: z.url(),
         model_name: z.string(),
       }),
       z.object({
         image_partial: z.string(),
       }),
-    ])
-    .optional(),
-  preferred: z.boolean().optional(),
+    ]),
+  ),
+  preferred: z.optional(z.boolean()),
   team_keys: z.array(z.string()),
-  direct_url: z.string().optional(),
-  view_url: z.string().optional(),
+  direct_url: z.optional(z.string()),
+  view_url: z.optional(z.string()),
 });
 
 export const zEliminationAlliance = z.object({
-  name: z.union([z.string(), z.null()]).optional(),
-  backup: z
-    .union([
+  name: z.optional(z.union([z.string(), z.null()])),
+  backup: z.optional(
+    z.union([
       z.object({
         in: z.string(),
         out: z.string(),
       }),
       z.null(),
-    ])
-    .optional(),
+    ]),
+  ),
   declines: z.array(z.string()),
   picks: z.array(z.string()),
-  status: z
-    .object({
-      playoff_average: z.union([z.number(), z.null()]).optional(),
-      playoff_type: z.union([z.number(), z.null()]).optional(),
-      level: z.string().optional(),
-      record: z.union([zWltRecord, z.null()]).optional(),
-      current_level_record: z.union([zWltRecord, z.null()]).optional(),
-      status: z.string().optional(),
-    })
-    .optional(),
+  status: z.optional(
+    z.object({
+      playoff_average: z.optional(z.union([z.number(), z.null()])),
+      playoff_type: z.optional(z.union([z.number(), z.null()])),
+      level: z.optional(z.string()),
+      record: z.optional(z.union([zWltRecord, z.null()])),
+      current_level_record: z.optional(z.union([zWltRecord, z.null()])),
+      status: z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1214,40 +1225,44 @@ export const zAwardRecipient = z.object({
 
 export const zAward = z.object({
   name: z.string(),
-  award_type: z.number().int(),
+  award_type: z.int(),
   event_key: z.string(),
   recipient_list: z.array(zAwardRecipient),
-  year: z.number().int(),
+  year: z.int(),
 });
 
 export const zDistrictInsightRegionData = z.object({
-  yearly_active_team_count: z.record(z.number().int()),
-  yearly_event_count: z.record(z.number().int()),
-  yearly_gained_teams: z.record(z.array(z.string())),
-  yearly_lost_teams: z.record(z.array(z.string())),
+  yearly_active_team_count: z.record(z.string(), z.int()),
+  yearly_event_count: z.record(z.string(), z.int()),
+  yearly_gained_teams: z.record(z.string(), z.array(z.string())),
+  yearly_lost_teams: z.record(z.string(), z.array(z.string())),
 });
 
 export const zDistrictInsight = z.object({
   district_data: z.object({
-    region_data: z.union([z.record(zDistrictInsightRegionData), z.null()]),
+    region_data: z.union([
+      z.record(z.string(), zDistrictInsightRegionData),
+      z.null(),
+    ]),
     district_wide_data: z.union([zDistrictInsightRegionData, z.null()]),
   }),
   team_data: z.union([
     z.record(
+      z.string(),
       z.object({
-        district_seasons: z.number().int(),
-        total_district_points: z.number().int(),
-        total_pre_dcmp_district_points: z.number().int(),
-        district_event_wins: z.number().int(),
-        dcmp_wins: z.number().int(),
-        team_awards: z.number().int(),
-        individual_awards: z.number().int(),
+        district_seasons: z.int(),
+        total_district_points: z.int(),
+        total_pre_dcmp_district_points: z.int(),
+        district_event_wins: z.int(),
+        dcmp_wins: z.int(),
+        team_awards: z.int(),
+        individual_awards: z.int(),
         quals_record: zWltRecord,
         elims_record: zWltRecord,
-        in_district_extra_play_count: z.number().int(),
-        total_matches_played: z.number().int(),
-        dcmp_appearances: z.number().int(),
-        cmp_appearances: z.number().int(),
+        in_district_extra_play_count: z.int(),
+        total_matches_played: z.int(),
+        dcmp_appearances: z.int(),
+        cmp_appearances: z.int(),
       }),
     ),
     z.null(),
@@ -1259,22 +1274,22 @@ export const zDistrictInsight = z.object({
  */
 export const zDistrictRanking = z.object({
   team_key: z.string(),
-  rank: z.number().int(),
-  rookie_bonus: z.number().int().optional(),
-  point_total: z.number().int(),
-  event_points: z
-    .array(
+  rank: z.int(),
+  rookie_bonus: z.optional(z.int()),
+  point_total: z.int(),
+  event_points: z.optional(
+    z.array(
       z.object({
         district_cmp: z.boolean(),
-        total: z.number().int(),
-        alliance_points: z.number().int(),
-        elim_points: z.number().int(),
-        award_points: z.number().int(),
+        total: z.int(),
+        alliance_points: z.int(),
+        elim_points: z.int(),
+        award_points: z.int(),
         event_key: z.string(),
-        qual_points: z.number().int(),
+        qual_points: z.int(),
       }),
-    )
-    .optional(),
+    ),
+  ),
 });
 
 /**
@@ -1297,9 +1312,9 @@ export const zRegionalAdvancement = z.object({
     'PoolQualified',
     'Declined',
   ]),
-  qualifying_event: z.string().optional(),
-  qualifying_award_name: z.string().optional(),
-  qualifying_pool_week: z.number().int().optional(),
+  qualifying_event: z.optional(z.string()),
+  qualifying_award_name: z.optional(z.string()),
+  qualifying_pool_week: z.optional(z.int()),
 });
 
 /**
@@ -1307,22 +1322,22 @@ export const zRegionalAdvancement = z.object({
  */
 export const zRegionalRanking = z.object({
   team_key: z.string(),
-  rank: z.number().int(),
-  rookie_bonus: z.number().int().optional(),
-  single_event_bonus: z.number().int().optional(),
-  point_total: z.number().int(),
-  event_points: z
-    .array(
+  rank: z.int(),
+  rookie_bonus: z.optional(z.int()),
+  single_event_bonus: z.optional(z.int()),
+  point_total: z.int(),
+  event_points: z.optional(
+    z.array(
       z.object({
-        total: z.number().int(),
-        alliance_points: z.number().int(),
-        elim_points: z.number().int(),
-        award_points: z.number().int(),
+        total: z.int(),
+        alliance_points: z.int(),
+        elim_points: z.int(),
+        award_points: z.int(),
         event_key: z.string(),
-        qual_points: z.number().int(),
+        qual_points: z.int(),
       }),
-    )
-    .optional(),
+    ),
+  ),
 });
 
 export const zLeaderboardInsight = z.object({
@@ -1336,7 +1351,7 @@ export const zLeaderboardInsight = z.object({
     key_type: z.enum(['team', 'event', 'match']),
   }),
   name: z.string(),
-  year: z.number().int(),
+  year: z.int(),
 });
 
 export const zNotablesInsight = z.object({
@@ -1349,7 +1364,7 @@ export const zNotablesInsight = z.object({
     ),
   }),
   name: z.string(),
-  year: z.number().int(),
+  year: z.int(),
 });
 
 export const zHistory = z.object({
@@ -1375,7 +1390,7 @@ export const zSearchIndex = z.object({
 /**
  * Competition Year (or Season). Must be 4 digits.
  */
-export const zYear = z.number().int();
+export const zYear = z.int();
 
 /**
  * Media Tag which describes the Media.
@@ -1390,7 +1405,7 @@ export const zIfNoneMatch = z.string();
 /**
  * Page number of results to return, zero-indexed
  */
-export const zPageNum = z.number().int();
+export const zPageNum = z.int();
 
 /**
  * TBA Match Key, eg `2016nytr_qm1`
@@ -1418,14 +1433,14 @@ export const zEventKey = z.string();
 export const zDistrictAbbreviation = z.string();
 
 export const zGetStatusData = z.object({
-  body: z.never().optional(),
-  path: z.never().optional(),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1434,16 +1449,16 @@ export const zGetStatusData = z.object({
 export const zGetStatusResponse = zApiStatus;
 
 export const zGetTeamsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    page_num: z.number().int(),
+    page_num: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1452,16 +1467,16 @@ export const zGetTeamsData = z.object({
 export const zGetTeamsResponse = z.array(zTeam);
 
 export const zGetTeamsSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    page_num: z.number().int(),
+    page_num: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1470,16 +1485,16 @@ export const zGetTeamsSimpleData = z.object({
 export const zGetTeamsSimpleResponse = z.array(zTeamSimple);
 
 export const zGetTeamsKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    page_num: z.number().int(),
+    page_num: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1488,17 +1503,17 @@ export const zGetTeamsKeysData = z.object({
 export const zGetTeamsKeysResponse = z.array(z.string());
 
 export const zGetTeamsByYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
-    page_num: z.number().int(),
+    year: z.int(),
+    page_num: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1507,17 +1522,17 @@ export const zGetTeamsByYearData = z.object({
 export const zGetTeamsByYearResponse = z.array(zTeam);
 
 export const zGetTeamsByYearSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
-    page_num: z.number().int(),
+    year: z.int(),
+    page_num: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1526,17 +1541,17 @@ export const zGetTeamsByYearSimpleData = z.object({
 export const zGetTeamsByYearSimpleResponse = z.array(zTeamSimple);
 
 export const zGetTeamsByYearKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
-    page_num: z.number().int(),
+    year: z.int(),
+    page_num: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1545,16 +1560,16 @@ export const zGetTeamsByYearKeysData = z.object({
 export const zGetTeamsByYearKeysResponse = z.array(z.string());
 
 export const zGetTeamData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1563,16 +1578,16 @@ export const zGetTeamData = z.object({
 export const zGetTeamResponse = zTeam;
 
 export const zGetTeamSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1581,16 +1596,16 @@ export const zGetTeamSimpleData = z.object({
 export const zGetTeamSimpleResponse = zTeamSimple;
 
 export const zGetTeamHistoryData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1599,34 +1614,34 @@ export const zGetTeamHistoryData = z.object({
 export const zGetTeamHistoryResponse = zHistory;
 
 export const zGetTeamYearsParticipatedData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
  * Successful response
  */
-export const zGetTeamYearsParticipatedResponse = z.array(z.number().int());
+export const zGetTeamYearsParticipatedResponse = z.array(z.int());
 
 export const zGetTeamDistrictsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1635,16 +1650,16 @@ export const zGetTeamDistrictsData = z.object({
 export const zGetTeamDistrictsResponse = z.array(zDistrict);
 
 export const zGetTeamRobotsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1653,16 +1668,16 @@ export const zGetTeamRobotsData = z.object({
 export const zGetTeamRobotsResponse = z.array(zTeamRobot);
 
 export const zGetTeamEventsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1671,16 +1686,16 @@ export const zGetTeamEventsData = z.object({
 export const zGetTeamEventsResponse = z.array(zEvent);
 
 export const zGetTeamEventsSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1689,16 +1704,16 @@ export const zGetTeamEventsSimpleData = z.object({
 export const zGetTeamEventsSimpleResponse = z.array(zEventSimple);
 
 export const zGetTeamEventsKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1707,17 +1722,17 @@ export const zGetTeamEventsKeysData = z.object({
 export const zGetTeamEventsKeysResponse = z.array(z.string());
 
 export const zGetTeamEventsByYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1726,17 +1741,17 @@ export const zGetTeamEventsByYearData = z.object({
 export const zGetTeamEventsByYearResponse = z.array(zEvent);
 
 export const zGetTeamEventsByYearSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1745,17 +1760,17 @@ export const zGetTeamEventsByYearSimpleData = z.object({
 export const zGetTeamEventsByYearSimpleResponse = z.array(zEventSimple);
 
 export const zGetTeamEventsByYearKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1764,38 +1779,39 @@ export const zGetTeamEventsByYearKeysData = z.object({
 export const zGetTeamEventsByYearKeysResponse = z.array(z.string());
 
 export const zGetTeamEventsStatusesByYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
  * A key-value pair of `Team_Event_Status` objects with the event key as the key.
  */
 export const zGetTeamEventsStatusesByYearResponse = z.record(
+  z.string(),
   z.union([zTeamEventStatus, z.null()]),
 );
 
 export const zGetTeamEventMatchesData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1804,17 +1820,17 @@ export const zGetTeamEventMatchesData = z.object({
 export const zGetTeamEventMatchesResponse = z.array(zMatch);
 
 export const zGetTeamEventMatchesSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1823,17 +1839,17 @@ export const zGetTeamEventMatchesSimpleData = z.object({
 export const zGetTeamEventMatchesSimpleResponse = z.array(zMatch);
 
 export const zGetTeamEventMatchesKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1842,17 +1858,17 @@ export const zGetTeamEventMatchesKeysData = z.object({
 export const zGetTeamEventMatchesKeysResponse = z.array(z.string());
 
 export const zGetTeamEventAwardsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1861,17 +1877,17 @@ export const zGetTeamEventAwardsData = z.object({
 export const zGetTeamEventAwardsResponse = z.array(zAward);
 
 export const zGetTeamEventStatusData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1883,16 +1899,16 @@ export const zGetTeamEventStatusResponse = z.union([
 ]);
 
 export const zGetTeamAwardsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1901,17 +1917,17 @@ export const zGetTeamAwardsData = z.object({
 export const zGetTeamAwardsResponse = z.array(zAward);
 
 export const zGetTeamAwardsByYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1920,17 +1936,17 @@ export const zGetTeamAwardsByYearData = z.object({
 export const zGetTeamAwardsByYearResponse = z.array(zAward);
 
 export const zGetTeamMatchesByYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1939,17 +1955,17 @@ export const zGetTeamMatchesByYearData = z.object({
 export const zGetTeamMatchesByYearResponse = z.array(zMatch);
 
 export const zGetTeamMatchesByYearSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1958,17 +1974,17 @@ export const zGetTeamMatchesByYearSimpleData = z.object({
 export const zGetTeamMatchesByYearSimpleResponse = z.array(zMatchSimple);
 
 export const zGetTeamMatchesByYearKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1977,17 +1993,17 @@ export const zGetTeamMatchesByYearKeysData = z.object({
 export const zGetTeamMatchesByYearKeysResponse = z.array(z.string());
 
 export const zGetTeamMediaByYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -1996,17 +2012,17 @@ export const zGetTeamMediaByYearData = z.object({
 export const zGetTeamMediaByYearResponse = z.array(zMedia);
 
 export const zGetTeamMediaByTagData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
     media_tag: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2015,18 +2031,18 @@ export const zGetTeamMediaByTagData = z.object({
 export const zGetTeamMediaByTagResponse = z.array(zMedia);
 
 export const zGetTeamMediaByTagYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
     media_tag: z.string(),
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2035,16 +2051,16 @@ export const zGetTeamMediaByTagYearData = z.object({
 export const zGetTeamMediaByTagYearResponse = z.array(zMedia);
 
 export const zGetTeamSocialMediaData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     team_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2053,16 +2069,16 @@ export const zGetTeamSocialMediaData = z.object({
 export const zGetTeamSocialMediaResponse = z.array(zMedia);
 
 export const zGetEventsByYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2071,16 +2087,16 @@ export const zGetEventsByYearData = z.object({
 export const zGetEventsByYearResponse = z.array(zEvent);
 
 export const zGetEventsByYearSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2089,16 +2105,16 @@ export const zGetEventsByYearSimpleData = z.object({
 export const zGetEventsByYearSimpleResponse = z.array(zEventSimple);
 
 export const zGetEventsByYearKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2107,16 +2123,16 @@ export const zGetEventsByYearKeysData = z.object({
 export const zGetEventsByYearKeysResponse = z.array(z.string());
 
 export const zGetEventData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2125,16 +2141,16 @@ export const zGetEventData = z.object({
 export const zGetEventResponse = zEvent;
 
 export const zGetEventSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2143,16 +2159,16 @@ export const zGetEventSimpleData = z.object({
 export const zGetEventSimpleResponse = zEventSimple;
 
 export const zGetEventAlliancesData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2164,16 +2180,16 @@ export const zGetEventAlliancesResponse = z.union([
 ]);
 
 export const zGetEventInsightsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2182,16 +2198,16 @@ export const zGetEventInsightsData = z.object({
 export const zGetEventInsightsResponse = z.union([zEventInsights, z.null()]);
 
 export const zGetEventOprsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2200,16 +2216,16 @@ export const zGetEventOprsData = z.object({
 export const zGetEventOprsResponse = z.union([zEventOprs, z.null()]);
 
 export const zGetEventCoprsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2218,16 +2234,16 @@ export const zGetEventCoprsData = z.object({
 export const zGetEventCoprsResponse = z.union([zEventCoprs, z.null()]);
 
 export const zGetEventPredictionsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2239,16 +2255,16 @@ export const zGetEventPredictionsResponse = z.union([
 ]);
 
 export const zGetEventRankingsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2257,16 +2273,16 @@ export const zGetEventRankingsData = z.object({
 export const zGetEventRankingsResponse = z.union([zEventRanking, z.null()]);
 
 export const zGetEventDistrictPointsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2278,16 +2294,16 @@ export const zGetEventDistrictPointsResponse = z.union([
 ]);
 
 export const zGetRegionalChampsPoolPointsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2299,16 +2315,16 @@ export const zGetRegionalChampsPoolPointsResponse = z.union([
 ]);
 
 export const zGetEventAdvancementPointsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2320,16 +2336,16 @@ export const zGetEventAdvancementPointsResponse = z.union([
 ]);
 
 export const zGetEventTeamsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2338,16 +2354,16 @@ export const zGetEventTeamsData = z.object({
 export const zGetEventTeamsResponse = z.array(zTeam);
 
 export const zGetEventTeamsSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2356,16 +2372,16 @@ export const zGetEventTeamsSimpleData = z.object({
 export const zGetEventTeamsSimpleResponse = z.array(zTeamSimple);
 
 export const zGetEventTeamsKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2374,36 +2390,37 @@ export const zGetEventTeamsKeysData = z.object({
 export const zGetEventTeamsKeysResponse = z.array(z.string());
 
 export const zGetEventTeamsStatusesData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
  * A key-value pair of `Team_Event_Status` objects with the event key as the key.
  */
 export const zGetEventTeamsStatusesResponse = z.record(
+  z.string(),
   z.union([zTeamEventStatus, z.null()]),
 );
 
 export const zGetEventMatchesData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2412,16 +2429,16 @@ export const zGetEventMatchesData = z.object({
 export const zGetEventMatchesResponse = z.array(zMatch);
 
 export const zGetEventMatchesSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2430,16 +2447,16 @@ export const zGetEventMatchesSimpleData = z.object({
 export const zGetEventMatchesSimpleResponse = z.array(zMatchSimple);
 
 export const zGetEventMatchesKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2448,16 +2465,16 @@ export const zGetEventMatchesKeysData = z.object({
 export const zGetEventMatchesKeysResponse = z.array(z.string());
 
 export const zGetEventMatchTimeseriesData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2466,16 +2483,16 @@ export const zGetEventMatchTimeseriesData = z.object({
 export const zGetEventMatchTimeseriesResponse = z.array(z.string());
 
 export const zGetEventAwardsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2484,16 +2501,16 @@ export const zGetEventAwardsData = z.object({
 export const zGetEventAwardsResponse = z.array(zAward);
 
 export const zGetEventTeamMediaData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     event_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2502,16 +2519,16 @@ export const zGetEventTeamMediaData = z.object({
 export const zGetEventTeamMediaResponse = z.array(zMedia);
 
 export const zGetMatchData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     match_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2520,16 +2537,16 @@ export const zGetMatchData = z.object({
 export const zGetMatchResponse = zMatch;
 
 export const zGetMatchSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     match_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2538,34 +2555,36 @@ export const zGetMatchSimpleData = z.object({
 export const zGetMatchSimpleResponse = zMatchSimple;
 
 export const zGetMatchTimeseriesData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     match_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
  * Successful response
  */
-export const zGetMatchTimeseriesResponse = z.array(z.record(z.unknown()));
+export const zGetMatchTimeseriesResponse = z.array(
+  z.record(z.string(), z.unknown()),
+);
 
 export const zGetMatchZebraData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     match_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2574,16 +2593,16 @@ export const zGetMatchZebraData = z.object({
 export const zGetMatchZebraResponse = zZebra;
 
 export const zGetDistrictsByYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2592,16 +2611,16 @@ export const zGetDistrictsByYearData = z.object({
 export const zGetDistrictsByYearResponse = z.array(zDistrict);
 
 export const zGetDistrictHistoryData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_abbreviation: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2610,16 +2629,16 @@ export const zGetDistrictHistoryData = z.object({
 export const zGetDistrictHistoryResponse = z.array(zDistrict);
 
 export const zGetDistrictInsightsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_abbreviation: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2628,16 +2647,16 @@ export const zGetDistrictInsightsData = z.object({
 export const zGetDistrictInsightsResponse = zDistrictInsight;
 
 export const zGetDistrictEventsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2646,16 +2665,16 @@ export const zGetDistrictEventsData = z.object({
 export const zGetDistrictEventsResponse = z.array(zEvent);
 
 export const zGetDistrictAwardsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2664,16 +2683,16 @@ export const zGetDistrictAwardsData = z.object({
 export const zGetDistrictAwardsResponse = z.array(zAward);
 
 export const zGetDistrictEventsSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2682,16 +2701,16 @@ export const zGetDistrictEventsSimpleData = z.object({
 export const zGetDistrictEventsSimpleResponse = z.array(zEventSimple);
 
 export const zGetDistrictEventsKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2700,16 +2719,16 @@ export const zGetDistrictEventsKeysData = z.object({
 export const zGetDistrictEventsKeysResponse = z.array(z.string());
 
 export const zGetDistrictTeamsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2718,16 +2737,16 @@ export const zGetDistrictTeamsData = z.object({
 export const zGetDistrictTeamsResponse = z.array(zTeam);
 
 export const zGetDistrictTeamsSimpleData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2736,16 +2755,16 @@ export const zGetDistrictTeamsSimpleData = z.object({
 export const zGetDistrictTeamsSimpleResponse = z.array(zTeamSimple);
 
 export const zGetDistrictTeamsKeysData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2754,16 +2773,16 @@ export const zGetDistrictTeamsKeysData = z.object({
 export const zGetDistrictTeamsKeysResponse = z.array(z.string());
 
 export const zGetDistrictRankingsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2775,16 +2794,16 @@ export const zGetDistrictRankingsResponse = z.union([
 ]);
 
 export const zGetDistrictAdvancementData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_key: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2792,20 +2811,20 @@ export const zGetDistrictAdvancementData = z.object({
  */
 export const zGetDistrictAdvancementResponse = z.union([
   z.null(),
-  z.record(zDistrictAdvancement),
+  z.record(z.string(), zDistrictAdvancement),
 ]);
 
 export const zGetDistrictDcmpHistoryData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
     district_abbreviation: z.string(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2813,22 +2832,22 @@ export const zGetDistrictDcmpHistoryData = z.object({
  */
 export const zGetDistrictDcmpHistoryResponse = z.array(
   z.object({
-    awards: z.array(zAward).optional(),
-    event: zEvent.optional(),
+    awards: z.optional(z.array(zAward)),
+    event: z.optional(zEvent),
   }),
 );
 
 export const zGetRegionalAdvancementData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2836,20 +2855,20 @@ export const zGetRegionalAdvancementData = z.object({
  */
 export const zGetRegionalAdvancementResponse = z.union([
   z.null(),
-  z.record(zRegionalAdvancement),
+  z.record(z.string(), zRegionalAdvancement),
 ]);
 
 export const zGetRegionalRankingsData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2861,16 +2880,16 @@ export const zGetRegionalRankingsResponse = z.union([
 ]);
 
 export const zGetInsightsLeaderboardsYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2880,16 +2899,16 @@ export const zGetInsightsLeaderboardsYearResponse =
   z.array(zLeaderboardInsight);
 
 export const zGetInsightsNotablesYearData = z.object({
-  body: z.never().optional(),
+  body: z.optional(z.never()),
   path: z.object({
-    year: z.number().int(),
+    year: z.int(),
   }),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
@@ -2898,14 +2917,14 @@ export const zGetInsightsNotablesYearData = z.object({
 export const zGetInsightsNotablesYearResponse = z.array(zNotablesInsight);
 
 export const zGetSearchIndexData = z.object({
-  body: z.never().optional(),
-  path: z.never().optional(),
-  query: z.never().optional(),
-  headers: z
-    .object({
-      'If-None-Match': z.string().optional(),
-    })
-    .optional(),
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+  headers: z.optional(
+    z.object({
+      'If-None-Match': z.optional(z.string()),
+    }),
+  ),
 });
 
 /**
