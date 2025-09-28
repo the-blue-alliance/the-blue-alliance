@@ -93,7 +93,7 @@ def event_detail(event_key: EventKey) -> str:
                 "event": event,
                 "playoff_advancement": event.playoff_advancement,
                 "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
-                    event.year
+                    event.year, []
                 ),
                 "bracket_table": event.playoff_bracket,
             },
