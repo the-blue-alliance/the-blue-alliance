@@ -172,7 +172,11 @@ export const Nav = () => {
                 title="Insights"
                 route="/insights"
               />
-              <DropMenuItem icon={<BiPencilFill />} title="Blog" />
+              <DropMenuItem
+                icon={<BiPencilFill />}
+                title="Blog"
+                route="https://blog.thebluealliance.com"
+              />
               <DropMenuItem
                 icon={<BiGearFill />}
                 title="Account"
