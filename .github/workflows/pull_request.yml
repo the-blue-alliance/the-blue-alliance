@@ -207,6 +207,10 @@ jobs:
         with:
           node-version: "22.14.0"
           cache: "npm"
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         run: npm --prefix pwa ci
       - name: Generate react-router types
@@ -225,6 +229,10 @@ jobs:
         with:
           node-version: "22.14.0"
           cache: "npm"
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         run: npm --prefix pwa ci
       - name: Run Type Check
@@ -334,6 +342,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22.14.0"
+
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
 
       - name: Install Dependencies
         working-directory: pwa

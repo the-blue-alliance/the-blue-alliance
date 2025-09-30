@@ -147,8 +147,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20"
+          node-version: "22.14.0"
           cache: "npm"
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa ci
@@ -169,8 +173,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20"
+          node-version: "22.14.0"
           cache: "npm"
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm --prefix pwa ci
@@ -185,7 +193,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20"
+          node-version: "22.14.0"
           cache: "npm"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -232,7 +240,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: "20"
+          node-version: "22.14.0"
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
@@ -251,7 +259,7 @@ jobs:
         with:
           name: pwa-build
           path: pwa/build
-  
+
   # Disabled due to environment variables missing randomly
   # https://github.com/the-blue-alliance/the-blue-alliance/actions/runs/16448655087/job/46500449900?
   # pwa-e2e:
@@ -294,6 +302,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22.14.0"
+
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
 
       - name: Install Dependencies
         working-directory: pwa
