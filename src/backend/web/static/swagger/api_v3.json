@@ -5651,7 +5651,10 @@
                 "description": "Number of matches played."
               },
               "qual_average": {
-                "type": "number",
+                "type": [
+                  "number",
+                  "null"
+                ],
                 "description": "For some years, average qualification score. Can be null.",
                 "format": "double"
               },
@@ -9301,7 +9304,10 @@
                     "format": "uri"
                   },
                   "height": {
-                    "type": ["integer", "null"]
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
                   },
                   "html": {
                     "type": "string"
@@ -9365,7 +9371,10 @@
                     "format": "date-time"
                   },
                   "model_description": {
-                    "type": ["string", "null"]
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "model_image": {
                     "type": "string",

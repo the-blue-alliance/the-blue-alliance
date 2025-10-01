@@ -142,7 +142,7 @@ export const zTeamEventStatusRank = z.object({
   ranking: z.optional(
     z.object({
       matches_played: z.optional(z.int()),
-      qual_average: z.optional(z.number()),
+      qual_average: z.optional(z.union([z.number(), z.null()])),
       sort_orders: z.optional(z.array(z.number())),
       record: z.optional(z.union([zWltRecord, z.null()])),
       rank: z.optional(z.int()),

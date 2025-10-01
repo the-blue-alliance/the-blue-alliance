@@ -370,7 +370,7 @@ export type TeamEventStatusRank = {
     /**
      * For some years, average qualification score. Can be null.
      */
-    qual_average?: number;
+    qual_average?: number | null;
     /**
      * Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.
      */
