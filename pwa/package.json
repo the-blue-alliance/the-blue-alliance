@@ -70,7 +70,7 @@
     "@eslint/compat": "1.4.0",
     "@eslint/js": "9.36.0",
     "@hey-api/openapi-ts": "0.84.4",
-    "@iconify/json": "2.2.391",
+    "@iconify/json": "2.2.392",
     "@julr/vite-plugin-validate-env": "2.2.0",
     "@playwright/test": "1.55.1",
     "@react-router/dev": "7.9.3",
