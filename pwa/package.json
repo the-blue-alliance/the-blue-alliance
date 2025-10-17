@@ -72,7 +72,7 @@
     "@hey-api/openapi-ts": "0.84.4",
     "@iconify/json": "2.2.396",
     "@julr/vite-plugin-validate-env": "2.2.0",
-    "@playwright/test": "1.56.0",
+    "@playwright/test": "1.56.1",
     "@react-router/dev": "7.9.4",
     "@react-router/fs-routes": "7.9.4",
     "@sentry/vite-plugin": "3.5.0",
