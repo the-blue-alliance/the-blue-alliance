@@ -81,7 +81,7 @@
     "@tailwindcss/vite": "4.1.16",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/compression": "1.8.1",
-    "@types/express": "5.0.3",
+    "@types/express": "5.0.4",
     "@types/morgan": "1.9.10",
     "@types/node": "22.15.31",
     "@types/react": "19.2.2",
