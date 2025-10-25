@@ -10,7 +10,10 @@ from backend.api.api_trusted_parsers.json_alliance_selections_parser import (
     JSONAllianceSelectionsParser,
 )
 from backend.api.api_trusted_parsers.json_awards_parser import JSONAwardsParser
-from backend.api.api_trusted_parsers.json_event_info_parser import JSONEventInfoParser
+from backend.api.api_trusted_parsers.json_event_info_parser import (
+    EventInfoParsed,
+    JSONEventInfoParser,
+)
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
 from backend.api.api_trusted_parsers.json_matches_parser import JSONMatchesParser
 from backend.api.api_trusted_parsers.json_rankings_parser import JSONRankingsParser
@@ -165,6 +168,23 @@ def update_event_info(event_key: EventKey) -> Response:
 
     EventManipulator.createOrUpdate(event, auto_union=False)
     return profiled_jsonify({"Success": f"Event {event_key} updated"})
+
+
+@require_write_auth({AuthType.EVENT_INFO})
+@validate_keys
+def get_event_info(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
+    event: Event = none_throws(Event.get_by_id(event_key))
+    event_info: EventInfoParsed = {
+        "first_event_code": event.first_api_code if event.official else None,
+        "playoff_type": event.playoff_type,
+        "webcasts": event.webcast,
+        "remap_teams": event.remap_teams or {},
+        "timezone": event.timezone_id,
+        "sync_disabled_flags": event.disable_sync_flags or 0,
+    }
+
+    return profiled_jsonify(event_info)
 
 
 @require_write_auth({AuthType.EVENT_ALLIANCES})
