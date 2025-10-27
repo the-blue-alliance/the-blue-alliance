@@ -247,3 +247,67 @@ def test_categorize_offseasons_no_events():
     # Should have no existing events
     assert len(existing) == 0
     assert len(new) == 3
+
+
+def test_categorize_offseasons_same_date_and_location():
+    event1 = Event(
+        id="2025onham1",
+        name="STEMley Cup Championship",
+        event_type_enum=EventType.OFFSEASON,
+        event_short="onham1",
+        first_code="onham1",
+        year=2025,
+        end_date=datetime.datetime(2025, 11, 1),
+        start_date=datetime.datetime(2025, 11, 2),
+        city="Hamilton",
+        state_prov="ON",
+        country="Canada",
+    )
+    event1.put()
+
+    event2 = Event(
+        id="2025onham2",
+        name="Overtime Sunday",
+        event_type_enum=EventType.OFFSEASON,
+        event_short="onham2",
+        first_code="onham2",
+        year=2025,
+        end_date=datetime.datetime(2025, 11, 1),
+        start_date=datetime.datetime(2025, 11, 2),
+        city="Hamilton",
+        state_prov="ON",
+        country="Canada",
+    )
+    event2.put()
+
+    first_event1 = Event(
+        id="2025onham1",
+        name="STEMley Cup Championship",
+        event_type_enum=EventType.OFFSEASON,
+        event_short="onham1",
+        year=2025,
+        end_date=datetime.datetime(2025, 11, 1),
+        start_date=datetime.datetime(2025, 11, 2),
+        city="Hamilton",
+        state_prov="ON",
+        country="Canada",
+    )
+    first_event2 = Event(
+        id="2025onham2",
+        name="Overtime Sunday",
+        event_type_enum=EventType.OFFSEASON,
+        event_short="onham2",
+        year=2025,
+        end_date=datetime.datetime(2025, 11, 1),
+        start_date=datetime.datetime(2025, 11, 2),
+        city="Hamilton",
+        state_prov="ON",
+        country="Canada",
+    )
+
+    first_events = [first_event1, first_event2]
+
+    existing, new = OffseasonEventHelper.categorize_offseasons(2025, first_events)
+    assert len(existing) == 2
+    assert (event1, first_event1) in existing
+    assert (event2, first_event2) in existing
