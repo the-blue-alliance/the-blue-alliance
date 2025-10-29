@@ -67,7 +67,7 @@
     "zod": "4.1.12"
   },
   "devDependencies": {
-    "@eslint/compat": "1.4.0",
+    "@eslint/compat": "1.4.1",
     "@eslint/js": "9.38.0",
     "@hey-api/openapi-ts": "0.84.4",
     "@iconify/json": "2.2.401",
