@@ -5644,7 +5644,10 @@
             "description": "Number of teams ranked."
           },
           "ranking": {
-            "type": "object",
+            "type": [
+              "object",
+              "null"
+            ],
             "properties": {
               "matches_played": {
                 "type": "integer",
@@ -5659,7 +5662,10 @@
                 "format": "double"
               },
               "sort_orders": {
-                "type": "array",
+                "type": [
+                  "array",
+                  "null"
+                ],
                 "description": "Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.",
                 "items": {
                   "type": "number",
@@ -5674,11 +5680,17 @@
                 ]
               },
               "rank": {
-                "type": "integer",
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "description": "Relative rank of this team."
               },
               "dq": {
-                "type": "integer",
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "description": "Number of matches the team was disqualified for."
               },
               "team_key": {
@@ -5688,7 +5700,10 @@
             }
           },
           "sort_order_info": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "description": "Ordered list of names corresponding to the elements of the `sort_orders` array.",
             "items": {
               "type": "object",
