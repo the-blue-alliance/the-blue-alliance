@@ -316,7 +316,7 @@ export type Event = {
    */
   parent_event_key: string | null;
   /**
-   * Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null.
+   * Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/playoff_type.py#L37, or null.
    */
   playoff_type: number | null;
   /**
