@@ -529,7 +529,7 @@
           "playoff_type": {
             "type": "integer",
             "nullable": true,
-            "description": "Integer constant representing the playoff format. References constants here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py",
+            "description": "Integer constant representing the playoff format. References constants defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/playoff_type.py#L37",
             "example": "0"
           },
           "webcasts": {
