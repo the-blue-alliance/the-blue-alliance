@@ -140,23 +140,29 @@ export const zWltRecord = z.object({
 export const zTeamEventStatusRank = z.object({
   num_teams: z.optional(z.int()),
   ranking: z.optional(
-    z.object({
-      matches_played: z.optional(z.int()),
-      qual_average: z.optional(z.union([z.number(), z.null()])),
-      sort_orders: z.optional(z.array(z.number())),
-      record: z.optional(z.union([zWltRecord, z.null()])),
-      rank: z.optional(z.int()),
-      dq: z.optional(z.int()),
-      team_key: z.optional(z.string()),
-    }),
+    z.union([
+      z.object({
+        matches_played: z.optional(z.int()),
+        qual_average: z.optional(z.union([z.number(), z.null()])),
+        sort_orders: z.optional(z.union([z.array(z.number()), z.null()])),
+        record: z.optional(z.union([zWltRecord, z.null()])),
+        rank: z.optional(z.union([z.int(), z.null()])),
+        dq: z.optional(z.union([z.int(), z.null()])),
+        team_key: z.optional(z.string()),
+      }),
+      z.null(),
+    ]),
   ),
   sort_order_info: z.optional(
-    z.array(
-      z.object({
-        precision: z.optional(z.int()),
-        name: z.optional(z.string()),
-      }),
-    ),
+    z.union([
+      z.array(
+        z.object({
+          precision: z.optional(z.int()),
+          name: z.optional(z.string()),
+        }),
+      ),
+      z.null(),
+    ]),
   ),
   status: z.optional(z.string()),
 });

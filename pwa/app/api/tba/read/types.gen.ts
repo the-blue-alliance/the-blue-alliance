@@ -374,21 +374,21 @@ export type TeamEventStatusRank = {
     /**
      * Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.
      */
-    sort_orders?: Array<number>;
+    sort_orders?: Array<number> | null;
     record?: WltRecord | null;
     /**
      * Relative rank of this team.
      */
-    rank?: number;
+    rank?: number | null;
     /**
      * Number of matches the team was disqualified for.
      */
-    dq?: number;
+    dq?: number | null;
     /**
      * TBA team key for this rank.
      */
     team_key?: string;
-  };
+  } | null;
   /**
    * Ordered list of names corresponding to the elements of the `sort_orders` array.
    */
@@ -401,7 +401,7 @@ export type TeamEventStatusRank = {
      * The descriptive name of the value used to sort the ranking.
      */
     name?: string;
-  }>;
+  }> | null;
   status?: string;
 };
 
