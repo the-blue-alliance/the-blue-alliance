@@ -42,6 +42,8 @@ ops/                    # Build, deploy, and dev scripts
 
 ## Key Conventions
 - Python 3 (migrated from Python 2, see docs/Developing/Py2ToPy3.md)
+- **All Python code must be well-typed** - use type hints and pass `pyre-check`
+- **Tests must accompany every change** - no code changes without corresponding tests
 - Use manipulators for all database writes
 - Use queries for database reads
 - Models in `common/models/` are NDB entities

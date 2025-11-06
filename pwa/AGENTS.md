@@ -27,6 +27,7 @@ tests/                 # Playwright E2E tests
 
 ## Key Conventions
 
+- **Tests must accompany every change** - no code changes without corresponding tests
 - Use functional components with TypeScript interfaces (not types)
 - Mobile-first responsive design with Tailwind
 - `~/` alias resolves to `app/` directory
