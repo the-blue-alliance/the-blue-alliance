@@ -124,13 +124,13 @@ async function loadData(params: Route.LoaderArgs['params']) {
     getEventAlliances({ path: { event_key: params.eventKey } }),
   ]);
 
-  if (event.data == undefined) {
+  if (event.data === undefined) {
     throw new Response(null, {
       status: 404,
     });
   }
 
-  if (matches.data == undefined || alliances.data == undefined) {
+  if (matches.data === undefined || alliances.data === undefined) {
     throw new Response(null, {
       status: 500,
     });
@@ -139,7 +139,7 @@ async function loadData(params: Route.LoaderArgs['params']) {
   return {
     event: event.data,
     matches: matches.data,
-    alliances: alliances.data,
+    alliances: alliances.data ?? [],
     shouldPreviewAwardsTab: SEASON_EVENT_TYPES.has(event.data.event_type),
     shouldPreviewInsightsTab: matches.data.length > 0,
     shouldPreviewRankingsTab: matches.data.length > 0,
