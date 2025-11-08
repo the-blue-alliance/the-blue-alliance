@@ -15,44 +15,24 @@ import {
 } from 'react-router';
 
 import { client } from '~/api/tba/read/client.gen';
+import { createCachedFetch } from '~/lib/middleware/network-cache';
 
+// Configure request interceptor for auth
 client.interceptors.request.use((request) => {
   request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
   return request;
 });
 
-// Disabled on 11/12/24 due to clone() issues:
-// https://the-blue-alliance.sentry.io/issues/6042521923
-// ======================================================
-// Custom fetch that uses an in-memory cache to handle ETags.
-// TODO: Maybe also use localStorage for clients?
-// TODO: Fix CORS on client
-// const isServer = typeof window === 'undefined';
-// const cache = new LRUCache<string, Response>({
-//   max: 500,
-// });
-// api.defaults.fetch = async (url, options = {}) => {
-//   if ((options.method && options.method !== 'GET') || !isServer) {
-//     return fetch(url, options);
-//   }
-
-//   // Only cache GET requests
-//   const cachedResponse = cache.get(url as string);
-//   const etag = cachedResponse?.headers.get('ETag');
-//   if (cachedResponse && etag) {
-//     (options.headers as Headers).set('If-None-Match', etag);
-//   }
-
-//   const response = await fetch(url, options);
-//   if (response.status === 304 && cachedResponse) {
-//     return cachedResponse.clone();
-//   }
-
-//   if (response.status === 200 && response.headers.has('ETag')) {
-//     cache.set(url as string, response.clone());
-//   }
-//   return response;
-// };
+// Configure network cache middleware
+// Caches API responses in memory across sessions to reduce external API calls
+client.setConfig({
+  fetch: createCachedFetch({
+    maxEntries: 500,
+    ttl: 10800000, // 3 hours
+    debug: false, // Set to true to enable debug logging
+    cacheableMethods: ['GET'],
+  }),
+});
 
 const queryClient = new QueryClient();
 
