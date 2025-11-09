@@ -14,6 +14,39 @@
     }
   ],
   "paths": {
+    "/event/{eventKey}/info/": {
+      "get": {
+        "tags": [
+          "Event Details"
+        ],
+        "summary": "Fetch top-level admin properties for the event",
+        "description": "An endpoint to fetch the current value of the event info. This lets you fetch the current value of fields that are settable via /event/{eventKey}/info/update",
+        "operationId": "getEventInfo",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventInfo"
+                }
+              } 
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
     "/event/{eventKey}/info/update": {
       "post": {
         "tags": [
