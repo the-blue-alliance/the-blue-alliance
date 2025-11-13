@@ -282,7 +282,11 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         else []
     )
 
-    website = "None" if request.form.get("website") == "None" else WebsiteHelper.format_url(request.form.get("website"))
+    website = (
+        "None"
+        if request.form.get("website") == "None"
+        else WebsiteHelper.format_url(request.form.get("website"))
+    )
 
     key = str(request.form.get("year")) + str.lower(
         str(request.form.get("event_short"))

@@ -96,6 +96,7 @@
         <li class="{% if match_count == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
         <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length}}</span></a></li>
+        <li><a href="#scouting" data-toggle="tab">Scouting</a></li>
       </ul>
     </div>
   </div>
@@ -458,6 +459,27 @@
           </div>
         </div>
       </div>
+
+    <div class="tab-pane" id="scouting">
+      <div class="row">
+        <div class="col-sm-12">
+          <h2>Scouting</h2>
+          <p>Copy the CSV data below for scouting purposes:</p>
+          <div class="form-group">
+            <label>Team List</label>
+            <textarea class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ team_list_csv|safe }}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Schedule</label>
+            <textarea class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ schedule_csv|safe }}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Flat Schedule</label>
+            <textarea class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ flat_schedule_csv|safe }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
 
       </div>
     </div>
