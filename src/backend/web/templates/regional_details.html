@@ -144,7 +144,7 @@
             </thead>
             <tbody>
               {% for item in rankings %}
-              <tr id="advancement-{{item.team_key}}" data-qualified="{{item.team_key in advancement and advancement[item.team_key].cmp}}">
+              <tr id="advancement-{{item.team_key}}" data-qualified="{{advancement and item.team_key in advancement and advancement[item.team_key].cmp}}">
                 <td>{{loop.index}}</td>
                 <td><a href="/team/{{item.team_key|digits}}/{{year}}">{{item.team_key|digits}}</a></td>
                 <td>
