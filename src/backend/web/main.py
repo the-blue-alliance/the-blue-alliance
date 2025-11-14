@@ -31,6 +31,9 @@ from backend.web.handlers.event import (
     event_insights,
     event_list,
     event_rss,
+    simple_event_flat_schedule,
+    simple_event_schedule,
+    simple_event_teams,
 )
 from backend.web.handlers.eventwizard import eventwizard, eventwizard2
 from backend.web.handlers.gameday import gameday, gameday_redirect
@@ -98,6 +101,11 @@ app.add_url_rule("/gameday", view_func=gameday)
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
 app.add_url_rule("/event/<event_key>/agenda", view_func=event_agenda)
 app.add_url_rule("/event/<event_key>/feed", view_func=event_rss)
+app.add_url_rule(
+    "/event/<event_key>/html/flat_schedule", view_func=simple_event_flat_schedule
+)
+app.add_url_rule("/event/<event_key>/html/schedule", view_func=simple_event_schedule)
+app.add_url_rule("/event/<event_key>/html/teams", view_func=simple_event_teams)
 app.add_url_rule("/event/<event_key>/insights", view_func=event_insights)
 app.add_url_rule("/events/<int:year>", view_func=event_list)
 app.add_url_rule(
