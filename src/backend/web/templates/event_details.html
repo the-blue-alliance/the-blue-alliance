@@ -466,16 +466,25 @@
           <h2>Scouting</h2>
           <p>Copy the CSV data below for scouting purposes:</p>
           <div class="form-group">
-            <label>Team List</label>
-            <textarea class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ team_list_csv|safe }}</textarea>
+            <div class="clearfix">
+              <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Team List</label>
+              <button type="button" class="btn btn-default btn-xs pull-right" onclick="downloadCSVFromTextarea('team-list-csv', 'team_list.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+            </div>
+            <textarea id="team-list-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ team_list_csv|safe }}</textarea>
           </div>
           <div class="form-group">
-            <label>Schedule</label>
-            <textarea class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ schedule_csv|safe }}</textarea>
+            <div class="clearfix">
+              <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Schedule</label>
+              <button type="button" class="btn btn-default btn-xs pull-right" onclick="downloadCSVFromTextarea('schedule-csv', 'schedule.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+            </div>
+            <textarea id="schedule-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ schedule_csv|safe }}</textarea>
           </div>
           <div class="form-group">
-            <label>Flat Schedule</label>
-            <textarea class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ flat_schedule_csv|safe }}</textarea>
+            <div class="clearfix">
+              <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Flat Schedule</label>
+              <button type="button" class="btn btn-default btn-xs pull-right" onclick="downloadCSVFromTextarea('flat-schedule-csv', 'flat_schedule.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+            </div>
+            <textarea id="flat-schedule-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ flat_schedule_csv|safe }}</textarea>
           </div>
         </div>
       </div>
@@ -502,4 +511,38 @@
 {% if event.now %}
 <script type="text/javascript" src="/py3_javascript/liveevent.min.js"></script>
 {% endif %}
+<script type="text/javascript">
+  function downloadCSVFromTextarea(textareaId, filename) {
+    try {
+      var textarea = document.getElementById(textareaId);
+      if (!textarea) {
+        console.warn('Textarea not found: ' + textareaId);
+        return;
+      }
+      var csv = textarea.value || textarea.textContent || '';
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+      } else {
+        var link = document.createElement('a');
+        if (link.download !== undefined) { // feature detection
+          var url = URL.createObjectURL(blob);
+          link.setAttribute('href', url);
+          link.setAttribute('download', filename);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        } else {
+          // Fallback: open in new tab
+          var url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        }
+      }
+    } catch (e) {
+      console.error('Failed to download CSV', e);
+    }
+  }
+</script>
 {% endblock %}
