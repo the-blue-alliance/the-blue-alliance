@@ -468,7 +468,7 @@
           <div class="form-group">
             <div class="clearfix">
               <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Team List</label>
-              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('team-list-csv', 'team_list.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('team-list-csv', '{{ event.key_name }}_team_list.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
               <button type="button" class="btn btn-default btn-xs pull-right" onclick="copyCSVFromTextarea('team-list-csv')"><span class="glyphicon glyphicon-copy"></span> Copy to Clipboard</button>
             </div>
             <textarea id="team-list-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ team_list_csv|safe }}</textarea>
@@ -476,7 +476,7 @@
           <div class="form-group">
             <div class="clearfix">
               <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Schedule</label>
-              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('schedule-csv', 'schedule.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('schedule-csv', '{{ event.key_name }}_schedule.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
               <button type="button" class="btn btn-default btn-xs pull-right" onclick="copyCSVFromTextarea('schedule-csv')"><span class="glyphicon glyphicon-copy"></span> Copy to Clipboard</button>
             </div>
             <textarea id="schedule-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ schedule_csv|safe }}</textarea>
@@ -484,7 +484,7 @@
           <div class="form-group">
             <div class="clearfix">
               <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Flat Schedule</label>
-              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('flat-schedule-csv', 'flat_schedule.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('flat-schedule-csv', '{{ event.key_name }}_flat_schedule.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
               <button type="button" class="btn btn-default btn-xs pull-right" onclick="copyCSVFromTextarea('flat-schedule-csv')"><span class="glyphicon glyphicon-copy"></span> Copy to Clipboard</button>
             </div>
             <textarea id="flat-schedule-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ flat_schedule_csv|safe }}</textarea>
