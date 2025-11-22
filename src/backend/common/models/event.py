@@ -107,6 +107,7 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
+    # WARNING: normalized_location is no longer being set. This property is deprecated
     normalized_location: Optional[Location] = cast(
         Location, ndb.StructuredProperty(Location)
     )

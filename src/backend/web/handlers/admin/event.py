@@ -20,7 +20,6 @@ from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
     DistrictPointTiebreakersSortingHelper,
 )
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
-from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -440,46 +439,6 @@ def event_remap_teams_post(event_key: EventKey) -> Response:
         url=f"/tasks/do/remap_teams/{event.key_name}",
         method="GET",
     )
-    return redirect(url_for("admin.event_detail", event_key=event.key_name))
-
-
-def event_update_location_get(event_key: EventKey) -> str:
-    event = Event.get_by_id(event_key)
-    if not event:
-        abort(404)
-
-    event.normalized_location = None
-    LocationHelper.update_event_location(event)
-    event = EventManipulator.createOrUpdate(event)
-
-    return f"New location: {event.normalized_location}"
-
-
-def event_update_location_post(event_key: EventKey) -> Response:
-    event = Event.get_by_id(event_key)
-    if not event:
-        abort(404)
-
-    place_id = request.form.get("place_id")
-    if not place_id:
-        abort(400)
-
-    # Construct a mostly empty input struct that'll get filled in
-    location_input = {
-        "place_id": place_id,
-        "geometry": {
-            "location": {
-                "lat": "",
-                "lng": "",
-            },
-        },
-        "name": "",
-        "types": [],
-    }
-    location_info = LocationHelper.construct_location_info(location_input)
-    event.normalized_location = LocationHelper.build_normalized_location(location_info)
-    EventManipulator.createOrUpdate(event)
-
     return redirect(url_for("admin.event_detail", event_key=event.key_name))
 
 

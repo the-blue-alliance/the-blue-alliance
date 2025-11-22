@@ -78,6 +78,14 @@ class EventConverter(ConverterBase):
             "remap_teams": event.remap_teams,
         }
         event_dict.update(cls.constructLocation_v3(event))
+        # TODO: Move these into the dict above.
+        # For now, they need to come AFTER our `constructLocation_v3`
+        # This is because our `constructLocation_v3` will use the Event.normalized_location
+        # for the `location_name` and `address` keys. However, we'd like to use the FRC-API
+        # address and venue as opposed to the `normalized_location` values.
+        # Move these sets up once we remove normalized_location ~ZachOrr
+        event_dict["address"] = event.venue_address
+        event_dict["location_name"] = event.venue
 
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()

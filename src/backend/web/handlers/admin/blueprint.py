@@ -48,8 +48,6 @@ from backend.web.handlers.admin.event import (
     event_list,
     event_remap_teams_post,
     event_remove_webcast_post,
-    event_update_location_get,
-    event_update_location_post,
 )
 from backend.web.handlers.admin.gameday import gameday_dashboard, gameday_dashboard_post
 from backend.web.handlers.admin.landing import (
@@ -274,16 +272,6 @@ admin_routes.add_url_rule(
     "/event/delete_matches/<event_key>/<comp_level>/<to_delete>",
     view_func=event_delete_matches,
     methods=["GET"],
-)
-admin_routes.add_url_rule(
-    "/event/update_location/<event_key>",
-    view_func=event_update_location_get,
-    methods=["GET"],
-)
-admin_routes.add_url_rule(
-    "/event/update_location/<event_key>",
-    view_func=event_update_location_post,
-    methods=["POST"],
 )
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 admin_routes.add_url_rule("/events/<int:year>", view_func=event_list)
