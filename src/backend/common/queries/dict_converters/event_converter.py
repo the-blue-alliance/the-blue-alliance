@@ -82,10 +82,21 @@ class EventConverter(ConverterBase):
         # For now, they need to come AFTER our `constructLocation_v3`
         # This is because our `constructLocation_v3` will use the Event.normalized_location
         # for the `location_name` and `address` keys. However, we'd like to use the FRC-API
-        # address and venue as opposed to the `normalized_location` values.
+        # address and venue as opposed to the `normalized_location` values for events 2026+
+        # or in the legacy case where we have normalized locations but not `venue`/`venue_address`
         # Move these sets up once we remove normalized_location ~ZachOrr
-        event_dict["address"] = event.venue_address
-        event_dict["location_name"] = event.venue
+        #
+        # For 2026 onward, always use FRC-API `venue_address` and `venue`
+        # Otherwise, use our `normalized_location` if available, fallback to FRC-API data.
+        # This is because some old events (ex: see `2001cmp`) do not have venue/venue_address
+        if event.year >= 2026:
+            event_dict["address"] = event.venue_address
+            event_dict["location_name"] = event.venue
+        else:
+            if event_dict["address"] == None:
+                event_dict["address"] = event.venue_address
+            if event_dict["location_name"] == None:
+                event_dict["location_name"] = event.venue
 
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()
