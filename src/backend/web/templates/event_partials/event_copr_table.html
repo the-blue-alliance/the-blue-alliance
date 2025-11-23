@@ -113,32 +113,49 @@
         // Initialize: set OPR checked by default if present
         const checkboxNodes = document.querySelectorAll('.copr-select');
         const selected = [];
+        // Helper to compute and apply selection state
+        function handleSelectionChange() {
+            const newSelected = [];
+            document.querySelectorAll('.copr-select').forEach(n => {
+                const c = n.getAttribute('data-key');
+                const r = n.getAttribute('data-name');
+                const icb = n.querySelector('input[type=checkbox]');
+                if (icb && icb.checked) {
+                    newSelected.push({ key: c, readable: r });
+                }
+            });
+            updateSelectorText(newSelected);
+            buildCoprTable(newSelected);
+        }
+
         checkboxNodes.forEach(node => {
             const key = node.getAttribute('data-key');
             const name = node.getAttribute('data-name');
             const input = node.querySelector('input[type=checkbox]');
+
             if (key === 'OPR') {
                 input.checked = true;
                 selected.push({ key: key, readable: name });
             }
-            // bind click handler
-            node.addEventListener('click', function(e) {
-                e.preventDefault();
-                const cb = node.querySelector('input[type=checkbox]');
-                cb.checked = !cb.checked;
 
-                // Recompute selected
-                const newSelected = [];
-                document.querySelectorAll('.copr-select').forEach(n => {
-                    const c = n.getAttribute('data-key');
-                    const r = n.getAttribute('data-name');
-                    const icb = n.querySelector('input[type=checkbox]');
-                    if (icb && icb.checked) {
-                        newSelected.push({ key: c, readable: r });
-                    }
-                });
-                updateSelectorText(newSelected);
-                buildCoprTable(newSelected);
+            // If the user clicks the input itself, let the input toggle and handle via change event.
+            // If the user clicks the surrounding anchor, toggle the input programmatically.
+            node.addEventListener('click', function(e) {
+                // If the click target is the checkbox input, let the change handler run instead.
+                if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'input') {
+                    return;
+                }
+                e.preventDefault();
+                // Toggle the input and trigger change handler
+                input.checked = !input.checked;
+                handleSelectionChange();
+            });
+
+            // Respond to direct checkbox interactions
+            input.addEventListener('change', function(e) {
+                // Prevent the click from bubbling up to the anchor which might toggle again
+                e.stopPropagation();
+                handleSelectionChange();
             });
         });
 
