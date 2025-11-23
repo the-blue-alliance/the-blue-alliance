@@ -6,6 +6,10 @@
     <span id="coprSelector">Choose component</span> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
+    <li>
+        <a href="#" id="copr_clear">Clear (reset to OPR)</a>
+    </li>
+    <li role="separator" class="divider"></li>
     {% for copr_item in copr_items %}
         <li>
             <a href="#" class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}">
@@ -110,9 +114,8 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        // Initialize: set OPR checked by default if present
+        // Initialize: wire up checkboxes and derive initial selection from current DOM state
         const checkboxNodes = document.querySelectorAll('.copr-select');
-        const selected = [];
         // Helper to compute and apply selection state
         function handleSelectionChange() {
             const newSelected = [];
@@ -133,10 +136,6 @@
             const name = node.getAttribute('data-name');
             const input = node.querySelector('input[type=checkbox]');
 
-            if (key === 'OPR') {
-                input.checked = true;
-                selected.push({ key: key, readable: name });
-            }
 
             // If the user clicks the input itself, let the input toggle and handle via change event.
             // If the user clicks the surrounding anchor, toggle the input programmatically.
@@ -159,18 +158,47 @@
             });
         });
 
+        // Compute initial selected components from current checkbox states (honor server-rendered checked attrs)
+        const initialSelected = [];
+        document.querySelectorAll('.copr-select').forEach(n => {
+            const c = n.getAttribute('data-key');
+            const r = n.getAttribute('data-name');
+            const icb = n.querySelector('input[type=checkbox]');
+            if (icb && icb.checked) {
+                initialSelected.push({ key: c, readable: r });
+            }
+        });
+
         // If nothing was pre-selected, select OPR by default if exists in list
-        if (selected.length === 0) {
+        if (initialSelected.length === 0) {
             const oprNode = document.querySelector('.copr-select[data-key="OPR"]');
             if (oprNode) {
                 const cb = oprNode.querySelector('input[type=checkbox]');
                 if (cb) { cb.checked = true; }
-                selected.push({ key: 'OPR', readable: 'OPR' });
+                initialSelected.push({ key: 'OPR', readable: 'OPR' });
             }
         }
 
-        updateSelectorText(selected);
-        buildCoprTable(selected);
+        updateSelectorText(initialSelected);
+        buildCoprTable(initialSelected);
+
+        // Clear handler: reset to only OPR selected
+        const clearEl = document.getElementById('copr_clear');
+        if (clearEl) {
+            clearEl.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Uncheck everything except OPR
+                document.querySelectorAll('.copr-select').forEach(n => {
+                    const k = n.getAttribute('data-key');
+                    const icb = n.querySelector('input[type=checkbox]');
+                    if (icb) {
+                        icb.checked = (k === 'OPR');
+                    }
+                });
+                // Apply change
+                handleSelectionChange();
+            });
+        }
     });
 </script>
 
