@@ -1,24 +1,26 @@
 {% if has_coprs %}
 <h3><abbr title="Component Offensive Power Ratings">COPRs</abbr> (<a href="/opr">?</a>)</h3>
-<div class="btn-group">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">
-    <span id="coprSelector">Choose component</span> <span class="caret"></span>
-  </button>
-    <button type="button" class="btn btn-default" id="copr_csv">Download CSV</button>
-  <ul class="dropdown-menu">
-    <li>
-        <a href="#" id="copr_clear">Clear (reset to OPR)</a>
-    </li>
-    <li role="separator" class="divider"></li>
-    {% for copr_item in copr_items %}
-        <li>
-            <label class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}" for="checkbox_{{ copr_item[1] }}" style="display:block; padding:3px 12px; cursor:pointer;">
-                <input type="checkbox" id="checkbox_{{ copr_item[1] }}" style="margin-right:6px;">{{ copr_item[2] }}
-            </label>
-        </li>
-    {% endfor %}
-  </ul>
+<div class="clearfix">
+    <div class="btn-group pull-left">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+            <span id="coprSelector">Statistics</span> <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                    <a href="#" id="copr_clear">Clear (reset to OPR)</a>
+            </li>
+            <li role="separator" class="divider"></li>
+            {% for copr_item in copr_items %}
+                    <li>
+                            <label class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}" for="checkbox_{{ copr_item[1] }}" style="display:block; padding:3px 12px; cursor:pointer;">
+                                    <input type="checkbox" id="checkbox_{{ copr_item[1] }}" style="margin-right:6px;">{{ copr_item[2] }}
+                            </label>
+                    </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <button type="button" class="btn btn-default pull-right" id="copr_csv" style="margin-left:8px;">Download CSV</button>
 </div>
 
 <table class="table table-condensed table-striped table-center table-hover" style="table-layout: fixed;">
@@ -189,16 +191,6 @@
         });
     }
 
-    function updateSelectorText(selectedComponents) {
-        const el = document.getElementById('coprSelector');
-        if (!el) return;
-        if (selectedComponents.length === 0) {
-            el.innerText = 'Choose component(s)';
-            return;
-        }
-        el.innerText = selectedComponents.map(c => c.readable).join(', ');
-    }
-
     document.addEventListener("DOMContentLoaded", function() {
         // Initialize: wire up checkboxes and derive initial selection from current DOM state
         const checkboxNodes = document.querySelectorAll('.copr-select');
@@ -213,7 +205,6 @@
                     newSelected.push({ key: c, readable: r });
                 }
             });
-            updateSelectorText(newSelected);
             buildCoprTable(newSelected);
         }
 
@@ -252,7 +243,6 @@
             }
         }
 
-        updateSelectorText(initialSelected);
         buildCoprTable(initialSelected);
 
             // CSV download handler: export current table view
