@@ -35,6 +35,65 @@
 <script>
     const coprs = JSON.parse('{{ coprs_json|safe }}');
 
+    // Sorting state: index (column index), dir (1 = asc, -1 = desc)
+    let sortState = { index: null, dir: 1 };
+
+    function clearSortIndicators() {
+        document.querySelectorAll('#coprTableBody').forEach(() => {}); // noop to keep consistent selection usage
+        const ths = document.querySelectorAll('table thead tr th');
+        ths.forEach(t => {
+            const ind = t.querySelector('.sort-indicator');
+            if (ind) ind.remove();
+        });
+    }
+
+    function setSortIndicator(th, dir) {
+        // remove existing indicators first
+        clearSortIndicators();
+        const span = document.createElement('span');
+        span.className = 'sort-indicator';
+        span.style.marginLeft = '6px';
+        span.innerText = dir === 1 ? '▲' : '▼';
+        th.appendChild(span);
+    }
+
+    function getCellValueForSort(cell, type) {
+        if (!cell) return null;
+        const txt = cell.innerText.trim();
+        if (type === 'number') {
+            const n = parseFloat(txt.replace(',', ''));
+            return Number.isFinite(n) ? n : NaN;
+        }
+        // default: string
+        return txt.toLowerCase();
+    }
+
+    function sortTableRows(tbody, colIndex, type, dir) {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+            const aCell = a.children[colIndex];
+            const bCell = b.children[colIndex];
+            const aVal = getCellValueForSort(aCell, type);
+            const bVal = getCellValueForSort(bCell, type);
+
+            // Handle NaN for numeric by pushing to bottom
+            if (type === 'number') {
+                const aNaN = Number.isNaN(aVal);
+                const bNaN = Number.isNaN(bVal);
+                if (aNaN && bNaN) return 0;
+                if (aNaN) return 1;
+                if (bNaN) return -1;
+            }
+
+            if (aVal < bVal) return -1 * dir;
+            if (aVal > bVal) return 1 * dir;
+            return 0;
+        });
+
+        // Re-append in sorted order
+        rows.forEach(r => tbody.appendChild(r));
+    }
+
     // Helper: return teams in the order of the primary component (first selected)
     function getPrimaryTeamList(primaryComponent) {
         if (!coprs[primaryComponent]) return [];
@@ -58,6 +117,8 @@
         selectedComponents.forEach(comp => {
             const th = document.createElement('th');
             th.innerHTML = `<abbr title="Component Offensive Power Rating">${comp.readable}</abbr>`;
+            // mark component columns as sortable (type=number)
+            th.setAttribute('data-sort-type', 'number');
             theadRow.appendChild(th);
         });
 
@@ -100,6 +161,30 @@
             });
 
             tbody.appendChild(tr);
+        });
+
+        // After building header/body, attach sorting handlers to headers.
+        const ths = theadRow.querySelectorAll('th');
+        ths.forEach((th, idx) => {
+            // determine column type: rank (number), team (string), others (number)
+            let type = th.getAttribute('data-sort-type');
+            if (!type) {
+                if (idx === 0) type = 'number';
+                else if (idx === 1) type = 'string';
+                else type = 'number';
+            }
+            th.style.cursor = 'pointer';
+            th.addEventListener('click', function() {
+                // toggle sort
+                if (sortState.index === idx) {
+                    sortState.dir = -sortState.dir;
+                } else {
+                    sortState.index = idx;
+                    sortState.dir = 1;
+                }
+                setSortIndicator(th, sortState.dir);
+                sortTableRows(tbody, idx, type, sortState.dir);
+            });
         });
     }
 
