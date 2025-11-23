@@ -8,7 +8,9 @@
   <ul class="dropdown-menu">
     {% for copr_item in copr_items %}
         <li>
-            <a href="#" id="dropdown_{{ copr_item[1] }}">{{ copr_item[2] }}</a>
+            <a href="#" class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}">
+                <input type="checkbox" id="checkbox_{{ copr_item[1] }}" style="margin-right:6px;">{{ copr_item[2] }}
+            </a>
         </li>
     {% endfor %}
   </ul>
@@ -29,42 +31,129 @@
 <script>
     const coprs = JSON.parse('{{ coprs_json|safe }}');
 
-    function buildCoprTable(component, readableName) {
-        document.getElementById('componentColHeader').innerHTML = readableName;
-        document.getElementById('coprSelector').innerText = readableName;
-        document.getElementById('coprTableBody').innerHTML = '';
-        coprs[component].forEach((e, idx) => {
+    // Helper: return teams in the order of the primary component (first selected)
+    function getPrimaryTeamList(primaryComponent) {
+        if (!coprs[primaryComponent]) return [];
+        return coprs[primaryComponent].map(e => e[0]);
+    }
+
+    function buildCoprTable(selectedComponents) {
+        const theadRow = document.querySelector('#coprTableBody').parentElement.querySelector('thead tr');
+        const tbody = document.getElementById('coprTableBody');
+
+        // Build header: fixed columns + one per selected component
+        theadRow.innerHTML = '';
+        const thRank = document.createElement('th');
+        thRank.innerText = '#';
+        theadRow.appendChild(thRank);
+
+        const thTeam = document.createElement('th');
+        thTeam.innerText = 'Team';
+        theadRow.appendChild(thTeam);
+
+        selectedComponents.forEach(comp => {
+            const th = document.createElement('th');
+            th.innerHTML = `<abbr title="Component Offensive Power Rating">${comp.readable}</abbr>`;
+            theadRow.appendChild(th);
+        });
+
+        // Build body
+        tbody.innerHTML = '';
+        if (selectedComponents.length === 0) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 2;
+            td.innerText = 'No components selected';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        const primaryKey = selectedComponents[0].key;
+        const teams = getPrimaryTeamList(primaryKey);
+
+        teams.forEach((teamId, idx) => {
+            const tr = document.createElement('tr');
+
             const rankTd = document.createElement('td');
             rankTd.innerText = idx + 1;
+            tr.appendChild(rankTd);
 
-            const teamId = e[0];
             const teamLink = document.createElement('a');
             teamLink.href = `/team/${teamId}/{{ event.year }}`;
             teamLink.innerText = teamId;
             const teamTd = document.createElement('td');
             teamTd.appendChild(teamLink);
-
-            const coprTd = document.createElement('td');
-            coprTd.innerText = e[1].toFixed(2); // round to 2 decimal places
-
-            const tr = document.createElement('tr');
-            tr.appendChild(rankTd);
             tr.appendChild(teamTd);
-            tr.appendChild(coprTd);
-            document.getElementById('coprTableBody').appendChild(tr);
+
+            // For each selected component, find value for this team
+            selectedComponents.forEach(comp => {
+                const coprTd = document.createElement('td');
+                const list = coprs[comp.key] || [];
+                const found = list.find(e => e[0] === teamId);
+                coprTd.innerText = found ? found[1].toFixed(2) : '-';
+                tr.appendChild(coprTd);
+            });
+
+            tbody.appendChild(tr);
         });
     }
 
+    function updateSelectorText(selectedComponents) {
+        const el = document.getElementById('coprSelector');
+        if (!el) return;
+        if (selectedComponents.length === 0) {
+            el.innerText = 'Choose component(s)';
+            return;
+        }
+        el.innerText = selectedComponents.map(c => c.readable).join(', ');
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
-        {% for copr_item in copr_items %}
-            $("#dropdown_{{ copr_item[1] }}").click(function(e) {
-               e.preventDefault();
-               buildCoprTable("{{ copr_item[0] }}", "{{ copr_item[2] }}");
+        // Initialize: set OPR checked by default if present
+        const checkboxNodes = document.querySelectorAll('.copr-select');
+        const selected = [];
+        checkboxNodes.forEach(node => {
+            const key = node.getAttribute('data-key');
+            const name = node.getAttribute('data-name');
+            const input = node.querySelector('input[type=checkbox]');
+            if (key === 'OPR') {
+                input.checked = true;
+                selected.push({ key: key, readable: name });
+            }
+            // bind click handler
+            node.addEventListener('click', function(e) {
+                e.preventDefault();
+                const cb = node.querySelector('input[type=checkbox]');
+                cb.checked = !cb.checked;
+
+                // Recompute selected
+                const newSelected = [];
+                document.querySelectorAll('.copr-select').forEach(n => {
+                    const c = n.getAttribute('data-key');
+                    const r = n.getAttribute('data-name');
+                    const icb = n.querySelector('input[type=checkbox]');
+                    if (icb && icb.checked) {
+                        newSelected.push({ key: c, readable: r });
+                    }
+                });
+                updateSelectorText(newSelected);
+                buildCoprTable(newSelected);
             });
+        });
 
-        {% endfor %}
+        // If nothing was pre-selected, select OPR by default if exists in list
+        if (selected.length === 0) {
+            const oprNode = document.querySelector('.copr-select[data-key="OPR"]');
+            if (oprNode) {
+                const cb = oprNode.querySelector('input[type=checkbox]');
+                if (cb) { cb.checked = true; }
+                selected.push({ key: 'OPR', readable: 'OPR' });
+            }
+        }
 
-        buildCoprTable("OPR", "OPR");
+        updateSelectorText(selected);
+        buildCoprTable(selected);
     });
 </script>
 
