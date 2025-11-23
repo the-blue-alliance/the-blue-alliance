@@ -12,9 +12,9 @@
     <li role="separator" class="divider"></li>
     {% for copr_item in copr_items %}
         <li>
-            <a href="#" class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}">
+            <label class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}" for="checkbox_{{ copr_item[1] }}" style="display:block; padding:3px 12px; cursor:pointer;">
                 <input type="checkbox" id="checkbox_{{ copr_item[1] }}" style="margin-right:6px;">{{ copr_item[2] }}
-            </a>
+            </label>
         </li>
     {% endfor %}
   </ul>
@@ -136,26 +136,13 @@
             const name = node.getAttribute('data-name');
             const input = node.querySelector('input[type=checkbox]');
 
-
-            // If the user clicks the input itself, let the input toggle and handle via change event.
-            // If the user clicks the surrounding anchor, toggle the input programmatically.
-            node.addEventListener('click', function(e) {
-                // If the click target is the checkbox input, let the change handler run instead.
-                if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'input') {
-                    return;
-                }
-                e.preventDefault();
-                // Toggle the input and trigger change handler
-                input.checked = !input.checked;
-                handleSelectionChange();
-            });
-
-            // Respond to direct checkbox interactions
-            input.addEventListener('change', function(e) {
-                // Prevent the click from bubbling up to the anchor which might toggle again
-                e.stopPropagation();
-                handleSelectionChange();
-            });
+            // Respond to direct checkbox interactions. Rely on change events for accessibility and simplicity.
+            if (input) {
+                input.addEventListener('change', function(e) {
+                    e.stopPropagation();
+                    handleSelectionChange();
+                });
+            }
         });
 
         // Compute initial selected components from current checkbox states (honor server-rendered checked attrs)
