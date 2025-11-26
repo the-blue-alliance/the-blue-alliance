@@ -1,23 +1,24 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Toolbar, ToolbarGroup } from "material-ui/Toolbar";
-import FlatButton from "material-ui/FlatButton";
-import IconButton from "material-ui/IconButton";
-import CloseIcon from "material-ui/svg-icons/navigation/close";
-import SwapIcon from "material-ui/svg-icons/action/compare-arrows";
-import VideocamIcon from "material-ui/svg-icons/av/videocam";
-import EqualizerIcon from "material-ui/svg-icons/av/equalizer";
-import { white, green500, grey900 } from "material-ui/styles/colors";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import EqualizerIcon from "@mui/icons-material/Equalizer";
+import { green, grey } from "@mui/material/colors";
 
 import TickerMatch from "./TickerMatch";
 import { NUM_VIEWS_FOR_LAYOUT } from "../constants/LayoutConstants";
 
 const VideoCellToolbar = (props) => {
   const toolbarStyle = {
-    backgroundColor: grey900,
+    backgroundColor: grey[900],
     ...props.style,
   };
 
+  const white = "#fff";
   const titleStyle = {
     color: white,
     fontSize: 16,
@@ -41,7 +42,7 @@ const VideoCellToolbar = (props) => {
     position: "absolute",
     right: 0,
     marginRight: 0,
-    backgroundColor: grey900,
+    backgroundColor: grey[900],
     boxShadow: "-2px 0px 15px -2px rgba(0, 0, 0, 0.5)",
   };
 
@@ -78,62 +79,53 @@ const VideoCellToolbar = (props) => {
   } else {
     swapButton = (
       <IconButton
-        tooltip="Swap position"
-        tooltipPosition="top-center"
         onClick={() => props.onRequestSwapPosition()}
-        touch
+        aria-label="swap"
       >
-        <SwapIcon color={white} />
+        <CompareArrowsIcon style={{ color: white }} />
       </IconButton>
     );
   }
 
   return (
     <Toolbar style={toolbarStyle}>
-      <ToolbarGroup>
-        <FlatButton
-          label={props.webcast.name}
+      <div>
+        <Button
           style={titleStyle}
           href={`/event/${props.webcast.key}`}
           target="_blank"
           rel="noopener noreferrer"
           disabled={props.specialWebcastIds.has(props.webcast.id)}
-        />
-      </ToolbarGroup>
-      <ToolbarGroup style={matchTickerGroupStyle}>
+        >
+          {props.webcast.name}
+        </Button>
+      </div>
+      <div style={matchTickerGroupStyle}>
         <div style={matchTickerStyle}>{tickerMatches}</div>
-      </ToolbarGroup>
-      <ToolbarGroup lastChild style={controlsStyle}>
+      </div>
+      <div style={controlsStyle}>
         {swapButton}
         <IconButton
-          tooltip="Change webcast"
-          tooltipPosition="top-center"
           onClick={() => props.onRequestSelectWebcast()}
-          touch
+          aria-label="change-webcast"
         >
-          <VideocamIcon color={white} />
+          <VideocamIcon style={{ color: white }} />
         </IconButton>
         <IconButton
-          tooltip={
-            props.livescoreOn
-              ? "Switch to webcast view"
-              : "Switch to live scores view"
-          }
-          tooltipPosition="top-center"
           onClick={() => props.onRequestLiveScoresToggle()}
-          touch
+          aria-label="toggle-livescore"
         >
-          <EqualizerIcon color={props.livescoreOn ? green500 : white} />
+          <EqualizerIcon
+            style={{ color: props.livescoreOn ? green[500] : white }}
+          />
         </IconButton>
         <IconButton
           onClick={() => props.removeWebcast(props.webcast.id)}
-          tooltip="Close webcast"
-          tooltipPosition="top-left"
-          touch
+          aria-label="close-webcast"
         >
-          <CloseIcon color={white} />
+          <CloseIcon style={{ color: white }} />
         </IconButton>
-      </ToolbarGroup>
+      </div>
     </Toolbar>
   );
 };

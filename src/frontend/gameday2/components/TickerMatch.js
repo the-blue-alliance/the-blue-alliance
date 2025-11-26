@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { black, white } from "material-ui/styles/colors";
+const black = "#000";
+const white = "#fff";
 
 const TickerMatch = (props) => {
   const matchStyle = {

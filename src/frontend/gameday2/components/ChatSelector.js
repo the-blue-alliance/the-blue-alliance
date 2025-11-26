@@ -1,10 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ReactTransitionGroup from "react-addons-transition-group";
-import { List, ListItem } from "material-ui/List";
-import Paper from "material-ui/Paper";
-import ActionHome from "material-ui/svg-icons/action/home";
-import CheckmarkIcon from "material-ui/svg-icons/navigation/check";
+import { TransitionGroup } from "react-transition-group";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import Paper from "@mui/material/Paper";
+import HomeIcon from "@mui/icons-material/Home";
+import CheckIcon from "@mui/icons-material/Check";
 import { chatPropType } from "../utils/PropTypes";
 import AnimatableContainer from "./AnimatableContainer";
 
@@ -28,7 +32,7 @@ export default class ChatSelector extends React.Component {
     this.props.chats.forEach((chat) => {
       const isSelected = chat.channel === this.props.currentChat;
       const isDefault = chat.channel === this.props.defaultChat;
-      const icon = isSelected ? <CheckmarkIcon /> : null;
+      const icon = isSelected ? <CheckIcon /> : null;
 
       let chatName = chat.name;
       if (chat.channel === "firstupdatesnow" && isDefault) {
@@ -39,12 +43,18 @@ export default class ChatSelector extends React.Component {
 
       chatItems.push(
         <ListItem
-          primaryText={chatName}
-          leftIcon={isDefault ? <ActionHome /> : null}
-          rightIcon={icon}
+          button
           onClick={(e) => this.setTwitchChat(e, chat.channel)}
           key={chat.channel}
-        />
+        >
+          {isDefault && (
+            <ListItemIcon>
+              <HomeIcon />
+            </ListItemIcon>
+          )}
+          <ListItemText primary={chatName} />
+          {icon && <ListItemSecondaryAction>{icon}</ListItemSecondaryAction>}
+        </ListItem>
       );
     });
 
@@ -68,7 +78,7 @@ export default class ChatSelector extends React.Component {
     };
 
     return (
-      <ReactTransitionGroup component="div">
+      <TransitionGroup component="div">
         {this.props.open && (
           <AnimatableContainer
             key="overlay"
@@ -95,12 +105,12 @@ export default class ChatSelector extends React.Component {
               transform: "translate(0, 0)",
             }}
           >
-            <Paper zDepth={4}>
+            <Paper elevation={4}>
               <List onClick={(e) => e.stopPropagation()}>{chatItems}</List>
             </Paper>
           </AnimatableContainer>
         )}
-      </ReactTransitionGroup>
+      </TransitionGroup>
     );
   }
 }
