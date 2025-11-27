@@ -1,5 +1,5 @@
 beautifulsoup4==4.13.5
-black==25.1.0
+black==25.9.0
 flake8==7.2.0
 flake8-import-order
 flake8-tidy-imports
