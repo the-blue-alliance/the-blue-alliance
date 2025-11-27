@@ -1,8 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Dialog from "material-ui/Dialog";
-import FlatButton from "material-ui/FlatButton";
-import EventListener from "react-event-listener";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 import SwapPositionPreviewCell from "./SwapPositionPreviewCell";
 import {
   NUM_VIEWS_FOR_LAYOUT,
@@ -20,6 +22,8 @@ export default class SwapPositionDialog extends React.Component {
 
   componentDidMount() {
     this.updateSizing();
+    this._boundUpdateSizing = this.updateSizing.bind(this);
+    window.addEventListener("resize", this._boundUpdateSizing);
   }
 
   componentDidUpdate() {
@@ -51,6 +55,12 @@ export default class SwapPositionDialog extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    if (this._boundUpdateSizing) {
+      window.removeEventListener("resize", this._boundUpdateSizing);
+    }
+  }
+
   render() {
     const videoViews = [];
     const layoutId = this.props.layoutId;
@@ -69,11 +79,13 @@ export default class SwapPositionDialog extends React.Component {
     }
 
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary
+      <Button
+        key="cancel"
         onClick={() => this.onRequestClose()}
-      />,
+        color="primary"
+      >
+        Cancel
+      </Button>,
     ];
 
     const bodyStyle = {
@@ -86,25 +98,21 @@ export default class SwapPositionDialog extends React.Component {
     };
 
     return (
-      <Dialog
-        title="Select a position to swap with"
-        actions={actions}
-        modal={false}
-        bodyStyle={bodyStyle}
-        open={this.props.open}
-        onRequestClose={() => this.onRequestClose()}
-        autoScrollBodyContent
-      >
-        <EventListener target="window" onResize={() => this.updateSizing()} />
-        <div
-          style={previewContainerStyle}
-          ref={(e) => {
-            this.container = e;
-            this.updateSizing();
-          }}
-        >
-          {videoViews}
-        </div>
+      <Dialog open={this.props.open} onClose={() => this.onRequestClose()}>
+        <DialogTitle>Select a position to swap with</DialogTitle>
+        <DialogContent dividers style={bodyStyle}>
+          {/* resize listener handled in lifecycle methods */}
+          <div
+            style={previewContainerStyle}
+            ref={(e) => {
+              this.container = e;
+              this.updateSizing();
+            }}
+          >
+            {videoViews}
+          </div>
+        </DialogContent>
+        <DialogActions>{actions}</DialogActions>
       </Dialog>
     );
   }
