@@ -467,7 +467,7 @@ jobs:
           python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.queue == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -500,7 +500,7 @@ jobs:
           python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.index == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -536,7 +536,7 @@ jobs:
           python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.default == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -594,7 +594,7 @@ jobs:
           FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.web == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -635,7 +635,7 @@ jobs:
           FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.api == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -671,7 +671,7 @@ jobs:
           python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-io == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -707,7 +707,7 @@ jobs:
           python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-cpu == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -754,7 +754,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.pwa == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -787,7 +787,7 @@ jobs:
           python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.cron == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
@@ -829,7 +829,7 @@ jobs:
           python-version: "3.12"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.dispatch == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Setup Google Cloud Platform
