@@ -24,7 +24,7 @@ jobs:
               - '**/requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: "pip"
@@ -51,7 +51,7 @@ jobs:
               - '**/requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: "pip"
@@ -82,7 +82,7 @@ jobs:
               - '.test_durations'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: "pip"
@@ -118,7 +118,7 @@ jobs:
               - '.test_durations'
       - name: Set up Python 3.12
         if: steps.changes.outputs.python == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: "pip"
@@ -377,7 +377,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: "pip"
@@ -410,7 +410,7 @@ jobs:
               - 'requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.buildweb == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Set up Node
@@ -447,7 +447,7 @@ jobs:
               - 'requirements.txt'
       - name: Set up Python 3.12
         if: steps.changes.outputs.web == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: "pip"
