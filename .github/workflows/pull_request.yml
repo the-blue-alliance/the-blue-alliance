@@ -14,7 +14,7 @@ jobs:
     name: "[py3] Type Check"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -41,7 +41,7 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -71,7 +71,7 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -107,7 +107,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [py3-test]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -145,7 +145,7 @@ jobs:
     name: "[node] Format & Lint"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -170,7 +170,7 @@ jobs:
     name: "[node] Test"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -201,7 +201,7 @@ jobs:
     name: "[pwa] Format & Lint"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
@@ -223,7 +223,7 @@ jobs:
     name: "[pwa] Type Check"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
@@ -241,7 +241,7 @@ jobs:
     name: "[pwa] Test"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
@@ -264,7 +264,7 @@ jobs:
     name: "[pwa] Test w/ Devbox"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install devbox
         uses: jetify-com/devbox-install-action@v0.14.0
         with:
@@ -284,7 +284,7 @@ jobs:
     name: "[pwa] Build"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Node
         uses: actions/setup-node@v4.4.0
         with:
@@ -306,7 +306,7 @@ jobs:
   #   runs-on: ubuntu-22.04
   #   if: ${{ github.actor != 'dependabot[bot]' }}
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v6
 
   #     - name: Set up Node
   #       uses: actions/setup-node@v4.4.0
@@ -336,7 +336,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -375,7 +375,7 @@ jobs:
     name: "[bash] Lint"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -398,7 +398,7 @@ jobs:
     name: Build Web
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -435,7 +435,7 @@ jobs:
         ports:
           - 5000:5000
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: changes
         with:
