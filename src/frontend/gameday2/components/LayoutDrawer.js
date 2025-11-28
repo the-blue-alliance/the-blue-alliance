@@ -78,7 +78,9 @@ const LayoutDrawer = (props) => {
       open={props.layoutDrawerVisible}
       onClose={() => props.setLayoutDrawerVisibility(false)}
       anchor="right"
-      PaperProps={{ style: { width: 300 } }}
+      PaperProps={{
+        style: { width: 300, marginTop: theme.layout.appBarHeight },
+      }}
     >
       <div>
         <List>

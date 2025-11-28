@@ -1,4 +1,5 @@
 import React from "react";
+import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -25,12 +26,13 @@ const AppBar = (props) => {
 
   const appBarStyle = {
     height: theme.layout.appBarHeight,
+    minHeight: theme.layout.appBarHeight,
     backgroundColor:
       (theme.palette && theme.palette.primary && theme.palette.primary.main) ||
       undefined,
-    position: "relative",
     zIndex: theme.zIndex && theme.zIndex.appBar,
     paddingRight: 0,
+    paddingLeft: 0,
   };
 
   const appBarTitleStyle = {
@@ -43,6 +45,7 @@ const AppBar = (props) => {
     color: theme.appBar.textColor,
     textDecoration: "none",
     fontSize: 12,
+    paddingLeft: 8,
   };
 
   const tbaBrandingButton = (
@@ -68,25 +71,27 @@ const AppBar = (props) => {
   );
 
   return (
-    <div>
-      <Toolbar style={appBarStyle}>
-        <div>
-          {tbaBrandingButton}
-          <div style={appBarTitleStyle}>GameDay</div>
-          <a style={appBarSubtitleStyle} href="/">
-            by The Blue Alliance
-          </a>
-          <div
-            className="fb-like"
-            data-href="https://www.facebook.com/thebluealliance/"
-            data-layout="button_count"
-            data-action="like"
-            data-size="small"
-            data-show-faces="false"
-            data-share="false"
-          />
-        </div>
-        <div>{configureLayoutButton}</div>
+    <Box>
+      <Toolbar
+        style={appBarStyle}
+        variant="dense"
+        sx={{ flexDirection: "row", flexWrap: "nowrap" }}
+      >
+        {tbaBrandingButton}
+        <Box sx={appBarTitleStyle}>GameDay</Box>
+        <a style={appBarSubtitleStyle} href="/">
+          by The Blue Alliance
+        </a>
+        <div
+          className="fb-like"
+          data-href="https://www.facebook.com/thebluealliance/"
+          data-layout="button_count"
+          data-action="like"
+          data-size="small"
+          data-show-faces="false"
+          data-share="false"
+        />
+        <Box sx={{ marginLeft: "auto" }}>{configureLayoutButton}</Box>
       </Toolbar>
       <LayoutDrawer
         setLayout={props.setLayout}
@@ -101,7 +106,7 @@ const AppBar = (props) => {
         hasWebcasts={props.webcasts.length > 0}
         resetWebcasts={props.resetWebcasts}
       />
-    </div>
+    </Box>
   );
 };
 
