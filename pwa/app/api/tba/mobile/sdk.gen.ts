@@ -32,40 +32,29 @@ export type Options<
  */
 export const listFavorites = <ThrowOnError extends boolean = false>(
   options?: Options<ListFavoritesData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
+) =>
+  (options?.client ?? client).post<
     ListFavoritesResponses,
     unknown,
     ThrowOnError
   >({
-    security: [
-      {
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/favorites/list',
     ...options,
   });
-};
 
 /**
  * Set model preferences
  */
 export const setModelPreferences = <ThrowOnError extends boolean = false>(
   options: Options<SetModelPreferencesData, ThrowOnError>,
-) => {
-  return (options.client ?? client).post<
+) =>
+  (options.client ?? client).post<
     SetModelPreferencesResponses,
     unknown,
     ThrowOnError
   >({
-    security: [
-      {
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/model/setPreferences',
     ...options,
     headers: {
@@ -73,26 +62,19 @@ export const setModelPreferences = <ThrowOnError extends boolean = false>(
       ...options.headers,
     },
   });
-};
 
 /**
  * List subscriptions
  */
 export const listSubscriptions = <ThrowOnError extends boolean = false>(
   options?: Options<ListSubscriptionsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
+) =>
+  (options?.client ?? client).post<
     ListSubscriptionsResponses,
     unknown,
     ThrowOnError
   >({
-    security: [
-      {
-        scheme: 'bearer',
-        type: 'http',
-      },
-    ],
+    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/subscriptions/list',
     ...options,
   });
-};
