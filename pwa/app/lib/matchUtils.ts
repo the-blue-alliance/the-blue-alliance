@@ -18,6 +18,10 @@ export const COMP_LEVEL_SHORT_STRINGS = {
   qm: 'Quals',
 };
 
+export type AllianceColor = 'red' | 'blue';
+
+type RecycleRushWLTStrategy = 'official' | 'score-based';
+
 export function isValidMatchKey(key: string) {
   return /^[1-9]\d{3}[a-z]+[0-9]*_(?:qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$/.test(
     key,
@@ -97,50 +101,129 @@ function getMaybeUnpenalizedScores(m: Match): { blue: number; red: number } {
   return { blue: m.alliances.blue.score, red: m.alliances.red.score };
 }
 
+/*
+ * Returns the result of a match for a given alliance.
+ * @param match - The match to get the result of.
+ * @param alliance - The alliance to get the result of.
+ * @param recycleRushStrategy - 'official' for quals/qf/sf being all ties. 'score-based' for quals/qf/sf being based on score.
+ * @returns 'win', 'loss', 'tie', or undefined if the match hasn't been played.
+ */
+export function getAllianceMatchResult(
+  match: Match,
+  alliance: AllianceColor,
+  recycleRushStrategy: RecycleRushWLTStrategy,
+): 'win' | 'loss' | 'tie' | undefined {
+  // match not played or only partially scored
+  if (!matchHasBeenPlayed(match)) {
+    return undefined;
+  }
+
+  // no winner listed
+  if (match.winning_alliance === '') {
+    // if it's been played, there's no winner, and it's not 2015, it's a tie
+    if (!match.key.startsWith('2015')) {
+      return 'tie';
+    }
+
+    // if it's been played, there's no winner, but it is 2015
+    if (recycleRushStrategy === 'official') {
+      return 'tie';
+    }
+
+    if (recycleRushStrategy === 'score-based') {
+      if (
+        (match.alliances.red.score > match.alliances.blue.score &&
+          alliance === 'red') ||
+        (match.alliances.blue.score > match.alliances.red.score &&
+          alliance === 'blue')
+      ) {
+        return 'win';
+      }
+      if (
+        (match.alliances.red.score < match.alliances.blue.score &&
+          alliance === 'red') ||
+        (match.alliances.blue.score < match.alliances.red.score &&
+          alliance === 'blue')
+      ) {
+        return 'loss';
+      }
+
+      return 'tie';
+    }
+  }
+
+  return match.winning_alliance === alliance ? 'win' : 'loss';
+}
+
+export function getTeamMatchResults(
+  teamKey: string,
+  matches: Match[],
+  recycleRushStrategy: RecycleRushWLTStrategy = 'official',
+): {
+  quals: { wins: Match[]; losses: Match[]; ties: Match[] };
+  playoff: { wins: Match[]; losses: Match[]; ties: Match[] };
+} {
+  const allWins = matches.filter(
+    (m) =>
+      (getAllianceMatchResult(m, 'red', recycleRushStrategy) === 'win' &&
+        m.alliances.red.team_keys.includes(teamKey)) ||
+      (getAllianceMatchResult(m, 'blue', recycleRushStrategy) === 'win' &&
+        m.alliances.blue.team_keys.includes(teamKey)),
+  );
+  const allLosses = matches.filter(
+    (m) =>
+      (getAllianceMatchResult(m, 'red', recycleRushStrategy) === 'loss' &&
+        m.alliances.red.team_keys.includes(teamKey)) ||
+      (getAllianceMatchResult(m, 'blue', recycleRushStrategy) === 'loss' &&
+        m.alliances.blue.team_keys.includes(teamKey)),
+  );
+  const allTies = matches.filter(
+    (m) =>
+      (getAllianceMatchResult(m, 'red', recycleRushStrategy) === 'tie' &&
+        m.alliances.red.team_keys.includes(teamKey)) ||
+      (getAllianceMatchResult(m, 'blue', recycleRushStrategy) === 'tie' &&
+        m.alliances.blue.team_keys.includes(teamKey)),
+  );
+  const quals = {
+    wins: allWins.filter((m) => m.comp_level === 'qm'),
+    losses: allLosses.filter((m) => m.comp_level === 'qm'),
+    ties: allTies.filter((m) => m.comp_level === 'qm'),
+  };
+  const playoff = {
+    wins: allWins.filter((m) => m.comp_level !== 'qm'),
+    losses: allLosses.filter((m) => m.comp_level !== 'qm'),
+    ties: allTies.filter((m) => m.comp_level !== 'qm'),
+  };
+  return { quals, playoff };
+}
+
 export function calculateTeamRecordsFromMatches(
   teamKey: string,
   matches: Match[],
+  recycleRushStrategy: RecycleRushWLTStrategy = 'official',
 ): {
   quals: WltRecord;
   playoff: WltRecord;
 } {
-  const won = matches.filter(
-    (m) =>
-      (m.winning_alliance === 'red' &&
-        m.alliances.red.team_keys.includes(teamKey)) ||
-      (m.winning_alliance === 'blue' &&
-        m.alliances.blue.team_keys.includes(teamKey)),
+  const { quals, playoff } = getTeamMatchResults(
+    teamKey,
+    matches,
+    recycleRushStrategy,
   );
 
-  const lost = matches.filter(
-    (m) =>
-      (m.winning_alliance === 'red' &&
-        m.alliances.blue.team_keys.includes(teamKey)) ||
-      (m.winning_alliance === 'blue' &&
-        m.alliances.red.team_keys.includes(teamKey)),
-  );
-
-  const tied = matches.filter(
-    (m) =>
-      (m.alliances.blue.team_keys.includes(teamKey) ||
-        m.alliances.red.team_keys.includes(teamKey)) &&
-      m.winning_alliance === '' &&
-      matchHasBeenPlayed(m),
-  );
-
-  const quals: WltRecord = {
-    wins: won.filter((m) => m.comp_level === 'qm').length,
-    losses: lost.filter((m) => m.comp_level === 'qm').length,
-    ties: tied.filter((m) => m.comp_level === 'qm').length,
+  const qualsRecord: WltRecord = {
+    wins: quals.wins.length,
+    losses: quals.losses.length,
+    ties: quals.ties.length,
   };
 
-  const playoff: WltRecord = {
-    wins: won.filter((m) => m.comp_level !== 'qm').length,
-    losses: lost.filter((m) => m.comp_level !== 'qm').length,
-    ties: tied.filter((m) => m.comp_level !== 'qm').length,
+  const playoffRecord: WltRecord = {
+    wins: playoff.wins.length,
+    losses: playoff.losses.length,
+    ties: playoff.ties.length,
   };
 
-  return { quals, playoff };
+  return { quals: qualsRecord, playoff: playoffRecord };
 }
 
 export function getTeamsUnpenalizedHighScore(
