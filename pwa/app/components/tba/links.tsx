@@ -26,9 +26,11 @@ TeamLink.displayName = 'TeamLink';
 
 const EventLink = React.forwardRef<
   HTMLAnchorElement,
-  React.PropsWithChildren<{
-    eventOrKey: Event | string;
-  }>
+  React.PropsWithChildren<
+    {
+      eventOrKey: Event | string;
+    } & React.AnchorHTMLAttributes<HTMLAnchorElement>
+  >
 >(({ eventOrKey, ...props }, ref) => {
   const eventKey = typeof eventOrKey === 'string' ? eventOrKey : eventOrKey.key;
   return <Link to={`/event/${eventKey}`} {...props} ref={ref} />;

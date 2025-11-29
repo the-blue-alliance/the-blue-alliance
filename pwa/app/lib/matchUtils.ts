@@ -1,4 +1,4 @@
-import { Match, MatchAlliance, WltRecord } from '~/api/tba/read';
+import { Event, Match, MatchAlliance, WltRecord } from '~/api/tba/read';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { median } from '~/lib/utils';
 
@@ -35,6 +35,15 @@ export function sortMatchComparator(a: Match, b: Match) {
     );
   }
   return a.set_number - b.set_number || a.match_number - b.match_number;
+}
+
+export function sortMultipleEventsMatches(matches: Match[], events: Event[]) {
+  const eventKeys = events.map((e) => e.key);
+  return matches.sort(
+    (a, b) =>
+      eventKeys.indexOf(a.event_key) - eventKeys.indexOf(b.event_key) ||
+      sortMatchComparator(a, b),
+  );
 }
 
 export function matchTitleShort(
