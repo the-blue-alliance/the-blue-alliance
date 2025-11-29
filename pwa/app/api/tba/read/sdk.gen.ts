@@ -428,532 +428,370 @@ export type Options<
  */
 export const getStatus = <ThrowOnError extends boolean = false>(
   options?: Options<GetStatusData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     GetStatusResponses,
     GetStatusErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetStatusData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetStatusResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetStatusData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetStatusResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/status',
     ...options,
   });
-};
 
 /**
  * Gets a list of `Team` objects, paginated in groups of 500.
  */
 export const getTeams = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamsResponses,
     GetTeamsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetTeamsData.parseAsync(data),
+    responseValidator: async (data) => await zGetTeamsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/teams/{page_num}',
     ...options,
   });
-};
 
 /**
  * Gets a list of short form `Team_Simple` objects, paginated in groups of 500.
  */
 export const getTeamsSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamsSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamsSimpleResponses,
     GetTeamsSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamsSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamsSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamsSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamsSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/teams/{page_num}/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of Team keys, paginated in groups of 500. (Note, each page will not have 500 teams, but will include the teams within that range of 500.)
  */
 export const getTeamsKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamsKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamsKeysResponses,
     GetTeamsKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamsKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamsKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetTeamsKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamsKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/teams/{page_num}/keys',
     ...options,
   });
-};
 
 /**
  * Gets a list of `Team` objects that competed in the given year, paginated in groups of 500.
  */
 export const getTeamsByYear = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamsByYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamsByYearResponses,
     GetTeamsByYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamsByYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamsByYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamsByYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamsByYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/teams/{year}/{page_num}',
     ...options,
   });
-};
 
 /**
  * Gets a list of short form `Team_Simple` objects that competed in the given year, paginated in groups of 500.
  */
 export const getTeamsByYearSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamsByYearSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamsByYearSimpleResponses,
     GetTeamsByYearSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamsByYearSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamsByYearSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamsByYearSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamsByYearSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/teams/{year}/{page_num}/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list Team Keys that competed in the given year, paginated in groups of 500.
  */
 export const getTeamsByYearKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamsByYearKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamsByYearKeysResponses,
     GetTeamsByYearKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamsByYearKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamsByYearKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamsByYearKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamsByYearKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/teams/{year}/{page_num}/keys',
     ...options,
   });
-};
 
 /**
  * Gets a `Team` object for the team referenced by the given key.
  */
 export const getTeam = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
-    GetTeamResponses,
-    GetTeamErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) => {
-      return await zGetTeamData.parseAsync(data);
+) =>
+  (options.client ?? client).get<GetTeamResponses, GetTeamErrors, ThrowOnError>(
+    {
+      requestValidator: async (data) => await zGetTeamData.parseAsync(data),
+      responseValidator: async (data) =>
+        await zGetTeamResponse.parseAsync(data),
+      security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+      url: '/team/{team_key}',
+      ...options,
     },
-    responseValidator: async (data) => {
-      return await zGetTeamResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
-    url: '/team/{team_key}',
-    ...options,
-  });
-};
+  );
 
 /**
  * Gets a `Team_Simple` object for the team referenced by the given key.
  */
 export const getTeamSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamSimpleResponses,
     GetTeamSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetTeamSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/simple',
     ...options,
   });
-};
 
 /**
  * Gets the history for the team referenced by the given key, including their events and awards.
  */
 export const getTeamHistory = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamHistoryData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamHistoryResponses,
     GetTeamHistoryErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamHistoryData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamHistoryResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamHistoryData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamHistoryResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/history',
     ...options,
   });
-};
 
 /**
  * Gets a list of years in which the team participated in at least one competition.
  */
 export const getTeamYearsParticipated = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamYearsParticipatedData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamYearsParticipatedResponses,
     GetTeamYearsParticipatedErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamYearsParticipatedData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamYearsParticipatedResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamYearsParticipatedData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamYearsParticipatedResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/years_participated',
     ...options,
   });
-};
 
 /**
  * Gets an array of districts representing each year the team was in a district. Will return an empty array if the team was never in a district.
  */
 export const getTeamDistricts = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamDistrictsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamDistrictsResponses,
     GetTeamDistrictsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamDistrictsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamDistrictsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamDistrictsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamDistrictsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/districts',
     ...options,
   });
-};
 
 /**
  * Gets a list of year and robot name pairs for each year that a robot name was provided. Will return an empty array if the team has never named a robot.
  */
 export const getTeamRobots = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamRobotsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamRobotsResponses,
     GetTeamRobotsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamRobotsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamRobotsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetTeamRobotsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamRobotsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/robots',
     ...options,
   });
-};
 
 /**
  * Gets a list of all events this team has competed at.
  */
 export const getTeamEvents = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventsResponses,
     GetTeamEventsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetTeamEventsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/events',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of all events this team has competed at.
  */
 export const getTeamEventsSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventsSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventsSimpleResponses,
     GetTeamEventsSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventsSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventsSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventsSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventsSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/events/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of the event keys for all events this team has competed at.
  */
 export const getTeamEventsKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventsKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventsKeysResponses,
     GetTeamEventsKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventsKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventsKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventsKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventsKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/events/keys',
     ...options,
   });
-};
 
 /**
  * Gets a list of events this team has competed at in the given year.
  */
 export const getTeamEventsByYear = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventsByYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventsByYearResponses,
     GetTeamEventsByYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventsByYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventsByYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventsByYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventsByYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/events/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of events this team has competed at in the given year.
  */
 export const getTeamEventsByYearSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventsByYearSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventsByYearSimpleResponses,
     GetTeamEventsByYearSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventsByYearSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventsByYearSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventsByYearSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventsByYearSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/events/{year}/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of the event keys for events this team has competed at in the given year.
  */
 export const getTeamEventsByYearKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventsByYearKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventsByYearKeysResponses,
     GetTeamEventsByYearKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventsByYearKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventsByYearKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventsByYearKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventsByYearKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/events/{year}/keys',
     ...options,
   });
-};
 
 /**
  * Gets a key-value list of the event statuses for events this team has competed at in the given year.
@@ -962,252 +800,179 @@ export const getTeamEventsStatusesByYear = <
   ThrowOnError extends boolean = false,
 >(
   options: Options<GetTeamEventsStatusesByYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventsStatusesByYearResponses,
     GetTeamEventsStatusesByYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventsStatusesByYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventsStatusesByYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventsStatusesByYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventsStatusesByYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/events/{year}/statuses',
     ...options,
   });
-};
 
 /**
  * Gets a list of matches for the given team and event.
  */
 export const getTeamEventMatches = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventMatchesData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventMatchesResponses,
     GetTeamEventMatchesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventMatchesData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventMatchesResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventMatchesData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventMatchesResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/event/{event_key}/matches',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of matches for the given team and event.
  */
 export const getTeamEventMatchesSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventMatchesSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventMatchesSimpleResponses,
     GetTeamEventMatchesSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventMatchesSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventMatchesSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventMatchesSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventMatchesSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/event/{event_key}/matches/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of match keys for matches for the given team and event.
  */
 export const getTeamEventMatchesKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventMatchesKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventMatchesKeysResponses,
     GetTeamEventMatchesKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventMatchesKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventMatchesKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventMatchesKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventMatchesKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/event/{event_key}/matches/keys',
     ...options,
   });
-};
 
 /**
  * Gets a list of awards the given team won at the given event.
  */
 export const getTeamEventAwards = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventAwardsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventAwardsResponses,
     GetTeamEventAwardsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventAwardsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventAwardsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventAwardsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventAwardsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/event/{event_key}/awards',
     ...options,
   });
-};
 
 /**
  * Gets the competition rank and status of the team at the given event.
  */
 export const getTeamEventStatus = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamEventStatusData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamEventStatusResponses,
     GetTeamEventStatusErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamEventStatusData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamEventStatusResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamEventStatusData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamEventStatusResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/event/{event_key}/status',
     ...options,
   });
-};
 
 /**
  * Gets a list of awards the given team has won.
  */
 export const getTeamAwards = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamAwardsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamAwardsResponses,
     GetTeamAwardsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamAwardsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamAwardsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetTeamAwardsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamAwardsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/awards',
     ...options,
   });
-};
 
 /**
  * Gets a list of awards the given team has won in a given year.
  */
 export const getTeamAwardsByYear = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamAwardsByYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamAwardsByYearResponses,
     GetTeamAwardsByYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamAwardsByYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamAwardsByYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamAwardsByYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamAwardsByYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/awards/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a list of matches for the given team and year.
  */
 export const getTeamMatchesByYear = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamMatchesByYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamMatchesByYearResponses,
     GetTeamMatchesByYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamMatchesByYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamMatchesByYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamMatchesByYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamMatchesByYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/matches/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of matches for the given team and year.
@@ -1216,504 +981,356 @@ export const getTeamMatchesByYearSimple = <
   ThrowOnError extends boolean = false,
 >(
   options: Options<GetTeamMatchesByYearSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamMatchesByYearSimpleResponses,
     GetTeamMatchesByYearSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamMatchesByYearSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamMatchesByYearSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamMatchesByYearSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamMatchesByYearSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/matches/{year}/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of match keys for matches for the given team and year.
  */
 export const getTeamMatchesByYearKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamMatchesByYearKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamMatchesByYearKeysResponses,
     GetTeamMatchesByYearKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamMatchesByYearKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamMatchesByYearKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamMatchesByYearKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamMatchesByYearKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/matches/{year}/keys',
     ...options,
   });
-};
 
 /**
  * Gets a list of Media (videos / pictures) for the given team and year.
  */
 export const getTeamMediaByYear = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamMediaByYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamMediaByYearResponses,
     GetTeamMediaByYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamMediaByYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamMediaByYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamMediaByYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamMediaByYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/media/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a list of Media (videos / pictures) for the given team and tag.
  */
 export const getTeamMediaByTag = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamMediaByTagData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamMediaByTagResponses,
     GetTeamMediaByTagErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamMediaByTagData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamMediaByTagResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamMediaByTagData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamMediaByTagResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/media/tag/{media_tag}',
     ...options,
   });
-};
 
 /**
  * Gets a list of Media (videos / pictures) for the given team, tag and year.
  */
 export const getTeamMediaByTagYear = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamMediaByTagYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamMediaByTagYearResponses,
     GetTeamMediaByTagYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamMediaByTagYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamMediaByTagYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamMediaByTagYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamMediaByTagYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/media/tag/{media_tag}/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a list of Media (social media) for the given team.
  */
 export const getTeamSocialMedia = <ThrowOnError extends boolean = false>(
   options: Options<GetTeamSocialMediaData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetTeamSocialMediaResponses,
     GetTeamSocialMediaErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetTeamSocialMediaData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetTeamSocialMediaResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetTeamSocialMediaData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTeamSocialMediaResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/team/{team_key}/social_media',
     ...options,
   });
-};
 
 /**
  * Gets a list of events in the given year.
  */
 export const getEventsByYear = <ThrowOnError extends boolean = false>(
   options: Options<GetEventsByYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventsByYearResponses,
     GetEventsByYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventsByYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventsByYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventsByYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventsByYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/events/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of events in the given year.
  */
 export const getEventsByYearSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetEventsByYearSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventsByYearSimpleResponses,
     GetEventsByYearSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventsByYearSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventsByYearSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventsByYearSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventsByYearSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/events/{year}/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of event keys in the given year.
  */
 export const getEventsByYearKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetEventsByYearKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventsByYearKeysResponses,
     GetEventsByYearKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventsByYearKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventsByYearKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventsByYearKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventsByYearKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/events/{year}/keys',
     ...options,
   });
-};
 
 /**
  * Gets an Event.
  */
 export const getEvent = <ThrowOnError extends boolean = false>(
   options: Options<GetEventData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventResponses,
     GetEventErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetEventData.parseAsync(data),
+    responseValidator: async (data) => await zGetEventResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}',
     ...options,
   });
-};
 
 /**
  * Gets a short-form Event.
  */
 export const getEventSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetEventSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventSimpleResponses,
     GetEventSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of Elimination Alliances for the given Event.
  */
 export const getEventAlliances = <ThrowOnError extends boolean = false>(
   options: Options<GetEventAlliancesData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventAlliancesResponses,
     GetEventAlliancesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventAlliancesData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventAlliancesResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventAlliancesData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventAlliancesResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/alliances',
     ...options,
   });
-};
 
 /**
  * Gets a set of Event-specific insights for the given Event.
  */
 export const getEventInsights = <ThrowOnError extends boolean = false>(
   options: Options<GetEventInsightsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventInsightsResponses,
     GetEventInsightsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventInsightsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventInsightsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventInsightsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventInsightsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/insights',
     ...options,
   });
-};
 
 /**
  * Gets a set of Event OPRs (including OPR, DPR, and CCWM) for the given Event.
  */
 export const getEventOprs = <ThrowOnError extends boolean = false>(
   options: Options<GetEventOprsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventOprsResponses,
     GetEventOprsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventOprsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventOprsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetEventOprsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventOprsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/oprs',
     ...options,
   });
-};
 
 /**
  * Gets a set of Event Component OPRs for the given Event.
  */
 export const getEventCoprs = <ThrowOnError extends boolean = false>(
   options: Options<GetEventCoprsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventCoprsResponses,
     GetEventCoprsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventCoprsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventCoprsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetEventCoprsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventCoprsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/coprs',
     ...options,
   });
-};
 
 /**
  * Gets information on TBA-generated predictions for the given Event. Contains year-specific information. *WARNING* This endpoint is currently under development and may change at any time.
  */
 export const getEventPredictions = <ThrowOnError extends boolean = false>(
   options: Options<GetEventPredictionsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventPredictionsResponses,
     GetEventPredictionsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventPredictionsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventPredictionsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventPredictionsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventPredictionsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/predictions',
     ...options,
   });
-};
 
 /**
  * Gets a list of team rankings for the Event.
  */
 export const getEventRankings = <ThrowOnError extends boolean = false>(
   options: Options<GetEventRankingsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventRankingsResponses,
     GetEventRankingsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventRankingsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventRankingsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventRankingsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventRankingsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/rankings',
     ...options,
   });
-};
 
 /**
  * Gets a list of district points for the Event. These are always calculated, regardless of event type, and may/may not be actually useful.
  */
 export const getEventDistrictPoints = <ThrowOnError extends boolean = false>(
   options: Options<GetEventDistrictPointsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventDistrictPointsResponses,
     GetEventDistrictPointsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventDistrictPointsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventDistrictPointsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventDistrictPointsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventDistrictPointsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/district_points',
     ...options,
   });
-};
 
 /**
  * For 2025+ Regional events, this will return points towards the Championship qualification pool.
@@ -1722,252 +1339,179 @@ export const getRegionalChampsPoolPoints = <
   ThrowOnError extends boolean = false,
 >(
   options: Options<GetRegionalChampsPoolPointsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetRegionalChampsPoolPointsResponses,
     GetRegionalChampsPoolPointsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetRegionalChampsPoolPointsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetRegionalChampsPoolPointsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetRegionalChampsPoolPointsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRegionalChampsPoolPointsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/regional_champs_pool_points',
     ...options,
   });
-};
 
 /**
  * Depending on the type of event (district/regional), this will return either district points or regional CMP points
  */
 export const getEventAdvancementPoints = <ThrowOnError extends boolean = false>(
   options: Options<GetEventAdvancementPointsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventAdvancementPointsResponses,
     GetEventAdvancementPointsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventAdvancementPointsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventAdvancementPointsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventAdvancementPointsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventAdvancementPointsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/advancement_points',
     ...options,
   });
-};
 
 /**
  * Gets a list of `Team` objects that competed in the given event.
  */
 export const getEventTeams = <ThrowOnError extends boolean = false>(
   options: Options<GetEventTeamsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventTeamsResponses,
     GetEventTeamsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventTeamsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventTeamsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetEventTeamsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventTeamsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/teams',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of `Team` objects that competed in the given event.
  */
 export const getEventTeamsSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetEventTeamsSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventTeamsSimpleResponses,
     GetEventTeamsSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventTeamsSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventTeamsSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventTeamsSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventTeamsSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/teams/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of `Team` keys that competed in the given event.
  */
 export const getEventTeamsKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetEventTeamsKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventTeamsKeysResponses,
     GetEventTeamsKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventTeamsKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventTeamsKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventTeamsKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventTeamsKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/teams/keys',
     ...options,
   });
-};
 
 /**
  * Gets a key-value list of the event statuses for teams competing at the given event.
  */
 export const getEventTeamsStatuses = <ThrowOnError extends boolean = false>(
   options: Options<GetEventTeamsStatusesData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventTeamsStatusesResponses,
     GetEventTeamsStatusesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventTeamsStatusesData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventTeamsStatusesResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventTeamsStatusesData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventTeamsStatusesResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/teams/statuses',
     ...options,
   });
-};
 
 /**
  * Gets a list of matches for the given event.
  */
 export const getEventMatches = <ThrowOnError extends boolean = false>(
   options: Options<GetEventMatchesData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventMatchesResponses,
     GetEventMatchesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventMatchesData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventMatchesResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventMatchesData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventMatchesResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/matches',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of matches for the given event.
  */
 export const getEventMatchesSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetEventMatchesSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventMatchesSimpleResponses,
     GetEventMatchesSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventMatchesSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventMatchesSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventMatchesSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventMatchesSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/matches/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of match keys for the given event.
  */
 export const getEventMatchesKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetEventMatchesKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventMatchesKeysResponses,
     GetEventMatchesKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventMatchesKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventMatchesKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventMatchesKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventMatchesKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/matches/keys',
     ...options,
   });
-};
 
 /**
  * Gets an array of Match Keys for the given event key that have timeseries data. Returns an empty array if no matches have timeseries data.
@@ -1976,140 +1520,98 @@ export const getEventMatchesKeys = <ThrowOnError extends boolean = false>(
  */
 export const getEventMatchTimeseries = <ThrowOnError extends boolean = false>(
   options: Options<GetEventMatchTimeseriesData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventMatchTimeseriesResponses,
     GetEventMatchTimeseriesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventMatchTimeseriesData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventMatchTimeseriesResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventMatchTimeseriesData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventMatchTimeseriesResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/matches/timeseries',
     ...options,
   });
-};
 
 /**
  * Gets a list of awards from the given event.
  */
 export const getEventAwards = <ThrowOnError extends boolean = false>(
   options: Options<GetEventAwardsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventAwardsResponses,
     GetEventAwardsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventAwardsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventAwardsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventAwardsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventAwardsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/awards',
     ...options,
   });
-};
 
 /**
  * Gets a list of media objects that correspond to teams at this event.
  */
 export const getEventTeamMedia = <ThrowOnError extends boolean = false>(
   options: Options<GetEventTeamMediaData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetEventTeamMediaResponses,
     GetEventTeamMediaErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetEventTeamMediaData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetEventTeamMediaResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetEventTeamMediaData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventTeamMediaResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/team_media',
     ...options,
   });
-};
 
 /**
  * Gets a `Match` object for the given match key.
  */
 export const getMatch = <ThrowOnError extends boolean = false>(
   options: Options<GetMatchData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetMatchResponses,
     GetMatchErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetMatchData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetMatchResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetMatchData.parseAsync(data),
+    responseValidator: async (data) => await zGetMatchResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/match/{match_key}',
     ...options,
   });
-};
 
 /**
  * Gets a short-form `Match` object for the given match key.
  */
 export const getMatchSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetMatchSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetMatchSimpleResponses,
     GetMatchSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetMatchSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetMatchSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetMatchSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetMatchSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/match/{match_key}/simple',
     ...options,
   });
-};
 
 /**
  * Gets an array of game-specific Match Timeseries objects for the given match key or an empty array if not available.
@@ -2118,476 +1620,339 @@ export const getMatchSimple = <ThrowOnError extends boolean = false>(
  */
 export const getMatchTimeseries = <ThrowOnError extends boolean = false>(
   options: Options<GetMatchTimeseriesData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetMatchTimeseriesResponses,
     GetMatchTimeseriesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetMatchTimeseriesData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetMatchTimeseriesResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetMatchTimeseriesData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetMatchTimeseriesResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/match/{match_key}/timeseries',
     ...options,
   });
-};
 
 /**
  * Gets Zebra MotionWorks data for a Match for the given match key.
  */
 export const getMatchZebra = <ThrowOnError extends boolean = false>(
   options: Options<GetMatchZebraData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetMatchZebraResponses,
     GetMatchZebraErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetMatchZebraData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetMatchZebraResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) => await zGetMatchZebraData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetMatchZebraResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/match/{match_key}/zebra_motionworks',
     ...options,
   });
-};
 
 /**
  * Gets a list of districts and their corresponding district key, for the given year.
  */
 export const getDistrictsByYear = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictsByYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictsByYearResponses,
     GetDistrictsByYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictsByYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictsByYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictsByYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictsByYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/districts/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a list of District objects with the given district abbreviation. This accounts for district abbreviation changes, such as MAR to FMA.
  */
 export const getDistrictHistory = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictHistoryData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictHistoryResponses,
     GetDistrictHistoryErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictHistoryData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictHistoryResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictHistoryData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictHistoryResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_abbreviation}/history',
     ...options,
   });
-};
 
 /**
  * Gets insights for a given district.
  */
 export const getDistrictInsights = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictInsightsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictInsightsResponses,
     GetDistrictInsightsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictInsightsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictInsightsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictInsightsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictInsightsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_abbreviation}/insights',
     ...options,
   });
-};
 
 /**
  * Gets a list of events in the given district.
  */
 export const getDistrictEvents = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictEventsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictEventsResponses,
     GetDistrictEventsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictEventsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictEventsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictEventsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictEventsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/events',
     ...options,
   });
-};
 
 /**
  * Gets a list of awards in the given district.
  */
 export const getDistrictAwards = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictAwardsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictAwardsResponses,
     GetDistrictAwardsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictAwardsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictAwardsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictAwardsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictAwardsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/awards',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of events in the given district.
  */
 export const getDistrictEventsSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictEventsSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictEventsSimpleResponses,
     GetDistrictEventsSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictEventsSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictEventsSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictEventsSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictEventsSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/events/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of event keys for events in the given district.
  */
 export const getDistrictEventsKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictEventsKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictEventsKeysResponses,
     GetDistrictEventsKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictEventsKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictEventsKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictEventsKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictEventsKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/events/keys',
     ...options,
   });
-};
 
 /**
  * Gets a list of `Team` objects that competed in events in the given district.
  */
 export const getDistrictTeams = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictTeamsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictTeamsResponses,
     GetDistrictTeamsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictTeamsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictTeamsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictTeamsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictTeamsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/teams',
     ...options,
   });
-};
 
 /**
  * Gets a short-form list of `Team` objects that competed in events in the given district.
  */
 export const getDistrictTeamsSimple = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictTeamsSimpleData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictTeamsSimpleResponses,
     GetDistrictTeamsSimpleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictTeamsSimpleData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictTeamsSimpleResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictTeamsSimpleData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictTeamsSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/teams/simple',
     ...options,
   });
-};
 
 /**
  * Gets a list of `Team` objects that competed in events in the given district.
  */
 export const getDistrictTeamsKeys = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictTeamsKeysData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictTeamsKeysResponses,
     GetDistrictTeamsKeysErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictTeamsKeysData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictTeamsKeysResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictTeamsKeysData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictTeamsKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/teams/keys',
     ...options,
   });
-};
 
 /**
  * Gets a list of team district rankings for the given district.
  */
 export const getDistrictRankings = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictRankingsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictRankingsResponses,
     GetDistrictRankingsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictRankingsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictRankingsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictRankingsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictRankingsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/rankings',
     ...options,
   });
-};
 
 /**
  * Gets a list of advancement information per team in a district.
  */
 export const getDistrictAdvancement = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictAdvancementData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictAdvancementResponses,
     GetDistrictAdvancementErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictAdvancementData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictAdvancementResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictAdvancementData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictAdvancementResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_key}/advancement',
     ...options,
   });
-};
 
 /**
  * Gets a list of DCMP events and awards for the given district abbreviation.
  */
 export const getDistrictDcmpHistory = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictDcmpHistoryData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetDistrictDcmpHistoryResponses,
     GetDistrictDcmpHistoryErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetDistrictDcmpHistoryData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetDistrictDcmpHistoryResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetDistrictDcmpHistoryData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDistrictDcmpHistoryResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/district/{district_abbreviation}/dcmp_history',
     ...options,
   });
-};
 
 /**
  * Gets information about per-team advancement to the FIRST Championship.
  */
 export const getRegionalAdvancement = <ThrowOnError extends boolean = false>(
   options: Options<GetRegionalAdvancementData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetRegionalAdvancementResponses,
     GetRegionalAdvancementErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetRegionalAdvancementData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetRegionalAdvancementResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetRegionalAdvancementData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRegionalAdvancementResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/regional_advancement/{year}',
     ...options,
   });
-};
 
 /**
  * Gets the team rankings in the regional pool for a specific year.
  */
 export const getRegionalRankings = <ThrowOnError extends boolean = false>(
   options: Options<GetRegionalRankingsData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetRegionalRankingsResponses,
     GetRegionalRankingsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetRegionalRankingsData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetRegionalRankingsResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetRegionalRankingsData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRegionalRankingsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/regional_advancement/{year}/rankings',
     ...options,
   });
-};
 
 /**
  * Gets a list of `LeaderboardInsight` objects from a specific year. Use year=0 for overall.
@@ -2596,81 +1961,57 @@ export const getInsightsLeaderboardsYear = <
   ThrowOnError extends boolean = false,
 >(
   options: Options<GetInsightsLeaderboardsYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetInsightsLeaderboardsYearResponses,
     GetInsightsLeaderboardsYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetInsightsLeaderboardsYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetInsightsLeaderboardsYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetInsightsLeaderboardsYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInsightsLeaderboardsYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/insights/leaderboards/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a list of `NotablesInsight` objects from a specific year. Use year=0 for overall.
  */
 export const getInsightsNotablesYear = <ThrowOnError extends boolean = false>(
   options: Options<GetInsightsNotablesYearData, ThrowOnError>,
-) => {
-  return (options.client ?? client).get<
+) =>
+  (options.client ?? client).get<
     GetInsightsNotablesYearResponses,
     GetInsightsNotablesYearErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetInsightsNotablesYearData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetInsightsNotablesYearResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetInsightsNotablesYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInsightsNotablesYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/insights/notables/{year}',
     ...options,
   });
-};
 
 /**
  * Gets a large blob of data that is used on the frontend for searching. May change without notice.
  */
 export const getSearchIndex = <ThrowOnError extends boolean = false>(
   options?: Options<GetSearchIndexData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
+) =>
+  (options?.client ?? client).get<
     GetSearchIndexResponses,
     GetSearchIndexErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zGetSearchIndexData.parseAsync(data);
-    },
-    responseValidator: async (data) => {
-      return await zGetSearchIndexResponse.parseAsync(data);
-    },
-    security: [
-      {
-        name: 'X-TBA-Auth-Key',
-        type: 'apiKey',
-      },
-    ],
+    requestValidator: async (data) =>
+      await zGetSearchIndexData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSearchIndexResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/search_index',
     ...options,
   });
-};
