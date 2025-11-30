@@ -1,12 +1,17 @@
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { uniq } from 'lodash-es';
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useLoaderData } from 'react-router';
 
+import MdiCog from '~icons/mdi/cog';
+import MdiRobotExcited from '~icons/mdi/robot-excited';
+
+import { Event } from '~/api/tba/read';
+import { getTeamMatchesByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import {
   getTeam,
   getTeamAwards,
   getTeamEvents,
-  getTeamMatchesByYear,
   getTeamMediaByYear,
   getTeamSocialMedia,
 } from '~/api/tba/read/sdk.gen';
@@ -46,21 +51,8 @@ async function loadData(params: Route.LoaderArgs['params']) {
     throw new Response(null, { status: 404 });
   }
 
-  const allMatchesByYear = await Promise.all(
-    uniq(events.data.map((e) => e.year)).map((year) =>
-      getTeamMatchesByYear({
-        path: { team_key: `frc${params.teamNumber}`, year },
-      }),
-    ),
-  );
-
-  if (allMatchesByYear.some((resp) => resp.data === undefined)) {
-    throw new Response(null, { status: 500 });
-  }
-
   return {
     team: team.data,
-    allMatchesByYear: allMatchesByYear.map((resp) => resp.data ?? []),
     allAwards: awards.data,
     allEvents: events.data,
     socials: socials.data,
@@ -92,8 +84,87 @@ export function meta({ data }: Route.MetaArgs) {
   ];
 }
 
+function MatchStatsLoadingState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16">
+      <div className="relative mb-6">
+        <MdiRobotExcited className="size-16 animate-bounce text-blue-500" />
+        <MdiCog
+          className="absolute -top-2 -right-4 size-8 animate-spin text-blue-400"
+        />
+        <MdiCog
+          className="absolute -bottom-1 -left-3 size-6 animate-spin
+            text-blue-300 [animation-direction:reverse]"
+        />
+      </div>
+      <div className="mb-3 text-lg font-medium text-foreground">
+        Compiling match data...
+      </div>
+      <div className="flex gap-1">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="size-2 animate-pulse rounded-full bg-blue-500"
+            style={{ animationDelay: `${i * 200}ms` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MatchStatsWithData({
+  teamKey,
+  allEvents,
+  usedEvents,
+  minYear,
+  maxYear,
+}: {
+  teamKey: string;
+  allEvents: Event[];
+  usedEvents: Event[];
+  minYear: number;
+  maxYear: number;
+}) {
+  const matchQueries = useSuspenseQueries({
+    queries: uniq(allEvents.map((e) => e.year)).map((year) =>
+      getTeamMatchesByYearOptions({
+        path: { team_key: teamKey, year },
+      }),
+    ),
+  });
+
+  const allMatchesByYear = useMemo(
+    () => matchQueries.map((q) => q.data ?? []),
+    [matchQueries],
+  );
+
+  const usedMatches = useMemo(() => {
+    const eventKeys = new Set(usedEvents.map((event) => event.key));
+    return sortMultipleEventsMatches(
+      allMatchesByYear
+        .flat()
+        .filter(
+          (match) =>
+            eventKeys.has(match.event_key) &&
+            Number(match.event_key.slice(0, 4)) >= minYear &&
+            Number(match.event_key.slice(0, 4)) <= maxYear,
+        ),
+      usedEvents,
+    );
+  }, [allMatchesByYear, usedEvents, minYear, maxYear]);
+
+  return (
+    <TeamMatchStats
+      teamKey={teamKey}
+      matches={usedMatches}
+      events={usedEvents}
+    />
+  );
+}
+
 export default function TeamStatsPage() {
-  const { team, allMatchesByYear, allEvents, allAwards, socials, media } =
+  const { team, allEvents, allAwards, socials, media } =
     useLoaderData<typeof loader>();
 
   const [includeOffseasons, setIncludeOffseasons] = useState(false);
@@ -127,21 +198,6 @@ export default function TeamStatsPage() {
       usedEvents,
     );
   }, [allAwards, usedEvents, minYear, maxYear]);
-
-  const usedMatches = useMemo(() => {
-    const eventKeys = new Set(usedEvents.map((event) => event.key));
-    return sortMultipleEventsMatches(
-      allMatchesByYear
-        .flat()
-        .filter(
-          (match) =>
-            eventKeys.has(match.event_key) &&
-            Number(match.event_key.slice(0, 4)) >= minYear &&
-            Number(match.event_key.slice(0, 4)) <= maxYear,
-        ),
-      usedEvents,
-    );
-  }, [allMatchesByYear, usedEvents, minYear, maxYear]);
 
   return (
     <div>
@@ -183,11 +239,15 @@ export default function TeamStatsPage() {
       <Divider className="my-4" />
       <TeamAwardsSummary awards={usedAwards} events={usedEvents} />
       <Divider className="my-4" />
-      <TeamMatchStats
-        teamKey={team.key}
-        matches={usedMatches}
-        events={usedEvents}
-      />
+      <Suspense fallback={<MatchStatsLoadingState />}>
+        <MatchStatsWithData
+          teamKey={team.key}
+          allEvents={allEvents}
+          usedEvents={usedEvents}
+          minYear={minYear}
+          maxYear={maxYear}
+        />
+      </Suspense>
     </div>
   );
 }
