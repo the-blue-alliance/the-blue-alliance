@@ -12,7 +12,7 @@ concurrency:
 jobs:
   py3-type:
     name: "[py3] Type Check"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
@@ -39,7 +39,7 @@ jobs:
         run: ./ops/typecheck_py3.sh
   py3-lint:
     name: "[py3] Format & Lint"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
@@ -66,7 +66,7 @@ jobs:
         run: ./ops/lint_py3.sh
   py3-test:
     name: "[py3] Test"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         group: [1, 2, 3, 4, 5]
@@ -104,7 +104,7 @@ jobs:
           include-hidden-files: true
   py3-coverage:
     name: "[py3] Coverage"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [py3-test]
     steps:
       - uses: actions/checkout@v6
@@ -143,7 +143,7 @@ jobs:
           file: coverage.xml
   node-lint:
     name: "[node] Format & Lint"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
@@ -168,7 +168,7 @@ jobs:
         run: ./ops/lint_node.sh
   node-test:
     name: "[node] Test"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
@@ -199,7 +199,7 @@ jobs:
           directory: ./.node_coverage/
   pwa-lint:
     name: "[pwa] Format & Lint"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - name: Set up Node
@@ -221,7 +221,7 @@ jobs:
         run: npm --prefix pwa run lint
   pwa-type:
     name: "[pwa] Type Check"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - name: Set up Node
@@ -239,7 +239,7 @@ jobs:
         run: npm --prefix pwa run typecheck
   pwa-test:
     name: "[pwa] Test"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - name: Set up Node
@@ -262,7 +262,7 @@ jobs:
           directory: ./pwa/coverage/
   pwa-test-devbox:
     name: "[pwa] Test w/ Devbox"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - name: Install devbox
@@ -282,7 +282,7 @@ jobs:
         working-directory: pwa
   pwa-build:
     name: "[pwa] Build"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - name: Set up Node
@@ -303,7 +303,7 @@ jobs:
   # https://github.com/the-blue-alliance/the-blue-alliance/actions/runs/16448655087/job/46500449900?
   # pwa-e2e:
   #   name: "[pwa] E2E Tests"
-  #   runs-on: ubuntu-22.04
+  #   runs-on: ubuntu-24.04
   #   if: ${{ github.actor != 'dependabot[bot]' }}
   #   steps:
   #     - uses: actions/checkout@v6
@@ -333,7 +333,7 @@ jobs:
 
   check-pwa-api:
     name: "[pwa] Check API regeneration"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v6
@@ -373,7 +373,7 @@ jobs:
 
   bash-lint:
     name: "[bash] Lint"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - name: Set up Python 3.12
@@ -396,7 +396,7 @@ jobs:
 
   build-web:
     name: Build Web
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
@@ -428,7 +428,7 @@ jobs:
 
   ops-test:
     name: Ops Fullstack Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       registry:
         image: registry:2
