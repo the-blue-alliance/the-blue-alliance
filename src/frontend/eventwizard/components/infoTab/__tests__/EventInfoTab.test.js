@@ -107,7 +107,7 @@ describe("EventInfoTab", () => {
       />
     );
     // When eventInfo is null, child inputs/selects are disabled
-    expect(html).toContain('disabled');
+    expect(html).toContain("disabled");
     expect(html).toContain('aria-disabled="true"');
   });
 
@@ -122,11 +122,11 @@ describe("EventInfoTab", () => {
       selectedEvent: "2024test",
       makeTrustedRequest: mockMakeTrustedRequest,
     });
-    
+
     // Set eventInfo state
     component.state.eventInfo = eventInfo;
     component.updateEventInfo();
-    
+
     expect(mockMakeTrustedRequest).toHaveBeenCalled();
   });
 });

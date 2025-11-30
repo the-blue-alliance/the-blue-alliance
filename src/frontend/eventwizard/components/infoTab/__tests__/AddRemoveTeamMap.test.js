@@ -162,12 +162,12 @@ describe("AddRemoveTeamMap", () => {
       addTeamMap: mockAddTeamMap,
       removeTeamMap: mockRemoveTeamMap,
     });
-    
+
     // Set state directly instead of calling setState
     component.state.nextFromTeam = "9254";
     component.state.nextToTeam = "254";
     component.onAddTeamMapClick();
-    
+
     expect(mockAddTeamMap).toHaveBeenCalledWith("frc9254", "frc254");
   });
 
@@ -178,15 +178,15 @@ describe("AddRemoveTeamMap", () => {
       addTeamMap: mockAddTeamMap,
       removeTeamMap: mockRemoveTeamMap,
     });
-    
+
     // Spy on setState to verify it's called with empty values
-    const setStateSpy = jest.spyOn(component, 'setState');
-    
+    const setStateSpy = jest.spyOn(component, "setState");
+
     // Set state directly
     component.state.nextFromTeam = "9254";
     component.state.nextToTeam = "254";
     component.onAddTeamMapClick();
-    
+
     expect(setStateSpy).toHaveBeenCalledWith({
       nextFromTeam: "",
       nextToTeam: "",
@@ -202,10 +202,10 @@ describe("AddRemoveTeamMap", () => {
       addTeamMap: mockAddTeamMap,
       removeTeamMap: mockRemoveTeamMap,
     });
-    
-    const setStateSpy = jest.spyOn(component, 'setState');
+
+    const setStateSpy = jest.spyOn(component, "setState");
     component.onNextFromTeamChange({ target: { value: "invalid" } });
-    
+
     expect(setStateSpy).toHaveBeenCalledWith({
       nextFromTeam: "invalid",
       fromError: true,
@@ -219,10 +219,10 @@ describe("AddRemoveTeamMap", () => {
       addTeamMap: mockAddTeamMap,
       removeTeamMap: mockRemoveTeamMap,
     });
-    
-    const setStateSpy = jest.spyOn(component, 'setState');
+
+    const setStateSpy = jest.spyOn(component, "setState");
     component.onNextFromTeamChange({ target: { value: "9254" } });
-    
+
     expect(setStateSpy).toHaveBeenCalledWith({
       nextFromTeam: "9254",
       fromError: false,
@@ -236,10 +236,10 @@ describe("AddRemoveTeamMap", () => {
       addTeamMap: mockAddTeamMap,
       removeTeamMap: mockRemoveTeamMap,
     });
-    
-    const setStateSpy = jest.spyOn(component, 'setState');
+
+    const setStateSpy = jest.spyOn(component, "setState");
     component.onNextToTeamChange({ target: { value: "254B" } });
-    
+
     expect(setStateSpy).toHaveBeenCalledWith({
       nextToTeam: "254B",
       toError: false,
@@ -253,10 +253,10 @@ describe("AddRemoveTeamMap", () => {
       addTeamMap: mockAddTeamMap,
       removeTeamMap: mockRemoveTeamMap,
     });
-    
-    const setStateSpy = jest.spyOn(component, 'setState');
+
+    const setStateSpy = jest.spyOn(component, "setState");
     component.onNextToTeamChange({ target: { value: "invalid!@#" } });
-    
+
     expect(setStateSpy).toHaveBeenCalledWith({
       nextToTeam: "invalid!@#",
       toError: true,

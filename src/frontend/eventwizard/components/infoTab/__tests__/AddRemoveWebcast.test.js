@@ -4,10 +4,7 @@ import AddRemoveWebcast from "../AddRemoveWebcast";
 
 // Mock WebcastList component
 jest.mock("../WebcastList", () => (props) => (
-  <div
-    data-testid="webcast-list"
-    data-webcast-count={props.webcasts.length}
-  />
+  <div data-testid="webcast-list" data-webcast-count={props.webcasts.length} />
 ));
 
 describe("AddRemoveWebcast", () => {
@@ -103,13 +100,16 @@ describe("AddRemoveWebcast", () => {
       addWebcast: mockAddWebcast,
       removeWebcast: mockRemoveWebcast,
     });
-    
+
     // Set state directly instead of calling setState
     component.state.newWebcastUrl = "https://youtu.be/test123";
     component.state.newWebcastDate = "2025-03-02";
     component.onAddWebcastClick();
-    
-    expect(mockAddWebcast).toHaveBeenCalledWith("https://youtu.be/test123", "2025-03-02");
+
+    expect(mockAddWebcast).toHaveBeenCalledWith(
+      "https://youtu.be/test123",
+      "2025-03-02"
+    );
   });
 
   it("clears state after adding webcast", () => {
@@ -119,15 +119,15 @@ describe("AddRemoveWebcast", () => {
       addWebcast: mockAddWebcast,
       removeWebcast: mockRemoveWebcast,
     });
-    
+
     // Spy on setState to verify it's called with empty values
-    const setStateSpy = jest.spyOn(component, 'setState');
-    
+    const setStateSpy = jest.spyOn(component, "setState");
+
     // Set state directly
     component.state.newWebcastUrl = "https://youtu.be/test";
     component.state.newWebcastDate = "2025-03-02";
     component.onAddWebcastClick();
-    
+
     expect(setStateSpy).toHaveBeenCalledWith({
       newWebcastUrl: "",
       newWebcastDate: "",
@@ -141,11 +141,15 @@ describe("AddRemoveWebcast", () => {
       addWebcast: mockAddWebcast,
       removeWebcast: mockRemoveWebcast,
     });
-    
-    const setStateSpy = jest.spyOn(component, 'setState');
-    component.onNewWebcastUrlChange({ target: { value: "https://youtu.be/abc" } });
-    
-    expect(setStateSpy).toHaveBeenCalledWith({ newWebcastUrl: "https://youtu.be/abc" });
+
+    const setStateSpy = jest.spyOn(component, "setState");
+    component.onNewWebcastUrlChange({
+      target: { value: "https://youtu.be/abc" },
+    });
+
+    expect(setStateSpy).toHaveBeenCalledWith({
+      newWebcastUrl: "https://youtu.be/abc",
+    });
   });
 
   it("updates state when date input changes", () => {
@@ -155,10 +159,10 @@ describe("AddRemoveWebcast", () => {
       addWebcast: mockAddWebcast,
       removeWebcast: mockRemoveWebcast,
     });
-    
-    const setStateSpy = jest.spyOn(component, 'setState');
+
+    const setStateSpy = jest.spyOn(component, "setState");
     component.onNewWebcastDateChange({ target: { value: "2025-03-02" } });
-    
+
     expect(setStateSpy).toHaveBeenCalledWith({ newWebcastDate: "2025-03-02" });
   });
 });

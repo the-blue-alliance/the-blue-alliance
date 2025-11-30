@@ -9,7 +9,10 @@ jest.mock("react-select/async", () => (props) => (
     data-name={props.name}
     data-placeholder={props.placeholder}
     data-disabled={props.isDisabled ? "true" : "false"}
-    onClick={() => props.onChange && props.onChange({ value: 1, label: "Double Elimination" })}
+    onClick={() =>
+      props.onChange &&
+      props.onChange({ value: 1, label: "Double Elimination" })
+    }
   >
     {props.value && props.value.label}
   </div>
@@ -82,5 +85,4 @@ describe("PlayoffTypeDropdown", () => {
     expect(html).toContain("col-sm-10");
     expect(html).toContain("control-label");
   });
-
 });

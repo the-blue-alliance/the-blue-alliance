@@ -162,7 +162,9 @@ describe("AuthTools", () => {
       setAuth: mockSetAuth,
     });
     component.storeAuth();
-    expect(mockAlert).toHaveBeenCalledWith("You must enter you auth ID and secret");
+    expect(mockAlert).toHaveBeenCalledWith(
+      "You must enter you auth ID and secret"
+    );
     expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
   });
 
