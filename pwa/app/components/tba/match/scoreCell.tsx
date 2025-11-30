@@ -28,6 +28,7 @@ interface ScoreCellProps
   score: number;
   scoreBreakdown?: NonNullable<Match['score_breakdown']>['red'];
   year?: number;
+  compLevel: Match['comp_level'];
 }
 
 export default function ScoreCell({
@@ -36,6 +37,7 @@ export default function ScoreCell({
   allianceColor,
   scoreBreakdown,
   year,
+  compLevel,
   className,
   ...props
 }: ScoreCellProps) {
@@ -44,7 +46,7 @@ export default function ScoreCell({
       className={cn(scoreCellVariants({ winner, allianceColor }), className)}
       {...props}
     >
-      {scoreBreakdown && year && (
+      {scoreBreakdown && year && compLevel === 'qm' && (
         <RpDots score_breakdown={scoreBreakdown} year={year} />
       )}
       {score}
