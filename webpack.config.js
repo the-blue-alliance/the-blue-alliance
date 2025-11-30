@@ -37,6 +37,12 @@ module.exports = [
             { loader: "less-loader" },
           ],
         },
+        {
+          test: /\.m?js$/,
+          resolve: {
+            fullySpecified: false,
+          },
+        },
       ],
     },
     plugins: [

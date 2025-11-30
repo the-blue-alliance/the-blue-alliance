@@ -1,7 +1,13 @@
 import React, { Component } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
 import PropTypes from "prop-types";
-// import FileInput from "react-file-input";
+import Input from "@mui/material/Input";
 import TeamList from "./TeamList";
+import XLSX from "xlsx";
 
 class AddTeamsFMSReport extends Component {
   constructor(props) {
@@ -10,6 +16,7 @@ class AddTeamsFMSReport extends Component {
       selectedFileName: "",
       message: "",
       stagingTeamKeys: [],
+      stagingTeams: [],
     };
     this.onFileChange = this.onFileChange.bind(this);
     this.parseFMSReport = this.parseFMSReport.bind(this);
@@ -34,14 +41,12 @@ class AddTeamsFMSReport extends Component {
   parseFMSReport(event) {
     const data = event.target.result;
 
-    // eslint-disable-next-line no-undef
     const workbook = XLSX.read(data, { type: "binary" });
     const firstSheet = workbook.SheetNames[0];
     const sheet = workbook.Sheets[firstSheet];
 
     // parse the excel to array of matches
     // headers start on 2nd row
-    // eslint-disable-next-line no-undef
     const teamsInFile = XLSX.utils.sheet_to_json(sheet, { range: 3 });
     const teams = [];
     for (let i = 0; i < teamsInFile.length; i++) {
@@ -54,7 +59,7 @@ class AddTeamsFMSReport extends Component {
       }
 
       const teamNum = parseInt(team["#"], 10);
-      if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999) {
+      if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 99999) {
         this.props.showErrorMessage(`Invalid team number ${teamNum}`);
         return;
       }
@@ -77,38 +82,41 @@ class AddTeamsFMSReport extends Component {
     this.setState({
       message: "",
       stagingTeamKeys: teamKeys,
-    });
-
-    this.reportConfirmDialog.show({
-      title: `Confirm Teams: ${this.state.selectedFileName}`,
-      body: <TeamList teams={teams} />,
-      bsSize: "large",
-      actions: [
-        Dialog.CancelAction(),
-        Dialog.Action(
-          "Confirm",
-          () => {
-            this.setState({ message: "Uploading teams..." });
-            this.props.updateTeamList(
-              this.state.stagingTeamKeys,
-              () => {
-                this.setState({
-                  selectedFileName: "",
-                  message: `${teams.length} teams added to ${this.props.selectedEvent}`,
-                  stagingTeamKeys: [],
-                });
-                this.props.clearTeams();
-              },
-              (error) => this.props.showErrorMessage(`${error}`)
-            );
-          },
-          "btn-primary"
-        ),
-      ],
+      stagingTeams: teams,
     });
   }
 
   render() {
+    const handleCancel = () => {
+      this.setState({
+        selectedFileName: "",
+        stagingTeams: [],
+        stagingTeamKeys: [],
+      });
+    };
+
+    const handleOk = () => {
+      const teamKeys = this.state.stagingTeamKeys;
+      this.setState({
+        message: "Uploading teams...",
+        stagingTeamKeys: [],
+        stagingTeams: [],
+      });
+      this.props.updateTeamList(
+        teamKeys,
+        () => {
+          this.setState({
+            selectedFileName: "",
+            message: `${teams.length} teams added to ${this.props.selectedEvent}`,
+            stagingTeamKeys: [],
+            stagingTeams: [],
+          });
+          this.props.clearTeams();
+        },
+        (error) => this.props.showErrorMessage(`${error}`)
+      );
+    };
+
     return (
       <div>
         <h4>Import FMS Report</h4>
@@ -116,14 +124,28 @@ class AddTeamsFMSReport extends Component {
           This will <em>overwrite</em> all existing teams for this event.
         </p>
         {this.state.message && <p>{this.state.message}</p>}
-        {/* <FileInput
-          name="fmsTeamsReport"
-          accept=".xlsx,.xls,.csv"
-          placeholder="Click to choose file"
+        <Input
+          type="file"
+          inputProps={{ accept: ".xlsx,.xls,.csv" }}
           onChange={this.onFileChange}
           disabled={!this.props.selectedEvent}
-        /> */}
-        {/*<Dialog ref={(dialog) => (this.reportConfirmDialog = dialog)} />*/}
+        />
+        <Dialog open={this.state.stagingTeams.length > 0}>
+          <DialogTitle>
+            Confirm Teams: {this.state.selectedFileName}
+          </DialogTitle>
+          <DialogContent>
+            <TeamList teams={this.state.stagingTeams} />
+          </DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={handleCancel} size="large">
+              Cancel
+            </Button>
+            <Button variant="contained" onClick={handleOk} size="large">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
