@@ -98,4 +98,41 @@ describe("EventSelector", () => {
     );
     expect(html).toContain("form-control");
   });
+
+  it("calls callbacks when event is selected", () => {
+    const component = new EventSelector({
+      manualEvent: false,
+      setEvent: mockSetEvent,
+      setManualEvent: mockSetManualEvent,
+      clearAuth: mockClearAuth,
+    });
+    component.onEventSelected({ value: "2024test", label: "2024 Test" });
+    expect(mockClearAuth).toHaveBeenCalled();
+    expect(mockSetManualEvent).toHaveBeenCalledWith(false);
+    expect(mockSetEvent).toHaveBeenCalledWith("2024test");
+  });
+
+  it("handles Other selection correctly", () => {
+    const component = new EventSelector({
+      manualEvent: false,
+      setEvent: mockSetEvent,
+      setManualEvent: mockSetManualEvent,
+      clearAuth: mockClearAuth,
+    });
+    component.onEventSelected({ value: "_other", label: "Other" });
+    expect(mockClearAuth).toHaveBeenCalled();
+    expect(mockSetManualEvent).toHaveBeenCalledWith(true);
+    expect(mockSetEvent).toHaveBeenCalledWith("");
+  });
+
+  it("calls setEvent when manual event key changes", () => {
+    const component = new EventSelector({
+      manualEvent: true,
+      setEvent: mockSetEvent,
+      setManualEvent: mockSetManualEvent,
+      clearAuth: mockClearAuth,
+    });
+    component.onManualEventChange({ target: { value: "2024test" } });
+    expect(mockSetEvent).toHaveBeenCalledWith("2024test");
+  });
 });

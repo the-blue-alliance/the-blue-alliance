@@ -4,9 +4,23 @@ import AuthTools from "../AuthTools";
 
 describe("AuthTools", () => {
   const mockSetAuth = jest.fn();
+  let mockAlert;
+  let mockLocalStorage;
+
+  beforeEach(() => {
+    mockAlert = jest.fn();
+    global.alert = mockAlert;
+    mockLocalStorage = {
+      getItem: jest.fn(),
+      setItem: jest.fn(),
+    };
+    global.localStorage = mockLocalStorage;
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
+    delete global.alert;
+    delete global.localStorage;
   });
 
   it("renders nothing when manualEvent is false", () => {
@@ -91,5 +105,78 @@ describe("AuthTools", () => {
     expect(html).toContain("control-label");
     expect(html).toContain("col-sm-2");
     expect(html).toContain("col-sm-10");
+  });
+
+  it("stores auth in localStorage when storeAuth is called", () => {
+    const component = new AuthTools({
+      authId: "test_id",
+      authSecret: "test_secret",
+      manualEvent: true,
+      selectedEvent: "2024test",
+      setAuth: mockSetAuth,
+    });
+    component.storeAuth();
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+      "2024test_auth",
+      JSON.stringify({ id: "test_id", secret: "test_secret" })
+    );
+    expect(mockAlert).toHaveBeenCalledWith("Auth Stored");
+  });
+
+  it("loads auth from localStorage when loadAuth is called", () => {
+    mockLocalStorage.getItem.mockReturnValue(
+      JSON.stringify({ id: "stored_id", secret: "stored_secret" })
+    );
+    const component = new AuthTools({
+      authId: "",
+      authSecret: "",
+      manualEvent: true,
+      selectedEvent: "2024test",
+      setAuth: mockSetAuth,
+    });
+    component.loadAuth();
+    expect(mockLocalStorage.getItem).toHaveBeenCalledWith("2024test_auth");
+    expect(mockSetAuth).toHaveBeenCalledWith("stored_id", "stored_secret");
+    expect(mockAlert).toHaveBeenCalledWith("Auth Loaded");
+  });
+
+  it("shows alert when storing auth without event key", () => {
+    const component = new AuthTools({
+      authId: "test_id",
+      authSecret: "test_secret",
+      manualEvent: true,
+      selectedEvent: "",
+      setAuth: mockSetAuth,
+    });
+    component.storeAuth();
+    expect(mockAlert).toHaveBeenCalledWith("You must enter an event key");
+    expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
+  });
+
+  it("shows alert when storing auth without credentials", () => {
+    const component = new AuthTools({
+      authId: "",
+      authSecret: "",
+      manualEvent: true,
+      selectedEvent: "2024test",
+      setAuth: mockSetAuth,
+    });
+    component.storeAuth();
+    expect(mockAlert).toHaveBeenCalledWith("You must enter you auth ID and secret");
+    expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
+  });
+
+  it("shows alert when loading auth with no stored data", () => {
+    mockLocalStorage.getItem.mockReturnValue(null);
+    const component = new AuthTools({
+      authId: "",
+      authSecret: "",
+      manualEvent: true,
+      selectedEvent: "2024test",
+      setAuth: mockSetAuth,
+    });
+    component.loadAuth();
+    expect(mockAlert).toHaveBeenCalledWith("No auth found for 2024test");
+    expect(mockSetAuth).not.toHaveBeenCalled();
   });
 });

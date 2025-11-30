@@ -98,4 +98,26 @@ describe("AuthInput", () => {
     );
     expect(html).toContain('value=""');
   });
+
+  it("wires onChange handler to auth ID input", () => {
+    const component = new AuthInput({
+      authId: "old_id",
+      authSecret: "secret123",
+      manualEvent: true,
+      setAuth: mockSetAuth,
+    });
+    component.onAuthIdChange({ target: { value: "new_id" } });
+    expect(mockSetAuth).toHaveBeenCalledWith("new_id", "secret123");
+  });
+
+  it("wires onChange handler to auth secret input", () => {
+    const component = new AuthInput({
+      authId: "id123",
+      authSecret: "old_secret",
+      manualEvent: true,
+      setAuth: mockSetAuth,
+    });
+    component.onAuthSecretChange({ target: { value: "new_secret" } });
+    expect(mockSetAuth).toHaveBeenCalledWith("id123", "new_secret");
+  });
 });
