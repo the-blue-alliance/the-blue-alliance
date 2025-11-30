@@ -161,6 +161,7 @@ export function MatchRow({
             winner={match.winning_alliance === 'red'}
             scoreBreakdown={match.score_breakdown?.red}
             year={year}
+            compLevel={match.comp_level}
           />
         )}
 
@@ -174,6 +175,7 @@ export function MatchRow({
             winner={match.winning_alliance === 'blue'}
             scoreBreakdown={match.score_breakdown?.blue}
             year={year}
+            compLevel={match.comp_level}
           />
         )}
       </div>
