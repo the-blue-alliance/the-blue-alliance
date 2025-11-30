@@ -30,7 +30,8 @@ const rowVariants = cva('text-center', {
 });
 
 interface AllianceTableRowProps
-  extends React.HTMLAttributes<HTMLTableRowElement>,
+  extends
+    React.HTMLAttributes<HTMLTableRowElement>,
     VariantProps<typeof rowVariants> {}
 
 function AllianceTableRow({

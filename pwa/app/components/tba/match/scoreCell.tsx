@@ -22,7 +22,8 @@ const scoreCellVariants = cva('relative flex items-center justify-center', {
 });
 
 interface ScoreCellProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof scoreCellVariants> {
   score: number;
   scoreBreakdown?: NonNullable<Match['score_breakdown']>['red'];

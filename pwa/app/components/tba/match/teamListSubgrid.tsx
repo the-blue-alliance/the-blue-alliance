@@ -23,7 +23,8 @@ const teamListSubgridVariants = cva('flex items-center justify-center', {
 });
 
 interface TeamListSubgridProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof teamListSubgridVariants> {
   allianceColor: 'red' | 'blue';
   teamKeys: string[];
@@ -78,7 +79,8 @@ const teamCellVariants = cva('flex items-center justify-center', {
 });
 
 interface TeamCellProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof teamCellVariants> {
   teamKey: string;
 }
