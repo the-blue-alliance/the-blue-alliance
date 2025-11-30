@@ -22,6 +22,6 @@ export function sortAwardsByEventDate(
       return dateA.getTime() - dateB.getTime();
     }
 
-    return 0;
+    return sortAwardsComparator(a, b);
   });
 }
