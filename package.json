@@ -26,7 +26,7 @@
     "react-dom": "^18.3.1",
     "react-ga": "^3.3.1",
     "react-redux": "^9.2.0",
-    "react-select": "^5.9.0",
+    "react-select": "^5.10.2",
     "react-transition-group": "^4.4.5",
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
