@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 MAINTAINER The Blue Alliance
 
 # Set debconf to run non-interactively
@@ -47,17 +47,11 @@ ENV HTTPLIB2_CA_CERTS /usr/lib/google-cloud-sdk/platform/google_appengine/lib/ht
 # Install JDK 11 for firebase-tools
 RUN apt-get install default-jre -y
 
-# dev_appserver expects `python2` to exist
-RUN sudo apt update
-RUN sudo apt install python2 -y
-RUN update-alternatives --install /usr/bin/python2 python2 /usr/bin/python2.7 1
-RUN echo 1 | update-alternatives --config python2
-
 # Set up nvm and nodejs
 ENV NVM_DIR /nvm
 ENV NODE_VERSION 24
 RUN mkdir -p $NVM_DIR  \
-    && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
+    && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash \
     && . $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION --silent \
     && nvm alias default $NODE_VERSION \
