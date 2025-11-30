@@ -1,9 +1,10 @@
 import { maxBy, startCase, uniq } from 'lodash-es';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Event, Match } from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { TeamLink } from '~/components/tba/links';
+import { Checkbox } from '~/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -15,6 +16,7 @@ import {
 import {
   calculateTeamRecordsFromMatches,
   getAllianceMatchResult,
+  getMatchScoreWithoutAdjustPoints,
 } from '~/lib/matchUtils';
 import { addRecords, cn, joinComponents, winrateFromRecord } from '~/lib/utils';
 
@@ -218,6 +220,11 @@ export default function TeamMatchStats({
   matches,
   events,
 }: TeamMatchStatsProps) {
+  const [
+    useOriginalScoreForPlayoffRedCards,
+    setUseOriginalScoreForPlayoffRedCards,
+  ] = useState(true);
+
   const uniqueTeamsSeen = uniq(
     matches.flatMap((m) => [
       ...m.alliances.red.team_keys,
@@ -245,30 +252,48 @@ export default function TeamMatchStats({
       Object.entries(groupMatchesByYear(matches)).map(([year, matches]) => {
         return [
           Number(year),
-          maxBy(matches, (m) =>
-            m.alliances.red.team_keys.includes(teamKey)
-              ? m.alliances.red.score - m.alliances.blue.score
-              : m.alliances.blue.score - m.alliances.red.score,
-          ),
+          maxBy(matches, (m) => {
+            const originalScore = getMatchScoreWithoutAdjustPoints(m);
+            const redScore =
+              useOriginalScoreForPlayoffRedCards && m.comp_level != 'qm'
+                ? originalScore.redScore
+                : m.alliances.red.score;
+            const blueScore =
+              useOriginalScoreForPlayoffRedCards && m.comp_level != 'qm'
+                ? originalScore.blueScore
+                : m.alliances.blue.score;
+            return m.alliances.red.team_keys.includes(teamKey)
+              ? redScore - blueScore
+              : blueScore - redScore;
+          }),
         ];
       }),
     );
-  }, [matches, teamKey]);
+  }, [matches, teamKey, useOriginalScoreForPlayoffRedCards]);
 
   const blowoutLossesByYear: Record<number, Match | undefined> = useMemo(() => {
     return Object.fromEntries(
       Object.entries(groupMatchesByYear(matches)).map(([year, matches]) => {
         return [
           Number(year),
-          maxBy(matches, (m) =>
-            m.alliances.blue.team_keys.includes(teamKey)
-              ? m.alliances.red.score - m.alliances.blue.score
-              : m.alliances.blue.score - m.alliances.red.score,
-          ),
+          maxBy(matches, (m) => {
+            const originalScore = getMatchScoreWithoutAdjustPoints(m);
+            const redScore =
+              useOriginalScoreForPlayoffRedCards && m.comp_level != 'qm'
+                ? originalScore.redScore
+                : m.alliances.red.score;
+            const blueScore =
+              useOriginalScoreForPlayoffRedCards && m.comp_level != 'qm'
+                ? originalScore.blueScore
+                : m.alliances.blue.score;
+            return m.alliances.blue.team_keys.includes(teamKey)
+              ? redScore - blueScore
+              : blueScore - redScore;
+          }),
         ];
       }),
     );
-  }, [matches, teamKey]);
+  }, [matches, teamKey, useOriginalScoreForPlayoffRedCards]);
 
   const records = useMemo(
     () => calculateTeamRecordsFromMatches(teamKey, matches, 'score-based'),
@@ -374,6 +399,23 @@ export default function TeamMatchStats({
             </span>
           }
         />
+      </div>
+
+      <div className="flex items-center justify-end gap-2">
+        <Checkbox
+          id="exclude-red-cards"
+          checked={useOriginalScoreForPlayoffRedCards}
+          onCheckedChange={(checked) =>
+            setUseOriginalScoreForPlayoffRedCards(checked === true)
+          }
+        />
+        <label
+          htmlFor="exclude-red-cards"
+          className="cursor-pointer text-sm leading-none font-medium
+            peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Use Original Score for Playoff Red Cards
+        </label>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
