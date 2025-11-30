@@ -44,6 +44,7 @@ export default function SimpleMatchRowsWithBreaks({
       <MatchRow
         match={match}
         playoffType={event.playoff_type ?? PlayoffType.CUSTOM}
+        year={event.year}
         key={match.key}
       />,
     );
@@ -70,9 +71,11 @@ export default function SimpleMatchRowsWithBreaks({
 export function MatchRow({
   match,
   playoffType,
+  year,
 }: {
   match: Match;
   playoffType: PlayoffType;
+  year: number;
 }) {
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
   const isPlayed =
@@ -156,6 +159,8 @@ export function MatchRow({
             className="col-start-6 row-start-1 xl:col-span-1 xl:col-start-auto
               xl:row-start-auto"
             winner={match.winning_alliance === 'red'}
+            scoreBreakdown={match.score_breakdown?.red}
+            year={year}
           />
         )}
 
@@ -167,6 +172,8 @@ export function MatchRow({
             className="col-start-6 row-start-2 xl:col-span-1 xl:col-start-auto
               xl:row-start-auto"
             winner={match.winning_alliance === 'blue'}
+            scoreBreakdown={match.score_breakdown?.blue}
+            year={year}
           />
         )}
       </div>

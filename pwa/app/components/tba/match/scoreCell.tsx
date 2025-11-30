@@ -1,8 +1,10 @@
 import { VariantProps, cva } from 'class-variance-authority';
 
+import { Match } from '~/api/tba/read';
+import RpDots from '~/components/tba/rpDot';
 import { cn } from '~/lib/utils';
 
-const scoreCellVariants = cva('flex items-center justify-center', {
+const scoreCellVariants = cva('relative flex items-center justify-center', {
   variants: {
     winner: {
       true: 'font-semibold',
@@ -23,12 +25,16 @@ interface ScoreCellProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof scoreCellVariants> {
   score: number;
+  scoreBreakdown?: NonNullable<Match['score_breakdown']>['red'];
+  year?: number;
 }
 
 export default function ScoreCell({
   score,
   winner,
   allianceColor,
+  scoreBreakdown,
+  year,
   className,
   ...props
 }: ScoreCellProps) {
@@ -37,6 +43,9 @@ export default function ScoreCell({
       className={cn(scoreCellVariants({ winner, allianceColor }), className)}
       {...props}
     >
+      {scoreBreakdown && year && (
+        <RpDots score_breakdown={scoreBreakdown} year={year} />
+      )}
       {score}
     </div>
   );
