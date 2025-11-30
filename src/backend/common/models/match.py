@@ -257,9 +257,12 @@ class Match(CachedModel):
             # Add count of coral per level
             elif self.year == 2025:
                 for period in ["auto", "teleop"]:
+                    reef = score_breakdown[color].get(f"{period}Reef")
+                    if reef is None:
+                        continue
                     for row in ["bot", "mid", "top"]:
-                        row_count = sum([1 for v in score_breakdown[color][f"{period}Reef"][f"{row}Row"].values() if v])
-                        score_breakdown[color][f"{period}Reef"][f"tba_{row}RowCount"] = row_count
+                        row_count = sum([1 for v in reef[f"{row}Row"].values() if v])
+                        reef[f"tba_{row}RowCount"] = row_count
         # fmt: on
         return score_breakdown
 
