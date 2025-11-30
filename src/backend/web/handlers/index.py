@@ -21,6 +21,7 @@ from backend.common.models.media import Media
 from backend.common.sitevars.landing_config import LandingConfig
 from backend.web.profiled_render import render_template
 
+# RANDOM CHANGE
 
 @cached_public
 def index() -> Response:
