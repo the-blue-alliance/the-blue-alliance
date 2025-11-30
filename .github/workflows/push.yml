@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -30,10 +30,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -52,10 +52,10 @@ jobs:
         group: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -78,10 +78,10 @@ jobs:
     needs: [py3-test]
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -336,10 +336,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Shellcheck
         run: |
@@ -359,10 +359,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -393,10 +393,10 @@ jobs:
           - 5000:5000
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Install Python Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
@@ -460,11 +460,11 @@ jobs:
           filters: |
             queue:
               - 'src/queue.yaml'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.queue == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.queue == 'true'
         uses: google-github-actions/auth@v3
@@ -493,11 +493,11 @@ jobs:
           filters: |
             index:
               - 'src/index.yaml'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.index == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.index == 'true'
         uses: google-github-actions/auth@v3
@@ -529,11 +529,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.default == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.default == 'true'
         uses: google-github-actions/auth@v3
@@ -576,11 +576,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Download production artifacts
         if: steps.changes.outputs.web == 'true'
         uses: actions/download-artifact@v6
@@ -623,11 +623,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.api == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Update env_variables.yaml
         if: steps.changes.outputs.api == 'true'
         run: ./ops/deploy/update_env_variables_yaml.sh
@@ -664,11 +664,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.tasks-io == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-io == 'true'
         uses: google-github-actions/auth@v3
@@ -700,11 +700,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: google-github-actions/auth@v3
@@ -780,11 +780,11 @@ jobs:
           filters: |
             cron:
               - 'src/cron.yaml'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.cron == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.cron == 'true'
         uses: google-github-actions/auth@v3
@@ -822,11 +822,11 @@ jobs:
           filters: |
             dispatch:
               - 'src/dispatch.yaml'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.dispatch == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.dispatch == 'true'
         uses: google-github-actions/auth@v3

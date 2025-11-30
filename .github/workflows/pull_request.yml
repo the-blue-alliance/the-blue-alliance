@@ -22,11 +22,11 @@ jobs:
             python:
               - '**/*.py'
               - '**/requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Dependencies
         if: steps.changes.outputs.python == 'true'
@@ -49,11 +49,11 @@ jobs:
             python:
               - '**/*.py'
               - '**/requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Dependencies
         if: steps.changes.outputs.python == 'true'
@@ -80,11 +80,11 @@ jobs:
               - '**/*.py'
               - '**/requirements.txt'
               - '.test_durations'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Dependencies
         if: steps.changes.outputs.python == 'true'
@@ -116,11 +116,11 @@ jobs:
               - '**/*.py'
               - '**/requirements.txt'
               - '.test_durations'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.python == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Dependencies
         if: steps.changes.outputs.python == 'true'
@@ -376,10 +376,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Shellcheck
         run: |
@@ -408,11 +408,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Set up Node
         if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-node@v6
@@ -445,11 +445,11 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'requirements.txt'
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: "pip"
       - name: Install Python Dependencies
         if: steps.changes.outputs.web == 'true'
