@@ -282,6 +282,44 @@ export function getTeamsUnpenalizedHighScore(
   return highScoreMatch;
 }
 
+export function getMatchScoreWithoutAdjustPoints(match: Match): {
+  redScore: number;
+  blueScore: number;
+} {
+  if (
+    match.score_breakdown &&
+    'adjustPoints' in match.score_breakdown.red &&
+    'adjustPoints' in match.score_breakdown.blue
+  ) {
+    return {
+      redScore:
+        match.alliances.red.score -
+        (match.score_breakdown.red.adjustPoints ?? 0),
+      blueScore:
+        match.alliances.blue.score -
+        (match.score_breakdown.blue.adjustPoints ?? 0),
+    };
+  }
+  if (
+    match.score_breakdown &&
+    'adjust_points' in match.score_breakdown.red &&
+    'adjust_points' in match.score_breakdown.blue
+  ) {
+    return {
+      redScore:
+        match.alliances.red.score -
+        (match.score_breakdown.red.adjust_points ?? 0),
+      blueScore:
+        match.alliances.blue.score -
+        (match.score_breakdown.blue.adjust_points ?? 0),
+    };
+  }
+  return {
+    redScore: match.alliances.red.score,
+    blueScore: match.alliances.blue.score,
+  };
+}
+
 export function getHighScoreMatch(matches: Match[]): Match | undefined {
   if (matches.length === 0) {
     return undefined;
