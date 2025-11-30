@@ -2,7 +2,7 @@
   "name": "tba-react",
   "version": "0.0.0",
   "engines": {
-    "node": "^18"
+    "node": "^24"
   },
   "dependencies": {
     "classnames": "^2.5.1",

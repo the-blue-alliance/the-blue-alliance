@@ -109,7 +109,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "18"
+          node-version: "24"
           cache: "npm"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -125,7 +125,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "18"
+          node-version: "24"
           cache: "npm"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -147,7 +147,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "22.14.0"
+          node-version: "24"
           cache: "npm"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
@@ -173,7 +173,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "22.14.0"
+          node-version: "24"
           cache: "npm"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
@@ -193,7 +193,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "22.14.0"
+          node-version: "24"
           cache: "npm"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -240,7 +240,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "22.14.0"
+          node-version: "24"
           cache: "npm"
       - name: Install Dependencies
         run: npm --prefix pwa ci
@@ -271,7 +271,7 @@ jobs:
   #     - name: Set up Node
   #       uses: actions/setup-node@v6
   #       with:
-  #         node-version: "22.14.0"
+  #         node-version: "24"
   #         cache: "npm"
 
   #     - name: Install Dependencies
@@ -301,7 +301,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "22.14.0"
+          node-version: "24"
 
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
@@ -366,7 +366,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "18"
+          node-version: "24"
           cache: "npm"
       - name: Install Node Dependencies
         run: npm ci
@@ -405,7 +405,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "18"
+          node-version: "24"
           cache: "npm"
       - name: Install Node Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
