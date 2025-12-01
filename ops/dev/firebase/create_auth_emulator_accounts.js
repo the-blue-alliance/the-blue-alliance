@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 
 // Get configuration from environment variables
 const project = process.env.PROJECT_ID;
-const emulatorHost = process.env.FIREBASE_AUTH_EMULATOR_HOST || 'localhost:9099';
+const emulatorHost =
+  process.env.FIREBASE_AUTH_EMULATOR_HOST || "localhost:9099";
 
 if (!project) {
-  console.error('Error: PROJECT_ID environment variable is required');
+  console.error("Error: PROJECT_ID environment variable is required");
   process.exit(1);
 }
 
@@ -22,14 +23,14 @@ async function createAccounts() {
     const auth = admin.auth();
 
     // Admin user
-    const adminUid = '1';
-    const adminEmail = 'admin@thebluealliance.com';
-    const adminName = 'TBA Admin';
+    const adminUid = "1";
+    const adminEmail = "admin@thebluealliance.com";
+    const adminName = "TBA Admin";
 
     // Regular user
-    const userUid = '2';
-    const userEmail = 'user@thebluealliance.com';
-    const userName = 'TBA User';
+    const userUid = "2";
+    const userEmail = "user@thebluealliance.com";
+    const userName = "TBA User";
 
     // Import users
     await auth.importUsers([
@@ -40,13 +41,13 @@ async function createAccounts() {
         providerData: [
           {
             uid: adminUid,
-            providerId: 'google.com',
+            providerId: "google.com",
             email: adminEmail,
             displayName: adminName,
           },
           {
             uid: adminUid,
-            providerId: 'apple.com',
+            providerId: "apple.com",
             email: adminEmail,
             displayName: adminName,
           },
@@ -60,13 +61,13 @@ async function createAccounts() {
         providerData: [
           {
             uid: userUid,
-            providerId: 'google.com',
+            providerId: "google.com",
             email: userEmail,
             displayName: userName,
           },
           {
             uid: userUid,
-            providerId: 'apple.com',
+            providerId: "apple.com",
             email: userEmail,
             displayName: userName,
           },
@@ -75,10 +76,10 @@ async function createAccounts() {
       },
     ]);
 
-    console.log('Successfully created auth emulator accounts');
+    console.log("Successfully created auth emulator accounts");
     process.exit(0);
   } catch (error) {
-    console.error('Error creating accounts:', error);
+    console.error("Error creating accounts:", error);
     process.exit(1);
   }
 }
