@@ -1,6 +1,4 @@
-import os
-
-from flask import abort, Flask, redirect
+from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from google.appengine.api import wrap_wsgi_app
 
@@ -88,19 +86,6 @@ csrf = CSRFProtect()
 csrf.init_app(app)
 
 app.url_map.strict_slashes = False
-
-
-# This is used to use `thebluealliance.com` as our custom domain during login flow.
-# We need to be able to redirect
-# `thebluealliance.com/__/auth/handler` -> `tbatv-prod-hrd.firebaseapp.com/__/auth/handler`
-@app.route("/__/auth/handler")
-def redirect_to_firebase():
-    project_id = os.environ.get("GCLOUD_PROJECT")
-    if not project_id:
-        abort(404)
-
-    return redirect(f"{project_id}.firebaseapp.com/__/auth/handler")
-
 
 app.add_url_rule("/", view_func=index)
 app.add_url_rule("/about", view_func=about)
