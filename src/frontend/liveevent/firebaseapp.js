@@ -4,7 +4,7 @@ import "firebase/compat/database";
 
 const FirebaseApp = firebase.initializeApp({
   apiKey: "AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs",
-  authDomain: "thebluealliance.com",
+  authDomain: "tbatv-prod-hrd.firebaseapp.com",
   databaseURL: "https://tbatv-prod-hrd.firebaseio.com",
 });
 
