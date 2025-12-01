@@ -1,7 +1,11 @@
+from firebase_admin import auth
 from flask import abort, redirect, request, url_for
 from werkzeug import Response
 
+import logging
+
 from backend.common.consts.account_permission import AccountPermission, PERMISSIONS
+from backend.common.firebase import app
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.web.profiled_render import render_template
@@ -35,10 +39,17 @@ def user_detail(user_id: str) -> str:
     if user is None:
         abort(404)
 
+    firebase_user = None
+    try:
+        firebase_user = auth.get_user_by_email(user.email, app=app())
+    except Exception as e:
+        logging.error(f"Failed to fetch Firebase user: {e}")
+
     api_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user.key).fetch()
 
     template_values = {
         "user": user,
+        "firebase_user": firebase_user,
         "api_keys": api_keys,
         "permissions": PERMISSIONS,
     }
