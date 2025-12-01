@@ -95,11 +95,11 @@ app.url_map.strict_slashes = False
 # `thebluealliance.com/__/auth/handler` -> `tbatv-prod-hrd.firebaseapp.com/__/auth/handler`
 @app.route("/__/auth/handler")
 def redirect_to_firebase():
-    project_id = os.environ.get("GCLOUD_PROJECT")
-    if not project_id:
-        abort(404)
+    # project_id = os.environ.get("GCLOUD_PROJECT")
+    # if not project_id:
+    #     abort(404)
 
-    url = f"{request.scheme}://{project_id}.firebaseapp.com/__/auth/handler"
+    url = f"{request.scheme}://tbatv-prod-hrd.firebaseapp.com/__/auth/handler"
     if request.query_string:
         url += f"?{request.query_string.decode('utf-8')}"
     return redirect(url)
