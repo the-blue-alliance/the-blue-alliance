@@ -4,3 +4,4 @@ src/backend
 src/build
 subtrees
 venv/
+ops/dev/firebase
