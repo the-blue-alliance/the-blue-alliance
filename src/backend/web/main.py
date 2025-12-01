@@ -1,6 +1,6 @@
 import os
 
-from flask import abort, Flask, redirect, request
+from flask import abort, Flask, redirect
 from flask_wtf.csrf import CSRFProtect
 from google.appengine.api import wrap_wsgi_app
 
@@ -99,10 +99,7 @@ def redirect_to_firebase():
     if not project_id:
         abort(404)
 
-    url = f"{request.scheme}://{project_id}.firebaseapp.com/__/auth/handler"
-    if request.query_string:
-        url += f"?{request.query_string.decode('utf-8')}"
-    return redirect(url)
+    return redirect(f"{project_id}.firebaseapp.com/__/auth/handler")
 
 
 app.add_url_rule("/", view_func=index)
