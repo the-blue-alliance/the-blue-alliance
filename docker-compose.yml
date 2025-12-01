@@ -31,8 +31,6 @@ services:
       - "8089:8089"
       # GAE Admin
       - "8000:8000"
-      # RQ Dashboard
-      - "9181:9181"
     entrypoint: [ "sh", "/tba/ops/dev/docker/docker-entry.sh" ]
     command: [ "/usr/sbin/sshd", "-D" ]
     working_dir: /tba
