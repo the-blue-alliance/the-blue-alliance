@@ -1,7 +1,5 @@
 FROM node:alpine
 
-ENV PROJECT_ID=tbatv-prod-hrd
-
 RUN apk --no-cache add openjdk21-jre && \
     npm cache clean --force && \
     npm i -g firebase-tools

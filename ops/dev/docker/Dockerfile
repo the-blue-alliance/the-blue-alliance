@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     openssh-server
 
 RUN apt-get install software-properties-common -y
+RUN add-apt-repository ppa:deadsnakes/ppa -y
 
 # Setup python environment
 ENV PYTHON_VERSION=python3.13
