@@ -1,25 +1,34 @@
-version: "3"
-
 services:
-  tba:
-    # image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+  firebase:
     build:
       context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile
-    volumes:
-      - ./:/tba:delegated
-    tty: true
-    stdin_open: true
+      dockerfile: ./ops/dev/firebase/Dockerfile.firebase
     ports:
-      # Firebase
       - "4000:4000"
       - "4400:4400"
       - "4500:4500"
       - "9005:9005"
       - "9000:9000"
       - "9099:9099"
+
+  tba:
+    image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+    depends_on:
+      - firebase
+    # build:
+    #   context: ./
+    #   dockerfile: ./ops/dev/docker/Dockerfile
+    volumes:
+      - ./:/tba:delegated
+    tty: true
+    stdin_open: true
+    ports:
       # GAE
       - "8080:8080"
+      # TODO:
+      # Forward GAE modules
+      # Only forward 8080 on CI since some others conflict with GH Actions
+      # and are not needed for testing.
       - "8081:8081"
       - "8082:8082"
       - "8083:8083"
