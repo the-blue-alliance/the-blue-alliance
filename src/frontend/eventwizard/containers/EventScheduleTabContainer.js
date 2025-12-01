@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import EventInfoTab from "../components/infoTab/EventInfoTab";
+import EventScheduleTab from "../components/eventScheduleTab/EventScheduleTab";
 import makeTrustedApiRequest from "../net/TrustedApiRequest";
 
 const mapStateToProps = (state) => ({
@@ -16,4 +16,4 @@ const mapStateToProps = (state) => ({
   },
 });
 
-export default connect(mapStateToProps)(EventInfoTab);
+export default connect(mapStateToProps)(EventScheduleTab);

@@ -15,6 +15,7 @@ function makeTrustedApiRequest(
   headers.append("X-TBA-Auth-Sig", authSig);
   return fetch(requestPath, {
     method: "POST",
+    headers: headers,
     credentials: "same-origin",
     body: requestBody,
   })
