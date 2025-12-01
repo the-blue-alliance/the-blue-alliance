@@ -54,7 +54,6 @@ class AddTeamsFMSReport extends Component {
 
       // check for invalid row
       if (!team["#"]) {
-        // eslint-disable-next-line no-continue
         continue;
       }
 

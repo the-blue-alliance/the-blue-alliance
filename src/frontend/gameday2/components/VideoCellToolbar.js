@@ -134,13 +134,13 @@ VideoCellToolbar.propTypes = {
   matches: PropTypes.arrayOf(PropTypes.object).isRequired,
   webcast: PropTypes.object.isRequired,
   specialWebcastIds: PropTypes.instanceOf(Set).isRequired,
-  /* eslint-disable react/no-unused-prop-types */
+
   isBlueZone: PropTypes.bool.isRequired,
   livescoreOn: PropTypes.bool.isRequired,
   onRequestSwapPosition: PropTypes.func.isRequired,
   onRequestSelectWebcast: PropTypes.func.isRequired,
   onRequestLiveScoresToggle: PropTypes.func.isRequired,
-  /* eslint-enable react/no-unused-prop-types */
+
   removeWebcast: PropTypes.func.isRequired,
   style: PropTypes.object,
   layoutId: PropTypes.number.isRequired,

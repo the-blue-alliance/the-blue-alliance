@@ -14,9 +14,9 @@ export default class HashtagSidebar extends React.Component {
       if (!d.getElementById(id)) {
         const js = d.createElement(s);
         js.id = id;
-        /* eslint-disable prefer-template */
+
         js.src = p + "://platform.twitter.com/widgets.js";
-        /* eslint-enable prefer-template */
+
         fjs.parentNode.insertBefore(js, fjs);
       }
     })(document, "script", "twitter-wjs");
