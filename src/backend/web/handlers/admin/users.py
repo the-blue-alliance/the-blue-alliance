@@ -1,8 +1,8 @@
+import logging
+
 from firebase_admin import auth
 from flask import abort, redirect, request, url_for
 from werkzeug import Response
-
-import logging
 
 from backend.common.consts.account_permission import AccountPermission, PERMISSIONS
 from backend.common.firebase import app
