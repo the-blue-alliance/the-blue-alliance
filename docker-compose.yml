@@ -48,10 +48,6 @@ services:
     ports:
       # GAE
       - "8080:8080"
-      # TODO:
-      # Forward GAE modules
-      # Only forward 8080 on CI since some others conflict with GH Actions
-      # and are not needed for testing.
       - "8081:8081"
       - "8082:8082"
       - "8083:8083"
@@ -68,3 +64,4 @@ services:
     hostname: tba
     environment:
       - PUPPETEER_SKIP_DOWNLOAD=true
+      - TBA_DOCKER_COMPOSE=true

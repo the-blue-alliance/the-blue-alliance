@@ -42,6 +42,9 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk-pubsub-emulator
 ENV HTTPLIB2_CA_CERTS="/usr/lib/google-cloud-sdk/platform/google_appengine/lib/httplib2/httplib2/cacerts.txt"
 
+# Install JDK for firebase-tools
+RUN apt-get install default-jre -y
+
 # Set up nvm and nodejs
 ENV NVM_DIR=/nvm
 ENV NODE_VERSION=24
@@ -60,6 +63,14 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 ENV NOTVISIBLE="in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 EXPOSE 22
+
+# Expose Firebase emulator
+EXPOSE 4000
+EXPOSE 4400
+EXPOSE 4500
+EXPOSE 9005
+EXPOSE 9000
+EXPOSE 9099
 
 # Expose ports for TBA
 EXPOSE 8000
