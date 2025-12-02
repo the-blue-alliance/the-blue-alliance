@@ -8,8 +8,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { AwardType } from '~/lib/api/AwardType';
-import { cn } from '~/lib/utils';
+import { AwardType, BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
+import { cn, pluralize } from '~/lib/utils';
 
 interface TeamAwardsSummaryProps {
   awards: Award[];
@@ -84,11 +84,6 @@ const AWARD_CATEGORIES: AwardCategoryDefinition[] = [
         key: 'sustainability',
         label: 'Sustainability',
         types: [AwardType.SUSTAINABILITY],
-      },
-      {
-        key: 'ras',
-        label: 'RAS',
-        types: [AwardType.ROOKIE_ALL_STAR],
       },
       {
         key: 'imagery',
@@ -207,6 +202,10 @@ const AWARD_CATEGORIES: AwardCategoryDefinition[] = [
 function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
   const eventNameLookup = getEventNameLookup(events);
 
+  const blueBannerAwards = awards.filter((award) =>
+    BLUE_BANNER_AWARDS.has(award.award_type),
+  );
+
   if (awards.length === 0) {
     return null;
   }
@@ -216,6 +215,11 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
       <div className="flex flex-row items-baseline gap-1">
         <h2 className="text-xl font-semibold">Awards Won</h2>
         <span className="text-sm text-muted-foreground">({awards.length})</span>
+        {blueBannerAwards.length > 0 && (
+          <span className="text-sm text-muted-foreground">
+            ({pluralize(blueBannerAwards.length, 'banner', 'banners')})
+          </span>
+        )}
       </div>
 
       <TooltipProvider>

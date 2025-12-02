@@ -94,7 +94,7 @@ function MatchStatsLoadingState() {
         />
         <MdiCog
           className="absolute -bottom-1 -left-3 size-6 animate-spin
-            text-blue-300 [animation-direction:reverse]"
+            text-blue-300 direction-[reverse]"
         />
       </div>
       <div className="mb-3 text-lg font-medium text-foreground">
