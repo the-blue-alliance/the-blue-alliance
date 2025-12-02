@@ -2,6 +2,7 @@ import { useLoaderData } from 'react-router';
 
 import { getEvent, getMatch } from '~/api/tba/read';
 import { EventLink } from '~/components/tba/links';
+import MatchDetails from '~/components/tba/match/matchDetails';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
 
@@ -78,6 +79,7 @@ export default function MatchPage() {
           </EventLink>
         </small>
       </h1>
+      <MatchDetails match={match} event={event} />
     </div>
   );
 }

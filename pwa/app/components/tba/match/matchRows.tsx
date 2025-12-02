@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import PlayCircle from '~icons/bi/play-circle';
 
 import { Event, Match } from '~/api/tba/read';
+import { MatchLink } from '~/components/tba/links';
 import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
 import ScoreCell from '~/components/tba/match/scoreCell';
 import TeamListSubgrid from '~/components/tba/match/teamListSubgrid';
@@ -43,6 +44,7 @@ export default function SimpleMatchRowsWithBreaks({
     divs.push(
       <MatchRow
         match={match}
+        event={event}
         playoffType={event.playoff_type ?? PlayoffType.CUSTOM}
         year={event.year}
         key={match.key}
@@ -70,10 +72,12 @@ export default function SimpleMatchRowsWithBreaks({
 
 export function MatchRow({
   match,
+  event,
   playoffType,
   year,
 }: {
   match: Match;
+  event: Event;
   playoffType: PlayoffType;
   year: number;
 }) {
@@ -106,9 +110,13 @@ export function MatchRow({
           className="row-span-2 flex items-center justify-center p-2
             xl:col-span-2 xl:row-span-1"
         >
-          <span className="text-center">
+          <MatchLink
+            match={match}
+            event={event}
+            className="text-center hover:underline"
+          >
             {matchTitleShort(match, playoffType)}
-          </span>
+          </MatchLink>
         </div>
 
         {/* Red Team Players - Subgrid Component */}

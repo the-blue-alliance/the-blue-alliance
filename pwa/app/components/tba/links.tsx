@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import { Event, Team } from '~/api/tba/read';
+import { Event, Match, Team } from '~/api/tba/read';
+import { useMatchModal } from '~/lib/matchModalContext';
 import { removeNonNumeric } from '~/lib/utils';
 
 const TeamLink = React.forwardRef<
@@ -61,4 +62,34 @@ const LocationLink = React.forwardRef<
 });
 LocationLink.displayName = 'LocationLink';
 
-export { TeamLink, EventLink, LocationLink };
+interface MatchLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  match: Match;
+  event: Event;
+  children: React.ReactNode;
+}
+
+const MatchLink = React.forwardRef<HTMLAnchorElement, MatchLinkProps>(
+  ({ match, event, children, onClick, ...props }, ref) => {
+    const { openMatch } = useMatchModal();
+
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      openMatch(match, event);
+      onClick?.(e);
+    };
+
+    return (
+      <Link
+        to={`/match/${match.key}`}
+        onClick={handleClick}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </Link>
+    );
+  },
+);
+MatchLink.displayName = 'MatchLink';
+
+export { TeamLink, EventLink, LocationLink, MatchLink };

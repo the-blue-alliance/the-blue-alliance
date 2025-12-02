@@ -15,6 +15,8 @@ import {
 } from 'react-router';
 
 import { client } from '~/api/tba/read/client.gen';
+import MatchModal from '~/components/tba/match/matchModal';
+import { MatchModalProvider } from '~/lib/matchModalContext';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 
 // Configure request interceptor for auth
@@ -219,7 +221,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
             <QueryClientProvider client={queryClient}>
-              {children}
+              <MatchModalProvider>
+                {children}
+                <MatchModal />
+              </MatchModalProvider>
             </QueryClientProvider>
           </div>
         </div>

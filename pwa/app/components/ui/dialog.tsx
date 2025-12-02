@@ -49,6 +49,7 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  onPointerDownOutside,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
@@ -67,6 +68,15 @@ function DialogContent({
           data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg`,
           className,
         )}
+        onPointerDownOutside={(e) => {
+          // Prevent non-primary mouse buttons (back/forward) from closing the dialog
+          const pointerEvent = e.detail.originalEvent;
+          if (pointerEvent.button !== 0) {
+            e.preventDefault();
+            return;
+          }
+          onPointerDownOutside?.(e);
+        }}
         {...props}
       >
         {children}
