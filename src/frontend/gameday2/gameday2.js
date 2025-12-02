@@ -1,3 +1,4 @@
+import { createRoot } from "react-dom/client";
 import "./gameday2.less";
 
 import React from "react";
@@ -55,13 +56,14 @@ const muiTheme = createTheme({
   },
 });
 
-ReactDOM.render(
+const root = createRoot(document.getElementById("content"));
+
+root.render(
   <ThemeProvider theme={muiTheme}>
     <Provider store={store}>
       <GamedayFrame />
     </Provider>
-  </ThemeProvider>,
-  document.getElementById("content")
+  </ThemeProvider>
 );
 
 // Subscribe to changes in state.videoGrid.displayed to watch the correct Firebase paths
