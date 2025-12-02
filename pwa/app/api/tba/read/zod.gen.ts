@@ -16,60 +16,74 @@ export const zApiStatus = z.object({
   max_team_page: z.int(),
 });
 
-export const zTeamSimple = z.object({
-  key: z.string(),
-  team_number: z.int(),
-  nickname: z.string(),
-  name: z.string(),
-  city: z.union([z.string(), z.null()]),
-  state_prov: z.union([z.string(), z.null()]),
-  country: z.union([z.string(), z.null()]),
+/**
+ * An `Award_Recipient` object represents the team and/or person who received an award at an event.
+ */
+export const zAwardRecipient = z.object({
+  team_key: z.union([z.string(), z.null()]),
+  awardee: z.union([z.string(), z.null()]),
 });
 
-export const zTeam = z.object({
-  key: z.string(),
-  team_number: z.int(),
-  nickname: z.string(),
+export const zAward = z.object({
   name: z.string(),
-  school_name: z.union([z.string(), z.null()]),
-  city: z.union([z.string(), z.null()]),
-  state_prov: z.union([z.string(), z.null()]),
-  country: z.union([z.string(), z.null()]),
-  address: z.union([z.string(), z.null()]),
-  postal_code: z.union([z.string(), z.null()]),
-  gmaps_place_id: z.union([z.string(), z.null()]),
-  gmaps_url: z.union([z.string(), z.null()]),
-  lat: z.union([z.number(), z.null()]),
-  lng: z.union([z.number(), z.null()]),
-  location_name: z.union([z.string(), z.null()]),
-  website: z.optional(z.union([z.string(), z.null()])),
-  rookie_year: z.union([z.int(), z.null()]),
-});
-
-export const zTeamRobot = z.object({
+  award_type: z.int(),
+  event_key: z.string(),
+  recipient_list: z.array(zAwardRecipient),
   year: z.int(),
-  robot_name: z.string(),
+});
+
+export const zDistrict = z.object({
+  abbreviation: z.string(),
+  display_name: z.string(),
   key: z.string(),
-  team_key: z.string(),
+  year: z.int(),
+});
+
+export const zDistrictInsightRegionData = z.object({
+  yearly_active_team_count: z.record(z.string(), z.int()),
+  yearly_event_count: z.record(z.string(), z.int()),
+  yearly_gained_teams: z.record(z.string(), z.array(z.string())),
+  yearly_lost_teams: z.record(z.string(), z.array(z.string())),
 });
 
 /**
- * Backup status, may be null.
+ * Advancement status of a team in a district.
  */
-export const zTeamEventStatusAllianceBackup = z.union([
-  z.null(),
-  z.object({
-    out: z.optional(z.string()),
-    in: z.optional(z.string()),
-  }),
-]);
-
-export const zTeamEventStatusAlliance = z.object({
-  name: z.optional(z.union([z.string(), z.null()])),
-  number: z.int(),
-  backup: z.optional(zTeamEventStatusAllianceBackup),
-  pick: z.int(),
+export const zDistrictAdvancement = z.object({
+  dcmp: z.boolean(),
+  cmp: z.boolean(),
 });
+
+/**
+ * Rank of a team in a district.
+ */
+export const zDistrictRanking = z.object({
+  team_key: z.string(),
+  rank: z.int(),
+  rookie_bonus: z.optional(z.int()),
+  point_total: z.int(),
+  event_points: z.optional(
+    z.array(
+      z.object({
+        district_cmp: z.boolean(),
+        total: z.int(),
+        alliance_points: z.int(),
+        elim_points: z.int(),
+        award_points: z.int(),
+        event_key: z.string(),
+        qual_points: z.int(),
+      }),
+    ),
+  ),
+});
+
+/**
+ * Component OPRs for teams at the event.
+ */
+export const zEventCoprs = z.record(
+  z.string(),
+  z.record(z.string(), z.number()),
+);
 
 export const zEventDistrictPoints = z.object({
   points: z.record(
@@ -222,54 +236,36 @@ export const zEventOprs = z.object({
 });
 
 /**
- * Component OPRs for teams at the event.
- */
-export const zEventCoprs = z.record(
-  z.string(),
-  z.record(z.string(), z.number()),
-);
-
-/**
  * JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.
  */
 export const zEventPredictions = z.record(z.string(), z.unknown());
 
-export const zMatchAlliance = z.object({
-  score: z.int(),
-  team_keys: z.array(z.string()),
-  surrogate_team_keys: z.array(z.string()),
-  dq_team_keys: z.array(z.string()),
-});
-
-export const zMatchSimple = z.object({
+export const zEventSimple = z.object({
   key: z.string(),
-  comp_level: z.enum(['qm', 'ef', 'qf', 'sf', 'f']),
-  set_number: z.int(),
-  match_number: z.int(),
-  alliances: z.object({
-    red: zMatchAlliance,
-    blue: zMatchAlliance,
-  }),
-  winning_alliance: z.enum(['red', 'blue', '']),
-  event_key: z.string(),
-  time: z.union([z.coerce.bigint(), z.null()]),
-  predicted_time: z.union([z.coerce.bigint(), z.null()]),
-  actual_time: z.union([z.coerce.bigint(), z.null()]),
+  name: z.string(),
+  event_code: z.string(),
+  event_type: z.int(),
+  District: z.union([zDistrict, z.null()]),
+  city: z.union([z.string(), z.null()]),
+  state_prov: z.union([z.string(), z.null()]),
+  country: z.union([z.string(), z.null()]),
+  start_date: z.iso.date(),
+  end_date: z.iso.date(),
+  year: z.int(),
 });
 
-export const zZebraTeam = z.object({
-  team_key: z.string(),
-  xs: z.array(z.number()),
-  ys: z.array(z.number()),
-});
-
-export const zZebra = z.object({
-  key: z.string(),
-  times: z.array(z.number()),
-  alliances: z.object({
-    red: z.optional(z.array(zZebraTeam)),
-    blue: z.optional(z.array(zZebraTeam)),
+export const zLeaderboardInsight = z.object({
+  data: z.object({
+    rankings: z.array(
+      z.object({
+        value: z.number(),
+        keys: z.array(z.string()),
+      }),
+    ),
+    key_type: z.enum(['Team', 'Event', 'Match']),
   }),
+  name: z.string(),
+  year: z.int(),
 });
 
 export const zMatchScoreBreakdown2015Alliance = z.object({
@@ -448,45 +444,6 @@ export const zMatchScoreBreakdown2018Alliance = z.object({
 export const zMatchScoreBreakdown2018 = z.object({
   blue: zMatchScoreBreakdown2018Alliance,
   red: zMatchScoreBreakdown2018Alliance,
-});
-
-/**
- * Timeseries data for the 2018 game *FIRST* POWER UP.
- * *WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.
- * *WARNING:* This model is currently under active development and may change at any time, including in breaking ways.
- */
-export const zMatchTimeseries2018 = z.object({
-  event_key: z.optional(z.string()),
-  match_id: z.optional(z.string()),
-  mode: z.optional(z.string()),
-  play: z.optional(z.int()),
-  time_remaining: z.optional(z.int()),
-  blue_auto_quest: z.optional(z.int()),
-  blue_boost_count: z.optional(z.int()),
-  blue_boost_played: z.optional(z.int()),
-  blue_current_powerup: z.optional(z.string()),
-  blue_face_the_boss: z.optional(z.int()),
-  blue_force_count: z.optional(z.int()),
-  blue_force_played: z.optional(z.int()),
-  blue_levitate_count: z.optional(z.int()),
-  blue_levitate_played: z.optional(z.int()),
-  blue_powerup_time_remaining: z.optional(z.string()),
-  blue_scale_owned: z.optional(z.int()),
-  blue_score: z.optional(z.int()),
-  blue_switch_owned: z.optional(z.int()),
-  red_auto_quest: z.optional(z.int()),
-  red_boost_count: z.optional(z.int()),
-  red_boost_played: z.optional(z.int()),
-  red_current_powerup: z.optional(z.string()),
-  red_face_the_boss: z.optional(z.int()),
-  red_force_count: z.optional(z.int()),
-  red_force_played: z.optional(z.int()),
-  red_levitate_count: z.optional(z.int()),
-  red_levitate_played: z.optional(z.int()),
-  red_powerup_time_remaining: z.optional(z.string()),
-  red_scale_owned: z.optional(z.int()),
-  red_score: z.optional(z.int()),
-  red_switch_owned: z.optional(z.int()),
 });
 
 export const zMatchScoreBreakdown2019Alliance = z.object({
@@ -932,6 +889,52 @@ export const zMatchScoreBreakdown2025 = z.object({
   red: zMatchScoreBreakdown2025Alliance,
 });
 
+/**
+ * Timeseries data for the 2018 game *FIRST* POWER UP.
+ * *WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.
+ * *WARNING:* This model is currently under active development and may change at any time, including in breaking ways.
+ */
+export const zMatchTimeseries2018 = z.object({
+  event_key: z.optional(z.string()),
+  match_id: z.optional(z.string()),
+  mode: z.optional(z.string()),
+  play: z.optional(z.int()),
+  time_remaining: z.optional(z.int()),
+  blue_auto_quest: z.optional(z.int()),
+  blue_boost_count: z.optional(z.int()),
+  blue_boost_played: z.optional(z.int()),
+  blue_current_powerup: z.optional(z.string()),
+  blue_face_the_boss: z.optional(z.int()),
+  blue_force_count: z.optional(z.int()),
+  blue_force_played: z.optional(z.int()),
+  blue_levitate_count: z.optional(z.int()),
+  blue_levitate_played: z.optional(z.int()),
+  blue_powerup_time_remaining: z.optional(z.string()),
+  blue_scale_owned: z.optional(z.int()),
+  blue_score: z.optional(z.int()),
+  blue_switch_owned: z.optional(z.int()),
+  red_auto_quest: z.optional(z.int()),
+  red_boost_count: z.optional(z.int()),
+  red_boost_played: z.optional(z.int()),
+  red_current_powerup: z.optional(z.string()),
+  red_face_the_boss: z.optional(z.int()),
+  red_force_count: z.optional(z.int()),
+  red_force_played: z.optional(z.int()),
+  red_levitate_count: z.optional(z.int()),
+  red_levitate_played: z.optional(z.int()),
+  red_powerup_time_remaining: z.optional(z.string()),
+  red_scale_owned: z.optional(z.int()),
+  red_score: z.optional(z.int()),
+  red_switch_owned: z.optional(z.int()),
+});
+
+export const zMatchAlliance = z.object({
+  score: z.int(),
+  team_keys: z.array(z.string()),
+  surrogate_team_keys: z.array(z.string()),
+  dq_team_keys: z.array(z.string()),
+});
+
 export const zMatch = z.object({
   key: z.string(),
   comp_level: z.enum(['qm', 'ef', 'qf', 'sf', 'f']),
@@ -966,6 +969,22 @@ export const zMatch = z.object({
       key: z.string(),
     }),
   ),
+});
+
+export const zMatchSimple = z.object({
+  key: z.string(),
+  comp_level: z.enum(['qm', 'ef', 'qf', 'sf', 'f']),
+  set_number: z.int(),
+  match_number: z.int(),
+  alliances: z.object({
+    red: zMatchAlliance,
+    blue: zMatchAlliance,
+  }),
+  winning_alliance: z.enum(['red', 'blue', '']),
+  event_key: z.string(),
+  time: z.union([z.coerce.bigint(), z.null()]),
+  predicted_time: z.union([z.coerce.bigint(), z.null()]),
+  actual_time: z.union([z.coerce.bigint(), z.null()]),
 });
 
 /**
@@ -1030,79 +1049,17 @@ export const zMedia = z.object({
   view_url: z.optional(z.string()),
 });
 
-/**
- * An `Award_Recipient` object represents the team and/or person who received an award at an event.
- */
-export const zAwardRecipient = z.object({
-  team_key: z.union([z.string(), z.null()]),
-  awardee: z.union([z.string(), z.null()]),
-});
-
-export const zAward = z.object({
-  name: z.string(),
-  award_type: z.int(),
-  event_key: z.string(),
-  recipient_list: z.array(zAwardRecipient),
-  year: z.int(),
-});
-
-export const zDistrict = z.object({
-  abbreviation: z.string(),
-  display_name: z.string(),
-  key: z.string(),
-  year: z.int(),
-});
-
-export const zEventSimple = z.object({
-  key: z.string(),
-  name: z.string(),
-  event_code: z.string(),
-  event_type: z.int(),
-  district: z.union([zDistrict, z.null()]),
-  city: z.union([z.string(), z.null()]),
-  state_prov: z.union([z.string(), z.null()]),
-  country: z.union([z.string(), z.null()]),
-  start_date: z.iso.date(),
-  end_date: z.iso.date(),
-  year: z.int(),
-});
-
-export const zDistrictInsightRegionData = z.object({
-  yearly_active_team_count: z.record(z.string(), z.int()),
-  yearly_event_count: z.record(z.string(), z.int()),
-  yearly_gained_teams: z.record(z.string(), z.array(z.string())),
-  yearly_lost_teams: z.record(z.string(), z.array(z.string())),
-});
-
-/**
- * Rank of a team in a district.
- */
-export const zDistrictRanking = z.object({
-  team_key: z.string(),
-  rank: z.int(),
-  rookie_bonus: z.optional(z.int()),
-  point_total: z.int(),
-  event_points: z.optional(
-    z.array(
+export const zNotablesInsight = z.object({
+  data: z.object({
+    entries: z.array(
       z.object({
-        district_cmp: z.boolean(),
-        total: z.int(),
-        alliance_points: z.int(),
-        elim_points: z.int(),
-        award_points: z.int(),
-        event_key: z.string(),
-        qual_points: z.int(),
+        context: z.array(z.string()),
+        team_key: z.string(),
       }),
     ),
-  ),
-});
-
-/**
- * Advancement status of a team in a district.
- */
-export const zDistrictAdvancement = z.object({
-  dcmp: z.boolean(),
-  cmp: z.boolean(),
+  }),
+  name: z.string(),
+  year: z.int(),
 });
 
 /**
@@ -1145,6 +1102,76 @@ export const zRegionalRanking = z.object({
   ),
 });
 
+export const zSearchIndex = z.object({
+  teams: z.array(
+    z.object({
+      key: z.string(),
+      nickname: z.string(),
+    }),
+  ),
+  events: z.array(
+    z.object({
+      key: z.string(),
+      name: z.string(),
+    }),
+  ),
+});
+
+export const zTeam = z.object({
+  key: z.string(),
+  team_number: z.int(),
+  nickname: z.string(),
+  name: z.string(),
+  school_name: z.union([z.string(), z.null()]),
+  city: z.union([z.string(), z.null()]),
+  state_prov: z.union([z.string(), z.null()]),
+  country: z.union([z.string(), z.null()]),
+  address: z.union([z.string(), z.null()]),
+  postal_code: z.union([z.string(), z.null()]),
+  gmaps_place_id: z.union([z.string(), z.null()]),
+  gmaps_url: z.union([z.string(), z.null()]),
+  lat: z.union([z.number(), z.null()]),
+  lng: z.union([z.number(), z.null()]),
+  location_name: z.union([z.string(), z.null()]),
+  website: z.optional(z.union([z.string(), z.null()])),
+  rookie_year: z.union([z.int(), z.null()]),
+});
+
+/**
+ * Backup status, may be null.
+ */
+export const zTeamEventStatusAllianceBackup = z.union([
+  z.null(),
+  z.object({
+    out: z.optional(z.string()),
+    in: z.optional(z.string()),
+  }),
+]);
+
+export const zTeamEventStatusAlliance = z.object({
+  name: z.optional(z.union([z.string(), z.null()])),
+  number: z.int(),
+  backup: z.optional(zTeamEventStatusAllianceBackup),
+  pick: z.int(),
+});
+
+export const zTeamRobot = z.object({
+  year: z.int(),
+  robot_name: z.string(),
+  key: z.string(),
+  team_key: z.string(),
+});
+
+export const zTeamSimple = z.object({
+  key: z.string(),
+  team_number: z.int(),
+  nickname: z.string(),
+  name: z.string(),
+  city: z.union([z.string(), z.null()]),
+  state_prov: z.union([z.string(), z.null()]),
+  country: z.union([z.string(), z.null()]),
+});
+
 /**
  * A Win-Loss-Tie record for a team, or an alliance.
  */
@@ -1152,113 +1179,6 @@ export const zWltRecord = z.object({
   losses: z.int(),
   wins: z.int(),
   ties: z.int(),
-});
-
-export const zTeamEventStatusRank = z.object({
-  num_teams: z.optional(z.int()),
-  ranking: z.optional(
-    z.union([
-      z.object({
-        matches_played: z.optional(z.int()),
-        qual_average: z.optional(z.union([z.number(), z.null()])),
-        sort_orders: z.optional(z.union([z.array(z.number()), z.null()])),
-        record: z.optional(z.union([zWltRecord, z.null()])),
-        rank: z.optional(z.union([z.int(), z.null()])),
-        dq: z.optional(z.union([z.int(), z.null()])),
-        team_key: z.optional(z.string()),
-      }),
-      z.null(),
-    ]),
-  ),
-  sort_order_info: z.optional(
-    z.union([
-      z.array(
-        z.object({
-          precision: z.optional(z.int()),
-          name: z.optional(z.string()),
-        }),
-      ),
-      z.null(),
-    ]),
-  ),
-  status: z.optional(z.string()),
-});
-
-/**
- * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
- */
-export const zTeamEventStatusPlayoff = z.union([
-  z.null(),
-  z.object({
-    level: z.optional(z.enum(['qm', 'ef', 'qf', 'sf', 'f'])),
-    current_level_record: z.optional(z.union([zWltRecord, z.null()])),
-    record: z.optional(z.union([zWltRecord, z.null()])),
-    status: z.optional(z.enum(['won', 'eliminated', 'playing'])),
-    playoff_average: z.optional(z.union([z.null(), z.number()])),
-  }),
-]);
-
-export const zTeamEventStatus = z.object({
-  qual: z.optional(z.union([zTeamEventStatusRank, z.null()])),
-  alliance: z.optional(z.union([zTeamEventStatusAlliance, z.null()])),
-  playoff: z.optional(z.union([zTeamEventStatusPlayoff, z.null()])),
-  alliance_status_str: z.optional(z.string()),
-  playoff_status_str: z.optional(z.string()),
-  overall_status_str: z.optional(z.string()),
-  next_match_key: z.optional(z.union([z.string(), z.null()])),
-  last_match_key: z.optional(z.union([z.string(), z.null()])),
-});
-
-export const zEventRanking = z.object({
-  rankings: z.array(
-    z.object({
-      matches_played: z.int(),
-      qual_average: z.union([z.int(), z.null()]),
-      extra_stats: z.array(z.number()),
-      sort_orders: z.union([z.array(z.number()), z.null()]),
-      record: z.union([zWltRecord, z.null()]),
-      rank: z.int(),
-      dq: z.int(),
-      team_key: z.string(),
-    }),
-  ),
-  extra_stats_info: z.array(
-    z.object({
-      precision: z.number(),
-      name: z.string(),
-    }),
-  ),
-  sort_order_info: z.array(
-    z.object({
-      precision: z.int(),
-      name: z.string(),
-    }),
-  ),
-});
-
-export const zEliminationAlliance = z.object({
-  name: z.optional(z.union([z.string(), z.null()])),
-  backup: z.optional(
-    z.union([
-      z.object({
-        in: z.string(),
-        out: z.string(),
-      }),
-      z.null(),
-    ]),
-  ),
-  declines: z.array(z.string()),
-  picks: z.array(z.string()),
-  status: z.optional(
-    z.object({
-      playoff_average: z.optional(z.union([z.number(), z.null()])),
-      playoff_type: z.optional(z.union([z.number(), z.null()])),
-      level: z.optional(z.string()),
-      record: z.optional(z.union([zWltRecord, z.null()])),
-      current_level_record: z.optional(z.union([zWltRecord, z.null()])),
-      status: z.optional(z.string()),
-    }),
-  ),
 });
 
 export const zDistrictInsight = z.object({
@@ -1292,6 +1212,113 @@ export const zDistrictInsight = z.object({
   ]),
 });
 
+export const zEliminationAlliance = z.object({
+  name: z.optional(z.union([z.string(), z.null()])),
+  backup: z.optional(
+    z.union([
+      z.object({
+        in: z.string(),
+        out: z.string(),
+      }),
+      z.null(),
+    ]),
+  ),
+  declines: z.array(z.string()),
+  picks: z.array(z.string()),
+  status: z.optional(
+    z.object({
+      playoff_average: z.optional(z.union([z.number(), z.null()])),
+      playoff_type: z.optional(z.union([z.number(), z.null()])),
+      level: z.optional(z.string()),
+      record: z.optional(z.union([zWltRecord, z.null()])),
+      current_level_record: z.optional(z.union([zWltRecord, z.null()])),
+      status: z.optional(z.string()),
+    }),
+  ),
+});
+
+export const zEventRanking = z.object({
+  rankings: z.array(
+    z.object({
+      matches_played: z.int(),
+      qual_average: z.union([z.int(), z.null()]),
+      extra_stats: z.array(z.number()),
+      sort_orders: z.union([z.array(z.number()), z.null()]),
+      record: z.union([zWltRecord, z.null()]),
+      rank: z.int(),
+      dq: z.int(),
+      team_key: z.string(),
+    }),
+  ),
+  extra_stats_info: z.array(
+    z.object({
+      precision: z.number(),
+      name: z.string(),
+    }),
+  ),
+  sort_order_info: z.array(
+    z.object({
+      precision: z.int(),
+      name: z.string(),
+    }),
+  ),
+});
+
+/**
+ * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
+ */
+export const zTeamEventStatusPlayoff = z.union([
+  z.null(),
+  z.object({
+    level: z.optional(z.enum(['qm', 'ef', 'qf', 'sf', 'f'])),
+    current_level_record: z.optional(z.union([zWltRecord, z.null()])),
+    record: z.optional(z.union([zWltRecord, z.null()])),
+    status: z.optional(z.enum(['won', 'eliminated', 'playing'])),
+    playoff_average: z.optional(z.union([z.null(), z.number()])),
+  }),
+]);
+
+export const zTeamEventStatusRank = z.object({
+  num_teams: z.optional(z.int()),
+  ranking: z.optional(
+    z.union([
+      z.object({
+        matches_played: z.optional(z.int()),
+        qual_average: z.optional(z.union([z.number(), z.null()])),
+        sort_orders: z.optional(z.union([z.array(z.number()), z.null()])),
+        record: z.optional(z.union([zWltRecord, z.null()])),
+        rank: z.optional(z.union([z.int(), z.null()])),
+        dq: z.optional(z.union([z.int(), z.null()])),
+        team_key: z.optional(z.string()),
+      }),
+      z.null(),
+    ]),
+  ),
+  sort_order_info: z.optional(
+    z.union([
+      z.array(
+        z.object({
+          precision: z.optional(z.int()),
+          name: z.optional(z.string()),
+        }),
+      ),
+      z.null(),
+    ]),
+  ),
+  status: z.optional(z.string()),
+});
+
+export const zTeamEventStatus = z.object({
+  qual: z.optional(z.union([zTeamEventStatusRank, z.null()])),
+  alliance: z.optional(z.union([zTeamEventStatusAlliance, z.null()])),
+  playoff: z.optional(z.union([zTeamEventStatusPlayoff, z.null()])),
+  alliance_status_str: z.optional(z.string()),
+  playoff_status_str: z.optional(z.string()),
+  overall_status_str: z.optional(z.string()),
+  next_match_key: z.optional(z.union([z.string(), z.null()])),
+  last_match_key: z.optional(z.union([z.string(), z.null()])),
+});
+
 export const zWebcast = z.object({
   type: z.enum([
     'youtube',
@@ -1317,7 +1344,7 @@ export const zEvent = z.object({
   name: z.string(),
   event_code: z.string(),
   event_type: z.int(),
-  district: z.union([zDistrict, z.null()]),
+  District: z.union([zDistrict, z.null()]),
   city: z.union([z.string(), z.null()]),
   state_prov: z.union([z.string(), z.null()]),
   country: z.union([z.string(), z.null()]),
@@ -1346,51 +1373,24 @@ export const zEvent = z.object({
   remap_teams: z.union([z.record(z.string(), z.string()), z.null()]),
 });
 
-export const zLeaderboardInsight = z.object({
-  data: z.object({
-    rankings: z.array(
-      z.object({
-        value: z.number(),
-        keys: z.array(z.string()),
-      }),
-    ),
-    key_type: z.enum(['team', 'event', 'match']),
-  }),
-  name: z.string(),
-  year: z.int(),
-});
-
-export const zNotablesInsight = z.object({
-  data: z.object({
-    entries: z.array(
-      z.object({
-        context: z.array(z.string()),
-        team_key: z.string(),
-      }),
-    ),
-  }),
-  name: z.string(),
-  year: z.int(),
-});
-
 export const zHistory = z.object({
   events: z.array(zEvent),
   awards: z.array(zAward),
 });
 
-export const zSearchIndex = z.object({
-  teams: z.array(
-    z.object({
-      key: z.string(),
-      nickname: z.string(),
-    }),
-  ),
-  events: z.array(
-    z.object({
-      key: z.string(),
-      name: z.string(),
-    }),
-  ),
+export const zZebraTeam = z.object({
+  team_key: z.string(),
+  xs: z.array(z.number()),
+  ys: z.array(z.number()),
+});
+
+export const zZebra = z.object({
+  key: z.string(),
+  times: z.array(z.number()),
+  alliances: z.object({
+    red: z.optional(z.array(zZebraTeam)),
+    blue: z.optional(z.array(zZebraTeam)),
+  }),
 });
 
 /**
@@ -2839,7 +2839,7 @@ export const zGetDistrictDcmpHistoryData = z.object({
 export const zGetDistrictDcmpHistoryResponse = z.array(
   z.object({
     awards: z.optional(z.array(zAward)),
-    event: z.optional(zEvent),
+    Event: z.optional(zEvent),
   }),
 );
 

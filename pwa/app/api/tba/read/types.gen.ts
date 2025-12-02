@@ -43,169 +43,218 @@ export type ApiStatusAppVersion = {
   latest_app_version: number;
 };
 
-export type TeamSimple = {
+export type Award = {
   /**
-   * TBA team key with the format `frcXXXX` with `XXXX` representing the team number.
-   */
-  key: string;
-  /**
-   * Official team number issued by FIRST.
-   */
-  team_number: number;
-  /**
-   * Team nickname provided by FIRST.
-   */
-  nickname: string;
-  /**
-   * Official long name registered with FIRST.
+   * The name of the award as provided by FIRST. May vary for the same award type.
    */
   name: string;
   /**
-   * City of team derived from parsing the address registered with FIRST.
+   * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6
    */
-  city: string | null;
+  award_type: AwardType;
   /**
-   * State of team derived from parsing the address registered with FIRST.
+   * The event_key of the event the award was won at.
    */
-  state_prov: string | null;
+  event_key: string;
   /**
-   * Country of team derived from parsing the address registered with FIRST.
+   * A list of recipients of the award at the event. May have either a team_key or an awardee, both, or neither (in the case the award wasn't awarded at the event).
    */
-  country: string | null;
-};
-
-export type Team = {
+  recipient_list: Array<AwardRecipient>;
   /**
-   * TBA team key with the format `frcXXXX` with `XXXX` representing the team number.
-   */
-  key: string;
-  /**
-   * Official team number issued by FIRST.
-   */
-  team_number: number;
-  /**
-   * Team nickname provided by FIRST.
-   */
-  nickname: string;
-  /**
-   * Official long name registered with FIRST.
-   */
-  name: string;
-  /**
-   * Name of team school or affilited group registered with FIRST.
-   */
-  school_name: string | null;
-  /**
-   * City of team derived from parsing the address registered with FIRST.
-   */
-  city: string | null;
-  /**
-   * State of team derived from parsing the address registered with FIRST.
-   */
-  state_prov: string | null;
-  /**
-   * Country of team derived from parsing the address registered with FIRST.
-   */
-  country: string | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  address: string | null;
-  /**
-   * Postal code from the team address.
-   */
-  postal_code: string | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  gmaps_place_id: string | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  gmaps_url: string | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  lat: number | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  lng: number | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  location_name: string | null;
-  /**
-   * Official website associated with the team.
-   */
-  website?: string | null;
-  /**
-   * First year the team officially competed.
-   */
-  rookie_year: number | null;
-};
-
-export type TeamRobot = {
-  /**
-   * Year this robot competed in.
+   * The year this award was won.
    */
   year: number;
+};
+
+/**
+ * An `Award_Recipient` object represents the team and/or person who received an award at an event.
+ */
+export type AwardRecipient = {
   /**
-   * Name of the robot as provided by the team.
+   * The TBA team key for the team that was given the award. May be null.
    */
-  robot_name: string;
+  team_key: string | null;
   /**
-   * Internal TBA identifier for this robot.
+   * The name of the individual given the award. May be null.
+   */
+  awardee: string | null;
+};
+
+export type District = {
+  /**
+   * The short identifier for the district.
+   */
+  abbreviation: string;
+  /**
+   * The long name for the district.
+   */
+  display_name: string;
+  /**
+   * Key for this district, e.g. `2016ne`.
    */
   key: string;
   /**
-   * TBA team key for this robot.
+   * Year this district participated.
+   */
+  year: number;
+};
+
+export type DistrictInsightRegionData = {
+  /**
+   * Map of year to number of active teams
+   */
+  yearly_active_team_count: {
+    [key: string]: number;
+  };
+  /**
+   * Map of year to number of events
+   */
+  yearly_event_count: {
+    [key: string]: number;
+  };
+  /**
+   * Map of year to list of team keys gained
+   */
+  yearly_gained_teams: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Map of year to list of team keys lost
+   */
+  yearly_lost_teams: {
+    [key: string]: Array<string>;
+  };
+};
+
+/**
+ * Advancement status of a team in a district.
+ */
+export type DistrictAdvancement = {
+  /**
+   * Whether or not the team qualified for their District Championship
+   */
+  dcmp: boolean;
+  /**
+   * Whether or not the team qualified for the FIRST Championship
+   */
+  cmp: boolean;
+};
+
+export type DistrictInsight = {
+  district_data: {
+    region_data: {
+      [key: string]: DistrictInsightRegionData;
+    } | null;
+    district_wide_data: DistrictInsightRegionData | null;
+  };
+  team_data: {
+    [key: string]: {
+      district_seasons: number;
+      total_district_points: number;
+      total_pre_dcmp_district_points: number;
+      district_event_wins: number;
+      dcmp_wins: number;
+      team_awards: number;
+      individual_awards: number;
+      quals_record: WltRecord;
+      elims_record: WltRecord;
+      in_district_extra_play_count: number;
+      total_matches_played: number;
+      dcmp_appearances: number;
+      cmp_appearances: number;
+    };
+  } | null;
+};
+
+/**
+ * Rank of a team in a district.
+ */
+export type DistrictRanking = {
+  /**
+   * TBA team key for the team.
    */
   team_key: string;
+  /**
+   * Numerical rank of the team, 1 being top rank.
+   */
+  rank: number;
+  /**
+   * Any points added to a team as a result of the rookie bonus.
+   */
+  rookie_bonus?: number;
+  /**
+   * Total district points for the team.
+   */
+  point_total: number;
+  /**
+   * List of events that contributed to the point total for the team.
+   */
+  event_points?: Array<{
+    /**
+     * `true` if this event is a District Championship event.
+     */
+    district_cmp: boolean;
+    /**
+     * Total points awarded at this event.
+     */
+    total: number;
+    /**
+     * Points awarded for alliance selection.
+     */
+    alliance_points: number;
+    /**
+     * Points awarded for elimination match performance.
+     */
+    elim_points: number;
+    /**
+     * Points awarded for event awards.
+     */
+    award_points: number;
+    /**
+     * TBA Event key for this event.
+     */
+    event_key: string;
+    /**
+     * Points awarded for qualification match performance.
+     */
+    qual_points: number;
+  }>;
 };
 
-export type EventSimple = {
+export type EliminationAlliance = {
   /**
-   * TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.
+   * Alliance name, may be null.
    */
-  key: string;
+  name?: string | null;
   /**
-   * Official name of event on record either provided by FIRST or organizers of offseason event.
+   * Backup team called in, may be null.
    */
-  name: string;
+  backup?: {
+    /**
+     * Team key that was called in as the backup.
+     */
+    in: string;
+    /**
+     * Team key that was replaced by the backup team.
+     */
+    out: string;
+  } | null;
   /**
-   * Event short code, as provided by FIRST.
+   * List of teams that declined the alliance.
    */
-  event_code: string;
+  declines: Array<string>;
   /**
-   * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2
+   * List of team keys picked for the alliance. First pick is captain.
    */
-  event_type: EventType;
-  district: District | null;
-  /**
-   * City, town, village, etc. the event is located in.
-   */
-  city: string | null;
-  /**
-   * State or Province the event is located in.
-   */
-  state_prov: string | null;
-  /**
-   * Country the event is located in.
-   */
-  country: string | null;
-  /**
-   * Event start date in `yyyy-mm-dd` format.
-   */
-  start_date: string;
-  /**
-   * Event end date in `yyyy-mm-dd` format.
-   */
-  end_date: string;
-  /**
-   * Year the event data is for.
-   */
-  year: number;
+  picks: Array<string>;
+  status?: {
+    playoff_average?: number | null;
+    playoff_type?: number | null;
+    level?: string;
+    record?: WltRecord | null;
+    current_level_record?: WltRecord | null;
+    status?: string;
+  };
 };
 
 export type Event = {
@@ -225,7 +274,7 @@ export type Event = {
    * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2
    */
   event_type: EventType;
-  district: District | null;
+  District: District | null;
   /**
    * City, town, village, etc. the event is located in.
    */
@@ -331,191 +380,13 @@ export type Event = {
   } | null;
 };
 
-export type TeamEventStatus = {
-  qual?: TeamEventStatusRank | null;
-  alliance?: TeamEventStatusAlliance | null;
-  playoff?: TeamEventStatusPlayoff | null;
-  /**
-   * An HTML formatted string suitable for display to the user containing the team's alliance pick status.
-   */
-  alliance_status_str?: string;
-  /**
-   * An HTML formatter string suitable for display to the user containing the team's playoff status.
-   */
-  playoff_status_str?: string;
-  /**
-   * An HTML formatted string suitable for display to the user containing the team's overall status summary of the event.
-   */
-  overall_status_str?: string;
-  /**
-   * TBA match key for the next match the team is scheduled to play in at this event, or null.
-   */
-  next_match_key?: string | null;
-  /**
-   * TBA match key for the last match the team played in at this event, or null.
-   */
-  last_match_key?: string | null;
-};
-
-export type TeamEventStatusRank = {
-  /**
-   * Number of teams ranked.
-   */
-  num_teams?: number;
-  ranking?: {
-    /**
-     * Number of matches played.
-     */
-    matches_played?: number;
-    /**
-     * For some years, average qualification score. Can be null.
-     */
-    qual_average?: number | null;
-    /**
-     * Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.
-     */
-    sort_orders?: Array<number> | null;
-    record?: WltRecord | null;
-    /**
-     * Relative rank of this team.
-     */
-    rank?: number | null;
-    /**
-     * Number of matches the team was disqualified for.
-     */
-    dq?: number | null;
-    /**
-     * TBA team key for this rank.
-     */
-    team_key?: string;
-  } | null;
-  /**
-   * Ordered list of names corresponding to the elements of the `sort_orders` array.
-   */
-  sort_order_info?: Array<{
-    /**
-     * The number of digits of precision used for this value, eg `2` would correspond to a value of `101.11` while `0` would correspond to `101`.
-     */
-    precision?: number;
-    /**
-     * The descriptive name of the value used to sort the ranking.
-     */
-    name?: string;
-  }> | null;
-  status?: string;
-};
-
-export type TeamEventStatusAlliance = {
-  /**
-   * Alliance name, may be null.
-   */
-  name?: string | null;
-  /**
-   * Alliance number.
-   */
-  number: number;
-  backup?: TeamEventStatusAllianceBackup;
-  /**
-   * Order the team was picked in the alliance from 0-2, with 0 being alliance captain.
-   */
-  pick: number;
-};
-
 /**
- * Backup status, may be null.
+ * Component OPRs for teams at the event.
  */
-export type TeamEventStatusAllianceBackup = null | {
-  /**
-   * TBA key for the team replaced by the backup.
-   */
-  out?: string;
-  /**
-   * TBA key for the backup team called in.
-   */
-  in?: string;
-};
-
-/**
- * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
- */
-export type TeamEventStatusPlayoff = null | {
-  /**
-   * The highest playoff level the team reached.
-   */
-  level?: 'qm' | 'ef' | 'qf' | 'sf' | 'f';
-  current_level_record?: WltRecord | null;
-  record?: WltRecord | null;
-  /**
-   * Current competition status for the playoffs.
-   */
-  status?: 'won' | 'eliminated' | 'playing';
-  /**
-   * The average match score during playoffs. Year specific. May be null if not relevant for a given year.
-   */
-  playoff_average?: null | number;
-};
-
-export type EventRanking = {
-  /**
-   * List of rankings at the event.
-   */
-  rankings: Array<{
-    /**
-     * Number of matches played by this team.
-     */
-    matches_played: number;
-    /**
-     * The average match score during qualifications. Year specific. May be null if not relevant for a given year.
-     */
-    qual_average: number | null;
-    /**
-     * Additional special data on the team's performance calculated by TBA.
-     */
-    extra_stats: Array<number>;
-    /**
-     * Additional year-specific information, may be null. See parent `sort_order_info` for details.
-     */
-    sort_orders: Array<number> | null;
-    record: WltRecord | null;
-    /**
-     * The team's rank at the event as provided by FIRST.
-     */
-    rank: number;
-    /**
-     * Number of times disqualified.
-     */
-    dq: number;
-    /**
-     * The team with this rank.
-     */
-    team_key: string;
-  }>;
-  /**
-   * List of special TBA-generated values provided in the `extra_stats` array for each item.
-   */
-  extra_stats_info: Array<{
-    /**
-     * Integer expressing the number of digits of precision in the number provided in `sort_orders`.
-     */
-    precision: number;
-    /**
-     * Name of the field used in the `extra_stats` array.
-     */
-    name: string;
-  }>;
-  /**
-   * List of year-specific values provided in the `sort_orders` array for each team.
-   */
-  sort_order_info: Array<{
-    /**
-     * Integer expressing the number of digits of precision in the number provided in `sort_orders`.
-     */
-    precision: number;
-    /**
-     * Name of the field used in the `sort_order` array.
-     */
-    name: string;
-  }>;
+export type EventCoprs = {
+  [key: string]: {
+    [key: string]: number;
+  };
 };
 
 export type EventDistrictPoints = {
@@ -990,65 +861,149 @@ export type EventOprs = {
 };
 
 /**
- * Component OPRs for teams at the event.
- */
-export type EventCoprs = {
-  [key: string]: {
-    [key: string]: number;
-  };
-};
-
-/**
  * JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.
  */
 export type EventPredictions = {
   [key: string]: unknown;
 };
 
-export type MatchSimple = {
+export type EventRanking = {
   /**
-   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
+   * List of rankings at the event.
+   */
+  rankings: Array<{
+    /**
+     * Number of matches played by this team.
+     */
+    matches_played: number;
+    /**
+     * The average match score during qualifications. Year specific. May be null if not relevant for a given year.
+     */
+    qual_average: number | null;
+    /**
+     * Additional special data on the team's performance calculated by TBA.
+     */
+    extra_stats: Array<number>;
+    /**
+     * Additional year-specific information, may be null. See parent `sort_order_info` for details.
+     */
+    sort_orders: Array<number> | null;
+    record: WltRecord | null;
+    /**
+     * The team's rank at the event as provided by FIRST.
+     */
+    rank: number;
+    /**
+     * Number of times disqualified.
+     */
+    dq: number;
+    /**
+     * The team with this rank.
+     */
+    team_key: string;
+  }>;
+  /**
+   * List of special TBA-generated values provided in the `extra_stats` array for each item.
+   */
+  extra_stats_info: Array<{
+    /**
+     * Integer expressing the number of digits of precision in the number provided in `sort_orders`.
+     */
+    precision: number;
+    /**
+     * Name of the field used in the `extra_stats` array.
+     */
+    name: string;
+  }>;
+  /**
+   * List of year-specific values provided in the `sort_orders` array for each team.
+   */
+  sort_order_info: Array<{
+    /**
+     * Integer expressing the number of digits of precision in the number provided in `sort_orders`.
+     */
+    precision: number;
+    /**
+     * Name of the field used in the `sort_order` array.
+     */
+    name: string;
+  }>;
+};
+
+export type EventSimple = {
+  /**
+   * TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.
    */
   key: string;
   /**
-   * The competition level the match was played at.
+   * Official name of event on record either provided by FIRST or organizers of offseason event.
    */
-  comp_level: 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+  name: string;
   /**
-   * The set number in a series of matches where more than one match is required in the match series.
+   * Event short code, as provided by FIRST.
    */
-  set_number: number;
+  event_code: string;
   /**
-   * The match number of the match in the competition level.
+   * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2
    */
-  match_number: number;
+  event_type: EventType;
+  District: District | null;
   /**
-   * A list of alliances, the teams on the alliances, and their score.
+   * City, town, village, etc. the event is located in.
    */
-  alliances: {
-    red: MatchAlliance;
-    blue: MatchAlliance;
+  city: string | null;
+  /**
+   * State or Province the event is located in.
+   */
+  state_prov: string | null;
+  /**
+   * Country the event is located in.
+   */
+  country: string | null;
+  /**
+   * Event start date in `yyyy-mm-dd` format.
+   */
+  start_date: string;
+  /**
+   * Event end date in `yyyy-mm-dd` format.
+   */
+  end_date: string;
+  /**
+   * Year the event data is for.
+   */
+  year: number;
+};
+
+export type History = {
+  events: Array<Event>;
+  awards: Array<Award>;
+};
+
+export type LeaderboardInsight = {
+  data: {
+    rankings: Array<{
+      /**
+       * Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played.
+       */
+      value: number;
+      /**
+       * Team/Event/Match keys that have the corresponding value.
+       */
+      keys: Array<string>;
+    }>;
+    /**
+     * What type of key is used in the rankings; either 'team', 'event', or 'match'.
+     */
+    key_type: 'Team' | 'Event' | 'Match';
   };
   /**
-   * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
+   * Name of the insight.
    */
-  winning_alliance: 'red' | 'blue' | '';
+  name: string;
   /**
-   * Event key of the event the match was played at.
+   * Year the insight was measured in (year=0 for overall insights).
    */
-  event_key: string;
-  /**
-   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.
-   */
-  time: number | null;
-  /**
-   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.
-   */
-  predicted_time: number | null;
-  /**
-   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.
-   */
-  actual_time: number | null;
+  year: number;
 };
 
 export type Match = {
@@ -1127,58 +1082,6 @@ export type Match = {
      */
     key: string;
   }>;
-};
-
-export type MatchAlliance = {
-  /**
-   * Score for this alliance. Will be null or -1 for an unplayed match.
-   */
-  score: number;
-  team_keys: Array<string>;
-  /**
-   * TBA team keys (eg `frc254`) of any teams playing as a surrogate.
-   */
-  surrogate_team_keys: Array<string>;
-  /**
-   * TBA team keys (eg `frc254`) of any disqualified teams.
-   */
-  dq_team_keys: Array<string>;
-};
-
-export type Zebra = {
-  /**
-   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
-   */
-  key: string;
-  /**
-   * A list of relative timestamps for each data point. Each timestamp will correspond to the X and Y value at the same index in a team xs and ys arrays. `times`, all teams `xs` and all teams `ys` are guarenteed to be the same length.
-   */
-  times: Array<number>;
-  alliances: {
-    /**
-     * Zebra MotionWorks data for teams on the red alliance
-     */
-    red?: Array<ZebraTeam>;
-    /**
-     * Zebra data for teams on the blue alliance
-     */
-    blue?: Array<ZebraTeam>;
-  };
-};
-
-export type ZebraTeam = {
-  /**
-   * The TBA team key for the Zebra MotionWorks data.
-   */
-  team_key: string;
-  /**
-   * A list containing doubles and nulls representing a teams X position in feet at the corresponding timestamp. A null value represents no tracking data for a given timestamp.
-   */
-  xs: Array<number>;
-  /**
-   * A list containing doubles and nulls representing a teams Y position in feet at the corresponding timestamp. A null value represents no tracking data for a given timestamp.
-   */
-  ys: Array<number>;
 };
 
 /**
@@ -1360,135 +1263,6 @@ export type MatchScoreBreakdown2018Alliance = {
    * Unofficial TBA-computed value of the FMS provided GameData given to the alliance teams at the start of the match. 3 Character String containing `L` and `R` only. The first character represents the near switch, the 2nd the scale, and the 3rd the far, opposing, switch from the alliance's perspective. An `L` in a position indicates the platform on the left will be lit for the alliance while an `R` will indicate the right platform will be lit for the alliance. See also [WPI Screen Steps](https://wpilib.screenstepslive.com/s/currentCS/m/getting_started/l/826278-2018-game-data-details).
    */
   tba_gameData?: string;
-};
-
-/**
- * Timeseries data for the 2018 game *FIRST* POWER UP.
- * *WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.
- * *WARNING:* This model is currently under active development and may change at any time, including in breaking ways.
- */
-export type MatchTimeseries2018 = {
-  /**
-   * TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.
-   */
-  event_key?: string;
-  /**
-   * Match ID consisting of the level, match number, and set number, eg `qm45` or `f1m1`.
-   */
-  match_id?: string;
-  /**
-   * Current mode of play, can be `pre_match`, `auto`, `telop`, or `post_match`.
-   */
-  mode?: string;
-  play?: number;
-  /**
-   * Amount of time remaining in the match, only valid during `auto` and `teleop` modes.
-   */
-  time_remaining?: number;
-  /**
-   * 1 if the blue alliance is credited with the AUTO QUEST, 0 if not.
-   */
-  blue_auto_quest?: number;
-  /**
-   * Number of POWER CUBES in the BOOST section of the blue alliance VAULT.
-   */
-  blue_boost_count?: number;
-  /**
-   * Returns 1 if the blue alliance BOOST was played, or 0 if not played.
-   */
-  blue_boost_played?: number;
-  /**
-   * Name of the current blue alliance POWER UP being played, or `null`.
-   */
-  blue_current_powerup?: string;
-  /**
-   * 1 if the blue alliance is credited with FACING THE BOSS, 0 if not.
-   */
-  blue_face_the_boss?: number;
-  /**
-   * Number of POWER CUBES in the FORCE section of the blue alliance VAULT.
-   */
-  blue_force_count?: number;
-  /**
-   * Returns 1 if the blue alliance FORCE was played, or 0 if not played.
-   */
-  blue_force_played?: number;
-  /**
-   * Number of POWER CUBES in the LEVITATE section of the blue alliance VAULT.
-   */
-  blue_levitate_count?: number;
-  /**
-   * Returns 1 if the blue alliance LEVITATE was played, or 0 if not played.
-   */
-  blue_levitate_played?: number;
-  /**
-   * Number of seconds remaining in the blue alliance POWER UP time, or 0 if none is active.
-   */
-  blue_powerup_time_remaining?: string;
-  /**
-   * 1 if the blue alliance owns the SCALE, 0 if not.
-   */
-  blue_scale_owned?: number;
-  /**
-   * Current score for the blue alliance.
-   */
-  blue_score?: number;
-  /**
-   * 1 if the blue alliance owns their SWITCH, 0 if not.
-   */
-  blue_switch_owned?: number;
-  /**
-   * 1 if the red alliance is credited with the AUTO QUEST, 0 if not.
-   */
-  red_auto_quest?: number;
-  /**
-   * Number of POWER CUBES in the BOOST section of the red alliance VAULT.
-   */
-  red_boost_count?: number;
-  /**
-   * Returns 1 if the red alliance BOOST was played, or 0 if not played.
-   */
-  red_boost_played?: number;
-  /**
-   * Name of the current red alliance POWER UP being played, or `null`.
-   */
-  red_current_powerup?: string;
-  /**
-   * 1 if the red alliance is credited with FACING THE BOSS, 0 if not.
-   */
-  red_face_the_boss?: number;
-  /**
-   * Number of POWER CUBES in the FORCE section of the red alliance VAULT.
-   */
-  red_force_count?: number;
-  /**
-   * Returns 1 if the red alliance FORCE was played, or 0 if not played.
-   */
-  red_force_played?: number;
-  /**
-   * Number of POWER CUBES in the LEVITATE section of the red alliance VAULT.
-   */
-  red_levitate_count?: number;
-  /**
-   * Returns 1 if the red alliance LEVITATE was played, or 0 if not played.
-   */
-  red_levitate_played?: number;
-  /**
-   * Number of seconds remaining in the red alliance POWER UP time, or 0 if none is active.
-   */
-  red_powerup_time_remaining?: string;
-  /**
-   * 1 if the red alliance owns the SCALE, 0 if not.
-   */
-  red_scale_owned?: number;
-  /**
-   * Current score for the red alliance.
-   */
-  red_score?: number;
-  /**
-   * 1 if the red alliance owns their SWITCH, 0 if not.
-   */
-  red_switch_owned?: number;
 };
 
 /**
@@ -1934,6 +1708,197 @@ export type MatchScoreBreakdown2025Alliance = {
   wallAlgaeCount?: number;
 };
 
+export type MatchSimple = {
+  /**
+   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
+   */
+  key: string;
+  /**
+   * The competition level the match was played at.
+   */
+  comp_level: 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+  /**
+   * The set number in a series of matches where more than one match is required in the match series.
+   */
+  set_number: number;
+  /**
+   * The match number of the match in the competition level.
+   */
+  match_number: number;
+  /**
+   * A list of alliances, the teams on the alliances, and their score.
+   */
+  alliances: {
+    red: MatchAlliance;
+    blue: MatchAlliance;
+  };
+  /**
+   * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
+   */
+  winning_alliance: 'red' | 'blue' | '';
+  /**
+   * Event key of the event the match was played at.
+   */
+  event_key: string;
+  /**
+   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.
+   */
+  time: number | null;
+  /**
+   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.
+   */
+  predicted_time: number | null;
+  /**
+   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.
+   */
+  actual_time: number | null;
+};
+
+/**
+ * Timeseries data for the 2018 game *FIRST* POWER UP.
+ * *WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.
+ * *WARNING:* This model is currently under active development and may change at any time, including in breaking ways.
+ */
+export type MatchTimeseries2018 = {
+  /**
+   * TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.
+   */
+  event_key?: string;
+  /**
+   * Match ID consisting of the level, match number, and set number, eg `qm45` or `f1m1`.
+   */
+  match_id?: string;
+  /**
+   * Current mode of play, can be `pre_match`, `auto`, `telop`, or `post_match`.
+   */
+  mode?: string;
+  play?: number;
+  /**
+   * Amount of time remaining in the match, only valid during `auto` and `teleop` modes.
+   */
+  time_remaining?: number;
+  /**
+   * 1 if the blue alliance is credited with the AUTO QUEST, 0 if not.
+   */
+  blue_auto_quest?: number;
+  /**
+   * Number of POWER CUBES in the BOOST section of the blue alliance VAULT.
+   */
+  blue_boost_count?: number;
+  /**
+   * Returns 1 if the blue alliance BOOST was played, or 0 if not played.
+   */
+  blue_boost_played?: number;
+  /**
+   * Name of the current blue alliance POWER UP being played, or `null`.
+   */
+  blue_current_powerup?: string;
+  /**
+   * 1 if the blue alliance is credited with FACING THE BOSS, 0 if not.
+   */
+  blue_face_the_boss?: number;
+  /**
+   * Number of POWER CUBES in the FORCE section of the blue alliance VAULT.
+   */
+  blue_force_count?: number;
+  /**
+   * Returns 1 if the blue alliance FORCE was played, or 0 if not played.
+   */
+  blue_force_played?: number;
+  /**
+   * Number of POWER CUBES in the LEVITATE section of the blue alliance VAULT.
+   */
+  blue_levitate_count?: number;
+  /**
+   * Returns 1 if the blue alliance LEVITATE was played, or 0 if not played.
+   */
+  blue_levitate_played?: number;
+  /**
+   * Number of seconds remaining in the blue alliance POWER UP time, or 0 if none is active.
+   */
+  blue_powerup_time_remaining?: string;
+  /**
+   * 1 if the blue alliance owns the SCALE, 0 if not.
+   */
+  blue_scale_owned?: number;
+  /**
+   * Current score for the blue alliance.
+   */
+  blue_score?: number;
+  /**
+   * 1 if the blue alliance owns their SWITCH, 0 if not.
+   */
+  blue_switch_owned?: number;
+  /**
+   * 1 if the red alliance is credited with the AUTO QUEST, 0 if not.
+   */
+  red_auto_quest?: number;
+  /**
+   * Number of POWER CUBES in the BOOST section of the red alliance VAULT.
+   */
+  red_boost_count?: number;
+  /**
+   * Returns 1 if the red alliance BOOST was played, or 0 if not played.
+   */
+  red_boost_played?: number;
+  /**
+   * Name of the current red alliance POWER UP being played, or `null`.
+   */
+  red_current_powerup?: string;
+  /**
+   * 1 if the red alliance is credited with FACING THE BOSS, 0 if not.
+   */
+  red_face_the_boss?: number;
+  /**
+   * Number of POWER CUBES in the FORCE section of the red alliance VAULT.
+   */
+  red_force_count?: number;
+  /**
+   * Returns 1 if the red alliance FORCE was played, or 0 if not played.
+   */
+  red_force_played?: number;
+  /**
+   * Number of POWER CUBES in the LEVITATE section of the red alliance VAULT.
+   */
+  red_levitate_count?: number;
+  /**
+   * Returns 1 if the red alliance LEVITATE was played, or 0 if not played.
+   */
+  red_levitate_played?: number;
+  /**
+   * Number of seconds remaining in the red alliance POWER UP time, or 0 if none is active.
+   */
+  red_powerup_time_remaining?: string;
+  /**
+   * 1 if the red alliance owns the SCALE, 0 if not.
+   */
+  red_scale_owned?: number;
+  /**
+   * Current score for the red alliance.
+   */
+  red_score?: number;
+  /**
+   * 1 if the red alliance owns their SWITCH, 0 if not.
+   */
+  red_switch_owned?: number;
+};
+
+export type MatchAlliance = {
+  /**
+   * Score for this alliance. Will be null or -1 for an unplayed match.
+   */
+  score: number;
+  team_keys: Array<string>;
+  /**
+   * TBA team keys (eg `frc254`) of any teams playing as a surrogate.
+   */
+  surrogate_team_keys: Array<string>;
+  /**
+   * TBA team keys (eg `frc254`) of any disqualified teams.
+   */
+  dq_team_keys: Array<string>;
+};
+
 /**
  * The `Media` object contains a reference for most any media associated with a team or event on TBA.
  */
@@ -2015,218 +1980,18 @@ export type Media = {
   view_url?: string;
 };
 
-export type EliminationAlliance = {
-  /**
-   * Alliance name, may be null.
-   */
-  name?: string | null;
-  /**
-   * Backup team called in, may be null.
-   */
-  backup?: {
-    /**
-     * Team key that was called in as the backup.
-     */
-    in: string;
-    /**
-     * Team key that was replaced by the backup team.
-     */
-    out: string;
-  } | null;
-  /**
-   * List of teams that declined the alliance.
-   */
-  declines: Array<string>;
-  /**
-   * List of team keys picked for the alliance. First pick is captain.
-   */
-  picks: Array<string>;
-  status?: {
-    playoff_average?: number | null;
-    playoff_type?: number | null;
-    level?: string;
-    record?: WltRecord | null;
-    current_level_record?: WltRecord | null;
-    status?: string;
+export type NotablesInsight = {
+  data: {
+    entries: Array<{
+      /**
+       * A list of events this team achieved the notable at. This type may change over time.
+       */
+      context: Array<string>;
+      team_key: string;
+    }>;
   };
-};
-
-export type Award = {
-  /**
-   * The name of the award as provided by FIRST. May vary for the same award type.
-   */
   name: string;
-  /**
-   * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6
-   */
-  award_type: AwardType;
-  /**
-   * The event_key of the event the award was won at.
-   */
-  event_key: string;
-  /**
-   * A list of recipients of the award at the event. May have either a team_key or an awardee, both, or neither (in the case the award wasn't awarded at the event).
-   */
-  recipient_list: Array<AwardRecipient>;
-  /**
-   * The year this award was won.
-   */
   year: number;
-};
-
-/**
- * An `Award_Recipient` object represents the team and/or person who received an award at an event.
- */
-export type AwardRecipient = {
-  /**
-   * The TBA team key for the team that was given the award. May be null.
-   */
-  team_key: string | null;
-  /**
-   * The name of the individual given the award. May be null.
-   */
-  awardee: string | null;
-};
-
-export type District = {
-  /**
-   * The short identifier for the district.
-   */
-  abbreviation: string;
-  /**
-   * The long name for the district.
-   */
-  display_name: string;
-  /**
-   * Key for this district, e.g. `2016ne`.
-   */
-  key: string;
-  /**
-   * Year this district participated.
-   */
-  year: number;
-};
-
-export type DistrictInsight = {
-  district_data: {
-    region_data: {
-      [key: string]: DistrictInsightRegionData;
-    } | null;
-    district_wide_data: DistrictInsightRegionData | null;
-  };
-  team_data: {
-    [key: string]: {
-      district_seasons: number;
-      total_district_points: number;
-      total_pre_dcmp_district_points: number;
-      district_event_wins: number;
-      dcmp_wins: number;
-      team_awards: number;
-      individual_awards: number;
-      quals_record: WltRecord;
-      elims_record: WltRecord;
-      in_district_extra_play_count: number;
-      total_matches_played: number;
-      dcmp_appearances: number;
-      cmp_appearances: number;
-    };
-  } | null;
-};
-
-export type DistrictInsightRegionData = {
-  /**
-   * Map of year to number of active teams
-   */
-  yearly_active_team_count: {
-    [key: string]: number;
-  };
-  /**
-   * Map of year to number of events
-   */
-  yearly_event_count: {
-    [key: string]: number;
-  };
-  /**
-   * Map of year to list of team keys gained
-   */
-  yearly_gained_teams: {
-    [key: string]: Array<string>;
-  };
-  /**
-   * Map of year to list of team keys lost
-   */
-  yearly_lost_teams: {
-    [key: string]: Array<string>;
-  };
-};
-
-/**
- * Rank of a team in a district.
- */
-export type DistrictRanking = {
-  /**
-   * TBA team key for the team.
-   */
-  team_key: string;
-  /**
-   * Numerical rank of the team, 1 being top rank.
-   */
-  rank: number;
-  /**
-   * Any points added to a team as a result of the rookie bonus.
-   */
-  rookie_bonus?: number;
-  /**
-   * Total district points for the team.
-   */
-  point_total: number;
-  /**
-   * List of events that contributed to the point total for the team.
-   */
-  event_points?: Array<{
-    /**
-     * `true` if this event is a District Championship event.
-     */
-    district_cmp: boolean;
-    /**
-     * Total points awarded at this event.
-     */
-    total: number;
-    /**
-     * Points awarded for alliance selection.
-     */
-    alliance_points: number;
-    /**
-     * Points awarded for elimination match performance.
-     */
-    elim_points: number;
-    /**
-     * Points awarded for event awards.
-     */
-    award_points: number;
-    /**
-     * TBA Event key for this event.
-     */
-    event_key: string;
-    /**
-     * Points awarded for qualification match performance.
-     */
-    qual_points: number;
-  }>;
-};
-
-/**
- * Advancement status of a team in a district.
- */
-export type DistrictAdvancement = {
-  /**
-   * Whether or not the team qualified for their District Championship
-   */
-  dcmp: boolean;
-  /**
-   * Whether or not the team qualified for the FIRST Championship
-   */
-  cmp: boolean;
 };
 
 /**
@@ -2312,6 +2077,262 @@ export type RegionalRanking = {
   }>;
 };
 
+export type SearchIndex = {
+  teams: Array<{
+    key: string;
+    nickname: string;
+  }>;
+  events: Array<{
+    key: string;
+    name: string;
+  }>;
+};
+
+export type Team = {
+  /**
+   * TBA team key with the format `frcXXXX` with `XXXX` representing the team number.
+   */
+  key: string;
+  /**
+   * Official team number issued by FIRST.
+   */
+  team_number: number;
+  /**
+   * Team nickname provided by FIRST.
+   */
+  nickname: string;
+  /**
+   * Official long name registered with FIRST.
+   */
+  name: string;
+  /**
+   * Name of team school or affilited group registered with FIRST.
+   */
+  school_name: string | null;
+  /**
+   * City of team derived from parsing the address registered with FIRST.
+   */
+  city: string | null;
+  /**
+   * State of team derived from parsing the address registered with FIRST.
+   */
+  state_prov: string | null;
+  /**
+   * Country of team derived from parsing the address registered with FIRST.
+   */
+  country: string | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  address: string | null;
+  /**
+   * Postal code from the team address.
+   */
+  postal_code: string | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  gmaps_place_id: string | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  gmaps_url: string | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  lat: number | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  lng: number | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  location_name: string | null;
+  /**
+   * Official website associated with the team.
+   */
+  website?: string | null;
+  /**
+   * First year the team officially competed.
+   */
+  rookie_year: number | null;
+};
+
+export type TeamEventStatus = {
+  qual?: TeamEventStatusRank | null;
+  alliance?: TeamEventStatusAlliance | null;
+  playoff?: TeamEventStatusPlayoff | null;
+  /**
+   * An HTML formatted string suitable for display to the user containing the team's alliance pick status.
+   */
+  alliance_status_str?: string;
+  /**
+   * An HTML formatter string suitable for display to the user containing the team's playoff status.
+   */
+  playoff_status_str?: string;
+  /**
+   * An HTML formatted string suitable for display to the user containing the team's overall status summary of the event.
+   */
+  overall_status_str?: string;
+  /**
+   * TBA match key for the next match the team is scheduled to play in at this event, or null.
+   */
+  next_match_key?: string | null;
+  /**
+   * TBA match key for the last match the team played in at this event, or null.
+   */
+  last_match_key?: string | null;
+};
+
+export type TeamEventStatusAlliance = {
+  /**
+   * Alliance name, may be null.
+   */
+  name?: string | null;
+  /**
+   * Alliance number.
+   */
+  number: number;
+  backup?: TeamEventStatusAllianceBackup;
+  /**
+   * Order the team was picked in the alliance from 0-2, with 0 being alliance captain.
+   */
+  pick: number;
+};
+
+/**
+ * Backup status, may be null.
+ */
+export type TeamEventStatusAllianceBackup = null | {
+  /**
+   * TBA key for the team replaced by the backup.
+   */
+  out?: string;
+  /**
+   * TBA key for the backup team called in.
+   */
+  in?: string;
+};
+
+/**
+ * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
+ */
+export type TeamEventStatusPlayoff = null | {
+  /**
+   * The highest playoff level the team reached.
+   */
+  level?: 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+  current_level_record?: WltRecord | null;
+  record?: WltRecord | null;
+  /**
+   * Current competition status for the playoffs.
+   */
+  status?: 'won' | 'eliminated' | 'playing';
+  /**
+   * The average match score during playoffs. Year specific. May be null if not relevant for a given year.
+   */
+  playoff_average?: null | number;
+};
+
+export type TeamEventStatusRank = {
+  /**
+   * Number of teams ranked.
+   */
+  num_teams?: number;
+  ranking?: {
+    /**
+     * Number of matches played.
+     */
+    matches_played?: number;
+    /**
+     * For some years, average qualification score. Can be null.
+     */
+    qual_average?: number | null;
+    /**
+     * Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.
+     */
+    sort_orders?: Array<number> | null;
+    record?: WltRecord | null;
+    /**
+     * Relative rank of this team.
+     */
+    rank?: number | null;
+    /**
+     * Number of matches the team was disqualified for.
+     */
+    dq?: number | null;
+    /**
+     * TBA team key for this rank.
+     */
+    team_key?: string;
+  } | null;
+  /**
+   * Ordered list of names corresponding to the elements of the `sort_orders` array.
+   */
+  sort_order_info?: Array<{
+    /**
+     * The number of digits of precision used for this value, eg `2` would correspond to a value of `101.11` while `0` would correspond to `101`.
+     */
+    precision?: number;
+    /**
+     * The descriptive name of the value used to sort the ranking.
+     */
+    name?: string;
+  }> | null;
+  status?: string;
+};
+
+export type TeamRobot = {
+  /**
+   * Year this robot competed in.
+   */
+  year: number;
+  /**
+   * Name of the robot as provided by the team.
+   */
+  robot_name: string;
+  /**
+   * Internal TBA identifier for this robot.
+   */
+  key: string;
+  /**
+   * TBA team key for this robot.
+   */
+  team_key: string;
+};
+
+export type TeamSimple = {
+  /**
+   * TBA team key with the format `frcXXXX` with `XXXX` representing the team number.
+   */
+  key: string;
+  /**
+   * Official team number issued by FIRST.
+   */
+  team_number: number;
+  /**
+   * Team nickname provided by FIRST.
+   */
+  nickname: string;
+  /**
+   * Official long name registered with FIRST.
+   */
+  name: string;
+  /**
+   * City of team derived from parsing the address registered with FIRST.
+   */
+  city: string | null;
+  /**
+   * State of team derived from parsing the address registered with FIRST.
+   */
+  state_prov: string | null;
+  /**
+   * Country of team derived from parsing the address registered with FIRST.
+   */
+  country: string | null;
+};
+
 /**
  * A Win-Loss-Tie record for a team, or an alliance.
  */
@@ -2361,61 +2382,40 @@ export type Webcast = {
   file?: string | null;
 };
 
-export type LeaderboardInsight = {
-  data: {
-    rankings: Array<{
-      /**
-       * Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played.
-       */
-      value: number;
-      /**
-       * Team/Event/Match keys that have the corresponding value.
-       */
-      keys: Array<string>;
-    }>;
+export type Zebra = {
+  /**
+   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
+   */
+  key: string;
+  /**
+   * A list of relative timestamps for each data point. Each timestamp will correspond to the X and Y value at the same index in a team xs and ys arrays. `times`, all teams `xs` and all teams `ys` are guarenteed to be the same length.
+   */
+  times: Array<number>;
+  alliances: {
     /**
-     * What type of key is used in the rankings; either 'team', 'event', or 'match'.
+     * Zebra MotionWorks data for teams on the red alliance
      */
-    key_type: 'team' | 'event' | 'match';
+    red?: Array<ZebraTeam>;
+    /**
+     * Zebra data for teams on the blue alliance
+     */
+    blue?: Array<ZebraTeam>;
   };
+};
+
+export type ZebraTeam = {
   /**
-   * Name of the insight.
+   * The TBA team key for the Zebra MotionWorks data.
    */
-  name: string;
+  team_key: string;
   /**
-   * Year the insight was measured in (year=0 for overall insights).
+   * A list containing doubles and nulls representing a teams X position in feet at the corresponding timestamp. A null value represents no tracking data for a given timestamp.
    */
-  year: number;
-};
-
-export type NotablesInsight = {
-  data: {
-    entries: Array<{
-      /**
-       * A list of events this team achieved the notable at. This type may change over time.
-       */
-      context: Array<string>;
-      team_key: string;
-    }>;
-  };
-  name: string;
-  year: number;
-};
-
-export type History = {
-  events: Array<Event>;
-  awards: Array<Award>;
-};
-
-export type SearchIndex = {
-  teams: Array<{
-    key: string;
-    nickname: string;
-  }>;
-  events: Array<{
-    key: string;
-    name: string;
-  }>;
+  xs: Array<number>;
+  /**
+   * A list containing doubles and nulls representing a teams Y position in feet at the corresponding timestamp. A null value represents no tracking data for a given timestamp.
+   */
+  ys: Array<number>;
 };
 
 /**
@@ -6048,7 +6048,7 @@ export type GetDistrictDcmpHistoryResponses = {
    */
   200: Array<{
     awards?: Array<Award>;
-    event?: Event;
+    Event?: Event;
   }>;
 };
 
