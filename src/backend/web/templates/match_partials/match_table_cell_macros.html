@@ -70,7 +70,7 @@
 
 {% macro match_score_td(match, alliance_color, cur_team_key, compact=False, force_played=False, predictions=None) %}
 <td{% if compact %} colspan="2"{% endif %} class="{{alliance_color}}Score{% if cur_team_key and cur_team_key in match.alliances.get(alliance_color).teams %} current-team{% endif %}">
-  {% if match.score_breakdown and not predictions %}
+  {% if match.score_breakdown and not predictions and match.comp_level == 'qm' %}
     {% if match.year in [2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024, 2025] %}
     <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% elif match.year == 2018 %}Auto Quest{% elif match.year == 2019 %}Complete Rocket{% elif match.year == 2020 %}Shield Energized{% elif match.year == 2022 %}Cargo Bonus{% elif match.year == 2023 %}Sustainability Bonus{% elif match.year == 2024 %}Melody Bonus{% elif match.year == 2025 %}Auto Bonus{% endif %}">
       {% if match.score_breakdown.get(alliance_color).teleopDefensesBreached
