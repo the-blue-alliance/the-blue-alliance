@@ -60,7 +60,7 @@
         "Add event/key/team_media endpoint; add team_keys to media objects."
       ],
       "3.9.1": [
-        "Mark WLT_Record as nullable. "
+        "Mark WLT_Record as nullable."
       ],
       "3.9.0": [
         "Fixed undefined vs nullable fields.",
@@ -69,7 +69,7 @@
         "Adds leaderboard insights endpoint and type."
       ],
       "3.8.2": [
-        "Replace `If-Modified-Since` with `If-None-Match`, and `Last-Modified` with `ETag`."
+        "Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`."
       ],
       "3.8.1": [
         "Added Webcast date field."

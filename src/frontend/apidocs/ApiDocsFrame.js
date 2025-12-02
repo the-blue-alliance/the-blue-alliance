@@ -7,7 +7,7 @@ const ShowChangesPlugin = (system) => {
     wrapComponents: {
       info: (Original) => (props) => {
         const [isOpened, setIsOpened] = useState(false);
-        const changes = props.info.get("x-changes");
+        const changes = props.info.get("x-changes") || new Map();
         const Collapse = system.getComponent("Collapse");
 
         const toggleOpen = useCallback(() => {
@@ -57,6 +57,7 @@ const ChangesComponent = memo(({ changes }) => {
 ChangesComponent.displayName = "ChangesComponent";
 
 ChangesComponent.propTypes = {
+  // Should be an Immutable.js Map with entrySeq and map methods
   changes: PropTypes.object.isRequired,
 };
 
