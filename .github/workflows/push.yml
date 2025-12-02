@@ -393,6 +393,10 @@ jobs:
           - 5000:5000
     steps:
       - uses: actions/checkout@v6
+      # See https://github.com/puppeteer/puppeteer/issues/12818
+      # Ubuntu 23+ doesn't like running puppeteer without disabling AppArmor.
+      - name: Disable AppArmor
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
