@@ -64,6 +64,7 @@
     "react-intersection-observer": "10.0.0",
     "react-router": "7.9.6",
     "recharts": "2.15.3",
+    "swagger-ui-react": "5.30.3",
     "tailwind-merge": "3.4.0",
     "vaul": "1.1.2",
     "zod": "4.1.13"
@@ -88,6 +89,7 @@
     "@types/node": "22.15.31",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "@types/swagger-ui-react": "^5.18.0",
     "@typescript-eslint/eslint-plugin": "8.48.0",
     "@typescript-eslint/parser": "8.48.0",
     "@vitest/coverage-v8": "4.0.14",
