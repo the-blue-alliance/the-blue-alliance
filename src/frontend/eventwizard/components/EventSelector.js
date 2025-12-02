@@ -10,7 +10,13 @@ class EventSelector extends Component {
       EventSelector.eventsCache = await fetch("/_/account/apiwrite_events", {
         credentials: "same-origin",
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.status == 401) {
+            // If we're not logged in, return no events
+            return [];
+          }
+          return response.json();
+        })
         .then((events) => {
           events.push({ value: "_other", label: "Other" });
           return events;

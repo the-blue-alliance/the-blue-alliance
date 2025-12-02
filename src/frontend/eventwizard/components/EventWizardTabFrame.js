@@ -4,6 +4,7 @@ import TeamListContainer from "../containers/TeamListContainer";
 import AwardsTabContainer from "../containers/AwardsTabContainer";
 import MatchVideosContainer from "../containers/MatchVideosContainer";
 import EventScheduleTabContainer from "../containers/EventScheduleTabContainer";
+import MatchPlayTabContainer from "../containers/MatchPlayTabContainer";
 
 const NotAvailableMessage = () => (
   <p>
@@ -71,10 +72,7 @@ const EventWizardTabFrame = () => (
       <AwardsTabContainer />
       <MatchVideosContainer />
       <EventScheduleTabContainer />
-      <div className="tab-pane" id="matches">
-        <h3>Match Play</h3>
-        <NotAvailableMessage />
-      </div>
+      <MatchPlayTabContainer />
       <div className="tab-pane" id="results">
         <h3>FMS Matches</h3>
         <NotAvailableMessage />
