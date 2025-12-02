@@ -15,7 +15,7 @@ def test_render_event(ndb_stub, web_client: Client) -> None:
 
     resp = web_client.get("/event/2020nyny")
     assert resp.status_code == 200
-    assert "max-age=86400" in resp.headers["Cache-Control"]
+    assert "max-age=21600" in resp.headers["Cache-Control"]
 
     soup = BeautifulSoup(resp.data, "html.parser")
     assert soup.find(id="event-name").string == "Test Event 2020"

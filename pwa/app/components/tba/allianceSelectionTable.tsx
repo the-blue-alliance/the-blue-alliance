@@ -3,7 +3,7 @@ import type React from 'react';
 
 import BiTrophy from '~icons/bi/trophy';
 
-import { EliminationAlliance } from '~/api/tba';
+import { EliminationAlliance } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLink } from '~/components/tba/links';
 import {
@@ -30,7 +30,8 @@ const rowVariants = cva('text-center', {
 });
 
 interface AllianceTableRowProps
-  extends React.HTMLAttributes<HTMLTableRowElement>,
+  extends
+    React.HTMLAttributes<HTMLTableRowElement>,
     VariantProps<typeof rowVariants> {}
 
 function AllianceTableRow({

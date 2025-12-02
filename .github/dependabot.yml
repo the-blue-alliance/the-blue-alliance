@@ -14,14 +14,10 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: swagger-ui
-  - dependency-name: firebase
-    versions:
-    - 8.4.0
-  - dependency-name: "@babel/preset-env"
-    versions:
-    - 7.13.0
+  groups:
+    mui:
+      patterns:
+        - "@mui/*"
 - package-ecosystem: npm
   directory: "/pwa"
   schedule:

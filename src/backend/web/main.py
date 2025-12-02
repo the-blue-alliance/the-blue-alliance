@@ -78,7 +78,7 @@ configure_logging()
 
 app = Flask(__name__)
 app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
-install_middleware(app, configure_secret_key=True)
+install_middleware(app, configure_secret_key=True, include_appspot_redirect=True)
 install_url_converters(app)
 configure_flask_cache(app)
 

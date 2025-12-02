@@ -1,4 +1,4 @@
-import { SearchIndex, getSearchIndex } from '~/api/tba';
+import { SearchIndex, getSearchIndex } from '~/api/tba/read';
 import { SearchDataProvider } from '~/lib/search/api';
 
 export class ProdAPIProvider implements SearchDataProvider {

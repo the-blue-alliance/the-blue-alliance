@@ -110,4 +110,4 @@ dev_appserver.py \
     --env_var SAVE_FRC_API_RESPONSE="$save_frc_api_response" \
     --dev_appserver_log_level="$log_level" \
     --enable_task_running yes \
-    src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/tasks_cpu.yaml src/dispatch.yaml
+    src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/tasks_cpu_enqueue.yaml src/tasks_cpu.yaml src/dispatch.yaml

@@ -78,6 +78,7 @@ from backend.api.handlers.trusted import (
     add_match_zebra_motionworks_info,
     delete_all_event_matches,
     delete_event_matches,
+    get_event_info,
     update_event_alliances,
     update_event_awards,
     update_event_info,
@@ -108,7 +109,7 @@ configure_logging()
 
 app = Flask(__name__)
 app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
-install_middleware(app, configure_secret_key=True)
+install_middleware(app, configure_secret_key=True, include_appspot_redirect=True)
 install_url_converters(app)
 configure_flask_cache(app)
 
@@ -338,6 +339,11 @@ trusted_api.add_url_rule(
     "/event/<string:event_key>/awards/update",
     methods=["POST"],
     view_func=update_event_awards,
+)
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/info",
+    methods=["GET"],
+    view_func=get_event_info,
 )
 trusted_api.add_url_rule(
     "/event/<string:event_key>/info/update",

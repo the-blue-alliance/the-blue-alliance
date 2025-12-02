@@ -8,6 +8,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.models.account import Account
 from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.webcast import Webcast
 
 
 class ApiAuthAccess(ndb.Model):
@@ -38,6 +39,11 @@ class ApiAuthAccess(ndb.Model):
     # On update, we resolve the events in these districts and add them to event_list
     district_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         kind=District, repeated=True
+    )
+    # Only for offseason events: grant access to MATCH_VIDEO for events whose webcast
+    # is here (twitch channel / youtube account)
+    offseason_webcast_channels: List[str] = ndb.StringProperty(  # pyre-ignore[8]
+        repeated=True
     )
     # Allow access for all events marked official
     all_official_events: bool = ndb.BooleanProperty()
@@ -107,3 +113,11 @@ class ApiAuthAccess(ndb.Model):
                 for district_key in self.district_list
             ]
         )
+
+    @property
+    def webcast_list_str(self) -> str:
+        return ",".join(self.offseason_webcast_channels)
+
+    @staticmethod
+    def webcast_key(w: Webcast) -> str:
+        return f"{w["type"]}:{w["channel"]}"

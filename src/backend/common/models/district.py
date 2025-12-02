@@ -12,6 +12,7 @@ from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKe
 
 ALL_KNOWN_DISTRICT_ABBREVIATIONS: Set[DistrictAbbreviation] = {
     "chs",
+    "fch",
     "fim",
     "fit",
     "tx",
@@ -27,6 +28,8 @@ ALL_KNOWN_DISTRICT_ABBREVIATIONS: Set[DistrictAbbreviation] = {
     "ont",
     "pnw",
     "pch",
+    "ca",
+    "win",
 }
 
 

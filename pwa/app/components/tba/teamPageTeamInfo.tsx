@@ -6,7 +6,7 @@ import BiInfoCircleFill from '~icons/bi/info-circle-fill';
 import BiLink from '~icons/bi/link';
 import BiPinMapFill from '~icons/bi/pin-map-fill';
 
-import { Media, Team } from '~/api/tba';
+import { Media, Team } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
@@ -55,7 +55,9 @@ export default function TeamPageTeamInfo({
         {sponsors.length > 0 ? (
           <Accordion type="single" collapsible>
             <AccordionItem value="item-1" className="border-0">
-              <AccordionTrigger className="justify-normal p-0 text-left font-normal">
+              <AccordionTrigger
+                className="justify-normal p-0 text-left font-normal"
+              >
                 <InlineIcon displayStyle={'flexless'}>
                   <BiInfoCircleFill />
                   {schoolName}

@@ -20,7 +20,7 @@ import {
   getTeamMediaByYear,
   getTeamSocialMedia,
   getTeamYearsParticipated,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { AwardBanner } from '~/components/tba/banner';
 import TeamEventAppearance from '~/components/tba/teamEventAppearance';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
@@ -170,6 +170,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `Team Information - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `Team information for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.team.nickname} - Team ${data.team.team_number} - The Blue Alliance`,
@@ -265,7 +277,10 @@ export default function TeamPage(): React.JSX.Element {
       </div>
 
       <div className="mt-8 w-full">
-        <div className="flex flex-wrap justify-center sm:flex-nowrap sm:justify-between">
+        <div
+          className="flex flex-wrap justify-center sm:flex-nowrap
+            sm:justify-between"
+        >
           <div className="flex flex-col justify-between">
             <TeamPageTeamInfo
               team={team}
@@ -438,9 +453,9 @@ function StatsSection({
           <div
             // The padding/margins make the separator not actually perfectly centered
             // left-47.5 looks significantly better than left-1/2
-            className={`relative flex flex-wrap *:w-full before:absolute before:inset-y-0
-            before:left-[47.5%] before:hidden before:w-px before:bg-gray-200 sm:mt-0
-            lg:*:w-1/2 lg:before:block`}
+            className={`relative flex flex-wrap *:w-full before:absolute
+            before:inset-y-0 before:left-[47.5%] before:hidden before:w-px
+            before:bg-gray-200 sm:mt-0 lg:*:w-1/2 lg:before:block`}
           >
             <div className="grid grid-cols-2 items-center gap-y-4">
               <Stat
@@ -481,23 +496,50 @@ function StatsSection({
               <TableBody>
                 <TableRow>
                   <TableHead>Official</TableHead>
-                  <RecordCell record={officialRecords.quals} />
-                  <RecordCell record={officialRecords.playoff} />
-                  <RecordCell record={officialRecord} />
+                  <RecordCell
+                    record={officialRecords.quals}
+                    dataTestId="official_quals"
+                  />
+                  <RecordCell
+                    record={officialRecords.playoff}
+                    dataTestId="official_playoff"
+                  />
+                  <RecordCell
+                    record={officialRecord}
+                    dataTestId="official_overall"
+                  />
                 </TableRow>
 
                 <TableRow>
                   <TableHead>Unofficial</TableHead>
-                  <RecordCell record={unofficialRecords.quals} />
-                  <RecordCell record={unofficialRecords.playoff} />
-                  <RecordCell record={unofficialRecord} />
+                  <RecordCell
+                    record={unofficialRecords.quals}
+                    dataTestId="unofficial_quals"
+                  />
+                  <RecordCell
+                    record={unofficialRecords.playoff}
+                    dataTestId="unofficial_playoff"
+                  />
+                  <RecordCell
+                    record={unofficialRecord}
+                    dataTestId="unofficial_overall"
+                  />
                 </TableRow>
 
                 <TableRow>
                   <TableHead>Combined</TableHead>
-                  <RecordCell record={combinedQuals} />
-                  <RecordCell record={combinedPlayoff} />
-                  <RecordCell record={combinedRecord} />
+                  <RecordCell
+                    record={combinedQuals}
+                    dataTestId="combined_quals"
+                  />
+                  <RecordCell
+                    record={combinedPlayoff}
+                    dataTestId="combined_playoff"
+                  />
+                  <RecordCell
+                    record={combinedRecord}
+                    dataTestId="combined_overall"
+                  />
                 </TableRow>
               </TableBody>
             </Table>
@@ -508,15 +550,23 @@ function StatsSection({
   );
 }
 
-function RecordCell({ record }: { record: WltRecord }) {
+function RecordCell({
+  record,
+  dataTestId,
+}: {
+  record: WltRecord;
+  dataTestId: string;
+}) {
   return (
     <TableCell className="text-center">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="cursor-pointer">{stringifyRecord(record)}</div>
+            <div className="cursor-pointer" data-testid={`${dataTestId}_cell`}>
+              {stringifyRecord(record)}
+            </div>
           </TooltipTrigger>
-          <TooltipContent side="top">
+          <TooltipContent side="top" data-testid={`${dataTestId}_tooltip`}>
             {(winrateFromRecord(record) * 100).toFixed(0)}% winrate
           </TooltipContent>
         </Tooltip>
@@ -527,9 +577,15 @@ function RecordCell({ record }: { record: WltRecord }) {
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="mx-auto flex min-w-[16ch] flex-col text-center">
+    <div
+      className="mx-auto flex min-w-[16ch] flex-col text-center"
+      data-testid={`test_${label}`}
+    >
       <dt className="text-gray-500">{label}</dt>
-      <dd className="order-first text-2xl font-semibold tracking-tight text-gray-900">
+      <dd
+        className="order-first text-2xl font-semibold tracking-tight
+          text-gray-900"
+      >
         {value}
       </dd>
     </div>

@@ -1,0 +1,10 @@
+FROM google/cloud-sdk:emulators
+
+ENV DATASTORE_EMULATOR_PORT=8089
+ENV DATASTORE_PATH=/data/datastore
+
+RUN mkdir -p $DATASTORE_PATH
+
+EXPOSE $DATASTORE_EMULATOR_PORT
+
+ENTRYPOINT ["/bin/sh", "-c", "gcloud beta emulators datastore start --project=$PROJECT_ID --data-dir=$DATASTORE_PATH --host-port=0.0.0.0:$DATASTORE_EMULATOR_PORT"]

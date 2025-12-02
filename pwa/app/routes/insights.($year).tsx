@@ -6,7 +6,7 @@ import {
   NotablesInsight,
   getInsightsLeaderboardsYear,
   getInsightsNotablesYear,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { EventLink, TeamLink } from '~/components/tba/links';
@@ -75,6 +75,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `Insights - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `Insights for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.year > 0 ? data.year : 'Overall'} Insights - The Blue Alliance`,

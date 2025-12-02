@@ -1,10 +1,10 @@
-import { RequestResult } from '@hey-api/client-fetch';
 import { type ClassValue, clsx } from 'clsx';
 import React from 'react';
 import { Params } from 'react-router';
 import { twMerge } from 'tailwind-merge';
 
-import { WltRecord, getStatus } from '~/api/tba';
+import { WltRecord, getStatus } from '~/api/tba/read';
+import { RequestResult } from '~/api/tba/read/client';
 
 // TODO: Generate this from the API
 const VALID_YEARS: number[] = [];

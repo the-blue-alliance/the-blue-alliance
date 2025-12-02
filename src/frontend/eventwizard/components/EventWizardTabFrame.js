@@ -2,6 +2,11 @@ import React from "react";
 import EventInfoContainer from "../containers/EventInfoContainer";
 import TeamListContainer from "../containers/TeamListContainer";
 import AwardsTabContainer from "../containers/AwardsTabContainer";
+import MatchVideosContainer from "../containers/MatchVideosContainer";
+import EventScheduleTabContainer from "../containers/EventScheduleTabContainer";
+import MatchPlayTabContainer from "../containers/MatchPlayTabContainer";
+import EventMatchResultsTabContainer from "../containers/EventMatchResultsTabContainer";
+import EventRankingsTabContainer from "../containers/EventRankingsTabContainer";
 
 const NotAvailableMessage = () => (
   <p>
@@ -55,6 +60,11 @@ const EventWizardTabFrame = () => (
               Alliance Selection
             </a>
           </li>
+          <li>
+            <a href="#match-videos" data-toggle="tab">
+              Match Videos
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -62,22 +72,11 @@ const EventWizardTabFrame = () => (
       <EventInfoContainer />
       <TeamListContainer />
       <AwardsTabContainer />
-      <div className="tab-pane" id="schedule">
-        <h3>FMS Schedule</h3>
-        <NotAvailableMessage />
-      </div>
-      <div className="tab-pane" id="matches">
-        <h3>Match Play</h3>
-        <NotAvailableMessage />
-      </div>
-      <div className="tab-pane" id="results">
-        <h3>FMS Matches</h3>
-        <NotAvailableMessage />
-      </div>
-      <div className="tab-pane" id="rankings">
-        <h3>FMS Rankings</h3>
-        <NotAvailableMessage />
-      </div>
+      <MatchVideosContainer />
+      <EventScheduleTabContainer />
+      <MatchPlayTabContainer />
+      <EventMatchResultsTabContainer />
+      <EventRankingsTabContainer />
       <div className="tab-pane" id="alliances">
         <h3>FMS Alliances</h3>
         <NotAvailableMessage />

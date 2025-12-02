@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-import { Event, Team } from '~/api/tba';
+import { Event, Team } from '~/api/tba/read';
 import { removeNonNumeric } from '~/lib/utils';
 
 const TeamLink = React.forwardRef<
@@ -26,9 +26,11 @@ TeamLink.displayName = 'TeamLink';
 
 const EventLink = React.forwardRef<
   HTMLAnchorElement,
-  React.PropsWithChildren<{
-    eventOrKey: Event | string;
-  }>
+  React.PropsWithChildren<
+    {
+      eventOrKey: Event | string;
+    } & React.AnchorHTMLAttributes<HTMLAnchorElement>
+  >
 >(({ eventOrKey, ...props }, ref) => {
   const eventKey = typeof eventOrKey === 'string' ? eventOrKey : eventOrKey.key;
   return <Link to={`/event/${eventKey}`} {...props} ref={ref} />;

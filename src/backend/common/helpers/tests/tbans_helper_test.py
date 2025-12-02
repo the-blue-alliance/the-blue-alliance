@@ -472,7 +472,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         match_creator.createIncompleteQuals()
 
         # Test send called with user id
@@ -542,7 +543,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         match_creator.createIncompleteQuals()
 
         from backend.common.helpers.match_helper import MatchHelper
@@ -852,7 +854,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         match_creator.createIncompleteQuals()
 
         with patch.object(
@@ -868,7 +871,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         matches = match_creator.createIncompleteQuals()
 
         # Hack our first next upcoming match to be Match 1
@@ -890,7 +894,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         matches = match_creator.createIncompleteQuals()
 
         # Hack our first next upcoming match to be Match 1

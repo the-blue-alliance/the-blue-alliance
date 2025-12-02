@@ -8,7 +8,7 @@ You can optionally use [devbox](https://www.jetify.com/devbox) to set up a repro
 devbox shell
 ```
 
-to enter a shell with system dependencies preinstalled. Otherwise, you'll need Node v20 (we specifically pin to 20.16, but others will work).
+to enter a shell with system dependencies preinstalled. Otherwise, you'll need Node v22 (we specifically pin to 22.14, but others will work).
 
 ## Development
 

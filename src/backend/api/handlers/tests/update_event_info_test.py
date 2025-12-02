@@ -7,6 +7,7 @@ from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -17,12 +18,19 @@ AUTH_SECRET = "321tEsTsEcReT"
 REQUEST_PATH = "/api/trusted/v1/event/2014casj/info/update"
 
 
-def setup_event() -> None:
+def setup_event(
+    official: bool | None = None,
+    playoff_type: PlayoffType | None = None,
+    manual_attrs: list[str] | None = None,
+) -> None:
     Event(
         id="2014casj",
         year=2014,
         event_short="casj",
         event_type_enum=EventType.OFFSEASON,
+        official=official,
+        playoff_type=playoff_type,
+        manual_attrs=manual_attrs if manual_attrs is not None else [],
     ).put()
 
 
@@ -105,6 +113,10 @@ def test_update_event_info(
             "frc8254": "frc254C",
             "frc9000": "frc6000",
         },
+        "timezone": "America/New_York",
+        "disable_sync": {
+            "event_playoff_matches": True,
+        },
         "someother": "randomstuff",  # This should be ignored
     }
     request_body = json.dumps(request)
@@ -120,6 +132,7 @@ def test_update_event_info(
     assert event.first_code == "abc123"
     assert event.official is True
     assert event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM
+    assert event.timezone_id == "America/New_York"
 
     webcasts = event.webcast
     assert len(webcasts) == 2
@@ -140,6 +153,8 @@ def test_update_event_info(
         "frc8254": "frc254C",
         "frc9000": "frc6000",
     }
+
+    assert event.is_sync_enabled(EventSyncType.EVENT_PLAYOFF_MATCHES) is False
 
     # We should have a job enqueued to remap data
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 1
@@ -325,4 +340,167 @@ def test_invalid_remap_teams_mapping_bad_end_format(
     event: Optional[Event] = Event.get_by_id("2014casj")
     assert event is not None
     assert event.remap_teams is None
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_bad_playoff_type(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {"playoff_type": "DoubleElim"}
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 400
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.timezone_id is None
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_playoff_type_sets_manual_attr(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {
+        "first_event_code": "TEST",
+        "playoff_type": int(PlayoffType.ROUND_ROBIN_6_TEAM),
+    }
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 200
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM
+    assert event.official is True
+    assert event.manual_attrs == ["playoff_type"]
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_playoff_type_sets_manual_attr_dedup(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event(manual_attrs=["playoff_type"])
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {
+        "first_event_code": "TEST",
+        "playoff_type": int(PlayoffType.ROUND_ROBIN_6_TEAM),
+    }
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 200
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM
+    assert event.official is True
+    assert event.manual_attrs == ["playoff_type"]
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_playoff_type_None_clears_manual_attr(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event(
+        official=True,
+        playoff_type=PlayoffType.ROUND_ROBIN_6_TEAM,
+        manual_attrs=["playoff_type"],
+    )
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {"playoff_type": None}
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 200
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM
+    assert event.official is True
+    assert event.manual_attrs == []
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_invalid_event_timezone(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {"timezone": "Not/Real_Timezone"}
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 400
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.timezone_id is None
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_invalid_sync_disable_flags(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {"disable_sync": True}
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 400
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.disable_sync_flags is None
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+def test_invalid_sync_disable_flags_key(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {"disable_sync": {"invalid_sync_type": True}}
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert response.status_code == 400
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.disable_sync_flags is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0

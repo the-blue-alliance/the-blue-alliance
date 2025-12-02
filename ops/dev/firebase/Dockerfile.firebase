@@ -1,0 +1,15 @@
+FROM node:alpine
+
+RUN apk --no-cache add default-jre && \
+    npm cache clean --force && \
+    npm i -g firebase-tools
+
+WORKDIR /firebase
+
+COPY ops/dev/firebase/package.json .
+COPY ops/dev/firebase/firebase.json .
+COPY ops/dev/firebase/create_auth_emulator_accounts.js .
+
+RUN npm install
+
+ENTRYPOINT ["npm", "start"]

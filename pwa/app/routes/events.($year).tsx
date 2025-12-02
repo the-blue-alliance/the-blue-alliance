@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useLoaderData, useNavigate } from 'react-router';
 
-import { Event, getEventsByYear } from '~/api/tba';
+import { Event, getEventsByYear } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
 import {
   Select,
@@ -61,6 +61,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `FIRST Robotics Events - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `Event list for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.year} FIRST Robotics Events - The Blue Alliance`,

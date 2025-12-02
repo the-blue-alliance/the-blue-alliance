@@ -16,15 +16,18 @@ from backend.common import auth
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
+from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
+from backend.common.models.webcast import Webcast
 
 
 def setup_event(
     event_type: EventType = EventType.OFFSEASON,
     official: bool = False,
+    webcasts: Optional[List[Webcast]] = None,
 ) -> None:
     Event(
         id="2019nyny",
@@ -32,6 +35,7 @@ def setup_event(
         event_short="nyny",
         event_type_enum=event_type,
         official=official,
+        webcast_json=json.dumps(webcasts) if webcasts else None,
     ).put()
 
 
@@ -69,6 +73,7 @@ def setup_api_auth(
     expiration: Optional[datetime.datetime] = None,
     owner: Optional[ndb.Key] = None,
     all_official_events: bool = False,
+    webcasts: List[Webcast] = [],
 ) -> Tuple[str, str]:
     auth = ApiAuthAccess(
         id="".join(random.choices(string.ascii_letters + string.digits, k=10)),
@@ -78,6 +83,7 @@ def setup_api_auth(
         expiration=expiration,
         owner=owner,
         all_official_events=all_official_events,
+        offseason_webcast_channels=[ApiAuthAccess.webcast_key(w) for w in webcasts],
     )
     auth.put()
 
@@ -189,6 +195,125 @@ def test_eventwizard_permission_passes(
     with api_client.application.test_request_context():  # pyre-ignore[16]
         resp = api_client.post(
             "/api/trusted/v1/event/2019nyny/team_list/update", data=json.dumps([])
+        )
+
+    assert resp.status_code == 200
+    assert "Success" in resp.json
+
+
+@freeze_time("2019-06-01")
+def test_webcast_permission_not_offseason(ndb_stub, api_client: Client) -> None:
+    """
+    An API key linked to a webcast will grant MATCH_VIDEO permissions for current-year offseason events
+    that are using that webcast channel
+    """
+    webcast = Webcast(type=WebcastType.TWITCH, channel="test_webcast")
+    setup_event(event_type=EventType.REGIONAL, webcasts=[webcast])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other", auth_types=[AuthType.MATCH_VIDEO], webcasts=[webcast]
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps({})
+        request_path = "/api/trusted/v1/event/2019nyny/match_videos/add"
+        resp = api_client.post(
+            request_path,
+            data=request_data,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+        )
+
+    assert resp.status_code == 401
+
+
+@freeze_time("2020-06-01")
+def test_webcast_permission_not_this_year(ndb_stub, api_client: Client) -> None:
+    """
+    An API key linked to a webcast will grant MATCH_VIDEO permissions for current-year offseason events
+    that are using that webcast channel
+    """
+    webcast = Webcast(type=WebcastType.TWITCH, channel="test_webcast")
+    setup_event(event_type=EventType.OFFSEASON, webcasts=[webcast])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other", auth_types=[AuthType.MATCH_VIDEO], webcasts=[webcast]
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps({})
+        request_path = "/api/trusted/v1/event/2019nyny/match_videos/add"
+        resp = api_client.post(
+            request_path,
+            data=request_data,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+        )
+
+    assert resp.status_code == 401
+
+
+@freeze_time("2020-06-01")
+def test_webcast_permission_wrong_permission(ndb_stub, api_client: Client) -> None:
+    """
+    An API key linked to a webcast will grant MATCH_VIDEO permissions for current-year offseason events
+    that are using that webcast channel
+    """
+    webcast = Webcast(type=WebcastType.TWITCH, channel="test_webcast")
+    setup_event(event_type=EventType.OFFSEASON, webcasts=[webcast])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other",
+        auth_types=[AuthType.MATCH_VIDEO, AuthType.EVENT_INFO],
+        webcasts=[webcast],
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps({})
+        request_path = "/api/trusted/v1/event/2019nyny/info/update"
+        resp = api_client.post(
+            request_path,
+            data=request_data,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+        )
+
+    assert resp.status_code == 401
+
+
+@freeze_time("2019-06-01")
+def test_webcast_permission_passes(ndb_stub, api_client: Client) -> None:
+    """
+    An API key linked to a webcast will grant MATCH_VIDEO permissions for current-year offseason events
+    that are using that webcast channel
+    """
+    webcast = Webcast(type=WebcastType.TWITCH, channel="test_webcast")
+    setup_event(event_type=EventType.OFFSEASON, webcasts=[webcast])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other", auth_types=[AuthType.MATCH_VIDEO], webcasts=[webcast]
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps({})
+        request_path = "/api/trusted/v1/event/2019nyny/match_videos/add"
+        resp = api_client.post(
+            request_path,
+            data=request_data,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
         )
 
     assert resp.status_code == 200

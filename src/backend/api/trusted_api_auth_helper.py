@@ -120,10 +120,24 @@ class TrustedApiAuthHelper:
         required_auth_types: Set[AuthType],
     ) -> Optional[str]:
         allowed_event_keys = [none_throws(ekey.string_id()) for ekey in auth.event_list]
-        if event.key_name not in allowed_event_keys and not (
-            auth.all_official_events
-            and event.official
-            and event.year == datetime.datetime.now().year
+        if (
+            event.key_name not in allowed_event_keys
+            and not (
+                auth.all_official_events
+                and event.official
+                and event.year == datetime.datetime.now().year
+            )
+            and not (
+                required_auth_types == {AuthType.MATCH_VIDEO}
+                and any(
+                    (
+                        ApiAuthAccess.webcast_key(w) in auth.offseason_webcast_channels
+                        for w in event.webcast
+                    )
+                )
+                and event.event_type_enum == EventType.OFFSEASON
+                and event.year == datetime.datetime.now().year
+            )
         ):
             return "Only allowed to edit events: {}".format(
                 ", ".join(allowed_event_keys)

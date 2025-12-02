@@ -14,7 +14,7 @@ import {
   DistrictInsight,
   getDistrictHistory,
   getDistrictInsights,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { TeamLink } from '~/components/tba/links';
 import {
   ChartContainer,
@@ -67,9 +67,25 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `District Insights - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `District insights for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.history[data.history.length - 1].display_name} District Insights - The Blue Alliance`,
+    },
+    {
+      name: 'description',
+      content: `District insights for the ${data.history[data.history.length - 1].display_name} District.`,
     },
   ];
 }
@@ -84,7 +100,10 @@ export default function DistrictPage() {
       </h1>
 
       <Tabs defaultValue="Growth">
-        <TabsList className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2 lg:*:basis-1">
+        <TabsList
+          className="flex h-auto flex-wrap items-center justify-evenly
+            *:basis-1/2 lg:*:basis-1"
+        >
           <TabsTrigger value="Growth">Growth</TabsTrigger>
           <TabsTrigger value="Team">Team Data</TabsTrigger>
         </TabsList>
@@ -112,17 +131,20 @@ function DistrictDataView({
 
   return (
     <div>
-      <div className="flex flex-row flex-wrap gap-4 md:flex-nowrap [&>*]:w-full md:[&>*]:w-1/2">
+      <div
+        className="flex flex-row flex-wrap gap-4 md:flex-nowrap [&>*]:w-full
+          md:[&>*]:w-1/2"
+      >
         <div className="flex flex-col">
           <h1 className="mb-2 text-center text-xl">Yearly Active Team Count</h1>
           <ChartContainer config={{}} className="min-h-[100px] w-full">
             <BarChart
-              data={Object.entries(districtData.yearly_active_team_count).map(
-                ([year, count]) => ({
-                  year: Number(year),
-                  count,
-                }),
-              )}
+              data={Object.entries(
+                districtData.district_wide_data?.yearly_active_team_count ?? {},
+              ).map(([year, count]) => ({
+                year: Number(year),
+                count,
+              }))}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />
@@ -141,12 +163,12 @@ function DistrictDataView({
           <h1 className="mb-2 text-center text-xl">Yearly Event Count</h1>
           <ChartContainer config={{}} className="min-h-[100px] w-full">
             <BarChart
-              data={Object.entries(districtData.yearly_event_count).map(
-                ([year, count]) => ({
-                  year: Number(year),
-                  count,
-                }),
-              )}
+              data={Object.entries(
+                districtData.district_wide_data?.yearly_event_count ?? {},
+              ).map(([year, count]) => ({
+                year: Number(year),
+                count,
+              }))}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />
@@ -223,6 +245,14 @@ function TeamDataView({
       accessorKey: 'district_event_wins',
     },
     {
+      header: 'CMP Appearances',
+      accessorKey: 'cmp_appearances',
+    },
+    {
+      header: 'DCMP Appearances',
+      accessorKey: 'dcmp_appearances',
+    },
+    {
       header: 'DCMP Wins',
       accessorKey: 'dcmp_wins',
     },
@@ -292,6 +322,14 @@ function TeamDataView({
           )
         );
       },
+    },
+    {
+      header: 'Total Matches',
+      accessorKey: 'total_matches_played',
+    },
+    {
+      header: 'Third Plays',
+      accessorKey: 'in_district_extra_play_count',
     },
   ];
 

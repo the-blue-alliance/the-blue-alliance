@@ -82,18 +82,27 @@ class SeasonHelper(object):
 
     @staticmethod
     def kickoff_datetime_est(year: Year = datetime.now().year) -> datetime:
-        """Computes the date of Kickoff for a given year. Kickoff is always the first Saturday in January after Jan 2nd."""
+        """
+        Computes the date of Kickoff for a given year.
+        Kickoff is always the first Saturday in January after Jan 2nd.
+        2026 and later, it is the second Saturday in January after Jan 2nd.
+        """
         jan_2nd = datetime(
-            year=year, month=1, day=2, hour=10, minute=30, second=00, tzinfo=EST
+            year=year, month=1, day=2, hour=10, minute=30, second=0, tzinfo=EST
         )
         # Since 2021, Kickoff starts at 12:00am EST
         if year >= 2021:
-            jan_2nd = jan_2nd.replace(hour=12, minute=00)
+            jan_2nd = jan_2nd.replace(hour=12, minute=0)
         days_ahead = 5 - jan_2nd.weekday()  # Saturday is 5
-        # Kickoff won't occur *on* Jan 2nd if it's a Saturday - it'll be the next Saturday
+        # Kickoff won't occur *on* Jan 2nd if it's a Saturday,
+        # it'll be a following Saturday (either the first or second Saturday)
         if days_ahead <= 0:
             days_ahead += 7
-        return jan_2nd + timedelta(days=days_ahead)
+        kickoff_date = jan_2nd + timedelta(days=days_ahead)
+        # 2026 onward, everything got pushed back a week, including kickoff
+        if year >= 2026:
+            kickoff_date += timedelta(days=7)
+        return kickoff_date
 
     @staticmethod
     def kickoff_datetime_utc(year: Year = datetime.now().year) -> datetime:

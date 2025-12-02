@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { createSelector } from "reselect";
 
 const getWebcastsById = (state) => state.webcastsById;

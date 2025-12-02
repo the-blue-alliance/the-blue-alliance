@@ -121,6 +121,11 @@ def api_auth_edit_post(auth_id: str) -> Response:
     else:
         district_list = []
 
+    webcast_list_str = request.form.get("webcast_list_str")
+    offseason_webcast_channels = []
+    if webcast_list_str:
+        offseason_webcast_channels = webcast_list_str.split(",")
+
     event_list = [ndb.Key(Event, k) for k in sorted(set(event_keys))]
 
     all_official_events = False
@@ -142,6 +147,7 @@ def api_auth_edit_post(auth_id: str) -> Response:
             ),
             district_list=district_list,
             event_list=event_list,
+            offseason_webcast_channels=offseason_webcast_channels,
             all_official_events=all_official_events,
             auth_types_enum=auth_types_enum,
         )

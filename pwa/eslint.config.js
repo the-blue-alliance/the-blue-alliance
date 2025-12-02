@@ -19,7 +19,7 @@ export default tseslint.config([
   // Ignore files
   includeIgnoreFile(gitignorePath),
   {
-    ignores: ['app/api/v3.ts', 'eslint.config.js'],
+    ignores: ['app/api/tba/', 'eslint.config.js'],
   },
 
   // Typescript config
@@ -48,6 +48,7 @@ export default tseslint.config([
       '@typescript-eslint/no-non-null-assertion': ['error'],
       '@typescript-eslint/no-throw-literal': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
+      '@typescript-eslint/await-thenable': 'off',
     },
   },
 

@@ -1,3 +1,4 @@
+from itertools import product
 from typing import Any, List, Set, Tuple, Type
 
 from google.appengine.ext import ndb
@@ -340,10 +341,23 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
 
 def insight_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
+    district_abbreviations = _filter(affected_refs["district_abbreviation"])
+    names = _filter(affected_refs["name"])
 
     queries: List[CachedDatabaseQuery] = []
     for year in years:
         queries.append(insight_query.InsightsLeaderboardsYearQuery(year))
         queries.append(insight_query.InsightsNotablesYearQuery(year))
+
+    for year, district_abbreviation, name in product(
+        years, district_abbreviations, names
+    ):
+        queries.append(
+            insight_query.DistrictInsightQuery(
+                name,
+                year,
+                district_abbreviation,
+            )
+        )
 
     return _queries_to_cache_keys_and_queries(queries)

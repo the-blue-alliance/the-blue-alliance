@@ -95,6 +95,20 @@
             <td><input type="text" name="official" value="{{event.official}}" /></td>
         </tr>
         <tr>
+            <td>
+                Sync Disabled Flags
+            </td>
+            <td>
+                <ul>
+                    {% for name, val in event_sync_types.items() %}
+                        <li>
+                            <input type="checkbox" name="sync_disabled::{{name}}" value="on" {% if not event.is_sync_enabled(val) %}checked{%endif%}> {{name}}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        <tr>
             <td>FIRST Event ID</td>
             <td><input type="text" name="first_eid" value="{{event.first_eid}}" /></td>
         </tr>

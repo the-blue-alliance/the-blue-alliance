@@ -10,8 +10,8 @@ export default function SignInWithAppleButton() {
       provider={provider}
       logo={AppleLogo}
       text="Sign in with Apple"
-      className="border-none bg-black text-white transition duration-300 ease-in-out
-        hover:bg-gray-800 active:bg-gray-900"
+      className="border-none bg-black text-white transition duration-300
+        ease-in-out hover:bg-gray-800 active:bg-gray-900"
     />
   );
 }

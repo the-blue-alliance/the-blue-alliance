@@ -27,21 +27,28 @@ import {
   getEvent,
   getEventAlliances,
   getEventMatches,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import {
   getEventAwardsOptions,
   getEventCoprsOptions,
   getEventRankingsOptions,
   getEventTeamMediaOptions,
   getEventTeamsOptions,
-} from '~/api/tba/@tanstack/react-query.gen';
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { LocationLink, TeamLink } from '~/components/tba/links';
-import MatchResultsTable from '~/components/tba/matchResultsTable';
+import {
+  CHANGE_IN_COMP_LEVEL_BREAKER,
+  CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
+  END_OF_DAY_BREAKER,
+  START_OF_ELIMS_BREAKER,
+  START_OF_QUALS_BREAKER,
+} from '~/components/tba/match/breakers';
+import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import RankingsTable from '~/components/tba/rankingsTable';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
@@ -117,13 +124,13 @@ async function loadData(params: Route.LoaderArgs['params']) {
     getEventAlliances({ path: { event_key: params.eventKey } }),
   ]);
 
-  if (event.data == undefined) {
+  if (event.data === undefined) {
     throw new Response(null, {
       status: 404,
     });
   }
 
-  if (matches.data == undefined || alliances.data == undefined) {
+  if (matches.data === undefined || alliances.data === undefined) {
     throw new Response(null, {
       status: 500,
     });
@@ -132,7 +139,7 @@ async function loadData(params: Route.LoaderArgs['params']) {
   return {
     event: event.data,
     matches: matches.data,
-    alliances: alliances.data,
+    alliances: alliances.data ?? [],
     shouldPreviewAwardsTab: SEASON_EVENT_TYPES.has(event.data.event_type),
     shouldPreviewInsightsTab: matches.data.length > 0,
     shouldPreviewRankingsTab: matches.data.length > 0,
@@ -148,6 +155,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `Event Not Found - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `Videos and match results for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     { title: `${data.event.name} (${data.event.year}) - The Blue Alliance` },
     {
@@ -207,25 +226,30 @@ export default function EventPage() {
     [sortedMatches],
   );
 
-  const leftSideMatches =
-    matches.length > 0 ? (
-      <>
-        <h2 className="text-xl">
-          {quals.length > 0 ? 'Quals' : 'Elims'} Results
-        </h2>
-        <MatchResultsTable
-          matches={quals.length > 0 ? quals : elims}
-          event={event}
-        />
-      </>
-    ) : null;
+  const leftSideMatches = (
+    <SimpleMatchRowsWithBreaks
+      matches={quals.length > 0 ? quals : elims}
+      event={event}
+      breakers={[
+        END_OF_DAY_BREAKER,
+        START_OF_QUALS_BREAKER,
+        CHANGE_IN_COMP_LEVEL_BREAKER,
+      ]}
+    />
+  );
 
   const rightSideElims =
-    quals.length > 0 && elims.length > 0 ? (
-      <>
-        <h2 className="mt-4 text-xl">Playoff Results</h2>
-        <MatchResultsTable matches={elims} event={event} />
-      </>
+    elims.length > 0 ? (
+      <SimpleMatchRowsWithBreaks
+        matches={elims}
+        event={event}
+        breakers={[
+          END_OF_DAY_BREAKER,
+          START_OF_ELIMS_BREAKER,
+          CHANGE_IN_COMP_LEVEL_BREAKER,
+          CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
+        ]}
+      />
     ) : null;
 
   return (
@@ -297,7 +321,10 @@ export default function EventPage() {
         defaultValue={matches.length > 0 ? 'results' : 'teams'}
         className="mt-4"
       >
-        <TabsList className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2 lg:*:basis-1">
+        <TabsList
+          className="flex h-auto flex-wrap items-center justify-evenly
+            *:basis-1/2 lg:*:basis-1"
+        >
           {(matches.length > 0 || alliances.length > 0) && (
             <TabsTrigger value="results">
               <InlineIcon>
@@ -428,7 +455,8 @@ function AwardsTab({ awards }: { awards: Award[] }) {
           {awards.map((award) => (
             <div
               key={award.name}
-              className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4 sm:px-10"
+              className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4
+                sm:px-10"
             >
               <dt className="font-medium text-gray-900 sm:col-span-2">
                 {award.name}
@@ -497,7 +525,10 @@ function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
                     })}
                   >
                     {maybeAvatar && (
-                      <div className="flex h-full w-full items-center justify-center">
+                      <div
+                        className="flex h-full w-full items-center
+                          justify-center"
+                      >
                         <TeamAvatar media={maybeAvatar} />
                       </div>
                     )}
@@ -534,7 +565,8 @@ function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
                               <img
                                 src={maybeRobotPic}
                                 alt=""
-                                className="max-h-[80vh] w-3xl rounded-lg object-cover"
+                                className="max-h-[80vh] w-3xl rounded-lg
+                                  object-cover"
                                 loading="lazy"
                               />
                             </DialogDescription>

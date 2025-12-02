@@ -59,5 +59,12 @@ repos:
       language: script
       always_run: true
       stages: [post-checkout]
+    - id: dev-container-version
+      name: "Updating Development Container Version"
+      entry: ./ops/check_dev_container_version.sh
+      language: script
+      always_run: true
+      verbose: true
+      stages: [post-checkout]
 
 

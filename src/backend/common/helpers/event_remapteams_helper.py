@@ -26,7 +26,9 @@ class EventRemapTeamsHelper:
         if not event or not event.remap_teams:
             return None
 
-        event.prep_awards_matches_teams()
+        event.prep_awards()
+        event.prep_matches()
+        event.prep_teams()
 
         # Remap matches
         cls.remapteams_matches(event.matches, event.remap_teams)

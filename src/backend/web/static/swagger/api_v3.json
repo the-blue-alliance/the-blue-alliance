@@ -3,9 +3,9 @@
   "info": {
     "title": "The Blue Alliance API v3",
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.10.0",
+    "version": "3.10.1",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.10.1: Add remap_teams to event. 3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "servers": [
     {
@@ -5376,7 +5376,8 @@
           "division_keys",
           "parent_event_key",
           "playoff_type",
-          "playoff_type_string"
+          "playoff_type_string",
+          "remap_teams"
         ],
         "type": "object",
         "properties": {
@@ -5561,7 +5562,7 @@
               "integer",
               "null"
             ],
-            "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null."
+            "description": "Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/playoff_type.py#L37, or null."
           },
           "playoff_type_string": {
             "type": [
@@ -5569,6 +5570,17 @@
               "null"
             ],
             "description": "String representation of the `playoff_type`, or null."
+          },
+          "remap_teams": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Map of temporary \"off-season demo\" team numbers to pre-rookie and B teams. Both keys and values are team keys in the format 'frc####'. Key is the old team key ('frc' + numeric only), value is the new team key ('frc' + numeric + may include a letter suffix).",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Team key in the format 'frc####'"
+            }
           }
         }
       },
@@ -5632,19 +5644,28 @@
             "description": "Number of teams ranked."
           },
           "ranking": {
-            "type": "object",
+            "type": [
+              "object",
+              "null"
+            ],
             "properties": {
               "matches_played": {
                 "type": "integer",
                 "description": "Number of matches played."
               },
               "qual_average": {
-                "type": "number",
+                "type": [
+                  "number",
+                  "null"
+                ],
                 "description": "For some years, average qualification score. Can be null.",
                 "format": "double"
               },
               "sort_orders": {
-                "type": "array",
+                "type": [
+                  "array",
+                  "null"
+                ],
                 "description": "Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.",
                 "items": {
                   "type": "number",
@@ -5659,11 +5680,17 @@
                 ]
               },
               "rank": {
-                "type": "integer",
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "description": "Relative rank of this team."
               },
               "dq": {
-                "type": "integer",
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "description": "Number of matches the team was disqualified for."
               },
               "team_key": {
@@ -5673,7 +5700,10 @@
             }
           },
           "sort_order_info": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "description": "Ordered list of names corresponding to the elements of the `sort_orders` array.",
             "items": {
               "type": "object",
@@ -9258,8 +9288,136 @@
           },
           "details": {
             "type": "object",
-            "additionalProperties": true,
-            "description": "If required, a JSON dict of additional media information."
+            "description": "If required, a JSON dict of additional media information.",
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {}
+              },
+              {
+                "properties": {
+                  "base64Image": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "base64Image"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "author_id": {
+                    "type": "integer"
+                  },
+                  "author_name": {
+                    "type": "string"
+                  },
+                  "author_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "height": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "html": {
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "type": "string"
+                  },
+                  "provider_name": {
+                    "type": "string"
+                  },
+                  "provider_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "thumbnail_height": {
+                    "type": "integer"
+                  },
+                  "thumbnail_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "thumbnail_width": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "width": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "author_id",
+                  "author_name",
+                  "author_url",
+                  "height",
+                  "html",
+                  "media_id",
+                  "provider_name",
+                  "provider_url",
+                  "thumbnail_height",
+                  "thumbnail_url",
+                  "thumbnail_width",
+                  "title",
+                  "type",
+                  "version",
+                  "width"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "model_created": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "model_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "model_image": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "model_name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "model_created",
+                  "model_description",
+                  "model_image",
+                  "model_name"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "image_partial": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "image_partial"
+                ]
+              }
+            ]
           },
           "preferred": {
             "type": "boolean",
@@ -9466,55 +9624,35 @@
         "type": "object",
         "properties": {
           "district_data": {
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "yearly_active_team_count": {
+            "type": "object",
+            "properties": {
+              "region_data": {
+                "oneOf": [
+                  {
                     "type": "object",
-                    "description": "Map of year to number of active teams",
                     "additionalProperties": {
-                      "type": "integer"
+                      "$ref": "#/components/schemas/DistrictInsightRegionData"
                     }
                   },
-                  "yearly_event_count": {
-                    "type": "object",
-                    "description": "Map of year to number of events",
-                    "additionalProperties": {
-                      "type": "integer"
-                    }
-                  },
-                  "yearly_gained_teams": {
-                    "type": "object",
-                    "description": "Map of year to list of team keys gained",
-                    "additionalProperties": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "yearly_lost_teams": {
-                    "type": "object",
-                    "description": "Map of year to list of team keys lost",
-                    "additionalProperties": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
+                  {
+                    "type": "null"
                   }
-                },
-                "required": [
-                  "yearly_active_team_count",
-                  "yearly_event_count",
-                  "yearly_gained_teams",
-                  "yearly_lost_teams"
                 ]
               },
-              {
-                "type": "null"
+              "district_wide_data": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DistrictInsightRegionData"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
+            },
+            "required": [
+              "region_data",
+              "district_wide_data"
             ]
           },
           "team_data": {
@@ -9550,6 +9688,18 @@
                     },
                     "elims_record": {
                       "$ref": "#/components/schemas/WLT_Record"
+                    },
+                    "in_district_extra_play_count": {
+                      "type": "integer"
+                    },
+                    "total_matches_played": {
+                      "type": "integer"
+                    },
+                    "dcmp_appearances": {
+                      "type": "integer"
+                    },
+                    "cmp_appearances": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -9561,7 +9711,11 @@
                     "team_awards",
                     "individual_awards",
                     "quals_record",
-                    "elims_record"
+                    "elims_record",
+                    "in_district_extra_play_count",
+                    "total_matches_played",
+                    "dcmp_appearances",
+                    "cmp_appearances"
                   ]
                 }
               },
@@ -9574,6 +9728,51 @@
         "required": [
           "team_data",
           "district_data"
+        ]
+      },
+      "DistrictInsightRegionData": {
+        "type": "object",
+        "properties": {
+          "yearly_active_team_count": {
+            "type": "object",
+            "description": "Map of year to number of active teams",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "yearly_event_count": {
+            "type": "object",
+            "description": "Map of year to number of events",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "yearly_gained_teams": {
+            "type": "object",
+            "description": "Map of year to list of team keys gained",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "yearly_lost_teams": {
+            "type": "object",
+            "description": "Map of year to list of team keys lost",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "yearly_active_team_count",
+          "yearly_event_count",
+          "yearly_gained_teams",
+          "yearly_lost_teams"
         ]
       },
       "District_Ranking": {

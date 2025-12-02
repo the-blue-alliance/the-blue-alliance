@@ -41,6 +41,8 @@ class ParsedMatch(TypedDict):
     score_breakdown_json: Optional[str]
     time_string: str
     time: datetime.datetime
+    actual_start_time: Optional[datetime.datetime]
+    post_results_time: Optional[datetime.datetime]
     team_key_names: Sequence[TeamKey]
     display_name: Optional[str]
 
@@ -79,6 +81,8 @@ class JSONMatchesParser:
             score_breakdown = match.get("score_breakdown", None)
             time_string = match.get("time_string", None)
             time_utc = match.get("time_utc", None)
+            actual_start_time_utc = match.get("actual_start_time_utc", None)
+            post_results_time_utc = match.get("post_results_time_utc", None)
             display_name = match.get("display_name", None)
 
             if comp_level is None:
@@ -173,6 +177,30 @@ class JSONMatchesParser:
                         "Could not parse 'time_utc'. Check that it is in ISO 8601 format."
                     )
 
+            if actual_start_time_utc is not None:
+                try:
+                    actual_start_time_utc = datetime.datetime.fromisoformat(
+                        actual_start_time_utc
+                    )
+                    # remove timezone info because DatetimeProperty can't handle timezones
+                    actual_start_time_utc = actual_start_time_utc.replace(tzinfo=None)
+                except ValueError:
+                    raise ParserInputException(
+                        "Could not parse 'actual_start_time_utc'. Check that it is in ISO 8601 format."
+                    )
+
+            if post_results_time_utc is not None:
+                try:
+                    post_results_time_utc = datetime.datetime.fromisoformat(
+                        post_results_time_utc
+                    )
+                    # remove timezone info because DatetimeProperty can't handle timezones
+                    post_results_time_utc = post_results_time_utc.replace(tzinfo=None)
+                except ValueError:
+                    raise ParserInputException(
+                        "Could not parse 'post_results_time_utc'. Check that it is in ISO 8601 format."
+                    )
+
             if display_name is not None and type(display_name) is not str:
                 raise ParserInputException("'display_name' must be a string")
 
@@ -201,6 +229,8 @@ class JSONMatchesParser:
                 ),
                 "time_string": time_string,
                 "time": datetime_utc,
+                "actual_start_time": actual_start_time_utc,
+                "post_results_time": post_results_time_utc,
                 "team_key_names": parsed_alliances[AllianceColor.RED]["teams"]
                 + parsed_alliances[AllianceColor.BLUE]["teams"],
                 "display_name": display_name,

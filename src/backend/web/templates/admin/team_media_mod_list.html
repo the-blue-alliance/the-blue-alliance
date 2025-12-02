@@ -45,7 +45,7 @@ $("#go_button").click(function() {
     <tr>
         <td><a href="/admin/team/{{auth_code.team_number}}">{{ auth_code.team_number }}</a></td>
         <td><a href="/admin/media/modcodes/edit/{{auth_code.team_number}}/{{auth_code.year}}">{{ auth_code.access_code }}</a></td>
-        <td>{{ auth_code.account }}</td>
+        <td>{% if auth_code.account %}<a href="/admin/user/{{ auth_code.account.id() }}">{{ auth_code.account_email }}</a>{% else %}{{ auth_code.account }}{% endif %}</td>
         <td>{{ auth_code.expiration|strftime("%Y-%m-%d")}}</td>
     </tr>
     {% endfor %}

@@ -6,7 +6,7 @@ import {
   getTeamHistory,
   getTeamSocialMedia,
   getTeamYearsParticipated,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { AwardBanner } from '~/components/tba/banner';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
@@ -82,6 +82,18 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `Team History - The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `Team history for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.team.nickname} - Team ${data.team.team_number} (History) - The Blue Alliance`,
@@ -138,7 +150,10 @@ export default function TeamPage(): React.JSX.Element {
       </div>
 
       <div className="mt-5 w-full">
-        <div className="flex flex-wrap justify-center sm:flex-nowrap sm:justify-between">
+        <div
+          className="flex flex-wrap justify-center sm:flex-nowrap
+            sm:justify-between"
+        >
           <div className="flex flex-col justify-between">
             <TeamPageTeamInfo
               maybeAvatar={undefined}

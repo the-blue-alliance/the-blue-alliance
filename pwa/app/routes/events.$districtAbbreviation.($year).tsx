@@ -11,7 +11,7 @@ import {
   getDistrictHistory,
   getDistrictRankings,
   getDistrictTeams,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { DataTable } from '~/components/tba/dataTable';
 import { EventLink, LocationLink, TeamLink } from '~/components/tba/links';
@@ -118,9 +118,25 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
+  if (!data) {
+    return [
+      {
+        title: `The Blue Alliance`,
+      },
+      {
+        name: 'description',
+        content: `District information for the FIRST Robotics Competition.`,
+      },
+    ];
+  }
+
   return [
     {
       title: `${data.year} ${data.districtHistory[data.districtHistory.length - 1].display_name} District - The Blue Alliance`,
+    },
+    {
+      name: 'description',
+      content: `District information for the ${data.year} ${data.districtHistory[data.districtHistory.length - 1].display_name} District.`,
     },
   ];
 }
@@ -169,8 +185,8 @@ export default function DistrictPage() {
 
       <Tabs defaultValue={'overview'} className="mt-4">
         <TabsList
-          className="flex h-auto flex-wrap items-center justify-evenly [&>*]:basis-1/2
-            lg:[&>*]:basis-1"
+          className="flex h-auto flex-wrap items-center justify-evenly
+            [&>*]:basis-1/2 lg:[&>*]:basis-1"
         >
           <TabsTrigger value="overview">Overview</TabsTrigger>
           {hasRankings && <TabsTrigger value="rankings">Rankings</TabsTrigger>}

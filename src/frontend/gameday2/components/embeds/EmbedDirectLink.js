@@ -1,6 +1,9 @@
 import React from "react";
-import { Card, CardActions, CardHeader, CardText } from "material-ui/Card";
-import RaisedButton from "material-ui/RaisedButton";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardHeader from "@mui/material/CardHeader";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
 import { webcastPropType } from "../../utils/webcastUtils";
 
 const EmbedDirectLink = (props) => {
@@ -15,17 +18,19 @@ const EmbedDirectLink = (props) => {
   return (
     <Card style={style}>
       <CardHeader title="Webcast could not be embedded" />
-      <CardText>
+      <CardContent>
         Due to technical or copyright issues, the webcast cannot be displayed in
         TBA GameDay.
-      </CardText>
+      </CardContent>
       <CardActions>
-        <RaisedButton
+        <Button
           href={directLink}
           target="_blank"
           rel="noopener noreferrer"
-          label="Open in new tab"
-        />
+          variant="contained"
+        >
+          Open in new tab
+        </Button>
       </CardActions>
     </Card>
   );
