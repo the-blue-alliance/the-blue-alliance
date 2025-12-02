@@ -176,7 +176,7 @@ function LeaderboardKeyLink({
   keyVal: string;
   year: number;
 }) {
-  if (keyType === 'team') {
+  if (keyType === 'Team') {
     return (
       <TeamLink teamOrKey={keyVal} year={year}>
         {keyVal.substring(3)}
