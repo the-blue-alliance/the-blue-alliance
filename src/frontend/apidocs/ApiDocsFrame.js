@@ -1,86 +1,83 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
 import PropTypes from "prop-types";
 import SwaggerUi from "swagger-ui";
 
-const ShowChangesPlugin = function (system) {
+const ShowChangesPlugin = (system) => {
   return {
     wrapComponents: {
-      info: (Original, system) =>
-        class WrappedNumberDisplay extends Component {
-          constructor(props) {
-            super(props);
+      info: (Original) => (props) => {
+        const [isOpened, setIsOpened] = useState(false);
+        const changes = props.info.get("x-changes");
+        const Collapse = system.getComponent("Collapse");
 
-            this.state = { isOpened: false };
-            this.changes = props.info.get("x-changes");
-          }
+        const toggleOpen = useCallback(() => {
+          setIsOpened((prev) => !prev);
+        }, []);
 
-          render() {
-            const Collapse = system.getComponent("Collapse");
-
-            return (
-              <div>
-                <Original {...this.props} />
-                <h2>
-                  API Changelog{" "}
-                  <button
-                    className="swagger-ui btn"
-                    onClick={() =>
-                      this.setState({ isOpened: !this.state.isOpened })
-                    }
-                  >
-                    {this.state.isOpened ? "Hide" : "Show"}
-                  </button>
-                </h2>
-                <Collapse isOpened={this.state.isOpened}>
-                  <ChangesComponent changes={this.changes} />
-                </Collapse>
-              </div>
-            );
-          }
-        },
+        return (
+          <div>
+            <Original {...props} />
+            <h2>
+              API Changelog{" "}
+              <button
+                className="swagger-ui btn"
+                onClick={toggleOpen}
+                aria-expanded={isOpened}
+              >
+                {isOpened ? "Hide" : "Show"}
+              </button>
+            </h2>
+            <Collapse isOpened={isOpened}>
+              <ChangesComponent changes={changes} />
+            </Collapse>
+          </div>
+        );
+      },
     },
   };
 };
 
-class ChangesComponent extends Component {
-  render() {
-    return this.props.changes.entrySeq().map((item) => {
-      const version = item[0];
-      const changes = item[1];
-      return (
-        <div key={version}>
-          <h3>{version}</h3>
-          <ul>
-            {changes.map((c, i) => (
-              <li key={i}>{c}</li>
-            ))}
-          </ul>
-        </div>
-      );
-    });
-  }
-}
+const ChangesComponent = memo(({ changes }) => {
+  return changes.entrySeq().map((item) => {
+    const version = item[0];
+    const changes = item[1];
+    return (
+      <div key={version}>
+        <h3>{version}</h3>
+        <ul>
+          {changes.map((c, i) => (
+            <li key={i}>{c}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  });
+});
 
-class ApiDocsFrame extends Component {
-  componentDidMount() {
+ChangesComponent.displayName = "ChangesComponent";
+
+ChangesComponent.propTypes = {
+  changes: PropTypes.object.isRequired,
+};
+
+const ApiDocsFrame = ({
+  url = "http://localhost:8080/swagger/api_v3.json",
+}) => {
+  const plugins = useMemo(() => [ShowChangesPlugin], []);
+
+  useEffect(() => {
     SwaggerUi({
       dom_id: "#swaggerContainer",
-      url: this.props.url,
-      plugins: [ShowChangesPlugin],
+      url,
+      plugins,
     });
-  }
+  }, [url, plugins]);
 
-  render() {
-    return <div id="swaggerContainer" />;
-  }
-}
+  return <div id="swaggerContainer" />;
+};
 
 ApiDocsFrame.propTypes = {
   url: PropTypes.string,
-};
-
-ApiDocsFrame.defaultProps = {
-  url: "http://localhost:8080/swagger/api_v3.json",
 };
 
 export default ApiDocsFrame;
