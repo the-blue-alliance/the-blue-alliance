@@ -1,5 +1,3 @@
-const { defineConfig, globalIgnores } = require("eslint/config");
-
 const babelParser = require("@babel/eslint-parser");
 const react = require("eslint-plugin-react");
 const globals = require("globals");
@@ -13,7 +11,19 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-module.exports = defineConfig([
+module.exports = [
+  {
+    ignores: [
+      "**/old_py2",
+      "**/pwa/",
+      "src/backend",
+      "src/build",
+      "**/subtrees",
+      "**/venv/",
+      "ops/dev/firebase",
+    ],
+  },
+  ...compat.extends("plugin:prettier/recommended"),
   {
     languageOptions: {
       parser: babelParser,
@@ -26,8 +36,6 @@ module.exports = defineConfig([
       },
     },
 
-    extends: compat.extends("plugin:prettier/recommended"),
-
     plugins: {
       react,
     },
@@ -36,13 +44,4 @@ module.exports = defineConfig([
       "no-console": "warn",
     },
   },
-  globalIgnores([
-    "**/old_py2",
-    "**/pwa/",
-    "src/backend",
-    "src/build",
-    "**/subtrees",
-    "**/venv/",
-    "ops/dev/firebase",
-  ]),
-]);
+];
