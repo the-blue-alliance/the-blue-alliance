@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { parseScheduleFile, cleanTeamNum } from "../../utils/scheduleParser";
+import { parseScheduleFile } from "../../utils/scheduleParser";
+import { cleanTeamNum } from "../../utils/playoffHelpers";
 
 function EventScheduleTab({ selectedEvent, makeTrustedRequest }) {
   const [file, setFile] = useState(null);
