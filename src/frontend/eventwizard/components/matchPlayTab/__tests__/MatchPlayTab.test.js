@@ -464,10 +464,10 @@ describe("MatchPlayTab", () => {
     );
 
     const fetchButton = screen.getByText("Fetch Matches");
-    
+
     // Button should be disabled when no event selected
     expect(fetchButton).toBeDisabled();
-    
+
     // Clicking disabled button does nothing but we can test the behavior
     fireEvent.click(fetchButton);
 

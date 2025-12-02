@@ -17,7 +17,11 @@ const COMP_LEVEL_NAMES = {
   f: "Final",
 };
 
-const MatchPlayTab = ({ selectedEvent, makeTrustedRequest, makeApiV3Request }) => {
+const MatchPlayTab = ({
+  selectedEvent,
+  makeTrustedRequest,
+  makeApiV3Request,
+}) => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
@@ -36,44 +40,43 @@ const MatchPlayTab = ({ selectedEvent, makeTrustedRequest, makeApiV3Request }) =
     makeApiV3Request(
       `/api/v3/event/${selectedEvent}/matches/simple`,
       (data) => {
+        // Sort matches by comp_level and match_number
+        const sortedMatches = data.sort((a, b) => {
+          const compLevelDiff =
+            COMP_LEVELS_PLAY_ORDER[a.comp_level] -
+            COMP_LEVELS_PLAY_ORDER[b.comp_level];
+          if (compLevelDiff !== 0) return compLevelDiff;
 
-      // Sort matches by comp_level and match_number
-      const sortedMatches = data.sort((a, b) => {
-        const compLevelDiff =
-          COMP_LEVELS_PLAY_ORDER[a.comp_level] -
-          COMP_LEVELS_PLAY_ORDER[b.comp_level];
-        if (compLevelDiff !== 0) return compLevelDiff;
+          // For playoff matches, sort by set_number then match_number
+          if (a.comp_level !== "qm") {
+            const setDiff = a.set_number - b.set_number;
+            if (setDiff !== 0) return setDiff;
+          }
 
-        // For playoff matches, sort by set_number then match_number
-        if (a.comp_level !== "qm") {
-          const setDiff = a.set_number - b.set_number;
-          if (setDiff !== 0) return setDiff;
-        }
+          return a.match_number - b.match_number;
+        });
 
-        return a.match_number - b.match_number;
-      });
+        setMatches(sortedMatches);
 
-      setMatches(sortedMatches);
+        // Initialize scores from existing match data
+        const initialScores = {};
+        sortedMatches.forEach((match) => {
+          const key = match.key;
+          initialScores[key] = {
+            red: match.alliances?.red?.score ?? "",
+            blue: match.alliances?.blue?.score ?? "",
+          };
+        });
+        setScores(initialScores);
 
-      // Initialize scores from existing match data
-      const initialScores = {};
-      sortedMatches.forEach((match) => {
-        const key = match.key;
-        initialScores[key] = {
-          red: match.alliances?.red?.score ?? "",
-          blue: match.alliances?.blue?.score ?? "",
-        };
-      });
-      setScores(initialScores);
-
-      setStatusMessage(`Loaded ${sortedMatches.length} matches`);
-      setLoading(false);
-    },
-    (error) => {
-      setStatusMessage(`Error loading matches: ${error}`);
-      setMatches([]);
-      setLoading(false);
-    }
+        setStatusMessage(`Loaded ${sortedMatches.length} matches`);
+        setLoading(false);
+      },
+      (error) => {
+        setStatusMessage(`Error loading matches: ${error}`);
+        setMatches([]);
+        setLoading(false);
+      }
     );
   };
 
