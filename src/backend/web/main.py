@@ -67,6 +67,10 @@ from backend.web.handlers.team import (
 from backend.web.handlers.team_admin import (
     blueprint as team_admin,
 )
+from backend.web.handlers.team_threads import (
+    team_threads,
+    team_threads_canonical,
+)
 from backend.web.handlers.webcasts import webcast_list
 from backend.web.handlers.webhooks import (
     blueprint as webhooks,
@@ -126,6 +130,8 @@ app.add_url_rule("/team/<int:team_number>/<int:year>", view_func=team_detail)
 app.add_url_rule("/team/<int:team_number>/history", view_func=team_history)
 app.add_url_rule("/teams/<int:page>", view_func=team_list)
 app.add_url_rule("/teams", view_func=team_list, defaults={"page": 1})
+app.add_url_rule("/team-threads", view_func=team_threads_canonical)
+app.add_url_rule("/team-threads/<int:year>", view_func=team_threads)
 
 app.add_url_rule("/avatars", view_func=avatar_list)
 app.add_url_rule("/avatars/<int:year>", view_func=avatar_list)

@@ -235,9 +235,7 @@ class TestMediaUrlParser(unittest.TestCase):
                 ):
                     result = MediaParser.partial_media_dict_from_url(url)
                     self.assertIsNotNone(result)
-                    self.assertEqual(
-                        result["media_type_enum"], MediaType.CD_THREAD
-                    )
+                    self.assertEqual(result["media_type_enum"], MediaType.CD_THREAD)
                     self.assertEqual(result["foreign_key"], "506115")
                     self.assertEqual(
                         result["site_name"], TYPE_NAMES[MediaType.CD_THREAD]
