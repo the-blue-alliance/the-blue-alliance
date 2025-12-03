@@ -11,6 +11,7 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.deferred import run_from_task
+from backend.common.helpers.location_helper import LocationHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.models.event import Event
 
@@ -99,3 +100,42 @@ class TestEventManipulator(unittest.TestCase):
         EventManipulator.createOrUpdate(self.new_event, auto_union=False)
         check = Event.get_by_id("2011ct")
         self.assertEqual(check.webcast, self.new_event.webcast)
+
+    @patch.object(LocationHelper, "update_event_location")
+    def test_update_location_official_event(self, update_location_mock) -> None:
+        self.old_event.official = True
+        EventManipulator.createOrUpdate(self.old_event)
+        update_location_mock.assert_not_called()
+
+    @patch.object(LocationHelper, "update_event_location")
+    def test_update_location_has_timezone(self, update_location_mock) -> None:
+        self.old_event.timezone_id = "America/New_York"
+        EventManipulator.createOrUpdate(self.old_event)
+        update_location_mock.assert_not_called()
+
+    @patch.object(LocationHelper, "update_event_location")
+    def test_update_location_on_update(self, update_location_mock) -> None:
+        self.old_event.city = "Hartford"
+        self.old_event.state_prov = "CT"
+        self.old_event.country = "USA"
+        assert self.old_event.timezone_id is None
+
+        EventManipulator.createOrUpdate(self.old_event)
+
+        def update_side_effect(event):
+            event.timezone_id = "America/New_York"
+            event.put()
+
+        update_location_mock.side_effect = update_side_effect
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            # This lets us ensure that the devserver can run our task
+            # See https://github.com/GoogleCloudPlatform/appengine-python-standard/issues/45
+            six.ensure_text(task.payload)
+            run_from_task(task)
+
+        assert none_throws(Event.get_by_id("2011ct")).timezone_id is not None
