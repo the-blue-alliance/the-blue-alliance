@@ -4,6 +4,7 @@ import EventMatchResultsTab from "../EventMatchResultsTab";
 
 describe("EventMatchResultsTab", () => {
   const mockMakeTrustedRequest = jest.fn();
+  const mockMakeApiV3Request = jest.fn();
   const selectedEvent = "2024nytr";
 
   beforeEach(() => {
@@ -11,26 +12,41 @@ describe("EventMatchResultsTab", () => {
   });
 
   describe("Rendering", () => {
-    it("renders the main tab structure with correct headings and labels", () => {
+    it("renders the main tab structure with both subcomponents", () => {
       const html = renderToStaticMarkup(
         <EventMatchResultsTab
           selectedEvent={selectedEvent}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
-      expect(html).toContain('id="results"');
-      expect(html).toContain("Upload Match Results");
+      expect(html).toContain('id="matches"');
+      expect(html).toContain("Match Results");
+      expect(html).toContain("FMS Match Results Import");
+      expect(html).toContain("Manual Match Score Entry");
+    });
+
+    it("renders FMS import section with correct labels", () => {
+      const html = renderToStaticMarkup(
+        <EventMatchResultsTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
       expect(html).toContain("FMS Results Excel File");
       expect(html).toContain("Playoff Format");
       expect(html).toContain("Number of Playoff Alliances");
     });
 
-    it("renders playoff format options", () => {
+    it("renders playoff format options in FMS section", () => {
       const html = renderToStaticMarkup(
         <EventMatchResultsTab
           selectedEvent={selectedEvent}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
@@ -41,11 +57,12 @@ describe("EventMatchResultsTab", () => {
       expect(html).toContain("Double Elimination");
     });
 
-    it("renders alliance count options", () => {
+    it("renders alliance count options in FMS section", () => {
       const html = renderToStaticMarkup(
         <EventMatchResultsTab
           selectedEvent={selectedEvent}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
@@ -55,14 +72,28 @@ describe("EventMatchResultsTab", () => {
       expect(html).toContain('value="16"');
       expect(html).toContain("16 Alliances");
     });
-  });
 
-  describe("Component Structure", () => {
-    it("contains file input for results upload", () => {
+    it("renders manual entry section with fetch button", () => {
       const html = renderToStaticMarkup(
         <EventMatchResultsTab
           selectedEvent={selectedEvent}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      expect(html).toContain("Fetch Matches");
+      expect(html).toContain("Match Score Entry");
+    });
+  });
+
+  describe("Component Structure", () => {
+    it("contains file input for FMS results upload", () => {
+      const html = renderToStaticMarkup(
+        <EventMatchResultsTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
@@ -71,11 +102,12 @@ describe("EventMatchResultsTab", () => {
       expect(html).toContain('accept=".xls,.xlsx"');
     });
 
-    it("contains radio buttons for playoff format", () => {
+    it("contains radio buttons for playoff format in FMS section", () => {
       const html = renderToStaticMarkup(
         <EventMatchResultsTab
           selectedEvent={selectedEvent}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
@@ -83,15 +115,16 @@ describe("EventMatchResultsTab", () => {
       expect(html).toContain('name="playoff-format-results"');
     });
 
-    it("does not show preview table initially", () => {
+    it("does not show confirmation dialog initially", () => {
       const html = renderToStaticMarkup(
         <EventMatchResultsTab
           selectedEvent={selectedEvent}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
-      expect(html).not.toContain("Match Results Preview");
+      expect(html).not.toContain("Confirm Match Results Upload");
     });
 
     it("disables file input when no event is selected", () => {
@@ -99,6 +132,7 @@ describe("EventMatchResultsTab", () => {
         <EventMatchResultsTab
           selectedEvent={null}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
@@ -110,6 +144,7 @@ describe("EventMatchResultsTab", () => {
         <EventMatchResultsTab
           selectedEvent={selectedEvent}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
@@ -124,15 +159,30 @@ describe("EventMatchResultsTab", () => {
       expect(hasDisabled).toBe(false);
     });
 
-    it("renders description about overwriting data", () => {
+    it("renders description about overwriting data in FMS section", () => {
       const html = renderToStaticMarkup(
         <EventMatchResultsTab
           selectedEvent={selectedEvent}
           makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
         />
       );
 
       expect(html).toContain("overwrite data");
+    });
+
+    it("includes both FMS and manual entry sections separated by hr", () => {
+      const html = renderToStaticMarkup(
+        <EventMatchResultsTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      expect(html).toContain("<hr");
+      expect(html).toContain("FMS Match Results Import");
+      expect(html).toContain("Manual Match Score Entry");
     });
   });
 });

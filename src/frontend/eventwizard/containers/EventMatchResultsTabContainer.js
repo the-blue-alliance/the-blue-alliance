@@ -1,6 +1,7 @@
 import { connect } from "react-redux";
 import EventMatchResultsTab from "../components/eventMatchResultsTab/EventMatchResultsTab";
 import makeTrustedApiRequest from "../net/TrustedApiRequest";
+import makeApiV3Request from "../net/ApiV3Request";
 
 const mapStateToProps = (state) => ({
   selectedEvent: state.auth.selectedEvent,
@@ -13,6 +14,9 @@ const mapStateToProps = (state) => ({
       onSuccess,
       onError
     );
+  },
+  makeApiV3Request: (requestPath, onSuccess, onError) => {
+    makeApiV3Request(state.auth.authId, requestPath, onSuccess, onError);
   },
 });
 
