@@ -84,6 +84,12 @@ class EventConverter(ConverterBase):
         if event.year >= 2026:
             event_dict["address"] = event.venue_address or event_dict.get("address")
             event_dict["location_name"] = event.venue or event_dict.get("location_name")
+            event_dict["city"] = event.city or event_dict.get("city")
+            event_dict["state_prov"] = event.state_prov or event_dict.get("state_prov")
+            event_dict["country"] = event.country or event_dict.get("country")
+            event_dict["postal_code"] = event.postalcode or event_dict.get(
+                "postal_code"
+            )
             # Drop our lat/lng + gmaps_place_id/gmaps_url
             event_dict["lat"] = None
             event_dict["lng"] = None

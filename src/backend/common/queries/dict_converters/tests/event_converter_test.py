@@ -144,7 +144,7 @@ def test_eventConverter_v3_2026_with_normalized_location(ndb_context) -> None:
     assert converted["city"] == "San Jose"
     assert converted["state_prov"] == "CA"
     assert converted["country"] == "USA"
-    assert converted["postal_code"] == "95120"
+    assert converted["postal_code"] == "95126"
     assert converted["lat"] is None
     assert converted["lng"] is None
     assert converted["gmaps_place_id"] is None
