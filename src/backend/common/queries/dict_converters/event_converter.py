@@ -78,25 +78,20 @@ class EventConverter(ConverterBase):
             "remap_teams": event.remap_teams,
         }
         event_dict.update(cls.constructLocation_v3(event))
-        # TODO: Move these into the dict above.
-        # For now, they need to come AFTER our `constructLocation_v3`
-        # This is because our `constructLocation_v3` will use the Event.normalized_location
-        # for the `location_name` and `address` keys. However, we'd like to use the FRC-API
-        # address and venue as opposed to the `normalized_location` values for events 2026+
-        # or in the legacy case where we have normalized locations but not `venue`/`venue_address`
-        # Move these sets up once we remove normalized_location ~ZachOrr
-        #
-        # For 2026 onward, always use FRC-API `venue_address` and `venue`
+        # For 2026 onward, always use FRC-API `venue_address` and `venue` (and other bits)
         # Otherwise, use our `normalized_location` if available, fallback to FRC-API data.
         # This is because some old events (ex: see `2001cmp`) do not have venue/venue_address
         if event.year >= 2026:
-            event_dict["address"] = event.venue_address
-            event_dict["location_name"] = event.venue
+            event_dict["address"] = event.venue_address or event_dict.get("address")
+            event_dict["location_name"] = event.venue or event_dict.get("location_name")
+            # Drop our lat/lng + gmaps_place_id/gmaps_url
+            event_dict["lat"] = None
+            event_dict["lng"] = None
+            event_dict["gmaps_place_id"] = None
+            event_dict["gmaps_url"] = None
         else:
-            if event_dict["address"] == None:
-                event_dict["address"] = event.venue_address
-            if event_dict["location_name"] == None:
-                event_dict["location_name"] = event.venue
+            event_dict["address"] = event_dict.get("address") or event.venue_address
+            event_dict["location_name"] = event_dict.get("location_name") or event.venue
 
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()
