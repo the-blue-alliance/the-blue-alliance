@@ -6,9 +6,10 @@ from google.appengine.ext import ndb
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import TeamKey
 from backend.common.models.location import Location
+from backend.common.protocols.locatable import Locatable
 
 
-class Team(CachedModel):
+class Team(CachedModel, Locatable):
     """
     Teams represent FIRST Robotics Competition teams.
     key_name is like 'frc177'

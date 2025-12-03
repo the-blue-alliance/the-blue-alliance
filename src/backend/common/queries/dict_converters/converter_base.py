@@ -1,19 +1,11 @@
 import abc
-from typing import Dict, Generic, List, Protocol, Union
+from typing import Dict, Generic, List, Union
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.helpers.listify import delistify, listify
-from backend.common.models.location import Location
 from backend.common.profiler import Span
+from backend.common.protocols.locatable import Locatable
 from backend.common.queries.types import DictQueryReturn, QueryReturn
-
-
-class Locatable(Protocol):
-    city: str | None
-    state_prov: str | None
-    country: str | None
-    postalcode: str | None
-    nl: Location | None
 
 
 class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
