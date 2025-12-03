@@ -79,9 +79,9 @@ class EventConverter(ConverterBase):
         }
         event_dict.update(cls.constructLocation_v3(event))
 
-        # If we don't have a geocoded address or location, use FRC API address + venue
-        event_dict["address"] = event_dict.get("address") or event.venue_address
-        event_dict["location_name"] = event_dict.get("location_name") or event.venue
+        # Use FRC API address + venue, fallback to geocoded location
+        event_dict["address"] = event.venue_address or event_dict.get("address")
+        event_dict["location_name"] = event.venue or event_dict.get("location_name")
 
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()

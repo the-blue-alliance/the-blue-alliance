@@ -1,6 +1,5 @@
 from typing import List, TypedDict
 
-import pytest
 from google.appengine.ext import ndb
 
 from backend.common.consts.api_version import ApiMajorVersion
@@ -52,8 +51,7 @@ def test_convert_none() -> None:
     assert converted is None
 
 
-@pytest.mark.parametrize("official", [True, False])
-def test_constructLocation_v3_legacy(official: bool) -> None:
+def test_constructLocation_v3_location_event() -> None:
     location = Location(
         name="Test",
         formatted_address="1234 Street St., San Jose, CA 95120, USA",
@@ -63,46 +61,53 @@ def test_constructLocation_v3_legacy(official: bool) -> None:
         state_prov_short="CA",
         country="United States",
         country_short="US",
-        place_details={},
+        place_details={"url": "some_url"},
     )
-    event = Event(normalized_location=location, official=official, year=2025)
+    event = Event(
+        city="Anytown",
+        state_prov="MI",
+        country="USA",
+        postalcode="90216",
+        normalized_location=location,
+    )
     converted = ConverterBase.constructLocation_v3(event)
 
-    assert converted["location_name"] == location.name
+    # Should use the Event location as opposed to geocoded location
+    assert converted["city"] == event.city
+    assert converted["country"] == event.country
+    assert converted["state_prov"] == event.state_prov
+    assert converted["postal_code"] == event.postalcode
+    assert converted["location_name"] == "Test"
+    assert converted["address"] == "1234 Street St., San Jose, CA 95120, USA"
+    assert converted["lat"] is None
+    assert converted["lng"] is None
+    assert converted["gmaps_place_id"] is None
+    assert converted["gmaps_url"] is None
+
+
+def test_constructLocation_v3_location() -> None:
+    location = Location(
+        name="Test",
+        formatted_address="1234 Street St., San Jose, CA 95120, USA",
+        lat_lng=ndb.GeoPt(30, 40),
+        city="San Jose",
+        state_prov="California",
+        state_prov_short="CA",
+        country="United States",
+        country_short="US",
+        place_details={"url": "some_url"},
+    )
+    event = Event(normalized_location=location)
+    converted = ConverterBase.constructLocation_v3(event)
+
+    # Fallback to geocoded location if the event does not have location information
     assert converted["city"] == location.city
     assert converted["state_prov"] == location.state_prov_short
     assert converted["country"] == location.country_short_if_usa
-    assert converted["lat"] == location.lat_lng.lat
-    assert converted["lng"] == location.lat_lng.lon
-
-
-@pytest.mark.parametrize("official", [True, False])
-def test_constructLocation_v3(official: bool) -> None:
-    location = Location(
-        name="Test",
-        formatted_address="1234 Street St., San Jose, CA 95120, USA",
-        lat_lng=ndb.GeoPt(30, 40),
-        city="San Jose",
-        state_prov="California",
-        state_prov_short="CA",
-        country="United States",
-        country_short="US",
-        place_details={},
-    )
-    event = Event(normalized_location=location, official=official, year=2026)
-    converted = ConverterBase.constructLocation_v3(event)
-
-    if official:
-        assert converted["location_name"] is None
-        assert converted["city"] is None
-        assert converted["state_prov"] is None
-        assert converted["country"] is None
-        assert converted["lat"] is None
-        assert converted["lng"] is None
-    else:
-        assert converted["location_name"] == location.name
-        assert converted["city"] == location.city
-        assert converted["state_prov"] == location.state_prov_short
-        assert converted["country"] == location.country_short_if_usa
-        assert converted["lat"] == location.lat_lng.lat
-        assert converted["lng"] == location.lat_lng.lon
+    assert converted["postal_code"] == location.postal_code
+    assert converted["location_name"] == "Test"
+    assert converted["address"] == "1234 Street St., San Jose, CA 95120, USA"
+    assert converted["lat"] is None
+    assert converted["lng"] is None
+    assert converted["gmaps_place_id"] is None
+    assert converted["gmaps_url"] is None
