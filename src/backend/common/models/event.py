@@ -34,7 +34,6 @@ from backend.common.models.event_ranking import EventRanking
 from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast, WebcastOnlineStatus
-from backend.common.protocols.locatable import Locatable
 from backend.common.tasklets import typed_toplevel
 
 if typing.TYPE_CHECKING:
@@ -43,7 +42,7 @@ if typing.TYPE_CHECKING:
     from backend.common.models.team import Team
 
 
-class Event(CachedModel, Locatable):
+class Event(CachedModel):
     """
     Events represent FIRST Robotics Competition events, both official and unofficial.
     key_name is like '2010ct'
