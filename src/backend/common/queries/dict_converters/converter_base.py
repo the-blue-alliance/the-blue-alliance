@@ -4,6 +4,7 @@ from typing import Dict, Generic, List, Union
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.helpers.listify import delistify, listify
 from backend.common.profiler import Span
+from backend.common.protocols.locatable import Locatable
 from backend.common.queries.types import DictQueryReturn, QueryReturn
 
 
@@ -38,25 +39,19 @@ class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
         return [{} for model in model_list]
 
     @classmethod
-    def constructLocation_v3(cls, model) -> Dict:
+    def constructLocation_v3(cls, model: Locatable) -> Dict:
         """
         Works for teams and events
         """
-        has_nl = (
-            model.nl
-            and model.nl.city
-            and model.nl.state_prov_short
-            and model.nl.country_short_if_usa
-        )
         return {
-            "city": model.nl.city if has_nl else model.city,
-            "state_prov": model.nl.state_prov_short if has_nl else model.state_prov,
-            "country": model.nl.country_short_if_usa if has_nl else model.country,
-            "postal_code": model.nl.postal_code if has_nl else model.postalcode,
-            "lat": model.nl.lat_lng.lat if has_nl else None,
-            "lng": model.nl.lat_lng.lon if has_nl else None,
-            "location_name": model.nl.name if has_nl else None,
-            "address": model.nl.formatted_address if has_nl else None,
-            "gmaps_place_id": model.nl.place_id if has_nl else None,
-            "gmaps_url": model.nl.place_details.get("url") if has_nl else None,
+            "city": model.city or (model.nl and model.nl.city),
+            "state_prov": model.state_prov or (model.nl and model.nl.state_prov_short),
+            "country": model.country or (model.nl and model.nl.country_short_if_usa),
+            "postal_code": model.postalcode or (model.nl and model.nl.postal_code),
+            "lat": None,
+            "lng": None,
+            "location_name": model.nl and model.nl.name,
+            "address": model.nl and model.nl.formatted_address,
+            "gmaps_place_id": None,
+            "gmaps_url": None,
         }
