@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { MatchLink } from 'app/components/tba/links';
 
 import PlayCircle from '~icons/bi/play-circle';
 
@@ -48,7 +49,7 @@ export default function SimpleMatchRowsWithBreaks({
     divs.push(
       <MatchRow
         match={match}
-        playoffType={event.playoff_type ?? PlayoffType.CUSTOM}
+        event={event}
         year={event.year}
         key={match.key}
         focusTeamKey={focusTeamKey}
@@ -79,15 +80,16 @@ export default function SimpleMatchRowsWithBreaks({
 
 export function MatchRow({
   match,
-  playoffType,
+  event,
   year,
   focusTeamKey,
 }: {
   match: Match;
-  playoffType: PlayoffType;
+  event: Event;
   year: number;
   focusTeamKey?: string;
 }) {
+  const playoffType = event.playoff_type ?? PlayoffType.CUSTOM;
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
@@ -118,7 +120,9 @@ export function MatchRow({
             xl:col-span-2 xl:row-span-1"
         >
           <span className="text-center text-sm">
-            {matchTitleShort(match, playoffType)}
+            <MatchLink matchOrKey={match} event={event}>
+              {matchTitleShort(match, playoffType)}
+            </MatchLink>
           </span>
         </div>
 
