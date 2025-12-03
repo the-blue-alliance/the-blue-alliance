@@ -271,19 +271,19 @@ export type Event = {
    */
   postal_code: string | null;
   /**
-   * Google Maps Place ID for the event address.
+   * Google Maps Place ID for the event address. Will be NULL, for future development.
    */
   gmaps_place_id: string | null;
   /**
-   * Link to address location on Google Maps.
+   * Link to address location on Google Maps. Will be NULL, for future development.
    */
   gmaps_url: string | null;
   /**
-   * Latitude for the event address.
+   * Latitude for the event address. Will be NULL, for future development.
    */
   lat: number | null;
   /**
-   * Longitude for the event address.
+   * Longitude for the event address. Will be NULL, for future development.
    */
   lng: number | null;
   /**
@@ -291,7 +291,7 @@ export type Event = {
    */
   location_name: string | null;
   /**
-   * Timezone name.
+   * IANA Timezone identifier.
    */
   timezone: string | null;
   /**
