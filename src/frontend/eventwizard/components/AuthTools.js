@@ -1,21 +1,37 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import Alert from "@mui/material/Alert";
 
 class AuthTools extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      alert: null,
+    };
     this.storeAuth = this.storeAuth.bind(this);
     this.loadAuth = this.loadAuth.bind(this);
+    this.clearAlert = this.clearAlert.bind(this);
+  }
+
+  clearAlert() {
+    this.setState({ alert: null });
   }
 
   storeAuth() {
     if (!this.props.selectedEvent) {
-      alert("You must enter an event key");
+      this.setState({
+        alert: { severity: "error", message: "You must enter an event key" },
+      });
       return;
     }
 
     if (!this.props.authId || !this.props.authSecret) {
-      alert("You must enter you auth ID and secret");
+      this.setState({
+        alert: {
+          severity: "error",
+          message: "You must enter you auth ID and secret",
+        },
+      });
       return;
     }
 
@@ -27,24 +43,31 @@ class AuthTools extends Component {
       `${this.props.selectedEvent}_auth`,
       JSON.stringify(auth)
     );
-    alert("Auth Stored");
+    this.setState({ alert: { severity: "success", message: "Auth Stored" } });
   }
 
   loadAuth() {
     if (!this.props.selectedEvent) {
-      alert("You must select an event");
+      this.setState({
+        alert: { severity: "error", message: "You must select an event" },
+      });
       return;
     }
 
     const auth = localStorage.getItem(`${this.props.selectedEvent}_auth`);
     if (!auth) {
-      alert(`No auth found for ${this.props.selectedEvent}`);
+      this.setState({
+        alert: {
+          severity: "error",
+          message: `No auth found for ${this.props.selectedEvent}`,
+        },
+      });
       return;
     }
 
     const authData = JSON.parse(auth);
     this.props.setAuth(authData.id, authData.secret);
-    alert("Auth Loaded");
+    this.setState({ alert: { severity: "success", message: "Auth Loaded" } });
   }
 
   render() {
@@ -58,6 +81,16 @@ class AuthTools extends Component {
           Auth Tools
         </label>
         <div className="col-sm-10">
+          {this.state.alert && (
+            <Alert
+              severity={this.state.alert.severity}
+              icon={false}
+              onClose={this.clearAlert}
+              sx={{ mb: 2, fontSize: 14 }}
+            >
+              {this.state.alert.message}
+            </Alert>
+          )}
           <button
             type="button"
             className="btn btn-default"

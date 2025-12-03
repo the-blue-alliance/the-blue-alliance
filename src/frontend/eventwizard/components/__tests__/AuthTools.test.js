@@ -4,12 +4,9 @@ import AuthTools from "../AuthTools";
 
 describe("AuthTools", () => {
   const mockSetAuth = jest.fn();
-  let mockAlert;
   let mockLocalStorage;
 
   beforeEach(() => {
-    mockAlert = jest.fn();
-    global.alert = mockAlert;
     mockLocalStorage = {
       getItem: jest.fn(),
       setItem: jest.fn(),
@@ -19,7 +16,6 @@ describe("AuthTools", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    delete global.alert;
     delete global.localStorage;
   });
 
@@ -115,12 +111,18 @@ describe("AuthTools", () => {
       selectedEvent: "2024test",
       setAuth: mockSetAuth,
     });
+    // Mock setState to capture the state change
+    component.setState = jest.fn((newState) => {
+      component.state = { ...component.state, ...newState };
+    });
     component.storeAuth();
     expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
       "2024test_auth",
       JSON.stringify({ id: "test_id", secret: "test_secret" })
     );
-    expect(mockAlert).toHaveBeenCalledWith("Auth Stored");
+    expect(component.setState).toHaveBeenCalledWith({
+      alert: { severity: "success", message: "Auth Stored" },
+    });
   });
 
   it("loads auth from localStorage when loadAuth is called", () => {
@@ -134,10 +136,16 @@ describe("AuthTools", () => {
       selectedEvent: "2024test",
       setAuth: mockSetAuth,
     });
+    // Mock setState to capture the state change
+    component.setState = jest.fn((newState) => {
+      component.state = { ...component.state, ...newState };
+    });
     component.loadAuth();
     expect(mockLocalStorage.getItem).toHaveBeenCalledWith("2024test_auth");
     expect(mockSetAuth).toHaveBeenCalledWith("stored_id", "stored_secret");
-    expect(mockAlert).toHaveBeenCalledWith("Auth Loaded");
+    expect(component.setState).toHaveBeenCalledWith({
+      alert: { severity: "success", message: "Auth Loaded" },
+    });
   });
 
   it("shows alert when storing auth without event key", () => {
@@ -148,8 +156,12 @@ describe("AuthTools", () => {
       selectedEvent: "",
       setAuth: mockSetAuth,
     });
+    // Mock setState to capture the state change
+    component.setState = jest.fn();
     component.storeAuth();
-    expect(mockAlert).toHaveBeenCalledWith("You must enter an event key");
+    expect(component.setState).toHaveBeenCalledWith({
+      alert: { severity: "error", message: "You must enter an event key" },
+    });
     expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
   });
 
@@ -161,10 +173,15 @@ describe("AuthTools", () => {
       selectedEvent: "2024test",
       setAuth: mockSetAuth,
     });
+    // Mock setState to capture the state change
+    component.setState = jest.fn();
     component.storeAuth();
-    expect(mockAlert).toHaveBeenCalledWith(
-      "You must enter you auth ID and secret"
-    );
+    expect(component.setState).toHaveBeenCalledWith({
+      alert: {
+        severity: "error",
+        message: "You must enter you auth ID and secret",
+      },
+    });
     expect(mockLocalStorage.setItem).not.toHaveBeenCalled();
   });
 
@@ -177,8 +194,48 @@ describe("AuthTools", () => {
       selectedEvent: "2024test",
       setAuth: mockSetAuth,
     });
+    // Mock setState to capture the state change
+    component.setState = jest.fn();
     component.loadAuth();
-    expect(mockAlert).toHaveBeenCalledWith("No auth found for 2024test");
+    expect(component.setState).toHaveBeenCalledWith({
+      alert: {
+        severity: "error",
+        message: "No auth found for 2024test",
+      },
+    });
     expect(mockSetAuth).not.toHaveBeenCalled();
+  });
+
+  it("shows alert when loading auth without event selected", () => {
+    const component = new AuthTools({
+      authId: "",
+      authSecret: "",
+      manualEvent: true,
+      selectedEvent: "",
+      setAuth: mockSetAuth,
+    });
+    // Mock setState to capture the state change
+    component.setState = jest.fn();
+    component.loadAuth();
+    expect(component.setState).toHaveBeenCalledWith({
+      alert: { severity: "error", message: "You must select an event" },
+    });
+    expect(mockLocalStorage.getItem).not.toHaveBeenCalled();
+    expect(mockSetAuth).not.toHaveBeenCalled();
+  });
+
+  it("clears alert when clearAlert is called", () => {
+    const component = new AuthTools({
+      authId: "",
+      authSecret: "",
+      manualEvent: true,
+      selectedEvent: "",
+      setAuth: mockSetAuth,
+    });
+    // Mock setState
+    component.setState = jest.fn();
+    // Call clearAlert
+    component.clearAlert();
+    expect(component.setState).toHaveBeenCalledWith({ alert: null });
   });
 });
