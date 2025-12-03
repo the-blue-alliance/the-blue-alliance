@@ -45,8 +45,7 @@ export function parseFmsAlliancesFile(file) {
         for (const row of rows) {
           const teamsStr = row[teamsCol];
           if (!teamsStr || teamsStr.trim() === "") {
-            // Empty alliance
-            alliances.push([]);
+            // Skip empty rows
             continue;
           }
 

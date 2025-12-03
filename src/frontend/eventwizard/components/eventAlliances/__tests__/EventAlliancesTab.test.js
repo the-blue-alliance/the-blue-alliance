@@ -24,9 +24,8 @@ describe("EventAlliancesTab", () => {
       );
 
       expect(screen.getByText("Alliance Selection")).toBeInTheDocument();
-      expect(
-        screen.getByText("Alliance Selection Configuration")
-      ).toBeInTheDocument();
+      expect(screen.getByText("FMS Alliance Import")).toBeInTheDocument();
+      expect(screen.getByText("Manual Alliance Entry")).toBeInTheDocument();
       expect(screen.getByText("Alliance Selection Data")).toBeInTheDocument();
     });
 
