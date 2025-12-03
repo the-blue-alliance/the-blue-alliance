@@ -67,9 +67,6 @@ def event_post_update_hook(updated_models: List[TUpdatedModel[Event]]) -> None:
     events = []
     for updated in updated_models:
         event: Event = updated.model
-        # Only non-Official (events that don't sync via FRC Events) need geocoding
-        if event.official:
-            continue
 
         try:
             LocationHelper.update_event_location(event)
@@ -80,7 +77,12 @@ def event_post_update_hook(updated_models: List[TUpdatedModel[Event]]) -> None:
             logging.exception(e)
 
         try:
-            if event.normalized_location and event.normalized_location.lat_lng:
+            # Official events will get their timezone from the FRC API
+            if (
+                not event.official
+                and event.normalized_location
+                and event.normalized_location.lat_lng
+            ):
                 timezone_id = LocationHelper.get_timezone_id(
                     None, lat_lng=event.normalized_location.lat_lng
                 )

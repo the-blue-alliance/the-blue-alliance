@@ -592,19 +592,19 @@ def test_disable_sync_by_mask() -> None:
         ), f"Sync should be {expected} for {sync_type} when official"
 
 
-def test_nl_legacy_events() -> None:
+def test_nl_legacy_event() -> None:
     event = Event(id="2024miket", year=2024, normalized_location=Location())
     assert event.nl is not None
 
 
-def test_nl_official_events() -> None:
+def test_nl_official_event() -> None:
     event = Event(
         id="2026miket", year=2026, official=True, normalized_location=Location()
     )
     assert event.nl is None
 
 
-def test_nl_unofficial_events() -> None:
+def test_nl_unofficial_event() -> None:
     event = Event(
         id="2026miket", year=2026, official=False, normalized_location=Location()
     )
