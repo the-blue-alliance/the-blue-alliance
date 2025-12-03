@@ -68,7 +68,7 @@ def event_post_update_hook(updated_models: List[TUpdatedModel[Event]]) -> None:
     for updated in updated_models:
         event: Event = updated.model
         # Only update location for offseason/unofficial events that do not have timezone data
-        if event.official or event.timezone_id != None:
+        if event.official or event.timezone_id is not None:
             continue
 
         try:
