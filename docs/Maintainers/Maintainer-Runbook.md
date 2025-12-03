@@ -4,7 +4,8 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
 
 1) Update the [`runtime` directive in the service `.yaml` files](https://cloud.google.com/appengine/docs/standard/python3/config/appref)
 2) Update the [`python-version`](https://docs.github.com/en/actions/guides/building-and-testing-python#specifying-a-python-version) in the GitHub Actions (`.github/workflows/*.yml`) files
-3) Update the [[Repo Setup|Repo-Setup]] docs to reflect the new Python version
+3) Update the `runtime_version` variable in [`ops/dev/vagrant/dev_appserver.sh`](https://github.com/the-blue-alliance/the-blue-alliance/blob/93540b694209c98b3f65cbbbef9c585593ef5761/ops/dev/vagrant/dev_appserver.sh#L92)
+4) Update the [[Repo Setup|Repo-Setup]] docs to reflect the new Python version
 
 
 ## Building a New Development Container Version
