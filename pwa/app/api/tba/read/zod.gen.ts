@@ -992,7 +992,7 @@ export const zMedia = z.object({
   foreign_key: z.string(),
   details: z.optional(
     z.union([
-      z.record(z.string(), z.unknown()),
+      z.record(z.string(), z.never()),
       z.object({
         base64Image: z.string(),
       }),
