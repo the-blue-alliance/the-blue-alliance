@@ -253,7 +253,7 @@ export async function queryFromAPI<T>(
 
 // https://web.archive.org/web/20250409124545/https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
 // Typically used for sorting WLTRecords
-export function confidence(ups: number, downs: number, z = 1.96): number {
+export function confidence(ups: number, downs: number, z = 3): number {
   const n = ups + downs;
   if (n === 0) {
     return 0;
