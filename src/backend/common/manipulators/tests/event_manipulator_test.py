@@ -1,6 +1,5 @@
 import datetime
 import json
-from typing import Optional
 from unittest.mock import patch
 
 import pytest
@@ -82,9 +81,9 @@ def assert_old_event(event: Event) -> None:
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 def test_createOrUpdate(old_event: Event, new_event: Event) -> None:
     EventManipulator.createOrUpdate(old_event)
-    assert_old_event(Event.get_by_id("2011ct"))
+    assert_old_event(none_throws(Event.get_by_id("2011ct")))
     EventManipulator.createOrUpdate(new_event)
-    assert_merged_event(Event.get_by_id("2011ct"))
+    assert_merged_event(none_throws(Event.get_by_id("2011ct")))
 
 
 @pytest.mark.usefixtures("ndb_context")
@@ -101,9 +100,9 @@ def test_updateMerge(old_event: Event, new_event: Event) -> None:
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 def test_updateWebcast_noUnion(old_event: Event, new_event: Event) -> None:
     EventManipulator.createOrUpdate(old_event)
-    assert_old_event(Event.get_by_id("2011ct"))
+    assert_old_event(none_throws(Event.get_by_id("2011ct")))
     EventManipulator.createOrUpdate(new_event, auto_union=False)
-    check = Event.get_by_id("2011ct")
+    check = none_throws(Event.get_by_id("2011ct"))
     assert check.webcast == new_event.webcast
 
 
