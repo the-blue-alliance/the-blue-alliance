@@ -7,7 +7,6 @@ import EventScheduleTabContainer from "../containers/EventScheduleTabContainer";
 import MatchPlayTabContainer from "../containers/MatchPlayTabContainer";
 import EventMatchResultsTabContainer from "../containers/EventMatchResultsTabContainer";
 import EventRankingsTabContainer from "../containers/EventRankingsTabContainer";
-import FmsAlliancesTabContainer from "../containers/FmsAlliancesTabContainer";
 import EventAlliancesTabContainer from "../containers/EventAlliancesTabContainer";
 
 const NotAvailableMessage = () => (
@@ -33,11 +32,6 @@ const EventWizardTabFrame = () => (
             </a>
           </li>
           <li>
-            <a href="#awards" data-toggle="tab">
-              Awards
-            </a>
-          </li>
-          <li>
             <a href="#schedule" data-toggle="tab">
               FMS Schedule Import
             </a>
@@ -53,23 +47,23 @@ const EventWizardTabFrame = () => (
             </a>
           </li>
           <li>
+            <a href="#match-videos" data-toggle="tab">
+              Match Videos
+            </a>
+          </li>
+          <li>
             <a href="#rankings" data-toggle="tab">
               FMS Rankings Import
             </a>
           </li>
           <li>
             <a href="#alliances" data-toggle="tab">
-              Alliance Selection
+              Alliance Selections
             </a>
           </li>
           <li>
-            <a href="#fms-alliances" data-toggle="tab">
-              FMS Alliances
-            </a>
-          </li>
-          <li>
-            <a href="#match-videos" data-toggle="tab">
-              Match Videos
+            <a href="#awards" data-toggle="tab">
+              Awards
             </a>
           </li>
         </ul>
@@ -78,14 +72,13 @@ const EventWizardTabFrame = () => (
     <div className="tab-content row">
       <EventInfoContainer />
       <TeamListContainer />
-      <AwardsTabContainer />
-      <MatchVideosContainer />
       <EventScheduleTabContainer />
       <MatchPlayTabContainer />
       <EventMatchResultsTabContainer />
+      <MatchVideosContainer />
       <EventRankingsTabContainer />
       <EventAlliancesTabContainer />
-      <FmsAlliancesTabContainer />
+      <AwardsTabContainer />
     </div>
   </div>
 );
