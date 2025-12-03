@@ -144,11 +144,12 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             # Attempt to convert our API (Windows) timezone -> IANA timezone
             # We'll ensure it's capatiable with pytz as well, since that's what we use everywhere
             timezone = None
-            if api_timezone := event.get("timezone"):
-                if (
-                    iana_tz_name := WINDOWS_TO_IANA.get(api_timezone)
-                ) and iana_tz_name in PYTZ_ALL_TIMEZONES:
-                    timezone = iana_tz_name
+            if (
+                (api_timezone := event.get("timezone"))
+                and (iana_tz_name := WINDOWS_TO_IANA.get(api_timezone))
+                and iana_tz_name in PYTZ_ALL_TIMEZONES
+            ):
+                timezone = iana_tz_name
 
             # Special cases for champs
             if code in EVENT_CODE_EXCEPTIONS:

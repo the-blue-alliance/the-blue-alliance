@@ -78,26 +78,10 @@ class EventConverter(ConverterBase):
             "remap_teams": event.remap_teams,
         }
         event_dict.update(cls.constructLocation_v3(event))
-        # For 2026 onward, always use FRC-API `venue_address` and `venue` (and other bits)
-        # Otherwise, use our `normalized_location` if available, fallback to FRC-API data.
-        # This is because some old events (ex: see `2001cmp`) do not have venue/venue_address
-        if event.year >= 2026:
-            event_dict["address"] = event.venue_address or event_dict.get("address")
-            event_dict["location_name"] = event.venue or event_dict.get("location_name")
-            event_dict["city"] = event.city or event_dict.get("city")
-            event_dict["state_prov"] = event.state_prov or event_dict.get("state_prov")
-            event_dict["country"] = event.country or event_dict.get("country")
-            event_dict["postal_code"] = event.postalcode or event_dict.get(
-                "postal_code"
-            )
-            # Drop our lat/lng + gmaps_place_id/gmaps_url
-            event_dict["lat"] = None
-            event_dict["lng"] = None
-            event_dict["gmaps_place_id"] = None
-            event_dict["gmaps_url"] = None
-        else:
-            event_dict["address"] = event_dict.get("address") or event.venue_address
-            event_dict["location_name"] = event_dict.get("location_name") or event.venue
+
+        # If we don't have a geocoded address or location, use FRC API address + venue
+        event_dict["address"] = event_dict.get("address") or event.venue_address
+        event_dict["location_name"] = event_dict.get("location_name") or event.venue
 
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()

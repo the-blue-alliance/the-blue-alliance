@@ -108,12 +108,6 @@ class TestEventManipulator(unittest.TestCase):
         update_location_mock.assert_not_called()
 
     @patch.object(LocationHelper, "update_event_location")
-    def test_update_location_has_timezone(self, update_location_mock) -> None:
-        self.old_event.timezone_id = "America/New_York"
-        EventManipulator.createOrUpdate(self.old_event)
-        update_location_mock.assert_not_called()
-
-    @patch.object(LocationHelper, "update_event_location")
     def test_update_location_on_update(self, update_location_mock) -> None:
         self.old_event.city = "Hartford"
         self.old_event.state_prov = "CT"

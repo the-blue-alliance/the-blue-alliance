@@ -529,6 +529,9 @@ class Event(CachedModel):
 
     @property
     def nl(self) -> Optional[Location]:
+        # zorr(12-03-2025): Deprecate nl for synced events
+        if self.year >= 2026 and self.official:
+            return None
         return self.normalized_location
 
     @property

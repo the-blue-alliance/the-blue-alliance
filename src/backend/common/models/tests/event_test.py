@@ -20,6 +20,7 @@ from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import Year
+from backend.common.models.location import Location
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.models.tests.util import (
@@ -589,3 +590,22 @@ def test_disable_sync_by_mask() -> None:
         assert (
             event.is_sync_enabled(sync_type) == expected
         ), f"Sync should be {expected} for {sync_type} when official"
+
+
+def test_nl_legacy_events() -> None:
+    event = Event(id="2024miket", year=2024, normalized_location=Location())
+    assert event.nl is not None
+
+
+def test_nl_official_events() -> None:
+    event = Event(
+        id="2026miket", year=2026, official=True, normalized_location=Location()
+    )
+    assert event.nl is None
+
+
+def test_nl_unofficial_events() -> None:
+    event = Event(
+        id="2026miket", year=2026, official=False, normalized_location=Location()
+    )
+    assert event.nl is not None
