@@ -9292,7 +9292,8 @@
             "oneOf": [
               {
                 "type": "object",
-                "properties": {}
+                "properties": {},
+                "additionalProperties": false
               },
               {
                 "properties": {
