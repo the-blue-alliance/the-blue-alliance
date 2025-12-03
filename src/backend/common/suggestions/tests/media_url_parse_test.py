@@ -1,5 +1,6 @@
 import json
 import unittest
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -207,6 +208,66 @@ class TestMediaUrlParser(unittest.TestCase):
         self.assertEqual(
             MediaParser.partial_media_dict_from_url("http://foo.bar"), None
         )
+
+    def test_cd_thread_parse_success(self) -> None:
+        urls = [
+            "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115",
+            "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115?u=stray_username",
+            "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115?u=1234",
+            "https://www.chiefdelphi.com/t/506115",
+            "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115/10",
+            "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115/10?u=stray_username",
+            "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115/10?u=1234",
+        ]
+
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "title": "Team 254 presents 2025 Undertow technical binder code Q&A",
+            "image_url": "https://www.chiefdelphi.com/uploads/default/optimized/4X/8/6/8/8681c45bd475d3f1b23f3af4f7b3a77df8a0e1cf_2_1024x750.jpeg",
+        }
+
+        for url in urls:
+            with self.subTest(url=url):
+                with patch(
+                    "backend.common.suggestions.media_parser.requests.get",
+                    return_value=mock_response,
+                ):
+                    result = MediaParser.partial_media_dict_from_url(url)
+                    self.assertIsNotNone(result)
+                    self.assertEqual(
+                        result["media_type_enum"], MediaType.CD_THREAD
+                    )
+                    self.assertEqual(result["foreign_key"], "506115")
+                    self.assertEqual(
+                        result["site_name"], TYPE_NAMES[MediaType.CD_THREAD]
+                    )
+                    self.assertEqual(
+                        result["profile_url"], "https://www.chiefdelphi.com/t/506115"
+                    )
+                    self.assertEqual(
+                        result["details_json"],
+                        json.dumps(
+                            {
+                                "thread_title": "Team 254 presents 2025 Undertow technical binder code Q&A",
+                                "image_url": "https://www.chiefdelphi.com/uploads/default/optimized/4X/8/6/8/8681c45bd475d3f1b23f3af4f7b3a77df8a0e1cf_2_1024x750.jpeg",
+                            }
+                        ),
+                    )
+
+    def test_cd_thread_parse_cd_unavailable(self) -> None:
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_response.json.return_value = None
+
+        with patch(
+            "backend.common.suggestions.media_parser.requests.get",
+            return_value=mock_response,
+        ):
+            result = MediaParser.partial_media_dict_from_url(
+                "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115/10"
+            )
+            self.assertIsNone(result)
 
 
 class TestWebcastUrlParser(unittest.TestCase):

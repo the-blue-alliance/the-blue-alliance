@@ -198,6 +198,8 @@ class Media(CachedModel):
             return "https://cad.onshape.com/documents/{}".format(self.foreign_key)
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
+        elif self.media_type_enum == MediaType.CD_THREAD:
+            return "https://www.chiefdelphi.com/t/{}".format(self.foreign_key)
         else:
             return ""
 
