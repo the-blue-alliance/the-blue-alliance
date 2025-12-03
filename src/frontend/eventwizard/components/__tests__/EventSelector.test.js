@@ -125,7 +125,8 @@ describe("EventSelector", () => {
     expect(mockSetEvent).toHaveBeenCalledWith("");
   });
 
-  it("calls setEvent when manual event key changes", () => {
+  it("calls setEvent when manual event key changes after debounce", () => {
+    jest.useFakeTimers();
     const component = new EventSelector({
       manualEvent: true,
       setEvent: mockSetEvent,
@@ -133,6 +134,12 @@ describe("EventSelector", () => {
       clearAuth: mockClearAuth,
     });
     component.onManualEventChange({ target: { value: "2024test" } });
+    // Should not be called immediately
+    expect(mockSetEvent).not.toHaveBeenCalled();
+    // Fast-forward time by 500ms (the debounce delay)
+    jest.advanceTimersByTime(500);
+    // Now it should have been called
     expect(mockSetEvent).toHaveBeenCalledWith("2024test");
+    jest.useRealTimers();
   });
 });

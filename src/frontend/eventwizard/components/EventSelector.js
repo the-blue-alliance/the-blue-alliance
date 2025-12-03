@@ -33,8 +33,16 @@ class EventSelector extends Component {
     this.state = {
       eventSelectLabel: "",
     };
+    this.debounceTimer = null;
     this.onEventSelected = this.onEventSelected.bind(this);
     this.onManualEventChange = this.onManualEventChange.bind(this);
+  }
+
+  componentWillUnmount() {
+    // Clean up timer on unmount
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
   }
 
   onEventSelected(newEvent) {
@@ -51,7 +59,17 @@ class EventSelector extends Component {
   }
 
   onManualEventChange(event) {
-    this.props.setEvent(event.target.value);
+    const value = event.target.value;
+
+    // Clear existing timer
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+
+    // Set new timer to update after 500ms of no typing
+    this.debounceTimer = setTimeout(() => {
+      this.props.setEvent(value);
+    }, 500);
   }
 
   render() {
