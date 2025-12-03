@@ -1,5 +1,5 @@
 x-env-vars: &env-vars
-  PROJECT_ID: tbatv-prod-hrd
+  PROJECT_ID: demo-test
 
 services:
   firebase:
