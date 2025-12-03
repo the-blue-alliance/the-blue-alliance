@@ -25,8 +25,8 @@ export default function SimpleMatchRowsWithBreaks({
     const match = matches[i];
     const maybeNextMatch = i < matches.length - 1 ? matches[i + 1] : null;
 
-    for (const breaker of breakers) {
-      const result = breaker({
+    for (let bi = 0; bi < breakers.length; bi++) {
+      const result = breakers[bi]({
         match,
         matchIndex: i,
         nextMatch: maybeNextMatch,
@@ -35,7 +35,10 @@ export default function SimpleMatchRowsWithBreaks({
 
       if (result.shouldBreak && result.whereToInsertBreak === 'before') {
         divs.push(
-          <BreakRow key={`break-${i}`} text={result.text ?? 'Break'} />,
+          <BreakRow
+            key={`break-before-${i}-${bi}`}
+            text={result.text ?? 'Break'}
+          />,
         );
       }
     }
@@ -49,8 +52,8 @@ export default function SimpleMatchRowsWithBreaks({
       />,
     );
 
-    for (const breaker of breakers) {
-      const result = breaker({
+    for (let bi = 0; bi < breakers.length; bi++) {
+      const result = breakers[bi]({
         match,
         matchIndex: i,
         nextMatch: maybeNextMatch,
@@ -59,7 +62,10 @@ export default function SimpleMatchRowsWithBreaks({
 
       if (result.shouldBreak && result.whereToInsertBreak === 'after') {
         divs.push(
-          <BreakRow key={`break-${i}`} text={result.text ?? 'Break'} />,
+          <BreakRow
+            key={`break-after-${i}-${bi}`}
+            text={result.text ?? 'Break'}
+          />,
         );
       }
     }
