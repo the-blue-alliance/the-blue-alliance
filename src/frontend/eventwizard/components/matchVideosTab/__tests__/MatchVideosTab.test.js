@@ -2,71 +2,286 @@
 
 import React from "react";
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import MatchVideosTab from "../MatchVideosTab";
 
 describe("MatchVideosTab", () => {
-  test("Add Videos button is disabled when no selectedEvent", () => {
-    const makeTrustedRequest = jest.fn();
-    render(
-      <MatchVideosTab
-        selectedEvent={""}
-        makeTrustedRequest={makeTrustedRequest}
-      />
-    );
+  const mockMakeTrustedRequest = jest.fn();
+  const mockMakeApiV3Request = jest.fn();
+  const selectedEvent = "2024nytr";
 
-    const btn = screen.getByRole("button", { name: /Add Videos/i });
-    expect(btn).toBeDisabled();
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  test("parses textarea lines and renders parsed videos with iframe src", () => {
-    const makeTrustedRequest = jest.fn();
-    const { container } = render(
-      <MatchVideosTab
-        selectedEvent={"evt1"}
-        makeTrustedRequest={makeTrustedRequest}
-      />
-    );
+  describe("Rendering", () => {
+    it("renders the component with correct headings", () => {
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
 
-    const textarea = screen.getByRole("textbox");
-    fireEvent.change(textarea, {
-      target: { value: "match1, abc\nmatch2, def?t=20" },
+      expect(screen.getByText("Match Videos")).toBeInTheDocument();
+      expect(
+        screen.getByText(/Fetch matches from TBA and add YouTube videos/)
+      ).toBeInTheDocument();
     });
 
-    // Parsed match keys are displayed
-    expect(screen.getByText("match1")).toBeInTheDocument();
-    expect(screen.getByText("match2")).toBeInTheDocument();
+    it("disables Fetch Matches button when no event is selected", () => {
+      render(
+        <MatchVideosTab
+          selectedEvent=""
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
 
-    const iframes = container.querySelectorAll("iframe");
-    expect(iframes.length).toBe(2);
-    expect(iframes[0].src).toContain("https://www.youtube.com/embed/abc");
-    // Ensure t= was replaced with start=
-    expect(iframes[1].src).toContain(
-      "https://www.youtube.com/embed/def?start=20"
-    );
+      const btn = screen.getByRole("button", { name: /Fetch Matches/i });
+      expect(btn).toBeDisabled();
+    });
+
+    it("enables Fetch Matches button when event is selected", () => {
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      const btn = screen.getByRole("button", { name: /Fetch Matches/i });
+      expect(btn).toBeEnabled();
+    });
   });
 
-  test("clicking Add Videos calls makeTrustedRequest with expected payload", () => {
-    const makeTrustedRequest = jest.fn();
-    render(
-      <MatchVideosTab
-        selectedEvent={"evX"}
-        makeTrustedRequest={makeTrustedRequest}
-      />
-    );
+  describe("Fetching Matches", () => {
+    it("calls makeApiV3Request when Fetch Matches is clicked", () => {
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
 
-    const textarea = screen.getByRole("textbox");
-    fireEvent.change(textarea, { target: { value: "m1,vid1\nm2,vid2" } });
+      const btn = screen.getByRole("button", { name: /Fetch Matches/i });
+      fireEvent.click(btn);
 
-    const btn = screen.getByRole("button", { name: /Add Videos/i });
-    expect(btn).toBeEnabled();
-    fireEvent.click(btn);
+      expect(mockMakeApiV3Request).toHaveBeenCalledWith(
+        `/api/v3/event/${selectedEvent}/matches`,
+        expect.any(Function),
+        expect.any(Function)
+      );
+    });
 
-    expect(makeTrustedRequest).toHaveBeenCalledTimes(1);
-    const [url, body, onSuccess, onError] = makeTrustedRequest.mock.calls[0];
-    expect(url).toBe("/api/trusted/v1/event/evX/match_videos/add");
-    expect(body).toBe(JSON.stringify({ m1: "vid1", m2: "vid2" }));
-    expect(typeof onSuccess).toBe("function");
-    expect(typeof onError).toBe("function");
+    it("displays matches after successful fetch", async () => {
+      const mockMatches = [
+        {
+          key: "2024nytr_qm1",
+          comp_level: "qm",
+          set_number: 1,
+          match_number: 1,
+          alliances: {
+            red: { team_keys: ["frc254", "frc971", "frc1678"], score: 100 },
+            blue: { team_keys: ["frc1323", "frc2056", "frc5499"], score: 90 },
+          },
+          videos: [],
+        },
+        {
+          key: "2024nytr_qm2",
+          comp_level: "qm",
+          set_number: 1,
+          match_number: 2,
+          alliances: {
+            red: { team_keys: ["frc254", "frc971", "frc1678"], score: 110 },
+            blue: { team_keys: ["frc1323", "frc2056", "frc5499"], score: 95 },
+          },
+          videos: [{ type: "youtube", key: "abc123" }],
+        },
+      ];
+
+      mockMakeApiV3Request.mockImplementation((path, onSuccess) => {
+        onSuccess(mockMatches);
+      });
+
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      const btn = screen.getByRole("button", { name: /Fetch Matches/i });
+      fireEvent.click(btn);
+
+      await waitFor(() => {
+        expect(screen.getByText("Qualification 1")).toBeInTheDocument();
+        expect(screen.getByText("Qualification 2")).toBeInTheDocument();
+      });
+
+      // Check that one match shows "No videos" and one shows video ID
+      expect(screen.getByText("No videos")).toBeInTheDocument();
+      expect(screen.getByText("abc123")).toBeInTheDocument();
+    });
+  });
+
+  describe("Adding Videos", () => {
+    beforeEach(async () => {
+      const mockMatches = [
+        {
+          key: "2024nytr_qm1",
+          comp_level: "qm",
+          set_number: 1,
+          match_number: 1,
+          alliances: {
+            red: { team_keys: ["frc254"], score: 100 },
+            blue: { team_keys: ["frc1323"], score: 90 },
+          },
+          videos: [],
+        },
+      ];
+
+      mockMakeApiV3Request.mockImplementation((path, onSuccess) => {
+        onSuccess(mockMatches);
+      });
+
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      const btn = screen.getByRole("button", { name: /Fetch Matches/i });
+      fireEvent.click(btn);
+
+      await waitFor(() => {
+        expect(screen.getByText("Qualification 1")).toBeInTheDocument();
+      });
+    });
+
+    it("adds a video when Add button is clicked", async () => {
+      mockMakeTrustedRequest.mockImplementation((path, body, onSuccess) => {
+        onSuccess();
+      });
+
+      const input = screen.getByPlaceholderText("YouTube ID");
+      fireEvent.change(input, { target: { value: "newVideoId123" } });
+
+      const addButton = screen.getByRole("button", { name: /Add/i });
+      fireEvent.click(addButton);
+
+      await waitFor(() => {
+        expect(mockMakeTrustedRequest).toHaveBeenCalledWith(
+          `/api/trusted/v1/event/${selectedEvent}/match_videos/add`,
+          JSON.stringify({ qm1: "newVideoId123" }),
+          expect.any(Function),
+          expect.any(Function)
+        );
+      });
+    });
+
+    it("shows error message when trying to add empty video ID", async () => {
+      const addButton = screen.getByRole("button", { name: /Add/i });
+      fireEvent.click(addButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("Please enter a YouTube video ID")
+        ).toBeInTheDocument();
+      });
+
+      expect(mockMakeTrustedRequest).not.toHaveBeenCalled();
+    });
+
+    it("updates state inline after successful video add without refetching", async () => {
+      mockMakeTrustedRequest.mockImplementation((path, body, onSuccess) => {
+        onSuccess();
+      });
+
+      const input = screen.getByPlaceholderText("YouTube ID");
+      fireEvent.change(input, { target: { value: "newVideoId123" } });
+
+      const addButton = screen.getByRole("button", { name: /Add/i });
+      fireEvent.click(addButton);
+
+      await waitFor(() => {
+        // Should only be called once for initial fetch, not again for refresh
+        expect(mockMakeApiV3Request).toHaveBeenCalledTimes(1);
+        // Video should appear in the UI via state update
+        expect(screen.getByText("newVideoId123")).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Match Formatting", () => {
+    it("formats qualification matches correctly", async () => {
+      const mockMatches = [
+        {
+          key: "2024nytr_qm15",
+          comp_level: "qm",
+          set_number: 1,
+          match_number: 15,
+          alliances: { red: { team_keys: [] }, blue: { team_keys: [] } },
+          videos: [],
+        },
+      ];
+
+      mockMakeApiV3Request.mockImplementation((path, onSuccess) => {
+        onSuccess(mockMatches);
+      });
+
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      const btn = screen.getByRole("button", { name: /Fetch Matches/i });
+      fireEvent.click(btn);
+
+      await waitFor(() => {
+        expect(screen.getByText("Qualification 15")).toBeInTheDocument();
+      });
+    });
+
+    it("formats playoff matches correctly", async () => {
+      const mockMatches = [
+        {
+          key: "2024nytr_qf2m1",
+          comp_level: "qf",
+          set_number: 2,
+          match_number: 1,
+          alliances: { red: { team_keys: [] }, blue: { team_keys: [] } },
+          videos: [],
+        },
+      ];
+
+      mockMakeApiV3Request.mockImplementation((path, onSuccess) => {
+        onSuccess(mockMatches);
+      });
+
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      const btn = screen.getByRole("button", { name: /Fetch Matches/i });
+      fireEvent.click(btn);
+
+      await waitFor(() => {
+        expect(screen.getByText("Quarterfinal 2-1")).toBeInTheDocument();
+      });
+    });
   });
 });
