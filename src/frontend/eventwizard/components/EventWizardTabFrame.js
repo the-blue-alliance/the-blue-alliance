@@ -4,7 +4,6 @@ import TeamListContainer from "../containers/TeamListContainer";
 import AwardsTabContainer from "../containers/AwardsTabContainer";
 import MatchVideosContainer from "../containers/MatchVideosContainer";
 import EventScheduleTabContainer from "../containers/EventScheduleTabContainer";
-import MatchPlayTabContainer from "../containers/MatchPlayTabContainer";
 import EventMatchResultsTabContainer from "../containers/EventMatchResultsTabContainer";
 import EventRankingsTabContainer from "../containers/EventRankingsTabContainer";
 import EventAlliancesTabContainer from "../containers/EventAlliancesTabContainer";
@@ -33,17 +32,12 @@ const EventWizardTabFrame = () => (
           </li>
           <li>
             <a href="#schedule" data-toggle="tab">
-              FMS Schedule Import
+              Match Schedule
             </a>
           </li>
           <li>
             <a href="#matches" data-toggle="tab">
-              Match Play
-            </a>
-          </li>
-          <li>
-            <a href="#results" data-toggle="tab">
-              FMS Match Import
+              Match Results
             </a>
           </li>
           <li>
@@ -53,7 +47,7 @@ const EventWizardTabFrame = () => (
           </li>
           <li>
             <a href="#rankings" data-toggle="tab">
-              FMS Rankings Import
+              Rankings
             </a>
           </li>
           <li>
@@ -73,7 +67,6 @@ const EventWizardTabFrame = () => (
       <EventInfoContainer />
       <TeamListContainer />
       <EventScheduleTabContainer />
-      <MatchPlayTabContainer />
       <EventMatchResultsTabContainer />
       <MatchVideosContainer />
       <EventRankingsTabContainer />

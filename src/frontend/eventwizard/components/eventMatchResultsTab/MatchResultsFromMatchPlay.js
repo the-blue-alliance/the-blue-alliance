@@ -17,7 +17,7 @@ const COMP_LEVEL_NAMES = {
   f: "Final",
 };
 
-const MatchPlayTab = ({
+const MatchResultsFromMatchPlay = ({
   selectedEvent,
   makeTrustedRequest,
   makeApiV3Request,
@@ -146,8 +146,8 @@ const MatchPlayTab = ({
   };
 
   return (
-    <div className="tab-pane" id="matches">
-      <h3>Match Play</h3>
+    <div>
+      <h4>Manual Match Score Entry</h4>
       <p>
         Fetch matches from TBA and update scores. This lets you manually enter
         match scores for events.
@@ -258,10 +258,10 @@ const MatchPlayTab = ({
   );
 };
 
-MatchPlayTab.propTypes = {
+MatchResultsFromMatchPlay.propTypes = {
   selectedEvent: PropTypes.string.isRequired,
   makeTrustedRequest: PropTypes.func.isRequired,
   makeApiV3Request: PropTypes.func.isRequired,
 };
 
-export default MatchPlayTab;
+export default MatchResultsFromMatchPlay;

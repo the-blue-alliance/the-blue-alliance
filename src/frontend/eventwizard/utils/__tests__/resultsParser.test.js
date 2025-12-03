@@ -367,7 +367,7 @@ describe("resultsParser", () => {
           "..",
           "..",
           "components",
-          "fmsMatchesTab",
+          "eventMatchResultsTab",
           "__tests__",
           "data",
           "2025nysu_MatchResultsReport_Quals.xlsx"
@@ -506,7 +506,7 @@ describe("resultsParser", () => {
           "..",
           "..",
           "components",
-          "fmsMatchesTab",
+          "eventMatchResultsTab",
           "__tests__",
           "data",
           "2025nysu_MatchResultsReport_Playoffs.xlsx"
