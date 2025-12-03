@@ -1,5 +1,5 @@
+import { Link } from '@tanstack/react-router';
 import React from 'react';
-import { Link } from 'react-router';
 
 import { Event, Team } from '~/api/tba/read';
 import { removeNonNumeric } from '~/lib/utils';
@@ -33,7 +33,9 @@ const EventLink = React.forwardRef<
   >
 >(({ eventOrKey, ...props }, ref) => {
   const eventKey = typeof eventOrKey === 'string' ? eventOrKey : eventOrKey.key;
-  return <Link to={`/event/${eventKey}`} {...props} ref={ref} />;
+  return (
+    <Link to="/event/$eventKey" params={{ eventKey }} {...props} ref={ref} />
+  );
 });
 EventLink.displayName = 'EventLink';
 

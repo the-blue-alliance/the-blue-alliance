@@ -2,19 +2,13 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "**/.server/**/*.ts",
-    "**/.server/**/*.tsx",
-    "**/.client/**/*.ts",
-    "**/.client/**/*.tsx",
-    ".react-router/types/**/*"
+    "eslint.config.js",
+    "prettier.config.js",
+    "vite.config.js"
   ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": [
-      "@react-router/node",
-      "vite/client",
-      "unplugin-icons/types/react"
-    ],
+    "types": ["vite/client", "unplugin-icons/types/react"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
@@ -30,7 +24,7 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-    "rootDirs": [".", "./.react-router/types"],
+    "rootDirs": ["."],
 
     // Vite takes care of building everything, not tsc.
     "noEmit": true

@@ -1,5 +1,5 @@
+import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Link } from 'react-router';
 
 import BiTrophy from '~icons/bi/trophy';
 
@@ -23,7 +23,8 @@ export default function RankingsTable({
       header: 'Team',
       cell: ({ row }) => (
         <Link
-          to={`/team/${row.original.team_key.substring(3)}`}
+          to="/team/$teamNumber/{-$year}"
+          params={{ teamNumber: row.original.team_key.substring(3) }}
           className="whitespace-nowrap"
         >
           {winners.includes(row.original.team_key) ? (

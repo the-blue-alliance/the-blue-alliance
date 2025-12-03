@@ -1,3 +1,4 @@
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import {
   ColumnDef,
   SortingState,
@@ -7,7 +8,6 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { useLoaderData } from 'react-router';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 import {
@@ -32,66 +32,62 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { confidence } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/district.$districtAbbreviation.insights';
+export const Route = createFileRoute(
+  '/district/$districtAbbreviation/insights',
+)({
+  loader: async ({ params }) => {
+    const [history, insights] = await Promise.all([
+      await getDistrictHistory({
+        path: {
+          district_abbreviation: params.districtAbbreviation,
+        },
+      }),
+      await getDistrictInsights({
+        path: {
+          district_abbreviation: params.districtAbbreviation,
+        },
+      }),
+    ]);
 
-async function loadData(params: Route.LoaderArgs['params']) {
-  const [history, insights] = await Promise.all([
-    await getDistrictHistory({
-      path: {
-        district_abbreviation: params.districtAbbreviation,
-      },
-    }),
-    await getDistrictInsights({
-      path: {
-        district_abbreviation: params.districtAbbreviation,
-      },
-    }),
-  ]);
+    if (history.data === undefined || insights.data === undefined) {
+      throw notFound();
+    }
 
-  if (history.data === undefined || insights.data === undefined) {
-    throw new Response(null, { status: 404 });
-  }
+    return {
+      history: history.data,
+      insights: insights.data,
+    };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: 'District Insights - The Blue Alliance' },
+          {
+            name: 'description',
+            content: 'District insights for the FIRST Robotics Competition.',
+          },
+        ],
+      };
+    }
 
-  return {
-    history: history.data,
-    insights: insights.data,
-  };
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.history[loaderData.history.length - 1].display_name} District Insights - The Blue Alliance`,
+        },
+        {
+          name: 'description',
+          content: `District insights for the ${loaderData.history[loaderData.history.length - 1].display_name} District.`,
+        },
+      ],
+    };
+  },
+  component: DistrictInsightsPage,
+});
 
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `District Insights - The Blue Alliance`,
-      },
-      {
-        name: 'description',
-        content: `District insights for the FIRST Robotics Competition.`,
-      },
-    ];
-  }
-
-  return [
-    {
-      title: `${data.history[data.history.length - 1].display_name} District Insights - The Blue Alliance`,
-    },
-    {
-      name: 'description',
-      content: `District insights for the ${data.history[data.history.length - 1].display_name} District.`,
-    },
-  ];
-}
-
-export default function DistrictPage() {
-  const { history, insights } = useLoaderData<typeof loader>();
+function DistrictInsightsPage() {
+  const { history, insights } = Route.useLoaderData();
 
   return (
     <div>

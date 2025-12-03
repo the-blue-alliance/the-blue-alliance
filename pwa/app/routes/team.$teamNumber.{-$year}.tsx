@@ -1,6 +1,6 @@
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
-import { useLoaderData, useNavigate } from 'react-router';
 
 import {
   Award,
@@ -69,133 +69,127 @@ import {
   winrateFromRecord,
 } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/team.$teamNumber.($year)';
+export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
+  loader: async ({ params }) => {
+    const teamKey = `frc${params.teamNumber}`;
+    const year = await parseParamsForYearElseDefault(params);
+    if (year === undefined) {
+      throw notFound();
+    }
 
-async function loadData(params: Route.LoaderArgs['params']) {
-  const teamKey = `frc${params.teamNumber}`;
-  const year = await parseParamsForYearElseDefault(params);
-  if (year === undefined) {
-    throw new Response(null, { status: 404 });
-  }
+    const [
+      team,
+      media,
+      socials,
+      yearsParticipated,
+      events,
+      matches,
+      statuses,
+      awards,
+    ] = await Promise.all([
+      getTeam({ path: { team_key: teamKey } }),
+      getTeamMediaByYear({ path: { team_key: teamKey, year } }),
+      getTeamSocialMedia({ path: { team_key: teamKey } }),
+      getTeamYearsParticipated({ path: { team_key: teamKey } }),
+      getTeamEventsByYear({ path: { team_key: teamKey, year } }),
+      getTeamMatchesByYear({ path: { team_key: teamKey, year } }),
+      getTeamEventsStatusesByYear({ path: { team_key: teamKey, year } }),
+      getTeamAwardsByYear({ path: { team_key: teamKey, year } }),
+    ]);
 
-  const [
-    team,
-    media,
-    socials,
-    yearsParticipated,
-    events,
-    matches,
-    statuses,
-    awards,
-  ] = await Promise.all([
-    getTeam({ path: { team_key: teamKey } }),
-    getTeamMediaByYear({ path: { team_key: teamKey, year } }),
-    getTeamSocialMedia({ path: { team_key: teamKey } }),
-    getTeamYearsParticipated({ path: { team_key: teamKey } }),
-    getTeamEventsByYear({ path: { team_key: teamKey, year } }),
-    getTeamMatchesByYear({ path: { team_key: teamKey, year } }),
-    getTeamEventsStatusesByYear({ path: { team_key: teamKey, year } }),
-    getTeamAwardsByYear({ path: { team_key: teamKey, year } }),
-  ]);
+    if (team.data === undefined) {
+      throw notFound();
+    }
 
-  if (team.data === undefined) {
-    throw new Response(null, { status: 404 });
-  }
+    if (
+      media.data === undefined ||
+      socials.data === undefined ||
+      yearsParticipated.data === undefined ||
+      events.data === undefined ||
+      matches.data === undefined ||
+      statuses.data === undefined ||
+      awards.data === undefined
+    ) {
+      throw new Error('Failed to load team data');
+    }
 
-  if (
-    media.data === undefined ||
-    socials.data === undefined ||
-    yearsParticipated.data === undefined ||
-    events.data === undefined ||
-    matches.data === undefined ||
-    statuses.data === undefined ||
-    awards.data === undefined
-  ) {
-    throw new Response(null, { status: 500 });
-  }
+    if (!yearsParticipated.data.includes(year)) {
+      throw notFound();
+    }
 
-  if (!yearsParticipated.data.includes(year)) {
-    throw new Response(null, { status: 404 });
-  }
+    // TODO: fetch these in parallel after initial render
+    const eventDistrictPts: Record<string, EventDistrictPoints | null> = {};
+    await Promise.all(
+      events.data.map(async (e) => {
+        if (
+          [
+            EventType.DISTRICT,
+            EventType.DISTRICT_CMP,
+            EventType.DISTRICT_CMP_DIVISION,
+          ].includes(e.event_type)
+        ) {
+          const resp = await getEventDistrictPoints({
+            path: { event_key: e.key },
+          });
+          eventDistrictPts[e.key] = resp.data ?? null;
+        } else {
+          eventDistrictPts[e.key] = null;
+        }
+      }),
+    );
+    const eventAlliances: Record<string, EliminationAlliance[] | null> = {};
+    await Promise.all(
+      events.data.map(async (e) => {
+        const resp = await getEventAlliances({ path: { event_key: e.key } });
+        eventAlliances[e.key] = resp.data ?? null;
+      }),
+    );
 
-  // TODO: fetch these in parallel after initial render
-  const eventDistrictPts: Record<string, EventDistrictPoints | null> = {};
-  await Promise.all(
-    events.data.map(async (e) => {
-      if (
-        [
-          EventType.DISTRICT,
-          EventType.DISTRICT_CMP,
-          EventType.DISTRICT_CMP_DIVISION,
-        ].includes(e.event_type)
-      ) {
-        const resp = await getEventDistrictPoints({
-          path: { event_key: e.key },
-        });
-        eventDistrictPts[e.key] = resp.data ?? null;
-      } else {
-        eventDistrictPts[e.key] = null;
-      }
-    }),
-  );
-  const eventAlliances: Record<string, EliminationAlliance[] | null> = {};
-  await Promise.all(
-    events.data.map(async (e) => {
-      const resp = await getEventAlliances({ path: { event_key: e.key } });
-      eventAlliances[e.key] = resp.data ?? null;
-    }),
-  );
+    return {
+      year,
+      team: team.data,
+      media: media.data,
+      socials: socials.data,
+      yearsParticipated: yearsParticipated.data,
+      events: events.data,
+      matches: matches.data,
+      statuses: statuses.data,
+      awards: awards.data,
+      eventDistrictPts: eventDistrictPts,
+      eventAlliances: eventAlliances,
+    };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: 'Team Information - The Blue Alliance' },
+          {
+            name: 'description',
+            content: 'Team information for the FIRST Robotics Competition.',
+          },
+        ],
+      };
+    }
 
-  return {
-    year,
-    team: team.data,
-    media: media.data,
-    socials: socials.data,
-    yearsParticipated: yearsParticipated.data,
-    events: events.data,
-    matches: matches.data,
-    statuses: statuses.data,
-    awards: awards.data,
-    eventDistrictPts: eventDistrictPts,
-    eventAlliances: eventAlliances,
-  };
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.team.nickname} - Team ${loaderData.team.team_number} - The Blue Alliance`,
+        },
+        {
+          name: 'description',
+          content:
+            `From ${loaderData.team.city}, ${loaderData.team.state_prov} ${loaderData.team.postal_code}, ${loaderData.team.country}.` +
+            ' Team information, match results, and match videos from the FIRST Robotics Competition.',
+        },
+      ],
+    };
+  },
+  component: TeamPage,
+});
 
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `Team Information - The Blue Alliance`,
-      },
-      {
-        name: 'description',
-        content: `Team information for the FIRST Robotics Competition.`,
-      },
-    ];
-  }
-
-  return [
-    {
-      title: `${data.team.nickname} - Team ${data.team.team_number} - The Blue Alliance`,
-    },
-    {
-      name: 'description',
-      content:
-        `From ${data.team.city}, ${data.team.state_prov} ${data.team.postal_code}, ${data.team.country}.` +
-        ' Team information, match results, and match videos from the FIRST Robotics Competition.',
-    },
-  ];
-}
-
-export default function TeamPage(): React.JSX.Element {
+function TeamPage(): React.JSX.Element {
   const navigate = useNavigate();
   const {
     year,
@@ -209,7 +203,7 @@ export default function TeamPage(): React.JSX.Element {
     awards,
     eventDistrictPts,
     eventAlliances,
-  } = useLoaderData<typeof loader>();
+  } = Route.useLoaderData();
   const [eventsInView, setEventsInView] = useState(new Set());
 
   events.sort(sortEventsComparator);
@@ -245,7 +239,10 @@ export default function TeamPage(): React.JSX.Element {
           <Select
             value={String(year)}
             onValueChange={(value) => {
-              void navigate(`/team/${team.team_number}/${value}`);
+              void navigate({
+                to: '/team/$teamNumber/{-$year}',
+                params: { teamNumber: String(team.team_number), year: value },
+              });
             }}
           >
             <SelectTrigger className="w-[180px]">

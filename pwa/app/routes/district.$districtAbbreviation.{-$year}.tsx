@@ -1,5 +1,5 @@
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { groupBy, sumBy } from 'lodash-es';
-import { useLoaderData } from 'react-router';
 
 import {
   Award,
@@ -37,113 +37,110 @@ import {
   parseParamsForYearElseDefault,
 } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/district.$districtAbbreviation.($year)';
+export const Route = createFileRoute(
+  '/district/$districtAbbreviation/{-$year}',
+)({
+  loader: async ({ params }) => {
+    const year = await parseParamsForYearElseDefault(params);
+    if (year === undefined) {
+      throw notFound();
+    }
 
-async function loadData(params: Route.LoaderArgs['params']) {
-  const year = await parseParamsForYearElseDefault(params);
-  if (year === undefined) {
-    throw new Error('invalid year');
-  }
+    const [districtHistory, rankings, teams, events, awards] =
+      await Promise.all([
+        await getDistrictHistory({
+          path: {
+            district_abbreviation: params.districtAbbreviation,
+          },
+        }),
+        await getDistrictRankings({
+          path: {
+            district_key: `${year}${params.districtAbbreviation}`,
+          },
+        }),
+        await getDistrictTeams({
+          path: {
+            district_key: `${year}${params.districtAbbreviation}`,
+          },
+        }),
+        await getDistrictEvents({
+          path: {
+            district_key: `${year}${params.districtAbbreviation}`,
+          },
+        }),
+        await getDistrictAwards({
+          path: {
+            district_key: `${year}${params.districtAbbreviation}`,
+          },
+        }),
+      ]);
 
-  const [districtHistory, rankings, teams, events, awards] = await Promise.all([
-    await getDistrictHistory({
-      path: {
-        district_abbreviation: params.districtAbbreviation,
-      },
-    }),
-    await getDistrictRankings({
-      path: {
-        district_key: `${year}${params.districtAbbreviation}`,
-      },
-    }),
-    await getDistrictTeams({
-      path: {
-        district_key: `${year}${params.districtAbbreviation}`,
-      },
-    }),
-    await getDistrictEvents({
-      path: {
-        district_key: `${year}${params.districtAbbreviation}`,
-      },
-    }),
-    await getDistrictAwards({
-      path: {
-        district_key: `${year}${params.districtAbbreviation}`,
-      },
-    }),
-  ]);
+    if (
+      districtHistory.data === undefined ||
+      rankings.data === undefined ||
+      teams.data === undefined ||
+      events.data === undefined ||
+      awards.data === undefined
+    ) {
+      throw notFound();
+    }
 
-  if (
-    districtHistory.data === undefined ||
-    rankings.data === undefined ||
-    teams.data === undefined ||
-    events.data === undefined ||
-    awards.data === undefined
-  ) {
-    throw new Response(null, { status: 404 });
-  }
+    // The api returns a lot of teams that previously played in the district but didn't in the given year
+    const actuallyActiveRankings =
+      rankings.data === null
+        ? null
+        : rankings.data.filter(
+            (r) => r.point_total > 0 && (r.event_points?.length ?? 0) > 0,
+          );
 
-  // The api returns a lot of teams that previously played in the district but didn't in the given year
-  const actuallyActiveRankings =
-    rankings.data === null
-      ? null
-      : rankings.data.filter(
-          (r) => r.point_total > 0 && (r.event_points?.length ?? 0) > 0,
-        );
+    const actuallyActiveTeams =
+      actuallyActiveRankings === null
+        ? teams.data
+        : teams.data.filter((team) =>
+            actuallyActiveRankings.find((r) => r.team_key === team.key),
+          );
 
-  const actuallyActiveTeams =
-    actuallyActiveRankings === null
-      ? teams.data
-      : teams.data.filter((team) =>
-          actuallyActiveRankings.find((r) => r.team_key === team.key),
-        );
+    return {
+      abbreviation: params.districtAbbreviation,
+      year,
+      districtHistory: districtHistory.data,
+      rankings: actuallyActiveRankings,
+      teams: actuallyActiveTeams,
+      events: events.data,
+      awards: awards.data,
+    };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: 'The Blue Alliance' },
+          {
+            name: 'description',
+            content: 'District information for the FIRST Robotics Competition.',
+          },
+        ],
+      };
+    }
 
-  return {
-    abbreviation: params.districtAbbreviation,
-    year,
-    districtHistory: districtHistory.data,
-    rankings: actuallyActiveRankings,
-    teams: actuallyActiveTeams,
-    events: events.data,
-    awards: awards.data,
-  };
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.year} ${loaderData.districtHistory[loaderData.districtHistory.length - 1].display_name} District - The Blue Alliance`,
+        },
+        {
+          name: 'description',
+          content: `District information for the ${loaderData.year} ${loaderData.districtHistory[loaderData.districtHistory.length - 1].display_name} District.`,
+        },
+      ],
+    };
+  },
+  component: DistrictPage,
+});
 
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `The Blue Alliance`,
-      },
-      {
-        name: 'description',
-        content: `District information for the FIRST Robotics Competition.`,
-      },
-    ];
-  }
-
-  return [
-    {
-      title: `${data.year} ${data.districtHistory[data.districtHistory.length - 1].display_name} District - The Blue Alliance`,
-    },
-    {
-      name: 'description',
-      content: `District information for the ${data.year} ${data.districtHistory[data.districtHistory.length - 1].display_name} District.`,
-    },
-  ];
-}
-
-export default function DistrictPage() {
+function DistrictPage() {
   const { awards, districtHistory, events, rankings, teams, year } =
-    useLoaderData<typeof loader>();
+    Route.useLoaderData();
 
   const hasRankings = rankings !== null;
 

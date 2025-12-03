@@ -42,7 +42,7 @@ export default tseslint.config([
       '@typescript-eslint/only-throw-error': [
         'error',
         {
-          allow: ['Response'],
+          allow: ['NotFoundError'],
         },
       ],
       '@typescript-eslint/no-non-null-assertion': ['error'],
@@ -105,7 +105,7 @@ export default tseslint.config([
           project: path.resolve(__dirname, 'tsconfig.json'),
         },
         node: {
-          paths: ['.', '.react-router/types'],
+          paths: ['.'],
         },
       },
     },

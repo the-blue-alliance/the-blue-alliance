@@ -1,7 +1,7 @@
 import { useSuspenseQueries } from '@tanstack/react-query';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
 import { Suspense, useMemo, useState } from 'react';
-import { useLoaderData } from 'react-router';
 
 import MdiCog from '~icons/mdi/cog';
 import MdiRobotExcited from '~icons/mdi/robot-excited';
@@ -26,63 +26,55 @@ import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import { sortMultipleEventsMatches } from '~/lib/matchUtils';
 
-import { Route } from '.react-router/types/app/routes/+types/team.$teamNumber.stats';
+export const Route = createFileRoute('/team/$teamNumber/stats')({
+  loader: async ({ params }) => {
+    const [team, events, awards, socials, media] = await Promise.all([
+      getTeam({ path: { team_key: `frc${params.teamNumber}` } }),
+      getTeamEvents({ path: { team_key: `frc${params.teamNumber}` } }),
+      getTeamAwards({ path: { team_key: `frc${params.teamNumber}` } }),
+      getTeamSocialMedia({ path: { team_key: `frc${params.teamNumber}` } }),
+      getTeamMediaByYear({
+        path: {
+          team_key: `frc${params.teamNumber}`,
+          year: new Date().getFullYear(),
+        },
+      }),
+    ]);
+    if (
+      team.data === undefined ||
+      events.data === undefined ||
+      awards.data === undefined ||
+      socials.data === undefined ||
+      media.data === undefined
+    ) {
+      throw notFound();
+    }
 
-async function loadData(params: Route.LoaderArgs['params']) {
-  const [team, events, awards, socials, media] = await Promise.all([
-    getTeam({ path: { team_key: `frc${params.teamNumber}` } }),
-    getTeamEvents({ path: { team_key: `frc${params.teamNumber}` } }),
-    getTeamAwards({ path: { team_key: `frc${params.teamNumber}` } }),
-    getTeamSocialMedia({ path: { team_key: `frc${params.teamNumber}` } }),
-    getTeamMediaByYear({
-      path: {
-        team_key: `frc${params.teamNumber}`,
-        year: new Date().getFullYear(),
-      },
-    }),
-  ]);
-  if (
-    team.data === undefined ||
-    events.data === undefined ||
-    awards.data === undefined ||
-    socials.data === undefined ||
-    media.data === undefined
-  ) {
-    throw new Response(null, { status: 404 });
-  }
+    return {
+      team: team.data,
+      allAwards: awards.data,
+      allEvents: events.data,
+      socials: socials.data,
+      media: media.data,
+    };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [{ title: 'Team Stats - The Blue Alliance' }],
+      };
+    }
 
-  return {
-    team: team.data,
-    allAwards: awards.data,
-    allEvents: events.data,
-    socials: socials.data,
-    media: media.data,
-  };
-}
-
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `Team Stats - The Blue Alliance`,
-      },
-    ];
-  }
-
-  return [
-    {
-      title: `${data.team.nickname} - Team ${data.team.team_number} (Stats) - The Blue Alliance`,
-    },
-  ];
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.team.nickname} - Team ${loaderData.team.team_number} (Stats) - The Blue Alliance`,
+        },
+      ],
+    };
+  },
+  component: TeamStatsPage,
+});
 
 function MatchStatsLoadingState() {
   return (
@@ -163,9 +155,8 @@ function MatchStatsWithData({
   );
 }
 
-export default function TeamStatsPage() {
-  const { team, allEvents, allAwards, socials, media } =
-    useLoaderData<typeof loader>();
+function TeamStatsPage() {
+  const { team, allEvents, allAwards, socials, media } = Route.useLoaderData();
 
   const [includeOffseasons, setIncludeOffseasons] = useState(false);
   const [minYear, setMinYear] = useState(allEvents[0].year);
