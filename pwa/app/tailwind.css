@@ -8,6 +8,9 @@
   --font-sans:
     Roboto, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
 
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
@@ -191,5 +194,15 @@
   /* Apply blue text and a hover underline to every link */
   a {
     @apply text-blue-800 hover:underline;
+  }
+
+  /* Bootstrap-style code styling */
+  code {
+    background-color: #f9f2f4;
+    border-radius: 4px;
+    color: #c7254e;
+    padding: 2px 4px;
+    font-size: 90%;
+    font-family: var(--font-mono);
   }
 }
