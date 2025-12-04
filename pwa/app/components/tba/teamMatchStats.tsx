@@ -1,9 +1,22 @@
 import { maxBy, startCase, uniq } from 'lodash-es';
 import { ReactNode, useMemo, useState } from 'react';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 import { Event, Match, WltRecord } from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { TeamLink } from '~/components/tba/links';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '~/components/ui/chart';
 import { Checkbox } from '~/components/ui/checkbox';
 import {
   Table,
@@ -287,6 +300,90 @@ function SingleHighlightedMatchPerYearTable({
             )}
         </TableBody>
       </Table>
+    </div>
+  );
+}
+
+interface MatchWinOverTimeData {
+  matchNumber: number;
+  netWins: number;
+}
+
+function MatchWinOverTimeChart({
+  matches,
+  teamKey,
+}: {
+  matches: Match[];
+  teamKey: string;
+}) {
+  const { data, yearBoundaries, xAxisTicks } = useMemo(() => {
+    const data: MatchWinOverTimeData[] = [{ matchNumber: 0, netWins: 0 }];
+    const yearBoundaries: Array<{ matchNumber: number; year: number }> = [];
+    let previousYear: number | undefined;
+
+    for (let i = 0; i < matches.length; i++) {
+      const match = matches[i];
+      const currentYear = Number(match.event_key.slice(0, 4));
+
+      // Track year boundaries (when year changes)
+      if (currentYear !== previousYear) {
+        yearBoundaries.push({
+          matchNumber: data.length - 1,
+          year: currentYear,
+        });
+      }
+      previousYear = currentYear;
+
+      const isRed = match.alliances.red.team_keys.includes(teamKey);
+      const didWin =
+        getAllianceMatchResult(match, isRed ? 'red' : 'blue', 'score-based') ===
+        'win';
+      const didLose =
+        getAllianceMatchResult(match, isRed ? 'red' : 'blue', 'score-based') ===
+        'loss';
+
+      const newNet =
+        data[data.length - 1].netWins + (didWin ? 1 : didLose ? -1 : 0);
+      data.push({ matchNumber: data.length, netWins: newNet });
+    }
+
+    const maxMatchNumber = data[data.length - 1]?.matchNumber ?? 0;
+    const xAxisTicks: number[] = [];
+    for (let i = 0; i <= maxMatchNumber; i += 50) {
+      xAxisTicks.push(i);
+    }
+
+    return { data, yearBoundaries, xAxisTicks };
+  }, [matches, teamKey]);
+
+  return (
+    <div>
+      <div className="text-lg font-semibold">Net Wins Over Time</div>
+      <ChartContainer config={{}}>
+        <LineChart accessibilityLayer data={data}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="matchNumber" ticks={xAxisTicks} />
+          <YAxis dataKey="netWins" />
+          <Line
+            dataKey="netWins"
+            stroke="var(--color-primary)"
+            dot={false}
+            strokeWidth={2}
+            type="linear"
+          />
+          {yearBoundaries.map(({ matchNumber, year }) => (
+            <ReferenceLine
+              key={matchNumber}
+              x={matchNumber}
+              label={{
+                value: year.toString(),
+                position: 'insideTopLeft',
+              }}
+            />
+          ))}
+          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+        </LineChart>
+      </ChartContainer>
     </div>
   );
 }
@@ -736,6 +833,8 @@ export default function TeamMatchStats({
           </TabsContent>
         </Tabs>
       </div>
+
+      <MatchWinOverTimeChart matches={matches} teamKey={teamKey} />
     </div>
   );
 }
