@@ -14,10 +14,12 @@ export default function SimpleMatchRowsWithBreaks({
   matches,
   event,
   breakers,
+  focusTeamKey,
 }: {
   matches: Match[];
   event: Event;
   breakers: ShouldInsertBreakCallback[];
+  focusTeamKey?: string;
 }) {
   const divs = [];
 
@@ -49,6 +51,7 @@ export default function SimpleMatchRowsWithBreaks({
         playoffType={event.playoff_type ?? PlayoffType.CUSTOM}
         year={event.year}
         key={match.key}
+        focusTeamKey={focusTeamKey}
       />,
     );
 
@@ -78,10 +81,12 @@ export function MatchRow({
   match,
   playoffType,
   year,
+  focusTeamKey,
 }: {
   match: Match;
   playoffType: PlayoffType;
   year: number;
+  focusTeamKey?: string;
 }) {
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
   const isPlayed =
@@ -92,8 +97,8 @@ export function MatchRow({
       {/* Desktop: 1x11 grid, Mobile: 2x6 grid */}
       <div
         className="mx-auto grid w-full max-w-6xl
-          grid-cols-[auto_6em_repeat(4,1fr)] grid-rows-[2.5em_2.5em] gap-x-1
-          text-sm xl:grid-cols-[auto_6em_repeat(9,1fr)] xl:grid-rows-1"
+          grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2.5em_2.5em] gap-x-1
+          text-sm xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
       >
         {/* Play Button */}
         <div
@@ -112,7 +117,7 @@ export function MatchRow({
           className="row-span-2 flex items-center justify-center p-2
             xl:col-span-2 xl:row-span-1"
         >
-          <span className="text-center">
+          <span className="text-center text-sm">
             {matchTitleShort(match, playoffType)}
           </span>
         </div>
@@ -125,6 +130,8 @@ export function MatchRow({
           winner={match.winning_alliance === 'red'}
           dq={match.alliances.red.dq_team_keys}
           surrogate={match.alliances.red.surrogate_team_keys}
+          year={year}
+          focusTeamKey={focusTeamKey}
         />
 
         {/* Blue Team Players - Subgrid Component */}
@@ -135,6 +142,8 @@ export function MatchRow({
           winner={match.winning_alliance === 'blue'}
           dq={match.alliances.blue.dq_team_keys}
           surrogate={match.alliances.blue.surrogate_team_keys}
+          year={year}
+          focusTeamKey={focusTeamKey}
         />
 
         {!isPlayed && (
@@ -207,7 +216,7 @@ export function BreakRow({ className, text, ...props }: BreakRowProps) {
       {...props}
     >
       <span
-        className="flex h-[1.25rem] w-full items-center justify-center text-xs
+        className="flex h-5 w-full items-center justify-center text-xs
           font-bold"
       >
         {text}
