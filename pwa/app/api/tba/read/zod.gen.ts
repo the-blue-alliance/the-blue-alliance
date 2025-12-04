@@ -1015,7 +1015,7 @@ export const zMedia = z.object({
         width: z.int(),
       }),
       z.object({
-        model_created: z.iso.datetime(),
+        model_created: z.iso.datetime({ offset: true }),
         model_description: z.union([z.string(), z.null()]),
         model_image: z.url(),
         model_name: z.string(),
