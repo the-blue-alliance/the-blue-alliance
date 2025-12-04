@@ -988,6 +988,7 @@ export const zMedia = z.object({
     'external-link',
     'avatar',
     'onshape',
+    'cd-thread',
   ]),
   foreign_key: z.string(),
   details: z.optional(
@@ -1021,6 +1022,10 @@ export const zMedia = z.object({
       }),
       z.object({
         image_partial: z.string(),
+      }),
+      z.object({
+        thread_title: z.string(),
+        image_url: z.union([z.string(), z.null()]),
       }),
     ]),
   ),
