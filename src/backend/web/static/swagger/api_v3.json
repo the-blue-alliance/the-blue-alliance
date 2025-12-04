@@ -9279,7 +9279,8 @@
               "instagram-image",
               "external-link",
               "avatar",
-              "onshape"
+              "onshape",
+              "cd-thread"
             ]
           },
           "foreign_key": {
@@ -9416,6 +9417,24 @@
                 },
                 "required": [
                   "image_partial"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "thread_title": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "thread_title",
+                  "image_url"
                 ]
               }
             ]

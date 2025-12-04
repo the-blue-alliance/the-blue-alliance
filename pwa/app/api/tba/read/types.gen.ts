@@ -1956,7 +1956,8 @@ export type Media = {
     | 'instagram-image'
     | 'external-link'
     | 'avatar'
-    | 'onshape';
+    | 'onshape'
+    | 'cd-thread';
   /**
    * The key used to identify this media on the media site.
    */
@@ -1996,6 +1997,10 @@ export type Media = {
       }
     | {
         image_partial: string;
+      }
+    | {
+        thread_title: string;
+        image_url: string | null;
       };
   /**
    * True if the media is of high quality.
