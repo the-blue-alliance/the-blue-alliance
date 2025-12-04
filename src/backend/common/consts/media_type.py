@@ -28,6 +28,7 @@ class MediaType(enum.IntEnum):
     AVATAR = 12
     ONSHAPE = 13
     GITLAB_PROFILE = 14
+    CD_THREAD = 15
 
 
 MEDIA_TYPES: Set[MediaType] = {t for t in MediaType}
@@ -49,6 +50,7 @@ SLUG_NAMES: Dict[MediaType, str] = {
     MediaType.EXTERNAL_LINK: "external-link",
     MediaType.AVATAR: "avatar",
     MediaType.GITLAB_PROFILE: "gitlab-profile",
+    MediaType.CD_THREAD: "cd-thread",
 }
 
 SLUG_NAME_TO_TYPE: Dict[str, MediaType] = {
@@ -71,6 +73,7 @@ TYPE_NAMES: Dict[MediaType, str] = {
     MediaType.AVATAR: "Avatar",
     MediaType.ONSHAPE: "Onshape",
     MediaType.GITLAB_PROFILE: "GitLab Profile",
+    MediaType.CD_THREAD: "Chief Delphi Thread",
 }
 
 IMAGE_TYPES: Set[MediaType] = {
@@ -93,6 +96,7 @@ SOCIAL_TYPES: Set[MediaType] = {
 ROBOT_TYPES: Set[MediaType] = {
     MediaType.GRABCAD,
     MediaType.ONSHAPE,
+    MediaType.CD_THREAD,
 }
 
 # Format with foreign_key
@@ -104,6 +108,7 @@ PROFILE_URLS: Dict[MediaType, str] = {
     MediaType.INSTAGRAM_PROFILE: "https://www.instagram.com/{}",
     MediaType.PERISCOPE_PROFILE: "https://www.periscope.tv/{}",
     MediaType.GITLAB_PROFILE: "https://www.gitlab.com/{}",
+    MediaType.CD_THREAD: "https://www.chiefdelphi.com/t/{}",
 }
 
 SOCIAL_SORT_ORDER: Dict[MediaType, int] = {

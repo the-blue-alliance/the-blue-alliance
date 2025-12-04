@@ -36,7 +36,7 @@ PERMISSIONS: Dict[AccountPermission, PermissionDescription] = {
     ),
     AccountPermission.REVIEW_DESIGNS: PermissionDescription(
         "REVIEW_DESIGNS",
-        "Can link CAD models and Behind the Design blog posts to team robot profiles",
+        "Can link CAD models, discussion threads, and Behind the Design blog posts to team robot profiles",
     ),
     AccountPermission.REVIEW_EVENT_MEDIA: PermissionDescription(
         "REVIEW_EVENT_MEDIA", "Can approve media (non-match video) linked to events"
