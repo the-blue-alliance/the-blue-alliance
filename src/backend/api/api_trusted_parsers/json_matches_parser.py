@@ -14,20 +14,6 @@ from backend.common.models.keys import TeamKey, Year
 from backend.common.models.team import Team
 
 
-def _validate_team_list(
-    team_keys: list, teams_in_match: list | None, label: str
-) -> None:
-    for team_key in team_keys:
-        if not Team.validate_key_name(str(team_key)):
-            raise ParserInputException(
-                f"Bad {label}: '{team_key}'. Must follow format 'frcXXX'."
-            )
-        if teams_in_match is not None and team_key not in teams_in_match:
-            raise ParserInputException(
-                f"Bad {label}: '{team_key}'. Must be a team in the match."
-            )
-
-
 def _parse_datetime(value: str | None, field_name: str) -> datetime.datetime | None:
     if value is None:
         return None
@@ -132,18 +118,35 @@ class JSONMatchesParser:
                         raise ParserInputException(
                             f"alliances[{color}] must have key '{key}'"
                         )
-
-                _validate_team_list(details["teams"], None, "team")
+                for team_key in details["teams"]:
+                    if not Team.validate_key_name(str(team_key)):
+                        raise ParserInputException(
+                            f"Bad team: '{team_key}'. Must follow format 'frcXXX'."
+                        )
 
                 if details["score"] is not None and type(details["score"]) is not int:
                     raise ParserInputException(
                         f"alliances[{color}]['score'] must be an integer or null"
                     )
 
-                _validate_team_list(
-                    details.get("surrogates", []), details["teams"], "surrogate team"
-                )
-                _validate_team_list(details.get("dqs", []), details["teams"], "dq team")
+                for team_key in details.get("surrogates", []):
+                    if not Team.validate_key_name(str(team_key)):
+                        raise ParserInputException(
+                            f"Bad surrogate team: '{team_key}'. Must follow format 'frcXXX'."
+                        )
+                    if team_key not in details["teams"]:
+                        raise ParserInputException(
+                            f"Bad surrogate team: '{team_key}'. Must be a team in the match.'."
+                        )
+                for team_key in details.get("dqs", []):
+                    if not Team.validate_key_name(str(team_key)):
+                        raise ParserInputException(
+                            f"Bad dq team: '{team_key}'. Must follow format 'frcXXX'."
+                        )
+                    if team_key not in details["teams"]:
+                        raise ParserInputException(
+                            f"Bad dq team: '{team_key}'. Must be a team in the match.'."
+                        )
 
             if score_breakdown is not None:
                 if not isinstance(score_breakdown, dict):

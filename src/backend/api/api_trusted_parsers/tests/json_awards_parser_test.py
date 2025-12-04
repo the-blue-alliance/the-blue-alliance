@@ -265,3 +265,14 @@ def test_parse_rookie_all_star(event_key: str) -> None:
 def test_parse_empty_list(event_key: str) -> None:
     parsed = JSONAwardsParser.parse("[]", event_key)
     assert parsed == []
+
+
+def test_non_list_json_raises_exception(event_key: str) -> None:
+    with pytest.raises(ParserInputException, match="Invalid JSON"):
+        JSONAwardsParser.parse(json.dumps({"name_str": "Winner"}), event_key)
+
+
+def test_non_dict_award_raises_exception(event_key: str) -> None:
+    data = ["not a dict", {"name_str": "Winner", "team_key": "frc254"}]
+    with pytest.raises(ParserInputException, match="Award must be a dict"):
+        JSONAwardsParser.parse(json.dumps(data), event_key)
