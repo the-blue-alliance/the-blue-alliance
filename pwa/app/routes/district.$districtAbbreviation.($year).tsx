@@ -37,7 +37,7 @@ import {
   parseParamsForYearElseDefault,
 } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/events.$districtAbbreviation.($year)';
+import { Route } from '.react-router/types/app/routes/+types/district.$districtAbbreviation.($year)';
 
 async function loadData(params: Route.LoaderArgs['params']) {
   const year = await parseParamsForYearElseDefault(params);

@@ -32,7 +32,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { confidence } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/events.$districtAbbreviation.insights';
+import { Route } from '.react-router/types/app/routes/+types/district.$districtAbbreviation.insights';
 
 async function loadData(params: Route.LoaderArgs['params']) {
   const [history, insights] = await Promise.all([
