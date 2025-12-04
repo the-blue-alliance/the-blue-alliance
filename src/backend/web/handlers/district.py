@@ -2,7 +2,6 @@ import datetime
 import logging
 from datetime import timedelta
 from operator import itemgetter
-from typing import List, Optional, Tuple
 
 from flask import abort
 from google.appengine.ext import ndb
@@ -28,7 +27,7 @@ from backend.web.profiled_render import render_template
 
 @cached_public
 def district_detail(
-    district_abbrev: DistrictAbbreviation, year: Optional[Year]
+    district_abbrev: DistrictAbbreviation, year: Year | None
 ) -> Response:
     explicit_year = year is not None
     if year is None:
@@ -70,7 +69,7 @@ def district_detail(
         events_by_key[event.key.id()] = event
     week_events = EventHelper.group_by_week(events)
 
-    valid_districts: List[Tuple[str, DistrictAbbreviation]] = []
+    valid_districts: list[tuple[str, DistrictAbbreviation]] = []
     districts_in_year = districts_in_year_future.get_result()
     for dist in districts_in_year:
         valid_districts.append((dist.display_name, dist.abbreviation))
@@ -167,7 +166,7 @@ def district_detail(
 
 
 @cached_public
-def regional_detail(year: Optional[Year]) -> Response:
+def regional_detail(year: Year | None) -> Response:
     explicit_year = year is not None
     if year is None:
         year = SeasonHelper.get_current_season()
@@ -201,7 +200,7 @@ def regional_detail(year: Optional[Year]) -> Response:
         events_by_key[event.key.id()] = event
     week_events = EventHelper.group_by_week(events)
 
-    valid_districts: List[Tuple[str, DistrictAbbreviation]] = []
+    valid_districts: list[tuple[str, DistrictAbbreviation]] = []
     districts_in_year = districts_in_year_future.get_result()
     for dist in districts_in_year:
         valid_districts.append((dist.display_name, dist.abbreviation))

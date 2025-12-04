@@ -1,6 +1,7 @@
 import abc
 import logging
-from typing import Any, Dict, Generator, Generic, Optional, TypeVar
+from collections.abc import Generator
+from typing import Any, Generic, TypeVar
 from urllib.parse import urlencode
 
 from google.appengine.ext import ndb
@@ -25,7 +26,7 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
     @abc.abstractmethod
     def url(self) -> str: ...
 
-    def headers(self) -> Dict[str, str]:
+    def headers(self) -> dict[str, str]:
         return {}
 
     @abc.abstractmethod
@@ -35,16 +36,16 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
     def method(self) -> URLFetchMethod:
         return URLFetchMethod.GET
 
-    def payload(self) -> Optional[Dict[str, str]]:
+    def payload(self) -> dict[str, str] | None:
         return None
 
-    def fetch_async(self) -> TypedFuture[Optional[TReturn]]:
+    def fetch_async(self) -> TypedFuture[TReturn | None]:
         # Work around a pyre limitation where we can't combine
         # decorator type hints with generics
         return self._gen()
 
     @ndb.tasklet
-    def _gen(self) -> Generator[Any, Any, Optional[TReturn]]:
+    def _gen(self) -> Generator[Any, Any, TReturn | None]:
         response = yield self._fetch()
         parser = self.parser()
         return self._parse(response, parser)
@@ -56,7 +57,7 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
 
     @ndb.tasklet
     def _urlfetch(
-        self, url: str, headers: Dict[str, str]
+        self, url: str, headers: dict[str, str]
     ) -> Generator[Any, Any, URLFetchResult]:
         with Span(f"api_fetch:{type(self).__name__}"):
             if payload_data := self.payload():
@@ -75,7 +76,7 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
 
     def _parse(
         self, response: URLFetchResult, parser: ParserBase[TParsedResponse]
-    ) -> Optional[TParsedResponse]:
+    ) -> TParsedResponse | None:
         if response.status_code == 200:
             with Span(f"api_parser:{type(parser).__name__}"):
                 return parser.parse(response.json())

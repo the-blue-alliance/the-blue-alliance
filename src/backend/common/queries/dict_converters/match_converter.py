@@ -1,7 +1,7 @@
 import datetime
 import json
 import time
-from typing import Dict, List, NewType
+from typing import NewType
 
 from google.appengine.ext import ndb
 
@@ -11,7 +11,7 @@ from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
-MatchDict = NewType("MatchDict", Dict)
+MatchDict = NewType("MatchDict", dict)
 
 
 class MatchConverter(ConverterBase):
@@ -21,15 +21,15 @@ class MatchConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[Match], version: ApiMajorVersion
-    ) -> List[MatchDict]:
+        cls, model_list: list[Match], version: ApiMajorVersion
+    ) -> list[MatchDict]:
         CONVERTERS = {
             ApiMajorVersion.API_V3: cls.matchesConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
     @classmethod
-    def matchesConverter_v3(cls, matches: List[Match]) -> List[MatchDict]:
+    def matchesConverter_v3(cls, matches: list[Match]) -> list[MatchDict]:
         return list(map(cls.matchConverter_v3, matches))
 
     @classmethod
@@ -82,7 +82,7 @@ class MatchConverter(ConverterBase):
         return MatchDict(match_dict)
 
     @staticmethod
-    def dictToModel_v3(data: Dict) -> Match:
+    def dictToModel_v3(data: dict) -> Match:
         match = Match(id=data["key"])
         match.event = ndb.Key(Event, data["event_key"])
         match.year = int(data["key"][:4])

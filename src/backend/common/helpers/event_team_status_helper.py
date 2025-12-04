@@ -1,6 +1,6 @@
 import copy
 from collections import defaultdict
-from typing import cast, List, Optional, Set, Tuple
+from typing import cast
 
 from pyre_extensions import none_throws
 
@@ -122,7 +122,7 @@ class EventTeamStatusHelper:
         team_key: TeamKey,
         status_dict: EventTeamStatus,
         formatting: bool = True,
-        event: Optional[Event] = None,
+        event: Event | None = None,
         include_team: bool = True,
         verbose: bool = False,
     ) -> str:
@@ -257,7 +257,7 @@ class EventTeamStatusHelper:
 
     @classmethod
     def generate_team_at_event_status(
-        cls, team_key: TeamKey, event: Event, match_list: Optional[List[Match]] = None
+        cls, team_key: TeamKey, event: Event, match_list: list[Match] | None = None
     ) -> EventTeamStatus:
         """
         Generate a dict containing team@event status information
@@ -292,7 +292,7 @@ class EventTeamStatusHelper:
         event_details: EventDetails,
         matches: TOrganizedMatches,
         year: Year,
-    ) -> Optional[EventTeamStatusQual]:
+    ) -> EventTeamStatusQual | None:
         if not matches[CompLevel.QM]:
             status = EventTeamLevelStatus.NOT_STARTED
         else:
@@ -305,7 +305,7 @@ class EventTeamStatusHelper:
         if event_details and event_details.rankings2:
             rankings = event_details.rankings2
 
-            qual_info: Optional[EventTeamStatusQual] = None
+            qual_info: EventTeamStatusQual | None = None
             for ranking in rankings:
                 if ranking["team_key"] == team_key:
                     qual_info = {
@@ -384,7 +384,7 @@ class EventTeamStatusHelper:
     @classmethod
     def _build_alliance_info(
         cls, team_key: TeamKey, event_details: EventDetails, matches: TOrganizedMatches
-    ) -> Optional[EventTeamStatusAlliance]:
+    ) -> EventTeamStatusAlliance | None:
         if not event_details or not event_details.alliance_selections:
             return None
         alliance, number = cls._get_alliance(team_key, event_details, matches)
@@ -414,7 +414,7 @@ class EventTeamStatusHelper:
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
-    ) -> Optional[PlayoffAllianceStatus]:
+    ) -> PlayoffAllianceStatus | None:
         alliance, _ = cls._get_alliance(team_key, event_details, matches)
         complete_alliance = set(alliance["picks"]) if alliance else set()
         if alliance and alliance.get("backup"):
@@ -454,11 +454,11 @@ class EventTeamStatusHelper:
     @classmethod
     def _build_playoff_info_bracket(
         cls,
-        complete_alliance: Set[TeamKey],
+        complete_alliance: set[TeamKey],
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
-    ) -> Optional[PlayoffAllianceStatus]:
+    ) -> PlayoffAllianceStatus | None:
         # Matches needs to be all playoff matches at the event, to properly account for backups
         import numpy as np
 
@@ -468,7 +468,7 @@ class EventTeamStatusHelper:
         all_losses = 0
         all_ties = 0
         playoff_scores = []
-        status: Optional[PlayoffAllianceStatus] = None
+        status: PlayoffAllianceStatus | None = None
         for comp_level in reversed(ELIM_LEVELS):  # playoffs
             if matches[comp_level]:
                 level_wins = 0
@@ -561,11 +561,11 @@ class EventTeamStatusHelper:
     @classmethod
     def _build_playoff_info_double_elim(
         cls,
-        complete_alliance: Set[TeamKey],
+        complete_alliance: set[TeamKey],
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
-    ) -> Optional[PlayoffAllianceStatus]:
+    ) -> PlayoffAllianceStatus | None:
         if playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
             double_elim_matches = MatchHelper.organized_double_elim_matches(
                 matches, year
@@ -582,7 +582,7 @@ class EventTeamStatusHelper:
         round_records: defaultdict[DoubleElimRound, WLTRecord] = defaultdict(
             lambda: WLTRecord(wins=0, losses=0, ties=0)
         )
-        rounds_played: Set[DoubleElimRound] = set()
+        rounds_played: set[DoubleElimRound] = set()
         for round in reversed(ORDERED_DOUBLE_ELIM_ROUNDS):
             for match in double_elim_matches[round]:
                 for color in ALLIANCE_COLORS:
@@ -661,12 +661,12 @@ class EventTeamStatusHelper:
     @classmethod
     def _build_playoff_info_round_robin(
         cls,
-        complete_alliance: Set[TeamKey],
+        complete_alliance: set[TeamKey],
         matches: TOrganizedMatches,
         year: Year,
         playoff_type: PlayoffType,
-        alliance_selections: List[EventAlliance],
-    ) -> Optional[PlayoffAllianceStatus]:
+        alliance_selections: list[EventAlliance],
+    ) -> PlayoffAllianceStatus | None:
         round_robin_rank = None
         round_robin_record = WLTRecord(wins=0, losses=0, ties=0)
         finals_record = WLTRecord(wins=0, losses=0, ties=0)
@@ -770,8 +770,8 @@ class EventTeamStatusHelper:
     @classmethod
     def _get_alliance(
         cls, team_key: TeamKey, event_details: EventDetails, matches: TOrganizedMatches
-    ) -> Tuple[
-        Optional[EventAlliance], Optional[int]
+    ) -> tuple[
+        EventAlliance | None, int | None
     ]:  # Tuple of (Alliance, Alliance Number)
         """
         Get the alliance number of the team

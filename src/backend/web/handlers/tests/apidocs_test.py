@@ -1,5 +1,4 @@
 import json
-from typing import List
 from unittest.mock import patch
 from urllib.parse import urlparse
 
@@ -52,7 +51,7 @@ def apidocs_match(apidocs_event, ndb_stub) -> Match:
 
 
 def test_apidocs_overview(
-    web_client: Client, captured_templates: List[CapturedTemplate]
+    web_client: Client, captured_templates: list[CapturedTemplate]
 ) -> None:
     resp = web_client.get("/apidocs")
     assert resp.status_code == 200
@@ -68,7 +67,7 @@ def test_test_apidocs_trusted_redirect(web_client: Client) -> None:
 
 
 def test_apidocs_trusted_v1(
-    web_client: Client, captured_templates: List[CapturedTemplate]
+    web_client: Client, captured_templates: list[CapturedTemplate]
 ) -> None:
     resp = web_client.get("/apidocs/trusted/v1")
     assert resp.status_code == 200
@@ -80,7 +79,7 @@ def test_apidocs_trusted_v1(
 
 
 def test_apidocs_v3(
-    web_client: Client, captured_templates: List[CapturedTemplate]
+    web_client: Client, captured_templates: list[CapturedTemplate]
 ) -> None:
     resp = web_client.get("/apidocs/v3")
     assert resp.status_code == 200
@@ -92,7 +91,7 @@ def test_apidocs_v3(
 
 
 def test_apidocs_webhooks(
-    web_client: Client, captured_templates: List[CapturedTemplate]
+    web_client: Client, captured_templates: list[CapturedTemplate]
 ) -> None:
     resp = web_client.get("/apidocs/webhooks")
     assert resp.status_code == 200

@@ -1,5 +1,4 @@
 import json
-from typing import Optional
 
 from flask import redirect, request
 from google.appengine.ext import ndb
@@ -100,9 +99,9 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
             "suggestions/suggest_team_media_review_list.html", template_values
         )
 
-    def create_target_model(self, suggestion: Suggestion) -> Optional[Media]:
+    def create_target_model(self, suggestion: Suggestion) -> Media | None:
         # Setup
-        to_replace: Optional[Media] = None
+        to_replace: Media | None = None
         to_replace_id = request.form.get(
             "replace-preferred-{}".format(suggestion.key.id()), None
         )

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import enum
-from typing import Dict
 
 from backend.common.consts.fcm.platform_type import PlatformType
 
@@ -39,20 +38,20 @@ class PlatformPriority(enum.IntEnum):
         PlatformPriority.validate(platform_priority)
 
         # https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidmessagepriority
-        ANDROID: Dict[PlatformPriority, str] = {
+        ANDROID: dict[PlatformPriority, str] = {
             PlatformPriority.NORMAL: "normal",
             PlatformPriority.HIGH: "high",
         }
 
         # https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html#//apple_ref/doc/uid/TP40008194-CH11-SW1
-        APNS: Dict[PlatformPriority, str] = {
+        APNS: dict[PlatformPriority, str] = {
             PlatformPriority.NORMAL: "5",
             PlatformPriority.HIGH: "10",
         }
         # Note: Do not use HIGH for iOS notifications when notifications only contain content-available
 
         # https://developers.google.com/web/fundamentals/push-notifications/web-push-protocol#urgency
-        WEB: Dict[PlatformPriority, str] = {
+        WEB: dict[PlatformPriority, str] = {
             PlatformPriority.NORMAL: "normal",
             PlatformPriority.HIGH: "high",
         }

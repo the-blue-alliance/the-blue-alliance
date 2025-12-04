@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_ranking import EventRanking
@@ -22,12 +20,12 @@ class RankingsHelper:
         wins: int,
         losses: int,
         ties: int,
-        qual_average: Optional[float],
+        qual_average: float | None,
         matches_played: int,
         dq: int,
-        sort_orders: List[float],
+        sort_orders: list[float],
     ) -> EventRanking:
-        record: Optional[WLTRecord] = None
+        record: WLTRecord | None = None
         if year not in cls.NO_RECORD_YEARS:
             record = {
                 "wins": int(wins),
@@ -58,5 +56,5 @@ class RankingsHelper:
     @classmethod
     def get_sort_order_info(
         cls, event_details: EventDetails
-    ) -> Optional[List[RankingSortOrderInfo]]:
+    ) -> list[RankingSortOrderInfo] | None:
         return SORT_ORDER_INFO.get(event_details.game_year)

@@ -3,7 +3,7 @@ import logging
 import math
 import re
 from difflib import SequenceMatcher
-from typing import Dict, List, NamedTuple, Optional, Tuple, TypedDict
+from typing import NamedTuple, TypedDict
 
 import requests
 from google.appengine.ext import ndb
@@ -30,7 +30,7 @@ class LocationInfo(TypedDict, total=False):
     country_short: str
     postal_code: int
     formatted_address: str
-    place_details: Dict
+    place_details: dict
 
 
 class LatLng(NamedTuple):
@@ -110,7 +110,7 @@ class LocationHelper:
         event.normalized_location = cls.get_event_location(event)
 
     @classmethod
-    def get_event_location_info(cls, event: Event) -> Tuple[LocationInfo, float]:
+    def get_event_location_info(cls, event: Event) -> tuple[LocationInfo, float]:
         """
         Search for different combinations of venue, venue_address, city,
         state_prov, postalcode, and country in attempt to find the correct
@@ -290,7 +290,7 @@ class LocationHelper:
     @classmethod
     def get_team_location_info(
         cls, team: Team, textsearch: bool = False
-    ) -> Tuple[LocationInfo, float]:
+    ) -> tuple[LocationInfo, float]:
         """
         Search for different combinations of team name (which should include
         high school or title sponsor) with city, state_prov, postalcode, and country
@@ -395,7 +395,7 @@ class LocationHelper:
 
     @classmethod
     def construct_location_info(
-        cls, gmaps_result: Dict, auto_fill: bool = True
+        cls, gmaps_result: dict, auto_fill: bool = True
     ) -> LocationInfo:
         """
         Gets location info given a gmaps result
@@ -461,7 +461,7 @@ class LocationHelper:
     @classmethod
     def google_maps_placesearch(
         cls, query: str, lat_lng: LatLng, textsearch: bool = False
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """
         https://developers.google.com/places/web-service/search#nearbysearchRequests
         https://developers.google.com/places/web-service/search#TextSearchRequests
@@ -539,7 +539,7 @@ class LocationHelper:
         return results or []
 
     @classmethod
-    def google_maps_place_details(cls, place_id: str) -> Optional[Dict]:
+    def google_maps_place_details(cls, place_id: str) -> dict | None:
         """
         https://developers.google.com/places/web-service/details#PlaceDetailsRequests
         """
@@ -600,7 +600,7 @@ class LocationHelper:
         return result
 
     @classmethod
-    def get_lat_lng(cls, location: Optional[str]) -> Optional[LatLng]:
+    def get_lat_lng(cls, location: str | None) -> LatLng | None:
         results = cls.google_maps_geocode(location)
         if results:
             return LatLng(
@@ -612,7 +612,7 @@ class LocationHelper:
             return None
 
     @classmethod
-    def google_maps_geocode(cls, location: Optional[str]) -> List[Dict]:
+    def google_maps_geocode(cls, location: str | None) -> list[dict]:
         cache_key = "google_maps_geocode:{}".format(location).encode()
         memcache = MemcacheClient.get()
         results = memcache.get(cache_key)
@@ -667,8 +667,8 @@ class LocationHelper:
 
     @classmethod
     def get_timezone_id(
-        cls, location: Optional[str], lat_lng: Optional[LatLng] = None
-    ) -> Optional[str]:
+        cls, location: str | None, lat_lng: LatLng | None = None
+    ) -> str | None:
         if lat_lng is None:
             result = cls.get_lat_lng(location)
             if result is None:

@@ -1,11 +1,12 @@
-from typing import Any, Dict, Generator, List
+from collections.abc import Generator
+from typing import Any
 
 from google.appengine.ext import ndb
 
 from backend.common.models.district import ALL_KNOWN_DISTRICT_ABBREVIATIONS
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey
 
-OLD_TO_NEW_CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
+OLD_TO_NEW_CODE_MAP: dict[DistrictAbbreviation, DistrictAbbreviation] = {
     # Old to new
     "mar": "fma",
     "nc": "fnc",
@@ -13,7 +14,7 @@ OLD_TO_NEW_CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
     "tx": "fit",
 }
 
-NEW_TO_OLD_CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
+NEW_TO_OLD_CODE_MAP: dict[DistrictAbbreviation, DistrictAbbreviation] = {
     # New to old
     "fma": "mar",
     "fnc": "nc",
@@ -21,7 +22,7 @@ NEW_TO_OLD_CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
     "fit": "tx",
 }
 
-CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
+CODE_MAP: dict[DistrictAbbreviation, DistrictAbbreviation] = {
     **OLD_TO_NEW_CODE_MAP,
     **NEW_TO_OLD_CODE_MAP,
 }
@@ -29,7 +30,7 @@ CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
 
 class RenamedDistricts:
     @staticmethod
-    def get_equivalent_codes(code: DistrictAbbreviation) -> List[DistrictAbbreviation]:
+    def get_equivalent_codes(code: DistrictAbbreviation) -> list[DistrictAbbreviation]:
         # Returns a list of equivalent district codes
         codes = [code]
         if code in CODE_MAP:
@@ -37,7 +38,7 @@ class RenamedDistricts:
         return codes
 
     @classmethod
-    def get_equivalent_keys(cls, district_key: DistrictKey) -> List[DistrictKey]:
+    def get_equivalent_keys(cls, district_key: DistrictKey) -> list[DistrictKey]:
         year = district_key[:4]
         code = district_key[4:]
         return [
@@ -46,7 +47,7 @@ class RenamedDistricts:
         ]
 
     @classmethod
-    def get_latest_codes(cls) -> List[DistrictAbbreviation]:
+    def get_latest_codes(cls) -> list[DistrictAbbreviation]:
         seen = set()
         for abbr in ALL_KNOWN_DISTRICT_ABBREVIATIONS:
             seen.add(OLD_TO_NEW_CODE_MAP.get(abbr, abbr))

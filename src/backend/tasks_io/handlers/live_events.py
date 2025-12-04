@@ -1,6 +1,5 @@
 import datetime
 import json
-from typing import List, Optional
 
 import pytz
 from flask import abort, Blueprint, request, url_for
@@ -48,7 +47,7 @@ def update_live_events() -> str:
 
 @blueprint.route("/tasks/math/enqueue/event_team_status/all", defaults={"year": None})
 @blueprint.route("/tasks/math/enqueue/event_team_status/<int:year>")
-def enqueue_eventteam_status(year: Optional[Year]) -> Response:
+def enqueue_eventteam_status(year: Year | None) -> Response:
     """
     Enqueues calculation of event team status for a year
     """
@@ -116,7 +115,7 @@ def update_event_team_status(event_key: EventKey) -> Response:
     "/tasks/math/enqueue/playoff_advancement_update/all", defaults={"year": None}
 )
 @blueprint.route("/tasks/math/enqueue/playoff_advancement_update/<int:year>")
-def enqueue_playoff_advancement_year(year: Optional[Year]) -> Response:
+def enqueue_playoff_advancement_year(year: Year | None) -> Response:
     if year is None:
         for season_year in SeasonHelper.get_valid_years():
             taskqueue.add(
@@ -177,7 +176,7 @@ def update_playoff_advancement(event_key: EventKey) -> str:
         abort(404)
 
     matches_future = EventMatchesQuery(event_key).fetch_async()
-    matches: List[Match] = matches_future.get_result()
+    matches: list[Match] = matches_future.get_result()
 
     cleaned_matches, _ = MatchHelper.delete_invalid_matches(matches, event)
 

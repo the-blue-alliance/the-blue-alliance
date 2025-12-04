@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any, Optional
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -45,7 +45,7 @@ def nexus_api_secrets(ndb_stub) -> None:
     NexusApiSecrets.put(NexusAPISecretsContentType(api_secret="abc123"))
 
 
-def create_event(api_short: Optional[str] = None) -> Event:
+def create_event(api_short: str | None = None) -> Event:
     e = Event(
         id="2019casj",
         year=2019,

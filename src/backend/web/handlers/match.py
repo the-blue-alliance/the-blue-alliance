@@ -1,6 +1,5 @@
 import json
 from datetime import timedelta
-from typing import Optional
 
 from flask import abort
 from werkzeug.wrappers import Response
@@ -21,11 +20,12 @@ def match_detail(match_key: MatchKey) -> Response:
 
     match_future = Match.get_by_id_async(match_key)
     event_future = Event.get_by_id_async(match_key.split("_")[0])
-    match: Optional[Match] = match_future.get_result()
-    event: Optional[Event] = event_future.get_result()
+    match: Match | None = match_future.get_result()
+    event: Event | None = event_future.get_result()
 
     if not match or not event:
         abort(404)
+        return
 
     zebra_data = ZebraMotionWorks.get_by_id(match_key)
     """

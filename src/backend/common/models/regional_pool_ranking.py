@@ -1,4 +1,4 @@
-from typing import List, NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from backend.common.models.event_district_points import TeamAtEventDistrictPoints
 from backend.common.models.keys import TeamKey
@@ -11,4 +11,4 @@ class RegionalPoolRanking(TypedDict):
     rookie_bonus: int
     single_event_bonus: int
     adjustments: NotRequired[int]
-    event_points: List[TeamAtEventDistrictPoints]
+    event_points: list[TeamAtEventDistrictPoints]

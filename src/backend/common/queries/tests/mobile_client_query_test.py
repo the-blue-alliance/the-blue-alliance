@@ -1,4 +1,4 @@
-from typing import Callable, List, Optional
+from collections.abc import Callable
 
 import pytest
 from google.appengine.ext import ndb
@@ -54,9 +54,9 @@ def _client(
 )
 def test_mobile_client_list(
     clients,
-    user_ids: List[str],
-    client_types: Optional[List[ClientType]],
-    expected_users: List[str],
+    user_ids: list[str],
+    client_types: list[ClientType] | None,
+    expected_users: list[str],
 ) -> None:
     clients = [client() for client in clients]
     expected = [client for client in clients if client.user_id in expected_users]

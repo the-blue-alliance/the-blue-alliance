@@ -1,5 +1,3 @@
-from typing import Optional
-
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -11,7 +9,7 @@ from backend.common.queries.event_query import DistrictEventsQuery
 
 
 def preseed_events(
-    year: Year, n: int, district_abbrev: Optional[DistrictAbbreviation]
+    year: Year, n: int, district_abbrev: DistrictAbbreviation | None
 ) -> None:
     event_type = EventType.DISTRICT if district_abbrev else EventType.REGIONAL
     district_key = (

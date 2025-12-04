@@ -1,4 +1,5 @@
-from typing import Any, Generator, List, Optional
+from collections.abc import Generator
+from typing import Any
 
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.account import Account
@@ -7,14 +8,14 @@ from backend.common.queries.database_query import DatabaseQuery
 from backend.common.tasklets import typed_tasklet
 
 
-class SuggestionQuery(DatabaseQuery[List[Suggestion], None]):
+class SuggestionQuery(DatabaseQuery[list[Suggestion], None]):
     DICT_CONVERTER = None
 
     def __init__(
         self,
         review_state: SuggestionState,
-        author: Optional[Account] = None,
-        reviewer: Optional[Account] = None,
+        author: Account | None = None,
+        reviewer: Account | None = None,
         keys_only: bool = False,
     ) -> None:
         super().__init__(
@@ -28,10 +29,10 @@ class SuggestionQuery(DatabaseQuery[List[Suggestion], None]):
     def _query_async(
         self,
         review_state: SuggestionState,
-        author: Optional[Account] = None,
-        reviewer: Optional[Account] = None,
+        author: Account | None = None,
+        reviewer: Account | None = None,
         keys_only: bool = False,
-    ) -> Generator[Any, Any, List[Suggestion]]:
+    ) -> Generator[Any, Any, list[Suggestion]]:
         params = [Suggestion.review_state == review_state]
         if author:
             params.append(Suggestion.author == author.key)

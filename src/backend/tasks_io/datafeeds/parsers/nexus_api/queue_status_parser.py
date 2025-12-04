@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import Dict, Optional
 
 from pyre_extensions import JSON
 
@@ -19,7 +18,7 @@ from backend.common.models.match import Match
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
+class NexusAPIQueueStatusParser(ParserBase[EventQueueStatus | None]):
 
     MATCH_LABEL_PATTERN: re.Pattern = re.compile(
         r"(Practice|Qualification|Playoff|Final) (\d+)( Replay)?"
@@ -30,7 +29,7 @@ class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
         self.event = event
         self.matches = event.matches
 
-    def parse(self, response: JSON) -> Optional[EventQueueStatus]:
+    def parse(self, response: JSON) -> EventQueueStatus | None:
         if self.event.playoff_type != PlayoffType.DOUBLE_ELIM_8_TEAM:
             logging.warning(
                 f"Unable to parse nexus status for {self.event.key_name}, playoff type is {self.event.playoff_type}"
@@ -43,8 +42,8 @@ class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
         if not isinstance(nexus_matches, list):
             return None
 
-        now_queueing_match_key: Optional[MatchKey] = None
-        matches: Dict[MatchKey, NexusMatch] = {}
+        now_queueing_match_key: MatchKey | None = None
+        matches: dict[MatchKey, NexusMatch] = {}
         for api_match in nexus_matches:
             match_key = self._parse_match_description(api_match["label"])
             if not match_key:
@@ -83,7 +82,7 @@ class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
             matches=matches,
         )
 
-    def _parse_match_description(self, description: str) -> Optional[MatchKey]:
+    def _parse_match_description(self, description: str) -> MatchKey | None:
         re_match = self.MATCH_LABEL_PATTERN.match(description)
         if not re_match:
             logging.warning(f"Unable to parse nexus match label: {description}")

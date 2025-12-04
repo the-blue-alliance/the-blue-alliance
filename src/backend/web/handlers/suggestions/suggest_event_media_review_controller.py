@@ -1,5 +1,4 @@
 import json
-from typing import Optional
 
 from flask import redirect, request
 from google.appengine.ext import ndb
@@ -71,7 +70,7 @@ class SuggestEventMediaReviewController(SuggestionsReviewBase[Media]):
             "suggestions/suggest_event_media_review_list.html", template_values
         )
 
-    def create_target_model(self, suggestion: Suggestion) -> Optional[Media]:
+    def create_target_model(self, suggestion: Suggestion) -> Media:
         # Setup
 
         # Remove preferred reference from another Media if specified

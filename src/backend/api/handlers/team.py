@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import Response
 
 from backend.api.handlers.decorators import (
@@ -55,7 +53,7 @@ from backend.common.queries.team_query import (
 @api_authenticated
 @validate_keys
 @cached_public
-def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
+def team(team_key: TeamKey, model_type: ModelType | None = None) -> Response:
     """
     Returns details about one team, specified by |team_key|.
     """
@@ -149,8 +147,8 @@ def team_social_media(team_key: TeamKey) -> Response:
 @cached_public
 def team_events(
     team_key: TeamKey,
-    year: Optional[int] = None,
-    model_type: Optional[ModelType] = None,
+    year: int | None = None,
+    model_type: ModelType | None = None,
 ) -> Response:
     """
     Returns a list of all event models associated with the given Team.
@@ -205,7 +203,7 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
 @validate_keys
 @cached_public
 def team_event_matches(
-    team_key: TeamKey, event_key: EventKey, model_type: Optional[ModelType] = None
+    team_key: TeamKey, event_key: EventKey, model_type: ModelType | None = None
 ) -> Response:
     """
     Returns a list of matches for a team at an event.
@@ -269,7 +267,7 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
 @cached_public
 def team_awards(
     team_key: TeamKey,
-    year: Optional[int] = None,
+    year: int | None = None,
 ) -> Response:
     """
     Returns a list of awards associated with the given Team.
@@ -292,7 +290,7 @@ def team_awards(
 def team_matches(
     team_key: TeamKey,
     year: int,
-    model_type: Optional[ModelType] = None,
+    model_type: ModelType | None = None,
 ) -> Response:
     """
     Returns a list of matches associated with the given Team in a given year.
@@ -327,7 +325,7 @@ def team_media_year(team_key: TeamKey, year: int) -> Response:
 @validate_keys
 @cached_public
 def team_media_tag(
-    team_key: TeamKey, media_tag: str, year: Optional[int] = None
+    team_key: TeamKey, media_tag: str, year: int | None = None
 ) -> Response:
     """
     Returns a list of media associated with the given Team with a given tag.
@@ -355,7 +353,7 @@ def team_media_tag(
 
 @api_authenticated
 @cached_public
-def team_list_all(model_type: Optional[ModelType] = None) -> Response:
+def team_list_all(model_type: ModelType | None = None) -> Response:
     """
     Returns a list of all teams.
     """
@@ -384,7 +382,7 @@ def team_list_all(model_type: Optional[ModelType] = None) -> Response:
 @api_authenticated
 @cached_public
 def team_list(
-    page_num: int, year: Optional[int] = None, model_type: Optional[ModelType] = None
+    page_num: int, year: int | None = None, model_type: ModelType | None = None
 ) -> Response:
     """
     Returns a list of teams, paginated by team number in sets of 500.

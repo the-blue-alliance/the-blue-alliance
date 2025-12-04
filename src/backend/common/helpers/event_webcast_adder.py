@@ -1,5 +1,4 @@
 import json
-from typing import List, Optional, Union
 
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.models.event import Event
@@ -9,7 +8,7 @@ from backend.common.models.webcast import Webcast, WebcastType
 class EventWebcastAdder:
     @classmethod
     def add_webcast(
-        cls, event: Event, webcast: Union[Webcast, List[Webcast]], update: bool = True
+        cls, event: Event, webcast: Webcast | list[Webcast], update: bool = True
     ) -> Event:
         """Takes a webcast dictionary and adds it to an event"""
 
@@ -40,7 +39,7 @@ class EventWebcastAdder:
         index: int,
         webcast_type: WebcastType,
         channel: str,
-        file: Optional[str],
+        file: str | None,
     ) -> None:
         webcasts = event.webcast
         if not webcasts or index >= len(webcasts):

@@ -1,5 +1,5 @@
 import types
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from google.appengine.ext import ndb
 
@@ -29,17 +29,17 @@ class TypedFuture(ndb.Future, Generic[T]):
     def get_exception(self) -> Exception:
         return super().get_exception()
 
-    def get_traceback(self) -> Optional[types.TracebackType]:
+    def get_traceback(self) -> types.TracebackType | None:
         return super().get_traceback()
 
 
-class InstantFuture(TypedFuture[T], Generic[T]):
+class InstantFuture(TypedFuture[T]):
     def __init__(self, result: T):
         super().__init__()
         self.set_result(result)
 
 
-class FailedFuture(TypedFuture[T], Generic[T]):
+class FailedFuture(TypedFuture[T]):
     def __init__(self, exception: Exception):
         super().__init__()
         self.set_exception(exception)

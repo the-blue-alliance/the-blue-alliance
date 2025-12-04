@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, NewType, Optional
+from typing import NewType
 
 from google.appengine.ext import ndb
 
@@ -10,7 +10,7 @@ from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
-MediaDict = NewType("MediaDict", Dict)
+MediaDict = NewType("MediaDict", dict)
 
 
 class MediaConverter(ConverterBase):
@@ -20,15 +20,15 @@ class MediaConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[Media], version: ApiMajorVersion
-    ) -> List[MediaDict]:
+        cls, model_list: list[Media], version: ApiMajorVersion
+    ) -> list[MediaDict]:
         MEDIA_CONVERTERS = {
             ApiMajorVersion.API_V3: cls.mediasConverter_v3,
         }
         return MEDIA_CONVERTERS[version](model_list)
 
     @classmethod
-    def mediasConverter_v3(cls, medias: List[Media]) -> List[MediaDict]:
+    def mediasConverter_v3(cls, medias: list[Media]) -> list[MediaDict]:
         return list(map(cls.mediaConverter_v3, medias))
 
     @classmethod
@@ -53,9 +53,7 @@ class MediaConverter(ConverterBase):
         return MediaDict(dict)
 
     @staticmethod
-    def dictToModel_v3(
-        data: Dict, year: Optional[int], team_key: Optional[TeamKey]
-    ) -> Media:
+    def dictToModel_v3(data: dict, year: int | None, team_key: TeamKey | None) -> Media:
         media_type = SLUG_NAME_TO_TYPE[data["type"]]
         foreign_key = data["foreign_key"]
         media = Media(

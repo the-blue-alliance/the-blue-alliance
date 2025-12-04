@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.keys import Year
@@ -7,7 +6,7 @@ from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.web.profiled_render import render_template
 
 
-def regional_champs_pool_list(year: Optional[Year]) -> str:
+def regional_champs_pool_list(year: Year | None) -> str:
     if not year:
         year = datetime.now().year
 

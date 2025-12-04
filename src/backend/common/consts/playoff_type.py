@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import enum
-from typing import Dict, Set, Tuple
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.string_enum import StrEnum
@@ -65,7 +64,7 @@ class PlayoffType(enum.IntEnum):
     CUSTOM = 8
 
 
-BRACKET_TYPES: Set[PlayoffType] = {
+BRACKET_TYPES: set[PlayoffType] = {
     PlayoffType.BRACKET_2_TEAM,
     PlayoffType.BRACKET_4_TEAM,
     PlayoffType.BRACKET_8_TEAM,
@@ -73,7 +72,7 @@ BRACKET_TYPES: Set[PlayoffType] = {
 }
 
 
-DOUBLE_ELIM_TYPES: Set[PlayoffType] = {
+DOUBLE_ELIM_TYPES: set[PlayoffType] = {
     PlayoffType.DOUBLE_ELIM_8_TEAM,
     PlayoffType.DOUBLE_ELIM_4_TEAM,
     PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM,
@@ -81,7 +80,7 @@ DOUBLE_ELIM_TYPES: Set[PlayoffType] = {
 
 
 # Names for Rendering
-TYPE_NAMES: Dict[PlayoffType, str] = {
+TYPE_NAMES: dict[PlayoffType, str] = {
     PlayoffType.BRACKET_16_TEAM: "Elimination Bracket (16 Alliances)",
     PlayoffType.BRACKET_8_TEAM: "Elimination Bracket (8 Alliances)",
     PlayoffType.BRACKET_4_TEAM: "Elimination Bracket (4 Alliances)",
@@ -96,7 +95,7 @@ TYPE_NAMES: Dict[PlayoffType, str] = {
     PlayoffType.CUSTOM: "Custom",
 }
 
-API_TYPE_NAMES: Dict[PlayoffType, str] = {
+API_TYPE_NAMES: dict[PlayoffType, str] = {
     PlayoffType.BRACKET_16_TEAM: "best_of_3",
     PlayoffType.BRACKET_8_TEAM: "best_of_3",
     PlayoffType.BRACKET_4_TEAM: "best_of_3",
@@ -112,7 +111,7 @@ API_TYPE_NAMES: Dict[PlayoffType, str] = {
 }
 
 
-BRACKET_ELIM_MAPPING: Dict[int, Tuple[int, int]] = {
+BRACKET_ELIM_MAPPING: dict[int, tuple[int, int]] = {
     1: (1, 1),  # (set, match)
     2: (2, 1),
     3: (3, 1),
@@ -140,7 +139,7 @@ BRACKET_ELIM_MAPPING: Dict[int, Tuple[int, int]] = {
 }
 
 
-BRACKET_OCTO_ELIM_MAPPING: Dict[int, Tuple[int, int]] = {
+BRACKET_OCTO_ELIM_MAPPING: dict[int, tuple[int, int]] = {
     # octofinals
     1: (1, 1),  # (set, match)
     2: (2, 1),
@@ -198,7 +197,7 @@ BRACKET_OCTO_ELIM_MAPPING: Dict[int, Tuple[int, int]] = {
 # Map match number -> set/match for a 8 alliance double elim bracket
 # Based off: https://www.printyourbrackets.com/fillable-brackets/8-seeded-double-fillable.pdf
 # Matches 1-6 are ef, 7-10 are qf, 11/12 are sf, 13 is f1, and 14/15 are f2
-LEGACY_DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+LEGACY_DOUBLE_ELIM_MAPPING: dict[int, tuple[CompLevel, int, int]] = {
     # octofinals (winners bracket)
     1: (CompLevel.EF, 1, 1),
     2: (CompLevel.EF, 2, 1),
@@ -228,7 +227,7 @@ LEGACY_DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
 # Map a match number -> set/match for FIRST's 8 alliance double elim bracket
 # Based off: https://firstfrc.blob.core.windows.net/frc2023/Manual/2023FRCGameManual.pdf
 # We consider everything before finals as "semi-finals" to match FIRST's match numbering.
-DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+DOUBLE_ELIM_MAPPING: dict[int, tuple[CompLevel, int, int]] = {
     # round 1
     1: (CompLevel.SF, 1, 1),
     2: (CompLevel.SF, 2, 1),
@@ -256,7 +255,7 @@ DOUBLE_ELIM_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     19: (CompLevel.F, 1, 6),  # Overtime 3
 }
 
-DOUBLE_ELIM_4_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
+DOUBLE_ELIM_4_MAPPING: dict[int, tuple[CompLevel, int, int]] = {
     # round 1
     1: (CompLevel.SF, 1, 1),
     2: (CompLevel.SF, 2, 1),
@@ -274,11 +273,11 @@ DOUBLE_ELIM_4_MAPPING: Dict[int, Tuple[CompLevel, int, int]] = {
     11: (CompLevel.F, 1, 6),  # Overtime 3
 }
 
-DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
+DOUBLE_ELIM_MAPPING_INVERSE: dict[tuple[CompLevel, int, int], int] = {
     v: k for k, v in DOUBLE_ELIM_MAPPING.items()
 }
 
 
-DOUBLE_ELIM_4_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
+DOUBLE_ELIM_4_MAPPING_INVERSE: dict[tuple[CompLevel, int, int], int] = {
     v: k for k, v in DOUBLE_ELIM_4_MAPPING.items()
 }

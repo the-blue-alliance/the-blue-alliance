@@ -4,7 +4,7 @@ import json
 import re
 import time
 from datetime import datetime, timezone
-from typing import Any, Optional, Union
+from typing import Any
 
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.keys import MatchKey
@@ -29,19 +29,19 @@ def defense_name(value: str) -> str:
     return value
 
 
-def digits(s: Optional[Union[int, str]]) -> Union[int, str]:
+def digits(s: int | str | None) -> int | str:
     if not s:
         return ""
     if type(s) is int:
         return s
-    return re.sub("[^0-9]", "", s)
+    return re.sub("[^0-9]", "", str(s))
 
 
 def floatformat(num: float, num_decimals: int) -> str:
     return "%.{}f".format(num_decimals) % num
 
 
-def isoformat(dt: datetime) -> datetime:
+def isoformat(dt: datetime) -> str:
     return dt.isoformat()
 
 
@@ -59,7 +59,7 @@ def limit_prob(prob: float) -> int:
     return int(round(prob))
 
 
-def from_ms_timestamp(timestamp: Optional[int]) -> Optional[datetime]:
+def from_ms_timestamp(timestamp: int | None) -> datetime | None:
     if timestamp is None:
         return None
     return datetime.fromtimestamp(timestamp / 1000)
@@ -88,7 +88,7 @@ def strftime(dt: datetime, formatstr: str) -> str:
     return dt.strftime(formatstr).lstrip("0").replace(" 0", " ")
 
 
-def strip_frc(s: Optional[str]) -> str:
+def strip_frc(s: str | None) -> str:
     if not s:
         return ""
     return s[3:]

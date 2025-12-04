@@ -1,11 +1,10 @@
 import enum
-from typing import Dict
 
 from backend.common.consts.string_enum import StrEnum
 from backend.common.models.keys import TeamId
 
 
-TStatMap = Dict[TeamId, float]
+TStatMap = dict[TeamId, float]
 
 
 @enum.unique
@@ -15,4 +14,4 @@ class StatType(StrEnum):
     CCWM = "ccwms"
 
 
-EventMatchStats = Dict[StatType, TStatMap]
+EventMatchStats = dict[StatType, TStatMap]

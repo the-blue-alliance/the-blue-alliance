@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 from difflib import SequenceMatcher
-from typing import List, Optional, Tuple, Union
 
 from flask import redirect, request
 from pyre_extensions import none_throws
@@ -24,7 +23,7 @@ from backend.web.profiled_render import render_template
 @dataclass
 class SuggestOffseasonTargetModel:
     status: str
-    event_key: Optional[EventKey]
+    event_key: EventKey | None
 
 
 class SuggestOffseasonEventReviewController(
@@ -37,7 +36,7 @@ class SuggestOffseasonEventReviewController(
 
     def create_target_model(
         self, suggestion: Suggestion
-    ) -> Optional[SuggestOffseasonTargetModel]:
+    ) -> SuggestOffseasonTargetModel | None:
         year = int(request.form.get("year", 0))
         event_short = request.form.get("event_short", None)
         if event_short:
@@ -109,7 +108,7 @@ The Blue Alliance Admins\
             event_key=event_key,
         )
 
-    def was_create_success(self, ret: Optional[SuggestOffseasonTargetModel]) -> bool:
+    def was_create_success(self, ret: SuggestOffseasonTargetModel | None) -> bool:
         return ret is not None and ret.status == "success"
 
     def get(self) -> Response:
@@ -177,9 +176,7 @@ The Blue Alliance Admins\
         return redirect("/suggest/offseason/review")
 
     @classmethod
-    def _create_candidate_event(
-        cls, suggestion: Suggestion
-    ) -> Tuple[Union[int, str], Event]:
+    def _create_candidate_event(cls, suggestion: Suggestion) -> tuple[int | str, Event]:
         start_date = None
         end_date = None
         try:
@@ -215,8 +212,8 @@ The Blue Alliance Admins\
 
     @classmethod
     def _get_similar_events(
-        cls, candidate_event: Event, offseason_events: List[Event]
-    ) -> List[Tuple[str, str]]:
+        cls, candidate_event: Event, offseason_events: list[Event]
+    ) -> list[tuple[str, str]]:
         """
         Finds events this year with a similar name
         Returns a tuple of (event key, event name)

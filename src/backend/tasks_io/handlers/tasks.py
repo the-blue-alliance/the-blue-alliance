@@ -1,5 +1,5 @@
 import datetime
-from typing import cast, List
+from typing import cast
 
 from flask import abort, Blueprint, make_response, redirect, request
 from google.appengine.ext import ndb
@@ -78,7 +78,7 @@ def remap_teams(event_key: EventKey) -> str:
 
 @blueprint.route("/tasks/do/archive_api_keys")
 def archive_api_keys() -> str:
-    keys: List[ApiAuthAccess] = ApiAuthAccess.query(
+    keys: list[ApiAuthAccess] = ApiAuthAccess.query(
         ndb.AND(
             cast(ndb.IntegerProperty, ApiAuthAccess.auth_types_enum).IN(
                 list(WRITE_TYPE_NAMES.keys())

@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Tuple
 from unittest import mock
 
 from freezegun import freeze_time
@@ -111,7 +110,7 @@ def test_calc_matchstats(
     coprs: EventComponentOPRs = {
         "MyComponent": {"254": 67.0},
     }
-    match_predictions: Tuple[
+    match_predictions: tuple[
         TMatchPredictions,
         TMatchPredictionStats,
         TEventStatMeanVars,
@@ -120,7 +119,7 @@ def test_calc_matchstats(
         {},
         {},
     )
-    ranking_predictions: Tuple[TRankingPredictions, TRankingPredictionStats] = (
+    ranking_predictions: tuple[TRankingPredictions, TRankingPredictionStats] = (
         [],
         {"last_played_match": None},
     )
@@ -177,7 +176,7 @@ def test_calc_matchstats_no_output_in_taskqueue(
     coprs: EventComponentOPRs = {
         "MyComponent": {"254": 67.0},
     }
-    match_predictions: Tuple[
+    match_predictions: tuple[
         TMatchPredictions,
         TMatchPredictionStats,
         TEventStatMeanVars,
@@ -186,7 +185,7 @@ def test_calc_matchstats_no_output_in_taskqueue(
         {},
         {},
     )
-    ranking_predictions: Tuple[TRankingPredictions, TRankingPredictionStats] = (
+    ranking_predictions: tuple[TRankingPredictions, TRankingPredictionStats] = (
         [],
         {"last_played_match": None},
     )

@@ -3,8 +3,8 @@ from __future__ import annotations
 import datetime
 import json
 import re
-import typing
-from typing import Any, cast, Dict, Generator, List, Optional, Set
+from collections.abc import Generator
+from typing import Any, cast, TYPE_CHECKING
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -36,7 +36,7 @@ from backend.common.models.location import Location
 from backend.common.models.webcast import Webcast, WebcastOnlineStatus
 from backend.common.tasklets import typed_toplevel
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from backend.common.models.award import Award
     from backend.common.models.match import Match
     from backend.common.models.team import Team
@@ -88,7 +88,7 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # Event code used in FIRST's API, if different from event_short
     year: Year = ndb.IntegerProperty(required=True)
-    district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
+    district_key: ndb.Key | None = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
     playoff_type: PlayoffType = cast(
@@ -107,7 +107,7 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
-    normalized_location: Optional[Location] = cast(
+    normalized_location: Location | None = cast(
         Location, ndb.StructuredProperty(Location)
     )
 
@@ -119,11 +119,11 @@ class Event(CachedModel):
         ndb.IntegerProperty()
     )  # Turn off a particular type of sync
     first_eid = ndb.StringProperty()  # from USFIRST
-    parent_event: Optional[ndb.Key] = (
+    parent_event: ndb.Key | None = (
         ndb.KeyProperty()
     )  # This is the division -> event champs relationship
     # event champs -> all divisions
-    divisions: List[ndb.Key] = ndb.KeyProperty(repeated=True)  # pyre-ignore[8]
+    divisions: list[ndb.Key] = ndb.KeyProperty(repeated=True)  # pyre-ignore[8]
     facebook_eid = ndb.TextProperty(indexed=False)  # from Facebook
     custom_hashtag = ndb.TextProperty(indexed=False)  # Custom HashTag
     website = ndb.TextProperty(indexed=False)
@@ -131,14 +131,14 @@ class Event(CachedModel):
         indexed=False
     )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
-    remap_teams: Dict[TeamKey, TeamKey] = (
+    remap_teams: dict[TeamKey, TeamKey] = (
         ndb.JsonProperty()
     )  # Map of temporary "off-season demo" team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "end_date",
         "event_short",
         "event_type_enum",
@@ -168,11 +168,11 @@ class Event(CachedModel):
         "remap_teams",
     }
 
-    _allow_none_attrs: Set[str] = {
+    _allow_none_attrs: set[str] = {
         "district_key",
     }
 
-    _list_attrs: Set[str] = {
+    _list_attrs: set[str] = {
         "divisions",
     }
 
@@ -180,27 +180,27 @@ class Event(CachedModel):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {"key": set(), "year": set(), "district_key": set()}
-        self._awards_future: Optional[TypedFuture[List[Award]]] = None
-        self._details_future: Optional[TypedFuture[EventDetails]] = None
+        self._awards_future: TypedFuture[list[Award]] | None = None
+        self._details_future: TypedFuture[EventDetails] | None = None
         self._location = None
         self._city_state_country = None
-        self._matches_future: Optional[TypedFuture[List[Match]]] = None
-        self._teams_future: Optional[TypedFuture[List[Team]]] = None
+        self._matches_future: TypedFuture[list[Match]] | None = None
+        self._teams_future: TypedFuture[list[Team]] | None = None
         self._venue_address_safe = None
-        self._webcast = None
-        self._updated_attrs = []  # Used in EventManipulator to track what changed
+        self._webcast = []
+        self._updated_attrs = set()  # Used in EventManipulator to track what changed
         self._week = None
         super(Event, self).__init__(*args, **kw)
 
     @property
-    def alliance_selections(self) -> Optional[List[EventAlliance]]:
+    def alliance_selections(self) -> list[EventAlliance] | None:
         if self.details is None:
             return None
         else:
             return self.details.alliance_selections
 
     @property
-    def alliance_teams(self) -> List[TeamKey]:
+    def alliance_teams(self) -> list[TeamKey]:
         # Load a list of team keys playing in elims
         alliances = self.alliance_selections
         if alliances is None:
@@ -215,7 +215,7 @@ class Event(CachedModel):
                 teams.append(backup["in"])
         return teams
 
-    def prep_awards(self) -> TypedFuture[List[Award]]:
+    def prep_awards(self) -> TypedFuture[list[Award]]:
         if self._awards_future is None:
             from backend.common.queries import award_query
 
@@ -225,7 +225,7 @@ class Event(CachedModel):
         return self._awards_future
 
     @property
-    def awards(self) -> List["Award"]:
+    def awards(self) -> list["Award"]:
         if self._awards_future is None:
             self.prep_awards()
         return none_throws(self._awards_future).get_result()
@@ -244,21 +244,21 @@ class Event(CachedModel):
         return none_throws(self._details_future).get_result()
 
     @property
-    def district_points(self) -> Optional[EventDistrictPoints]:
+    def district_points(self) -> EventDistrictPoints | None:
         if self.details is None:
             return None
         else:
             return self.details.district_points
 
     @property
-    def regional_champs_pool_points(self) -> Optional[EventDistrictPoints]:
+    def regional_champs_pool_points(self) -> EventDistrictPoints | None:
         if self.event_type_enum != EventType.REGIONAL or self.details is None:
             return None
 
         return self.details.regional_champs_pool_points
 
     @property
-    def playoff_advancement(self) -> Optional[TPlayoffAdvancement]:
+    def playoff_advancement(self) -> TPlayoffAdvancement | None:
         if self.details is None:
             return None
         else:
@@ -269,7 +269,7 @@ class Event(CachedModel):
             )
 
     @property
-    def playoff_bracket(self) -> Optional[TBracketTable]:
+    def playoff_bracket(self) -> TBracketTable | None:
         if self.details is None:
             return None
         else:
@@ -288,7 +288,7 @@ class Event(CachedModel):
     def clear_teams(self) -> None:
         self._teams_future = None
 
-    def prep_matches(self) -> TypedFuture[List[Match]]:
+    def prep_matches(self) -> TypedFuture[list[Match]]:
         if self._matches_future is None:
             from backend.common.queries import match_query
 
@@ -298,7 +298,7 @@ class Event(CachedModel):
         return self._matches_future
 
     @property
-    def matches(self) -> List["Match"]:
+    def matches(self) -> list["Match"]:
         if self._matches_future is None:
             self.prep_matches()
         return none_throws(self._matches_future).get_result()
@@ -378,7 +378,7 @@ class Event(CachedModel):
         return self.end_date.date() == self.local_time().date()
 
     @property
-    def week(self) -> Optional[int]:
+    def week(self) -> int | None:
         """
         Returns the week of the event relative to the first official season event as an integer
         Returns None if the event is not of type NON_CMP_EVENT_TYPES or is not official
@@ -437,7 +437,7 @@ class Event(CachedModel):
         return self._week
 
     @property
-    def week_str(self) -> Optional[str]:
+    def week_str(self) -> str | None:
         if self.week is None:
             return None
 
@@ -458,7 +458,7 @@ class Event(CachedModel):
                 return "Awards"
         return "Week {}".format(week + 1)
 
-    def prep_teams(self) -> TypedFuture[List[Team]]:
+    def prep_teams(self) -> TypedFuture[list[Team]]:
         if self._teams_future is None:
             from backend.common.queries import team_query
 
@@ -468,7 +468,7 @@ class Event(CachedModel):
         return self._teams_future
 
     @property
-    def teams(self) -> List["Team"]:
+    def teams(self) -> list["Team"]:
         if self._teams_future is None:
             self.prep_teams()
         return none_throws(self._teams_future).get_result()
@@ -488,14 +488,14 @@ class Event(CachedModel):
             return self.details.coprs
 
     @property
-    def rankings(self) -> Optional[List[EventRanking]]:
+    def rankings(self) -> list[EventRanking] | None:
         if self.details is None:
             return None
         else:
             return self.details.rankings2
 
     @property
-    def location(self) -> Optional[str]:
+    def location(self) -> str | None:
         if self._location is None:
             split_location = []
             if self.city:
@@ -511,7 +511,7 @@ class Event(CachedModel):
         return self._location
 
     @property
-    def city_state_country(self) -> Optional[str]:
+    def city_state_country(self) -> str | None:
         if not self._city_state_country:
             location_parts = []
             if self.city:
@@ -527,11 +527,11 @@ class Event(CachedModel):
         return self._city_state_country
 
     @property
-    def nl(self) -> Optional[Location]:
+    def nl(self) -> Location | None:
         return self.normalized_location
 
     @property
-    def venue_or_venue_from_address(self) -> Optional[str]:
+    def venue_or_venue_from_address(self) -> str | None:
         if self.venue:
             return self.venue
         else:
@@ -541,7 +541,7 @@ class Event(CachedModel):
                 return None
 
     @property
-    def venue_address_safe(self) -> Optional[str]:
+    def venue_address_safe(self) -> str | None:
         """
         Construct (not detailed) venue address if detailed venue address doesn't exist
         """
@@ -571,13 +571,13 @@ class Event(CachedModel):
         return self._venue_address_safe
 
     @property
-    def webcast(self) -> List[Webcast]:
+    def webcast(self) -> list[Webcast]:
         """
         Lazy load parsing webcast JSON
         """
-        if self._webcast is None:
+        if not self._webcast:
             try:
-                self._webcast: List[Webcast] = json.loads(self.webcast_json)
+                self._webcast: list[Webcast] = json.loads(self.webcast_json)
 
                 # Sort firstinspires channels to the front, keep the order of the rest
                 self._webcast = sorted(
@@ -592,7 +592,7 @@ class Event(CachedModel):
                     ),
                 )
             except Exception:
-                self._webcast = None
+                self._webcast = []
         return self._webcast or []
 
     @typed_toplevel
@@ -601,7 +601,7 @@ class Event(CachedModel):
             WebcastOnlineStatusMemcache(webcast).get_async()
             for webcast in self.current_webcasts
         ]
-        statuses: List[Optional[Webcast]] = yield status_futures
+        statuses: list[Webcast | None] = yield status_futures
 
         for webcast, with_status in zip(self.current_webcasts, statuses):
             if with_status is not None:
@@ -630,7 +630,7 @@ class Event(CachedModel):
         return overall_status
 
     @property
-    def current_webcasts(self) -> List[Webcast]:
+    def current_webcasts(self) -> list[Webcast]:
         if not self.webcast or not self.within_a_day:
             return []
 
@@ -693,7 +693,7 @@ class Event(CachedModel):
         return "/event/%s" % self.key_name
 
     @property
-    def gameday_url(self) -> Optional[str]:
+    def gameday_url(self) -> str | None:
         """
         Returns the URL pattern for the link to watch webcasts in Gameday
         """
@@ -703,7 +703,7 @@ class Event(CachedModel):
             return None
 
     @property
-    def public_agenda_url(self) -> Optional[str]:
+    def public_agenda_url(self) -> str | None:
         if self.event_type_enum not in SEASON_EVENT_TYPES:
             return None
 
@@ -732,7 +732,7 @@ class Event(CachedModel):
         return True if match else False
 
     @property
-    def event_district_str(self) -> Optional[str]:
+    def event_district_str(self) -> str | None:
         from backend.common.queries.district_query import DistrictQuery
 
         if self.district_key is None:
@@ -743,14 +743,14 @@ class Event(CachedModel):
         return district.display_name if district else None
 
     @property
-    def event_district_abbrev(self) -> Optional[str]:
+    def event_district_abbrev(self) -> str | None:
         if self.district_key is None:
             return None
         else:
             return none_throws(none_throws(self.district_key).string_id())[4:]
 
     @property
-    def event_district_key(self) -> Optional[str]:
+    def event_district_key(self) -> str | None:
         if self.district_key is None:
             return None
         else:

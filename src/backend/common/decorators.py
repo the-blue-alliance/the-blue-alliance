@@ -1,6 +1,6 @@
+from collections.abc import Callable
 from datetime import timedelta
 from functools import partial, wraps
-from typing import Callable, Optional, Union
 
 from flask import current_app, has_request_context, make_response, request, Response
 from flask_caching import CachedResponse
@@ -9,8 +9,8 @@ from backend.common.environment import Environment
 
 
 def cached_public(
-    func: Optional[Callable] = None,
-    ttl: Union[int, timedelta] = 61,
+    func: Callable | None = None,
+    ttl: int | timedelta = 61,
     cache_redirects: bool = False,
 ):
     timeout = ttl if isinstance(ttl, int) else int(ttl.total_seconds())
@@ -59,7 +59,7 @@ def cached_public(
     return decorated_function
 
 
-def memoize(func: Optional[Callable] = None, timeout: int = 61):
+def memoize(func: Callable | None = None, timeout: int = 61):
     if func is None:  # Handle no-argument decorator
         return partial(memoize, timeout=timeout)
 

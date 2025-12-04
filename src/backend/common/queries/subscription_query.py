@@ -1,4 +1,5 @@
-from typing import Any, Generator, List
+from collections.abc import Generator
+from typing import Any
 
 from backend.common.models.account import Account
 from backend.common.models.subscription import Subscription
@@ -6,7 +7,7 @@ from backend.common.queries.database_query import DatabaseQuery
 from backend.common.tasklets import typed_tasklet
 
 
-class SubscriptionQuery(DatabaseQuery[List[Subscription], None]):
+class SubscriptionQuery(DatabaseQuery[list[Subscription], None]):
     DICT_CONVERTER = None
 
     def __init__(self, account: Account, keys_only: bool = False) -> None:
@@ -15,6 +16,6 @@ class SubscriptionQuery(DatabaseQuery[List[Subscription], None]):
     @typed_tasklet
     def _query_async(
         self, account: Account, keys_only: bool = False
-    ) -> Generator[Any, Any, List[Subscription]]:
+    ) -> Generator[Any, Any, list[Subscription]]:
         subscription_query = Subscription.query(ancestor=account.key)
         return (yield (subscription_query.fetch_async(keys_only=keys_only)))

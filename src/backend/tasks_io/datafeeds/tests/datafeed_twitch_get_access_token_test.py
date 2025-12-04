@@ -1,6 +1,6 @@
 import json
 import time
-from typing import Any, Dict
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -45,7 +45,7 @@ def test_request_token(api_mock: mock.Mock, twitch_secrets) -> None:
     assert df.payload()["grant_type"] == "client_credentials"
 
     result = df.fetch_async().get_result()
-    expected: Dict[str, Any] = {
+    expected: dict[str, Any] = {
         "client_id": "test",
         "expires_at": int(time.time()) + 14124,
     }
@@ -74,7 +74,7 @@ def test_refresh_token(api_mock: mock.Mock, twitch_secrets) -> None:
     result = df.fetch_async().get_result()
 
     result = df.fetch_async().get_result()
-    expected: Dict[str, Any] = {
+    expected: dict[str, Any] = {
         "client_id": "test",
         "expires_at": int(time.time()) + 14124,
     }

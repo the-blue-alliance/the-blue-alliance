@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Dict
 
 from pyre_extensions import JSON
 
@@ -15,7 +14,7 @@ from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 @dataclass
 class TParsedRegionalAdvancement:
     advancement: RegionalPoolAdvancement
-    adjustments: Dict[TeamKey, int]
+    adjustments: dict[TeamKey, int]
 
 
 class RegionalAdvancementParser(ParserBase[TParsedRegionalAdvancement]):
@@ -28,7 +27,7 @@ class RegionalAdvancementParser(ParserBase[TParsedRegionalAdvancement]):
             return TParsedRegionalAdvancement(advancement={}, adjustments={})
 
         advancement: RegionalPoolAdvancement = {}
-        adjustments: Dict[TeamKey, int] = {}
+        adjustments: dict[TeamKey, int] = {}
         year = response["season"]
         for team in team_advancement:
             if not isinstance(team, dict):

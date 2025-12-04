@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import cast, List
+from typing import cast
 from unittest.mock import patch
 from urllib.parse import urlparse
 
@@ -90,7 +90,7 @@ def createMatchAndEvent(ndb_stub):
 
 
 def assert_num_added(
-    captured_templates: List[CapturedTemplate], num_added: int
+    captured_templates: list[CapturedTemplate], num_added: int
 ) -> None:
     template = captured_templates[0][0]
     context = captured_templates[0][1]
@@ -163,7 +163,7 @@ def test_submit_empty_form(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
         "/suggest/event/video",
@@ -181,7 +181,7 @@ def test_submit_partial_mismatch(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     response = web_client.post(
         "/suggest/event/video?event_key=2016necmp",
@@ -203,7 +203,7 @@ def test_submit_bad_match(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     response = web_client.post(
         "/suggest/event/video?event_key=2016necmp",
@@ -226,7 +226,7 @@ def test_submit_one_video(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     response = web_client.post(
         "/suggest/event/video?event_key=2016necmp",

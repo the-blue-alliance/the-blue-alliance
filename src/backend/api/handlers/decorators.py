@@ -1,6 +1,6 @@
 import json
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, Set, Type, TypeVar
 
 from flask import g, jsonify, request, Response
 
@@ -61,7 +61,7 @@ def api_authenticated(func):
     return decorated_function
 
 
-def require_write_auth(auth_types: Set[AuthType]):
+def require_write_auth(auth_types: set[AuthType]):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
@@ -77,12 +77,8 @@ def require_write_auth(auth_types: Set[AuthType]):
     return decorator
 
 
-T = TypeVar("T")
-R = TypeVar("R")
-
-
-def client_api_method(
-    req_type: Type[T], resp_type: Type[R]
+def client_api_method[T, R](
+    req_type: type[T], resp_type: type[R]
 ) -> Callable[[Callable[[T], R]], Callable[..., Response]]:
     """
     This is a decorator to apply JSON request/response models

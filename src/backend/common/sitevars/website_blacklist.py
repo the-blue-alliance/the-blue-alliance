@@ -1,10 +1,10 @@
-from typing import List, TypedDict
+from typing import TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 
 
 class ContentType(TypedDict):
-    websites: List[str]
+    websites: list[str]
 
 
 class WebsiteBlacklist(Sitevar[ContentType]):

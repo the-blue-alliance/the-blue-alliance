@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.sitevar import Sitevar
@@ -11,8 +11,8 @@ class WebcastType(Webcast):
 
 class ContentType(TypedDict):
     default_chat: str
-    webcasts: List[WebcastType]
-    aliases: Dict[str, str]
+    webcasts: list[WebcastType]
+    aliases: dict[str, str]
 
 
 class GamedaySpecialWebcasts(Sitevar[ContentType]):
@@ -37,11 +37,11 @@ class GamedaySpecialWebcasts(Sitevar[ContentType]):
         return cls.get()["default_chat"]
 
     @classmethod
-    def webcasts(cls) -> List[WebcastType]:
+    def webcasts(cls) -> list[WebcastType]:
         return cls.get()["webcasts"]
 
     @classmethod
-    def get_alias(cls, alias) -> Optional[str]:
+    def get_alias(cls, alias) -> str | None:
         return cls.get()["aliases"].get(alias)
 
     @classmethod

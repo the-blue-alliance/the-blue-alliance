@@ -1,4 +1,4 @@
-from typing import cast, Dict, Union
+from typing import cast
 
 from flask import redirect, request, url_for
 from werkzeug.wrappers import Response
@@ -32,7 +32,7 @@ def landing_edit_post() -> Response:
     props = request.values
 
     # Handle our integer key
-    new_props: Dict[str, Union[bool, int, str]] = {
+    new_props: dict[str, bool | int | str] = {
         "current_landing": int(props.get("landing_type", int(LandingType.BUILDSEASON)))
     }
 

@@ -1,5 +1,5 @@
 import abc
-from typing import Dict, Generic, List, Union
+from typing import Generic
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.helpers.listify import delistify, listify
@@ -10,7 +10,7 @@ from backend.common.queries.types import DictQueryReturn, QueryReturn
 
 class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     # Used to version cached outputs
-    SUBVERSIONS: Dict[ApiMajorVersion, int]
+    SUBVERSIONS: dict[ApiMajorVersion, int]
 
     _query_return: QueryReturn
 
@@ -19,7 +19,7 @@ class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
 
     def convert(
         self, version: ApiMajorVersion
-    ) -> Union[None, DictQueryReturn, List[DictQueryReturn]]:
+    ) -> None | DictQueryReturn | list[DictQueryReturn]:
         with Span("{}.convert".format(self.__class__.__name__)):
             if self._query_return is None:
                 return None
@@ -34,12 +34,12 @@ class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     @classmethod
     @abc.abstractmethod
     def _convert_list(
-        cls, model_list: List, version: ApiMajorVersion
-    ) -> List[DictQueryReturn]:
+        cls, model_list: list, version: ApiMajorVersion
+    ) -> list[DictQueryReturn]:
         return [{} for model in model_list]
 
     @classmethod
-    def constructLocation_v3(cls, model: Locatable) -> Dict:
+    def constructLocation_v3(cls, model: Locatable) -> dict:
         """
         Works for teams and events
         """

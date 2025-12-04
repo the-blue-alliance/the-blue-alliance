@@ -1,6 +1,5 @@
 import json
 import unittest
-from typing import Optional
 from unittest.mock import patch
 
 import pytest
@@ -20,7 +19,7 @@ from backend.common.models.team import Team
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestAwardManipulator(unittest.TestCase):
-    taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub | None = None
 
     @pytest.fixture(autouse=True)
     def store_taskqueue_stub(self, taskqueue_stub):

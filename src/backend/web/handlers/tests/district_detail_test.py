@@ -1,5 +1,4 @@
 import re
-from typing import List
 
 import pytest
 from bs4 import BeautifulSoup
@@ -187,14 +186,14 @@ def test_district_detail_rankings(
     expects_rankings,
     cache_ttl,
     ndb_stub,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: Client,
 ):
     district_key = f"{year}fim"
 
     helpers.preseed_district(district_key)
 
-    rankings: List[DistrictRanking] = [
+    rankings: list[DistrictRanking] = [
         DistrictRanking(
             rank=1,
             team_key="frc7332",

@@ -1,4 +1,4 @@
-from typing import Dict, List, NewType
+from typing import NewType
 
 from google.appengine.ext import ndb
 
@@ -7,7 +7,7 @@ from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
-RobotDict = NewType("RobotDict", Dict)
+RobotDict = NewType("RobotDict", dict)
 
 
 class RobotConverter(ConverterBase):
@@ -17,15 +17,15 @@ class RobotConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[Robot], version: ApiMajorVersion
-    ) -> List[RobotDict]:
+        cls, model_list: list[Robot], version: ApiMajorVersion
+    ) -> list[RobotDict]:
         ROBOT_CONVERTERS = {
             ApiMajorVersion.API_V3: cls.robotsConverter_v3,
         }
         return ROBOT_CONVERTERS[version](model_list)
 
     @classmethod
-    def robotsConverter_v3(cls, robots: List[Robot]) -> List[RobotDict]:
+    def robotsConverter_v3(cls, robots: list[Robot]) -> list[RobotDict]:
         return list(map(cls.robotConverter_v3, robots))
 
     @classmethod
@@ -40,7 +40,7 @@ class RobotConverter(ConverterBase):
         )
 
     @staticmethod
-    def dictToModel_v3(data: Dict) -> Robot:
+    def dictToModel_v3(data: dict) -> Robot:
         return Robot(
             id=data["key"],
             team=ndb.Key(Team, data["team_key"]),

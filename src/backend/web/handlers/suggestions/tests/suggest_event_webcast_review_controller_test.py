@@ -1,6 +1,5 @@
 import re
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 import pytest
@@ -51,8 +50,8 @@ def login_user_with_permission(login_user):
 
 
 def get_suggestion_queue_and_fields(
-    web_client: Client, form_id: Optional[str] = None
-) -> Tuple[List[str], Dict]:
+    web_client: Client, form_id: str | None = None
+) -> tuple[list[str], dict]:
     response = web_client.get("/suggest/event/webcast/review")
     assert response.status_code == 200
     soup = BeautifulSoup(response.data, "html.parser")

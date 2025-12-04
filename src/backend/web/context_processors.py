@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
-from typing import Dict, Optional
 
 
-def render_time_context_processor() -> Dict[str, Optional[datetime]]:
+def render_time_context_processor() -> dict[str, datetime | None]:
     return dict(
         render_time=datetime.now(timezone.utc)  # pyre-ignore[16]
         .astimezone(timezone.utc)

@@ -1,6 +1,7 @@
 import abc
 import json
-from typing import Callable, Generic, TypeVar
+from collections.abc import Callable
+from typing import Generic, TypeVar
 
 from backend.common.models import sitevar
 

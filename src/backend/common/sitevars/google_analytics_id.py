@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 
@@ -25,13 +25,13 @@ class GoogleAnalyticsID(Sitevar[ContentType]):
         )
 
     @classmethod
-    def google_analytics_id(cls) -> Optional[str]:
+    def google_analytics_id(cls) -> str | None:
         google_analytics_id = cls.get().get("GOOGLE_ANALYTICS_ID")
         return (
             google_analytics_id if google_analytics_id else None
         )  # Drop empty strings
 
     @classmethod
-    def api_secret(cls) -> Optional[str]:
+    def api_secret(cls) -> str | None:
         api_secret = cls.get().get("API_SECRET")
         return api_secret if api_secret else None  # Drop empty strings

@@ -1,12 +1,6 @@
 import abc
 import logging
-from typing import (
-    Generic,
-    List,
-    Optional,
-    Tuple,
-    TypeVar,
-)
+from typing import Generic, TypeVar
 
 import requests
 
@@ -24,8 +18,8 @@ class DatafeedHTML(abc.ABC, Generic[TParser, TModel]):
     """
 
     def parse(
-        self, url: str, parser: TParser, usfirst_session_key: Optional[str] = None
-    ) -> Tuple[List[TModel], bool]:
+        self, url: str, parser: TParser, usfirst_session_key: str | None = None
+    ) -> tuple[list[TModel], bool]:
         headers = {
             "Cache-Control": "no-cache, max-age=10",
             "Pragma": "no-cache",

@@ -1,5 +1,4 @@
 import json
-from typing import Dict, List
 
 from google.appengine.ext import ndb
 from werkzeug.test import Client
@@ -44,7 +43,7 @@ def setup_matches(n: int = 5) -> None:
     )
 
 
-def setup_auth(access_types: List[AuthType]) -> None:
+def setup_auth(access_types: list[AuthType]) -> None:
     ApiAuthAccess(
         id=AUTH_ID,
         secret=AUTH_SECRET,
@@ -53,7 +52,7 @@ def setup_auth(access_types: List[AuthType]) -> None:
     ).put()
 
 
-def get_auth_headers(request_path: str, request_body) -> Dict[str, str]:
+def get_auth_headers(request_path: str, request_body) -> dict[str, str]:
     return {
         "X-TBA-Auth-Id": AUTH_ID,
         "X-TBA-AUth-Sig": TrustedApiAuthHelper.compute_auth_signature(

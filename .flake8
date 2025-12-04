@@ -26,5 +26,6 @@ extension =
   E = service_import_checker:ServiceImportChecker
   E = api_authenticated_decorator_checker:APIAuthenticatedDecoratorCheker
   E = use_safe_deferred_checker:UseSafeDeferredChecker
+  E = no_typing_checker:NoTypingChecker
 paths =
   ./flake8_plugins

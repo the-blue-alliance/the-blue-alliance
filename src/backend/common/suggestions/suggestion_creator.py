@@ -1,7 +1,7 @@
 import enum
 import logging
 from datetime import datetime
-from typing import cast, Dict, List, Optional, Tuple
+from typing import cast
 
 from google.appengine.ext import ndb
 
@@ -44,11 +44,11 @@ class SuggestionCreator:
         author_account_key: ndb.Key,
         media_url: str,
         team_key: TeamKey,
-        year_str: Optional[str],
-        private_details_json: Optional[str] = None,
+        year_str: str | None,
+        private_details_json: str | None = None,
         is_social: bool = False,
         default_preferred: bool = False,
-    ) -> Tuple[SuggestionCreationStatus, Optional[Suggestion]]:
+    ) -> tuple[SuggestionCreationStatus, Suggestion | None]:
         """Create a Team Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
 
         year = int(year_str) if year_str else None
@@ -114,8 +114,8 @@ class SuggestionCreator:
         author_account_key: ndb.Key,
         media_url: str,
         event_key: EventKey,
-        private_details_json: Optional[str] = None,
-    ) -> Tuple[SuggestionCreationStatus, Optional[Suggestion]]:
+        private_details_json: str | None = None,
+    ) -> tuple[SuggestionCreationStatus, Suggestion | None]:
         """Create an Event Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
 
         media_dict = MediaParser.partial_media_dict_from_url(media_url)
@@ -289,7 +289,7 @@ class SuggestionCreator:
             return SuggestionCreationStatus.BAD_URL
 
     @classmethod
-    def createDummyOffseasonSuggestions(cls, events_to_suggest: List[Event]) -> None:
+    def createDummyOffseasonSuggestions(cls, events_to_suggest: list[Event]) -> None:
         """
         Create an offseason suggestion from a made up bot.
         Used to link offseasons with official data sync
@@ -344,15 +344,15 @@ class SuggestionCreator:
         name: str,
         start_date: str,
         end_date: str,
-        website: Optional[str],
+        website: str | None,
         venue_name: str,
         address: str,
         city: str,
         state: str,
         country: str,
-        first_code: Optional[str] = None,
-        suggestion_id: Optional[str] = None,
-    ) -> Tuple[SuggestionCreationStatus, Optional[Dict[str, str]]]:
+        first_code: str | None = None,
+        suggestion_id: str | None = None,
+    ) -> tuple[SuggestionCreationStatus, dict[str, str]] | None:
         """
         Create a suggestion for offseason event. Returns (status, failures):
         ('success', None)
@@ -425,7 +425,7 @@ class SuggestionCreator:
         author_account_key: ndb.Key,
         event_key: EventKey,
         affiliation: str,
-        auth_types: List[int],
+        auth_types: list[int],
     ) -> SuggestionCreationStatus:
         """
         Create a suggestion for auth keys request.
@@ -436,7 +436,7 @@ class SuggestionCreator:
 
         if event_key:
             event = Event.get_by_id(event_key)
-            clean_auth_types: List[AuthType] = []
+            clean_auth_types: list[AuthType] = []
             if event:
                 suggestion = Suggestion(
                     author=author_account_key,

@@ -1,5 +1,5 @@
 import json
-from typing import cast, Dict, List, Optional, Set
+from typing import cast
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -30,8 +30,8 @@ class Media(CachedModel):
     media_type_enum: MediaType = cast(
         MediaType, ndb.IntegerProperty(required=True, choices=media_type.MEDIA_TYPES)
     )
-    media_tag_enum: List[MediaTag] = cast(
-        List[MediaTag], ndb.IntegerProperty(repeated=True, choices=media_tag.MEDIA_TAGS)
+    media_tag_enum: list[MediaTag] = cast(
+        list[MediaTag], ndb.IntegerProperty(repeated=True, choices=media_tag.MEDIA_TAGS)
     )
     # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
     foreign_key = ndb.StringProperty(required=True)
@@ -41,24 +41,24 @@ class Media(CachedModel):
         ndb.TextProperty()
     )  # Additional properties we don't want to expose via API
     year: Year = ndb.IntegerProperty()  # None if year is not relevant
-    references: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
+    references: list[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         repeated=True
     )  # Other models that are linked to this object
-    preferred_references: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
+    preferred_references: list[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         repeated=True
     )  # Other models for which this media is "Preferred". All preferred_references MUST also be in references
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "media_type_enum",
         "foreign_key",
         "details_json",
         "year",
     }
 
-    _auto_union_attrs: Set[str] = {
+    _auto_union_attrs: set[str] = {
         "references",
         "preferred_references",
         "media_tag_enum",
@@ -73,20 +73,20 @@ class Media(CachedModel):
             "year": set(),
             "media_tag_enum": set(),
         }
-        self._details: Optional[Dict] = None
-        self._private_details: Optional[Dict] = None
-        self._updated_attrs = []  # Used in MediaManipulator to track what changed
+        self._details: dict | None = None
+        self._private_details: dict | None = None
+        self._updated_attrs = set()  # Used in MediaManipulator to track what changed
         super(Media, self).__init__(*args, **kw)
 
     @property
-    def details(self) -> Optional[Dict]:
+    def details(self) -> dict | None:
         # TODO add better typing
         if self._details is None and self.details_json is not None:
             self._details = json.loads(self.details_json)
         return self._details
 
     @property
-    def private_details(self) -> Optional[Dict]:
+    def private_details(self) -> dict | None:
         # TODO add better typing
         if self._private_details is None and self.private_details_json is not None:
             self._private_details = json.loads(self.private_details_json)
@@ -236,7 +236,7 @@ class Media(CachedModel):
         return media_type.TYPE_NAMES[self.media_type_enum]
 
     @property
-    def tag_names(self) -> List[str]:
+    def tag_names(self) -> list[str]:
         return [media_tag.TAG_NAMES[t] for t in self.media_tag_enum]
 
     @property

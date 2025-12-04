@@ -1,5 +1,5 @@
 from itertools import product
-from typing import Any, List, Set, Tuple, Type
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -21,31 +21,31 @@ from backend.common.queries import (
 )
 from backend.common.queries.database_query import CachedDatabaseQuery
 
-TCacheKeyAndQuery = Tuple[str, Type[CachedDatabaseQuery]]
+TCacheKeyAndQuery = tuple[str, type[CachedDatabaseQuery]]
 
 
 def _queries_to_cache_keys_and_queries(
-    queries: List[CachedDatabaseQuery],
-) -> List[TCacheKeyAndQuery]:
+    queries: list[CachedDatabaseQuery],
+) -> list[TCacheKeyAndQuery]:
     out = []
     for query in queries:
         out.append((query.cache_key, type(query)))
     return out
 
 
-def _filter(refs: Set[Any]) -> Set[Any]:
+def _filter(refs: set[Any]) -> set[Any]:
     # Default filter() filters zeros, so we can't use it.
     return {r for r in refs if r is not None}
 
 
-def award_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def award_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     event_keys = _filter(affected_refs["event"])
     team_keys = _filter(affected_refs["team_list"])
     years = _filter(affected_refs["year"])
     event_types = _filter(affected_refs["event_type_enum"])
     award_types = _filter(affected_refs["award_type_enum"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for event_key in event_keys:
         queries.append(award_query.EventAwardsQuery(event_key.id()))
         for team_key in team_keys:
@@ -68,7 +68,7 @@ def award_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     return _queries_to_cache_keys_and_queries(queries)
 
 
-def event_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def event_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     event_keys = _filter(affected_refs["key"])
     years = _filter(affected_refs["year"])
     event_district_keys = _filter(affected_refs["district_key"])
@@ -78,7 +78,7 @@ def event_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     ).fetch_async(None, keys_only=True)
     events_future = ndb.get_multi_async(event_keys)
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for event_key in event_keys:
         queries.append(event_query.EventQuery(event_key.id()))
         queries.append(event_query.EventDivisionsQuery(event_key.id()))
@@ -112,23 +112,23 @@ def event_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
 
 def event_details_updated(
     affected_refs: TAffectedReferences,
-) -> List[TCacheKeyAndQuery]:
+) -> list[TCacheKeyAndQuery]:
     event_details_keys = _filter(affected_refs["key"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for event_details_key in event_details_keys:
         queries.append(event_details_query.EventDetailsQuery(event_details_key.id()))
 
     return _queries_to_cache_keys_and_queries(queries)
 
 
-def match_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def match_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     match_keys = _filter(affected_refs["key"])
     event_keys = _filter(affected_refs["event"])
     team_keys = _filter(affected_refs["team_keys"])
     years = _filter(affected_refs["year"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for match_key in match_keys:
         queries.append(match_query.MatchQuery(match_key.id()))
         # queries.append(match_query.MatchGdcvDataQuery(match_key.id()))
@@ -148,7 +148,7 @@ def match_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     return _queries_to_cache_keys_and_queries(queries)
 
 
-def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def media_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     reference_keys = _filter(affected_refs["references"])
     years = _filter(affected_refs["year"])
     media_tags = _filter(affected_refs["media_tag_enum"])
@@ -162,7 +162,7 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
         else None
     )
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for reference_key in reference_keys:
         if reference_key.kind() == "Team":
             for year in years:
@@ -192,17 +192,17 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     return _queries_to_cache_keys_and_queries(queries)
 
 
-def robot_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def robot_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     team_keys = _filter(affected_refs["team"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for team_key in team_keys:
         queries.append(robot_query.TeamRobotsQuery(team_key.id()))
 
     return _queries_to_cache_keys_and_queries(queries)
 
 
-def team_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def team_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     team_keys = _filter(affected_refs["key"])
 
     event_team_keys_future = EventTeam.query(
@@ -212,7 +212,7 @@ def team_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
         DistrictTeam.team.IN([team_key for team_key in team_keys])
     ).fetch_async(None, keys_only=True)
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for team_key in team_keys:
         queries.append(team_query.TeamQuery(team_key.id()))
         page_num = team_query.get_team_page_num(team_key.id())
@@ -233,12 +233,12 @@ def team_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
     return _queries_to_cache_keys_and_queries(queries)
 
 
-def eventteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def eventteam_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     event_keys = _filter(affected_refs["event"])
     team_keys = _filter(affected_refs["team"])
     years = _filter(affected_refs["year"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for team_key in team_keys:
         queries.append(event_query.TeamEventsQuery(team_key.id()))
         queries.append(team_query.TeamParticipationQuery(team_key.id()))
@@ -257,11 +257,11 @@ def eventteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQu
     return _queries_to_cache_keys_and_queries(queries)
 
 
-def districtteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def districtteam_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     district_keys = _filter(affected_refs["district_key"])
     team_keys = _filter(affected_refs["team"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for district_key in district_keys:
         queries.append(team_query.DistrictTeamsQuery(district_key.id()))
 
@@ -273,10 +273,10 @@ def districtteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAn
 
 def regionalpoolteam_updated(
     affected_refs: TAffectedReferences,
-) -> List[TCacheKeyAndQuery]:
+) -> list[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for year in years:
         queries.append(team_query.RegionalTeamsQuery(year))
     return _queries_to_cache_keys_and_queries(queries)
@@ -284,16 +284,16 @@ def regionalpoolteam_updated(
 
 def regional_champs_pool_updated(
     affected_refs: TAffectedReferences,
-) -> List[TCacheKeyAndQuery]:
+) -> list[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for year in years:
         queries.append(team_query.RegionalTeamsQuery(year))
     return _queries_to_cache_keys_and_queries(queries)
 
 
-def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def district_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
     district_abbrevs = _filter(affected_refs["abbreviation"])
     district_keys = _filter(affected_refs["key"])
@@ -305,7 +305,7 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
         Event.district_key.IN(list(district_keys))  # pyre-ignore[16]
     ).fetch_async(keys_only=True)
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for year in years:
         queries.append(district_query.DistrictsInYearQuery(year))
 
@@ -339,12 +339,12 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
     )
 
 
-def insight_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+def insight_updated(affected_refs: TAffectedReferences) -> list[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
     district_abbreviations = _filter(affected_refs["district_abbreviation"])
     names = _filter(affected_refs["name"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: list[CachedDatabaseQuery] = []
     for year in years:
         queries.append(insight_query.InsightsLeaderboardsYearQuery(year))
         queries.append(insight_query.InsightsNotablesYearQuery(year))

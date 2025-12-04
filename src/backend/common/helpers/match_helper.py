@@ -2,7 +2,7 @@ import collections
 import datetime
 import logging
 import re
-from typing import Dict, List, Mapping, MutableSequence, Sequence, Tuple
+from collections.abc import Mapping, MutableSequence, Sequence
 
 import pytz
 from google.appengine.ext import ndb
@@ -21,12 +21,12 @@ from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
 
 
-TOrganizedMatches = Dict[CompLevel, List[Match]]
+TOrganizedMatches = dict[CompLevel, list[Match]]
 TOrganizedLegacyDoubleElimMatches = Mapping[
-    LegacyDoubleElimBracket, Mapping[CompLevel, List[Match]]
+    LegacyDoubleElimBracket, Mapping[CompLevel, list[Match]]
 ]
-TOrganizedDoubleElimMatches = Mapping[DoubleElimRound, List[Match]]
-TOrganizedKeys = Dict[CompLevel, List[MatchKey]]
+TOrganizedDoubleElimMatches = Mapping[DoubleElimRound, list[Match]]
+TOrganizedKeys = dict[CompLevel, list[MatchKey]]
 
 
 class MatchHelper(object):
@@ -39,7 +39,7 @@ class MatchHelper(object):
     """
 
     @classmethod
-    def natural_sorted_matches(cls, matches: List[Match]) -> List[Match]:
+    def natural_sorted_matches(cls, matches: list[Match]) -> list[Match]:
         def convert(text):
             return int(text) if text.isdigit() else text.lower()
 
@@ -51,11 +51,11 @@ class MatchHelper(object):
     @classmethod
     def play_order_sorted_matches(
         cls, matches: Sequence[Match], reverse: bool = False
-    ) -> List[Match]:
+    ) -> list[Match]:
         return sorted(matches, key=lambda m: m.play_order, reverse=reverse)
 
     @classmethod
-    def organized_keys(cls, match_keys: List[MatchKey]) -> Tuple[int, TOrganizedKeys]:
+    def organized_keys(cls, match_keys: list[MatchKey]) -> tuple[int, TOrganizedKeys]:
         matches = dict([(comp_level, list()) for comp_level in COMP_LEVELS])
         while len(match_keys) > 0:
             match_key = match_keys.pop(0)
@@ -68,8 +68,8 @@ class MatchHelper(object):
 
     @classmethod
     def organized_matches(
-        cls, match_list: List[Match]
-    ) -> Tuple[int, TOrganizedMatches]:
+        cls, match_list: list[Match]
+    ) -> tuple[int, TOrganizedMatches]:
         match_list = cls.natural_sorted_matches(match_list)
         matches = dict([(comp_level, list()) for comp_level in COMP_LEVELS])
         count = len(match_list)
@@ -137,13 +137,13 @@ class MatchHelper(object):
         return matches
 
     @classmethod
-    def recent_matches(cls, matches: List[Match], num: int = 3) -> List[Match]:
+    def recent_matches(cls, matches: list[Match], num: int = 3) -> list[Match]:
         matches = list(filter(lambda x: x.has_been_played, matches))
         matches = cls.play_order_sorted_matches(matches)
         return matches[-num:]
 
     @classmethod
-    def upcoming_matches(cls, matches: List[Match], num: int = 3) -> List[Match]:
+    def upcoming_matches(cls, matches: list[Match], num: int = 3) -> list[Match]:
         matches = cls.play_order_sorted_matches(matches)
 
         last_played_match_index = None
@@ -229,8 +229,8 @@ class MatchHelper(object):
 
     @classmethod
     def delete_invalid_matches(
-        cls, match_list: List[Match], event: Event
-    ) -> Tuple[List[Match], List[ndb.Key]]:
+        cls, match_list: list[Match], event: Event
+    ) -> tuple[list[Match], list[ndb.Key]]:
         """
         A match is invalid iff it is an elim match that has not been played
         and the same alliance already won in 2 match numbers in the same set.
@@ -246,8 +246,8 @@ class MatchHelper(object):
                 elif match.winning_alliance == AllianceColor.BLUE:
                     blue_win_counts[key] += 1
 
-        return_list: List[Match] = []
-        keys_to_delete: List[ndb.Key] = []
+        return_list: list[Match] = []
+        keys_to_delete: list[ndb.Key] = []
         for match in match_list:
             if match.comp_level in ELIM_LEVELS and not match.has_been_played:
                 if (

@@ -1,10 +1,8 @@
-from typing import Dict, Set
-
 from backend.common.consts.auth_type import AuthType
 from backend.common.sitevars.sitevar import Sitevar
 
 
-ContentType = Dict[str, bool]
+ContentType = dict[str, bool]
 
 
 class TrustedApiConfig(Sitevar[ContentType]):
@@ -21,11 +19,11 @@ class TrustedApiConfig(Sitevar[ContentType]):
         return "For configuring which types of event data are allowed to be changed via the trusted API"
 
     @staticmethod
-    def default_value() -> Dict[str, bool]:
+    def default_value() -> dict[str, bool]:
         return {}
 
     @classmethod
-    def is_auth_enalbed(cls, required_auth_types: Set[AuthType]) -> bool:
+    def is_auth_enalbed(cls, required_auth_types: set[AuthType]) -> bool:
         config = cls.get()
         return all(
             # Allow access to the trusted API if unset

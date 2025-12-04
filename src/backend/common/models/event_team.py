@@ -1,4 +1,4 @@
-from typing import cast, Set
+from typing import cast
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -32,7 +32,7 @@ class EventTeam(CachedModel):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "status",
         "year",  # technically immutable, but corruptable and needs repair. See github issue #409
         "pit_location",

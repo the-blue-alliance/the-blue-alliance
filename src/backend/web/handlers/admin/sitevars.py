@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import redirect, request, url_for
 from werkzeug.wrappers import Response
 
@@ -30,7 +28,7 @@ def sitevar_edit(sitevar_key: str) -> str:
     return render_template("admin/sitevar_edit.html", template_values)
 
 
-def sitevar_edit_post(sitevar_key: Optional[str] = None) -> Response:
+def sitevar_edit_post(sitevar_key: str | None = None) -> Response:
     # note, we don't use sitevar_key
 
     sitevar = Sitevar(

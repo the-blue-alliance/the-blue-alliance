@@ -1,7 +1,6 @@
 import json
 import logging
 import re
-from typing import Dict, List, Optional, Set, Tuple
 from urllib.parse import urlencode, urlparse
 
 import requests
@@ -18,17 +17,17 @@ from backend.common.sitevars.cd_request_user_agent import CdRequestUserAgent
 
 class MediaParser:
     # Add MediaTypes to this list to indicate that they case case-sensitive (shouldn't be normalized to lower case)
-    CASE_SENSITIVE_FOREIGN_KEYS: Set[MediaType] = {
+    CASE_SENSITIVE_FOREIGN_KEYS: set[MediaType] = {
         MediaType.YOUTUBE_VIDEO,
         MediaType.IMGUR,
         MediaType.CD_PHOTO_THREAD,
         MediaType.INSTAGRAM_IMAGE,
     }
 
-    OEMBED_PROVIDERS: Set[MediaType] = set()
+    OEMBED_PROVIDERS: set[MediaType] = set()
 
     # Dict that maps media types -> list of tuple of regex pattern and group # of foreign key
-    FOREIGN_KEY_PATTERNS: Dict[MediaType, List[Tuple[str, int]]] = {
+    FOREIGN_KEY_PATTERNS: dict[MediaType, list[tuple[str, int]]] = {
         MediaType.FACEBOOK_PROFILE: [(r".*facebook.com\/(.*)(\/(.*))?", 1)],
         MediaType.TWITTER_PROFILE: [(r".*twitter.com\/(.*)(\/(.*))?", 1)],
         MediaType.YOUTUBE_CHANNEL: [
@@ -56,7 +55,7 @@ class MediaParser:
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
     # This is a list because the order matters
-    URL_PATTERNS: List[Tuple[str, MediaType]] = [
+    URL_PATTERNS: list[tuple[str, MediaType]] = [
         ("facebook.com/", MediaType.FACEBOOK_PROFILE),
         ("twitter.com/", MediaType.TWITTER_PROFILE),
         ("youtube.com/user", MediaType.YOUTUBE_CHANNEL),
@@ -78,7 +77,7 @@ class MediaParser:
     ]
 
     # The default is to strip out all urlparams, but this is a white-list for exceptions
-    ALLOWED_URLPARAMS: Dict[MediaType, List[str]] = {
+    ALLOWED_URLPARAMS: dict[MediaType, list[str]] = {
         MediaType.YOUTUBE_VIDEO: ["v"],
     }
 
@@ -89,10 +88,10 @@ class MediaParser:
         "https://cad.onshape.com/api/documents/{}"  # Format w/ stripped foreign key
     )
 
-    OEMBED_DETAIL_URL: Dict[MediaType, str] = {}
+    OEMBED_DETAIL_URL: dict[MediaType, str] = {}
 
     @classmethod
-    def partial_media_dict_from_url(cls, url: str) -> Optional[SuggestionDict]:
+    def partial_media_dict_from_url(cls, url: str) -> SuggestionDict | None:
         """
         Takes a url, and turns it into a partial Media object dict
         """
@@ -124,7 +123,7 @@ class MediaParser:
     @classmethod
     def _create_media_dict(
         cls, media_type: MediaType, url: str
-    ) -> Optional[SuggestionDict]:
+    ) -> SuggestionDict | None:
         """
         Build a media dict from the given url and media type
         This will parse the foreign key from the url and add other data about the media type
@@ -155,7 +154,7 @@ class MediaParser:
         return media_dict
 
     @classmethod
-    def _parse_foreign_key(cls, media_type: MediaType, url: str) -> Optional[str]:
+    def _parse_foreign_key(cls, media_type: MediaType, url: str) -> str | None:
         """
         Uses FOREIGN_KEY_PATTERNS to extract the media foreign key from the given url
         Each index in the dict contains a list of valid patterns - tuples of (regex string, group #)
@@ -197,7 +196,7 @@ class MediaParser:
     @classmethod
     def _partial_media_dict_from_cd_photo_thread(
         cls, url: str
-    ) -> Optional[SuggestionDict]:
+    ) -> SuggestionDict | None:
         # This is broken with new CD, cd-media is no more
         return None
         """
@@ -227,7 +226,7 @@ class MediaParser:
         """
 
     @classmethod
-    def _partial_media_dict_from_onshape(cls, url: str) -> Optional[SuggestionDict]:
+    def _partial_media_dict_from_onshape(cls, url: str) -> SuggestionDict | None:
         media_dict = cls._create_media_dict(MediaType.ONSHAPE, url)
         if not media_dict:
             return None
@@ -259,7 +258,7 @@ class MediaParser:
         return media_dict
 
     @classmethod
-    def _partial_media_dict_from_grabcad(cls, url: str) -> Optional[SuggestionDict]:
+    def _partial_media_dict_from_grabcad(cls, url: str) -> SuggestionDict | None:
         media_dict = cls._create_media_dict(MediaType.GRABCAD, url)
         if not media_dict:
             return None
@@ -286,7 +285,7 @@ class MediaParser:
     @classmethod
     def _partial_media_dict_from_oembed(
         cls, media_type: MediaType, url: str
-    ) -> Optional[SuggestionDict]:
+    ) -> SuggestionDict | None:
         media_dict = cls._create_media_dict(media_type, url)
         if not media_dict:
             return None
@@ -304,7 +303,7 @@ class MediaParser:
         return media_dict
 
     @classmethod
-    def _parse_cdphotothread_foreign_key(cls, url: str) -> Optional[str]:
+    def _parse_cdphotothread_foreign_key(cls, url: str) -> str | None:
         regex1 = re.match(r".*chiefdelphi.com\/media\/photos\/(\d+)", url)
         if regex1 is not None:
             return regex1.group(1)
@@ -312,7 +311,7 @@ class MediaParser:
             return None
 
     @classmethod
-    def _parse_cdphotothread_image_partial(cls, html_bytes: bytes) -> Optional[str]:
+    def _parse_cdphotothread_image_partial(cls, html_bytes: bytes) -> str | None:
         """
         Input: the HTML from the thread page
         ex: https://www.chiefdelphi.com/media/photos/38464,

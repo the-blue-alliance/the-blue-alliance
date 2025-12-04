@@ -1,4 +1,4 @@
-from typing import List, TypedDict
+from typing import TypedDict
 
 from google.appengine.ext import ndb
 
@@ -23,8 +23,8 @@ class DummyConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[DummyModel], version: ApiMajorVersion
-    ) -> List[DummyDict]:
+        cls, model_list: list[DummyModel], version: ApiMajorVersion
+    ) -> list[DummyDict]:
         return list(map(cls.converter_v3, model_list))
 
     @classmethod

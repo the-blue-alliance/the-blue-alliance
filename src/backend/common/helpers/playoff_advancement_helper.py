@@ -1,13 +1,6 @@
 import copy
 from collections import defaultdict
-from typing import (
-    cast,
-    Dict,
-    List,
-    NamedTuple,
-    Optional,
-    Union,
-)
+from typing import cast, NamedTuple
 
 from pyre_extensions import none_throws
 
@@ -61,15 +54,15 @@ class PlayoffAdvancement(NamedTuple):
     """
 
     bracket_table: TBracketTable
-    playoff_advancement: Optional[TPlayoffAdvancement]
-    double_elim_matches: Optional[
-        Union[TOrganizedDoubleElimMatches, TOrganizedLegacyDoubleElimMatches]
-    ]
-    playoff_template: Optional[str]
+    playoff_advancement: TPlayoffAdvancement | None
+    double_elim_matches: (
+        TOrganizedDoubleElimMatches | TOrganizedLegacyDoubleElimMatches | None
+    )
+    playoff_template: str | None
 
 
 class PlayoffAdvancementHelper:
-    ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS: Dict[Year, List[str]] = {
+    ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS: dict[Year, list[str]] = {
         2017: ["totalPoints"],
         2018: ["endgamePoints", "autoPoints"],
         2019: ["cargoPoints", "hatchPanelPoints"],
@@ -78,7 +71,7 @@ class PlayoffAdvancementHelper:
         2022: ["endgamePoints", "autoPoints"],
     }
 
-    ROUND_ROBIN_TIEBREAKERS: Dict[Year, List[str]] = {
+    ROUND_ROBIN_TIEBREAKERS: dict[Year, list[str]] = {
         2017: ["Match Points"],
         2018: ["Park/Climb Points", "Auto Points"],
         2019: ["Cargo Points", "Hatch Panel Points"],
@@ -87,28 +80,26 @@ class PlayoffAdvancementHelper:
         2022: ["Hangar Points", "Auto Taxi/Cargo Points"],
     }
 
-    ADVANCEMENT_COUNT_2015: Dict[CompLevel, int] = {
+    ADVANCEMENT_COUNT_2015: dict[CompLevel, int] = {
         CompLevel.EF: 8,
         CompLevel.QF: 4,
         CompLevel.SF: 2,
     }
 
-    PLAYOFF_TYPE_TO_TEMPLATE: Dict[PlayoffType, str] = {
+    PLAYOFF_TYPE_TO_TEMPLATE: dict[PlayoffType, str] = {
         PlayoffType.AVG_SCORE_8_TEAM: "playoff_table",
         PlayoffType.ROUND_ROBIN_6_TEAM: "playoff_round_robin_6_team",
         PlayoffType.CUSTOM: "custom",
     }
 
     @classmethod
-    def playoff_template(cls, event: Event) -> Optional[str]:
+    def playoff_template(cls, event: Event) -> str | None:
         return cls.PLAYOFF_TYPE_TO_TEMPLATE.get(event.playoff_type)
 
     @classmethod
     def double_elim_matches(
         cls, event: Event, matches: TOrganizedMatches
-    ) -> Optional[
-        Union[TOrganizedDoubleElimMatches, TOrganizedLegacyDoubleElimMatches]
-    ]:
+    ) -> TOrganizedDoubleElimMatches | TOrganizedLegacyDoubleElimMatches | None:
         double_elim_matches = None
         if event.playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
             double_elim_matches = MatchHelper.organized_legacy_double_elim_matches(
@@ -222,7 +213,7 @@ class PlayoffAdvancementHelper:
         cls,
         matches: TOrganizedMatches,
         event: Event,
-        alliance_selections: Optional[List[EventAlliance]] = None,
+        alliance_selections: list[EventAlliance] | None = None,
     ) -> TBracketTable:
         complete_alliances = []
         bracket_table = defaultdict(lambda: defaultdict(dict))
@@ -338,10 +329,10 @@ class PlayoffAdvancementHelper:
     def generate_playoff_advancement_2015(
         cls,
         matches: TOrganizedMatches,
-        alliance_selections: Optional[List[EventAlliance]] = None,
+        alliance_selections: list[EventAlliance] | None = None,
     ) -> TPlayoffAdvancement2015Levels:
-        complete_alliances: List[List[TeamNumber]] = []
-        alliance_names: List[str] = []
+        complete_alliances: list[list[TeamNumber]] = []
+        alliance_names: list[str] = []
         per_alliance_advancement: defaultdict[
             CompLevel, defaultdict[int, PlayoffAdvancement2015]
         ] = defaultdict(
@@ -354,7 +345,7 @@ class PlayoffAdvancementHelper:
                 )
             )
         )
-        advancement: Dict[CompLevel, List[PlayoffAdvancement2015]] = {}
+        advancement: dict[CompLevel, list[PlayoffAdvancement2015]] = {}
 
         for comp_level in [CompLevel.EF, CompLevel.QF, CompLevel.SF]:
             for match in matches.get(comp_level, []):
@@ -389,7 +380,7 @@ class PlayoffAdvancementHelper:
                         )
                     )
 
-            sorted_advancements: List[PlayoffAdvancement2015] = list(
+            sorted_advancements: list[PlayoffAdvancement2015] = list(
                 per_alliance_advancement.get(comp_level, {}).values()
             )
             sorted_advancements = sorted(
@@ -404,10 +395,10 @@ class PlayoffAdvancementHelper:
         cls,
         matches: TOrganizedMatches,
         year: Year,
-        alliance_selections: Optional[List[EventAlliance]] = None,
+        alliance_selections: list[EventAlliance] | None = None,
     ) -> PlayoffAdvancementRoundRobinLevels:
-        complete_alliances: List[List[TeamNumber]] = []
-        alliance_names: List[str] = []
+        complete_alliances: list[list[TeamNumber]] = []
+        alliance_names: list[str] = []
 
         # key is the index into complete_alliances
         per_alliance_advancement: defaultdict[
@@ -428,7 +419,7 @@ class PlayoffAdvancementHelper:
             )
         )
 
-        advancement: Dict[CompLevel, List[PlayoffAdvancementRoundRobin]] = {}
+        advancement: dict[CompLevel, list[PlayoffAdvancementRoundRobin]] = {}
         comp_level = CompLevel.SF
         any_unplayed = False
         for match in matches.get(comp_level, []):
@@ -490,7 +481,7 @@ class PlayoffAdvancementHelper:
                     record=record,
                 )
 
-        alliance_advancements: List[PlayoffAdvancementRoundRobin] = list(
+        alliance_advancements: list[PlayoffAdvancementRoundRobin] = list(
             per_alliance_advancement[comp_level].values()
         )
         alliance_advancements = sorted(
@@ -524,7 +515,7 @@ class PlayoffAdvancementHelper:
     def generate_playoff_advancement_double_elim(
         cls,
         organized_matches: TOrganizedDoubleElimMatches,
-        alliance_selections: Optional[List[EventAlliance]] = None,
+        alliance_selections: list[EventAlliance] | None = None,
     ) -> PlayoffAdvancementDoubleElimLevels:
         rounds: defaultdict[DoubleElimRound, PlayoffAdvancementDoubleElimRound] = (
             defaultdict(
@@ -535,8 +526,8 @@ class PlayoffAdvancementHelper:
             )
         )
 
-        complete_alliances: List[List[TeamNumber]] = []
-        alliance_names: List[str] = []
+        complete_alliances: list[list[TeamNumber]] = []
+        alliance_names: list[str] = []
 
         # key is the index into "complete_alliances"
         cumulative_record_per_alliance: defaultdict[int, WLTRecord] = defaultdict(
@@ -553,7 +544,7 @@ class PlayoffAdvancementHelper:
             if not matches:
                 continue
 
-            round_alliances: List[PlayoffAdvancementDoubleElimAlliance] = []
+            round_alliances: list[PlayoffAdvancementDoubleElimAlliance] = []
             any_unplayed = False
             for match in matches:
                 if not match.has_been_played:
@@ -607,9 +598,9 @@ class PlayoffAdvancementHelper:
     @classmethod
     def ordered_alliance(
         cls,
-        team_keys: List[TeamKey],
-        alliance_selections: Optional[List[EventAlliance]],
-    ) -> List[TeamNumber]:
+        team_keys: list[TeamKey],
+        alliance_selections: list[EventAlliance] | None,
+    ) -> list[TeamNumber]:
         if alliance_selections:
             for (
                 alliance_selection
@@ -641,9 +632,9 @@ class PlayoffAdvancementHelper:
     @classmethod
     def _alliance_name(
         cls,
-        team_keys: List[TeamKey],
-        alliance_selections: Optional[List[EventAlliance]],
-    ) -> Optional[str]:
+        team_keys: list[TeamKey],
+        alliance_selections: list[EventAlliance] | None,
+    ) -> str | None:
         if not alliance_selections:
             return None
         for n, alliance_selection in enumerate(
@@ -659,9 +650,9 @@ class PlayoffAdvancementHelper:
     @classmethod
     def _update_complete_alliance(
         cls,
-        complete_alliances: List[List[TeamNumber]],
-        alliance_names: List[str],
-        alliance: List[TeamNumber],
+        complete_alliances: list[list[TeamNumber]],
+        alliance_names: list[str],
+        alliance: list[TeamNumber],
         alliance_name: str,
     ) -> int:
         # return alliance_index
@@ -686,10 +677,10 @@ class PlayoffAdvancementHelper:
     def create_playoff_advancement_response_for_apiv3(
         cls,
         event: Event,
-        playoff_advancement: Optional[TPlayoffAdvancement],
+        playoff_advancement: TPlayoffAdvancement | None,
         bracket_table: TBracketTable,
-    ) -> List[ApiPlayoffAdvancement]:
-        output: List[ApiPlayoffAdvancement] = []
+    ) -> list[ApiPlayoffAdvancement]:
+        output: list[ApiPlayoffAdvancement] = []
 
         if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
             bracket_levels_to_include = [CompLevel.F]
@@ -738,7 +729,7 @@ class PlayoffAdvancementHelper:
             if not bracket_table.get(level):
                 continue
 
-            level_ranks: List[ApiPlayoffAdvancement] = []
+            level_ranks: list[ApiPlayoffAdvancement] = []
             level_ranks = PlayoffAdvancementHelper.transform_bracket_level_for_apiv3(
                 event, bracket_table, level
             )
@@ -748,7 +739,7 @@ class PlayoffAdvancementHelper:
     @classmethod
     def transform_bracket_level_for_apiv3(
         cls, event: Event, bracket_table: TBracketTable, comp_level: CompLevel
-    ) -> List[ApiPlayoffAdvancement]:
+    ) -> list[ApiPlayoffAdvancement]:
         level_ranks = []
         for series_level, set_bracket in bracket_table[comp_level].items():
             series = int("".join(c for c in series_level if c.isdigit()))
@@ -800,7 +791,7 @@ class PlayoffAdvancementHelper:
         event: Event,
         playoff_advancement: TPlayoffAdvancement2015Levels,
         comp_level: CompLevel,
-    ) -> List[ApiPlayoffAdvancement]:
+    ) -> list[ApiPlayoffAdvancement]:
         level_order = COMP_LEVELS_PLAY_ORDER[comp_level]
         next_level = list(COMP_LEVELS_PLAY_ORDER.keys())[
             list(COMP_LEVELS_PLAY_ORDER.values()).index(level_order + 1)
@@ -835,7 +826,7 @@ class PlayoffAdvancementHelper:
         cls,
         event: Event,
         playoff_advancement: PlayoffAdvancementRoundRobinLevels,
-    ) -> List[ApiPlayoffAdvancement]:
+    ) -> list[ApiPlayoffAdvancement]:
         data = ApiPlayoffAdvancement(
             level=str(CompLevel.SF),
             level_name="Round Robin " + COMP_LEVELS_VERBOSE_FULL[CompLevel.SF],
@@ -869,7 +860,7 @@ class PlayoffAdvancementHelper:
         event: Event,
         playoff_advancement: PlayoffAdvancementDoubleElimLevels,
         round: DoubleElimRound,
-    ) -> List[ApiPlayoffAdvancement]:
+    ) -> list[ApiPlayoffAdvancement]:
         data = ApiPlayoffAdvancement(
             level=round.name.lower(),
             level_name=round.value,

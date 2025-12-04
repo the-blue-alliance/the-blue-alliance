@@ -1,4 +1,3 @@
-from typing import List
 from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, quote, urlparse
 
@@ -30,7 +29,7 @@ def test_register_logged_out(web_client: FlaskClient) -> None:
 
 
 def test_register_unregistered(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     login_user.is_registered = False
     response = web_client.get("/account/register")
@@ -57,7 +56,7 @@ def test_register_unregistered_next(
     login_user,
     next_url: str,
     expected: str,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     login_user.is_registered = False
@@ -180,7 +179,7 @@ def test_edit_unregistered(login_user, web_client: FlaskClient) -> None:
 
 
 def test_edit(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     response = web_client.get("/account/edit")
 
@@ -207,7 +206,7 @@ def test_edit_no_account_id(login_user, web_client: FlaskClient) -> None:
 
 
 def test_edit_no_account_id_follow_redirect(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     with web_client:
         response = web_client.post("/account/edit", follow_redirects=True, data={})
@@ -235,7 +234,7 @@ def test_edit_mismatch_account_id(login_user, web_client: FlaskClient) -> None:
 
 
 def test_edit_mismatch_account_id_follow_redirect(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     with web_client:
         response = web_client.post(
@@ -267,7 +266,7 @@ def test_edit_no_display_name(login_user, web_client: FlaskClient) -> None:
 
 
 def test_edit_no_display_name_follow_redirect(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     login_user.uid = "abc"
 
@@ -388,7 +387,7 @@ def test_login_logged_in(login_user, web_client: FlaskClient) -> None:
 def test_login(
     auth_emulator_host,
     monkeypatch: MonkeyPatch,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     if auth_emulator_host is not None:
@@ -525,7 +524,7 @@ def test_read_key_delete(login_user, web_client: FlaskClient) -> None:
 
 
 def test_mytba(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     mock_mytba = Mock()
 
@@ -632,7 +631,7 @@ def test_ping_client(
     ping_sent,
     expected,
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ):
     c1 = MobileClient(
@@ -661,7 +660,7 @@ def test_ping_client(
 
 
 def test_ping_not_our_client(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ):
     # Insert two mobile clients - one for our user, and one for another user
     # Make sure we can only ping the one for our user - not the other user

@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 
 from backend.common.consts.award_type import AwardType
@@ -98,5 +96,5 @@ def test_organize_awards() -> None:
         ("An Award", None),
     ],
 )
-def test_parse_award_type(name: str, award_type: Optional[AwardType]) -> None:
+def test_parse_award_type(name: str, award_type: AwardType | None) -> None:
     assert AwardHelper.parse_award_type(name) == award_type

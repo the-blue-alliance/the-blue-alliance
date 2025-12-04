@@ -1,6 +1,6 @@
 import random
 import string
-from typing import Any, cast, Dict, List, Optional, Union
+from typing import Any, cast
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -26,9 +26,9 @@ from backend.common.queries.suggestion_query import SuggestionQuery
 class User:
     """Represents a TBA web user - for a TBA database account, see Account"""
 
-    def __init__(self, session_claims: Dict[str, Any]) -> None:
+    def __init__(self, session_claims: dict[str, Any]) -> None:
         self._session_claims = session_claims
-        self._account: Optional[Account] = None
+        self._account: Account | None = None
 
         email = self._session_claims.get("email")
         if not email:
@@ -51,31 +51,31 @@ class User:
         none_throws(self._account).put()
 
     @property
-    def email(self) -> Optional[str]:
+    def email(self) -> str | None:
         if self._account is None:
             return None
         return none_throws(self._account).email
 
     @property
-    def display_name(self) -> Optional[str]:
+    def display_name(self) -> str | None:
         if self._account is None:
             return None
         return none_throws(self._account).display_name
 
     @property
-    def nickname(self) -> Optional[str]:
+    def nickname(self) -> str | None:
         if self._account is None:
             return None
         return none_throws(self._account).nickname
 
     @property
-    def account_key(self) -> Optional[ndb.Key]:
+    def account_key(self) -> ndb.Key | None:
         if self._account is None:
             return None
         return none_throws(self._account).key
 
     @property
-    def uid(self) -> Optional[Union[int, str]]:
+    def uid(self) -> int | str | None:
         if self._account is None:
             return None
         return none_throws(none_throws(self._account).key.id())
@@ -87,13 +87,13 @@ class User:
         return none_throws(self._account).registered
 
     @property
-    def permissions(self) -> Optional[List[AccountPermission]]:
+    def permissions(self) -> list[AccountPermission] | None:
         if self._account is None:
             return None
         return none_throws(self._account).permissions
 
     @property
-    def mobile_clients(self) -> List[MobileClient]:
+    def mobile_clients(self) -> list[MobileClient]:
         if self._account is None:
             return []
         return MobileClientQuery(
@@ -103,13 +103,13 @@ class User:
 
     @property
     def myTBA(self) -> MyTBA:
-        models = cast(List[MyTBAModel], self.favorites) + cast(
-            List[MyTBAModel], self.subscriptions
+        models = cast(list[MyTBAModel], self.favorites) + cast(
+            list[MyTBAModel], self.subscriptions
         )
         return MyTBA(models)
 
     @property
-    def favorites(self) -> List[Favorite]:
+    def favorites(self) -> list[Favorite]:
         if self._account is None:
             return []
         return FavoriteQuery(account=none_throws(self._account)).fetch()
@@ -123,7 +123,7 @@ class User:
         )
 
     @property
-    def subscriptions(self) -> List[Subscription]:
+    def subscriptions(self) -> list[Subscription]:
         if self._account is None:
             return []
         return SubscriptionQuery(account=none_throws(self._account)).fetch()
@@ -207,16 +207,16 @@ class User:
         return True if none_throws(self._account).permissions else False
 
     @property
-    def api_keys(self) -> List[ApiAuthAccess]:
+    def api_keys(self) -> list[ApiAuthAccess]:
         if self._account is None:
             return []
         return ApiAuthAccessQuery(owner=none_throws(self._account)).fetch()
 
     @property
-    def api_read_keys(self) -> List[ApiAuthAccess]:
+    def api_read_keys(self) -> list[ApiAuthAccess]:
         return list(filter(lambda key: key.is_read_key, self.api_keys))
 
-    def api_read_key(self, key_id: str) -> Optional[ApiAuthAccess]:
+    def api_read_key(self, key_id: str) -> ApiAuthAccess | None:
         return next(
             (
                 api_read_key
@@ -227,7 +227,7 @@ class User:
         )
 
     @property
-    def api_write_keys(self) -> List[ApiAuthAccess]:
+    def api_write_keys(self) -> list[ApiAuthAccess]:
         return list(filter(lambda key: key.is_write_key, self.api_keys))
 
     def add_api_read_key(self, description: str) -> ApiAuthAccess:

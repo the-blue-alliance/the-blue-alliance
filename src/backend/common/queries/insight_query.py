@@ -1,4 +1,5 @@
-from typing import Any, Generator, List
+from collections.abc import Generator
+from typing import Any
 
 from backend.common.models.insight import Insight
 from backend.common.models.keys import DistrictAbbreviation, Year
@@ -11,7 +12,7 @@ from backend.common.tasklets import typed_tasklet
 
 
 class InsightsLeaderboardsYearQuery(
-    CachedDatabaseQuery[List[Insight], List[InsightDict]]
+    CachedDatabaseQuery[list[Insight], list[InsightDict]]
 ):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "insights_leaderboards_{year}"
@@ -21,7 +22,7 @@ class InsightsLeaderboardsYearQuery(
         super().__init__(year=year)
 
     @typed_tasklet
-    def _query_async(self, year: Year) -> Generator[Any, Any, List[Insight]]:
+    def _query_async(self, year: Year) -> Generator[Any, Any, list[Insight]]:
         insight_names = []
         for insight_type in Insight.TYPED_LEADERBOARD_KEY_TYPES.keys():
             insight_names.append(Insight.INSIGHT_NAMES[insight_type])
@@ -33,7 +34,7 @@ class InsightsLeaderboardsYearQuery(
         return insights
 
 
-class InsightsNotablesYearQuery(CachedDatabaseQuery[List[Insight], List[InsightDict]]):
+class InsightsNotablesYearQuery(CachedDatabaseQuery[list[Insight], list[InsightDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "insights_notables_{year}"
     DICT_CONVERTER = InsightConverter
@@ -42,7 +43,7 @@ class InsightsNotablesYearQuery(CachedDatabaseQuery[List[Insight], List[InsightD
         super().__init__(year=year)
 
     @typed_tasklet
-    def _query_async(self, year: Year) -> Generator[Any, Any, List[Insight]]:
+    def _query_async(self, year: Year) -> Generator[Any, Any, list[Insight]]:
         insight_names = []
         for insight_type in Insight.NOTABLE_INSIGHTS:
             insight_names.append(Insight.INSIGHT_NAMES[insight_type])

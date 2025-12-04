@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
-
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import (
@@ -13,7 +11,7 @@ from backend.common.models.match import Match
 
 
 # Tuples of (red_tiebreaker, blue_tiebreaker) or None. Higher value wins.
-TCriteria = Optional[Tuple[int, int]]
+TCriteria = tuple[int, int] | None
 
 
 class MatchTiebreakers(object):
@@ -32,7 +30,7 @@ class MatchTiebreakers(object):
 
         red_breakdown = none_throws(match.score_breakdown)[AllianceColor.RED]
         blue_breakdown = none_throws(match.score_breakdown)[AllianceColor.BLUE]
-        tiebreakers: List[TCriteria]
+        tiebreakers: list[TCriteria]
 
         if match.year == 2016:
             tiebreakers = cls._tiebreak_2016(red_breakdown, blue_breakdown)
@@ -86,9 +84,9 @@ class MatchTiebreakers(object):
 
     @classmethod
     def _tiebreak_2025(
-        cls, red_breakdown: Dict, blue_breakdown: Dict
-    ) -> List[TCriteria]:
-        tiebreakers: List[TCriteria] = []
+        cls, red_breakdown: dict, blue_breakdown: dict
+    ) -> list[TCriteria]:
+        tiebreakers: list[TCriteria] = []
 
         # TECH FOUL points due to opponent rule violations
         # Since tech foul points are not provided, we use the count instead.
@@ -128,9 +126,9 @@ class MatchTiebreakers(object):
 
     @classmethod
     def _tiebreak_2024(
-        cls, red_breakdown: Dict, blue_breakdown: Dict
-    ) -> List[TCriteria]:
-        tiebreakers: List[TCriteria] = []
+        cls, red_breakdown: dict, blue_breakdown: dict
+    ) -> list[TCriteria]:
+        tiebreakers: list[TCriteria] = []
 
         # TECH FOUL points due to opponent rule violations
         # Since tech foul points are not provided, we use the count instead.
@@ -170,9 +168,9 @@ class MatchTiebreakers(object):
 
     @classmethod
     def _tiebreak_2023(
-        cls, red_breakdown: Dict, blue_breakdown: Dict
-    ) -> List[TCriteria]:
-        tiebreakers: List[TCriteria] = []
+        cls, red_breakdown: dict, blue_breakdown: dict
+    ) -> list[TCriteria]:
+        tiebreakers: list[TCriteria] = []
 
         # TECH FOUL points due to opponent rule violations
         # Since tech foul points are not provided, we use the count instead.
@@ -209,9 +207,9 @@ class MatchTiebreakers(object):
 
     @classmethod
     def _tiebreak_2022(
-        cls, red_breakdown: Dict, blue_breakdown: Dict
-    ) -> List[TCriteria]:
-        tiebreakers: List[TCriteria] = []
+        cls, red_breakdown: dict, blue_breakdown: dict
+    ) -> list[TCriteria]:
+        tiebreakers: list[TCriteria] = []
 
         # Cumulative FOUL and TECH FOUL points due to opponent rule violations
         if "foulPoints" in red_breakdown and "foulPoints" in blue_breakdown:
@@ -241,9 +239,9 @@ class MatchTiebreakers(object):
 
     @classmethod
     def _tiebreak_2020(
-        cls, red_breakdown: Dict, blue_breakdown: Dict
-    ) -> List[TCriteria]:
-        tiebreakers: List[TCriteria] = []
+        cls, red_breakdown: dict, blue_breakdown: dict
+    ) -> list[TCriteria]:
+        tiebreakers: list[TCriteria] = []
 
         # Cumulative FOUL and TECH FOUL points due to opponent rule violations
         if "foulPoints" in red_breakdown and "foulPoints" in blue_breakdown:
@@ -290,9 +288,9 @@ class MatchTiebreakers(object):
 
     @classmethod
     def _tiebreak_2019(
-        cls, red_breakdown: Dict, blue_breakdown: Dict
-    ) -> List[TCriteria]:
-        tiebreakers: List[TCriteria] = []
+        cls, red_breakdown: dict, blue_breakdown: dict
+    ) -> list[TCriteria]:
+        tiebreakers: list[TCriteria] = []
 
         # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
         if "foulPoints" in red_breakdown and "foulPoints" in blue_breakdown:
@@ -343,9 +341,9 @@ class MatchTiebreakers(object):
 
     @classmethod
     def _tiebreak_2017(
-        cls, red_breakdown: Dict, blue_breakdown: Dict
-    ) -> List[TCriteria]:
-        tiebreakers: List[TCriteria] = []
+        cls, red_breakdown: dict, blue_breakdown: dict
+    ) -> list[TCriteria]:
+        tiebreakers: list[TCriteria] = []
 
         # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
         if "foulPoints" in red_breakdown and "foulPoints" in blue_breakdown:
@@ -414,9 +412,9 @@ class MatchTiebreakers(object):
 
     @classmethod
     def _tiebreak_2016(
-        cls, red_breakdown: Dict, blue_breakdown: Dict
-    ) -> List[TCriteria]:
-        tiebreakers: List[TCriteria] = []
+        cls, red_breakdown: dict, blue_breakdown: dict
+    ) -> list[TCriteria]:
+        tiebreakers: list[TCriteria] = []
 
         # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
         if "foulPoints" in red_breakdown and "foulPoints" in blue_breakdown:

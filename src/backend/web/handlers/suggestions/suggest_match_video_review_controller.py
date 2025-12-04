@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import redirect, request
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
@@ -23,7 +21,7 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBase[Match]):
     def __init__(self, *args, **kw):
         super(SuggestMatchVideoReviewController, self).__init__(*args, **kw)
 
-    def create_target_model(self, suggestion: Suggestion) -> Optional[Match]:
+    def create_target_model(self, suggestion: Suggestion) -> Match | None:
         target_key = request.form.get(
             "key-{}".format(suggestion.key.id()), suggestion.target_key
         )

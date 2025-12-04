@@ -1,5 +1,3 @@
-from typing import Set
-
 from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
@@ -21,7 +19,7 @@ class DistrictTeam(CachedModel):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "district_key",  # for migrations
     }
 

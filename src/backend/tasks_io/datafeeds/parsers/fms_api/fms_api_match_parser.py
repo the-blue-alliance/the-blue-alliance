@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -35,7 +35,7 @@ TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
 
 
 class FMSAPIHybridScheduleParser(
-    ParserJSON[Tuple[List[Match], Dict[MatchKey, MatchKey]]]
+    ParserJSON[tuple[list[Match], dict[MatchKey, MatchKey]]]
 ):
     def __init__(self, year: Year, event_short: str):
         self.year = year
@@ -60,8 +60,8 @@ class FMSAPIHybridScheduleParser(
         return True
 
     def parse(
-        self, response: Dict[str, Any]
-    ) -> Tuple[List[Match], Dict[MatchKey, MatchKey]]:
+        self, response: dict[str, Any]
+    ) -> tuple[list[Match], dict[MatchKey, MatchKey]]:
         import pytz
 
         matches = response["Schedule"]
@@ -76,7 +76,7 @@ class FMSAPIHybridScheduleParser(
             )
             event_tz = None
 
-        match_identifiers: List[Tuple[MatchKey, CompLevel, int, int]] = []
+        match_identifiers: list[tuple[MatchKey, CompLevel, int, int]] = []
         for match in matches:
             if "tournamentLevel" in match:  # 2016+
                 level = match["tournamentLevel"]
@@ -98,20 +98,20 @@ class FMSAPIHybridScheduleParser(
             [ndb.Key(Match, key_name) for (key_name, _, _, _) in match_identifiers]
         )
 
-        parsed_matches: List[Match] = []
-        remapped_matches: Dict[MatchKey, MatchKey] = (
+        parsed_matches: list[Match] = []
+        remapped_matches: dict[MatchKey, MatchKey] = (
             {}
         )  # If a key changes due to a tiebreaker
         for match, (key_name, comp_level, set_number, match_number) in zip(
             matches, match_identifiers
         ):
-            red_teams: List[TeamKey] = []
-            blue_teams: List[TeamKey] = []
-            red_surrogates: List[TeamKey] = []
-            blue_surrogates: List[TeamKey] = []
-            red_dqs: List[TeamKey] = []
-            blue_dqs: List[TeamKey] = []
-            team_key_names: List[TeamKey] = []
+            red_teams: list[TeamKey] = []
+            blue_teams: list[TeamKey] = []
+            red_surrogates: list[TeamKey] = []
+            blue_surrogates: list[TeamKey] = []
+            red_dqs: list[TeamKey] = []
+            blue_dqs: list[TeamKey] = []
+            team_key_names: list[TeamKey] = []
 
             # Sort by station to ensure correct ordering. Kind of hacky.
             sorted_teams = list(
@@ -339,18 +339,18 @@ class FMSAPIHybridScheduleParser(
         return parsed_matches, remapped_matches
 
 
-class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
+class FMSAPIMatchDetailsParser(ParserJSON[dict[MatchKey, MatchScoreBreakdown]]):
     def __init__(self, year, event_short):
         self.year = year
         self.event_short = event_short
 
-    def parse(self, response: Dict[str, Any]) -> Dict[MatchKey, MatchScoreBreakdown]:
+    def parse(self, response: dict[str, Any]) -> dict[MatchKey, MatchScoreBreakdown]:
         matches = response["MatchScores"]
 
         event_key = "{}{}".format(self.year, self.event_short)
         event = none_throws(Event.get_by_id(event_key))
 
-        match_details_by_key: Dict[MatchKey, MatchScoreBreakdown] = {}
+        match_details_by_key: dict[MatchKey, MatchScoreBreakdown] = {}
 
         for match in matches:
             comp_level = PlayoffTypeHelper.get_comp_level(

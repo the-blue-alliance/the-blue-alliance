@@ -1,6 +1,5 @@
 import datetime
 import json
-from typing import Optional
 
 import pytest
 from google.appengine.ext import ndb
@@ -238,7 +237,7 @@ def test_parse_match_nothing_played(ndb_stub) -> None:
     ],
 )
 def test_parse_match_label(
-    ndb_stub, match_label: str, match_key: Optional[MatchKey]
+    ndb_stub, match_label: str, match_key: MatchKey | None
 ) -> None:
     e = create_event()
     parsed_key = NexusAPIQueueStatusParser(e)._parse_match_description(match_label)
@@ -256,7 +255,7 @@ def test_parse_match_label(
     ],
 )
 def test_nexus_match_status_parsing(
-    api_status: str, status: Optional[NexusMatchStatus]
+    api_status: str, status: NexusMatchStatus | None
 ) -> None:
     if status is None:
         with pytest.raises(ValueError):

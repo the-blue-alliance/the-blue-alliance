@@ -1,7 +1,6 @@
 import datetime
 import logging
 import re
-from typing import List, Optional, Set
 
 from flask import Blueprint, make_response, render_template, request, Response, url_for
 from google.appengine.api import taskqueue
@@ -56,8 +55,8 @@ blueprint = Blueprint("frc_api", __name__)
 
 
 def splay_delay_for(
-    i: int, total: int, total_time: Optional[datetime.timedelta]
-) -> Optional[datetime.datetime]:
+    i: int, total: int, total_time: datetime.timedelta | None
+) -> datetime.datetime | None:
     if total_time is None:
         return None
 
@@ -129,7 +128,7 @@ def team_details(team_key: TeamKey) -> Response:
     fms_details = fms_df.get_team_details(year, team_key).get_result()
 
     team, district_team, robot = fms_details or (None, None, None)
-    regional_pool_team: Optional[RegionalPoolTeam] = None
+    regional_pool_team: RegionalPoolTeam | None = None
 
     if team:
         team = TeamManipulator.createOrUpdate(team, update_manual_attrs=False)
@@ -243,8 +242,8 @@ def team_avatar(team_key: TeamKey) -> Response:
 
 @blueprint.route("/backend-tasks/enqueue/event_list/current", defaults={"year": None})
 @blueprint.route("/backend-tasks/enqueue/event_list/<int:year>")
-def enqueue_event_list(year: Optional[Year]) -> Response:
-    years: List[Year]
+def enqueue_event_list(year: Year | None) -> Response:
+    years: list[Year]
 
     if year is None:
         api_status_sv = ApiStatus.get()
@@ -393,11 +392,11 @@ def event_details(event_key: EventKey) -> Response:
 
     models = event_teams_future.get_result()
 
-    teams: List[Team] = []
-    district_teams: List[DistrictTeam] = []
-    regional_pool_teams: List[RegionalPoolTeam] = []
+    teams: list[Team] = []
+    district_teams: list[DistrictTeam] = []
+    regional_pool_teams: list[RegionalPoolTeam] = []
 
-    robots: List[Robot] = []
+    robots: list[Robot] = []
     for group in models:
         # models is a list of tuples (team, districtTeam, robot)
         team = group[0]
@@ -538,10 +537,8 @@ def event_details(event_key: EventKey) -> Response:
     "/tasks/enqueue/fmsapi_event_alliances/now", defaults={"year": None, "when": "now"}
 )
 @blueprint.route("/tasks/enqueue/fmsapi_event_alliances/<int:year>")
-def enqueue_event_alliances(
-    year: Optional[Year], when: Optional[str] = None
-) -> Response:
-    events: List[Event]
+def enqueue_event_alliances(year: Year | None, when: str | None = None) -> Response:
+    events: list[Event]
     if when == "now":
         events = EventHelper.events_within_a_day()
         events = list(filter(lambda e: e.official, events))
@@ -615,8 +612,8 @@ def event_alliances(event_key: EventKey) -> Response:
 
 @blueprint.route("/tasks/enqueue/fmsapi_event_rankings/now", defaults={"year": None})
 @blueprint.route("/tasks/enqueue/fmsapi_event_rankings/<int:year>")
-def enqueue_event_rankings(year: Optional[Year]) -> Response:
-    events: List[Event] = []
+def enqueue_event_rankings(year: Year | None) -> Response:
+    events: list[Event] = []
     if year is None:
         events = EventHelper.events_within_a_day()
         events = list(filter(lambda e: e.official, events))
@@ -685,8 +682,8 @@ def event_rankings(event_key: EventKey) -> Response:
 
 @blueprint.route("/tasks/enqueue/fmsapi_matches/now", defaults={"year": None})
 @blueprint.route("/tasks/enqueue/fmsapi_matches/<int:year>")
-def enqueue_event_matches(year: Optional[Year]) -> Response:
-    events: List[Event]
+def enqueue_event_matches(year: Year | None) -> Response:
+    events: list[Event]
     if year is None:
         events = EventHelper.events_within_a_day()
         events = list(filter(lambda e: e.official, events))
@@ -779,8 +776,8 @@ def event_matches(event_key: EventKey) -> Response:
     defaults={"year": None, "when": "last_day_only"},
 )
 @blueprint.route("/tasks/enqueue/fmsapi_awards/<int:year>")
-def awards_year(year: Optional[int], when: Optional[str] = None) -> Response:
-    events: List[Event]
+def awards_year(year: int | None, when: str | None = None) -> Response:
+    events: list[Event]
     if when == "last_day_only":
         events = EventHelper.events_within_a_day()
         events = list(filter(lambda e: e.official and e.ends_today, events))
@@ -833,7 +830,7 @@ def awards_event(event_key: EventKey) -> Response:
     new_awards = listify(new_awards)
 
     # Create EventTeams
-    team_ids: Set[TeamKey] = set()
+    team_ids: set[TeamKey] = set()
     for award in new_awards:
         for team in award.team_list:
             team_id = none_throws(team.string_id())

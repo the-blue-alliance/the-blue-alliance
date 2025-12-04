@@ -1,5 +1,4 @@
 import abc
-from typing import Dict, Optional
 
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
@@ -17,7 +16,7 @@ from backend.tasks_io.datafeeds.parsers.nexus_api.queue_status_parser import (
 
 class _DatafeedNexus(DatafeedBase[TReturn]):
 
-    def __init__(self, auth_token: Optional[str] = None, version: str = "v1") -> None:
+    def __init__(self, auth_token: str | None = None, version: str = "v1") -> None:
         super().__init__()
         self.version = version
         self.auth_token = auth_token or NexusApiSecrets.auth_token()
@@ -27,7 +26,7 @@ class _DatafeedNexus(DatafeedBase[TReturn]):
                 f"Missing Nexus API key. Setup {NexusApiSecrets.key()} sitevar"
             )
 
-    def headers(self) -> Dict[str, str]:
+    def headers(self) -> dict[str, str]:
         return {
             "Accept": "application/json",
             "Cache-Control": "no-cache, max-age=10",
@@ -43,7 +42,7 @@ class _DatafeedNexus(DatafeedBase[TReturn]):
     def endpoint(self) -> str: ...
 
 
-class NexusPitLocations(_DatafeedNexus[Dict[TeamKey, EventTeamPitLocation]]):
+class NexusPitLocations(_DatafeedNexus[dict[TeamKey, EventTeamPitLocation]]):
 
     def __init__(self, event: Event) -> None:
         super().__init__()
@@ -56,7 +55,7 @@ class NexusPitLocations(_DatafeedNexus[Dict[TeamKey, EventTeamPitLocation]]):
         return NexusAPIPitLocationParser()
 
 
-class NexusEventQueueStatus(_DatafeedNexus[Optional[EventQueueStatus]]):
+class NexusEventQueueStatus(_DatafeedNexus[EventQueueStatus | None]):
     def __init__(self, event: Event) -> None:
         super().__init__()
         self.event = event

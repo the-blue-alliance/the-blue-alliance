@@ -1,4 +1,5 @@
-from typing import Any, Callable, Type, Union
+from collections.abc import Callable
+from typing import Any
 
 from flask import Flask
 from google.appengine.ext import ndb
@@ -82,12 +83,8 @@ def install_middleware(
     # This means, the last one in this list is the "outermost" middleware that runs
     # _first_ for a given request, for the cases when order matters
     middlewares: list[
-        Type[
-            Union[
-                TraceRequestMiddleware,
-                AfterResponseMiddleware,
-                AppspotRedirectMiddleware,
-            ]
+        type[
+            TraceRequestMiddleware | AfterResponseMiddleware | AppspotRedirectMiddleware
         ]
     ] = [
         TraceRequestMiddleware,

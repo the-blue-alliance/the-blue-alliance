@@ -1,9 +1,9 @@
-from typing import Any, Dict, Optional, Set
+from typing import Any
 
 from google.appengine.ext import ndb
 
 
-TAffectedReferences = Dict[str, Set[Any]]
+TAffectedReferences = dict[str, set[Any]]
 
 
 class CachedModel(ndb.Model):
@@ -25,20 +25,20 @@ class CachedModel(ndb.Model):
     _affected_references: TAffectedReferences = {}
 
     # Which references get overwritten
-    _mutable_attrs: Set[str] = set()
+    _mutable_attrs: set[str] = set()
 
     # Attributes where overwriting None is allowed
-    _allow_none_attrs: Set[str] = set()
+    _allow_none_attrs: set[str] = set()
 
     # We will merge the lists of these attrs
-    _list_attrs: Set[str] = set()
+    _list_attrs: set[str] = set()
 
-    _json_attrs: Set[str] = set()
+    _json_attrs: set[str] = set()
 
-    _auto_union_attrs: Set[str] = set()
+    _auto_union_attrs: set[str] = set()
 
     # This will get updated with the attrs that actually change
-    _updated_attrs: Optional[Set[str]] = None
+    _updated_attrs: set[str] | None = None
 
     def __init__(self, *args, **kwargs):
         super(CachedModel, self).__init__(*args, **kwargs)

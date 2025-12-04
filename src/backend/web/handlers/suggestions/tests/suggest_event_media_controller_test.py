@@ -1,4 +1,4 @@
-from typing import cast, List
+from typing import cast
 from urllib.parse import urlparse
 
 import pytest
@@ -27,7 +27,7 @@ def storeEvent(ndb_stub) -> None:
 
 
 def assert_template_status(
-    captured_templates: List[CapturedTemplate], status: str
+    captured_templates: list[CapturedTemplate], status: str
 ) -> None:
     template = captured_templates[0][0]
     context = captured_templates[0][1]
@@ -96,7 +96,7 @@ def test_submit_empty_form(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
         "/suggest/event/media",
@@ -118,7 +118,7 @@ def test_submit_bad_url(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
         "/suggest/event/media",
@@ -140,7 +140,7 @@ def test_suggest_media(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
         "/suggest/event/media",

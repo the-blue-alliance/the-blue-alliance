@@ -2,7 +2,6 @@ import csv
 import itertools
 from datetime import datetime
 from io import StringIO
-from typing import List, Optional
 
 from flask import abort, redirect, request, url_for
 
@@ -13,7 +12,7 @@ from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.web.profiled_render import render_template
 
 
-def team_media_mod_list(year: Optional[Year] = None, page_num: int = 0):
+def team_media_mod_list(year: Year | None = None, page_num: int = 0):
     MAX_PAGE = 10
     PAGE_SIZE = 1000
 
@@ -61,7 +60,7 @@ def team_media_mod_add():
     return render_template("admin/team_media_mod_add.html")
 
 
-def team_media_add_single(year: Year, csv_row: List[str]) -> None:
+def team_media_add_single(year: Year, csv_row: list[str]) -> None:
     team_number = int(csv_row[0])
     access = TeamAdminAccess(
         id=TeamAdminAccess.render_key_name(team_number, year),
@@ -73,7 +72,7 @@ def team_media_add_single(year: Year, csv_row: List[str]) -> None:
     access.put()
 
 
-def team_media_add_group(year: Year, csv_rows: List[List[str]]) -> None:
+def team_media_add_group(year: Year, csv_rows: list[list[str]]) -> None:
     for row in csv_rows:
         defer_safe(team_media_add_single, year, row, _queue="admin")
 

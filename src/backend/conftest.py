@@ -1,5 +1,5 @@
+from collections.abc import Generator
 from concurrent import futures
-from typing import Generator
 
 import pytest
 from freezegun import api as freezegun_api

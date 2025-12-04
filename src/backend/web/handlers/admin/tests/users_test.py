@@ -1,5 +1,3 @@
-from typing import List
-
 import bs4
 from google.appengine.ext import ndb
 from werkzeug.test import Client
@@ -8,7 +6,7 @@ from backend.common.consts.account_permission import AccountPermission
 from backend.common.models.account import Account
 
 
-def create_accounts(n: int, permissions: List[AccountPermission] = []) -> List[ndb.Key]:
+def create_accounts(n: int, permissions: list[AccountPermission] = []) -> list[ndb.Key]:
     accounts = []
     for i in range(n):
         accounts.append(

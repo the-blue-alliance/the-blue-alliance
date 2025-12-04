@@ -1,9 +1,7 @@
-from typing import Dict, List
-
 from backend.common.helpers.insights_helper import InsightsHelper
 
 
-def call_calc_streaks(division_winners_map: Dict[str, List[int]]) -> Dict[str, int]:
+def call_calc_streaks(division_winners_map: dict[str, list[int]]) -> dict[str, int]:
     # Helper to call the static method.
     # The _calculate_einstein_streaks method returns a dict.
     return InsightsHelper._calculate_einstein_streaks(division_winners_map)

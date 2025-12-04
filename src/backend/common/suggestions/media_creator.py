@@ -1,5 +1,3 @@
-from typing import List
-
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -26,7 +24,7 @@ class MediaCreator:
     def create_media_model(
         suggestion: Suggestion,
         team_reference: ndb.Key,
-        preferred_references: List[ndb.Key] = [],
+        preferred_references: list[ndb.Key] = [],
     ) -> Media:
         media_type_enum = suggestion.contents["media_type_enum"]
         return Media(

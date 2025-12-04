@@ -2,7 +2,7 @@ import random
 import string
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from flask import redirect, request
 from google.appengine.ext import ndb
@@ -38,9 +38,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBase[ApiWriteTargetModel]
     def __init__(self, *args, **kw):
         super(SuggestApiWriteReviewController, self).__init__(*args, **kw)
 
-    def create_target_model(
-        self, suggestion: Suggestion
-    ) -> Optional[ApiWriteTargetModel]:
+    def create_target_model(self, suggestion: Suggestion) -> ApiWriteTargetModel | None:
         message = request.args.get("user_message")
         event_key = suggestion.contents["event_key"]
         user = suggestion.author.get()

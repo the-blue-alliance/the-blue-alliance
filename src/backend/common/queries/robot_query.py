@@ -1,4 +1,5 @@
-from typing import Any, Generator, List
+from collections.abc import Generator
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -13,7 +14,7 @@ from backend.common.queries.dict_converters.robot_converter import (
 from backend.common.tasklets import typed_tasklet
 
 
-class TeamRobotsQuery(CachedDatabaseQuery[List[Robot], List[RobotDict]]):
+class TeamRobotsQuery(CachedDatabaseQuery[list[Robot], list[RobotDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_robots_{team_key}"
     DICT_CONVERTER = RobotConverter
@@ -22,6 +23,6 @@ class TeamRobotsQuery(CachedDatabaseQuery[List[Robot], List[RobotDict]]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Robot]]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, list[Robot]]:
         robots = yield Robot.query(Robot.team == ndb.Key(Team, team_key)).fetch_async()
         return robots

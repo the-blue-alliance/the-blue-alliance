@@ -1,9 +1,7 @@
-from typing import Dict, Optional
-
 from backend.common.sitevars.sitevar import Sitevar
 
 
-class SlackHookUrls(Sitevar[Dict[str, str]]):
+class SlackHookUrls(Sitevar[dict[str, str]]):
     @staticmethod
     def key() -> str:
         return "slack.hookurls"
@@ -13,9 +11,9 @@ class SlackHookUrls(Sitevar[Dict[str, str]]):
         return "Webhook URLs for Slack Integrations"
 
     @staticmethod
-    def default_value() -> Dict[str, str]:
+    def default_value() -> dict[str, str]:
         return {}
 
     @classmethod
-    def url_for(cls, channel: str) -> Optional[str]:
+    def url_for(cls, channel: str) -> str | None:
         return cls.get().get(channel)

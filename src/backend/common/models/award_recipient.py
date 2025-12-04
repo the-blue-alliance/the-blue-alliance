@@ -1,6 +1,6 @@
-from typing import Optional, TypedDict, Union
+from typing import TypedDict
 
 
 class AwardRecipient(TypedDict):
-    awardee: Optional[str]
-    team_number: Optional[Union[int, str]]  # Ex: 7332 or 7332B
+    awardee: str | None
+    team_number: int | str | None  # Ex: 7332 or 7332B

@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional, Tuple
-
 from pyre_extensions import none_throws
 
 from backend.common.consts.comp_level import COMP_LEVELS_VERBOSE_FULL, CompLevel
@@ -17,7 +15,7 @@ from backend.common.models.keys import TeamKey
 class AllianceHelper:
     UNKNOWN_ALLIANCE_SIZE = 99
 
-    KNOWN_MODERN_EVENT_TYPE_ALLIANCE_SIZES: Dict[EventType, int] = {
+    KNOWN_MODERN_EVENT_TYPE_ALLIANCE_SIZES: dict[EventType, int] = {
         EventType.REGIONAL: 3,
         EventType.DISTRICT: 3,
         EventType.DISTRICT_CMP: 3,
@@ -54,7 +52,7 @@ class AllianceHelper:
     @classmethod
     def get_alliance_details_and_pick_name(
         cls, event: Event, team: TeamKey
-    ) -> Tuple[Optional[EventAlliance], Optional[str], int]:
+    ) -> tuple[EventAlliance | None, str | None, int]:
         alliance_size = cls.get_known_alliance_size(event.event_type_enum, event.year)
 
         if event.alliance_selections is None:
@@ -87,7 +85,7 @@ class AllianceHelper:
     @classmethod
     def generate_playoff_level_status_string(
         cls,
-        playoff_type: Optional[PlayoffType],
+        playoff_type: PlayoffType | None,
         playoff_status: PlayoffAllianceStatus,
     ) -> str:
         if playoff_type in [
@@ -113,11 +111,11 @@ class AllianceHelper:
     def generate_playoff_status_string(
         cls,
         playoff: PlayoffAllianceStatus,
-        pick: Optional[str],
-        alliance_name: Optional[str],
+        pick: str | None,
+        alliance_name: str | None,
         plural: bool = False,
         include_record: bool = True,
-    ) -> List[str]:
+    ) -> list[str]:
         level = playoff["level"]
         status = playoff.get("status")
         record = playoff.get("record")

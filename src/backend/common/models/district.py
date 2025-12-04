@@ -1,5 +1,4 @@
 import re
-from typing import Dict, List, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
@@ -10,7 +9,7 @@ from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
 
 
-ALL_KNOWN_DISTRICT_ABBREVIATIONS: Set[DistrictAbbreviation] = {
+ALL_KNOWN_DISTRICT_ABBREVIATIONS: set[DistrictAbbreviation] = {
     "chs",
     "fch",
     "fim",
@@ -47,8 +46,8 @@ class District(CachedModel):
     elasticsearch_name = ndb.StringProperty()
 
     # District rankings as calculated by TBA
-    rankings: List[DistrictRanking] = safe_cast(
-        List[DistrictRanking], ndb.JsonProperty()
+    rankings: list[DistrictRanking] = safe_cast(
+        list[DistrictRanking], ndb.JsonProperty()
     )
     # Dict of team key -> advancement data
     advancement: DistrictAdvancement = safe_cast(
@@ -56,12 +55,12 @@ class District(CachedModel):
     )
 
     # other changes from FIRST to correct errors
-    adjustments: Dict[TeamKey, int] = ndb.JsonProperty()
+    adjustments: dict[TeamKey, int] = ndb.JsonProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "adjustments",
         "advancement",
         "display_name",

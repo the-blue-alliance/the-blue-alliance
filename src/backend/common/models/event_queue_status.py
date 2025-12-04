@@ -1,4 +1,4 @@
-from typing import Dict, Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.models.keys import MatchKey
@@ -10,8 +10,8 @@ class NexusCurrentlyQueueing(TypedDict):
 
 
 class NexusMatchTiming(TypedDict):
-    estimated_queue_time_ms: Optional[int]
-    estimated_start_time_ms: Optional[int]
+    estimated_queue_time_ms: int | None
+    estimated_start_time_ms: int | None
 
 
 class NexusMatch(TypedDict):
@@ -23,5 +23,5 @@ class NexusMatch(TypedDict):
 
 class EventQueueStatus(TypedDict):
     data_as_of_ms: int
-    now_queueing: Optional[NexusCurrentlyQueueing]
-    matches: Dict[MatchKey, NexusMatch]
+    now_queueing: NexusCurrentlyQueueing | None
+    matches: dict[MatchKey, NexusMatch]

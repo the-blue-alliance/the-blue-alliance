@@ -1,6 +1,5 @@
 import copy
 import json
-from typing import Dict, List, Optional
 
 from google.appengine.ext import ndb
 from werkzeug.test import Client
@@ -84,7 +83,7 @@ def setup_match() -> None:
     ).put()
 
 
-def setup_auth(access_types: List[AuthType]) -> None:
+def setup_auth(access_types: list[AuthType]) -> None:
     ApiAuthAccess(
         id=AUTH_ID,
         secret=AUTH_SECRET,
@@ -93,7 +92,7 @@ def setup_auth(access_types: List[AuthType]) -> None:
     ).put()
 
 
-def get_auth_headers(request_path: str, request_body) -> Dict[str, str]:
+def get_auth_headers(request_path: str, request_body) -> dict[str, str]:
     return {
         "X-TBA-Auth-Id": AUTH_ID,
         "X-TBA-AUth-Sig": TrustedApiAuthHelper.compute_auth_signature(
@@ -211,6 +210,6 @@ def test_add_data(api_client: Client) -> None:
     )
     assert response.status_code == 200, response.data
 
-    match_data: Optional[ZebraMotionWorks] = ZebraMotionWorks.get_by_id("2014casj_qm1")
+    match_data: ZebraMotionWorks | None = ZebraMotionWorks.get_by_id("2014casj_qm1")
     assert match_data is not None
     assert match_data.data == REQUEST_DATA[0]

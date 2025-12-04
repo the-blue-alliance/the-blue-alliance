@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import List
 
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.helpers.location_helper import LocationHelper
@@ -17,7 +16,7 @@ class EventManipulator(ManipulatorBase[Event]):
     @classmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
-    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+    ) -> list[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.event_updated(affected_refs)
 
     """
@@ -63,7 +62,7 @@ class EventManipulator(ManipulatorBase[Event]):
 
 
 @EventManipulator.register_post_update_hook
-def event_post_update_hook(updated_models: List[TUpdatedModel[Event]]) -> None:
+def event_post_update_hook(updated_models: list[TUpdatedModel[Event]]) -> None:
     events = []
     for updated in updated_models:
         event: Event = updated.model

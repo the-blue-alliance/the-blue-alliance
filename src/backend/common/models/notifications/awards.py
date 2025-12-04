@@ -1,5 +1,6 @@
-from typing import Any, cast, Dict, Optional
+from typing import Any, cast
 
+from firebase_admin import messaging
 from pyre_extensions import none_throws
 
 from backend.common.consts.award_type import AwardType
@@ -10,7 +11,7 @@ from backend.common.models.team import Team
 
 
 class AwardsNotification(Notification):
-    def __init__(self, event: Event, team: Optional[Team] = None) -> None:
+    def __init__(self, event: Event, team: Team | None = None) -> None:
         self.event = event
         self.team = team
         self.team_awards = event.team_awards().get(team.key, []) if team else []
@@ -22,9 +23,7 @@ class AwardsNotification(Notification):
         return NotificationType.AWARDS
 
     @property
-    def fcm_notification(self) -> Optional[Any]:
-        from firebase_admin import messaging
-
+    def fcm_notification(self) -> messaging.Notification | None:
         # Construct Team-specific payload
         if self.team:
             if len(self.team_awards) == 1:
@@ -56,7 +55,7 @@ class AwardsNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, str]]:
+    def data_payload(self) -> dict[str, str] | None:
         payload = {"event_key": self.event.key_name}
 
         if self.team:
@@ -65,8 +64,8 @@ class AwardsNotification(Notification):
         return payload
 
     @property
-    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
-        payload = cast(Dict[str, Any], none_throws(self.data_payload))
+    def webhook_message_data(self) -> dict[str, Any] | None:
+        payload = cast(dict[str, Any], none_throws(self.data_payload))
         payload["event_name"] = self.event.name
 
         from backend.common.helpers.award_helper import AwardHelper

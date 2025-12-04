@@ -1,6 +1,5 @@
 import datetime
 from random import randint
-from typing import List
 from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
@@ -73,7 +72,7 @@ def test_overview_unregistered(login_user, web_client: FlaskClient) -> None:
 
 def test_overview(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     response = web_client.get("/account")
@@ -133,7 +132,7 @@ def test_overview_status(
     status: str,
     message: str,
     success: bool,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     with web_client:
@@ -157,7 +156,7 @@ def test_overview_status(
 
 def test_overview_no_status(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     response = web_client.get("/account")
@@ -177,7 +176,7 @@ def test_overview_no_status(
 
 def test_overview_webhook_verification_success(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     webhook_verification_success = "1"
@@ -204,7 +203,7 @@ def test_overview_webhook_verification_success(
 
 def test_overview_no_webhook_verification_success(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     response = web_client.get("/account")
@@ -227,7 +226,7 @@ def test_overview_ping_sent(
     login_user,
     ping_sent: str,
     success: bool,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     with web_client:
@@ -256,7 +255,7 @@ def test_overview_ping_sent(
 
 def test_overview_no_ping_sent(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     response = web_client.get("/account")
@@ -276,7 +275,7 @@ def test_overview_no_ping_sent(
 
 def test_ping_enabled(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     # Add a dummy client so we have something to ping, to check that the ping rows are disabled
@@ -298,7 +297,7 @@ def test_ping_enabled(
 
 def test_ping_disabled(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     # Add a dummy client so we have something to ping, to check that the ping rows are disabled
@@ -320,7 +319,7 @@ def test_ping_disabled(
 
 def test_num_favorites(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     favorites_count = randint(1, 100)
@@ -344,7 +343,7 @@ def test_num_favorites(
 
 def test_num_subscriptions(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     subscriptions_count = randint(1, 100)
@@ -370,7 +369,7 @@ def test_num_subscriptions(
 
 def test_submissions_pending(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     submissions_pending_count = randint(1, 100)
@@ -396,7 +395,7 @@ def test_submissions_pending(
 
 def test_submissions_accepted(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     submissions_accepted_count = randint(1, 100)
@@ -422,7 +421,7 @@ def test_submissions_accepted(
 
 def test_submissions_reviewed(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     submissions_reviewed_count = randint(1, 100)
@@ -450,7 +449,7 @@ def test_submissions_reviewed(
 def test_has_review_permissions(
     login_user,
     has_review_permissions: bool,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     login_user.has_review_permissions = has_review_permissions
@@ -476,7 +475,7 @@ def test_has_review_permissions(
 def test_api_read_keys(
     login_user,
     setup_keys: bool,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     api_key_id = "some_api_key"
@@ -538,7 +537,7 @@ def test_api_write_keys(
     login_user,
     setup_keys: bool,
     key_expires: bool,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     event = Mock()
@@ -610,7 +609,7 @@ def test_api_write_keys(
 
 def test_auth_write_type_names(
     login_user,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     response = web_client.get("/account")
@@ -625,7 +624,7 @@ def test_auth_write_type_names(
 
 
 def test_overview_api_read_add_form(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     response = web_client.get("/account")
 
@@ -654,7 +653,7 @@ def test_overview_api_read_add_form(
 
 
 def test_overview_api_write_add_button(
-    login_user, captured_templates: List[CapturedTemplate], web_client: FlaskClient
+    login_user, captured_templates: list[CapturedTemplate], web_client: FlaskClient
 ) -> None:
     response = web_client.get("/account")
 

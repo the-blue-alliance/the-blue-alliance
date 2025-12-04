@@ -1,5 +1,4 @@
 import re
-from typing import Optional, Set
 
 from backend.common.consts.event_type import EventType
 from backend.common.decorators import memoize
@@ -14,7 +13,7 @@ class EventShortNameHelper:
 
     @staticmethod
     @memoize(timeout=86400)  # 1 day
-    def _get_all_district_codes() -> Set[str]:
+    def _get_all_district_codes() -> set[str]:
         codes = set(
             [d.id()[4:].upper() for d in District.query().fetch(keys_only=True)]
         )
@@ -32,9 +31,9 @@ class EventShortNameHelper:
     def get_short_name(
         cls,
         name_str: str,
-        district_code: Optional[str] = None,
-        event_type: Optional[str] = None,
-        year: Optional[Year] = None,
+        district_code: str | None = None,
+        event_type: str | None = None,
+        year: Year | None = None,
     ) -> str:
         """
         Extracts a short name like "Silicon Valley" from an event name like

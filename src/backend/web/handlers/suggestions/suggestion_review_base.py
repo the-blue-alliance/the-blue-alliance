@@ -1,5 +1,5 @@
 import datetime
-from typing import Generic, List, Optional, TypeVar, Union
+from typing import Generic, TypeVar
 
 from flask import redirect, request, url_for
 from flask.views import MethodView
@@ -80,17 +80,17 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
         if self.user.is_admin:
             return
 
-        user_permissions: List[AccountPermission] = (
+        user_permissions: list[AccountPermission] = (
             none_throws(self.user).permissions or []
         )
         for permission in self.REQUIRED_PERMISSIONS:
             if permission not in user_permissions:
                 abort(401)
 
-    def get(self) -> Optional[Response]:
+    def get(self) -> Response | None:
         return self.verify_permissions()
 
-    def post(self) -> Optional[Response]:
+    def post(self) -> Response | None:
         """
         now = datetime.datetime.now()
         self.existing_access = TeamAdminAccess.query(
@@ -98,17 +98,17 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             TeamAdminAccess.expiration > now).fetch()
         """
 
-    def create_target_model(self, suggestion: Suggestion) -> Optional[TTargetModel]:
+    def create_target_model(self, suggestion: Suggestion) -> TTargetModel | None:
         """
         This function creates the model from the accepted suggestion and writes it to the ndb
         """
         raise NotImplementedError
 
-    def was_create_success(self, ret: Optional[TTargetModel]) -> bool:
+    def was_create_success(self, ret: TTargetModel | None) -> bool:
         return ret is not None
 
     @ndb.transactional(xg=True)
-    def _process_accepted(self, accept_key: str) -> Optional[TTargetModel]:
+    def _process_accepted(self, accept_key: str) -> TTargetModel | None:
         """
         Performs all actions for an accepted Suggestion in a Transaction.
         Suggestions are processed one at a time (instead of in batch) in a
@@ -135,7 +135,7 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             suggestion.put()
         return ret
 
-    def _process_rejected(self, reject_keys: List[Union[int, str]]) -> None:
+    def _process_rejected(self, reject_keys: list[int | str]) -> None:
         """
         Do everything we need to reject a batch of suggestions
         We can batch these, because we're just rejecting everything

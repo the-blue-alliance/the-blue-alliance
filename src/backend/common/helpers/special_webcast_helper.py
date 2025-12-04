@@ -1,4 +1,5 @@
-from typing import Any, Generator, List, Optional
+from collections.abc import Generator
+from typing import Any
 
 from backend.common.futures import TypedFuture
 from backend.common.memcache_models.webcast_online_status_memcache import (
@@ -14,7 +15,7 @@ class SpecialWebcastHelper:
     @typed_toplevel
     def get_special_webcasts_with_online_status(
         cls,
-    ) -> Generator[Any, Any, List[Webcast]]:
+    ) -> Generator[Any, Any, list[Webcast]]:
         webcasts = yield cls.get_special_webcasts_with_online_status_async()
         return webcasts
 
@@ -22,18 +23,16 @@ class SpecialWebcastHelper:
     @typed_tasklet
     def get_special_webcasts_with_online_status_async(
         cls,
-    ) -> Generator[Any, Any, List[Webcast]]:
-        special_webcasts: List[Webcast] = []
-        webcast_with_status_futures: List[TypedFuture[Optional[Webcast]]] = []
+    ) -> Generator[Any, Any, list[Webcast]]:
+        special_webcasts: list[Webcast] = []
+        webcast_with_status_futures: list[TypedFuture[Webcast | None]] = []
         for webcast in GamedaySpecialWebcasts.webcasts():
             webcast_with_status_futures.append(
                 WebcastOnlineStatusMemcache(webcast).get_async()
             )
             special_webcasts.append(webcast)
 
-        webcasts_with_status: List[Optional[Webcast]] = (
-            yield webcast_with_status_futures
-        )
+        webcasts_with_status: list[Webcast | None] = (yield webcast_with_status_futures)
         return [
             webcast_with_status if webcast_with_status is not None else webcast
             for webcast, webcast_with_status in zip(

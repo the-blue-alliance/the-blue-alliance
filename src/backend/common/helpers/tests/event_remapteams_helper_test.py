@@ -1,5 +1,4 @@
 import json
-from typing import List
 
 from google.appengine.ext import ndb
 
@@ -162,7 +161,7 @@ def test_remap_alliances(ndb_context):
 
 
 def test_remap_rankings2(ndb_context):
-    rankings: List[EventRanking] = [
+    rankings: list[EventRanking] = [
         EventRanking(
             rank=1,
             team_key="frc254",

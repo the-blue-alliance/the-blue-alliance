@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import enum
-from typing import Dict, Set
 
 
 @enum.unique
@@ -20,10 +19,10 @@ class EventType(enum.IntEnum):
     UNLABLED = -1
 
 
-EVENT_TYPES: Set[EventType] = {e for e in EventType}
+EVENT_TYPES: set[EventType] = {e for e in EventType}
 
 
-TYPE_NAMES: Dict[EventType, str] = {
+TYPE_NAMES: dict[EventType, str] = {
     EventType.REGIONAL: "Regional",
     EventType.DISTRICT: "District",
     EventType.DISTRICT_CMP_DIVISION: "District Championship Division",
@@ -38,7 +37,7 @@ TYPE_NAMES: Dict[EventType, str] = {
 }
 
 
-SHORT_TYPE_NAMES: Dict[EventType, str] = {
+SHORT_TYPE_NAMES: dict[EventType, str] = {
     EventType.REGIONAL: "Regional",
     EventType.DISTRICT: "District",
     EventType.DISTRICT_CMP_DIVISION: "District Championship Division",
@@ -53,14 +52,14 @@ SHORT_TYPE_NAMES: Dict[EventType, str] = {
 }
 
 
-DISTRICT_EVENT_TYPES: Set[EventType] = {
+DISTRICT_EVENT_TYPES: set[EventType] = {
     EventType.DISTRICT,
     EventType.DISTRICT_CMP_DIVISION,
     EventType.DISTRICT_CMP,
 }
 
 
-NON_CMP_EVENT_TYPES: Set[EventType] = {
+NON_CMP_EVENT_TYPES: set[EventType] = {
     EventType.REGIONAL,
     EventType.DISTRICT,
     EventType.DISTRICT_CMP_DIVISION,
@@ -68,13 +67,13 @@ NON_CMP_EVENT_TYPES: Set[EventType] = {
     EventType.REMOTE,
 }
 
-CMP_EVENT_TYPES: Set[EventType] = {
+CMP_EVENT_TYPES: set[EventType] = {
     EventType.CMP_DIVISION,
     EventType.CMP_FINALS,
 }
 
 
-SEASON_EVENT_TYPES: Set[EventType] = {
+SEASON_EVENT_TYPES: set[EventType] = {
     EventType.REGIONAL,
     EventType.DISTRICT,
     EventType.DISTRICT_CMP_DIVISION,

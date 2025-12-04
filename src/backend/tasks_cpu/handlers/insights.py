@@ -1,6 +1,5 @@
 import logging
 from html import escape
-from typing import Optional
 
 from flask import abort, Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
@@ -31,7 +30,7 @@ blueprint = Blueprint("insights", __name__)
 @blueprint.route(
     "/backend-tasks-b2/enqueue/math/insights/<kind>", defaults={"year": None}
 )
-def enqueue_year_insights(kind: str, year: Optional[Year] = None) -> Response:
+def enqueue_year_insights(kind: str, year: Year | None = None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 
@@ -125,7 +124,7 @@ def do_leaderboard_year_insights(kind: LeaderboardKeyType, year: Year) -> Respon
     defaults={"year": None},
 )
 def enqueue_leaderboard_year_insights(
-    kind: LeaderboardKeyType, year: Optional[Year] = None
+    kind: LeaderboardKeyType, year: Year | None = None
 ) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
@@ -164,7 +163,7 @@ def enqueue_all_leaderboard_insights(kind: LeaderboardKeyType) -> Response:
 
 @blueprint.route("/backend-tasks-b2/enqueue/math/notables/<int:year>")
 @blueprint.route("/backend-tasks-b2/enqueue/math/notables", defaults={"year": None})
-def enqueue_notables_year_insights(year: Optional[Year] = None) -> Response:
+def enqueue_notables_year_insights(year: Year | None = None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 

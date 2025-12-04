@@ -1,4 +1,4 @@
-from typing import List, TypedDict
+from typing import TypedDict
 
 from backend.common.consts.model_type import ModelType
 
@@ -30,7 +30,7 @@ class RegisteredMobileClient(TypedDict):
 
 
 class ListDevicesResponse(BaseResponse):
-    devices: List[RegisteredMobileClient]
+    devices: list[RegisteredMobileClient]
 
 
 class PingRequest(TypedDict):
@@ -51,24 +51,24 @@ class FavoriteMessage(TypedDict):
 
 
 class FavoriteCollection(BaseResponse):
-    favorites: List[FavoriteMessage]
+    favorites: list[FavoriteMessage]
 
 
 class SubscriptionMessage(TypedDict):
     model_key: str
-    notifications: List[str]  # stringified NotificationType.TYPE_NAMES
+    notifications: list[str]  # stringified NotificationType.TYPE_NAMES
     model_type: ModelType
 
 
 class SubscriptionCollection(BaseResponse):
-    subscriptions: List[SubscriptionMessage]
+    subscriptions: list[SubscriptionMessage]
 
 
 class ModelPreferenceMessage(TypedDict):
     model_key: str
     model_type: ModelType
     device_key: str  # so we know which device NOT to push sync notifications to
-    notifications: List[str]  # stringified NotificationType.TYPE_NAMES
+    notifications: list[str]  # stringified NotificationType.TYPE_NAMES
     favorite: bool
 
 

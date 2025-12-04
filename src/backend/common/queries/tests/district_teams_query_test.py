@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from google.appengine.ext import ndb
 
 from backend.common.models.district import District
@@ -9,7 +7,7 @@ from backend.common.models.team import Team
 from backend.common.queries.team_query import DistrictTeamsQuery
 
 
-def preseed_teams(start_team: int, end_team: Optional[int] = None) -> List[ndb.Key]:
+def preseed_teams(start_team: int, end_team: int | None = None) -> list[ndb.Key]:
     end_team = end_team or start_team
     stored = ndb.put_multi(
         [
@@ -24,7 +22,7 @@ def preseed_teams(start_team: int, end_team: Optional[int] = None) -> List[ndb.K
     return stored
 
 
-def preseed_district_teams(team_keys: List[ndb.Key], district_key: DistrictKey) -> None:
+def preseed_district_teams(team_keys: list[ndb.Key], district_key: DistrictKey) -> None:
     district_teams = [
         DistrictTeam(
             id=f"{district_key}_{t.id()}",

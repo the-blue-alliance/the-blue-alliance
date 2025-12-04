@@ -1,5 +1,3 @@
-from typing import Dict, Set
-
 from backend.common.models.keys import Year
 
 """
@@ -7,7 +5,7 @@ Valid breakdowns are those used for seeding. Varies by year.
 For 2014, seeding outlined in Section 5.3.4 in the 2014 manual.
 For 2016+, valid breakdowns match those provided by the FRC API.
 """
-VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
+VALID_BREAKDOWNS: dict[Year, set[str]] = {
     2014: set(["auto", "assist", "truss+catch", "teleop_goal+foul"]),
     2015: set(
         [

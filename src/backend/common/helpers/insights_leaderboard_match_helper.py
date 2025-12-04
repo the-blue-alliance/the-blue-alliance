@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import Dict, List, Optional
 
 from pyre_extensions import none_throws
 
@@ -14,7 +13,7 @@ from backend.common.models.insight import Insight
 
 class InsightsLeaderboardMatchHelper:
     @staticmethod
-    def make_insights(year: int) -> List[Insight]:
+    def make_insights(year: int) -> list[Insight]:
         return make_insights_from_functions(
             year,
             [
@@ -27,7 +26,7 @@ class InsightsLeaderboardMatchHelper:
     @staticmethod
     def _highest_match_clean_score(
         arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
+    ) -> Insight | None:
         if arguments.year == 0:
             return None
 
@@ -57,7 +56,7 @@ class InsightsLeaderboardMatchHelper:
     @staticmethod
     def _highest_match_clean_combined_score(
         arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
+    ) -> Insight | None:
         if arguments.year == 0:
             return None
 
@@ -87,11 +86,11 @@ class InsightsLeaderboardMatchHelper:
     @staticmethod
     def _2025_most_coral_scored(
         arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
+    ) -> Insight | None:
         if arguments.year != 2025:
             return None
 
-        def get_coral_count(sb: Dict) -> int:
+        def get_coral_count(sb: dict) -> int:
             return sum(
                 [
                     sb["teleopReef"]["tba_botRowCount"],

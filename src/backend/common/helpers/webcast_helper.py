@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import Optional, Tuple
 
 import requests
 
@@ -15,7 +14,7 @@ class WebcastParser:
     LIVESTREAM_URL_PATTERNS = ["livestream.com/"]
 
     @classmethod
-    def webcast_dict_from_url(cls, url: str) -> Optional[Webcast]:
+    def webcast_dict_from_url(cls, url: str) -> Webcast | None:
         """
         Takes a url, and turns it into a webcast dict (as defined in models.event)
         """
@@ -32,7 +31,7 @@ class WebcastParser:
             return None
 
     @classmethod
-    def _webcast_dict_from_twitch(cls, url: str) -> Optional[Webcast]:
+    def _webcast_dict_from_twitch(cls, url: str) -> Webcast | None:
         channel = cls._parse_twitch_channel(url)
         if channel is None:
             logging.warning("Failed to determine channel from url: {}".format(url))
@@ -44,7 +43,7 @@ class WebcastParser:
         return webcast_dict
 
     @classmethod
-    def _webcast_dict_from_youtube(cls, url: str) -> Optional[Webcast]:
+    def _webcast_dict_from_youtube(cls, url: str) -> Webcast | None:
         channel = cls._parse_youtube_channel(url)
         if channel is None:
             logging.warning("Failed to determine channel from url: {}".format(url))
@@ -56,7 +55,7 @@ class WebcastParser:
         return webcast_dict
 
     @classmethod
-    def _webcast_dict_from_ustream(cls, url: str) -> Optional[Webcast]:
+    def _webcast_dict_from_ustream(cls, url: str) -> Webcast | None:
         urlfetch_result = requests.get(url, timeout=10)
         if urlfetch_result.status_code != 200:
             logging.warning("Unable to retrieve url: {}".format(url))
@@ -73,7 +72,7 @@ class WebcastParser:
         return webcast_dict
 
     @classmethod
-    def _webcast_dict_from_livestream(cls, url: str) -> Optional[Webcast]:
+    def _webcast_dict_from_livestream(cls, url: str) -> Webcast | None:
         urlfetch_result = requests.get(url, timeout=10)
         if urlfetch_result.status_code != 200:
             logging.warning("Unable to retrieve url: {}".format(url))
@@ -94,7 +93,7 @@ class WebcastParser:
         return webcast_dict
 
     @classmethod
-    def _parse_twitch_channel(cls, url: str) -> Optional[str]:
+    def _parse_twitch_channel(cls, url: str) -> str | None:
         regex1 = re.match(r".*twitch.tv\/(\w+)", url)
         if regex1 is not None:
             return regex1.group(1)
@@ -102,7 +101,7 @@ class WebcastParser:
             return None
 
     @classmethod
-    def _parse_youtube_channel(cls, url: str) -> Optional[str]:
+    def _parse_youtube_channel(cls, url: str) -> str | None:
         youtube_id = None
         # youtu.be/video-id or youtube.com/live/video-id
         regex1 = re.match(
@@ -123,7 +122,7 @@ class WebcastParser:
             return youtube_id
 
     @classmethod
-    def _parse_ustream_channel(cls, html: bytes) -> Optional[str]:
+    def _parse_ustream_channel(cls, html: bytes) -> str | None:
         from bs4 import BeautifulSoup
 
         content = html.decode("utf-8", "replace")
@@ -141,7 +140,7 @@ class WebcastParser:
                 return None
 
     @classmethod
-    def _parse_livestream_channel(cls, html: bytes) -> Optional[Tuple[str, str]]:
+    def _parse_livestream_channel(cls, html: bytes) -> tuple[str, str] | None:
         from bs4 import BeautifulSoup
 
         content = html.decode("utf-8", "replace")

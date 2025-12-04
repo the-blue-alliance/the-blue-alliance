@@ -1,7 +1,8 @@
 import calendar
 import logging
-from typing import Any, cast, Dict, Optional
+from typing import Any, cast
 
+from firebase_admin import messaging
 from pyre_extensions import none_throws
 
 from backend.common.consts.notification_type import NotificationType
@@ -11,7 +12,7 @@ from backend.common.models.notifications.notification import Notification
 
 
 class EventScheduleNotification(Notification):
-    def __init__(self, event: Event, next_match: Optional[Match] = None) -> None:
+    def __init__(self, event: Event, next_match: Match | None = None) -> None:
         self.event = event
 
         if not next_match:
@@ -27,7 +28,7 @@ class EventScheduleNotification(Notification):
         return NotificationType.SCHEDULE_UPDATED
 
     @property
-    def fcm_notification(self) -> Optional[Any]:
+    def fcm_notification(self) -> messaging.Notification | None:
         body = f"The {self.event.normalized_name} match schedule has been updated."
         if self.next_match and self.next_match.time:
             time = self.next_match.time.strftime("%H:%M")
@@ -45,20 +46,18 @@ class EventScheduleNotification(Notification):
 
             body += f" The next match starts at {time}."
 
-        from firebase_admin import messaging
-
         return messaging.Notification(
             title="{} Schedule Updated".format(self.event.event_short.upper()),
             body=body,
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, str]]:
+    def data_payload(self) -> dict[str, str] | None:
         return {"event_key": self.event.key_name}
 
     @property
-    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
-        payload = cast(Dict[str, Any], none_throws(self.data_payload))
+    def webhook_message_data(self) -> dict[str, Any] | None:
+        payload = cast(dict[str, Any], none_throws(self.data_payload))
         if self.next_match and self.next_match.time:
             payload["first_match_time"] = calendar.timegm(
                 self.next_match.time.utctimetuple()

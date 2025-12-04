@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from backend.common.models.event_district_points import (
     EventDistrictPoints,
     TeamAtEventDistrictPoints,
@@ -12,7 +10,7 @@ class DistrictPointTiebreakersSortingHelper:
     @classmethod
     def sorted_points(
         cls, event_points: EventDistrictPoints
-    ) -> List[Tuple[TeamKey, TeamAtEventDistrictPoints]]:
+    ) -> list[tuple[TeamKey, TeamAtEventDistrictPoints]]:
         return sorted(
             event_points["points"].items(),
             key=lambda team_and_points: [

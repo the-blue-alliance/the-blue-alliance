@@ -1,5 +1,4 @@
 import enum
-from typing import Dict, Set
 
 from backend.common.consts.event_type import EventType
 
@@ -108,10 +107,10 @@ class AwardType(enum.IntEnum):
     RISING_ALL_STAR = 83
 
 
-AWARD_TYPES: Set[AwardType] = {a for a in AwardType}
+AWARD_TYPES: set[AwardType] = {a for a in AwardType}
 
 
-BLUE_BANNER_AWARDS: Set[AwardType] = {
+BLUE_BANNER_AWARDS: set[AwardType] = {
     AwardType.CHAIRMANS,
     AwardType.CHAIRMANS_FINALIST,
     AwardType.WINNER,
@@ -121,7 +120,7 @@ BLUE_BANNER_AWARDS: Set[AwardType] = {
 }
 
 
-INDIVIDUAL_AWARDS: Set[AwardType] = {
+INDIVIDUAL_AWARDS: set[AwardType] = {
     AwardType.WOODIE_FLOWERS,
     AwardType.DEANS_LIST,
     AwardType.VOLUNTEER,
@@ -132,7 +131,7 @@ INDIVIDUAL_AWARDS: Set[AwardType] = {
 
 
 # awards not used in the district point model
-NON_JUDGED_NON_TEAM_AWARDS: Set[AwardType] = {
+NON_JUDGED_NON_TEAM_AWARDS: set[AwardType] = {
     AwardType.HIGHEST_ROOKIE_SEED,
     AwardType.WOODIE_FLOWERS,
     AwardType.DEANS_LIST,
@@ -160,7 +159,7 @@ NORMALIZED_NAMES_2023 = {
 
 
 # Only searchable awards. Obscure & old awards not listed
-SEARCHABLE: Dict[AwardType, str] = {
+SEARCHABLE: dict[AwardType, str] = {
     AwardType.CHAIRMANS: "Chairman's",
     AwardType.CHAIRMANS_FINALIST: "Chairman's Finalist",
     AwardType.ENGINEERING_INSPIRATION: "Engineering Inspiration",
@@ -186,7 +185,7 @@ SEARCHABLE: Dict[AwardType, str] = {
 }
 
 # Prioritized sort order for certain awards
-SORT_ORDER: Dict[AwardType, int] = {
+SORT_ORDER: dict[AwardType, int] = {
     AwardType.CHAIRMANS: 0,
     AwardType.FOUNDERS: 1,
     AwardType.ENGINEERING_INSPIRATION: 2,

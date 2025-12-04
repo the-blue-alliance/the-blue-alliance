@@ -1,6 +1,7 @@
 import datetime
 from collections import defaultdict
-from typing import Any, cast, Dict, Generator, List, Optional, Tuple
+from collections.abc import Generator
+from typing import Any, cast
 
 from google.appengine.ext import ndb
 
@@ -41,7 +42,7 @@ class TeamRenderer:
     @classmethod
     def render_team_details(
         cls, team: Team, year: Year, is_canonical: bool
-    ) -> Tuple[Optional[Dict], bool]:
+    ) -> tuple[dict | None, bool]:
         events_future = cls._fetch_events_async(team, year)
         matches_by_event_key_future = cls._fetch_matches_by_event_key_async(team, year)
         awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team, year)
@@ -226,8 +227,8 @@ class TeamRenderer:
                 }
             )
 
-        season_wlt: Optional[WLTRecord] = None
-        offseason_wlt: Optional[WLTRecord] = None
+        season_wlt: WLTRecord | None = None
+        offseason_wlt: WLTRecord | None = None
         total_season_matches = 0
         total_offseason_matches = 0
         if year == 2015:
@@ -332,7 +333,7 @@ class TeamRenderer:
         return template_values, short_cache
 
     @classmethod
-    def render_team_history(cls, team: Team, is_canonical: bool) -> Tuple[Dict, bool]:
+    def render_team_history(cls, team: Team, is_canonical: bool) -> tuple[dict, bool]:
         events_future = cls._fetch_events_async(team)
         awards_by_event_key_future = cls._fetch_awards_by_event_key_async(team)
         participation_future = cls._fetch_participation_async(team)
@@ -385,7 +386,7 @@ class TeamRenderer:
     @ndb.tasklet
     def _fetch_participation_async(
         cls, team: Team
-    ) -> Generator[Any, Any, Tuple[List[Year], Optional[Year], Year]]:
+    ) -> Generator[Any, Any, tuple[list[Year], Year | None, Year]]:
         participation_years = yield team_query.TeamParticipationQuery(
             team_key=team.key_name
         ).fetch_async()
@@ -400,8 +401,8 @@ class TeamRenderer:
     @classmethod
     @ndb.tasklet
     def _fetch_events_async(
-        cls, team: Team, year: Optional[Year] = None
-    ) -> Generator[Any, Any, List[Event]]:
+        cls, team: Team, year: Year | None = None
+    ) -> Generator[Any, Any, list[Event]]:
         if year is None:
             events = yield event_query.TeamEventsQuery(
                 team_key=team.key_name
@@ -424,13 +425,13 @@ class TeamRenderer:
     @ndb.tasklet
     def _fetch_matches_by_event_key_async(
         cls, team: Team, year: Year
-    ) -> Generator[Any, Any, Dict[ndb.Key, List[Match]]]:
+    ) -> Generator[Any, Any, dict[ndb.Key, list[Match]]]:
         matches = yield match_query.TeamYearMatchesQuery(
             team_key=team.key_name, year=year
         ).fetch_async()
 
         # Group matches by event key
-        matches_by_event_key: Dict[ndb.Key, List[Match]] = defaultdict(list)
+        matches_by_event_key: dict[ndb.Key, list[Match]] = defaultdict(list)
         for match in matches:
             matches_by_event_key[match.event].append(match)
 
@@ -439,8 +440,8 @@ class TeamRenderer:
     @classmethod
     @ndb.tasklet
     def _fetch_awards_by_event_key_async(
-        cls, team: Team, year: Optional[Year] = None
-    ) -> Generator[Any, Any, Dict[ndb.Key, List[Award]]]:
+        cls, team: Team, year: Year | None = None
+    ) -> Generator[Any, Any, dict[ndb.Key, list[Award]]]:
         if year is None:
             awards = yield award_query.TeamAwardsQuery(
                 team_key=team.key_name
@@ -451,7 +452,7 @@ class TeamRenderer:
             ).fetch_async()
 
         # Group awards by event key
-        awards_by_event_key: Dict[ndb.Key, List[Award]] = defaultdict(list)
+        awards_by_event_key: dict[ndb.Key, list[Award]] = defaultdict(list)
         for award in awards:
             awards_by_event_key[award.event].append(award)
 
@@ -465,7 +466,7 @@ class TeamRenderer:
     @ndb.tasklet
     def _fetch_current_event_info_async(
         cls, team: Team, event: Event
-    ) -> Generator[Any, Any, Tuple[Event, List[Match], Optional[str]]]:
+    ) -> Generator[Any, Any, tuple[Event, list[Match], str | None]]:
         matches, event_team = yield (
             match_query.TeamEventMatchesQuery(
                 team.key_name, event.key_name
@@ -482,7 +483,7 @@ class TeamRenderer:
 
     @classmethod
     @ndb.tasklet
-    def _fetch_social_medias_async(cls, team: Team) -> Generator[Any, Any, List[Media]]:
+    def _fetch_social_medias_async(cls, team: Team) -> Generator[Any, Any, list[Media]]:
         social_medias = yield media_query.TeamSocialMediaQuery(
             team_key=team.key_name
         ).fetch_async()
@@ -490,7 +491,7 @@ class TeamRenderer:
 
     @classmethod
     @ndb.tasklet
-    def _fetch_hof_async(cls, team: Team) -> Generator[Any, Any, Dict]:
+    def _fetch_hof_async(cls, team: Team) -> Generator[Any, Any, dict]:
         hof_awards, hof_video, hof_presentation, hof_essay = yield (
             award_query.TeamEventTypeAwardsQuery(
                 team_key=team.key_name,
@@ -528,8 +529,8 @@ class TeamRenderer:
     @classmethod
     @ndb.tasklet
     def _fetch_alliance_info_by_event_key_async(
-        cls, team: Team, events: List[Event]
-    ) -> Generator[Any, Any, Dict[ndb.Key, Dict]]:
+        cls, team: Team, events: list[Event]
+    ) -> Generator[Any, Any, dict[ndb.Key, dict]]:
         """Fetch alliance info for all events in parallel."""
         # Prepare all event details in parallel
         yield [event.prep_details() for event in events]

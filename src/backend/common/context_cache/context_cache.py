@@ -1,16 +1,16 @@
-from typing import Any, AnyStr, Dict, Optional, Union
+from typing import Any
 
 from google.appengine.ext import ndb
 
 
-CACHE_DATA: Dict[Union[str, bytes], Any] = {}
+CACHE_DATA: dict[str | bytes, Any] = {}
 
 
-def get(cache_key: AnyStr) -> Optional[Any]:
+def get[T: (str, bytes)](cache_key: T) -> Any | None:
     full_cache_key = f"{cache_key}:{ndb.get_context.__hash__()}"
     return CACHE_DATA.get(full_cache_key, None)
 
 
-def set(cache_key: AnyStr, value: Any) -> None:
+def set[T: (str, bytes)](cache_key: T, value: Any) -> None:
     full_cache_key = f"{cache_key}:{ndb.get_context.__hash__()}"
     CACHE_DATA[full_cache_key] = value

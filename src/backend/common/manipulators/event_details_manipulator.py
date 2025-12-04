@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 from google.appengine.api import taskqueue
 
@@ -22,7 +21,7 @@ class EventDetailsManipulator(ManipulatorBase[EventDetails]):
     @classmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
-    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+    ) -> list[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.event_details_updated(affected_refs)
 
     @classmethod
@@ -39,7 +38,7 @@ class EventDetailsManipulator(ManipulatorBase[EventDetails]):
 
 @EventDetailsManipulator.register_post_update_hook
 def event_details_post_update_hook(
-    updated_models: List[TUpdatedModel[EventDetails]],
+    updated_models: list[TUpdatedModel[EventDetails]],
 ) -> None:
     for updated_model in updated_models:
         # Enqueue task to calculate district points

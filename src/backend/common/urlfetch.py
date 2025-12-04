@@ -1,5 +1,5 @@
 import json
-from typing import Mapping, Optional
+from collections.abc import Mapping
 
 from google.appengine.api import urlfetch_service_pb2
 from google.appengine.api.urlfetch import _URLFetchResult
@@ -31,7 +31,7 @@ class URLFetchResult:
     headers: Mapping[str, str]
 
     # If a redirect was followed, the ultimate URL
-    final_url: Optional[str]
+    final_url: str | None
 
     def __init__(self, url: str, res: _URLFetchResult) -> None:
         self.request_url = url
@@ -46,7 +46,7 @@ class URLFetchResult:
     def url(self) -> str:
         return self.final_url or self.request_url
 
-    def json(self) -> Optional[JSON]:
+    def json(self) -> JSON | None:
         if not self.content:
             return None
         return json.loads(self.content)

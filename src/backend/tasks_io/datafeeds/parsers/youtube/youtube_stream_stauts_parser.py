@@ -1,4 +1,4 @@
-from typing import Any, cast, List, NotRequired, TypedDict
+from typing import Any, cast, NotRequired, TypedDict
 
 from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.webcast_status import WebcastStatus
@@ -27,7 +27,7 @@ class _StreamDataResponse(TypedDict):
 
 
 class _StreamStatusResponse(TypedDict):
-    items: List[_StreamDataResponse]
+    items: list[_StreamDataResponse]
 
 
 class YoutubeStreamStatusParser(ParserBase[Webcast]):

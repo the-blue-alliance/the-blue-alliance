@@ -1,4 +1,5 @@
-from typing import List, Literal, Mapping, NamedTuple, Optional, TypedDict, Union
+from collections.abc import Mapping
+from typing import Literal, NamedTuple, TypedDict
 
 from backend.common.consts.alliance_color import AllianceColor, TMatchWinner
 from backend.common.consts.comp_level import CompLevel
@@ -8,54 +9,54 @@ from backend.common.models.keys import TeamKey, TeamNumber
 
 
 class BracketItem(TypedDict):
-    red_alliance: List[TeamNumber]
-    blue_alliance: List[TeamNumber]
-    winning_alliance: Optional[TMatchWinner]
+    red_alliance: list[TeamNumber]
+    blue_alliance: list[TeamNumber]
+    winning_alliance: TMatchWinner | None
     red_wins: int
     blue_wins: int
     red_record: WLTRecord
     blue_record: WLTRecord
-    red_name: Optional[str]
-    blue_name: Optional[str]
+    red_name: str | None
+    blue_name: str | None
 
 
 class PlayoffAdvancement2015(NamedTuple):
-    complete_alliance: List[TeamNumber]
-    scores: List[int]
+    complete_alliance: list[TeamNumber]
+    scores: list[int]
     average_score: float
     num_played: int
 
 
 class PlayoffAdvancementRoundRobin(NamedTuple):
-    complete_alliance: List[TeamNumber]
-    champ_points: List[int]
+    complete_alliance: list[TeamNumber]
+    champ_points: list[int]
     sum_champ_points: int
-    tiebreaker1: List[int]
+    tiebreaker1: list[int]
     sum_tiebreaker1: int
-    tiebreaker2: List[int]
+    tiebreaker2: list[int]
     sum_tiebreaker2: int
     alliance_name: str
     record: WLTRecord
 
 
 class PlayoffAdvancementDoubleElimAlliance(TypedDict):
-    complete_alliance: List[TeamNumber]
+    complete_alliance: list[TeamNumber]
     alliance_name: str
     record: WLTRecord
     eliminated: bool
 
 
 class PlayoffAdvancementDoubleElimRound(NamedTuple):
-    competing_alliances: List[PlayoffAdvancementDoubleElimAlliance]
+    competing_alliances: list[PlayoffAdvancementDoubleElimAlliance]
     complete: bool
 
 
 class PlayoffAdvancementRoundRobinLevels(TypedDict):
-    sf: List[PlayoffAdvancementRoundRobin]
+    sf: list[PlayoffAdvancementRoundRobin]
     sf_complete: bool
 
 
-TPlayoffAdvancement2015Levels = Mapping[CompLevel, List[PlayoffAdvancement2015]]
+TPlayoffAdvancement2015Levels = Mapping[CompLevel, list[PlayoffAdvancement2015]]
 
 
 class PlayoffAdvancementDoubleElimLevels(TypedDict):
@@ -64,11 +65,11 @@ class PlayoffAdvancementDoubleElimLevels(TypedDict):
 
 TBracketTable = Mapping[CompLevel, Mapping[str, BracketItem]]
 
-TPlayoffAdvancement = Union[
-    TPlayoffAdvancement2015Levels,
-    PlayoffAdvancementRoundRobinLevels,
-    PlayoffAdvancementDoubleElimLevels,
-]
+TPlayoffAdvancement = (
+    TPlayoffAdvancement2015Levels
+    | PlayoffAdvancementRoundRobinLevels
+    | PlayoffAdvancementDoubleElimLevels
+)
 
 
 class EventPlayoffAdvancement(TypedDict):
@@ -77,7 +78,7 @@ class EventPlayoffAdvancement(TypedDict):
     """
 
     bracket: TBracketTable
-    advancement: Optional[TPlayoffAdvancement]
+    advancement: TPlayoffAdvancement | None
 
 
 class ApiPlayoffAdvancemnetSortOrderInfo(TypedDict):
@@ -95,11 +96,11 @@ class _ApiPlayoffAdvancemnetAllianceRankOptional(TypedDict, total=False):
 class ApiPlayoffAdvancementAllianceRank(
     _ApiPlayoffAdvancemnetAllianceRankOptional, total=True
 ):
-    team_keys: List[TeamKey]
+    team_keys: list[TeamKey]
     alliance_name: str
     matches_played: int
-    sort_orders: List  # TODO
-    extra_stats: List  # TODO
+    sort_orders: list  # TODO: Add proper typehints here
+    extra_stats: list  # TODO: Add proper typehints here
 
 
 class ApiPlayoffAdvancement(TypedDict):
@@ -109,7 +110,7 @@ class ApiPlayoffAdvancement(TypedDict):
 
     level: str  # comp level + series
     level_name: str
-    rankings: Optional[List[ApiPlayoffAdvancementAllianceRank]]
+    rankings: list[ApiPlayoffAdvancementAllianceRank] | None
     type: str
-    sort_order_info: List[ApiPlayoffAdvancemnetSortOrderInfo]
-    extra_stats_info: List[ApiPlayoffAdvancemnetSortOrderInfo]
+    sort_order_info: list[ApiPlayoffAdvancemnetSortOrderInfo]
+    extra_stats_info: list[ApiPlayoffAdvancemnetSortOrderInfo]

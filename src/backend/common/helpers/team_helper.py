@@ -1,5 +1,3 @@
-from typing import List, Tuple, Union
-
 from google.appengine.ext import ndb
 
 from backend.common.memcache import MemcacheClient
@@ -11,7 +9,7 @@ from backend.common.models.team import Team
 
 class TeamHelper(object):
     @classmethod
-    def sort_teams(cls, team_list: List[Union[Team, None]]) -> List[Team]:
+    def sort_teams(cls, team_list: list[Team | None]) -> list[Team]:
         """
         Takes a list of Teams (not a Query object).
         """
@@ -22,8 +20,8 @@ class TeamHelper(object):
 
     @classmethod
     def getPopularTeamsEvents(
-        self, events: List[Event]
-    ) -> List[Tuple[Team, List[Event]]]:
+        cls, events: list[Event]
+    ) -> list[tuple[Team, list[Event]]]:
         events_by_key = {}
         for event in events:
             events_by_key[event.key.id()] = event

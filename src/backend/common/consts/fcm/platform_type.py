@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import enum
-from typing import Dict
 
 
 @enum.unique
@@ -30,7 +29,7 @@ class PlatformType(enum.IntEnum):
         # Validate that platform_type is supported
         PlatformType.validate(platform_type)
 
-        COLLAPSE_KEY_KEYS: Dict[PlatformType, str] = {
+        COLLAPSE_KEY_KEYS: dict[PlatformType, str] = {
             PlatformType.ANDROID: "collapse_key",
             PlatformType.APNS: "apns-collapse-id",
             PlatformType.WEBPUSH: "Topic",
@@ -42,7 +41,7 @@ class PlatformType(enum.IntEnum):
         # Validate that platform_type is supported
         PlatformType.validate(platform_type)
 
-        PRIORITY_KEYS: Dict[PlatformType, str] = {
+        PRIORITY_KEYS: dict[PlatformType, str] = {
             PlatformType.ANDROID: "priority",
             PlatformType.APNS: "apns-priority",
             PlatformType.WEBPUSH: "Urgency",

@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable, Set
 
 from flask import abort, redirect, request, url_for
 from flask.typing import ResponseValue
@@ -75,7 +75,7 @@ def require_permission(
 
 
 def require_any_permission(
-    permissions: Set[AccountPermission],
+    permissions: set[AccountPermission],
 ) -> Callable[..., Callable[..., ResponseValue]]:
     def decorator(f: Callable[..., ResponseValue]) -> Callable[..., ResponseValue]:
         @wraps(f)

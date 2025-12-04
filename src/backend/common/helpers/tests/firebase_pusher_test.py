@@ -1,6 +1,5 @@
 import datetime
 import json
-from typing import Dict, Optional
 
 import pytest
 import requests
@@ -41,7 +40,7 @@ class InMemoryRealtimeDb:
     """
 
     # a map of path -> data
-    data: Dict[str, bytes]
+    data: dict[str, bytes]
 
     def __init__(self) -> None:
         self.data = {}
@@ -71,7 +70,7 @@ class InMemoryRealtimeDb:
     """
 
     def _patch(
-        self, path: str, body: bytes, prefix: Optional[str] = None
+        self, path: str, body: bytes, prefix: str | None = None
     ) -> requests.Response:
         if prefix is None and path in self.data:
             existing_data = json.loads(self.data[path])
@@ -104,7 +103,7 @@ class InMemoryRealtimeDb:
         self.data[path] = body
         return self._make_response(200, body)
 
-    def _delete(self, path: str, prefix: Optional[str] = None) -> requests.Response:
+    def _delete(self, path: str, prefix: str | None = None) -> requests.Response:
         if path in self.data:
             self.data.pop(path, None)
             return self._make_response(200, b"null")

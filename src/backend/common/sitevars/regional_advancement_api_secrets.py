@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 
@@ -21,6 +21,6 @@ class RegionalAdvancementApiSecret(Sitevar[ContentType]):
         return "For accessing regional advancement info"
 
     @classmethod
-    def url_format(cls) -> Optional[str]:
+    def url_format(cls) -> str | None:
         fmt = cls.get().get("url_format")
         return fmt if fmt else None

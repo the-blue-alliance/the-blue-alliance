@@ -1,4 +1,6 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
+
+from firebase_admin import messaging
 
 from backend.common.consts.notification_type import NotificationType
 from backend.common.models.fcm.platform_config import PlatformConfig
@@ -59,7 +61,7 @@ class Notification(object):
         return True
 
     @property
-    def fcm_notification(self) -> Optional[Any]:
+    def fcm_notification(self) -> messaging.Notification | None:
         """FCM Notification object to use for FCM.
 
         Returns:
@@ -68,7 +70,7 @@ class Notification(object):
         return None
 
     @property
-    def data_payload(self) -> Optional[Dict[str, str]]:
+    def data_payload(self) -> dict[str, str] | None:
         """Arbitrary key/value payload.
 
         Returns:
@@ -77,7 +79,7 @@ class Notification(object):
         return None
 
     @property
-    def platform_config(self) -> Optional[PlatformConfig]:
+    def platform_config(self) -> PlatformConfig | None:
         """Default config to use for all platforms.
 
         Note:
@@ -90,7 +92,7 @@ class Notification(object):
         return None
 
     @property
-    def android_config(self) -> Optional[Any]:
+    def android_config(self) -> messaging.AndroidConfig | None:
         """Android specific options for messages sent through FCM connection server.
 
         Returns:
@@ -99,16 +101,16 @@ class Notification(object):
         return None
 
     @property
-    def apns_config(self) -> Optional[Any]:
+    def apns_config(self) -> messaging.APNSConfig | None:
         """Apple Push Notification Service specific options for messages sent through FCM connection server.
 
         Returns:
-            firebase_admin.messaging.ApnsConfig: None if no APNS-specific config is necessary.
+            firebase_admin.messaging.APNSConfig: None if no APNS-specific config is necessary.
         """
         return None
 
     @property
-    def webpush_config(self) -> Optional[Any]:
+    def webpush_config(self) -> messaging.WebpushConfig | None:
         """Webpush protocol options for messages sent through FCM connection server.
 
         Returns:
@@ -117,7 +119,7 @@ class Notification(object):
         return None
 
     @property
-    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
+    def webhook_message_data(self) -> dict[str, Any] | None:
         """`message_data` dictionary for a webhook request.
 
         Note:
@@ -128,6 +130,6 @@ class Notification(object):
         """
         return self.data_payload
 
-    def _additional_logging_values(self) -> List[Tuple[str, str]]:
+    def _additional_logging_values(self) -> list[tuple[str, str]]:
         """Return a list of value (or None)/name tuples to be adding to str for logging"""
         return []

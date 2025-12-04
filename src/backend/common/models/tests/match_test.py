@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from typing import Optional
 
 import pytest
 from freezegun import freeze_time
@@ -304,7 +303,7 @@ def test_schedule_error(
     ],
 )
 def test_within_seconds(
-    current_time: datetime, match_time: Optional[datetime], nsec: int, within: bool
+    current_time: datetime, match_time: datetime | None, nsec: int, within: bool
 ) -> None:
     with freeze_time(current_time):
         match = get_base_qual_match(actual_time=match_time)

@@ -1,5 +1,5 @@
 import base64
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 
@@ -23,17 +23,17 @@ class FMSApiSecrets(Sitevar[ContentType]):
         return "For accessing the FMS API"
 
     @classmethod
-    def username(cls) -> Optional[str]:
+    def username(cls) -> str | None:
         username = cls.get().get("username")
         return username if username else None  # Drop empty strings
 
     @classmethod
-    def authkey(cls) -> Optional[str]:
+    def authkey(cls) -> str | None:
         authkey = cls.get().get("authkey")
         return authkey if authkey else None  # Drop empty strings
 
     @classmethod
-    def auth_token(cls) -> Optional[str]:
+    def auth_token(cls) -> str | None:
         """The base64 encoded username + auth key - used to authenticate with the FMS API"""
 
         username = cls.username()

@@ -1,4 +1,4 @@
-from typing import Any, cast, Dict, List, Optional
+from typing import Any, cast
 from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
@@ -11,8 +11,8 @@ from backend.web.handlers.conftest import CapturedTemplate
 
 
 def assert_template_status(
-    captured_templates: List[CapturedTemplate], status: str
-) -> Optional[Dict[str, Any]]:
+    captured_templates: list[CapturedTemplate], status: str
+) -> dict[str, Any] | None:
     template = captured_templates[0][0]
     context = captured_templates[0][1]
     assert template.name == "suggestions/suggest_offseason_event.html"
@@ -57,7 +57,7 @@ def test_submit_empty_form(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     resp = web_client.post("/suggest/offseason", data={}, follow_redirects=True)
     assert resp.status_code == 200
@@ -87,7 +87,7 @@ def test_suggest_event(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     form = {}
     form["name"] = "Test Event"

@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Dict, List, NewType
+from typing import NewType
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -13,7 +13,7 @@ from backend.common.models.event import Event
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.dict_converters.district_converter import DistrictConverter
 
-EventDict = NewType("EventDict", Dict)
+EventDict = NewType("EventDict", dict)
 
 
 class EventConverter(ConverterBase):
@@ -25,15 +25,15 @@ class EventConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[Event], version: ApiMajorVersion
-    ) -> List[EventDict]:
+        cls, model_list: list[Event], version: ApiMajorVersion
+    ) -> list[EventDict]:
         CONVERTERS = {
             ApiMajorVersion.API_V3: cls.eventsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
     @classmethod
-    def eventsConverter_v3(cls, events: List[Event]) -> List[EventDict]:
+    def eventsConverter_v3(cls, events: list[Event]) -> list[EventDict]:
         return list(map(cls.eventConverter_v3, events))
 
     @classmethod
@@ -100,7 +100,7 @@ class EventConverter(ConverterBase):
         return EventDict(event_dict)
 
     @classmethod
-    def dictToModel_v3(cls, data: Dict) -> Event:
+    def dictToModel_v3(cls, data: dict) -> Event:
         event = Event(id=data["key"])
         event.name = data["name"]
         event.short_name = data["short_name"]

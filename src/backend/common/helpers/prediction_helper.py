@@ -1,16 +1,8 @@
 import copy
 import math
 from collections import defaultdict
-from typing import (
-    cast,
-    Dict,
-    List,
-    Literal,
-    Mapping,
-    MutableMapping,
-    Optional,
-    Tuple,
-)
+from collections.abc import Mapping, MutableMapping
+from typing import cast, Literal
 
 import numpy as np
 from pyre_extensions import none_throws
@@ -52,7 +44,7 @@ class ContributionCalculator:
     def __init__(
         self,
         event: Event,
-        matches: List[Match],
+        matches: list[Match],
         stat: str,
         default_mean: float,
         default_var: float,
@@ -89,10 +81,10 @@ class ContributionCalculator:
         self._diags = np.ndarray(t)  # Prior estimates variances
 
         # Things to return
-        self._means: Dict[TeamKey, float] = {}
-        self._vars: Dict[TeamKey, float] = {}
+        self._means: dict[TeamKey, float] = {}
+        self._vars: dict[TeamKey, float] = {}
 
-    def _build_team_mapping(self) -> Tuple[List[TeamKey], Dict[TeamKey, int]]:
+    def _build_team_mapping(self) -> tuple[list[TeamKey], dict[TeamKey, int]]:
         """
         Returns (team_list, team_id_map)
         team_list: A list of team_str such as 'frc254' or 'frc254B'
@@ -113,12 +105,12 @@ class ContributionCalculator:
         return team_list, team_id_map
 
     def _get_past_stats(
-        self, cur_event: Event, team_list: List[Team]
-    ) -> Tuple[Mapping[TeamKey, List[float]], Mapping[TeamKey, List[float]]]:
-        past_stats_mean: MutableMapping[TeamKey, List[float]] = defaultdict(
+        self, cur_event: Event, team_list: list[Team]
+    ) -> tuple[Mapping[TeamKey, list[float]], Mapping[TeamKey, list[float]]]:
+        past_stats_mean: MutableMapping[TeamKey, list[float]] = defaultdict(
             list
         )  # team key > values
-        past_stats_var: MutableMapping[TeamKey, List[float]] = defaultdict(
+        past_stats_var: MutableMapping[TeamKey, list[float]] = defaultdict(
             list
         )  # team key > values
 
@@ -265,7 +257,7 @@ class ContributionCalculator:
         match = self._matches[i]
         score_breakdown = match.score_breakdown
         if match.has_been_played and score_breakdown:
-            means: Dict[AllianceColor, float] = {}
+            means: dict[AllianceColor, float] = {}
             for color in ALLIANCE_COLORS:
                 if self._stat == "score":
                     score = match.alliances[color]["score"]
@@ -793,10 +785,10 @@ class PredictionHelper:
         )
 
     @classmethod
-    def get_match_predictions(cls, matches: List[Match]) -> Tuple[
-        Optional[TMatchPredictions],
-        Optional[TMatchPredictionStats],
-        Optional[TEventStatMeanVars],
+    def get_match_predictions(cls, matches: list[Match]) -> tuple[
+        TMatchPredictions | None,
+        TMatchPredictionStats | None,
+        TEventStatMeanVars | None,
     ]:
         if not matches:
             return None, None, None
@@ -811,7 +803,7 @@ class PredictionHelper:
         }
         event_key = matches[0].event
         event = event_key.get()
-        relevant_stats: List[Tuple[str, int, int]]
+        relevant_stats: list[tuple[str, int, int]]
         if event.year == 2016:
             relevant_stats = [
                 ("score", 20, 10**2),
@@ -1002,10 +994,10 @@ class PredictionHelper:
     @classmethod
     def get_ranking_predictions(
         cls,
-        all_matches: List[Match],
-        match_predictions: Optional[TMatchPredictions],
+        all_matches: list[Match],
+        match_predictions: TMatchPredictions | None,
         n: int = 1000,
-    ) -> Tuple[Optional[TRankingPredictions], Optional[TRankingPredictionStats]]:
+    ) -> tuple[TRankingPredictions | None, TRankingPredictionStats | None]:
         _count, organized_matches = MatchHelper.organized_matches(all_matches)
         matches = organized_matches[CompLevel.QM]
         if not matches or not match_predictions:
@@ -1322,7 +1314,7 @@ class PredictionHelper:
                 all_rankings[team][i] = rank + 1
                 all_ranking_points[team][i] = ranking_points
 
-        rankings: Dict[TeamKey, TRankingPrediction] = {}
+        rankings: dict[TeamKey, TRankingPrediction] = {}
         for team, team_rankings in all_rankings.items():
             avg_rank = int(np.mean(np.asarray(team_rankings)))
             min_rank = min(team_rankings)

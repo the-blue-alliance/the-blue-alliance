@@ -1,5 +1,5 @@
 import json
-from typing import cast, Dict, List, Optional
+from typing import cast
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -22,7 +22,7 @@ from backend.common.models.team import Team
 class EventRemapTeamsHelper:
     @classmethod
     def remap_teams(cls, event_key: EventKey) -> None:
-        event: Optional[Event] = Event.get_by_id(event_key)
+        event: Event | None = Event.get_by_id(event_key)
         if not event or not event.remap_teams:
             return None
 
@@ -51,7 +51,7 @@ class EventRemapTeamsHelper:
 
     @classmethod
     def remapteams_awards(
-        cls, awards: List[Award], remap_teams: Dict[str, str]
+        cls, awards: list[Award], remap_teams: dict[str, str]
     ) -> None:
         """
         Remaps teams in awards. Mutates in place.
@@ -88,7 +88,7 @@ class EventRemapTeamsHelper:
 
     @classmethod
     def remapteams_matches(
-        cls, matches: List[Match], remap_teams: Dict[str, str]
+        cls, matches: list[Match], remap_teams: dict[str, str]
     ) -> None:
         """
         Remaps teams in matches
@@ -100,7 +100,7 @@ class EventRemapTeamsHelper:
                 for color in ALLIANCE_COLORS:
                     for attr in ["teams", "surrogates", "dqs"]:
                         team_keys = cast(
-                            List[TeamKey], match.alliances[color].get(attr, [])
+                            list[TeamKey], match.alliances[color].get(attr, [])
                         )
                         for i, key in enumerate(team_keys):
                             if key == old_team:
@@ -119,7 +119,7 @@ class EventRemapTeamsHelper:
 
     @classmethod
     def remapteams_alliances(
-        cls, alliance_selections: List[EventAlliance], remap_teams: Dict[str, str]
+        cls, alliance_selections: list[EventAlliance], remap_teams: dict[str, str]
     ) -> None:
         """
         Remaps teams in alliance selections
@@ -128,14 +128,14 @@ class EventRemapTeamsHelper:
         for row in alliance_selections:
             for choice in ["picks", "declines"]:
                 for old_team, new_team in remap_teams.items():
-                    team_keys = cast(List[TeamKey], row.get(choice, []))
+                    team_keys = cast(list[TeamKey], row.get(choice, []))
                     for i, key in enumerate(team_keys):
                         if key == old_team:
                             row[choice][i] = new_team  # pyre-ignore[26,6]
 
     @classmethod
     def remapteams_rankings2(
-        cls, rankings2: List[EventRanking], remap_teams: Dict[str, str]
+        cls, rankings2: list[EventRanking], remap_teams: dict[str, str]
     ) -> None:
         """
         Remaps teams in rankings2

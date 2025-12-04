@@ -1,5 +1,3 @@
-from typing import List
-
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase
 from backend.common.models.cached_model import TAffectedReferences
@@ -14,7 +12,7 @@ class EventTeamManipulator(ManipulatorBase[EventTeam]):
     @classmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
-    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+    ) -> list[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.eventteam_updated(affected_refs)
 
     @classmethod

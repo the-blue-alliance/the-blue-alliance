@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, NewType
+from typing import NewType
 
 from google.appengine.ext import ndb
 
@@ -9,7 +9,7 @@ from backend.common.models.event import Event
 from backend.common.models.team import Team
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
-AwardDict = NewType("AwardDict", Dict)
+AwardDict = NewType("AwardDict", dict)
 
 
 class AwardConverter(ConverterBase):
@@ -19,15 +19,15 @@ class AwardConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[Award], version: ApiMajorVersion
-    ) -> List[AwardDict]:
+        cls, model_list: list[Award], version: ApiMajorVersion
+    ) -> list[AwardDict]:
         AWARD_CONVERTERS = {
             ApiMajorVersion.API_V3: cls.awardsConverter_v3,
         }
         return AWARD_CONVERTERS[version](model_list)
 
     @classmethod
-    def awardsConverter_v3(cls, awards: List[Award]) -> List[AwardDict]:
+    def awardsConverter_v3(cls, awards: list[Award]) -> list[AwardDict]:
         return list(map(cls.awardConverter_v3, awards))
 
     @classmethod
@@ -55,7 +55,7 @@ class AwardConverter(ConverterBase):
         )
 
     @staticmethod
-    def dictToModel_v3(data: Dict, event: Event) -> Award:
+    def dictToModel_v3(data: dict, event: Event) -> Award:
         award = Award(id=Award.render_key_name(data["event_key"], data["award_type"]))
         award.event = ndb.Key(Event, data["event_key"])
         award.award_type_enum = data["award_type"]

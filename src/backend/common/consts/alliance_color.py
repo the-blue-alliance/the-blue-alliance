@@ -1,5 +1,4 @@
 import enum
-from typing import Dict, List, Union
 
 from typing_extensions import Literal
 
@@ -12,13 +11,13 @@ class AllianceColor(StrEnum):
     BLUE = "blue"
 
 
-OPPONENT: Dict[AllianceColor, AllianceColor] = {
+OPPONENT: dict[AllianceColor, AllianceColor] = {
     AllianceColor.RED: AllianceColor.BLUE,
     AllianceColor.BLUE: AllianceColor.RED,
 }
 
 
-TMatchWinner = Union[AllianceColor, Literal[""]]
+TMatchWinner = AllianceColor | Literal[""]
 
 
-ALLIANCE_COLORS: List[AllianceColor] = list([c.value for c in AllianceColor])
+ALLIANCE_COLORS: list[str] = [c.value for c in AllianceColor]
