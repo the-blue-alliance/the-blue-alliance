@@ -1,5 +1,5 @@
 import enum
-from typing import List, Optional, TypedDict
+from typing import NotRequired, TypedDict
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.playoff_type import DoubleElimRound, PlayoffType
@@ -15,46 +15,38 @@ class PlayoffOutcome(StrEnum):
     PLAYING = "playing"
 
 
-class _EventTeamStatusPlayoffOptional(TypedDict, total=False):
-    playoff_type: PlayoffType
+class PlayoffAllianceStatus(TypedDict):
+    level: CompLevel
+    current_level_record: WLTRecord | None
+    record: WLTRecord | None
+    status: PlayoffOutcome
+
+    playoff_type: NotRequired[PlayoffType]
 
     # Relevant for double elim tournaments
-    double_elim_round: Optional[DoubleElimRound]
+    double_elim_round: NotRequired[DoubleElimRound | None]
 
     # Relevant for round robin tournaments
-    round_robin_rank: Optional[int]
-    advanced_to_round_robin_finals: Optional[bool]
+    round_robin_rank: NotRequired[int | None]
+    advanced_to_round_robin_finals: NotRequired[bool | None]
 
     # Relevant for 2015 tournaments
-    playoff_average: Optional[float]
-
-
-class PlayoffAllianceStatus(_EventTeamStatusPlayoffOptional, total=True):
-    level: CompLevel
-    current_level_record: Optional[WLTRecord]
-    record: Optional[WLTRecord]
-    status: PlayoffOutcome
+    playoff_average: NotRequired[float | None]
 
 
 EventAllianceBackup = TypedDict("EventAllianceBackup", {"in": str, "out": str})
 
 
-class _EventAllianceOptional(TypedDict, total=False):
-    declines: List[TeamKey]
-    name: str
-    backup: EventAllianceBackup
-    status: PlayoffAllianceStatus
+class EventAlliance(TypedDict):
+    picks: list[TeamKey]
+    declines: NotRequired[list[TeamKey]]
+    name: NotRequired[str]
+    backup: NotRequired[EventAllianceBackup]
+    status: NotRequired[PlayoffAllianceStatus]
 
 
-class EventAlliance(_EventAllianceOptional, total=True):
-    picks: List[TeamKey]
-
-
-class _MatchAllianceOptional(TypedDict, total=False):
-    surrogates: List[TeamKey]
-    dqs: List[TeamKey]
-
-
-class MatchAlliance(_MatchAllianceOptional, total=True):
-    teams: List[TeamKey]
+class MatchAlliance(TypedDict):
+    teams: list[TeamKey]
     score: int
+    surrogates: NotRequired[list[TeamKey]]
+    dqs: NotRequired[list[TeamKey]]
