@@ -3,6 +3,7 @@ import { useLoaderData } from 'react-router';
 
 import { getEventsByYear, getStatus } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
+import { KickoffCountdown } from '~/components/tba/kickoffCountdown';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 
 export async function loader() {
@@ -69,13 +70,15 @@ export default function Index() {
         </div>
       </div>
 
-      {events.length > 0 ? (
+      <KickoffCountdown
+        kickoffDateTimeEST={new Date('2026-01-10T12:00:00-05:00')}
+      />
+
+      {events.length > 0 && (
         <div>
           <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
           <EventListTable events={events} />
         </div>
-      ) : (
-        <h1 className="mt-5 mb-2.5 text-4xl">No Events This Week</h1>
       )}
 
       <a
