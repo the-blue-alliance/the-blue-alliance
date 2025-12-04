@@ -76,6 +76,7 @@ export default function TeamEventAppearance({
         <div className="mt-4" />
 
         <TeamStatus
+          event={event}
           status={status}
           team={team}
           awards={awards}
@@ -109,12 +110,14 @@ export default function TeamEventAppearance({
 }
 
 function TeamStatus({
+  event,
   status,
   team,
   awards,
   maybeDistrictPoints,
   maybeAlliances,
 }: {
+  event: Event;
   status: TeamEventStatus | null;
   team: Team;
   awards: Award[];
@@ -202,7 +205,7 @@ function TeamStatus({
                 {maybeAlliances
                   .find((a) => a.picks.includes(team.key))
                   ?.picks.map((k) => (
-                    <TeamLink key={k} teamOrKey={k}>
+                    <TeamLink key={k} teamOrKey={k} year={event.year}>
                       <Badge key={k} variant={'outline'}>
                         {k.substring(3)}
                       </Badge>
