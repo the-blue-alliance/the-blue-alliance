@@ -2,6 +2,7 @@ from flask import redirect, request, url_for
 from werkzeug.wrappers import Response
 
 from backend.common.sitevars.apiv3_key import Apiv3Key
+from backend.common.sitevars.cd_request_user_agent import CdRequestUserAgent
 from backend.common.sitevars.firebase_secrets import FirebaseSecrets
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 from backend.common.sitevars.gcm_server_key import GcmServerKey
@@ -40,6 +41,7 @@ def authkeys_get() -> str:
         "livestream_secret": livestream_secrets.get("api_key", ""),
         "instagram_secret": instagram_secrets.get("api_key", ""),
         "nexus_secret": nexus_secrets.get("api_secret", ""),
+        "cd_request_user_agent": CdRequestUserAgent.user_agent(),
     }
 
     return render_template("admin/authkeys.html", template_values)
@@ -60,6 +62,7 @@ def authkeys_post() -> Response:
     instagram_key = request.form.get("instagram_secret", "")
     apiv3_key = request.form.get("apiv3_key", "")
     nexus_secret = request.form.get("nexus_secret", "")
+    cd_request_user_agent = request.form.get("cd_request_user_agent", "")
 
     GoogleApiSecret.put({"api_key": google_key})
     InstagramApiSecret.put({"api_key": instagram_key})
@@ -83,5 +86,7 @@ def authkeys_post() -> Response:
     LivestreamSecrets.put({"api_key": livestream_key})
 
     NexusApiSecrets.put({"api_secret": nexus_secret})
+
+    CdRequestUserAgent.put(cd_request_user_agent)
 
     return redirect(url_for("admin.authkeys_get"))
