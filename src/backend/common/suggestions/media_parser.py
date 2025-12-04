@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import re
 from typing import Dict, List, Optional, Set, Tuple
 from urllib.parse import urlencode, urlparse
@@ -14,6 +13,7 @@ from backend.common.consts.media_type import (
     TYPE_NAMES,
 )
 from backend.common.models.suggestion_dict import SuggestionDict
+from backend.common.sitevars.cd_request_user_agent import CdRequestUserAgent
 
 
 class MediaParser:
@@ -367,7 +367,7 @@ class MediaParser:
         discourse_data = requests.get(
             discourse_url,
             timeout=10,
-            headers={"User-Agent": os.getenv("CD_REQUEST_USER_AGENT", "default")},
+            headers={"User-Agent": CdRequestUserAgent.user_agent()},
         )
         if discourse_data.status_code != 200:
             logging.warning(

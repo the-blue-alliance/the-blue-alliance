@@ -9,6 +9,11 @@ from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.suggestions.media_parser import MediaParser
 
 
+@pytest.fixture(autouse=True)
+def auto_add_ndb_context(ndb_context) -> None:
+    pass
+
+
 class TestMediaUrlParser(unittest.TestCase):
     def test_youtube_parse_long(self) -> None:
         yt_long = MediaParser.partial_media_dict_from_url(
@@ -235,9 +240,7 @@ class TestMediaUrlParser(unittest.TestCase):
                 ):
                     result = MediaParser.partial_media_dict_from_url(url)
                     self.assertIsNotNone(result)
-                    self.assertEqual(
-                        result["media_type_enum"], MediaType.CD_THREAD
-                    )
+                    self.assertEqual(result["media_type_enum"], MediaType.CD_THREAD)
                     self.assertEqual(result["foreign_key"], "506115")
                     self.assertEqual(
                         result["site_name"], TYPE_NAMES[MediaType.CD_THREAD]
