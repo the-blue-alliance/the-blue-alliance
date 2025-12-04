@@ -5,7 +5,6 @@ import os
 import pickle
 import subprocess
 import time
-from typing import List, Tuple
 
 from artifact_data import ARTIFACT_FILENAME, ArtifactData
 
@@ -20,7 +19,7 @@ GITHUB_PULL_REQUEST_NUMBER = (
 )
 
 
-def capture_screenshots(urls: List[Tuple[str, str]]) -> List[Tuple[str, str, str]]:
+def capture_screenshots(urls: list[tuple[str, str]]) -> list[tuple[str, str, str]]:
     screenshots = []  # (name, filename, base64encode image)
     for name, url in urls:
         print(f"Screenshotting {name}: {url}")
