@@ -40,8 +40,10 @@ import splashPortrait1668x2388 from 'app/images/apple-splash/apple-splash-portra
 import splashPortrait2048x2732 from 'app/images/apple-splash/apple-splash-portrait-2048x2732.png?url';
 import appleTouchIcon180 from 'app/images/apple-splash/apple-touch-icon-180.png?url';
 import appCss from 'app/tailwind.css?url';
+import { z } from 'zod';
 
 import { client } from '~/api/tba/read/client.gen';
+import { MatchModal } from '~/components/tba/match/matchModal';
 import { Nav } from '~/components/tba/nav';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 
@@ -62,9 +64,17 @@ client.setConfig({
   }),
 });
 
+// Search params schema for global modal state
+const rootSearchSchema = z.object({
+  matchKey: z.string().optional(),
+});
+
+export type RootSearchParams = z.infer<typeof rootSearchSchema>;
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
+  validateSearch: rootSearchSchema,
   head: ({ matches }) => ({
     meta: [
       {
@@ -303,6 +313,7 @@ function RootComponent() {
         <div className="container mx-auto px-4 pt-14 text-sm">
           <div vaul-drawer-wrapper="" className="bg-background">
             <Outlet />
+            <MatchModal />
           </div>
         </div>
         <TanStackRouterDevtools position="bottom-right" />
