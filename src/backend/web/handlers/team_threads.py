@@ -21,6 +21,9 @@ def team_threads(year: Year) -> str:
 
     rows = []
     for thread in all_cd_threads:
+        if len(thread.references) == 0:
+            continue
+
         rows.append(
             {
                 "year": thread.year,
