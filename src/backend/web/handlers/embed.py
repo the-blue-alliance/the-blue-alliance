@@ -44,7 +44,11 @@ def instagram_oembed(media_key: str):
 
         instagram_url = media.instagram_url
 
-    width = int(request.args.get("width") or 320)
+    # Validate our user input "width" can be converted to an integer
+    try:
+        width = int(request.args.get("width") or 320)
+    except Exception:
+        return abort(400)
 
     with Span("GET: https://graph.facebook.com/v14.0/instagram_oembed"):
         response = requests.get(
