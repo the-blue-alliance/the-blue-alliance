@@ -1,21 +1,19 @@
 # The Blue Alliance PWA (beta)
 
-## Development - Optional
-
-You can optionally use [devbox](https://www.jetify.com/devbox) to set up a reproducible shell. Follow the instructions on the devbox website to install it, then:
-
-```sh
-devbox shell
-```
-
-to enter a shell with system dependencies preinstalled. Otherwise, you'll need Node v22 (we specifically pin to 22.14, but others will work).
-
 ## Development
 
-First install the dependencies:
+If you don't have `pnpm`, you can install it with
 
 ```shellscript
-npm i
+npm i -g pnpm
+```
+
+or any of their strategies here: https://pnpm.io/installation
+
+Install node deps:
+
+```shellscript
+pnpm i
 ```
 
 Make sure you have your TBA APIv3 Read Key set in `.env`:
@@ -28,7 +26,7 @@ VITE_TBA_API_READ_KEY="myKey"
 Run the dev server:
 
 ```shellscript
-npm run dev
+pnpm run dev
 ```
 
 ## Deployment
@@ -36,13 +34,13 @@ npm run dev
 First, build your app for production:
 
 ```sh
-npm run build
+pnpm run build
 ```
 
 Then run the app in production mode:
 
 ```sh
-npm start
+pnpm start
 ```
 
 Now you'll need to pick a host to deploy it to.
@@ -89,23 +87,23 @@ Playwright (end to end) tests are within `./tests`. Test names with `mobile` in 
 
 ```sh
 # Runs the end-to-end tests.
-npx playwright test
+pnpm dlx playwright test
 
 # Starts the interactive UI mode.
-npx playwright test --ui
+pnpm dlx playwright test --ui
 
 # Runs the tests only on Desktop Chrome.
-npx playwright test --project=chromium
+pnpm dlx playwright test --project=chromium
 
 # Runs the tests in a specific file.
-npx playwright test example
+pnpm dlx playwright test example
 
 # Runs the tests in debug mode.
-npx playwright test --debug
+pnpm dlx playwright test --debug
 
 # Auto generate tests with Codegen.
-npx playwright codegen
+pnpm dlx playwright codegen
 
 # Auto generate tests with a specific device
-npx playwright codegen --device="Pixel 7"
+pnpm dlx playwright codegen --device="Pixel 7"
 ```

@@ -68,7 +68,6 @@ tests/                 # Playwright E2E tests
 
 - **Node.js**: Version pinned to `22.14.0` (see `package.json` engines field)
 - **npm packages**: Always pin to specific versions (e.g., `"react": "19.2.0"`, not `"^19.2.0"`)
-- **OS packages**: Add to `devbox.json`, update `devbox.lock` (run `devbox update`), and document in README.md
 
 ## Testing
 
