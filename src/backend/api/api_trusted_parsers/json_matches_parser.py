@@ -99,10 +99,10 @@ class JSONMatchesParser:
 
             if comp_level == CompLevel.QM:
                 set_number = 1
-            elif set_number is None or type(set_number) is not int:
+            elif not isinstance(set_number, int):
                 raise ParserInputException("Match must have an integer 'set_number'")
 
-            if match_number is None or type(match_number) is not int:
+            if not isinstance(match_number, int):
                 raise ParserInputException("Match must have an integer 'match_number'")
 
             if not isinstance(alliances, dict):
@@ -124,7 +124,9 @@ class JSONMatchesParser:
                             f"Bad team: '{team_key}'. Must follow format 'frcXXX'."
                         )
 
-                if details["score"] is not None and type(details["score"]) is not int:
+                if details["score"] is not None and not isinstance(
+                    details["score"], int
+                ):
                     raise ParserInputException(
                         f"alliances[{color}]['score'] must be an integer or null"
                     )
@@ -171,7 +173,7 @@ class JSONMatchesParser:
                 post_results_time_utc, "post_results_time_utc"
             )
 
-            if display_name is not None and type(display_name) is not str:
+            if display_name is not None and not isinstance(display_name, str):
                 raise ParserInputException("'display_name' must be a string")
 
             # validation passed. build new dicts to sanitize
