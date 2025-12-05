@@ -1,49 +1,36 @@
-import type { MetaFunction } from 'react-router';
-import { useLoaderData } from 'react-router';
+import { createFileRoute } from '@tanstack/react-router';
 
 import { getEventsByYear, getStatus } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
 import { KickoffCountdown } from '~/components/tba/kickoffCountdown';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 
-export async function loader() {
-  const status = await getStatus();
+export const Route = createFileRoute('/')({
+  loader: async () => {
+    const status = await getStatus();
 
-  if (status.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    if (status.data === undefined) {
+      throw new Error('Failed to load status');
+    }
 
-  const year = status.data.current_season;
-  const events = await getEventsByYear({ path: { year } });
+    const year = status.data.current_season;
+    const events = await getEventsByYear({ path: { year } });
 
-  if (events.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    if (events.data === undefined) {
+      throw new Error('Failed to load events');
+    }
 
-  const filteredEvents = getCurrentWeekEvents(events.data);
+    const filteredEvents = getCurrentWeekEvents(events.data);
 
-  return {
-    events: filteredEvents,
-  };
-}
+    return {
+      events: filteredEvents,
+    };
+  },
+  component: Home,
+});
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: 'The Blue Alliance' },
-    {
-      name: 'description',
-      content:
-        'Team information and match videos and results from the FIRST Robotics Competition',
-    },
-  ];
-};
-
-export default function Index() {
-  const { events } = useLoaderData<typeof loader>();
+function Home() {
+  const { events } = Route.useLoaderData();
 
   // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 
 import IconMenu2 from '~icons/tabler/menu-2';
 
@@ -16,7 +16,11 @@ import {
   TableOfContentsList,
 } from '~/components/ui/toc';
 
-export default function ApiDocs(): React.JSX.Element {
+export const Route = createFileRoute('/apidocs')({
+  component: ApiDocs,
+});
+
+function ApiDocs(): React.JSX.Element {
   const tocItems = [
     { slug: 'getting-started', label: 'Getting Started' },
     { slug: 'apiv3', label: 'Read API (v3)' },
@@ -144,7 +148,7 @@ export default function ApiDocs(): React.JSX.Element {
 
           <section id="apiv3" className="py-4">
             <h2 className="mb-2 text-2xl font-medium">
-              <Link to="/apidocs/v3">Read API (v3)</Link>
+              <a href="/apidocs/v3">Read API (v3)</a>
             </h2>
             <p>
               Most people want to pull event listings, team information, match
@@ -232,7 +236,7 @@ export default function ApiDocs(): React.JSX.Element {
 
           <section id="webhooks" className="py-4">
             <h2 className="mb-2 text-2xl font-medium">
-              <Link to="/apidocs/webhooks">Webhooks</Link>
+              <a href="/apidocs/webhooks">Webhooks</a>
             </h2>
             <p>
               The TBA API also includes support for{' '}
@@ -242,14 +246,14 @@ export default function ApiDocs(): React.JSX.Element {
               instantly to the change. This can save both your client and our
               server time and processing power, as it can reduce the need to
               poll the API. See{' '}
-              <Link to="/apidocs/webhooks">our webhook documentation page</Link>{' '}
-              for more information.
+              <a href="/apidocs/webhooks">our webhook documentation page</a> for
+              more information.
             </p>
           </section>
 
           <section id="trusted" className="py-4">
             <h2 className="mb-2 text-2xl font-medium">
-              <Link to="/apidocs/trusted/v1">Write API (v1)</Link>
+              <a href="/apidocs/trusted/v1">Write API (v1)</a>
             </h2>
             <p>
               The Blue Alliance provides a Write API, called the Trusted API,
@@ -257,13 +261,13 @@ export default function ApiDocs(): React.JSX.Element {
               archival. For example, many offseason events use the Trusted API
               to provide real-time match results to their audience. To get
               started, you need to{' '}
-              <Link to="/request/apiwrite">request access tokens</Link> for your
+              <a href="/request/apiwrite">request access tokens</a> for your
               desired event. These need to be used when constructing each
               request.
             </p>
             <p>
               To see the complete specification of the trusted API, refer to the{' '}
-              <Link to="/apidocs/trusted/v1">full documentation</Link>.
+              <a href="/apidocs/trusted/v1">full documentation</a>.
             </p>
           </section>
 

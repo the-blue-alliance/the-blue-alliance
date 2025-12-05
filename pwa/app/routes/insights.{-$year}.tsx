@@ -1,5 +1,5 @@
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { ReactNode } from 'react';
-import { useLoaderData, useNavigate } from 'react-router';
 
 import {
   LeaderboardInsight,
@@ -23,83 +23,71 @@ import {
 } from '~/lib/insightUtils';
 import { VALID_YEARS, joinComponents } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/insights.($year)';
-
-async function loadData(params: Route.LoaderArgs['params']) {
-  let numericYear = -1;
-  if (params.year === undefined) {
-    numericYear = 0;
-  } else {
-    const parsed = Number(params.year);
-    if (!Number.isNaN(parsed) && parsed > 0) {
-      numericYear = parsed;
+export const Route = createFileRoute('/insights/{-$year}')({
+  loader: async ({ params }) => {
+    let numericYear = -1;
+    if (params.year === undefined || params.year === '') {
+      numericYear = 0;
+    } else {
+      const parsed = Number(params.year);
+      if (!Number.isNaN(parsed) && parsed > 0) {
+        numericYear = parsed;
+      }
     }
-  }
 
-  if (numericYear === -1) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
+    if (numericYear === -1) {
+      throw notFound();
+    }
 
-  const [leaderboards, notables] = await Promise.all([
-    getInsightsLeaderboardsYear({ path: { year: numericYear } }),
-    getInsightsNotablesYear({ path: { year: numericYear } }),
-  ]);
+    const [leaderboards, notables] = await Promise.all([
+      getInsightsLeaderboardsYear({ path: { year: numericYear } }),
+      getInsightsNotablesYear({ path: { year: numericYear } }),
+    ]);
 
-  if (leaderboards.data === undefined || notables.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    if (leaderboards.data === undefined || notables.data === undefined) {
+      throw new Error('Failed to load insights');
+    }
 
-  if (leaderboards.data.length === 0 || notables.data.length === 0) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
+    if (leaderboards.data.length === 0 || notables.data.length === 0) {
+      throw notFound();
+    }
 
-  return {
-    year: numericYear,
-    leaderboards: leaderboards.data,
-    notables: notables.data,
-  };
-}
+    return {
+      year: numericYear,
+      leaderboards: leaderboards.data,
+      notables: notables.data,
+    };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: 'Insights - The Blue Alliance' },
+          {
+            name: 'description',
+            content: 'Insights for the FIRST Robotics Competition.',
+          },
+        ],
+      };
+    }
 
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.year > 0 ? loaderData.year : 'Overall'} Insights - The Blue Alliance`,
+        },
+        {
+          name: 'description',
+          content: `${loaderData.year > 0 ? loaderData.year : 'Overall'} insights for the FIRST Robotics Competition.`,
+        },
+      ],
+    };
+  },
+  component: InsightsPage,
+});
 
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `Insights - The Blue Alliance`,
-      },
-      {
-        name: 'description',
-        content: `Insights for the FIRST Robotics Competition.`,
-      },
-    ];
-  }
-
-  return [
-    {
-      title: `${data.year > 0 ? data.year : 'Overall'} Insights - The Blue Alliance`,
-    },
-    {
-      name: 'description',
-      content: `${data.year > 0 ? data.year : 'Overall'} insights for the FIRST Robotics Competition.`,
-    },
-  ];
-}
-
-export default function InsightsPage() {
-  const { leaderboards, year, notables } = useLoaderData<typeof loader>();
+function InsightsPage() {
+  const { leaderboards, year, notables } = Route.useLoaderData();
 
   return (
     <div>
@@ -142,7 +130,10 @@ function SingleYearInsights({
 
         <Select
           onValueChange={(value) => {
-            void navigate(`/insights/${value === 'Overall' ? '' : value}`);
+            void navigate({
+              to: '/insights/{-$year}',
+              params: { year: value === 'Overall' ? '' : value },
+            });
           }}
         >
           <SelectTrigger className="w-[180px] cursor-pointer">

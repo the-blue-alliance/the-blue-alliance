@@ -1,5 +1,5 @@
+import { Link } from '@tanstack/react-router';
 import React, { ReactNode } from 'react';
-import { Link } from 'react-router';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
@@ -183,5 +183,18 @@ function LeaderboardKeyLink({
       </TeamLink>
     );
   }
-  return <Link to={`/${keyType}/${keyVal}`}>{keyVal}</Link>;
+  if (keyType === 'event') {
+    return (
+      <Link to="/event/$eventKey" params={{ eventKey: keyVal }}>
+        {keyVal}
+      </Link>
+    );
+  }
+  if (keyType === 'match') {
+    return (
+      <Link to="/match/$matchKey" params={{ matchKey: keyVal }}>
+        {keyVal}
+      </Link>
+    );
+  }
 }

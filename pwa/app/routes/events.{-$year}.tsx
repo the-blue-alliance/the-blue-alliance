@@ -1,6 +1,6 @@
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
-import { useLoaderData, useNavigate } from 'react-router';
 
 import { Event, getEventsByYear } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
@@ -25,64 +25,52 @@ import {
   slugify,
 } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/events.($year)';
+export const Route = createFileRoute('/events/{-$year}')({
+  loader: async ({ params }) => {
+    const year = await parseParamsForYearElseDefault(params);
+    if (year === undefined) {
+      throw notFound();
+    }
 
-async function loadData(params: Route.LoaderArgs['params']) {
-  const year = await parseParamsForYearElseDefault(params);
-  if (year === undefined) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
+    const events = await getEventsByYear({ path: { year } });
 
-  const events = await getEventsByYear({ path: { year } });
+    if (events.data === undefined) {
+      throw new Error('Failed to load events');
+    }
 
-  if (events.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    if (events.data.length === 0) {
+      throw notFound();
+    }
 
-  if (events.data.length === 0) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
+    return { year, events: events.data };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: 'FIRST Robotics Events - The Blue Alliance' },
+          {
+            name: 'description',
+            content: 'Event list for the FIRST Robotics Competition.',
+          },
+        ],
+      };
+    }
 
-  return { year, events: events.data };
-}
-
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `FIRST Robotics Events - The Blue Alliance`,
-      },
-      {
-        name: 'description',
-        content: `Event list for the FIRST Robotics Competition.`,
-      },
-    ];
-  }
-
-  return [
-    {
-      title: `${data.year} FIRST Robotics Events - The Blue Alliance`,
-    },
-    {
-      name: 'description',
-      content: `Event list for the ${data.year} FIRST Robotics Competition.`,
-    },
-  ];
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.year} FIRST Robotics Events - The Blue Alliance`,
+        },
+        {
+          name: 'description',
+          content: `Event list for the ${loaderData.year} FIRST Robotics Competition.`,
+        },
+      ],
+    };
+  },
+  component: YearEventsPage,
+});
 
 interface EventGroup {
   groupName: string;
@@ -173,8 +161,8 @@ function groupBySections(events: Event[]): EventGroup[] {
   return groups;
 }
 
-export default function YearEventsPage() {
-  const { year, events } = useLoaderData<typeof loader>();
+function YearEventsPage() {
+  const { year, events } = Route.useLoaderData();
   const [inView, setInView] = useState(new Set());
   const navigate = useNavigate();
 
@@ -188,7 +176,7 @@ export default function YearEventsPage() {
           <Select
             value={String(year)}
             onValueChange={(value) => {
-              void navigate(`/events/${value}`);
+              void navigate({ to: `/events/${value}` });
             }}
           >
             <SelectTrigger className="w-[180px]">

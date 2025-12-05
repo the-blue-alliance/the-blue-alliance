@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
 import { useMemo, useState } from 'react';
-import { Link, useLoaderData } from 'react-router';
 
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
@@ -109,74 +109,65 @@ import {
   splitIntoNChunks,
 } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/event.$eventKey';
+export const Route = createFileRoute('/event/$eventKey')({
+  loader: async ({ params }) => {
+    if (!isValidEventKey(params.eventKey)) {
+      throw notFound();
+    }
 
-async function loadData(params: Route.LoaderArgs['params']) {
-  if (!isValidEventKey(params.eventKey)) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
+    const [event, matches, alliances] = await Promise.all([
+      getEvent({ path: { event_key: params.eventKey } }),
+      getEventMatches({ path: { event_key: params.eventKey } }),
+      getEventAlliances({ path: { event_key: params.eventKey } }),
+    ]);
 
-  const [event, matches, alliances] = await Promise.all([
-    getEvent({ path: { event_key: params.eventKey } }),
-    getEventMatches({ path: { event_key: params.eventKey } }),
-    getEventAlliances({ path: { event_key: params.eventKey } }),
-  ]);
+    if (event.data === undefined) {
+      throw notFound();
+    }
 
-  if (event.data === undefined) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
+    if (matches.data === undefined || alliances.data === undefined) {
+      throw new Error('Failed to load event data');
+    }
 
-  if (matches.data === undefined || alliances.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    return {
+      event: event.data,
+      matches: matches.data,
+      alliances: alliances.data ?? [],
+      shouldPreviewAwardsTab: SEASON_EVENT_TYPES.has(event.data.event_type),
+      shouldPreviewInsightsTab: matches.data.length > 0,
+      shouldPreviewRankingsTab: matches.data.length > 0,
+    };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: 'Event Not Found - The Blue Alliance' },
+          {
+            name: 'description',
+            content:
+              'Videos and match results for the FIRST Robotics Competition.',
+          },
+        ],
+      };
+    }
 
-  return {
-    event: event.data,
-    matches: matches.data,
-    alliances: alliances.data ?? [],
-    shouldPreviewAwardsTab: SEASON_EVENT_TYPES.has(event.data.event_type),
-    shouldPreviewInsightsTab: matches.data.length > 0,
-    shouldPreviewRankingsTab: matches.data.length > 0,
-  };
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.event.name} (${loaderData.event.year}) - The Blue Alliance`,
+        },
+        {
+          name: 'description',
+          content: `Videos and match results for the ${loaderData.event.year} ${loaderData.event.name} FIRST Robotics Competition.`,
+        },
+      ],
+    };
+  },
+  component: EventPage,
+});
 
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `Event Not Found - The Blue Alliance`,
-      },
-      {
-        name: 'description',
-        content: `Videos and match results for the FIRST Robotics Competition.`,
-      },
-    ];
-  }
-
-  return [
-    { title: `${data.event.name} (${data.event.year}) - The Blue Alliance` },
-    {
-      name: 'description',
-      content: `Videos and match results for the ${data.event.year} ${data.event.name} FIRST Robotics Competition.`,
-    },
-  ];
-}
-
-export default function EventPage() {
+function EventPage() {
   const {
     event,
     alliances,
@@ -184,7 +175,7 @@ export default function EventPage() {
     shouldPreviewAwardsTab,
     shouldPreviewInsightsTab,
     shouldPreviewRankingsTab,
-  } = useLoaderData<Awaited<ReturnType<typeof loadData>>>();
+  } = Route.useLoaderData();
 
   const awardsQuery = useQuery({
     ...getEventAwardsOptions({ path: { event_key: event.key } }),
@@ -272,9 +263,9 @@ export default function EventPage() {
         <BiPinMapFill />
 
         {event.gmaps_url ? (
-          <Link to={event.gmaps_url}>
+          <a href={event.gmaps_url}>
             {event.city}, {event.state_prov}, {event.country}
-          </Link>
+          </a>
         ) : (
           <>
             {event.city}, {event.state_prov}, {event.country}
@@ -284,7 +275,7 @@ export default function EventPage() {
       {event.website && (
         <InlineIcon>
           <BiLink />
-          <Link to={event.website}>{event.website}</Link>
+          <a href={event.website}>{event.website}</a>
         </InlineIcon>
       )}
 
@@ -292,28 +283,26 @@ export default function EventPage() {
         <InlineIcon>
           <BiInfoCircleFill />
           Details on{' '}
-          <Link
-            to={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+          <a
+            href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
           >
             FRC Events
-          </Link>
+          </a>
         </InlineIcon>
       )}
 
       <InlineIcon>
         <BiGraphUp />
-        <Link to={`https://www.statbotics.io/event/${event.key}`}>
-          Statbotics
-        </Link>
+        <a href={`https://www.statbotics.io/event/${event.key}`}>Statbotics</a>
       </InlineIcon>
 
       {event.webcasts.length > 0 &&
         getCurrentWeekEvents([event]).length > 0 && (
           <InlineIcon>
             <MdiVideo />
-            <Link to={`https://www.thebluealliance.com/gameday/${event.key}`}>
+            <a href={`https://www.thebluealliance.com/gameday/${event.key}`}>
               GameDay
-            </Link>
+            </a>
           </InlineIcon>
         )}
 

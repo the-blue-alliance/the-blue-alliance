@@ -1,5 +1,3 @@
-import { Link } from 'react-router';
-
 import LogosFacebook from '~icons/logos/facebook';
 import LogosGithubIcon from '~icons/logos/github-icon';
 import LogosGitlab from '~icons/logos/gitlab';
@@ -23,72 +21,72 @@ function SingleSocialIcon({
     case 'youtube':
     case 'youtube-channel':
       return (
-        <Link
-          to={`https://www.youtube.com/${media.foreign_key}`}
+        <a
+          href={`https://www.youtube.com/${media.foreign_key}`}
           className={className}
         >
           <InlineIcon>
             <LogosYoutubeIcon />
             {media.foreign_key}
           </InlineIcon>
-        </Link>
+        </a>
       );
     case 'facebook-profile':
       return (
-        <Link
-          to={`https://www.facebook.com/${media.foreign_key}`}
+        <a
+          href={`https://www.facebook.com/${media.foreign_key}`}
           className={className}
         >
           <InlineIcon>
             <LogosFacebook />
             {media.foreign_key}
           </InlineIcon>
-        </Link>
+        </a>
       );
     case 'github-profile':
       return (
-        <Link
-          to={`https://github.com/${media.foreign_key}`}
+        <a
+          href={`https://github.com/${media.foreign_key}`}
           className={className}
         >
           <InlineIcon>
             <LogosGithubIcon />
             {media.foreign_key}
           </InlineIcon>
-        </Link>
+        </a>
       );
     case 'instagram-profile':
       return (
-        <Link
-          to={`https://www.instagram.com/${media.foreign_key}`}
+        <a
+          href={`https://www.instagram.com/${media.foreign_key}`}
           className={className}
         >
           <InlineIcon>
             <LogosInstagramIcon />
             {media.foreign_key}
           </InlineIcon>
-        </Link>
+        </a>
       );
     case 'twitter-profile':
       return (
-        <Link to={`https://x.com/${media.foreign_key}`} className={className}>
+        <a href={`https://x.com/${media.foreign_key}`} className={className}>
           <InlineIcon>
             <SimpleIconsX />
             {media.foreign_key}
           </InlineIcon>
-        </Link>
+        </a>
       );
     case 'gitlab-profile':
       return (
-        <Link
-          to={`https://gitlab.com/${media.foreign_key}`}
+        <a
+          href={`https://gitlab.com/${media.foreign_key}`}
           className={className}
         >
           <InlineIcon>
             <LogosGitlab />
             {media.foreign_key}
           </InlineIcon>
-        </Link>
+        </a>
       );
     default:
       return null;
