@@ -93,6 +93,7 @@ const MatchLink = React.forwardRef<
       mask={{
         to: '/match/$matchKey',
         params: { matchKey },
+        unmaskOnReload: true,
       }}
       replace={true}
       resetScroll={false}

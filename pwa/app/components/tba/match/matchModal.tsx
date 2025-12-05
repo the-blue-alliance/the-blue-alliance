@@ -104,11 +104,18 @@ function MatchModalContent({ matchKey }: { matchKey: string }) {
 
 function MatchModalSpinner() {
   return (
-    <div className="flex min-h-32 items-center justify-center">
-      <div
-        className="size-8 animate-spin rounded-full border-4 border-muted
-          border-t-primary"
-      />
-    </div>
+    <>
+      <CredenzaHeader>
+        <CredenzaTitle>
+          <div className="h-6 w-100 animate-pulse rounded bg-muted" />
+        </CredenzaTitle>
+      </CredenzaHeader>
+      <CredenzaBody className="flex min-h-32 items-center justify-center">
+        <div
+          className="size-8 animate-spin rounded-full border-4 border-muted
+            border-t-primary"
+        />
+      </CredenzaBody>
+    </>
   );
 }
