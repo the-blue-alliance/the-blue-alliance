@@ -1,12 +1,10 @@
-from typing import Optional
-
 from flask import g
 
 from backend.common.google_analytics import GoogleAnalytics
 
 
 def track_call_after_response(
-    api_action: str, api_label: Optional[str] = None, model_type: Optional[str] = None
+    api_action: str, api_label: str | None = None, model_type: str | None = None
 ) -> None:
     """
     Schedules a callback to Google Analytics to track an API call.
@@ -14,6 +12,10 @@ def track_call_after_response(
     # Save |auth_owner_id| and |auth_description| while we stil have access to the flask request context.
     auth_owner_id = g.auth_owner_id if hasattr(g, "auth_owner_id") else None
     auth_description = g.auth_description if hasattr(g, "auth_description") else None
+
+    # Make sure auth_owner_id + auth_description are 1) not None and 2) strings
+    if not isinstance(auth_owner_id, str) or not isinstance(auth_description, str):
+        return
 
     if model_type is not None:
         api_action += f"/{model_type}"
