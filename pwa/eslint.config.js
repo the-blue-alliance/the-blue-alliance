@@ -19,7 +19,7 @@ export default tseslint.config([
   // Ignore files
   includeIgnoreFile(gitignorePath),
   {
-    ignores: ['app/api/tba/', 'eslint.config.js'],
+    ignores: ['app/api/tba/', 'eslint.config.js', 'pnpm-lock.yaml'],
   },
 
   // Typescript config

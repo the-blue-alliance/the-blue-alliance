@@ -144,60 +144,75 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa ci
+        run: pnpm --dir pwa install --frozen-lockfile
       - name: Generate react-router types
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa run typecheck
+        run: pnpm --dir pwa run typecheck
       - name: Run Format
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa run format
+        run: pnpm --dir pwa run format
       - name: Run Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa run lint
+        run: pnpm --dir pwa run lint
   pwa-type:
     name: "[pwa] Type Check"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa ci
+        run: pnpm --dir pwa install --frozen-lockfile
       - name: Run Type Check
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa run typecheck
+        run: pnpm --dir pwa run typecheck
   pwa-test:
     name: "[pwa] Test"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa ci
+        run: pnpm --dir pwa install --frozen-lockfile
       - name: Create dotenv
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/pwa/create_dotenv.sh --env
@@ -205,45 +220,30 @@ jobs:
           TBA_API_READ_KEY: TEST_KEY
       - name: Run Test
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npm --prefix pwa test
+        run: pnpm --dir pwa test
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         uses: codecov/codecov-action@v5.5.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
-  pwa-test-devbox:
-    name: "[pwa] Test w/ Devbox"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - name: Install devbox
-        uses: jetify-com/devbox-install-action@v0.14.0
-        with:
-          project-path: pwa
-          enable-cache: true
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
-      - name: Install dependencies
-        run: devbox run -- npm ci
-        working-directory: pwa
-      - name: Run tests
-        run: devbox run -- npm test
-        working-directory: pwa
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Install Dependencies
-        run: npm --prefix pwa ci
+        run: pnpm --dir pwa install --frozen-lockfile
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
         env:
@@ -251,7 +251,7 @@ jobs:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Run Build
-        run: npm --prefix pwa run build
+        run: pnpm --dir pwa run build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Archive production artifacts
@@ -268,23 +268,29 @@ jobs:
   #   steps:
   #     - uses: actions/checkout@v6
 
+  #     - name: Set up pnpm
+  #       uses: pnpm/action-setup@v4
+  #       with:
+  #         version: "10.24.0"
+
   #     - name: Set up Node
   #       uses: actions/setup-node@v6
   #       with:
   #         node-version: "24"
-  #         cache: "npm"
+  #         cache: "pnpm"
+  #         cache-dependency-path: "pwa/pnpm-lock.yaml"
 
   #     - name: Install Dependencies
   #       working-directory: pwa
-  #       run: npm ci
+  #       run: pnpm install --frozen-lockfile
 
   #     - name: Install Playwright Browsers
   #       working-directory: pwa
-  #       run: npx playwright install --with-deps chromium webkit
+  #       run: pnpm exec playwright install --with-deps chromium webkit
 
   #     - name: Run Playwright tests
   #       working-directory: pwa
-  #       run: npx playwright test
+  #       run: pnpm exec playwright test
   #       env:
   #         VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
   #         VITE_FIREBASE_API_KEY: "fake-api-key"
@@ -298,10 +304,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
 
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
@@ -310,11 +323,11 @@ jobs:
 
       - name: Install Dependencies
         working-directory: pwa
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate react-router types
         working-directory: pwa
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Run generate-api.sh
         working-directory: ./pwa
