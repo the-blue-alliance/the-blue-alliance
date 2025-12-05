@@ -5,7 +5,7 @@ import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 
 import { LeaderboardInsight } from '~/api/tba/read';
-import { TeamLink } from '~/components/tba/links';
+import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {
   Card,
@@ -191,10 +191,6 @@ function LeaderboardKeyLink({
     );
   }
   if (keyType === 'match') {
-    return (
-      <Link to="/match/$matchKey" params={{ matchKey: keyVal }}>
-        {keyVal}
-      </Link>
-    );
+    return <MatchLink matchOrKey={keyVal}>{keyVal}</MatchLink>;
   }
 }

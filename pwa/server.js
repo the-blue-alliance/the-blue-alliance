@@ -49,6 +49,9 @@ app.use(morgan('tiny'));
 const { default: handler } = await import('./build/server/server.js');
 const nodeHandler = toNodeHandler(handler.fetch);
 app.use(async (req, res, next) => {
+  // Enable JavaScript profiling for Sentry browser profiling
+  res.setHeader('Document-Policy', 'js-profiling');
+
   try {
     await nodeHandler(req, res);
   } catch (error) {
