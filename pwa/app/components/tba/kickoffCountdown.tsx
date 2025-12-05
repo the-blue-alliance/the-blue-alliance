@@ -1,3 +1,4 @@
+import { ClientOnly } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';
@@ -37,11 +38,8 @@ export function KickoffCountdown({
   const [timeRemaining, setTimeRemaining] = useState(() =>
     calculateTimeRemaining(kickoffDateTimeEST),
   );
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-
     const interval = setInterval(() => {
       const remaining = calculateTimeRemaining(kickoffDateTimeEST);
       setTimeRemaining(remaining);
@@ -56,6 +54,18 @@ export function KickoffCountdown({
 
   const isKickoffTime = timeRemaining.totalMs <= 0;
   const isWithin24Hours = timeRemaining.totalMs <= 24 * 60 * 60 * 1000;
+  const kickoffDateEST = kickoffDateTimeEST.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'America/New_York',
+  });
+  const kickoffTimeEST = kickoffDateTimeEST.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+    timeZone: 'America/New_York',
+  });
   const kickoffDate = kickoffDateTimeEST.toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
@@ -88,22 +98,22 @@ export function KickoffCountdown({
         <>
           <div className="mb-4 flex justify-center gap-2 sm:gap-4">
             <CountdownUnit
-              value={isClient ? timeRemaining.days : '--'}
+              value={timeRemaining.days}
               label="D"
               fullLabel="Days"
             />
             <CountdownUnit
-              value={isClient ? formatTimeUnit(timeRemaining.hours) : '--'}
+              value={formatTimeUnit(timeRemaining.hours)}
               label="H"
               fullLabel="Hours"
             />
             <CountdownUnit
-              value={isClient ? formatTimeUnit(timeRemaining.minutes) : '--'}
+              value={formatTimeUnit(timeRemaining.minutes)}
               label="M"
               fullLabel="Minutes"
             />
             <CountdownUnit
-              value={isClient ? formatTimeUnit(timeRemaining.seconds) : '--'}
+              value={formatTimeUnit(timeRemaining.seconds)}
               label="S"
               fullLabel="Seconds"
             />
@@ -114,7 +124,10 @@ export function KickoffCountdown({
           </p>
 
           <p className="text-center text-sm text-slate-600">
-            Come back at {kickoffTime} on {kickoffDate} to watch live!
+            Come back at{' '}
+            <ClientOnly fallback={kickoffTimeEST}>{kickoffTime}</ClientOnly> on{' '}
+            <ClientOnly fallback={kickoffDateEST}>{kickoffDate}</ClientOnly> to
+            watch live!
           </p>
         </>
       )}
@@ -172,7 +185,7 @@ function CountdownUnit({
         <span
           className="font-mono text-3xl font-bold text-slate-800 sm:text-4xl"
         >
-          {value}
+          <ClientOnly fallback="--">{value}</ClientOnly>
         </span>
       </div>
       <span className="mt-1 text-xs font-medium text-slate-600 sm:hidden">
