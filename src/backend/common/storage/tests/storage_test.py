@@ -44,23 +44,23 @@ def set_storage_path(monkeypatch: MonkeyPatch) -> None:
 
 def test_client_for_env_unit_test():
     client = storage._client_for_env()
-    assert type(client) is InMemoryClient
+    assert isinstance(client, InMemoryClient)
 
 
 def test_client_for_env_unit_test_remote(set_storage_mode_remote):
     client = storage._client_for_env()
-    assert type(client) is InMemoryClient
+    assert isinstance(client, InMemoryClient)
 
 
 def test_client_for_env_dev(set_override_tba_test, set_dev):
     client = storage._client_for_env()
-    assert type(client) is LocalStorageClient
+    assert isinstance(client, LocalStorageClient)
     assert client.base_path == Path(tempfile.gettempdir())
 
 
 def test_client_for_env_dev_path(set_override_tba_test, set_dev, set_storage_path):
     client = storage._client_for_env()
-    assert type(client) is LocalStorageClient
+    assert isinstance(client, LocalStorageClient)
     assert client.base_path == Path("some/fake/path")
 
 
@@ -85,7 +85,7 @@ def test_client_for_env_dev_remote(
         client = storage._client_for_env()
 
     gcloud_storage_client_init.assert_called_with("tbatv-prod-hrd")
-    assert type(client) is GCloudStorageClient
+    assert isinstance(client, GCloudStorageClient)
 
 
 def test_client_for_env_production_no_project(set_override_tba_test, set_prod):
@@ -105,7 +105,7 @@ def test_client_for_env_production(set_override_tba_test, set_prod, set_project)
         client = storage._client_for_env()
 
     gcloud_storage_client_init.assert_called_with("tbatv-prod-hrd")
-    assert type(client) is GCloudStorageClient
+    assert isinstance(client, GCloudStorageClient)
 
 
 def test_write():

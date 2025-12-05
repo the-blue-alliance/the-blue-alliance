@@ -90,7 +90,7 @@ def test_accept_suggestion(
         web_client, f"review_{suggestion_id}"
     )
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["event_short"] = "test"
     form_fields["verdict"] = "accept"
@@ -120,7 +120,7 @@ def test_accept_suggestion_normalize_event_short_and_first_code(
         web_client, f"review_{suggestion_id}"
     )
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["event_short"] = "TEST"
     form_fields["first_code"] = "frctest"
@@ -151,7 +151,7 @@ def test_reject_suggestion(
         web_client, f"review_{suggestion_id}"
     )
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["event_short"] = "test"
     form_fields["verdict"] = "reject"

@@ -71,7 +71,7 @@ class EventRemapTeamsHelper:
                 # Convert `team_number` down to an int, if possible
                 recipient_team_number = recipient["team_number"]
                 if (
-                    type(recipient_team_number) is str
+                    isinstance(recipient_team_number, str)
                     and recipient_team_number.isdigit()
                 ):
                     award._dirty = True

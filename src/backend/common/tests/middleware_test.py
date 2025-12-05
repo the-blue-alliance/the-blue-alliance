@@ -8,7 +8,7 @@ from flask import Flask
 from werkzeug.test import create_environ, run_wsgi_app
 from werkzeug.wrappers import Request
 
-import backend
+from backend.common import middleware
 from backend.common.environment import Environment
 from backend.common.middleware import (
     _set_secret_key,
@@ -184,28 +184,24 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     callback2.assert_called_once()
 
 
-def test_install_middleware(app: Flask) -> None:
-    assert not type(app.wsgi_app) is AfterResponseMiddleware
-    with patch.object(
-        backend.common.middleware, "_set_secret_key"
-    ) as mock_set_secret_key:
-        install_middleware(app, configure_secret_key=True)
-        assert len(app.before_request_funcs) == 0
+@patch.object(middleware, "_set_secret_key")
+def test_install_middleware(mock_set_secret_key: Mock, app: Flask) -> None:
+    assert not isinstance(app.wsgi_app, AfterResponseMiddleware)
+    install_middleware(app, configure_secret_key=True)
+    assert len(app.before_request_funcs) == 0
     mock_set_secret_key.assert_called_once_with(app)
-    assert type(app.wsgi_app) is AfterResponseMiddleware
+    assert isinstance(app.wsgi_app, AfterResponseMiddleware)
 
 
-def test_install_middleware_with_appspot_redirect(app: Flask) -> None:
-    assert not type(app.wsgi_app) is AppspotRedirectMiddleware
-    with patch.object(
-        backend.common.middleware, "_set_secret_key"
-    ) as mock_set_secret_key:
-        install_middleware(
-            app, configure_secret_key=True, include_appspot_redirect=True
-        )
-        assert len(app.before_request_funcs) == 0
+@patch.object(middleware, "_set_secret_key")
+def test_install_middleware_with_appspot_redirect(
+    mock_set_secret_key: Mock, app: Flask
+) -> None:
+    assert not isinstance(app.wsgi_app, AppspotRedirectMiddleware)
+    install_middleware(app, configure_secret_key=True, include_appspot_redirect=True)
+    assert len(app.before_request_funcs) == 0
     mock_set_secret_key.assert_called_once_with(app)
-    assert type(app.wsgi_app) is AppspotRedirectMiddleware
+    assert isinstance(app.wsgi_app, AppspotRedirectMiddleware)
 
 
 def test_set_secret_key_default(app: Flask) -> None:
@@ -222,10 +218,8 @@ def test_set_secret_key_empty(app: Flask, monkeypatch: MonkeyPatch) -> None:
         _set_secret_key(app)
 
 
-def test_set_secret_key_default_prod(app: Flask) -> None:
+@patch.object(Environment, "is_prod", return_value=True)
+def test_set_secret_key_default_prod(_mock_is_prod: Mock, app: Flask) -> None:
     assert app.secret_key is None
-    with patch.object(Environment, "is_prod", return_value=True):
-        with pytest.raises(
-            Exception, match="Secret key may not be default in production!"
-        ):
-            _set_secret_key(app)
+    with pytest.raises(Exception, match="Secret key may not be default in production!"):
+        _set_secret_key(app)
