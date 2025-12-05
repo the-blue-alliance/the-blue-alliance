@@ -8,6 +8,7 @@ from backend.common.cache_clearing import get_affected_queries
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_tag import MediaTag
+from backend.common.consts.media_type import MediaType
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -238,6 +239,7 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             "references": {ndb.Key(Team, "frc254"), ndb.Key(Team, "frc604")},
             "year": {2014, 2015},
             "media_tag_enum": {MediaTag.CHAIRMANS_ESSAY, MediaTag.CHAIRMANS_VIDEO},
+            "media_type_enum": {MediaType.CD_THREAD, MediaType.ONSHAPE},
         }
         cache_keys = {q[0] for q in get_affected_queries.media_updated(affected_refs)}
 
@@ -288,6 +290,10 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             media_query.TeamYearTagMediasQuery(
                 "frc604", 2015, MediaTag.CHAIRMANS_ESSAY
             ).cache_key,
+            media_query.MediaTypeYearQuery(MediaType.CD_THREAD, 2014).cache_key,
+            media_query.MediaTypeYearQuery(MediaType.CD_THREAD, 2015).cache_key,
+            media_query.MediaTypeYearQuery(MediaType.ONSHAPE, 2014).cache_key,
+            media_query.MediaTypeYearQuery(MediaType.ONSHAPE, 2015).cache_key,
         }
 
     def test_media_updated_event(self) -> None:
@@ -295,6 +301,7 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             "references": {ndb.Key(Event, "2016necmp")},
             "year": {2016},
             "media_tag_enum": {None, None},
+            "media_type_enum": {None, None},
         }
         cache_keys = {q[0] for q in get_affected_queries.media_updated(affected_refs)}
 

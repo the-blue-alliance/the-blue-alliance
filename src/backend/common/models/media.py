@@ -72,6 +72,7 @@ class Media(CachedModel):
             "preferred_references": set(),
             "year": set(),
             "media_tag_enum": set(),
+            "media_type_enum": set(),
         }
         self._details: Optional[Dict] = None
         self._private_details: Optional[Dict] = None
