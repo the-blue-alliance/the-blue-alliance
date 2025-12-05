@@ -124,7 +124,9 @@ class JSONMatchesParser:
                             f"Bad team: '{team_key}'. Must follow format 'frcXXX'."
                         )
 
-                if not isinstance(details["score"], int):
+                if details["score"] is not None and not isinstance(
+                    details["score"], int
+                ):
                     raise ParserInputException(
                         f"alliances[{color}]['score'] must be an integer or null"
                     )
@@ -171,7 +173,7 @@ class JSONMatchesParser:
                 post_results_time_utc, "post_results_time_utc"
             )
 
-            if not isinstance(display_name, str):
+            if display_name is not None and not isinstance(display_name, str):
                 raise ParserInputException("'display_name' must be a string")
 
             # validation passed. build new dicts to sanitize
