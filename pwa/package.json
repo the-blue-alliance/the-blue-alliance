@@ -63,7 +63,7 @@
     "morgan": "1.10.1",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "react-hook-form": "7.67.0",
+    "react-hook-form": "7.68.0",
     "react-intersection-observer": "10.0.0",
     "recharts": "2.15.3",
     "tailwind-merge": "3.4.0",
