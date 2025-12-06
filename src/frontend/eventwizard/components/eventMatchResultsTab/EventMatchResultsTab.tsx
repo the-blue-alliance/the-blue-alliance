@@ -6,7 +6,7 @@ export interface EventMatchResultsTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string
+    body: string | FormData
   ) => Promise<Response>;
   makeApiV3Request: <T = unknown>(
     path: string

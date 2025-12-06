@@ -1,11 +1,12 @@
 import React, { ChangeEvent, useState } from "react";
 import { parseResultsFile, ResultsMatch } from "../../utils/resultsParser";
+import { uploadFmsReport } from "../../utils/fmsReportUpload";
 
 interface FMSMatchResultsProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string
+    body: string | FormData
   ) => Promise<Response>;
 }
 
@@ -145,6 +146,19 @@ const FMSMatchResults: React.FC<FMSMatchResultsProps> = ({
         `/api/trusted/v1/event/${selectedEvent}/matches/update`,
         JSON.stringify(apiMatches)
       );
+      
+      // Upload the FMS report file to the backend for archival
+      // Determine report type based on match types
+      let reportType = "qual_results";
+      const hasPlayoffMatches = matches.some(m => m.comp_level !== "qm");
+      if (hasPlayoffMatches) {
+        reportType = "playoff_results";
+      }
+      
+      if (file) {
+        await uploadFmsReport(file, selectedEvent, reportType, makeTrustedRequest);
+      }
+      
       setUploading(false);
       setStatusMessage(`Successfully uploaded ${matches.length} matches!`);
       setMatches([]);

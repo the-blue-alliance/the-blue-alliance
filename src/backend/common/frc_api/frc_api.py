@@ -244,8 +244,12 @@ class FRCAPI:
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
                 content = read(gcs_file)
                 if content is not None:
-                    with open(filename, "w") as f:
-                        f.write(content)
+                    if isinstance(content, str):
+                        with open(filename, "w") as f:
+                            f.write(content)
+                    else:
+                        with open(filename, "wb") as f:
+                            f.write(content)
                     files.append(f"{safe_dir_name}/{safe_file_name}")
         return sorted(files)
 

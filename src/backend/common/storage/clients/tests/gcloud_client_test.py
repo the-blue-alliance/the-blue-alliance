@@ -39,7 +39,9 @@ def test_write():
 
     client.write(file_name, file_content)
     mock_bucket.blob.assert_called_with(file_name)
-    mock_blob.upload_from_string.assert_called_with(file_content)
+    mock_blob.upload_from_string.assert_called_with(
+        file_content, content_type="text/plain"
+    )
 
 
 def test_read_none():
