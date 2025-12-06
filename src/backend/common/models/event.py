@@ -10,6 +10,7 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts import event_type
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import (
     CMP_EVENT_TYPES,
     EventType,
@@ -114,6 +115,9 @@ class Event(CachedModel):
         ndb.StringProperty()
     )  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official: bool = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
+    disable_sync_flags: int = (
+        ndb.IntegerProperty()
+    )  # Turn off a particular type of sync
     first_eid = ndb.StringProperty()  # from USFIRST
     parent_event: Optional[ndb.Key] = (
         ndb.KeyProperty()
@@ -127,9 +131,9 @@ class Event(CachedModel):
         indexed=False
     )  # list of dicts, valid keys include 'type' and 'channel'
     enable_predictions = ndb.BooleanProperty(default=False)
-    remap_teams: Dict[str, str] = (
+    remap_teams: Dict[TeamKey, TeamKey] = (
         ndb.JsonProperty()
-    )  # Map of temporary team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
+    )  # Map of temporary "off-season demo" team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -139,6 +143,7 @@ class Event(CachedModel):
         "event_short",
         "event_type_enum",
         "district_key",
+        "disable_sync_flags",
         "custom_hashtag",
         "enable_predictions",
         "facebook_eid",
@@ -210,13 +215,14 @@ class Event(CachedModel):
                 teams.append(backup["in"])
         return teams
 
-    def prep_awards(self) -> None:
+    def prep_awards(self) -> TypedFuture[List[Award]]:
         if self._awards_future is None:
             from backend.common.queries import award_query
 
             self._awards_future = award_query.EventAwardsQuery(
                 event_key=self.key_name
             ).fetch_async()
+        return self._awards_future
 
     @property
     def awards(self) -> List["Award"]:
@@ -224,9 +230,10 @@ class Event(CachedModel):
             self.prep_awards()
         return none_throws(self._awards_future).get_result()
 
-    def prep_details(self) -> None:
+    def prep_details(self) -> TypedFuture[EventDetails]:
         if self._details_future is None:
             self._details_future = ndb.Key(EventDetails, self.key.id()).get_async()
+        return self._details_future
 
     @property
     def details(self) -> EventDetails:
@@ -281,13 +288,14 @@ class Event(CachedModel):
     def clear_teams(self) -> None:
         self._teams_future = None
 
-    def prep_matches(self) -> None:
+    def prep_matches(self) -> TypedFuture[List[Match]]:
         if self._matches_future is None:
             from backend.common.queries import match_query
 
             self._matches_future = match_query.EventMatchesQuery(
                 event_key=self.key_name
             ).fetch_async()
+        return self._matches_future
 
     @property
     def matches(self) -> List["Match"]:
@@ -450,13 +458,14 @@ class Event(CachedModel):
                 return "Awards"
         return "Week {}".format(week + 1)
 
-    def prep_teams(self) -> None:
+    def prep_teams(self) -> TypedFuture[List[Team]]:
         if self._teams_future is None:
             from backend.common.queries import team_query
 
             self._teams_future = team_query.EventTeamsQuery(
                 event_key=self.key_name
             ).fetch_async()
+        return self._teams_future
 
     @property
     def teams(self) -> List["Team"]:
@@ -828,3 +837,12 @@ class Event(CachedModel):
                 a.append(award)
                 team_awards[team_key] = a
         return team_awards
+
+    def is_sync_enabled(self, sync_type: EventSyncType) -> bool:
+        if not self.official:
+            return False
+
+        if self.disable_sync_flags is None:
+            return True
+
+        return (self.disable_sync_flags & sync_type) == 0

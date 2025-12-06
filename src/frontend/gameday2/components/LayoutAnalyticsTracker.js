@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ReactGA from "react-ga";
+import ReactGA from "react-ga4";
 import { NAME_FOR_LAYOUT } from "../constants/LayoutConstants";
 
 export default class LayoutAnalyticsTracker extends React.Component {

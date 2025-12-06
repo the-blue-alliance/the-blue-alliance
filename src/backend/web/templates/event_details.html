@@ -96,6 +96,7 @@
         <li class="{% if match_count == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
         <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length}}</span></a></li>
+        <li><a href="#scouting" data-toggle="tab">Scouting</a></li>
       </ul>
     </div>
   </div>
@@ -459,6 +460,39 @@
         </div>
       </div>
 
+    <div class="tab-pane" id="scouting">
+      <div class="row">
+        <div class="col-sm-12">
+          <h2>Scouting</h2>
+          <p>Copy the CSV data below for scouting purposes:</p>
+          <div class="form-group">
+            <div class="clearfix">
+              <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Team List</label>
+              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('team-list-csv', '{{ event.key_name }}_team_list.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+              <button type="button" class="btn btn-default btn-xs pull-right" onclick="copyCSVFromTextarea('team-list-csv')"><span class="glyphicon glyphicon-copy"></span> Copy to Clipboard</button>
+            </div>
+            <textarea id="team-list-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ team_list_csv|safe }}</textarea>
+          </div>
+          <div class="form-group">
+            <div class="clearfix">
+              <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Schedule</label>
+              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('schedule-csv', '{{ event.key_name }}_schedule.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+              <button type="button" class="btn btn-default btn-xs pull-right" onclick="copyCSVFromTextarea('schedule-csv')"><span class="glyphicon glyphicon-copy"></span> Copy to Clipboard</button>
+            </div>
+            <textarea id="schedule-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ schedule_csv|safe }}</textarea>
+          </div>
+          <div class="form-group">
+            <div class="clearfix">
+              <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Flat Schedule</label>
+              <button type="button" class="btn btn-default btn-xs pull-right" style="margin-left:4px;" onclick="downloadCSVFromTextarea('flat-schedule-csv', '{{ event.key_name }}_flat_schedule.csv')"><span class="glyphicon glyphicon-download"></span> Download CSV</button>
+              <button type="button" class="btn btn-default btn-xs pull-right" onclick="copyCSVFromTextarea('flat-schedule-csv')"><span class="glyphicon glyphicon-copy"></span> Copy to Clipboard</button>
+            </div>
+            <textarea id="flat-schedule-csv" class="form-control" rows="20" readonly style="font-family: monospace; resize: vertical;">{{ flat_schedule_csv|safe }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
       </div>
     </div>
 </div>
@@ -480,4 +514,50 @@
 {% if event.now %}
 <script type="text/javascript" src="/py3_javascript/liveevent.min.js"></script>
 {% endif %}
+<script type="text/javascript">
+  function downloadCSVFromTextarea(textareaId, filename) {
+    try {
+      var textarea = document.getElementById(textareaId);
+      if (!textarea) {
+        console.warn('Textarea not found: ' + textareaId);
+        return;
+      }
+      var csv = textarea.value || textarea.textContent || '';
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement('a');
+      var url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Failed to download CSV', e);
+    }
+  }
+
+  function copyCSVFromTextarea(textareaId) {
+    try {
+      var textarea = document.getElementById(textareaId);
+      if (!textarea) {
+        console.warn('Textarea not found: ' + textareaId);
+        return;
+      }
+      var csv = textarea.value || textarea.textContent || '';
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(csv).then(function() {
+          // Optionally show a success message
+        }, function(err) {
+          console.error('Clipboard write failed', err);
+        });
+      } else {
+        console.warn('Clipboard copy failed. This is likely due to an older browser, or not granting the clipboard-write permission.');
+      }
+    } catch (e) {
+      console.error('Failed to copy CSV', e);
+    }
+  }
+</script>
 {% endblock %}

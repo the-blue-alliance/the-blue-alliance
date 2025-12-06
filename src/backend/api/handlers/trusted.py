@@ -10,7 +10,10 @@ from backend.api.api_trusted_parsers.json_alliance_selections_parser import (
     JSONAllianceSelectionsParser,
 )
 from backend.api.api_trusted_parsers.json_awards_parser import JSONAwardsParser
-from backend.api.api_trusted_parsers.json_event_info_parser import JSONEventInfoParser
+from backend.api.api_trusted_parsers.json_event_info_parser import (
+    EventInfoParsed,
+    JSONEventInfoParser,
+)
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
 from backend.api.api_trusted_parsers.json_matches_parser import JSONMatchesParser
 from backend.api.api_trusted_parsers.json_rankings_parser import JSONRankingsParser
@@ -145,13 +148,43 @@ def update_event_info(event_key: EventKey) -> Response:
         event.first_code = parsed_info["first_event_code"]
 
     if "playoff_type" in parsed_info:
-        event.playoff_type = parsed_info["playoff_type"]
+        playoff_type = parsed_info["playoff_type"]
+        if playoff_type is not None:
+            event.playoff_type = playoff_type
+            if event.official:
+                # If this event is pulling info from the FRC API, we want to prevent it from being clobbered
+                event.manual_attrs = list(set(event.manual_attrs) | {"playoff_type"})
+        else:
+            # We can clear the "manual attr" (and allow the API to re-clobber) by setting
+            # a None value in the API
+            if event.official:
+                event.manual_attrs = list(set(event.manual_attrs) - {"playoff_type"})
 
     if "timezone" in parsed_info:
         event.timezone_id = parsed_info["timezone"]
 
+    if "sync_disabled_flags" in parsed_info:
+        event.disable_sync_flags = parsed_info["sync_disabled_flags"]
+
     EventManipulator.createOrUpdate(event, auto_union=False)
     return profiled_jsonify({"Success": f"Event {event_key} updated"})
+
+
+@require_write_auth({AuthType.EVENT_INFO})
+@validate_keys
+def get_event_info(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
+    event: Event = none_throws(Event.get_by_id(event_key))
+    event_info: EventInfoParsed = {
+        "first_event_code": event.first_api_code if event.official else None,
+        "playoff_type": event.playoff_type,
+        "webcasts": event.webcast,
+        "remap_teams": event.remap_teams or {},
+        "timezone": event.timezone_id,
+        "sync_disabled_flags": event.disable_sync_flags or 0,
+    }
+
+    return profiled_jsonify(event_info)
 
 
 @require_write_auth({AuthType.EVENT_ALLIANCES})

@@ -13,5 +13,11 @@ export default defineConfig({
       name: '@hey-api/sdk',
       validator: true,
     },
+    {
+      name: 'zod',
+      dates: {
+        offset: true,
+      },
+    },
   ],
 });

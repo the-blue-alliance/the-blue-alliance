@@ -4,6 +4,8 @@ import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 from google.appengine.ext import ndb
+from pytz import all_timezones_set as PYTZ_ALL_TIMEZONES
+from tzlocal.windows_tz import win_tz as WINDOWS_TO_IANA
 
 from backend.common.consts.event_code_exceptions import EVENT_CODE_EXCEPTIONS
 from backend.common.consts.event_type import EventType
@@ -139,7 +141,15 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 for url in event.get("webcasts", [])
             ]
 
-            # TODO read timezone from API
+            # Attempt to convert our API (Windows) timezone -> IANA timezone
+            # We'll ensure it's capatiable with pytz as well, since that's what we use everywhere
+            timezone = None
+            if (
+                (api_timezone := event.get("timezone"))
+                and (iana_tz_name := WINDOWS_TO_IANA.get(api_timezone))
+                and iana_tz_name in PYTZ_ALL_TIMEZONES
+            ):
+                timezone = iana_tz_name
 
             # Special cases for champs
             if code in EVENT_CODE_EXCEPTIONS:
@@ -182,6 +192,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                     short_name=short_name,
                     event_short=code,
                     event_type_enum=event_type,
+                    timezone_id=timezone,
                     official=official,
                     playoff_type=playoff_type,
                     start_date=start,

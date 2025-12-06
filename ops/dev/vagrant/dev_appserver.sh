@@ -87,9 +87,7 @@ else
     assert_google_application_credentials
 fi
 
-# dev_appserver doesn't support the python311 runtime yet
-# but will still point at the local system python3 binary
-runtime_version="python312"
+runtime_version="python313"
 
 set -x
 dev_appserver.py \

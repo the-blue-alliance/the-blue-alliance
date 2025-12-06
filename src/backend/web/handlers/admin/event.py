@@ -9,6 +9,7 @@ from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts.comp_level import COMP_LEVELS, COMP_LEVELS_VERBOSE_FULL
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType, TYPE_NAMES as EVENT_TYPE_NAMES
 from backend.common.consts.playoff_type import (
     PlayoffType,
@@ -92,7 +93,7 @@ def event_detail(event_key: EventKey) -> str:
                 "event": event,
                 "playoff_advancement": event.playoff_advancement,
                 "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
-                    event.year
+                    event.year, []
                 ),
                 "bracket_table": event.playoff_bracket,
             },
@@ -174,6 +175,7 @@ def event_detail(event_key: EventKey) -> str:
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "webcast_online_status": webcast_online_status,
         "nexus_queue_status": nexus_queue_status,
+        "event_sync_types": dict(EventSyncType.__members__.items()),
     }
 
     return render_template("admin/event_details.html", template_values)
@@ -190,6 +192,7 @@ def event_edit(event_key: EventKey) -> Response:
         "rankings": json.dumps(event.rankings),
         "playoff_types": PLAYOFF_TYPE_NAMES,
         "event_types": EVENT_TYPE_NAMES,
+        "event_sync_types": dict(EventSyncType.__members__.items()),
     }
     return render_template("admin/event_edit.html", template_values)
 
@@ -279,13 +282,22 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         else []
     )
 
-    website = WebsiteHelper.format_url(request.form.get("website"))
+    website = (
+        "None"
+        if request.form.get("website") == "None"
+        else WebsiteHelper.format_url(request.form.get("website"))
+    )
 
     key = str(request.form.get("year")) + str.lower(
         str(request.form.get("event_short"))
     )
     if event_key is not None and event_key != key:
         abort(400)
+
+    sync_disabled_flags = 0
+    for flag_name, flag_value in EventSyncType.__members__.items():
+        if request.form.get(f"sync_disabled::{flag_name}"):
+            sync_disabled_flags |= flag_value
 
     event = Event(
         id=key,
@@ -313,6 +325,7 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         official={"true": True, "false": False}.get(
             request.form.get("official", "false").lower()
         ),
+        disable_sync_flags=sync_disabled_flags,
         enable_predictions={"true": True, "false": False}.get(
             request.form.get("enable_predictions", "false").lower()
         ),

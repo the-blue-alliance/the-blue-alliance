@@ -1,8 +1,12 @@
-import { Link } from 'react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 
 import { Button } from '~/components/ui/button';
 
-export default function About(): React.JSX.Element {
+export const Route = createFileRoute('/about')({
+  component: About,
+});
+
+function About(): React.JSX.Element {
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-medium">About Us</h1>
@@ -55,7 +59,7 @@ export default function About(): React.JSX.Element {
           </h3>
           <p>
             <em>FIRST</em>
-            <sup>®</sup> is the world’s leading youth-serving nonprofit
+            <sup>®</sup> is the world&apos;s leading youth-serving nonprofit
             advancing STEM education. Through a suite of inclusive, team-based
             robotics programs for ages 4-18 and backed by a global network of
             mentors, coaches, volunteers, alumni, and sponsors, FIRST has a

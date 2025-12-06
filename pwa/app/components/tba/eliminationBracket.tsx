@@ -1,5 +1,5 @@
+import { Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { Link } from 'react-router';
 
 import PlayCircle from '~icons/bi/play-circle';
 

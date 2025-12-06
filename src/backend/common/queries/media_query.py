@@ -3,6 +3,7 @@ from typing import Any, cast, Generator, List
 from google.appengine.ext import ndb
 
 from backend.common.consts.media_tag import MediaTag
+from backend.common.consts.media_type import MediaType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey, Year
@@ -176,5 +177,23 @@ class TeamYearTagMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
             Media.references == team_ndb_key,
             Media.year == year,
             Media.media_tag_enum == media_tag,
+        ).fetch_async()
+        return medias
+
+
+class MediaTypeYearQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "media_type_{media_type}_{year}"
+    DICT_CONVERTER = MediaConverter
+
+    def __init__(self, media_type: MediaType, year: Year) -> None:
+        super().__init__(media_type=media_type, year=year)
+
+    @typed_tasklet
+    def _query_async(
+        self, media_type: MediaType, year: Year
+    ) -> Generator[Any, Any, List[Media]]:
+        medias = yield Media.query(
+            Media.media_type_enum == media_type, Media.year == year
         ).fetch_async()
         return medias

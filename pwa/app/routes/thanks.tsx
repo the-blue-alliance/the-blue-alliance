@@ -1,6 +1,10 @@
-import { Link } from 'react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 
-export default function Thanks(): React.JSX.Element {
+export const Route = createFileRoute('/thanks')({
+  component: Thanks,
+});
+
+function Thanks(): React.JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y **:mt-4">

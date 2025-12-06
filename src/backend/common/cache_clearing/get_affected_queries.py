@@ -152,6 +152,7 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     reference_keys = _filter(affected_refs["references"])
     years = _filter(affected_refs["year"])
     media_tags = _filter(affected_refs["media_tag_enum"])
+    media_types = _filter(affected_refs["media_type_enum"])
 
     team_keys = list(filter(lambda x: x.kind() == "Team", reference_keys))
     event_team_keys_future = (
@@ -164,6 +165,10 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
 
     queries: List[CachedDatabaseQuery] = []
     for reference_key in reference_keys:
+        for year in years:
+            for media_type in media_types:
+                queries.append(media_query.MediaTypeYearQuery(media_type, year))
+
         if reference_key.kind() == "Team":
             for year in years:
                 queries.append(media_query.TeamYearMediaQuery(reference_key.id(), year))
@@ -177,6 +182,7 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
                 queries.append(
                     media_query.TeamTagMediasQuery(reference_key.id(), media_tag)
                 )
+
             queries.append(media_query.TeamSocialMediaQuery(reference_key.id()))
         if reference_key.kind() == "Event":
             queries.append(media_query.EventMediasQuery(reference_key.id()))

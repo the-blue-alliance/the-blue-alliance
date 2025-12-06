@@ -1,6 +1,11 @@
 import { VariantProps, cva } from 'class-variance-authority';
 
 import { TeamLink } from '~/components/tba/links';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { cn } from '~/lib/utils';
 
 const teamListSubgridVariants = cva('flex items-center justify-center', {
@@ -23,12 +28,16 @@ const teamListSubgridVariants = cva('flex items-center justify-center', {
 });
 
 interface TeamListSubgridProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof teamListSubgridVariants> {
   allianceColor: 'red' | 'blue';
   teamKeys: string[];
   dq: string[];
   surrogate: string[];
+  year: number;
+  focusTeamKey?: string;
+  teamCellClassName?: string;
 }
 
 export default function TeamListSubgrid({
@@ -38,6 +47,9 @@ export default function TeamListSubgrid({
   winner,
   dq,
   surrogate,
+  year,
+  focusTeamKey,
+  teamCellClassName,
   ...props
 }: TeamListSubgridProps) {
   return (
@@ -46,13 +58,16 @@ export default function TeamListSubgrid({
         <TeamCell
           key={index}
           teamKey={teamKey}
+          year={year}
           dq={dq.includes(teamKey)}
           surrogate={surrogate.includes(teamKey)}
+          focus={focusTeamKey === teamKey}
           className={cn(
             teamListSubgridVariants({
               allianceColor,
               winner,
             }),
+            teamCellClassName,
           )}
         />
       ))}
@@ -67,6 +82,10 @@ const teamCellVariants = cva('flex items-center justify-center', {
       false: '',
     },
     surrogate: {
+      true: 'underline decoration-dashed',
+      false: '',
+    },
+    focus: {
       true: 'underline',
       false: '',
     },
@@ -74,23 +93,44 @@ const teamCellVariants = cva('flex items-center justify-center', {
   defaultVariants: {
     dq: false,
     surrogate: false,
+    focus: false,
   },
 });
 
 interface TeamCellProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof teamCellVariants> {
   teamKey: string;
+  year: number;
 }
 
-function TeamCell({ teamKey, dq, surrogate, ...props }: TeamCellProps) {
-  return (
-    <div {...props}>
-      <TeamLink teamOrKey={teamKey}>
-        <span className={cn(teamCellVariants({ dq, surrogate }))}>
-          {teamKey.substring(3)}
-        </span>
-      </TeamLink>
-    </div>
+function TeamCell({
+  teamKey,
+  year,
+  dq,
+  surrogate,
+  focus,
+  ...props
+}: TeamCellProps) {
+  const content = (
+    <TeamLink teamOrKey={teamKey} year={year}>
+      <span className={cn(teamCellVariants({ dq, surrogate, focus }))}>
+        {teamKey.substring(3)}
+      </span>
+    </TeamLink>
   );
+
+  if (dq || surrogate) {
+    return (
+      <div {...props}>
+        <Tooltip>
+          <TooltipTrigger asChild>{content}</TooltipTrigger>
+          <TooltipContent>{dq ? 'DQ' : 'Surrogate'}</TooltipContent>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  return <div {...props}>{content}</div>;
 }

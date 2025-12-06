@@ -1,6 +1,10 @@
-import { Link } from 'react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 
-export default function Add_Data(): React.JSX.Element {
+export const Route = createFileRoute('/add-data')({
+  component: AddData,
+});
+
+function AddData(): React.JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y **:mt-4">
@@ -23,7 +27,7 @@ export default function Add_Data(): React.JSX.Element {
             &quot;Event&quot; page and input the playlist link. If you&apos;re
             webcasting and archiving an event and want to directly add videos as
             they get uploaded, you can{' '}
-            <Link to="/request/apiwrite">request write keys.</Link>
+            <a href="/request/apiwrite">request write keys.</a>
           </p>
         </div>
 
@@ -53,7 +57,7 @@ export default function Add_Data(): React.JSX.Element {
           <h3 className="text-2xl">Adding a New Offseason Event</h3>
           <p>
             Do you know of an offseason event missing from TBA? You can suggest
-            an event to be added <Link to="/suggest/offseason">here</Link>. The
+            an event to be added <a href="/suggest/offseason">here</a>. The
             request will be reviewed and added shortly.
           </p>
         </div>
@@ -76,10 +80,10 @@ export default function Add_Data(): React.JSX.Element {
           <p>
             If your offseason event does <em>not</em> have FMS Sync back to
             Headquarters, that&apos;s not an issue either. You can{' '}
-            <Link to="/request/apiwrite">request write keys</Link> and post
+            <a href="/request/apiwrite">request write keys</a> and post
             individual data points during an event using the{' '}
-            <Link to="/eventwizard2">Event Wizard</Link> to get results in a
-            timely manner.
+            <a href="/eventwizard2">Event Wizard</a> to get results in a timely
+            manner.
           </p>
           <p>
             Alternately, get the FMS Reports exported before you tear down your
@@ -92,9 +96,9 @@ export default function Add_Data(): React.JSX.Element {
           <h3 className="text-2xl">FMS Reports</h3>
           <p>
             We can also import FMS Report exports into The Blue Alliance. You
-            can either <Link to="/request/apiwrite">obtain write keys</Link> and
-            use the <Link to="/eventwizard2">Event Wizard</Link> to input the
-            reports, or post them in our{' '}
+            can either <a href="/request/apiwrite">obtain write keys</a> and use
+            the <a href="/eventwizard2">Event Wizard</a> to input the reports,
+            or post them in our{' '}
             <a href="https://www.facebook.com/groups/moardata/">
               Facebook Group.
             </a>

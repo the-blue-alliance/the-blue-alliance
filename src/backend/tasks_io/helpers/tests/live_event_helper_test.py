@@ -195,8 +195,9 @@ def test_forced_live_events(status_fetch_mock: Mock) -> None:
     ]
 
 
+@patch.object(WebcastOnlineHelper, "add_online_status_async")
 @patch.object(SpecialWebcastHelper, "get_special_webcasts_with_online_status_async")
-def test_special_webcasts(special_webcast_mock: Mock) -> None:
+def test_special_webcasts(special_webcast_mock: Mock, status_fetch_mock: Mock) -> None:
     w = TSpecialWebcast(
         type=WebcastType.YOUTUBE,
         channel="abc123",
@@ -204,6 +205,7 @@ def test_special_webcasts(special_webcast_mock: Mock) -> None:
         name="Special Webcast",
     )
     special_webcast_mock.return_value = InstantFuture([w])
+    status_fetch_mock.return_value = InstantFuture(None)
 
     _, special_webcasts = LiveEventHelper.get_live_events_with_current_webcasts()
     assert special_webcasts == [w]

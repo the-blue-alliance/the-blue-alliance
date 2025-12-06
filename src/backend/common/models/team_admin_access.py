@@ -33,3 +33,12 @@ class TeamAdminAccess(ndb.Model):
     @classmethod
     def render_key_name(cls, team_number, year):
         return "frc{}_{}".format(team_number, year)
+
+    @property
+    def account_email(self) -> str | None:
+        if not self.account:
+            return None
+        account = self.account.get()
+        if not account:
+            return None
+        return account.email

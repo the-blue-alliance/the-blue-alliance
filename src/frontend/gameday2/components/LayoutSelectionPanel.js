@@ -1,8 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Paper from "material-ui/Paper";
-import { List, ListItem } from "material-ui/List";
-import EventListener from "react-event-listener";
+import Paper from "@mui/material/Paper";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+// Replaced react-event-listener with native window event listeners
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import {
   NUM_LAYOUTS,
@@ -21,13 +24,19 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
     this.layout = {
       margin: 20,
     };
+    this._boundUpdateSizing = this.updateSizing.bind(this);
   }
   componentDidMount() {
     this.updateSizing();
+    window.addEventListener("resize", this._boundUpdateSizing);
   }
 
   componentDidUpdate() {
     this.updateSizing();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this._boundUpdateSizing);
   }
 
   updateSizing() {
@@ -56,11 +65,15 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
       const layoutNum = LAYOUT_DISPLAY_ORDER[i];
       layouts.push(
         <ListItem
-          primaryText={NAME_FOR_LAYOUT[layoutNum]}
+          button
           onClick={() => this.props.setLayout(layoutNum)}
           key={i.toString()}
-          rightIcon={getLayoutSvgIcon(layoutNum)}
-        />
+        >
+          <ListItemText primary={NAME_FOR_LAYOUT[layoutNum]} />
+          <ListItemSecondaryAction>
+            {getLayoutSvgIcon(layoutNum)}
+          </ListItemSecondaryAction>
+        </ListItem>
       );
     }
 
@@ -92,7 +105,6 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
         }}
       >
         <Paper style={containerStyles}>
-          <EventListener target="window" onResize={() => this.updateSizing()} />
           <h3 style={titleStyle}>Select a layout</h3>
           <div
             ref={(e) => {

@@ -67,6 +67,10 @@ from backend.web.handlers.team import (
 from backend.web.handlers.team_admin import (
     blueprint as team_admin,
 )
+from backend.web.handlers.team_threads import (
+    team_threads,
+    team_threads_canonical,
+)
 from backend.web.handlers.webcasts import webcast_list
 from backend.web.handlers.webhooks import (
     blueprint as webhooks,
@@ -78,7 +82,7 @@ configure_logging()
 
 app = Flask(__name__)
 app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
-install_middleware(app, configure_secret_key=True)
+install_middleware(app, configure_secret_key=True, include_appspot_redirect=True)
 install_url_converters(app)
 configure_flask_cache(app)
 
@@ -116,8 +120,8 @@ app.add_url_rule(
 )
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 
-app.add_url_rule("/eventwizard", view_func=eventwizard)
-app.add_url_rule("/eventwizard2", view_func=eventwizard2)
+app.add_url_rule("/eventwizard_legacy", view_func=eventwizard)
+app.add_url_rule("/eventwizard", view_func=eventwizard2)
 
 app.add_url_rule("/match/<match_key>", view_func=match_detail)
 
@@ -126,6 +130,8 @@ app.add_url_rule("/team/<int:team_number>/<int:year>", view_func=team_detail)
 app.add_url_rule("/team/<int:team_number>/history", view_func=team_history)
 app.add_url_rule("/teams/<int:page>", view_func=team_list)
 app.add_url_rule("/teams", view_func=team_list, defaults={"page": 1})
+app.add_url_rule("/team-threads", view_func=team_threads_canonical)
+app.add_url_rule("/team-threads/<int:year>", view_func=team_threads)
 
 app.add_url_rule("/avatars", view_func=avatar_list)
 app.add_url_rule("/avatars/<int:year>", view_func=avatar_list)

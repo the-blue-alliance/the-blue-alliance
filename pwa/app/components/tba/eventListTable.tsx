@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link } from '@tanstack/react-router';
 
 import MdiVideo from '~icons/mdi/video';
 
@@ -29,7 +29,11 @@ export default function EventListTable({ events }: { events: Event[] }) {
         {events.map((event) => (
           <TableRow key={event.key}>
             <TableCell className="w-8/12">
-              <Link className="text-base" to={`/event/${event.key}`}>
+              <Link
+                className="text-base"
+                to="/event/$eventKey"
+                params={{ eventKey: event.key }}
+              >
                 {event.name}
               </Link>
               <div className="text-sm text-neutral-600">
@@ -38,9 +42,9 @@ export default function EventListTable({ events }: { events: Event[] }) {
             </TableCell>
             <TableCell className="mt-2 flex justify-center md:mt-1">
               {event.webcasts.length > 0 && (
-                <Button className="cursor-pointer" asChild variant="success">
-                  <Link
-                    to={`https://www.thebluealliance.com/gameday/${event.key}`}
+                <Button asChild variant="success">
+                  <a
+                    href={`https://www.thebluealliance.com/gameday/${event.key}`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -48,7 +52,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
                       <MdiVideo />
                       <span className="hidden md:contents">Watch Now</span>
                     </InlineIcon>
-                  </Link>
+                  </a>
                 </Button>
               )}
             </TableCell>

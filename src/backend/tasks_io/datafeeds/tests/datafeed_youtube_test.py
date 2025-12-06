@@ -42,7 +42,7 @@ def test_get_online_status(
     api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, youtube_api_secrets
 ) -> None:
     api_response = URLFetchResult.mock_for_content(
-        "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=abc123",
+        "https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=abc123&key=test",
         200,
         "{}",
     )

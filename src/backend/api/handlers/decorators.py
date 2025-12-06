@@ -32,6 +32,8 @@ def api_authenticated(func):
                 auth = ApiAuthAccess.get_by_id(auth_key)
                 if auth:
                     auth_owner_id = auth.owner.id() if auth.owner else None
+                    # Set for our GA event tracking in `track_call_after_response`
+                    g.auth_description = auth.description
                 else:
                     return (
                         {

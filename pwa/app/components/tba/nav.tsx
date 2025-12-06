@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link } from '@tanstack/react-router';
 
 import BiBarChartLineFill from '~icons/bi/bar-chart-line-fill';
 import BiCameraVideoFill from '~icons/bi/camera-video-fill';
@@ -25,26 +25,41 @@ import {
 } from '~/components/ui/popover';
 import lamp from '~/images/tba/tba-lamp.svg';
 import { cn } from '~/lib/utils';
+import { FileRouteTypes } from '~/routeTree.gen';
 
 interface MenuItemProps {
   className?: string;
-  route?: string;
+  to?: FileRouteTypes['to'];
+  params?: Record<string, string>;
+  href?: string;
   icon: React.ReactNode;
   title: string;
 }
 
-export const MenuItem = ({ className, icon, title, route }: MenuItemProps) => {
+export const MenuItem = ({
+  className,
+  icon,
+  title,
+  to,
+  href,
+  params,
+}: MenuItemProps) => {
   return (
     <NavigationMenuItem className={className}>
       <NavigationMenuLink
         className={navigationMenuTriggerStyle() + ' cursor-pointer'}
         asChild
       >
-        {route ? (
-          <Link to={route} className="hover:no-underline">
+        {to ? (
+          <Link to={to} params={params} className="hover:no-underline">
             {icon}
             <div className="hidden pl-2 sm:block">{title}</div>
           </Link>
+        ) : href ? (
+          <a href={href} className="hover:no-underline">
+            {icon}
+            <div className="hidden pl-2 sm:block">{title}</div>
+          </a>
         ) : (
           <div>
             {icon}
@@ -60,7 +75,9 @@ export const DropMenuItem = ({
   className,
   icon,
   title,
-  route,
+  to,
+  href,
+  params,
 }: MenuItemProps) => {
   return (
     <NavigationMenuItem
@@ -79,15 +96,21 @@ export const DropMenuItem = ({
         }
         asChild
       >
-        {route ? (
+        {to ? (
           <Link
-            to={route}
+            to={to}
+            params={params}
             className="flex grow flex-row flex-wrap content-between items-center
               justify-start px-2 text-white hover:no-underline"
           >
             {icon}
             <div className="pl-2 antialiased">{title}</div>
           </Link>
+        ) : href ? (
+          <a href={href} className="hover:no-underline">
+            {icon}
+            <div className="pl-2 antialiased">{title}</div>
+          </a>
         ) : (
           <div
             className="flex grow flex-row flex-wrap content-between items-center
@@ -125,7 +148,11 @@ export const Nav = () => {
         </Link>
         <NavigationMenuList className="flex w-full grow">
           <MenuItem icon={<BiStarFill />} title="myTBA" />
-          <MenuItem icon={<IonCalendar />} title="Events" route="/events" />
+          <MenuItem
+            icon={<IonCalendar />}
+            title="Events"
+            to="/events/{-$year}"
+          />
           <MenuItem
             className="hidden md:block"
             icon={<BiPeopleFill />}
@@ -135,12 +162,13 @@ export const Nav = () => {
             className="hidden md:block"
             icon={<BiCameraVideoFill />}
             title="GameDay"
+            to="/gameday"
           />
           <MenuItem
             className="hidden md:block"
             icon={<BiBarChartLineFill />}
             title="Insights"
-            route="/insights"
+            to="/insights/{-$year}"
           />
           <Popover>
             <PopoverTrigger>
@@ -159,24 +187,28 @@ export const Nav = () => {
                 className="lg:hidden"
                 icon={<BiPeopleFill />}
                 title="Teams"
-                route="/teams"
               />
               <DropMenuItem
                 className="lg:hidden"
                 icon={<BiCameraVideoFill />}
                 title="GameDay"
+                to="/gameday"
               />
               <DropMenuItem
                 className="lg:hidden"
                 icon={<BiBarChartLineFill />}
                 title="Insights"
-                route="/insights"
+                to="/insights/{-$year}"
               />
-              <DropMenuItem icon={<BiPencilFill />} title="Blog" />
+              <DropMenuItem
+                icon={<BiPencilFill />}
+                title="Blog"
+                href="https://blog.thebluealliance.com"
+              />
               <DropMenuItem
                 icon={<BiGearFill />}
                 title="Account"
-                route="/account"
+                to="/account"
               />
             </PopoverContent>
           </Popover>

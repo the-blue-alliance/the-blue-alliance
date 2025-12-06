@@ -1,3 +1,4 @@
+import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 
 import BiBellFill from '~icons/bi/bell-fill';
@@ -7,7 +8,11 @@ import SignInWithAppleButton from '~/components/tba/auth/signInWithAppleButton';
 import SignInWithGoogleButton from '~/components/tba/auth/signInWithGoogleButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 
-export default function Account(): React.JSX.Element {
+export const Route = createFileRoute('/account')({
+  component: Account,
+});
+
+function Account(): React.JSX.Element {
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-medium">

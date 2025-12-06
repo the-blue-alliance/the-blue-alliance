@@ -2,34 +2,36 @@
   "name": "tba-react",
   "version": "0.0.0",
   "engines": {
-    "node": "^18"
+    "node": "^24"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.3.5",
+    "@mui/material": "^7.3.5",
     "classnames": "^2.5.1",
     "element-resize-event": "^3.0.6",
-    "firebase": "^11.1.0",
+    "firebase": "^12.6.0",
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
-    "less-loader": "^12.2.0",
-    "material-ui": "^0.20.2",
-    "prettier": "^3.4.2",
+    "less-loader": "^12.3.0",
+    "prettier": "^3.7.3",
     "prop-types": "^15.8.1",
-    "query-string": "^9.1.1",
-    "react": "^18.3.1",
-    "react-addons-transition-group": "^15.4.1",
-    "react-bootstrap": "^2.10.7",
-    "react-bootstrap-typeahead": "^6.3.4",
+    "query-string": "^9.3.1",
+    "react": "^19.2.0",
+    "react-bootstrap": "^2.10.10",
+    "react-bootstrap-typeahead": "^6.4.1",
     "react-countup": "^6.5.3",
-    "react-dom": "^18.3.1",
-    "react-event-listener": "^0.6.6",
-    "react-file-input": "^0.2.5",
-    "react-ga": "^3.3.1",
+    "react-dom": "^19.2.0",
+    "react-ga4": "^2.1.0",
     "react-redux": "^9.2.0",
-    "react-select": "^5.9.0",
-    "redux": "^4.2.1",
-    "redux-thunk": "^2.4.2",
+    "react-select": "^5.10.2",
+    "react-transition-group": "^4.4.5",
+    "redux": "^5.0.1",
+    "redux-thunk": "^3.1.0",
     "reselect": "^5.1.1",
-    "swagger-ui": "5.18.2"
+    "swagger-ui": "file:/./src/frontend/lib/swagger-ui-5.31.0-dev.tgz",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
@@ -37,15 +39,23 @@
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.28.5",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/md5": "^2.3.5",
+    "@types/react": "^19.0.6",
+    "@types/react-dom": "^19.0.2",
+    "@types/react-redux": "^7.1.34",
     "babel-loader": "^9.2.1",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.1.0",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^4.2.2",
-    "eslint": "^8.57.0",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.2",
     "eslint-plugin-react": "^7.37.4",
-    "jest-cli": "^29.7.0",
+    "jest-cli": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "jest-puppeteer": "^11.0.0",
     "less": "4.2.1",
     "md5": "^2.3.0",
@@ -54,7 +64,9 @@
     "process": "^0.11.10",
     "puppeteer": "^23.11.1",
     "style-loader": "^4.0.0",
-    "webpack": "^5.97.1",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.7.2",
+    "webpack": "^5.103.0",
     "webpack-cli": "^6.0.1"
   },
   "scripts": {
@@ -78,6 +90,58 @@
       "<rootDir>/node_modules/react-test-renderer/",
       "<rootDir>/node_modules/react-addons-test-utils/",
       "<rootDir>/node_modules/enzyme/"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": [
+        "babel-jest",
+        {
+          "presets": [
+            [
+              "@babel/preset-env",
+              {
+                "targets": {
+                  "node": "current"
+                }
+              }
+            ],
+            "@babel/preset-react",
+            "@babel/preset-typescript"
+          ],
+          "plugins": [
+            "@babel/plugin-proposal-class-properties"
+          ]
+        }
+      ],
+      "^.+\\.jsx?$": [
+        "babel-jest",
+        {
+          "presets": [
+            [
+              "@babel/preset-env",
+              {
+                "targets": {
+                  "node": "current"
+                }
+              }
+            ],
+            "@babel/preset-react"
+          ],
+          "plugins": [
+            "@babel/plugin-proposal-class-properties"
+          ]
+        }
+      ]
+    },
+    "testMatch": [
+      "**/__tests__/**/*.(test|spec).(js|ts|tsx)",
+      "**/*.(test|spec).(js|ts|tsx)"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
     ],
     "coverageDirectory": "./.node_coverage/",
     "collectCoverage": true,

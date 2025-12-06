@@ -24,7 +24,7 @@ import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
-import { cn, joinComponents, pluralize } from '~/lib/utils';
+import { cn, pluralize } from '~/lib/utils';
 
 export default function TeamEventAppearance({
   event,
@@ -51,7 +51,7 @@ export default function TeamEventAppearance({
 
   return (
     <div className="flex flex-wrap gap-x-8" id={event.key}>
-      <div className="w-full md:w-[30%]">
+      <div className="w-full md:w-[32%]">
         <h2 className="text-2xl font-medium">
           <EventLink eventOrKey={event.key}>{event.name}</EventLink>
         </h2>
@@ -76,6 +76,7 @@ export default function TeamEventAppearance({
         <div className="mt-4" />
 
         <TeamStatus
+          event={event}
           status={status}
           team={team}
           awards={awards}
@@ -101,6 +102,7 @@ export default function TeamEventAppearance({
             END_OF_DAY_BREAKER,
             CHANGE_IN_COMP_LEVEL_BREAKER,
           ]}
+          focusTeamKey={team.key}
         />
       </div>
     </div>
@@ -108,12 +110,14 @@ export default function TeamEventAppearance({
 }
 
 function TeamStatus({
+  event,
   status,
   team,
   awards,
   maybeDistrictPoints,
   maybeAlliances,
 }: {
+  event: Event;
   status: TeamEventStatus | null;
   team: Team;
   awards: Award[];
@@ -127,7 +131,11 @@ function TeamStatus({
           <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
             <dt className="font-medium text-gray-900">Rank</dt>
             <dd className="text-gray-700 sm:col-span-2">
-              {status.qual.ranking.rank} / {status.qual.num_teams}
+              <span className="font-bold">{status.qual.ranking.rank}</span>
+              <span className="text-muted-foreground">
+                {' '}
+                of {status.qual.num_teams}
+              </span>
             </dd>
           </div>
         )}
@@ -193,16 +201,17 @@ function TeamStatus({
               {status.alliance.name}
             </dt>
             <dd className="text-gray-700 sm:col-span-2">
-              {joinComponents(
-                maybeAlliances
+              <div className="flex flex-wrap gap-1">
+                {maybeAlliances
                   .find((a) => a.picks.includes(team.key))
                   ?.picks.map((k) => (
-                    <TeamLink key={k} teamOrKey={k}>
-                      {k.substring(3)}
+                    <TeamLink key={k} teamOrKey={k} year={event.year}>
+                      <Badge key={k} variant={'outline'}>
+                        {k.substring(3)}
+                      </Badge>
                     </TeamLink>
-                  )) ?? [],
-                '-',
-              )}
+                  ))}
+              </div>
             </dd>
           </div>
         )}
@@ -229,38 +238,41 @@ function DistrictPointsTable({
 }) {
   return (
     <div className="flow-root">
-      <dl className="-my-0 divide-y divide-gray-200 text-sm">
-        <div className="grid grid-cols-1 gap-1 py-1 sm:grid-cols-3 sm:gap-4">
-          <dt className="font-medium text-gray-900">Quals</dt>
-          <dd className="text-gray-700 sm:col-span-2">
+      <dl className="my-0 text-sm">
+        <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
+          <dt className="col-span-1 font-medium text-gray-900">Quals</dt>
+          <dd className="col-span-2 text-right text-gray-700">
             {districtPoints.qual_points}
           </dd>
         </div>
 
-        <div className="grid grid-cols-1 gap-1 py-1 sm:grid-cols-3 sm:gap-4">
-          <dt className="font-medium text-gray-900">Alliance</dt>
-          <dd className="text-gray-700 sm:col-span-2">
+        <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
+          <dt className="col-span-1 font-medium text-gray-900">Alliance</dt>
+          <dd className="col-span-2 text-right text-gray-700">
             {districtPoints.alliance_points}
           </dd>
         </div>
 
-        <div className="grid grid-cols-1 gap-1 py-1 sm:grid-cols-3 sm:gap-4">
-          <dt className="font-medium text-gray-900">Playoff</dt>
-          <dd className="text-gray-700 sm:col-span-2">
+        <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
+          <dt className="col-span-1 font-medium text-gray-900">Playoff</dt>
+          <dd className="col-span-2 text-right text-gray-700">
             {districtPoints.elim_points}
           </dd>
         </div>
 
-        <div className="grid grid-cols-1 gap-1 py-1 sm:grid-cols-3 sm:gap-4">
-          <dt className="font-medium text-gray-900">Award</dt>
-          <dd className="text-gray-700 sm:col-span-2">
+        <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
+          <dt className="col-span-1 font-medium text-gray-900">Award</dt>
+          <dd className="col-span-2 text-right text-gray-700">
             {districtPoints.award_points}
           </dd>
         </div>
 
-        <div className="grid grid-cols-1 gap-1 py-1 sm:grid-cols-3 sm:gap-4">
-          <dt className="font-medium text-gray-900">Total</dt>
-          <dd className="font-bold text-gray-700 sm:col-span-2">
+        <div
+          className="grid grid-cols-3 gap-2 border-t-2 border-gray-300 py-0.5
+            pt-1"
+        >
+          <dt className="col-span-1 font-semibold text-gray-900">Total</dt>
+          <dd className="col-span-2 text-right font-bold text-gray-900">
             {districtPoints.total}
           </dd>
         </div>

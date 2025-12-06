@@ -1,5 +1,5 @@
+import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
 
 import { SearchIndex } from '~/api/tba/read';
 import { EventLink, TeamLink } from '~/components/tba/links';
@@ -114,7 +114,7 @@ export default function Searchbar() {
               <CommandItem
                 key={team.key}
                 onSelect={() => {
-                  void navigate(`/team/${team.key.substring(3)}`);
+                  void navigate({ to: `/team/${team.key.substring(3)}` });
                   setIsOpen(false);
                 }}
                 asChild
@@ -133,7 +133,7 @@ export default function Searchbar() {
               <CommandItem
                 key={event.key}
                 onSelect={() => {
-                  void navigate(`/event/${event.key}`);
+                  void navigate({ to: `/event/${event.key}` });
                   setIsOpen(false);
                 }}
               >

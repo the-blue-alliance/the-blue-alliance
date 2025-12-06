@@ -1,4 +1,3 @@
-/* eslint-disable react/no-danger */
 import React from "react";
 import { webcastPropType } from "../../utils/webcastUtils";
 

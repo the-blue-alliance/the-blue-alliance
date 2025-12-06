@@ -1,7 +1,8 @@
 import { Schema, ValidateEnv } from '@julr/vite-plugin-validate-env';
-import { reactRouter } from '@react-router/dev/vite';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import viteReact from '@vitejs/plugin-react';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
 import { defineConfig } from 'vite';
@@ -17,8 +18,15 @@ function getCommitHash(): string {
 
 export default defineConfig({
   plugins: [
-    reactRouter(),
     tsconfigPaths(),
+    tanstackStart({
+      srcDirectory: 'app',
+    }),
+    viteReact({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
     tailwindcss(),
     Icons({
       compiler: 'jsx',
@@ -35,6 +43,7 @@ export default defineConfig({
     }),
   ],
   build: {
+    outDir: 'build',
     sourcemap: true,
   },
   define: {

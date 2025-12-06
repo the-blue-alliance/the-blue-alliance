@@ -3,13 +3,10 @@ set -e
 
 source ops/dev/vagrant/config.sh
 
-project=$(project)
+PROJECT_ID=$(project)
+export PROJECT_ID
 
-firebase emulators:start --project="$project" &
+cd ops/dev/firebase
+npm i
 
-# Give the emualtor a second to boot before inserting users
-sleep 500
-
-python ops/dev/vagrant/create_auth_emulator_accounts.py --project="$project"
-
-fg
+./start.sh

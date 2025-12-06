@@ -24,6 +24,8 @@ class EventShortNameHelper:
             codes.add("FIT")
         if "IN" in codes:  # IN and FIN used interchangeably
             codes.add("FIN")
+        if "CHS" in codes:  # CHS and FCH used interchangeably
+            codes.add("FCH")
         return codes
 
     @classmethod

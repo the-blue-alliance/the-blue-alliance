@@ -14,6 +14,39 @@
     }
   ],
   "paths": {
+    "/event/{eventKey}/info": {
+      "get": {
+        "tags": [
+          "Event Details"
+        ],
+        "summary": "Fetch top-level admin properties for the event",
+        "description": "An endpoint to fetch the current value of the event info. This lets you fetch the current value of fields that are settable via /event/{eventKey}/info/update",
+        "operationId": "getEventInfo",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventInfo"
+                }
+              } 
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
     "/event/{eventKey}/info/update": {
       "post": {
         "tags": [
@@ -528,7 +561,8 @@
           },
           "playoff_type": {
             "type": "integer",
-            "description": "Integer constant representing the playoff format. References constants here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py",
+            "nullable": true,
+            "description": "Integer constant representing the playoff format. References constants defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/playoff_type.py#L37",
             "example": "0"
           },
           "webcasts": {
@@ -560,6 +594,27 @@
             "type": "string",
             "description": "Timezone name for the event",
             "example": "America/New_York"
+          },
+          "disable_sync": {
+            "type": "object",
+            "description": "flags controlling disabling certain aspects of sync",
+            "properties": {
+              "event_alliances": {
+                "type": "boolean"
+              },
+              "event_rankings": {
+                "type": "boolean"
+              },
+              "event_qual_matches": {
+                "type": "boolean"
+              },
+              "event_playoff_matches": {
+                "type": "boolean"
+              },
+              "event_awards": {
+                "type": "boolean"
+              }
+            }
           }
         }
       },

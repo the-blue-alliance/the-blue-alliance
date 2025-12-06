@@ -25,10 +25,9 @@ function getStyles(props, state) {
 
 export default class SwapPositionPreviewCell extends React.Component {
   static propTypes = {
-    /* eslint-disable react/no-unused-prop-types */
     style: PropTypes.object.isRequired,
     enabled: PropTypes.bool.isRequired,
-    /* eslint-enable react/no-unused-prop-types */
+
     onClick: PropTypes.func.isRequired,
   };
 

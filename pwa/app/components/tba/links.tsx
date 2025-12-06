@@ -1,7 +1,8 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import React from 'react';
-import { Link } from 'react-router';
 
-import { Event, Team } from '~/api/tba/read';
+import { Event, Match, Team } from '~/api/tba/read';
 import { removeNonNumeric } from '~/lib/utils';
 
 const TeamLink = React.forwardRef<
@@ -26,12 +27,16 @@ TeamLink.displayName = 'TeamLink';
 
 const EventLink = React.forwardRef<
   HTMLAnchorElement,
-  React.PropsWithChildren<{
-    eventOrKey: Event | string;
-  }>
+  React.PropsWithChildren<
+    {
+      eventOrKey: Event | string;
+    } & React.AnchorHTMLAttributes<HTMLAnchorElement>
+  >
 >(({ eventOrKey, ...props }, ref) => {
   const eventKey = typeof eventOrKey === 'string' ? eventOrKey : eventOrKey.key;
-  return <Link to={`/event/${eventKey}`} {...props} ref={ref} />;
+  return (
+    <Link to="/event/$eventKey" params={{ eventKey }} {...props} ref={ref} />
+  );
 });
 EventLink.displayName = 'EventLink';
 
@@ -59,4 +64,62 @@ const LocationLink = React.forwardRef<
 });
 LocationLink.displayName = 'LocationLink';
 
-export { TeamLink, EventLink, LocationLink };
+const MatchLink = React.forwardRef<
+  HTMLAnchorElement,
+  {
+    matchOrKey: Match | string;
+    event?: Event;
+    children: React.ReactNode;
+    noModal?: boolean;
+  }
+>(({ matchOrKey, event, children, noModal, ...props }, ref) => {
+  const queryClient = useQueryClient();
+  const isMatch = typeof matchOrKey !== 'string';
+  const matchKey = isMatch ? matchOrKey.key : matchOrKey;
+
+  const handleClick = () => {
+    // Prepopulate the query cache with the match and event data
+    if (isMatch) {
+      queryClient.setQueryData(['match', matchKey], { data: matchOrKey });
+    }
+    if (event) {
+      queryClient.setQueryData(['event', event.key], { data: event });
+    }
+  };
+
+  if (noModal) {
+    return (
+      <Link
+        to="/match/$matchKey"
+        params={{ matchKey }}
+        {...props}
+        ref={ref}
+        onClick={handleClick}
+      >
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      to="."
+      search={(prev) => ({ ...prev, matchKey })}
+      mask={{
+        to: '/match/$matchKey',
+        params: { matchKey },
+        unmaskOnReload: true,
+      }}
+      replace={true}
+      resetScroll={false}
+      onClick={handleClick}
+      {...props}
+      ref={ref}
+    >
+      {children}
+    </Link>
+  );
+});
+MatchLink.displayName = 'MatchLink';
+
+export { EventLink, LocationLink, MatchLink, TeamLink };

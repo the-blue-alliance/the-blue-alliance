@@ -116,7 +116,7 @@ def test_accespt_suggestion(
     suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(web_client, suggestion_id)
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["verdict"] = "accept"
     response = web_client.post(
@@ -147,7 +147,7 @@ def test_reject_suggestion(
     suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(web_client, suggestion_id)
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["verdict"] = "reject"
     response = web_client.post(
@@ -181,7 +181,7 @@ def test_existing_auth_keys(
     suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(web_client, suggestion_id)
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["verdict"] = "accept"
     response = web_client.post(
@@ -201,7 +201,7 @@ def test_accept_suggestion_with_different_auth_types(
     suggestion_id = createSuggestion(login_user_with_permission)
     queue, form_fields = get_suggestion_queue_and_fields(web_client, suggestion_id)
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["auth_types"] = [AuthType.MATCH_VIDEO.value, AuthType.EVENT_TEAMS.value]
     form_fields["verdict"] = "accept"

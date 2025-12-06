@@ -1,63 +1,58 @@
-from typing import Optional
+import logging
+import uuid
+
+import requests
 
 from backend.common.run_after_response import run_after_response
 
 
 class GoogleAnalytics:
     """
-    Class that manages sending information to Google Analytics
+    Class that manages sending information to Google Analytics 4 (GA4)
 
-    For more information about GAnalytics Protocol Parameters, visit
-    https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
+    For more information about GA4 Measurement Protocol, visit
+    https://developers.google.com/analytics/devguides/collection/protocol/ga4
     """
 
     @classmethod
     def track_event(
         cls,
         client_id: str,
-        event_category: str,
-        event_action: str,
-        event_label: Optional[str] = None,
-        event_value: Optional[int] = None,
+        event_name: str,
+        event_params: dict,
         run_after: bool = False,
     ) -> None:
         from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
 
         google_analytics_id = GoogleAnalyticsID.google_analytics_id()
-
         if not google_analytics_id:
-            import logging
-
             logging.warning(
-                "Missing sitevar: google_analytics.id. Can't track API usage."
+                "Missing sitevar: google_analytics.id GOOGLE_ANALYTICS_ID. Can't track API usage."
             )
             return
 
-        import uuid
+        api_secret = GoogleAnalyticsID.api_secret()
+        if not api_secret:
+            logging.warning(
+                "Missing sitevar: google_analytics.id API_SECRET. Can't track API usage."
+            )
+            return
 
-        cid = uuid.uuid3(uuid.NAMESPACE_X500, str(client_id))
-
-        params = {
-            "v": 1,
-            "tid": google_analytics_id,
-            "cid": str(cid),
-            "t": "event",
-            "ec": event_category,
-            "ea": event_action,
-            "cd1": client_id,  # custom dimension 1 is the raw client ID
-            "ni": 1,
-            "sc": "end",  # forces tracking session to end
+        payload = {
+            "client_id": str(uuid.uuid3(uuid.NAMESPACE_X500, str(client_id))),
+            "events": [
+                {
+                    "name": event_name,
+                    "params": event_params,
+                }
+            ],
         }
-        if event_label:
-            params["el"] = event_label
-        if event_value:
-            params["ev"] = event_value
 
         def make_request():
-            import requests
-
-            requests.get(
-                "https://www.google-analytics.com/collect", params=params, timeout=10
+            requests.post(
+                f"https://www.google-analytics.com/mp/collect?measurement_id={google_analytics_id}&api_secret={api_secret}",
+                json=payload,
+                timeout=10,
             )
 
         if run_after:

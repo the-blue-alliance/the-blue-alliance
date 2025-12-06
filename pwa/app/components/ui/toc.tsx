@@ -1,10 +1,9 @@
+import { Link } from '@tanstack/react-router';
 import * as React from 'react';
-import { Link } from 'react-router';
 
 import { cn } from '~/lib/utils';
 
-interface TableOfContentsListProps
-  extends React.ComponentPropsWithoutRef<'ul'> {
+interface TableOfContentsListProps extends React.ComponentPropsWithoutRef<'ul'> {
   indent?: boolean;
 }
 
@@ -32,8 +31,7 @@ const TableOfContentsTitle = React.forwardRef<
 ));
 TableOfContentsTitle.displayName = 'TableOfContentsTitle';
 
-interface TableOfContentsItemProps
-  extends React.ComponentPropsWithoutRef<'li'> {
+interface TableOfContentsItemProps extends React.ComponentPropsWithoutRef<'li'> {
   indent?: boolean;
 }
 
@@ -49,8 +47,9 @@ const TableOfContentsItem = React.forwardRef<
 ));
 TableOfContentsItem.displayName = 'TableOfContentsItem';
 
-interface TableOfContentsLinkProps
-  extends React.ComponentPropsWithoutRef<typeof Link> {
+interface TableOfContentsLinkProps extends React.ComponentPropsWithoutRef<
+  typeof Link
+> {
   isActive?: boolean;
 }
 
