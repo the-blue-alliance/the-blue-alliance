@@ -104,8 +104,8 @@ export function MatchRow({
       >
         {/* Play Button */}
         <div
-          className="row-span-2 flex items-center justify-center xl:col-span-1
-            xl:row-span-1"
+          className="row-span-2 flex items-center justify-center rounded-tl-lg
+            bg-gray-100 xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
         >
           {maybeVideoURL && (
             <Link to={maybeVideoURL}>
@@ -116,8 +116,8 @@ export function MatchRow({
 
         {/* Match Name */}
         <div
-          className="row-span-2 flex items-center justify-center p-2
-            xl:col-span-2 xl:row-span-1"
+          className="row-span-2 flex items-center justify-center rounded-tr-lg
+            bg-gray-100 p-2 xl:col-span-2 xl:row-span-1 xl:rounded-r-lg"
         >
           <span className="text-center text-sm">
             <MatchLink matchOrKey={match} event={event}>
