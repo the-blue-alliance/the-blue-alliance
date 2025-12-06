@@ -61,7 +61,7 @@ function MatchPage() {
 
   return (
     <div>
-      <h1 className="mt-5 text-4xl">
+      <h1 className="mt-8 mb-4 text-4xl">
         {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}{' '}
         <small className="text-xl">
           <EventLink eventOrKey={event}>

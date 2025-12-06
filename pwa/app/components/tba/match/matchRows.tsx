@@ -202,6 +202,116 @@ export function MatchRow({
   );
 }
 
+// Used on match pages, omits the play button and match title
+export function SimpleMatchRow({
+  match,
+  year,
+}: {
+  match: Match;
+  year: number;
+}) {
+  const isPlayed =
+    match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+
+  return (
+    <div>
+      {/* 3x4 grid with header row */}
+      <div
+        className="mx-auto grid w-full max-w-6xl grid-cols-[repeat(4,1fr)]
+          grid-rows-[auto_repeat(2,2.5em)] gap-x-1 text-sm"
+      >
+        {/* Header: Teams */}
+        <div
+          className="col-span-3 col-start-1 row-start-1 flex items-center
+            justify-center text-sm font-semibold"
+        >
+          Teams
+        </div>
+
+        {/* Header: Score */}
+        <div
+          className="col-start-4 row-start-1 flex items-center justify-center
+            text-sm font-semibold"
+        >
+          Score
+        </div>
+
+        {/* Red Team Players - Subgrid Component */}
+        <TeamListSubgrid
+          teamKeys={match.alliances.red.team_keys}
+          allianceColor="red"
+          className="col-span-3 col-start-1 row-start-2"
+          winner={match.winning_alliance === 'red'}
+          dq={match.alliances.red.dq_team_keys}
+          surrogate={match.alliances.red.surrogate_team_keys}
+          year={year}
+          teamCellClassName="xl:first:rounded-bl-none xl:last:rounded-br-none"
+        />
+
+        {/* Blue Team Players - Subgrid Component */}
+        <TeamListSubgrid
+          teamKeys={match.alliances.blue.team_keys}
+          allianceColor="blue"
+          className="col-span-3 col-start-1 row-start-3"
+          winner={match.winning_alliance === 'blue'}
+          dq={match.alliances.blue.dq_team_keys}
+          surrogate={match.alliances.blue.surrogate_team_keys}
+          year={year}
+          teamCellClassName="xl:first:rounded-tl-none xl:last:rounded-tr-none"
+        />
+
+        {!isPlayed && (
+          <div
+            className="col-start-4 row-span-2 row-start-2 flex items-center
+              justify-center"
+          >
+            <span>
+              {match.predicted_time &&
+                new Date(match.predicted_time * 1000).toLocaleTimeString(
+                  'en-US',
+                  {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    weekday: 'short',
+                    hour12: true,
+                  },
+                )}
+            </span>
+          </div>
+        )}
+
+        {/* Red Score */}
+        {isPlayed && (
+          <ScoreCell
+            score={match.alliances.red.score}
+            allianceColor="red"
+            className="col-start-4 row-start-2 xl:rounded-br-none
+              xl:rounded-bl-none"
+            winner={match.winning_alliance === 'red'}
+            scoreBreakdown={match.score_breakdown?.red}
+            year={year}
+            compLevel={match.comp_level}
+          />
+        )}
+
+        {/* Blue Score */}
+        {isPlayed && (
+          <ScoreCell
+            score={match.alliances.blue.score}
+            allianceColor="blue"
+            className="col-start-4 row-start-3 xl:rounded-tl-none
+              xl:rounded-tr-none"
+            winner={match.winning_alliance === 'blue'}
+            scoreBreakdown={match.score_breakdown?.blue}
+            year={year}
+            compLevel={match.comp_level}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
   if (match.videos.length === 0) {
     return undefined;
