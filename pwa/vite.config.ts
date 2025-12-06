@@ -22,7 +22,11 @@ export default defineConfig({
     tanstackStart({
       srcDirectory: 'app',
     }),
-    viteReact(),
+    viteReact({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
     tailwindcss(),
     Icons({
       compiler: 'jsx',

@@ -46,6 +46,7 @@ updates:
         - "@vitest/coverage-v8"
         - "@julr/vite-plugin-validate-env"
         - "@vitejs/plugin-react"
+        - "babel-plugin-react-compiler"
     linting:
       patterns:
         - "@eslint/*"
