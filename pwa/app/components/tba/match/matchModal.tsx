@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter, useSearch } from '@tanstack/react-router';
+import { MatchLink } from 'app/components/tba/links';
 import { Suspense, useRef } from 'react';
 
 import { getEvent, getMatch } from '~/api/tba/read';
@@ -90,9 +91,11 @@ function MatchModalContent({ matchKey }: { matchKey: string }) {
     <>
       <CredenzaHeader>
         <CredenzaTitle>
-          {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}
-          {' - '}
-          {event.name} {event.year}
+          <MatchLink matchOrKey={match} event={event} noModal>
+            {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}
+            {' - '}
+            {event.name} {event.year}
+          </MatchLink>
         </CredenzaTitle>
       </CredenzaHeader>
       <CredenzaBody className="max-h-[80vh] overflow-y-auto">
