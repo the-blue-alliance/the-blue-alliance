@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 from google.appengine.ext import ndb
 
@@ -15,7 +14,7 @@ from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
 
 
-def _create_one_of_each_mytba_model() -> List[MyTBAModel]:
+def _create_one_of_each_mytba_model() -> list[MyTBAModel]:
     e1 = Event(
         id="2020miket",
         year=2020,

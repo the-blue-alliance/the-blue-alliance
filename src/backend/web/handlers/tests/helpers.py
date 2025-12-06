@@ -1,7 +1,8 @@
 import json
 import re
+from collections.abc import Generator
 from datetime import datetime, timedelta
-from typing import Generator, List, NamedTuple, Optional, Tuple
+from typing import NamedTuple
 
 import bs4
 from google.appengine.ext import ndb
@@ -17,28 +18,26 @@ from backend.common.models.team import Team
 
 
 class TeamCurrentEvent(NamedTuple):
-    event_key: Optional[str]
-    webcast: Optional[Tuple[str, str]]  # (link, text)
-    currently_competing: Optional[str]
-    upcoming_matches: Optional[bool]
+    event_key: str | None
+    webcast: tuple[str, str] | None  # (link, text)
+    currently_competing: str | None
+    upcoming_matches: bool | None
 
 
 class TeamInfo(NamedTuple):
     header: str
-    location: Optional[str]
-    full_name: Optional[str]
-    rookie_year: Optional[str]
-    last_competed: Optional[str]
-    website: Optional[str]
-    home_cmp: Optional[str]
-    hof: Optional[str]
-    district: Optional[str]
-    district_link: Optional[str]
-    social_media: Optional[List[Tuple[str, str]]]  # tuple of (slug_name, foreign_key)
-    preferred_medias: Optional[
-        List[Tuple[str, str]]
-    ]  # tuple of (slug_name, foreign_key)
-    current_event: Optional[TeamCurrentEvent]
+    location: str | None
+    full_name: str | None
+    rookie_year: str | None
+    last_competed: str | None
+    website: str | None
+    home_cmp: str | None
+    hof: str | None
+    district: str | None
+    district_link: str | None
+    social_media: list[tuple[str, str]] | None  # tuple of (slug_name, foreign_key)
+    preferred_medias: list[tuple[str, str]] | None  # tuple of (slug_name, foreign_key)
+    current_event: TeamCurrentEvent | None
 
 
 class TeamEventParticipation(NamedTuple):
@@ -48,7 +47,7 @@ class TeamEventParticipation(NamedTuple):
 class TeamEventHistory(NamedTuple):
     year: int
     event: str
-    awards: List[str]
+    awards: list[str]
 
 
 class TeamHOFInfo(NamedTuple):
@@ -59,9 +58,9 @@ class TeamHOFInfo(NamedTuple):
 
 class ParsedTeam(NamedTuple):
     team_number: TeamNumber
-    team_number_link: Optional[str]
+    team_number_link: str | None
     team_name: str
-    team_name_link: Optional[str]
+    team_name_link: str | None
     team_location: str
 
 
@@ -281,7 +280,7 @@ def get_team_info(resp_data: str) -> TeamInfo:
     )
 
 
-def get_team_history(resp_data: str) -> Optional[List[TeamEventHistory]]:
+def get_team_history(resp_data: str) -> list[TeamEventHistory] | None:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     history_table = soup.find(id="competition-list-table")
     if not history_table:
@@ -304,7 +303,7 @@ def get_page_title(resp_data: str) -> str:
     return title.string.strip()
 
 
-def get_years_participated_dropdown(resp_data: str) -> List[str]:
+def get_years_participated_dropdown(resp_data: str) -> list[str]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     dropdown = soup.find("ul", id="team-year-dropdown")
     return [li.string.strip() for li in dropdown.contents if li.name == "li"]
@@ -336,12 +335,12 @@ def assert_alert(div: bs4.element.Tag, title: str, message: str, success: bool) 
     assert alert_message.text == message
 
 
-def find_teams_tables(resp_data: str) -> List[bs4.element.Tag]:
+def find_teams_tables(resp_data: str) -> list[bs4.element.Tag]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     return soup.find_all(id=re.compile(r"^teams_[ab]$"))
 
 
-def get_teams_from_table(table: bs4.element.Tag) -> List[ParsedTeam]:
+def get_teams_from_table(table: bs4.element.Tag) -> list[ParsedTeam]:
     team_rows = table.find("tbody").find_all("tr")
     parsed_teams = []
     for t in team_rows:
@@ -360,7 +359,7 @@ def get_teams_from_table(table: bs4.element.Tag) -> List[ParsedTeam]:
     return parsed_teams
 
 
-def get_all_teams(resp_data: str) -> List[ParsedTeam]:
+def get_all_teams(resp_data: str) -> list[ParsedTeam]:
     tables = find_teams_tables(resp_data)
     if len(tables) == 0:
         return []
@@ -368,7 +367,7 @@ def get_all_teams(resp_data: str) -> List[ParsedTeam]:
     return get_teams_from_table(tables[0]) + get_teams_from_table(tables[1])
 
 
-def get_HOF_awards(resp_data: str) -> Optional[List[TeamHOFInfo]]:
+def get_HOF_awards(resp_data: str) -> list[TeamHOFInfo] | None:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     banners = soup.find_all("div", class_="panel-default")
 

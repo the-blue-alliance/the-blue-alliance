@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import List, Optional
 
 from flask import abort, Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
@@ -49,7 +48,7 @@ blueprint = Blueprint("math", __name__)
 
 @blueprint.route("/tasks/math/enqueue/district_points_calc/<int:year>")
 @blueprint.route("/tasks/math/enqueue/district_points_calc", defaults={"year": None})
-def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
+def enqueue_event_district_points_calc(year: Year | None) -> Response:
     """
     Enqueues calculation of district points for all season events for a given year
     """
@@ -63,10 +62,10 @@ def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
         district_point_types = SEASON_EVENT_TYPES
         regional_point_types = {}
 
-    district_event_keys_future: TypedFuture[List[ndb.Key]] = Event.query(
+    district_event_keys_future: TypedFuture[list[ndb.Key]] = Event.query(
         Event.year == year, Event.event_type_enum.IN(district_point_types)
     ).fetch_async(None, keys_only=True)
-    regional_event_keys_future: TypedFuture[List[ndb.Key]] = (
+    regional_event_keys_future: TypedFuture[list[ndb.Key]] = (
         Event.query(
             Event.year == year, Event.event_type_enum.IN(regional_point_types)
         ).fetch_async(None, keys_only=True)
@@ -196,7 +195,7 @@ def regional_event_champs_pool_points_calc(event_key: EventKey) -> Response:
 
 @blueprint.route("/tasks/math/enqueue/district_rankings_calc/<int:year>")
 @blueprint.route("/tasks/math/enqueue/district_rankings_calc", defaults={"year": None})
-def enqueue_district_rankings_calc(year: Optional[Year]) -> Response:
+def enqueue_district_rankings_calc(year: Year | None) -> Response:
     """
     Enqueues calculation of rankings for all districts for a given year
     """
@@ -232,10 +231,10 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
     if not district:
         return make_response(f"District {district_key} not found", 404)
 
-    events_future: TypedFuture[List[Event]] = DistrictEventsQuery(
+    events_future: TypedFuture[list[Event]] = DistrictEventsQuery(
         district_key
     ).fetch_async()
-    teams_future: TypedFuture[List[Team]] = DistrictTeamsQuery(
+    teams_future: TypedFuture[list[Team]] = DistrictTeamsQuery(
         district_key
     ).fetch_async()
 
@@ -250,7 +249,7 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
         adjustments=district.adjustments,
     )
 
-    rankings: List[DistrictRanking] = []
+    rankings: list[DistrictRanking] = []
     current_rank = 1
     for key, points in team_totals.items():
         point_detail = DistrictRanking(
@@ -297,8 +296,8 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
         RegionalChampsPool.render_key_name(year),
         year=year,
     )
-    events_future: TypedFuture[List[Event]] = RegionalEventsQuery(year).fetch_async()
-    team_keys_future: TypedFuture[List[ndb.Key]] = RegionalTeamsQuery(
+    events_future: TypedFuture[list[Event]] = RegionalEventsQuery(year).fetch_async()
+    team_keys_future: TypedFuture[list[ndb.Key]] = RegionalTeamsQuery(
         year
     ).fetch_async()
 
@@ -316,7 +315,7 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
         regional_pool.adjustments,
     )
 
-    rankings: List[RegionalPoolRanking] = []
+    rankings: list[RegionalPoolRanking] = []
     current_rank = 1
     for key, points in team_totals.items():
         point_detail = RegionalPoolRanking(
@@ -351,14 +350,14 @@ def regional_champs_pool_rankings_calc(year: Year) -> Response:
 
 @blueprint.route("/tasks/math/enqueue/event_matchstats/now", defaults={"year": None})
 @blueprint.route("/tasks/math/enqueue/event_matchstats/<int:year>")
-def enqueue_event_matchstats(year: Optional[Year]) -> str:
+def enqueue_event_matchstats(year: Year | None) -> str:
     """
     Enqueues Matchstats calculation
     """
     if year is None:
         events = EventHelper.events_within_a_day()
     else:
-        events: List[Event] = EventListQuery(year=year).fetch()
+        events: list[Event] = EventListQuery(year=year).fetch()
 
     events = EventHelper.sorted_events(events)
     for event in events:
@@ -453,7 +452,7 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
 
 @blueprint.route("/tasks/math/enqueue/eventteam_update/<when>")
 def enqueue_eventteam_update(when: str) -> Response:
-    event_keys: List[ndb.Key] = []
+    event_keys: list[ndb.Key] = []
     if when == "current":
         event_keys = Event.query(Event.year == SeasonHelper.get_current_season()).fetch(
             1000, keys_only=True

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import cast, List
+from typing import cast
 from urllib.parse import urlparse
 
 import pytest
@@ -40,7 +40,7 @@ def createEvent(ndb_stub) -> None:
 
 
 def assert_template_status(
-    captured_templates: List[CapturedTemplate], status: str
+    captured_templates: list[CapturedTemplate], status: str
 ) -> None:
     template = captured_templates[0][0]
     context = captured_templates[0][1]
@@ -83,7 +83,7 @@ def test_submit_empty_form(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
         "/request/apiwrite", data={"event_key": "2016necmp"}, follow_redirects=True
@@ -103,7 +103,7 @@ def test_submit_bad_event(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ) -> None:
     resp = web_client.post(
         "/request/apiwrite",
@@ -125,7 +125,7 @@ def test_suggest_api_write(
     login_user,
     ndb_stub,
     web_client: Client,
-    captured_templates: List[CapturedTemplate],
+    captured_templates: list[CapturedTemplate],
 ):
     resp = web_client.post(
         "/request/apiwrite",

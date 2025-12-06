@@ -1,7 +1,6 @@
 import json
 import os
 import unittest
-from typing import Optional
 
 import pytest
 from google.appengine.ext import ndb
@@ -14,7 +13,7 @@ from backend.common.models.team import Team
 
 @pytest.mark.usefixtures("ndb_context")
 class TestLocationHelper(unittest.TestCase):
-    test_google_api_key: Optional[str] = None
+    test_google_api_key: str | None = None
 
     def setUp(self):
         # Load env vars that contain test keys

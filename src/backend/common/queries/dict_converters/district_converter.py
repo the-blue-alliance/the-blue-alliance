@@ -1,10 +1,10 @@
-from typing import Dict, List, NewType
+from typing import NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.district import District
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
-DistrictDict = NewType("DistrictDict", Dict)
+DistrictDict = NewType("DistrictDict", dict)
 
 
 class DistrictConverter(ConverterBase):
@@ -14,15 +14,15 @@ class DistrictConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[District], version: ApiMajorVersion
-    ) -> List[DistrictDict]:
+        cls, model_list: list[District], version: ApiMajorVersion
+    ) -> list[DistrictDict]:
         CONVERTERS = {
             3: cls.districtsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
     @classmethod
-    def districtsConverter_v3(cls, districts: List[District]) -> List[DistrictDict]:
+    def districtsConverter_v3(cls, districts: list[District]) -> list[DistrictDict]:
         return list(map(cls.districtConverter_v3, districts))
 
     @classmethod
@@ -37,7 +37,7 @@ class DistrictConverter(ConverterBase):
         )
 
     @staticmethod
-    def dictToModel_v3(data: Dict) -> District:
+    def dictToModel_v3(data: dict) -> District:
         district = District(id=data["key"])
         district.year = data["year"]
         district.abbreviation = data["abbreviation"]

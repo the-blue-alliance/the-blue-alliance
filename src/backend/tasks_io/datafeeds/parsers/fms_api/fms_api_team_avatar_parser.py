@@ -1,6 +1,6 @@
 import json
 
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -12,18 +12,18 @@ from backend.tasks_io.datafeeds.parsers.json.parser_paginated_json import (
 )
 
 
-class FMSAPITeamAvatarParser(ParserPaginatedJSON[Tuple[List[Media], Set[ndb.Key]]]):
+class FMSAPITeamAvatarParser(ParserPaginatedJSON[tuple[list[Media], set[ndb.Key]]]):
     def __init__(self, year: int):
         self.year = year
 
     def parse(
-        self, response: Dict[str, Any]
-    ) -> Tuple[Optional[Tuple[List[Media], Set[ndb.Key]]], bool]:
+        self, response: dict[str, Any]
+    ) -> tuple[tuple[list[Media], set[ndb.Key]] | None, bool]:
         current_page = response["pageCurrent"]
         total_pages = response["pageTotal"]
 
-        avatars: List[Media] = []
-        media_keys_to_delete: Set[ndb.Key] = set()
+        avatars: list[Media] = []
+        media_keys_to_delete: set[ndb.Key] = set()
 
         for teamData in response["teams"]:
             team_number = teamData["teamNumber"]

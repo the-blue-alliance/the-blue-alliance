@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 from pyre_extensions import JSON
 
@@ -10,9 +10,7 @@ from backend.tasks_io.datafeeds.parsers.youtube.youtube_stream_stauts_parser imp
 )
 
 
-def get_api_response(
-    status: Literal["live", "none", "upcoming"], viewers: Optional[int]
-):
+def get_api_response(status: Literal["live", "none", "upcoming"], viewers: int | None):
     live_details = {
         "actualStartTime": "2025-03-29T14:33:11Z",
         "actualEndTime": "2025-03-29T22:04:00Z",

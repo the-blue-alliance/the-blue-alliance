@@ -1,4 +1,4 @@
-from typing import cast, List
+from typing import cast
 
 from google.appengine.ext import ndb
 
@@ -16,8 +16,8 @@ class Subscription(MyTBAModel):
     should be created with a parent that is the associated Account key.
     """
 
-    notification_types: List[NotificationType] = cast(
-        List[NotificationType],
+    notification_types: list[NotificationType] = cast(
+        list[NotificationType],
         ndb.IntegerProperty(choices=list(NotificationType), repeated=True),
     )
 
@@ -25,7 +25,7 @@ class Subscription(MyTBAModel):
         super(Subscription, self).__init__(*args, **kwargs)
 
     @property
-    def notification_names(self) -> List[str]:
+    def notification_names(self) -> list[str]:
         return [
             NOTIFICATION_RENDER_NAMES[NotificationType(index)]
             for index in sorted(self.notification_types)

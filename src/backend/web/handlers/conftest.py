@@ -1,4 +1,5 @@
-from typing import Any, Dict, Generator, List, Tuple
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
@@ -62,11 +63,11 @@ def login_admin(login_user):
     return login_user
 
 
-CapturedTemplate = Tuple[Template, Dict[str, Any]]  # (template, context)
+CapturedTemplate = tuple[Template, dict[str, Any]]  # (template, context)
 
 
 @pytest.fixture
-def captured_templates() -> Generator[List[CapturedTemplate], None, None]:
+def captured_templates() -> Generator[list[CapturedTemplate], None, None]:
     from backend.web.main import app
 
     recorded = []
@@ -81,7 +82,7 @@ def captured_templates() -> Generator[List[CapturedTemplate], None, None]:
         template_rendered.disconnect(record, app)
 
 
-def get_inputs_from_form(soup: BeautifulSoup) -> Dict:
+def get_inputs_from_form(soup: BeautifulSoup) -> dict:
     fields = {}
     for form_input in soup.find_all("input"):
         # ignore submit/image with no name attribute

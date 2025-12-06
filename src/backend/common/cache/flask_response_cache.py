@@ -1,6 +1,6 @@
 import pickle
 import zlib
-from typing import Any, AnyStr, Dict, List, Optional
+from typing import Any
 
 from flask_caching.backends.base import BaseCache
 from google.appengine.api import memcache
@@ -37,7 +37,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         except ValueError:
             return value
 
-    def get(self, key: AnyStr) -> Optional[Any]:
+    def get[T: (str, bytes)](self, key: T) -> Any | None:
         """Look up key in the cache and return the value for it.
 
         :param key: the key to be looked up.
@@ -45,7 +45,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         """
         return self.load_object(self.memcache_client.get(key))
 
-    def delete(self, key: AnyStr) -> bool:
+    def delete[T: (str, bytes)](self, key: T) -> bool:
         """Delete `key` from the cache.
 
         :param key: the key to delete.
@@ -54,7 +54,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         """
         return self.memcache_client.delete(key)
 
-    def get_many(self, *keys: AnyStr) -> List[Optional[Any]]:
+    def get_many[T: (str, bytes)](self, *keys: T) -> list[Any | None]:
         """Returns a list of values for the given keys.
         For each key an item in the list is created::
 
@@ -68,7 +68,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         resp = self.memcache_client.get_multi(keys)
         return [self.load_object(resp.get(k)) for k in keys]
 
-    def get_dict(self, *keys: AnyStr) -> Dict[AnyStr, Optional[Any]]:
+    def get_dict[T: (str, bytes)](self, *keys: T) -> dict[T, Any | None]:
         """Like :meth:`get_many` but return a dict::
 
             d = cache.get_dict("foo", "bar")
@@ -81,7 +81,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         resp = self.memcache_client.get_multi(keys)
         return {k: self.load_object(v) for k, v in resp.items()}
 
-    def set(self, key: AnyStr, value: Any, timeout: Optional[int] = None) -> bool:
+    def set[T: (str, bytes)](self, key: T, value: Any, timeout: int | None = None) -> bool:  # fmt: skip
         """Add a new key/value to the cache (overwrites value, if key already
         exists in the cache).
 
@@ -97,7 +97,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         """
         return self.memcache_client.set(key, self.dump_object(value), timeout or 0)
 
-    def add(self, key: AnyStr, value: Any, timeout: Optional[int] = None):
+    def add[T: (str, bytes)](self, key: T, value: Any, timeout: int | None = None):
         """Works like :meth:`set` but does not overwrite the values of already
         existing keys.
 
@@ -112,9 +112,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         """
         return self.memcache_client.add(key, self.dump_object(value), timeout or 0)
 
-    def set_many(
-        self, mapping: Dict[AnyStr, Any], timeout: Optional[int] = None
-    ) -> bool:
+    def set_many[T: (str, bytes)](self, mapping: dict[T, Any], timeout: int | None = None) -> bool:  # fmt: skip
         """Sets multiple keys and values from a mapping.
 
         :param mapping: a mapping with the keys/values to set.
@@ -129,7 +127,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         )
         return len(keys_not_set) == 0
 
-    def delete_many(self, *keys: AnyStr) -> bool:
+    def delete_many[T: (str, bytes)](self, *keys: T) -> bool:
         """Deletes multiple keys at once.
 
         :param keys: The function accepts multiple keys as positional
@@ -163,7 +161,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         """
         return self.memcache_client.flush_all()
 
-    def inc(self, key: AnyStr, delta: int = 1) -> Optional[int]:
+    def inc[T: (str, bytes)](self, key: T, delta: int = 1) -> int | None:
         """Increments the value of a key by `delta`.  If the key does
         not yet exist it is initialized with `delta`.
 
@@ -175,7 +173,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         """
         return self.memcache_client.incr(key, delta)
 
-    def dec(self, key: AnyStr, delta: int = 1):
+    def dec[T: (str, bytes)](self, key: T, delta: int = 1):
         """Decrements the value of a key by `delta`.  If the key does
         not yet exist it is initialized with `-delta`.
 

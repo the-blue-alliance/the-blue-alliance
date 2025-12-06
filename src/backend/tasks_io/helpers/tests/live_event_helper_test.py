@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from typing import Optional
 from unittest.mock import Mock, patch
 
 import pytest
@@ -35,7 +34,7 @@ class WebcastStatusMock:
         return InstantFuture(None)
 
 
-def create_event(webcast_date: Optional[datetime]) -> None:
+def create_event(webcast_date: datetime | None) -> None:
     w = Webcast(
         type=WebcastType.YOUTUBE,
         channel="abc123",

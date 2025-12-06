@@ -1,5 +1,4 @@
 import datetime
-from typing import Dict, Optional
 from unittest import mock
 
 from freezegun import freeze_time
@@ -17,8 +16,8 @@ from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 def create_event(
     official: bool,
-    end_date: Optional[datetime.datetime] = None,
-    remap_teams: Optional[Dict[str, str]] = None,
+    end_date: datetime.datetime | None = None,
+    remap_teams: dict[str, str] | None = None,
     disable_sync_flags: int = 0,
 ) -> None:
     Event(

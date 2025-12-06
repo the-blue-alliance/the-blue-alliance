@@ -1,4 +1,4 @@
-from typing import Dict, List, TypedDict
+from typing import TypedDict
 
 from backend.common.models.keys import EventKey, TeamKey
 
@@ -23,9 +23,9 @@ class TeamAtEventDistrictPoints(_TeamAtEventDistrictPointsOptional):
 
 class TeamAtEventDistrictPointTiebreakers(TypedDict):
     qual_wins: int
-    highest_qual_scores: List[int]
+    highest_qual_scores: list[int]
 
 
 class EventDistrictPoints(TypedDict):
-    points: Dict[TeamKey, TeamAtEventDistrictPoints]
-    tiebreakers: Dict[TeamKey, TeamAtEventDistrictPointTiebreakers]
+    points: dict[TeamKey, TeamAtEventDistrictPoints]
+    tiebreakers: dict[TeamKey, TeamAtEventDistrictPointTiebreakers]

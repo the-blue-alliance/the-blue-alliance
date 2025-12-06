@@ -1,7 +1,8 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, Generator, List, Optional, Set, Tuple
+from collections.abc import Generator
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -90,8 +91,8 @@ class DatafeedFMSAPI:
 
     def __init__(
         self,
-        sim_time: Optional[datetime.datetime] = None,
-        sim_api_version: Optional[str] = None,
+        sim_time: datetime.datetime | None = None,
+        sim_api_version: str | None = None,
         save_response: bool = False,
     ) -> None:
         self.api = FRCAPI(
@@ -101,16 +102,14 @@ class DatafeedFMSAPI:
         )
 
     @typed_tasklet
-    def get_root_info(self) -> Generator[Any, Any, Optional[RootInfo]]:
+    def get_root_info(self) -> Generator[Any, Any, RootInfo | None]:
         root_response = yield self.api.root()
         return self._parse(root_response, FMSAPIRootParser())
 
     @typed_tasklet
     def get_team_details(
         self, year: Year, team_key: TeamKey
-    ) -> Generator[
-        Any, Any, Optional[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]]
-    ]:
+    ) -> Generator[Any, Any, tuple[Team, DistrictTeam | None, Robot | None] | None]:
         team_number = int(team_key[3:])  # everything after 'frc'
         api_response = yield self.api.team_details(year, team_number)
         result = self._parse(api_response, FMSAPITeamDetailsParser(year))
@@ -123,7 +122,7 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_team_avatar(
         self, year: Year, team_key: TeamKey
-    ) -> Generator[Any, Any, Tuple[List[Media], Set[ndb.Key]]]:
+    ) -> Generator[Any, Any, tuple[list[Media], set[ndb.Key]]]:
         team_number = int(team_key[3:])  # everything after 'frc'
         api_response = yield self.api.team_avatar(year, team_number)
         result = self._parse(api_response, FMSAPITeamAvatarParser(year))
@@ -137,7 +136,7 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_event_list(
         self, year: Year
-    ) -> Generator[Any, Any, Tuple[List[Event], List[District]]]:
+    ) -> Generator[Any, Any, tuple[list[Event], list[District]]]:
         event_list_response = yield self.api.event_list(year)
         result = self._parse(event_list_response, FMSAPIEventListParser(year))
         return result or ([], [])
@@ -146,7 +145,7 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_event_details(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, Tuple[List[Event], List[District]]]:
+    ) -> Generator[Any, Any, tuple[list[Event], list[District]]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
@@ -163,16 +162,14 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_event_teams(
         self, event_key: EventKey
-    ) -> Generator[
-        Any, Any, List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]]
-    ]:
+    ) -> Generator[Any, Any, list[tuple[Team, DistrictTeam | None, Robot | None]]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
         event = Event.get_by_id(event_key)
         event_code = self._get_event_short(year, event_short, event)
 
         parser = FMSAPITeamDetailsParser(year)
-        models: List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]] = []
+        models: list[tuple[Team, DistrictTeam | None, Robot | None]] = []
 
         more_pages = True
         page = 1
@@ -191,7 +188,7 @@ class DatafeedFMSAPI:
         return models
 
     @typed_tasklet
-    def get_awards(self, event: Event) -> Generator[Any, Any, List[Award]]:
+    def get_awards(self, event: Event) -> Generator[Any, Any, list[Award]]:
         awards = []
 
         # 8 subdivisions from 2015-2021 have awards listed under 4 divisions
@@ -234,7 +231,7 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_event_alliances(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, List[EventAlliance]]:
+    ) -> Generator[Any, Any, list[EventAlliance]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
@@ -247,7 +244,7 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_event_rankings(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, List[EventRanking]]:
+    ) -> Generator[Any, Any, list[EventRanking]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
@@ -260,7 +257,7 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_event_matches(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, List[Match]]:
+    ) -> Generator[Any, Any, list[Match]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
@@ -341,15 +338,15 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_event_team_avatars(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, Tuple[List[Media], Set[ndb.Key]]]:
+    ) -> Generator[Any, Any, tuple[list[Media], set[ndb.Key]]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
         event = Event.get_by_id(event_key)
         parser = FMSAPITeamAvatarParser(year)
         api_event_short = DatafeedFMSAPI._get_event_short(year, event_short, event)
-        avatars: List[Media] = []
-        keys_to_delete: Set[ndb.Key] = set()
+        avatars: list[Media] = []
+        keys_to_delete: set[ndb.Key] = set()
 
         more_pages = True
         page = 1
@@ -373,7 +370,7 @@ class DatafeedFMSAPI:
 
     # Returns a list of districts
     @typed_tasklet
-    def get_district_list(self, year: Year) -> Generator[Any, Any, List[District]]:
+    def get_district_list(self, year: Year) -> Generator[Any, Any, list[District]]:
         district_list_response = yield self.api.district_list(year)
         result = self._parse(district_list_response, FMSAPIDistrictListParser(year))
         return result or []
@@ -385,7 +382,7 @@ class DatafeedFMSAPI:
         year = int(district_key[:4])
         district_short = district_key[4:]
         advancement: DistrictAdvancement = {}
-        adjustments: Dict[TeamKey, int] = {}
+        adjustments: dict[TeamKey, int] = {}
 
         more_pages = True
         page = 1
@@ -408,16 +405,14 @@ class DatafeedFMSAPI:
         )
 
     @classmethod
-    def _get_event_short(
-        self, year: int, event_short: str, event: Optional[Event]
-    ) -> str:
+    def _get_event_short(cls, year: int, event_short: str, event: Event | None) -> str:
         if event:
             return event.first_api_code
         return Event.compute_first_api_code(year, event_short)
 
     def _parse(
         self, response: URLFetchResult, parser: ParserBase[TParsedResponse]
-    ) -> Optional[TParsedResponse]:
+    ) -> TParsedResponse | None:
         if response.status_code == 200:
             ApiStatusFMSApiDown.set_down(False)
 

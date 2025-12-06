@@ -1,5 +1,4 @@
 import datetime
-from typing import List, Optional
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -22,32 +21,32 @@ class ApiAuthAccess(ndb.Model):
 
     # For both read and write:
     description: str = ndb.TextProperty(indexed=False)  # human-readable description
-    auth_types_enum: List[AuthType] = ndb.IntegerProperty(  # pyre-ignore[8]
+    auth_types_enum: list[AuthType] = ndb.IntegerProperty(  # pyre-ignore[8]
         choices=list(AuthType), repeated=True
     )  # read and write types should never be mixed
-    owner: Optional[ndb.Key] = ndb.KeyProperty(kind=Account)
+    owner: ndb.Key | None = ndb.KeyProperty(kind=Account)
     allow_admin = ndb.BooleanProperty(default=False)  # Allow access to admin APIv3
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
 
     # Write only:
-    secret: Optional[str] = ndb.TextProperty(indexed=False)
-    event_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
+    secret: str | None = ndb.TextProperty(indexed=False)
+    event_list: list[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         kind=Event, repeated=True
     )  # events for which auth is granted
     # On update, we resolve the events in these districts and add them to event_list
-    district_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
+    district_list: list[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         kind=District, repeated=True
     )
     # Only for offseason events: grant access to MATCH_VIDEO for events whose webcast
     # is here (twitch channel / youtube account)
-    offseason_webcast_channels: List[str] = ndb.StringProperty(  # pyre-ignore[8]
+    offseason_webcast_channels: list[str] = ndb.StringProperty(  # pyre-ignore[8]
         repeated=True
     )
     # Allow access for all events marked official
     all_official_events: bool = ndb.BooleanProperty()
-    expiration: Optional[datetime.datetime] = ndb.DateTimeProperty()
+    expiration: datetime.datetime | None = ndb.DateTimeProperty()
 
     def put(self, *args, **kwargs):
         # Validation for making sure that we never mix the READ_API and other write types together

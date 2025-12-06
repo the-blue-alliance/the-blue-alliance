@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
@@ -19,7 +17,7 @@ from backend.common.queries.match_query import MatchQuery
 @api_authenticated
 @validate_keys
 @cached_public
-def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Response:
+def match(match_key: MatchKey, model_type: ModelType | None = None) -> Response:
     """
     Returns details about one match, specified by |match_key|.
     """

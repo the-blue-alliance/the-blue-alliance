@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from flask import abort, redirect, request, url_for
 from werkzeug import Response
@@ -16,7 +15,7 @@ from backend.common.models.keys import DistrictKey, Year
 from backend.web.profiled_render import render_template
 
 
-def district_list(year: Optional[Year]) -> str:
+def district_list(year: Year | None) -> str:
     if not year:
         year = datetime.now().year
 
@@ -49,7 +48,7 @@ def district_edit(district_key: DistrictKey) -> str:
     return render_template("admin/district_edit.html", template_values)
 
 
-def district_edit_post(district_key: Optional[DistrictKey]) -> Response:
+def district_edit_post(district_key: DistrictKey | None) -> Response:
     year = int(request.form["year"])
     abbreviation = request.form["abbreviation"]
     display_name = request.form.get("display_name")

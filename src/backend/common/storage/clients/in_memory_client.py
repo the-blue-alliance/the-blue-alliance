@@ -1,14 +1,12 @@
-from typing import Dict, List, Optional
-
 from pyre_extensions import none_throws
 
 from backend.common.storage.clients.storage_client import StorageClient
 
 
 class InMemoryClient(StorageClient):
-    CLIENT: Optional["InMemoryClient"] = None
+    CLIENT: "InMemoryClient | None" = None
 
-    data: Dict[str, str]
+    data: dict[str, str]
 
     @classmethod
     def get(cls) -> "InMemoryClient":
@@ -22,8 +20,8 @@ class InMemoryClient(StorageClient):
     def write(self, file_name: str, content: str) -> None:
         self.data[file_name] = content
 
-    def read(self, file_name: str) -> Optional[str]:
+    def read(self, file_name: str) -> str | None:
         return self.data.get(file_name)
 
-    def get_files(self, path: Optional[str] = None) -> List[str]:
+    def get_files(self, path: str | None = None) -> list[str]:
         return [p for p in self.data.keys() if path is None or p.startswith(path)]

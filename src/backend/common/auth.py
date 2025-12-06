@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 
 from firebase_admin import auth
 from flask import session
@@ -14,14 +14,14 @@ _SESSION_KEY = "session"
 # Code from https://firebase.google.com/docs/auth/admin/manage-cookies
 
 
-def _verify_id_token(id_token: str) -> Optional[dict]:
+def _verify_id_token(id_token: str) -> dict | None:
     try:
         return auth.verify_id_token(id_token, check_revoked=True, app=app())
     except Exception:
         return None
 
 
-def verify_id_token(id_token: str) -> Optional[dict]:
+def verify_id_token(id_token: str) -> dict | None:
     return _verify_id_token(id_token)
 
 
@@ -39,7 +39,7 @@ def revoke_session_cookie() -> None:
     session.pop(_SESSION_KEY, None)
 
 
-def _decoded_claims() -> Optional[Dict[str, Any]]:
+def _decoded_claims() -> dict[str, Any] | None:
     session_cookie = session.get(_SESSION_KEY)
     if not session_cookie:
         return None
@@ -53,14 +53,14 @@ def _decoded_claims() -> Optional[Dict[str, Any]]:
         return None
 
 
-def _current_user() -> Optional[User]:
+def _current_user() -> User | None:
     session_claims = _decoded_claims()
     if not session_claims:
         return None
     return User(session_claims)
 
 
-def current_user() -> Optional[User]:
+def current_user() -> User | None:
     return _current_user()
 
 
@@ -72,5 +72,5 @@ def delete_user(uid: str) -> None:
     _delete_user(uid)
 
 
-def _user_context_processor() -> Dict[str, Optional[User]]:
+def _user_context_processor() -> dict[str, User | None]:
     return dict(user=current_user())

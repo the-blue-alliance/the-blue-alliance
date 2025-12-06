@@ -1,5 +1,6 @@
-from typing import Any, cast, Dict, Optional
+from typing import Any, cast
 
+from firebase_admin import messaging
 from pyre_extensions import none_throws
 
 from backend.common.consts.notification_type import NotificationType
@@ -9,7 +10,7 @@ from backend.common.models.team import Team
 
 
 class AllianceSelectionNotification(Notification):
-    def __init__(self, event: Event, team: Optional[Team] = None) -> None:
+    def __init__(self, event: Event, team: Team | None = None) -> None:
         self.event = event
         self.team = team
 
@@ -29,7 +30,7 @@ class AllianceSelectionNotification(Notification):
         return NotificationType.ALLIANCE_SELECTION
 
     @property
-    def fcm_notification(self) -> Optional[Any]:
+    def fcm_notification(self) -> messaging.Notification | None:
         body = ["{} alliances have been updated.".format(self.event.normalized_name)]
         # Add alliance information for team
         if self.team and self.alliance:
@@ -56,15 +57,13 @@ class AllianceSelectionNotification(Notification):
             )
             body.append(" ".join(sub_body))
 
-        from firebase_admin import messaging
-
         return messaging.Notification(
             title="{} Alliances Updated".format(self.event.event_short.upper()),
             body=" ".join(body),
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, str]]:
+    def data_payload(self) -> dict[str, str] | None:
         payload = {"event_key": self.event.key_name}
 
         if self.team:
@@ -73,12 +72,12 @@ class AllianceSelectionNotification(Notification):
         return payload
 
     @property
-    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
+    def webhook_message_data(self) -> dict[str, Any] | None:
         from backend.common.queries.dict_converters.event_converter import (
             EventConverter,
         )
 
-        payload = cast(Dict[str, Any], none_throws(self.data_payload))
+        payload = cast(dict[str, Any], none_throws(self.data_payload))
         payload["event_name"] = self.event.name
         payload["event"] = EventConverter.eventConverter_v3(self.event)
         return payload

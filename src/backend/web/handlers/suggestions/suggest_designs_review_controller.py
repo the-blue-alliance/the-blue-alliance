@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import redirect, request
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -23,7 +21,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBase[Media]):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
 
-    def create_target_model(self, suggestion: Suggestion) -> Optional[Media]:
+    def create_target_model(self, suggestion: Suggestion) -> Media | None:
         # Create a basic Media from this suggestion
         return MediaCreator.from_suggestion(suggestion)
 
@@ -65,9 +63,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBase[Media]):
         )
 
     def _fastpath_review(self) -> Response:
-        suggestion: Optional[Suggestion] = Suggestion.get_by_id(
-            request.args.get("id", "")
-        )
+        suggestion: Suggestion | None = Suggestion.get_by_id(request.args.get("id", ""))
         status = None
         if suggestion and suggestion.target_model == "robot":
             if suggestion.review_state == SuggestionState.REVIEW_PENDING:

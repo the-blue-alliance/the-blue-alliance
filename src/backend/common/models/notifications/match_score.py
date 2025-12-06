@@ -1,5 +1,6 @@
-from typing import Any, cast, Dict, Optional
+from typing import Any, cast
 
+from firebase_admin import messaging
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -10,7 +11,7 @@ from backend.common.models.team import Team
 
 
 class MatchScoreNotification(Notification):
-    def __init__(self, match: Match, team: Optional[Team] = None) -> None:
+    def __init__(self, match: Match, team: Team | None = None) -> None:
         self.match = match
         self.event = match.event.get()
         self.team = team
@@ -20,7 +21,7 @@ class MatchScoreNotification(Notification):
         return NotificationType.MATCH_SCORE
 
     @property
-    def fcm_notification(self) -> Optional[Any]:
+    def fcm_notification(self) -> messaging.Notification | None:
         if self.match.winning_alliance == "":
             alliance_one = self.match.alliances[AllianceColor.RED]
         else:
@@ -50,8 +51,6 @@ class MatchScoreNotification(Notification):
         if self.team:
             title = "Team {} {}".format(self.team.team_number, title)
 
-        from firebase_admin import messaging
-
         return messaging.Notification(
             title="{} {} Results".format(title, self.match.short_name),
             body="{} {} {} scoring {}-{}.".format(
@@ -64,7 +63,7 @@ class MatchScoreNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, str]]:
+    def data_payload(self) -> dict[str, str] | None:
         payload = {"event_key": self.event.key_name, "match_key": self.match.key_name}
 
         if self.team:
@@ -73,12 +72,12 @@ class MatchScoreNotification(Notification):
         return payload
 
     @property
-    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
+    def webhook_message_data(self) -> dict[str, Any] | None:
         from backend.common.queries.dict_converters.match_converter import (
             MatchConverter,
         )
 
-        payload = cast(Dict[str, Any], none_throws(self.data_payload))
+        payload = cast(dict[str, Any], none_throws(self.data_payload))
 
         payload["event_name"] = self.event.name
         payload["match"] = MatchConverter.matchConverter_v3(self.match)

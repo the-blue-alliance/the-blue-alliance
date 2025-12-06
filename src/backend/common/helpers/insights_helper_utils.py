@@ -1,7 +1,8 @@
 import json
 from collections import defaultdict
+from collections.abc import Callable, Generator
 from dataclasses import dataclass
-from typing import Any, Callable, DefaultDict, Dict, Generator, List, Optional, Tuple
+from typing import Any
 
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.helpers.season_helper import SeasonHelper
@@ -18,12 +19,12 @@ from backend.common.models.match import Match
 from backend.common.queries.event_query import EventListQuery
 
 
-CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float] | Dict[Any, int]
+CounterDictType = defaultdict[Any, int] | defaultdict[Any, float] | dict[Any, int]
 
 
 @dataclass
 class LeaderboardInsightArguments:
-    events: List[Event]
+    events: list[Event]
     year: int
 
     def matches(self) -> Generator[Match, None, None]:
@@ -46,7 +47,7 @@ class LeaderboardInsightArguments:
 
 
 def make_leaderboard_args(year: Year) -> LeaderboardInsightArguments:
-    all_events: List[Event] = []
+    all_events: list[Event] = []
 
     if year == 0:
         for yr in SeasonHelper.get_valid_years():
@@ -62,11 +63,11 @@ def make_leaderboard_args(year: Year) -> LeaderboardInsightArguments:
 
 
 def make_insights_from_functions(
-    year: Year, fns: List[Callable[[LeaderboardInsightArguments], Optional[Insight]]]
-) -> List[Insight]:
+    year: Year, fns: list[Callable[[LeaderboardInsightArguments], Insight | None]]
+) -> list[Insight]:
     args = make_leaderboard_args(year=year)
 
-    insights: List[Insight] = []
+    insights: list[Insight] = []
     for fn in fns:
         if maybe_insight := fn(args):
             insights.append(maybe_insight)
@@ -76,7 +77,7 @@ def make_insights_from_functions(
 
 def sort_counter_dict(
     count: CounterDictType, key_type: LeaderboardKeyType = "team"
-) -> List[Tuple[int | float, List[str]]]:
+) -> list[tuple[int | float, list[str]]]:
     """
     Takes an object that looks like: {"frc1": 5, "frc2": 5, "frc3": 3}
     (may be match, event, or team keys) and returns a list of tuples that
@@ -103,7 +104,7 @@ def sort_counter_dict(
 
 
 def create_insight(
-    data: Any, name: str, year: int, district_abbreviation: Optional[str] = None
+    data: Any, name: str, year: int, district_abbreviation: str | None = None
 ) -> Insight:
     """
     Create Insight object given data, name, and year
@@ -125,7 +126,7 @@ def make_leaderboard_from_dict_counts(
     sorted_leaderboard_tuples = sort_counter_dict(
         counter, key_type=Insight.TYPED_LEADERBOARD_KEY_TYPES[insight_type]
     )
-    leaderboard_rankings: List[LeaderboardRanking] = [
+    leaderboard_rankings: list[LeaderboardRanking] = [
         LeaderboardRanking(keys=keys, value=value)
         # Only take top 25 sorted results
         for (value, keys) in sorted_leaderboard_tuples[:25]

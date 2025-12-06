@@ -1,12 +1,10 @@
-from typing import Optional
-
 from google.appengine.ext import ndb
 
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamListQuery
 
 
-def preseed_teams(start_team: int, end_team: Optional[int] = None) -> None:
+def preseed_teams(start_team: int, end_team: int | None = None) -> None:
     end_team = end_team or start_team
     stored = ndb.put_multi(
         [

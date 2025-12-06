@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from backend.common.models.district_advancement import DistrictAdvancement
 from backend.common.models.keys import TeamKey
@@ -11,18 +11,18 @@ from backend.tasks_io.datafeeds.parsers.json.parser_paginated_json import (
 @dataclass
 class TParsedDistrictAdvancement:
     advancement: DistrictAdvancement
-    adjustments: Dict[TeamKey, int]
+    adjustments: dict[TeamKey, int]
 
 
 class FMSAPIDistrictRankingsParser(ParserPaginatedJSON[TParsedDistrictAdvancement]):
     def parse(
-        self, response: Dict[str, Any]
-    ) -> Tuple[TParsedDistrictAdvancement, bool]:
+        self, response: dict[str, Any]
+    ) -> tuple[TParsedDistrictAdvancement, bool]:
         current_page = response["pageCurrent"]
         total_pages = response["pageTotal"]
 
         district_ranks: DistrictAdvancement = {}
-        adjustments: Dict[TeamKey, int] = {}
+        adjustments: dict[TeamKey, int] = {}
 
         for ranking in response["districtRanks"]:
             team_key = f"frc{ranking["teamNumber"]}"

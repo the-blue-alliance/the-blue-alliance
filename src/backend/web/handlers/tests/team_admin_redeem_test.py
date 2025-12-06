@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 from urllib.parse import urlparse
 
 import pytest
@@ -37,7 +36,7 @@ def add_team_admin_access(account, team_number=1124, year=None, access_code="abc
 
 
 def assert_template_status(
-    captured_templates: List[CapturedTemplate], status: str
+    captured_templates: list[CapturedTemplate], status: str
 ) -> None:
     template = captured_templates[0][0]
     context = captured_templates[0][1]

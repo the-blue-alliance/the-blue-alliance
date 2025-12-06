@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 
@@ -21,6 +21,6 @@ class GoogleApiSecret(Sitevar[ContentType]):
         return ContentType(api_key="")
 
     @classmethod
-    def secret_key(cls) -> Optional[str]:
+    def secret_key(cls) -> str | None:
         secret_key = cls.get().get("api_key")
         return secret_key if secret_key else None  # Drop empty strings

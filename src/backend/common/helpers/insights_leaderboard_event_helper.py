@@ -1,6 +1,5 @@
 from collections import defaultdict
 from statistics import median
-from typing import List, Optional
 
 from pyre_extensions import none_throws
 
@@ -15,7 +14,7 @@ from backend.common.models.insight import Insight
 
 class InsightsLeaderboardEventHelper:
     @staticmethod
-    def make_insights(year: int) -> List[Insight]:
+    def make_insights(year: int) -> list[Insight]:
         return make_insights_from_functions(
             year,
             [
@@ -26,7 +25,7 @@ class InsightsLeaderboardEventHelper:
     @staticmethod
     def _highest_median_score(
         arguments: LeaderboardInsightArguments,
-    ) -> Optional[Insight]:
+    ) -> Insight | None:
         if arguments.year == 0:
             return None
 

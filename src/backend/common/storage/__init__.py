@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from backend.common.environment import Environment, EnvironmentMode
 from backend.common.storage.clients.gcloud_client import GCloudStorageClient
 from backend.common.storage.clients.in_memory_client import InMemoryClient
@@ -34,11 +32,11 @@ def write(file_name: str, content: str) -> None:
     client.write(file_name, content)
 
 
-def read(file_name: str) -> Optional[str]:
+def read(file_name: str) -> str | None:
     client = _client_for_env()
     return client.read(file_name)
 
 
-def get_files(path: Optional[str] = None) -> List[str]:
+def get_files(path: str | None = None) -> list[str]:
     client = _client_for_env()
     return client.get_files(path)

@@ -1,5 +1,4 @@
 import json
-from typing import Dict, List, Optional
 
 import pytest
 from google.appengine.ext import ndb, testbed
@@ -34,7 +33,7 @@ def setup_event(
     ).put()
 
 
-def setup_auth(access_types: List[AuthType]) -> None:
+def setup_auth(access_types: list[AuthType]) -> None:
     ApiAuthAccess(
         id=AUTH_ID,
         secret=AUTH_SECRET,
@@ -43,7 +42,7 @@ def setup_auth(access_types: List[AuthType]) -> None:
     ).put()
 
 
-def get_auth_headers(request_path: str, request_body) -> Dict[str, str]:
+def get_auth_headers(request_path: str, request_body) -> dict[str, str]:
     return {
         "X-TBA-Auth-Id": AUTH_ID,
         "X-TBA-AUth-Sig": TrustedApiAuthHelper.compute_auth_signature(
@@ -127,7 +126,7 @@ def test_update_event_info(
     )
     assert response.status_code == 200, response.data
 
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.first_code == "abc123"
     assert event.official is True
@@ -185,7 +184,7 @@ def test_invalid_webcasts_date(
     )
     assert response.status_code == 400
 
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.webcast == []
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -211,7 +210,7 @@ def test_invalid_remap_teams_lowercase(
     )
     assert response.status_code == 400
 
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.remap_teams is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -236,7 +235,7 @@ def test_invalid_remap_teams_a_team(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.remap_teams is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -261,7 +260,7 @@ def test_invalid_remap_teams_two_letters(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.remap_teams is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -287,7 +286,7 @@ def test_invalid_remap_teams_mapping_from_b_team(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.remap_teams is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -312,7 +311,7 @@ def test_invalid_remap_teams_mapping_bad_start_format(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.remap_teams is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -337,7 +336,7 @@ def test_invalid_remap_teams_mapping_bad_end_format(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.remap_teams is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -358,7 +357,7 @@ def test_bad_playoff_type(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.timezone_id is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -382,7 +381,7 @@ def test_playoff_type_sets_manual_attr(
     )
 
     assert response.status_code == 200
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM
     assert event.official is True
@@ -408,7 +407,7 @@ def test_playoff_type_sets_manual_attr_dedup(
     )
 
     assert response.status_code == 200
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM
     assert event.official is True
@@ -435,7 +434,7 @@ def test_playoff_type_None_clears_manual_attr(
     )
 
     assert response.status_code == 200
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM
     assert event.official is True
@@ -458,7 +457,7 @@ def test_invalid_event_timezone(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.timezone_id is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -479,7 +478,7 @@ def test_invalid_sync_disable_flags(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.disable_sync_flags is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
@@ -500,7 +499,7 @@ def test_invalid_sync_disable_flags_key(
     )
 
     assert response.status_code == 400
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     assert event.disable_sync_flags is None
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0

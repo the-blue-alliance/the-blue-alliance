@@ -1,5 +1,4 @@
 import json
-from typing import Optional
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -37,7 +36,7 @@ class Suggestion(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
-        self._contents: Optional[SuggestionDict] = None
+        self._contents: SuggestionDict | None = None
         super(Suggestion, self).__init__(*args, **kw)
 
     def put(self, *args, **kwargs):
@@ -78,7 +77,7 @@ class Suggestion(ndb.Model):
     @classmethod
     def render_media_key_name(
         cls,
-        year: Optional[Year],
+        year: Year | None,
         target_model: str,
         target_key: str,
         foreign_type: str,

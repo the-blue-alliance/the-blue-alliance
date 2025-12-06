@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.playoff_type import (
     BRACKET_ELIM_MAPPING,
@@ -77,7 +75,7 @@ class PlayoffTypeHelper:
     @classmethod
     def get_set_match_number(
         cls, playoff_type: PlayoffType, comp_level: CompLevel, match_number: int
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         if comp_level == CompLevel.QM:
             return 1, match_number
 

@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import Dict, List, Set, Tuple
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.award_type import AwardType, BLUE_BANNER_AWARDS
@@ -43,8 +42,8 @@ class InsightsDistrictsHelper:
     @staticmethod
     def make_insight_team_data(
         district_abbreviation: DistrictAbbreviation,
-    ) -> Dict[TeamKey, DistrictInsightTeamData]:
-        history: List[District] = DistrictHistoryQuery(district_abbreviation).fetch()
+    ) -> dict[TeamKey, DistrictInsightTeamData]:
+        history: list[District] = DistrictHistoryQuery(district_abbreviation).fetch()
         years_participated = defaultdict(list)
         total_district_points = defaultdict(int)
         total_pre_dcmp_district_points = defaultdict(int)
@@ -75,7 +74,7 @@ class InsightsDistrictsHelper:
                 DistrictEventsQuery(district_key=district.key_name).fetch_async()
             )
 
-        district_event_list: List[Event] = []
+        district_event_list: list[Event] = []
         for future in event_futures:
             partial_event_list = future.get_result()
             district_event_list += partial_event_list
@@ -86,7 +85,7 @@ class InsightsDistrictsHelper:
                 DistrictChampsInYearQuery(year=district.year).fetch_async()
             )
 
-        dcmp_event_list: List[Event] = []
+        dcmp_event_list: list[Event] = []
         for future in dcmp_event_futures:
             partial_event_list = future.get_result()
             dcmp_event_list += partial_event_list
@@ -97,7 +96,7 @@ class InsightsDistrictsHelper:
                 CmpDivisionsInYearQuery(year=district.year).fetch_async()
             )
 
-        cmp_event_list: List[Event] = []
+        cmp_event_list: list[Event] = []
         for future in cmp_event_futures:
             partial_event_list = future.get_result()
             cmp_event_list += partial_event_list
@@ -205,10 +204,10 @@ class InsightsDistrictsHelper:
 
     @staticmethod
     def _make_team_deltas(
-        yearly_teams: Dict[Year, Set[TeamKey]],
+        yearly_teams: dict[Year, set[TeamKey]],
         year_a: Year,
         year_b: Year,
-    ) -> Tuple[List[TeamKey], List[TeamKey]]:
+    ) -> tuple[list[TeamKey], list[TeamKey]]:
         year_a_teams = yearly_teams.get(year_a, set())
         year_b_teams = yearly_teams.get(year_b, set())
 
@@ -221,7 +220,7 @@ class InsightsDistrictsHelper:
     def make_insight_district_data(
         district_abbreviation: DistrictAbbreviation,
     ) -> DistrictInsightDistrictData:
-        history: List[District] = DistrictHistoryQuery(district_abbreviation).fetch()
+        history: list[District] = DistrictHistoryQuery(district_abbreviation).fetch()
 
         district_yearly_teams = defaultdict(list)
         district_yearly_events = defaultdict(list)
@@ -252,7 +251,7 @@ class InsightsDistrictsHelper:
                 ].append(event)
 
         def make_region_data(
-            yearly_teams: Dict[Year, List[Team]], yearly_events: Dict[Year, List[Event]]
+            yearly_teams: dict[Year, list[Team]], yearly_events: dict[Year, list[Event]]
         ) -> DistrictInsightDistrictRegionData:
             yearly_gained_teams = {}
             yearly_lost_teams = {}

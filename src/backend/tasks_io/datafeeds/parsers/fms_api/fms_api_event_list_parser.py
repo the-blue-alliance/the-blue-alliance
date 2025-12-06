@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from google.appengine.ext import ndb
 from pytz import all_timezones_set as PYTZ_ALL_TIMEZONES
@@ -19,7 +19,7 @@ from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHac
 from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
-class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
+class FMSAPIEventListParser(ParserJSON[tuple[list[Event], list[District]]]):
     DATE_FORMAT_STR = "%Y-%m-%dT%H:%M:%S"
 
     EVENT_TYPES = {
@@ -57,7 +57,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
     EINSTEIN_NAME_DEFAULT = "Einstein Field"
     EINSTEIN_CODES = {"cmp", "cmpmi", "cmpmo", "cmptx"}
 
-    def __init__(self, season: Year, short: Optional[str] = None) -> None:
+    def __init__(self, season: Year, short: str | None = None) -> None:
         self.season = season
         self.event_short = short
 
@@ -79,9 +79,9 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
         return playoff_type
 
-    def parse(self, response: Dict[str, Any]) -> Tuple[List[Event], List[District]]:
-        events: List[Event] = []
-        districts: Dict[DistrictKey, District] = {}
+    def parse(self, response: dict[str, Any]) -> tuple[list[Event], list[District]]:
+        events: list[Event] = []
+        districts: dict[DistrictKey, District] = {}
 
         cmp_hack_sitevar = ChampsRegistrationHacks.get()
         divisions_to_skip = cmp_hack_sitevar["divisions_to_skip"]

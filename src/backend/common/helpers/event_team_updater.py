@@ -1,5 +1,4 @@
 import datetime
-from typing import List, Set, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -19,7 +18,7 @@ class EventTeamUpdater:
     @classmethod
     def update(
         self, event_key: EventKey, allow_deletes: bool = False
-    ) -> Tuple[List[Team], List[EventTeam], Set[ndb.Key]]:
+    ) -> tuple[list[Team], list[EventTeam], set[ndb.Key]]:
         """
         Updates EventTeams for an event.
         Returns a tuple of (teams, event_teams, event_team_keys_to_delete)
@@ -35,7 +34,7 @@ class EventTeamUpdater:
         cur_year = datetime.datetime.now().year
 
         # Add teams from Matches and Awards
-        team_ids: Set[TeamId] = set()
+        team_ids: set[TeamId] = set()
         match_key_futures = Match.query(Match.event == event.key).fetch_async(
             1000, keys_only=True
         )
@@ -102,11 +101,11 @@ class EventTeamUpdater:
             1000, keys_only=True
         )
         existing_event_teams = ndb.get_multi(existing_event_teams_keys)
-        existing_team_ids: Set[TeamId] = set()
+        existing_team_ids: set[TeamId] = set()
         for et in existing_event_teams:
             existing_team_ids.add(et.team.id())
 
-        et_keys_to_delete: Set[ndb.Key] = set()
+        et_keys_to_delete: set[ndb.Key] = set()
         if allow_deletes or (event.year == cur_year and event.past):
             for team_id in existing_team_ids.difference(
                 [team.key.id() for team in teams]
@@ -117,7 +116,7 @@ class EventTeamUpdater:
         return teams, event_teams, et_keys_to_delete
 
     @classmethod
-    def get_event_winners(cls, event: Event, matches: List[Match]) -> Set[TeamKey]:
+    def get_event_winners(cls, event: Event, matches: list[Match]) -> set[TeamKey]:
         """
         First alliance to win two finals matches is the winner
         """
@@ -125,7 +124,7 @@ class EventTeamUpdater:
         if CompLevel.F not in matches_by_type or not matches_by_type[CompLevel.F]:
             return set()
 
-        finals_matches: List[Match] = matches_by_type[CompLevel.F]
+        finals_matches: list[Match] = matches_by_type[CompLevel.F]
         red_wins = 0
         blue_wins = 0
 

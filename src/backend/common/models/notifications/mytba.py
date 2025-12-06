@@ -1,5 +1,3 @@
-from typing import Optional
-
 from backend.common.consts.client_type import ClientType
 from backend.common.consts.notification_type import (
     NotificationType,
@@ -11,7 +9,7 @@ from backend.common.models.notifications.notification import Notification
 
 
 class MyTbaBaseNotification(Notification):
-    def __init__(self, user_id: str, initiating_device_id: Optional[str]) -> None:
+    def __init__(self, user_id: str, initiating_device_id: str | None) -> None:
         super().__init__()
         self.user_id = user_id
         self.initiating_device_id = initiating_device_id

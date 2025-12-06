@@ -1,5 +1,6 @@
 import json
-from typing import Any, Dict, Generator, List, Optional, Set
+from collections.abc import Generator
+from typing import Any
 
 import pytest
 import six
@@ -17,34 +18,34 @@ from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
 class DummyModel(CachedModel):
-    int_prop: Optional[int] = ndb.IntegerProperty()
+    int_prop: int | None = ndb.IntegerProperty()
     str_prop: str = ndb.StringProperty()
     mutable_str_prop: str = ndb.StringProperty()
-    can_be_none: Optional[int] = ndb.IntegerProperty()
-    repeated_prop: List[int] = ndb.IntegerProperty(repeated=True)  # pyre-ignore[8]
-    union_prop: List[int] = ndb.IntegerProperty(repeated=True)  # pyre-ignore[8]
+    can_be_none: int | None = ndb.IntegerProperty()
+    repeated_prop: list[int] = ndb.IntegerProperty(repeated=True)  # pyre-ignore[8]
+    union_prop: list[int] = ndb.IntegerProperty(repeated=True)  # pyre-ignore[8]
 
     prop_json: str = ndb.StringProperty()
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "int_prop",
         "can_be_none",
         "mutable_str_prop",
     }
 
-    _allow_none_attrs: Set[str] = {
+    _allow_none_attrs: set[str] = {
         "can_be_none",
     }
 
-    _list_attrs: Set[str] = {
+    _list_attrs: set[str] = {
         "repeated_prop",
     }
 
-    _json_attrs: Set[str] = {
+    _json_attrs: set[str] = {
         "prop_json",
     }
 
-    _auto_union_attrs: Set[str] = {
+    _auto_union_attrs: set[str] = {
         "union_prop",
     }
 
@@ -58,7 +59,7 @@ class DummyModel(CachedModel):
         }
 
     @property
-    def prop(self) -> Dict:
+    def prop(self) -> dict:
         if self._prop is None and self.prop_json is not None:
             self._prop = json.loads(self.prop_json)
         return self._prop
@@ -92,8 +93,8 @@ class DummyManipulator(ManipulatorBase[DummyModel]):
     @classmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
-    ) -> List[TCacheKeyAndQuery]:
-        ref_keys: Set[ndb.Key] = affected_refs["key"]
+    ) -> list[TCacheKeyAndQuery]:
+        ref_keys: set[ndb.Key] = affected_refs["key"]
         return [
             (
                 none_throws(
@@ -117,7 +118,7 @@ class DummyManipulator(ManipulatorBase[DummyModel]):
 
 
 @DummyManipulator.register_post_delete_hook
-def post_delete_hook(models: List[DummyModel]) -> None:
+def post_delete_hook(models: list[DummyModel]) -> None:
     DummyManipulator.delete_calls += 1
 
     if DummyManipulator.delete_hook_extra is not None:
@@ -125,7 +126,7 @@ def post_delete_hook(models: List[DummyModel]) -> None:
 
 
 @DummyManipulator.register_post_update_hook
-def post_update_hook(models: List[TUpdatedModel[DummyModel]]) -> None:
+def post_update_hook(models: list[TUpdatedModel[DummyModel]]) -> None:
     DummyManipulator.update_calls += 1
 
     if DummyManipulator.update_hook_extra is not None:
@@ -360,7 +361,7 @@ def test_update_hook_right_args(ndb_context, taskqueue_stub) -> None:
 
     update = DummyModel(id="test", int_prop=42)
 
-    def update_hook_extra(models: List[TUpdatedModel[DummyModel]]) -> None:
+    def update_hook_extra(models: list[TUpdatedModel[DummyModel]]) -> None:
         assert models == [
             TUpdatedModel(
                 model=update,
@@ -387,7 +388,7 @@ def test_update_hook_right_args(ndb_context, taskqueue_stub) -> None:
 def test_update_hook_creation(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
 
-    def update_hook_extra(models: List[TUpdatedModel[DummyModel]]) -> None:
+    def update_hook_extra(models: list[TUpdatedModel[DummyModel]]) -> None:
         assert models == [
             TUpdatedModel(
                 model=model,
@@ -500,7 +501,7 @@ def test_delete_hook_right_args(ndb_context, taskqueue_stub) -> None:
     model = DummyModel(id="test", int_prop=1337)
     model.put()
 
-    def delete_hook_extra(models: List[DummyModel]) -> None:
+    def delete_hook_extra(models: list[DummyModel]) -> None:
         assert models == [model]
 
     DummyManipulator.delete_hook_extra = delete_hook_extra

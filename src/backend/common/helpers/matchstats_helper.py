@@ -9,7 +9,8 @@
 # x is OPR and should be n x 1
 
 from collections import defaultdict, OrderedDict
-from typing import Any, Callable, Dict, List, Tuple
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -35,7 +36,7 @@ from backend.common.models.stats import EventMatchStats, StatType
 from backend.common.queries import event_query
 
 
-TTeamIdMap = Dict[TeamId, int]
+TTeamIdMap = dict[TeamId, int]
 StatAccessor = Callable[[Match, AllianceColor], float]
 
 
@@ -189,8 +190,8 @@ def make_default_component_accessor(component: Component) -> StatAccessor:
 class MatchstatsHelper(object):
     @classmethod
     def build_team_mapping(
-        cls, matches: List[Match]
-    ) -> Tuple[List[TeamId], TTeamIdMap]:
+        cls, matches: list[Match]
+    ) -> tuple[list[TeamId], TTeamIdMap]:
         """
         Returns (team_list, team_id_map)
         team_list: A list of team_str such as '254' or '254B'
@@ -214,7 +215,7 @@ class MatchstatsHelper(object):
 
     @classmethod
     def build_Minv_matrix(
-        cls, matches: List[Match], team_id_map: TTeamIdMap
+        cls, matches: list[Match], team_id_map: TTeamIdMap
     ) -> npt.NDArray[np.float64]:
         n = len(team_id_map.keys())
         M = np.zeros((n, n))
@@ -234,7 +235,7 @@ class MatchstatsHelper(object):
     @classmethod
     def build_s_matrix(
         cls,
-        matches: List[Match],
+        matches: list[Match],
         team_id_map: TTeamIdMap,
         stat_accessor: StatAccessor,
     ) -> npt.NDArray[np.float64]:
@@ -257,8 +258,8 @@ class MatchstatsHelper(object):
     @classmethod
     def calc_stat(
         cls,
-        matches: List[Match],
-        team_list: List[TeamId],
+        matches: list[Match],
+        team_list: list[TeamId],
         team_id_map: TTeamIdMap,
         Minv: Any,
         stat_accessor: StatAccessor,
@@ -276,7 +277,7 @@ class MatchstatsHelper(object):
         return stat_dict
 
     @classmethod
-    def calculate_matchstats(cls, matches: List[Match], year: Year) -> EventMatchStats:
+    def calculate_matchstats(cls, matches: list[Match], year: Year) -> EventMatchStats:
         if not matches:
             return {}
 
@@ -298,7 +299,7 @@ class MatchstatsHelper(object):
         return stats
 
     @classmethod
-    def calculate_coprs(cls, matches: List[Match], year: Year) -> EventComponentOPRs:
+    def calculate_coprs(cls, matches: list[Match], year: Year) -> EventComponentOPRs:
         coprs: OrderedDict[Component, TeamStatMap] = OrderedDict()
 
         if matches is None or len(matches) == 0:
@@ -344,7 +345,7 @@ class MatchstatsHelper(object):
 
     @classmethod
     def get_last_event_stats(
-        cls, team_list: List[TeamId], event_key: ndb.Key
+        cls, team_list: list[TeamId], event_key: ndb.Key
     ) -> EventMatchStats:
         year = int(none_throws(event_key.string_id())[:4])
         cur_event = event_key.get()

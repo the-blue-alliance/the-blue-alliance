@@ -1,4 +1,4 @@
-from typing import cast, List, Optional, Set, TypedDict
+from typing import cast, TypedDict
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -19,9 +19,9 @@ from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
 class RenderedRankings(TypedDict):
-    rankings: List[EventRanking]
-    sort_order_info: Optional[List[RankingSortOrderInfo]]
-    extra_stats_info: List[RankingSortOrderInfo]
+    rankings: list[EventRanking]
+    sort_order_info: list[RankingSortOrderInfo] | None
+    extra_stats_info: list[RankingSortOrderInfo]
 
 
 class EventDetails(CachedModel):
@@ -31,7 +31,7 @@ class EventDetails(CachedModel):
     key_name is the event key, like '2010ct'
     """
 
-    alliance_selections: List[EventAlliance] = (
+    alliance_selections: list[EventAlliance] = (
         ndb.JsonProperty()
     )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points: EventDistrictPoints = cast(EventDistrictPoints, ndb.JsonProperty())
@@ -43,9 +43,9 @@ class EventDetails(CachedModel):
     )  # for OPR, DPR, CCWM, etc.
     coprs: EventComponentOPRs = cast(EventComponentOPRs, ndb.JsonProperty())
     insights: EventInsights = cast(EventInsights, ndb.JsonProperty())
-    predictions: Optional[EventPredictions] = cast(EventPredictions, ndb.JsonProperty())
+    predictions: EventPredictions | None = cast(EventPredictions, ndb.JsonProperty())
     rankings = ndb.JsonProperty()  # deprecated
-    rankings2: List[EventRanking] = ndb.JsonProperty()
+    rankings2: list[EventRanking] = ndb.JsonProperty()
 
     playoff_advancement: EventPlayoffAdvancement = cast(
         EventPlayoffAdvancement, ndb.JsonProperty()
@@ -54,7 +54,7 @@ class EventDetails(CachedModel):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "alliance_selections",
         "district_points",
         "matchstats",
@@ -135,7 +135,7 @@ class EventDetails(CachedModel):
 
         sort_order_info = RANKING_SORT_ORDERS.get(game_year)
 
-        extra_stats_info: List[RankingSortOrderInfo] = []
+        extra_stats_info: list[RankingSortOrderInfo] = []
         if has_extra_stats:
             if game_year == 2021:
                 # 2021 did not have matches played for rankings
@@ -155,7 +155,7 @@ class EventDetails(CachedModel):
         }
 
     @property
-    def rankings_table(self) -> Optional[List[List[str]]]:
+    def rankings_table(self) -> list[list[str]] | None:
         if not self.rankings2:
             return None
 

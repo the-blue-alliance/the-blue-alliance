@@ -1,5 +1,4 @@
 import json
-from typing import Dict, List
 
 from google.appengine.ext import ndb
 from pyre_extensions.refinement import none_throws
@@ -62,7 +61,7 @@ def setup_matches(event_key: EventKey = "2014casj") -> None:
     ).put()
 
 
-def setup_auth(access_types: List[AuthType], event_key: EventKey = "2014casj") -> None:
+def setup_auth(access_types: list[AuthType], event_key: EventKey = "2014casj") -> None:
     ApiAuthAccess(
         id=AUTH_ID,
         secret=AUTH_SECRET,
@@ -71,7 +70,7 @@ def setup_auth(access_types: List[AuthType], event_key: EventKey = "2014casj") -
     ).put()
 
 
-def get_auth_headers(request_path: str, request_body) -> Dict[str, str]:
+def get_auth_headers(request_path: str, request_body) -> dict[str, str]:
     return {
         "X-TBA-Auth-Id": AUTH_ID,
         "X-TBA-AUth-Sig": TrustedApiAuthHelper.compute_auth_signature(

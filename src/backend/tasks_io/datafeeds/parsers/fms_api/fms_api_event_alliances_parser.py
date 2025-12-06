@@ -1,11 +1,11 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from backend.common.models.alliance import EventAlliance, EventAllianceBackup
 from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
-class FMSAPIEventAlliancesParser(ParserJSON[List[EventAlliance]]):
-    def parse(self, response: Dict[str, Any]) -> Optional[List[EventAlliance]]:
+class FMSAPIEventAlliancesParser(ParserJSON[list[EventAlliance]]):
+    def parse(self, response: dict[str, Any]) -> list[EventAlliance] | None:
         alliances = []
 
         alliance_response = response["Alliances"]

@@ -1,4 +1,4 @@
-from typing import List, TypedDict
+from typing import TypedDict
 
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
@@ -13,10 +13,10 @@ class EventNameOverride(TypedDict):
 
 
 class ContentType(TypedDict):
-    set_start_to_last_day: List[EventKey]
-    event_name_override: List[EventNameOverride]
-    divisions_to_skip: List[EventKey]
-    skip_eventteams: List[EventKey]
+    set_start_to_last_day: list[EventKey]
+    event_name_override: list[EventNameOverride]
+    divisions_to_skip: list[EventKey]
+    skip_eventteams: list[EventKey]
 
 
 class ChampsRegistrationHacks(Sitevar[ContentType]):

@@ -1,6 +1,5 @@
 import json
 from dataclasses import asdict
-from typing import Optional
 
 from flask import abort, Blueprint, make_response, request, Response, url_for
 from google.appengine.api import taskqueue
@@ -20,7 +19,7 @@ blueprint = Blueprint("ra_api", __name__)
 
 @blueprint.route("/tasks/get/regional_advancement/", defaults={"year": None})
 @blueprint.route("/tasks/get/regional_advancement/<int:year>")
-def get_regional_advancement(year: Optional[Year]) -> Response:
+def get_regional_advancement(year: Year | None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 

@@ -1,15 +1,15 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from backend.common.helpers.rankings_helper import RankingsHelper
 from backend.common.models.event_ranking import EventRanking
 from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
-class FMSAPIEventRankingsParser(ParserJSON[List[EventRanking]]):
+class FMSAPIEventRankingsParser(ParserJSON[list[EventRanking]]):
     def __init__(self, year: int) -> None:
         self.year = year
 
-    def parse(self, response: Dict[str, Any]) -> Optional[List[EventRanking]]:
+    def parse(self, response: dict[str, Any]) -> list[EventRanking] | None:
         rankings = []
 
         for team in response["Rankings"]:

@@ -2,20 +2,9 @@ import heapq
 import logging
 import math
 from collections import defaultdict
+from collections.abc import Sequence
 from datetime import timedelta
-from typing import (
-    cast,
-    DefaultDict,
-    Dict,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    TypedDict,
-    Union,
-)
+from typing import cast, NamedTuple, TypedDict
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -50,10 +39,10 @@ class DistrictRankingTeamTotal(TypedDict):
     This is used internally in DistrictHelper to compute ranking components per-team
     """
 
-    event_points: List[Tuple[Event, TeamAtEventDistrictPoints]]
+    event_points: list[tuple[Event, TeamAtEventDistrictPoints]]
     point_total: int
     tiebreakers: Sequence[int]
-    qual_scores: List[int]
+    qual_scores: list[int]
     rookie_bonus: int
     single_event_bonus: int
     other_bonus: int
@@ -213,15 +202,15 @@ class DistrictHelper:
     @classmethod
     def calculate_rankings(
         cls,
-        events: List[Event],
-        teams: Union[List[Team], TypedFuture[List[Team]]],
+        events: list[Event],
+        teams: list[Team] | TypedFuture[list[Team]],
         year: Year,
-        adjustments: Optional[Dict[TeamKey, int]],
-    ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
+        adjustments: dict[TeamKey, int] | None,
+    ) -> dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two events and district championship
-        events_by_key: Dict[EventKey, Event] = {}
-        team_attendance: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
-        team_totals: Dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
+        events_by_key: dict[EventKey, Event] = {}
+        team_attendance: defaultdict[TeamKey, list[EventKey]] = defaultdict(list)
+        team_totals: dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
             lambda: DistrictRankingTeamTotal(
                 event_points=[],
                 point_total=0,
@@ -307,7 +296,7 @@ class DistrictHelper:
 
         # adding in rookie bonus
         # save valid team keys
-        valid_team_keys: Set[TeamKey] = set()
+        valid_team_keys: set[TeamKey] = set()
         if isinstance(teams, ndb.tasklets.Future):
             teams = teams.get_result()
 
@@ -389,8 +378,8 @@ class DistrictHelper:
     @classmethod
     def _get_alliance_number_from_teams(
         cls,
-        alliance_selections: List[EventAlliance],
-        teams: List[TeamKey],
+        alliance_selections: list[EventAlliance],
+        teams: list[TeamKey],
     ):
         for pos in [0, 1, 2]:
             search_team = teams[pos]
@@ -403,19 +392,19 @@ class DistrictHelper:
     def _calc_elim_match_points(
         cls,
         district_points: EventDistrictPoints,
-        matches: List[Match],
-        alliance_selections: List[EventAlliance],
+        matches: list[Match],
+        alliance_selections: list[EventAlliance],
         playoff_type: PlayoffType,
         POINTS_MULTIPLIER: int,
     ):
-        double_elim_alliance_pts: DefaultDict[int, int] = defaultdict(int)
-        double_elim_alliance_wins: DefaultDict[int, int] = defaultdict(int)
-        double_elim_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
-        elim_alliances: DefaultDict[TeamKey, int] = defaultdict(int)
+        double_elim_alliance_pts: defaultdict[int, int] = defaultdict(int)
+        double_elim_alliance_wins: defaultdict[int, int] = defaultdict(int)
+        double_elim_team_wins: defaultdict[TeamKey, int] = defaultdict(int)
+        elim_alliances: defaultdict[TeamKey, int] = defaultdict(int)
 
-        finals_alliance_wins: DefaultDict[int, int] = defaultdict(int)
-        finals_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
-        finals_team_pts: DefaultDict[TeamKey, int] = defaultdict(int)
+        finals_alliance_wins: defaultdict[int, int] = defaultdict(int)
+        finals_team_wins: defaultdict[TeamKey, int] = defaultdict(int)
+        finals_team_pts: defaultdict[TeamKey, int] = defaultdict(int)
 
         if playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
             sf_points = DistrictPointValues.DE_4_SF_WIN
@@ -480,20 +469,20 @@ class DistrictHelper:
     def _calc_elim_match_points_2023(
         cls,
         district_points: EventDistrictPoints,
-        matches: List[Match],
-        alliance_selections: List[EventAlliance],
+        matches: list[Match],
+        alliance_selections: list[EventAlliance],
         playoff_type: PlayoffType,
         POINTS_MULTIPLIER: int,
     ):
         # match_set_key -> alliance -> num wins
-        elim_num_wins: DefaultDict[str, DefaultDict[AllianceColor, int]] = defaultdict(
+        elim_num_wins: defaultdict[str, defaultdict[AllianceColor, int]] = defaultdict(
             lambda: defaultdict(int)
         )
 
-        elim_alliance_pts: DefaultDict[int, int] = defaultdict(int)
-        elim_alliance_wins: DefaultDict[int, int] = defaultdict(int)
-        elim_team_wins: DefaultDict[TeamKey, int] = defaultdict(int)
-        elim_alliances: DefaultDict[TeamKey, int] = defaultdict(int)
+        elim_alliance_pts: defaultdict[int, int] = defaultdict(int)
+        elim_alliance_wins: defaultdict[int, int] = defaultdict(int)
+        elim_team_wins: defaultdict[TeamKey, int] = defaultdict(int)
+        elim_alliances: defaultdict[TeamKey, int] = defaultdict(int)
 
         if playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
             sf_points = DistrictPointValues.DE_4_SF_WIN
@@ -549,16 +538,16 @@ class DistrictHelper:
     def _calc_elim_match_points_pre_2023(
         cls,
         district_points: EventDistrictPoints,
-        matches: List[Match],
+        matches: list[Match],
         POINTS_MULTIPLIER: int,
     ):
         # match_set_key -> alliance -> num wins
-        elim_num_wins: DefaultDict[str, DefaultDict[AllianceColor, int]] = defaultdict(
+        elim_num_wins: defaultdict[str, defaultdict[AllianceColor, int]] = defaultdict(
             lambda: defaultdict(int)
         )
 
         # match_set_key -> alliance -> list of list of teams
-        elim_alliances: DefaultDict[str, DefaultDict[AllianceColor, List[TeamKey]]] = (
+        elim_alliances: defaultdict[str, defaultdict[AllianceColor, list[TeamKey]]] = (
             defaultdict(lambda: defaultdict(list))
         )
         for match in matches:
@@ -607,7 +596,7 @@ class DistrictHelper:
     def _calc_elim_match_points_2015(
         cls,
         district_points: EventDistrictPoints,
-        matches: Dict[CompLevel, List[Match]],
+        matches: dict[CompLevel, list[Match]],
         POINTS_MULTIPLIER: int,
     ) -> None:
         # count number of matches played per team per comp level
@@ -687,7 +676,7 @@ class DistrictHelper:
     def _calc_wlt_based_match_points(
         cls,
         district_points: EventDistrictPoints,
-        matches: List[Match],
+        matches: list[Match],
         POINTS_MULTIPLIER: int,
     ) -> None:
         """
@@ -738,7 +727,7 @@ class DistrictHelper:
         cls,
         event: Event,
         district_points: EventDistrictPoints,
-        matches: List[Match],
+        matches: list[Match],
         POINTS_MULTIPLIER: int,
     ) -> None:
         """
@@ -828,9 +817,9 @@ class DistrictHelper:
 
     @classmethod
     def _alliance_selections_to_points(
-        self, event: Event, multiplier: int, alliance_selections: List[EventAlliance]
-    ) -> Dict[TeamKey, int]:
-        team_points: Dict[TeamKey, int] = {}
+        self, event: Event, multiplier: int, alliance_selections: list[EventAlliance]
+    ) -> dict[TeamKey, int]:
+        team_points: dict[TeamKey, int] = {}
         try:
             if event.key.id() == "2015micmp":
                 # Special case for 2015 Michigan District CMP, due to there being 16 alliances instead of 8

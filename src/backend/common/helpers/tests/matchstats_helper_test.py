@@ -1,6 +1,5 @@
 import json
 import os
-from typing import Dict
 
 import pytest
 
@@ -16,7 +15,7 @@ def auto_add_ndb_context(ndb_context) -> None:
 
 
 def api_data_to_matchstats(
-    api_data: Dict[StatType, Dict[TeamKey, float]],
+    api_data: dict[StatType, dict[TeamKey, float]],
 ) -> EventMatchStats:
     data: EventMatchStats = {}
     for stat_type in StatType:

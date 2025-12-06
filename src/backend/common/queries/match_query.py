@@ -1,4 +1,5 @@
-from typing import Any, Generator, List, Optional
+from collections.abc import Generator
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -13,7 +14,7 @@ from backend.common.queries.dict_converters.match_converter import (
 from backend.common.tasklets import typed_tasklet
 
 
-class MatchQuery(CachedDatabaseQuery[Optional[Match], Optional[MatchDict]]):
+class MatchQuery(CachedDatabaseQuery[Match | None, MatchDict | None]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "match_{match_key}"
     MODEL_CACHING_ENABLED = False  # No need to cache a point query
@@ -23,12 +24,12 @@ class MatchQuery(CachedDatabaseQuery[Optional[Match], Optional[MatchDict]]):
         super().__init__(match_key=match_key)
 
     @typed_tasklet
-    def _query_async(self, match_key: MatchKey) -> Generator[Any, Any, Optional[Match]]:
+    def _query_async(self, match_key: MatchKey) -> Generator[Any, Any, Match | None]:
         match = yield Match.get_by_id_async(match_key)
         return match
 
 
-class EventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
+class EventMatchesQuery(CachedDatabaseQuery[list[Match], list[MatchDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "event_matches_{event_key}"
     DICT_CONVERTER = MatchConverter
@@ -37,14 +38,14 @@ class EventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Match]]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, list[Match]]:
         matches = yield Match.query(
             Match.event == ndb.Key(Event, event_key)
         ).fetch_async()
         return matches
 
 
-class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
+class TeamEventMatchesQuery(CachedDatabaseQuery[list[Match], list[MatchDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_event_matches_{team_key}_{event_key}"
     DICT_CONVERTER = MatchConverter
@@ -55,7 +56,7 @@ class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     @typed_tasklet
     def _query_async(
         self, team_key: TeamKey, event_key: EventKey
-    ) -> Generator[Any, Any, List[Match]]:
+    ) -> Generator[Any, Any, list[Match]]:
         match_keys = yield Match.query(
             Match.team_key_names == team_key, Match.event == ndb.Key(Event, event_key)
         ).fetch_async(keys_only=True)
@@ -63,7 +64,7 @@ class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
         return list(filter(None, matches))
 
 
-class TeamYearMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
+class TeamYearMatchesQuery(CachedDatabaseQuery[list[Match], list[MatchDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_year_matches_{team_key}_{year}"
     DICT_CONVERTER = MatchConverter
@@ -74,7 +75,7 @@ class TeamYearMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     @typed_tasklet
     def _query_async(
         self, team_key: TeamKey, year: Year
-    ) -> Generator[Any, Any, List[Match]]:
+    ) -> Generator[Any, Any, list[Match]]:
         match_keys = yield Match.query(
             Match.team_key_names == team_key, Match.year == year
         ).fetch_async(keys_only=True)

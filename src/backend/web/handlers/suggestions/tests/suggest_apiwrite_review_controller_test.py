@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import cast, Dict, List, Optional, Tuple
+from typing import cast
 from urllib.parse import urlparse
 
 import pytest
@@ -54,8 +54,8 @@ def login_user_with_permission(login_user):
 
 
 def get_suggestion_queue_and_fields(
-    web_client: Client, suggestion_id: Optional[int] = None
-) -> Tuple[List[str], Dict]:
+    web_client: Client, suggestion_id: int | None = None
+) -> tuple[list[str], dict]:
     response = web_client.get("/suggest/apiwrite/review")
     assert response.status_code == 200
     soup = BeautifulSoup(response.data, "html.parser")

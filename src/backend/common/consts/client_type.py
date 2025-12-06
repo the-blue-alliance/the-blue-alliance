@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import enum
-from typing import Dict, Set
 
 
 @enum.unique
@@ -14,13 +13,13 @@ class ClientType(enum.IntEnum):
     TEST = 4
 
 
-FCM_CLIENTS: Set[ClientType] = {
+FCM_CLIENTS: set[ClientType] = {
     ClientType.OS_IOS,
     ClientType.WEB,
 }
 
 
-NAMES: Dict[ClientType, str] = {
+NAMES: dict[ClientType, str] = {
     ClientType.OS_ANDROID: "Android",
     ClientType.OS_IOS: "iOS",
     ClientType.WEBHOOK: "Webhook",
@@ -28,7 +27,7 @@ NAMES: Dict[ClientType, str] = {
     ClientType.TEST: "Test",
 }
 
-ENUMS: Dict[str, ClientType] = {
+ENUMS: dict[str, ClientType] = {
     "android": ClientType.OS_ANDROID,
     "ios": ClientType.OS_IOS,
     "webhook": ClientType.WEBHOOK,

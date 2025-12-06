@@ -1,5 +1,5 @@
 import enum
-from typing import List, Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.consts.string_enum import StrEnum
 from backend.common.models.alliance import EventAllianceBackup, PlayoffAllianceStatus
@@ -20,12 +20,12 @@ class RankingSortOrderInfo(TypedDict):
 
 
 class EventTeamRanking(TypedDict):
-    rank: Optional[int]
+    rank: int | None
     matches_played: int
-    dq: Optional[int]
-    record: Optional[WLTRecord]
-    qual_average: Optional[float]
-    sort_orders: Optional[List[float]]
+    dq: int | None
+    record: WLTRecord | None
+    qual_average: float | None
+    sort_orders: list[float] | None
     team_key: TeamKey
 
 
@@ -33,25 +33,25 @@ class EventTeamStatusQual(TypedDict):
     status: EventTeamLevelStatus
     num_teams: int
     ranking: EventTeamRanking
-    sort_order_info: Optional[List[RankingSortOrderInfo]]
+    sort_order_info: list[RankingSortOrderInfo] | None
 
 
 class EventTeamStatusAlliance(TypedDict):
-    name: Optional[str]
+    name: str | None
     number: int
     pick: int
-    backup: Optional[EventAllianceBackup]
+    backup: EventAllianceBackup | None
 
 
 class EventTeamStatus(TypedDict):
-    qual: Optional[EventTeamStatusQual]
-    playoff: Optional[PlayoffAllianceStatus]
-    alliance: Optional[EventTeamStatusAlliance]
-    last_match_key: Optional[str]
-    next_match_key: Optional[str]
+    qual: EventTeamStatusQual | None
+    playoff: PlayoffAllianceStatus | None
+    alliance: EventTeamStatusAlliance | None
+    last_match_key: str | None
+    next_match_key: str | None
 
 
 class EventTeamStatusStrings(TypedDict):
-    alliance: Optional[str]
-    playoff: Optional[str]
-    overall: Optional[str]
+    alliance: str | None
+    playoff: str | None
+    overall: str | None

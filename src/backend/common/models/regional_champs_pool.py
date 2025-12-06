@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional, Set
-
 from google.appengine.ext import ndb
 
 from backend.common.helpers.season_helper import SeasonHelper
@@ -20,15 +18,15 @@ class RegionalChampsPool(CachedModel):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    rankings: List[RegionalPoolRanking] = ndb.JsonProperty()
+    rankings: list[RegionalPoolRanking] = ndb.JsonProperty()
 
     # Dict of team key -> advancement data
     advancement: RegionalPoolAdvancement = ndb.JsonProperty()
 
     # other changes from FIRST to correct errors
-    adjustments: Dict[TeamKey, int] = ndb.JsonProperty()
+    adjustments: dict[TeamKey, int] = ndb.JsonProperty()
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "adjustments",
         "advancement",
         "rankings",
@@ -45,7 +43,7 @@ class RegionalChampsPool(CachedModel):
         return f"{self.year}"
 
     @classmethod
-    def get_for_year(cls, year: Year) -> Optional["RegionalChampsPool"]:
+    def get_for_year(cls, year: Year) -> "RegionalChampsPool | None":
         if year not in SeasonHelper.get_valid_regional_pool_years():
             return None
 

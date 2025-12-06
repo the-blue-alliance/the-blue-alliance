@@ -1,6 +1,5 @@
 from abc import ABC
 from collections import defaultdict
-from typing import List, Optional
 
 from google.appengine.ext import ndb
 
@@ -24,7 +23,7 @@ class AbstractLeaderboardCalculator(ABC):
     def on_event(self, event: Event) -> None:
         pass
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         pass
 
 
@@ -38,7 +37,7 @@ class MostBlueBannersCalculator(AbstractLeaderboardCalculator):
                 for team_key in award.team_list:
                     self.count[team_key.id()] += 1
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         return make_leaderboard_from_dict_counts(
             self.count, Insight.TYPED_LEADERBOARD_BLUE_BANNERS, year
         )
@@ -56,7 +55,7 @@ class MostAwardsCalculator(AbstractLeaderboardCalculator):
             for team_key in award.team_list:
                 self.count[team_key.id()] += 1
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         return make_leaderboard_from_dict_counts(
             self.count, Insight.TYPED_LEADERBOARD_MOST_AWARDS, year
         )
@@ -75,7 +74,7 @@ class MostNonChampsEventWinsCalculator(AbstractLeaderboardCalculator):
                 for team_key in award.team_list:
                     self.count[team_key.id()] += 1
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         return make_leaderboard_from_dict_counts(
             self.count, Insight.TYPED_LEADERBOARD_MOST_NON_CHAMPS_EVENT_WINS, year
         )
@@ -91,7 +90,7 @@ class MostMatchesPlayedCalculator(AbstractLeaderboardCalculator):
                 for team_key in match.team_keys:
                     self.count[team_key.id()] += 1
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         return make_leaderboard_from_dict_counts(
             self.count, Insight.TYPED_LEADERBOARD_MOST_MATCHES_PLAYED, year
         )
@@ -107,7 +106,7 @@ class MostEventsPlayedAtCalculator(AbstractLeaderboardCalculator):
                 for team_key in match.team_keys:
                     self.events_played[team_key.id()].add(event.key_name)
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         return make_leaderboard_from_dict_counts(
             {tk: len(events) for tk, events in self.events_played.items()},
             Insight.TYPED_LEADERBOARD_MOST_EVENTS_PLAYED_AT,
@@ -128,7 +127,7 @@ class MostUniqueTeamsPlayedWithOrAgainstCalculator(AbstractLeaderboardCalculator
                             self.seen_teams[a].add(b)
                             self.seen_teams[b].add(a)
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         return make_leaderboard_from_dict_counts(
             {tk: len(teams) for tk, teams in self.seen_teams.items()},
             Insight.TYPED_LEADERBOARD_MOST_UNIQUE_TEAMS_PLAYED_WITH_AGAINST,
@@ -149,7 +148,7 @@ class MostNonChampsImpactWinsCalculator(AbstractLeaderboardCalculator):
                 for team_key in award.team_list:
                     self.count[team_key.id()] += 1
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         if year != 0:
             return None
 
@@ -171,7 +170,7 @@ class MostWffasCalculator(AbstractLeaderboardCalculator):
                 for team_key in award.team_list:
                     self.count[team_key.id()] += 1
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         if year != 0:
             return None
 
@@ -202,7 +201,7 @@ class LongestEinsteinStreakCalculator(AbstractLeaderboardCalculator):
         return a == b + 1 or a == b - 1
 
     @staticmethod
-    def get_streaks(appearances: List[int]) -> List[int]:
+    def get_streaks(appearances: list[int]) -> list[int]:
         streaks = []
         current_streak = 0
 
@@ -221,7 +220,7 @@ class LongestEinsteinStreakCalculator(AbstractLeaderboardCalculator):
         streaks.append(current_streak)
         return streaks
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         if year != 0:
             return None
 
@@ -267,7 +266,7 @@ class LongestQualifyingEventStreakCalculator(AbstractLeaderboardCalculator):
             if team.key_name not in winners and self.active_streaks[team.key_name] > 0:
                 self.active_streaks[team.key_name] = 0
 
-    def make_insight(self, year: Year) -> Optional[Insight]:
+    def make_insight(self, year: Year) -> Insight | None:
         if year != 0:
             return None
 
@@ -287,8 +286,8 @@ class LongestQualifyingEventStreakCalculator(AbstractLeaderboardCalculator):
 class InsightsLeaderboardTeamCalculator:
     @staticmethod
     def make_insights(
-        year: Year, calculators: Optional[List[AbstractLeaderboardCalculator]] = None
-    ) -> List[Insight]:
+        year: Year, calculators: list[AbstractLeaderboardCalculator] | None = None
+    ) -> list[Insight]:
         if calculators is None:
             calculators = [
                 MostBlueBannersCalculator(),

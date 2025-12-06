@@ -1,5 +1,3 @@
-from typing import List
-
 from google.appengine.ext import ndb
 
 from backend.common.consts.comp_level import CompLevel
@@ -9,7 +7,7 @@ from backend.common.models.match import Match
 from backend.common.queries.match_query import TeamYearMatchesQuery
 
 
-def preseed_matches(n: int, event_key: EventKey, team_keys: List[TeamKey]) -> None:
+def preseed_matches(n: int, event_key: EventKey, team_keys: list[TeamKey]) -> None:
     matches = [
         Match(
             id=f"{event_key}_qm{i}",

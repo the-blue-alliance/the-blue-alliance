@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
@@ -32,7 +30,7 @@ from backend.common.queries.team_query import EventEventTeamsQuery, EventTeamsQu
 @api_authenticated
 @validate_keys
 @cached_public
-def event(event_key: EventKey, model_type: Optional[ModelType] = None) -> Response:
+def event(event_key: EventKey, model_type: ModelType | None = None) -> Response:
     """
     Returns info about one event, specified by |event_key|.
     """
@@ -46,7 +44,7 @@ def event(event_key: EventKey, model_type: Optional[ModelType] = None) -> Respon
 
 @api_authenticated
 @cached_public
-def event_list_all(model_type: Optional[ModelType] = None) -> Response:
+def event_list_all(model_type: ModelType | None = None) -> Response:
     """
     Returns a list of all events.
     """
@@ -70,7 +68,7 @@ def event_list_all(model_type: Optional[ModelType] = None) -> Response:
 
 @api_authenticated
 @cached_public
-def event_list_year(year: int, model_type: Optional[ModelType] = None) -> Response:
+def event_list_year(year: int, model_type: ModelType | None = None) -> Response:
     """
     Returns a list of all events for a given year.
     """
@@ -132,9 +130,7 @@ def event_advancement_points(event_key: EventKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def event_teams(
-    event_key: EventKey, model_type: Optional[ModelType] = None
-) -> Response:
+def event_teams(event_key: EventKey, model_type: ModelType | None = None) -> Response:
     """
     Returns a list of teams attending a given event.
     """
@@ -188,9 +184,7 @@ def event_teams_media(event_key: EventKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def event_matches(
-    event_key: EventKey, model_type: Optional[ModelType] = None
-) -> Response:
+def event_matches(event_key: EventKey, model_type: ModelType | None = None) -> Response:
     """
     Returns a list of matches for a given event.
     """

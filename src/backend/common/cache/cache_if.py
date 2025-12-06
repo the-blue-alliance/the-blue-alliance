@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, TypedDict
 
 from backend.common.futures import TypedFuture
 
@@ -21,7 +21,7 @@ class CacheStats(TypedDict):
 
 class CacheIf(abc.ABC):
     @abc.abstractmethod
-    def set(self, key: bytes, value: Any, time: Optional[int] = None) -> bool:
+    def set(self, key: bytes, value: Any, time: int | None = None) -> bool:
         """Sets a key's value, regardless of previous contents in cache.
 
         Unlike add() and replace(), this method always sets (or
@@ -42,15 +42,15 @@ class CacheIf(abc.ABC):
 
     @abc.abstractmethod
     def set_async(
-        self, key: bytes, value: Any, time: Optional[int] = None
+        self, key: bytes, value: Any, time: int | None = None
     ) -> TypedFuture[bool]: ...
 
     @abc.abstractmethod
     def set_multi(
         self,
-        mapping: Dict[bytes, Any],
-        time: Optional[int] = None,
-        namespace: Optional[str] = None,
+        mapping: dict[bytes, Any],
+        time: int | None = None,
+        namespace: str | None = None,
     ) -> None:
         """Set multiple keys' values at once, regardless of previous contents.
 
@@ -68,7 +68,7 @@ class CacheIf(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get(self, key: bytes) -> Optional[Any]:
+    def get(self, key: bytes) -> Any | None:
         """Looks up a single key in memcache.
 
         If you have multiple items to load, though, it's much more efficient
@@ -85,14 +85,14 @@ class CacheIf(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_async(self, key: bytes) -> TypedFuture[Optional[Any]]: ...
+    def get_async(self, key: bytes) -> TypedFuture[Any | None]: ...
 
     @abc.abstractmethod
     def get_multi(
         self,
-        keys: List[bytes],
-        namespace: Optional[str] = None,
-    ) -> Dict[bytes, Optional[Any]]:
+        keys: list[bytes],
+        namespace: str | None = None,
+    ) -> dict[bytes, Any | None]:
         """Looks up multiple keys from memcache in one operation.
 
         This is the recommended way to do bulk loads.
@@ -120,7 +120,7 @@ class CacheIf(abc.ABC):
         """
 
     @abc.abstractmethod
-    def delete_multi(self, keys: List[bytes]) -> None:
+    def delete_multi(self, keys: list[bytes]) -> None:
         """Delete multiple keys at once.
 
         Args:
@@ -128,7 +128,7 @@ class CacheIf(abc.ABC):
         """
 
     @abc.abstractmethod
-    def incr(self, key: bytes) -> Optional[int]:
+    def incr(self, key: bytes) -> int | None:
         """Atomically increments a key's value.
 
         Internally, the value is a unsigned 64-bit integer.  Memcache
@@ -144,7 +144,7 @@ class CacheIf(abc.ABC):
         """
 
     @abc.abstractmethod
-    def decr(self, key: bytes) -> Optional[int]:
+    def decr(self, key: bytes) -> int | None:
         """Atomically decrements a key's value.
 
         Internally, the value is a unsigned 64-bit integer.  Memcache
@@ -160,7 +160,7 @@ class CacheIf(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_stats(self) -> Optional[CacheStats]:
+    def get_stats(self) -> CacheStats | None:
         """Gets memcache statistics for this application.
 
         All of these statistics may reset due to various transient conditions. They

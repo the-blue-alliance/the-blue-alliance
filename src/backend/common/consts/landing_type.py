@@ -1,5 +1,4 @@
 import enum
-from typing import Dict
 
 
 @enum.unique
@@ -13,7 +12,7 @@ class LandingType(enum.IntEnum):
     CHAMPS = 6
 
 
-LANDING_TYPE_NAMES: Dict[LandingType, str] = {
+LANDING_TYPE_NAMES: dict[LandingType, str] = {
     LandingType.KICKOFF: "Kickoff",
     LandingType.BUILDSEASON: "Build Season",
     LandingType.COMPETITIONSEASON: "Competition Season",

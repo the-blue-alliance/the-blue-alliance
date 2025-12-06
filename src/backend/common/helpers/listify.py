@@ -1,17 +1,17 @@
-from typing import List, overload, TypeVar, Union
+from typing import overload, TypeVar
 
 TThing = TypeVar("TThing")
 
 
 @overload
-def listify(thing: List[TThing]) -> List[TThing]: ...
+def listify(thing: list[TThing]) -> list[TThing]: ...
 
 
 @overload
-def listify(thing: TThing) -> List[TThing]: ...
+def listify(thing: TThing) -> list[TThing]: ...
 
 
-def listify(thing: Union[TThing, List[TThing]]) -> List[TThing]:
+def listify(thing: TThing | list[TThing]) -> list[TThing]:
     if thing is None:
         return []
     elif not isinstance(thing, list):
@@ -20,7 +20,7 @@ def listify(thing: Union[TThing, List[TThing]]) -> List[TThing]:
         return thing
 
 
-def delistify(things: List[TThing]) -> Union[None, TThing, List[TThing]]:
+def delistify(things: list[TThing]) -> None | TThing | list[TThing]:
     if len(things) == 0:
         return []
     if len(things) == 1:

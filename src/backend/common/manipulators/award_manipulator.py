@@ -1,5 +1,4 @@
 import json
-from typing import List, Set
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
@@ -23,7 +22,7 @@ class AwardManipulator(ManipulatorBase[Award]):
     @classmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
-    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+    ) -> list[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.award_updated(affected_refs)
 
     @classmethod
@@ -74,8 +73,8 @@ class AwardManipulator(ManipulatorBase[Award]):
 
 
 @AwardManipulator.register_post_update_hook
-def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
-    event_keys: Set[ndb.Key] = set()
+def award_post_update_hook(updated_models: list[TUpdatedModel[Award]]) -> None:
+    event_keys: set[ndb.Key] = set()
     for updated_award in updated_models:
         event_keys.add(none_throws(updated_award.model.event))
 

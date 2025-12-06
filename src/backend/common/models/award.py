@@ -1,5 +1,5 @@
 import json
-from typing import cast, Dict, List, Optional
+from typing import cast
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -37,10 +37,10 @@ class Award(CachedModel):
         choices=event_type.EVENT_TYPES,
     )  # needed to query for awards from events of a certain event type
 
-    team_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
+    team_list: list[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
         kind=Team, repeated=True
     )  # key of team(s) that won the award (if applicable)
-    recipient_json_list: List[str] = ndb.StringProperty(  # pyre-ignore[8]
+    recipient_json_list: list[str] = ndb.StringProperty(  # pyre-ignore[8]
         repeated=True
     )  # JSON dict(s) with team_number and/or awardee
 
@@ -61,9 +61,9 @@ class Award(CachedModel):
             "event_type_enum": set(),
             "award_type_enum": set(),
         }
-        self._recipient_list: Optional[List[AwardRecipient]] = None
-        self._recipient_dict: Optional[Dict[Optional[int], List[AwardRecipient]]] = None
-        self._recipient_list_json: Optional[str] = None
+        self._recipient_list: list[AwardRecipient] | None = None
+        self._recipient_dict: dict[int | None, list[AwardRecipient]] | None = None
+        self._recipient_list_json: str | None = None
         super(Award, self).__init__(*args, **kw)
 
     @property
@@ -113,7 +113,7 @@ class Award(CachedModel):
             return self.name_str
 
     @property
-    def recipient_dict(self) -> Dict[Optional[int], List[AwardRecipient]]:
+    def recipient_dict(self) -> dict[int | None, list[AwardRecipient]]:
         """
         Uses recipient_list to add a recipient_dict property,
         where the key is the team_number and the value is a list of awardees.
@@ -131,7 +131,7 @@ class Award(CachedModel):
         return none_throws(self._recipient_dict)
 
     @property
-    def recipient_list(self) -> List[AwardRecipient]:
+    def recipient_list(self) -> list[AwardRecipient]:
         if self._recipient_list is None:
             recipient_list = []
             for recipient_json in self.recipient_json_list:

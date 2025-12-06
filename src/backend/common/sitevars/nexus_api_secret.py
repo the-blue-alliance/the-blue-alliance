@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.sitevars.sitevar import Sitevar
 
@@ -21,6 +21,6 @@ class NexusApiSecrets(Sitevar[ContentType]):
         return "For accessing the Nexus API"
 
     @classmethod
-    def auth_token(cls) -> Optional[str]:
+    def auth_token(cls) -> str | None:
         secret = cls.get().get("api_secret")
         return secret if secret else None  # drop empty strings

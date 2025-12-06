@@ -1,5 +1,4 @@
 import enum
-from typing import List
 
 from backend.common.consts.string_enum import StrEnum
 
@@ -16,7 +15,7 @@ class SuggestionType(StrEnum):
     EVENT_MEDIA = "event_media"
 
 
-SUGGESTION_TYPES: List[SuggestionType] = [t.value for t in SuggestionType]
+SUGGESTION_TYPES: list[str] = [t.value for t in SuggestionType]
 
 
 TYPE_NAMES = {

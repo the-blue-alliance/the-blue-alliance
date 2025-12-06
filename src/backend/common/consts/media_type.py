@@ -1,5 +1,4 @@
 import enum
-from typing import Dict, Set
 
 from backend.common.consts.string_enum import StrEnum
 
@@ -31,10 +30,10 @@ class MediaType(enum.IntEnum):
     CD_THREAD = 15
 
 
-MEDIA_TYPES: Set[MediaType] = {t for t in MediaType}
+MEDIA_TYPES: set[MediaType] = {t for t in MediaType}
 
 # Do not change! key_names are generated based on this
-SLUG_NAMES: Dict[MediaType, str] = {
+SLUG_NAMES: dict[MediaType, str] = {
     MediaType.YOUTUBE_VIDEO: "youtube",
     MediaType.CD_PHOTO_THREAD: "cdphotothread",
     MediaType.IMGUR: "imgur",
@@ -53,11 +52,11 @@ SLUG_NAMES: Dict[MediaType, str] = {
     MediaType.CD_THREAD: "cd-thread",
 }
 
-SLUG_NAME_TO_TYPE: Dict[str, MediaType] = {
+SLUG_NAME_TO_TYPE: dict[str, MediaType] = {
     slug: media_type for media_type, slug in SLUG_NAMES.items()
 }
 
-TYPE_NAMES: Dict[MediaType, str] = {
+TYPE_NAMES: dict[MediaType, str] = {
     MediaType.YOUTUBE_VIDEO: "YouTube Video",
     MediaType.CD_PHOTO_THREAD: "Chief Delphi Photo Thread",
     MediaType.IMGUR: "Imgur Image",
@@ -76,13 +75,13 @@ TYPE_NAMES: Dict[MediaType, str] = {
     MediaType.CD_THREAD: "Chief Delphi Thread",
 }
 
-IMAGE_TYPES: Set[MediaType] = {
+IMAGE_TYPES: set[MediaType] = {
     MediaType.CD_PHOTO_THREAD,
     MediaType.IMGUR,
     MediaType.INSTAGRAM_IMAGE,
 }
 
-SOCIAL_TYPES: Set[MediaType] = {
+SOCIAL_TYPES: set[MediaType] = {
     MediaType.FACEBOOK_PROFILE,
     MediaType.TWITTER_PROFILE,
     MediaType.YOUTUBE_CHANNEL,
@@ -93,14 +92,14 @@ SOCIAL_TYPES: Set[MediaType] = {
 }
 
 # Media used to back a Robot Profile
-ROBOT_TYPES: Set[MediaType] = {
+ROBOT_TYPES: set[MediaType] = {
     MediaType.GRABCAD,
     MediaType.ONSHAPE,
     MediaType.CD_THREAD,
 }
 
 # Format with foreign_key
-PROFILE_URLS: Dict[MediaType, str] = {
+PROFILE_URLS: dict[MediaType, str] = {
     MediaType.FACEBOOK_PROFILE: "https://www.facebook.com/{}",
     MediaType.TWITTER_PROFILE: "https://twitter.com/{}",
     MediaType.YOUTUBE_CHANNEL: "https://www.youtube.com/{}",
@@ -111,7 +110,7 @@ PROFILE_URLS: Dict[MediaType, str] = {
     MediaType.CD_THREAD: "https://www.chiefdelphi.com/t/{}",
 }
 
-SOCIAL_SORT_ORDER: Dict[MediaType, int] = {
+SOCIAL_SORT_ORDER: dict[MediaType, int] = {
     MediaType.FACEBOOK_PROFILE: 0,
     MediaType.YOUTUBE_CHANNEL: 1,
     MediaType.TWITTER_PROFILE: 2,

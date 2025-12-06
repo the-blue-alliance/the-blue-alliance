@@ -1,14 +1,14 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from backend.common.models.district import District
 from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
-class FMSAPIDistrictListParser(ParserJSON[List[District]]):
+class FMSAPIDistrictListParser(ParserJSON[list[District]]):
     def __init__(self, season: int) -> None:
         self.season = season
 
-    def parse(self, response: Dict[str, Any]) -> Optional[List[District]]:
+    def parse(self, response: dict[str, Any]) -> list[District] | None:
         districts = []
 
         for district in response["districts"]:

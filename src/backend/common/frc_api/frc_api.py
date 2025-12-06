@@ -3,7 +3,8 @@ import json
 import logging
 import os
 import re
-from typing import Any, cast, Dict, Generator, Literal, Optional
+from collections.abc import Generator
+from typing import Any, cast, Literal
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -35,9 +36,9 @@ class FRCAPI:
 
     def __init__(
         self,
-        auth_token: Optional[str] = None,
-        sim_time: Optional[datetime.datetime] = None,
-        sim_api_version: Optional[str] = None,
+        auth_token: str | None = None,
+        sim_time: datetime.datetime | None = None,
+        sim_api_version: str | None = None,
         save_response: bool = False,
     ):
         # Load auth_token from Sitevar if not specified
@@ -126,8 +127,8 @@ class FRCAPI:
     def awards(
         self,
         year: Year,
-        event_code: Optional[str] = None,
-        team_number: Optional[int] = None,
+        event_code: str | None = None,
+        team_number: int | None = None,
     ) -> TypedFuture[URLFetchResult]:
         if not event_code and not team_number:
             raise FRCAPI.ValidationError(
@@ -285,7 +286,7 @@ class FRCAPI:
             f"/{year}/matches/{event_code}?tournamentLevel={comp_level}", version
         )
         merged_content = self._merge_match_schedule_and_results(
-            cast(Dict, schedule_result.json()), cast(Dict, matches_result.json())
+            cast(dict, schedule_result.json()), cast(dict, matches_result.json())
         )
 
         versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
@@ -314,7 +315,7 @@ class FRCAPI:
                     break
 
             # Fetch response
-            content: Optional[str] = None
+            content: str | None = None
             if last_file_name:
                 with open(
                     os.path.join(
@@ -333,7 +334,7 @@ class FRCAPI:
             logging.exception("Error fetching sim frc api")
             return URLFetchResult.mock_for_content(url, 500, "")
 
-    def _merge_match_schedule_and_results(self, schedule: Dict, matches: Dict) -> Dict:
+    def _merge_match_schedule_and_results(self, schedule: dict, matches: dict) -> dict:
         scheduled_matches = schedule["Schedule"]
         if "Matches" not in matches:
             matches["Matches"] = [{}] * len(scheduled_matches)
@@ -345,7 +346,7 @@ class FRCAPI:
         }
 
     @classmethod
-    def _merge_match(cls, scheduled: Dict, result: Dict) -> Dict:
+    def _merge_match(cls, scheduled: dict, result: dict) -> dict:
         # Over the years, both "Teams" and "teams" have been used in FRC API responses...
         teams_key = "Teams" if "Teams" in scheduled else "teams"
 

@@ -1,6 +1,7 @@
 import abc
+from collections.abc import Generator
 from datetime import timedelta
-from typing import Any, Generator, Generic, Optional, TypeVar
+from typing import Any, Generic, TypeVar
 
 from backend.common.futures import TypedFuture
 from backend.common.memcache import MemcacheClient
@@ -36,14 +37,14 @@ class MemcacheModel(abc.ABC, Generic[DT]):
     def put_async(self, val: DT) -> TypedFuture[bool]:
         return self._put_async(val)
 
-    def get(self) -> Optional[DT]:
+    def get(self) -> DT | None:
         return self.get_async().get_result()
 
     @typed_tasklet  # pyre-ignore[56]
-    def _get_async(self) -> Generator[Any, Any, Optional[DT]]:
+    def _get_async(self) -> Generator[Any, Any, DT | None]:
         mc_key = self.key()
         ret = yield self.mc_client.get_async(mc_key)
         return ret
 
-    def get_async(self) -> TypedFuture[Optional[DT]]:
+    def get_async(self) -> TypedFuture[DT | None]:
         return self._get_async()

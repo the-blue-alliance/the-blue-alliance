@@ -1,5 +1,4 @@
 import json
-from typing import Dict, List, Optional
 
 from google.appengine.ext import ndb
 from werkzeug.test import Client
@@ -15,7 +14,7 @@ AUTH_SECRET = "321tEsTsEcReT"
 REQUEST_PATH = "/api/trusted/v1/event/2014casj/alliance_selections/update"
 
 
-def setup_event(remap_teams: Optional[Dict[str, str]] = None) -> None:
+def setup_event(remap_teams: dict[str, str] | None = None) -> None:
     Event(
         id="2014casj",
         year=2014,
@@ -25,7 +24,7 @@ def setup_event(remap_teams: Optional[Dict[str, str]] = None) -> None:
     ).put()
 
 
-def setup_auth(access_types: List[AuthType]) -> None:
+def setup_auth(access_types: list[AuthType]) -> None:
     ApiAuthAccess(
         id=AUTH_ID,
         secret=AUTH_SECRET,
@@ -34,7 +33,7 @@ def setup_auth(access_types: List[AuthType]) -> None:
     ).put()
 
 
-def get_auth_headers(request_path: str, request_body) -> Dict[str, str]:
+def get_auth_headers(request_path: str, request_body) -> dict[str, str]:
     return {
         "X-TBA-Auth-Id": AUTH_ID,
         "X-TBA-AUth-Sig": TrustedApiAuthHelper.compute_auth_signature(
@@ -124,7 +123,7 @@ def test_alliance_selections_update(api_client: Client) -> None:
     )
     assert response.status_code == 200, response.data
 
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     event_alliances = event.alliance_selections
     assert event_alliances is not None
@@ -155,7 +154,7 @@ def test_empty_alliance_selections_update(api_client: Client) -> None:
     )
     assert response.status_code == 200, response.data
 
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     event_alliances = event.alliance_selections
     assert event_alliances is not None
@@ -179,7 +178,7 @@ def test_alliance_selections_remapteams(api_client: Client) -> None:
     )
     assert response.status_code == 200, response.data
 
-    event: Optional[Event] = Event.get_by_id("2014casj")
+    event: Event | None = Event.get_by_id("2014casj")
     assert event is not None
     event_alliances = event.alliance_selections
     assert event_alliances is not None

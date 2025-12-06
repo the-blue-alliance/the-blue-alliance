@@ -1,5 +1,5 @@
 import logging
-from typing import List, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from google.appengine.api import taskqueue
 from pyre_extensions import none_throws
@@ -27,7 +27,7 @@ class MatchManipulator(ManipulatorBase[Match]):
     @classmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
-    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+    ) -> list[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.match_updated(affected_refs)
 
     @classmethod
@@ -50,7 +50,7 @@ class MatchManipulator(ManipulatorBase[Match]):
 
 
 @MatchManipulator.register_post_delete_hook
-def match_post_delete_hook(deleted_models: List[Match]) -> None:
+def match_post_delete_hook(deleted_models: list[Match]) -> None:
     for match in deleted_models:
         try:
             FirebasePusher.delete_match(match)
@@ -59,9 +59,9 @@ def match_post_delete_hook(deleted_models: List[Match]) -> None:
 
 
 @MatchManipulator.register_post_update_hook
-def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
-    affected_stats_event_keys: Set[EventKey] = set()
-    affected_stats_events: List[Event] = []
+def match_post_update_hook(updated_models: list[TUpdatedModel[Match]]) -> None:
+    affected_stats_event_keys: set[EventKey] = set()
+    affected_stats_events: list[Event] = []
 
     for updated_model in updated_models:
         event_key: EventKey = none_throws(updated_model.model.event.string_id())

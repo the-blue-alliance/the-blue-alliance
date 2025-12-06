@@ -1,4 +1,5 @@
-from typing import Any, Dict, Generator, List, Tuple
+from collections.abc import Generator
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -20,12 +21,12 @@ class LiveEventHelper:
     @typed_toplevel
     def get_live_events_with_current_webcasts(
         cls,
-    ) -> Generator[Any, Any, Tuple[Dict[EventKey, Event], List[TSpecialWebcast]]]:
+    ) -> Generator[Any, Any, tuple[dict[EventKey, Event], list[TSpecialWebcast]]]:
         week_events = EventHelper.week_events()
-        events_by_key: Dict[EventKey, Event] = {}
+        events_by_key: dict[EventKey, Event] = {}
 
-        live_events: List[Event] = []
-        webcast_status_futures: List[TypedFuture[None]] = []
+        live_events: list[Event] = []
+        webcast_status_futures: list[TypedFuture[None]] = []
         for event in week_events:
             if event.now:
                 event._webcast = event.current_webcasts  # Only show current webcasts
@@ -50,7 +51,7 @@ class LiveEventHelper:
                     )
             events_by_key[event.key.id()] = event
 
-        special_webcasts: List[TSpecialWebcast] = (
+        special_webcasts: list[TSpecialWebcast] = (
             yield SpecialWebcastHelper.get_special_webcasts_with_online_status_async()
         )
 

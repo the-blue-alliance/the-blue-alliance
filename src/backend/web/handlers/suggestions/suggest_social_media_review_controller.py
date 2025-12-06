@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import redirect, request
 from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
@@ -22,7 +20,7 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBase[Media]):
     def __init__(self, *args, **kw) -> None:
         super(SuggestSocialMediaReviewController, self).__init__(*args, **kw)
 
-    def create_target_model(self, suggestion: Suggestion) -> Optional[Media]:
+    def create_target_model(self, suggestion: Suggestion) -> Media | None:
         # Create a basic Media from this suggestion
         return MediaCreator.from_suggestion(suggestion)
 

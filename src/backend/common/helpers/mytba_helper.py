@@ -1,5 +1,3 @@
-from typing import Optional
-
 from google.appengine.ext import ndb
 
 from backend.common.consts.model_type import ModelType
@@ -10,7 +8,7 @@ from backend.common.models.subscription import Subscription
 
 class MyTBAHelper:
     @staticmethod
-    def add_favorite(fav: Favorite, device_key: Optional[str] = None) -> bool:
+    def add_favorite(fav: Favorite, device_key: str | None = None) -> bool:
         """
         returns true if the favorite was successfully added,
         or false if it already existed
@@ -35,7 +33,7 @@ class MyTBAHelper:
         account_key: ndb.Key,
         model_key: str,
         model_type: ModelType,
-        device_key: Optional[str] = None,
+        device_key: str | None = None,
     ) -> bool:
         """
         returns true if the favorite was deleted,
@@ -56,7 +54,7 @@ class MyTBAHelper:
             return False
 
     @staticmethod
-    def add_subscription(sub: Subscription, device_key: Optional[str] = None) -> bool:
+    def add_subscription(sub: Subscription, device_key: str | None = None) -> bool:
         """
         return true if the subscription was successfully added
         or false if it already existed
@@ -96,7 +94,7 @@ class MyTBAHelper:
         parent_key: ndb.Key,
         model_key: str,
         model_type: ModelType,
-        device_key: Optional[str] = None,
+        device_key: str | None = None,
     ) -> bool:
         """
         return true if the subscription was successfully deleted

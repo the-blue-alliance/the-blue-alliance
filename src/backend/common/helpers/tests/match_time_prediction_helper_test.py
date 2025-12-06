@@ -1,6 +1,5 @@
 import copy
 import json
-from typing import List
 
 from dateutil import tz
 from google.appengine.ext import testbed
@@ -25,7 +24,7 @@ def _mark_match_unplayed(match: Match) -> None:
 
 
 def _mark_match_played(
-    test_matches: List[Match], original_matches: List[Match], i: int
+    test_matches: list[Match], original_matches: list[Match], i: int
 ) -> None:
     test_matches[i].alliances_json = original_matches[i].alliances_json
     test_matches[i]._alliances = None

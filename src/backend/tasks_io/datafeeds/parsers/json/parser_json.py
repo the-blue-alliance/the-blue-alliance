@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, Optional, TypeVar
+from typing import Any, TypeVar
 
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
@@ -14,4 +14,4 @@ class ParserJSON(ParserBase[TParsedResponse]):
     """
 
     @abc.abstractmethod
-    def parse(self, response: Dict[str, Any]) -> Optional[TParsedResponse]: ...
+    def parse(self, response: dict[str, Any]) -> TParsedResponse | None: ...

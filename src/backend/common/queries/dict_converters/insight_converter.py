@@ -1,11 +1,11 @@
 import json
-from typing import Dict, List, NewType
+from typing import NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.insight import Insight
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
-InsightDict = NewType("InsightDict", Dict)
+InsightDict = NewType("InsightDict", dict)
 
 
 class InsightConverter(ConverterBase):
@@ -15,15 +15,15 @@ class InsightConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[Insight], version: ApiMajorVersion
-    ) -> List[InsightDict]:
+        cls, model_list: list[Insight], version: ApiMajorVersion
+    ) -> list[InsightDict]:
         INSIGHT_CONVERTERS = {
             ApiMajorVersion.API_V3: cls.insightsConverter_v3,
         }
         return INSIGHT_CONVERTERS[version](model_list)
 
     @classmethod
-    def insightsConverter_v3(cls, insights: List[Insight]) -> List[InsightDict]:
+    def insightsConverter_v3(cls, insights: list[Insight]) -> list[InsightDict]:
         return list(map(cls.insightConverter_v3, insights))
 
     @classmethod

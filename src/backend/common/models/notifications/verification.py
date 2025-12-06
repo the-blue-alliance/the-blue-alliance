@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from backend.common.consts.notification_type import NotificationType
 from backend.common.models.notifications.notification import Notification
@@ -40,8 +40,8 @@ class VerificationNotification(Notification):
 
     # Only webhook message data is defined - because we'll only ever send verification to webhooks
     @property
-    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
+    def webhook_message_data(self) -> dict[str, Any] | None:
         return {"verification_key": self.verification_key}
 
-    def _additional_logging_values(self) -> List[Tuple[str, str]]:
+    def _additional_logging_values(self) -> list[tuple[str, str]]:
         return [(self.verification_key, "verification_key")]

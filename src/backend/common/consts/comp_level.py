@@ -1,5 +1,4 @@
 import enum
-from typing import Dict, List
 
 from backend.common.consts.string_enum import StrEnum
 
@@ -24,12 +23,12 @@ class CompLevel(StrEnum):
         return None
 
 
-COMP_LEVELS: List[CompLevel] = [e.value for e in CompLevel]
+COMP_LEVELS: list[CompLevel] = [e.value for e in CompLevel]
 
-ELIM_LEVELS: List[CompLevel] = [e.value for e in CompLevel if e != CompLevel.QM]
+ELIM_LEVELS: list[CompLevel] = [e.value for e in CompLevel if e != CompLevel.QM]
 
 
-COMP_LEVELS_VERBOSE: Dict[CompLevel, str] = {
+COMP_LEVELS_VERBOSE: dict[CompLevel, str] = {
     CompLevel.QM: "Quals",
     CompLevel.QM: "Quals",
     CompLevel.EF: "Eighths",
@@ -39,7 +38,7 @@ COMP_LEVELS_VERBOSE: Dict[CompLevel, str] = {
 }
 
 
-COMP_LEVELS_VERBOSE_FULL: Dict[CompLevel, str] = {
+COMP_LEVELS_VERBOSE_FULL: dict[CompLevel, str] = {
     CompLevel.QM: "Qualification",
     CompLevel.EF: "Octo-finals",
     CompLevel.QF: "Quarterfinals",
@@ -48,7 +47,7 @@ COMP_LEVELS_VERBOSE_FULL: Dict[CompLevel, str] = {
 }
 
 
-COMP_LEVELS_PLAY_ORDER: Dict[CompLevel, int] = {
+COMP_LEVELS_PLAY_ORDER: dict[CompLevel, int] = {
     CompLevel.QM: 1,
     CompLevel.EF: 2,
     CompLevel.QF: 3,

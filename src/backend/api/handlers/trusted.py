@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import List, Optional, Set
 
 from flask import make_response, request, Response
 from google.appengine.ext import ndb
@@ -60,12 +59,12 @@ def update_teams(event_key: EventKey) -> Response:
     team_key_names = JSONTeamListParser.parse(request.data)
     team_keys = [ndb.Key(Team, key_name) for key_name in team_key_names]
 
-    teams: List[Optional[Team]] = ndb.get_multi(team_keys)
+    teams: list[Team | None] = ndb.get_multi(team_keys)
     old_eventteam_keys_future = EventTeam.query(
         EventTeam.event == ndb.Key(Event, event_key)
     ).fetch_async(None, keys_only=True)
 
-    event_teams: List[EventTeam] = []
+    event_teams: list[EventTeam] = []
     for team in teams:
         # Only create EventTeam objects for Teams that exist
         if team:
@@ -79,7 +78,7 @@ def update_teams(event_key: EventKey) -> Response:
             )
 
     # Delete old EventTeams
-    old_eventteam_keys: List[ndb.Key] = old_eventteam_keys_future.get_result()
+    old_eventteam_keys: list[ndb.Key] = old_eventteam_keys_future.get_result()
     to_delete = set(old_eventteam_keys).difference(set([et.key for et in event_teams]))
     if to_delete:
         EventTeamManipulator.delete_keys(to_delete)
@@ -97,7 +96,7 @@ def add_match_video(event_key: EventKey) -> Response:
     event_key = EventCodeExceptions.resolve(event_key)
     match_key_to_video = JSONMatchVideoParser.parse(event_key, request.data)
     match_keys = [ndb.Key(Match, k) for k in match_key_to_video.keys()]
-    match_futures: List[TypedFuture[Match]] = ndb.get_multi_async(match_keys)
+    match_futures: list[TypedFuture[Match]] = ndb.get_multi_async(match_keys)
 
     nonexistent_matches = []
     matches_to_put = []
@@ -212,7 +211,7 @@ def update_event_awards(event_key: EventKey) -> Response:
     awards = JSONAwardsParser.parse(request.data, event_key)
     event: Event = none_throws(Event.get_by_id(event_key))
 
-    awards_to_put: List[Award] = []
+    awards_to_put: list[Award] = []
     for award in awards:
         awards_to_put.append(
             Award(
@@ -247,8 +246,8 @@ def update_event_matches(event_key: EventKey) -> Response:
     event: Event = none_throws(Event.get_by_id(event_key))
     parsed_matches = JSONMatchesParser.parse(request.data, event.year)
 
-    matches: List[Match] = []
-    needs_time: List[Match] = []
+    matches: list[Match] = []
+    needs_time: list[Match] = []
     for match in parsed_matches:
         match = Match(
             id=Match.render_key_name(
@@ -294,9 +293,9 @@ def update_event_matches(event_key: EventKey) -> Response:
 @validate_keys
 def delete_event_matches(event_key: EventKey) -> Response:
     event_key = EventCodeExceptions.resolve(event_key)
-    keys_to_delete: Set[ndb.Key] = set()
+    keys_to_delete: set[ndb.Key] = set()
     try:
-        match_keys = safe_json.loads(request.data, List[str])
+        match_keys = safe_json.loads(request.data, list[str])
     except Exception:
         return make_response(
             profiled_jsonify({"Error": "'keys_to_delete' could not be parsed"}), 400
@@ -365,8 +364,8 @@ def add_event_media(event_key: EventKey) -> Response:
     event_key = EventCodeExceptions.resolve(event_key)
     event: Event = none_throws(Event.get_by_id(event_key))
 
-    video_list = safe_json.loads(request.data, List[str])
-    media_to_put: List[Media] = []
+    video_list = safe_json.loads(request.data, list[str])
+    media_to_put: list[Media] = []
     event_reference = Media.create_reference("event", event.key_name)
     for youtube_id in video_list:
         media = Media(
@@ -389,7 +388,7 @@ def add_event_media(event_key: EventKey) -> Response:
 @validate_keys
 def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
     event_key = EventCodeExceptions.resolve(event_key)
-    to_put: List[ZebraMotionWorks] = []
+    to_put: list[ZebraMotionWorks] = []
     for zebra_data in JSONZebraMotionWorksParser.parse(request.data):
         match_key = zebra_data["key"]
 
@@ -405,7 +404,7 @@ def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
             )
 
         # Check that match exists
-        match: Optional[Match] = Match.get_by_id(match_key)
+        match: Match | None = Match.get_by_id(match_key)
         if match is None:
             return make_response(
                 profiled_jsonify({"Error": f"Match {match_key} does not exist!"}), 400

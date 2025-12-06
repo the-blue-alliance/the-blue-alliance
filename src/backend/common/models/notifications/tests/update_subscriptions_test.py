@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 
 from backend.common.consts.client_type import ClientType
@@ -46,7 +44,7 @@ def test_collapse_key() -> None:
 )
 def test_notification_shoud_skip(
     user_id: str,
-    notif_device_id: Optional[str],
+    notif_device_id: str,
     client_type: ClientType,
     client_device_id: str,
     should_send: bool,

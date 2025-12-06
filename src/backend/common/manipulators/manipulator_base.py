@@ -4,20 +4,9 @@ import json
 import logging
 import pickle
 from collections import defaultdict
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import (
-    Any,
-    Callable,
-    DefaultDict,
-    Generic,
-    Iterable,
-    List,
-    Optional,
-    overload,
-    Set,
-    Type,
-    TypeVar,
-)
+from typing import Any, Generic, overload, TypeVar
 
 from google.appengine.ext import ndb
 
@@ -34,14 +23,14 @@ TModel = TypeVar("TModel", bound=CachedModel)
 @dataclass(frozen=True)
 class TUpdatedModel(Generic[TModel]):
     model: TModel
-    updated_attrs: Set[str]
+    updated_attrs: set[str]
     is_new: bool
 
 
 class ManipulatorBase(abc.ABC, Generic[TModel]):
-    _post_delete_hooks: List[Callable[[List[TModel]], None]] = None  # pyre-ignore[8]
-    _post_update_hooks: List[  # pyre-ignore[8]
-        Callable[[List[TUpdatedModel[TModel]]], None]
+    _post_delete_hooks: list[Callable[[list[TModel]], None]] = None  # pyre-ignore[8]
+    _post_update_hooks: list[  # pyre-ignore[8]
+        Callable[[list[TUpdatedModel[TModel]]], None]
     ] = None
 
     def __init_subclass__(cls, *args, **kwargs):
@@ -60,15 +49,15 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @classmethod
     def register_post_delete_hook(
-        cls, func: Callable[[List[TModel]], None]
-    ) -> Callable[[List[TModel]], None]:
+        cls, func: Callable[[list[TModel]], None]
+    ) -> Callable[[list[TModel]], None]:
         cls._post_delete_hooks.append(func)
         return func
 
     @classmethod
     def register_post_update_hook(
-        cls, func: Callable[[List[TUpdatedModel[TModel]]], None]
-    ) -> Callable[[List[TUpdatedModel[TModel]]], None]:
+        cls, func: Callable[[list[TUpdatedModel[TModel]]], None]
+    ) -> Callable[[list[TUpdatedModel[TModel]]], None]:
         cls._post_update_hooks.append(func)
         return func
 
@@ -105,11 +94,11 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     @classmethod
     def createOrUpdate(
         cls,
-        new_models: List[TModel],
+        new_models: list[TModel],
         auto_union: bool = True,
         run_post_update_hook: bool = True,
         update_manual_attrs: bool = True,
-    ) -> List[TModel]: ...
+    ) -> list[TModel]: ...
 
     @classmethod
     def createOrUpdate(
@@ -150,7 +139,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @overload
     @classmethod
-    def delete(self, models: List[TModel], run_post_delete_hook=True) -> None: ...
+    def delete(self, models: list[TModel], run_post_delete_hook=True) -> None: ...
 
     @classmethod
     def delete(self, models, run_post_delete_hook=True) -> None:
@@ -170,7 +159,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @overload
     @classmethod
-    def clearCache(cls, models: List[TModel]) -> None: ...
+    def clearCache(cls, models: list[TModel]) -> None: ...
 
     @classmethod
     def clearCache(cls, models) -> None:
@@ -198,10 +187,10 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     @classmethod
     def findOrSpawn(
         cls,
-        new_models: List[TModel],
+        new_models: list[TModel],
         auto_union: bool = True,
         update_manual_attrs: bool = True,
-    ) -> List[TModel]: ...
+    ) -> list[TModel]: ...
 
     @classmethod
     def findOrSpawn(cls, new_models, auto_union=True, update_manual_attrs=True) -> Any:
@@ -219,7 +208,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     def updateMergeBase(
         cls,
         new_model: TModel,
-        old_model: Optional[TModel],
+        old_model: TModel | None,
         auto_union: bool,
         update_manual_attrs: bool,
     ) -> TModel:
@@ -240,11 +229,11 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     @classmethod
     def mergeModels(
         self,
-        new_models: List[TModel],
-        old_models: List[TModel],
+        new_models: list[TModel],
+        old_models: list[TModel],
         auto_union: bool = True,
         update_manual_attrs: bool = True,
-    ) -> List[TModel]:
+    ) -> list[TModel]:
         """
         Returns a list of models containing the union of new_models and old_models.
         If a model with the same key is in both input lists, the new_model is merged with the old_model.
@@ -256,7 +245,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             old_models_by_key[model_key] = model
             untouched_old_keys.add(model_key)
 
-        merged_models: List[TModel] = []
+        merged_models: list[TModel] = []
         for model in new_models:
             model_key = model.key.id()
             if model_key in old_models_by_key:
@@ -279,7 +268,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @classmethod
     def _computeAndSaveAffectedReferences(
-        cls, old_model: TModel, new_model: Optional[TModel] = None
+        cls, old_model: TModel, new_model: TModel | None = None
     ) -> None:
         """
         This method is called whenever a model may potentially be created or updated.
@@ -294,7 +283,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 ].union(val)
 
     @classmethod
-    def _run_post_delete_hook(cls, models: List[TModel]) -> None:
+    def _run_post_delete_hook(cls, models: list[TModel]) -> None:
         """
         Asynchronously runs the manipulator's post delete hooks if available.
         """
@@ -311,7 +300,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
             )
 
     @classmethod
-    def _run_post_update_hook(cls, models: List[TModel]) -> None:
+    def _run_post_update_hook(cls, models: list[TModel]) -> None:
         """
         Asynchronously runs the manipulator's post update hooks if available.
         """
@@ -361,7 +350,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         "old" that are present in the "new", but keep fields from
         the "old" that are null in the "new".
         """
-        updated_attrs: Set[str] = set()
+        updated_attrs: set[str] = set()
 
         for attr in old_model._mutable_attrs:
             if not update_manual_attrs and attr in old_model.manual_attrs:
@@ -433,7 +422,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         Make deferred calls to clear caches
         Needs to save _affected_references and the dirty flag
         """
-        all_affected_references: List[TAffectedReferences] = []
+        all_affected_references: list[TAffectedReferences] = []
         for model in models:
             if model._dirty and model._affected_references:
                 all_affected_references.append(model._affected_references)
@@ -451,9 +440,9 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @classmethod
     def _clearCacheDeferred(
-        cls, all_affected_references: List[TAffectedReferences]
+        cls, all_affected_references: list[TAffectedReferences]
     ) -> None:
-        to_clear: DefaultDict[Type[CachedDatabaseQuery], Set[str]] = defaultdict(set)
+        to_clear: defaultdict[type[CachedDatabaseQuery], set[str]] = defaultdict(set)
         for affected_references in all_affected_references:
             for cache_key, query in cls.getCacheKeysAndQueries(affected_references):
                 to_clear[query].add(cache_key)
@@ -465,7 +454,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     @abc.abstractmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
-    ) -> List[TCacheKeyAndQuery]:
+    ) -> list[TCacheKeyAndQuery]:
         """
         Child classes should replace method with appropriate call to CacheClearer.
         """

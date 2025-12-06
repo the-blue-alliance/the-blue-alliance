@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import cast, Dict, List, NamedTuple, Optional
+from typing import cast, NamedTuple
 
 from google.appengine.ext import ndb
 
@@ -23,15 +23,15 @@ PRESEASON_EVENTS_LABEL = "Preseason"
 
 
 class TeamAvgScore(NamedTuple):
-    qual_avg: Optional[float]
-    elim_avg: Optional[float]
-    all_qual_scores: List[int]
-    all_elim_scores: List[int]
+    qual_avg: float
+    elim_avg: float
+    all_qual_scores: list[int]
+    all_elim_scores: list[int]
 
 
 class EventHelper(object):
     @classmethod
-    def sorted_events(cls, events: List[Event]) -> List[Event]:
+    def sorted_events(cls, events: list[Event]) -> list[Event]:
         """
         Sort events first by end date (ascending), and break ties by start date (ascending)
         Ex:
@@ -65,7 +65,7 @@ class EventHelper(object):
             return event.end_date
 
     @classmethod
-    def group_by_week(cls, events: List[Event]) -> Dict[str, List[Event]]:
+    def group_by_week(cls, events: list[Event]) -> dict[str, list[Event]]:
         """
         Events should already be ordered by start_date
         """
@@ -133,13 +133,13 @@ class EventHelper(object):
 
     @staticmethod
     def calculate_team_avg_score(
-        team_key: TeamKey, matches: List[Match]
+        team_key: TeamKey, matches: list[Match]
     ) -> TeamAvgScore:
         """
         Given a team_key and some matches, find the team's average qual and elim score
         """
-        all_qual_scores: List[int] = []
-        all_elim_scores: List[int] = []
+        all_qual_scores: list[int] = []
+        all_elim_scores: list[int] = []
         for match in matches:
             if match.has_been_played:
                 for alliance in match.alliances.values():
@@ -167,7 +167,7 @@ class EventHelper(object):
         )
 
     @staticmethod
-    def calculate_wlt(team_key: TeamKey, matches: List[Match]) -> WLTRecord:
+    def calculate_wlt(team_key: TeamKey, matches: list[Match]) -> WLTRecord:
         """
         Given a team_key and some matches, find the Win Loss Tie.
         """
@@ -190,12 +190,12 @@ class EventHelper(object):
 
     @classmethod
     @memoize(timeout=3600)  # 1 hour
-    def events_within_a_day(cls) -> List[Event]:
+    def events_within_a_day(cls) -> list[Event]:
         return list(filter(lambda e: e.within_a_day, cls.week_events()))
 
     @classmethod
     @memoize(timeout=3600)  # 1 hour
-    def week_events(cls) -> List[Event]:
+    def week_events(cls) -> list[Event]:
         """
         Get events this week
         In general, if an event is currently going on, it shows up in this query

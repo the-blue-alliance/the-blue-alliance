@@ -1,4 +1,5 @@
-from typing import Any, Generator, Optional
+from collections.abc import Generator
+from typing import Any
 
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import EventKey
@@ -11,7 +12,7 @@ from backend.common.tasklets import typed_tasklet
 
 
 class EventDetailsQuery(
-    CachedDatabaseQuery[Optional[EventDetails], Optional[EventDetailsDict]]
+    CachedDatabaseQuery[EventDetails | None, EventDetailsDict | None]
 ):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "event_details_{event_key}"
@@ -24,6 +25,6 @@ class EventDetailsQuery(
     @typed_tasklet
     def _query_async(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, Optional[EventDetails]]:
+    ) -> Generator[Any, Any, EventDetails | None]:
         event_details = yield EventDetails.get_by_id_async(event_key)
         return event_details

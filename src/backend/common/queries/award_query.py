@@ -1,4 +1,5 @@
-from typing import Any, Generator, List
+from collections.abc import Generator
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -16,7 +17,7 @@ from backend.common.queries.dict_converters.award_converter import (
 from backend.common.tasklets import typed_tasklet
 
 
-class EventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
+class EventAwardsQuery(CachedDatabaseQuery[list[Award], list[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "event_awards_{event_key}"
     DICT_CONVERTER = AwardConverter
@@ -25,14 +26,14 @@ class EventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         super().__init__(event_key=event_key)
 
     @typed_tasklet
-    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Award]]:
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, list[Award]]:
         awards = yield Award.query(
             Award.event == ndb.Key(Event, event_key)
         ).fetch_async()
         return awards
 
 
-class TeamAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
+class TeamAwardsQuery(CachedDatabaseQuery[list[Award], list[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_awards_{team_key}"
     DICT_CONVERTER = AwardConverter
@@ -41,14 +42,14 @@ class TeamAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Award]]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, list[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key)
         ).fetch_async()
         return awards
 
 
-class TeamYearAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
+class TeamYearAwardsQuery(CachedDatabaseQuery[list[Award], list[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_year_awards_{team_key}_{year}"
     DICT_CONVERTER = AwardConverter
@@ -59,14 +60,14 @@ class TeamYearAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     @typed_tasklet
     def _query_async(
         self, team_key: TeamKey, year: Year
-    ) -> Generator[Any, Any, List[Award]]:
+    ) -> Generator[Any, Any, list[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key), Award.year == year
         ).fetch_async()
         return awards
 
 
-class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
+class TeamEventAwardsQuery(CachedDatabaseQuery[list[Award], list[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "team_event_awards_{team_key}_{event_key}"
     DICT_CONVERTER = AwardConverter
@@ -77,7 +78,7 @@ class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     @typed_tasklet
     def _query_async(
         self, team_key: TeamKey, event_key: EventKey
-    ) -> Generator[Any, Any, List[Award]]:
+    ) -> Generator[Any, Any, list[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.event == ndb.Key(Event, event_key),
@@ -85,7 +86,7 @@ class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         return awards
 
 
-class TeamEventTypeAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
+class TeamEventTypeAwardsQuery(CachedDatabaseQuery[list[Award], list[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = (
         "team_events_type_tag_awards_{team_key}_{event_type}_{award_type}"
@@ -102,7 +103,7 @@ class TeamEventTypeAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]
     @typed_tasklet
     def _query_async(
         self, team_key: TeamKey, event_type: EventType, award_type: AwardType
-    ) -> Generator[Any, Any, List[Award]]:
+    ) -> Generator[Any, Any, list[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.event_type_enum == event_type,

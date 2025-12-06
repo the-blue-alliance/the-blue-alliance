@@ -1,6 +1,5 @@
 import datetime
 import json
-from typing import Optional
 
 from flask import abort, redirect, request, url_for
 from google.appengine.api import taskqueue
@@ -50,7 +49,7 @@ from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHac
 from backend.web.profiled_render import render_template
 
 
-def event_list(year: Optional[Year]) -> str:
+def event_list(year: Year | None) -> str:
     if year is None:
         year = datetime.datetime.now().year
 
@@ -258,7 +257,7 @@ def event_create() -> Response:
     return render_template("admin/event_create.html", template_values)
 
 
-def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
+def event_edit_post(event_key: EventKey | None = None) -> Response:
     # Note, we don't actually use event_key.
 
     start_date = None

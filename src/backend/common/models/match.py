@@ -1,7 +1,7 @@
 import datetime
 import json
 import re
-from typing import cast, Dict, List, Optional, Set
+from typing import cast
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -58,7 +58,7 @@ class Match(CachedModel):
     #   }
     # }
 
-    score_breakdown_json: Optional[str] = ndb.TextProperty(
+    score_breakdown_json: str | None = ndb.TextProperty(
         indexed=False
     )  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
     # Example for 2014. Seeding outlined in Section 5.3.4 in the 2014 manual.
@@ -91,7 +91,7 @@ class Match(CachedModel):
     )  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
     # list of teams in Match, for indexing.
-    team_key_names: List[TeamKey] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
+    team_key_names: list[TeamKey] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
     time = ndb.DateTimeProperty()  # UTC time of scheduled start
     time_string = ndb.TextProperty(
         indexed=False
@@ -104,9 +104,9 @@ class Match(CachedModel):
         ndb.DateTimeProperty()
     )  # UTC time scores were shown to the audience
     # list of Youtube IDs
-    youtube_videos: List[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
+    youtube_videos: list[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
     # list of filetypes a TBA video exists for
-    tba_videos: List[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
+    tba_videos: list[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
     push_sent = (
         ndb.BooleanProperty()
     )  # has an upcoming match notification been sent for this match? None counts as False
@@ -118,7 +118,7 @@ class Match(CachedModel):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
 
-    _mutable_attrs: Set[str] = {
+    _mutable_attrs: set[str] = {
         "year",
         "no_auto_update",
         "time",
@@ -131,16 +131,16 @@ class Match(CachedModel):
         "display_name",
     }
 
-    _list_attrs: Set[str] = {
+    _list_attrs: set[str] = {
         "team_key_names",
     }
 
-    _json_attrs: Set[str] = {
+    _json_attrs: set[str] = {
         "alliances_json",
         "score_breakdown_json",
     }
 
-    _auto_union_attrs: Set[str] = {
+    _auto_union_attrs: set[str] = {
         "tba_videos",
         "youtube_videos",
     }
@@ -154,16 +154,16 @@ class Match(CachedModel):
             "team_keys": set(),
             "year": set(),
         }
-        self._alliances: Optional[Dict[AllianceColor, MatchAlliance]] = None
-        self._score_breakdown: Optional[MatchScoreBreakdown] = None
-        self._tba_video: Optional[TBAVideo] = None
-        self._winning_alliance: Optional[TMatchWinner] = None
-        self._youtube_videos: Optional[List[str]] = None
-        self._updated_attrs = []  # Used in MatchManipulator to track what changed
+        self._alliances: dict[AllianceColor, MatchAlliance] | None = None
+        self._score_breakdown: MatchScoreBreakdown | None = None
+        self._tba_video: TBAVideo | None = None
+        self._winning_alliance: TMatchWinner | None = None
+        self._youtube_videos: list[str] | None = None
+        self._updated_attrs = set()  # Used in MatchManipulator to track what changed
         super(Match, self).__init__(*args, **kw)
 
     @property
-    def alliances(self) -> Dict[AllianceColor, MatchAlliance]:
+    def alliances(self) -> dict[AllianceColor, MatchAlliance]:
         """
         Lazy load alliances_json
         """
@@ -198,12 +198,12 @@ class Match(CachedModel):
         return none_throws(self._alliances)
 
     @alliances.setter
-    def alliances(self, alliances: Dict[AllianceColor, MatchAlliance]):
+    def alliances(self, alliances: dict[AllianceColor, MatchAlliance]):
         self._alliances = alliances
         self.alliances_json = json.dumps(alliances)
 
     @property
-    def score_breakdown(self) -> Optional[MatchScoreBreakdown]:
+    def score_breakdown(self) -> MatchScoreBreakdown | None:
         """
         Lazy load score_breakdown_json
         """
@@ -310,7 +310,7 @@ class Match(CachedModel):
         return none_throws(self.event.string_id())
 
     @property
-    def team_keys(self) -> List[ndb.Key]:
+    def team_keys(self) -> list[ndb.Key]:
         return [ndb.Key(Team, team_key_name) for team_key_name in self.team_key_names]
 
     @property
@@ -411,7 +411,7 @@ class Match(CachedModel):
         return "/match/%s" % self.key_name
 
     @property
-    def tba_video(self) -> Optional[TBAVideo]:
+    def tba_video(self) -> TBAVideo | None:
         if len(self.tba_videos) > 0:
             if self._tba_video is None:
                 self._tba_video = TBAVideo(
@@ -436,7 +436,7 @@ class Match(CachedModel):
         return "%s" % (comp_level.COMP_LEVELS_VERBOSE_FULL[self.comp_level])
 
     @property
-    def youtube_videos_formatted(self) -> List[str]:
+    def youtube_videos_formatted(self) -> list[str]:
         """
         Get youtube video ids formatted for embedding
         """
@@ -456,7 +456,7 @@ class Match(CachedModel):
         return self._youtube_videos or []
 
     @property
-    def videos(self) -> List[MatchVideo]:
+    def videos(self) -> list[MatchVideo]:
         videos = []
         for v in self.youtube_videos_formatted:
             v = v.replace("?start=", "?t=")  # links must use ?t=
@@ -469,7 +469,7 @@ class Match(CachedModel):
         return videos
 
     @property
-    def prediction_error_str(self) -> Optional[str]:
+    def prediction_error_str(self) -> str | None:
         if self.actual_time and self.predicted_time:
             if self.actual_time > self.predicted_time:
                 delta = self.actual_time - self.predicted_time
@@ -488,7 +488,7 @@ class Match(CachedModel):
         return None
 
     @property
-    def schedule_error_str(self) -> Optional[str]:
+    def schedule_error_str(self) -> str | None:
         if self.actual_time and self.time:
             if self.actual_time > self.time:
                 delta = self.actual_time - self.time

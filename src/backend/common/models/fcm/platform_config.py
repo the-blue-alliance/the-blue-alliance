@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from pyre_extensions import none_throws
 
 from backend.common.consts.fcm.platform_priority import PlatformPriority
@@ -22,8 +20,8 @@ class PlatformConfig:
     # TODO: Add ttl
     def __init__(
         self,
-        collapse_key: Optional[str] = None,
-        priority: Optional[PlatformPriority] = None,
+        collapse_key: str | None = None,
+        priority: PlatformPriority | None = None,
     ) -> None:
         """
         Args:
@@ -49,7 +47,7 @@ class PlatformConfig:
             platform_type (PlatformType): Type for the platform config.
 
         Returns:
-            object: Either a AndroidConfig, ApnsConfig, or WebpushConfig depending on the platform_type.
+            object: Either a AndroidConfig, APNSConfig, or WebpushConfig depending on the platform_type.
         """
         from backend.common.consts.fcm.platform_type import PlatformType
 

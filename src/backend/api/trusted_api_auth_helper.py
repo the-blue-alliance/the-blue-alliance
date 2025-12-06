@@ -1,6 +1,5 @@
 import datetime
 import hashlib
-from typing import Optional, Set
 
 from flask import abort, make_response, request
 from pyre_extensions import none_throws
@@ -20,14 +19,14 @@ from backend.common.sitevars.trusted_api import TrustedApiConfig
 class TrustedApiAuthHelper:
     @staticmethod
     def compute_auth_signature(
-        auth_secret: Optional[str], request_path: str, request_body: str
+        auth_secret: str | None, request_path: str, request_body: str
     ) -> str:
         to_hash = f"{auth_secret}{request_path}{request_body}"
         return hashlib.md5(to_hash.encode()).hexdigest()
 
     @classmethod
     def do_trusted_api_auth(
-        cls, event_key: EventKey, required_auth_types: Set[AuthType]
+        cls, event_key: EventKey, required_auth_types: set[AuthType]
     ) -> None:
         event_key = EventCodeExceptions.resolve(event_key)
         event = Event.get_by_id(event_key)
@@ -117,8 +116,8 @@ class TrustedApiAuthHelper:
         cls,
         auth: ApiAuthAccess,
         event: Event,
-        required_auth_types: Set[AuthType],
-    ) -> Optional[str]:
+        required_auth_types: set[AuthType],
+    ) -> str | None:
         allowed_event_keys = [none_throws(ekey.string_id()) for ekey in auth.event_list]
         if (
             event.key_name not in allowed_event_keys

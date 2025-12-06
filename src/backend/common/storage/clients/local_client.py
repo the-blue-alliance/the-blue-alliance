@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List, Optional
 
 from backend.common.storage.clients.storage_client import StorageClient
 
@@ -15,7 +14,7 @@ class LocalStorageClient(StorageClient):
 
         path.write_text(content)
 
-    def read(self, file_name: str) -> Optional[str]:
+    def read(self, file_name: str) -> str | None:
         path = self.base_path / file_name
         if path.exists():
             with path.open() as f:
@@ -23,7 +22,7 @@ class LocalStorageClient(StorageClient):
 
         return None
 
-    def get_files(self, path: Optional[str] = None) -> List[str]:
+    def get_files(self, path: str | None = None) -> list[str]:
         return [
             p.name
             for p in self.base_path.iterdir()

@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from typing import Optional
 
 import pytest
 from freezegun import freeze_time
@@ -69,9 +68,7 @@ def test_time_as_utc(starttime: datetime, timezone_id: str, output: datetime) ->
         ("2009-10-31 23:30", "America/New_York", datetime(2009, 10, 31, 19, 30)),
     ],
 )
-def test_local_time(
-    mock_time: str, timezone_id: Optional[str], output: datetime
-) -> None:
+def test_local_time(mock_time: str, timezone_id: str | None, output: datetime) -> None:
     e = Event(
         timezone_id=timezone_id,
     )
@@ -94,8 +91,8 @@ def test_local_time(
 )
 def test_within_days(
     mock_time: str,
-    event_start: Optional[datetime],
-    event_end: Optional[datetime],
+    event_start: datetime | None,
+    event_end: datetime | None,
     days_before: int,
     days_after: int,
     is_within: bool,
@@ -148,7 +145,7 @@ def test_within_a_day(
 )
 def test_now(
     mock_time: str,
-    timezone: Optional[str],
+    timezone: str | None,
     is_now: bool,
 ) -> None:
     e = Event(

@@ -1,8 +1,6 @@
-from typing import Dict, List
-
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
-SORT_ORDER_INFO: Dict[int, List[RankingSortOrderInfo]] = {
+SORT_ORDER_INFO: dict[int, list[RankingSortOrderInfo]] = {
     2025: [
         {"name": "Ranking Score", "precision": 2},
         {"name": "Avg Coop", "precision": 2},

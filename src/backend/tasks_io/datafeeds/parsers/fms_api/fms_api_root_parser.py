@@ -1,4 +1,4 @@
-from typing import Any, cast, Dict
+from typing import Any, cast
 
 from typing_extensions import TypedDict
 
@@ -14,5 +14,5 @@ class RootInfo(TypedDict):
 
 
 class FMSAPIRootParser(ParserJSON[RootInfo]):
-    def parse(self, response: Dict[str, Any]) -> RootInfo:
+    def parse(self, response: dict[str, Any]) -> RootInfo:
         return cast(RootInfo, response)

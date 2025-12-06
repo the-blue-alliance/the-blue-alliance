@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -14,16 +14,14 @@ from backend.tasks_io.datafeeds.parsers.json.parser_paginated_json import (
 
 
 class FMSAPITeamDetailsParser(
-    ParserPaginatedJSON[List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]]]
+    ParserPaginatedJSON[list[tuple[Team, DistrictTeam | None, Robot | None]]]
 ):
     def __init__(self, year: int):
         self.year = year
 
     def parse(
-        self, response: Dict[str, Any]
-    ) -> Tuple[
-        Optional[List[Tuple[Team, Optional[DistrictTeam], Optional[Robot]]]], bool
-    ]:
+        self, response: dict[str, Any]
+    ) -> tuple[list[tuple[Team, DistrictTeam | None, Robot | None]] | None, bool]:
         current_page = response["pageCurrent"]
         total_pages = response["pageTotal"]
 

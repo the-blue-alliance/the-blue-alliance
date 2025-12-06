@@ -1,5 +1,5 @@
 import enum
-from typing import Dict, NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 from backend.common.consts.string_enum import StrEnum
 from backend.common.models.keys import EventKey, TeamKey
@@ -22,4 +22,4 @@ class TeamRegionalPoolAdvancement(TypedDict):
     qualifying_pool_week: NotRequired[int]
 
 
-RegionalPoolAdvancement = Dict[TeamKey, TeamRegionalPoolAdvancement]
+RegionalPoolAdvancement = dict[TeamKey, TeamRegionalPoolAdvancement]

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, List, NamedTuple, Optional
+from typing import Any, NamedTuple
 
 import pytest
 from flask import Flask
@@ -54,7 +54,7 @@ def test_floatformat(input: float, digits: int, output: float) -> None:
 
 
 @pytest.mark.parametrize("input, output", [(None, ""), ("", ""), ("frc254", "254")])
-def test_strip_frc(input: Optional[str], output: str) -> None:
+def test_strip_frc(input: str | None, output: str) -> None:
     assert filters.strip_frc(input) == output
 
 
@@ -134,7 +134,7 @@ class ExampleObject(NamedTuple):
         ),
     ],
 )
-def test_sort_by(input: List, field: str, output: List) -> None:
+def test_sort_by(input: list, field: str, output: list) -> None:
     assert filters.sort_by(input, field) == output
 
 

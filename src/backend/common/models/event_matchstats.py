@@ -1,10 +1,10 @@
-from typing import Dict, TypedDict
+from typing import TypedDict
 
 from backend.common.models.keys import TeamKey
 
-TeamStatMap = Dict[TeamKey, float]
+TeamStatMap = dict[TeamKey, float]
 Component = str
-EventComponentOPRs = Dict[Component, TeamStatMap]
+EventComponentOPRs = dict[Component, TeamStatMap]
 
 
 class EventMatchstats(TypedDict):

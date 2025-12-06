@@ -1,4 +1,4 @@
-from typing import List, Optional, TypedDict
+from typing import TypedDict
 
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.media_type import MediaType
@@ -15,7 +15,7 @@ class SuggestionDict(TypedDict, total=False):
     details_json: str
     private_details_json: str
 
-    year: Optional[Year]
+    year: Year | None
     reference_type: str
     reference_key: str
     default_preferred: bool
@@ -24,7 +24,7 @@ class SuggestionDict(TypedDict, total=False):
     name: str
     start_date: str
     end_date: str
-    website: Optional[str]
+    website: str | None
     address: str
     city: str
     state: str
@@ -34,15 +34,15 @@ class SuggestionDict(TypedDict, total=False):
     # For apiwrite suggestions
     event_key: str
     affiliation: str
-    auth_types: List[AuthType]
+    auth_types: list[AuthType]
 
     # For webcast suggestions
     webcast_dict: Webcast
     webcast_url: str
-    webcast_date: Optional[str]
+    webcast_date: str | None
 
     # For match videos
-    youtube_videos: List[str]
+    youtube_videos: list[str]
 
     # For ApiWrite access
-    first_code: Optional[str]
+    first_code: str | None

@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Generator, List, Optional
+from collections.abc import Generator
+from typing import Any
 
 from pyre_extensions import none_throws
 
@@ -24,7 +25,7 @@ from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeWebcastStatus
 class WebcastOnlineHelper:
     @classmethod
     @typed_toplevel
-    def add_online_status(cls, webcasts: List[Webcast]) -> Generator[Any, Any, None]:
+    def add_online_status(cls, webcasts: list[Webcast]) -> Generator[Any, Any, None]:
         yield tuple(cls.add_online_status_async(webcast) for webcast in webcasts)
 
     @classmethod
@@ -61,7 +62,7 @@ class WebcastOnlineHelper:
     @typed_tasklet
     def _add_twitch_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
         token_mc = TwitchOauthTokenMemcache()
-        maybe_twitch_token: Optional[TwitchAccessToken] = yield token_mc.get_async()
+        maybe_twitch_token: TwitchAccessToken | None = yield token_mc.get_async()
         if maybe_twitch_token is not None:
             now = datetime.datetime.now()
             token_expiration = datetime.datetime.fromtimestamp(

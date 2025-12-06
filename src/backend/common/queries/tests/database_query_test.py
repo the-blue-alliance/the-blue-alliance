@@ -1,4 +1,5 @@
-from typing import Any, Generator, Iterable, List, TypedDict
+from collections.abc import Generator, Iterable
+from typing import Any, TypedDict
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -24,8 +25,8 @@ class DummyConverter(ConverterBase):
 
     @classmethod
     def _convert_list(
-        cls, model_list: List[DummyModel], version: ApiMajorVersion
-    ) -> List[DummyDict]:
+        cls, model_list: list[DummyModel], version: ApiMajorVersion
+    ) -> list[DummyDict]:
         return list(map(cls.converter_v3, model_list))
 
     @classmethod
@@ -44,11 +45,11 @@ class DummyModelPointQuery(DatabaseQuery[DummyModel, DummyDict]):
         return model
 
 
-class DummyModelRangeQuery(DatabaseQuery[List[DummyModel], List[DummyDict]]):
+class DummyModelRangeQuery(DatabaseQuery[list[DummyModel], list[DummyDict]]):
     DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
-    def _query_async(self, min: int, max: int) -> Generator[Any, Any, List[DummyModel]]:
+    def _query_async(self, min: int, max: int) -> Generator[Any, Any, list[DummyModel]]:
         models: Iterable[DummyModel] = yield DummyModel.query(
             DummyModel.int_prop >= min, DummyModel.int_prop <= max
         ).fetch_async()
@@ -56,14 +57,14 @@ class DummyModelRangeQuery(DatabaseQuery[List[DummyModel], List[DummyDict]]):
 
 
 class CachedDummyModelRangeQuery(
-    CachedDatabaseQuery[List[DummyModel], List[DummyDict]]
+    CachedDatabaseQuery[list[DummyModel], list[DummyDict]]
 ):
     CACKE_KEY_FORMAT = "test_query_{min}_{max}"
     DICT_CONVERTER = DummyConverter
     CACHE_WRITES_ENABLED = True
 
     @ndb.tasklet
-    def _query_async(self, min: int, max: int) -> Generator[Any, Any, List[DummyModel]]:
+    def _query_async(self, min: int, max: int) -> Generator[Any, Any, list[DummyModel]]:
         models: Iterable[DummyModel] = yield DummyModel.query(
             DummyModel.int_prop >= min, DummyModel.int_prop <= max
         ).fetch_async()

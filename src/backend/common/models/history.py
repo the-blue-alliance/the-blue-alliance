@@ -1,9 +1,9 @@
-from typing import List, TypedDict
+from typing import TypedDict
 
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 
 
 class History(TypedDict):
-    events: List[Event]
-    awards: List[Award]
+    events: list[Event]
+    awards: list[Award]

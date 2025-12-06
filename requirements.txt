@@ -2,6 +2,7 @@ beautifulsoup4==4.14.3
 black==25.11.0
 flake8==7.3.0
 flake8-import-order
+flake8-pep585
 flake8-tidy-imports
 blinker==1.9.0
 freezegun==1.5.5

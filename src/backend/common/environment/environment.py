@@ -2,7 +2,6 @@ import enum
 import os
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 
 @enum.unique
@@ -36,23 +35,23 @@ class Environment:
         return env is not None and env.startswith("standard")
 
     @staticmethod
-    def service() -> Optional[str]:
+    def service() -> str | None:
         return os.environ.get("GAE_SERVICE", None)
 
     @staticmethod
-    def project() -> Optional[str]:
+    def project() -> str | None:
         return os.environ.get("GOOGLE_CLOUD_PROJECT", None)
 
     @staticmethod
-    def log_level() -> Optional[str]:
+    def log_level() -> str | None:
         return os.environ.get("TBA_LOG_LEVEL")
 
     @staticmethod
-    def ndb_log_level() -> Optional[str]:
+    def ndb_log_level() -> str | None:
         return os.environ.get("NDB_LOG_LEVEL")
 
     @staticmethod
-    def flask_secret_key() -> Optional[str]:
+    def flask_secret_key() -> str | None:
         return os.environ.get("FLASK_SECRET_KEY", Environment.DEFAULT_FLASK_SECRET_KEY)
 
     @classmethod
@@ -77,7 +76,7 @@ class Environment:
         return Path(os.environ.get("STORAGE_PATH", tempfile.gettempdir()))
 
     @staticmethod
-    def auth_emulator_host() -> Optional[str]:
+    def auth_emulator_host() -> str | None:
         return os.environ.get("FIREBASE_AUTH_EMULATOR_HOST")
 
     @staticmethod

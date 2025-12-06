@@ -1,5 +1,4 @@
 import json
-from typing import Dict, List, Optional
 
 from google.appengine.ext import ndb
 from werkzeug.test import Client
@@ -18,7 +17,7 @@ AUTH_SECRET = "321tEsTsEcReT"
 REQUEST_PATH = "/api/trusted/v1/event/2014casj/media/add"
 
 
-def setup_event(remap_teams: Optional[Dict[str, str]] = None) -> None:
+def setup_event(remap_teams: dict[str, str] | None = None) -> None:
     Event(
         id="2014casj",
         year=2014,
@@ -38,7 +37,7 @@ def setup_cmp() -> None:
     ).put()
 
 
-def setup_auth(access_types: List[AuthType], event_key: EventKey = "2014casj") -> None:
+def setup_auth(access_types: list[AuthType], event_key: EventKey = "2014casj") -> None:
     ApiAuthAccess(
         id=AUTH_ID,
         secret=AUTH_SECRET,
@@ -47,7 +46,7 @@ def setup_auth(access_types: List[AuthType], event_key: EventKey = "2014casj") -
     ).put()
 
 
-def get_auth_headers(request_path: str, request_body) -> Dict[str, str]:
+def get_auth_headers(request_path: str, request_body) -> dict[str, str]:
     return {
         "X-TBA-Auth-Id": AUTH_ID,
         "X-TBA-AUth-Sig": TrustedApiAuthHelper.compute_auth_signature(
@@ -114,7 +113,7 @@ def test_add_media(api_client: Client) -> None:
     )
     assert resp.status_code == 200
 
-    medias: List[Media] = Media.query(
+    medias: list[Media] = Media.query(
         Media.references == ndb.Key(Event, "2014casj")
     ).fetch()
     assert len(medias) == 1
@@ -138,7 +137,7 @@ def test_add_media_cmp_remap(api_client: Client) -> None:
     )
     assert resp.status_code == 200
 
-    medias: List[Media] = Media.query(
+    medias: list[Media] = Media.query(
         Media.references == ndb.Key(Event, "2014cur")
     ).fetch()
     assert len(medias) == 1

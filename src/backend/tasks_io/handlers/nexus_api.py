@@ -1,5 +1,4 @@
 import json
-from typing import List, Optional
 
 from flask import abort, Blueprint, make_response, request, Response, url_for
 from google.appengine.api import taskqueue
@@ -36,9 +35,9 @@ blueprint = Blueprint("nexus_api", __name__)
     "/tasks/enqueue/nexus_pit_locations/<int:year>", defaults={"current_year": False}
 )
 def enqueue_nexus_pit_locations_current(
-    year: Optional[Year], current_year: bool
+    year: Year | None, current_year: bool
 ) -> Response:
-    events: List[Event]
+    events: list[Event]
     if year is None and not current_year:
         events = EventHelper.events_within_a_day()
     else:
@@ -126,9 +125,7 @@ def event_queue_status(event_key: EventKey) -> Response:
     event.prep_matches()
 
     event_queue_status_future = NexusEventQueueStatus(event).fetch_async()
-    event_queue_status: Optional[EventQueueStatus] = (
-        event_queue_status_future.get_result()
-    )
+    event_queue_status: EventQueueStatus | None = event_queue_status_future.get_result()
 
     if event_queue_status:
         # Write the results to memcache

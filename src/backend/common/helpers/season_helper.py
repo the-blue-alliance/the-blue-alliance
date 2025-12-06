@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import Optional, Sequence
 
 from pytz import timezone, UTC
 
@@ -112,7 +112,7 @@ class SeasonHelper(object):
     @staticmethod
     def first_event_datetime_utc(
         year: Year = datetime.now().year,
-    ) -> Optional[datetime]:
+    ) -> datetime | None:
         """Computes day the first in-season event begins"""
         events = EventListQuery(year).fetch()
         earliest_start = None

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import cast, List
+from typing import cast
 
 from google.appengine.ext import ndb
 
@@ -16,8 +16,8 @@ class Account(ndb.Model):
     email: str = ndb.StringProperty()
     nickname: str = ndb.StringProperty()
     registered: bool = ndb.BooleanProperty()
-    permissions: List[AccountPermission] = cast(
-        List[AccountPermission],
+    permissions: list[AccountPermission] = cast(
+        list[AccountPermission],
         ndb.IntegerProperty(choices=list(AccountPermission), repeated=True),
     )
     shadow_banned: bool = ndb.BooleanProperty(default=False)

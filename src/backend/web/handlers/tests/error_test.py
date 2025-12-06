@@ -1,12 +1,10 @@
 import importlib
 
-from typing import Tuple
-
 import bs4
 from werkzeug.test import Client
 
 
-def get_error_title(resp_data: str) -> Tuple[str, str]:
+def get_error_title(resp_data: str) -> tuple[str, str]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     return soup.find("h1").string, soup.find("h2").string
 

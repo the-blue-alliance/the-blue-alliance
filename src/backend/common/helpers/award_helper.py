@@ -1,5 +1,4 @@
 import logging
-from typing import List, Optional
 
 from backend.common.consts.award_matching_strings import AWARD_MATCHING_STRINGS
 from backend.common.consts.award_type import AwardType, SORT_ORDER as AWARD_SORT_ORDER
@@ -8,7 +7,7 @@ from backend.common.models.award import Award
 
 class AwardHelper(object):
     @classmethod
-    def organize_awards(cls, award_list: List[Award]) -> List[Award]:
+    def organize_awards(cls, award_list: list[Award]) -> list[Award]:
         """
         Sorts awards first by sort_order and then alphabetically by name_str
         """
@@ -23,7 +22,7 @@ class AwardHelper(object):
         return sorted_awards
 
     @classmethod
-    def parse_award_type(cls, name_str: str) -> Optional[AwardType]:
+    def parse_award_type(cls, name_str: str) -> AwardType | None:
         """
         Returns the AwardType given a name_str, or None if there are no matches.
         """

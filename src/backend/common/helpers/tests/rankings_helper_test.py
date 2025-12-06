@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import cast, List
+from typing import cast
 
 import pytest
 from google.appengine.ext import ndb
@@ -103,7 +103,7 @@ def test_build_ranking_sort_orders_sanitized() -> None:
         39.91,  # qual_average
         1,  # matches_played
         2,  # dq
-        cast(List[float], [0.0, 1.1, 2.2, "3.3", 4]),  # sort_orders - Casting for tests
+        cast(list[float], [0.0, 1.1, 2.2, "3.3", 4]),  # sort_orders - Casting for tests
     )
     assert ranking["sort_orders"] == [0.0, 1.1, 2.2, 3.3, 4.0]
 
@@ -119,7 +119,7 @@ def test_build_ranking_sort_orders_unsupported() -> None:
         39.91,  # qual_average
         1,  # matches_played
         2,  # dq
-        cast(List[float], [1.1, None]),  # sort_orders - Casting for tests
+        cast(list[float], [1.1, None]),  # sort_orders - Casting for tests
     )
     assert ranking["sort_orders"] == [1.1, 0.0]
 

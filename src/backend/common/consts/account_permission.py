@@ -1,6 +1,5 @@
 import enum
 from dataclasses import dataclass
-from typing import Dict, Set
 
 
 @enum.unique
@@ -23,7 +22,7 @@ class PermissionDescription:
     description: str
 
 
-PERMISSIONS: Dict[AccountPermission, PermissionDescription] = {
+PERMISSIONS: dict[AccountPermission, PermissionDescription] = {
     AccountPermission.REVIEW_MEDIA: PermissionDescription(
         "REVIEW_MEDIA", "Can review (accept/reject) media suggestions"
     ),
@@ -46,7 +45,7 @@ PERMISSIONS: Dict[AccountPermission, PermissionDescription] = {
     ),
 }
 
-SUGGESTION_PERMISSIONS: Set[AccountPermission] = {
+SUGGESTION_PERMISSIONS: set[AccountPermission] = {
     AccountPermission.REVIEW_MEDIA,
     AccountPermission.REVIEW_OFFSEASON_EVENTS,
     AccountPermission.REVIEW_APIWRITE,

@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional
-
 from backend.common.consts.media_type import (
     IMAGE_TYPES,
     MediaType,
@@ -11,8 +9,8 @@ from backend.common.models.media import Media
 
 class MediaHelper(object):
     @classmethod
-    def group_by_slugname(cls, medias: List[Media]) -> Dict[str, List[Media]]:
-        medias_by_slugname: Dict[str, List[Media]] = {}
+    def group_by_slugname(cls, medias: list[Media]) -> dict[str, list[Media]]:
+        medias_by_slugname: dict[str, list[Media]] = {}
         for media in medias:
             slugname = media.slug_name
             if slugname in medias_by_slugname:
@@ -22,16 +20,16 @@ class MediaHelper(object):
         return medias_by_slugname
 
     @classmethod
-    def get_avatar(cls, medias: List[Media]) -> Optional[Media]:
+    def get_avatar(cls, medias: list[Media]) -> Media | None:
         avatars = filter(lambda m: m.media_type_enum == MediaType.AVATAR, medias)
         return next(avatars, None)
 
     @classmethod
-    def get_images(cls, medias: List[Media]) -> List[Media]:
+    def get_images(cls, medias: list[Media]) -> list[Media]:
         return list(filter(lambda m: m.media_type_enum in IMAGE_TYPES, medias))
 
     @classmethod
-    def get_socials(cls, medias: List[Media]) -> List[Media]:
+    def get_socials(cls, medias: list[Media]) -> list[Media]:
         return list(filter(lambda m: m.media_type_enum in SOCIAL_TYPES, medias))
 
     @classmethod

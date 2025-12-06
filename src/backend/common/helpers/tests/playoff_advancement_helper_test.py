@@ -1,6 +1,5 @@
 import json
 import os
-from typing import List, Optional
 
 import pytest
 
@@ -73,9 +72,9 @@ def create_event(event_key: EventKey, playoff_type: PlayoffType) -> Event:
     ],
 )
 def test_alliance_name(
-    selections: Optional[List[EventAlliance]],
-    team_keys: List[TeamKey],
-    output: Optional[str],
+    selections: list[EventAlliance] | None,
+    team_keys: list[TeamKey],
+    output: str | None,
 ) -> None:
     name = PlayoffAdvancementHelper._alliance_name(team_keys, selections)
     assert name == output

@@ -1,5 +1,4 @@
 import datetime
-from typing import List, Optional
 
 from google.appengine.ext import ndb
 from typing_extensions import TypedDict
@@ -10,18 +9,18 @@ from backend.common.models.keys import MatchKey, TeamKey
 
 class ZebraTeamData(TypedDict):
     team_key: TeamKey
-    xs: List[Optional[float]]
-    ys: List[Optional[float]]
+    xs: list[float | None]
+    ys: list[float | None]
 
 
 class ZebraAllianceData(TypedDict):
-    red: List[ZebraTeamData]
-    blue: List[ZebraTeamData]
+    red: list[ZebraTeamData]
+    blue: list[ZebraTeamData]
 
 
 class ZebraData(TypedDict):
     key: MatchKey
-    times: List[float]
+    times: list[float]
     alliances: ZebraAllianceData
 
 
@@ -32,7 +31,7 @@ class ZebraMotionWorks(ndb.Model):
     """
 
     event: ndb.Key = ndb.KeyProperty(kind=Event, required=True)
-    data: List[ZebraData] = ndb.JsonProperty(required=True)
+    data: list[ZebraData] = ndb.JsonProperty(required=True)
 
     created = ndb.DateTimeProperty(
         auto_now_add=True, indexed=False, default=datetime.datetime.fromtimestamp(0)

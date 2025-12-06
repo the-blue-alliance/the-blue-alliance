@@ -1,6 +1,5 @@
 import json
 import os
-from typing import Dict
 from urllib.parse import urlencode
 
 import pytest
@@ -217,7 +216,7 @@ def mock_google_api_secret(monkeypatch: MonkeyPatch) -> None:
 def mock_youtube_api(
     m: RequestsMocker,
     playlist_id: str,
-    result: Dict,
+    result: dict,
     status_code: int = 200,
     next_token: str = "",
 ) -> None:

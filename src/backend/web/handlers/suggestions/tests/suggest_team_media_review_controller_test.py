@@ -1,5 +1,4 @@
 import re
-from typing import List
 from urllib.parse import urlparse
 
 import pytest
@@ -25,7 +24,7 @@ def login_user_with_permission(login_user):
     return login_user
 
 
-def get_suggestion_queue(web_client: Client) -> List[str]:
+def get_suggestion_queue(web_client: Client) -> list[str]:
     response = web_client.get("/suggest/team/media/review")
     assert response.status_code == 200
     soup = BeautifulSoup(response.data, "html.parser")

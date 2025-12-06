@@ -2,7 +2,7 @@ import logging
 import random
 import string
 from datetime import datetime
-from typing import cast, Optional
+from typing import cast
 
 from flask import abort, redirect, request, url_for
 from google.appengine.ext import ndb
@@ -166,7 +166,7 @@ def api_auth_edit_post(auth_id: str) -> Response:
     return redirect(url_for("admin.api_auth_manage"))
 
 
-def api_auth_manage(key_type: Optional[str]) -> Response:
+def api_auth_manage(key_type: str | None) -> Response:
     if key_type == "write":
         auth_filter = cast(ndb.IntegerProperty, ApiAuthAccess.auth_types_enum).IN(
             list(WRITE_TYPE_NAMES.keys())

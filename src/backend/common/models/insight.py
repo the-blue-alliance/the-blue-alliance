@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Literal, Optional, Set, TypeAlias, TypedDict
+from typing import Literal, TypeAlias, TypedDict
 
 from google.appengine.ext import ndb
 
@@ -126,7 +126,7 @@ class Insight(CachedModel):
         DISTRICT_INSIGHT_DISTRICT_DATA: "district_insights_district_data",
     }
 
-    TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
+    TYPED_LEADERBOARD_KEY_TYPES: dict[int, LeaderboardKeyType] = {
         TYPED_LEADERBOARD_BLUE_BANNERS: "team",
         TYPED_LEADERBOARD_MOST_MATCHES_PLAYED: "team",
         TYPED_LEADERBOARD_HIGHEST_MEDIAN_SCORE_BY_EVENT: "event",
@@ -165,11 +165,11 @@ class Insight(CachedModel):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    _json_attrs: Set[str] = {
+    _json_attrs: set[str] = {
         "data_json",
     }
 
-    _mutable_attrs: Set[str] = set()
+    _mutable_attrs: set[str] = set()
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
@@ -203,7 +203,7 @@ class Insight(CachedModel):
         cls,
         year: int,
         name: str,
-        district_abbreviation: Optional[DistrictAbbreviation] = None,
+        district_abbreviation: DistrictAbbreviation | None = None,
     ) -> str:
         prefix = f"{year}insights" if year != 0 else "insights"
         suffix = f"_{district_abbreviation}" if district_abbreviation else ""
@@ -211,12 +211,12 @@ class Insight(CachedModel):
 
 
 class LeaderboardRanking(TypedDict):
-    keys: List[TeamKey | EventKey | MatchKey]
+    keys: list[TeamKey | EventKey | MatchKey]
     value: int | float
 
 
 class LeaderboardData(TypedDict):
-    rankings: List[LeaderboardRanking]
+    rankings: list[LeaderboardRanking]
     key_type: LeaderboardKeyType
 
 
@@ -233,13 +233,13 @@ class NotableEntry(TypedDict):
 
     # this needs to be a list to support overall
     # in an individual year, this should probably always be len 1
-    context: List[EventKey]
+    context: list[EventKey]
 
 
 class NotablesData(TypedDict):
     """In case we need more data in the future, we can add it here."""
 
-    entries: List[NotableEntry]
+    entries: list[NotableEntry]
 
 
 class NotablesInsight(TypedDict):
@@ -268,14 +268,14 @@ class DistrictInsightTeamData(TypedDict):
 
 
 class DistrictInsightDistrictRegionData(TypedDict):
-    yearly_active_team_count: Dict[Year, int]
-    yearly_gained_teams: Dict[Year, List[TeamKey]]
-    yearly_lost_teams: Dict[Year, List[TeamKey]]
-    yearly_event_count: Dict[Year, int]
+    yearly_active_team_count: dict[Year, int]
+    yearly_gained_teams: dict[Year, list[TeamKey]]
+    yearly_lost_teams: dict[Year, list[TeamKey]]
+    yearly_event_count: dict[Year, int]
 
 
 class DistrictInsightDistrictData(TypedDict):
     # Grouped by region (state or country)
-    region_data: Dict[str, DistrictInsightDistrictRegionData]
+    region_data: dict[str, DistrictInsightDistrictRegionData]
     # Full district-wide data
     district_wide_data: DistrictInsightDistrictRegionData

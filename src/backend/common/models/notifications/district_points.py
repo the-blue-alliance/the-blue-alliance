@@ -1,5 +1,6 @@
-from typing import Any, cast, Dict, Optional
+from typing import Any, cast
 
+from firebase_admin import messaging
 from pyre_extensions import none_throws
 
 from backend.common.consts.notification_type import NotificationType
@@ -16,9 +17,7 @@ class DistrictPointsNotification(Notification):
         return NotificationType.DISTRICT_POINTS_UPDATED
 
     @property
-    def fcm_notification(self) -> Optional[Any]:
-        from firebase_admin import messaging
-
+    def fcm_notification(self) -> messaging.Notification | None:
         return messaging.Notification(
             title="{} District Points Updated".format(
                 self.district.abbreviation.upper()
@@ -29,11 +28,11 @@ class DistrictPointsNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, str]]:
+    def data_payload(self) -> dict[str, str] | None:
         return {"district_key": self.district.key_name}
 
     @property
-    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
-        payload = cast(Dict[str, Any], none_throws(self.data_payload))
+    def webhook_message_data(self) -> dict[str, Any] | None:
+        payload = cast(dict[str, Any], none_throws(self.data_payload))
         payload["district_name"] = self.district.display_name
         return payload

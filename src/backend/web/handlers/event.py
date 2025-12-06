@@ -5,7 +5,6 @@ import json
 import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 
 import pytz
 from flask import abort, redirect, request
@@ -60,13 +59,13 @@ def convert_component_name(component_name: str) -> str:
 
 
 def sort_and_limit_stats(
-    stats_dict: TeamStatMap, num_matchstats: Optional[int] = None
-) -> List[Tuple[TeamKey, float]]:
+    stats_dict: TeamStatMap, num_matchstats: int | None = None
+) -> list[tuple[TeamKey, float]]:
     return sorted(stats_dict.items(), key=lambda t: -t[1])[:num_matchstats]
 
 
 @cached_public
-def event_list(year: Optional[Year] = None) -> Response:
+def event_list(year: Year | None = None) -> Response:
     explicit_year = year is not None
     if year is None:
         year = SeasonHelper.get_current_season()
@@ -74,6 +73,7 @@ def event_list(year: Optional[Year] = None) -> Response:
     valid_years = list(reversed(SeasonHelper.get_valid_years()))
     if year not in valid_years:
         abort(404)
+        return
 
     state_prov = request.args.get("state_prov", None)
     districts_future = district_query.DistrictsInYearQuery(year).fetch_async()
@@ -126,10 +126,11 @@ def event_list(year: Optional[Year] = None) -> Response:
 
 @cached_public
 def event_detail(event_key: EventKey) -> Response:
-    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    event: Event | None = event_query.EventQuery(event_key).fetch()
 
     if not event:
         abort(404)
+        return
 
     event.prep_awards()
     event.prep_matches()
@@ -183,7 +184,7 @@ def event_detail(event_key: EventKey) -> Response:
     teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
 
     # Helper to convert OrderedDict list to CSV string
-    def dicts_to_csv(rows: List[OrderedDict]) -> str:
+    def dicts_to_csv(rows: list[OrderedDict]) -> str:
         if not rows:
             return ""
         output = io.StringIO()
@@ -235,7 +236,7 @@ def event_detail(event_key: EventKey) -> Response:
         default=3,
     )
 
-    def format_match_time(match_time: Optional[datetime]) -> Tuple[str, str]:
+    def format_match_time(match_time: datetime | None) -> tuple[str, str]:
         if not match_time or not event_tz:
             return "", ""
         local_time = MatchTimePredictionHelper.as_local(match_time, event_tz)
@@ -300,7 +301,7 @@ def event_detail(event_key: EventKey) -> Response:
     flat_schedule_csv = dicts_to_csv(flat_schedule_rows)
 
     oprs = []
-    copr_leaders: Dict[Component, List[Tuple[TeamId, float]]] = {}
+    copr_leaders: dict[Component, list[tuple[TeamId, float]]] = {}
 
     if event.matchstats is not None:
         oprs = sort_and_limit_stats(event.matchstats.get("oprs") or {})
@@ -311,7 +312,7 @@ def event_detail(event_key: EventKey) -> Response:
             copr_leaders[component] = sort_and_limit_stats(tsm)
 
     # Container for (component, componentValidHtmlId, and componentHumanReadableName) elements
-    copr_items: List[Tuple[Component, str, str]] = [
+    copr_items: list[tuple[Component, str, str]] = [
         (k, re.sub("[^0-9a-zA-Z]+", "_", k), convert_component_name(k))
         for k in copr_leaders.keys()
     ]
@@ -439,10 +440,11 @@ def event_detail(event_key: EventKey) -> Response:
 
 @cached_public
 def event_insights(event_key: EventKey) -> Response:
-    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    event: Event | None = event_query.EventQuery(event_key).fetch()
 
     if not event or event.year < 2016:
         abort(404)
+        return
 
     event.prep_matches()
 
@@ -450,6 +452,7 @@ def event_insights(event_key: EventKey) -> Response:
     event_predictions = event_details.predictions if event_details else None
     if not event_details or not event_predictions:
         abort(404)
+        return
 
     match_predictions = event_predictions.get("match_predictions", None)
     match_prediction_stats = event_predictions.get("match_prediction_stats", None)
@@ -543,7 +546,7 @@ def event_insights(event_key: EventKey) -> Response:
 
 @cached_public
 def event_rss(event_key: EventKey) -> Response:
-    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    event: Event | None = event_query.EventQuery(event_key).fetch()
 
     if not event:
         return redirect("/events")
@@ -573,5 +576,6 @@ def event_agenda(event_key: EventKey) -> Response:
         or not (agenda_url := event.public_agenda_url)
     ):
         abort(404)
+        return
 
     return redirect(agenda_url)

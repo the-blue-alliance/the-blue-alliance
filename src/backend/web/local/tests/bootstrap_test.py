@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import cast, Dict, List
+from typing import cast
 
 from google.appengine.ext import ndb
 from requests_mock.mocker import Mocker as RequestsMocker
@@ -56,7 +56,7 @@ def make_team(team_num: TeamNumber) -> Team:
     )
 
 
-def make_media(team_num: TeamNumber, year: int) -> List[Media]:
+def make_media(team_num: TeamNumber, year: int) -> list[Media]:
     return [
         Media(
             id="imgur_HSHpnyg",
@@ -147,7 +147,7 @@ def mock_team_detail_url(m: RequestsMocker, team: Team) -> None:
 
 
 def mock_team_media_url(
-    m: RequestsMocker, team: Team, media: List[Media], year: int
+    m: RequestsMocker, team: Team, media: list[Media], year: int
 ) -> None:
     m.register_uri(
         "GET",
@@ -189,7 +189,7 @@ def mock_event_detail_url(m: RequestsMocker, event: Event) -> None:
 
 
 def mock_event_teams_url(
-    m: RequestsMocker, event_key: EventKey, teams: List[Team]
+    m: RequestsMocker, event_key: EventKey, teams: list[Team]
 ) -> None:
     m.register_uri(
         "GET",
@@ -201,7 +201,7 @@ def mock_event_teams_url(
 
 
 def mock_event_matches_url(
-    m: RequestsMocker, event_key: EventKey, matches: List[Match]
+    m: RequestsMocker, event_key: EventKey, matches: list[Match]
 ) -> None:
     m.register_uri(
         "GET",
@@ -213,7 +213,7 @@ def mock_event_matches_url(
 
 
 def mock_event_rankings_url(
-    m: RequestsMocker, event_key: EventKey, rankings: List[EventRanking]
+    m: RequestsMocker, event_key: EventKey, rankings: list[EventRanking]
 ) -> None:
     details = EventDetailsConverter(
         EventDetails(id=event_key, rankings2=rankings)
@@ -223,12 +223,12 @@ def mock_event_rankings_url(
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/rankings",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
         status_code=200,
-        json=cast(Dict, details)["rankings"] if details else {},
+        json=cast(dict, details)["rankings"] if details else {},
     )
 
 
 def mock_event_alliances_url(
-    m: RequestsMocker, event_key: EventKey, alliances: List[EventAlliance]
+    m: RequestsMocker, event_key: EventKey, alliances: list[EventAlliance]
 ) -> None:
     details = EventDetailsConverter(
         EventDetails(id=event_key, alliance_selections=alliances)
@@ -238,12 +238,12 @@ def mock_event_alliances_url(
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/alliances",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
         status_code=200,
-        json=cast(Dict, details)["alliances"],
+        json=cast(dict, details)["alliances"],
     )
 
 
 def mock_event_awards_url(
-    m: RequestsMocker, event_key: EventKey, awards: List[Award]
+    m: RequestsMocker, event_key: EventKey, awards: list[Award]
 ) -> None:
     m.register_uri(
         "GET",
@@ -254,7 +254,7 @@ def mock_event_awards_url(
     )
 
 
-def mock_events_url(m: RequestsMocker, year: Year, events: List[Event]) -> None:
+def mock_events_url(m: RequestsMocker, year: Year, events: list[Event]) -> None:
     m.register_uri(
         "GET",
         f"https://www.thebluealliance.com/api/v3/events/{year}",

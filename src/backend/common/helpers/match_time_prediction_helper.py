@@ -1,6 +1,5 @@
 import datetime
 import time
-from typing import List, Optional
 
 import numpy as np
 import pytz
@@ -25,7 +24,7 @@ class MatchTimePredictionHelper:
     @classmethod
     def as_local(
         cls, time: datetime.datetime, timezone: datetime.tzinfo
-    ) -> Optional[datetime.datetime]:
+    ) -> datetime.datetime | None:
         if not time:
             return None
         return pytz.utc.localize(time).astimezone(timezone)
@@ -43,10 +42,10 @@ class MatchTimePredictionHelper:
     @classmethod
     def compute_average_cycle_time(
         cls,
-        played_matches: List[Match],
+        played_matches: list[Match],
         next_unplayed: Match,
         timezone: datetime.tzinfo,
-    ) -> Optional[float]:
+    ) -> float | None:
         """
         Compute the average cycle time of the given matches, but only for the current day
         :param played_matches: The matches for this event that have been played
@@ -100,11 +99,11 @@ class MatchTimePredictionHelper:
     def predict_future_matches(
         cls,
         event_key: EventKey,
-        played_matches: List[Match],
-        unplayed_matches: List[Match],
+        played_matches: list[Match],
+        unplayed_matches: list[Match],
         timezone: datetime.tzinfo,
         is_live: bool,
-        nexus_queue_info: Optional[EventQueueStatus],
+        nexus_queue_info: EventQueueStatus | None,
     ) -> None:
         """
         Add match time predictions for future matches

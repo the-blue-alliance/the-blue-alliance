@@ -1,5 +1,3 @@
-from typing import List
-
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
@@ -15,7 +13,7 @@ class DistrictManipulator(ManipulatorBase[District]):
     @classmethod
     def getCacheKeysAndQueries(
         cls, affected_refs: TAffectedReferences
-    ) -> List[get_affected_queries.TCacheKeyAndQuery]:
+    ) -> list[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.district_updated(affected_refs)
 
     @classmethod
@@ -31,7 +29,7 @@ class DistrictManipulator(ManipulatorBase[District]):
 
 
 @DistrictManipulator.register_post_update_hook
-def district_post_update_hook(updated_models: List[TUpdatedModel[District]]) -> None:
+def district_post_update_hook(updated_models: list[TUpdatedModel[District]]) -> None:
     """
     To run after a district has been updated.
     For new districts, tries to guess the names based on other year's data

@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
@@ -14,7 +12,7 @@ from backend.common.queries.event_query import (
 )
 
 
-def preseed_events(year: Year, n: int) -> List[str]:
+def preseed_events(year: Year, n: int) -> list[str]:
     stored = ndb.put_multi(
         [
             Event(
@@ -30,7 +28,7 @@ def preseed_events(year: Year, n: int) -> List[str]:
     return [k.id() for k in stored]
 
 
-def preseed_teams(start_team: int, end_team: Optional[int] = None) -> None:
+def preseed_teams(start_team: int, end_team: int | None = None) -> None:
     end_team = end_team or start_team
     stored = ndb.put_multi(
         [
@@ -44,7 +42,7 @@ def preseed_teams(start_team: int, end_team: Optional[int] = None) -> None:
     assert len(stored) == (end_team - start_team + 1)
 
 
-def preseed_event_team(team_key: TeamKey, event_keys: List[EventKey]) -> None:
+def preseed_event_team(team_key: TeamKey, event_keys: list[EventKey]) -> None:
     [
         EventTeam(
             id=f"{event_key}_{team_key}",

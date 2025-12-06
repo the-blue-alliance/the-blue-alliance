@@ -1,7 +1,6 @@
 import datetime
 import json
 import unittest
-from typing import Optional
 from urllib.parse import urlparse
 
 import pytest
@@ -55,10 +54,10 @@ def mock_grabcad_api(monkeypatch: pytest.MonkeyPatch) -> None:
     "web_client", "ndb_context", "taskqueue_stub", "login_user", "mock_grabcad_api"
 )
 class TestSuggestTeamAdminReview(unittest.TestCase):
-    account: Optional[User] = None
-    web_client: Optional[FlaskClient] = None
-    team: Optional[Team] = None
-    now: Optional[datetime.datetime] = None
+    account: User | None = None
+    web_client: FlaskClient | None = None
+    team: Team | None = None
+    now: datetime.datetime | None = None
 
     @pytest.fixture(autouse=True)
     def set_up(self, login_user: User, web_client):

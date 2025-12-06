@@ -1,5 +1,4 @@
 import enum
-from typing import Dict, Set
 
 
 @enum.unique
@@ -33,7 +32,7 @@ class NotificationType(enum.IntEnum):
     VERIFICATION = 200
 
 
-TYPE_NAMES: Dict[NotificationType, str] = {
+TYPE_NAMES: dict[NotificationType, str] = {
     NotificationType.UPCOMING_MATCH: "upcoming_match",
     NotificationType.MATCH_SCORE: "match_score",
     NotificationType.LEVEL_STARTING: "starting_comp_level",
@@ -53,7 +52,7 @@ TYPE_NAMES: Dict[NotificationType, str] = {
 }
 
 
-RENDER_NAMES: Dict[NotificationType, str] = {
+RENDER_NAMES: dict[NotificationType, str] = {
     NotificationType.UPCOMING_MATCH: "Upcoming Match",
     NotificationType.MATCH_SCORE: "Match Score",
     NotificationType.LEVEL_STARTING: "Competition Level Starting",
@@ -68,7 +67,7 @@ RENDER_NAMES: Dict[NotificationType, str] = {
 }
 
 
-TYPES: Dict[str, NotificationType] = {
+TYPES: dict[str, NotificationType] = {
     "upcoming_match": NotificationType.UPCOMING_MATCH,
     "match_score": NotificationType.MATCH_SCORE,
     "starting_comp_level": NotificationType.LEVEL_STARTING,
@@ -86,7 +85,7 @@ TYPES: Dict[str, NotificationType] = {
 }
 
 
-ENABLED_NOTIFICATIONS: Dict[NotificationType, str] = {
+ENABLED_NOTIFICATIONS: dict[NotificationType, str] = {
     NotificationType.UPCOMING_MATCH: RENDER_NAMES[NotificationType.UPCOMING_MATCH],
     NotificationType.MATCH_SCORE: RENDER_NAMES[NotificationType.MATCH_SCORE],
     NotificationType.MATCH_VIDEO: RENDER_NAMES[NotificationType.MATCH_VIDEO],
@@ -99,7 +98,7 @@ ENABLED_NOTIFICATIONS: Dict[NotificationType, str] = {
 }
 
 
-ENABLED_EVENT_NOTIFICATIONS: Set[NotificationType] = {
+ENABLED_EVENT_NOTIFICATIONS: set[NotificationType] = {
     NotificationType.UPCOMING_MATCH,
     NotificationType.MATCH_SCORE,
     NotificationType.LEVEL_STARTING,
@@ -110,7 +109,7 @@ ENABLED_EVENT_NOTIFICATIONS: Set[NotificationType] = {
 }
 
 
-ENABLED_TEAM_NOTIFICATIONS: Set[NotificationType] = {
+ENABLED_TEAM_NOTIFICATIONS: set[NotificationType] = {
     NotificationType.UPCOMING_MATCH,
     NotificationType.MATCH_SCORE,
     NotificationType.ALLIANCE_SELECTION,
@@ -119,7 +118,7 @@ ENABLED_TEAM_NOTIFICATIONS: Set[NotificationType] = {
 }
 
 
-ENABLED_MATCH_NOTIFICATIONS: Set[NotificationType] = {
+ENABLED_MATCH_NOTIFICATIONS: set[NotificationType] = {
     NotificationType.UPCOMING_MATCH,
     NotificationType.MATCH_SCORE,
     NotificationType.MATCH_VIDEO,

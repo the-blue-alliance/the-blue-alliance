@@ -1,6 +1,5 @@
 import json
 import os
-from typing import List, Optional
 
 from google.appengine.ext import ndb
 from pyre_extensions.refinement import none_throws
@@ -37,7 +36,7 @@ class JsonDataImporter(object):
         team.put()
 
     def import_event_list(
-        self, base_path: str, path: str, team_key: Optional[TeamKey] = None
+        self, base_path: str, path: str, team_key: TeamKey | None = None
     ) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
@@ -176,7 +175,7 @@ class JsonDataImporter(object):
 
         [MatchConverter.dictToModel_v3(m).put() for m in data]
 
-    def parse_match_list(self, base_path: str, path: str) -> List[Match]:
+    def parse_match_list(self, base_path: str, path: str) -> list[Match]:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
@@ -187,9 +186,9 @@ class JsonDataImporter(object):
         self,
         base_path: str,
         path: str,
-        year: Optional[int] = None,
-        team_key: Optional[TeamKey] = None,
-    ) -> List[Media]:
+        year: int | None = None,
+        team_key: TeamKey | None = None,
+    ) -> list[Media]:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)
 
@@ -200,8 +199,8 @@ class JsonDataImporter(object):
         self,
         base_path: str,
         path: str,
-        year: Optional[int] = None,
-        team_key: Optional[TeamKey] = None,
+        year: int | None = None,
+        team_key: TeamKey | None = None,
     ) -> None:
         with open(self._get_path(base_path, path), "r") as f:
             data = json.load(f)

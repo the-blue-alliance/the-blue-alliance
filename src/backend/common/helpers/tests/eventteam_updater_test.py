@@ -1,7 +1,6 @@
 import datetime
 import json
 import os
-from typing import Set
 
 import pytest
 from freezegun import freeze_time
@@ -20,7 +19,7 @@ from backend.common.models.team import Team
 
 
 @pytest.fixture
-def expected_teams() -> Set[TeamNumber]:
+def expected_teams() -> set[TeamNumber]:
     base_dir = os.path.dirname(__file__)
     path = os.path.join(base_dir, "data/2012ct_teams.json")
 

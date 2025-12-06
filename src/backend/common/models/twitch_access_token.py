@@ -1,12 +1,12 @@
-from typing import List, Optional, TypedDict
+from typing import TypedDict
 
 
 class _TwitchAccessTokenApiResponse(TypedDict):
     access_token: str
     expires_in: int
-    refresh_token: Optional[str]
+    refresh_token: str | None
     token_type: str
-    scope: Optional[List[str]]
+    scope: list[str] | None
 
 
 class _TwitchAccessTokenDerived(TypedDict):

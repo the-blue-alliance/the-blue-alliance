@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from datetime import datetime, timedelta
-from typing import Any, Callable, cast, Dict, Optional, Tuple
+from typing import Any, cast
 
 from flask import abort, Response
 from google.appengine.ext import ndb
@@ -24,8 +25,8 @@ from backend.web.profiled_render import render_template
 
 @cached_public
 def index() -> Response:
-    HANDLER_MAP: Dict[
-        LandingType, Tuple[Callable[[Dict[str, Any]], str], timedelta]
+    HANDLER_MAP: dict[
+        LandingType, tuple[Callable[[dict[str, Any]], str], timedelta]
     ] = {
         # map landing type -> (handler function, cache ttl)
         LandingType.KICKOFF: (index_kickoff, timedelta(minutes=5)),
@@ -40,11 +41,11 @@ def index() -> Response:
     }
     landing_type = LandingConfig.current_landing_type()
     landing_type_handler, cache_ttl = HANDLER_MAP[landing_type]
-    template_values = cast(Dict[str, Any], LandingConfig.get())
+    template_values = cast(dict[str, Any], LandingConfig.get())
     return make_cached_response(landing_type_handler(template_values), ttl=cache_ttl)
 
 
-def index_kickoff(template_values: Dict[str, Any]) -> str:
+def index_kickoff(template_values: dict[str, Any]) -> str:
     # special_webcasts = FirebasePusher.get_special_webcasts()
     effective_season_year = SeasonHelper.effective_season_year()
     template_values.update(
@@ -67,7 +68,7 @@ def index_kickoff(template_values: Dict[str, Any]) -> str:
     return render_template("index/index_kickoff.html", template_values)
 
 
-def index_buildseason(template_values: Dict[str, Any]) -> str:
+def index_buildseason(template_values: dict[str, Any]) -> str:
     special_webcasts = SpecialWebcastHelper.get_special_webcasts_with_online_status()
     effective_season_year = SeasonHelper.effective_season_year()
     template_values.update(
@@ -86,7 +87,7 @@ def index_buildseason(template_values: Dict[str, Any]) -> str:
     return render_template("index/index_buildseason.html", template_values)
 
 
-def index_competitionseason(template_values: Dict[str, Any]) -> str:
+def index_competitionseason(template_values: dict[str, Any]) -> str:
     week_events = EventHelper.week_events()
     popular_teams_events = TeamHelper.getPopularTeamsEvents(week_events)
 
@@ -126,7 +127,7 @@ def index_competitionseason(template_values: Dict[str, Any]) -> str:
     return render_template("index/index_competitionseason.html", template_values)
 
 
-def index_champs(template_values: Dict[str, Any]) -> str:
+def index_champs(template_values: dict[str, Any]) -> str:
     year = datetime.now().year
     event_keys_future = Event.query(
         Event.year == year, Event.event_type_enum.IN(CMP_EVENT_TYPES)
@@ -143,7 +144,7 @@ def index_champs(template_values: Dict[str, Any]) -> str:
     return render_template("index/index_champs.html", template_values)
 
 
-def index_offseason(template_values: Dict[str, Any]) -> str:
+def index_offseason(template_values: dict[str, Any]) -> str:
     special_webcasts = SpecialWebcastHelper.get_special_webcasts_with_online_status()
     effective_season_year = SeasonHelper.effective_season_year()
 
@@ -163,7 +164,7 @@ def index_offseason(template_values: Dict[str, Any]) -> str:
     return render_template("index/index_offseason.html", template_values)
 
 
-def index_insights(template_values: Dict[str, Any]) -> str:
+def index_insights(template_values: dict[str, Any]) -> str:
     week_events = EventHelper.week_events()
     year = datetime.now().year
     special_webcasts = SpecialWebcastHelper.get_special_webcasts_with_online_status()
@@ -197,7 +198,7 @@ def about() -> str:
 
 
 @cached_public(ttl=timedelta(hours=24))
-def avatar_list(year: Optional[Year] = None) -> Response:
+def avatar_list(year: Year | None = None) -> Response:
     year = year or SeasonHelper.get_current_season()
 
     valid_years = list(range(2018, SeasonHelper.get_max_year() + 1))

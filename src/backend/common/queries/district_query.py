@@ -1,4 +1,5 @@
-from typing import Any, Generator, List, Optional
+from collections.abc import Generator
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -15,7 +16,7 @@ from backend.common.queries.dict_converters.district_converter import (
 from backend.common.tasklets import typed_tasklet
 
 
-class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDict]]):
+class DistrictQuery(CachedDatabaseQuery[District | None, DistrictDict | None]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "district_{district_key}"
     DICT_CONVERTER = DistrictConverter
@@ -26,7 +27,7 @@ class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDic
     @typed_tasklet
     def _query_async(
         self, district_key: DistrictKey
-    ) -> Generator[Any, Any, Optional[District]]:
+    ) -> Generator[Any, Any, District | None]:
         # Fetch all equivalent keys
         keys = RenamedDistricts.get_equivalent_keys(district_key)
         districts = yield ndb.get_multi_async([ndb.Key(District, key) for key in keys])
@@ -37,7 +38,7 @@ class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDic
         return None
 
 
-class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):
+class DistrictsInYearQuery(CachedDatabaseQuery[list[District], list[DistrictDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "districts_in_year_{year}"
     DICT_CONVERTER = DistrictConverter
@@ -46,7 +47,7 @@ class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict
         super().__init__(year=year)
 
     @typed_tasklet
-    def _query_async(self, year: Year) -> Generator[Any, Any, List[District]]:
+    def _query_async(self, year: Year) -> Generator[Any, Any, list[District]]:
         district_keys = yield District.query(District.year == year).fetch_async(
             keys_only=True
         )
@@ -54,7 +55,7 @@ class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict
         return list(districts)
 
 
-class DistrictHistoryQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):
+class DistrictHistoryQuery(CachedDatabaseQuery[list[District], list[DistrictDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "district_history_{abbreviation}"
     DICT_CONVERTER = DistrictConverter
@@ -65,7 +66,7 @@ class DistrictHistoryQuery(CachedDatabaseQuery[List[District], List[DistrictDict
     @typed_tasklet
     def _query_async(
         self, abbreviation: DistrictAbbreviation
-    ) -> Generator[Any, Any, List[District]]:
+    ) -> Generator[Any, Any, list[District]]:
         district_keys = yield District.query(
             District.abbreviation.IN(
                 RenamedDistricts.get_equivalent_codes(abbreviation)
@@ -75,7 +76,7 @@ class DistrictHistoryQuery(CachedDatabaseQuery[List[District], List[DistrictDict
         return list(districts)
 
 
-class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):
+class TeamDistrictsQuery(CachedDatabaseQuery[list[District], list[DistrictDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_districts_{team_key}"
     DICT_CONVERTER = DistrictConverter
@@ -84,7 +85,7 @@ class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]
         super().__init__(team_key=team_key)
 
     @typed_tasklet
-    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[District]]:
+    def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, list[District]]:
         district_team_keys = yield DistrictTeam.query(
             DistrictTeam.team == ndb.Key(Team, team_key)
         ).fetch_async(keys_only=True)
@@ -95,7 +96,7 @@ class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]
 
 
 class DistrictAbbreviationQuery(
-    CachedDatabaseQuery[List[District], List[DistrictDict]]
+    CachedDatabaseQuery[list[District], list[DistrictDict]]
 ):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "district_abbreviation_{abbreviation}"
@@ -107,7 +108,7 @@ class DistrictAbbreviationQuery(
     @typed_tasklet
     def _query_async(
         self, abbreviation: DistrictAbbreviation
-    ) -> Generator[Any, Any, List[District]]:
+    ) -> Generator[Any, Any, list[District]]:
         all_abbreviations = RenamedDistricts.get_equivalent_codes(abbreviation)
 
         district_keys = yield District.query(

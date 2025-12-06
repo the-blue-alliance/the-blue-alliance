@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, TypedDict
+from typing import Any, TypedDict
 
 
 class EventInsights(TypedDict):
@@ -6,5 +6,5 @@ class EventInsights(TypedDict):
     The format here varies by year
     """
 
-    qual: Optional[Dict[str, Any]]
-    playoff: Optional[Dict[str, Any]]
+    qual: dict[str, Any] | None
+    playoff: dict[str, Any] | None

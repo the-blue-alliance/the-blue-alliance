@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from backend.common.futures import TypedFuture
 from backend.common.models.event import Event
 from backend.common.models.keys import Year
@@ -29,8 +27,8 @@ class OffseasonEventHelper:
 
     @classmethod
     def categorize_offseasons(
-        cls, year: Year, first_events_offseasons: List[Event]
-    ) -> Tuple[List[Tuple[Event, Event]], List[Event]]:
+        cls, year: Year, first_events_offseasons: list[Event]
+    ) -> tuple[list[tuple[Event, Event]], list[Event]]:
         """
         Takes a list of offseason events from FIRST and sorts them in to two groups -
         events that directly or indirectly match TBA events, and events that do not
@@ -38,14 +36,14 @@ class OffseasonEventHelper:
 
         Returns a tuple of events (TBA/FIRST event tuples, new FIRST events)
         """
-        year_events_future: TypedFuture[List[Event]] = EventListQuery(
+        year_events_future: TypedFuture[list[Event]] = EventListQuery(
             year
         ).fetch_async()
         year_events = year_events_future.get_result()
         tba_events_offseasons = [e for e in year_events if e.is_offseason]
 
-        matched_events: List[Tuple[Event, Event]] = []
-        new_events: List[Event] = []
+        matched_events: list[tuple[Event, Event]] = []
+        new_events: list[Event] = []
 
         for first_event in first_events_offseasons:
             tba_event = next(

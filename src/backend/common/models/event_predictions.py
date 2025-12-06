@@ -1,35 +1,35 @@
-from typing import Dict, List, Literal, NamedTuple, Optional, TypedDict
+from typing import Literal, NamedTuple, TypedDict
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.models.keys import MatchKey, TeamKey
 
 
 class TComputedMatchInfo(TypedDict):
-    mean: Dict[TeamKey, float]
-    var: Dict[TeamKey, float]
+    mean: dict[TeamKey, float]
+    var: dict[TeamKey, float]
 
 
 TQualPlayoff = Literal["qual", "playoff"]
-TStatMeanVar = Dict[str, TComputedMatchInfo]
+TStatMeanVar = dict[str, TComputedMatchInfo]
 
 
 class MatchPrediction(TypedDict):
-    blue: Dict
-    red: Dict
+    blue: dict  # TODO: Add better typehints, if possible
+    red: dict  # TODO: Add better typehints, if possible
     winning_alliance: AllianceColor
     prob: float
 
 
 class MatchPredictionStatsLevel(TypedDict):
-    wl_accuracy: Optional[float]
-    wl_accuracy_75: Optional[float]
-    err_mean: Optional[float]
-    err_var: Optional[float]
-    brier_scores: Dict[Literal["win_loss"], float]
+    wl_accuracy: float | None
+    wl_accuracy_75: float | None
+    err_mean: float | None
+    err_var: float | None
+    brier_scores: dict[Literal["win_loss"], float]
 
 
 class TRankingPredictionStats(TypedDict):
-    last_played_match: Optional[str]
+    last_played_match: str | None
 
 
 class TRankingPrediction(NamedTuple):
@@ -42,15 +42,15 @@ class TRankingPrediction(NamedTuple):
     max_rp: int
 
 
-TMatchPredictions = Dict[TQualPlayoff, Dict[MatchKey, MatchPrediction]]
-TMatchPredictionStats = Dict[TQualPlayoff, MatchPredictionStatsLevel]
-TEventStatMeanVars = Dict[TQualPlayoff, TStatMeanVar]
-TRankingPredictions = List
+TMatchPredictions = dict[TQualPlayoff, dict[MatchKey, MatchPrediction]]
+TMatchPredictionStats = dict[TQualPlayoff, MatchPredictionStatsLevel]
+TEventStatMeanVars = dict[TQualPlayoff, TStatMeanVar]
+TRankingPredictions = list  # TODO: Add better typehints if possible
 
 
 class EventPredictions(TypedDict):
-    match_predictions: Optional[TMatchPredictions]
-    match_prediction_stats: Optional[TMatchPredictionStats]
-    stat_mean_vars: Optional[TEventStatMeanVars]
-    ranking_predictions: Optional[TRankingPredictions]
-    ranking_prediction_stats: Optional[TRankingPredictionStats]
+    match_predictions: TMatchPredictions | None
+    match_prediction_stats: TMatchPredictionStats | None
+    stat_mean_vars: TEventStatMeanVars | None
+    ranking_predictions: TRankingPredictions | None
+    ranking_prediction_stats: TRankingPredictionStats | None

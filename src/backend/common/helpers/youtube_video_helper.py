@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import Dict, List, Optional, TypedDict
+from typing import TypedDict
 from urllib import parse as urlparse
 
 import requests
@@ -17,7 +17,7 @@ class YouTubePlaylistItem(TypedDict):
 
 class YouTubeVideoHelper(object):
     @classmethod
-    def parse_id_from_url(cls, youtube_url: str) -> Optional[str]:
+    def parse_id_from_url(cls, youtube_url: str) -> str | None:
         """
         Attempts to parse a URL for the video ID and timestamp (if present)
         Returns None if parsing fails
@@ -82,8 +82,8 @@ class YouTubeVideoHelper(object):
         return ""
 
     @classmethod
-    def videos_in_playlist(cls, playlist_id: str) -> List[YouTubePlaylistItem]:
-        videos: List[Dict] = []
+    def videos_in_playlist(cls, playlist_id: str) -> list[YouTubePlaylistItem]:
+        videos: list[dict] = []
         yt_secret = GoogleApiSecret.secret_key()
         if not yt_secret:
             msg = "No Google API secret, unable to resolve playlist"

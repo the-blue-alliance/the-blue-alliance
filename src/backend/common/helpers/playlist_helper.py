@@ -1,5 +1,3 @@
-from typing import List
-
 from backend.common.consts import comp_level
 from backend.common.helpers.match_helper import TOrganizedMatches
 
@@ -10,7 +8,7 @@ class PlaylistHelper(object):
         cls,
         title: str,
         matches_organized: TOrganizedMatches,
-        allow_levels: List[comp_level.CompLevel],
+        allow_levels: list[comp_level.CompLevel],
     ) -> str:
         video_ids = []
         playlist = ""

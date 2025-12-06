@@ -1,6 +1,5 @@
 import datetime
 import json
-from typing import Dict, Optional
 from unittest import mock
 
 import pytest
@@ -19,7 +18,7 @@ from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 def create_event(
     official: bool,
-    remap_teams: Optional[Dict[str, str]] = None,
+    remap_teams: dict[str, str] | None = None,
     disable_sync_flags: int = 0,
 ) -> None:
     Event(

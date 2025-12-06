@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pytest
 from google.appengine.ext import ndb
@@ -21,8 +21,8 @@ REQUEST_PATH = "/api/trusted/v1/event/2014casj/matches/update"
 
 
 def setup_event(
-    remap_teams: Optional[Dict[str, str]] = None,
-    timezone_id: Optional[str] = "America/Los_Angeles",
+    remap_teams: dict[str, str] | None = None,
+    timezone_id: str | None = "America/Los_Angeles",
 ) -> None:
     Event(
         id="2014casj",
@@ -36,7 +36,7 @@ def setup_event(
     ).put()
 
 
-def setup_auth(access_types: List[AuthType]) -> None:
+def setup_auth(access_types: list[AuthType]) -> None:
     ApiAuthAccess(
         id=AUTH_ID,
         secret=AUTH_SECRET,
@@ -45,7 +45,7 @@ def setup_auth(access_types: List[AuthType]) -> None:
     ).put()
 
 
-def get_auth_headers(request_path: str, request_body) -> Dict[str, str]:
+def get_auth_headers(request_path: str, request_body) -> dict[str, str]:
     return {
         "X-TBA-Auth-Id": AUTH_ID,
         "X-TBA-AUth-Sig": TrustedApiAuthHelper.compute_auth_signature(

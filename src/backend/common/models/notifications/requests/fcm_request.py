@@ -28,7 +28,7 @@ class FCMRequest(Request):
 
         self._app = app
 
-        if len(tokens) > MAXIMUM_TOKENS:
+        if tokens and len(tokens) > MAXIMUM_TOKENS:
             raise ValueError(
                 "FCMRequest tokens must contain less than {} tokens".format(
                     MAXIMUM_TOKENS

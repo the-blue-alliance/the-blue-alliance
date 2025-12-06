@@ -1,17 +1,11 @@
 import logging
 from datetime import timedelta
-from typing import Any, Dict
+from typing import Any
 
 from flask import Flask, make_response, request, Response
-from flask_caching import BaseCache, Cache, CachedResponse
-from google.appengine.api import memcache
+from flask_caching import Cache, CachedResponse
 
-from backend.common.cache.flask_response_cache import MemcacheFlaskResponseCache
 from backend.common.sitevars.turbo_mode import TurboMode
-
-
-def app_engine_cache(_app: Flask, _config: Dict, *args, **kwargs) -> BaseCache:
-    return MemcacheFlaskResponseCache(memcache.Client())
 
 
 def configure_flask_cache(app: Flask) -> None:

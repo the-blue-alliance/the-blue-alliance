@@ -1,5 +1,3 @@
-from typing import Dict, List, Set
-
 from firebase_admin import db as firebase_db
 from pyre_extensions import none_throws
 
@@ -41,7 +39,7 @@ class FirebasePusher:
         ref.delete()
 
     @classmethod
-    def _patch_data(cls, key: str, data: Dict) -> None:
+    def _patch_data(cls, key: str, data: dict) -> None:
         """
         Write or replace data to a defined path, like messages/users/user1/<data>
         """
@@ -49,7 +47,7 @@ class FirebasePusher:
         ref.update(data)
 
     @classmethod
-    def _put_data(cls, key: str, data: Dict) -> None:
+    def _put_data(cls, key: str, data: dict) -> None:
         """
         Write or replace data to a defined path, like messages/users/user1/<data>
         """
@@ -87,7 +85,7 @@ class FirebasePusher:
         #     _queue="firebase")
 
     @classmethod
-    def _construct_match_dict(cls, match: MatchDict) -> Dict:
+    def _construct_match_dict(cls, match: MatchDict) -> dict:
         """
         Minimal amount needed to render
         """
@@ -107,7 +105,7 @@ class FirebasePusher:
 
     """
     @classmethod
-    def replace_event_matches(cls, event_key: EventKey, matches: List[Match]) -> None:
+    def replace_event_matches(cls, event_key: EventKey, matches: list[Match]) -> None:
         \"""
         Deletes matches from an event and puts these instead
         \"""
@@ -131,7 +129,7 @@ class FirebasePusher:
     def update_match(
         cls,
         match: Match,
-        updated_attrs: Set[str],
+        updated_attrs: set[str],
     ) -> None:
         """
         Updates a match in an event and event/team
@@ -239,7 +237,7 @@ class FirebasePusher:
 
     @classmethod
     def update_live_event(cls, event: Event) -> None:
-        events_by_key: Dict[EventKey, Dict] = {
+        events_by_key: dict[EventKey, dict] = {
             event.key_name: cls._convert_event(event),
         }
 
@@ -253,7 +251,7 @@ class FirebasePusher:
         )
 
     @classmethod
-    def _convert_event(cls, event: Event) -> Dict:
+    def _convert_event(cls, event: Event) -> dict:
         converted_event = EventConverter.eventConverter_v3(event)
         # Only what's needed to render webcast
         partial_event = {
@@ -271,12 +269,12 @@ class FirebasePusher:
 
     @classmethod
     def update_live_events(
-        cls, events: Dict[EventKey, Event], special_webcasts: List[TSpecialWebcast]
+        cls, events: dict[EventKey, Event], special_webcasts: list[TSpecialWebcast]
     ) -> None:
         """
         Updates live_events and special webcasts
         """
-        events_by_key: Dict[EventKey, Dict] = {}
+        events_by_key: dict[EventKey, dict] = {}
         for event_key, event in events.items():
             partial_event = cls._convert_event(event)
             events_by_key[event_key] = partial_event

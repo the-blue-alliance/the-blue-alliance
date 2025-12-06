@@ -1,4 +1,4 @@
-from typing import Dict, TypedDict
+from typing import TypedDict
 
 from backend.common.models.keys import TeamKey
 
@@ -8,4 +8,4 @@ class TeamDistrictAdvancement(TypedDict):
     cmp: bool
 
 
-DistrictAdvancement = Dict[TeamKey, TeamDistrictAdvancement]
+DistrictAdvancement = dict[TeamKey, TeamDistrictAdvancement]

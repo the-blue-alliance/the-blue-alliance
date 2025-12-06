@@ -1,5 +1,3 @@
-from typing import Dict, Optional
-
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.twitch_access_token import TwitchAccessToken
 from backend.common.models.webcast import Webcast
@@ -16,7 +14,7 @@ from backend.tasks_io.datafeeds.parsers.twitch.twitch_stream_status_parser impor
 
 class TwitchGetAccessToken(DatafeedBase[TwitchAccessToken]):
 
-    def __init__(self, refresh_token: Optional[str]) -> None:
+    def __init__(self, refresh_token: str | None) -> None:
         super().__init__()
         self.client_id = TwitchSecrets.client_id()
         self.client_secret = TwitchSecrets.client_secret()
@@ -34,7 +32,7 @@ class TwitchGetAccessToken(DatafeedBase[TwitchAccessToken]):
     def method(self) -> URLFetchMethod:
         return URLFetchMethod.POST
 
-    def payload(self) -> Dict[str, str]:
+    def payload(self) -> dict[str, str]:
         payload = {
             "client_id": self.client_id,
             "client_secret": self.client_secret,
@@ -60,7 +58,7 @@ class TwitchWebcastStatus(DatafeedBase[Webcast]):
         if self.webcast["type"] != WebcastType.TWITCH:
             raise ValueError(f"{webcast} is not twitch! Can't load status")
 
-    def headers(self) -> Dict[str, str]:
+    def headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.access_token['access_token']}",
             "Client-ID": self.access_token["client_id"],

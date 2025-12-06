@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
@@ -45,7 +43,7 @@ def district_history(district_abbreviation: DistrictAbbreviation) -> Response:
 @validate_keys
 @cached_public
 def district_events(
-    district_key: DistrictKey, model_type: Optional[ModelType] = None
+    district_key: DistrictKey, model_type: ModelType | None = None
 ) -> Response:
     """
     Returns a list of events for a given DistrictKey.
@@ -64,7 +62,7 @@ def district_events(
 @validate_keys
 @cached_public
 def district_teams(
-    district_key: DistrictKey, model_type: Optional[ModelType] = None
+    district_key: DistrictKey, model_type: ModelType | None = None
 ) -> Response:
     """
     Returns a list of teams for a given DistrictKey.

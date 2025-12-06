@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import cached_property
 from itertools import groupby
-from typing import cast, Dict, List, Optional, Set, Type
+from typing import cast
 
 from google.appengine.ext import ndb
 
@@ -22,10 +22,10 @@ from backend.common.queries.match_query import EventMatchesQuery
 
 @dataclass
 class AttendanceStatsHelper:
-    event_teams: List[EventTeam]
-    events: List[Event]
-    teams: List[Team]
-    matches: Dict[EventKey, List[Match]]
+    event_teams: list[EventTeam]
+    events: list[Event]
+    teams: list[Team]
+    matches: dict[EventKey, list[Match]]
 
     @property
     def event_count(self) -> int:
@@ -79,19 +79,19 @@ class AttendanceStatsHelper:
 class MyTBA:
     """A wrapper object for a collection of myTBA models for a given user"""
 
-    def __init__(self, models: List[MyTBAModel]) -> None:
+    def __init__(self, models: list[MyTBAModel]) -> None:
         self.models = models
 
     @property
-    def event_models(self) -> List[MyTBAModel]:
+    def event_models(self) -> list[MyTBAModel]:
         return [model for model in self.models if model.model_type == ModelType.EVENT]
 
     @staticmethod
-    def _event_keys(models: List[MyTBAModel]) -> Set[ndb.Key]:
+    def _event_keys(models: list[MyTBAModel]) -> set[ndb.Key]:
         return {ndb.Key(Event, model.model_key) for model in models}
 
     @property
-    def events(self) -> List[Event]:
+    def events(self) -> list[Event]:
         event_models = self.event_models
         wildcard_event_models = [m for m in event_models if m.is_wildcard]
 
@@ -116,27 +116,27 @@ class MyTBA:
         return events
 
     @property
-    def team_models(self) -> List[MyTBAModel]:
+    def team_models(self) -> list[MyTBAModel]:
         return [model for model in self.models if model.model_type == ModelType.TEAM]
 
     @property
-    def teams(self) -> List[Team]:
+    def teams(self) -> list[Team]:
         team_keys = {ndb.Key(Team, model.model_key) for model in self.team_models}
         futures = ndb.get_multi_async(team_keys)
         return [f.get_result() for f in futures]
 
     @property
-    def match_models(self) -> List[MyTBAModel]:
+    def match_models(self) -> list[MyTBAModel]:
         return [model for model in self.models if model.model_type == ModelType.MATCH]
 
     @property
-    def matches(self) -> List[Match]:
+    def matches(self) -> list[Match]:
         match_keys = {ndb.Key(Match, model.model_key) for model in self.match_models}
         futures = ndb.get_multi_async(match_keys)
         return [f.get_result() for f in futures]
 
     @property
-    def event_matches(self) -> Dict[ndb.Key, List[Match]]:
+    def event_matches(self) -> dict[ndb.Key, list[Match]]:
         # Key is an Event key, value is a list of Matches for that Event
         return {
             group[0]: [match for match in group[1]]
@@ -144,13 +144,13 @@ class MyTBA:
         }
 
     @property
-    def event_teams_models(self) -> List[MyTBAModel]:
+    def event_teams_models(self) -> list[MyTBAModel]:
         return [
             model for model in self.models if model.model_type == ModelType.EVENT_TEAM
         ]
 
     @property
-    def event_teams(self) -> List[EventTeam]:
+    def event_teams(self) -> list[EventTeam]:
         event_team_keys = {
             ndb.Key(EventTeam, model.model_key) for model in self.event_teams_models
         }
@@ -189,7 +189,7 @@ class MyTBA:
             for event in events
         }
         matches = {k: v.get_result() for k, v in matches_futures.items()}
-        event_team_matches: Dict[EventKey, List[Match]] = {}
+        event_team_matches: dict[EventKey, list[Match]] = {}
         for event_team in event_teams:
             if event_team.key_name not in event_team_matches:
                 event_team_matches[event_team.key_name] = []
@@ -206,20 +206,20 @@ class MyTBA:
             matches=event_team_matches,
         )
 
-    def favorite(self, model_type: ModelType, model_key: str) -> Optional[Favorite]:
+    def favorite(self, model_type: ModelType, model_key: str) -> Favorite | None:
         return self._first_model(Favorite, model_type, model_key)  # pyre-ignore[7]
 
     def subscription(
         self, model_type: ModelType, model_key: str
-    ) -> Optional[Subscription]:
+    ) -> Subscription | None:
         return self._first_model(Subscription, model_type, model_key)  # pyre-ignore[7]
 
     def _first_model(
         self,
-        mytba_model_type: Type[MyTBAModel],
+        mytba_model_type: type[MyTBAModel],
         model_type: ModelType,
         model_key: str,
-    ) -> Optional[MyTBAModel]:
+    ) -> MyTBAModel | None:
         # Note: There's probably a way to do this where mytba_model_type is a Generic Type and the return
         # is that Type. But I couldn't figure it out.
         # ~ zach

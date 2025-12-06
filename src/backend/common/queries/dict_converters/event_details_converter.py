@@ -1,12 +1,12 @@
 from collections import defaultdict
-from typing import cast, Dict, List, NewType
+from typing import cast, NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import TeamKey
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
-EventDetailsDict = NewType("EventDetailsDict", Dict)
+EventDetailsDict = NewType("EventDetailsDict", dict)
 
 
 class EventDetailsConverter(ConverterBase):
@@ -15,14 +15,14 @@ class EventDetailsConverter(ConverterBase):
     }
 
     @classmethod
-    def _convert_list(cls, model_list: List[EventDetails], version: ApiMajorVersion):
+    def _convert_list(cls, model_list: list[EventDetails], version: ApiMajorVersion):
         CONVERTERS = {
             3: cls.eventsDetailsConverter_v3,
         }
         return CONVERTERS[version](model_list)
 
     @classmethod
-    def eventsDetailsConverter_v3(cls, event_details: List[EventDetails]):
+    def eventsDetailsConverter_v3(cls, event_details: list[EventDetails]):
         return list(map(cls.eventDetailsConverter_v3, event_details))
 
     @classmethod
@@ -31,7 +31,7 @@ class EventDetailsConverter(ConverterBase):
         if event_details and event_details.matchstats:
             for stat_type, stats in event_details.matchstats.items():
                 if stat_type in {"oprs", "dprs", "ccwms"}:
-                    for team, value in cast(Dict[TeamKey, float], stats).items():
+                    for team, value in cast(dict[TeamKey, float], stats).items():
                         if "frc" not in team:  # Normalize output
                             team = "frc{}".format(team)
                         normalized_oprs[stat_type][team] = value

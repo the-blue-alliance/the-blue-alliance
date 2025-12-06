@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from backend.common.models.keys import EventKey, MatchKey
 
 
@@ -18,28 +16,28 @@ class TBAVideo(object):
     match_key: MatchKey
 
     # A list of filetypes where videos exist
-    match_tba_videos: List[str]
+    match_tba_videos: list[str]
 
     def __init__(
-        self, event_key: EventKey, match_key: MatchKey, match_tba_videos: List[str]
+        self, event_key: EventKey, match_key: MatchKey, match_tba_videos: list[str]
     ):
         self.event_key = event_key
         self.match_key = match_key
         self.match_tba_videos = match_tba_videos
 
     @property
-    def thumbnail_path(self) -> Optional[str]:
+    def thumbnail_path(self) -> str | None:
         return self._best_path_of(self.THUMBNAIL_FILETYPES)
 
     @property
-    def streamable_path(self) -> Optional[str]:
+    def streamable_path(self) -> str | None:
         return self._best_path_of(self.STREAMABLE_FILETYPES)
 
     @property
-    def downloadable_path(self) -> Optional[str]:
+    def downloadable_path(self) -> str | None:
         return self._best_path_of(self.DOWNLOADABLE_FILETYPES)
 
-    def _best_path_of(self, consider_filetypes: List[str]) -> Optional[str]:
+    def _best_path_of(self, consider_filetypes: list[str]) -> str | None:
         for filetype in consider_filetypes:
             if filetype in self.match_tba_videos:
                 return self.TBA_NET_VID_PATTERN % (

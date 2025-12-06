@@ -1,7 +1,7 @@
 import logging
 import traceback
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from pyre_extensions import none_throws
 
@@ -20,8 +20,8 @@ from backend.common.models.match import Match
 class EventInsightsHelper:
     @classmethod
     def calculate_event_insights(
-        cls, matches: List[Match], year: Year
-    ) -> Optional[EventInsights]:
+        cls, matches: list[Match], year: Year
+    ) -> EventInsights | None:
         INSIGHTS_MAP = {
             2016: cls.calculate_event_insights_2016,
             2017: cls.calculate_event_insights_2017,
@@ -40,7 +40,7 @@ class EventInsightsHelper:
             return None
 
     @classmethod
-    def calculate_event_insights_2025(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2025(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -59,8 +59,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2025_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         auto_rp_count = 0
         barge_rp_count = 0
         coral_rp_count = 0
@@ -72,7 +72,7 @@ class EventInsightsHelper:
         total_win_margins = 0
         total_winning_scores = 0
 
-        high_score: Tuple[int, str, str] = (0, "", "")
+        high_score: tuple[int, str, str] = (0, "", "")
 
         finished_matches = 0
 
@@ -178,7 +178,7 @@ class EventInsightsHelper:
         }
 
     @classmethod
-    def calculate_event_insights_2024(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2024(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -197,8 +197,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2024_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         melody_rp_count = 0
         ensemble_rp_count = 0
         coopertition_count = 0
@@ -209,7 +209,7 @@ class EventInsightsHelper:
         total_win_margins = 0
         total_winning_scores = 0
 
-        high_score: Tuple[int, str, str] = (0, "", "")
+        high_score: tuple[int, str, str] = (0, "", "")
 
         finished_matches = 0
 
@@ -301,7 +301,7 @@ class EventInsightsHelper:
         }
 
     @classmethod
-    def calculate_event_insights_2023(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2023(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -319,7 +319,7 @@ class EventInsightsHelper:
         }
 
     @classmethod
-    def calculate_event_insights_2022(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2022(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -338,8 +338,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2023_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         # Auto
         mobility_count = 0
         auto_top_count = 0
@@ -375,7 +375,7 @@ class EventInsightsHelper:
         win_margins = 0
         total_scores = 0
         foul_scores = 0
-        high_score: Tuple[int, str, str] = (0, "", "")
+        high_score: tuple[int, str, str] = (0, "", "")
 
         finished_matches = 0
         has_insights = False
@@ -560,8 +560,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2022_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         # Auto
         taxi_count = 0
         auto_lower_cargo_count = 0
@@ -593,7 +593,7 @@ class EventInsightsHelper:
         total_cargo_points = 0
         total_scores = 0
         foul_scores = 0
-        high_score: Tuple[int, str, str] = (0, "", "")
+        high_score: tuple[int, str, str] = (0, "", "")
 
         finished_matches = 0
         has_insights = False
@@ -809,7 +809,7 @@ class EventInsightsHelper:
         return event_insights
 
     @classmethod
-    def calculate_event_insights_2020(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2020(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -828,8 +828,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2020_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         # Auto
         init_line_auto = 0
         cell_count_bottom_auto = 0
@@ -865,7 +865,7 @@ class EventInsightsHelper:
         total_scores = 0
         total_cell = 0
         foul_scores = 0
-        high_score: Tuple[int, str, str] = (0, "", "")
+        high_score: tuple[int, str, str] = (0, "", "")
 
         finished_matches = 0
         has_insights = False
@@ -1092,7 +1092,7 @@ class EventInsightsHelper:
         return event_insights
 
     @classmethod
-    def calculate_event_insights_2019(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2019(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -1111,8 +1111,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2019_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         # Auto
         sandstorm_bonus_auto = 0
         points_auto = 0
@@ -1148,7 +1148,7 @@ class EventInsightsHelper:
         win_margins = 0
         total_scores = 0
         foul_scores = 0
-        high_score: Tuple[int, str, str] = (0, "", "")  # kpa, match key, match name
+        high_score: tuple[int, str, str] = (0, "", "")  # kpa, match key, match name
 
         finished_matches = 0
         has_insights = False
@@ -1437,7 +1437,7 @@ class EventInsightsHelper:
         return event_insights
 
     @classmethod
-    def calculate_event_insights_2018(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2018(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -1456,8 +1456,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2018_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         # Auto
         run_points_auto = 0
         scale_ownership_time_auto = 0
@@ -1503,7 +1503,7 @@ class EventInsightsHelper:
         win_margins = 0
         total_scores = 0
         foul_scores = 0
-        high_score: Tuple[int, str, str] = (0, "", "")  # score, match key, match name
+        high_score: tuple[int, str, str] = (0, "", "")  # score, match key, match name
 
         finished_matches = 0
         has_insights = False
@@ -1801,7 +1801,7 @@ class EventInsightsHelper:
         return event_insights
 
     @classmethod
-    def calculate_event_insights_2017(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2017(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -1820,8 +1820,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2017_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         # Auto
         mobility_points_auto = 0
         rotor_points_auto = 0
@@ -1859,8 +1859,8 @@ class EventInsightsHelper:
         win_margins = 0
         total_scores = 0
         foul_scores = 0
-        high_kpa: Tuple[int, str, str] = (0, "", "")  # score, match key, match name
-        high_score: Tuple[int, str, str] = (0, "", "")  # kpa, match key, match name
+        high_kpa: tuple[int, str, str] = (0, "", "")  # score, match key, match name
+        high_score: tuple[int, str, str] = (0, "", "")  # kpa, match key, match name
 
         finished_matches = 0
         has_insights = False
@@ -2081,7 +2081,7 @@ class EventInsightsHelper:
         return event_insights
 
     @classmethod
-    def calculate_event_insights_2016(cls, matches: List[Match]) -> EventInsights:
+    def calculate_event_insights_2016(cls, matches: list[Match]) -> EventInsights:
         qual_matches = []
         playoff_matches = []
         for match in matches:
@@ -2100,8 +2100,8 @@ class EventInsightsHelper:
 
     @classmethod
     def _calculate_event_insights_2016_helper(
-        cls, matches: List[Match]
-    ) -> Optional[Dict[str, Any]]:
+        cls, matches: list[Match]
+    ) -> dict[str, Any] | None:
         # defenses
         defense_opportunities = defaultdict(int)
         defense_damaged = defaultdict(int)
@@ -2123,7 +2123,7 @@ class EventInsightsHelper:
         boulder_scores = 0
         tower_scores = 0
         foul_scores = 0
-        high_score: Tuple[int, str, str] = (0, "", "")  # score, match key, match name
+        high_score: tuple[int, str, str] = (0, "", "")  # score, match key, match name
 
         finished_matches = 0
         has_insights = False

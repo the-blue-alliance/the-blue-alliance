@@ -1,5 +1,4 @@
 import unittest
-from typing import Optional
 
 import pytest
 from google.appengine.ext import testbed
@@ -12,7 +11,7 @@ from backend.common.models.district import District
 
 @pytest.mark.usefixtures("ndb_context")
 class TestDistrictManipulator(unittest.TestCase):
-    taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub | None = None
 
     @pytest.fixture(autouse=True)
     def store_taskqueue_stub(self, taskqueue_stub):

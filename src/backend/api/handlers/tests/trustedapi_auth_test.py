@@ -2,7 +2,6 @@ import datetime
 import json
 import random
 import string
-from typing import List, Optional, Tuple
 from unittest.mock import Mock
 
 from freezegun import freeze_time
@@ -27,7 +26,7 @@ from backend.common.models.webcast import Webcast
 def setup_event(
     event_type: EventType = EventType.OFFSEASON,
     official: bool = False,
-    webcasts: Optional[List[Webcast]] = None,
+    webcasts: list[Webcast] | None = None,
 ) -> None:
     Event(
         id="2019nyny",
@@ -51,7 +50,7 @@ def setup_cmp_event() -> None:
 
 def setup_user(
     monkeypatch: MonkeyPatch,
-    permissions: List[AccountPermission] = [],
+    permissions: list[AccountPermission] = [],
     is_admin: bool = False,
 ) -> ndb.Key:
     email = "zach@thebluealliance.com"
@@ -68,13 +67,13 @@ def setup_user(
 
 
 def setup_api_auth(
-    event_key: Optional[EventKey],
-    auth_types: List[AuthType] = [],
-    expiration: Optional[datetime.datetime] = None,
-    owner: Optional[ndb.Key] = None,
+    event_key: EventKey | None,
+    auth_types: list[AuthType] = [],
+    expiration: datetime.datetime | None = None,
+    owner: ndb.Key | None = None,
     all_official_events: bool = False,
-    webcasts: List[Webcast] = [],
-) -> Tuple[str, str]:
+    webcasts: list[Webcast] = [],
+) -> tuple[str, str]:
     auth = ApiAuthAccess(
         id="".join(random.choices(string.ascii_letters + string.digits, k=10)),
         secret="".join(random.choices(string.ascii_letters + string.digits, k=10)),

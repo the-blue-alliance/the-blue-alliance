@@ -1,7 +1,7 @@
 import heapq
 import logging
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, NamedTuple, Optional, Set, Union
+from typing import NamedTuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -107,16 +107,16 @@ class RegionalChampsPoolHelper(DistrictHelper):
     @classmethod
     def calculate_rankings(
         cls,
-        events: List[Event],
-        teams: Union[List[Team], TypedFuture[List[Team]]],
+        events: list[Event],
+        teams: list[Team] | TypedFuture[list[Team]],
         year: Year,
-        adjustments: Optional[Dict[TeamKey, int]],
-    ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
+        adjustments: dict[TeamKey, int] | None,
+    ) -> dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two regional events
-        events_by_key: Dict[EventKey, Event] = {}
-        team_attendance: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
-        single_event_teams: Set[TeamKey] = set()
-        team_totals: Dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
+        events_by_key: dict[EventKey, Event] = {}
+        team_attendance: defaultdict[TeamKey, list[EventKey]] = defaultdict(list)
+        single_event_teams: set[TeamKey] = set()
+        team_totals: dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
             lambda: DistrictRankingTeamTotal(
                 event_points=[],
                 point_total=0,
@@ -213,7 +213,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
         if isinstance(teams, ndb.tasklets.Future):
             teams = teams.get_result()
 
-        valid_team_keys: Set[TeamKey] = set()
+        valid_team_keys: set[TeamKey] = set()
         for team_f in teams:
             if isinstance(team_f, ndb.tasklets.Future):
                 team = team_f.get_result()

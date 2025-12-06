@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from backend.common.consts.award_type import AwardType
 
 """
@@ -7,7 +5,7 @@ An award matches an AwardType if the award's name_str contains every string in
 the the first list of the tuple and does NOT contain any string in the second
 list of the tuple.
 """
-AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
+AWARD_MATCHING_STRINGS: list[tuple[AwardType, tuple[list[str], list[str]]]] = [
     (AwardType.CHAIRMANS, (["chairman"], ["hon", "finalist"])),
     (AwardType.CHAIRMANS, (["first impact"], ["hon", "finalist"])),
     (AwardType.CHAIRMANS_HONORABLE_MENTION, (["chairman", "hon", "mention"], [])),

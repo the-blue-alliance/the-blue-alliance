@@ -1,5 +1,3 @@
-from typing import List
-
 from google.appengine.ext import ndb
 
 from backend.common.models.event import Event
@@ -8,7 +6,7 @@ from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamParticipationQuery
 
 
-def preseed_event_teams(team: int, event_short: str, years: List[int]) -> None:
+def preseed_event_teams(team: int, event_short: str, years: list[int]) -> None:
     event_teams = [
         EventTeam(
             id=f"{year}{event_short}_frc{team}",

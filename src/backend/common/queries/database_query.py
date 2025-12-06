@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
+from collections.abc import Generator
+from typing import Any, Generic
 
 from google.appengine.api.datastore_errors import BadRequestError
 from google.appengine.ext import ndb
@@ -17,8 +18,8 @@ from backend.common.queries.types import DictQueryReturn, QueryReturn
 
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
-    _query_args: Dict[str, Any]
-    DICT_CONVERTER: Optional[Type[ConverterBase[QueryReturn, DictQueryReturn]]]
+    _query_args: dict[str, Any]
+    DICT_CONVERTER: type[ConverterBase[QueryReturn, DictQueryReturn]] | None
 
     def __init__(self, *args, **kwargs) -> None:
         self._query_args = kwargs
@@ -35,7 +36,7 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     @ndb.tasklet
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
-    ) -> Generator[Any, Any, Union[None, DictQueryReturn, List[DictQueryReturn]]]:
+    ) -> Generator[Any, Any, None | DictQueryReturn | list[DictQueryReturn]]:
         # This gives CachedDatabaseQuery a place to hook into
         res = yield self._query_async(*args, **kwargs)
 
@@ -80,7 +81,7 @@ class CachedDatabaseQuery(
     DICT_CACHING_ENABLED: bool = True
     MODEL_CACHING_ENABLED: bool = True
     CACHE_WRITES_ENABLED: bool = True
-    _cache_key: Optional[str] = None
+    _cache_key: str | None = None
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -104,7 +105,7 @@ class CachedDatabaseQuery(
         return f"{cache_key}~dictv{dict_version}.{subvserion}"
 
     @classmethod
-    def delete_cache_multi(cls, cache_keys: Set[str]) -> None:
+    def delete_cache_multi(cls, cache_keys: set[str]) -> None:
         all_cache_keys = []
         for cache_key in cache_keys:
             all_cache_keys.append(cache_key)
@@ -145,7 +146,7 @@ class CachedDatabaseQuery(
     @ndb.tasklet
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
-    ) -> Generator[Any, Any, Union[None, DictQueryReturn, List[DictQueryReturn]]]:
+    ) -> Generator[Any, Any, None | DictQueryReturn | list[DictQueryReturn]]:
         if not self.DICT_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             return result

@@ -1,6 +1,7 @@
 import calendar
-from typing import Any, cast, Dict, Optional
+from typing import Any, cast
 
+from firebase_admin import messaging
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -11,7 +12,7 @@ from backend.common.models.team import Team
 
 
 class MatchUpcomingNotification(Notification):
-    def __init__(self, match: Match, team: Optional[Team] = None) -> None:
+    def __init__(self, match: Match, team: Team | None = None) -> None:
         self.match = match
         self.event = match.event.get()
         self.team = team
@@ -21,7 +22,7 @@ class MatchUpcomingNotification(Notification):
         return NotificationType.UPCOMING_MATCH
 
     @property
-    def fcm_notification(self) -> Optional[Any]:
+    def fcm_notification(self) -> messaging.Notification | None:
         # [3:] to remove "frc" prefix
         red_alliance = ", ".join(
             [team[3:] for team in self.match.alliances[AllianceColor.RED]["teams"]]
@@ -41,8 +42,6 @@ class MatchUpcomingNotification(Notification):
         else:
             ending = "."
 
-        from firebase_admin import messaging
-
         return messaging.Notification(
             title="{} {} Starting Soon".format(
                 self.event.event_short.upper(), self.match.short_name
@@ -57,7 +56,7 @@ class MatchUpcomingNotification(Notification):
         )
 
     @property
-    def data_payload(self) -> Optional[Dict[str, str]]:
+    def data_payload(self) -> dict[str, str] | None:
         payload = {
             "event_key": self.event.key_name,
             "match_key": self.match.key_name,
@@ -69,8 +68,8 @@ class MatchUpcomingNotification(Notification):
         return payload
 
     @property
-    def webhook_message_data(self) -> Optional[Dict[str, Any]]:
-        payload = cast(Dict[str, Any], none_throws(self.data_payload))
+    def webhook_message_data(self) -> dict[str, Any] | None:
+        payload = cast(dict[str, Any], none_throws(self.data_payload))
         payload["event_name"] = self.event.name
         payload["team_keys"] = self.match.team_key_names
 

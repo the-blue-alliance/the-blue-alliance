@@ -1,6 +1,5 @@
 import json
 import re
-from typing import List
 from urllib.parse import urlparse
 
 import pytest
@@ -50,7 +49,7 @@ def mock_grabcad_api(monkeypatch: pytest.MonkeyPatch) -> None:
     )
 
 
-def get_suggestion_queue(web_client: Client) -> List[str]:
+def get_suggestion_queue(web_client: Client) -> list[str]:
     response = web_client.get("/suggest/cad/review")
     assert response.status_code == 200
     soup = BeautifulSoup(response.data, "html.parser")

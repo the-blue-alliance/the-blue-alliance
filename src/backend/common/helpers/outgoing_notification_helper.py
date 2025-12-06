@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import requests
 
@@ -33,11 +33,11 @@ class OutgoingNotificationHelper(object):
 
     @classmethod
     def send_slack_alert(
-        cls, webhook_url: str, body_text: str, attachment_list: Optional[List] = None
+        cls, webhook_url: str, body_text: str, attachment_list: list | None = None
     ) -> None:
         if not Environment.is_prod():
             return
-        post_dict: Dict[str, Any] = {
+        post_dict: dict[str, Any] = {
             "text": body_text,
         }
         if attachment_list:

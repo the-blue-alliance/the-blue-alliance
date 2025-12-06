@@ -1,4 +1,4 @@
-from typing import Any, cast, List, TypedDict
+from typing import Any, cast, TypedDict
 
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.models.webcast import Webcast
@@ -11,7 +11,7 @@ class _StreamDataResponse(TypedDict):
 
 
 class _StreamStatusResponse(TypedDict):
-    data: List[_StreamDataResponse]
+    data: list[_StreamDataResponse]
 
 
 class TwitchStreamStatusParser(ParserBase[Webcast]):

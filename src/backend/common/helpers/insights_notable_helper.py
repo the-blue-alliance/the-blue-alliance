@@ -1,4 +1,4 @@
-from typing import DefaultDict, Dict, List
+from collections import defaultdict
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
@@ -18,7 +18,7 @@ from backend.common.models.keys import EventKey, TeamKey, Year
 
 class InsightsNotableHelper:
     @staticmethod
-    def make_insights(year: Year) -> List[Insight]:
+    def make_insights(year: Year) -> list[Insight]:
         return make_insights_from_functions(
             year,
             [
@@ -33,7 +33,7 @@ class InsightsNotableHelper:
 
     @staticmethod
     def _create_notable_insight(
-        teams: Dict[TeamKey, List[EventKey]] | DefaultDict[TeamKey, List[EventKey]],
+        teams: dict[TeamKey, list[EventKey]] | defaultdict[TeamKey, list[EventKey]],
         insight_type: InsightEnumId,
         year: int,
     ) -> Insight:
@@ -55,7 +55,7 @@ class InsightsNotableHelper:
         event_type: EventType,
         insight_type: InsightEnumId,
     ) -> Insight:
-        team_context_map: Dict[TeamKey, List[EventKey]] = {}
+        team_context_map: dict[TeamKey, list[EventKey]] = {}
         for award in arguments.awards():
             if (
                 award.event_type_enum == event_type
@@ -112,7 +112,7 @@ class InsightsNotableHelper:
     def _calculate_notables_division_finals_appearances(
         arguments: LeaderboardInsightArguments,
     ) -> Insight:
-        team_context_map: Dict[TeamKey, List[EventKey]] = {}
+        team_context_map: dict[TeamKey, list[EventKey]] = {}
         for award in arguments.awards():
             if (
                 award.event_type_enum == EventType.CMP_DIVISION
@@ -136,7 +136,7 @@ class InsightsNotableHelper:
     def _calculate_notables_cmp_finals_appearances(
         arguments: LeaderboardInsightArguments,
     ) -> Insight:
-        team_context_map: Dict[TeamKey, List[EventKey]] = {}
+        team_context_map: dict[TeamKey, list[EventKey]] = {}
         for award in arguments.awards():
             if (
                 award.event_type_enum == EventType.CMP_FINALS
