@@ -12,7 +12,7 @@ describe("makeApiV3Request", () => {
     jest.restoreAllMocks();
   });
 
-  it("makes a GET request with X-TBA-Auth-Key header", () => {
+  it("makes a GET request with X-TBA-Auth-Key header", async () => {
     const mockResponse = {
       ok: true,
       json: jest.fn().mockResolvedValue({ data: "test" }),
@@ -21,10 +21,8 @@ describe("makeApiV3Request", () => {
 
     const authId = "test-auth-id";
     const requestPath = "/api/v3/event/2024nytr/matches/simple";
-    const onSuccess = jest.fn();
-    const onError = jest.fn();
 
-    makeApiV3Request(authId, requestPath, onSuccess, onError);
+    await makeApiV3Request(authId, requestPath);
 
     expect(mockFetch).toHaveBeenCalledWith(requestPath, {
       method: "GET",
@@ -32,7 +30,7 @@ describe("makeApiV3Request", () => {
     });
   });
 
-  it("includes X-TBA-Auth-Key in headers", () => {
+  it("includes X-TBA-Auth-Key in headers", async () => {
     const mockResponse = {
       ok: true,
       json: jest.fn().mockResolvedValue({ data: "test" }),
@@ -41,17 +39,15 @@ describe("makeApiV3Request", () => {
 
     const authId = "test-auth-id-123";
     const requestPath = "/api/v3/event/2024nytr/matches/simple";
-    const onSuccess = jest.fn();
-    const onError = jest.fn();
 
-    makeApiV3Request(authId, requestPath, onSuccess, onError);
+    await makeApiV3Request(authId, requestPath);
 
     const callArgs = mockFetch.mock.calls[0];
     const headers = callArgs[1].headers;
     expect(headers.get("X-TBA-Auth-Key")).toBe(authId);
   });
 
-  it("calls onSuccess with parsed JSON data on successful response", async () => {
+  it("returns parsed JSON data on successful response", async () => {
     const mockData = [
       { key: "2024nytr_qm1", match_number: 1 },
       { key: "2024nytr_qm2", match_number: 2 },
@@ -64,19 +60,13 @@ describe("makeApiV3Request", () => {
 
     const authId = "test-auth-id";
     const requestPath = "/api/v3/event/2024nytr/matches/simple";
-    const onSuccess = jest.fn();
-    const onError = jest.fn();
 
-    await makeApiV3Request(authId, requestPath, onSuccess, onError);
+    const result = await makeApiV3Request(authId, requestPath);
 
-    // Wait for promises to resolve
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(onSuccess).toHaveBeenCalledWith(mockData);
-    expect(onError).not.toHaveBeenCalled();
+    expect(result).toEqual(mockData);
   });
 
-  it("calls onError with error message when response is not ok", async () => {
+  it("throws error when response is not ok", async () => {
     const mockResponse = {
       ok: false,
       status: 404,
@@ -85,36 +75,24 @@ describe("makeApiV3Request", () => {
 
     const authId = "test-auth-id";
     const requestPath = "/api/v3/event/2024invalid/matches/simple";
-    const onSuccess = jest.fn();
-    const onError = jest.fn();
 
-    await makeApiV3Request(authId, requestPath, onSuccess, onError);
-
-    // Wait for promises to resolve
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(onSuccess).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalledWith("HTTP error! status: 404");
+    await expect(makeApiV3Request(authId, requestPath)).rejects.toThrow(
+      "HTTP error! status: 404"
+    );
   });
 
-  it("calls onError with error message when fetch throws", async () => {
+  it("throws error when fetch throws", async () => {
     mockFetch.mockRejectedValue(new Error("Network error"));
 
     const authId = "test-auth-id";
     const requestPath = "/api/v3/event/2024nytr/matches/simple";
-    const onSuccess = jest.fn();
-    const onError = jest.fn();
 
-    await makeApiV3Request(authId, requestPath, onSuccess, onError);
-
-    // Wait for promises to resolve
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(onSuccess).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalledWith("Network error");
+    await expect(makeApiV3Request(authId, requestPath)).rejects.toThrow(
+      "Network error"
+    );
   });
 
-  it("calls onError when JSON parsing fails", async () => {
+  it("throws error when JSON parsing fails", async () => {
     const mockResponse = {
       ok: true,
       json: jest.fn().mockRejectedValue(new Error("Invalid JSON")),
@@ -123,19 +101,13 @@ describe("makeApiV3Request", () => {
 
     const authId = "test-auth-id";
     const requestPath = "/api/v3/event/2024nytr/matches/simple";
-    const onSuccess = jest.fn();
-    const onError = jest.fn();
 
-    await makeApiV3Request(authId, requestPath, onSuccess, onError);
-
-    // Wait for promises to resolve
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(onSuccess).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalledWith("Invalid JSON");
+    await expect(makeApiV3Request(authId, requestPath)).rejects.toThrow(
+      "Invalid JSON"
+    );
   });
 
-  it("uses GET method for all requests", () => {
+  it("uses GET method for all requests", async () => {
     const mockResponse = {
       ok: true,
       json: jest.fn().mockResolvedValue({}),
@@ -144,10 +116,8 @@ describe("makeApiV3Request", () => {
 
     const authId = "test-auth-id";
     const requestPath = "/api/v3/event/2024nytr/teams/simple";
-    const onSuccess = jest.fn();
-    const onError = jest.fn();
 
-    makeApiV3Request(authId, requestPath, onSuccess, onError);
+    await makeApiV3Request(authId, requestPath);
 
     const callArgs = mockFetch.mock.calls[0];
     expect(callArgs[1].method).toBe("GET");

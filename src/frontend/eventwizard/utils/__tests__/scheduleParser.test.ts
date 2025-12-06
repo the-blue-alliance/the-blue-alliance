@@ -1,36 +1,16 @@
 import { parseScheduleFile } from "../scheduleParser";
 import fs from "fs";
 import path from "path";
+import {
+  installMockFileReader,
+  restoreFileReader,
+} from "./testHelpers/mockFileReader";
+import {
+  loadFmsReportFile,
+  FMS_REPORT_FILES,
+} from "./testHelpers/fmsReportLoader";
 
-// Mock FileReader for Node.js environment
-class MockFileReader {
-  result?: string;
-  onload?: ((event: { target: MockFileReader }) => void) | null;
-
-  readAsBinaryString(blob: Blob | Buffer): void {
-    // Convert blob to buffer, then to binary string
-    const reader = this;
-    const arrayBuffer = (blob as any).arrayBuffer
-      ? (blob as any).arrayBuffer()
-      : Promise.resolve(blob);
-
-    arrayBuffer.then((buffer: ArrayBuffer | Buffer) => {
-      if (buffer instanceof ArrayBuffer) {
-        reader.result = Buffer.from(buffer).toString("binary");
-      } else if (Buffer.isBuffer(buffer)) {
-        reader.result = buffer.toString("binary");
-      } else {
-        reader.result = buffer as any;
-      }
-
-      if (reader.onload) {
-        reader.onload({ target: reader });
-      }
-    });
-  }
-}
-
-(global as any).FileReader = MockFileReader;
+installMockFileReader();
 
 describe("scheduleParser", () => {
   describe("parseScheduleFile - Integration Tests with Real FMS Reports", () => {

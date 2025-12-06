@@ -11,14 +11,12 @@ interface Alliance {
   pick3: string;
 }
 
-interface EventAlliancesTabProps {
+export interface EventAlliancesTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
+    body: string
+  ) => Promise<Response>;
 }
 
 const EventAlliancesTab: React.FC<EventAlliancesTabProps> = ({
@@ -67,7 +65,7 @@ const EventAlliancesTab: React.FC<EventAlliancesTabProps> = ({
     setAlliances(newAlliances);
   };
 
-  const handleManualSubmit = (): void => {
+  const handleManualSubmit = async (): Promise<void> => {
     if (!selectedEvent) {
       setStatusMessage("Please select an event first");
       return;
@@ -103,31 +101,33 @@ const EventAlliancesTab: React.FC<EventAlliancesTabProps> = ({
       requestBody.push(allianceTeams);
     }
 
-    makeTrustedRequest(
-      `/api/trusted/v1/event/${selectedEvent}/alliance_selections/update`,
-      JSON.stringify(requestBody),
-      () => {
-        setStatusMessage("Alliances uploaded successfully!");
-        setUploading(false);
-      },
-      (error) => {
-        setStatusMessage(`Error uploading alliances: ${error}`);
-        setUploading(false);
-      }
-    );
+    try {
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/alliance_selections/update`,
+        JSON.stringify(requestBody)
+      );
+      setStatusMessage("Alliances uploaded successfully!");
+      setUploading(false);
+    } catch (error) {
+      setStatusMessage(`Error uploading alliances: ${error}`);
+      setUploading(false);
+    }
   };
 
-  const handleFMSImport = (
+  const handleFMSImport = async (
     alliancesData: string[][],
     onSuccess: () => void,
     onError: (error: string) => void
-  ): void => {
-    makeTrustedRequest(
-      `/api/trusted/v1/event/${selectedEvent}/alliance_selections/update`,
-      JSON.stringify(alliancesData),
-      onSuccess,
-      onError
-    );
+  ): Promise<void> => {
+    try {
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/alliance_selections/update`,
+        JSON.stringify(alliancesData)
+      );
+      onSuccess();
+    } catch (error) {
+      onError(String(error));
+    }
   };
 
   return (

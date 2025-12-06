@@ -24,20 +24,19 @@ class EventSelector extends Component<EventSelectorProps, EventSelectorState> {
 
   static async loadEvents(search: string): Promise<EventOption[]> {
     if (!EventSelector.eventsCache) {
-      EventSelector.eventsCache = await fetch("/_/account/apiwrite_events", {
+      const response = await fetch("/_/account/apiwrite_events", {
         credentials: "same-origin",
-      })
-        .then((response) => {
-          if (response.status === 401) {
-            // If we're not logged in, return no events
-            return [];
-          }
-          return response.json();
-        })
-        .then((events: EventOption[]) => {
-          events.push({ value: "_other", label: "Other" });
-          return events;
-        });
+      });
+
+      let events: EventOption[];
+      if (response.status === 401) {
+        // If we're not logged in, return no events
+        events = [];
+      } else {
+        events = await response.json();
+      }
+      events.push({ value: "_other", label: "Other" });
+      EventSelector.eventsCache = events;
     }
 
     return (EventSelector.eventsCache || []).filter((e) =>

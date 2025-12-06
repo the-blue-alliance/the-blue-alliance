@@ -16,10 +16,11 @@ const PlayoffTypeDropdown: React.FC<PlayoffTypeDropdownProps> = ({
   eventInfo,
   setType,
 }) => {
-  const loadPlayoffTypes = (): Promise<PlayoffType[]> => {
-    return fetch("/_/playoff_types", {
+  const loadPlayoffTypes = async (): Promise<PlayoffType[]> => {
+    const response = await fetch("/_/playoff_types", {
       credentials: "same-origin",
-    }).then((response) => response.json());
+    });
+    return response.json();
   };
 
   return (
@@ -38,7 +39,7 @@ const PlayoffTypeDropdown: React.FC<PlayoffTypeDropdownProps> = ({
           value={
             eventInfo
               ? {
-                  label: eventInfo.playoff_type_string,
+                  label: eventInfo.playoff_type_string || '',
                   value: eventInfo.playoff_type || 0,
                 }
               : null

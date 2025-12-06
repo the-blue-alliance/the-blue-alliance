@@ -11,10 +11,8 @@ interface AwardsTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     requestPath: string,
-    requestBody: string,
-    onSuccess: (response: Response) => void,
-    onError: (error: Error) => void
-  ) => void;
+    requestBody: string
+  ) => Promise<Response>;
 }
 
 const getAwardKey = (
@@ -102,17 +100,16 @@ function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React
         )
     );
 
-    makeTrustedRequest(
-      `/api/trusted/v1/event/${selectedEvent}/awards/update`,
-      JSON.stringify(awardsToSave),
-      () => {
-        setUpdating(false);
-      },
-      (error: Error) => {
-        alert(`There was an error: ${error}`);
-        setUpdating(false);
-      }
-    );
+    try {
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/awards/update`,
+        JSON.stringify(awardsToSave)
+      );
+      setUpdating(false);
+    } catch (error) {
+      alert(`There was an error: ${error}`);
+      setUpdating(false);
+    }
   };
 
   const sortedAwards = [...awards].sort((a, b) => (a.type_enum || 0) - (b.type_enum || 0));

@@ -5,10 +5,8 @@ interface FMSMatchResultsProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
+    body: string
+  ) => Promise<Response>;
 }
 
 const FMSMatchResults: React.FC<FMSMatchResultsProps> = ({
@@ -124,7 +122,7 @@ const FMSMatchResults: React.FC<FMSMatchResultsProps> = ({
     }
   };
 
-  const handleConfirm = (): void => {
+  const handleConfirm = async (): Promise<void> => {
     if (matches.length === 0) {
       setStatusMessage("No matches to submit");
       return;
@@ -142,20 +140,19 @@ const FMSMatchResults: React.FC<FMSMatchResultsProps> = ({
       time_string: match.time_string,
     }));
 
-    makeTrustedRequest(
-      `/api/trusted/v1/event/${selectedEvent}/matches/update`,
-      JSON.stringify(apiMatches),
-      () => {
-        setUploading(false);
-        setStatusMessage(`Successfully uploaded ${matches.length} matches!`);
-        setMatches([]);
-        setFile(null);
-      },
-      (error) => {
-        setUploading(false);
-        setStatusMessage(`Error uploading matches: ${error}`);
-      }
-    );
+    try {
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/matches/update`,
+        JSON.stringify(apiMatches)
+      );
+      setUploading(false);
+      setStatusMessage(`Successfully uploaded ${matches.length} matches!`);
+      setMatches([]);
+      setFile(null);
+    } catch (error) {
+      setUploading(false);
+      setStatusMessage(`Error uploading matches: ${error}`);
+    }
   };
 
   const handleCancel = (): void => {

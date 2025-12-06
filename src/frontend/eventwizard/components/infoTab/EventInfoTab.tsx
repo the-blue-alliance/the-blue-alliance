@@ -10,10 +10,8 @@ interface EventInfoTabProps {
   selectedEvent: string | null;
   makeTrustedRequest: (
     path: string,
-    body: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
+    body: string
+  ) => Promise<Response>;
 }
 
 interface EventInfoTabState {
@@ -72,31 +70,32 @@ class EventInfoTab extends Component<EventInfoTabProps, EventInfoTabState> {
     }
   }
 
-  loadEventInfo(newEventKey: string): void {
+  async loadEventInfo(newEventKey: string): Promise<void> {
     this.setState({ status: "Loading event info..." });
-    fetch(`/api/v3/event/${newEventKey}`, {
+    
+    const response1 = await fetch(`/api/v3/event/${newEventKey}`, {
       credentials: "same-origin",
-    })
-      .then(ensureRequestSuccess)
-      .then((response) => response.json())
-      .then(
-        (data1: ApiEvent) =>
-          // Merge in remap_teams
-          fetch(`/_/remap_teams/${newEventKey}`)
-            .then(ensureRequestSuccess)
-            .then((response) => response.json())
-            .then((data2: Record<string, string>) => {
-              const data = Object.assign({}, data1);
-              data.remap_teams = data2;
-              return data;
-            })
-      )
-      .then((data: ApiEvent) => this.setState({ eventInfo: data, status: "" }));
+    });
+    await ensureRequestSuccess(response1);
+    const data1: ApiEvent = await response1.json();
+
+    // Merge in remap_teams
+    const response2 = await fetch(`/_/remap_teams/${newEventKey}`);
+    await ensureRequestSuccess(response2);
+    const data2: Record<string, string> = await response2.json();
+    
+    const data = Object.assign({}, data1);
+    data.remap_teams = data2;
+    
+    this.setState({ eventInfo: data, status: "" });
   }
 
   addWebcast(webcastUrl: string, webcastDate: string): void {
     const currentInfo = this.state.eventInfo;
     if (currentInfo !== null) {
+      if (!currentInfo.webcasts) {
+        currentInfo.webcasts = [];
+      }
       currentInfo.webcasts.push({
         type: "",
         channel: "",
@@ -109,7 +108,7 @@ class EventInfoTab extends Component<EventInfoTabProps, EventInfoTabState> {
 
   removeWebcast(indexToRemove: number): void {
     const currentInfo = this.state.eventInfo;
-    if (currentInfo !== null) {
+    if (currentInfo !== null && currentInfo.webcasts) {
       currentInfo.webcasts.splice(indexToRemove, 1);
       this.setState({ eventInfo: currentInfo });
     }
@@ -118,6 +117,9 @@ class EventInfoTab extends Component<EventInfoTabProps, EventInfoTabState> {
   addTeamMap(fromTeamKey: string, toTeamKey: string): void {
     const currentInfo = this.state.eventInfo;
     if (currentInfo !== null) {
+      if (!currentInfo.remap_teams) {
+        currentInfo.remap_teams = {};
+      }
       currentInfo.remap_teams[fromTeamKey] = toTeamKey;
       this.setState({ eventInfo: currentInfo });
     }
@@ -125,22 +127,23 @@ class EventInfoTab extends Component<EventInfoTabProps, EventInfoTabState> {
 
   removeTeamMap(keyToRemove: string): void {
     const currentInfo = this.state.eventInfo;
-    if (currentInfo !== null) {
+    if (currentInfo !== null && currentInfo.remap_teams) {
       delete currentInfo.remap_teams[keyToRemove];
       this.setState({ eventInfo: currentInfo });
     }
   }
 
-  updateEventInfo(): void {
+  async updateEventInfo(): Promise<void> {
     this.setState({ buttonClass: "btn-warning" });
-    this.props.makeTrustedRequest(
-      `/api/trusted/v1/event/${this.props.selectedEvent}/info/update`,
-      JSON.stringify(this.state.eventInfo),
-      () => {
-        this.setState({ buttonClass: "btn-success" });
-      },
-      (error) => alert(`Error: ${error}`)
-    );
+    try {
+      await this.props.makeTrustedRequest(
+        `/api/trusted/v1/event/${this.props.selectedEvent}/info/update`,
+        JSON.stringify(this.state.eventInfo)
+      );
+      this.setState({ buttonClass: "btn-success" });
+    } catch (error) {
+      alert(`Error: ${error}`);
+    }
   }
 
   render(): React.ReactNode {

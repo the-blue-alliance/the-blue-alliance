@@ -5,3 +5,5 @@ export interface Webcast {
   date?: string;
   url?: string;
 }
+
+export type ApiWebcast = Webcast;

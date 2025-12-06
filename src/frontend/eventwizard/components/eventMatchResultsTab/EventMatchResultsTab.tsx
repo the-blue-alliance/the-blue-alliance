@@ -2,19 +2,15 @@ import React from "react";
 import FMSMatchResults from "./FMSMatchResults";
 import MatchResultsFromMatchPlay from "./MatchResultsFromMatchPlay";
 
-interface EventMatchResultsTabProps {
+export interface EventMatchResultsTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
-  makeApiV3Request: (
-    path: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
+    body: string
+  ) => Promise<Response>;
+  makeApiV3Request: <T = unknown>(
+    path: string
+  ) => Promise<T>;
 }
 
 const EventMatchResultsTab: React.FC<EventMatchResultsTabProps> = ({

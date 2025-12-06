@@ -3,3 +3,5 @@ export interface Team {
   team_number: number;
   nickname: string;
 }
+
+export type ApiTeam = Team;

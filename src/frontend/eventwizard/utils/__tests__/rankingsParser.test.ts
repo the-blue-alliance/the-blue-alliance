@@ -2,6 +2,15 @@ import { parseRankingsFile } from "../rankingsParser";
 import fs from "fs";
 import path from "path";
 import type * as XLSX from "xlsx";
+import {
+  installSimpleMockFileReader,
+  installMockFileReader,
+  restoreFileReader,
+} from "./testHelpers/mockFileReader";
+import {
+  loadFmsReportFile,
+  FMS_REPORT_FILES,
+} from "./testHelpers/fmsReportLoader";
 
 // Mock XLSX
 jest.mock("xlsx", () => ({
@@ -13,22 +22,7 @@ jest.mock("xlsx", () => ({
 
 const XLSXMock = require("xlsx") as jest.Mocked<typeof XLSX>;
 
-// Mock FileReader
-class MockFileReader {
-  onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null = null;
-  result: string | ArrayBuffer | null = null;
-
-  readAsBinaryString(file: Blob): void {
-    // Simulate async file read
-    setTimeout(() => {
-      if (this.onload) {
-        this.onload({ target: { result: "mock binary data" } } as any);
-      }
-    }, 0);
-  }
-}
-
-(global as any).FileReader = MockFileReader;
+installSimpleMockFileReader();
 
 describe("rankingsParser", () => {
   beforeEach(() => {
@@ -341,35 +335,8 @@ describe("rankingsParser", () => {
   });
 
   describe("parseRankingsFile - Integration Tests with Real FMS Reports", () => {
-    // Mock FileReader for Node.js environment
-    class RealMockFileReader {
-      result: string | ArrayBuffer | null = null;
-      onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null = null;
-
-      readAsBinaryString(blob: Blob): void {
-        const reader = this;
-        const arrayBuffer = (blob as any).arrayBuffer
-          ? (blob as any).arrayBuffer()
-          : Promise.resolve(blob);
-
-        arrayBuffer.then((buffer: any) => {
-          if (buffer instanceof ArrayBuffer) {
-            reader.result = Buffer.from(buffer).toString("binary");
-          } else if (Buffer.isBuffer(buffer)) {
-            reader.result = buffer.toString("binary");
-          } else {
-            reader.result = buffer;
-          }
-
-          if (reader.onload) {
-            reader.onload({ target: reader } as any);
-          }
-        });
-      }
-    }
-
     beforeEach(() => {
-      (global as any).FileReader = RealMockFileReader;
+      installMockFileReader();
       // Use real XLSX for integration tests
       jest.doMock("xlsx", () => jest.requireActual("xlsx"));
     });

@@ -8,35 +8,14 @@ import FMSMatchResults from "../FMSMatchResults";
 import { parseResultsFile } from "../../../utils/resultsParser";
 import fs from "fs";
 import path from "path";
+import {
+  installMockFileReader,
+  restoreFileReader,
+} from "../../../utils/__tests__/testHelpers/mockFileReader";
 
 jest.mock("../../../utils/resultsParser");
 
-// Mock FileReader for Node.js environment (for integration tests)
-class MockFileReader {
-  result?: string;
-  onload?: ((event: { target: MockFileReader }) => void) | null;
-
-  readAsBinaryString(blob: Blob | Buffer): void {
-    const reader = this;
-    const arrayBuffer = (blob as any).arrayBuffer
-      ? (blob as any).arrayBuffer()
-      : Promise.resolve(blob);
-
-    arrayBuffer.then((buffer: ArrayBuffer | Buffer) => {
-      if (buffer instanceof ArrayBuffer) {
-        reader.result = Buffer.from(buffer).toString("binary");
-      } else if (Buffer.isBuffer(buffer)) {
-        reader.result = buffer.toString("binary");
-      } else {
-        reader.result = buffer as any;
-      }
-
-      if (reader.onload) {
-        reader.onload({ target: reader });
-      }
-    });
-  }
-}
+installMockFileReader();
 
 describe("FMSMatchResults", () => {
   const mockMakeTrustedRequest = jest.fn();
@@ -208,9 +187,7 @@ describe("FMSMatchResults", () => {
     });
 
     it("uploads matches when confirmed", async () => {
-      mockMakeTrustedRequest.mockImplementation((path, body, onSuccess) => {
-        onSuccess();
-      });
+      mockMakeTrustedRequest.mockResolvedValue({} as Response);
 
       render(
         <FMSMatchResults
@@ -238,9 +215,7 @@ describe("FMSMatchResults", () => {
       await waitFor(() => {
         expect(mockMakeTrustedRequest).toHaveBeenCalledWith(
           `/api/trusted/v1/event/${selectedEvent}/matches/update`,
-          expect.any(String),
-          expect.any(Function),
-          expect.any(Function)
+          expect.any(String)
         );
       });
 

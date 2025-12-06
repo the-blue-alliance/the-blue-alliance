@@ -45,11 +45,9 @@ interface MatchResultsFromMatchPlayProps {
     successCallback: (response: any) => void,
     errorCallback: (error: any) => void
   ) => void;
-  makeApiV3Request: (
-    path: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
+  makeApiV3Request: <T = unknown>(
+    path: string
+  ) => Promise<T>;
 }
 
 const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
@@ -63,7 +61,7 @@ const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
   const [scores, setScores] = useState<Record<string, MatchScores>>({});
   const [updatingMatches, setUpdatingMatches] = useState<Record<string, boolean>>({});
 
-  const fetchMatches = (): void => {
+  const fetchMatches = async (): Promise<void> => {
     if (!selectedEvent) {
       setStatusMessage("Please select an event first");
       return;
@@ -72,47 +70,47 @@ const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
     setLoading(true);
     setStatusMessage("Loading matches...");
 
-    makeApiV3Request(
-      `/api/v3/event/${selectedEvent}/matches/simple`,
-      (data: SimpleMatch[]) => {
-        // Sort matches by comp_level and match_number
-        const sortedMatches = data.sort((a, b) => {
-          const compLevelDiff =
-            COMP_LEVELS_PLAY_ORDER[a.comp_level] -
-            COMP_LEVELS_PLAY_ORDER[b.comp_level];
-          if (compLevelDiff !== 0) return compLevelDiff;
+    try {
+      const data = await makeApiV3Request<SimpleMatch[]>(
+        `/api/v3/event/${selectedEvent}/matches/simple`
+      );
 
-          // For playoff matches, sort by set_number then match_number
-          if (a.comp_level !== "qm") {
-            const setDiff = a.set_number - b.set_number;
-            if (setDiff !== 0) return setDiff;
-          }
+      // Sort matches by comp_level and match_number
+      const sortedMatches = data.sort((a, b) => {
+        const compLevelDiff =
+          COMP_LEVELS_PLAY_ORDER[a.comp_level] -
+          COMP_LEVELS_PLAY_ORDER[b.comp_level];
+        if (compLevelDiff !== 0) return compLevelDiff;
 
-          return a.match_number - b.match_number;
-        });
+        // For playoff matches, sort by set_number then match_number
+        if (a.comp_level !== "qm") {
+          const setDiff = a.set_number - b.set_number;
+          if (setDiff !== 0) return setDiff;
+        }
 
-        setMatches(sortedMatches);
+        return a.match_number - b.match_number;
+      });
 
-        // Initialize scores from existing match data
-        const initialScores: Record<string, MatchScores> = {};
-        sortedMatches.forEach((match) => {
-          const key = match.key;
-          initialScores[key] = {
-            red: match.alliances?.red?.score?.toString() ?? "",
-            blue: match.alliances?.blue?.score?.toString() ?? "",
-          };
-        });
-        setScores(initialScores);
+      setMatches(sortedMatches);
 
-        setStatusMessage(`Loaded ${sortedMatches.length} matches`);
-        setLoading(false);
-      },
-      (error) => {
-        setStatusMessage(`Error loading matches: ${error}`);
-        setMatches([]);
-        setLoading(false);
-      }
-    );
+      // Initialize scores from existing match data
+      const initialScores: Record<string, MatchScores> = {};
+      sortedMatches.forEach((match) => {
+        const key = match.key;
+        initialScores[key] = {
+          red: match.alliances?.red?.score?.toString() ?? "",
+          blue: match.alliances?.blue?.score?.toString() ?? "",
+        };
+      });
+      setScores(initialScores);
+
+      setStatusMessage(`Loaded ${sortedMatches.length} matches`);
+      setLoading(false);
+    } catch (error) {
+      setStatusMessage(`Error loading matches: ${error}`);
+      setMatches([]);
+      setLoading(false);
+    }
   };
 
   const handleScoreChange = (

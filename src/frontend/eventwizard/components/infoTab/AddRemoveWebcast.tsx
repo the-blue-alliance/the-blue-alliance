@@ -47,7 +47,7 @@ class AddRemoveWebcast extends Component<
 
   render(): React.ReactNode {
     let webcastList: React.ReactNode = null;
-    if (this.props.eventInfo && this.props.eventInfo.webcasts.length > 0) {
+    if (this.props.eventInfo && this.props.eventInfo.webcasts && this.props.eventInfo.webcasts.length > 0) {
       webcastList = (
         <WebcastList
           webcasts={this.props.eventInfo.webcasts}

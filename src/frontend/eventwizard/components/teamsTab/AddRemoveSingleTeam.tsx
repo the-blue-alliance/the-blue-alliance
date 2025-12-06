@@ -26,7 +26,7 @@ class AddRemoveSingleTeam extends Component<
   AddRemoveSingleTeamProps,
   AddRemoveSingleTeamState
 > {
-  private teamTypeahead: Typeahead<string> | null = null;
+  private teamTypeahead: any = null;
 
   constructor(props: AddRemoveSingleTeamProps) {
     super(props);
@@ -41,11 +41,11 @@ class AddRemoveSingleTeam extends Component<
     this.onTeamSelectionChanged = this.onTeamSelectionChanged.bind(this);
   }
 
-  componentDidMount(): void {
+  async componentDidMount(): Promise<void> {
     // Load team typeahead data
-    fetch("/_/typeahead/teams-all")
-      .then((resp) => resp.json())
-      .then((json: string[]) => this.setState({ teamTypeaheadOptions: json }));
+    const resp = await fetch("/_/typeahead/teams-all");
+    const json: string[] = await resp.json();
+    this.setState({ teamTypeaheadOptions: json });
   }
 
   UNSAFE_componentWillReceiveProps(nextProps: AddRemoveSingleTeamProps): void {
@@ -57,9 +57,10 @@ class AddRemoveSingleTeam extends Component<
     }
   }
 
-  onTeamSelectionChanged(selected: string[]): void {
+  onTeamSelectionChanged(selected: any[]): void {
     if (selected && selected.length > 0) {
-      const teamNumber = selected[0].split("|")[0].trim();
+      const teamValue = typeof selected[0] === 'string' ? selected[0] : String(selected[0]);
+      const teamNumber = teamValue.split("|")[0].trim();
       this.setState({ selectedTeamKey: `frc${teamNumber}` });
     } else {
       this.setState({ selectedTeamKey: "" });
@@ -89,7 +90,7 @@ class AddRemoveSingleTeam extends Component<
       existingTeamKeys,
       () => {
         this.setState({ addButtonClass: "btn-success" });
-        this.teamTypeahead?.getInstance().clear();
+        this.teamTypeahead?.clear();
         if (this.props.clearTeams) {
           this.props.clearTeams();
         }
@@ -121,7 +122,7 @@ class AddRemoveSingleTeam extends Component<
       existingTeamKeys,
       () => {
         this.setState({ removeButtonClass: "btn-success" });
-        this.teamTypeahead?.getInstance().clear();
+        this.teamTypeahead?.clear();
         if (this.props.clearTeams) {
           this.props.clearTeams();
         }

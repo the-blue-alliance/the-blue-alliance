@@ -29,19 +29,15 @@ interface Match {
   videos: Video[];
 }
 
-interface MatchVideosTabProps {
+export interface MatchVideosTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
-  makeApiV3Request: (
-    path: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
+    body: string
+  ) => Promise<Response>;
+  makeApiV3Request: <T = unknown>(
+    path: string
+  ) => Promise<T>;
 }
 
 const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
@@ -55,7 +51,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
   const [newVideoIds, setNewVideoIds] = useState<Record<string, string>>({});
   const [addingVideos, setAddingVideos] = useState<Record<string, boolean>>({});
 
-  const fetchMatches = (): void => {
+  const fetchMatches = async (): Promise<void> => {
     if (!selectedEvent) {
       setStatusMessage("Please select an event first");
       return;
@@ -64,35 +60,35 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     setLoading(true);
     setStatusMessage("Loading matches...");
 
-    makeApiV3Request(
-      `/api/v3/event/${selectedEvent}/matches`,
-      (data: Match[]) => {
-        // Sort matches by comp_level and match_number
-        const sortedMatches = data.sort((a, b) => {
-          const compLevelDiff =
-            COMP_LEVELS_PLAY_ORDER[a.comp_level] -
-            COMP_LEVELS_PLAY_ORDER[b.comp_level];
-          if (compLevelDiff !== 0) return compLevelDiff;
+    try {
+      const data = await makeApiV3Request<Match[]>(
+        `/api/v3/event/${selectedEvent}/matches`
+      );
 
-          // For playoff matches, sort by set_number then match_number
-          if (a.comp_level !== "qm") {
-            const setDiff = a.set_number - b.set_number;
-            if (setDiff !== 0) return setDiff;
-          }
+      // Sort matches by comp_level and match_number
+      const sortedMatches = data.sort((a, b) => {
+        const compLevelDiff =
+          COMP_LEVELS_PLAY_ORDER[a.comp_level] -
+          COMP_LEVELS_PLAY_ORDER[b.comp_level];
+        if (compLevelDiff !== 0) return compLevelDiff;
 
-          return a.match_number - b.match_number;
-        });
+        // For playoff matches, sort by set_number then match_number
+        if (a.comp_level !== "qm") {
+          const setDiff = a.set_number - b.set_number;
+          if (setDiff !== 0) return setDiff;
+        }
 
-        setMatches(sortedMatches);
-        setStatusMessage(`Loaded ${sortedMatches.length} matches`);
-        setLoading(false);
-      },
-      (error) => {
-        setStatusMessage(`Error loading matches: ${error}`);
-        setMatches([]);
-        setLoading(false);
-      }
-    );
+        return a.match_number - b.match_number;
+      });
+
+      setMatches(sortedMatches);
+      setStatusMessage(`Loaded ${sortedMatches.length} matches`);
+      setLoading(false);
+    } catch (error) {
+      setStatusMessage(`Error loading matches: ${error}`);
+      setMatches([]);
+      setLoading(false);
+    }
   };
 
   const handleVideoIdChange = (matchKey: string, value: string): void => {
@@ -102,7 +98,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     }));
   };
 
-  const addVideo = (match: Match): void => {
+  const addVideo = async (match: Match): Promise<void> => {
     const matchKey = match.key;
     const videoId = newVideoIds[matchKey]?.trim();
 
@@ -118,34 +114,33 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     // Partial match key is just the comp_level + match/set numbers (without event key)
     const partialMatchKey = matchKey.replace(`${selectedEvent}_`, "");
 
-    makeTrustedRequest(
-      `/api/trusted/v1/event/${selectedEvent}/match_videos/add`,
-      JSON.stringify({ [partialMatchKey]: videoId }),
-      () => {
-        setAddingVideos((prev) => ({ ...prev, [matchKey]: false }));
-        setStatusMessage(
-          `Successfully added video to ${formatMatchName(match)}!`
-        );
-        // Clear the input
-        setNewVideoIds((prev) => ({ ...prev, [matchKey]: "" }));
-        // Update state inline instead of refetching to avoid server data lag
-        setMatches((prevMatches) =>
-          prevMatches.map((m) => {
-            if (m.key === matchKey) {
-              return {
-                ...m,
-                videos: [...m.videos, { type: "youtube", key: videoId }],
-              };
-            }
-            return m;
-          })
-        );
-      },
-      (error) => {
-        setAddingVideos((prev) => ({ ...prev, [matchKey]: false }));
-        setStatusMessage(`Error adding video: ${error}`);
-      }
-    );
+    try {
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/match_videos/add`,
+        JSON.stringify({ [partialMatchKey]: videoId })
+      );
+      setAddingVideos((prev) => ({ ...prev, [matchKey]: false }));
+      setStatusMessage(
+        `Successfully added video to ${formatMatchName(match)}!`
+      );
+      // Clear the input
+      setNewVideoIds((prev) => ({ ...prev, [matchKey]: "" }));
+      // Update state inline instead of refetching to avoid server data lag
+      setMatches((prevMatches) =>
+        prevMatches.map((m) => {
+          if (m.key === matchKey) {
+            return {
+              ...m,
+              videos: [...m.videos, { type: "youtube", key: videoId }],
+            };
+          }
+          return m;
+        })
+      );
+    } catch (error) {
+      setAddingVideos((prev) => ({ ...prev, [matchKey]: false }));
+      setStatusMessage(`Error adding video: ${error}`);
+    }
   };
 
   const formatMatchName = (match: Match): string => {
