@@ -70,8 +70,9 @@ const MatchLink = React.forwardRef<
     matchOrKey: Match | string;
     event?: Event;
     children: React.ReactNode;
+    noModal?: boolean;
   }
->(({ matchOrKey, event, children, ...props }, ref) => {
+>(({ matchOrKey, event, children, noModal, ...props }, ref) => {
   const queryClient = useQueryClient();
   const isMatch = typeof matchOrKey !== 'string';
   const matchKey = isMatch ? matchOrKey.key : matchOrKey;
@@ -85,6 +86,20 @@ const MatchLink = React.forwardRef<
       queryClient.setQueryData(['event', event.key], { data: event });
     }
   };
+
+  if (noModal) {
+    return (
+      <Link
+        to="/match/$matchKey"
+        params={{ matchKey }}
+        {...props}
+        ref={ref}
+        onClick={handleClick}
+      >
+        {children}
+      </Link>
+    );
+  }
 
   return (
     <Link
