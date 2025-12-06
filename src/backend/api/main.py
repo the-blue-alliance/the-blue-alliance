@@ -53,6 +53,8 @@ from backend.api.handlers.regional_advancement import (
 )
 from backend.api.handlers.search import search_index
 from backend.api.handlers.status import status
+from backend.api.handlers.status import season
+
 from backend.api.handlers.team import (
     team,
     team_awards,
@@ -130,6 +132,7 @@ CORS(
 
 # Overall Status
 api_v3.add_url_rule("/status", view_func=status)
+api_v3.add_url_rule("/status/season", view_func=season)
 
 # District
 api_v3.add_url_rule(

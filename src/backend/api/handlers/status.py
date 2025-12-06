@@ -12,6 +12,7 @@ from backend.common.models.team import Team
 from backend.common.sitevars.apistatus import ApiStatus
 from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
 
+from backend.common.helpers.season_helper import SeasonHelper
 
 @api_authenticated
 @cached_public
@@ -37,3 +38,23 @@ def status() -> Response:
     status["max_team_page"] = max_team_page
 
     return profiled_jsonify(status)
+
+@api_authenticated
+@cached_public
+def season() -> Response:
+    track_call_after_response("season", "status")
+
+    # TODO: Remove Sitevar usage for Sitevar classes
+    down_events_sitevar_future = Sitevar.get_by_id_async("apistatus.down_events")
+
+    season = dict()
+    season.update(cast(dict, ApiStatus.status()))
+    season.update({"kickoff_time_utc": SeasonHelper.kickoff_datetime_utc(2023)})
+
+    down_events_sitevar = down_events_sitevar_future.get_result()
+    down_events_list = down_events_sitevar.contents if down_events_sitevar else None
+
+    season["is_datafeed_down"] = ApiStatusFMSApiDown.get()
+    season["down_events"] = down_events_list if down_events_list is not None else []
+
+    return profiled_jsonify(season)
