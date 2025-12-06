@@ -37,6 +37,7 @@ interface TeamListSubgridProps
   surrogate: string[];
   year: number;
   focusTeamKey?: string;
+  teamCellClassName?: string;
 }
 
 export default function TeamListSubgrid({
@@ -48,6 +49,7 @@ export default function TeamListSubgrid({
   surrogate,
   year,
   focusTeamKey,
+  teamCellClassName,
   ...props
 }: TeamListSubgridProps) {
   return (
@@ -65,6 +67,7 @@ export default function TeamListSubgrid({
               allianceColor,
               winner,
             }),
+            teamCellClassName,
           )}
         />
       ))}
