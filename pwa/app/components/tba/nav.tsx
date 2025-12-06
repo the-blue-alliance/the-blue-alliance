@@ -162,6 +162,7 @@ export const Nav = () => {
             className="hidden md:block"
             icon={<BiCameraVideoFill />}
             title="GameDay"
+            to="/gameday"
           />
           <MenuItem
             className="hidden md:block"
@@ -191,6 +192,7 @@ export const Nav = () => {
                 className="lg:hidden"
                 icon={<BiCameraVideoFill />}
                 title="GameDay"
+                to="/gameday"
               />
               <DropMenuItem
                 className="lg:hidden"

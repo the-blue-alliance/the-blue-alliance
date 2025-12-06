@@ -42,7 +42,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
             </TableCell>
             <TableCell className="mt-2 flex justify-center md:mt-1">
               {event.webcasts.length > 0 && (
-                <Button className="cursor-pointer" asChild variant="success">
+                <Button asChild variant="success">
                   <a
                     href={`https://www.thebluealliance.com/gameday/${event.key}`}
                     target="_blank"

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThanksRouteImport } from './routes/thanks'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
+import { Route as GamedayRouteImport } from './routes/gameday'
 import { Route as DonateRouteImport } from './routes/donate'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ApidocsRouteImport } from './routes/apidocs'
@@ -42,6 +43,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const Match_suggestionRoute = Match_suggestionRouteImport.update({
   id: '/match_suggestion',
   path: '/match_suggestion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamedayRoute = GamedayRouteImport.update({
+  id: '/gameday',
+  path: '/gameday',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DonateRoute = DonateRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
+  '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
+  '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
+  '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/apidocs'
     | '/contact'
     | '/donate'
+    | '/gameday'
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/apidocs'
     | '/contact'
     | '/donate'
+    | '/gameday'
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/apidocs'
     | '/contact'
     | '/donate'
+    | '/gameday'
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
@@ -268,6 +280,7 @@ export interface RootRouteChildren {
   ApidocsRoute: typeof ApidocsRoute
   ContactRoute: typeof ContactRoute
   DonateRoute: typeof DonateRoute
+  GamedayRoute: typeof GamedayRoute
   Match_suggestionRoute: typeof Match_suggestionRoute
   PrivacyRoute: typeof PrivacyRoute
   ThanksRoute: typeof ThanksRoute
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       path: '/match_suggestion'
       fullPath: '/match_suggestion'
       preLoaderRoute: typeof Match_suggestionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gameday': {
+      id: '/gameday'
+      path: '/gameday'
+      fullPath: '/gameday'
+      preLoaderRoute: typeof GamedayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/donate': {
@@ -428,6 +448,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApidocsRoute: ApidocsRoute,
   ContactRoute: ContactRoute,
   DonateRoute: DonateRoute,
+  GamedayRoute: GamedayRoute,
   Match_suggestionRoute: Match_suggestionRoute,
   PrivacyRoute: PrivacyRoute,
   ThanksRoute: ThanksRoute,

@@ -6,6 +6,7 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useLocation,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import splashLandscape1136x640 from 'app/images/apple-splash/apple-splash-landscape-1136x640.png?url';
@@ -302,20 +303,33 @@ export const Route = createRootRouteWithContext<{
   component: RootComponent,
 });
 
+const FULLSCREEN_ROUTES = ['/gameday'];
+
 function RootComponent() {
+  const { pathname } = useLocation();
+  const isFullscreen = FULLSCREEN_ROUTES.some((route) =>
+    pathname.startsWith(route),
+  );
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body>
-        <Nav />
-        <div className="container mx-auto px-4 pt-14 text-sm">
-          <div vaul-drawer-wrapper="" className="bg-background">
-            <Outlet />
-            <MatchModal />
-          </div>
-        </div>
+        {isFullscreen ? (
+          <Outlet />
+        ) : (
+          <>
+            <Nav />
+            <div className="container mx-auto px-4 pt-14 text-sm">
+              <div vaul-drawer-wrapper="" className="bg-background">
+                <Outlet />
+                <MatchModal />
+              </div>
+            </div>
+          </>
+        )}
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />
