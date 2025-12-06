@@ -34,7 +34,7 @@ class AttendingTeamList extends Component<
     }
   }
 
-  updateAttendingTeams(): void {
+  async updateAttendingTeams(): Promise<void> {
     if (!this.props.selectedEvent) {
       // No valid event
       this.props.showErrorMessage(
@@ -43,21 +43,20 @@ class AttendingTeamList extends Component<
       return;
     }
 
-    this.setState({ buttonClass: "btn-warning" });
-    fetch(`/api/v3/event/${this.props.selectedEvent}/teams/simple`, {
-      credentials: "same-origin",
-    })
-      .then(ensureRequestSuccess)
-      .then((response) => response.json())
-      .then((data: ApiTeam[]) =>
-        data.sort((a, b) => a.team_number - b.team_number)
-      )
-      .then((data: ApiTeam[]) => this.props.updateTeams(data))
-      .then(() => this.setState({ buttonClass: "btn-success" }))
-      .catch((error) => {
-        this.props.showErrorMessage(`${error}`);
-        this.setState({ buttonClass: "btn-danger" });
+    try {
+      this.setState({ buttonClass: "btn-warning" });
+      const response = await fetch(`/api/v3/event/${this.props.selectedEvent}/teams/simple`, {
+        credentials: "same-origin",
       });
+      await ensureRequestSuccess(response);
+      const data: ApiTeam[] = await response.json();
+      const sortedData = data.sort((a, b) => a.team_number - b.team_number);
+      this.props.updateTeams(sortedData);
+      this.setState({ buttonClass: "btn-success" });
+    } catch (error) {
+      this.props.showErrorMessage(`${error}`);
+      this.setState({ buttonClass: "btn-danger" });
+    }
   }
 
   render(): React.ReactNode {

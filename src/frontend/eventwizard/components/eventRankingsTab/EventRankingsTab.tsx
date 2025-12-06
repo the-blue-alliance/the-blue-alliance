@@ -5,14 +5,11 @@ interface EventRankingsTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     requestPath: string,
-    requestBody: string,
-    onSuccess: (response: Response) => void,
-    onError: (error: Error) => void
-  ) => void;
+    requestBody: string
+  ) => Promise<Response>;
 }
 
 function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTabProps): React.ReactElement {
-  const [file, setFile] = useState<File | null>(null);
   const [rankings, setRankings] = useState<Ranking[]>([]);
   const [breakdowns, setBreakdowns] = useState<string[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -26,7 +23,6 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
       return;
     }
 
-    setFile(selectedFile);
     setLoading(true);
     setStatusMessage("Loading rankings...");
 
@@ -48,7 +44,7 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
     }
   };
 
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     if (!selectedEvent) {
       alert("Please select an event first");
       return;
@@ -67,18 +63,17 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
       rankings: rankings,
     };
 
-    makeTrustedRequest(
-      `/api/trusted/v1/event/${selectedEvent}/rankings/update`,
-      JSON.stringify(requestBody),
-      () => {
-        setStatusMessage("Rankings uploaded successfully!");
-        setUploading(false);
-      },
-      (error: Error) => {
-        setStatusMessage(`Error uploading rankings: ${error}`);
-        setUploading(false);
-      }
-    );
+    try {
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/rankings/update`,
+        JSON.stringify(requestBody)
+      );
+      setStatusMessage("Rankings uploaded successfully!");
+      setUploading(false);
+    } catch (error) {
+      setStatusMessage(`Error uploading rankings: ${error}`);
+      setUploading(false);
+    }
   };
 
   return (

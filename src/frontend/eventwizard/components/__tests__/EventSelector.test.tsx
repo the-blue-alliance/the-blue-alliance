@@ -142,4 +142,115 @@ describe("EventSelector", () => {
     expect(mockSetEvent).toHaveBeenCalledWith("2024test");
     jest.useRealTimers();
   });
+
+  describe("loadEvents", () => {
+    beforeEach(() => {
+      // Clear the cache before each test
+      (EventSelector as any).eventsCache = null;
+      global.fetch = jest.fn();
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it("adds Other option when user is logged in and has events", async () => {
+      const mockEvents = [
+        { value: "2024test1", label: "2024 Test Event 1" },
+        { value: "2024test2", label: "2024 Test Event 2" },
+      ];
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        status: 200,
+        json: async () => mockEvents,
+      });
+
+      const result = await EventSelector.loadEvents("");
+
+      expect(result).toHaveLength(3);
+      expect(result[2]).toEqual({ value: "_other", label: "Other" });
+    });
+
+    it("adds Other option when user is not logged in (401)", async () => {
+      (global.fetch as jest.Mock).mockResolvedValue({
+        status: 401,
+      });
+
+      const result = await EventSelector.loadEvents("");
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({ value: "_other", label: "Other" });
+    });
+
+    it("filters events based on search string", async () => {
+      const mockEvents = [
+        { value: "2024test1", label: "2024 Test Event 1" },
+        { value: "2024test2", label: "2024 Another Event" },
+      ];
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        status: 200,
+        json: async () => mockEvents,
+      });
+
+      const result = await EventSelector.loadEvents("test");
+
+      expect(result).toHaveLength(1);
+      expect(result[0].label).toContain("Test");
+    });
+
+    it("includes Other option in search results when searching for 'other'", async () => {
+      const mockEvents = [
+        { value: "2024test1", label: "2024 Test Event 1" },
+      ];
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        status: 200,
+        json: async () => mockEvents,
+      });
+
+      const result = await EventSelector.loadEvents("other");
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({ value: "_other", label: "Other" });
+    });
+
+    it("uses cached events on subsequent calls", async () => {
+      const mockEvents = [
+        { value: "2024test1", label: "2024 Test Event 1" },
+      ];
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        status: 200,
+        json: async () => mockEvents,
+      });
+
+      // First call
+      await EventSelector.loadEvents("");
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      // Second call should use cache
+      await EventSelector.loadEvents("");
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("Other option is present in cached results", async () => {
+      const mockEvents = [
+        { value: "2024test1", label: "2024 Test Event 1" },
+      ];
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        status: 200,
+        json: async () => mockEvents,
+      });
+
+      // First call
+      const result1 = await EventSelector.loadEvents("");
+      expect(result1[1]).toEqual({ value: "_other", label: "Other" });
+
+      // Second call from cache
+      const result2 = await EventSelector.loadEvents("");
+      expect(result2[1]).toEqual({ value: "_other", label: "Other" });
+    });
+  });
 });

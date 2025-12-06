@@ -155,7 +155,7 @@ describe("AwardsTab", () => {
   });
 
   test("saveEdits calls makeTrustedRequest excluding deleted awards", async () => {
-    const makeTrustedRequest = jest.fn((path, body, onSuccess) => onSuccess());
+    const makeTrustedRequest = jest.fn(() => Promise.resolve({} as Response));
 
     // start with no awards fetched
     (global.fetch as jest.Mock).mockResolvedValue({

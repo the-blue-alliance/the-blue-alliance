@@ -2,6 +2,15 @@ import { parseResultsFile } from "../resultsParser";
 import fs from "fs";
 import path from "path";
 import type * as XLSX from "xlsx";
+import {
+  installSimpleMockFileReader,
+  installMockFileReader,
+  restoreFileReader,
+} from "./testHelpers/mockFileReader";
+import {
+  loadFmsReportFile,
+  FMS_REPORT_FILES,
+} from "./testHelpers/fmsReportLoader";
 
 // Mock XLSX
 jest.mock("xlsx", () => ({
@@ -13,22 +22,7 @@ jest.mock("xlsx", () => ({
 
 const XLSXModule = require("xlsx") as jest.Mocked<typeof XLSX>;
 
-// Mock FileReader
-class MockFileReader {
-  result?: string;
-  onload?: ((event: { target: { result: string } }) => void) | null;
-
-  readAsBinaryString(file: File): void {
-    // Simulate async file read
-    setTimeout(() => {
-      if (this.onload) {
-        this.onload({ target: { result: "mock binary data" } });
-      }
-    }, 0);
-  }
-}
-
-(global as any).FileReader = MockFileReader;
+installSimpleMockFileReader();
 
 describe("resultsParser", () => {
   beforeEach(() => {
@@ -334,39 +328,12 @@ describe("resultsParser", () => {
       jest.mock("xlsx");
     });
 
-    // Mock FileReader for Node.js environment
-    class RealFileReader {
-      result?: string;
-      onload?: ((event: { target: RealFileReader }) => void) | null;
-
-      readAsBinaryString(blob: Blob | Buffer): void {
-        const reader = this;
-        const arrayBuffer = (blob as any).arrayBuffer
-          ? (blob as any).arrayBuffer()
-          : Promise.resolve(blob);
-
-        arrayBuffer.then((buffer: ArrayBuffer | Buffer) => {
-          if (buffer instanceof ArrayBuffer) {
-            reader.result = Buffer.from(buffer).toString("binary");
-          } else if (Buffer.isBuffer(buffer)) {
-            reader.result = buffer.toString("binary");
-          } else {
-            reader.result = buffer as any;
-          }
-
-          if (reader.onload) {
-            reader.onload({ target: reader });
-          }
-        });
-      }
-    }
-
     describe("Qualification Matches", () => {
       let qualsFile: File;
       const realXLSX = jest.requireActual("xlsx");
 
       beforeAll(() => {
-        (global as any).FileReader = RealFileReader;
+        installMockFileReader();
         Object.assign(XLSXModule, realXLSX);
 
         const filePath = path.join(
@@ -390,7 +357,7 @@ describe("resultsParser", () => {
       });
 
       afterAll(() => {
-        (global as any).FileReader = MockFileReader;
+        installSimpleMockFileReader();
       });
 
       it("parses all qualification matches from real FMS report", async () => {
@@ -505,7 +472,7 @@ describe("resultsParser", () => {
       const realXLSX = jest.requireActual("xlsx");
 
       beforeAll(() => {
-        (global as any).FileReader = RealFileReader;
+        installMockFileReader();
         Object.assign(XLSXModule, realXLSX);
 
         const filePath = path.join(
@@ -529,7 +496,7 @@ describe("resultsParser", () => {
       });
 
       afterAll(() => {
-        (global as any).FileReader = MockFileReader;
+        installSimpleMockFileReader();
       });
 
       it("parses all playoff matches from real FMS report", async () => {

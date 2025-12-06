@@ -12,10 +12,8 @@ interface TeamListTabProps {
   selectedEvent: string | null;
   makeTrustedRequest: (
     path: string,
-    body: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
+    body: string
+  ) => Promise<Response>;
 }
 
 interface TeamListTabState {
@@ -49,18 +47,21 @@ class TeamListTab extends Component<TeamListTabProps, TeamListTabState> {
     }
   }
 
-  updateTeamList(
+  async updateTeamList(
     teamKeys: string[],
     onSuccess: () => void,
     onError: (error: string) => void
-  ): void {
+  ): Promise<void> {
     if (!this.props.selectedEvent) return;
-    this.props.makeTrustedRequest(
-      `/api/trusted/v1/event/${this.props.selectedEvent}/team_list/update`,
-      JSON.stringify(teamKeys),
-      onSuccess,
-      onError
-    );
+    try {
+      await this.props.makeTrustedRequest(
+        `/api/trusted/v1/event/${this.props.selectedEvent}/team_list/update`,
+        JSON.stringify(teamKeys)
+      );
+      onSuccess();
+    } catch (error) {
+      onError(String(error));
+    }
   }
 
   showError(errorMessage: string): void {

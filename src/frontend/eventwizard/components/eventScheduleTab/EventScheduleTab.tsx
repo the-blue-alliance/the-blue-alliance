@@ -2,14 +2,12 @@ import React, { useState, ChangeEvent } from "react";
 import { parseScheduleFile } from "../../utils/scheduleParser";
 import { ScheduleMatch } from "../../utils/scheduleParser";
 
-interface EventScheduleTabProps {
+export interface EventScheduleTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
+    body: string
+  ) => Promise<Response>;
 }
 
 const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
@@ -125,7 +123,7 @@ const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
     }
   };
 
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     if (matches.length === 0) {
       alert("No matches to upload!");
       return;
@@ -135,38 +133,37 @@ const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
     setStatusMessage("Uploading matches to TBA...");
 
     const matchData = matches.map((match) => ({
-      comp_level: match.compLevel,
-      set_number: match.setNumber,
-      match_number: match.matchNumber,
+      comp_level: match.comp_level,
+      set_number: match.set_number,
+      match_number: match.match_number,
       alliances: match.alliances,
-      time: match.predictedTime,
+      time: match.time_string,
     }));
 
-    makeTrustedRequest(
-      `event/${selectedEvent}/matches/update`,
-      JSON.stringify(matchData),
-      (response) => {
-        setUploading(false);
-        setStatusMessage(
-          `Successfully uploaded ${matches.length} matches to TBA!`
-        );
-        setTimeout(() => {
-          setStatusMessage("");
-          setMatches([]);
-          setFile(null);
-          const fileInput = document.getElementById(
-            "schedule_file"
-          ) as HTMLInputElement;
-          if (fileInput) {
-            fileInput.value = "";
-          }
-        }, 3000);
-      },
-      (error) => {
-        setUploading(false);
-        setStatusMessage(`Error uploading matches: ${error}`);
-      }
-    );
+    try {
+      await makeTrustedRequest(
+        `event/${selectedEvent}/matches/update`,
+        JSON.stringify(matchData)
+      );
+      setUploading(false);
+      setStatusMessage(
+        `Successfully uploaded ${matches.length} matches to TBA!`
+      );
+      setTimeout(() => {
+        setStatusMessage("");
+        setMatches([]);
+        setFile(null);
+        const fileInput = document.getElementById(
+          "schedule_file"
+        ) as HTMLInputElement;
+        if (fileInput) {
+          fileInput.value = "";
+        }
+      }, 3000);
+    } catch (error) {
+      setUploading(false);
+      setStatusMessage(`Error uploading matches: ${error}`);
+    }
   };
 
   return (
@@ -273,7 +270,7 @@ const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
                       name="playoff-format"
                       value="standard"
                       checked={!isDoubleElim}
-                      onChange={async (e) => {
+                      onChange={async () => {
                         setIsDoubleElim(false);
                         if (file) {
                           setLoading(true);
@@ -318,7 +315,7 @@ const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
                       name="playoff-format"
                       value="doubleelim"
                       checked={isDoubleElim}
-                      onChange={async (e) => {
+                      onChange={async () => {
                         setIsDoubleElim(true);
                         if (file) {
                           setLoading(true);
