@@ -25,16 +25,12 @@ updates:
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: "@sentry/*"
-  - dependency-name: "@types/node"
-    versions:
-    - ">=23.0.0"
   labels:
     - PWA
   groups:
-    react-router:
+    tanstack:
       patterns:
-        - "@react-router/*"
-        - "react-router"
+        - "@tanstack/*"
     embla-carousel:
       patterns:
         - "embla-carousel-autoplay"
@@ -49,6 +45,7 @@ updates:
         - "vitest"
         - "@vitest/coverage-v8"
         - "@julr/vite-plugin-validate-env"
+        - "@vitejs/plugin-react"
     linting:
       patterns:
         - "@eslint/*"
@@ -67,6 +64,7 @@ updates:
         - "prettier-plugin-classnames"
         - "prettier-plugin-merge"
         - "prettier-plugin-tailwindcss"
+        - "@trivago/prettier-plugin-sort-imports"
     sentry:
       patterns:
         - "@sentry/*"
@@ -87,15 +85,14 @@ updates:
         - "react-dom"
         - "@types/react"
         - "@types/react-dom"
-    forms-and-validation:
-      patterns:
-        - "react-hook-form"
-        - "@hookform/resolvers"
-        - "zod"
+        - "react-intersection-observer"
     firebase:
       patterns:
         - "firebase"
         - "firebase-admin"
+    testing:
+      patterns:
+        - "@playwright/test"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
