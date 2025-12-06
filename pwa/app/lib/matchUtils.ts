@@ -352,11 +352,3 @@ export function calculateMedianTurnaroundTime(
   turnarounds.sort((a, b) => a - b);
   return median(turnarounds);
 }
-
-export function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
-  if (match.videos.length === 0) {
-    return undefined;
-  }
-
-  return `https://www.youtube.com/watch?v=${match.videos[0].key}`;
-}

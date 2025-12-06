@@ -7,10 +7,12 @@ import { removeNonNumeric } from '~/lib/utils';
 
 const TeamLink = React.forwardRef<
   HTMLAnchorElement,
-  React.PropsWithChildren<{
-    teamOrKey: Team | string;
-    year?: number;
-  }>
+  React.PropsWithChildren<
+    {
+      teamOrKey: Team | string;
+      year?: number;
+    } & React.AnchorHTMLAttributes<HTMLAnchorElement>
+  >
 >(({ teamOrKey, year, ...props }, ref) => {
   const teamNumber =
     typeof teamOrKey === 'string'
@@ -71,7 +73,7 @@ const MatchLink = React.forwardRef<
     event?: Event;
     children: React.ReactNode;
     noModal?: boolean;
-  }
+  } & React.AnchorHTMLAttributes<HTMLAnchorElement>
 >(({ matchOrKey, event, children, noModal, ...props }, ref) => {
   const queryClient = useQueryClient();
   const isMatch = typeof matchOrKey !== 'string';

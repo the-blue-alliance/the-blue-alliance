@@ -87,6 +87,7 @@ import {
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { PlayoffType } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
@@ -245,6 +246,10 @@ function EventPage() {
       />
     ) : null;
 
+  const showBracket =
+    alliances.length > 0 &&
+    event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
+
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">
@@ -383,7 +388,7 @@ function EventPage() {
                 />
               )}
 
-              {alliances.length > 0 && (
+              {showBracket && (
                 <div className="my-4">
                   <Button
                     onClick={() => {
@@ -409,12 +414,11 @@ function EventPage() {
             </div>
           </div>
 
-          {alliances.length > 0 && (
+          {showBracket && (
             <div data-bracket-section>
               <EliminationBracket
                 alliances={alliances}
                 matches={elims}
-                year={event.year}
                 event={event}
               />
             </div>
