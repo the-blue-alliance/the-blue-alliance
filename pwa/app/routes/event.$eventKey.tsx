@@ -39,6 +39,7 @@ import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
+import EliminationBracket from '~/components/tba/eliminationBracket';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { LocationLink, TeamLink } from '~/components/tba/links';
 import {
@@ -53,6 +54,7 @@ import RankingsTable from '~/components/tba/rankingsTable';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -85,6 +87,7 @@ import {
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { PlayoffType } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
@@ -243,6 +246,10 @@ function EventPage() {
       />
     ) : null;
 
+  const showBracket =
+    alliances.length > 0 &&
+    event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
+
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">
@@ -380,9 +387,42 @@ function EventPage() {
                   year={event.year}
                 />
               )}
+
+              {showBracket && (
+                <div className="my-4">
+                  <Button
+                    onClick={() => {
+                      const bracketElement = document.querySelector(
+                        '[data-bracket-section]',
+                      );
+                      if (bracketElement) {
+                        bracketElement.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    }}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    View Playoff Bracket →
+                  </Button>
+                </div>
+              )}
+
               {rightSideElims}
             </div>
           </div>
+
+          {showBracket && (
+            <div data-bracket-section>
+              <EliminationBracket
+                alliances={alliances}
+                matches={elims}
+                event={event}
+              />
+            </div>
+          )}
         </TabsContent>
 
         {rankingsQuery.data && (
