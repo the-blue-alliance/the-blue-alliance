@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 
 interface AddMultipleTeamsProps {
   selectedEvent: string | null;
@@ -11,83 +11,71 @@ interface AddMultipleTeamsProps {
   showErrorMessage: (message: string) => void;
 }
 
-interface AddMultipleTeamsState {
-  inputTeams: string;
-  buttonClass: string;
-}
+const AddMultipleTeams: React.FC<AddMultipleTeamsProps> = ({
+  selectedEvent,
+  clearTeams,
+  updateTeamList,
+  showErrorMessage,
+}) => {
+  const [inputTeams, setInputTeams] = useState("");
+  const [buttonClass, setButtonClass] = useState("btn-primary");
 
-class AddMultipleTeams extends Component<
-  AddMultipleTeamsProps,
-  AddMultipleTeamsState
-> {
-  constructor(props: AddMultipleTeamsProps) {
-    super(props);
-    this.state = {
-      inputTeams: "",
-      buttonClass: "btn-primary",
-    };
-    this.addTeams = this.addTeams.bind(this);
-    this.onInputChange = this.onInputChange.bind(this);
-  }
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>): void => {
+    setInputTeams(event.target.value);
+  };
 
-  onInputChange(event: ChangeEvent<HTMLTextAreaElement>): void {
-    this.setState({ inputTeams: event.target.value });
-  }
-
-  addTeams(): void {
-    if (!this.props.selectedEvent) {
+  const handleAddTeams = (): void => {
+    if (!selectedEvent) {
       // No valid event
-      this.props.showErrorMessage("Please select an event before adding teams");
+      showErrorMessage("Please select an event before adding teams");
       return;
     }
 
     const teams: string[] = [];
-    const teamInput = this.state.inputTeams.split("\n");
-    for (let i = 0; this.state.inputTeams && i < teamInput.length; i++) {
+    const teamInput = inputTeams.split("\n");
+    for (let i = 0; inputTeams && i < teamInput.length; i++) {
       const teamNum = parseInt(teamInput[i], 10);
       if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999) {
-        this.props.showErrorMessage(`Invalid team ${teamInput[i]}`);
+        showErrorMessage(`Invalid team ${teamInput[i]}`);
         return;
       }
       teams.push(`frc${teamNum}`);
     }
 
-    this.setState({ buttonClass: "btn-warning" });
-    this.props.updateTeamList(
+    setButtonClass("btn-warning");
+    updateTeamList(
       teams,
       () => {
-        this.setState({ buttonClass: "btn-success" });
-        if (this.props.clearTeams) {
-          this.props.clearTeams();
+        setButtonClass("btn-success");
+        if (clearTeams) {
+          clearTeams();
         }
       },
-      (error: string) => this.props.showErrorMessage(`${error}`)
+      (error: string) => showErrorMessage(`${error}`)
     );
-  }
+  };
 
-  render(): React.ReactNode {
-    return (
-      <div>
-        <h4>Add Multiple Teams</h4>
-        <p>
-          Enter a list of team numbers, one per line. This will{" "}
-          <em>overwrite</em> all existing teams for this event.
-        </p>
-        <textarea
-          className="form-control"
-          value={this.state.inputTeams}
-          onChange={this.onInputChange}
-        />
-        <button
-          className={`btn ${this.state.buttonClass}`}
-          onClick={this.addTeams}
-          disabled={!this.props.selectedEvent}
-        >
-          Overwrite Teams
-        </button>
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <h4>Add Multiple Teams</h4>
+      <p>
+        Enter a list of team numbers, one per line. This will{" "}
+        <em>overwrite</em> all existing teams for this event.
+      </p>
+      <textarea
+        className="form-control"
+        value={inputTeams}
+        onChange={handleInputChange}
+      />
+      <button
+        className={`btn ${buttonClass}`}
+        onClick={handleAddTeams}
+        disabled={!selectedEvent}
+      >
+        Overwrite Teams
+      </button>
+    </div>
+  );
+};
 
 export default AddMultipleTeams;

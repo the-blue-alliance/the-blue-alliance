@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { ApiTeam } from "../../constants/ApiTeam";
@@ -16,133 +16,119 @@ interface TeamListTabProps {
   ) => Promise<Response>;
 }
 
-interface TeamListTabState {
-  teams: ApiTeam[];
-  hasFetchedTeams: boolean;
-  addMultipleButtonStatus: string;
-  showErrorDialog: boolean;
-  errorMessage: string;
-}
+const TeamListTab: React.FC<TeamListTabProps> = ({
+  selectedEvent,
+  makeTrustedRequest,
+}) => {
+  const [teams, setTeams] = useState<ApiTeam[]>([]);
+  const [hasFetchedTeams, setHasFetchedTeams] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-class TeamListTab extends Component<TeamListTabProps, TeamListTabState> {
-  constructor(props: TeamListTabProps) {
-    super(props);
-    this.state = {
-      teams: [],
-      hasFetchedTeams: false,
-      addMultipleButtonStatus: "btn-primary",
-      showErrorDialog: false,
-      errorMessage: "",
-    };
-    this.showError = this.showError.bind(this);
-    this.clearError = this.clearError.bind(this);
-    this.updateTeams = this.updateTeams.bind(this);
-    this.clearTeams = this.clearTeams.bind(this);
-    this.updateTeamList = this.updateTeamList.bind(this);
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps: TeamListTabProps): void {
-    if (this.props.selectedEvent !== nextProps.selectedEvent) {
-      this.clearTeams();
+  useEffect(() => {
+    if (selectedEvent !== null) {
+      handleClearTeams();
     }
-  }
+  }, [selectedEvent]);
 
-  async updateTeamList(
+  const handleUpdateTeamList = async (
     teamKeys: string[],
     onSuccess: () => void,
     onError: (error: string) => void
-  ): Promise<void> {
-    if (!this.props.selectedEvent) return;
+  ): Promise<void> => {
+    if (!selectedEvent) return;
     try {
-      await this.props.makeTrustedRequest(
-        `/api/trusted/v1/event/${this.props.selectedEvent}/team_list/update`,
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/team_list/update`,
         JSON.stringify(teamKeys)
       );
       onSuccess();
     } catch (error) {
       onError(String(error));
     }
-  }
+  };
 
-  showError(errorMessage: string): void {
-    this.setState({ showErrorDialog: true, errorMessage: errorMessage });
-  }
+  const handleShowError = (message: string): void => {
+    setShowErrorDialog(true);
+    setErrorMessage(message);
+  };
 
-  clearError(): void {
-    this.setState({ showErrorDialog: false, errorMessage: "" });
-  }
+  const handleClearError = (): void => {
+    setShowErrorDialog(false);
+    setErrorMessage("");
+  };
 
-  updateTeams(teams: ApiTeam[]): void {
-    this.setState({ teams, hasFetchedTeams: true });
-  }
+  const handleUpdateTeams = (newTeams: ApiTeam[]): void => {
+    setTeams(newTeams);
+    setHasFetchedTeams(true);
+  };
 
-  clearTeams(): void {
-    this.setState({ teams: [], hasFetchedTeams: false });
-  }
+  const handleClearTeams = (): void => {
+    setTeams([]);
+    setHasFetchedTeams(false);
+  };
 
-  render(): React.ReactNode {
-    return (
-      <div className="tab-pane" id="teams">
-        <Modal
-          show={this.state.showErrorDialog}
-          onHide={this.clearError}
-          backdrop={false}
-          animation={false}
-          centered={true}
-        >
-          <Modal.Header>
-            <Modal.Title>Error!</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>{this.state.errorMessage}</Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" onClick={this.clearError}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
+  return (
+    <div className="tab-pane" id="teams">
+      <Modal
+        show={showErrorDialog}
+        onHide={handleClearError}
+        backdrop={false}
+        animation={false}
+        centered={true}
+      >
+        <Modal.Header>
+          <Modal.Title>Error!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{errorMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleClearError}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
-        <h3>Team List</h3>
-        <div className="row">
-          <div className="col-sm-6">
-            <AddTeamsFMSReport
-              selectedEvent={this.props.selectedEvent}
-              updateTeamList={this.updateTeamList}
-              showErrorMessage={this.showError}
-              clearTeams={this.clearTeams}
-              makeTrustedRequest={this.props.makeTrustedRequest}
-            />
-            <hr />
+      <h3>Team List</h3>
+      <div className="row">
+        <div className="col-sm-6">
+          <AddTeamsFMSReport
+            selectedEvent={selectedEvent}
+            updateTeamList={handleUpdateTeamList}
+            showErrorMessage={handleShowError}
+            clearTeams={handleClearTeams}
+            makeTrustedRequest={makeTrustedRequest}
+          />
+          <hr />
 
-            <AddRemoveSingleTeam
-              selectedEvent={this.props.selectedEvent}
-              updateTeamList={this.updateTeamList}
-              showErrorMessage={this.showError}
-              hasFetchedTeams={this.state.hasFetchedTeams}
-              currentTeams={this.state.teams}
-              clearTeams={this.clearTeams}
-            />
-            <hr />
+          <AddRemoveSingleTeam
+            selectedEvent={selectedEvent}
+            updateTeamList={handleUpdateTeamList}
+            showErrorMessage={handleShowError}
+            hasFetchedTeams={hasFetchedTeams}
+            currentTeams={teams}
+            clearTeams={handleClearTeams}
+          />
+          <hr />
 
-            <AddMultipleTeams
-              selectedEvent={this.props.selectedEvent}
-              updateTeamList={this.updateTeamList}
-              showErrorMessage={this.showError}
-              clearTeams={this.clearTeams}
-            />
-          </div>
-          <div className="col-sm-6">
-            <AttendingTeamList
-              selectedEvent={this.props.selectedEvent}
-              hasFetchedTeams={this.state.hasFetchedTeams}
-              teams={this.state.teams}
-              updateTeams={this.updateTeams}
-              showErrorMessage={this.showError}
-            />
-          </div>
+          <AddMultipleTeams
+            selectedEvent={selectedEvent}
+            updateTeamList={handleUpdateTeamList}
+            showErrorMessage={handleShowError}
+            clearTeams={handleClearTeams}
+          />
+        </div>
+        <div className="col-sm-6">
+          <AttendingTeamList
+            selectedEvent={selectedEvent}
+            hasFetchedTeams={hasFetchedTeams}
+            teams={teams}
+            updateTeams={handleUpdateTeams}
+            showErrorMessage={handleShowError}
+          />
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default TeamListTab;

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { ApiTeam } from "../../constants/ApiTeam";
 import ensureRequestSuccess from "../../net/EnsureRequestSuccess";
 import TeamList from "./TeamList";
@@ -11,76 +11,66 @@ interface AttendingTeamListProps {
   showErrorMessage: (message: string) => void;
 }
 
-interface AttendingTeamListState {
-  buttonClass: string;
-}
+const AttendingTeamList: React.FC<AttendingTeamListProps> = ({
+  selectedEvent,
+  hasFetchedTeams,
+  teams,
+  updateTeams,
+  showErrorMessage,
+}) => {
+  const [buttonClass, setButtonClass] = useState("btn-info");
 
-class AttendingTeamList extends Component<
-  AttendingTeamListProps,
-  AttendingTeamListState
-> {
-  constructor(props: AttendingTeamListProps) {
-    super(props);
-    this.state = {
-      buttonClass: "btn-info",
-    };
-
-    this.updateAttendingTeams = this.updateAttendingTeams.bind(this);
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps: AttendingTeamListProps): void {
-    if (!nextProps.hasFetchedTeams) {
-      this.setState({ buttonClass: "btn-info" });
+  useEffect(() => {
+    if (!hasFetchedTeams) {
+      setButtonClass("btn-info");
     }
-  }
+  }, [hasFetchedTeams]);
 
-  async updateAttendingTeams(): Promise<void> {
-    if (!this.props.selectedEvent) {
+  const handleUpdateAttendingTeams = async (): Promise<void> => {
+    if (!selectedEvent) {
       // No valid event
-      this.props.showErrorMessage(
+      showErrorMessage(
         "Please select an event before fetching teams"
       );
       return;
     }
 
     try {
-      this.setState({ buttonClass: "btn-warning" });
-      const response = await fetch(`/api/v3/event/${this.props.selectedEvent}/teams/simple`, {
+      setButtonClass("btn-warning");
+      const response = await fetch(`/api/v3/event/${selectedEvent}/teams/simple`, {
         credentials: "same-origin",
       });
       await ensureRequestSuccess(response);
       const data: ApiTeam[] = await response.json();
       const sortedData = data.sort((a, b) => a.team_number - b.team_number);
-      this.props.updateTeams(sortedData);
-      this.setState({ buttonClass: "btn-success" });
+      updateTeams(sortedData);
+      setButtonClass("btn-success");
     } catch (error) {
-      this.props.showErrorMessage(`${error}`);
-      this.setState({ buttonClass: "btn-danger" });
+      showErrorMessage(`${error}`);
+      setButtonClass("btn-danger");
     }
+  };
+
+  let renderedTeams: React.ReactNode;
+  if (hasFetchedTeams && teams.length === 0) {
+    renderedTeams = <p>No teams found</p>;
+  } else {
+    renderedTeams = <TeamList teams={teams} />;
   }
 
-  render(): React.ReactNode {
-    let renderedTeams: React.ReactNode;
-    if (this.props.hasFetchedTeams && this.props.teams.length === 0) {
-      renderedTeams = <p>No teams found</p>;
-    } else {
-      renderedTeams = <TeamList teams={this.props.teams} />;
-    }
-
-    return (
-      <div>
-        <h4>Currently Attending Teams</h4>
-        <button
-          className={`btn ${this.state.buttonClass}`}
-          onClick={this.updateAttendingTeams}
-          disabled={!this.props.selectedEvent}
-        >
-          Fetch Teams
-        </button>
-        {renderedTeams}
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <h4>Currently Attending Teams</h4>
+      <button
+        className={`btn ${buttonClass}`}
+        onClick={handleUpdateAttendingTeams}
+        disabled={!selectedEvent}
+      >
+        Fetch Teams
+      </button>
+      {renderedTeams}
+    </div>
+  );
+};
 
 export default AttendingTeamList;
