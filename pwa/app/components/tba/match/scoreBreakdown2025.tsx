@@ -3,12 +3,8 @@ import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
 } from '~/components/tba/match/common';
+import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '~/components/ui/tooltip';
 
 export default function ScoreBreakdown2025({
   scoreBreakdown,
@@ -18,14 +14,20 @@ export default function ScoreBreakdown2025({
   match: Match;
 }) {
   return (
-    <Table className="text-center">
+    <Table className="table-fixed text-center">
+      <colgroup>
+        <col />
+        <col />
+        <col className="w-[45%]" />
+        <col />
+        <col />
+      </colgroup>
       <TableBody>
         {/* Auto Leave */}
         <TableRow>
           <TableCell
             colSpan={2}
-            className="bg-alliance-red-dark whitespace-nowrap
-              [&>*]:align-middle"
+            className="bg-alliance-red-dark whitespace-nowrap *:align-middle"
           >
             <ConditionalCheckmark
               condition={scoreBreakdown.red.autoLineRobot1 === 'Yes'}
@@ -44,8 +46,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-gray-200">Auto Leave</TableCell>
           <TableCell
             colSpan={2}
-            className="bg-alliance-blue-dark whitespace-nowrap
-              [&>*]:align-middle"
+            className="bg-alliance-blue-dark whitespace-nowrap *:align-middle"
           >
             <ConditionalCheckmark
               condition={scoreBreakdown.blue.autoLineRobot1 === 'Yes'}
@@ -244,7 +245,7 @@ export default function ScoreBreakdown2025({
               teamKey={match.alliances.red.team_keys[1]}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Robot 1 Endgame</TableCell>
+          <TableCell className="bg-gray-50">Robot 2 Endgame</TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot2}
@@ -261,7 +262,7 @@ export default function ScoreBreakdown2025({
               teamKey={match.alliances.red.team_keys[2]}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Robot 1 Endgame</TableCell>
+          <TableCell className="bg-gray-50">Robot 3 Endgame</TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot3}
@@ -442,11 +443,9 @@ function EndgameRobotCell({
   };
 
   return (
-    <Tooltip>
-      <TooltipTrigger>
-        {displayMap[endgame ?? 'None']} (+{pointMap[endgame ?? 'None']})
-      </TooltipTrigger>
-      <TooltipContent>{teamKey.substring(3)}</TooltipContent>
-    </Tooltip>
+    <div className="flex flex-col items-center gap-1">
+      <Badge variant={'outline'}>{teamKey.substring(3)}</Badge>
+      {displayMap[endgame ?? 'None']} (+{pointMap[endgame ?? 'None']})
+    </div>
   );
 }

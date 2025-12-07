@@ -5,7 +5,13 @@ import { useState } from 'react';
 
 import { Event, Match } from '~/api/tba/read';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
-import { isScoreBreakdown2025 } from '~/lib/rankingPoints';
+import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
+import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
+import {
+  isScoreBreakdown2023,
+  isScoreBreakdown2024,
+  isScoreBreakdown2025,
+} from '~/lib/rankingPoints';
 
 function formatMatchDate(timestamp: number, timezone: string): string {
   const date = new Date(timestamp * 1000);
@@ -87,6 +93,24 @@ export default function MatchDetails({
   if (isScoreBreakdown2025(match.score_breakdown)) {
     sbDiv = (
       <ScoreBreakdown2025
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2024(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2024
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2023(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2023
         scoreBreakdown={match.score_breakdown}
         match={match}
       />
