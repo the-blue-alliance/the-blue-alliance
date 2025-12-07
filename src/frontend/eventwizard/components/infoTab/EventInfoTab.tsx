@@ -12,6 +12,9 @@ interface EventInfoTabProps {
     path: string,
     body: string
   ) => Promise<Response>;
+  makeApiV3Request: <T = unknown>(
+    path: string
+  ) => Promise<T>;
 }
 
 interface EventInfoTabState {
@@ -72,22 +75,22 @@ class EventInfoTab extends Component<EventInfoTabProps, EventInfoTabState> {
 
   async loadEventInfo(newEventKey: string): Promise<void> {
     this.setState({ status: "Loading event info..." });
-    
-    const response1 = await fetch(`/api/v3/event/${newEventKey}`, {
-      credentials: "same-origin",
-    });
-    await ensureRequestSuccess(response1);
-    const data1: ApiEvent = await response1.json();
 
-    // Merge in remap_teams
-    const response2 = await fetch(`/_/remap_teams/${newEventKey}`);
-    await ensureRequestSuccess(response2);
-    const data2: Record<string, string> = await response2.json();
-    
-    const data = Object.assign({}, data1);
-    data.remap_teams = data2;
-    
-    this.setState({ eventInfo: data, status: "" });
+    try {
+      const data1 = await this.props.makeApiV3Request<ApiEvent>(`/api/v3/event/${newEventKey}`);
+
+      // Merge in remap_teams
+      const response2 = await fetch(`/_/remap_teams/${newEventKey}`);
+      await ensureRequestSuccess(response2);
+      const data2: Record<string, string> = await response2.json();
+
+      const data = Object.assign({}, data1);
+      data.remap_teams = data2;
+
+      this.setState({ eventInfo: data, status: "" });
+    } catch (error) {
+      this.setState({ status: "" });
+    }
   }
 
   addWebcast(webcastUrl: string, webcastDate: string): void {
