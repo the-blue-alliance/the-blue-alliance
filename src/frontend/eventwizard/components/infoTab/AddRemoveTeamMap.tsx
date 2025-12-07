@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 import TeamMappingsList from "./TeamMappingsList";
 import { ApiEvent } from "../../constants/ApiEvent";
 
@@ -8,134 +8,111 @@ interface AddRemoveTeamMapProps {
   removeTeamMap: (fromTeamKey: string) => void;
 }
 
-interface AddRemoveTeamMapState {
-  nextFromTeam: string;
-  nextToTeam: string;
-  fromError: boolean;
-  toError: boolean;
-}
+const AddRemoveTeamMap: React.FC<AddRemoveTeamMapProps> = ({
+  eventInfo,
+  addTeamMap,
+  removeTeamMap,
+}) => {
+  const [nextFromTeam, setNextFromTeam] = useState("");
+  const [nextToTeam, setNextToTeam] = useState("");
+  const [fromError, setFromError] = useState(false);
+  const [toError, setToError] = useState(false);
 
-class AddRemoveTeamMap extends Component<
-  AddRemoveTeamMapProps,
-  AddRemoveTeamMapState
-> {
-  constructor(props: AddRemoveTeamMapProps) {
-    super(props);
-    this.state = {
-      nextFromTeam: "",
-      nextToTeam: "",
-      fromError: false,
-      toError: false,
-    };
-
-    this.onNextFromTeamChange = this.onNextFromTeamChange.bind(this);
-    this.onNextToTeamChange = this.onNextToTeamChange.bind(this);
-    this.onAddTeamMapClick = this.onAddTeamMapClick.bind(this);
-  }
-
-  onNextFromTeamChange(event: ChangeEvent<HTMLInputElement>): void {
+  const handleNextFromTeamChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const match = event.target.value.match(/\d+/);
-    this.setState({
-      nextFromTeam: event.target.value,
-      fromError: !match || match[0] !== event.target.value,
-    });
-  }
+    setNextFromTeam(event.target.value);
+    setFromError(!match || match[0] !== event.target.value);
+  };
 
-  onNextToTeamChange(event: ChangeEvent<HTMLInputElement>): void {
+  const handleNextToTeamChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const match = event.target.value.match(/\d+[b-zB-Z]?/);
-    this.setState({
-      nextToTeam: event.target.value,
-      toError: !match || match[0] !== event.target.value,
-    });
-  }
+    setNextToTeam(event.target.value);
+    setToError(!match || match[0] !== event.target.value);
+  };
 
-  onAddTeamMapClick(): void {
-    this.props.addTeamMap(
-      `frc${this.state.nextFromTeam.toUpperCase()}`,
-      `frc${this.state.nextToTeam.toUpperCase()}`
+  const handleAddTeamMapClick = (): void => {
+    addTeamMap(
+      `frc${nextFromTeam.toUpperCase()}`,
+      `frc${nextToTeam.toUpperCase()}`
     );
-    this.setState({
-      nextFromTeam: "",
-      nextToTeam: "",
-      fromError: false,
-      toError: false,
-    });
+    setNextFromTeam("");
+    setNextToTeam("");
+    setFromError(false);
+    setToError(false);
+  };
+
+  let teamMappingsList: React.ReactNode = null;
+  if (
+    eventInfo &&
+    eventInfo.remap_teams &&
+    Object.keys(eventInfo.remap_teams).length > 0
+  ) {
+    teamMappingsList = (
+      <TeamMappingsList
+        teamMappings={eventInfo.remap_teams}
+        removeTeamMap={removeTeamMap}
+      />
+    );
+  } else {
+    teamMappingsList = <p>No team mappings found</p>;
   }
 
-  render(): React.ReactNode {
-    let teamMappingsList: React.ReactNode = null;
-    if (
-      this.props.eventInfo &&
-      this.props.eventInfo.remap_teams &&
-      Object.keys(this.props.eventInfo.remap_teams).length > 0
-    ) {
-      teamMappingsList = (
-        <TeamMappingsList
-          teamMappings={this.props.eventInfo.remap_teams}
-          removeTeamMap={this.props.removeTeamMap}
-        />
-      );
-    } else {
-      teamMappingsList = <p>No team mappings found</p>;
-    }
+  return (
+    <div className="form-group row">
+      <label htmlFor="team_mappings_list" className="col-sm-2 control-label">
+        Team Mappings
+        <br />
+        <small>Note: Removing a mapping will not unmap existing data!</small>
+      </label>
+      <div className="col-sm-10" id="team_mappings_list">
+        {teamMappingsList}
 
-    return (
-      <div className="form-group row">
-        <label htmlFor="team_mappings_list" className="col-sm-2 control-label">
-          Team Mappings
-          <br />
-          <small>Note: Removing a mapping will not unmap existing data!</small>
-        </label>
-        <div className="col-sm-10" id="team_mappings_list">
-          {teamMappingsList}
-
-          <div
-            className={
-              this.state.fromError || this.state.toError
-                ? "input-group has-error"
-                : "input-group"
-            }
-          >
-            <input
-              className="form-control"
-              type="text"
-              placeholder="9254"
-              disabled={this.props.eventInfo === null}
-              onChange={this.onNextFromTeamChange}
-              value={this.state.nextFromTeam}
+        <div
+          className={
+            fromError || toError
+              ? "input-group has-error"
+              : "input-group"
+          }
+        >
+          <input
+            className="form-control"
+            type="text"
+            placeholder="9254"
+            disabled={eventInfo === null}
+            onChange={handleNextFromTeamChange}
+            value={nextFromTeam}
+          />
+          <span className="input-group-addon">
+            <span
+              className="glyphicon glyphicon-arrow-right"
+              aria-hidden="true"
             />
-            <span className="input-group-addon">
-              <span
-                className="glyphicon glyphicon-arrow-right"
-                aria-hidden="true"
-              />
-            </span>
-            <input
-              className="form-control"
-              type="text"
-              placeholder="254B"
-              disabled={this.props.eventInfo === null}
-              onChange={this.onNextToTeamChange}
-              value={this.state.nextToTeam}
-            />
-            <span className="input-group-btn">
-              <button
-                className="btn btn-info"
-                onClick={this.onAddTeamMapClick}
-                disabled={
-                  this.props.eventInfo === null ||
-                  this.state.fromError ||
-                  this.state.toError
-                }
-              >
-                Add Mapping
-              </button>
-            </span>
-          </div>
+          </span>
+          <input
+            className="form-control"
+            type="text"
+            placeholder="254B"
+            disabled={eventInfo === null}
+            onChange={handleNextToTeamChange}
+            value={nextToTeam}
+          />
+          <span className="input-group-btn">
+            <button
+              className="btn btn-info"
+              onClick={handleAddTeamMapClick}
+              disabled={
+                eventInfo === null ||
+                fromError ||
+                toError
+              }
+            >
+              Add Mapping
+            </button>
+          </span>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default AddRemoveTeamMap;

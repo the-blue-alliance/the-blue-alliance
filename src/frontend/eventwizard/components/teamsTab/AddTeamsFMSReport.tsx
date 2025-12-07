@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -25,54 +25,25 @@ interface AddTeamsFMSReportProps {
   ) => Promise<Response>;
 }
 
-interface AddTeamsFMSReportState {
-  selectedFileName: string;
-  message: string;
-  stagingTeamKeys: string[];
-  stagingTeams: ApiTeam[];
-  selectedFile: File | null;
-}
-
 interface FMSTeamRow {
   "#": string;
   "Short Name": string;
 }
 
-class AddTeamsFMSReport extends Component<
-  AddTeamsFMSReportProps,
-  AddTeamsFMSReportState
-> {
-  constructor(props: AddTeamsFMSReportProps) {
-    super(props);
-    this.state = {
-      selectedFileName: "",
-      message: "",
-      stagingTeamKeys: [],
-      stagingTeams: [],
-      selectedFile: null,
-    };
-    this.onFileChange = this.onFileChange.bind(this);
-    this.parseFMSReport = this.parseFMSReport.bind(this);
-  }
+const AddTeamsFMSReport: React.FC<AddTeamsFMSReportProps> = ({
+  selectedEvent,
+  updateTeamList,
+  clearTeams,
+  showErrorMessage,
+  makeTrustedRequest,
+}) => {
+  const [selectedFileName, setSelectedFileName] = useState("");
+  const [message, setMessage] = useState("");
+  const [stagingTeamKeys, setStagingTeamKeys] = useState<string[]>([]);
+  const [stagingTeams, setStagingTeams] = useState<ApiTeam[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  onFileChange(event: ChangeEvent<HTMLInputElement>): void {
-    if (event && event.target && event.target.files && event.target.files.length > 0) {
-      const f = event.target.files[0];
-      const reader = new FileReader();
-      const name = f.name;
-      reader.onload = this.parseFMSReport;
-      this.setState({
-        selectedFileName: name,
-        message: "Processing file...",
-        selectedFile: f,
-      });
-      reader.readAsBinaryString(f);
-    } else {
-      this.setState({ selectedFileName: "", selectedFile: null });
-    }
-  }
-
-  parseFMSReport(event: ProgressEvent<FileReader>): void {
+  const handleParseFMSReport = (event: ProgressEvent<FileReader>): void => {
     const data = event.target?.result;
     if (!data || typeof data !== "string") return;
 
@@ -96,7 +67,7 @@ class AddTeamsFMSReport extends Component<
 
       const teamNum = parseInt(team["#"], 10);
       if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 99999) {
-        this.props.showErrorMessage(`Invalid team number ${teamNum}`);
+        showErrorMessage(`Invalid team number ${teamNum}`);
         return;
       }
       teams.push({
@@ -107,104 +78,107 @@ class AddTeamsFMSReport extends Component<
     }
 
     if (teams.length === 0) {
-      this.setState({
-        message:
-          "No teams found in the file. Try opening the report in Excel and overwriting it using File->Save As",
-      });
+      setMessage(
+        "No teams found in the file. Try opening the report in Excel and overwriting it using File->Save As"
+      );
       return;
     }
 
     const teamKeys = teams.map((team) => team.key);
-    this.setState({
-      message: "",
-      stagingTeamKeys: teamKeys,
-      stagingTeams: teams,
-    });
-  }
+    setMessage("");
+    setStagingTeamKeys(teamKeys);
+    setStagingTeams(teams);
+  };
 
-  render(): React.ReactNode {
-    const handleCancel = () => {
-      this.setState({
-        selectedFileName: "",
-        stagingTeams: [],
-        stagingTeamKeys: [],
-        selectedFile: null,
-      });
-    };
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (event && event.target && event.target.files && event.target.files.length > 0) {
+      const f = event.target.files[0];
+      const reader = new FileReader();
+      const name = f.name;
+      reader.onload = handleParseFMSReport;
+      setSelectedFileName(name);
+      setMessage("Processing file...");
+      setSelectedFile(f);
+      reader.readAsBinaryString(f);
+    } else {
+      setSelectedFileName("");
+      setSelectedFile(null);
+    }
+  };
 
-    const handleOk = () => {
-      const teamKeys = this.state.stagingTeamKeys;
-      const teamCount = this.state.stagingTeams.length;
-      const file = this.state.selectedFile;
-      this.setState({
-        message: "Uploading teams...",
-        stagingTeamKeys: [],
-        stagingTeams: [],
-      });
-      this.props.updateTeamList(
-        teamKeys,
-        async () => {
-          // Upload the FMS report file to the backend for archival
-          if (file && this.props.selectedEvent) {
-            try {
-              await uploadFmsReport(file, this.props.selectedEvent, "team_list", this.props.makeTrustedRequest);
-            } catch (error) {
-              console.error("Error uploading FMS report:", error);
-            }
+  const handleCancel = () => {
+    setSelectedFileName("");
+    setStagingTeams([]);
+    setStagingTeamKeys([]);
+    setSelectedFile(null);
+  };
+
+  const handleOk = () => {
+    const teamKeys = stagingTeamKeys;
+    const teamCount = stagingTeams.length;
+    const file = selectedFile;
+    setMessage("Uploading teams...");
+    setStagingTeamKeys([]);
+    setStagingTeams([]);
+    updateTeamList(
+      teamKeys,
+      async () => {
+        // Upload the FMS report file to the backend for archival
+        if (file && selectedEvent) {
+          try {
+            await uploadFmsReport(file, selectedEvent, "team_list", makeTrustedRequest);
+          } catch (error) {
+            console.error("Error uploading FMS report:", error);
           }
-          
-          this.setState({
-            selectedFileName: "",
-            message: `${teamCount} teams added to ${this.props.selectedEvent}`,
-            stagingTeamKeys: [],
-            stagingTeams: [],
-            selectedFile: null,
-          });
-          if (this.props.clearTeams) {
-            this.props.clearTeams();
-          }
-        },
-        (error: string) => {
-          this.props.showErrorMessage(`${error}`);
-          this.setState({
-            selectedFile: null,
-          });
         }
-      );
-    };
-
-    return (
-      <div>
-        <h4>Import FMS Report</h4>
-        <p>
-          This will <em>overwrite</em> all existing teams for this event.
-        </p>
-        {this.state.message && <p>{this.state.message}</p>}
-        <Input
-          type="file"
-          inputProps={{ accept: ".xlsx,.xls,.csv" }}
-          onChange={this.onFileChange}
-          disabled={!this.props.selectedEvent}
-        />
-        <Dialog open={this.state.stagingTeams.length > 0}>
-          <DialogTitle>
-            Confirm Teams: {this.state.selectedFileName}
-          </DialogTitle>
-          <DialogContent>
-            <TeamList teams={this.state.stagingTeams} />
-          </DialogContent>
-          <DialogActions>
-            <Button autoFocus onClick={handleCancel} size="large">
-              Cancel
-            </Button>
-            <Button variant="contained" onClick={handleOk} size="large">
-              Ok
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+        
+        setSelectedFileName("");
+        setMessage(`${teamCount} teams added to ${selectedEvent}`);
+        setStagingTeamKeys([]);
+        setStagingTeams([]);
+        setSelectedFile(null);
+        if (clearTeams) {
+          clearTeams();
+        }
+      },
+      (error: string) => {
+        showErrorMessage(`${error}`);
+        setSelectedFile(null);
+      }
     );
-  }
-}
+  };
+
+  return (
+    <div>
+      <h4>Import FMS Report</h4>
+      <p>
+        This will <em>overwrite</em> all existing teams for this event.
+      </p>
+      {message && <p>{message}</p>}
+      <Input
+        type="file"
+        inputProps={{ accept: ".xlsx,.xls,.csv" }}
+        onChange={handleFileChange}
+        disabled={!selectedEvent}
+      />
+      <Dialog open={stagingTeams.length > 0}>
+        <DialogTitle>
+          Confirm Teams: {selectedFileName}
+        </DialogTitle>
+        <DialogContent>
+          <TeamList teams={stagingTeams} />
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={handleCancel} size="large">
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleOk} size="large">
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
 
 export default AddTeamsFMSReport;

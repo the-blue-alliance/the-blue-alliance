@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent } from "react";
+import React, { useState, useEffect, useRef, ChangeEvent } from "react";
 import AsyncSelect from "react-select/async";
 
 interface EventOption {
@@ -14,16 +14,29 @@ interface EventSelectorProps {
   clearAuth: () => void;
 }
 
-interface EventSelectorState {
-  eventSelectLabel: string;
-}
+let eventsCache: EventOption[] | null = null;
 
-class EventSelector extends Component<EventSelectorProps, EventSelectorState> {
-  static eventsCache: EventOption[] | null;
-  debounceTimer: NodeJS.Timeout | null = null;
+const EventSelector: React.FC<EventSelectorProps> = ({
+  manualEvent,
+  selectedEvent,
+  setEvent,
+  setManualEvent,
+  clearAuth,
+}) => {
+  const [eventSelectLabel, setEventSelectLabel] = useState("");
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
-  static async loadEvents(search: string): Promise<EventOption[]> {
-    if (!EventSelector.eventsCache) {
+  useEffect(() => {
+    return () => {
+      // Clean up timer on unmount
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
+
+  const loadEvents = async (search: string): Promise<EventOption[]> => {
+    if (!eventsCache) {
       const response = await fetch("/_/account/apiwrite_events", {
         credentials: "same-origin",
       });
@@ -36,99 +49,81 @@ class EventSelector extends Component<EventSelectorProps, EventSelectorState> {
         events = await response.json();
       }
       events.push({ value: "_other", label: "Other" });
-      EventSelector.eventsCache = events;
+      eventsCache = events;
     }
 
-    return (EventSelector.eventsCache || []).filter((e) =>
+    return (eventsCache || []).filter((e) =>
       e.label.toLowerCase().includes(search.toLowerCase())
     );
-  }
+  };
 
-  constructor(props: EventSelectorProps) {
-    super(props);
-    this.state = {
-      eventSelectLabel: "",
-    };
-    this.onEventSelected = this.onEventSelected.bind(this);
-    this.onManualEventChange = this.onManualEventChange.bind(this);
-  }
-
-  componentWillUnmount(): void {
-    // Clean up timer on unmount
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
-    }
-  }
-
-  onEventSelected(newEvent: EventOption | null): void {
+  const handleEventSelected = (newEvent: EventOption | null): void => {
     if (!newEvent) return;
 
-    this.props.clearAuth();
-    this.setState({ eventSelectLabel: newEvent.label });
+    clearAuth();
+    setEventSelectLabel(newEvent.label);
 
     if (newEvent.value === "_other") {
-      this.props.setManualEvent(true);
-      this.props.setEvent("");
+      setManualEvent(true);
+      setEvent("");
     } else {
-      this.props.setManualEvent(false);
-      this.props.setEvent(newEvent.value);
+      setManualEvent(false);
+      setEvent(newEvent.value);
     }
-  }
+  };
 
-  onManualEventChange(event: ChangeEvent<HTMLInputElement>): void {
+  const handleManualEventChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const value = event.target.value;
 
     // Clear existing timer
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
     }
 
     // Set new timer to update after 500ms of no typing
-    this.debounceTimer = setTimeout(() => {
-      this.props.setEvent(value);
+    debounceTimer.current = setTimeout(() => {
+      setEvent(value);
     }, 500);
-  }
+  };
 
-  render(): React.ReactNode {
-    let eventKeyBox: React.ReactNode;
-    if (this.props.manualEvent) {
-      eventKeyBox = (
-        <input
-          type="text"
-          className="form-control"
-          id="event_key"
-          placeholder="Event Key"
-          onChange={this.onManualEventChange}
-        />
-      );
-    }
-
-    return (
-      <div className="form-group">
-        <label htmlFor="event_key_select" className="col-sm-2 control-label">
-          Select Event
-        </label>
-        <div className="col-sm-10">
-          <AsyncSelect<EventOption>
-            name="selectEvent"
-            placeholder="Select an Event..."
-            value={
-              this.state.eventSelectLabel
-                ? {
-                    label: this.state.eventSelectLabel,
-                    value: this.props.selectedEvent || "",
-                  }
-                : null
-            }
-            loadOptions={EventSelector.loadEvents}
-            onChange={this.onEventSelected}
-            defaultOptions
-          />
-          {eventKeyBox}
-        </div>
-      </div>
+  let eventKeyBox: React.ReactNode;
+  if (manualEvent) {
+    eventKeyBox = (
+      <input
+        type="text"
+        className="form-control"
+        id="event_key"
+        placeholder="Event Key"
+        onChange={handleManualEventChange}
+      />
     );
   }
-}
+
+  return (
+    <div className="form-group">
+      <label htmlFor="event_key_select" className="col-sm-2 control-label">
+        Select Event
+      </label>
+      <div className="col-sm-10">
+        <AsyncSelect<EventOption>
+          name="selectEvent"
+          placeholder="Select an Event..."
+          value={
+            eventSelectLabel
+              ? {
+                  label: eventSelectLabel,
+                  value: selectedEvent || "",
+                }
+              : null
+          }
+          loadOptions={loadEvents}
+          onChange={handleEventSelected}
+          defaultOptions
+        />
+        {eventKeyBox}
+      </div>
+    </div>
+  );
+};
 
 export default EventSelector;

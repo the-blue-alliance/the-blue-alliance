@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 import WebcastList from "./WebcastList";
 import { ApiEvent } from "../../constants/ApiEvent";
 
@@ -8,95 +8,78 @@ interface AddRemoveWebcastProps {
   removeWebcast: (index: number) => void;
 }
 
-interface AddRemoveWebcastState {
-  newWebcastUrl: string;
-  newWebcastDate: string;
-}
+const AddRemoveWebcast: React.FC<AddRemoveWebcastProps> = ({
+  eventInfo,
+  addWebcast,
+  removeWebcast,
+}) => {
+  const [newWebcastUrl, setNewWebcastUrl] = useState("");
+  const [newWebcastDate, setNewWebcastDate] = useState("");
 
-class AddRemoveWebcast extends Component<
-  AddRemoveWebcastProps,
-  AddRemoveWebcastState
-> {
-  constructor(props: AddRemoveWebcastProps) {
-    super(props);
-    this.state = {
-      newWebcastUrl: "",
-      newWebcastDate: "",
-    };
+  const handleNewWebcastUrlChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setNewWebcastUrl(event.target.value);
+  };
 
-    this.onNewWebcastUrlChange = this.onNewWebcastUrlChange.bind(this);
-    this.onNewWebcastDateChange = this.onNewWebcastDateChange.bind(this);
-    this.onAddWebcastClick = this.onAddWebcastClick.bind(this);
+  const handleNewWebcastDateChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setNewWebcastDate(event.target.value);
+  };
+
+  const handleAddWebcastClick = (): void => {
+    addWebcast(newWebcastUrl, newWebcastDate);
+    setNewWebcastUrl("");
+    setNewWebcastDate("");
+  };
+
+  let webcastList: React.ReactNode = null;
+  if (eventInfo && eventInfo.webcasts && eventInfo.webcasts.length > 0) {
+    webcastList = (
+      <WebcastList
+        webcasts={eventInfo.webcasts}
+        removeWebcast={removeWebcast}
+      />
+    );
+  } else {
+    webcastList = <p>No webcasts found</p>;
   }
 
-  onNewWebcastUrlChange(event: ChangeEvent<HTMLInputElement>): void {
-    this.setState({ newWebcastUrl: event.target.value });
-  }
+  return (
+    <div className="form-group row">
+      <label htmlFor="webcast_list" className="col-sm-2 control-label">
+        Webcasts
+      </label>
+      <div className="col-sm-10" id="webcast_list">
+        {webcastList}
 
-  onNewWebcastDateChange(event: ChangeEvent<HTMLInputElement>): void {
-    this.setState({ newWebcastDate: event.target.value });
-  }
-
-  onAddWebcastClick(): void {
-    this.props.addWebcast(this.state.newWebcastUrl, this.state.newWebcastDate);
-    this.setState({
-      newWebcastUrl: "",
-      newWebcastDate: "",
-    });
-  }
-
-  render(): React.ReactNode {
-    let webcastList: React.ReactNode = null;
-    if (this.props.eventInfo && this.props.eventInfo.webcasts && this.props.eventInfo.webcasts.length > 0) {
-      webcastList = (
-        <WebcastList
-          webcasts={this.props.eventInfo.webcasts}
-          removeWebcast={this.props.removeWebcast}
-        />
-      );
-    } else {
-      webcastList = <p>No webcasts found</p>;
-    }
-
-    return (
-      <div className="form-group row">
-        <label htmlFor="webcast_list" className="col-sm-2 control-label">
-          Webcasts
-        </label>
-        <div className="col-sm-10" id="webcast_list">
-          {webcastList}
-
-          <div style={{ display: "flex", gap: "0.5em" }}>
-            <input
-              type="text"
-              className="form-control"
-              id="webcast_url"
-              placeholder="https://youtu.be/abc123"
-              disabled={this.props.eventInfo === null}
-              onChange={this.onNewWebcastUrlChange}
-              value={this.state.newWebcastUrl}
-            />
-            <input
-              type="text"
-              className="form-control"
-              id="webcast_date"
-              placeholder="2025-03-02 (optional)"
-              disabled={this.props.eventInfo === null}
-              onChange={this.onNewWebcastDateChange}
-              value={this.state.newWebcastDate}
-            />
-            <button
-              className="btn btn-info"
-              onClick={this.onAddWebcastClick}
-              disabled={this.props.eventInfo === null}
-            >
-              Add Webcast
-            </button>
-          </div>
+        <div style={{ display: "flex", gap: "0.5em" }}>
+          <input
+            type="text"
+            className="form-control"
+            id="webcast_url"
+            placeholder="https://youtu.be/abc123"
+            disabled={eventInfo === null}
+            onChange={handleNewWebcastUrlChange}
+            value={newWebcastUrl}
+          />
+          <input
+            type="text"
+            className="form-control"
+            id="webcast_date"
+            placeholder="2025-03-02 (optional)"
+            disabled={eventInfo === null}
+            onChange={handleNewWebcastDateChange}
+            value={newWebcastDate}
+          />
+          <button
+            className="btn btn-info"
+            onClick={handleAddWebcastClick}
+            disabled={eventInfo === null}
+          >
+            Add Webcast
+          </button>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default AddRemoveWebcast;

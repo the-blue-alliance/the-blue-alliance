@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent } from "react";
+import React, { ChangeEvent, useState, useEffect } from "react";
 import PlayoffTypeDropdown from "./PlayoffTypeDropdown";
 import SyncCodeInput from "./SyncCodeInput";
 import AddRemoveWebcast from "./AddRemoveWebcast";
@@ -17,67 +17,35 @@ interface EventInfoTabProps {
   ) => Promise<T>;
 }
 
-interface EventInfoTabState {
-  eventInfo: ApiEvent | null;
-  status: string;
-  buttonClass: string;
-}
-
 interface PlayoffType {
   label: string;
   value: number;
 }
 
-class EventInfoTab extends Component<EventInfoTabProps, EventInfoTabState> {
-  constructor(props: EventInfoTabProps) {
-    super(props);
-    this.state = {
-      eventInfo: null,
-      status: "",
-      buttonClass: "btn-primary",
-    };
+const EventInfoTab: React.FC<EventInfoTabProps> = ({
+  selectedEvent,
+  makeTrustedRequest,
+  makeApiV3Request,
+}) => {
+  const [eventInfo, setEventInfo] = useState<ApiEvent | null>(null);
+  const [status, setStatus] = useState("");
+  const [buttonClass, setButtonClass] = useState("btn-primary");
 
-    this.loadEventInfo = this.loadEventInfo.bind(this);
-    this.setPlayoffType = this.setPlayoffType.bind(this);
-    this.updateEventInfo = this.updateEventInfo.bind(this);
-    this.onFirstCodeChange = this.onFirstCodeChange.bind(this);
-    this.addWebcast = this.addWebcast.bind(this);
-    this.removeWebcast = this.removeWebcast.bind(this);
-    this.addTeamMap = this.addTeamMap.bind(this);
-    this.removeTeamMap = this.removeTeamMap.bind(this);
-  }
-
-  UNSAFE_componentWillReceiveProps(newProps: EventInfoTabProps): void {
-    if (newProps.selectedEvent === null) {
-      this.setState({ eventInfo: null, buttonClass: "btn-primary" });
-    } else if (newProps.selectedEvent !== this.props.selectedEvent) {
-      this.loadEventInfo(newProps.selectedEvent);
-      this.setState({ buttonClass: "btn-primary" });
+  useEffect(() => {
+    if (selectedEvent === null) {
+      setEventInfo(null);
+      setButtonClass("btn-primary");
+    } else {
+      loadEventInfo(selectedEvent);
+      setButtonClass("btn-primary");
     }
-  }
+  }, [selectedEvent]);
 
-  onFirstCodeChange(event: ChangeEvent<HTMLInputElement>): void {
-    const currentInfo = this.state.eventInfo;
-    if (currentInfo !== null) {
-      currentInfo.first_event_code = event.target.value;
-      this.setState({ eventInfo: currentInfo });
-    }
-  }
-
-  setPlayoffType(newType: PlayoffType | null): void {
-    const currentInfo = this.state.eventInfo;
-    if (currentInfo !== null && newType !== null) {
-      currentInfo.playoff_type = newType.value;
-      currentInfo.playoff_type_string = newType.label;
-      this.setState({ eventInfo: currentInfo });
-    }
-  }
-
-  async loadEventInfo(newEventKey: string): Promise<void> {
-    this.setState({ status: "Loading event info..." });
+  const loadEventInfo = async (newEventKey: string): Promise<void> => {
+    setStatus("Loading event info...");
 
     try {
-      const data1 = await this.props.makeApiV3Request<ApiEvent>(`/api/v3/event/${newEventKey}`);
+      const data1 = await makeApiV3Request<ApiEvent>(`/api/v3/event/${newEventKey}`);
 
       // Merge in remap_teams
       const response2 = await fetch(`/_/remap_teams/${newEventKey}`);
@@ -87,107 +55,123 @@ class EventInfoTab extends Component<EventInfoTabProps, EventInfoTabState> {
       const data = Object.assign({}, data1);
       data.remap_teams = data2;
 
-      this.setState({ eventInfo: data, status: "" });
+      setEventInfo(data);
+      setStatus("");
     } catch (error) {
-      this.setState({ status: "" });
+      setStatus("");
     }
-  }
+  };
 
-  addWebcast(webcastUrl: string, webcastDate: string): void {
-    const currentInfo = this.state.eventInfo;
-    if (currentInfo !== null) {
-      if (!currentInfo.webcasts) {
-        currentInfo.webcasts = [];
+  const handleFirstCodeChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (eventInfo !== null) {
+      const newInfo = { ...eventInfo };
+      newInfo.first_event_code = event.target.value;
+      setEventInfo(newInfo);
+    }
+  };
+
+  const handleSetPlayoffType = (newType: PlayoffType | null): void => {
+    if (eventInfo !== null && newType !== null) {
+      const newInfo = { ...eventInfo };
+      newInfo.playoff_type = newType.value;
+      newInfo.playoff_type_string = newType.label;
+      setEventInfo(newInfo);
+    }
+  };
+
+  const handleAddWebcast = (webcastUrl: string, webcastDate: string): void => {
+    if (eventInfo !== null) {
+      const newInfo = { ...eventInfo };
+      if (!newInfo.webcasts) {
+        newInfo.webcasts = [];
       }
-      currentInfo.webcasts.push({
+      newInfo.webcasts.push({
         type: "",
         channel: "",
         url: webcastUrl,
         date: webcastDate ? webcastDate : undefined,
       });
-      this.setState({ eventInfo: currentInfo });
+      setEventInfo(newInfo);
     }
-  }
+  };
 
-  removeWebcast(indexToRemove: number): void {
-    const currentInfo = this.state.eventInfo;
-    if (currentInfo !== null && currentInfo.webcasts) {
-      currentInfo.webcasts.splice(indexToRemove, 1);
-      this.setState({ eventInfo: currentInfo });
+  const handleRemoveWebcast = (indexToRemove: number): void => {
+    if (eventInfo !== null && eventInfo.webcasts) {
+      const newInfo = { ...eventInfo };
+      newInfo.webcasts.splice(indexToRemove, 1);
+      setEventInfo(newInfo);
     }
-  }
+  };
 
-  addTeamMap(fromTeamKey: string, toTeamKey: string): void {
-    const currentInfo = this.state.eventInfo;
-    if (currentInfo !== null) {
-      if (!currentInfo.remap_teams) {
-        currentInfo.remap_teams = {};
+  const handleAddTeamMap = (fromTeamKey: string, toTeamKey: string): void => {
+    if (eventInfo !== null) {
+      const newInfo = { ...eventInfo };
+      if (!newInfo.remap_teams) {
+        newInfo.remap_teams = {};
       }
-      currentInfo.remap_teams[fromTeamKey] = toTeamKey;
-      this.setState({ eventInfo: currentInfo });
+      newInfo.remap_teams[fromTeamKey] = toTeamKey;
+      setEventInfo(newInfo);
     }
-  }
+  };
 
-  removeTeamMap(keyToRemove: string): void {
-    const currentInfo = this.state.eventInfo;
-    if (currentInfo !== null && currentInfo.remap_teams) {
-      delete currentInfo.remap_teams[keyToRemove];
-      this.setState({ eventInfo: currentInfo });
+  const handleRemoveTeamMap = (keyToRemove: string): void => {
+    if (eventInfo !== null && eventInfo.remap_teams) {
+      const newInfo = { ...eventInfo };
+      delete newInfo.remap_teams[keyToRemove];
+      setEventInfo(newInfo);
     }
-  }
+  };
 
-  async updateEventInfo(): Promise<void> {
-    this.setState({ buttonClass: "btn-warning" });
+  const handleUpdateEventInfo = async (): Promise<void> => {
+    setButtonClass("btn-warning");
     try {
-      await this.props.makeTrustedRequest(
-        `/api/trusted/v1/event/${this.props.selectedEvent}/info/update`,
-        JSON.stringify(this.state.eventInfo)
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/info/update`,
+        JSON.stringify(eventInfo)
       );
-      this.setState({ buttonClass: "btn-success" });
+      setButtonClass("btn-success");
     } catch (error) {
       alert(`Error: ${error}`);
     }
-  }
+  };
 
-  render(): React.ReactNode {
-    return (
-      <div className="tab-pane active col-xs-12" id="info">
-        <h3>Event Info</h3>
-        {this.state.status && <p>{this.state.status}</p>}
-        <div className="row" style={{ marginInline: "0" }}>
-          <PlayoffTypeDropdown
-            eventInfo={this.state.eventInfo}
-            setType={this.setPlayoffType}
-          />
+  return (
+    <div className="tab-pane active col-xs-12" id="info">
+      <h3>Event Info</h3>
+      {status && <p>{status}</p>}
+      <div className="row" style={{ marginInline: "0" }}>
+        <PlayoffTypeDropdown
+          eventInfo={eventInfo}
+          setType={handleSetPlayoffType}
+        />
 
-          <SyncCodeInput
-            eventInfo={this.state.eventInfo}
-            setSyncCode={this.onFirstCodeChange}
-          />
+        <SyncCodeInput
+          eventInfo={eventInfo}
+          setSyncCode={handleFirstCodeChange}
+        />
 
-          <AddRemoveWebcast
-            eventInfo={this.state.eventInfo}
-            addWebcast={this.addWebcast}
-            removeWebcast={this.removeWebcast}
-          />
+        <AddRemoveWebcast
+          eventInfo={eventInfo}
+          addWebcast={handleAddWebcast}
+          removeWebcast={handleRemoveWebcast}
+        />
 
-          <AddRemoveTeamMap
-            eventInfo={this.state.eventInfo}
-            addTeamMap={this.addTeamMap}
-            removeTeamMap={this.removeTeamMap}
-          />
+        <AddRemoveTeamMap
+          eventInfo={eventInfo}
+          addTeamMap={handleAddTeamMap}
+          removeTeamMap={handleRemoveTeamMap}
+        />
 
-          <button
-            className={`btn ${this.state.buttonClass}`}
-            onClick={this.updateEventInfo}
-            disabled={this.state.eventInfo === null}
-          >
-            Publish Changes
-          </button>
-        </div>
+        <button
+          className={`btn ${buttonClass}`}
+          onClick={handleUpdateEventInfo}
+          disabled={eventInfo === null}
+        >
+          Publish Changes
+        </button>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default EventInfoTab;
