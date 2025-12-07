@@ -808,7 +808,7 @@ def test_file_upload_no_file_param(
 
     with api_client.application.test_request_context():  # pyre-ignore[16]
         request_data = ""
-        request_path = "/api/trusted/v1/event/2019nyny/fms_reports/qual_rankings"
+        request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
         resp = api_client.post(
             request_path,
             headers={
@@ -844,7 +844,7 @@ def test_file_upload_mismatched_digest(
         wrong_digest = hashlib.sha256(b"wrong content").hexdigest()
         correct_digest = hashlib.sha256(file_content).hexdigest()
 
-        request_path = "/api/trusted/v1/event/2019nyny/fms_reports/qual_rankings"
+        request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
         # Create file storage object
         file_storage = FileStorage(
@@ -890,7 +890,7 @@ def test_file_upload_correct_digest(
         file_content = create_excel_file()
         file_digest = hashlib.sha256(file_content).hexdigest()
 
-        request_path = "/api/trusted/v1/event/2019nyny/fms_reports/qual_rankings"
+        request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
         # Create file storage object
         file_storage = FileStorage(
@@ -947,7 +947,7 @@ def test_file_upload_succeeds_with_correct_permission(
         file_content = create_excel_file()
         file_digest = hashlib.sha256(file_content).hexdigest()
 
-        request_path = f"/api/trusted/v1/event/2019nyny/fms_reports/{report_type}"
+        request_path = f"/_eventwizard/event/2019nyny/fms_reports/{report_type}"
 
         # Create file storage object
         file_storage = FileStorage(
