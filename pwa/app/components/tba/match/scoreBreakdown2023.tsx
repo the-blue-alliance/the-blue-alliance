@@ -14,7 +14,7 @@ export default function ScoreBreakdown2023({
   match: Match;
 }) {
   return (
-    <Table className="text-center">
+    <Table className="table-fixed overflow-hidden rounded-lg text-center">
       <colgroup>
         <col />
         <col className="w-[45%]" />
@@ -23,7 +23,7 @@ export default function ScoreBreakdown2023({
       <TableBody>
         {/* Mobility */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-dark">
             <ConditionalCheckmark
               condition={scoreBreakdown.red.mobilityRobot1 === 'Yes'}
               teamKey={match.alliances.red.team_keys[0].substring(3)}
@@ -37,8 +37,8 @@ export default function ScoreBreakdown2023({
               teamKey={match.alliances.red.team_keys[2].substring(3)}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Mobility</TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-gray-200">Mobility</TableCell>
+          <TableCell className="bg-alliance-blue-dark">
             <ConditionalCheckmark
               condition={scoreBreakdown.blue.mobilityRobot1 === 'Yes'}
               teamKey={match.alliances.blue.team_keys[0].substring(3)}
