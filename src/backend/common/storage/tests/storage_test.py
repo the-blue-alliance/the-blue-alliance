@@ -52,16 +52,24 @@ def test_client_for_env_unit_test_remote(set_storage_mode_remote):
     assert isinstance(client, InMemoryClient)
 
 
-def test_client_for_env_dev(set_override_tba_test, set_dev):
+def test_client_for_env_dev(set_override_tba_test, set_dev, set_project):
     client = storage._client_for_env()
     assert isinstance(client, LocalStorageClient)
-    assert client.base_path == Path(tempfile.gettempdir())
+    assert (
+        client.base_path
+        == Path(tempfile.gettempdir()) / "tbatv-prod-hrd" / "tbatv-prod-hrd.appspot.com"
+    )
 
 
-def test_client_for_env_dev_path(set_override_tba_test, set_dev, set_storage_path):
+def test_client_for_env_dev_path(
+    set_override_tba_test, set_dev, set_storage_path, set_project
+):
     client = storage._client_for_env()
     assert isinstance(client, LocalStorageClient)
-    assert client.base_path == Path("some/fake/path")
+    assert (
+        client.base_path
+        == Path("some/fake/path") / "tbatv-prod-hrd" / "tbatv-prod-hrd.appspot.com"
+    )
 
 
 def test_client_for_env_dev_remote_no_project(
@@ -84,7 +92,9 @@ def test_client_for_env_dev_remote(
     ) as gcloud_storage_client_init:
         client = storage._client_for_env()
 
-    gcloud_storage_client_init.assert_called_with("tbatv-prod-hrd")
+    gcloud_storage_client_init.assert_called_with(
+        "tbatv-prod-hrd", "tbatv-prod-hrd.appspot.com"
+    )
     assert isinstance(client, GCloudStorageClient)
 
 
@@ -104,7 +114,9 @@ def test_client_for_env_production(set_override_tba_test, set_prod, set_project)
     ) as gcloud_storage_client_init:
         client = storage._client_for_env()
 
-    gcloud_storage_client_init.assert_called_with("tbatv-prod-hrd")
+    gcloud_storage_client_init.assert_called_with(
+        "tbatv-prod-hrd", "tbatv-prod-hrd.appspot.com"
+    )
     assert isinstance(client, GCloudStorageClient)
 
 
@@ -116,7 +128,7 @@ def test_write():
     with patch.object(storage, "_client_for_env", return_value=client):
         storage.write(file_name, content)
 
-    client.write.assert_called_with(file_name, content)
+    client.write.assert_called_with(file_name, content, "text/plain", None)
 
 
 def test_read():

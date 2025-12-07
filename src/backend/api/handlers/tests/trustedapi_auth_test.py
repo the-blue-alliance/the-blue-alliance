@@ -1,14 +1,18 @@
 import datetime
+import hashlib
+import io
 import json
 import random
 import string
 from typing import List, Optional, Tuple
 from unittest.mock import Mock
 
+import pytest
 from freezegun import freeze_time
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from pytest import MonkeyPatch
+from werkzeug.datastructures import FileStorage
 from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
@@ -16,6 +20,10 @@ from backend.common import auth
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
+from backend.common.consts.fms_report_type import (
+    FMSReportType,
+    REQUIRED_REPORT_PERMISSOINS,
+)
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -88,6 +96,20 @@ def setup_api_auth(
     auth.put()
 
     return none_throws(auth.key.string_id()), none_throws(auth.secret)
+
+
+def create_excel_file() -> bytes:
+    """Create a minimal valid Excel file for testing"""
+    from openpyxl import Workbook
+
+    wb = Workbook()
+    ws = wb.active
+    ws["A1"] = "Test Data"
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return output.read()
 
 
 def test_no_event(ndb_stub, api_client: Client) -> None:
@@ -764,3 +786,189 @@ def test_explicit_auth_all_official_events_not_current_year_fails(
 
     assert resp.status_code == 401, resp.data
     assert "Error" in resp.json
+
+
+# File upload tests
+
+
+@freeze_time("2019-06-01")
+def test_file_upload_no_file_param(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    When fileParam is set but no file is provided, the request should fail
+    """
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_RANKINGS],
+        expiration=None,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = ""
+        request_path = "/api/trusted/v1/event/2019nyny/fms_reports/qual_rankings"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data={},
+        )
+
+    assert resp.status_code == 401
+    assert "Expected file upload not found" in resp.json["Error"]
+
+
+@freeze_time("2019-06-01")
+def test_file_upload_mismatched_digest(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    When the fileDigest in form data doesn't match the computed digest, request should fail
+    """
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_RANKINGS],
+        expiration=None,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        file_content = create_excel_file()
+        wrong_digest = hashlib.sha256(b"wrong content").hexdigest()
+        correct_digest = hashlib.sha256(file_content).hexdigest()
+
+        request_path = "/api/trusted/v1/event/2019nyny/fms_reports/qual_rankings"
+
+        # Create file storage object
+        file_storage = FileStorage(
+            stream=io.BytesIO(file_content),
+            filename="test.xlsx",
+            content_type="application/vnd.ms-excel",
+        )
+
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, correct_digest
+                ),
+            },
+            data={
+                "reportFile": file_storage,
+                "fileDigest": wrong_digest,
+            },
+        )
+
+    assert resp.status_code == 401
+    assert "File digest does not match" in resp.json["Error"]
+
+
+@freeze_time("2019-06-01")
+def test_file_upload_correct_digest(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    When the fileDigest matches the file content, and the user has correct permissions, request should succeed
+    """
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_RANKINGS],
+        expiration=None,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        file_content = create_excel_file()
+        file_digest = hashlib.sha256(file_content).hexdigest()
+
+        request_path = "/api/trusted/v1/event/2019nyny/fms_reports/qual_rankings"
+
+        # Create file storage object
+        file_storage = FileStorage(
+            stream=io.BytesIO(file_content),
+            filename="test.xlsx",
+            content_type="application/vnd.ms-excel",
+        )
+
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, file_digest
+                ),
+            },
+            data={
+                "reportFile": file_storage,
+                "fileDigest": file_digest,
+            },
+        )
+
+    assert resp.status_code == 200
+    assert "Success" in resp.json
+
+
+@pytest.mark.parametrize(
+    "report_type,required_permission",
+    [
+        (report_type.value, REQUIRED_REPORT_PERMISSOINS[report_type])
+        for report_type in FMSReportType
+    ],
+)
+@freeze_time("2019-06-01")
+def test_file_upload_succeeds_with_correct_permission(
+    report_type: str,
+    required_permission: AuthType,
+    monkeypatch: MonkeyPatch,
+    ndb_stub,
+    api_client: Client,
+) -> None:
+    """
+    Test that each FMS report type succeeds when the correct permission is provided
+    """
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[required_permission],
+        expiration=None,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        file_content = create_excel_file()
+        file_digest = hashlib.sha256(file_content).hexdigest()
+
+        request_path = f"/api/trusted/v1/event/2019nyny/fms_reports/{report_type}"
+
+        # Create file storage object
+        file_storage = FileStorage(
+            stream=io.BytesIO(file_content),
+            filename="test.xlsx",
+            content_type="application/vnd.ms-excel",
+        )
+
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, file_digest
+                ),
+            },
+            data={
+                "reportFile": file_storage,
+                "fileDigest": file_digest,
+            },
+        )
+
+    assert resp.status_code == 200
+    assert "Success" in resp.json

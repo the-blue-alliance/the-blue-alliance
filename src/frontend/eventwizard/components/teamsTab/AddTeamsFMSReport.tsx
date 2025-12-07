@@ -8,6 +8,7 @@ import Input from "@mui/material/Input";
 import TeamList from "./TeamList";
 import { ApiTeam } from "../../constants/ApiTeam";
 import XLSX from "xlsx";
+import { uploadFmsReport } from "../../utils/fmsReportUpload";
 
 interface AddTeamsFMSReportProps {
   selectedEvent: string | null;
@@ -18,6 +19,10 @@ interface AddTeamsFMSReportProps {
   ) => void;
   clearTeams?: () => void;
   showErrorMessage: (message: string) => void;
+  makeTrustedRequest: (
+    requestPath: string,
+    requestBody: string | FormData
+  ) => Promise<Response>;
 }
 
 interface AddTeamsFMSReportState {
@@ -25,6 +30,7 @@ interface AddTeamsFMSReportState {
   message: string;
   stagingTeamKeys: string[];
   stagingTeams: ApiTeam[];
+  selectedFile: File | null;
 }
 
 interface FMSTeamRow {
@@ -43,6 +49,7 @@ class AddTeamsFMSReport extends Component<
       message: "",
       stagingTeamKeys: [],
       stagingTeams: [],
+      selectedFile: null,
     };
     this.onFileChange = this.onFileChange.bind(this);
     this.parseFMSReport = this.parseFMSReport.bind(this);
@@ -57,10 +64,11 @@ class AddTeamsFMSReport extends Component<
       this.setState({
         selectedFileName: name,
         message: "Processing file...",
+        selectedFile: f,
       });
       reader.readAsBinaryString(f);
     } else {
-      this.setState({ selectedFileName: "" });
+      this.setState({ selectedFileName: "", selectedFile: null });
     }
   }
 
@@ -120,12 +128,14 @@ class AddTeamsFMSReport extends Component<
         selectedFileName: "",
         stagingTeams: [],
         stagingTeamKeys: [],
+        selectedFile: null,
       });
     };
 
     const handleOk = () => {
       const teamKeys = this.state.stagingTeamKeys;
       const teamCount = this.state.stagingTeams.length;
+      const file = this.state.selectedFile;
       this.setState({
         message: "Uploading teams...",
         stagingTeamKeys: [],
@@ -133,18 +143,33 @@ class AddTeamsFMSReport extends Component<
       });
       this.props.updateTeamList(
         teamKeys,
-        () => {
+        async () => {
+          // Upload the FMS report file to the backend for archival
+          if (file && this.props.selectedEvent) {
+            try {
+              await uploadFmsReport(file, this.props.selectedEvent, "team_list", this.props.makeTrustedRequest);
+            } catch (error) {
+              console.error("Error uploading FMS report:", error);
+            }
+          }
+          
           this.setState({
             selectedFileName: "",
             message: `${teamCount} teams added to ${this.props.selectedEvent}`,
             stagingTeamKeys: [],
             stagingTeams: [],
+            selectedFile: null,
           });
           if (this.props.clearTeams) {
             this.props.clearTeams();
           }
         },
-        (error: string) => this.props.showErrorMessage(`${error}`)
+        (error: string) => {
+          this.props.showErrorMessage(`${error}`);
+          this.setState({
+            selectedFile: null,
+          });
+        }
       );
     };
 

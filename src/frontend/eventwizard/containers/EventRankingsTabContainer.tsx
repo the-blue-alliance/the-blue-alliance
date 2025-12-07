@@ -7,7 +7,7 @@ const mapStateToProps = (state: RootState) => ({
   selectedEvent: state.auth.selectedEvent,
   makeTrustedRequest: (
     requestPath: string,
-    requestBody: string
+    requestBody: string | FormData
   ) => {
     return makeTrustedApiRequest(
       state.auth.authId || "",

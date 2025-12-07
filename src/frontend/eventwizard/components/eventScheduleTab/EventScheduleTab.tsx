@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent } from "react";
 import { parseScheduleFile } from "../../utils/scheduleParser";
 import { ScheduleMatch } from "../../utils/scheduleParser";
+import { uploadFmsReport } from "../../utils/fmsReportUpload";
 
 export interface EventScheduleTabProps {
   selectedEvent: string;
@@ -145,6 +146,18 @@ const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
         `event/${selectedEvent}/matches/update`,
         JSON.stringify(matchData)
       );
+      
+      // Upload the FMS report file to the backend for archival
+      // Determine report type based on competition level filter
+      let reportType = "qual_schedule";
+      if (compLevelFilter !== "qm" && compLevelFilter !== "all") {
+        reportType = "playoff_schedule";
+      }
+      
+      if (file) {
+        await uploadFmsReport(file, selectedEvent, reportType, makeTrustedRequest);
+      }
+      
       setUploading(false);
       setStatusMessage(
         `Successfully uploaded ${matches.length} matches to TBA!`

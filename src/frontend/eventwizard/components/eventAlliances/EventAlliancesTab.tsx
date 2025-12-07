@@ -15,7 +15,7 @@ export interface EventAlliancesTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string
+    body: string | FormData
   ) => Promise<Response>;
 }
 
@@ -144,6 +144,7 @@ const EventAlliancesTab: React.FC<EventAlliancesTabProps> = ({
               <FMSAllianceImport
                 selectedEvent={selectedEvent}
                 updateAlliances={handleFMSImport}
+                makeTrustedRequest={makeTrustedRequest}
               />
             </div>
           </div>

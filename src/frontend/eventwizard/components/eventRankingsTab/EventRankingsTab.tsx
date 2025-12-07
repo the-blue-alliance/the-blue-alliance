@@ -1,15 +1,17 @@
 import React, { useState, ChangeEvent } from "react";
 import { parseRankingsFile, Ranking } from "../../utils/rankingsParser";
+import { uploadFmsReport } from "../../utils/fmsReportUpload";
 
 interface EventRankingsTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     requestPath: string,
-    requestBody: string
+    requestBody: string | FormData
   ) => Promise<Response>;
 }
 
 function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTabProps): React.ReactElement {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [rankings, setRankings] = useState<Ranking[]>([]);
   const [breakdowns, setBreakdowns] = useState<string[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -25,6 +27,7 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
 
     setLoading(true);
     setStatusMessage("Loading rankings...");
+    setSelectedFile(selectedFile);
 
     try {
       const result = await parseRankingsFile(selectedFile);
@@ -69,6 +72,11 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
         JSON.stringify(requestBody)
       );
       setStatusMessage("Rankings uploaded successfully!");
+      
+      if (selectedFile) {
+        await uploadFmsReport(selectedFile, selectedEvent, "qual_rankings", makeTrustedRequest);
+      }
+      
       setUploading(false);
     } catch (error) {
       setStatusMessage(`Error uploading rankings: ${error}`);

@@ -12,7 +12,7 @@ interface TeamListTabProps {
   selectedEvent: string | null;
   makeTrustedRequest: (
     path: string,
-    body: string
+    body: string | FormData
   ) => Promise<Response>;
 }
 
@@ -109,6 +109,7 @@ class TeamListTab extends Component<TeamListTabProps, TeamListTabState> {
               updateTeamList={this.updateTeamList}
               showErrorMessage={this.showError}
               clearTeams={this.clearTeams}
+              makeTrustedRequest={this.props.makeTrustedRequest}
             />
             <hr />
 

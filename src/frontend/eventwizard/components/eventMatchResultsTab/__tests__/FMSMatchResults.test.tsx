@@ -17,6 +17,18 @@ jest.mock("../../../utils/resultsParser");
 
 installMockFileReader();
 
+// Mock crypto.subtle.digest for SHA-256 hashing
+global.crypto.subtle = {
+  digest: jest.fn(async (algorithm: string, data: ArrayBuffer) => {
+    // Return a mock digest (in real tests, this would compute the actual SHA-256)
+    // We'll just return a consistent buffer for testing
+    const mockDigest = new ArrayBuffer(32);
+    const view = new Uint8Array(mockDigest);
+    view.fill(0xAB); // Fill with a constant value for predictable tests
+    return mockDigest;
+  }),
+} as any;
+
 describe("FMSMatchResults", () => {
   const mockMakeTrustedRequest = jest.fn();
   const selectedEvent = "2024nytr";
@@ -201,6 +213,14 @@ describe("FMSMatchResults", () => {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
 
+      // Mock the arrayBuffer method on the file
+      const arrayBuffer = new ArrayBuffer(12);
+      const view = new Uint8Array(arrayBuffer);
+      view.set([100, 117, 109, 109, 121, 32, 99, 111, 110, 116, 101, 110]);
+      Object.defineProperty(file, "arrayBuffer", {
+        value: jest.fn().mockResolvedValue(arrayBuffer),
+      });
+
       fireEvent.change(fileInput, { target: { files: [file] } });
 
       await waitFor(() => {
@@ -237,6 +257,14 @@ describe("FMSMatchResults", () => {
       const fileInput = screen.getByLabelText("FMS Results Excel File");
       const file = new File(["dummy content"], "test.xlsx", {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      // Mock the arrayBuffer method on the file
+      const arrayBuffer = new ArrayBuffer(12);
+      const view = new Uint8Array(arrayBuffer);
+      view.set([100, 117, 109, 109, 121, 32, 99, 111, 110, 116, 101, 110]);
+      Object.defineProperty(file, "arrayBuffer", {
+        value: jest.fn().mockResolvedValue(arrayBuffer),
       });
 
       fireEvent.change(fileInput, { target: { files: [file] } });

@@ -6,6 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import Input from "@mui/material/Input";
 import { parseFmsAlliancesFile } from "../../utils/fmsAlliancesParser";
+import { uploadFmsReport } from "../../utils/fmsReportUpload";
 
 interface FMSAllianceImportProps {
   selectedEvent: string | null;
@@ -14,12 +15,17 @@ interface FMSAllianceImportProps {
     onSuccess: () => void,
     onError: (error: string) => void
   ) => void;
+  makeTrustedRequest: (
+    requestPath: string,
+    requestBody: string | FormData
+  ) => Promise<Response>;
 }
 
 interface FMSAllianceImportState {
   selectedFileName: string;
   message: string;
   stagingAlliances: string[][];
+  selectedFile: File | null;
 }
 
 class FMSAllianceImport extends Component<
@@ -32,6 +38,7 @@ class FMSAllianceImport extends Component<
       selectedFileName: "",
       message: "",
       stagingAlliances: [],
+      selectedFile: null,
     };
     this.onFileChange = this.onFileChange.bind(this);
     this.parseFMSReport = this.parseFMSReport.bind(this);
@@ -44,10 +51,11 @@ class FMSAllianceImport extends Component<
       this.setState({
         selectedFileName: name,
         message: "Processing file...",
+        selectedFile: f,
       });
       this.parseFMSReport(f);
     } else {
-      this.setState({ selectedFileName: "" });
+      this.setState({ selectedFileName: "", selectedFile: null });
     }
   }
 
@@ -83,28 +91,41 @@ class FMSAllianceImport extends Component<
         selectedFileName: "",
         stagingAlliances: [],
         message: "",
+        selectedFile: null,
       });
     };
 
-    const handleOk = () => {
+    const handleOk = async () => {
       const alliances = this.state.stagingAlliances;
+      const file = this.state.selectedFile;
       this.setState({
         message: "Uploading alliances...",
         stagingAlliances: [],
       });
       this.props.updateAlliances(
         alliances,
-        () => {
+        async () => {
+          // Upload the FMS report file to the backend for archival
+          if (file && this.props.selectedEvent) {
+            try {
+              await uploadFmsReport(file, this.props.selectedEvent, "playoff_alliances", this.props.makeTrustedRequest);
+            } catch (error) {
+              console.error("Error uploading FMS report:", error);
+            }
+          }
+          
           this.setState({
             selectedFileName: "",
             message: `${alliances.length} alliance${alliances.length !== 1 ? "s" : ""} uploaded to ${this.props.selectedEvent}`,
             stagingAlliances: [],
+            selectedFile: null,
           });
         },
         (error: string) => {
           this.setState({
             message: `Error: ${error}`,
             stagingAlliances: [],
+            selectedFile: null,
           });
         }
       );
