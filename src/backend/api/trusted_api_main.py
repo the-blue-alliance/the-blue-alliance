@@ -6,7 +6,6 @@ from flask_cors import CORS
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.trusted import (
     add_event_media,
-    add_fms_report_archive,
     add_match_video,
     add_match_zebra_motionworks_info,
     delete_all_event_matches,
@@ -89,11 +88,6 @@ trusted_api.add_url_rule(
     "/event/<string:event_key>/zebra_motionworks/add",
     methods=["POST"],
     view_func=add_match_zebra_motionworks_info,
-)
-trusted_api.add_url_rule(
-    "/event/<string:event_key>/fms_reports/<string:report_type>",
-    methods=["POST"],
-    view_func=add_fms_report_archive,
 )
 
 

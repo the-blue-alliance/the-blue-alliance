@@ -23,7 +23,7 @@ export async function uploadFmsReport(
   formData.append("fileDigest", fileDigest);
   
   await makeTrustedRequest(
-    `/api/trusted/v1/event/${eventKey}/fms_reports/${reportType}`,
+    `/_eventwizard/event/${eventKey}/fms_reports/${reportType}`,
     formData
   );
 }
