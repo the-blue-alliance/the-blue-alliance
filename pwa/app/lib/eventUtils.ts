@@ -165,3 +165,24 @@ export function getDivisionShortform(divisionName: string): string {
   // If no match found, take first 3 letters
   return divisionName.substring(0, 3);
 }
+
+export function isEventWithinDays(
+  event: Event,
+  negativeDaysBefore: number,
+  positiveDaysAfter: number,
+): boolean {
+  if (event.start_date === null || event.end_date === null) {
+    return false;
+  }
+  const DAY_IN_MS = 24 * 60 * 60 * 1000;
+  const startDate = getLocalMidnightOnDate(event.start_date);
+  const endDate = getLocalMidnightOnDate(event.end_date);
+  const now = new Date();
+  const windowStart = startDate.getTime() - negativeDaysBefore * DAY_IN_MS;
+  const windowEnd = endDate.getTime() + positiveDaysAfter * 2 * DAY_IN_MS;
+  return now.getTime() >= windowStart && now.getTime() <= windowEnd;
+}
+
+export function isEventWithinADay(event: Event): boolean {
+  return isEventWithinDays(event, -1, 1);
+}

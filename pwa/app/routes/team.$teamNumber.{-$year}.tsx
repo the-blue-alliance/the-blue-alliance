@@ -1,4 +1,9 @@
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  notFound,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
@@ -114,6 +119,12 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     }
 
     if (!yearsParticipated.data.includes(year)) {
+      if (params.year === undefined) {
+        throw redirect({
+          to: '/team/$teamNumber/history',
+          params: { teamNumber: params.teamNumber },
+        });
+      }
       throw notFound();
     }
 

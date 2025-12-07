@@ -1,4 +1,3 @@
-import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { SearchIndex } from '~/api/tba/read';
@@ -16,7 +15,6 @@ import { ProdAPIProvider } from '~/lib/search/prodAPIProvider';
 import { cn } from '~/lib/utils';
 
 export default function Searchbar() {
-  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
@@ -51,9 +49,9 @@ export default function Searchbar() {
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // Toggle the menu when ⌘K or ctrl-k is pressed
   useEffect(() => {
     function listener(e: KeyboardEvent) {
+      // Toggle the menu when ⌘K or ctrl-k is pressed
       if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         setIsOpen((o) => !o);
@@ -63,6 +61,11 @@ export default function Searchbar() {
         } else {
           inputRef.current?.focus();
         }
+      }
+
+      // Dismiss menu when escape is pressed
+      if (e.key === 'Escape') {
+        setIsOpen(false);
       }
     }
 
@@ -102,7 +105,8 @@ export default function Searchbar() {
 
       <CommandList
         className={cn(
-          'fixed top-14 z-50 w-64 border border-gray-200 bg-white shadow-lg',
+          `fixed top-14 z-50 w-64 rounded-lg border border-gray-200 bg-white
+          shadow-lg`,
           {
             hidden: !isOpen,
           },
@@ -114,12 +118,14 @@ export default function Searchbar() {
               <CommandItem
                 key={team.key}
                 onSelect={() => {
-                  void navigate({ to: `/team/${team.key.substring(3)}` });
                   setIsOpen(false);
                 }}
                 asChild
               >
-                <TeamLink teamOrKey={team.key}>
+                <TeamLink
+                  teamOrKey={team.key}
+                  className="cursor-pointer hover:no-underline"
+                >
                   {team.key.substring(3)} - {team.nickname}
                 </TeamLink>
               </CommandItem>
@@ -133,11 +139,14 @@ export default function Searchbar() {
               <CommandItem
                 key={event.key}
                 onSelect={() => {
-                  void navigate({ to: `/event/${event.key}` });
                   setIsOpen(false);
                 }}
+                asChild
               >
-                <EventLink eventOrKey={event.key}>
+                <EventLink
+                  eventOrKey={event.key}
+                  className="cursor-pointer hover:no-underline"
+                >
                   {event.key.substring(0, 4)} {event.name} [
                   {event.key.substring(4)}]
                 </EventLink>

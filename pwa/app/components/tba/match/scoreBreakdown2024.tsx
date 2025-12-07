@@ -18,7 +18,7 @@ export default function ScoreBreakdown2024({
   match: Match;
 }) {
   return (
-    <Table className="table-fixed text-center">
+    <Table className="table-fixed overflow-hidden rounded-lg text-center">
       <colgroup>
         <col />
         <col className="w-[45%]" />

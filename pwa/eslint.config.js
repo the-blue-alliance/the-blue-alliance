@@ -42,7 +42,7 @@ export default tseslint.config([
       '@typescript-eslint/only-throw-error': [
         'error',
         {
-          allow: ['NotFoundError'],
+          allow: ['NotFoundError', 'Redirect'],
         },
       ],
       '@typescript-eslint/no-non-null-assertion': ['error'],

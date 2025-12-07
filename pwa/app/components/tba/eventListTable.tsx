@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { getEventDateString } from '~/lib/eventUtils';
+import { getEventDateString, isEventWithinADay } from '~/lib/eventUtils';
 
 export default function EventListTable({ events }: { events: Event[] }) {
   return (
@@ -26,39 +26,54 @@ export default function EventListTable({ events }: { events: Event[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {events.map((event) => (
-          <TableRow key={event.key}>
-            <TableCell className="w-8/12">
-              <Link
-                className="text-base"
-                to="/event/$eventKey"
-                params={{ eventKey: event.key }}
-              >
-                {event.name}
-              </Link>
-              <div className="text-sm text-neutral-600">
-                {event.city}, {event.state_prov}, {event.country}
-              </div>
-            </TableCell>
-            <TableCell className="mt-2 flex justify-center md:mt-1">
-              {event.webcasts.length > 0 && (
-                <Button asChild variant="success">
-                  <a
-                    href={`https://www.thebluealliance.com/gameday/${event.key}`}
-                    target="_blank"
-                    rel="noreferrer"
+        {events.map((event) => {
+          const withinADay = isEventWithinADay(event);
+          return (
+            <TableRow key={event.key}>
+              <TableCell className="w-8/12">
+                <Link
+                  className="text-base"
+                  to="/event/$eventKey"
+                  params={{ eventKey: event.key }}
+                >
+                  {event.name}
+                </Link>
+                <div className="text-sm text-neutral-600">
+                  {event.city}, {event.state_prov}, {event.country}
+                </div>
+              </TableCell>
+              <TableCell className="mt-2 flex justify-center md:mt-1">
+                {event.webcasts.length > 0 && (
+                  <Button
+                    asChild
+                    variant={withinADay ? 'success' : 'secondary'}
+                    disabled={!withinADay}
+                    className={
+                      !withinADay ? 'pointer-events-none opacity-50' : ''
+                    }
                   >
-                    <InlineIcon iconSize="large">
-                      <MdiVideo />
-                      <span className="hidden md:contents">Watch Now</span>
-                    </InlineIcon>
-                  </a>
-                </Button>
-              )}
-            </TableCell>
-            <TableCell>{getEventDateString(event, 'short')}</TableCell>
-          </TableRow>
-        ))}
+                    <a
+                      href={`https://www.thebluealliance.com/gameday/${event.key}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hover:no-underline"
+                      aria-disabled={!withinADay}
+                      tabIndex={withinADay ? undefined : -1}
+                    >
+                      <InlineIcon iconSize="large">
+                        <MdiVideo />
+                        <span className="hidden md:contents">
+                          {withinADay ? 'Watch Now' : 'Offline'}
+                        </span>
+                      </InlineIcon>
+                    </a>
+                  </Button>
+                )}
+              </TableCell>
+              <TableCell>{getEventDateString(event, 'short')}</TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

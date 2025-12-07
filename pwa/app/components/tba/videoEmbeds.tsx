@@ -12,7 +12,7 @@ export function YoutubeEmbed({
   return (
     <div className={cn('relative aspect-video h-auto w-full', className)}>
       <iframe
-        src={`https://www.youtube.com/embed/${videoId}`}
+        src={`https://www.youtube.com/embed/${videoId.replace('?t=', '?start=')}`}
         title={title}
         allowFullScreen
         className="absolute inset-0 h-full w-full rounded-lg shadow-lg"
