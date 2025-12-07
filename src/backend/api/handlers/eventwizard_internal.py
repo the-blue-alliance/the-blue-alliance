@@ -10,6 +10,7 @@ from pyre_extensions import none_throws
 from backend.api.handlers.decorators import require_write_auth, validate_keys
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.auth import current_user
+from backend.common.consts.auth_type import AuthType
 from backend.common.models.keys import EventKey
 from backend.common.storage import (
     get_files as storage_get_files,
@@ -66,7 +67,7 @@ def add_fms_report_archive(event_key: EventKey, report_type: str) -> Response:
     return profiled_jsonify({"Success": "FMS report successfully uploaded"})
 
 
-@require_write_auth(None, file_param="companionDb")
+@require_write_auth({AuthType.EVENT_TEAMS}, file_param="companionDb")
 @validate_keys
 def add_fms_companion_db(event_key: EventKey) -> Response:
     form_data = request.files.get("companionDb")
@@ -82,7 +83,7 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
     if not file_contents.startswith(b"SQLite format 3"):
         logging.warning("Uploaded file does not appear to be a valid SQLite database")
         return make_response(
-            profiled_jsonify({"Error": "Uploaded file is not a valid SQLite database"}),
+            profiled_jsonify({"Error": "Uploaded file is not valid"}),
             400,
         )
 
