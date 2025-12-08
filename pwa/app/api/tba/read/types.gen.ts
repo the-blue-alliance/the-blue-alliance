@@ -1251,6 +1251,48 @@ export type Stage3TargetColor2020 =
   | 'Unknown'
   | 'Yellow';
 
+export type EndgameRobot2022 = 'High' | 'Low' | 'Mid' | 'None' | 'Traversal';
+
+export type TaxiRobot2022 = 'No' | 'Yes';
+
+export type BridgeState2023 = 'Level' | 'NotLevel';
+
+export type AutoChargeStationRobot2023 = 'Docked' | 'None';
+
+export type EndGameChargeStationRobot2023 =
+  | 'Docked'
+  | 'None'
+  | 'Park'
+  | 'Parked';
+
+export type MobilityRobot2023 = 'No' | 'Yes';
+
+export type AutoLineRobot2024 = 'No' | 'Yes';
+
+export type EndGameRobot2024 =
+  | 'CenterStage'
+  | 'None'
+  | 'Parked'
+  | 'StageLeft'
+  | 'StageRight';
+
+export type EndGameRobot2025 = 'DeepCage' | 'None' | 'Parked' | 'ShallowCage';
+
+export type ReefRow2025 = {
+  nodeA: boolean;
+  nodeB: boolean;
+  nodeC: boolean;
+  nodeD: boolean;
+  nodeE: boolean;
+  nodeF: boolean;
+  nodeG: boolean;
+  nodeH: boolean;
+  nodeI: boolean;
+  nodeJ: boolean;
+  nodeK: boolean;
+  nodeL: boolean;
+};
+
 /**
  * See the 2015 FMS API documentation for a description of each value
  */
@@ -1687,12 +1729,12 @@ export type MatchScoreBreakdown2022 = {
 };
 
 export type MatchScoreBreakdown2022Alliance = {
-  taxiRobot1?: 'Yes' | 'No';
-  endgameRobot1?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
-  taxiRobot2?: 'Yes' | 'No';
-  endgameRobot2?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
-  taxiRobot3?: 'Yes' | 'No';
-  endgameRobot3?: 'Traversal' | 'High' | 'Mid' | 'Low' | 'None';
+  taxiRobot1?: TaxiRobot2022;
+  endgameRobot1?: EndgameRobot2022;
+  taxiRobot2?: TaxiRobot2022;
+  endgameRobot2?: EndgameRobot2022;
+  taxiRobot3?: TaxiRobot2022;
+  endgameRobot3?: EndgameRobot2022;
   autoCargoLowerNear?: number;
   autoCargoLowerFar?: number;
   autoCargoLowerBlue?: number;
@@ -1725,7 +1767,7 @@ export type MatchScoreBreakdown2022Alliance = {
   techFoulCount?: number;
   adjustPoints?: number;
   foulPoints?: number;
-  rp?: number;
+  rp?: number | null;
   totalPoints?: number;
 };
 
@@ -1740,11 +1782,11 @@ export type MatchScoreBreakdown2023 = {
 export type MatchScoreBreakdown2023Alliance = {
   activationBonusAchieved?: boolean;
   adjustPoints?: number;
-  autoBridgeState?: 'NotLevel' | 'Level';
+  autoBridgeState?: BridgeState2023;
   autoChargeStationPoints?: number;
-  autoChargeStationRobot1?: 'None' | 'Docked';
-  autoChargeStationRobot2?: 'None' | 'Docked';
-  autoChargeStationRobot3?: 'None' | 'Docked';
+  autoChargeStationRobot1?: AutoChargeStationRobot2023;
+  autoChargeStationRobot2?: AutoChargeStationRobot2023;
+  autoChargeStationRobot3?: AutoChargeStationRobot2023;
   autoDocked?: boolean;
   autoCommunity?: {
     B: Array<'None' | 'Cone' | 'Cube'>;
@@ -1753,28 +1795,28 @@ export type MatchScoreBreakdown2023Alliance = {
   };
   autoGamePieceCount?: number;
   autoGamePiecePoints?: number;
-  autoMobilityPoints?: number;
-  mobilityRobot1?: 'Yes' | 'No';
-  mobilityRobot2?: 'Yes' | 'No';
-  mobilityRobot3?: 'Yes' | 'No';
-  autoPoints?: number;
+  autoMobilityPoints: number;
+  mobilityRobot1: MobilityRobot2023;
+  mobilityRobot2: MobilityRobot2023;
+  mobilityRobot3: MobilityRobot2023;
+  autoPoints: number;
   coopGamePieceCount?: number;
   coopertitionCriteriaMet?: boolean;
-  endGameBridgeState?: 'NotLevel' | 'Level';
+  endGameBridgeState?: BridgeState2023;
   endGameChargeStationPoints?: number;
-  endGameChargeStationRobot1?: 'None' | 'Docked' | 'Park';
-  endGameChargeStationRobot2?: 'None' | 'Docked' | 'Park';
-  endGameChargeStationRobot3?: 'None' | 'Docked' | 'Park';
+  endGameChargeStationRobot1?: EndGameChargeStationRobot2023;
+  endGameChargeStationRobot2?: EndGameChargeStationRobot2023;
+  endGameChargeStationRobot3?: EndGameChargeStationRobot2023;
   endGameParkPoints?: number;
   extraGamePieceCount?: number;
-  foulCount?: number;
-  foulPoints?: number;
-  techFoulCount?: number;
+  foulCount: number;
+  foulPoints: number;
+  techFoulCount: number;
   linkPoints?: number;
   links?: Array<{
     nodes: Array<'None' | 'Cone' | 'Cube'>;
     row: 'Bottom' | 'Mid' | 'Top';
-  }>;
+  }> | null;
   sustainabilityBonusAchieved?: boolean;
   teleopCommunity?: {
     B: Array<'None' | 'Cone' | 'Cube'>;
@@ -1784,9 +1826,9 @@ export type MatchScoreBreakdown2023Alliance = {
   teleopGamePieceCount?: number;
   teleopGamePiecePoints?: number;
   totalChargeStationPoints?: number;
-  teleopPoints?: number;
-  rp?: number;
-  totalPoints?: number;
+  teleopPoints: number;
+  rp: number;
+  totalPoints: number;
 };
 
 /**
@@ -1802,9 +1844,9 @@ export type MatchScoreBreakdown2024Alliance = {
   autoAmpNoteCount?: number;
   autoAmpNotePoints?: number;
   autoLeavePoints?: number;
-  autoLineRobot1?: string;
-  autoLineRobot2?: string;
-  autoLineRobot3?: string;
+  autoLineRobot1?: AutoLineRobot2024;
+  autoLineRobot2?: AutoLineRobot2024;
+  autoLineRobot3?: AutoLineRobot2024;
   autoPoints?: number;
   autoSpeakerNoteCount?: number;
   autoSpeakerNotePoints?: number;
@@ -1816,9 +1858,9 @@ export type MatchScoreBreakdown2024Alliance = {
   endGameNoteInTrapPoints?: number;
   endGameOnStagePoints?: number;
   endGameParkPoints?: number;
-  endGameRobot1?: string;
-  endGameRobot2?: string;
-  endGameRobot3?: string;
+  endGameRobot1?: EndGameRobot2024;
+  endGameRobot2?: EndGameRobot2024;
+  endGameRobot3?: EndGameRobot2024;
   endGameSpotLightBonusPoints?: number;
   endGameTotalStagePoints?: number;
   ensembleBonusAchieved?: boolean;
@@ -1836,7 +1878,7 @@ export type MatchScoreBreakdown2024Alliance = {
   micCenterStage?: boolean;
   micStageLeft?: boolean;
   micStageRight?: boolean;
-  rp?: number;
+  rp: number;
   techFoulCount?: number;
   teleopAmpNoteCount?: number;
   teleopAmpNotePoints?: number;
@@ -1846,7 +1888,7 @@ export type MatchScoreBreakdown2024Alliance = {
   teleopSpeakerNoteCount?: number;
   teleopSpeakerNotePoints?: number;
   teleopTotalNotePoints?: number;
-  totalPoints?: number;
+  totalPoints: number;
   trapCenterStage?: boolean;
   trapStageLeft?: boolean;
   trapStageRight?: boolean;
@@ -1862,58 +1904,19 @@ export type MatchScoreBreakdown2025 = {
 
 export type MatchScoreBreakdown2025Alliance = {
   adjustPoints?: number;
-  algaePoints?: number;
+  algaePoints: number;
   autoBonusAchieved?: boolean;
-  autoCoralCount?: number;
-  autoCoralPoints?: number;
-  autoLineRobot1?: 'No' | 'Yes';
-  autoLineRobot2?: 'No' | 'Yes';
-  autoLineRobot3?: 'No' | 'Yes';
-  autoMobilityPoints?: number;
-  autoPoints?: number;
-  autoReef?: {
-    topRow: {
-      nodeA: boolean;
-      nodeB: boolean;
-      nodeC: boolean;
-      nodeD: boolean;
-      nodeE: boolean;
-      nodeF: boolean;
-      nodeG: boolean;
-      nodeH: boolean;
-      nodeI: boolean;
-      nodeJ: boolean;
-      nodeK: boolean;
-      nodeL: boolean;
-    };
-    midRow: {
-      nodeA: boolean;
-      nodeB: boolean;
-      nodeC: boolean;
-      nodeD: boolean;
-      nodeE: boolean;
-      nodeF: boolean;
-      nodeG: boolean;
-      nodeH: boolean;
-      nodeI: boolean;
-      nodeJ: boolean;
-      nodeK: boolean;
-      nodeL: boolean;
-    };
-    botRow: {
-      nodeA: boolean;
-      nodeB: boolean;
-      nodeC: boolean;
-      nodeD: boolean;
-      nodeE: boolean;
-      nodeF: boolean;
-      nodeG: boolean;
-      nodeH: boolean;
-      nodeI: boolean;
-      nodeJ: boolean;
-      nodeK: boolean;
-      nodeL: boolean;
-    };
+  autoCoralCount: number;
+  autoCoralPoints: number;
+  autoLineRobot1: AutoLineRobot2024;
+  autoLineRobot2: AutoLineRobot2024;
+  autoLineRobot3: AutoLineRobot2024;
+  autoMobilityPoints: number;
+  autoPoints: number;
+  autoReef: {
+    topRow: ReefRow2025;
+    midRow: ReefRow2025;
+    botRow: ReefRow2025;
     trough: number;
     /**
      * Unofficial TBA-computed value that sums the total number of game pieces scored in the botRow object.
@@ -1931,65 +1934,26 @@ export type MatchScoreBreakdown2025Alliance = {
   bargeBonusAchieved?: boolean;
   coopertitionCriteriaMet?: boolean;
   coralBonusAchieved?: boolean;
-  endGameBargePoints?: number;
-  endGameRobot1?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
-  endGameRobot2?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
-  endGameRobot3?: 'None' | 'Parked' | 'ShallowCage' | 'DeepCage';
-  foulCount?: number;
-  foulPoints?: number;
-  g206Penalty?: boolean;
-  g410Penalty?: boolean;
-  g418Penalty?: boolean;
-  g428Penalty?: boolean;
-  netAlgaeCount?: number;
-  rp?: number;
-  techFoulCount?: number;
-  teleopCoralCount?: number;
-  teleopCoralPoints?: number;
-  teleopPoints?: number;
-  teleopReef?: {
-    topRow: {
-      nodeA: boolean;
-      nodeB: boolean;
-      nodeC: boolean;
-      nodeD: boolean;
-      nodeE: boolean;
-      nodeF: boolean;
-      nodeG: boolean;
-      nodeH: boolean;
-      nodeI: boolean;
-      nodeJ: boolean;
-      nodeK: boolean;
-      nodeL: boolean;
-    };
-    midRow: {
-      nodeA: boolean;
-      nodeB: boolean;
-      nodeC: boolean;
-      nodeD: boolean;
-      nodeE: boolean;
-      nodeF: boolean;
-      nodeG: boolean;
-      nodeH: boolean;
-      nodeI: boolean;
-      nodeJ: boolean;
-      nodeK: boolean;
-      nodeL: boolean;
-    };
-    botRow: {
-      nodeA: boolean;
-      nodeB: boolean;
-      nodeC: boolean;
-      nodeD: boolean;
-      nodeE: boolean;
-      nodeF: boolean;
-      nodeG: boolean;
-      nodeH: boolean;
-      nodeI: boolean;
-      nodeJ: boolean;
-      nodeK: boolean;
-      nodeL: boolean;
-    };
+  endGameBargePoints: number;
+  endGameRobot1: EndGameRobot2025;
+  endGameRobot2: EndGameRobot2025;
+  endGameRobot3: EndGameRobot2025;
+  foulCount: number;
+  foulPoints: number;
+  g206Penalty: boolean;
+  g410Penalty: boolean;
+  g418Penalty: boolean;
+  g428Penalty: boolean;
+  netAlgaeCount: number;
+  rp: number;
+  techFoulCount: number;
+  teleopCoralCount: number;
+  teleopCoralPoints: number;
+  teleopPoints: number;
+  teleopReef: {
+    topRow: ReefRow2025;
+    midRow: ReefRow2025;
+    botRow: ReefRow2025;
     trough: number;
     /**
      * Unofficial TBA-computed value that sums the total number of game pieces scored in the botRow object.
@@ -2004,8 +1968,8 @@ export type MatchScoreBreakdown2025Alliance = {
      */
     tba_topRowCount?: number;
   };
-  totalPoints?: number;
-  wallAlgaeCount?: number;
+  totalPoints: number;
+  wallAlgaeCount: number;
 };
 
 /**

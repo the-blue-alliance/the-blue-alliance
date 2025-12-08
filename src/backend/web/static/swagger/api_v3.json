@@ -7275,6 +7275,134 @@
           "Yellow"
         ]
       },
+      "EndgameRobot_2022": {
+        "type": "string",
+        "enum": [
+          "High",
+          "Low",
+          "Mid",
+          "None",
+          "Traversal"
+        ]
+      },
+      "TaxiRobot_2022": {
+        "type": "string",
+        "enum": [
+          "No",
+          "Yes"
+        ]
+      },
+      "BridgeState_2023": {
+        "type": "string",
+        "enum": [
+          "Level",
+          "NotLevel"
+        ]
+      },
+      "AutoChargeStationRobot_2023": {
+        "type": "string",
+        "enum": [
+          "Docked",
+          "None"
+        ]
+      },
+      "EndGameChargeStationRobot_2023": {
+        "type": "string",
+        "enum": [
+          "Docked",
+          "None",
+          "Park",
+          "Parked"
+        ]
+      },
+      "MobilityRobot_2023": {
+        "type": "string",
+        "enum": [
+          "No",
+          "Yes"
+        ]
+      },
+      "AutoLineRobot_2024": {
+        "type": "string",
+        "enum": [
+          "No",
+          "Yes"
+        ]
+      },
+      "EndGameRobot_2024": {
+        "type": "string",
+        "enum": [
+          "CenterStage",
+          "None",
+          "Parked",
+          "StageLeft",
+          "StageRight"
+        ]
+      },
+      "EndGameRobot_2025": {
+        "type": "string",
+        "enum": [
+          "DeepCage",
+          "None",
+          "Parked",
+          "ShallowCage"
+        ]
+      },
+      "ReefRow_2025": {
+        "type": "object",
+        "required": [
+          "nodeA",
+          "nodeB",
+          "nodeC",
+          "nodeD",
+          "nodeE",
+          "nodeF",
+          "nodeG",
+          "nodeH",
+          "nodeI",
+          "nodeJ",
+          "nodeK",
+          "nodeL"
+        ],
+        "properties": {
+          "nodeA": {
+            "type": "boolean"
+          },
+          "nodeB": {
+            "type": "boolean"
+          },
+          "nodeC": {
+            "type": "boolean"
+          },
+          "nodeD": {
+            "type": "boolean"
+          },
+          "nodeE": {
+            "type": "boolean"
+          },
+          "nodeF": {
+            "type": "boolean"
+          },
+          "nodeG": {
+            "type": "boolean"
+          },
+          "nodeH": {
+            "type": "boolean"
+          },
+          "nodeI": {
+            "type": "boolean"
+          },
+          "nodeJ": {
+            "type": "boolean"
+          },
+          "nodeK": {
+            "type": "boolean"
+          },
+          "nodeL": {
+            "type": "boolean"
+          }
+        }
+      },
       "Match_Score_Breakdown_2015": {
         "type": "object",
         "required": [
@@ -8412,55 +8540,22 @@
         "type": "object",
         "properties": {
           "taxiRobot1": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/TaxiRobot_2022"
           },
           "endgameRobot1": {
-            "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "$ref": "#/components/schemas/EndgameRobot_2022"
           },
           "taxiRobot2": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/TaxiRobot_2022"
           },
           "endgameRobot2": {
-            "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "$ref": "#/components/schemas/EndgameRobot_2022"
           },
           "taxiRobot3": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/TaxiRobot_2022"
           },
           "endgameRobot3": {
-            "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "$ref": "#/components/schemas/EndgameRobot_2022"
           },
           "autoCargoLowerNear": {
             "type": "integer"
@@ -8559,7 +8654,10 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "totalPoints": {
             "type": "integer"
@@ -8584,6 +8682,19 @@
       },
       "Match_Score_Breakdown_2023_Alliance": {
         "type": "object",
+        "required": [
+          "autoMobilityPoints",
+          "autoPoints",
+          "foulCount",
+          "foulPoints",
+          "mobilityRobot1",
+          "mobilityRobot2",
+          "mobilityRobot3",
+          "rp",
+          "techFoulCount",
+          "teleopPoints",
+          "totalPoints"
+        ],
         "properties": {
           "activationBonusAchieved": {
             "type": "boolean"
@@ -8592,35 +8703,19 @@
             "type": "integer"
           },
           "autoBridgeState": {
-            "type": "string",
-            "enum": [
-              "NotLevel",
-              "Level"
-            ]
+            "$ref": "#/components/schemas/BridgeState_2023"
           },
           "autoChargeStationPoints": {
             "type": "integer"
           },
           "autoChargeStationRobot1": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "$ref": "#/components/schemas/AutoChargeStationRobot_2023"
           },
           "autoChargeStationRobot2": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "$ref": "#/components/schemas/AutoChargeStationRobot_2023"
           },
           "autoChargeStationRobot3": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "$ref": "#/components/schemas/AutoChargeStationRobot_2023"
           },
           "autoDocked": {
             "type": "boolean"
@@ -8678,25 +8773,13 @@
             "type": "integer"
           },
           "mobilityRobot1": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/MobilityRobot_2023"
           },
           "mobilityRobot2": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/MobilityRobot_2023"
           },
           "mobilityRobot3": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/MobilityRobot_2023"
           },
           "autoPoints": {
             "type": "integer"
@@ -8708,38 +8791,19 @@
             "type": "boolean"
           },
           "endGameBridgeState": {
-            "type": "string",
-            "enum": [
-              "NotLevel",
-              "Level"
-            ]
+            "$ref": "#/components/schemas/BridgeState_2023"
           },
           "endGameChargeStationPoints": {
             "type": "integer"
           },
           "endGameChargeStationRobot1": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "$ref": "#/components/schemas/EndGameChargeStationRobot_2023"
           },
           "endGameChargeStationRobot2": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "$ref": "#/components/schemas/EndGameChargeStationRobot_2023"
           },
           "endGameChargeStationRobot3": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "$ref": "#/components/schemas/EndGameChargeStationRobot_2023"
           },
           "endGameParkPoints": {
             "type": "integer"
@@ -8760,7 +8824,10 @@
             "type": "integer"
           },
           "links": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "object",
               "required": [
@@ -8874,6 +8941,10 @@
       },
       "Match_Score_Breakdown_2024_Alliance": {
         "type": "object",
+        "required": [
+          "rp",
+          "totalPoints"
+        ],
         "properties": {
           "adjustPoints": {
             "type": "integer"
@@ -8888,13 +8959,13 @@
             "type": "integer"
           },
           "autoLineRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoLineRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoLineRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoPoints": {
             "type": "integer"
@@ -8930,13 +9001,13 @@
             "type": "integer"
           },
           "endGameRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndGameRobot_2024"
           },
           "endGameRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndGameRobot_2024"
           },
           "endGameRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndGameRobot_2024"
           },
           "endGameSpotLightBonusPoints": {
             "type": "integer"
@@ -9051,6 +9122,36 @@
       },
       "Match_Score_Breakdown_2025_Alliance": {
         "type": "object",
+        "required": [
+          "algaePoints",
+          "autoCoralCount",
+          "autoCoralPoints",
+          "autoLineRobot1",
+          "autoLineRobot2",
+          "autoLineRobot3",
+          "autoMobilityPoints",
+          "autoPoints",
+          "autoReef",
+          "endGameBargePoints",
+          "endGameRobot1",
+          "endGameRobot2",
+          "endGameRobot3",
+          "foulCount",
+          "foulPoints",
+          "g206Penalty",
+          "g410Penalty",
+          "g418Penalty",
+          "g428Penalty",
+          "netAlgaeCount",
+          "rp",
+          "techFoulCount",
+          "teleopCoralCount",
+          "teleopCoralPoints",
+          "teleopPoints",
+          "teleopReef",
+          "totalPoints",
+          "wallAlgaeCount"
+        ],
         "properties": {
           "adjustPoints": {
             "type": "integer"
@@ -9068,25 +9169,13 @@
             "type": "integer"
           },
           "autoLineRobot1": {
-            "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoLineRobot2": {
-            "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoLineRobot3": {
-            "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoMobilityPoints": {
             "type": "integer"
@@ -9104,169 +9193,13 @@
             ],
             "properties": {
               "topRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "midRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "botRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "trough": {
                 "type": "integer"
@@ -9298,31 +9231,13 @@
             "type": "integer"
           },
           "endGameRobot1": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "$ref": "#/components/schemas/EndGameRobot_2025"
           },
           "endGameRobot2": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "$ref": "#/components/schemas/EndGameRobot_2025"
           },
           "endGameRobot3": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "$ref": "#/components/schemas/EndGameRobot_2025"
           },
           "foulCount": {
             "type": "integer"
@@ -9370,169 +9285,13 @@
             ],
             "properties": {
               "topRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "midRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "botRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "trough": {
                 "type": "integer"

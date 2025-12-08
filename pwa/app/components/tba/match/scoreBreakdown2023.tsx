@@ -351,6 +351,7 @@ function EndgameRobotCell({
     number
   > = {
     Docked: 10,
+    Parked: 2,
     Park: 2,
     None: 0,
   };
