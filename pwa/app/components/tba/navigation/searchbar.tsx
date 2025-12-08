@@ -100,7 +100,7 @@ export default function Searchbar({ className }: { className?: string }) {
           setQuery(e);
         }}
         ref={inputRef}
-        className="hidden h-8 md:block"
+        className="h-8"
       />
 
       <CommandList

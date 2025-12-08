@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import MenuIcon from '~icons/lucide/menu';
 import XIcon from '~icons/lucide/x';
 
-import Searchbar from '~/components/tba/searchbar';
+import Searchbar from '~/components/tba/navigation/searchbar';
 import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 import { cn } from '~/lib/utils';
 

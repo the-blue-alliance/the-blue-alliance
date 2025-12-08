@@ -45,7 +45,7 @@ import { z } from 'zod';
 
 import { client } from '~/api/tba/read/client.gen';
 import { MatchModal } from '~/components/tba/match/matchModal';
-import { Nav } from '~/components/tba/nav';
+import { Nav } from '~/components/tba/navigation/nav';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 
 // Configure request interceptor for auth

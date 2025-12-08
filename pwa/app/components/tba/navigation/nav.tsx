@@ -6,7 +6,7 @@ import {
   NavMobile,
   NavMobileButton,
 } from '~/components/tba/navigation/nav-mobile';
-import Searchbar from '~/components/tba/searchbar';
+import Searchbar from '~/components/tba/navigation/searchbar';
 import {
   NavigationMenu,
   NavigationMenuItem,
