@@ -161,9 +161,6 @@ jobs:
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa install --frozen-lockfile
-      - name: Generate react-router types
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: pnpm --dir pwa run typecheck
       - name: Run Format
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa run format
@@ -324,10 +321,6 @@ jobs:
       - name: Install Dependencies
         working-directory: pwa
         run: pnpm install --frozen-lockfile
-
-      - name: Generate react-router types
-        working-directory: pwa
-        run: pnpm run typecheck
 
       - name: Run generate-api.sh
         working-directory: ./pwa

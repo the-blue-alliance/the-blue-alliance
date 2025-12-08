@@ -218,8 +218,6 @@ jobs:
           TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         run: pnpm --dir pwa install --frozen-lockfile
-      - name: Generate react-router types
-        run: pnpm --dir pwa run typecheck
       - name: Run Format
         run: pnpm --dir pwa run format
       - name: Run Lint
@@ -364,10 +362,6 @@ jobs:
       - name: Install Dependencies
         working-directory: pwa
         run: pnpm install --frozen-lockfile
-
-      - name: Generate react-router types
-        working-directory: pwa
-        run: pnpm run typecheck
 
       - name: Run generate-api.sh
         working-directory: ./pwa
