@@ -1,26 +1,32 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
-
-import IconMenu2 from '~icons/tabler/menu-2';
+import { useState } from 'react';
 
 import {
-  Credenza,
-  CredenzaBody,
-  CredenzaContent,
-  CredenzaHeader,
-  CredenzaTitle,
-  CredenzaTrigger,
-} from '~/components/ui/credenza';
-import {
-  TableOfContentsItem,
-  TableOfContentsLink,
-  TableOfContentsList,
-} from '~/components/ui/toc';
+  TableOfContentsPopover,
+  TableOfContentsSection,
+} from '~/components/tba/tableOfContentsPopover';
 
 export const Route = createFileRoute('/apidocs')({
   component: ApiDocs,
+  head: () => {
+    return {
+      meta: [
+        {
+          title: 'Developer APIs - The Blue Alliance',
+        },
+        {
+          name: 'description',
+          content:
+            'An overview of the developer APIs offered by The Blue Alliance',
+        },
+      ],
+    };
+  },
 });
 
 function ApiDocs(): React.JSX.Element {
+  const [inView, setInView] = useState(new Set<string>());
+
   const tocItems = [
     { slug: 'getting-started', label: 'Getting Started' },
     { slug: 'apiv3', label: 'Read API (v3)' },
@@ -29,45 +35,12 @@ function ApiDocs(): React.JSX.Element {
     { slug: 'guidelines', label: 'Developer Guidelines' },
   ];
 
-  const tocContent = (
-    <TableOfContentsList className="mt-2">
-      {tocItems.map((item) => (
-        <TableOfContentsItem key={item.slug}>
-          <TableOfContentsLink to={`#${item.slug}`} replace={true}>
-            {item.label}
-          </TableOfContentsLink>
-        </TableOfContentsItem>
-      ))}
-    </TableOfContentsList>
-  );
-
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
-      <Credenza>
-        <CredenzaTrigger asChild>
-          <button
-            className="fixed right-4 bottom-4 z-40 flex size-14 items-center
-              justify-center rounded-full bg-primary text-primary-foreground
-              shadow-lg md:hidden"
-            aria-label="Table of Contents"
-          >
-            <IconMenu2 className="size-6" />
-          </button>
-        </CredenzaTrigger>
-        <CredenzaContent>
-          <CredenzaHeader>
-            <CredenzaTitle>Table of Contents</CredenzaTitle>
-          </CredenzaHeader>
-          <CredenzaBody className="overflow-y-auto">{tocContent}</CredenzaBody>
-        </CredenzaContent>
-      </Credenza>
-
-      <div className="hidden basis-full md:block md:basis-1/6">
-        <div className="sticky top-14 pt-8">{tocContent}</div>
-      </div>
+      <TableOfContentsPopover tocItems={tocItems} inView={inView} />
       <div className="basis-full py-8 md:basis-5/6">
         <div>
-          <section className="py-4">
+          <section>
             <h1 className="mb-2 text-3xl font-medium">
               The Blue Alliance Developer APIs
             </h1>
@@ -106,7 +79,11 @@ function ApiDocs(): React.JSX.Element {
             </ul>
           </section>
 
-          <section id="getting-started" className="py-4">
+          <TableOfContentsSection
+            id="getting-started"
+            setInView={setInView}
+            className="py-4"
+          >
             <h2 className="mb-2 text-2xl font-medium">Getting Started</h2>
             <p>
               Before you get started using The Blue Alliance APIs, you need to
@@ -144,9 +121,13 @@ function ApiDocs(): React.JSX.Element {
               These will be used to pass authentication keys to TBA and
               understand the cache life of returned data.
             </p>
-          </section>
+          </TableOfContentsSection>
 
-          <section id="apiv3" className="py-4">
+          <TableOfContentsSection
+            id="apiv3"
+            setInView={setInView}
+            className="py-4"
+          >
             <h2 className="mb-2 text-2xl font-medium">
               <a href="/apidocs/v3">Read API (v3)</a>
             </h2>
@@ -232,9 +213,13 @@ function ApiDocs(): React.JSX.Element {
               looking to get started and can be found{' '}
               <a href="https://github.com/TBA-API">on the TBA-API GitHub</a>.
             </p>
-          </section>
+          </TableOfContentsSection>
 
-          <section id="webhooks" className="py-4">
+          <TableOfContentsSection
+            id="webhooks"
+            setInView={setInView}
+            className="py-4"
+          >
             <h2 className="mb-2 text-2xl font-medium">
               <a href="/apidocs/webhooks">Webhooks</a>
             </h2>
@@ -249,9 +234,13 @@ function ApiDocs(): React.JSX.Element {
               <a href="/apidocs/webhooks">our webhook documentation page</a> for
               more information.
             </p>
-          </section>
+          </TableOfContentsSection>
 
-          <section id="trusted" className="py-4">
+          <TableOfContentsSection
+            id="trusted"
+            setInView={setInView}
+            className="py-4"
+          >
             <h2 className="mb-2 text-2xl font-medium">
               <a href="/apidocs/trusted/v1">Write API (v1)</a>
             </h2>
@@ -269,9 +258,13 @@ function ApiDocs(): React.JSX.Element {
               To see the complete specification of the trusted API, refer to the{' '}
               <a href="/apidocs/trusted/v1">full documentation</a>.
             </p>
-          </section>
+          </TableOfContentsSection>
 
-          <section id="guidelines" className="py-4">
+          <TableOfContentsSection
+            id="guidelines"
+            setInView={setInView}
+            className="py-4"
+          >
             <h2 className="mb-2 text-2xl font-medium">
               TBA Developer Guidelines
             </h2>
@@ -322,7 +315,7 @@ function ApiDocs(): React.JSX.Element {
                 </ul>
               </li>
             </ol>
-          </section>
+          </TableOfContentsSection>
         </div>
       </div>
     </div>
