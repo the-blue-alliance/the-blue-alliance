@@ -1181,6 +1181,76 @@ export type ZebraTeam = {
   ys: Array<number>;
 };
 
+export type AutoRobot2018 = 'None' | 'AutoRun';
+
+export type EndgameRobot2018 =
+  | 'Climbing'
+  | 'Levitate'
+  | 'None'
+  | 'Parking'
+  | 'Unknown';
+
+export type RobotAuto2016WithUnknown =
+  | 'Crossed'
+  | 'None'
+  | 'Reached'
+  | 'Unknown';
+
+export type RobotAuto2016WithoutUnknown = 'Crossed' | 'Reached' | 'None';
+
+export type Position2016 =
+  | ''
+  | 'A_ChevalDeFrise'
+  | 'A_Portcullis'
+  | 'B_Moat'
+  | 'B_Ramparts'
+  | 'C_Drawbridge'
+  | 'C_SallyPort'
+  | 'D_RockWall'
+  | 'D_RoughTerrain'
+  | 'NotSpecified';
+
+export type TowerFace2016 =
+  | 'Both'
+  | 'Challenged'
+  | 'None'
+  | 'Scaled'
+  | 'Unknown';
+
+export type RobotAuto2017 = 'Mobility' | 'None' | 'Unknown';
+
+export type Touchpad2017 = 'None' | 'ReadyForTakeoff';
+
+export type Bay2019 = 'None' | 'Panel' | 'PanelAndCargo';
+
+export type EndgameRobot2019 =
+  | 'HabLevel1'
+  | 'HabLevel2'
+  | 'HabLevel3'
+  | 'None'
+  | 'Unknown';
+
+export type HabLine2019 =
+  | 'CrossedHabLineInSandstorm'
+  | 'CrossedHabLineInTeleop'
+  | 'None'
+  | 'Unknown';
+
+export type PreMatchBay2019 = 'Cargo' | 'Panel' | 'Unknown';
+
+export type InitLineRobot2020 = 'Exited' | 'None';
+
+export type EndgameRobot2020 = 'Hang' | 'None' | 'Park';
+
+export type EndgameRungIsLevel2020 = 'IsLevel' | 'NotLevel';
+
+export type Stage3TargetColor2020 =
+  | 'Blue'
+  | 'Green'
+  | 'Red'
+  | 'Unknown'
+  | 'Yellow';
+
 /**
  * See the 2015 FMS API documentation for a description of each value
  */
@@ -1192,12 +1262,14 @@ export type MatchScoreBreakdown2015 = {
 };
 
 export type MatchScoreBreakdown2015Alliance = {
-  auto_points?: number;
+  auto?: string | null;
+  auto_points?: number | null;
   teleop_points?: number;
   container_points?: number;
   tote_points?: number;
   litter_points?: number;
-  foul_points?: number;
+  foul?: string | null;
+  foul_points?: number | null;
   adjust_points?: number;
   total_points?: number;
   foul_count?: number;
@@ -1227,44 +1299,45 @@ export type MatchScoreBreakdown2016 = {
 };
 
 export type MatchScoreBreakdown2016Alliance = {
-  autoPoints?: number;
+  autoPoints: number;
   teleopPoints?: number;
-  breachPoints?: number;
-  foulPoints?: number;
-  capturePoints?: number;
+  breachPoints: number;
+  foulPoints: number;
+  capturePoints: number;
   adjustPoints?: number;
-  totalPoints?: number;
-  robot1Auto?: 'Crossed' | 'Reached' | 'None';
-  robot2Auto?: 'Crossed' | 'Reached' | 'None';
-  robot3Auto?: 'Crossed' | 'Reached' | 'None';
-  autoReachPoints?: number;
-  autoCrossingPoints?: number;
+  totalPoints: number;
+  tba_rpEarned: number | null;
+  robot1Auto?: RobotAuto2016WithUnknown;
+  robot2Auto?: RobotAuto2016WithoutUnknown;
+  robot3Auto?: RobotAuto2016WithUnknown;
+  autoReachPoints: number;
+  autoCrossingPoints: number;
   autoBouldersLow?: number;
   autoBouldersHigh?: number;
-  autoBoulderPoints?: number;
-  teleopCrossingPoints?: number;
-  teleopBouldersLow?: number;
-  teleopBouldersHigh?: number;
-  teleopBoulderPoints?: number;
-  teleopDefensesBreached?: boolean;
-  teleopChallengePoints?: number;
-  teleopScalePoints?: number;
-  teleopTowerCaptured?: boolean;
-  towerFaceA?: string;
-  towerFaceB?: string;
-  towerFaceC?: string;
+  autoBoulderPoints: number;
+  teleopCrossingPoints: number;
+  teleopBouldersLow: number;
+  teleopBouldersHigh: number;
+  teleopBoulderPoints: number;
+  teleopDefensesBreached: boolean;
+  teleopChallengePoints: number;
+  teleopScalePoints: number;
+  teleopTowerCaptured: boolean;
+  towerFaceA?: TowerFace2016;
+  towerFaceB?: TowerFace2016;
+  towerFaceC?: TowerFace2016;
   towerEndStrength?: number;
   techFoulCount?: number;
   foulCount?: number;
-  position2?: string;
-  position3?: string;
-  position4?: string;
-  position5?: string;
-  position1crossings?: number;
-  position2crossings?: number;
-  position3crossings?: number;
-  position4crossings?: number;
-  position5crossings?: number;
+  position2: Position2016;
+  position3: Position2016;
+  position4: Position2016;
+  position5: Position2016;
+  position1crossings: number;
+  position2crossings: number;
+  position3crossings: number;
+  position4crossings: number;
+  position5crossings: number;
 };
 
 /**
@@ -1276,39 +1349,40 @@ export type MatchScoreBreakdown2017 = {
 };
 
 export type MatchScoreBreakdown2017Alliance = {
-  autoPoints?: number;
-  teleopPoints?: number;
-  foulPoints?: number;
+  autoPoints: number;
+  teleopPoints: number;
+  foulPoints: number;
   adjustPoints?: number;
-  totalPoints?: number;
-  robot1Auto?: 'Unknown' | 'Mobility' | 'None';
-  robot2Auto?: 'Unknown' | 'Mobility' | 'None';
-  robot3Auto?: 'Unknown' | 'Mobility' | 'None';
-  rotor1Auto?: boolean;
-  rotor2Auto?: boolean;
-  autoFuelLow?: number;
-  autoFuelHigh?: number;
-  autoMobilityPoints?: number;
-  autoRotorPoints?: number;
-  autoFuelPoints?: number;
-  teleopFuelPoints?: number;
-  teleopFuelLow?: number;
-  teleopFuelHigh?: number;
-  teleopRotorPoints?: number;
-  kPaRankingPointAchieved?: boolean;
-  teleopTakeoffPoints?: number;
-  kPaBonusPoints?: number;
-  rotorBonusPoints?: number;
-  rotor1Engaged?: boolean;
-  rotor2Engaged?: boolean;
-  rotor3Engaged?: boolean;
-  rotor4Engaged?: boolean;
-  rotorRankingPointAchieved?: boolean;
+  totalPoints: number;
+  robot1Auto?: RobotAuto2017;
+  robot2Auto?: RobotAuto2017;
+  robot3Auto?: RobotAuto2017;
+  rotor1Auto: boolean;
+  rotor2Auto: boolean;
+  autoFuelLow: number;
+  autoFuelHigh: number;
+  autoMobilityPoints: number;
+  autoRotorPoints: number;
+  autoFuelPoints: number;
+  teleopFuelPoints: number;
+  teleopFuelLow: number;
+  teleopFuelHigh: number;
+  teleopRotorPoints: number;
+  kPaRankingPointAchieved: boolean;
+  teleopTakeoffPoints: number;
+  kPaBonusPoints: number;
+  rotorBonusPoints: number;
+  rotor1Engaged: boolean;
+  rotor2Engaged: boolean;
+  rotor3Engaged: boolean;
+  rotor4Engaged: boolean;
+  rotorRankingPointAchieved: boolean;
+  tba_rpEarned?: number | null;
   techFoulCount?: number;
   foulCount?: number;
-  touchpadNear?: string;
-  touchpadMiddle?: string;
-  touchpadFar?: string;
+  touchpadNear?: Touchpad2017;
+  touchpadMiddle?: Touchpad2017;
+  touchpadFar?: Touchpad2017;
 };
 
 /**
@@ -1321,45 +1395,45 @@ export type MatchScoreBreakdown2018 = {
 
 export type MatchScoreBreakdown2018Alliance = {
   adjustPoints?: number;
-  autoOwnershipPoints?: number;
-  autoPoints?: number;
+  autoOwnershipPoints: number;
+  autoPoints: number;
   autoQuestRankingPoint?: boolean;
-  autoRobot1?: string;
-  autoRobot2?: string;
-  autoRobot3?: string;
-  autoRunPoints?: number;
-  autoScaleOwnershipSec?: number;
+  autoRobot1?: AutoRobot2018;
+  autoRobot2?: AutoRobot2018;
+  autoRobot3?: AutoRobot2018;
+  autoRunPoints: number;
+  autoScaleOwnershipSec: number;
   autoSwitchAtZero?: boolean;
-  autoSwitchOwnershipSec?: number;
-  endgamePoints?: number;
-  endgameRobot1?: string;
-  endgameRobot2?: string;
-  endgameRobot3?: string;
-  faceTheBossRankingPoint?: boolean;
+  autoSwitchOwnershipSec: number;
+  endgamePoints: number;
+  endgameRobot1?: EndgameRobot2018;
+  endgameRobot2?: EndgameRobot2018;
+  endgameRobot3?: EndgameRobot2018;
+  faceTheBossRankingPoint: boolean;
   foulCount?: number;
-  foulPoints?: number;
-  rp?: number;
+  foulPoints: number;
+  rp: number;
   techFoulCount?: number;
-  teleopOwnershipPoints?: number;
-  teleopPoints?: number;
-  teleopScaleBoostSec?: number;
+  teleopOwnershipPoints: number;
+  teleopPoints: number;
+  teleopScaleBoostSec: number;
   teleopScaleForceSec?: number;
-  teleopScaleOwnershipSec?: number;
-  teleopSwitchBoostSec?: number;
+  teleopScaleOwnershipSec: number;
+  teleopSwitchBoostSec: number;
   teleopSwitchForceSec?: number;
-  teleopSwitchOwnershipSec?: number;
-  totalPoints?: number;
-  vaultBoostPlayed?: number;
-  vaultBoostTotal?: number;
-  vaultForcePlayed?: number;
-  vaultForceTotal?: number;
-  vaultLevitatePlayed?: number;
-  vaultLevitateTotal?: number;
-  vaultPoints?: number;
+  teleopSwitchOwnershipSec: number;
+  totalPoints: number;
+  vaultBoostPlayed: number;
+  vaultBoostTotal: number;
+  vaultForcePlayed: number;
+  vaultForceTotal: number;
+  vaultLevitatePlayed: number;
+  vaultLevitateTotal: number;
+  vaultPoints: number;
   /**
    * Unofficial TBA-computed value of the FMS provided GameData given to the alliance teams at the start of the match. 3 Character String containing `L` and `R` only. The first character represents the near switch, the 2nd the scale, and the 3rd the far, opposing, switch from the alliance's perspective. An `L` in a position indicates the platform on the left will be lit for the alliance while an `R` will indicate the right platform will be lit for the alliance. See also [WPI Screen Steps](https://wpilib.screenstepslive.com/s/currentCS/m/getting_started/l/826278-2018-game-data-details).
    */
-  tba_gameData?: string;
+  tba_gameData?: '' | 'LLL' | 'LRL' | 'RLR' | 'RRR';
 };
 
 /**
@@ -1502,55 +1576,55 @@ export type MatchScoreBreakdown2019 = {
 export type MatchScoreBreakdown2019Alliance = {
   adjustPoints?: number;
   autoPoints?: number;
-  bay1?: string;
-  bay2?: string;
-  bay3?: string;
-  bay4?: string;
-  bay5?: string;
-  bay6?: string;
-  bay7?: string;
-  bay8?: string;
-  cargoPoints?: number;
-  completeRocketRankingPoint?: boolean;
+  bay1: Bay2019;
+  bay2: Bay2019;
+  bay3: Bay2019;
+  bay4: Bay2019;
+  bay5: Bay2019;
+  bay6: Bay2019;
+  bay7: Bay2019;
+  bay8: Bay2019;
+  cargoPoints: number;
+  completeRocketRankingPoint: boolean;
   completedRocketFar?: boolean;
   completedRocketNear?: boolean;
-  endgameRobot1?: string;
-  endgameRobot2?: string;
-  endgameRobot3?: string;
+  endgameRobot1: EndgameRobot2019;
+  endgameRobot2: EndgameRobot2019;
+  endgameRobot3: EndgameRobot2019;
   foulCount?: number;
-  foulPoints?: number;
-  habClimbPoints?: number;
-  habDockingRankingPoint?: boolean;
-  habLineRobot1?: string;
-  habLineRobot2?: string;
-  habLineRobot3?: string;
-  hatchPanelPoints?: number;
-  lowLeftRocketFar?: string;
-  lowLeftRocketNear?: string;
-  lowRightRocketFar?: string;
-  lowRightRocketNear?: string;
-  midLeftRocketFar?: string;
-  midLeftRocketNear?: string;
-  midRightRocketFar?: string;
-  midRightRocketNear?: string;
-  preMatchBay1?: string;
-  preMatchBay2?: string;
-  preMatchBay3?: string;
-  preMatchBay6?: string;
-  preMatchBay7?: string;
-  preMatchBay8?: string;
-  preMatchLevelRobot1?: string;
-  preMatchLevelRobot2?: string;
-  preMatchLevelRobot3?: string;
-  rp?: number;
-  sandStormBonusPoints?: number;
+  foulPoints: number;
+  habClimbPoints: number;
+  habDockingRankingPoint: boolean;
+  habLineRobot1: HabLine2019;
+  habLineRobot2: HabLine2019;
+  habLineRobot3: HabLine2019;
+  hatchPanelPoints: number;
+  lowLeftRocketFar: Bay2019;
+  lowLeftRocketNear: Bay2019;
+  lowRightRocketFar: Bay2019;
+  lowRightRocketNear: Bay2019;
+  midLeftRocketFar: Bay2019;
+  midLeftRocketNear: Bay2019;
+  midRightRocketFar: Bay2019;
+  midRightRocketNear: Bay2019;
+  preMatchBay1: PreMatchBay2019;
+  preMatchBay2: PreMatchBay2019;
+  preMatchBay3: PreMatchBay2019;
+  preMatchBay6: PreMatchBay2019;
+  preMatchBay7: PreMatchBay2019;
+  preMatchBay8: PreMatchBay2019;
+  preMatchLevelRobot1: EndgameRobot2019;
+  preMatchLevelRobot2: EndgameRobot2019;
+  preMatchLevelRobot3: EndgameRobot2019;
+  rp: number;
+  sandStormBonusPoints: number;
   techFoulCount?: number;
-  teleopPoints?: number;
-  topLeftRocketFar?: string;
-  topLeftRocketNear?: string;
-  topRightRocketFar?: string;
-  topRightRocketNear?: string;
-  totalPoints?: number;
+  teleopPoints: number;
+  topLeftRocketFar: Bay2019;
+  topLeftRocketNear: Bay2019;
+  topRightRocketFar: Bay2019;
+  topRightRocketNear: Bay2019;
+  totalPoints: number;
 };
 
 /**
@@ -1562,32 +1636,32 @@ export type MatchScoreBreakdown2020 = {
 };
 
 export type MatchScoreBreakdown2020Alliance = {
-  initLineRobot1?: string;
-  endgameRobot1?: string;
-  initLineRobot2?: string;
-  endgameRobot2?: string;
-  initLineRobot3?: string;
-  endgameRobot3?: string;
-  autoCellsBottom?: number;
-  autoCellsOuter?: number;
-  autoCellsInner?: number;
-  teleopCellsBottom?: number;
-  teleopCellsOuter?: number;
-  teleopCellsInner?: number;
-  stage1Activated?: boolean;
-  stage2Activated?: boolean;
-  stage3Activated?: boolean;
-  stage3TargetColor?: string;
-  endgameRungIsLevel?: string;
-  autoInitLinePoints?: number;
-  autoCellPoints?: number;
-  autoPoints?: number;
-  teleopCellPoints?: number;
-  controlPanelPoints?: number;
-  endgamePoints?: number;
-  teleopPoints?: number;
-  shieldOperationalRankingPoint?: boolean;
-  shieldEnergizedRankingPoint?: boolean;
+  initLineRobot1: InitLineRobot2020;
+  endgameRobot1: EndgameRobot2020;
+  initLineRobot2: InitLineRobot2020;
+  endgameRobot2: EndgameRobot2020;
+  initLineRobot3: InitLineRobot2020;
+  endgameRobot3: EndgameRobot2020;
+  autoCellsBottom: number;
+  autoCellsOuter: number;
+  autoCellsInner: number;
+  teleopCellsBottom: number;
+  teleopCellsOuter: number;
+  teleopCellsInner: number;
+  stage1Activated: boolean;
+  stage2Activated: boolean;
+  stage3Activated: boolean;
+  stage3TargetColor: Stage3TargetColor2020;
+  endgameRungIsLevel: EndgameRungIsLevel2020;
+  autoInitLinePoints: number;
+  autoCellPoints: number;
+  autoPoints: number;
+  teleopCellPoints: number;
+  controlPanelPoints: number;
+  endgamePoints: number;
+  teleopPoints: number;
+  shieldOperationalRankingPoint: boolean;
+  shieldEnergizedRankingPoint: boolean;
   /**
    * Unofficial TBA-computed value that indicates whether the shieldEnergizedRankingPoint was earned normally or awarded due to a foul.
    */
@@ -1596,12 +1670,12 @@ export type MatchScoreBreakdown2020Alliance = {
    * Unofficial TBA-computed value that counts the number of robots who were hanging at the end of the match.
    */
   tba_numRobotsHanging?: number;
-  foulCount?: number;
-  techFoulCount?: number;
+  foulCount: number;
+  techFoulCount: number;
   adjustPoints?: number;
-  foulPoints?: number;
+  foulPoints: number;
   rp?: number;
-  totalPoints?: number;
+  totalPoints: number;
 };
 
 /**

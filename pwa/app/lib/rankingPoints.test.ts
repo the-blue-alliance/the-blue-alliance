@@ -20,7 +20,7 @@ describe('rankingPoints', () => {
     [{}, false],
   ])(
     'isScoreBreakdown2016Alliance (%#)',
-    (score_breakdown: MatchScoreBreakdownAlliance, expected) => {
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
       expect(isScoreBreakdown2016Alliance(score_breakdown)).toBe(expected);
     },
   );
@@ -31,7 +31,7 @@ describe('rankingPoints', () => {
     [{}, false],
   ])(
     'isScoreBreakdown2017Alliance (%#)',
-    (score_breakdown: MatchScoreBreakdownAlliance, expected) => {
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
       expect(isScoreBreakdown2017Alliance(score_breakdown)).toBe(expected);
     },
   );
@@ -42,7 +42,7 @@ describe('rankingPoints', () => {
     [{}, false],
   ])(
     'isScoreBreakdown2018Alliance (%#)',
-    (score_breakdown: MatchScoreBreakdownAlliance, expected) => {
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
       expect(isScoreBreakdown2018Alliance(score_breakdown)).toBe(expected);
     },
   );
@@ -53,7 +53,7 @@ describe('rankingPoints', () => {
     [{}, false],
   ])(
     'isScoreBreakdown2019Alliance (%#)',
-    (score_breakdown: MatchScoreBreakdownAlliance, expected) => {
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
       expect(isScoreBreakdown2019Alliance(score_breakdown)).toBe(expected);
     },
   );
@@ -64,7 +64,7 @@ describe('rankingPoints', () => {
     [{}, false],
   ])(
     'isScoreBreakdown2020Alliance (%#)',
-    (score_breakdown: MatchScoreBreakdownAlliance, expected) => {
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
       expect(isScoreBreakdown2020Alliance(score_breakdown)).toBe(expected);
     },
   );
@@ -75,7 +75,7 @@ describe('rankingPoints', () => {
     [{}, false],
   ])(
     'isScoreBreakdown2022Alliance (%#)',
-    (score_breakdown: MatchScoreBreakdownAlliance, expected) => {
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
       expect(isScoreBreakdown2022Alliance(score_breakdown)).toBe(expected);
     },
   );
@@ -86,7 +86,7 @@ describe('rankingPoints', () => {
     [{}, false],
   ])(
     'isScoreBreakdown2023Alliance (%#)',
-    (score_breakdown: MatchScoreBreakdownAlliance, expected) => {
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
       expect(isScoreBreakdown2023Alliance(score_breakdown)).toBe(expected);
     },
   );
@@ -97,7 +97,7 @@ describe('rankingPoints', () => {
     [{}, false],
   ])(
     'isScoreBreakdown2024Alliance (%#)',
-    (score_breakdown: MatchScoreBreakdownAlliance, expected) => {
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
       expect(isScoreBreakdown2024Alliance(score_breakdown)).toBe(expected);
     },
   );
@@ -189,7 +189,10 @@ describe('rankingPoints', () => {
       [false, true],
     ],
     [{ melodyBonusAchieved: true, ensembleBonusAchieved: true }, [true, true]],
-  ])(`getBonusRankingPoints (%#)`, (score_breakdown, expected) => {
-    expect(getBonusRankingPoints(score_breakdown)).toEqual(expected);
-  });
+  ])(
+    `getBonusRankingPoints (%#)`,
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      expect(getBonusRankingPoints(score_breakdown)).toEqual(expected);
+    },
+  );
 });
