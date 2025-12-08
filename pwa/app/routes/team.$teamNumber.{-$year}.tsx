@@ -5,7 +5,6 @@ import {
   useNavigate,
 } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { InView } from 'react-intersection-observer';
 
 import {
   Award,
@@ -27,6 +26,10 @@ import {
   getTeamYearsParticipated,
 } from '~/api/tba/read';
 import { AwardBanner } from '~/components/tba/banner';
+import {
+  TableOfContentsPopover,
+  TableOfContentsSection,
+} from '~/components/tba/tableOfContentsPopover';
 import TeamEventAppearance from '~/components/tba/teamEventAppearance';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
@@ -47,11 +50,6 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import {
-  TableOfContentsItem,
-  TableOfContentsLink,
-  TableOfContentsList,
-} from '~/components/ui/toc';
 import {
   Tooltip,
   TooltipContent,
@@ -215,7 +213,7 @@ function TeamPage(): React.JSX.Element {
     eventDistrictPts,
     eventAlliances,
   } = Route.useLoaderData();
-  const [eventsInView, setEventsInView] = useState(new Set());
+  const [eventsInView, setEventsInView] = useState(new Set<string>());
 
   events.sort(sortEventsComparator);
 
@@ -243,46 +241,40 @@ function TeamPage(): React.JSX.Element {
     [media],
   );
 
+  const tocItems = useMemo(
+    () =>
+      events.map((e) => ({
+        slug: e.key,
+        label: e.short_name?.trim() ? e.short_name : e.name,
+      })),
+    [events],
+  );
+
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
-      <div className="basis-full lg:basis-1/6">
-        <div className="top-14 pt-8 sm:sticky">
-          <Select
-            value={String(year)}
-            onValueChange={(value) => {
-              void navigate({
-                to: '/team/$teamNumber/{-$year}',
-                params: { teamNumber: String(team.team_number), year: value },
-              });
-            }}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={year} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="history">History</SelectItem>
-              {yearsParticipated.map((y) => (
-                <SelectItem key={y} value={`${y}`}>
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <TableOfContentsList className="mt-2">
-            {events.map((e) => (
-              <TableOfContentsItem key={e.key}>
-                <TableOfContentsLink
-                  to={`#${e.key}`}
-                  replace={true}
-                  isActive={eventsInView.has(e.key)}
-                >
-                  {e.short_name?.trim() ? e.short_name : e.name}
-                </TableOfContentsLink>
-              </TableOfContentsItem>
+      <TableOfContentsPopover tocItems={tocItems} inView={eventsInView}>
+        <Select
+          value={String(year)}
+          onValueChange={(value) => {
+            void navigate({
+              to: '/team/$teamNumber/{-$year}',
+              params: { teamNumber: String(team.team_number), year: value },
+            });
+          }}
+        >
+          <SelectTrigger className="mb-4 w-[180px]">
+            <SelectValue placeholder={year} />
+          </SelectTrigger>
+          <SelectContent className="max-h-[30vh] overflow-y-auto">
+            <SelectItem value="history">History</SelectItem>
+            {yearsParticipated.map((y) => (
+              <SelectItem key={y} value={`${y}`}>
+                {y}
+              </SelectItem>
             ))}
-          </TableOfContentsList>
-        </div>
-      </div>
+          </SelectContent>
+        </Select>
+      </TableOfContentsPopover>
 
       <div className="mt-8 w-full">
         <div
@@ -333,19 +325,10 @@ function TeamPage(): React.JSX.Element {
           <Separator className="mt-4 mb-8" />
 
           {events.map((e) => (
-            <InView
-              as="div"
+            <TableOfContentsSection
               key={e.key}
-              onChange={(inView) => {
-                setEventsInView((prev) => {
-                  if (inView) {
-                    prev.add(e.key);
-                  } else {
-                    prev.delete(e.key);
-                  }
-                  return new Set(prev);
-                });
-              }}
+              id={e.key}
+              setInView={setEventsInView}
             >
               <TeamEventAppearance
                 event={e}
@@ -357,7 +340,7 @@ function TeamPage(): React.JSX.Element {
                 maybeAlliances={eventAlliances[e.key]}
               />
               <Separator className="my-4" />
-            </InView>
+            </TableOfContentsSection>
           ))}
         </div>
       </div>
