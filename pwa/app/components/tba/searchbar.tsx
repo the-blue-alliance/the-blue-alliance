@@ -14,7 +14,7 @@ import FuzzysortFilterer from '~/lib/search/fuzzysortFilterer';
 import { ProdAPIProvider } from '~/lib/search/prodAPIProvider';
 import { cn } from '~/lib/utils';
 
-export default function Searchbar() {
+export default function Searchbar({ className }: { className?: string }) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
@@ -77,7 +77,7 @@ export default function Searchbar() {
   });
 
   return (
-    <Command className="relative" shouldFilter={false}>
+    <Command className={cn('relative', className)} shouldFilter={false}>
       <CommandInput
         placeholder="Search"
         onFocus={() => {
@@ -100,7 +100,7 @@ export default function Searchbar() {
           setQuery(e);
         }}
         ref={inputRef}
-        className="h-8"
+        className="hidden h-8 md:block"
       />
 
       <CommandList

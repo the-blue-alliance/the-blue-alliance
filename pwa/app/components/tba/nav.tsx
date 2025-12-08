@@ -1,15 +1,11 @@
 import { Link } from '@tanstack/react-router';
-
-import BiBarChartLineFill from '~icons/bi/bar-chart-line-fill';
-import BiCameraVideoFill from '~icons/bi/camera-video-fill';
-import BiGearFill from '~icons/bi/gear-fill';
-import BiPencilFill from '~icons/bi/pencil-fill';
-import BiPeopleFill from '~icons/bi/people-fill';
-import BiStarFill from '~icons/bi/star-fill';
-import BiThreeDotsVertical from '~icons/bi/three-dots-vertical';
-import IonCalendar from '~icons/ion/calendar';
+import { useState } from 'react';
 
 import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
+import {
+  NavMobile,
+  NavMobileButton,
+} from '~/components/tba/navigation/nav-mobile';
 import Searchbar from '~/components/tba/searchbar';
 import {
   NavigationMenu,
@@ -18,13 +14,8 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '~/components/ui/navigation-menu';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '~/components/ui/popover';
 import lamp from '~/images/tba/tba-lamp.svg';
-import { cn } from '~/lib/utils';
+import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 import { FileRouteTypes } from '~/routeTree.gen';
 
 interface MenuItemProps {
@@ -71,150 +62,52 @@ export const MenuItem = ({
   );
 };
 
-export const DropMenuItem = ({
-  className,
-  icon,
-  title,
-  to,
-  href,
-  params,
-}: MenuItemProps) => {
-  return (
-    <NavigationMenuItem
-      className={cn(
-        `text-md relative flex cursor-default items-center rounded-sm bg-primary
-        outline-hidden transition-colors select-none focus:bg-background
-        focus:text-accent-foreground data-disabled:pointer-events-none
-        data-disabled:opacity-50`,
-        className,
-      )}
-    >
-      <NavigationMenuLink
-        className={
-          navigationMenuTriggerStyle() +
-          ' w-full grow cursor-pointer hover:no-underline'
-        }
-        asChild
-      >
-        {to ? (
-          <Link
-            to={to}
-            params={params}
-            className="flex grow flex-row flex-wrap content-between items-center
-              justify-start px-2 text-white hover:no-underline"
-          >
-            {icon}
-            <div className="pl-2 antialiased">{title}</div>
-          </Link>
-        ) : href ? (
-          <a href={href} className="hover:no-underline">
-            {icon}
-            <div className="pl-2 antialiased">{title}</div>
-          </a>
-        ) : (
-          <div
-            className="flex grow flex-row flex-wrap content-between items-center
-              justify-start px-2"
-          >
-            {icon}
-            <div className="pl-2 antialiased">{title}</div>
-          </div>
-        )}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
-  );
-};
-
 export const Nav = () => {
+  const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
   return (
-    <div
-      className="fixed z-10 flex w-full grow justify-center bg-primary
-        shadow-md"
-    >
-      <GlobalLoadingProgress />
-      <NavigationMenu className="gap-6 px-4 py-2.5">
-        <Link to="/" className="flex items-center gap-3 hover:no-underline">
-          <img
-            src={lamp}
-            className="size-6 max-w-none"
-            alt="The Blue Alliance Logo"
-          />
-          <div
-            className="hidden text-xl font-medium tracking-tight
-              whitespace-nowrap text-white lg:block"
+    <>
+      <div
+        className="fixed z-15 flex w-full grow justify-center bg-primary
+          shadow-md"
+      >
+        <GlobalLoadingProgress />
+        <NavigationMenu className="gap-6 px-4 py-2.5">
+          <Link
+            to="/"
+            className="flex items-center gap-3 hover:no-underline max-md:flex-1"
           >
-            The Blue Alliance
-          </div>
-        </Link>
-        <NavigationMenuList className="flex w-full grow">
-          <MenuItem icon={<BiStarFill />} title="myTBA" />
-          <MenuItem
-            icon={<IonCalendar />}
-            title="Events"
-            to="/events/{-$year}"
-          />
-          <MenuItem
-            className="hidden md:block"
-            icon={<BiPeopleFill />}
-            title="Teams"
-          />
-          <MenuItem
-            className="hidden md:block"
-            icon={<BiCameraVideoFill />}
-            title="GameDay"
-            to="/gameday"
-          />
-          <MenuItem
-            className="hidden md:block"
-            icon={<BiBarChartLineFill />}
-            title="Insights"
-            to="/insights/{-$year}"
-          />
-          <Popover>
-            <PopoverTrigger>
-              <MenuItem title="More" icon={<BiThreeDotsVertical />} />{' '}
-            </PopoverTrigger>
-            <PopoverContent
-              sideOffset={12}
-              alignOffset={-2}
-              align="start"
-              className={cn(
-                `shadow-l m-0 mt-6 w-30 rounded-md border-none bg-primary px-1
-                py-1 drop-shadow-lg`,
-              )}
+            <img
+              src={lamp}
+              className="size-6 max-w-none"
+              alt="The Blue Alliance Logo"
+            />
+            <div
+              className="text-xl font-medium tracking-tight whitespace-nowrap
+                text-white"
             >
-              <DropMenuItem
-                className="lg:hidden"
-                icon={<BiPeopleFill />}
-                title="Teams"
+              <span className="md:hidden lg:block">The Blue Alliance</span>
+              <span className="hidden md:block lg:hidden">TBA</span>
+            </div>
+          </Link>
+          <NavigationMenuList className="flex w-full grow">
+            {/* Desktop Menu Items */}
+            {NAV_ITEMS_LIST.map((item) => (
+              <MenuItem
+                key={item.title}
+                className="hidden md:block"
+                icon={<item.icon />}
+                title={item.title}
+                to={item.href}
               />
-              <DropMenuItem
-                className="lg:hidden"
-                icon={<BiCameraVideoFill />}
-                title="GameDay"
-                to="/gameday"
-              />
-              <DropMenuItem
-                className="lg:hidden"
-                icon={<BiBarChartLineFill />}
-                title="Insights"
-                to="/insights/{-$year}"
-              />
-              <DropMenuItem
-                icon={<BiPencilFill />}
-                title="Blog"
-                href="https://blog.thebluealliance.com"
-              />
-              <DropMenuItem
-                icon={<BiGearFill />}
-                title="Account"
-                to="/account"
-              />
-            </PopoverContent>
-          </Popover>
-        </NavigationMenuList>
-        <Searchbar />
-      </NavigationMenu>
-    </div>
+            ))}
+          </NavigationMenuList>
+          <div className="hidden md:block">
+            <Searchbar />
+          </div>
+          <NavMobileButton open={mobileNavOpen} setOpen={setMobileNavOpen} />
+        </NavigationMenu>
+      </div>
+      <NavMobile open={mobileNavOpen} setOpen={setMobileNavOpen} />
+    </>
   );
 };
