@@ -7134,6 +7134,147 @@
           }
         }
       },
+      "AutoRobot_2018": {
+        "type": "string",
+        "enum": [
+          "None",
+          "AutoRun"
+        ]
+      },
+      "EndgameRobot_2018": {
+        "type": "string",
+        "enum": [
+          "Climbing",
+          "Levitate",
+          "None",
+          "Parking",
+          "Unknown"
+        ]
+      },
+      "RobotAuto_2016_WithUnknown": {
+        "type": "string",
+        "enum": [
+          "Crossed",
+          "None",
+          "Reached",
+          "Unknown"
+        ]
+      },
+      "RobotAuto_2016_WithoutUnknown": {
+        "type": "string",
+        "enum": [
+          "Crossed",
+          "Reached",
+          "None"
+        ]
+      },
+      "Position_2016": {
+        "type": "string",
+        "enum": [
+          "",
+          "A_ChevalDeFrise",
+          "A_Portcullis",
+          "B_Moat",
+          "B_Ramparts",
+          "C_Drawbridge",
+          "C_SallyPort",
+          "D_RockWall",
+          "D_RoughTerrain",
+          "NotSpecified"
+        ]
+      },
+      "TowerFace_2016": {
+        "type": "string",
+        "enum": [
+          "Both",
+          "Challenged",
+          "None",
+          "Scaled",
+          "Unknown"
+        ]
+      },
+      "RobotAuto_2017": {
+        "type": "string",
+        "enum": [
+          "Mobility",
+          "None",
+          "Unknown"
+        ]
+      },
+      "Touchpad_2017": {
+        "type": "string",
+        "enum": [
+          "None",
+          "ReadyForTakeoff"
+        ]
+      },
+      "Bay_2019": {
+        "type": "string",
+        "enum": [
+          "None",
+          "Panel",
+          "PanelAndCargo"
+        ]
+      },
+      "EndgameRobot_2019": {
+        "type": "string",
+        "enum": [
+          "HabLevel1",
+          "HabLevel2",
+          "HabLevel3",
+          "None",
+          "Unknown"
+        ]
+      },
+      "HabLine_2019": {
+        "type": "string",
+        "enum": [
+          "CrossedHabLineInSandstorm",
+          "CrossedHabLineInTeleop",
+          "None",
+          "Unknown"
+        ]
+      },
+      "PreMatchBay_2019": {
+        "type": "string",
+        "enum": [
+          "Cargo",
+          "Panel",
+          "Unknown"
+        ]
+      },
+      "InitLineRobot_2020": {
+        "type": "string",
+        "enum": [
+          "Exited",
+          "None"
+        ]
+      },
+      "EndgameRobot_2020": {
+        "type": "string",
+        "enum": [
+          "Hang",
+          "None",
+          "Park"
+        ]
+      },
+      "EndgameRungIsLevel_2020": {
+        "type": "string",
+        "enum": [
+          "IsLevel",
+          "NotLevel"
+        ]
+      },
+      "Stage3TargetColor_2020": {
+        "type": "string",
+        "enum": [
+          "Blue",
+          "Green",
+          "Red",
+          "Unknown",
+          "Yellow"
+        ]
+      },
       "Match_Score_Breakdown_2015": {
         "type": "object",
         "required": [
@@ -7166,8 +7307,17 @@
       "Match_Score_Breakdown_2015_Alliance": {
         "type": "object",
         "properties": {
+          "auto": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "auto_points": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "teleop_points": {
             "type": "integer"
@@ -7181,8 +7331,17 @@
           "litter_points": {
             "type": "integer"
           },
+          "foul": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "foul_points": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "adjust_points": {
             "type": "integer"
@@ -7258,6 +7417,34 @@
       },
       "Match_Score_Breakdown_2016_Alliance": {
         "type": "object",
+        "required": [
+          "autoBoulderPoints",
+          "autoCrossingPoints",
+          "autoPoints",
+          "autoReachPoints",
+          "breachPoints",
+          "capturePoints",
+          "foulPoints",
+          "position1crossings",
+          "position2",
+          "position2crossings",
+          "position3",
+          "position3crossings",
+          "position4",
+          "position4crossings",
+          "position5",
+          "position5crossings",
+          "tba_rpEarned",
+          "teleopBoulderPoints",
+          "teleopBouldersHigh",
+          "teleopBouldersLow",
+          "teleopChallengePoints",
+          "teleopCrossingPoints",
+          "teleopDefensesBreached",
+          "teleopScalePoints",
+          "teleopTowerCaptured",
+          "totalPoints"
+        ],
         "properties": {
           "autoPoints": {
             "type": "integer"
@@ -7280,29 +7467,20 @@
           "totalPoints": {
             "type": "integer"
           },
-          "robot1Auto": {
-            "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
+          "tba_rpEarned": {
+            "type": [
+              "integer",
+              "null"
             ]
+          },
+          "robot1Auto": {
+            "$ref": "#/components/schemas/RobotAuto_2016_WithUnknown"
           },
           "robot2Auto": {
-            "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2016_WithoutUnknown"
           },
           "robot3Auto": {
-            "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2016_WithUnknown"
           },
           "autoReachPoints": {
             "type": "integer"
@@ -7344,13 +7522,13 @@
             "type": "boolean"
           },
           "towerFaceA": {
-            "type": "string"
+            "$ref": "#/components/schemas/TowerFace_2016"
           },
           "towerFaceB": {
-            "type": "string"
+            "$ref": "#/components/schemas/TowerFace_2016"
           },
           "towerFaceC": {
-            "type": "string"
+            "$ref": "#/components/schemas/TowerFace_2016"
           },
           "towerEndStrength": {
             "type": "integer"
@@ -7362,16 +7540,16 @@
             "type": "integer"
           },
           "position2": {
-            "type": "string"
+            "$ref": "#/components/schemas/Position_2016"
           },
           "position3": {
-            "type": "string"
+            "$ref": "#/components/schemas/Position_2016"
           },
           "position4": {
-            "type": "string"
+            "$ref": "#/components/schemas/Position_2016"
           },
           "position5": {
-            "type": "string"
+            "$ref": "#/components/schemas/Position_2016"
           },
           "position1crossings": {
             "type": "integer"
@@ -7408,6 +7586,32 @@
       },
       "Match_Score_Breakdown_2017_Alliance": {
         "type": "object",
+        "required": [
+          "autoFuelHigh",
+          "autoFuelLow",
+          "autoFuelPoints",
+          "autoMobilityPoints",
+          "autoPoints",
+          "autoRotorPoints",
+          "foulPoints",
+          "kPaBonusPoints",
+          "kPaRankingPointAchieved",
+          "rotor1Auto",
+          "rotor1Engaged",
+          "rotor2Auto",
+          "rotor2Engaged",
+          "rotor3Engaged",
+          "rotor4Engaged",
+          "rotorBonusPoints",
+          "rotorRankingPointAchieved",
+          "teleopFuelHigh",
+          "teleopFuelLow",
+          "teleopFuelPoints",
+          "teleopPoints",
+          "teleopRotorPoints",
+          "teleopTakeoffPoints",
+          "totalPoints"
+        ],
         "properties": {
           "autoPoints": {
             "type": "integer"
@@ -7425,28 +7629,13 @@
             "type": "integer"
           },
           "robot1Auto": {
-            "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2017"
           },
           "robot2Auto": {
-            "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2017"
           },
           "robot3Auto": {
-            "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2017"
           },
           "rotor1Auto": {
             "type": "boolean"
@@ -7508,6 +7697,12 @@
           "rotorRankingPointAchieved": {
             "type": "boolean"
           },
+          "tba_rpEarned": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
           "techFoulCount": {
             "type": "integer"
           },
@@ -7515,13 +7710,13 @@
             "type": "integer"
           },
           "touchpadNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Touchpad_2017"
           },
           "touchpadMiddle": {
-            "type": "string"
+            "$ref": "#/components/schemas/Touchpad_2017"
           },
           "touchpadFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Touchpad_2017"
           }
         }
       },
@@ -7543,6 +7738,31 @@
       },
       "Match_Score_Breakdown_2018_Alliance": {
         "type": "object",
+        "required": [
+          "autoOwnershipPoints",
+          "autoPoints",
+          "autoRunPoints",
+          "autoScaleOwnershipSec",
+          "autoSwitchOwnershipSec",
+          "endgamePoints",
+          "faceTheBossRankingPoint",
+          "foulPoints",
+          "rp",
+          "teleopOwnershipPoints",
+          "teleopPoints",
+          "teleopScaleBoostSec",
+          "teleopScaleOwnershipSec",
+          "teleopSwitchBoostSec",
+          "teleopSwitchOwnershipSec",
+          "totalPoints",
+          "vaultBoostPlayed",
+          "vaultBoostTotal",
+          "vaultForcePlayed",
+          "vaultForceTotal",
+          "vaultLevitatePlayed",
+          "vaultLevitateTotal",
+          "vaultPoints"
+        ],
         "properties": {
           "adjustPoints": {
             "type": "integer"
@@ -7557,13 +7777,13 @@
             "type": "boolean"
           },
           "autoRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoRobot_2018"
           },
           "autoRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoRobot_2018"
           },
           "autoRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoRobot_2018"
           },
           "autoRunPoints": {
             "type": "integer"
@@ -7581,13 +7801,13 @@
             "type": "integer"
           },
           "endgameRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2018"
           },
           "endgameRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2018"
           },
           "endgameRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2018"
           },
           "faceTheBossRankingPoint": {
             "type": "boolean"
@@ -7654,6 +7874,13 @@
           },
           "tba_gameData": {
             "type": "string",
+            "enum": [
+              "",
+              "LLL",
+              "LRL",
+              "RLR",
+              "RRR"
+            ],
             "description": "Unofficial TBA-computed value of the FMS provided GameData given to the alliance teams at the start of the match. 3 Character String containing `L` and `R` only. The first character represents the near switch, the 2nd the scale, and the 3rd the far, opposing, switch from the alliance's perspective. An `L` in a position indicates the platform on the left will be lit for the alliance while an `R` will indicate the right platform will be lit for the alliance. See also [WPI Screen Steps](https://wpilib.screenstepslive.com/s/currentCS/m/getting_started/l/826278-2018-game-data-details)."
           }
         }
@@ -7805,6 +8032,53 @@
       },
       "Match_Score_Breakdown_2019_Alliance": {
         "type": "object",
+        "required": [
+          "bay1",
+          "bay2",
+          "bay3",
+          "bay4",
+          "bay5",
+          "bay6",
+          "bay7",
+          "bay8",
+          "cargoPoints",
+          "completeRocketRankingPoint",
+          "endgameRobot1",
+          "endgameRobot2",
+          "endgameRobot3",
+          "foulPoints",
+          "habClimbPoints",
+          "habDockingRankingPoint",
+          "habLineRobot1",
+          "habLineRobot2",
+          "habLineRobot3",
+          "hatchPanelPoints",
+          "lowLeftRocketFar",
+          "lowLeftRocketNear",
+          "lowRightRocketFar",
+          "lowRightRocketNear",
+          "midLeftRocketFar",
+          "midLeftRocketNear",
+          "midRightRocketFar",
+          "midRightRocketNear",
+          "preMatchBay1",
+          "preMatchBay2",
+          "preMatchBay3",
+          "preMatchBay6",
+          "preMatchBay7",
+          "preMatchBay8",
+          "preMatchLevelRobot1",
+          "preMatchLevelRobot2",
+          "preMatchLevelRobot3",
+          "rp",
+          "sandStormBonusPoints",
+          "teleopPoints",
+          "topLeftRocketFar",
+          "topLeftRocketNear",
+          "topRightRocketFar",
+          "topRightRocketNear",
+          "totalPoints"
+        ],
         "properties": {
           "adjustPoints": {
             "type": "integer"
@@ -7813,28 +8087,28 @@
             "type": "integer"
           },
           "bay1": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay2": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay3": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay4": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay5": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay6": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay7": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay8": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "cargoPoints": {
             "type": "integer"
@@ -7849,13 +8123,13 @@
             "type": "boolean"
           },
           "endgameRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "endgameRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "endgameRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "foulCount": {
             "type": "integer"
@@ -7870,67 +8144,67 @@
             "type": "boolean"
           },
           "habLineRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/HabLine_2019"
           },
           "habLineRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/HabLine_2019"
           },
           "habLineRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/HabLine_2019"
           },
           "hatchPanelPoints": {
             "type": "integer"
           },
           "lowLeftRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "lowLeftRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "lowRightRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "lowRightRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "midLeftRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "midLeftRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "midRightRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "midRightRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "preMatchBay1": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay2": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay3": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay6": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay7": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay8": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchLevelRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "preMatchLevelRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "preMatchLevelRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "rp": {
             "type": "integer"
@@ -7945,16 +8219,16 @@
             "type": "integer"
           },
           "topLeftRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "topLeftRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "topRightRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "topRightRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "totalPoints": {
             "type": "integer"
@@ -7979,24 +8253,56 @@
       },
       "Match_Score_Breakdown_2020_Alliance": {
         "type": "object",
+        "required": [
+          "autoCellPoints",
+          "autoCellsBottom",
+          "autoCellsInner",
+          "autoCellsOuter",
+          "autoInitLinePoints",
+          "autoPoints",
+          "controlPanelPoints",
+          "endgamePoints",
+          "endgameRobot1",
+          "endgameRobot2",
+          "endgameRobot3",
+          "endgameRungIsLevel",
+          "foulCount",
+          "foulPoints",
+          "initLineRobot1",
+          "initLineRobot2",
+          "initLineRobot3",
+          "shieldEnergizedRankingPoint",
+          "shieldOperationalRankingPoint",
+          "stage1Activated",
+          "stage2Activated",
+          "stage3Activated",
+          "stage3TargetColor",
+          "techFoulCount",
+          "teleopCellPoints",
+          "teleopCellsBottom",
+          "teleopCellsInner",
+          "teleopCellsOuter",
+          "teleopPoints",
+          "totalPoints"
+        ],
         "properties": {
           "initLineRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/InitLineRobot_2020"
           },
           "endgameRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2020"
           },
           "initLineRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/InitLineRobot_2020"
           },
           "endgameRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2020"
           },
           "initLineRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/InitLineRobot_2020"
           },
           "endgameRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2020"
           },
           "autoCellsBottom": {
             "type": "integer"
@@ -8026,10 +8332,10 @@
             "type": "boolean"
           },
           "stage3TargetColor": {
-            "type": "string"
+            "$ref": "#/components/schemas/Stage3TargetColor_2020"
           },
           "endgameRungIsLevel": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRungIsLevel_2020"
           },
           "autoInitLinePoints": {
             "type": "integer"
