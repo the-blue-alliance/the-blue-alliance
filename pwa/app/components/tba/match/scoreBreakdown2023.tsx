@@ -2,9 +2,11 @@ import { Match, MatchScoreBreakdown2023 } from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
+  FoulDisplay,
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
+import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
 
 export default function ScoreBreakdown2023({
   scoreBreakdown,
@@ -288,17 +290,23 @@ export default function ScoreBreakdown2023({
         {/* Fouls / Tech Fouls */}
         <TableRow>
           <TableCell className="bg-alliance-red-light">
-            {scoreBreakdown.red.foulCount} (+
-            {(scoreBreakdown.red.foulCount ?? 0) * 5}) /{' '}
-            {scoreBreakdown.red.techFoulCount} (+
-            {(scoreBreakdown.red.techFoulCount ?? 0) * 12})
+            <FoulDisplay
+              foulsReceived={scoreBreakdown.red.foulCount}
+              pointsPerFoul={POINTS_PER_FOUL[2023]}
+              techFoulsReceived={scoreBreakdown.red.techFoulCount}
+              pointsPerTechFoul={POINTS_PER_TECH_FOUL[2023]}
+              techOrMajor="tech"
+            />
           </TableCell>
           <TableCell className="bg-gray-50">Fouls / Tech Fouls</TableCell>
           <TableCell className="bg-alliance-blue-light">
-            {scoreBreakdown.blue.foulCount} (+
-            {(scoreBreakdown.blue.foulCount ?? 0) * 5}) /{' '}
-            {scoreBreakdown.blue.techFoulCount} (+
-            {(scoreBreakdown.blue.techFoulCount ?? 0) * 12})
+            <FoulDisplay
+              foulsReceived={scoreBreakdown.blue.foulCount}
+              pointsPerFoul={POINTS_PER_FOUL[2023]}
+              techFoulsReceived={scoreBreakdown.blue.techFoulCount}
+              pointsPerTechFoul={POINTS_PER_TECH_FOUL[2023]}
+              techOrMajor="tech"
+            />
           </TableCell>
         </TableRow>
 

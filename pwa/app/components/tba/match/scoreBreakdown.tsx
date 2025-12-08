@@ -15,20 +15,30 @@ export function ScoreBreakdownTable({
   className?: string;
 }) {
   return (
-    <Table className={cn('table-fixed text-center', className)}>
-      <TableBody>{children}</TableBody>
+    <Table
+      className={cn(
+        'table-fixed overflow-hidden rounded-lg text-center',
+        className,
+      )}
+    >
+      <colgroup>
+        <col />
+        <col className="w-[45%]" />
+        <col />
+      </colgroup>
+      <TableBody className="">{children}</TableBody>
     </Table>
   );
 }
 
 export function ScoreBreakdownRow({
   children,
-  blueValue,
-  redValue,
+  blueValue = undefined,
+  redValue = undefined,
 }: {
   children: React.ReactNode;
-  blueValue: number | undefined;
-  redValue: number | undefined;
+  blueValue?: number;
+  redValue?: number;
 }) {
   const redWon = (redValue ?? 0) > (blueValue ?? 0);
   const blueWon = (blueValue ?? 0) > (redValue ?? 0);
@@ -119,11 +129,13 @@ const cellVariants = cva('', {
 interface ScoreBreakdownCellProps
   extends
     React.ComponentPropsWithoutRef<typeof TableCell>,
-    Pick<VariantProps<typeof cellVariants>, 'shade' | 'fontWeight'> {
+    Omit<VariantProps<typeof cellVariants>, 'color'> {
+  color: 'red' | 'blue' | 'neutral';
   children?: React.ReactNode;
 }
 
-export function ScoreBreakdownRedCell({
+export function ScoreBreakdownAllianceCell({
+  color,
   shade,
   fontWeight,
   className,
@@ -132,30 +144,7 @@ export function ScoreBreakdownRedCell({
 }: ScoreBreakdownCellProps) {
   return (
     <TableCell
-      className={cn(
-        cellVariants({ color: 'red', shade, fontWeight }),
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </TableCell>
-  );
-}
-
-export function ScoreBreakdownBlueCell({
-  shade,
-  fontWeight,
-  className,
-  children,
-  ...props
-}: ScoreBreakdownCellProps) {
-  return (
-    <TableCell
-      className={cn(
-        cellVariants({ color: 'blue', shade, fontWeight }),
-        className,
-      )}
+      className={cn(cellVariants({ color, shade, fontWeight }), className)}
       {...props}
     >
       {children}
@@ -171,7 +160,7 @@ export function ScoreBreakdownLabelCell({
   redWon,
   blueWon,
   ...props
-}: ScoreBreakdownCellProps & {
+}: Omit<ScoreBreakdownCellProps, 'color'> & {
   redWon?: boolean;
   blueWon?: boolean;
 }) {
@@ -195,3 +184,5 @@ export function ScoreBreakdownLabelCell({
     </TableCell>
   );
 }
+
+ScoreBreakdownLabelCell.displayName = 'ScoreBreakdownLabelCell';

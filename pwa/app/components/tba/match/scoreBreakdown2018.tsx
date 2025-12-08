@@ -1,12 +1,21 @@
 import { Match, MatchScoreBreakdown2018 } from '~/api/tba/read';
-import { ConditionalBadge } from '~/components/tba/match/common';
 import {
-  ScoreBreakdownBlueCell,
+  ConditionalBadge,
+  FoulDisplay,
+  fmtFouls,
+} from '~/components/tba/match/common';
+import {
+  ScoreBreakdownAllianceCell,
   ScoreBreakdownLabelCell,
-  ScoreBreakdownRedCell,
   ScoreBreakdownRow,
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
+import { Badge } from '~/components/ui/badge';
+import {
+  ENDGAME_2018_POINTS,
+  POINTS_PER_FOUL,
+  POINTS_PER_TECH_FOUL,
+} from '~/lib/pointValues';
 
 export default function ScoreBreakdown2018({
   scoreBreakdown,
@@ -22,51 +31,55 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.autoRunPoints}
         redValue={scoreBreakdown.red.autoRunPoints}
       >
-        <ScoreBreakdownRedCell shade="light">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-center gap-1">
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
+          <div className="flex flex-row items-center gap-1">
+            <div className="flex flex-col items-start justify-center gap-1">
               <ConditionalBadge
                 condition={scoreBreakdown.red.autoRobot1 === 'AutoRun'}
                 teamKey={match.alliances.red.team_keys[0]}
+                alignIcon="left"
               />
               <ConditionalBadge
                 condition={scoreBreakdown.red.autoRobot2 === 'AutoRun'}
                 teamKey={match.alliances.red.team_keys[1]}
+                alignIcon="left"
               />
               <ConditionalBadge
                 condition={scoreBreakdown.red.autoRobot3 === 'AutoRun'}
                 teamKey={match.alliances.red.team_keys[2]}
+                alignIcon="left"
               />
             </div>
-            <div className="flex justify-center">
+            <div className="flex flex-1 justify-center">
               {scoreBreakdown.red.autoRunPoints}
             </div>
           </div>
-        </ScoreBreakdownRedCell>
-        <ScoreBreakdownLabelCell shade="light">
-          Auto Run
-        </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="light">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-center gap-1">
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark">Auto Run</ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
+          <div className="flex flex-row items-center gap-1">
+            <div className="flex flex-1 justify-center">
+              {scoreBreakdown.blue.autoRunPoints}
+            </div>
+            <div className="flex flex-col items-end justify-center gap-1">
               <ConditionalBadge
                 condition={scoreBreakdown.blue.autoRobot1 === 'AutoRun'}
                 teamKey={match.alliances.blue.team_keys[0]}
+                alignIcon="right"
               />
               <ConditionalBadge
                 condition={scoreBreakdown.blue.autoRobot2 === 'AutoRun'}
                 teamKey={match.alliances.blue.team_keys[1]}
+                alignIcon="right"
               />
               <ConditionalBadge
                 condition={scoreBreakdown.blue.autoRobot3 === 'AutoRun'}
                 teamKey={match.alliances.blue.team_keys[2]}
+                alignIcon="right"
               />
             </div>
-            <div className="flex justify-center">
-              {scoreBreakdown.blue.autoRunPoints}
-            </div>
           </div>
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Auto Scale Ownership (sec) */}
@@ -74,15 +87,15 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.autoScaleOwnershipSec}
         redValue={scoreBreakdown.red.autoScaleOwnershipSec}
       >
-        <ScoreBreakdownRedCell shade="light">
+        <ScoreBreakdownAllianceCell color="red" shade="light">
           {scoreBreakdown.red.autoScaleOwnershipSec}
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Auto Scale Ownership (sec)
+          Auto Scale Owned
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="light">
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
           {scoreBreakdown.blue.autoScaleOwnershipSec}
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Auto Switch Ownership (sec) */}
@@ -90,15 +103,15 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.autoSwitchOwnershipSec}
         redValue={scoreBreakdown.red.autoSwitchOwnershipSec}
       >
-        <ScoreBreakdownRedCell shade="light">
+        <ScoreBreakdownAllianceCell color="red" shade="light">
           {scoreBreakdown.red.autoSwitchOwnershipSec}
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Auto Switch Ownership (sec)
+          Auto Switch Owned
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="light">
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
           {scoreBreakdown.blue.autoSwitchOwnershipSec}
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Ownership Points */}
@@ -106,15 +119,15 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.autoOwnershipPoints}
         redValue={scoreBreakdown.red.autoOwnershipPoints}
       >
-        <ScoreBreakdownRedCell shade="dark">
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
           {scoreBreakdown.red.autoOwnershipPoints}
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark">
           Ownership Points
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="dark">
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
           {scoreBreakdown.blue.autoOwnershipPoints}
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Total Auto */}
@@ -122,15 +135,15 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.autoPoints}
         redValue={scoreBreakdown.red.autoPoints}
       >
-        <ScoreBreakdownRedCell shade="dark">
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
           {scoreBreakdown.red.autoPoints}
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark" fontWeight="bold">
           Total Auto
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="dark">
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
           {scoreBreakdown.blue.autoPoints}
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Scale Ownership + Boost */}
@@ -144,17 +157,17 @@ export default function ScoreBreakdown2018({
           (scoreBreakdown.red.teleopScaleBoostSec ?? 0)
         }
       >
-        <ScoreBreakdownRedCell shade="light">
+        <ScoreBreakdownAllianceCell color="red" shade="light">
           {scoreBreakdown.red.teleopScaleOwnershipSec ?? 0} +{' '}
           {scoreBreakdown.red.teleopScaleBoostSec ?? 0}
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Scale Ownership + Boost
+          Scale Owned + Boost
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="light">
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
           {scoreBreakdown.blue.teleopScaleOwnershipSec ?? 0} +{' '}
           {scoreBreakdown.blue.teleopScaleBoostSec ?? 0}
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Switch Ownership + Boost */}
@@ -168,17 +181,17 @@ export default function ScoreBreakdown2018({
           (scoreBreakdown.red.teleopSwitchBoostSec ?? 0)
         }
       >
-        <ScoreBreakdownRedCell shade="light">
+        <ScoreBreakdownAllianceCell color="red" shade="light">
           {scoreBreakdown.red.teleopSwitchOwnershipSec ?? 0} +{' '}
           {scoreBreakdown.red.teleopSwitchBoostSec ?? 0}
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Switch Ownership + Boost
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="light">
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
           {scoreBreakdown.blue.teleopSwitchOwnershipSec ?? 0} +{' '}
           {scoreBreakdown.blue.teleopSwitchBoostSec ?? 0}
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Ownership Points */}
@@ -186,15 +199,15 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.teleopOwnershipPoints}
         redValue={scoreBreakdown.red.teleopOwnershipPoints}
       >
-        <ScoreBreakdownRedCell shade="dark">
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
           {scoreBreakdown.red.teleopOwnershipPoints}
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark">
           Ownership Points
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="dark">
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
           {scoreBreakdown.blue.teleopOwnershipPoints}
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Force Cubes Total (Played) */}
@@ -202,18 +215,18 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.vaultForcePlayed}
         redValue={scoreBreakdown.red.vaultForcePlayed}
       >
-        <ScoreBreakdownRedCell shade="light">
+        <ScoreBreakdownAllianceCell color="red" shade="light">
           {scoreBreakdown.red.vaultForceTotal} (
           {scoreBreakdown.red.vaultForcePlayed})
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
 
         <ScoreBreakdownLabelCell shade="light">
           Force Cubes Total (Played)
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="light">
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
           {scoreBreakdown.blue.vaultForceTotal} (
           {scoreBreakdown.blue.vaultForcePlayed})
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Levitate Cubes Total (Played) */}
@@ -221,17 +234,17 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.vaultLevitatePlayed}
         redValue={scoreBreakdown.red.vaultLevitatePlayed}
       >
-        <ScoreBreakdownRedCell shade="light">
+        <ScoreBreakdownAllianceCell color="red" shade="light">
           {scoreBreakdown.red.vaultLevitateTotal} (
           {scoreBreakdown.red.vaultLevitatePlayed})
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Levitate Cubes Total (Played)
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="light">
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
           {scoreBreakdown.blue.vaultLevitateTotal} (
           {scoreBreakdown.blue.vaultLevitatePlayed})
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Boost Cubes Total (Played) */}
@@ -239,17 +252,17 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.vaultBoostPlayed}
         redValue={scoreBreakdown.red.vaultBoostPlayed}
       >
-        <ScoreBreakdownRedCell shade="light">
+        <ScoreBreakdownAllianceCell color="red" shade="light">
           {scoreBreakdown.red.vaultBoostTotal} (
           {scoreBreakdown.red.vaultBoostPlayed})
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Boost Cubes Total (Played)
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="light">
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
           {scoreBreakdown.blue.vaultBoostTotal} (
           {scoreBreakdown.blue.vaultBoostPlayed})
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Vault Points */}
@@ -257,15 +270,243 @@ export default function ScoreBreakdown2018({
         blueValue={scoreBreakdown.blue.vaultPoints}
         redValue={scoreBreakdown.red.vaultPoints}
       >
-        <ScoreBreakdownRedCell shade="dark">
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
           {scoreBreakdown.red.vaultPoints}
-        </ScoreBreakdownRedCell>
+        </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark">
           Vault Points
         </ScoreBreakdownLabelCell>
-        <ScoreBreakdownBlueCell shade="dark">
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
           {scoreBreakdown.blue.vaultPoints}
-        </ScoreBreakdownBlueCell>
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Robot 1 Endgame */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell
+          color="red"
+          shade="light"
+          className="flex flex-col items-center gap-1"
+        >
+          <Badge variant={'outline'}>
+            {match.alliances.red.team_keys[0].substring(3)}
+          </Badge>
+          <span>
+            {scoreBreakdown.red.endgameRobot1} (+
+            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot1 ?? 'Unknown']}
+            )
+          </span>
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          {' '}
+          Robot 1 Endgame{' '}
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell
+          color="blue"
+          shade="light"
+          className="flex flex-col items-center gap-1"
+        >
+          <Badge variant={'outline'}>
+            {match.alliances.blue.team_keys[0].substring(3)}
+          </Badge>
+          <span>
+            {scoreBreakdown.blue.endgameRobot1} (+
+            {
+              ENDGAME_2018_POINTS[
+                scoreBreakdown.blue.endgameRobot1 ?? 'Unknown'
+              ]
+            }
+            )
+          </span>
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Robot 2 Endgame */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell
+          color="red"
+          shade="light"
+          className="flex flex-col items-center gap-1"
+        >
+          <Badge variant={'outline'}>
+            {match.alliances.red.team_keys[1].substring(3)}
+          </Badge>
+          <span>
+            {scoreBreakdown.red.endgameRobot2} (+
+            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot2 ?? 'Unknown']}
+            )
+          </span>
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          {' '}
+          Robot 2 Endgame{' '}
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell
+          color="blue"
+          shade="light"
+          className="flex flex-col items-center gap-1"
+        >
+          <Badge variant={'outline'}>
+            {match.alliances.blue.team_keys[1].substring(3)}
+          </Badge>
+          <span>
+            {scoreBreakdown.blue.endgameRobot2} (+
+            {
+              ENDGAME_2018_POINTS[
+                scoreBreakdown.blue.endgameRobot2 ?? 'Unknown'
+              ]
+            }
+            )
+          </span>
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Robot 3 Endgame */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell
+          color="red"
+          shade="light"
+          className="flex flex-col items-center gap-1"
+        >
+          <Badge variant={'outline'}>
+            {match.alliances.red.team_keys[2].substring(3)}
+          </Badge>
+          <span>
+            {scoreBreakdown.red.endgameRobot3} (+
+            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot3 ?? 'Unknown']}
+            )
+          </span>
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          {' '}
+          Robot 3 Endgame{' '}
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell
+          color="blue"
+          shade="light"
+          className="flex flex-col items-center gap-1"
+        >
+          <Badge variant={'outline'}>
+            {match.alliances.blue.team_keys[2].substring(3)}
+          </Badge>
+          <span>
+            {scoreBreakdown.blue.endgameRobot3} (+
+            {
+              ENDGAME_2018_POINTS[
+                scoreBreakdown.blue.endgameRobot3 ?? 'Unknown'
+              ]
+            }
+            )
+          </span>
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Endgame Points */}
+      <ScoreBreakdownRow
+        blueValue={scoreBreakdown.blue.endgamePoints}
+        redValue={scoreBreakdown.red.endgamePoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
+          {scoreBreakdown.red.endgamePoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark">
+          Endgame Points
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
+          {scoreBreakdown.blue.endgamePoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Total Teleop */}
+      <ScoreBreakdownRow
+        blueValue={scoreBreakdown.blue.teleopPoints}
+        redValue={scoreBreakdown.red.teleopPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
+          {scoreBreakdown.red.teleopPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark" fontWeight="bold">
+          Total Teleop
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
+          {scoreBreakdown.blue.teleopPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Fouls */}
+      <ScoreBreakdownRow
+        blueValue={scoreBreakdown.blue.foulPoints}
+        redValue={scoreBreakdown.red.foulPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1">
+              <span className="text-xs opacity-70">Regular:</span>
+              <span>
+                {fmtFouls({
+                  foulCount: scoreBreakdown.blue.foulCount,
+                  pointsPerFoul: POINTS_PER_FOUL[2018],
+                })}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-xs opacity-70">Tech:</span>
+              <span>
+                {fmtFouls({
+                  foulCount: scoreBreakdown.blue.techFoulCount,
+                  pointsPerFoul: POINTS_PER_TECH_FOUL[2018],
+                })}
+              </span>
+            </div>
+          </div>
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Fouls Received
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          <FoulDisplay
+            foulsReceived={scoreBreakdown.blue.foulCount}
+            pointsPerFoul={POINTS_PER_FOUL[2018]}
+            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
+            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2018]}
+            techOrMajor="tech"
+          />
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Adjustments */}
+      {(scoreBreakdown.blue.adjustPoints ?? 0) !== 0 &&
+        (scoreBreakdown.red.adjustPoints ?? 0) !== 0 && (
+          <ScoreBreakdownRow
+            blueValue={scoreBreakdown.blue.adjustPoints}
+            redValue={scoreBreakdown.red.adjustPoints}
+          >
+            <ScoreBreakdownAllianceCell color="red" shade="light">
+              {scoreBreakdown.red.adjustPoints}
+            </ScoreBreakdownAllianceCell>
+            <ScoreBreakdownLabelCell shade="light">
+              Adjustments
+            </ScoreBreakdownLabelCell>
+            <ScoreBreakdownAllianceCell color="blue" shade="light">
+              {scoreBreakdown.blue.adjustPoints}
+            </ScoreBreakdownAllianceCell>
+          </ScoreBreakdownRow>
+        )}
+
+      {/* Total Score */}
+      <ScoreBreakdownRow
+        blueValue={scoreBreakdown.blue.totalPoints}
+        redValue={scoreBreakdown.red.totalPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark" fontWeight="bold">
+          {scoreBreakdown.red.totalPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark" fontWeight="bold">
+          Total Score
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark" fontWeight="bold">
+          {scoreBreakdown.blue.totalPoints}
+        </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
     </ScoreBreakdownTable>
   );
