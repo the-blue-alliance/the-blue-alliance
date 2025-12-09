@@ -6,21 +6,24 @@ import AccountIcon from '~icons/lucide/star';
 import TeamsIcon from '~icons/lucide/users-round';
 import WebcastIcon from '~icons/lucide/video';
 
+import { FileRouteTypes } from '~/routeTree.gen';
+
 export type NavItemChild = {
   title: string;
-  href: string;
+  href?: string;
+  to?: FileRouteTypes['to'];
   icon: ElementType;
 };
 
 export const NAV_ITEMS_LIST: NavItemChild[] = [
   {
     title: 'myTBA',
-    href: '/account',
+    to: '/account',
     icon: AccountIcon,
   },
   {
     title: 'Events',
-    href: '/events/{-$year}',
+    to: '/events/{-$year}',
     icon: EventsIcon,
   },
   {
@@ -30,12 +33,12 @@ export const NAV_ITEMS_LIST: NavItemChild[] = [
   },
   {
     title: 'GameDay',
-    href: '/gameday',
+    to: '/gameday',
     icon: WebcastIcon,
   },
   {
     title: 'Insights',
-    href: '/insights/{-$year}',
+    to: '/insights/{-$year}',
     icon: InsightsIcon,
   },
 ];

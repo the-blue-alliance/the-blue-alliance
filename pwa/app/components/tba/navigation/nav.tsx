@@ -44,12 +44,12 @@ export const MenuItem = ({
         {to ? (
           <Link to={to} params={params} className="hover:no-underline">
             {icon}
-            <div className="hidden pl-2 sm:block">{title}</div>
+            <span>{title}</span>
           </Link>
         ) : href ? (
           <a href={href} className="hover:no-underline">
             {icon}
-            <div className="hidden pl-2 sm:block">{title}</div>
+            <span>{title}</span>
           </a>
         ) : (
           <div>
@@ -96,7 +96,8 @@ export const Nav = () => {
                 className="hidden md:block"
                 icon={<item.icon />}
                 title={item.title}
-                to={item.href}
+                to={item.to}
+                href={item.href}
               />
             ))}
           </NavigationMenuList>
