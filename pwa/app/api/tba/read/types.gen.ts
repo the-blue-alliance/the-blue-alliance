@@ -138,11 +138,15 @@ export type Team = {
   /**
    * Official website associated with the team.
    */
-  website?: string | null;
+  website: string | null;
   /**
    * First year the team officially competed.
    */
   rookie_year: number | null;
+  /**
+   * Team's motto or tagline.
+   */
+  motto: string | null;
 };
 
 export type TeamRobot = {
