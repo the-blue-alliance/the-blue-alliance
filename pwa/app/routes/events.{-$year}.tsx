@@ -4,9 +4,9 @@ import { useMemo, useState } from 'react';
 import { Event, getEventsByYear } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
 import {
-  TableOfContentsPopover,
+  TableOfContents,
   TableOfContentsSection,
-} from '~/components/tba/tableOfContentsPopover';
+} from '~/components/tba/tableOfContents';
 import {
   Select,
   SelectContent,
@@ -177,14 +177,16 @@ function YearEventsPage() {
 
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
-      <TableOfContentsPopover tocItems={tocItems} inView={inView}>
+      <TableOfContents tocItems={tocItems} inView={inView}>
         <Select
           value={String(year)}
           onValueChange={(value) => {
             void navigate({ to: `/events/${value}` });
           }}
         >
-          <SelectTrigger className="mb-4 w-[180px]">
+          <SelectTrigger
+            className="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
+          >
             <SelectValue placeholder={year} />
           </SelectTrigger>
           <SelectContent className="max-h-[30vh] overflow-y-auto">
@@ -195,7 +197,7 @@ function YearEventsPage() {
             ))}
           </SelectContent>
         </Select>
-      </TableOfContentsPopover>
+      </TableOfContents>
       <div className="basis-full py-8 lg:basis-5/6">
         <h1 className="mb-3 text-3xl font-medium">
           {year} <em>FIRST</em> Robotics Competition Events{' '}

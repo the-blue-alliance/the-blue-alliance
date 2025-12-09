@@ -2,9 +2,9 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import {
-  TableOfContentsPopover,
+  TableOfContents,
   TableOfContentsSection,
-} from '~/components/tba/tableOfContentsPopover';
+} from '~/components/tba/tableOfContents';
 
 export const Route = createFileRoute('/apidocs')({
   component: ApiDocs,
@@ -37,7 +37,7 @@ function ApiDocs(): React.JSX.Element {
 
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
-      <TableOfContentsPopover tocItems={tocItems} inView={inView} />
+      <TableOfContents tocItems={tocItems} inView={inView} />
       <div className="basis-full py-8 md:basis-5/6">
         <div>
           <section>
