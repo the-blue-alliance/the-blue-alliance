@@ -42,8 +42,9 @@ export const zTeam = z.object({
   lat: z.union([z.number(), z.null()]),
   lng: z.union([z.number(), z.null()]),
   location_name: z.union([z.string(), z.null()]),
-  website: z.optional(z.union([z.string(), z.null()])),
+  website: z.union([z.string(), z.null()]),
   rookie_year: z.union([z.int(), z.null()]),
+  motto: z.union([z.string(), z.null()]),
 });
 
 export const zTeamRobot = z.object({

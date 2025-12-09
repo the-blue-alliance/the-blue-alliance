@@ -61,7 +61,7 @@ const TableOfContentsLink = React.forwardRef<
     ref={ref}
     className={cn(
       'text-sm font-medium text-foreground transition-colors hover:text-primary',
-      isActive ? 'font-medium text-foreground' : 'text-muted-foreground',
+      isActive ? 'font-bold text-foreground' : 'text-muted-foreground',
       className,
     )}
     {...props}

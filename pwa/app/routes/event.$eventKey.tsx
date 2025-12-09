@@ -180,30 +180,30 @@ function EventPage() {
     shouldPreviewRankingsTab,
   } = Route.useLoaderData();
 
-  const awardsQuery = useQuery({
-    ...getEventAwardsOptions({ path: { event_key: event.key } }),
-  });
+  const awardsQuery = useQuery(
+    getEventAwardsOptions({ path: { event_key: event.key } }),
+  );
 
-  const coprsQuery = useQuery({
-    ...getEventCoprsOptions({ path: { event_key: event.key } }),
-  });
+  const coprsQuery = useQuery(
+    getEventCoprsOptions({ path: { event_key: event.key } }),
+  );
 
   const colorsQuery = useQuery({
     queryKey: ['eventColors', event.key],
     queryFn: () => getEventColors({ eventKey: event.key }),
   });
 
-  const rankingsQuery = useQuery({
-    ...getEventRankingsOptions({ path: { event_key: event.key } }),
-  });
+  const rankingsQuery = useQuery(
+    getEventRankingsOptions({ path: { event_key: event.key } }),
+  );
 
-  const teamsQuery = useQuery({
-    ...getEventTeamsOptions({ path: { event_key: event.key } }),
-  });
+  const teamsQuery = useQuery(
+    getEventTeamsOptions({ path: { event_key: event.key } }),
+  );
 
-  const teamMediaQuery = useQuery({
-    ...getEventTeamMediaOptions({ path: { event_key: event.key } }),
-  });
+  const teamMediaQuery = useQuery(
+    getEventTeamMediaOptions({ path: { event_key: event.key } }),
+  );
 
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),

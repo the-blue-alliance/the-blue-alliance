@@ -5125,7 +5125,9 @@
           "lat",
           "lng",
           "location_name",
-          "rookie_year"
+          "website",
+          "rookie_year",
+          "motto"
         ],
         "type": "object",
         "properties": {
@@ -5239,6 +5241,13 @@
               "null"
             ],
             "description": "First year the team officially competed."
+          },
+          "motto": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Team's motto or tagline."
           }
         }
       },

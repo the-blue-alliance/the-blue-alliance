@@ -1,9 +1,12 @@
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
-import { InView } from 'react-intersection-observer';
+import { useMemo, useState } from 'react';
 
 import { Event, getEventsByYear } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
+import {
+  TableOfContentsPopover,
+  TableOfContentsSection,
+} from '~/components/tba/tableOfContentsPopover';
 import {
   Select,
   SelectContent,
@@ -11,11 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import {
-  TableOfContentsItem,
-  TableOfContentsLink,
-  TableOfContentsList,
-} from '~/components/ui/toc';
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
 import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
 import {
@@ -163,48 +161,41 @@ function groupBySections(events: Event[]): EventGroup[] {
 
 function YearEventsPage() {
   const { year, events } = Route.useLoaderData();
-  const [inView, setInView] = useState(new Set());
+  const [inView, setInView] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
   const sortedEvents = events.sort(sortEventsComparator);
   const groupedEvents = groupBySections(sortedEvents);
+  const tocItems = useMemo(
+    () =>
+      groupedEvents.map((group) => ({
+        slug: group.slug,
+        label: group.groupName,
+      })),
+    [groupedEvents],
+  );
 
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
-      <div className="basis-full lg:basis-1/6">
-        <div className="sticky top-14 pt-8">
-          <Select
-            value={String(year)}
-            onValueChange={(value) => {
-              void navigate({ to: `/event/${value}` });
-            }}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={year} />
-            </SelectTrigger>
-            <SelectContent>
-              {VALID_YEARS.map((y) => (
-                <SelectItem key={y} value={`${y}`}>
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <TableOfContentsList className="mt-2">
-            {groupedEvents.map((group) => (
-              <TableOfContentsItem key={group.slug}>
-                <TableOfContentsLink
-                  to={`#${group.slug}`}
-                  replace={true}
-                  isActive={inView.has(group.slug)}
-                >
-                  {group.groupName}
-                </TableOfContentsLink>
-              </TableOfContentsItem>
+      <TableOfContentsPopover tocItems={tocItems} inView={inView}>
+        <Select
+          value={String(year)}
+          onValueChange={(value) => {
+            void navigate({ to: `/events/${value}` });
+          }}
+        >
+          <SelectTrigger className="mb-4 w-[180px]">
+            <SelectValue placeholder={year} />
+          </SelectTrigger>
+          <SelectContent className="max-h-[30vh] overflow-y-auto">
+            {VALID_YEARS.map((y) => (
+              <SelectItem key={y} value={`${y}`}>
+                {y}
+              </SelectItem>
             ))}
-          </TableOfContentsList>
-        </div>
-      </div>
+          </SelectContent>
+        </Select>
+      </TableOfContentsPopover>
       <div className="basis-full py-8 lg:basis-5/6">
         <h1 className="mb-3 text-3xl font-medium">
           {year} <em>FIRST</em> Robotics Competition Events{' '}
@@ -214,18 +205,10 @@ function YearEventsPage() {
         </h1>
         {groupedEvents.map((group) => (
           <div key={group.slug} id={group.slug}>
-            <InView
-              as="div"
-              onChange={(inView) => {
-                setInView((prev) => {
-                  if (inView) {
-                    prev.add(group.slug);
-                  } else {
-                    prev.delete(group.slug);
-                  }
-                  return new Set(prev);
-                });
-              }}
+            <TableOfContentsSection
+              key={group.slug}
+              id={group.slug}
+              setInView={setInView}
             >
               <h2 className="mt-5 text-2xl">
                 {group.groupName}{' '}
@@ -234,7 +217,7 @@ function YearEventsPage() {
                 </small>
               </h2>
               <EventListTable events={group.events} />
-            </InView>
+            </TableOfContentsSection>
           </div>
         ))}
       </div>
