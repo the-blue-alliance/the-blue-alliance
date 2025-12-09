@@ -86,15 +86,15 @@ const MatchLink = React.forwardRef<
   const handleClick = () => {
     // Prepopulate the query cache with the match and event data
     if (isMatch) {
-      queryClient.setQueryData(
+      queryClient.setQueryData<Match>(
         getMatchQueryKey({ path: { match_key: matchKey } }),
-        { data: matchOrKey },
+        matchOrKey,
       );
     }
     if (event) {
-      queryClient.setQueryData(
+      queryClient.setQueryData<Event>(
         getEventQueryKey({ path: { event_key: event.key } }),
-        { data: event },
+        event,
       );
     }
   };
