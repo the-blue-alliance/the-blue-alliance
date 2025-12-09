@@ -30,7 +30,7 @@ export function TOCRendererProvider({
   const [content, setContent] = useState<React.ReactNode>(null);
   return (
     <TOCRendererContext.Provider value={{ content, setContent }}>
-      {/* Render the TOC */}
+      {/* Render the TOC header below navbar */}
       {content}
       {/* Render the provider outlet children */}
       {children}
