@@ -2,10 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
-import {
-  NavMobile,
-  NavMobileButton,
-} from '~/components/tba/navigation/navMobile';
+import { MobileMenuTrigger } from '~/components/tba/navigation/mobileMenu';
 import { SearchModal } from '~/components/tba/navigation/searchModal';
 import {
   NavigationMenu,
@@ -27,43 +24,8 @@ interface MenuItemProps {
   title: string;
 }
 
-export const MenuItem = ({
-  className,
-  icon,
-  title,
-  to,
-  href,
-  params,
-}: MenuItemProps) => {
-  return (
-    <NavigationMenuItem className={className}>
-      <NavigationMenuLink
-        className={navigationMenuTriggerStyle() + ' cursor-pointer'}
-        asChild
-      >
-        {to ? (
-          <Link to={to} params={params} className="hover:no-underline">
-            {icon}
-            <span>{title}</span>
-          </Link>
-        ) : href ? (
-          <a href={href} className="hover:no-underline">
-            {icon}
-            <span>{title}</span>
-          </a>
-        ) : (
-          <div>
-            {icon}
-            <div className="hidden pl-2 sm:block">{title}</div>
-          </div>
-        )}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
-  );
-};
-
-export const Nav = () => {
-  const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
+export function Navbar() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   return (
     <>
       <GlobalLoadingProgress />
@@ -103,11 +65,42 @@ export const Nav = () => {
           </NavigationMenuList>
           <div className="space-x-2">
             <SearchModal />
-            <NavMobileButton open={mobileNavOpen} setOpen={setMobileNavOpen} />
+            <MobileMenuTrigger
+              open={mobileMenuOpen}
+              setOpen={setMobileMenuOpen}
+            />
           </div>
         </NavigationMenu>
-        <NavMobile open={mobileNavOpen} setOpen={setMobileNavOpen} />
+        <MobileMenu open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
       </div>
     </>
   );
-};
+}
+
+function MenuItem({ className, icon, title, to, href, params }: MenuItemProps) {
+  return (
+    <NavigationMenuItem className={className}>
+      <NavigationMenuLink
+        className={navigationMenuTriggerStyle() + ' cursor-pointer'}
+        asChild
+      >
+        {to ? (
+          <Link to={to} params={params} className="hover:no-underline">
+            {icon}
+            <span>{title}</span>
+          </Link>
+        ) : href ? (
+          <a href={href} className="hover:no-underline">
+            {icon}
+            <span>{title}</span>
+          </a>
+        ) : (
+          <div>
+            {icon}
+            <div className="hidden pl-2 sm:block">{title}</div>
+          </div>
+        )}
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  );
+}

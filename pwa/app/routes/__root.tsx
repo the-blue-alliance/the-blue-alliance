@@ -45,7 +45,7 @@ import { z } from 'zod';
 
 import { client } from '~/api/tba/read/client.gen';
 import { MatchModal } from '~/components/tba/match/matchModal';
-import { Nav } from '~/components/tba/navigation/nav';
+import { Navbar } from '~/components/tba/navigation/navbar';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 
 // Configure request interceptor for auth
@@ -321,7 +321,7 @@ function RootComponent() {
           <Outlet />
         ) : (
           <>
-            <Nav />
+            <Navbar />
             <div className="container mx-auto px-4 pt-14 text-sm">
               <div vaul-drawer-wrapper="" className="bg-background">
                 <Outlet />

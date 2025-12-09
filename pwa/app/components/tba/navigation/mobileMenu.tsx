@@ -7,7 +7,7 @@ import XIcon from '~icons/lucide/x';
 import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 import { cn } from '~/lib/utils';
 
-export function NavMobileButton({
+export function MobileMenuTrigger({
   open,
   setOpen,
 }: {
@@ -27,7 +27,7 @@ export function NavMobileButton({
   );
 }
 
-export function NavMobile({
+export function MobileMenu({
   open,
   setOpen,
 }: {
