@@ -1,6 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { SearchIndex } from '~/api/tba/read';
+import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import {
   Command,
@@ -11,40 +13,18 @@ import {
   CommandList,
 } from '~/components/ui/command';
 import FuzzysortFilterer from '~/lib/search/fuzzysortFilterer';
-import { ProdAPIProvider } from '~/lib/search/prodAPIProvider';
 import { cn } from '~/lib/utils';
 
 export default function Searchbar() {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-
-  const provider = useMemo(() => new ProdAPIProvider(), []);
+  const fullSearchData = useQuery(getSearchIndexOptions({})).data;
   const filterer = useMemo(() => new FuzzysortFilterer(), []);
-
-  const [fullSearchData, setFullSearchData] = useState<SearchIndex | null>(
-    null,
-  );
-
-  useEffect(() => {
-    provider
-      .provide()
-      .then((data: SearchIndex) => {
-        setFullSearchData(data);
-      })
-      .catch(() => {
-        // todo: log in sentry
-      });
-  }, [provider]);
-
-  const [searchResults, setSearchResults] = useState<SearchIndex | null>(null);
-
-  useEffect(() => {
-    if (fullSearchData === null) {
-      return;
+  const searchResults: SearchIndex | null = useMemo(() => {
+    if (!fullSearchData) {
+      return null;
     }
-
-    const searchResults = filterer.filter(fullSearchData, query);
-    setSearchResults(searchResults);
+    return filterer.filter(fullSearchData, query);
   }, [query, fullSearchData, filterer]);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
