@@ -24,6 +24,7 @@ import {
   Match,
   Media,
   Team,
+  Webcast,
   getEvent,
   getEventAlliances,
   getEventMatches,
@@ -51,6 +52,7 @@ import {
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import RankingsTable from '~/components/tba/rankingsTable';
+import { WebcastIcon } from '~/components/tba/socialBadges';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
@@ -469,7 +471,9 @@ function EventPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="media">media</TabsContent>
+        <TabsContent value="media">
+          <MediaTab webcasts={event.webcasts} />
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -765,6 +769,17 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
           />
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function MediaTab({ webcasts }: { webcasts: Webcast[] }) {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">Webcasts</h1>
+      {webcasts.map((w) => (
+        <WebcastIcon webcast={w} key={w.channel} />
+      ))}
     </div>
   );
 }
