@@ -3,6 +3,10 @@ import { Link } from '@tanstack/react-router';
 import React from 'react';
 
 import { Event, Match, Team } from '~/api/tba/read';
+import {
+  getEventQueryKey,
+  getMatchQueryKey,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { removeNonNumeric } from '~/lib/utils';
 
 const TeamLink = React.forwardRef<
@@ -82,10 +86,16 @@ const MatchLink = React.forwardRef<
   const handleClick = () => {
     // Prepopulate the query cache with the match and event data
     if (isMatch) {
-      queryClient.setQueryData(['match', matchKey], { data: matchOrKey });
+      queryClient.setQueryData(
+        getMatchQueryKey({ path: { match_key: matchKey } }),
+        { data: matchOrKey },
+      );
     }
     if (event) {
-      queryClient.setQueryData(['event', event.key], { data: event });
+      queryClient.setQueryData(
+        getEventQueryKey({ path: { event_key: event.key } }),
+        { data: event },
+      );
     }
   };
 

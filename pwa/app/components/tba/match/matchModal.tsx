@@ -3,7 +3,10 @@ import { useRouter, useSearch } from '@tanstack/react-router';
 import { MatchLink } from 'app/components/tba/links';
 import { Suspense, useRef } from 'react';
 
-import { getEvent, getMatch } from '~/api/tba/read';
+import {
+  getEventOptions,
+  getMatchOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import MatchDetails from '~/components/tba/match/matchDetails';
 import {
   Credenza,
@@ -61,17 +64,15 @@ export function MatchModal() {
 function MatchModalContent({ matchKey }: { matchKey: string }) {
   const eventKey = matchKey.split('_')[0];
 
-  const { data: matchResponse } = useSuspenseQuery({
-    queryKey: ['match', matchKey],
-    queryFn: () => getMatch({ path: { match_key: matchKey } }),
-  });
+  const matchQuery = useSuspenseQuery(
+    getMatchOptions({ path: { match_key: matchKey } }),
+  );
 
-  const { data: eventResponse } = useSuspenseQuery({
-    queryKey: ['event', eventKey],
-    queryFn: () => getEvent({ path: { event_key: eventKey } }),
-  });
+  const eventQuery = useSuspenseQuery(
+    getEventOptions({ path: { event_key: eventKey } }),
+  );
 
-  if (!matchResponse.data || !eventResponse.data) {
+  if (!matchQuery.data || !eventQuery.data) {
     return (
       <>
         <CredenzaHeader>
@@ -84,8 +85,8 @@ function MatchModalContent({ matchKey }: { matchKey: string }) {
     );
   }
 
-  const match = matchResponse.data;
-  const event = eventResponse.data;
+  const match = matchQuery.data;
+  const event = eventQuery.data;
 
   return (
     <>
