@@ -5,8 +5,8 @@ import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
 import {
   NavMobile,
   NavMobileButton,
-} from '~/components/tba/navigation/nav-mobile';
-import Searchbar from '~/components/tba/navigation/searchbar';
+} from '~/components/tba/navigation/navMobile';
+import { SearchModal } from '~/components/tba/navigation/searchModal';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -66,12 +66,11 @@ export const Nav = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
   return (
     <>
+      <GlobalLoadingProgress />
       <div
-        className="fixed z-15 flex w-full grow justify-center bg-primary
-          shadow-md"
+        className="fixed z-15 w-full grow justify-center bg-primary shadow-md"
       >
-        <GlobalLoadingProgress />
-        <NavigationMenu className="gap-6 px-4 py-2.5">
+        <NavigationMenu className="flex justify-between gap-6 px-4 py-2.5">
           <Link
             to="/"
             className="flex items-center gap-3 hover:no-underline max-md:flex-1"
@@ -89,7 +88,7 @@ export const Nav = () => {
               <span className="hidden md:block lg:hidden">TBA</span>
             </div>
           </Link>
-          <NavigationMenuList className="flex w-full grow">
+          <NavigationMenuList className="flex w-full flex-1">
             {/* Desktop Menu Items */}
             {NAV_ITEMS_LIST.map((item) => (
               <MenuItem
@@ -101,13 +100,13 @@ export const Nav = () => {
               />
             ))}
           </NavigationMenuList>
-          <div className="hidden md:block">
-            <Searchbar />
+          <div className="space-x-2">
+            <SearchModal />
+            <NavMobileButton open={mobileNavOpen} setOpen={setMobileNavOpen} />
           </div>
-          <NavMobileButton open={mobileNavOpen} setOpen={setMobileNavOpen} />
         </NavigationMenu>
+        <NavMobile open={mobileNavOpen} setOpen={setMobileNavOpen} />
       </div>
-      <NavMobile open={mobileNavOpen} setOpen={setMobileNavOpen} />
     </>
   );
 };

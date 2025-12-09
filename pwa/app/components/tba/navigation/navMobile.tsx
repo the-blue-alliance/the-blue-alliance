@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import MenuIcon from '~icons/lucide/menu';
 import XIcon from '~icons/lucide/x';
 
-import Searchbar from '~/components/tba/navigation/searchbar';
 import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 import { cn } from '~/lib/utils';
 
@@ -56,23 +55,21 @@ export function NavMobile({
   return (
     <nav
       className={cn(
-        `fixed inset-0 z-10 hidden max-h-screen w-full overflow-y-auto
-        bg-zinc-50 px-5 py-20 lg:hidden dark:bg-black dark:text-white/70`,
-        open && 'block',
+        'bg-primary px-5 pb-2 text-white md:hidden',
+        open ? 'block' : 'hidden',
       )}
     >
-      <div className="mb-4">
-        <Searchbar className="border" />
-      </div>
-      <ul className="grid divide-y divide-neutral-200 dark:divide-white/15">
-        {NAV_ITEMS_LIST.map(({ title, href, icon: Icon }) => (
+      <ul className="grid divide-y divide-white/10">
+        {NAV_ITEMS_LIST.map(({ title, href, icon: Icon }, index) => (
           <Link
             key={title}
             to={href}
-            className="flex w-full items-center gap-3 py-4"
+            className="flex w-full animate-navigation-item-fade-in items-center
+              gap-3 py-4 opacity-0 hover:no-underline"
+            style={{ animationDelay: `${index * 50}ms` }}
           >
-            <Icon className="size-5 text-neutral-500" />
-            <p className="font-medium text-foreground">{title}</p>
+            <Icon className="size-5 text-white/50" />
+            <p className="font-medium text-white">{title}</p>
           </Link>
         ))}
       </ul>

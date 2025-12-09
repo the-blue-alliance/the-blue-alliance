@@ -176,7 +176,7 @@ function YearEventsPage() {
           <Select
             value={String(year)}
             onValueChange={(value) => {
-              void navigate({ to: `/events/${value}` });
+              void navigate({ to: `/event/${value}` });
             }}
           >
             <SelectTrigger className="w-[180px]">
