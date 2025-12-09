@@ -1,12 +1,44 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sentry from '@sentry/react';
-import { QueryClient } from '@tanstack/react-query';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import { QueryClient, isServer } from '@tanstack/react-query';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { routeTree } from 'app/routeTree.gen';
 
-export function getRouter() {
-  const queryClient = new QueryClient();
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5,
+      },
+    },
+  });
+}
 
+let browserQueryClient: QueryClient | undefined = undefined;
+
+function getQueryClient() {
+  if (isServer) {
+    return makeQueryClient();
+  } else {
+    if (!browserQueryClient) {
+      browserQueryClient = makeQueryClient();
+      const localStoragePersister = createAsyncStoragePersister({
+        storage: AsyncStorage,
+      });
+      persistQueryClient({
+        queryClient: browserQueryClient,
+        persister: localStoragePersister,
+      });
+    }
+    return browserQueryClient;
+  }
+}
+
+export function getRouter() {
+  const queryClient = getQueryClient();
   const router = createRouter({
     routeTree,
     context: {

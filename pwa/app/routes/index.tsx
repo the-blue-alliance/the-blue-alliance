@@ -1,36 +1,34 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { getEventsByYear, getStatus } from '~/api/tba/read';
+import {
+  getEventsByYearOptions,
+  getStatusOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import EventListTable from '~/components/tba/eventListTable';
 import { KickoffCountdown } from '~/components/tba/kickoffCountdown';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 
 export const Route = createFileRoute('/')({
-  loader: async () => {
-    const status = await getStatus();
+  loader: async ({ context }) => {
+    const status = await context.queryClient.ensureQueryData(
+      getStatusOptions({}),
+    );
 
-    if (status.data === undefined) {
-      throw new Error('Failed to load status');
-    }
-
-    const year = status.data.current_season;
-    const events = await getEventsByYear({ path: { year } });
-
-    if (events.data === undefined) {
-      throw new Error('Failed to load events');
-    }
-
-    const filteredEvents = getCurrentWeekEvents(events.data);
-
-    return {
-      events: filteredEvents,
-    };
+    await context.queryClient.ensureQueryData(
+      getEventsByYearOptions({ path: { year: status.current_season } }),
+    );
   },
   component: Home,
 });
 
 function Home() {
-  const { events } = Route.useLoaderData();
+  const statusQuery = useSuspenseQuery(getStatusOptions({}));
+  const eventsQuery = useSuspenseQuery(
+    getEventsByYearOptions({ path: { year: statusQuery.data.current_season } }),
+  );
+  const events = getCurrentWeekEvents(eventsQuery.data);
 
   // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
