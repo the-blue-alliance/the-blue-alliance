@@ -1,9 +1,12 @@
 import { DialogProps } from '@radix-ui/react-dialog';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import SearchIcon from '~icons/lucide/search';
 
+import { SearchIndex } from '~/api/tba/read';
+import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { Button } from '~/components/ui/button';
 import {
   Command,
@@ -21,13 +24,22 @@ import {
 } from '~/components/ui/dialog';
 import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
-import { useSearch } from '~/lib/search/useSearch';
+import FuzzysortFilterer from '~/lib/search/fuzzysortFilterer';
 import { cn } from '~/lib/utils';
 
 export function SearchModal({ ...props }: DialogProps) {
   const [open, setOpen] = useState<boolean>(false);
-  const { query, setQuery, searchResults, isSearchLoading } = useSearch();
+  const [query, setQuery] = useState<string>('');
+  const searchIndexQuery = useQuery(getSearchIndexOptions({}));
+  const filterer = useMemo(() => new FuzzysortFilterer(), []);
   const navigate = useNavigate();
+
+  const searchResults: SearchIndex | null = useMemo(() => {
+    if (!searchIndexQuery.data) {
+      return null;
+    }
+    return filterer.filter(searchIndexQuery.data, query);
+  }, [query, searchIndexQuery.data, filterer]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -110,7 +122,7 @@ export function SearchModal({ ...props }: DialogProps) {
               onValueChange={setQuery}
               className="h-20 text-base"
             />
-            {isSearchLoading && (
+            {searchIndexQuery.isLoading && (
               <div
                 className="pointer-events-none absolute top-1/2 right-3 z-10
                   flex -translate-y-1/2 items-center justify-center"
