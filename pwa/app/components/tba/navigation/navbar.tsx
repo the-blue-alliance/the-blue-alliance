@@ -2,7 +2,10 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
-import { MobileMenuTrigger } from '~/components/tba/navigation/mobileMenu';
+import {
+  MobileMenu,
+  MobileMenuTrigger,
+} from '~/components/tba/navigation/mobileMenu';
 import { SearchModal } from '~/components/tba/navigation/searchModal';
 import {
   NavigationMenu,
