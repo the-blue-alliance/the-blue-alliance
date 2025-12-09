@@ -1,6 +1,6 @@
 import { VariantProps, cva } from 'class-variance-authority';
 
-import { Match } from '~/api/tba/read';
+import { CompLevel, Match } from '~/api/tba/read';
 import RpDots from '~/components/tba/rpDot';
 import { cn } from '~/lib/utils';
 
@@ -28,7 +28,7 @@ interface ScoreCellProps
   score: number;
   scoreBreakdown?: NonNullable<Match['score_breakdown']>['red'];
   year?: number;
-  compLevel: Match['comp_level'];
+  compLevel: CompLevel;
 }
 
 export default function ScoreCell({

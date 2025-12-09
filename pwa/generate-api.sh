@@ -16,5 +16,5 @@ docker run --rm -v "$PWD":/work -w /work alpine sh -c \
 import { AwardType } from \"~/lib/api/AwardType\";\
 import { EventType } from \"~/lib/api/EventType\";' app/api/tba/read/types.gen.ts"
 
-npm run lint:fix
-npm run format:fix
+pnpm run lint:fix
+pnpm dlx prettier --write app/api/tba/
