@@ -29,5 +29,10 @@ export const useSearch = () => {
     setSearchResults(searchResults);
   }, [query, searchIndex, filterer]);
 
-  return { query, setQuery, searchResults, isSearchLoading: searchIndex === null };
+  return {
+    query,
+    setQuery,
+    searchResults,
+    isSearchLoading: searchIndex === null,
+  };
 };
