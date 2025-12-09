@@ -5784,15 +5784,7 @@
         ],
         "properties": {
           "level": {
-            "type": "string",
-            "description": "The highest playoff level the team reached.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "$ref": "#/components/schemas/Comp_Level"
           },
           "current_level_record": {
             "type": [
@@ -5871,15 +5863,12 @@
                   }
                 },
                 "sort_orders": {
-                  "type": [
-                    "array",
-                    "null"
-                  ],
+                  "type": "array",
                   "items": {
                     "type": "number",
                     "format": "double"
                   },
-                  "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details."
+                  "description": "Additional year-specific information. See parent `sort_order_info` for details."
                 },
                 "record": {
                   "type": [
@@ -5925,7 +5914,10 @@
             }
           },
           "sort_order_info": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "description": "List of year-specific values provided in the `sort_orders` array for each team.",
             "items": {
               "required": [
@@ -6759,6 +6751,29 @@
         "type": "object",
         "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change."
       },
+      "Comp_Level": {
+        "type": "string",
+        "enum": [
+          "qm",
+          "ef",
+          "qf",
+          "sf",
+          "f"
+        ],
+        "description": "The competition level the match was played at."
+      },
+      "Double_Elim_Round": {
+        "type": "string",
+        "enum": [
+          "Finals",
+          "Round 1",
+          "Round 2",
+          "Round 3",
+          "Round 4",
+          "Round 5"
+        ],
+        "description": "Double elimination round, if applicable."
+      },
       "Match_Simple": {
         "required": [
           "key",
@@ -6779,15 +6794,7 @@
             "description": "TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
           },
           "comp_level": {
-            "type": "string",
-            "description": "The competition level the match was played at.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "$ref": "#/components/schemas/Comp_Level"
           },
           "set_number": {
             "type": "integer",
@@ -6875,15 +6882,7 @@
             "description": "TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set."
           },
           "comp_level": {
-            "type": "string",
-            "description": "The competition level the match was played at.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "$ref": "#/components/schemas/Comp_Level"
           },
           "set_number": {
             "type": "integer",
@@ -9544,11 +9543,8 @@
         ],
         "properties": {
           "name": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Alliance name, may be null."
+            "type": "string",
+            "description": "Alliance name."
           },
           "backup": {
             "type": [
@@ -9589,40 +9585,69 @@
           },
           "status": {
             "type": "object",
+            "required": [
+              "current_level_record",
+              "level",
+              "playoff_type",
+              "record",
+              "status"
+            ],
             "properties": {
               "playoff_average": {
                 "type": [
                   "number",
                   "null"
                 ],
-                "format": "double"
+                "format": "double",
+                "description": "Average match score during playoffs. Year specific. May be null."
               },
               "playoff_type": {
                 "type": [
                   "number",
                   "null"
                 ],
-                "format": "int64"
+                "format": "int64",
+                "description": "Playoff type, may be null."
               },
               "level": {
-                "type": "string"
+                "$ref": "#/components/schemas/Comp_Level",
+                "description": "Match level, qm/ef/qf/sf/f."
               },
               "record": {
                 "type": [
                   "object",
                   "null"
                 ],
-                "$ref": "#/components/schemas/WLT_Record"
+                "$ref": "#/components/schemas/WLT_Record",
+                "description": "W-L-T record for the alliance, may be null."
               },
               "current_level_record": {
                 "type": [
                   "object",
                   "null"
                 ],
-                "$ref": "#/components/schemas/WLT_Record"
+                "$ref": "#/components/schemas/WLT_Record",
+                "description": "W-L-T record for the alliance at the current level, may be null."
               },
               "status": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "eliminated",
+                  "playing",
+                  "won"
+                ],
+                "description": "Status of the alliance."
+              },
+              "advanced_to_round_robin_finals": {
+                "type": "boolean",
+                "description": "Whether the alliance advanced to round robin finals."
+              },
+              "double_elim_round": {
+                "$ref": "#/components/schemas/Double_Elim_Round"
+              },
+              "round_robin_rank": {
+                "type": "integer",
+                "description": "Rank in round robin play."
               }
             }
           }
@@ -9871,8 +9896,10 @@
       },
       "District_Ranking": {
         "required": [
+          "event_points",
           "point_total",
           "rank",
+          "rookie_bonus",
           "team_key"
         ],
         "type": "object",
@@ -9938,6 +9965,14 @@
                 }
               }
             }
+          },
+          "adjustments": {
+            "type": "integer",
+            "description": "Any points adjustments applied to the team."
+          },
+          "other_bonus": {
+            "type": "integer",
+            "description": "Any other bonus points awarded to the team."
           }
         },
         "description": "Rank of a team in a district."
