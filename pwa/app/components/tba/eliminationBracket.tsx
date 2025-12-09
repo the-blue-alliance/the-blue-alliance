@@ -421,7 +421,7 @@ export default function EliminationBracket({
             px-4"
         >
           {/* Bracket Layout */}
-          <div className="relative z-10 space-y-4">
+          <div className="relative z-1 space-y-4">
             {/* Upper Bracket */}
             <div className="space-y-4">
               <h2 className="text-center text-xl font-bold">Upper Bracket</h2>
