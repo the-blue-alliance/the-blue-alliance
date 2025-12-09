@@ -20,6 +20,7 @@ function TOCContent({
   tocItems: { slug: string; label: string }[];
   inView: Set<string>;
 }) {
+  const firstInViewItem = tocItems.find((item) => inView.has(item.slug));
   return (
     <TableOfContentsList>
       {tocItems.map((item) => (
@@ -27,7 +28,7 @@ function TOCContent({
           <TableOfContentsLink
             to={`#${item.slug}`}
             replace={true}
-            isActive={inView.has(item.slug)}
+            isActive={item.slug === firstInViewItem?.slug}
           >
             {item.label}
           </TableOfContentsLink>
@@ -68,7 +69,7 @@ export function TableOfContentsPopover({
           side="top"
           align="end"
           sideOffset={12}
-          className="max-h-[70vh] w-80 overflow-y-auto lg:hidden"
+          className="max-h-[70vh] w-60 overflow-y-auto lg:hidden"
         >
           <div className="space-y-3">
             {children}
