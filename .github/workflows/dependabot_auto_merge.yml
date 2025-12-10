@@ -57,7 +57,6 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.head_ref }}
-          persist-credentials: false
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
