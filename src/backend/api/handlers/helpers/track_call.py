@@ -3,6 +3,7 @@ from flask import g
 from backend.common.google_analytics import GoogleAnalytics
 from backend.common.helpers.deferred import defer_safe
 
+
 def track_call_after_response(
     api_action: str, api_label: str | None = None, model_type: str | None = None
 ) -> None:
