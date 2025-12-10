@@ -343,6 +343,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -369,16 +372,43 @@ jobs:
         working-directory: ./pwa
         run: ./generate-api.sh
 
-      - name: Detect changes in pwa/app/api
+      - name: Check for API changes
+        id: api-changes
         run: |
           CHANGED_FILES=$(git diff --name-only pwa/app/api)
           if [[ -n "$CHANGED_FILES" ]]; then
-            echo "::error title=API Mismatch::Files changed in pwa/app/api:"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Files changed in pwa/app/api:"
             echo "$CHANGED_FILES"
-            exit 1
           else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
             echo "No changes detected in pwa/app/api."
           fi
+
+      - name: Format, lint, and commit API changes (Dependabot only)
+        if: |
+          steps.api-changes.outputs.has_changes == 'true' && 
+          github.actor == 'dependabot[bot]'
+        working-directory: pwa
+        run: |
+          # Format and lint the generated API
+          npm run format -- app/api
+          npm run lint -- --fix app/api || true
+
+          # Commit and push
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add app/api
+          git commit -m "chore: regenerate API after dependency update"
+          git push
+
+      - name: Fail if API changes detected (non-Dependabot)
+        if: |
+          steps.api-changes.outputs.has_changes == 'true' && 
+          github.actor != 'dependabot[bot]'
+        run: |
+          echo "::error title=API Mismatch::Generated API files are out of date. Run './pwa/generate-api.sh' and commit the changes."
+          exit 1
 
   bash-lint:
     name: "[bash] Lint"
