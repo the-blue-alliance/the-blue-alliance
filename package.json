@@ -2,7 +2,7 @@
   "name": "tba-react",
   "version": "0.0.0",
   "engines": {
-    "node": "^24"
+    "node": ">=22"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
