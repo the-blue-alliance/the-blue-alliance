@@ -1,6 +1,7 @@
 from flask import g
 
 from backend.common.google_analytics import GoogleAnalytics
+from backend.common.helpers.deferred import defer_safe_async
 
 
 def track_call_after_response(
@@ -27,4 +28,11 @@ def track_call_after_response(
         "label": api_label,
     }
 
-    GoogleAnalytics.track_event(auth_owner_id, "api_v03", params, run_after=True)
+    defer_safe_async(
+        GoogleAnalytics.track_event,
+        auth_owner_id,
+        "api_v03",
+        params,
+        _queue="api-track-call",
+        _url="/_ah/queue/deferred_track_call_apiv3",
+    )

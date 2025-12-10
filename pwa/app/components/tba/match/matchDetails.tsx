@@ -5,9 +5,11 @@ import { useState } from 'react';
 
 import { Event, Match } from '~/api/tba/read';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
+import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
 import {
+  isScoreBreakdown2018,
   isScoreBreakdown2023,
   isScoreBreakdown2024,
   isScoreBreakdown2025,
@@ -111,6 +113,15 @@ export default function MatchDetails({
   if (isScoreBreakdown2023(match.score_breakdown)) {
     sbDiv = (
       <ScoreBreakdown2023
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2018(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2018
         scoreBreakdown={match.score_breakdown}
         match={match}
       />
