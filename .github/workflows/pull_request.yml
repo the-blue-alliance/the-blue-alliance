@@ -342,10 +342,18 @@ jobs:
       contents: write
 
     steps:
+      - name: Generate merge bot token
+        id: app-token
+        uses: actions/create-github-app-token@v2.2.1
+        with:
+          app-id: ${{ secrets.MERGE_BOT_APP_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.head_ref }}
+          persist-credentials: false
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
