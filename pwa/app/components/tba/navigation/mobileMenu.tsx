@@ -60,10 +60,10 @@ export function MobileMenu({
       )}
     >
       <ul className="grid divide-y divide-white/10">
-        {NAV_ITEMS_LIST.map(({ title, href, icon: Icon }, index) => (
+        {NAV_ITEMS_LIST.map(({ title, to, icon: Icon }, index) => (
           <Link
             key={title}
-            to={href}
+            to={to}
             className="flex w-full animate-navigation-item-fade-in items-center
               gap-3 py-4 opacity-0 hover:no-underline"
             style={{ animationDelay: `${index * 50}ms` }}

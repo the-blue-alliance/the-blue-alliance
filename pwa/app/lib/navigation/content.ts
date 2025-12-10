@@ -10,8 +10,7 @@ import { FileRouteTypes } from '~/routeTree.gen';
 
 export type NavItemChild = {
   title: string;
-  href?: string;
-  to?: FileRouteTypes['to'];
+  to: FileRouteTypes['to'];
   icon: ElementType;
 };
 
@@ -28,7 +27,7 @@ export const NAV_ITEMS_LIST: NavItemChild[] = [
   },
   {
     title: 'Teams',
-    href: '/teams',
+    to: '/',
     icon: TeamsIcon,
   },
   {

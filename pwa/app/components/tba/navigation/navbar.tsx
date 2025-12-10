@@ -16,16 +16,6 @@ import {
 } from '~/components/ui/navigation-menu';
 import lamp from '~/images/tba/tba-lamp.svg';
 import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
-import { FileRouteTypes } from '~/routeTree.gen';
-
-interface MenuItemProps {
-  className?: string;
-  to?: FileRouteTypes['to'];
-  params?: Record<string, string>;
-  href?: string;
-  icon: React.ReactNode;
-  title: string;
-}
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -53,17 +43,20 @@ export function Navbar() {
               <span className="hidden md:block lg:hidden">TBA</span>
             </div>
           </Link>
-          <NavigationMenuList className="flex w-full flex-1">
+          <NavigationMenuList className="flex w-full flex-1 max-md:hidden">
             {/* Desktop Menu Items */}
-            {NAV_ITEMS_LIST.map((item) => (
-              <MenuItem
-                key={item.title}
-                className="hidden md:block"
-                icon={<item.icon />}
-                title={item.title}
-                to={item.to}
-                href={item.href}
-              />
+            {NAV_ITEMS_LIST.map(({ title, to, icon: Icon }) => (
+              <NavigationMenuItem key={title}>
+                <NavigationMenuLink
+                  className={navigationMenuTriggerStyle() + ' cursor-pointer'}
+                  asChild
+                >
+                  <Link to={to} className="hover:no-underline">
+                    <Icon />
+                    <span>{title}</span>
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
             ))}
           </NavigationMenuList>
           <div className="space-x-2">
@@ -77,33 +70,5 @@ export function Navbar() {
         <MobileMenu open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
       </div>
     </>
-  );
-}
-
-function MenuItem({ className, icon, title, to, href, params }: MenuItemProps) {
-  return (
-    <NavigationMenuItem className={className}>
-      <NavigationMenuLink
-        className={navigationMenuTriggerStyle() + ' cursor-pointer'}
-        asChild
-      >
-        {to ? (
-          <Link to={to} params={params} className="hover:no-underline">
-            {icon}
-            <span>{title}</span>
-          </Link>
-        ) : href ? (
-          <a href={href} className="hover:no-underline">
-            {icon}
-            <span>{title}</span>
-          </a>
-        ) : (
-          <div>
-            {icon}
-            <div className="hidden pl-2 sm:block">{title}</div>
-          </div>
-        )}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
   );
 }
