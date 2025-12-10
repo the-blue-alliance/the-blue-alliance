@@ -14,15 +14,15 @@ def app() -> Flask:
     return app
 
 
-@patch("backend.api.handlers.helpers.track_call.defer_safe")
-def test_track_call_after_response(mock_defer_safe, app: Flask) -> None:
+@patch("backend.api.handlers.helpers.track_call.defer_safe_async")
+def test_track_call_after_response(mock_defer_safe_async, app: Flask) -> None:
     with app.app_context():
         g.auth_owner_id = "owner123"
         g.auth_description = "Test API Key"
 
         track_call_after_response("teams/list", api_label="2020")
 
-        mock_defer_safe.assert_called_once_with(
+        mock_defer_safe_async.assert_called_once_with(
             track_call.GoogleAnalytics.track_event,
             "owner123",
             "api_v03",
@@ -37,15 +37,15 @@ def test_track_call_after_response(mock_defer_safe, app: Flask) -> None:
         )
 
 
-@patch("backend.api.handlers.helpers.track_call.defer_safe")
-def test_track_call_after_response_with_model_type(mock_defer_safe, app: Flask) -> None:
+@patch("backend.api.handlers.helpers.track_call.defer_safe_async")
+def test_track_call_after_response_with_model_type(mock_defer_safe_async, app: Flask) -> None:
     with app.app_context():
         g.auth_owner_id = "owner123"
         g.auth_description = "Test API Key"
 
         track_call_after_response("teams/list", api_label="2020", model_type="simple")
 
-        mock_defer_safe.assert_called_once_with(
+        mock_defer_safe_async.assert_called_once_with(
             track_call.GoogleAnalytics.track_event,
             "owner123",
             "api_v03",
@@ -60,15 +60,15 @@ def test_track_call_after_response_with_model_type(mock_defer_safe, app: Flask) 
         )
 
 
-@patch("backend.api.handlers.helpers.track_call.defer_safe")
-def test_track_call_after_response_no_label(mock_defer_safe, app: Flask) -> None:
+@patch("backend.api.handlers.helpers.track_call.defer_safe_async")
+def test_track_call_after_response_no_label(mock_defer_safe_async, app: Flask) -> None:
     with app.app_context():
         g.auth_owner_id = "owner123"
         g.auth_description = "Test API Key"
 
         track_call_after_response("teams/list")
 
-        mock_defer_safe.assert_called_once_with(
+        mock_defer_safe_async.assert_called_once_with(
             track_call.GoogleAnalytics.track_event,
             "owner123",
             "api_v03",
@@ -83,33 +83,33 @@ def test_track_call_after_response_no_label(mock_defer_safe, app: Flask) -> None
         )
 
 
-@patch("backend.api.handlers.helpers.track_call.defer_safe")
+@patch("backend.api.handlers.helpers.track_call.defer_safe_async")
 def test_track_call_after_response_missing_auth_owner_id(
-    mock_defer_safe, app: Flask
+    mock_defer_safe_async, app: Flask
 ) -> None:
     with app.app_context():
         g.auth_description = "Test API Key"
 
         track_call_after_response("teams/list")
 
-        mock_defer_safe.assert_not_called()
+        mock_defer_safe_async.assert_not_called()
 
 
-@patch("backend.api.handlers.helpers.track_call.defer_safe")
+@patch("backend.api.handlers.helpers.track_call.defer_safe_async")
 def test_track_call_after_response_missing_auth_description(
-    mock_defer_safe, app: Flask
+    mock_defer_safe_async, app: Flask
 ) -> None:
     with app.app_context():
         g.auth_owner_id = "owner123"
 
         track_call_after_response("teams/list")
 
-        mock_defer_safe.assert_not_called()
+        mock_defer_safe_async.assert_not_called()
 
 
-@patch("backend.api.handlers.helpers.track_call.defer_safe")
+@patch("backend.api.handlers.helpers.track_call.defer_safe_async")
 def test_track_call_after_response_non_string_auth_owner_id(
-    mock_defer_safe, app: Flask
+    mock_defer_safe_async, app: Flask
 ) -> None:
     with app.app_context():
         g.auth_owner_id = 12345
@@ -117,12 +117,12 @@ def test_track_call_after_response_non_string_auth_owner_id(
 
         track_call_after_response("teams/list")
 
-        mock_defer_safe.assert_not_called()
+        mock_defer_safe_async.assert_not_called()
 
 
-@patch("backend.api.handlers.helpers.track_call.defer_safe")
+@patch("backend.api.handlers.helpers.track_call.defer_safe_async")
 def test_track_call_after_response_non_string_auth_description(
-    mock_defer_safe, app: Flask
+    mock_defer_safe_async, app: Flask
 ) -> None:
     with app.app_context():
         g.auth_owner_id = "owner123"
@@ -130,4 +130,4 @@ def test_track_call_after_response_non_string_auth_description(
 
         track_call_after_response("teams/list")
 
-        mock_defer_safe.assert_not_called()
+        mock_defer_safe_async.assert_not_called()
