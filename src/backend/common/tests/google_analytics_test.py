@@ -1,6 +1,5 @@
-import json
 from typing import Generator
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from flask import Flask
@@ -55,11 +54,7 @@ def test_GoogleAnalytics_track_event(run_after) -> None:
     # Ensure response_context has a request object so run_after callbacks can be queued
     response_context.request = Request(create_environ(path="/"))
 
-    mock_future = MagicMock()
-    mock_context = MagicMock()
-    mock_context.urlfetch.return_value = mock_future
-
-    with patch("google.appengine.ext.ndb.get_context", return_value=mock_context):
+    with patch("requests.post") as mock_post:
         GoogleAnalytics.track_event(
             "testbed",
             "test_event",
@@ -67,27 +62,22 @@ def test_GoogleAnalytics_track_event(run_after) -> None:
             run_after=run_after,
         )
         if run_after:
-            mock_context.urlfetch.assert_not_called()
+            mock_post.assert_not_called()
         execute_callbacks()
 
-    mock_context.urlfetch.assert_called_once()
-    mock_future.get_result.assert_called_once()
-    args, kwargs = mock_context.urlfetch.call_args
+    mock_post.assert_called()
+    args, kwargs = mock_post.call_args
 
     assert len(args) == 1
-    assert len(kwargs) == 4
+    assert len(kwargs) == 2
     assert (
         args[0]
         == "https://www.google-analytics.com/mp/collect?measurement_id=G-ABC123DEF4&api_secret=test_secret"
     )
-    assert kwargs["deadline"] == 10
-    assert kwargs["method"] == "POST"
-    assert kwargs["headers"] == {"Content-Type": "application/json"}
+    assert kwargs["timeout"] == 10
 
     # Check the payload structure for GA4
-    payload_bytes = kwargs["payload"]
-    payload = json.loads(payload_bytes.decode("utf-8"))
-
+    payload = kwargs["json"]
     assert "client_id" in payload
     assert "events" in payload
     assert len(payload["events"]) == 1

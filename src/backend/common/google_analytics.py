@@ -1,8 +1,7 @@
-import json
 import logging
 import uuid
 
-from google.appengine.ext import ndb
+import requests
 
 from backend.common.run_after_response import run_after_response
 
@@ -50,17 +49,11 @@ class GoogleAnalytics:
         }
 
         def make_request():
-            url = (
-                "https://www.google-analytics.com/mp/collect"
-                f"?measurement_id={google_analytics_id}&api_secret={api_secret}"
+            requests.post(
+                f"https://www.google-analytics.com/mp/collect?measurement_id={google_analytics_id}&api_secret={api_secret}",
+                json=payload,
+                timeout=10,
             )
-            ndb.get_context().urlfetch(
-                url,
-                method="POST",
-                headers={"Content-Type": "application/json"},
-                payload=json.dumps(payload).encode("utf-8"),
-                deadline=10,
-            ).get_result()
 
         if run_after:
             run_after_response(make_request)
