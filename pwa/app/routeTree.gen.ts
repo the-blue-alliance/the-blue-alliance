@@ -22,6 +22,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TeamsChar123PgNumChar125RouteImport } from './routes/teams.{-$pgNum}'
 import { Route as MatchMatchKeyRouteImport } from './routes/match.$matchKey'
+import { Route as LocalDebugRouteImport } from './routes/local.debug'
 import { Route as InsightsChar123YearChar125RouteImport } from './routes/insights.{-$year}'
 import { Route as EventsChar123YearChar125RouteImport } from './routes/events.{-$year}'
 import { Route as EventEventKeyRouteImport } from './routes/event.$eventKey'
@@ -97,6 +98,11 @@ const MatchMatchKeyRoute = MatchMatchKeyRouteImport.update({
   path: '/match/$matchKey',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocalDebugRoute = LocalDebugRouteImport.update({
+  id: '/local/debug',
+  path: '/local/debug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsChar123YearChar125Route =
   InsightsChar123YearChar125RouteImport.update({
     id: '/insights/{-$year}',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
+  '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
+  '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
+  '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
+    | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
     | '/district/$districtAbbreviation/insights'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
+    | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
     | '/district/$districtAbbreviation/insights'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
+    | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
     | '/district/$districtAbbreviation/insights'
@@ -300,6 +312,7 @@ export interface RootRouteChildren {
   EventEventKeyRoute: typeof EventEventKeyRoute
   EventsChar123YearChar125Route: typeof EventsChar123YearChar125Route
   InsightsChar123YearChar125Route: typeof InsightsChar123YearChar125Route
+  LocalDebugRoute: typeof LocalDebugRoute
   MatchMatchKeyRoute: typeof MatchMatchKeyRoute
   TeamsChar123PgNumChar125Route: typeof TeamsChar123PgNumChar125Route
   DistrictDistrictAbbreviationInsightsRoute: typeof DistrictDistrictAbbreviationInsightsRoute
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MatchMatchKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/local/debug': {
+      id: '/local/debug'
+      path: '/local/debug'
+      fullPath: '/local/debug'
+      preLoaderRoute: typeof LocalDebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights/{-$year}': {
       id: '/insights/{-$year}'
       path: '/insights/{-$year}'
@@ -476,6 +496,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventEventKeyRoute: EventEventKeyRoute,
   EventsChar123YearChar125Route: EventsChar123YearChar125Route,
   InsightsChar123YearChar125Route: InsightsChar123YearChar125Route,
+  LocalDebugRoute: LocalDebugRoute,
   MatchMatchKeyRoute: MatchMatchKeyRoute,
   TeamsChar123PgNumChar125Route: TeamsChar123PgNumChar125Route,
   DistrictDistrictAbbreviationInsightsRoute:

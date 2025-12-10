@@ -1,7 +1,9 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
-import { Event, getEventsByYear } from '~/api/tba/read';
+import { Event } from '~/api/tba/read';
+import { getEventsByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import EventListTable from '~/components/tba/eventListTable';
 import {
   TableOfContents,
@@ -25,23 +27,17 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/events/{-$year}')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     const year = await parseParamsForYearElseDefault(params);
     if (year === undefined) {
       throw notFound();
     }
 
-    const events = await getEventsByYear({ path: { year } });
+    await Promise.all([
+      queryClient.ensureQueryData(getEventsByYearOptions({ path: { year } })),
+    ]);
 
-    if (events.data === undefined) {
-      throw new Error('Failed to load events');
-    }
-
-    if (events.data.length === 0) {
-      throw notFound();
-    }
-
-    return { year, events: events.data };
+    return { year };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
@@ -165,7 +161,10 @@ function groupBySections(events: Event[]): EventGroup[] {
 }
 
 function YearEventsPage() {
-  const { year, events } = Route.useLoaderData();
+  const { year } = Route.useLoaderData();
+  const { data: events } = useSuspenseQuery({
+    ...getEventsByYearOptions({ path: { year } }),
+  });
   const [inView, setInView] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
