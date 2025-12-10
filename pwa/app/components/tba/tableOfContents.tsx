@@ -1,3 +1,4 @@
+import { useRouter } from '@tanstack/react-router';
 import { Button } from 'app/components/ui/button';
 import {
   Popover,
@@ -9,7 +10,13 @@ import {
   TableOfContentsLink,
   TableOfContentsList,
 } from 'app/components/ui/toc';
-import { createContext, useContext, useLayoutEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import { InView, type PlainChildrenProps } from 'react-intersection-observer';
 
 import TableOfContentsIcon from '~icons/mdi/table-of-contents';
@@ -45,6 +52,13 @@ function TOCRenderPortal({ children }: { children: React.ReactNode }) {
     setContent(children);
   }, [children, setContent]);
 
+  // Clear the content on unmount
+  useEffect(() => {
+    return () => {
+      setContent(null);
+    };
+  }, [setContent]);
+
   return null;
 }
 
@@ -57,7 +71,18 @@ export function TableOfContents({
   tocItems: { slug: string; label: string }[];
   inView: Set<string>;
 }) {
+  const [mobilePopoverOpen, setMobilePopoverOpen] = useState<boolean>(false);
+  const router = useRouter();
+
   const firstInViewItem = tocItems.find((item) => inView.has(item.slug));
+
+  // Close mobile TOC on click
+  useEffect(() => {
+    const unsubscribe = router.subscribe('onBeforeNavigate', () => {
+      setMobilePopoverOpen(false);
+    });
+    return () => unsubscribe();
+  }, [router, setMobilePopoverOpen]);
 
   return (
     <>
@@ -76,7 +101,10 @@ export function TableOfContents({
             text-muted-foreground backdrop-blur-xs transition-colors lg:hidden"
         >
           <div className="flex items-center gap-1">
-            <Popover>
+            <Popover
+              open={mobilePopoverOpen}
+              onOpenChange={setMobilePopoverOpen}
+            >
               <PopoverTrigger asChild>
                 <Button
                   size="icon"
@@ -89,6 +117,7 @@ export function TableOfContents({
               <PopoverContent
                 side="top"
                 align="start"
+                sideOffset={0}
                 className="max-h-[70vh] w-60 overflow-y-auto lg:hidden"
               >
                 <TOCContent tocItems={tocItems} inView={inView} />
@@ -152,7 +181,7 @@ function TOCContent({
       {tocItems.map((item) => (
         <TableOfContentsItem key={item.slug} className="first:pt-0">
           <TableOfContentsLink
-            to={`#${item.slug}`}
+            hash={item.slug}
             replace={true}
             isActive={item.slug === firstInViewItem?.slug}
           >
