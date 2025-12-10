@@ -8,7 +8,7 @@ automatic_scaling:
   max_idle_instances: 1
   target_cpu_utilization: 0.9
   target_throughput_utilization: 0.9
-  max_concurrent_requests: 10
+  max_concurrent_requests: 20
 
 handlers:
   - url: .*
