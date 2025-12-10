@@ -235,6 +235,23 @@ export const zEventCoprs = z.record(
  */
 export const zEventPredictions = z.record(z.string(), z.unknown());
 
+/**
+ * The competition level the match was played at.
+ */
+export const zCompLevel = z.enum(['qm', 'ef', 'qf', 'sf', 'f']);
+
+/**
+ * Double elimination round, if applicable.
+ */
+export const zDoubleElimRound = z.enum([
+  'Finals',
+  'Round 1',
+  'Round 2',
+  'Round 3',
+  'Round 4',
+  'Round 5',
+]);
+
 export const zMatchAlliance = z.object({
   score: z.int(),
   team_keys: z.array(z.string()),
@@ -244,7 +261,7 @@ export const zMatchAlliance = z.object({
 
 export const zMatchSimple = z.object({
   key: z.string(),
-  comp_level: z.enum(['qm', 'ef', 'qf', 'sf', 'f']),
+  comp_level: zCompLevel,
   set_number: z.int(),
   match_number: z.int(),
   alliances: z.object({
@@ -984,7 +1001,7 @@ export const zMatchScoreBreakdown2025 = z.object({
 
 export const zMatch = z.object({
   key: z.string(),
-  comp_level: z.enum(['qm', 'ef', 'qf', 'sf', 'f']),
+  comp_level: zCompLevel,
   set_number: z.int(),
   match_number: z.int(),
   alliances: z.object({
@@ -1135,21 +1152,21 @@ export const zDistrictInsightRegionData = z.object({
 export const zDistrictRanking = z.object({
   team_key: z.string(),
   rank: z.int(),
-  rookie_bonus: z.optional(z.int()),
+  rookie_bonus: z.int(),
   point_total: z.int(),
-  event_points: z.optional(
-    z.array(
-      z.object({
-        district_cmp: z.boolean(),
-        total: z.int(),
-        alliance_points: z.int(),
-        elim_points: z.int(),
-        award_points: z.int(),
-        event_key: z.string(),
-        qual_points: z.int(),
-      }),
-    ),
+  event_points: z.array(
+    z.object({
+      district_cmp: z.boolean(),
+      total: z.int(),
+      alliance_points: z.int(),
+      elim_points: z.int(),
+      award_points: z.int(),
+      event_key: z.string(),
+      qual_points: z.int(),
+    }),
   ),
+  adjustments: z.optional(z.int()),
+  other_bonus: z.optional(z.int()),
 });
 
 /**
@@ -1245,7 +1262,7 @@ export const zTeamEventStatusRank = z.object({
 export const zTeamEventStatusPlayoff = z.union([
   z.null(),
   z.object({
-    level: z.optional(z.enum(['qm', 'ef', 'qf', 'sf', 'f'])),
+    level: z.optional(zCompLevel),
     current_level_record: z.optional(z.union([zWltRecord, z.null()])),
     record: z.optional(z.union([zWltRecord, z.null()])),
     status: z.optional(z.enum(['won', 'eliminated', 'playing'])),
@@ -1270,7 +1287,7 @@ export const zEventRanking = z.object({
       matches_played: z.int(),
       qual_average: z.union([z.int(), z.null()]),
       extra_stats: z.array(z.number()),
-      sort_orders: z.union([z.array(z.number()), z.null()]),
+      sort_orders: z.array(z.number()),
       record: z.union([zWltRecord, z.null()]),
       rank: z.int(),
       dq: z.int(),
@@ -1283,16 +1300,19 @@ export const zEventRanking = z.object({
       name: z.string(),
     }),
   ),
-  sort_order_info: z.array(
-    z.object({
-      precision: z.int(),
-      name: z.string(),
-    }),
-  ),
+  sort_order_info: z.union([
+    z.array(
+      z.object({
+        precision: z.int(),
+        name: z.string(),
+      }),
+    ),
+    z.null(),
+  ]),
 });
 
 export const zEliminationAlliance = z.object({
-  name: z.optional(z.union([z.string(), z.null()])),
+  name: z.optional(z.string()),
   backup: z.optional(
     z.union([
       z.object({
@@ -1307,11 +1327,14 @@ export const zEliminationAlliance = z.object({
   status: z.optional(
     z.object({
       playoff_average: z.optional(z.union([z.number(), z.null()])),
-      playoff_type: z.optional(z.union([z.number(), z.null()])),
-      level: z.optional(z.string()),
-      record: z.optional(z.union([zWltRecord, z.null()])),
-      current_level_record: z.optional(z.union([zWltRecord, z.null()])),
-      status: z.optional(z.string()),
+      playoff_type: z.union([z.number(), z.null()]),
+      level: zCompLevel,
+      record: z.union([zWltRecord, z.null()]),
+      current_level_record: z.union([zWltRecord, z.null()]),
+      status: z.enum(['eliminated', 'playing', 'won']),
+      advanced_to_round_robin_finals: z.optional(z.boolean()),
+      double_elim_round: z.optional(zDoubleElimRound),
+      round_robin_rank: z.optional(z.int()),
     }),
   ),
 });

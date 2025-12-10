@@ -443,10 +443,7 @@ export type TeamEventStatusAllianceBackup = null | {
  * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
  */
 export type TeamEventStatusPlayoff = null | {
-  /**
-   * The highest playoff level the team reached.
-   */
-  level?: 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+  level?: CompLevel;
   current_level_record?: WltRecord | null;
   record?: WltRecord | null;
   /**
@@ -477,9 +474,9 @@ export type EventRanking = {
      */
     extra_stats: Array<number>;
     /**
-     * Additional year-specific information, may be null. See parent `sort_order_info` for details.
+     * Additional year-specific information. See parent `sort_order_info` for details.
      */
-    sort_orders: Array<number> | null;
+    sort_orders: Array<number>;
     record: WltRecord | null;
     /**
      * The team's rank at the event as provided by FIRST.
@@ -519,7 +516,7 @@ export type EventRanking = {
      * Name of the field used in the `sort_order` array.
      */
     name: string;
-  }>;
+  }> | null;
 };
 
 export type EventDistrictPoints = {
@@ -1009,15 +1006,28 @@ export type EventPredictions = {
   [key: string]: unknown;
 };
 
+/**
+ * The competition level the match was played at.
+ */
+export type CompLevel = 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+
+/**
+ * Double elimination round, if applicable.
+ */
+export type DoubleElimRound =
+  | 'Finals'
+  | 'Round 1'
+  | 'Round 2'
+  | 'Round 3'
+  | 'Round 4'
+  | 'Round 5';
+
 export type MatchSimple = {
   /**
    * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
    */
   key: string;
-  /**
-   * The competition level the match was played at.
-   */
-  comp_level: 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+  comp_level: CompLevel;
   /**
    * The set number in a series of matches where more than one match is required in the match series.
    */
@@ -1060,10 +1070,7 @@ export type Match = {
    * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
    */
   key: string;
-  /**
-   * The competition level the match was played at.
-   */
-  comp_level: 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+  comp_level: CompLevel;
   /**
    * The set number in a series of matches where more than one match is required in the match series.
    */
@@ -2064,9 +2071,9 @@ export type Media = {
 
 export type EliminationAlliance = {
   /**
-   * Alliance name, may be null.
+   * Alliance name.
    */
-  name?: string | null;
+  name?: string;
   /**
    * Backup team called in, may be null.
    */
@@ -2089,12 +2096,39 @@ export type EliminationAlliance = {
    */
   picks: Array<string>;
   status?: {
+    /**
+     * Average match score during playoffs. Year specific. May be null.
+     */
     playoff_average?: number | null;
-    playoff_type?: number | null;
-    level?: string;
-    record?: WltRecord | null;
-    current_level_record?: WltRecord | null;
-    status?: string;
+    /**
+     * Playoff type, may be null.
+     */
+    playoff_type: number | null;
+    /**
+     * Match level, qm/ef/qf/sf/f.
+     */
+    level: CompLevel;
+    /**
+     * W-L-T record for the alliance, may be null.
+     */
+    record: WltRecord | null;
+    /**
+     * W-L-T record for the alliance at the current level, may be null.
+     */
+    current_level_record: WltRecord | null;
+    /**
+     * Status of the alliance.
+     */
+    status: 'eliminated' | 'playing' | 'won';
+    /**
+     * Whether the alliance advanced to round robin finals.
+     */
+    advanced_to_round_robin_finals?: boolean;
+    double_elim_round?: DoubleElimRound;
+    /**
+     * Rank in round robin play.
+     */
+    round_robin_rank?: number;
   };
 };
 
@@ -2222,7 +2256,7 @@ export type DistrictRanking = {
   /**
    * Any points added to a team as a result of the rookie bonus.
    */
-  rookie_bonus?: number;
+  rookie_bonus: number;
   /**
    * Total district points for the team.
    */
@@ -2230,7 +2264,7 @@ export type DistrictRanking = {
   /**
    * List of events that contributed to the point total for the team.
    */
-  event_points?: Array<{
+  event_points: Array<{
     /**
      * `true` if this event is a District Championship event.
      */
@@ -2260,6 +2294,14 @@ export type DistrictRanking = {
      */
     qual_points: number;
   }>;
+  /**
+   * Any points adjustments applied to the team.
+   */
+  adjustments?: number;
+  /**
+   * Any other bonus points awarded to the team.
+   */
+  other_bonus?: number;
 };
 
 /**

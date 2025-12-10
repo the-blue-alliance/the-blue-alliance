@@ -42,7 +42,7 @@ export default function RankingsTable({
     },
   ];
 
-  const sortOrderCols: RankingColumnType = rankings.sort_order_info.map(
+  const sortOrderCols: RankingColumnType = (rankings.sort_order_info ?? []).map(
     (sortOrder, idx) => ({
       header: sortOrder.name,
       accessorFn: (row) => row.sort_orders?.[idx].toFixed(sortOrder.precision),
