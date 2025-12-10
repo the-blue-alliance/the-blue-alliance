@@ -1,5 +1,4 @@
-import { nodeProfilingIntegration } from '@sentry/profiling-node';
-import * as Sentry from '@sentry/react';
+import * as Sentry from '@sentry/tanstackstart-react';
 import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
@@ -12,11 +11,10 @@ if (!isProd) {
 
 Sentry.init({
   dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
-  tracesSampleRate: 1,
-  autoInstrumentRemix: true,
-  enabled: isProd,
-  integrations: [nodeProfilingIntegration()],
-  profilesSampleRate: 1.0,
+  sendDefaultPii: false,
+  enableLogs: true,
+  enableMetrics: true,
+  tracesSampleRate: 1.0,
 });
 
 const app = express();

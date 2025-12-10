@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/tanstackstart-react';
 import {
   createFileRoute,
   notFound,
@@ -74,8 +75,12 @@ import {
 
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
   loader: async ({ params }) => {
+    const startTime = Date.now();
     const teamKey = `frc${params.teamNumber}`;
     const year = await parseParamsForYearElseDefault(params);
+    Sentry.metrics.count('team.page.view', 1, {
+      attributes: { team_number: params.teamNumber, year },
+    });
     if (year === undefined) {
       throw notFound();
     }
@@ -153,6 +158,12 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         eventAlliances[e.key] = resp.data ?? null;
       }),
     );
+
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    Sentry.metrics.distribution('team.page.loader.duration', duration, {
+      attributes: { team_number: params.teamNumber, year },
+    });
 
     return {
       year,
