@@ -343,6 +343,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -382,25 +385,6 @@ jobs:
             echo "No changes detected in pwa/app/api."
           fi
 
-      - name: Generate merge bot token (Dependabot only)
-        if: |
-          steps.api-changes.outputs.has_changes == 'true' &&
-          github.actor == 'dependabot[bot]'
-        id: app-token
-        uses: actions/create-github-app-token@v2.2.1
-        with:
-          app-id: ${{ secrets.MERGE_BOT_APP_ID }}
-          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
-
-      - name: Get Merge Bot User ID (Dependabot only)
-        if: |
-          steps.api-changes.outputs.has_changes == 'true' &&
-          github.actor == 'dependabot[bot]'
-        id: get-user-id
-        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-
       - name: Format, lint, and commit API changes (Dependabot only)
         if: |
           steps.api-changes.outputs.has_changes == 'true' && 
@@ -412,8 +396,8 @@ jobs:
           npm run lint -- --fix app/api || true
 
           # Commit and push
-          git config --local user.email "${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
-          git config --local user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add app/api
           git commit -m "chore: regenerate API after dependency update"
           git push
