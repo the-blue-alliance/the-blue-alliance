@@ -35,6 +35,11 @@ export default defineConfig({
     sentryVitePlugin({
       org: 'the-blue-alliance',
       project: 'the-blue-alliance-pwa',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      sourcemaps: {
+        assets: ['./build/client/**/*'],
+        ignore: ['**/node_modules/**'],
+      },
     }),
     ValidateEnv({
       VITE_TBA_API_READ_KEY: Schema.string({
