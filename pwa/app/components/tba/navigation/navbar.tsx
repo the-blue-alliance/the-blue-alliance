@@ -1,74 +1,92 @@
-import { Link } from '@tanstack/react-router';
-import { useState } from 'react';
+import { Link, useRouter } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 
 import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
-import {
-  MobileMenu,
-  MobileMenuTrigger,
-} from '~/components/tba/navigation/mobileMenu';
+import { MobileMenu } from '~/components/tba/navigation/mobileMenu';
 import { SearchModal } from '~/components/tba/navigation/searchModal';
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  navigationMenuTriggerStyle,
+  NavigationMenuViewport,
 } from '~/components/ui/navigation-menu';
 import lamp from '~/images/tba/tba-lamp.svg';
 import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 
 export function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [selected, setSelected] = useState<string | undefined>(undefined);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = router.subscribe('onBeforeNavigate', () => {
+      setSelected('');
+    });
+    return () => unsubscribe();
+  }, [router, setSelected]);
+
   return (
     <>
       <GlobalLoadingProgress />
-      <div
-        className="fixed z-15 w-full grow justify-center bg-primary shadow-md"
-      >
-        <NavigationMenu className="flex justify-between gap-6 px-4 py-2.5">
-          <Link
-            to="/"
-            className="flex items-center gap-3 hover:no-underline max-md:flex-1"
-          >
-            <img
-              src={lamp}
-              className="size-6 max-w-none"
-              alt="The Blue Alliance Logo"
-            />
-            <div
-              className="text-xl font-medium tracking-tight whitespace-nowrap
-                text-white"
+      <NavigationMenu value={selected} onValueChange={setSelected} asChild>
+        <header className="sticky top-0 z-10 h-14 w-full bg-primary shadow-md">
+          <div className="container">
+            <NavigationMenuList
+              asChild
+              className="flex h-14 w-full items-center justify-between"
             >
-              <span className="md:hidden lg:block">The Blue Alliance</span>
-              <span className="hidden md:block lg:hidden">TBA</span>
-            </div>
-          </Link>
-          <NavigationMenuList className="flex w-full flex-1 max-md:hidden">
-            {/* Desktop Menu Items */}
-            {NAV_ITEMS_LIST.map(({ title, to, icon: Icon }) => (
-              <NavigationMenuItem key={title}>
-                <NavigationMenuLink
-                  className={navigationMenuTriggerStyle() + ' cursor-pointer'}
-                  asChild
+              <nav>
+                <Link
+                  to="/"
+                  className="flex items-center gap-3 hover:no-underline
+                    max-md:flex-1"
                 >
-                  <Link to={to} className="hover:no-underline">
-                    <Icon />
-                    <span>{title}</span>
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-          <div className="space-x-2">
-            <SearchModal />
-            <MobileMenuTrigger
-              open={mobileMenuOpen}
-              setOpen={setMobileMenuOpen}
-            />
+                  <img
+                    src={lamp}
+                    className="size-6 max-w-none"
+                    alt="The Blue Alliance Logo"
+                  />
+                  <div
+                    className="text-xl font-medium tracking-tight
+                      whitespace-nowrap text-white"
+                  >
+                    <span className="sm:hidden md:block">
+                      The Blue Alliance
+                    </span>
+                    <span className="hidden sm:block md:hidden">TBA</span>
+                  </div>
+                </Link>
+                {/* Desktop Menu Items */}
+                <ul
+                  className="flex list-none flex-row items-center gap-1 px-6
+                    max-sm:hidden"
+                >
+                  {NAV_ITEMS_LIST.map(({ title, to, icon: Icon }) => (
+                    <NavigationMenuItem key={title}>
+                      <NavigationMenuLink
+                        className={`flex cursor-pointer items-center
+                        justify-start gap-2 bg-primary px-2.5 py-2 font-medium
+                        text-white hover:bg-black/20 hover:text-white`}
+                        asChild
+                      >
+                        <Link to={to} className="hover:no-underline">
+                          <Icon className="text-inherit" />
+                          <span>{title}</span>
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  ))}
+                </ul>
+                <ul className="flex items-center gap-2">
+                  <SearchModal />
+                  <MobileMenu />
+                </ul>
+              </nav>
+            </NavigationMenuList>
           </div>
-        </NavigationMenu>
-        <MobileMenu open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
-      </div>
+          <NavigationMenuViewport />
+        </header>
+      </NavigationMenu>
     </>
   );
 }
