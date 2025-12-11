@@ -206,21 +206,19 @@ function YearEventsPage() {
           </small>
         </h1>
         {groupedEvents.map((group) => (
-          <div key={group.slug} id={group.slug}>
-            <TableOfContentsSection
-              key={group.slug}
-              id={group.slug}
-              setInView={setInView}
-            >
-              <h2 className="mt-5 text-2xl">
-                {group.groupName}{' '}
-                <small className="text-slate-500">
-                  {pluralize(group.events.length, 'Event', 'Events')}
-                </small>
-              </h2>
-              <EventListTable events={group.events} />
-            </TableOfContentsSection>
-          </div>
+          <TableOfContentsSection
+            key={group.slug}
+            id={group.slug}
+            setInView={setInView}
+          >
+            <h2 className="mt-5 text-2xl">
+              {group.groupName}{' '}
+              <small className="text-slate-500">
+                {pluralize(group.events.length, 'Event', 'Events')}
+              </small>
+            </h2>
+            <EventListTable events={group.events} />
+          </TableOfContentsSection>
         ))}
       </div>
     </div>

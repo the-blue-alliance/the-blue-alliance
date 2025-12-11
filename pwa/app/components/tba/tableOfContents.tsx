@@ -15,6 +15,7 @@ import {
   useContext,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useState,
 } from 'react';
 import { InView, type PlainChildrenProps } from 'react-intersection-observer';
@@ -74,7 +75,10 @@ export function TableOfContents({
   const [mobilePopoverOpen, setMobilePopoverOpen] = useState<boolean>(false);
   const router = useRouter();
 
-  const firstInViewItem = tocItems.find((item) => inView.has(item.slug));
+  const activeItem = useMemo(
+    () => tocItems.find((item) => inView.has(item.slug)),
+    [tocItems, inView],
+  );
 
   // Close mobile TOC on click
   useEffect(() => {
@@ -90,7 +94,7 @@ export function TableOfContents({
       <div className="basis-full max-lg:hidden lg:basis-1/6">
         <div className="sticky top-14 space-y-6 pt-8">
           {children}
-          <TOCContent tocItems={tocItems} inView={inView} />
+          <TOCContent tocItems={tocItems} activeItem={activeItem} />
         </div>
       </div>
       {/* Mobile TOC - Sticky header */}
@@ -107,11 +111,11 @@ export function TableOfContents({
             >
               <PopoverTrigger asChild>
                 <Button
-                  size="icon"
                   variant="ghost"
-                  className="size-8 text-foreground"
+                  className="h-8 gap-1.5 px-2 text-foreground"
                 >
                   <TableOfContentsIcon className="size-5" />
+                  <span className="text-sm">{activeItem?.label}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent
@@ -120,10 +124,9 @@ export function TableOfContents({
                 sideOffset={0}
                 className="max-h-[70vh] w-60 overflow-y-auto lg:hidden"
               >
-                <TOCContent tocItems={tocItems} inView={inView} />
+                <TOCContent tocItems={tocItems} activeItem={activeItem} />
               </PopoverContent>
             </Popover>
-            <span className="text-sm">{firstInViewItem?.label}</span>
           </div>
           {children}
         </div>
@@ -151,6 +154,8 @@ export function TableOfContentsSection({
     <InView
       as="section"
       id={id}
+      className="scroll-mt-12 lg:scroll-mt-4"
+      rootMargin="-15% 0px 0px 0px"
       onChange={(inView) => {
         setInView((prev) => {
           if (inView) {
@@ -170,12 +175,11 @@ export function TableOfContentsSection({
 
 function TOCContent({
   tocItems,
-  inView,
+  activeItem,
 }: {
   tocItems: { slug: string; label: string }[];
-  inView: Set<string>;
+  activeItem: { slug: string; label: string } | undefined;
 }) {
-  const firstInViewItem = tocItems.find((item) => inView.has(item.slug));
   return (
     <TableOfContentsList>
       {tocItems.map((item) => (
@@ -183,7 +187,7 @@ function TOCContent({
           <TableOfContentsLink
             hash={item.slug}
             replace={true}
-            isActive={item.slug === firstInViewItem?.slug}
+            isActive={item.slug === activeItem?.slug}
           >
             {item.label}
           </TableOfContentsLink>
