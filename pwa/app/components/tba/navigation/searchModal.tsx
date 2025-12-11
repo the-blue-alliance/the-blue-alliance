@@ -1,6 +1,6 @@
 import { DialogProps } from '@radix-ui/react-dialog';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
+import { ClientOnly, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import SearchIcon from '~icons/lucide/search';
@@ -84,12 +84,14 @@ export function SearchModal({ ...props }: DialogProps) {
             Search teams and events...
           </span>
           <span className="inline-flex xl:hidden">Search...</span>
-          <div className="absolute top-2 right-1.5 hidden gap-1 sm:flex">
-            <KbdGroup>
-              <Kbd>{isMacintosh ? '⌘' : 'Ctrl'}</Kbd>
-              <Kbd>K</Kbd>
-            </KbdGroup>
-          </div>
+          <ClientOnly>
+            <div className="absolute top-2 right-1.5 hidden gap-1 sm:flex">
+              <KbdGroup>
+                <Kbd>{isMacintosh ? '⌘' : 'Ctrl'}</Kbd>
+                <Kbd>K</Kbd>
+              </KbdGroup>
+            </div>
+          </ClientOnly>
         </Button>
       </DialogTrigger>
 
