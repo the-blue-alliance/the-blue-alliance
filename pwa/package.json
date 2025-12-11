@@ -15,7 +15,8 @@
     "typecheck": "tsc",
     "bundle-visualizer": "npx vite-bundle-visualizer",
     "test": "vitest ./app --coverage",
-    "openapi-ts": "openapi-ts"
+    "openapi-ts": "openapi-ts",
+    "playwright": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.12",
