@@ -1,12 +1,10 @@
-import { Link } from 'react-router';
-
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';
 import BiLink from '~icons/bi/link';
 import BiPinMapFill from '~icons/bi/pin-map-fill';
 
-import { Media, Team } from '~/api/tba';
+import { Media, Team } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
@@ -55,7 +53,9 @@ export default function TeamPageTeamInfo({
         {sponsors.length > 0 ? (
           <Accordion type="single" collapsible>
             <AccordionItem value="item-1" className="border-0">
-              <AccordionTrigger className="justify-normal p-0 text-left font-normal">
+              <AccordionTrigger
+                className="justify-normal p-0 text-left font-normal"
+              >
                 <InlineIcon displayStyle={'flexless'}>
                   <BiInfoCircleFill />
                   {schoolName}
@@ -91,18 +91,18 @@ export default function TeamPageTeamInfo({
         <InlineIcon>
           <BiLink />
           Details on{' '}
-          <Link
-            to={`https://frc-events.firstinspires.org/team/${team.team_number}`}
+          <a
+            href={`https://frc-events.firstinspires.org/team/${team.team_number}`}
           >
             FRC Events
-          </Link>
+          </a>
         </InlineIcon>
 
         <InlineIcon>
           <BiGraphUp />
-          <Link to={`https://www.statbotics.io/team/${team.team_number}`}>
+          <a href={`https://www.statbotics.io/team/${team.team_number}`}>
             Statbotics
-          </Link>
+          </a>
         </InlineIcon>
       </div>
 

@@ -28,6 +28,7 @@ class Team(CachedModel):
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
     # Normalized address from the Google Maps API, constructed using the above
+    # WARNING: normalized_location is no longer being set. This property is deprecated
     normalized_location = ndb.StructuredProperty(Location)
 
     website = ndb.TextProperty(indexed=False)
@@ -98,9 +99,6 @@ class Team(CachedModel):
 
     @property
     def city_state_country(self):
-        if not self._city_state_country and self.nl:
-            self._city_state_country = self.nl.city_state_country
-
         if not self._city_state_country:
             location_parts = []
             if self.city:
@@ -130,8 +128,8 @@ class Team(CachedModel):
     def key_name(self) -> TeamKey:
         return "frc%s" % self.team_number
 
-    @classmethod
-    def validate_key_name(self, team_key: str) -> bool:
+    @staticmethod
+    def validate_key_name(team_key: str) -> bool:
         key_name_regex = re.compile(r"^frc[1-9]\d*$")
         match = re.match(key_name_regex, team_key)
         return True if match else False

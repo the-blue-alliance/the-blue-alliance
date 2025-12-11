@@ -1,6 +1,7 @@
 import datetime
 import hashlib
-from typing import Optional, Set
+import logging
+from typing import Optional
 
 from flask import abort, make_response, request
 from pyre_extensions import none_throws
@@ -11,6 +12,10 @@ from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
 from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.event_type import EventType
+from backend.common.consts.fms_report_type import (
+    FMSReportType,
+    REQUIRED_REPORT_PERMISSOINS,
+)
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
@@ -27,7 +32,11 @@ class TrustedApiAuthHelper:
 
     @classmethod
     def do_trusted_api_auth(
-        cls, event_key: EventKey, required_auth_types: Set[AuthType]
+        cls,
+        event_key: EventKey,
+        fms_report_type: FMSReportType | None,
+        required_auth_types: set[AuthType] | None,
+        file_param: str | None = None,
     ) -> None:
         event_key = EventCodeExceptions.resolve(event_key)
         event = Event.get_by_id(event_key)
@@ -58,6 +67,8 @@ class TrustedApiAuthHelper:
 
         # Next, check if the logged in user has any write API keys linked to their account
         # that are valid for this event
+        if required_auth_types is None:
+            required_auth_types = set()
         if user:
             user_has_auth = any(
                 cls._validate_auth(auth, event, required_auth_types) is None
@@ -93,9 +104,52 @@ class TrustedApiAuthHelper:
                 )
             )
 
+        if file_param:
+            file = request.files.get(file_param)
+            if not file:
+                abort(
+                    make_response(
+                        profiled_jsonify({"Error": "Expected file upload not found"}),
+                        401,
+                    )
+                )
+            file_contents = file.read()
+            file.seek(0)
+            request_data = hashlib.sha256(file_contents).hexdigest()
+            logging.info(f"Computed file digest: {request_data}")
+            file_digest = request.form.get("fileDigest")
+            if request_data != file_digest:
+                abort(
+                    make_response(
+                        profiled_jsonify(
+                            {"Error": "File digest does not match uploaded file"}
+                        ),
+                        401,
+                    )
+                )
+
+            # Create a new set for file upload auth types to avoid mutating the passed-in set
+            required_auth_types = set(required_auth_types)
+            if fms_report_type in REQUIRED_REPORT_PERMISSOINS:
+                required_auth_types.add(REQUIRED_REPORT_PERMISSOINS[fms_report_type])
+
+            if len(required_auth_types) == 0:
+                abort(
+                    make_response(
+                        profiled_jsonify(
+                            {
+                                "Error": "Unable to authorize request: no required auth types could be determined."
+                            }
+                        ),
+                        401,
+                    )
+                )
+        else:
+            request_data = request.get_data(as_text=True)
+
         auth = ApiAuthAccess.get_by_id(auth_id)
         expected_sig = cls.compute_auth_signature(
-            auth.secret if auth else None, request.path, request.get_data(as_text=True)
+            auth.secret if auth else None, request.path, request_data
         )
         if not auth or expected_sig != auth_sig:
             abort(
@@ -117,13 +171,27 @@ class TrustedApiAuthHelper:
         cls,
         auth: ApiAuthAccess,
         event: Event,
-        required_auth_types: Set[AuthType],
+        required_auth_types: set[AuthType],
     ) -> Optional[str]:
         allowed_event_keys = [none_throws(ekey.string_id()) for ekey in auth.event_list]
-        if event.key_name not in allowed_event_keys and not (
-            auth.all_official_events
-            and event.official
-            and event.year == datetime.datetime.now().year
+        if (
+            event.key_name not in allowed_event_keys
+            and not (
+                auth.all_official_events
+                and event.official
+                and event.year == datetime.datetime.now().year
+            )
+            and not (
+                required_auth_types == {AuthType.MATCH_VIDEO}
+                and any(
+                    (
+                        ApiAuthAccess.webcast_key(w) in auth.offseason_webcast_channels
+                        for w in event.webcast
+                    )
+                )
+                and event.event_type_enum == EventType.OFFSEASON
+                and event.year == datetime.datetime.now().year
+            )
         ):
             return "Only allowed to edit events: {}".format(
                 ", ".join(allowed_event_keys)

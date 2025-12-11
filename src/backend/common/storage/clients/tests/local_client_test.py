@@ -13,7 +13,7 @@ def test_init():
 
 def test_client_base_path(tmp_path):
     client = LocalStorageClient(tmp_path)
-    assert type(client) is LocalStorageClient
+    assert isinstance(client, LocalStorageClient)
     assert client.base_path == tmp_path
 
 

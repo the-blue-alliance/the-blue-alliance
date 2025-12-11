@@ -50,11 +50,16 @@ class LiveEventHelper:
                     )
             events_by_key[event.key.id()] = event
 
-        yield webcast_status_futures
-
         special_webcasts: List[TSpecialWebcast] = (
             yield SpecialWebcastHelper.get_special_webcasts_with_online_status_async()
         )
+
+        for webcast in special_webcasts:
+            webcast_status_futures.append(
+                WebcastOnlineHelper.add_online_status_async(webcast)
+            )
+
+        yield webcast_status_futures
 
         # # Add in the Fake TBA BlueZone event (watch for circular imports)
         # from helpers.bluezone_helper import BlueZoneHelper

@@ -1,9 +1,9 @@
+import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
-import { Link } from 'react-router';
 
 import BiTrophy from '~icons/bi/trophy';
 
-import { EventRanking } from '~/api/tba';
+import { EventRanking } from '~/api/tba/read';
 import { DataTable } from '~/components/tba/dataTable';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { cn } from '~/lib/utils';
@@ -23,7 +23,8 @@ export default function RankingsTable({
       header: 'Team',
       cell: ({ row }) => (
         <Link
-          to={`/team/${row.original.team_key.substring(3)}`}
+          to="/team/$teamNumber/{-$year}"
+          params={{ teamNumber: row.original.team_key.substring(3) }}
           className="whitespace-nowrap"
         >
           {winners.includes(row.original.team_key) ? (
@@ -41,7 +42,7 @@ export default function RankingsTable({
     },
   ];
 
-  const sortOrderCols: RankingColumnType = rankings.sort_order_info.map(
+  const sortOrderCols: RankingColumnType = (rankings.sort_order_info ?? []).map(
     (sortOrder, idx) => ({
       header: sortOrder.name,
       accessorFn: (row) => row.sort_orders?.[idx].toFixed(sortOrder.precision),

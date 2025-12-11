@@ -1,7 +1,7 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { useLoaderData } from 'react-router';
 
 import {
   Event,
@@ -14,42 +14,42 @@ import {
   getInsightsNotablesYear,
   getStatus,
   getTeamEventsStatusesByYear,
-} from '~/api/tba';
+} from '~/api/tba/read';
 import {
   getEventOptions,
   getTeamOptions,
-} from '~/api/tba/@tanstack/react-query.gen';
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { TeamLink } from '~/components/tba/links';
-import { MatchResultsTableGroup } from '~/components/tba/matchResultsTable';
+import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
+import { PlayoffType } from '~/lib/api/PlayoffType';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, queryFromAPI } from '~/lib/utils';
 
-export async function loader() {
-  const status = await getStatus();
+export const Route = createFileRoute('/match_suggestion')({
+  loader: async () => {
+    const status = await getStatus();
 
-  if (status.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    if (status.data === undefined) {
+      throw new Error('Failed to load status');
+    }
 
-  const year = status.data.current_season;
-  const events = await getEventsByYear({ path: { year } });
+    const year = status.data.current_season;
+    const events = await getEventsByYear({ path: { year } });
 
-  if (events.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    if (events.data === undefined) {
+      throw new Error('Failed to load events');
+    }
 
-  const filteredEvents = getCurrentWeekEvents(events.data);
+    const filteredEvents = getCurrentWeekEvents(events.data);
 
-  return {
-    events: filteredEvents,
-  };
-}
+    return {
+      events: filteredEvents,
+    };
+  },
+  component: MatchSuggestion,
+});
 
 // TODO: Fix this typing
 interface EventPredictions {
@@ -289,7 +289,9 @@ function MatchSuggestionRow({
     <>
       <tr key={match.key} className="text-center">
         <td className="border">{event.key.substring(4).toUpperCase()}</td>
-        <td className="border">{matchTitleShort(match, event)}</td>
+        <td className="border">
+          {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}
+        </td>
         <td className="border">
           {match.predicted_time && (
             <span>
@@ -386,8 +388,8 @@ function MatchSuggestionRow({
   );
 }
 
-export default function MatchSuggestion(): React.JSX.Element {
-  const { events } = useLoaderData<typeof loader>();
+function MatchSuggestion(): React.JSX.Element {
+  const { events } = Route.useLoaderData();
 
   const eventMatchesQuery = useQuery({
     queryKey: ['eventMatches', events],
@@ -509,10 +511,10 @@ export default function MatchSuggestion(): React.JSX.Element {
       </Badge>
       <h2 className="text-2xl font-medium">Finished Matches</h2>
       {/* This is a hack for now. */}
-      <MatchResultsTableGroup
-        event={events[0]}
+      <SimpleMatchRowsWithBreaks
         matches={finishedMatches}
-        showEvent
+        event={events[0]}
+        breakers={[]}
       />
       <h2 className="text-2xl font-medium">Current Matches</h2>
       <table className="w-[100%]">

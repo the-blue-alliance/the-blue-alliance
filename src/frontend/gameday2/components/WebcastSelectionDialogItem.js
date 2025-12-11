@@ -1,6 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { ListItem } from "material-ui/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 
 export default class WebcastSelectionDialogItem extends React.Component {
   static propTypes = {
@@ -17,16 +20,20 @@ export default class WebcastSelectionDialogItem extends React.Component {
 
   render() {
     return (
-      <ListItem
-        primaryText={this.props.webcast.name}
-        secondaryText={this.props.secondaryText}
-        onClick={() => this.handleClick()}
-        leftIcon={this.props.leftIcon}
-        rightIcon={this.props.rightIcon}
-        innerDivStyle={{
-          paddingLeft: "50px", // Leave room for the left icon
-        }}
-      />
+      <ListItem button onClick={() => this.handleClick()}>
+        {this.props.leftIcon && (
+          <ListItemIcon>{this.props.leftIcon}</ListItemIcon>
+        )}
+        <ListItemText
+          primary={this.props.webcast.name}
+          secondary={this.props.secondaryText}
+        />
+        {this.props.rightIcon && (
+          <ListItemSecondaryAction>
+            {this.props.rightIcon}
+          </ListItemSecondaryAction>
+        )}
+      </ListItem>
     );
   }
 }

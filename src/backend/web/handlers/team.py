@@ -46,7 +46,7 @@ def team_detail(
         abort(404)
     return make_cached_response(
         render_template("team_details.html", template_values),
-        ttl=timedelta(seconds=61) if short_cache else timedelta(days=1),
+        ttl=timedelta(seconds=61) if short_cache else timedelta(hours=6),
     )
 
 
@@ -63,7 +63,7 @@ def team_history(team_number: TeamNumber, is_canonical: bool = False) -> Respons
     template_values, short_cache = TeamRenderer.render_team_history(team, is_canonical)
     return make_cached_response(
         render_template("team_history.html", template_values),
-        ttl=timedelta(minutes=5) if short_cache else timedelta(days=1),
+        ttl=timedelta(minutes=5) if short_cache else timedelta(hours=6),
     )
 
 

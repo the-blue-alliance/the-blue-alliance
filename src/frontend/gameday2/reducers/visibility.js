@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import {
   TOGGLE_CHAT_SIDEBAR_VISIBILITY,
   SET_CHAT_SIDEBAR_VISIBILITY,
@@ -7,7 +6,6 @@ import {
   TOGGLE_LAYOUT_DRAWER_VISIBILITY,
   SET_LAYOUT_DRAWER_VISIBILITY,
 } from "../constants/ActionTypes";
-/* eslint-enable max-len */
 
 const defaultState = {
   hashtagSidebar: false,

@@ -1,8 +1,12 @@
-import { Link } from 'react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 
 import { Button } from '~/components/ui/button';
 
-export default function Donate(): React.JSX.Element {
+export const Route = createFileRoute('/donate')({
+  component: Donate,
+});
+
+function Donate(): React.JSX.Element {
   return (
     <>
       <div className="flex flex-col divide-y **:mt-4">

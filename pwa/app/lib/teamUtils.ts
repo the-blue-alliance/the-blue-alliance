@@ -1,4 +1,4 @@
-import { Team } from '~/api/tba';
+import { Team } from '~/api/tba/read';
 import { removeNonNumeric } from '~/lib/utils';
 
 export function sortTeamsComparator(a: Team, b: Team) {

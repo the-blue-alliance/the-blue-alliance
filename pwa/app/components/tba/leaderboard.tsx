@@ -1,11 +1,11 @@
+import { Link } from '@tanstack/react-router';
 import React, { ReactNode } from 'react';
-import { Link } from 'react-router';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 
-import { LeaderboardInsight } from '~/api/tba';
-import { TeamLink } from '~/components/tba/links';
+import { LeaderboardInsight } from '~/api/tba/read';
+import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {
   Card,
@@ -143,7 +143,10 @@ function LeaderboardKeyList({
               &nbsp;(and{' '}
               {pluralize(keyVals.length - cutoffSize, 'other', 'others')})
             </TooltipTrigger>
-            <TooltipContent className="max-w-[500px] text-center break-words whitespace-normal">
+            <TooltipContent
+              className="max-w-[500px] text-center break-words
+                whitespace-normal"
+            >
               <p>
                 {keyVals.map((k, i) => (
                   <React.Fragment key={k}>
@@ -180,5 +183,14 @@ function LeaderboardKeyLink({
       </TeamLink>
     );
   }
-  return <Link to={`/${keyType}/${keyVal}`}>{keyVal}</Link>;
+  if (keyType === 'event') {
+    return (
+      <Link to="/event/$eventKey" params={{ eventKey: keyVal }}>
+        {keyVal}
+      </Link>
+    );
+  }
+  if (keyType === 'match') {
+    return <MatchLink matchOrKey={keyVal}>{keyVal}</MatchLink>;
+  }
 }

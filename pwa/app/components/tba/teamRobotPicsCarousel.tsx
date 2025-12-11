@@ -1,6 +1,6 @@
 import Autoplay from 'embla-carousel-autoplay';
 
-import { Media } from '~/api/tba';
+import { Media } from '~/api/tba/read';
 import {
   Carousel,
   CarouselContent,

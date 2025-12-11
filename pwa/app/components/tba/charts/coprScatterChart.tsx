@@ -17,7 +17,7 @@ import {
 } from 'recharts/types/component/DefaultTooltipContent';
 
 import { EventColors, TeamWithColor } from '~/api/colors';
-import { EventCoprs } from '~/api/tba';
+import { EventCoprs } from '~/api/tba/read';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { ChartContainer } from '~/components/ui/chart';
 import {

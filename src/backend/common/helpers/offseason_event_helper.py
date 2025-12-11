@@ -16,6 +16,10 @@ class OffseasonEventHelper:
 
     @classmethod
     def is_maybe_match(cls, tba_event: Event, first_event: Event) -> bool:
+        if tba_event.first_code is not None:
+            # If the TBA event has first_code, we can guarantee that a direct match is available.
+            # Don't risk a false-positive maybe match.
+            return False
         return (
             tba_event.start_date == first_event.start_date
             and tba_event.end_date == first_event.end_date

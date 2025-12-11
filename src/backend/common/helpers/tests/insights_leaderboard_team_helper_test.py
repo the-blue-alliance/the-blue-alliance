@@ -3,8 +3,16 @@ from google.appengine.ext import ndb
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.insights_leaderboard_team_helper import (
-    InsightsLeaderboardTeamHelper,
-    LeaderboardInsightArguments,
+    InsightsLeaderboardTeamCalculator,
+    LongestEinsteinStreakCalculator,
+    MostAwardsCalculator,
+    MostBlueBannersCalculator,
+    MostEventsPlayedAtCalculator,
+    MostMatchesPlayedCalculator,
+    MostNonChampsEventWinsCalculator,
+    MostNonChampsImpactWinsCalculator,
+    MostUniqueTeamsPlayedWithOrAgainstCalculator,
+    MostWffasCalculator,
 )
 from backend.common.models.award import Award
 from backend.common.models.event import Event
@@ -19,13 +27,13 @@ def test_most_blue_banners(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2024nytr.json")
     test_data_importer.import_award_list(__file__, "data/2024nytr_awards.json")
 
-    insight = InsightsLeaderboardTeamHelper._most_blue_banners(
-        LeaderboardInsightArguments(
-            events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
-            year=0,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=0,
+        calculators=[MostBlueBannersCalculator()],
     )
 
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"] == [
         {"keys": ["frc1796"], "value": 2},
@@ -54,13 +62,13 @@ def test_most_awards(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2024nytr.json")
     test_data_importer.import_award_list(__file__, "data/2024nytr_awards.json")
 
-    insight = InsightsLeaderboardTeamHelper._most_awards(
-        LeaderboardInsightArguments(
-            events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
-            year=0,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=0,
+        calculators=[MostAwardsCalculator()],
     )
 
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"][:3] == [
         {"keys": ["frc1796"], "value": 4},
@@ -95,17 +103,13 @@ def test_most_non_champs_event_wins(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2024mil.json")
     test_data_importer.import_award_list(__file__, "data/2024mil_awards.json")
 
-    insight = InsightsLeaderboardTeamHelper._most_non_champs_event_wins(
-        LeaderboardInsightArguments(
-            events=[
-                Event.get_by_id("2019nyny"),
-                Event.get_by_id("2024nytr"),
-                Event.get_by_id("2024mil"),
-            ],
-            year=2024,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=0,
+        calculators=[MostNonChampsEventWinsCalculator()],
     )
 
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"] == [
         {"keys": ["frc1796"], "value": 2},
@@ -118,13 +122,13 @@ def test_most_matches_played(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2019nyny.json")
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
-    insight = InsightsLeaderboardTeamHelper._most_matches_played(
-        LeaderboardInsightArguments(
-            events=[Event.get_by_id("2019nyny")],
-            year=2019,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=2019,
+        calculators=[MostMatchesPlayedCalculator()],
     )
 
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"][:5] == [
         {"keys": ["frc1155", "frc2869"], "value": 17},
@@ -146,13 +150,13 @@ def test_most_events_played_at(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2024nytr.json")
     test_data_importer.import_match_list(__file__, "data/2024nytr_matches.json")
 
-    insight = InsightsLeaderboardTeamHelper._most_events_played_at(
-        LeaderboardInsightArguments(
-            events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
-            year=0,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=0,
+        calculators=[MostEventsPlayedAtCalculator()],
     )
 
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"][0] == {
         "keys": ["frc333", "frc1796", "frc1880", "frc3419", "frc4122", "frc6401"],
@@ -165,13 +169,13 @@ def test_most_unique_teams_played_with_or_against(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2019nyny.json")
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
-    insight = InsightsLeaderboardTeamHelper._most_unique_teams_played_with_or_against(
-        LeaderboardInsightArguments(
-            events=[Event.get_by_id("2019nyny")],
-            year=2019,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=2019,
+        calculators=[MostUniqueTeamsPlayedWithOrAgainstCalculator()],
     )
 
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"][:3] == [
         {"keys": ["frc1155"], "value": 46},
@@ -198,7 +202,7 @@ def test_only_overall_and_year_are_computed(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2019nyny.json")
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
-    insights = InsightsLeaderboardTeamHelper.make_insights(2025)
+    insights = InsightsLeaderboardTeamCalculator.make_insights(2025)
     assert len(insights) == 6
 
     insights_2025 = [i for i in insights if i.year == 2025]
@@ -211,7 +215,7 @@ def test_only_official_events_are_included(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2019nyny.json")
     test_data_importer.import_match_list(__file__, "data/2019nyny_matches.json")
 
-    insights = InsightsLeaderboardTeamHelper.make_insights(2019)
+    insights = InsightsLeaderboardTeamCalculator.make_insights(2019)
     most_matches_played_insights = [
         i
         for i in insights
@@ -283,17 +287,12 @@ def test_longest_einstein_streak_across_covid(ndb_stub):
         team_list=[ndb.Key(Team, "frc254")],
     ).put()
 
-    insight = InsightsLeaderboardTeamHelper._longest_einstein_streak(
-        LeaderboardInsightArguments(
-            events=[
-                Event.get_by_id("2018hop"),
-                Event.get_by_id("2019tur"),
-                Event.get_by_id("2022gal"),
-            ],
-            year=0,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=0,
+        calculators=[LongestEinsteinStreakCalculator()],
     )
-
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"][:3] == [
         {"keys": ["frc254"], "value": 3},
@@ -308,13 +307,13 @@ def test_most_non_champs_impact_wins(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2024nytr.json")
     test_data_importer.import_award_list(__file__, "data/2024nytr_awards.json")
 
-    insight = InsightsLeaderboardTeamHelper._most_non_champs_impact_wins(
-        LeaderboardInsightArguments(
-            events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
-            year=0,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=0,
+        calculators=[MostNonChampsImpactWinsCalculator()],
     )
 
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"] == [{"keys": ["frc1660", "frc5993"], "value": 1}]
     assert insight.data["key_type"] == "team"
@@ -327,13 +326,13 @@ def test_most_wffas(ndb_stub, test_data_importer):
     test_data_importer.import_event(__file__, "data/2024nytr.json")
     test_data_importer.import_award_list(__file__, "data/2024nytr_awards.json")
 
-    insight = InsightsLeaderboardTeamHelper._most_wffas(
-        LeaderboardInsightArguments(
-            events=[Event.get_by_id("2019nyny"), Event.get_by_id("2024nytr")],
-            year=0,
-        )
+    insights = InsightsLeaderboardTeamCalculator.make_insights(
+        year=0,
+        calculators=[MostWffasCalculator()],
     )
 
+    assert len(insights) == 1
+    insight = insights[0]
     assert insight is not None
     assert insight.data["rankings"] == [{"keys": ["frc250", "frc395"], "value": 1}]
     assert insight.data["key_type"] == "team"

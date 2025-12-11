@@ -3,9 +3,9 @@
   "info": {
     "title": "The Blue Alliance API v3",
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.10.0",
+    "version": "3.11.0",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.11.0: Deprecate Event.lat, Event.lng, Event.gmaps_place_id, Event.gmaps_url. Event models will no longer be geocoded. Moving forward, these fields will return null. Eventually these fields will be removed. Event.address will now return FRC-API address, and Event.location_name will return FRC-API venue. 3.10.1: Add remap_teams to event. 3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "servers": [
     {
@@ -5125,7 +5125,9 @@
           "lat",
           "lng",
           "location_name",
-          "rookie_year"
+          "website",
+          "rookie_year",
+          "motto"
         ],
         "type": "object",
         "properties": {
@@ -5239,6 +5241,13 @@
               "null"
             ],
             "description": "First year the team officially competed."
+          },
+          "motto": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Team's motto or tagline."
           }
         }
       },
@@ -5376,7 +5385,8 @@
           "division_keys",
           "parent_event_key",
           "playoff_type",
-          "playoff_type_string"
+          "playoff_type_string",
+          "remap_teams"
         ],
         "type": "object",
         "properties": {
@@ -5475,14 +5485,14 @@
               "string",
               "null"
             ],
-            "description": "Google Maps Place ID for the event address."
+            "description": "Google Maps Place ID for the event address. Will be NULL, for future development."
           },
           "gmaps_url": {
             "type": [
               "string",
               "null"
             ],
-            "description": "Link to address location on Google Maps.",
+            "description": "Link to address location on Google Maps. Will be NULL, for future development.",
             "format": "url"
           },
           "lat": {
@@ -5490,7 +5500,7 @@
               "number",
               "null"
             ],
-            "description": "Latitude for the event address.",
+            "description": "Latitude for the event address. Will be NULL, for future development.",
             "format": "double"
           },
           "lng": {
@@ -5498,7 +5508,7 @@
               "number",
               "null"
             ],
-            "description": "Longitude for the event address.",
+            "description": "Longitude for the event address. Will be NULL, for future development.",
             "format": "double"
           },
           "location_name": {
@@ -5513,7 +5523,7 @@
               "string",
               "null"
             ],
-            "description": "Timezone name."
+            "description": "IANA Timezone identifier."
           },
           "website": {
             "type": [
@@ -5561,7 +5571,7 @@
               "integer",
               "null"
             ],
-            "description": "Playoff Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py#L4, or null."
+            "description": "Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/playoff_type.py#L37, or null."
           },
           "playoff_type_string": {
             "type": [
@@ -5569,6 +5579,17 @@
               "null"
             ],
             "description": "String representation of the `playoff_type`, or null."
+          },
+          "remap_teams": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Map of temporary \"off-season demo\" team numbers to pre-rookie and B teams. Both keys and values are team keys in the format 'frc####'. Key is the old team key ('frc' + numeric only), value is the new team key ('frc' + numeric + may include a letter suffix).",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Team key in the format 'frc####'"
+            }
           }
         }
       },
@@ -5632,19 +5653,28 @@
             "description": "Number of teams ranked."
           },
           "ranking": {
-            "type": "object",
+            "type": [
+              "object",
+              "null"
+            ],
             "properties": {
               "matches_played": {
                 "type": "integer",
                 "description": "Number of matches played."
               },
               "qual_average": {
-                "type": "number",
+                "type": [
+                  "number",
+                  "null"
+                ],
                 "description": "For some years, average qualification score. Can be null.",
                 "format": "double"
               },
               "sort_orders": {
-                "type": "array",
+                "type": [
+                  "array",
+                  "null"
+                ],
                 "description": "Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.",
                 "items": {
                   "type": "number",
@@ -5659,11 +5689,17 @@
                 ]
               },
               "rank": {
-                "type": "integer",
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "description": "Relative rank of this team."
               },
               "dq": {
-                "type": "integer",
+                "type": [
+                  "integer",
+                  "null"
+                ],
                 "description": "Number of matches the team was disqualified for."
               },
               "team_key": {
@@ -5673,7 +5709,10 @@
             }
           },
           "sort_order_info": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "description": "Ordered list of names corresponding to the elements of the `sort_orders` array.",
             "items": {
               "type": "object",
@@ -5745,15 +5784,7 @@
         ],
         "properties": {
           "level": {
-            "type": "string",
-            "description": "The highest playoff level the team reached.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "$ref": "#/components/schemas/Comp_Level"
           },
           "current_level_record": {
             "type": [
@@ -5832,15 +5863,12 @@
                   }
                 },
                 "sort_orders": {
-                  "type": [
-                    "array",
-                    "null"
-                  ],
+                  "type": "array",
                   "items": {
                     "type": "number",
                     "format": "double"
                   },
-                  "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details."
+                  "description": "Additional year-specific information. See parent `sort_order_info` for details."
                 },
                 "record": {
                   "type": [
@@ -5886,7 +5914,10 @@
             }
           },
           "sort_order_info": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "description": "List of year-specific values provided in the `sort_orders` array for each team.",
             "items": {
               "required": [
@@ -6720,6 +6751,29 @@
         "type": "object",
         "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change."
       },
+      "Comp_Level": {
+        "type": "string",
+        "enum": [
+          "qm",
+          "ef",
+          "qf",
+          "sf",
+          "f"
+        ],
+        "description": "The competition level the match was played at."
+      },
+      "Double_Elim_Round": {
+        "type": "string",
+        "enum": [
+          "Finals",
+          "Round 1",
+          "Round 2",
+          "Round 3",
+          "Round 4",
+          "Round 5"
+        ],
+        "description": "Double elimination round, if applicable."
+      },
       "Match_Simple": {
         "required": [
           "key",
@@ -6740,15 +6794,7 @@
             "description": "TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set."
           },
           "comp_level": {
-            "type": "string",
-            "description": "The competition level the match was played at.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "$ref": "#/components/schemas/Comp_Level"
           },
           "set_number": {
             "type": "integer",
@@ -6836,15 +6882,7 @@
             "description": "TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set."
           },
           "comp_level": {
-            "type": "string",
-            "description": "The competition level the match was played at.",
-            "enum": [
-              "qm",
-              "ef",
-              "qf",
-              "sf",
-              "f"
-            ]
+            "$ref": "#/components/schemas/Comp_Level"
           },
           "set_number": {
             "type": "integer",
@@ -7104,6 +7142,275 @@
           }
         }
       },
+      "AutoRobot_2018": {
+        "type": "string",
+        "enum": [
+          "None",
+          "AutoRun"
+        ]
+      },
+      "EndgameRobot_2018": {
+        "type": "string",
+        "enum": [
+          "Climbing",
+          "Levitate",
+          "None",
+          "Parking",
+          "Unknown"
+        ]
+      },
+      "RobotAuto_2016_WithUnknown": {
+        "type": "string",
+        "enum": [
+          "Crossed",
+          "None",
+          "Reached",
+          "Unknown"
+        ]
+      },
+      "RobotAuto_2016_WithoutUnknown": {
+        "type": "string",
+        "enum": [
+          "Crossed",
+          "Reached",
+          "None"
+        ]
+      },
+      "Position_2016": {
+        "type": "string",
+        "enum": [
+          "",
+          "A_ChevalDeFrise",
+          "A_Portcullis",
+          "B_Moat",
+          "B_Ramparts",
+          "C_Drawbridge",
+          "C_SallyPort",
+          "D_RockWall",
+          "D_RoughTerrain",
+          "NotSpecified"
+        ]
+      },
+      "TowerFace_2016": {
+        "type": "string",
+        "enum": [
+          "Both",
+          "Challenged",
+          "None",
+          "Scaled",
+          "Unknown"
+        ]
+      },
+      "RobotAuto_2017": {
+        "type": "string",
+        "enum": [
+          "Mobility",
+          "None",
+          "Unknown"
+        ]
+      },
+      "Touchpad_2017": {
+        "type": "string",
+        "enum": [
+          "None",
+          "ReadyForTakeoff"
+        ]
+      },
+      "Bay_2019": {
+        "type": "string",
+        "enum": [
+          "None",
+          "Panel",
+          "PanelAndCargo"
+        ]
+      },
+      "EndgameRobot_2019": {
+        "type": "string",
+        "enum": [
+          "HabLevel1",
+          "HabLevel2",
+          "HabLevel3",
+          "None",
+          "Unknown"
+        ]
+      },
+      "HabLine_2019": {
+        "type": "string",
+        "enum": [
+          "CrossedHabLineInSandstorm",
+          "CrossedHabLineInTeleop",
+          "None",
+          "Unknown"
+        ]
+      },
+      "PreMatchBay_2019": {
+        "type": "string",
+        "enum": [
+          "Cargo",
+          "Panel",
+          "Unknown"
+        ]
+      },
+      "InitLineRobot_2020": {
+        "type": "string",
+        "enum": [
+          "Exited",
+          "None"
+        ]
+      },
+      "EndgameRobot_2020": {
+        "type": "string",
+        "enum": [
+          "Hang",
+          "None",
+          "Park"
+        ]
+      },
+      "EndgameRungIsLevel_2020": {
+        "type": "string",
+        "enum": [
+          "IsLevel",
+          "NotLevel"
+        ]
+      },
+      "Stage3TargetColor_2020": {
+        "type": "string",
+        "enum": [
+          "Blue",
+          "Green",
+          "Red",
+          "Unknown",
+          "Yellow"
+        ]
+      },
+      "EndgameRobot_2022": {
+        "type": "string",
+        "enum": [
+          "High",
+          "Low",
+          "Mid",
+          "None",
+          "Traversal"
+        ]
+      },
+      "TaxiRobot_2022": {
+        "type": "string",
+        "enum": [
+          "No",
+          "Yes"
+        ]
+      },
+      "BridgeState_2023": {
+        "type": "string",
+        "enum": [
+          "Level",
+          "NotLevel"
+        ]
+      },
+      "AutoChargeStationRobot_2023": {
+        "type": "string",
+        "enum": [
+          "Docked",
+          "None"
+        ]
+      },
+      "EndGameChargeStationRobot_2023": {
+        "type": "string",
+        "enum": [
+          "Docked",
+          "None",
+          "Park",
+          "Parked"
+        ]
+      },
+      "MobilityRobot_2023": {
+        "type": "string",
+        "enum": [
+          "No",
+          "Yes"
+        ]
+      },
+      "AutoLineRobot_2024": {
+        "type": "string",
+        "enum": [
+          "No",
+          "Yes"
+        ]
+      },
+      "EndGameRobot_2024": {
+        "type": "string",
+        "enum": [
+          "CenterStage",
+          "None",
+          "Parked",
+          "StageLeft",
+          "StageRight"
+        ]
+      },
+      "EndGameRobot_2025": {
+        "type": "string",
+        "enum": [
+          "DeepCage",
+          "None",
+          "Parked",
+          "ShallowCage"
+        ]
+      },
+      "ReefRow_2025": {
+        "type": "object",
+        "required": [
+          "nodeA",
+          "nodeB",
+          "nodeC",
+          "nodeD",
+          "nodeE",
+          "nodeF",
+          "nodeG",
+          "nodeH",
+          "nodeI",
+          "nodeJ",
+          "nodeK",
+          "nodeL"
+        ],
+        "properties": {
+          "nodeA": {
+            "type": "boolean"
+          },
+          "nodeB": {
+            "type": "boolean"
+          },
+          "nodeC": {
+            "type": "boolean"
+          },
+          "nodeD": {
+            "type": "boolean"
+          },
+          "nodeE": {
+            "type": "boolean"
+          },
+          "nodeF": {
+            "type": "boolean"
+          },
+          "nodeG": {
+            "type": "boolean"
+          },
+          "nodeH": {
+            "type": "boolean"
+          },
+          "nodeI": {
+            "type": "boolean"
+          },
+          "nodeJ": {
+            "type": "boolean"
+          },
+          "nodeK": {
+            "type": "boolean"
+          },
+          "nodeL": {
+            "type": "boolean"
+          }
+        }
+      },
       "Match_Score_Breakdown_2015": {
         "type": "object",
         "required": [
@@ -7136,8 +7443,17 @@
       "Match_Score_Breakdown_2015_Alliance": {
         "type": "object",
         "properties": {
+          "auto": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "auto_points": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "teleop_points": {
             "type": "integer"
@@ -7151,8 +7467,17 @@
           "litter_points": {
             "type": "integer"
           },
+          "foul": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "foul_points": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "adjust_points": {
             "type": "integer"
@@ -7228,6 +7553,34 @@
       },
       "Match_Score_Breakdown_2016_Alliance": {
         "type": "object",
+        "required": [
+          "autoBoulderPoints",
+          "autoCrossingPoints",
+          "autoPoints",
+          "autoReachPoints",
+          "breachPoints",
+          "capturePoints",
+          "foulPoints",
+          "position1crossings",
+          "position2",
+          "position2crossings",
+          "position3",
+          "position3crossings",
+          "position4",
+          "position4crossings",
+          "position5",
+          "position5crossings",
+          "tba_rpEarned",
+          "teleopBoulderPoints",
+          "teleopBouldersHigh",
+          "teleopBouldersLow",
+          "teleopChallengePoints",
+          "teleopCrossingPoints",
+          "teleopDefensesBreached",
+          "teleopScalePoints",
+          "teleopTowerCaptured",
+          "totalPoints"
+        ],
         "properties": {
           "autoPoints": {
             "type": "integer"
@@ -7250,29 +7603,20 @@
           "totalPoints": {
             "type": "integer"
           },
-          "robot1Auto": {
-            "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
+          "tba_rpEarned": {
+            "type": [
+              "integer",
+              "null"
             ]
+          },
+          "robot1Auto": {
+            "$ref": "#/components/schemas/RobotAuto_2016_WithUnknown"
           },
           "robot2Auto": {
-            "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2016_WithoutUnknown"
           },
           "robot3Auto": {
-            "type": "string",
-            "enum": [
-              "Crossed",
-              "Reached",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2016_WithUnknown"
           },
           "autoReachPoints": {
             "type": "integer"
@@ -7314,13 +7658,13 @@
             "type": "boolean"
           },
           "towerFaceA": {
-            "type": "string"
+            "$ref": "#/components/schemas/TowerFace_2016"
           },
           "towerFaceB": {
-            "type": "string"
+            "$ref": "#/components/schemas/TowerFace_2016"
           },
           "towerFaceC": {
-            "type": "string"
+            "$ref": "#/components/schemas/TowerFace_2016"
           },
           "towerEndStrength": {
             "type": "integer"
@@ -7332,16 +7676,16 @@
             "type": "integer"
           },
           "position2": {
-            "type": "string"
+            "$ref": "#/components/schemas/Position_2016"
           },
           "position3": {
-            "type": "string"
+            "$ref": "#/components/schemas/Position_2016"
           },
           "position4": {
-            "type": "string"
+            "$ref": "#/components/schemas/Position_2016"
           },
           "position5": {
-            "type": "string"
+            "$ref": "#/components/schemas/Position_2016"
           },
           "position1crossings": {
             "type": "integer"
@@ -7378,6 +7722,32 @@
       },
       "Match_Score_Breakdown_2017_Alliance": {
         "type": "object",
+        "required": [
+          "autoFuelHigh",
+          "autoFuelLow",
+          "autoFuelPoints",
+          "autoMobilityPoints",
+          "autoPoints",
+          "autoRotorPoints",
+          "foulPoints",
+          "kPaBonusPoints",
+          "kPaRankingPointAchieved",
+          "rotor1Auto",
+          "rotor1Engaged",
+          "rotor2Auto",
+          "rotor2Engaged",
+          "rotor3Engaged",
+          "rotor4Engaged",
+          "rotorBonusPoints",
+          "rotorRankingPointAchieved",
+          "teleopFuelHigh",
+          "teleopFuelLow",
+          "teleopFuelPoints",
+          "teleopPoints",
+          "teleopRotorPoints",
+          "teleopTakeoffPoints",
+          "totalPoints"
+        ],
         "properties": {
           "autoPoints": {
             "type": "integer"
@@ -7395,28 +7765,13 @@
             "type": "integer"
           },
           "robot1Auto": {
-            "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2017"
           },
           "robot2Auto": {
-            "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2017"
           },
           "robot3Auto": {
-            "type": "string",
-            "enum": [
-              "Unknown",
-              "Mobility",
-              "None"
-            ]
+            "$ref": "#/components/schemas/RobotAuto_2017"
           },
           "rotor1Auto": {
             "type": "boolean"
@@ -7478,6 +7833,12 @@
           "rotorRankingPointAchieved": {
             "type": "boolean"
           },
+          "tba_rpEarned": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
           "techFoulCount": {
             "type": "integer"
           },
@@ -7485,13 +7846,13 @@
             "type": "integer"
           },
           "touchpadNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Touchpad_2017"
           },
           "touchpadMiddle": {
-            "type": "string"
+            "$ref": "#/components/schemas/Touchpad_2017"
           },
           "touchpadFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Touchpad_2017"
           }
         }
       },
@@ -7513,6 +7874,31 @@
       },
       "Match_Score_Breakdown_2018_Alliance": {
         "type": "object",
+        "required": [
+          "autoOwnershipPoints",
+          "autoPoints",
+          "autoRunPoints",
+          "autoScaleOwnershipSec",
+          "autoSwitchOwnershipSec",
+          "endgamePoints",
+          "faceTheBossRankingPoint",
+          "foulPoints",
+          "rp",
+          "teleopOwnershipPoints",
+          "teleopPoints",
+          "teleopScaleBoostSec",
+          "teleopScaleOwnershipSec",
+          "teleopSwitchBoostSec",
+          "teleopSwitchOwnershipSec",
+          "totalPoints",
+          "vaultBoostPlayed",
+          "vaultBoostTotal",
+          "vaultForcePlayed",
+          "vaultForceTotal",
+          "vaultLevitatePlayed",
+          "vaultLevitateTotal",
+          "vaultPoints"
+        ],
         "properties": {
           "adjustPoints": {
             "type": "integer"
@@ -7527,13 +7913,13 @@
             "type": "boolean"
           },
           "autoRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoRobot_2018"
           },
           "autoRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoRobot_2018"
           },
           "autoRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoRobot_2018"
           },
           "autoRunPoints": {
             "type": "integer"
@@ -7551,13 +7937,13 @@
             "type": "integer"
           },
           "endgameRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2018"
           },
           "endgameRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2018"
           },
           "endgameRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2018"
           },
           "faceTheBossRankingPoint": {
             "type": "boolean"
@@ -7624,6 +8010,13 @@
           },
           "tba_gameData": {
             "type": "string",
+            "enum": [
+              "",
+              "LLL",
+              "LRL",
+              "RLR",
+              "RRR"
+            ],
             "description": "Unofficial TBA-computed value of the FMS provided GameData given to the alliance teams at the start of the match. 3 Character String containing `L` and `R` only. The first character represents the near switch, the 2nd the scale, and the 3rd the far, opposing, switch from the alliance's perspective. An `L` in a position indicates the platform on the left will be lit for the alliance while an `R` will indicate the right platform will be lit for the alliance. See also [WPI Screen Steps](https://wpilib.screenstepslive.com/s/currentCS/m/getting_started/l/826278-2018-game-data-details)."
           }
         }
@@ -7775,6 +8168,53 @@
       },
       "Match_Score_Breakdown_2019_Alliance": {
         "type": "object",
+        "required": [
+          "bay1",
+          "bay2",
+          "bay3",
+          "bay4",
+          "bay5",
+          "bay6",
+          "bay7",
+          "bay8",
+          "cargoPoints",
+          "completeRocketRankingPoint",
+          "endgameRobot1",
+          "endgameRobot2",
+          "endgameRobot3",
+          "foulPoints",
+          "habClimbPoints",
+          "habDockingRankingPoint",
+          "habLineRobot1",
+          "habLineRobot2",
+          "habLineRobot3",
+          "hatchPanelPoints",
+          "lowLeftRocketFar",
+          "lowLeftRocketNear",
+          "lowRightRocketFar",
+          "lowRightRocketNear",
+          "midLeftRocketFar",
+          "midLeftRocketNear",
+          "midRightRocketFar",
+          "midRightRocketNear",
+          "preMatchBay1",
+          "preMatchBay2",
+          "preMatchBay3",
+          "preMatchBay6",
+          "preMatchBay7",
+          "preMatchBay8",
+          "preMatchLevelRobot1",
+          "preMatchLevelRobot2",
+          "preMatchLevelRobot3",
+          "rp",
+          "sandStormBonusPoints",
+          "teleopPoints",
+          "topLeftRocketFar",
+          "topLeftRocketNear",
+          "topRightRocketFar",
+          "topRightRocketNear",
+          "totalPoints"
+        ],
         "properties": {
           "adjustPoints": {
             "type": "integer"
@@ -7783,28 +8223,28 @@
             "type": "integer"
           },
           "bay1": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay2": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay3": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay4": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay5": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay6": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay7": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "bay8": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "cargoPoints": {
             "type": "integer"
@@ -7819,13 +8259,13 @@
             "type": "boolean"
           },
           "endgameRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "endgameRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "endgameRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "foulCount": {
             "type": "integer"
@@ -7840,67 +8280,67 @@
             "type": "boolean"
           },
           "habLineRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/HabLine_2019"
           },
           "habLineRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/HabLine_2019"
           },
           "habLineRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/HabLine_2019"
           },
           "hatchPanelPoints": {
             "type": "integer"
           },
           "lowLeftRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "lowLeftRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "lowRightRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "lowRightRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "midLeftRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "midLeftRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "midRightRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "midRightRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "preMatchBay1": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay2": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay3": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay6": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay7": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchBay8": {
-            "type": "string"
+            "$ref": "#/components/schemas/PreMatchBay_2019"
           },
           "preMatchLevelRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "preMatchLevelRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "preMatchLevelRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "rp": {
             "type": "integer"
@@ -7915,16 +8355,16 @@
             "type": "integer"
           },
           "topLeftRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "topLeftRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "topRightRocketFar": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "topRightRocketNear": {
-            "type": "string"
+            "$ref": "#/components/schemas/Bay_2019"
           },
           "totalPoints": {
             "type": "integer"
@@ -7949,24 +8389,56 @@
       },
       "Match_Score_Breakdown_2020_Alliance": {
         "type": "object",
+        "required": [
+          "autoCellPoints",
+          "autoCellsBottom",
+          "autoCellsInner",
+          "autoCellsOuter",
+          "autoInitLinePoints",
+          "autoPoints",
+          "controlPanelPoints",
+          "endgamePoints",
+          "endgameRobot1",
+          "endgameRobot2",
+          "endgameRobot3",
+          "endgameRungIsLevel",
+          "foulCount",
+          "foulPoints",
+          "initLineRobot1",
+          "initLineRobot2",
+          "initLineRobot3",
+          "shieldEnergizedRankingPoint",
+          "shieldOperationalRankingPoint",
+          "stage1Activated",
+          "stage2Activated",
+          "stage3Activated",
+          "stage3TargetColor",
+          "techFoulCount",
+          "teleopCellPoints",
+          "teleopCellsBottom",
+          "teleopCellsInner",
+          "teleopCellsOuter",
+          "teleopPoints",
+          "totalPoints"
+        ],
         "properties": {
           "initLineRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/InitLineRobot_2020"
           },
           "endgameRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2020"
           },
           "initLineRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/InitLineRobot_2020"
           },
           "endgameRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2020"
           },
           "initLineRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/InitLineRobot_2020"
           },
           "endgameRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRobot_2020"
           },
           "autoCellsBottom": {
             "type": "integer"
@@ -7996,10 +8468,10 @@
             "type": "boolean"
           },
           "stage3TargetColor": {
-            "type": "string"
+            "$ref": "#/components/schemas/Stage3TargetColor_2020"
           },
           "endgameRungIsLevel": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndgameRungIsLevel_2020"
           },
           "autoInitLinePoints": {
             "type": "integer"
@@ -8076,55 +8548,22 @@
         "type": "object",
         "properties": {
           "taxiRobot1": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/TaxiRobot_2022"
           },
           "endgameRobot1": {
-            "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "$ref": "#/components/schemas/EndgameRobot_2022"
           },
           "taxiRobot2": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/TaxiRobot_2022"
           },
           "endgameRobot2": {
-            "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "$ref": "#/components/schemas/EndgameRobot_2022"
           },
           "taxiRobot3": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/TaxiRobot_2022"
           },
           "endgameRobot3": {
-            "type": "string",
-            "enum": [
-              "Traversal",
-              "High",
-              "Mid",
-              "Low",
-              "None"
-            ]
+            "$ref": "#/components/schemas/EndgameRobot_2022"
           },
           "autoCargoLowerNear": {
             "type": "integer"
@@ -8223,7 +8662,10 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "totalPoints": {
             "type": "integer"
@@ -8248,6 +8690,19 @@
       },
       "Match_Score_Breakdown_2023_Alliance": {
         "type": "object",
+        "required": [
+          "autoMobilityPoints",
+          "autoPoints",
+          "foulCount",
+          "foulPoints",
+          "mobilityRobot1",
+          "mobilityRobot2",
+          "mobilityRobot3",
+          "rp",
+          "techFoulCount",
+          "teleopPoints",
+          "totalPoints"
+        ],
         "properties": {
           "activationBonusAchieved": {
             "type": "boolean"
@@ -8256,35 +8711,19 @@
             "type": "integer"
           },
           "autoBridgeState": {
-            "type": "string",
-            "enum": [
-              "NotLevel",
-              "Level"
-            ]
+            "$ref": "#/components/schemas/BridgeState_2023"
           },
           "autoChargeStationPoints": {
             "type": "integer"
           },
           "autoChargeStationRobot1": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "$ref": "#/components/schemas/AutoChargeStationRobot_2023"
           },
           "autoChargeStationRobot2": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "$ref": "#/components/schemas/AutoChargeStationRobot_2023"
           },
           "autoChargeStationRobot3": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked"
-            ]
+            "$ref": "#/components/schemas/AutoChargeStationRobot_2023"
           },
           "autoDocked": {
             "type": "boolean"
@@ -8342,25 +8781,13 @@
             "type": "integer"
           },
           "mobilityRobot1": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/MobilityRobot_2023"
           },
           "mobilityRobot2": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/MobilityRobot_2023"
           },
           "mobilityRobot3": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No"
-            ]
+            "$ref": "#/components/schemas/MobilityRobot_2023"
           },
           "autoPoints": {
             "type": "integer"
@@ -8372,38 +8799,19 @@
             "type": "boolean"
           },
           "endGameBridgeState": {
-            "type": "string",
-            "enum": [
-              "NotLevel",
-              "Level"
-            ]
+            "$ref": "#/components/schemas/BridgeState_2023"
           },
           "endGameChargeStationPoints": {
             "type": "integer"
           },
           "endGameChargeStationRobot1": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "$ref": "#/components/schemas/EndGameChargeStationRobot_2023"
           },
           "endGameChargeStationRobot2": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "$ref": "#/components/schemas/EndGameChargeStationRobot_2023"
           },
           "endGameChargeStationRobot3": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Docked",
-              "Park"
-            ]
+            "$ref": "#/components/schemas/EndGameChargeStationRobot_2023"
           },
           "endGameParkPoints": {
             "type": "integer"
@@ -8424,7 +8832,10 @@
             "type": "integer"
           },
           "links": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "object",
               "required": [
@@ -8538,6 +8949,10 @@
       },
       "Match_Score_Breakdown_2024_Alliance": {
         "type": "object",
+        "required": [
+          "rp",
+          "totalPoints"
+        ],
         "properties": {
           "adjustPoints": {
             "type": "integer"
@@ -8552,13 +8967,13 @@
             "type": "integer"
           },
           "autoLineRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoLineRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoLineRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoPoints": {
             "type": "integer"
@@ -8594,13 +9009,13 @@
             "type": "integer"
           },
           "endGameRobot1": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndGameRobot_2024"
           },
           "endGameRobot2": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndGameRobot_2024"
           },
           "endGameRobot3": {
-            "type": "string"
+            "$ref": "#/components/schemas/EndGameRobot_2024"
           },
           "endGameSpotLightBonusPoints": {
             "type": "integer"
@@ -8715,6 +9130,36 @@
       },
       "Match_Score_Breakdown_2025_Alliance": {
         "type": "object",
+        "required": [
+          "algaePoints",
+          "autoCoralCount",
+          "autoCoralPoints",
+          "autoLineRobot1",
+          "autoLineRobot2",
+          "autoLineRobot3",
+          "autoMobilityPoints",
+          "autoPoints",
+          "autoReef",
+          "endGameBargePoints",
+          "endGameRobot1",
+          "endGameRobot2",
+          "endGameRobot3",
+          "foulCount",
+          "foulPoints",
+          "g206Penalty",
+          "g410Penalty",
+          "g418Penalty",
+          "g428Penalty",
+          "netAlgaeCount",
+          "rp",
+          "techFoulCount",
+          "teleopCoralCount",
+          "teleopCoralPoints",
+          "teleopPoints",
+          "teleopReef",
+          "totalPoints",
+          "wallAlgaeCount"
+        ],
         "properties": {
           "adjustPoints": {
             "type": "integer"
@@ -8732,25 +9177,13 @@
             "type": "integer"
           },
           "autoLineRobot1": {
-            "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoLineRobot2": {
-            "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoLineRobot3": {
-            "type": "string",
-            "enum": [
-              "No",
-              "Yes"
-            ]
+            "$ref": "#/components/schemas/AutoLineRobot_2024"
           },
           "autoMobilityPoints": {
             "type": "integer"
@@ -8768,169 +9201,13 @@
             ],
             "properties": {
               "topRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "midRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "botRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "trough": {
                 "type": "integer"
@@ -8962,31 +9239,13 @@
             "type": "integer"
           },
           "endGameRobot1": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "$ref": "#/components/schemas/EndGameRobot_2025"
           },
           "endGameRobot2": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "$ref": "#/components/schemas/EndGameRobot_2025"
           },
           "endGameRobot3": {
-            "type": "string",
-            "enum": [
-              "None",
-              "Parked",
-              "ShallowCage",
-              "DeepCage"
-            ]
+            "$ref": "#/components/schemas/EndGameRobot_2025"
           },
           "foulCount": {
             "type": "integer"
@@ -9034,169 +9293,13 @@
             ],
             "properties": {
               "topRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "midRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "botRow": {
-                "type": "object",
-                "required": [
-                  "nodeA",
-                  "nodeB",
-                  "nodeC",
-                  "nodeD",
-                  "nodeE",
-                  "nodeF",
-                  "nodeG",
-                  "nodeH",
-                  "nodeI",
-                  "nodeJ",
-                  "nodeK",
-                  "nodeL"
-                ],
-                "properties": {
-                  "nodeA": {
-                    "type": "boolean"
-                  },
-                  "nodeB": {
-                    "type": "boolean"
-                  },
-                  "nodeC": {
-                    "type": "boolean"
-                  },
-                  "nodeD": {
-                    "type": "boolean"
-                  },
-                  "nodeE": {
-                    "type": "boolean"
-                  },
-                  "nodeF": {
-                    "type": "boolean"
-                  },
-                  "nodeG": {
-                    "type": "boolean"
-                  },
-                  "nodeH": {
-                    "type": "boolean"
-                  },
-                  "nodeI": {
-                    "type": "boolean"
-                  },
-                  "nodeJ": {
-                    "type": "boolean"
-                  },
-                  "nodeK": {
-                    "type": "boolean"
-                  },
-                  "nodeL": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/components/schemas/ReefRow_2025"
               },
               "trough": {
                 "type": "integer"
@@ -9249,7 +9352,8 @@
               "instagram-image",
               "external-link",
               "avatar",
-              "onshape"
+              "onshape",
+              "cd-thread"
             ]
           },
           "foreign_key": {
@@ -9258,8 +9362,155 @@
           },
           "details": {
             "type": "object",
-            "additionalProperties": true,
-            "description": "If required, a JSON dict of additional media information."
+            "description": "If required, a JSON dict of additional media information.",
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              {
+                "properties": {
+                  "base64Image": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "base64Image"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "author_id": {
+                    "type": "integer"
+                  },
+                  "author_name": {
+                    "type": "string"
+                  },
+                  "author_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "height": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "html": {
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "type": "string"
+                  },
+                  "provider_name": {
+                    "type": "string"
+                  },
+                  "provider_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "thumbnail_height": {
+                    "type": "integer"
+                  },
+                  "thumbnail_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "thumbnail_width": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  },
+                  "width": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "author_id",
+                  "author_name",
+                  "author_url",
+                  "height",
+                  "html",
+                  "media_id",
+                  "provider_name",
+                  "provider_url",
+                  "thumbnail_height",
+                  "thumbnail_url",
+                  "thumbnail_width",
+                  "title",
+                  "type",
+                  "version",
+                  "width"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "model_created": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "model_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "model_image": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "model_name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "model_created",
+                  "model_description",
+                  "model_image",
+                  "model_name"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "image_partial": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "image_partial"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "thread_title": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "thread_title",
+                  "image_url"
+                ]
+              }
+            ]
           },
           "preferred": {
             "type": "boolean",
@@ -9292,11 +9543,8 @@
         ],
         "properties": {
           "name": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Alliance name, may be null."
+            "type": "string",
+            "description": "Alliance name."
           },
           "backup": {
             "type": [
@@ -9337,40 +9585,69 @@
           },
           "status": {
             "type": "object",
+            "required": [
+              "current_level_record",
+              "level",
+              "playoff_type",
+              "record",
+              "status"
+            ],
             "properties": {
               "playoff_average": {
                 "type": [
                   "number",
                   "null"
                 ],
-                "format": "double"
+                "format": "double",
+                "description": "Average match score during playoffs. Year specific. May be null."
               },
               "playoff_type": {
                 "type": [
                   "number",
                   "null"
                 ],
-                "format": "int64"
+                "format": "int64",
+                "description": "Playoff type, may be null."
               },
               "level": {
-                "type": "string"
+                "$ref": "#/components/schemas/Comp_Level",
+                "description": "Match level, qm/ef/qf/sf/f."
               },
               "record": {
                 "type": [
                   "object",
                   "null"
                 ],
-                "$ref": "#/components/schemas/WLT_Record"
+                "$ref": "#/components/schemas/WLT_Record",
+                "description": "W-L-T record for the alliance, may be null."
               },
               "current_level_record": {
                 "type": [
                   "object",
                   "null"
                 ],
-                "$ref": "#/components/schemas/WLT_Record"
+                "$ref": "#/components/schemas/WLT_Record",
+                "description": "W-L-T record for the alliance at the current level, may be null."
               },
               "status": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "eliminated",
+                  "playing",
+                  "won"
+                ],
+                "description": "Status of the alliance."
+              },
+              "advanced_to_round_robin_finals": {
+                "type": "boolean",
+                "description": "Whether the alliance advanced to round robin finals."
+              },
+              "double_elim_round": {
+                "$ref": "#/components/schemas/Double_Elim_Round"
+              },
+              "round_robin_rank": {
+                "type": "integer",
+                "description": "Rank in round robin play."
               }
             }
           }
@@ -9466,55 +9743,35 @@
         "type": "object",
         "properties": {
           "district_data": {
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "yearly_active_team_count": {
+            "type": "object",
+            "properties": {
+              "region_data": {
+                "oneOf": [
+                  {
                     "type": "object",
-                    "description": "Map of year to number of active teams",
                     "additionalProperties": {
-                      "type": "integer"
+                      "$ref": "#/components/schemas/DistrictInsightRegionData"
                     }
                   },
-                  "yearly_event_count": {
-                    "type": "object",
-                    "description": "Map of year to number of events",
-                    "additionalProperties": {
-                      "type": "integer"
-                    }
-                  },
-                  "yearly_gained_teams": {
-                    "type": "object",
-                    "description": "Map of year to list of team keys gained",
-                    "additionalProperties": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "yearly_lost_teams": {
-                    "type": "object",
-                    "description": "Map of year to list of team keys lost",
-                    "additionalProperties": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
+                  {
+                    "type": "null"
                   }
-                },
-                "required": [
-                  "yearly_active_team_count",
-                  "yearly_event_count",
-                  "yearly_gained_teams",
-                  "yearly_lost_teams"
                 ]
               },
-              {
-                "type": "null"
+              "district_wide_data": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DistrictInsightRegionData"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
+            },
+            "required": [
+              "region_data",
+              "district_wide_data"
             ]
           },
           "team_data": {
@@ -9550,6 +9807,18 @@
                     },
                     "elims_record": {
                       "$ref": "#/components/schemas/WLT_Record"
+                    },
+                    "in_district_extra_play_count": {
+                      "type": "integer"
+                    },
+                    "total_matches_played": {
+                      "type": "integer"
+                    },
+                    "dcmp_appearances": {
+                      "type": "integer"
+                    },
+                    "cmp_appearances": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -9561,7 +9830,11 @@
                     "team_awards",
                     "individual_awards",
                     "quals_record",
-                    "elims_record"
+                    "elims_record",
+                    "in_district_extra_play_count",
+                    "total_matches_played",
+                    "dcmp_appearances",
+                    "cmp_appearances"
                   ]
                 }
               },
@@ -9576,10 +9849,57 @@
           "district_data"
         ]
       },
+      "DistrictInsightRegionData": {
+        "type": "object",
+        "properties": {
+          "yearly_active_team_count": {
+            "type": "object",
+            "description": "Map of year to number of active teams",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "yearly_event_count": {
+            "type": "object",
+            "description": "Map of year to number of events",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "yearly_gained_teams": {
+            "type": "object",
+            "description": "Map of year to list of team keys gained",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "yearly_lost_teams": {
+            "type": "object",
+            "description": "Map of year to list of team keys lost",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "yearly_active_team_count",
+          "yearly_event_count",
+          "yearly_gained_teams",
+          "yearly_lost_teams"
+        ]
+      },
       "District_Ranking": {
         "required": [
+          "event_points",
           "point_total",
           "rank",
+          "rookie_bonus",
           "team_key"
         ],
         "type": "object",
@@ -9645,6 +9965,14 @@
                 }
               }
             }
+          },
+          "adjustments": {
+            "type": "integer",
+            "description": "Any points adjustments applied to the team."
+          },
+          "other_bonus": {
+            "type": "integer",
+            "description": "Any other bonus points awarded to the team."
           }
         },
         "description": "Rank of a team in a district."

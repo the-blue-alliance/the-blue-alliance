@@ -1,5 +1,5 @@
 import React from "react";
-import SvgIcon from "material-ui/SvgIcon";
+import SvgIcon from "@mui/material/SvgIcon";
 import {
   NUM_VIEWS_FOR_LAYOUT,
   LAYOUT_SVG_PATHS,

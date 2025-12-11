@@ -139,13 +139,12 @@ Class-based `unittest.TestCase` tests can pull the `pytest` test fixture on to t
 
 ```python
 import unittest
-from typing import Optional
 
 import pytest
 from google.appengine.ext import testbed
 
 class ClassBasedTest(unittest.TestCase):
-      taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
+      taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub | None = None
 
       @pytest.fixture(autouse=True)
       def store_taskqueue_stub(self, taskqueue_stub):

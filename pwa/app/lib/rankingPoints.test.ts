@@ -1,16 +1,16 @@
 import { describe, expect, test } from 'vitest';
 
 import {
-  type MatchScoreBreakdown,
+  type MatchScoreBreakdownAlliance,
   getBonusRankingPoints,
-  isScoreBreakdown2016,
-  isScoreBreakdown2017,
-  isScoreBreakdown2018,
-  isScoreBreakdown2019,
-  isScoreBreakdown2020,
-  isScoreBreakdown2022,
-  isScoreBreakdown2023,
-  isScoreBreakdown2024,
+  isScoreBreakdown2016Alliance,
+  isScoreBreakdown2017Alliance,
+  isScoreBreakdown2018Alliance,
+  isScoreBreakdown2019Alliance,
+  isScoreBreakdown2020Alliance,
+  isScoreBreakdown2022Alliance,
+  isScoreBreakdown2023Alliance,
+  isScoreBreakdown2024Alliance,
 } from '~/lib/rankingPoints';
 
 describe('rankingPoints', () => {
@@ -19,9 +19,10 @@ describe('rankingPoints', () => {
     [{ teleopDefensesBreached: false }, true],
     [{}, false],
   ])(
-    'isScoreBreakdown2016 (%#)',
-    (score_breakdown: MatchScoreBreakdown, expected) => {
-      expect(isScoreBreakdown2016(score_breakdown)).toBe(expected);
+    'isScoreBreakdown2016Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2016Alliance(score_breakdown)).toBe(expected);
     },
   );
 
@@ -30,9 +31,10 @@ describe('rankingPoints', () => {
     [{ kPaRankingPointAchieved: false }, true],
     [{}, false],
   ])(
-    'isScoreBreakdown2017 (%#)',
-    (score_breakdown: MatchScoreBreakdown, expected) => {
-      expect(isScoreBreakdown2017(score_breakdown)).toBe(expected);
+    'isScoreBreakdown2017Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2017Alliance(score_breakdown)).toBe(expected);
     },
   );
 
@@ -41,9 +43,10 @@ describe('rankingPoints', () => {
     [{ autoQuestRankingPoint: false }, true],
     [{}, false],
   ])(
-    'isScoreBreakdown2018 (%#)',
-    (score_breakdown: MatchScoreBreakdown, expected) => {
-      expect(isScoreBreakdown2018(score_breakdown)).toBe(expected);
+    'isScoreBreakdown2018Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2018Alliance(score_breakdown)).toBe(expected);
     },
   );
 
@@ -52,9 +55,10 @@ describe('rankingPoints', () => {
     [{ completeRocketRankingPoint: false }, true],
     [{}, false],
   ])(
-    'isScoreBreakdown2019 (%#)',
-    (score_breakdown: MatchScoreBreakdown, expected) => {
-      expect(isScoreBreakdown2019(score_breakdown)).toBe(expected);
+    'isScoreBreakdown2019Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2019Alliance(score_breakdown)).toBe(expected);
     },
   );
 
@@ -63,9 +67,10 @@ describe('rankingPoints', () => {
     [{ shieldEnergizedRankingPoint: false }, true],
     [{}, false],
   ])(
-    'isScoreBreakdown2020 (%#)',
-    (score_breakdown: MatchScoreBreakdown, expected) => {
-      expect(isScoreBreakdown2020(score_breakdown)).toBe(expected);
+    'isScoreBreakdown2020Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2020Alliance(score_breakdown)).toBe(expected);
     },
   );
 
@@ -74,9 +79,10 @@ describe('rankingPoints', () => {
     [{ cargoBonusRankingPoint: false }, true],
     [{}, false],
   ])(
-    'isScoreBreakdown2022 (%#)',
-    (score_breakdown: MatchScoreBreakdown, expected) => {
-      expect(isScoreBreakdown2022(score_breakdown)).toBe(expected);
+    'isScoreBreakdown2022Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2022Alliance(score_breakdown)).toBe(expected);
     },
   );
 
@@ -85,9 +91,10 @@ describe('rankingPoints', () => {
     [{ sustainabilityBonusAchieved: false }, true],
     [{}, false],
   ])(
-    'isScoreBreakdown2023 (%#)',
-    (score_breakdown: MatchScoreBreakdown, expected) => {
-      expect(isScoreBreakdown2023(score_breakdown)).toBe(expected);
+    'isScoreBreakdown2023Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2023Alliance(score_breakdown)).toBe(expected);
     },
   );
 
@@ -96,9 +103,10 @@ describe('rankingPoints', () => {
     [{ melodyBonusAchieved: false }, true],
     [{}, false],
   ])(
-    'isScoreBreakdown2024 (%#)',
-    (score_breakdown: MatchScoreBreakdown, expected) => {
-      expect(isScoreBreakdown2024(score_breakdown)).toBe(expected);
+    'isScoreBreakdown2024Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2024Alliance(score_breakdown)).toBe(expected);
     },
   );
 
@@ -189,7 +197,11 @@ describe('rankingPoints', () => {
       [false, true],
     ],
     [{ melodyBonusAchieved: true, ensembleBonusAchieved: true }, [true, true]],
-  ])(`getBonusRankingPoints (%#)`, (score_breakdown, expected) => {
-    expect(getBonusRankingPoints(score_breakdown)).toEqual(expected);
-  });
+  ])(
+    `getBonusRankingPoints (%#)`,
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(getBonusRankingPoints(score_breakdown)).toEqual(expected);
+    },
+  );
 });

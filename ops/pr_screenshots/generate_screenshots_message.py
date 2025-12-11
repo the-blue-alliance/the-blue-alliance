@@ -4,7 +4,6 @@ import os
 import pickle
 import subprocess
 import sys
-from typing import List, Optional, Tuple
 
 import requests
 
@@ -16,7 +15,7 @@ MESSAGE_FILENAME = "ci_screenshots_message.md"
 
 def upload_screenshots(
     artifact_data: ArtifactData, GITHUB_TOKEN: str
-) -> List[Tuple[str, Optional[str]]]:
+) -> list[tuple[str, str | None]]:
     GITHUB_API_URL = "https://api.github.com"
     GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")
     BRANCH_NAME = "ci-screenshots"
@@ -43,7 +42,7 @@ def upload_screenshots(
     else:
         print(f'Branch "{BRANCH_NAME}" Already Exists')
 
-    def upload_single_screenshot(filename: str, image: str) -> Optional[str]:
+    def upload_single_screenshot(filename: str, image: str) -> str | None:
         url = f"{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/contents/{filename}"
         data = {
             "message": f"[CI] Added Screenshots for PR #{artifact_data['pr']}",
@@ -76,7 +75,7 @@ def upload_screenshots(
     return image_urls
 
 
-def generate_message(image_urls: List[Tuple[str, Optional[str]]]):
+def generate_message(image_urls: list[tuple[str, str | None]]):
     print("Generating message")
     message = "## Screenshots"
     for name, image_url in image_urls:

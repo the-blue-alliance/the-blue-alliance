@@ -83,7 +83,7 @@ def test_events(ndb_stub) -> None:
     events = mytba.events
 
     assert len(events) == 2
-    assert all([type(event) is Event for event in events])
+    assert all([isinstance(event, Event) for event in events])
     assert {event.key.id() for event in events} == {"2020miket", "2020mitry"}
 
 
@@ -118,7 +118,7 @@ def test_teams(ndb_stub) -> None:
     teams = mytba.teams
 
     assert len(teams) == 2
-    assert all([type(team) is Team for team in teams])
+    assert all([isinstance(team, Team) for team in teams])
     assert {team.key.id() for team in teams} == {"frc1", "frc2"}
 
 
@@ -137,7 +137,7 @@ def test_matches(ndb_stub) -> None:
     matches = mytba.matches
 
     assert len(matches) == 2
-    assert all([type(match) is Match for match in matches])
+    assert all([isinstance(match, Match) for match in matches])
     assert {match.key.id() for match in matches} == {"2020miket_qm1", "2020miket_qm2"}
 
 
@@ -150,9 +150,9 @@ def test_event_matches(ndb_stub) -> None:
     keys = event_matches.keys()
     assert list(keys) == [expected_key]
 
-    values = event_matches[expected_key]
-    assert len(values) == 2
-    assert all([type(value) is Match for value in values])
+    matches = event_matches[expected_key]
+    assert len(matches) == 2
+    assert all([isinstance(match, Match) for match in matches])
 
 
 def test_favorite(ndb_stub):

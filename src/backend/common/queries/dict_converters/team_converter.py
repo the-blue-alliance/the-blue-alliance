@@ -1,7 +1,8 @@
-from typing import Dict, List, NewType
+from typing import cast, Dict, List, NewType
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.team import Team
+from backend.common.protocols.locatable import Locatable
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 TeamDict = NewType("TeamDict", Dict)
@@ -9,7 +10,7 @@ TeamDict = NewType("TeamDict", Dict)
 
 class TeamConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 4,
+        ApiMajorVersion.API_V3: 5,
     }
 
     @classmethod
@@ -39,7 +40,7 @@ class TeamConverter(ConverterBase):
             # "home_championship": team.championship_location,  # TODO: event not ported yet
             "school_name": team.school_name,
         }
-        team_dict.update(cls.constructLocation_v3(team))
+        team_dict.update(cls.constructLocation_v3(cast(Locatable, team)))
         return TeamDict(team_dict)
 
     @staticmethod

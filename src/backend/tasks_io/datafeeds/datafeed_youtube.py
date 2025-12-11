@@ -1,5 +1,3 @@
-from typing import Dict
-
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
@@ -20,12 +18,9 @@ class YoutubeWebcastStatus(DatafeedBase[Webcast]):
         if self.webcast["type"] != WebcastType.YOUTUBE:
             raise ValueError(f"{webcast} is not youtube! Can't load status")
 
-    def headers(self) -> Dict[str, str]:
-        return {"Authorization": f"Bearer {self.api_key}"}
-
     def url(self) -> str:
         channel = self.webcast["channel"]
-        return f"https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id={channel}"
+        return f"https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id={channel}&key={self.api_key}"
 
     def parser(self) -> YoutubeStreamStatusParser:
         return YoutubeStreamStatusParser(self.webcast)

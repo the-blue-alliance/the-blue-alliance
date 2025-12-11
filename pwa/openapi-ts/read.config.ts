@@ -3,9 +3,7 @@ import { defineConfig } from '@hey-api/openapi-ts';
 export default defineConfig({
   input: '../src/backend/web/static/swagger/api_v3.json',
   output: {
-    format: 'prettier',
-    path: 'app/api/tba/',
-    lint: 'eslint',
+    path: 'app/api/tba/read/',
   },
   plugins: [
     '@hey-api/client-fetch',
@@ -14,6 +12,12 @@ export default defineConfig({
     {
       name: '@hey-api/sdk',
       validator: true,
+    },
+    {
+      name: 'zod',
+      dates: {
+        offset: true,
+      },
     },
   ],
 });

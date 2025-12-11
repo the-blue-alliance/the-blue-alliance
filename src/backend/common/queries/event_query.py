@@ -99,6 +99,23 @@ class DistrictChampsInYearQuery(CachedDatabaseQuery[List[Event], List[EventDict]
         return list(events)
 
 
+class CmpDivisionsInYearQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "cmp_division_events_{year}"
+    DICT_CONVERTER = EventConverter
+
+    def __init__(self, year: Year) -> None:
+        super().__init__(year=year)
+
+    @typed_tasklet
+    def _query_async(self, year: Year) -> Generator[Any, Any, List[Event]]:
+        all_cmp_event_keys = yield Event.query(
+            Event.year == year, Event.event_type_enum == EventType.CMP_DIVISION
+        ).fetch_async(keys_only=True)
+        events = yield ndb.get_multi_async(all_cmp_event_keys)
+        return list(events)
+
+
 class TeamEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "team_events_{team_key}"

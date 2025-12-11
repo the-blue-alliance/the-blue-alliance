@@ -1,10 +1,9 @@
-import { RequestResult } from '@hey-api/client-fetch';
 import { type ClassValue, clsx } from 'clsx';
 import React from 'react';
-import { Params } from 'react-router';
 import { twMerge } from 'tailwind-merge';
 
-import { WltRecord, getStatus } from '~/api/tba';
+import { WltRecord, getStatus } from '~/api/tba/read';
+import { RequestResult } from '~/api/tba/read/client';
 
 // TODO: Generate this from the API
 const VALID_YEARS: number[] = [];
@@ -29,9 +28,9 @@ export function slugify(str: string): string {
     .replace(/-+$/, '');
 }
 
-export async function parseParamsForYearElseDefault(
-  params: Params,
-): Promise<number | undefined> {
+export async function parseParamsForYearElseDefault(params: {
+  year?: string | undefined;
+}): Promise<number | undefined> {
   if (params.year === undefined) {
     // TODO: Cache this call
     const status = await getStatus();
@@ -287,7 +286,7 @@ export async function queryFromAPI<T>(
 
 // https://web.archive.org/web/20250409124545/https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
 // Typically used for sorting WLTRecords
-export function confidence(ups: number, downs: number, z = 1.96): number {
+export function confidence(ups: number, downs: number, z = 3): number {
   const n = ups + downs;
   if (n === 0) {
     return 0;

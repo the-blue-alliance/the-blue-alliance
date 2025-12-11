@@ -1,7 +1,6 @@
 import fuzzysort from 'fuzzysort';
 
-import { SearchIndex } from '~/api/tba';
-import { SearchDataFilterer } from '~/lib/search/api';
+import { SearchIndex } from '~/api/tba/read';
 
 type SearchableTeam = SearchIndex['teams'][number];
 type SearchableEvent = SearchIndex['events'][number];
@@ -44,6 +43,10 @@ function searchEvents(
   });
 
   return results.map((result) => result.obj);
+}
+
+interface SearchDataFilterer {
+  filter(data: SearchIndex, query: string): SearchIndex;
 }
 
 export default class FuzzysortFilterer implements SearchDataFilterer {

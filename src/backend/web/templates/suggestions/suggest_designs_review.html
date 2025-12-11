@@ -7,9 +7,9 @@
 
   <ol class="breadcrumb">
     <li><a href="/suggest/review">Suggestions</a></li>
-    <li class="active">Team CAD Models</li>
+    <li class="active">Team CAD Models & Discussion Threads</li>
   </ol>
-  <h1>{{ suggestions_and_references|length }} Pending CAD Suggestions</h1>
+  <h1>{{ suggestions_and_references|length }} Pending CAD Models & Discussion Thread Suggestions</h1>
 
   <form action="/suggest/cad/review" method="post" id='review_designs'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

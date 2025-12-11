@@ -1,5 +1,5 @@
+import { useRouterState } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { useNavigation } from 'react-router';
 
 import { Progress } from '~/components/ui/progress';
 
@@ -7,8 +7,7 @@ import { Progress } from '~/components/ui/progress';
 export default function GlobalLoadingProgress() {
   const [hidden, setHidden] = useState(true);
   const [progress, setProgress] = useState(0);
-  const navigation = useNavigation();
-  const active = navigation.state !== 'idle';
+  const active = useRouterState({ select: (s) => s.isLoading });
 
   useEffect(() => {
     if (active) {

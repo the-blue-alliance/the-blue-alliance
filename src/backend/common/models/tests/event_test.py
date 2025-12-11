@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.alliance import EventAlliance
@@ -328,8 +329,6 @@ def test_nonexistent_linked_district() -> None:
 
 def test_get_awards() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
-    future = event.get_awards_async()
-    assert future.get_result() == []
     assert event.awards == []
 
     a = Award(
@@ -342,13 +341,11 @@ def test_get_awards() -> None:
     )
     a.put()
 
-    event._awards = None
+    event._awards_future = None
     clear_cached_queries()
-    future = event.get_awards_async()
-    assert future.get_result() == [a]
     assert event.awards == [a]
 
-    event._awards = None
+    event._awards_future = None
     clear_cached_queries()
     assert event.awards == [a]
 
@@ -360,10 +357,9 @@ def test_details() -> None:
     )
     d.put()
 
-    event.prep_details()
     assert event.details == d
 
-    event._details = None
+    event._details_future = None
     assert event.details == d
 
 
@@ -398,7 +394,7 @@ def test_get_alliances() -> None:
         alliance_selections=alliances,
     ).put()
 
-    event._details = None
+    event._details_future = None
     assert event.alliance_selections == alliances
     assert event.alliance_teams == teams
 
@@ -416,7 +412,7 @@ def test_get_alliances_with_backup() -> None:
         alliance_selections=alliances,
     ).put()
 
-    event._details = None
+    event._details_future = None
     assert event.alliance_selections == alliances
     assert event.alliance_teams == (teams + ["frc4"])
 
@@ -431,18 +427,15 @@ def test_district_points() -> None:
         district_points=points,
     ).put()
 
-    event._details = None
+    event._details_future = None
     assert event.district_points == points
 
 
 def test_matches() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
-    future = event.get_matches_async()
-    assert future.get_result() == []
     assert event.matches == []
 
-    event._matches = None
-    event.prep_matches()
+    event._matches_future = None
     assert event.matches == []
 
     m = Match(
@@ -456,15 +449,8 @@ def test_matches() -> None:
     )
     m.put()
 
-    event._matches = None
+    event._matches_future = None
     clear_cached_queries()
-    assert event.matches == [m]
-    assert event.get_matches_async().get_result() == [m]
-
-    event._matches = None
-    clear_cached_queries()
-    event.prep_matches()
-    assert event.get_matches_async().get_result() == [m]
     assert event.matches == [m]
 
 
@@ -484,10 +470,9 @@ def test_teams() -> None:
     )
     t.put()
 
-    event._teams = None
+    event._teams_future = None
     clear_cached_queries()
     assert event.teams == [t]
-    assert event.get_teams_async().get_result() == [t]
 
 
 def test_rankings() -> None:
@@ -508,7 +493,7 @@ def test_rankings() -> None:
 
     EventDetails(id="2019ct", rankings2=rankings).put()
 
-    event._details = None
+    event._details_future = None
     assert event.rankings == rankings
 
 
@@ -544,3 +529,63 @@ def test_venue_address():
         event.venue_address_safe
         == "Berkeley High School\n1980 Allston Way\nBerkeley, CA, USA"
     )
+
+
+def test_sync_never_enabled_when_unofficial() -> None:
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        official=False,
+    )
+
+    for sync_type in EventSyncType:
+        assert (
+            event.is_sync_enabled(sync_type) is False
+        ), f"Sync should not be enabled for {sync_type} when not official"
+
+
+def test_sync_always_enabled_with_null_mask() -> None:
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        official=True,
+        disable_sync_flags=None,
+    )
+
+    for sync_type in EventSyncType:
+        assert (
+            event.is_sync_enabled(sync_type) is True
+        ), f"Sync should be enabled for {sync_type} when official"
+
+
+def test_sync_always_enabled_with_zero_mask() -> None:
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        official=True,
+        disable_sync_flags=0,
+    )
+
+    for sync_type in EventSyncType:
+        assert (
+            event.is_sync_enabled(sync_type) is True
+        ), f"Sync should be enabled for {sync_type} when official"
+
+
+def test_disable_sync_by_mask() -> None:
+    event = Event(
+        id="2024cc",
+        year=2024,
+        event_short="cc",
+        official=True,
+        disable_sync_flags=(0 | EventSyncType.EVENT_ALLIANCES),
+    )
+
+    for sync_type in EventSyncType:
+        expected = sync_type != EventSyncType.EVENT_ALLIANCES
+        assert (
+            event.is_sync_enabled(sync_type) == expected
+        ), f"Sync should be {expected} for {sync_type} when official"

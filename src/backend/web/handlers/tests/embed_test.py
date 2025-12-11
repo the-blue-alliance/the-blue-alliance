@@ -89,6 +89,17 @@ def test_instagram_success_media_reviewer(
     assert urlparse(resp.headers["Location"]).path == THUMBNAIL_URL
 
 
+def test_instagram_invalid_width(web_client: Client):
+    media = create_media()
+
+    resp = web_client.get(
+        f"/instagram_oembed/{media.foreign_key}?width=invalid",
+        headers={"Referer": "thebluealliance.com"},
+    )
+
+    assert resp.status_code == 400
+
+
 def test_nonexistent_avatar(web_client: Client):
     resp = web_client.get(
         "/avatar/2024/frc604.png",
