@@ -55,6 +55,8 @@
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-navigation-item-fade-in: navigation-item-fade-in 150ms ease-in
+    forwards;
 
   @keyframes accordion-down {
     from {
@@ -70,6 +72,16 @@
     }
     to {
       height: 0;
+    }
+  }
+  @keyframes navigation-item-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
@@ -140,7 +152,7 @@
     --destructive: 0 100% 50%;
     --destructive-foreground: 231 5% 100%;
     --border: 231 30% 82%;
-    --input: 231 30% 50%;
+    --input: 214.3 31.8% 91.4%;
     --ring: 231 48.4% 47.8%;
     --radius: 0.5rem;
     --chart-1: 12 76% 61%;

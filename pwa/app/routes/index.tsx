@@ -39,20 +39,17 @@ function Home() {
 
   return (
     <div>
-      <div className="px-6 py-10 sm:py-8 lg:px-8">
+      <div className="px-6 py-10 sm:py-16 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2
             className="mt-2 text-4xl font-bold tracking-tight text-gray-900
-              sm:text-6xl"
+              sm:text-5xl"
           >
             The Blue Alliance
           </h2>
-          <p className="mt-6 text-lg leading-5 text-gray-600">
+          <p className="mx-auto mt-4 max-w-lg text-lg leading-6 text-gray-600">
             The Blue Alliance is the best way to scout, watch, and relive the{' '}
-            <i>FIRST</i> Robotics Competition.{' '}
-            <a href="http://www.firstinspires.org/">
-              Learn More About <i>FIRST</i>
-            </a>
+            <em>FIRST</em> Robotics Competition.
           </p>
         </div>
       </div>

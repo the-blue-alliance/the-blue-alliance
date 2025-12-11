@@ -80,7 +80,13 @@ export function ChatSidebar() {
 
       {/* Chat selector dialog */}
       <Dialog open={selectorOpen} onOpenChange={setSelectorOpen}>
-        <DialogContent className="max-w-sm p-0">
+        <DialogContent
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+            (e.currentTarget as HTMLElement)?.focus();
+          }}
+          className="max-w-sm p-0"
+        >
           <DialogHeader className="border-b px-4 py-3">
             <DialogTitle>Select a chat</DialogTitle>
           </DialogHeader>
