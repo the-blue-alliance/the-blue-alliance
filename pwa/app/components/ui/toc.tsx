@@ -4,19 +4,30 @@ import * as React from 'react';
 import { cn } from '~/lib/utils';
 
 interface TableOfContentsListProps extends React.ComponentPropsWithoutRef<'ul'> {
-  indent?: boolean;
+  indent?: number;
 }
 
 const TableOfContentsList = React.forwardRef<
   React.ElementRef<'ul'>,
   TableOfContentsListProps
->(({ className, indent, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn('m-0 list-none', indent && 'pl-4', className)}
-    {...props}
-  />
-));
+>(({ className, indent, ...props }, ref) => {
+  const paddingClass = indent
+    ? {
+        1: 'pl-4',
+        2: 'pl-8',
+        3: 'pl-12',
+        4: 'pl-16',
+        5: 'pl-20',
+      }[indent] || 'pl-24'
+    : '';
+  return (
+    <ul
+      ref={ref}
+      className={cn('m-0 list-none', paddingClass, className)}
+      {...props}
+    />
+  );
+});
 TableOfContentsList.displayName = 'TableOfContentsList';
 
 const TableOfContentsTitle = React.forwardRef<
@@ -32,19 +43,30 @@ const TableOfContentsTitle = React.forwardRef<
 TableOfContentsTitle.displayName = 'TableOfContentsTitle';
 
 interface TableOfContentsItemProps extends React.ComponentPropsWithoutRef<'li'> {
-  indent?: boolean;
+  indent?: number;
 }
 
 const TableOfContentsItem = React.forwardRef<
   React.ElementRef<'li'>,
   TableOfContentsItemProps
->(({ className, indent, ...props }, ref) => (
-  <li
-    ref={ref}
-    className={cn('mt-0 pt-2', indent && 'ml-4', className)}
-    {...props}
-  />
-));
+>(({ className, indent, ...props }, ref) => {
+  const marginClass = indent
+    ? {
+        1: 'ml-4',
+        2: 'ml-8',
+        3: 'ml-12',
+        4: 'ml-16',
+        5: 'ml-20',
+      }[indent] || 'ml-24'
+    : '';
+  return (
+    <li
+      ref={ref}
+      className={cn('mt-0 pt-2', marginClass, className)}
+      {...props}
+    />
+  );
+});
 TableOfContentsItem.displayName = 'TableOfContentsItem';
 
 interface TableOfContentsLinkProps extends React.ComponentPropsWithoutRef<
