@@ -45,7 +45,7 @@ import { z } from 'zod';
 
 import { client } from '~/api/tba/read/client.gen';
 import { MatchModal } from '~/components/tba/match/matchModal';
-import { Nav } from '~/components/tba/nav';
+import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 
@@ -322,9 +322,9 @@ function RootComponent() {
           <Outlet />
         ) : (
           <>
-            <Nav />
+            <Navbar />
             <TOCRendererProvider>
-              <div className="container mx-auto px-4 pt-14 text-sm">
+              <div className="container mx-auto px-4 text-sm">
                 <div vaul-drawer-wrapper="" className="bg-background">
                   <Outlet />
                   <MatchModal />
