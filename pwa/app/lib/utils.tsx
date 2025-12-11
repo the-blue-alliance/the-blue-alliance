@@ -47,6 +47,23 @@ export async function parseParamsForYearElseDefault(params: {
   return year;
 }
 
+// Page number is 1-indexed
+export function parseParamsForTeamPgNumElseDefault(
+  params: { pgNum?: string | undefined },
+  maxPgNum: number,
+): number | undefined {
+  if (params.pgNum === undefined) {
+    return 1;
+  }
+
+  const pgNum = Number(params.pgNum);
+  if (Number.isNaN(pgNum) || pgNum <= 0 || pgNum > maxPgNum) {
+    return undefined;
+  }
+
+  return pgNum;
+}
+
 export function timestampsAreOnDifferentDays(
   timestamp1: number,
   timestamp2: number,

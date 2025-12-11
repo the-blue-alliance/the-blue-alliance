@@ -20,6 +20,7 @@ import { Route as AddDataRouteImport } from './routes/add-data'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeamsChar123PgNumChar125RouteImport } from './routes/teams.{-$pgNum}'
 import { Route as MatchMatchKeyRouteImport } from './routes/match.$matchKey'
 import { Route as InsightsChar123YearChar125RouteImport } from './routes/insights.{-$year}'
 import { Route as EventsChar123YearChar125RouteImport } from './routes/events.{-$year}'
@@ -85,6 +86,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeamsChar123PgNumChar125Route =
+  TeamsChar123PgNumChar125RouteImport.update({
+    id: '/teams/{-$pgNum}',
+    path: '/teams/{-$pgNum}',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MatchMatchKeyRoute = MatchMatchKeyRouteImport.update({
   id: '/match/$matchKey',
   path: '/match/$matchKey',
@@ -152,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/match/$matchKey': typeof MatchMatchKeyRoute
+  '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -174,6 +182,7 @@ export interface FileRoutesByTo {
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/match/$matchKey': typeof MatchMatchKeyRoute
+  '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -197,6 +206,7 @@ export interface FileRoutesById {
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/match/$matchKey': typeof MatchMatchKeyRoute
+  '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/events/{-$year}'
     | '/insights/{-$year}'
     | '/match/$matchKey'
+    | '/teams/{-$pgNum}'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/team/$teamNumber/history'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/events/{-$year}'
     | '/insights/{-$year}'
     | '/match/$matchKey'
+    | '/teams/{-$pgNum}'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/team/$teamNumber/history'
@@ -265,6 +277,7 @@ export interface FileRouteTypes {
     | '/events/{-$year}'
     | '/insights/{-$year}'
     | '/match/$matchKey'
+    | '/teams/{-$pgNum}'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/team/$teamNumber/history'
@@ -288,6 +301,7 @@ export interface RootRouteChildren {
   EventsChar123YearChar125Route: typeof EventsChar123YearChar125Route
   InsightsChar123YearChar125Route: typeof InsightsChar123YearChar125Route
   MatchMatchKeyRoute: typeof MatchMatchKeyRoute
+  TeamsChar123PgNumChar125Route: typeof TeamsChar123PgNumChar125Route
   DistrictDistrictAbbreviationInsightsRoute: typeof DistrictDistrictAbbreviationInsightsRoute
   DistrictDistrictAbbreviationChar123YearChar125Route: typeof DistrictDistrictAbbreviationChar123YearChar125Route
   TeamTeamNumberHistoryRoute: typeof TeamTeamNumberHistoryRoute
@@ -374,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teams/{-$pgNum}': {
+      id: '/teams/{-$pgNum}'
+      path: '/teams/{-$pgNum}'
+      fullPath: '/teams/{-$pgNum}'
+      preLoaderRoute: typeof TeamsChar123PgNumChar125RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/match/$matchKey': {
       id: '/match/$matchKey'
       path: '/match/$matchKey'
@@ -456,6 +477,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsChar123YearChar125Route: EventsChar123YearChar125Route,
   InsightsChar123YearChar125Route: InsightsChar123YearChar125Route,
   MatchMatchKeyRoute: MatchMatchKeyRoute,
+  TeamsChar123PgNumChar125Route: TeamsChar123PgNumChar125Route,
   DistrictDistrictAbbreviationInsightsRoute:
     DistrictDistrictAbbreviationInsightsRoute,
   DistrictDistrictAbbreviationChar123YearChar125Route:

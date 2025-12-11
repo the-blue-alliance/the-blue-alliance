@@ -27,7 +27,7 @@ export const NAV_ITEMS_LIST: NavItemChild[] = [
   },
   {
     title: 'Teams',
-    to: '/',
+    to: '/teams/{-$pgNum}',
     icon: TeamsIcon,
   },
   {
