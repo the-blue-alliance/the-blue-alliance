@@ -47,17 +47,18 @@ export async function parseParamsForYearElseDefault(params: {
   return year;
 }
 
-export async function parseParamsForTeamPgNumElseDefault(
-  params: Params,
+// Page number is 1-indexed
+export function parseParamsForTeamPgNumElseDefault(
+  params: { pgNum?: string | undefined },
   maxPgNum: number,
-): Promise<number | undefined> {
+): number | undefined {
   if (params.pgNum === undefined) {
-    return 0;
+    return 1;
   }
 
   const pgNum = Number(params.pgNum);
-  if (Number.isNaN(pgNum) || pgNum < 0 || pgNum > maxPgNum) {
-    return 0;
+  if (Number.isNaN(pgNum) || pgNum <= 0 || pgNum > maxPgNum) {
+    return undefined;
   }
 
   return pgNum;
@@ -256,25 +257,7 @@ export function splitIntoNChunks<T>(array: T[], numChunks: number): T[][] {
 // Reduces boilerplate when using react-query and API functions.
 // Makes it so you don't have to call <response>.data.data, just <response>.data.
 export async function queryFromAPI<T>(
-  apiPromise: Promise<
-    | {
-      status: 200;
-      data: T;
-    }
-    | {
-      status: 304;
-    }
-    | {
-      status: 401;
-      data: {
-        Error: string;
-      };
-    }
-    | {
-      status: 404;
-    }
-  >,
-
+  apiPromise: RequestResult<T, unknown, false>,
 ): Promise<T> {
   const resp = await apiPromise;
   if (resp.data !== undefined) {

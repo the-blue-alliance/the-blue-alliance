@@ -157,7 +157,7 @@ export const Nav = () => {
             className="hidden md:block"
             icon={<BiPeopleFill />}
             title="Teams"
-            route="/teams"
+            to="/teams/{-$pgNum}"
           />
           <MenuItem
             className="hidden md:block"
