@@ -33,6 +33,10 @@ export function SearchModal({ ...props }: DialogProps) {
   const searchIndexQuery = useQuery(getSearchIndexOptions({}));
   const filterer = useMemo(() => new FuzzysortFilterer(), []);
   const navigate = useNavigate();
+  const isMacintosh =
+    typeof navigator !== 'undefined'
+      ? navigator.userAgent.includes('Macintosh')
+      : false;
 
   const searchResults: SearchIndex | null = useMemo(() => {
     if (!searchIndexQuery.data) {
@@ -82,7 +86,7 @@ export function SearchModal({ ...props }: DialogProps) {
           <span className="inline-flex xl:hidden">Search...</span>
           <div className="absolute top-2 right-1.5 hidden gap-1 sm:flex">
             <KbdGroup>
-              <Kbd>⌘</Kbd>
+              <Kbd>{isMacintosh ? '⌘' : 'Ctrl'}</Kbd>
               <Kbd>K</Kbd>
             </KbdGroup>
           </div>
