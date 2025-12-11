@@ -62,6 +62,14 @@ function TOCRenderPortal({ children }: { children: React.ReactNode }) {
 
   return null;
 }
+export interface TocNode {
+  /** The hash/id to scroll to when clicked */
+  slug: string;
+  /** The display text for this node */
+  label: string;
+  /** Child nodes - supports arbitrary nesting levels */
+  children?: TocNode[];
+}
 
 export function TableOfContents({
   children,
@@ -69,16 +77,29 @@ export function TableOfContents({
   inView,
 }: {
   children?: React.ReactNode;
-  tocItems: { slug: string; label: string }[];
+  tocItems: TocNode[];
   inView: Set<string>;
 }) {
   const [mobilePopoverOpen, setMobilePopoverOpen] = useState<boolean>(false);
   const router = useRouter();
 
-  const activeItem = useMemo(
-    () => tocItems.find((item) => inView.has(item.slug)),
-    [tocItems, inView],
-  );
+  const activeItem = useMemo(() => {
+    const findAllLeafNodes = (nodes: TocNode[]): TocNode[] => {
+      const leafNodes: TocNode[] = [];
+      for (const node of nodes) {
+        if (node.slug) {
+          leafNodes.push(node);
+        }
+        if (node.children) {
+          leafNodes.push(...findAllLeafNodes(node.children));
+        }
+      }
+      return leafNodes;
+    };
+
+    const allItems = findAllLeafNodes(tocItems);
+    return allItems.find((item) => item.slug && inView.has(item.slug));
+  }, [tocItems, inView]);
 
   // Close mobile TOC on click
   useEffect(() => {
@@ -177,22 +198,71 @@ function TOCContent({
   tocItems,
   activeItem,
 }: {
-  tocItems: { slug: string; label: string }[];
-  activeItem: { slug: string; label: string } | undefined;
+  tocItems: TocNode[];
+  activeItem: TocNode | undefined;
 }) {
   return (
     <TableOfContentsList>
-      {tocItems.map((item) => (
-        <TableOfContentsItem key={item.slug} className="first:pt-0">
-          <TableOfContentsLink
-            hash={item.slug}
-            replace={true}
-            isActive={item.slug === activeItem?.slug}
-          >
-            {item.label}
-          </TableOfContentsLink>
-        </TableOfContentsItem>
+      {tocItems.map((node) => (
+        <TOCNode
+          key={node.slug}
+          node={node}
+          activeItem={activeItem}
+          depth={0}
+        />
       ))}
     </TableOfContentsList>
+  );
+}
+
+function TOCNode({
+  node,
+  activeItem,
+  depth,
+}: {
+  node: TocNode;
+  activeItem: TocNode | undefined;
+  depth: number;
+}) {
+  // Check if this node or any of its descendants is active
+  const isNodeOrDescendantActive = useMemo(() => {
+    const checkActive = (n: TocNode): boolean => {
+      if (n.slug === activeItem?.slug) {
+        return true;
+      }
+      if (n.children) {
+        return n.children.some(checkActive);
+      }
+      return false;
+    };
+    return checkActive(node);
+  }, [node, activeItem]);
+
+  return (
+    <>
+      <TableOfContentsItem className="first:pt-0" indent={depth}>
+        <TableOfContentsLink
+          hash={node.slug}
+          replace={true}
+          isActive={isNodeOrDescendantActive}
+        >
+          {node.label}
+        </TableOfContentsLink>
+      </TableOfContentsItem>
+      {node.children && (
+        <TableOfContentsItem>
+          <TableOfContentsList>
+            {node.children.map((child) => (
+              <TOCNode
+                key={child.slug}
+                node={child}
+                activeItem={activeItem}
+                depth={depth + 1}
+              />
+            ))}
+          </TableOfContentsList>
+        </TableOfContentsItem>
+      )}
+    </>
   );
 }

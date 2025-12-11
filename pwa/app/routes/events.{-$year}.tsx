@@ -6,6 +6,7 @@ import EventListTable from '~/components/tba/eventListTable';
 import {
   TableOfContents,
   TableOfContentsSection,
+  type TocNode,
 } from '~/components/tba/tableOfContents';
 import {
   Select,
@@ -74,25 +75,18 @@ interface EventGroup {
   groupName: string;
   slug: string;
   events: Event[];
+  isOfficial: boolean;
 }
 
 function groupBySections(events: Event[]): EventGroup[] {
   const eventsByWeek = new Map<string, EventGroup>();
   const eventsByChampionship = new Map<string, EventGroup>();
+  const unofficialEventsByMonth = new Map<string, EventGroup>();
   const FOCEvents: EventGroup = {
     groupName: 'FIRST Festival of Champions',
     slug: 'foc',
     events: [],
-  };
-  const preaseasonEvents: EventGroup = {
-    groupName: 'Preseason',
-    slug: 'preaseason',
-    events: [],
-  };
-  const offseasonEvents: EventGroup = {
-    groupName: 'Offseason',
-    slug: 'offseason',
-    events: [],
+    isOfficial: true,
   };
   events.forEach((event) => {
     // Events by week
@@ -106,6 +100,7 @@ function groupBySections(events: Event[]): EventGroup[] {
           groupName: weekStr,
           slug: slugify(weekStr),
           events: [event],
+          isOfficial: true,
         });
       }
     }
@@ -124,6 +119,7 @@ function groupBySections(events: Event[]): EventGroup[] {
           groupName,
           slug: slugify(groupName),
           events: [event],
+          isOfficial: true,
         });
       }
     }
@@ -133,14 +129,26 @@ function groupBySections(events: Event[]): EventGroup[] {
       FOCEvents.events.push(event);
     }
 
-    // Preaseason
-    if (event.event_type == EventType.PRESEASON) {
-      preaseasonEvents.events.push(event);
-    }
-
-    // Offseason
-    if (event.event_type == EventType.OFFSEASON) {
-      offseasonEvents.events.push(event);
+    // Group unofficial events by month
+    if (
+      event.event_type == EventType.PRESEASON ||
+      event.event_type == EventType.OFFSEASON
+    ) {
+      const eventDate = new Date(event.start_date);
+      const monthName = eventDate.toLocaleDateString('default', {
+        month: 'long',
+      });
+      const offseasonGroup = unofficialEventsByMonth.get(monthName);
+      if (offseasonGroup) {
+        offseasonGroup.events.push(event);
+      } else {
+        unofficialEventsByMonth.set(monthName, {
+          groupName: monthName,
+          slug: slugify(monthName),
+          events: [event],
+          isOfficial: false,
+        });
+      }
     }
   });
 
@@ -150,11 +158,8 @@ function groupBySections(events: Event[]): EventGroup[] {
   if (FOCEvents.events.length > 0) {
     groups.push(FOCEvents);
   }
-  if (preaseasonEvents.events.length > 0) {
-    groups.push(preaseasonEvents);
-  }
-  if (offseasonEvents.events.length > 0) {
-    groups.push(offseasonEvents);
+  if (unofficialEventsByMonth.size > 0) {
+    groups.push(...Array.from(unofficialEventsByMonth.values()));
   }
   return groups;
 }
@@ -166,14 +171,36 @@ function YearEventsPage() {
 
   const sortedEvents = events.sort(sortEventsComparator);
   const groupedEvents = groupBySections(sortedEvents);
-  const tocItems = useMemo(
-    () =>
-      groupedEvents.map((group) => ({
-        slug: group.slug,
-        label: group.groupName,
-      })),
-    [groupedEvents],
-  );
+  const officialGroups = groupedEvents.filter((group) => group.isOfficial);
+  const unofficialGroups = groupedEvents.filter((group) => !group.isOfficial);
+
+  const tocItems = useMemo(() => {
+    const tocNodes: TocNode[] = [];
+
+    if (officialGroups.length > 0) {
+      tocNodes.push({
+        slug: 'official',
+        label: 'Official',
+        children: officialGroups.map((group) => ({
+          slug: group.slug,
+          label: group.groupName,
+        })),
+      });
+    }
+
+    if (unofficialGroups.length > 0) {
+      tocNodes.push({
+        slug: 'unofficial',
+        label: 'Unofficial',
+        children: unofficialGroups.map((group) => ({
+          slug: group.slug,
+          label: group.groupName,
+        })),
+      });
+    }
+
+    return tocNodes;
+  }, [officialGroups, unofficialGroups]);
 
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
@@ -200,27 +227,84 @@ function YearEventsPage() {
       </TableOfContents>
       <div className="basis-full py-8 lg:basis-5/6">
         <h1 className="mb-3 text-3xl font-medium">
-          {year} <em>FIRST</em> Robotics Competition Events{' '}
+          {year} <i>FIRST</i> Robotics Competition Events{' '}
           <small className="text-xl text-slate-500">
             {events.length} Events
           </small>
         </h1>
-        {groupedEvents.map((group) => (
-          <TableOfContentsSection
-            key={group.slug}
-            id={group.slug}
-            setInView={setInView}
-          >
-            <h2 className="mt-5 text-2xl">
-              {group.groupName}{' '}
-              <small className="text-slate-500">
-                {pluralize(group.events.length, 'Event', 'Events')}
+        {officialGroups.length > 0 && (
+          <>
+            <h2
+              id="official"
+              className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4"
+            >
+              Official Events{' '}
+              <small className="text-xl text-slate-500">
+                {officialGroups.reduce(
+                  (acc, group) => acc + group.events.length,
+                  0,
+                )}{' '}
+                Events
               </small>
             </h2>
-            <EventListTable events={group.events} />
-          </TableOfContentsSection>
-        ))}
+            {officialGroups.map((group) => (
+              <EventGroupSection
+                key={group.slug}
+                group={group}
+                setInView={setInView}
+              />
+            ))}
+          </>
+        )}
+        {unofficialGroups.length > 0 && (
+          <>
+            <h2
+              id="unofficial"
+              className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4"
+            >
+              Unofficial Events{' '}
+              <small className="text-xl text-slate-500">
+                {unofficialGroups.reduce(
+                  (acc, group) => acc + group.events.length,
+                  0,
+                )}{' '}
+                Events
+              </small>
+            </h2>
+            {unofficialGroups.map((group) => (
+              <EventGroupSection
+                key={group.slug}
+                group={group}
+                setInView={setInView}
+              />
+            ))}
+          </>
+        )}
       </div>
     </div>
+  );
+}
+
+function EventGroupSection({
+  group,
+  setInView,
+}: {
+  group: EventGroup;
+  setInView: React.Dispatch<React.SetStateAction<Set<string>>>;
+}) {
+  return (
+    <TableOfContentsSection
+      key={group.slug}
+      id={group.slug}
+      setInView={setInView}
+    >
+      <h2 className="mt-5 text-2xl">
+        {group.groupName}{' '}
+        <small className="text-slate-500">
+          {pluralize(group.events.length, 'Event', 'Events')}
+        </small>
+      </h2>
+      <EventListTable events={group.events} />
+    </TableOfContentsSection>
   );
 }
