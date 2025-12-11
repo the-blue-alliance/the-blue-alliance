@@ -2,7 +2,7 @@
   "name": "tba-react",
   "version": "0.0.0",
   "engines": {
-    "node": "^24"
+    "node": ">=22"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -30,7 +30,7 @@
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
     "reselect": "^5.1.1",
-    "swagger-ui": "file:/./src/frontend/lib/swagger-ui-5.31.0-dev.tgz",
+    "swagger-ui": "file:./src/frontend/lib/swagger-ui-5.31.0-dev.tgz",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/tanstackstart-react';
 import {
   createFileRoute,
   notFound,
@@ -27,9 +28,9 @@ import {
 } from '~/api/tba/read';
 import { AwardBanner } from '~/components/tba/banner';
 import {
-  TableOfContentsPopover,
+  TableOfContents,
   TableOfContentsSection,
-} from '~/components/tba/tableOfContentsPopover';
+} from '~/components/tba/tableOfContents';
 import TeamEventAppearance from '~/components/tba/teamEventAppearance';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
@@ -74,8 +75,12 @@ import {
 
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
   loader: async ({ params }) => {
+    const startTime = Date.now();
     const teamKey = `frc${params.teamNumber}`;
     const year = await parseParamsForYearElseDefault(params);
+    Sentry.metrics.count('team.page.view', 1, {
+      attributes: { team_number: params.teamNumber, year },
+    });
     if (year === undefined) {
       throw notFound();
     }
@@ -154,6 +159,12 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       }),
     );
 
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    Sentry.metrics.distribution('team.page.loader.duration', duration, {
+      attributes: { team_number: params.teamNumber, year },
+    });
+
     return {
       year,
       team: team.data,
@@ -213,7 +224,7 @@ function TeamPage(): React.JSX.Element {
     eventDistrictPts,
     eventAlliances,
   } = Route.useLoaderData();
-  const [eventsInView, setEventsInView] = useState(new Set<string>());
+  const [inView, setInView] = useState(new Set<string>());
 
   events.sort(sortEventsComparator);
 
@@ -242,17 +253,19 @@ function TeamPage(): React.JSX.Element {
   );
 
   const tocItems = useMemo(
-    () =>
-      events.map((e) => ({
+    () => [
+      { slug: 'team-info', label: 'Team Info' },
+      ...events.map((e) => ({
         slug: e.key,
         label: e.short_name?.trim() ? e.short_name : e.name,
       })),
+    ],
     [events],
   );
 
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
-      <TableOfContentsPopover tocItems={tocItems} inView={eventsInView}>
+      <TableOfContents tocItems={tocItems} inView={inView}>
         <Select
           value={String(year)}
           onValueChange={(value) => {
@@ -262,7 +275,9 @@ function TeamPage(): React.JSX.Element {
             });
           }}
         >
-          <SelectTrigger className="mb-4 w-[180px]">
+          <SelectTrigger
+            className="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
+          >
             <SelectValue placeholder={year} />
           </SelectTrigger>
           <SelectContent className="max-h-[30vh] overflow-y-auto">
@@ -274,52 +289,54 @@ function TeamPage(): React.JSX.Element {
             ))}
           </SelectContent>
         </Select>
-      </TableOfContentsPopover>
+      </TableOfContents>
 
       <div className="mt-8 w-full">
-        <div
-          className="flex flex-wrap justify-center sm:flex-nowrap
-            sm:justify-between"
-        >
-          <div className="flex flex-col justify-between">
-            <TeamPageTeamInfo
-              team={team}
-              socials={socials}
-              maybeAvatar={maybeAvatar}
-            />
-          </div>
-          <div className="flex-none">
-            <TeamRobotPicsCarousel media={robotPics} />
-          </div>
-        </div>
-
-        <Separator className="my-4" />
-
-        <StatsSection
-          events={events}
-          team={team}
-          matches={matches}
-          awards={awards}
-          year={year}
-        />
-
-        {awards.filter((a) => BLUE_BANNER_AWARDS.has(a.award_type)).length >
-          0 && (
-          <>
-            <Separator className="my-4" />
-            <div className="flex flex-row justify-around">
-              <BlueBanners
-                awards={awards
-                  .filter((a) => BLUE_BANNER_AWARDS.has(a.award_type))
-                  .filter((a) => {
-                    const event = events.find((e) => e.key === a.event_key);
-                    return event && SEASON_EVENT_TYPES.has(event.event_type);
-                  })}
-                events={events}
+        <TableOfContentsSection id="team-info" setInView={setInView}>
+          <div
+            className="flex flex-wrap justify-center sm:flex-nowrap
+              sm:justify-between"
+          >
+            <div className="flex flex-col justify-between">
+              <TeamPageTeamInfo
+                team={team}
+                socials={socials}
+                maybeAvatar={maybeAvatar}
               />
             </div>
-          </>
-        )}
+            <div className="flex-none">
+              <TeamRobotPicsCarousel media={robotPics} />
+            </div>
+          </div>
+
+          <Separator className="my-4" />
+
+          <StatsSection
+            events={events}
+            team={team}
+            matches={matches}
+            awards={awards}
+            year={year}
+          />
+
+          {awards.filter((a) => BLUE_BANNER_AWARDS.has(a.award_type)).length >
+            0 && (
+            <>
+              <Separator className="my-4" />
+              <div className="flex flex-row justify-around">
+                <BlueBanners
+                  awards={awards
+                    .filter((a) => BLUE_BANNER_AWARDS.has(a.award_type))
+                    .filter((a) => {
+                      const event = events.find((e) => e.key === a.event_key);
+                      return event && SEASON_EVENT_TYPES.has(event.event_type);
+                    })}
+                  events={events}
+                />
+              </div>
+            </>
+          )}
+        </TableOfContentsSection>
 
         <div>
           <Separator className="mt-4 mb-8" />
@@ -328,7 +345,7 @@ function TeamPage(): React.JSX.Element {
             <TableOfContentsSection
               key={e.key}
               id={e.key}
-              setInView={setEventsInView}
+              setInView={setInView}
             >
               <TeamEventAppearance
                 event={e}
