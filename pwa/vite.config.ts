@@ -51,6 +51,46 @@ export default defineConfig({
     outDir: 'build',
     sourcemap: true,
   },
+  environments: {
+    client: {
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: (id) => {
+              if (!id.includes('node_modules')) {
+                return undefined;
+              }
+              if (id.includes('/react/') || id.includes('/react-dom/')) {
+                return 'react';
+              }
+              if (id.includes('@firebase')) {
+                return 'firebase';
+              }
+              if (id.includes('@sentry')) {
+                return 'sentry';
+              }
+              if (id.includes('@tanstack')) {
+                return 'tanstack';
+              }
+              if (id.includes('@radix-ui')) {
+                return 'radix-ui';
+              }
+              if (id.includes('recharts')) {
+                return 'recharts';
+              }
+              if (id.includes('lodash')) {
+                return 'lodash';
+              }
+              if (id.includes('zod')) {
+                return 'zod';
+              }
+              return 'vendor';
+            },
+          },
+        },
+      },
+    },
+  },
   define: {
     __COMMIT_HASH__: JSON.stringify(getCommitHash()),
   },
