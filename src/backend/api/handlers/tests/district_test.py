@@ -18,6 +18,7 @@ from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.team import Team
 
 
@@ -215,8 +216,16 @@ def test_district_teams(ndb_stub, api_client: Client) -> None:
         year=2019,
         abbreviation="fim",
     ).put()
+    Event(
+        id="2019migib",
+        year=2019,
+        event_short="migib",
+        event_type_enum=EventType.REGIONAL,
+        district_key=ndb.Key(District, "2019fim"),
+    ).put()
     Team(id="frc254", team_number=254).put()
     Team(id="frc604", team_number=604).put()
+    Team(id="frc238", team_number=238).put()
     DistrictTeam(
         id="2019fim_frc254",
         district_key=ndb.Key(District, "2019fim"),
@@ -226,6 +235,24 @@ def test_district_teams(ndb_stub, api_client: Client) -> None:
     DistrictTeam(
         id="2019fim_frc604",
         district_key=ndb.Key(District, "2019fim"),
+        team=ndb.Key("Team", "frc604"),
+        year=2019,
+    ).put()
+    DistrictTeam(
+        id="2019fim_frc238",
+        district_key=ndb.Key(District, "2019fim"),
+        team=ndb.Key("Team", "frc238"),
+        year=2019,
+    ).put()
+    EventTeam(
+        id="2019migib_frc254",
+        event=ndb.Key(Event, "2019migib"),
+        team=ndb.Key("Team", "frc254"),
+        year=2019,
+    ).put()
+    EventTeam(
+        id="2019migib_frc604",
+        event=ndb.Key(Event, "2019migib"),
         team=ndb.Key("Team", "frc604"),
         year=2019,
     ).put()

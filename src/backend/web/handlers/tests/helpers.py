@@ -139,6 +139,17 @@ def preseed_district(district_key: DistrictKey) -> Generator:
     )
     yield ndb.put_multi_async(
         [
+            EventTeam(
+                id=f"{year}event1_frc{i}",
+                team=ndb.Key(Team, f"frc{i}"),
+                event=ndb.Key(Event, f"{year}event1"),
+                year=year,
+            )
+            for i in range(1, 6)
+        ]
+    )
+    yield ndb.put_multi_async(
+        [
             DistrictTeam(
                 id=f"{district_key}_frc{i}",
                 year=year,
