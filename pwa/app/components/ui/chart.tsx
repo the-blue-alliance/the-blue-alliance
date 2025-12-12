@@ -3,6 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';
+import type {
+  NameType,
+  ValueType,
+} from 'recharts/types/component/DefaultTooltipContent';
 
 import { cn } from '~/lib/utils';
 
@@ -36,18 +40,36 @@ function useChart() {
   return context;
 }
 
+interface ChartContainerProps
+  extends
+    Omit<React.ComponentProps<'div'>, 'children'>,
+    Pick<
+      React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>,
+      | 'initialDimension'
+      | 'aspect'
+      | 'debounce'
+      | 'minHeight'
+      | 'minWidth'
+      | 'maxHeight'
+      | 'height'
+      | 'width'
+      | 'onResize'
+      | 'children'
+    > {
+  config: ChartConfig;
+  innerResponsiveContainerStyle?: React.ComponentProps<
+    typeof RechartsPrimitive.ResponsiveContainer
+  >['style'];
+}
+
 function ChartContainer({
   id,
   className,
   children,
   config,
+  initialDimension = { width: 320, height: 200 },
   ...props
-}: React.ComponentProps<'div'> & {
-  config: ChartConfig;
-  children: React.ComponentProps<
-    typeof RechartsPrimitive.ResponsiveContainer
-  >['children'];
-}) {
+}: Readonly<ChartContainerProps>) {
   const uniqueId = React.useId();
   const chartId = `chart-${id ?? uniqueId.replace(/:/g, '')}`;
 
@@ -75,7 +97,9 @@ function ChartContainer({
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
+        <RechartsPrimitive.ResponsiveContainer
+          initialDimension={initialDimension}
+        >
           {children}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
@@ -139,7 +163,10 @@ function ChartTooltipContent({
     indicator?: 'line' | 'dot' | 'dashed';
     nameKey?: string;
     labelKey?: string;
-  }) {
+  } & Omit<
+    RechartsPrimitive.DefaultTooltipContentProps<ValueType, NameType>,
+    'accessibilityLayer'
+  >) {
   const { config } = useChart();
 
   const tooltipLabel = React.useMemo(() => {
@@ -201,7 +228,7 @@ function ChartTooltipContent({
 
           return (
             <div
-              key={item.dataKey}
+              key={key}
               className={cn(
                 `flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5
                 [&>svg]:w-2.5 [&>svg]:text-muted-foreground`,
@@ -249,12 +276,14 @@ function ChartTooltipContent({
                         {itemConfig?.label ?? item.name}
                       </span>
                     </div>
-                    {item.value && (
+                    {item.value != null && (
                       <span
                         className="font-mono font-medium text-foreground
                           tabular-nums"
                       >
-                        {item.value.toLocaleString()}
+                        {typeof item.value === 'number'
+                          ? item.value.toLocaleString()
+                          : String(item.value)}
                       </span>
                     )}
                   </div>
@@ -276,11 +305,10 @@ function ChartLegendContent({
   payload,
   verticalAlign = 'bottom',
   nameKey,
-}: React.ComponentProps<'div'> &
-  Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
-    hideIcon?: boolean;
-    nameKey?: string;
-  }) {
+}: React.ComponentProps<'div'> & {
+  hideIcon?: boolean;
+  nameKey?: string;
+} & RechartsPrimitive.DefaultLegendContentProps) {
   const { config } = useChart();
 
   if (!payload?.length) {
