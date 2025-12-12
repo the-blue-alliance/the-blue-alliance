@@ -6,3 +6,4 @@
 !pnpm-lock.yaml
 !build/
 !server.js
+!server.ts
