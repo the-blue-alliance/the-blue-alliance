@@ -129,7 +129,7 @@ jobs:
           pip install -r requirements.txt
       - name: Download all artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
       - name: Combine coverage
         if: steps.changes.outputs.python == 'true'
         run: |
