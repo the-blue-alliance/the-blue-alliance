@@ -26,7 +26,9 @@ updates:
     interval: daily
   open-pull-requests-limit: 10
   ignore:
-  - dependency-name: "@sentry/*"
+  - dependency-name: "@types/node"
+    update-types:
+      - version-update:semver-major
   labels:
     - PWA
   groups:
