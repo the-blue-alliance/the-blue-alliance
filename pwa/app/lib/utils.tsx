@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
+import pino from 'pino';
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -32,9 +33,8 @@ export async function parseParamsForYearElseDefault(params: {
   year?: string | undefined;
 }): Promise<number | undefined> {
   if (params.year === undefined) {
-    // TODO: Cache this call
-    const status = await getStatus();
-    return status.data !== undefined
+    const status = await getStatus({});
+    return status.data?.current_season !== undefined
       ? status.data.current_season
       : new Date().getFullYear();
   }
@@ -282,4 +282,28 @@ export function confidence(ups: number, downs: number, z = 3): number {
       z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
     (1 + (z * z) / n)
   );
+}
+
+export function secondsToMilliseconds(seconds: number): number {
+  return seconds * 1000;
+}
+
+export function minutesToMilliseconds(minutes: number): number {
+  return secondsToMilliseconds(minutes * 60);
+}
+
+export function hoursToMilliseconds(hours: number): number {
+  return minutesToMilliseconds(hours * 60);
+}
+
+export function createLogger(name: string) {
+  const transport =
+    process.env.NODE_ENV !== 'production'
+      ? { transport: { target: 'pino-pretty' } }
+      : {};
+
+  return pino({
+    name,
+    ...transport,
+  });
 }
