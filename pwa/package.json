@@ -71,7 +71,7 @@
   },
   "devDependencies": {
     "@eslint/compat": "2.0.0",
-    "@eslint/js": "9.39.1",
+    "@eslint/js": "9.39.2",
     "@hey-api/openapi-ts": "0.89.0",
     "@iconify/json": "2.2.417",
     "@julr/vite-plugin-validate-env": "2.2.0",
@@ -92,7 +92,7 @@
     "@vitejs/plugin-react": "5.1.2",
     "@vitest/coverage-v8": "4.0.15",
     "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "9.39.1",
+    "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
