@@ -42,8 +42,6 @@ app.use(express.static('build/client', { maxAge: '24h' }));
 app.use(morgan('tiny'));
 
 // handle SSR requests
-// Ignore the eslint error since the ./build directory doesn't exist until the build script is run.
-// eslint-disable-next-line import/no-unresolved
 const { default: handler } = await import('./build/server/server.js');
 const nodeHandler = toNodeHandler(handler.fetch);
 app.use(async (req, res, next) => {

@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc --project tsconfig.server.json",
     "gcp-build": "",
     "dev": "vite dev",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
@@ -12,7 +12,7 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "start": "cross-env NODE_ENV=production node ./server.js",
-    "typecheck": "tsc",
+    "typecheck": "tsc && tsc --project tsconfig.server.json",
     "bundle-visualizer": "npx vite-bundle-visualizer",
     "test": "vitest ./app --coverage",
     "openapi-ts": "openapi-ts",

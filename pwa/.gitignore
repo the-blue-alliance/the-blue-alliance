@@ -10,3 +10,4 @@ node_modules
 /playwright/.cache/
 .react-router/
 .tanstack/
+/server.js

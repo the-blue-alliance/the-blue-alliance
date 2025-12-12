@@ -251,11 +251,16 @@ jobs:
         run: pnpm --dir pwa run build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      - name: Archive production artifacts
+      - name: Archive production artifacts (build)
         uses: actions/upload-artifact@v5.0.0
         with:
           name: pwa-build
           path: pwa/build
+      - name: Archive production artifacts (server.js)
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          name: pwa-server
+          path: pwa/server.js
 
   pwa-e2e:
     name: "[pwa] E2E Tests"
@@ -757,12 +762,18 @@ jobs:
             pwa:
               - 'ops/**'
               - 'pwa/**'
-      - name: Download production artifacts
+      - name: Download production artifacts (build)
         if: steps.changes.outputs.pwa == 'true'
         uses: actions/download-artifact@v6
         with:
           name: pwa-build
           path: pwa/build
+      - name: Download production artifacts (server.js)
+        if: steps.changes.outputs.pwa == 'true'
+        uses: actions/download-artifact@v6
+        with:
+          name: pwa-server
+          path: pwa/server.js
       - name: Set up Sentry Release
         if: steps.changes.outputs.pwa == 'true'
         run: ./ops/pwa/set_sentry_release.sh
