@@ -229,7 +229,7 @@ function YearEventsPage() {
         <h1 className="mb-3 text-3xl font-medium">
           {year} <i>FIRST</i> Robotics Competition Events{' '}
           <small className="text-xl text-slate-500">
-            {events.length} Events
+            {events.length}&nbsp;Events
           </small>
         </h1>
         {officialGroups.length > 0 && (

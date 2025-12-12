@@ -1,41 +1,59 @@
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useEffect, useMemo, useState } from 'react';
 
-import { getStatus, getTeamsSimple } from '~/api/tba/read';
+import { getSearchIndex, getTeamsSimple } from '~/api/tba/read';
+import {
+  TableOfContents,
+  TableOfContentsSection,
+} from '~/components/tba/tableOfContents';
 import TeamListTable from '~/components/tba/teamListTable';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
-import { parseParamsForTeamPgNumElseDefault } from '~/lib/utils';
+  parseParamsForTeamPgNumElseDefault,
+  removeNonNumeric,
+} from '~/lib/utils';
+
+const TEAMS_PER_PAGE = 1000;
+
+function getPageNumberFromTeamKey(teamKey: string): number {
+  // 1-indexed, 1-999 is page 1, 1000-1999 is page 2, etc.
+  return 1 + Math.floor(Number(removeNonNumeric(teamKey)) / TEAMS_PER_PAGE);
+}
 
 export const Route = createFileRoute('/teams/{-$pgNum}')({
   loader: async ({ params }) => {
-    const status = await getStatus({});
-
-    if (status.data === undefined) {
-      throw new Error('Failed to load status');
+    const searchIndex = await getSearchIndex({});
+    if (searchIndex.data === undefined) {
+      throw new Error('Failed to load search index');
     }
+    const searchTeams = searchIndex.data.teams;
 
-    const maxPageNum = Math.floor(status.data.max_team_page / 2) + 1;
-    const pageNum = parseParamsForTeamPgNumElseDefault(params, maxPageNum);
-
-    if (pageNum === undefined) {
+    const maxPageNum = getPageNumberFromTeamKey(
+      searchTeams[searchTeams.length - 1].key,
+    );
+    const selectedPageNum = parseParamsForTeamPgNumElseDefault(
+      params,
+      maxPageNum,
+    );
+    if (selectedPageNum === undefined) {
       throw notFound();
     }
 
     const [teamsSetOne, teamsSetTwo] = await Promise.all([
-      getTeamsSimple({ path: { page_num: 2 * (pageNum - 1) } }),
-      getTeamsSimple({ path: { page_num: 2 * (pageNum - 1) + 1 } }),
+      getTeamsSimple({ path: { page_num: 2 * (selectedPageNum - 1) } }),
+      getTeamsSimple({ path: { page_num: 2 * (selectedPageNum - 1) + 1 } }),
     ]);
     if (teamsSetOne.data === undefined || teamsSetTwo.data === undefined) {
       throw new Error('Failed to load teams');
     }
     const teams = teamsSetOne.data.concat(teamsSetTwo.data);
 
-    return { teams, pageNum, maxPageNum };
+    const teamCountPerPage = new Map<number, number>();
+    for (const team of searchTeams) {
+      const page = getPageNumberFromTeamKey(team.key);
+      teamCountPerPage.set(page, (teamCountPerPage.get(page) ?? 0) + 1);
+    }
+
+    return { teams, teamCountPerPage, selectedPageNum, maxPageNum };
   },
   head: () => {
     return {
@@ -61,44 +79,63 @@ function TeamPageNumberToRange(pageNum: number): string {
 }
 
 function TeamsPage() {
-  const { teams, pageNum, maxPageNum } = Route.useLoaderData();
-  const navigate = useNavigate();
+  const { teams, teamCountPerPage, selectedPageNum, maxPageNum } =
+    Route.useLoaderData();
+  const [inView, setInView] = useState<Set<string>>(new Set());
+
+  const totalTeamCount = useMemo(() => {
+    return Array.from(teamCountPerPage.values()).reduce(
+      (acc, count) => acc + count,
+      0,
+    );
+  }, [teamCountPerPage]);
+
+  const tocItems = useMemo(() => {
+    return Array.from({ length: maxPageNum }, (_, i) => {
+      return { slug: `page-${i + 1}`, label: TeamPageNumberToRange(i + 1) };
+    });
+  }, [maxPageNum]);
+
+  useEffect(() => {
+    const sectionId = `page-${selectedPageNum}`;
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ block: 'start' });
+    }
+  }, [selectedPageNum]);
 
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
-      <div className="basis-full lg:basis-1/6">
-        <div className="top-14 pt-8 lg:sticky">
-          <Select
-            value={pageNum.toString()}
-            onValueChange={(value) => {
-              void navigate({
-                to: '/teams/{-$pgNum}',
-                params: { pgNum: value },
-              });
-            }}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={pageNum} />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: maxPageNum }, (_, i) => {
-                const p = i + 1;
-                return (
-                  <SelectItem key={p} value={p.toString()}>
-                    {TeamPageNumberToRange(p)}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="basis-full overflow-x-auto lg:basis-5/6 lg:py-8">
+      <TableOfContents tocItems={tocItems} inView={inView} />
+      <div className="basis-full py-8 lg:basis-5/6">
         <h1 className="mb-3 text-3xl font-medium">
-          <i>FIRST</i> Robotics Teams {TeamPageNumberToRange(pageNum)}{' '}
-          <small className="text-xl text-slate-500">{teams.length} Teams</small>
+          <i>FIRST</i> Robotics Competition Teams{' '}
+          <small className="text-xl text-slate-500">
+            {totalTeamCount}&nbsp;Teams
+          </small>
         </h1>
-        <TeamListTable teams={teams} />
+        {Array.from({ length: maxPageNum }, (_, i) => {
+          const teamCount = teamCountPerPage.get(i + 1) ?? 0;
+          return (
+            <TableOfContentsSection
+              key={i}
+              id={`page-${i + 1}`}
+              setInView={setInView}
+            >
+              <h2 key={i} className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4">
+                Teams {TeamPageNumberToRange(i + 1)}{' '}
+                <small className="text-xl text-slate-500">
+                  {teamCount} Teams
+                </small>
+              </h2>
+              {selectedPageNum === i + 1 ? (
+                <TeamListTable teams={teams} />
+              ) : (
+                <div className="h-[2000px]" />
+              )}
+            </TableOfContentsSection>
+          );
+        })}
       </div>
     </div>
   );
