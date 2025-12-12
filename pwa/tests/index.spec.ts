@@ -34,3 +34,12 @@ test('navbar is visible', async ({ page }) => {
 //   await expect(page.getByRole('button')).toBeVisible();
 //   await expect(page.getByPlaceholder('Search')).toBeVisible();
 // });
+
+test('Check no console errors', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (exception) => {
+    errors.push(exception.message);
+  });
+  await page.goto('/');
+  await expect(errors).toHaveLength(0);
+});
