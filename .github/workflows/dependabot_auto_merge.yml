@@ -34,6 +34,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Authenticate cli
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
         run: echo "${{ steps.generate_token.outputs.token }}" | gh auth login --with-token
       - name: Enable auto-merge for Dependabot PRs
         if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
