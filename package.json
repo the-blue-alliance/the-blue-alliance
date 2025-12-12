@@ -7,7 +7,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^7.3.5",
+    "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.5",
     "classnames": "^2.5.1",
     "element-resize-event": "^3.0.6",
