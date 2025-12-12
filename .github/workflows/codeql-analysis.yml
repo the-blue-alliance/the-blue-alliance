@@ -2,9 +2,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ py3 ]
+    branches: [ main ]
   pull_request:
-    branches: [ py3 ]
+    branches: [ main ]
 
 concurrency:
   group: codeql-${{ github.head_ref }}

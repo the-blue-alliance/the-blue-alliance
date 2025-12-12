@@ -24,11 +24,11 @@ $ ./ops/build/run_buildweb.sh
 
 ## Redirects
 
-Redirecting to a page via the `next` URL parameter is a pattern used in The Blue Alliance codebase. Since this `next` parameter can be modified by a user, caution should be taken to ensure the `next` parameter is redirecting back to The Blue Alliance as expected before redirecting the user. [`redirect`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/redirect.py) offers some helpful commands for safely redirecting.
+Redirecting to a page via the `next` URL parameter is a pattern used in The Blue Alliance codebase. Since this `next` parameter can be modified by a user, caution should be taken to ensure the `next` parameter is redirecting back to The Blue Alliance as expected before redirecting the user. [`redirect`](https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/web/redirect.py) offers some helpful commands for safely redirecting.
 
-| Method | Description |
-| --- | --- |
-| `is_safe_url` | Given a URL, check that the URL redirects back to the current host and is a HTTP URL. |
+| Method               | Description                                                                                                                                         |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `is_safe_url`        | Given a URL, check that the URL redirects back to the current host and is a HTTP URL.                                                               |
 | `safe_next_redirect` | Get a redirect Response from the `next` parameter. If the `next` parameter is not valid, the Response will be a redirect to the given fallback URL. |
 
 ```python
@@ -77,7 +77,7 @@ The `web` service uses [Flask WTF to enable CSRF protection](https://flask-wtf.r
 
 ```html
 <form method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 </form>
 ```
 
@@ -85,16 +85,16 @@ The `web` service uses [Flask WTF to enable CSRF protection](https://flask-wtf.r
 
 ### Authentication Decorators
 
-Use the [authentication decorators]((https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/decorators.py)) to ensure proper permission for a user for a given route.
+Use the [authentication decorators](<(https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/web/decorators.py)>) to ensure proper permission for a user for a given route.
 
-| Method | Description |
-| --- | --- |
-| `require_login` | Ensures that a user is currently logged in and registered. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. If the user is not registered, this method will automatically redirect the user to the registration page and after registering will redirect the user back to the original page. |
-| `require_login_only` | Like `require_login` but does not require that a user is registered. |
-| `enforce_login` | Ensures that a user is currently logged in - otherwise, this method will throw a 401. |
-| `require_admin` | Ensures that a user is an admin. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. |
-| `require_permission` | Ensures that a user has a given permission. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. If the user does not have the given permission, this method will throw a 401. |
-| `require_any_permission` | Ensures that a user has any of the given permission. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. If the user does not have any of the given permission, this method will throw a 401. |
+| Method                   | Description                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `require_login`          | Ensures that a user is currently logged in and registered. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. If the user is not registered, this method will automatically redirect the user to the registration page and after registering will redirect the user back to the original page. |
+| `require_login_only`     | Like `require_login` but does not require that a user is registered.                                                                                                                                                                                                                                                                                                                                                |
+| `enforce_login`          | Ensures that a user is currently logged in - otherwise, this method will throw a 401.                                                                                                                                                                                                                                                                                                                               |
+| `require_admin`          | Ensures that a user is an admin. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page.                                                                                                                                                                                                            |
+| `require_permission`     | Ensures that a user has a given permission. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. If the user does not have the given permission, this method will throw a 401.                                                                                                                   |
+| `require_any_permission` | Ensures that a user has any of the given permission. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. If the user does not have any of the given permission, this method will throw a 401.                                                                                                   |
 
 ```python
 from backend.web.decorators import require_login
@@ -122,9 +122,9 @@ def route() -> str:
 
 ```html
 {% if user %}
-    <p>Welcome back, {{ user.display_name }}</p>
+<p>Welcome back, {{ user.display_name }}</p>
 {% else %}
-    <a href="login">Login</a>
+<a href="login">Login</a>
 {% endif }
 ```
 
@@ -138,7 +138,7 @@ The `User` model exposes several methods and properties that fetch data scoped f
 
 ### Stubbing `current_user` + `User` in Tests
 
-A [`login_user`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/web/handlers/conftest.py#L32) pytest fixture is available for stubbing the `current_user` function. `current_user` will return a `User` [Mock](https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock) that can be used for verifying functionality.
+A [`login_user`](https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/web/handlers/conftest.py#L32) pytest fixture is available for stubbing the `current_user` function. `current_user` will return a `User` [Mock](https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock) that can be used for verifying functionality.
 
 ```python
 def test_register_account(login_user) -> None:

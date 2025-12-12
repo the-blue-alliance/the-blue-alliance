@@ -3,7 +3,7 @@ name: On pull request
 on:
   pull_request:
     branches:
-      - py3
+      - main
 
 concurrency:
   group: ci-${{ github.head_ref }}

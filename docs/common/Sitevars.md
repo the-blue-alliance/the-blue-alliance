@@ -1,6 +1,6 @@
-Sitevars are database-backed configurations that are used to store configurations that need to be updated, or keys that will change from production to development. An example of a Sitevar being used for configuration is the [landing page configuration Sitevar](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/sitevars/landing_config.py). An example of a Sitevar being used for keys is the [Google API secrets Sitevar](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/sitevars/google_api_secret.py).
+Sitevars are database-backed configurations that are used to store configurations that need to be updated, or keys that will change from production to development. An example of a Sitevar being used for configuration is the [landing page configuration Sitevar](https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/sitevars/landing_config.py). An example of a Sitevar being used for keys is the [Google API secrets Sitevar](https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/sitevars/google_api_secret.py).
 
-As mentioned, a Sitevar is backed by a database model called [Sitevar](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/models/sitevar.py) that is stored in ndb. However, these database models are wrapped via Sitevar classes to abstract away implementation details, such as referencing the Sitevar model by key, providing explicit methods for typed data access, etc.
+As mentioned, a Sitevar is backed by a database model called [Sitevar](https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/models/sitevar.py) that is stored in ndb. However, these database models are wrapped via Sitevar classes to abstract away implementation details, such as referencing the Sitevar model by key, providing explicit methods for typed data access, etc.
 
 ## Sitevar Usage
 
@@ -113,7 +113,7 @@ if notifications_enable.contents != should_enable_notifications:
     notifications_enable.put()
 ```
 
-The [`Sitevar`](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/sitevars/sitevar.py) class is used to fix all of these issues. A Sitevar class that extends `Sitevar` specifies a key local to the file. If the Sitevar key changes, this value only needs to change in one file, as opposed to everywhere in the codebase.
+The [`Sitevar`](https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/sitevars/sitevar.py) class is used to fix all of these issues. A Sitevar class that extends `Sitevar` specifies a key local to the file. If the Sitevar key changes, this value only needs to change in one file, as opposed to everywhere in the codebase.
 
 A Sitevar class defines a `default_value`, which conforms to a typed `SVType`. The first upside to this approach is having a typed definition of what can exist in a Sitevar. The `SVType` might be a boolean, or an integer, or a typed dictionary. No matter the data, the type is known and able to be enforced by the type-checker. The second upside is defining a default value for a Sitevar allows interfacing with ndb using `get_or_insert` as opposed to `get_by_id`. This ensures that a Sitevar will never a `None` and will always exist in the database. This simplifies local development by automatically creating the necessary Sitevars in the database to be filled in by the user later.
 
