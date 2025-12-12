@@ -89,7 +89,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Download all artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
       - name: Combine coverage
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
@@ -606,7 +606,7 @@ jobs:
           python-version: "3.13"
       - name: Download production artifacts
         if: steps.changes.outputs.web == 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: web-build
           path: src/build
@@ -764,13 +764,13 @@ jobs:
               - 'pwa/**'
       - name: Download production artifacts (build)
         if: steps.changes.outputs.pwa == 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: pwa-build
           path: pwa/build
       - name: Download production artifacts (server.js)
         if: steps.changes.outputs.pwa == 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: pwa-server
           path: pwa
