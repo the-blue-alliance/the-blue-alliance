@@ -17,6 +17,12 @@ updates:
   ignore:
   - dependency-name: swagger-ui
   groups:
+    react:
+      patterns:
+        - "react"
+        - "react-dom"
+        - "@types/react"
+        - "@types/react-dom"
     mui:
       patterns:
         - "@mui/*"
