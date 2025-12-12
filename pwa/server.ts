@@ -43,7 +43,7 @@ app.use(morgan('tiny'));
 
 // handle SSR requests
 const { default: handler } = await import('./build/server/server.js');
-const nodeHandler = toNodeHandler(handler.fetch);
+const nodeHandler = toNodeHandler((request) => handler.fetch(request));
 app.use(async (req, res, next) => {
   // Enable JavaScript profiling for Sentry browser profiling
   res.setHeader('Document-Policy', 'js-profiling');
