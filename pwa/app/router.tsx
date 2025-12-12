@@ -14,6 +14,7 @@ export function getRouter() {
       queryClient,
     },
     scrollRestoration: true,
+    caseSensitive: true,
     defaultErrorComponent: ErrorComponent,
     defaultNotFoundComponent: NotFoundComponent,
   });
