@@ -110,7 +110,10 @@ export default tseslint.config([
       },
     },
     rules: {
-      'import/no-unresolved': ['error', { ignore: ['^~icons/', '^virtual:'] }],
+      'import/no-unresolved': [
+        'error',
+        { ignore: ['^~icons/', '^virtual:', './build/'] },
+      ],
     },
   },
 
