@@ -94,6 +94,8 @@ class Event(CachedModel):
     playoff_type: PlayoffType = cast(
         PlayoffType, ndb.IntegerProperty(choices=list(PlayoffType))
     )
+    # Week number, as returned by the FRC API
+    api_week = ndb.IntegerProperty()
 
     # venue, venue_addresss, city, state_prov, country, and postalcode are from FIRST
     venue = ndb.TextProperty(indexed=False)  # Name of the event venue
@@ -381,13 +383,19 @@ class Event(CachedModel):
     def week(self) -> Optional[int]:
         """
         Returns the week of the event relative to the first official season event as an integer
-        Returns None if the event is not of type NON_CMP_EVENT_TYPES or is not official
+        Returns None if the event is not of type NON_CMP_EVENT_TYPES, is not official, or if
+        api_week is 0 (which only happens for invalid events)
         """
         if (
             self.event_type_enum not in event_type.NON_CMP_EVENT_TYPES
             or not self.official
+            or self.api_week == 0
         ):
             return None
+
+        if self.api_week is not None:
+            # TBA weeks are zero-indexed.
+            return self.api_week - 1
 
         if self._week:
             return self._week

@@ -140,6 +140,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 WebcastParser.webcast_dict_from_url(url)
                 for url in event.get("webcasts", [])
             ]
+            week = event.get("weekNumber")
 
             # Attempt to convert our API (Windows) timezone -> IANA timezone
             # We'll ensure it's capatiable with pytz as well, since that's what we use everywhere
@@ -197,6 +198,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                     playoff_type=playoff_type,
                     start_date=start,
                     end_date=end,
+                    api_week=week,
                     venue=venue,
                     city=city,
                     state_prov=state_prov,
