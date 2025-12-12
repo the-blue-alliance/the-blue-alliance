@@ -163,8 +163,8 @@ importers:
         specifier: 9.39.1
         version: 9.39.1
       '@hey-api/openapi-ts':
-        specifier: 0.88.2
-        version: 0.88.2(magicast@0.5.1)(typescript@5.9.3)
+        specifier: 0.89.0
+        version: 0.89.0(magicast@0.5.1)(typescript@5.9.3)
       '@iconify/json':
         specifier: 2.2.417
         version: 2.2.417
@@ -1095,8 +1095,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@hey-api/codegen-core@0.3.3':
-    resolution: {integrity: sha512-vArVDtrvdzFewu1hnjUm4jX1NBITlSCeO81EdWq676MxQbyxsGcDPAgohaSA+Wvr4HjPSvsg2/1s2zYxUtXebg==}
+  '@hey-api/codegen-core@0.4.0':
+    resolution: {integrity: sha512-o8rBbEXEUhEPzrHbqImYjwIHm4Oj0r1RPS+5cp8Z66kPO7SEN7PYUgK7XpmSxoy9LPMNK1M5qmCO4cGGwT+ELQ==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
       typescript: '>=5.5.3'
@@ -1105,8 +1105,8 @@ packages:
     resolution: {integrity: sha512-oS+5yAdwnK20lSeFO1d53Ku+yaGCsY8PcrmSq2GtSs3bsBfRnHAbpPKSVzQcaxAOrzj5NB+f34WhZglVrNayBA==}
     engines: {node: '>= 16'}
 
-  '@hey-api/openapi-ts@0.88.2':
-    resolution: {integrity: sha512-JMae1RJ8S8D8lVCFQnsrWaKY0CxrR4TUmZIoU1SuvaeZ+pkMPYuQoj8fO37R5d8juUfFVzCGYV5/Ro0vbDqBbA==}
+  '@hey-api/openapi-ts@0.89.0':
+    resolution: {integrity: sha512-6cnHppAR6vM8osyWqiCoHy35J3CqFz114ggOLHwaTb795XUnzoP/pdbvyz+TBpukY08QQh69kHMAXdi2Kuq9Ow==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -6719,8 +6719,10 @@ snapshots:
       yargs: 17.7.2
     optional: true
 
-  '@hey-api/codegen-core@0.3.3(typescript@5.9.3)':
+  '@hey-api/codegen-core@0.4.0(typescript@5.9.3)':
     dependencies:
+      ansi-colors: 4.1.3
+      color-support: 1.1.3
       typescript: 5.9.3
 
   '@hey-api/json-schema-ref-parser@1.2.2':
@@ -6730,9 +6732,9 @@ snapshots:
       js-yaml: 4.1.1
       lodash: 4.17.21
 
-  '@hey-api/openapi-ts@0.88.2(magicast@0.5.1)(typescript@5.9.3)':
+  '@hey-api/openapi-ts@0.89.0(magicast@0.5.1)(typescript@5.9.3)':
     dependencies:
-      '@hey-api/codegen-core': 0.3.3(typescript@5.9.3)
+      '@hey-api/codegen-core': 0.4.0(typescript@5.9.3)
       '@hey-api/json-schema-ref-parser': 1.2.2
       ansi-colors: 4.1.3
       c12: 3.3.2(magicast@0.5.1)
