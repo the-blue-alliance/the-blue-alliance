@@ -773,7 +773,7 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: pwa-server
-          path: pwa/server.js
+          path: pwa
       - name: Set up Sentry Release
         if: steps.changes.outputs.pwa == 'true'
         run: ./ops/pwa/set_sentry_release.sh
