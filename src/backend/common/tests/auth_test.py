@@ -141,4 +141,4 @@ def test_user_context_processor_no_claims() -> None:
 def test_user_context_processor() -> None:
     with patch.object(backend_auth, "_decoded_claims", return_value={"abc": "abc"}):
         user_context = _user_context_processor()
-    assert type(user_context["user"]) is User
+    assert isinstance(user_context["user"], User)

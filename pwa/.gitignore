@@ -9,3 +9,5 @@ node_modules
 /blob-report/
 /playwright/.cache/
 .react-router/
+.tanstack/
+/server.js

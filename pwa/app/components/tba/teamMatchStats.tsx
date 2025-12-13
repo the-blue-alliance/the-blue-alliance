@@ -1,9 +1,22 @@
 import { maxBy, startCase, uniq } from 'lodash-es';
-import { useMemo, useState } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
-import { Event, Match } from '~/api/tba/read';
+import { Event, Match, WltRecord } from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { TeamLink } from '~/components/tba/links';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '~/components/ui/chart';
 import { Checkbox } from '~/components/ui/checkbox';
 import {
   Table,
@@ -19,7 +32,82 @@ import {
   getAllianceMatchResult,
   getMatchScoreWithoutAdjustPoints,
 } from '~/lib/matchUtils';
-import { addRecords, cn, joinComponents, winrateFromRecord } from '~/lib/utils';
+import {
+  addRecords,
+  cn,
+  confidence,
+  joinComponents,
+  stringifyRecord,
+  winrateFromRecord,
+} from '~/lib/utils';
+
+const NUM_OTHER_TEAMS_TO_SHOW = 25;
+
+interface TeamRecord extends WltRecord {
+  team: string;
+  count: number;
+}
+
+interface TeamStatsTableProps {
+  title: string;
+  data: TeamRecord[];
+  valueColumnHeader: ReactNode;
+  getValue: (item: TeamRecord) => string | number;
+  limit?: number;
+}
+
+function TeamStatsTable({
+  title,
+  data,
+  valueColumnHeader,
+  getValue,
+  limit = NUM_OTHER_TEAMS_TO_SHOW,
+}: TeamStatsTableProps) {
+  return (
+    <div className="rounded-lg border bg-card">
+      <div className="border-b px-6 py-4">
+        <h3 className="text-lg font-semibold">{title}</h3>
+      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Team</TableHead>
+            <TableHead className="text-right">Record</TableHead>
+            <TableHead className="text-right">{valueColumnHeader}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.slice(0, limit).map((record) => (
+            <TableRow key={record.team}>
+              <TableCell>
+                <TeamLink teamOrKey={record.team}>
+                  <span className="font-medium">
+                    {record.team.substring(3)}
+                  </span>
+                </TeamLink>
+              </TableCell>
+              <TableCell className="text-right text-sm text-muted-foreground">
+                {stringifyRecord(record)}
+              </TableCell>
+              <TableCell className="text-right font-semibold">
+                {getValue(record)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+function recordsToSortedList(
+  records: Record<string, WltRecord & { count: number }>,
+  sortFn: (a: TeamRecord, b: TeamRecord) => number,
+): TeamRecord[] {
+  return Object.entries(records)
+    .map(([team, stats]) => ({ team, ...stats }))
+    .sort(sortFn);
+}
 
 interface TeamMatchStatsProps {
   teamKey: string;
@@ -216,6 +304,90 @@ function SingleHighlightedMatchPerYearTable({
   );
 }
 
+interface MatchWinOverTimeData {
+  matchNumber: number;
+  netWins: number;
+}
+
+function MatchWinOverTimeChart({
+  matches,
+  teamKey,
+}: {
+  matches: Match[];
+  teamKey: string;
+}) {
+  const { data, yearBoundaries, xAxisTicks } = useMemo(() => {
+    const data: MatchWinOverTimeData[] = [{ matchNumber: 0, netWins: 0 }];
+    const yearBoundaries: Array<{ matchNumber: number; year: number }> = [];
+    let previousYear: number | undefined;
+
+    for (let i = 0; i < matches.length; i++) {
+      const match = matches[i];
+      const currentYear = Number(match.event_key.slice(0, 4));
+
+      // Track year boundaries (when year changes)
+      if (currentYear !== previousYear) {
+        yearBoundaries.push({
+          matchNumber: data.length - 1,
+          year: currentYear,
+        });
+      }
+      previousYear = currentYear;
+
+      const isRed = match.alliances.red.team_keys.includes(teamKey);
+      const didWin =
+        getAllianceMatchResult(match, isRed ? 'red' : 'blue', 'score-based') ===
+        'win';
+      const didLose =
+        getAllianceMatchResult(match, isRed ? 'red' : 'blue', 'score-based') ===
+        'loss';
+
+      const newNet =
+        data[data.length - 1].netWins + (didWin ? 1 : didLose ? -1 : 0);
+      data.push({ matchNumber: data.length, netWins: newNet });
+    }
+
+    const maxMatchNumber = data[data.length - 1]?.matchNumber ?? 0;
+    const xAxisTicks: number[] = [];
+    for (let i = 0; i <= maxMatchNumber; i += 50) {
+      xAxisTicks.push(i);
+    }
+
+    return { data, yearBoundaries, xAxisTicks };
+  }, [matches, teamKey]);
+
+  return (
+    <div>
+      <div className="text-lg font-semibold">Net Wins Over Time</div>
+      <ChartContainer config={{}}>
+        <LineChart accessibilityLayer data={data}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="matchNumber" ticks={xAxisTicks} />
+          <YAxis dataKey="netWins" />
+          <Line
+            dataKey="netWins"
+            stroke="var(--color-primary)"
+            dot={false}
+            strokeWidth={2}
+            type="linear"
+          />
+          {yearBoundaries.map(({ matchNumber, year }) => (
+            <ReferenceLine
+              key={matchNumber}
+              x={matchNumber}
+              label={{
+                value: year.toString(),
+                position: 'insideTopLeft',
+              }}
+            />
+          ))}
+          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+        </LineChart>
+      </ChartContainer>
+    </div>
+  );
+}
+
 export default function TeamMatchStats({
   teamKey,
   matches,
@@ -234,10 +406,7 @@ export default function TeamMatchStats({
   ).filter((key) => key !== teamKey);
 
   const recordsWith = useMemo(() => {
-    const records: Record<
-      string,
-      { count: number; wins: number; losses: number; ties: number }
-    > = {};
+    const records: Record<string, WltRecord & { count: number }> = {};
 
     for (const match of matches) {
       const isRed = match.alliances.red.team_keys.includes(teamKey);
@@ -265,10 +434,7 @@ export default function TeamMatchStats({
   }, [matches, teamKey]);
 
   const recordsAgainst = useMemo(() => {
-    const records: Record<
-      string,
-      { count: number; wins: number; losses: number; ties: number }
-    > = {};
+    const records: Record<string, WltRecord & { count: number }> = {};
 
     for (const match of matches) {
       const isRed = match.alliances.red.team_keys.includes(teamKey);
@@ -295,53 +461,48 @@ export default function TeamMatchStats({
     return records;
   }, [matches, teamKey]);
 
-  const teammateFrequency = useMemo(() => {
-    return Object.entries(recordsWith)
-      .map(([team, stats]) => ({
-        team,
-        count: stats.count,
-        wins: stats.wins,
-        losses: stats.losses,
-        ties: stats.ties,
-      }))
-      .sort((a, b) => b.count - a.count);
-  }, [recordsWith]);
+  const withStats = useMemo(
+    () => ({
+      mostPlayed: recordsToSortedList(recordsWith, (a, b) => b.count - a.count),
+      mostWins: recordsToSortedList(recordsWith, (a, b) => b.wins - a.wins),
+      mostLosses: recordsToSortedList(
+        recordsWith,
+        (a, b) => b.losses - a.losses,
+      ),
+      bestRecord: recordsToSortedList(
+        recordsWith,
+        (a, b) => confidence(b.wins, b.losses) - confidence(a.wins, a.losses),
+      ),
+      worstRecord: recordsToSortedList(
+        recordsWith,
+        (a, b) => confidence(b.losses, b.wins) - confidence(a.losses, a.wins),
+      ),
+    }),
+    [recordsWith],
+  );
 
-  const mostWonWith = useMemo(() => {
-    return Object.entries(recordsWith)
-      .map(([team, stats]) => ({
-        team,
-        count: stats.count,
-        wins: stats.wins,
-        losses: stats.losses,
-        ties: stats.ties,
-      }))
-      .sort((a, b) => b.wins - a.wins);
-  }, [recordsWith]);
-
-  const mostPlayedAgainst = useMemo(() => {
-    return Object.entries(recordsAgainst)
-      .map(([team, stats]) => ({
-        team,
-        count: stats.count,
-        wins: stats.wins,
-        losses: stats.losses,
-        ties: stats.ties,
-      }))
-      .sort((a, b) => b.count - a.count);
-  }, [recordsAgainst]);
-
-  const mostLostTo = useMemo(() => {
-    return Object.entries(recordsAgainst)
-      .map(([team, stats]) => ({
-        team,
-        count: stats.count,
-        wins: stats.wins,
-        losses: stats.losses,
-        ties: stats.ties,
-      }))
-      .sort((a, b) => b.losses - a.losses);
-  }, [recordsAgainst]);
+  const againstStats = useMemo(
+    () => ({
+      mostPlayed: recordsToSortedList(
+        recordsAgainst,
+        (a, b) => b.count - a.count,
+      ),
+      mostWins: recordsToSortedList(recordsAgainst, (a, b) => b.wins - a.wins),
+      mostLosses: recordsToSortedList(
+        recordsAgainst,
+        (a, b) => b.losses - a.losses,
+      ),
+      bestRecord: recordsToSortedList(
+        recordsAgainst,
+        (a, b) => confidence(b.wins, b.losses) - confidence(a.wins, a.losses),
+      ),
+      worstRecord: recordsToSortedList(
+        recordsAgainst,
+        (a, b) => confidence(b.losses, b.wins) - confidence(a.losses, a.wins),
+      ),
+    }),
+    [recordsAgainst],
+  );
 
   const highScoresByYear: Record<number, Match | undefined> = useMemo(() => {
     return Object.fromEntries(
@@ -559,177 +720,121 @@ export default function TeamMatchStats({
           </TabsContent>
         </Tabs>
 
-        <Tabs defaultValue="most-played-with" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="most-played-with">Most Played With</TabsTrigger>
-            <TabsTrigger value="most-won-with">Most Won With</TabsTrigger>
-            <TabsTrigger value="most-played-against">
-              Most Played Against
-            </TabsTrigger>
-            <TabsTrigger value="most-lost-to">Most Lost To</TabsTrigger>
+        <Tabs defaultValue="with" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="with">With</TabsTrigger>
+            <TabsTrigger value="against">Against</TabsTrigger>
           </TabsList>
-          <TabsContent value="most-played-with">
-            <div className="rounded-lg border bg-card">
-              <div className="border-b px-6 py-4">
-                <h3 className="text-lg font-semibold">Most Played With</h3>
-              </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Team</TableHead>
-                    <TableHead className="text-right">Record</TableHead>
-                    <TableHead className="text-right">
-                      Matches Together
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {teammateFrequency
-                    .slice(0, 20)
-                    .map(({ team, count, wins, losses, ties }) => (
-                      <TableRow key={team}>
-                        <TableCell>
-                          <TeamLink teamOrKey={team}>
-                            <span className="font-medium">
-                              {team.substring(3)}
-                            </span>
-                          </TeamLink>
-                        </TableCell>
-                        <TableCell
-                          className="text-right text-sm text-muted-foreground"
-                        >
-                          {wins}-{losses}-{ties}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          {count}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
+          <TabsContent value="with">
+            <Tabs defaultValue="most-played" className="w-full">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="most-played">Most Played</TabsTrigger>
+                <TabsTrigger value="most-wins">Most Wins</TabsTrigger>
+                <TabsTrigger value="most-losses">Most Losses</TabsTrigger>
+                <TabsTrigger value="best-record">Best Record</TabsTrigger>
+                <TabsTrigger value="worst-record">Worst Record</TabsTrigger>
+              </TabsList>
+              <TabsContent value="most-played">
+                <TeamStatsTable
+                  title="Most Played With"
+                  data={withStats.mostPlayed}
+                  valueColumnHeader="Matches Together"
+                  getValue={(r) => r.count}
+                />
+              </TabsContent>
+              <TabsContent value="most-wins">
+                <TeamStatsTable
+                  title="Most Wins With"
+                  data={withStats.mostWins}
+                  valueColumnHeader="Wins Together"
+                  getValue={(r) => r.wins}
+                  limit={20}
+                />
+              </TabsContent>
+              <TabsContent value="most-losses">
+                <TeamStatsTable
+                  title="Most Losses With"
+                  data={withStats.mostLosses}
+                  valueColumnHeader="Losses Together"
+                  getValue={(r) => r.losses}
+                />
+              </TabsContent>
+              <TabsContent value="best-record">
+                <TeamStatsTable
+                  title="Best Record With"
+                  data={withStats.bestRecord}
+                  valueColumnHeader="Confidence"
+                  getValue={(r) => confidence(r.wins, r.losses).toFixed(2)}
+                />
+              </TabsContent>
+              <TabsContent value="worst-record">
+                <TeamStatsTable
+                  title="Worst Record With"
+                  data={withStats.worstRecord}
+                  valueColumnHeader="Confidence"
+                  getValue={(r) => confidence(r.losses, r.wins).toFixed(2)}
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
-          <TabsContent value="most-won-with">
-            <div className="rounded-lg border bg-card">
-              <div className="border-b px-6 py-4">
-                <h3 className="text-lg font-semibold">Most Won With</h3>
-              </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Team</TableHead>
-                    <TableHead className="text-right">Record</TableHead>
-                    <TableHead className="text-right">Wins Together</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mostWonWith
-                    .slice(0, 20)
-                    .map(({ team, wins, losses, ties }) => (
-                      <TableRow key={team}>
-                        <TableCell>
-                          <TeamLink teamOrKey={team}>
-                            <span className="font-medium">
-                              {team.substring(3)}
-                            </span>
-                          </TeamLink>
-                        </TableCell>
-                        <TableCell
-                          className="text-right text-sm text-muted-foreground"
-                        >
-                          {wins}-{losses}-{ties}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          {wins}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
-          </TabsContent>
-          <TabsContent value="most-played-against">
-            <div className="rounded-lg border bg-card">
-              <div className="border-b px-6 py-4">
-                <h3 className="text-lg font-semibold">Most Played Against</h3>
-              </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Team</TableHead>
-                    <TableHead className="text-right">Record</TableHead>
-                    <TableHead className="text-right">
-                      Matches Against
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mostPlayedAgainst
-                    .slice(0, 20)
-                    .map(({ team, count, wins, losses, ties }) => (
-                      <TableRow key={team}>
-                        <TableCell>
-                          <TeamLink teamOrKey={team}>
-                            <span className="font-medium">
-                              {team.substring(3)}
-                            </span>
-                          </TeamLink>
-                        </TableCell>
-                        <TableCell
-                          className="text-right text-sm text-muted-foreground"
-                        >
-                          {wins}-{losses}-{ties}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          {count}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
-          </TabsContent>
-          <TabsContent value="most-lost-to">
-            <div className="rounded-lg border bg-card">
-              <div className="border-b px-6 py-4">
-                <h3 className="text-lg font-semibold">Most Lost To</h3>
-              </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Team</TableHead>
-                    <TableHead className="text-right">Record</TableHead>
-                    <TableHead className="text-right">Losses Against</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mostLostTo
-                    .slice(0, 20)
-                    .map(({ team, wins, losses, ties }) => (
-                      <TableRow key={team}>
-                        <TableCell>
-                          <TeamLink teamOrKey={team}>
-                            <span className="font-medium">
-                              {team.substring(3)}
-                            </span>
-                          </TeamLink>
-                        </TableCell>
-                        <TableCell
-                          className="text-right text-sm text-muted-foreground"
-                        >
-                          {wins}-{losses}-{ties}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          {losses}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
+          <TabsContent value="against">
+            <Tabs defaultValue="most-played" className="w-full">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="most-played">Most Played</TabsTrigger>
+                <TabsTrigger value="most-wins">Most Wins</TabsTrigger>
+                <TabsTrigger value="most-losses">Most Losses</TabsTrigger>
+                <TabsTrigger value="best-record">Best Record</TabsTrigger>
+                <TabsTrigger value="worst-record">Worst Record</TabsTrigger>
+              </TabsList>
+              <TabsContent value="most-played">
+                <TeamStatsTable
+                  title="Most Played Against"
+                  data={againstStats.mostPlayed}
+                  valueColumnHeader="Matches Against"
+                  getValue={(r) => r.count}
+                />
+              </TabsContent>
+              <TabsContent value="most-wins">
+                <TeamStatsTable
+                  title="Most Wins Against"
+                  data={againstStats.mostWins}
+                  valueColumnHeader="Wins Against"
+                  getValue={(r) => r.wins}
+                  limit={20}
+                />
+              </TabsContent>
+              <TabsContent value="most-losses">
+                <TeamStatsTable
+                  title="Most Losses Against"
+                  data={againstStats.mostLosses}
+                  valueColumnHeader="Losses Against"
+                  getValue={(r) => r.losses}
+                  limit={20}
+                />
+              </TabsContent>
+              <TabsContent value="best-record">
+                <TeamStatsTable
+                  title="Best Record Against"
+                  data={againstStats.bestRecord}
+                  valueColumnHeader="Confidence"
+                  getValue={(r) => confidence(r.wins, r.losses).toFixed(2)}
+                  limit={20}
+                />
+              </TabsContent>
+              <TabsContent value="worst-record">
+                <TeamStatsTable
+                  title="Worst Record Against"
+                  data={againstStats.worstRecord}
+                  valueColumnHeader="Confidence"
+                  getValue={(r) => confidence(r.losses, r.wins).toFixed(2)}
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </div>
+
+      <MatchWinOverTimeChart matches={matches} teamKey={teamKey} />
     </div>
   );
 }

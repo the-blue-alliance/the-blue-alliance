@@ -1,9 +1,12 @@
+import { QueryClient } from '@tanstack/react-query';
+import { notFound } from '@tanstack/react-router';
 import { type ClassValue, clsx } from 'clsx';
+import pino from 'pino';
 import React from 'react';
-import { Params } from 'react-router';
 import { twMerge } from 'tailwind-merge';
 
-import { WltRecord, getStatus } from '~/api/tba/read';
+import { WltRecord } from '~/api/tba/read';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { RequestResult } from '~/api/tba/read/client';
 
 // TODO: Generate this from the API
@@ -30,14 +33,14 @@ export function slugify(str: string): string {
 }
 
 export async function parseParamsForYearElseDefault(
-  params: Params,
+  queryClient: QueryClient,
+  params: {
+    year?: string | undefined;
+  },
 ): Promise<number | undefined> {
   if (params.year === undefined) {
-    // TODO: Cache this call
-    const status = await getStatus();
-    return status.data !== undefined
-      ? status.data.current_season
-      : new Date().getFullYear();
+    const status = await queryClient.ensureQueryData(getStatusOptions({}));
+    return status.current_season;
   }
 
   const year = Number(params.year);
@@ -46,6 +49,23 @@ export async function parseParamsForYearElseDefault(
   }
 
   return year;
+}
+
+// Page number is 1-indexed
+export function parseParamsForTeamPgNumElseDefault(
+  params: { pgNum?: string | undefined },
+  maxPgNum: number,
+): number | undefined {
+  if (params.pgNum === undefined) {
+    return 1;
+  }
+
+  const pgNum = Number(params.pgNum);
+  if (Number.isNaN(pgNum) || pgNum <= 0 || pgNum > maxPgNum) {
+    return undefined;
+  }
+
+  return pgNum;
 }
 
 export function timestampsAreOnDifferentDays(
@@ -253,7 +273,7 @@ export async function queryFromAPI<T>(
 
 // https://web.archive.org/web/20250409124545/https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
 // Typically used for sorting WLTRecords
-export function confidence(ups: number, downs: number, z = 1.96): number {
+export function confidence(ups: number, downs: number, z = 3): number {
   const n = ups + downs;
   if (n === 0) {
     return 0;
@@ -266,4 +286,32 @@ export function confidence(ups: number, downs: number, z = 1.96): number {
       z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
     (1 + (z * z) / n)
   );
+}
+
+export function secondsToMilliseconds(seconds: number): number {
+  return seconds * 1000;
+}
+
+export function minutesToMilliseconds(minutes: number): number {
+  return secondsToMilliseconds(minutes * 60);
+}
+
+export function hoursToMilliseconds(hours: number): number {
+  return minutesToMilliseconds(hours * 60);
+}
+
+export function createLogger(name: string) {
+  const transport =
+    process.env.NODE_ENV !== 'production'
+      ? { transport: { target: 'pino-pretty' } }
+      : {};
+
+  return pino({
+    name,
+    ...transport,
+  });
+}
+
+export function doThrowNotFound(): never {
+  throw notFound();
 }

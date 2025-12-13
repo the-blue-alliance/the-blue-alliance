@@ -2,11 +2,11 @@
 
 ## Overview
 
-Progressive Web App for The Blue Alliance, a data archive site for the FIRST Robotics Competition, built with React Router v7, TypeScript, and Tailwind CSS.
+Progressive Web App for The Blue Alliance, a data archive site for the FIRST Robotics Competition, built with TanStack Start / Router, TypeScript, and Tailwind CSS.
 
 ## Tech Stack
 
-- **Framework**: React Router v7 in framework mode (SSR)
+- **Framework**: TanStack Start / Router
 - **Styling**: Tailwind CSS v4, Shadcn UI, Radix UI
 - **API**: Auto-generated OpenAPI clients in `app/api/tba/{read,mobile}/`
 - **Data Fetching**: TanStack Query
@@ -68,7 +68,6 @@ tests/                 # Playwright E2E tests
 
 - **Node.js**: Version pinned to `22.14.0` (see `package.json` engines field)
 - **npm packages**: Always pin to specific versions (e.g., `"react": "19.2.0"`, not `"^19.2.0"`)
-- **OS packages**: Add to `devbox.json`, update `devbox.lock` (run `devbox update`), and document in README.md
 
 ## Testing
 

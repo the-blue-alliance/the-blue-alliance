@@ -23,12 +23,15 @@ ENV PYTHON_VERSION=python3.13
 RUN apt-get update && apt-get install -y \
     "$PYTHON_VERSION" \
     "$PYTHON_VERSION-venv" \
-    "$PYTHON_VERSION-dev" \
-    python3-pip
+    "$PYTHON_VERSION-dev"
 RUN update-alternatives --install /usr/bin/python python "/usr/bin/$PYTHON_VERSION" 1
 RUN update-alternatives --install /usr/bin/python3 python3 "/usr/bin/$PYTHON_VERSION" 1
 RUN echo 1 | update-alternatives --config python
 RUN echo 1 | update-alternatives --config python3
+
+# The ubuntu python3-pip package depends on distutils, which is not available in Python 3.13
+# So we install pip manually using get-pip.py
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
 
 # Add gcloud repository and Cloud SDK dependencies
 RUN apt-get update && apt-get install -y apt-transport-https curl

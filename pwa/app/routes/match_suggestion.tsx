@@ -1,7 +1,7 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { useLoaderData } from 'react-router';
 
 import {
   Event,
@@ -27,30 +27,29 @@ import { getCurrentWeekEvents } from '~/lib/eventUtils';
 import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, queryFromAPI } from '~/lib/utils';
 
-export async function loader() {
-  const status = await getStatus();
+export const Route = createFileRoute('/match_suggestion')({
+  loader: async () => {
+    const status = await getStatus();
 
-  if (status.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    if (status.data === undefined) {
+      throw new Error('Failed to load status');
+    }
 
-  const year = status.data.current_season;
-  const events = await getEventsByYear({ path: { year } });
+    const year = status.data.current_season;
+    const events = await getEventsByYear({ path: { year } });
 
-  if (events.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    if (events.data === undefined) {
+      throw new Error('Failed to load events');
+    }
 
-  const filteredEvents = getCurrentWeekEvents(events.data);
+    const filteredEvents = getCurrentWeekEvents(events.data);
 
-  return {
-    events: filteredEvents,
-  };
-}
+    return {
+      events: filteredEvents,
+    };
+  },
+  component: MatchSuggestion,
+});
 
 // TODO: Fix this typing
 interface EventPredictions {
@@ -389,8 +388,8 @@ function MatchSuggestionRow({
   );
 }
 
-export default function MatchSuggestion(): React.JSX.Element {
-  const { events } = useLoaderData<typeof loader>();
+function MatchSuggestion(): React.JSX.Element {
+  const { events } = Route.useLoaderData();
 
   const eventMatchesQuery = useQuery({
     queryKey: ['eventMatches', events],

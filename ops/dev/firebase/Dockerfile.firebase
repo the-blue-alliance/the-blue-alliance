@@ -1,6 +1,6 @@
-FROM node:alpine
+FROM node:lts-alpine
 
-RUN apk --no-cache add default-jre && \
+RUN apk --no-cache add openjdk21-jre && \
     npm cache clean --force && \
     npm i -g firebase-tools
 

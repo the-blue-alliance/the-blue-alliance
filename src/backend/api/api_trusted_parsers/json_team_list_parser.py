@@ -1,5 +1,3 @@
-from typing import AnyStr, List
-
 from pyre_extensions import safe_json
 
 from backend.common.datafeed_parsers.exceptions import ParserInputException
@@ -13,11 +11,9 @@ class JSONTeamListParser:
     """
 
     @staticmethod
-    def parse(team_list_json: AnyStr) -> List[TeamKey]:
-        team_keys = safe_json.loads(team_list_json, List[str])
-        bad_team_keys = list(
-            filter(lambda team_key: not Team.validate_key_name(team_key), team_keys)
-        )
+    def parse[T: (str, bytes)](team_list_json: T) -> list[TeamKey]:
+        team_keys = safe_json.loads(team_list_json, list[str])
+        bad_team_keys = [key for key in team_keys if not Team.validate_key_name(key)]
         if bad_team_keys:
             raise ParserInputException(f"Invalid team keys provided: {bad_team_keys}")
 

@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
   Cell,
+  DefaultTooltipContentProps,
   Label,
   LabelList,
   ReferenceLine,
   Scatter,
   ScatterChart,
   Tooltip,
-  TooltipProps,
   XAxis,
   YAxis,
 } from 'recharts';
@@ -210,7 +210,7 @@ export default function CoprScatterChart({
               <LabelList
                 dataKey={'teamKey'}
                 position={'top'}
-                formatter={(value: string) => value.substring(3)}
+                formatter={(value) => String(value).substring(3)}
               />
             </Scatter>
           </ScatterChart>
@@ -264,7 +264,14 @@ const CustomTooltip = ({
   payload,
   xCopr,
   yCopr,
-}: TooltipProps<ValueType, NameType> & { xCopr: string; yCopr: string }) => {
+}: React.ComponentProps<typeof Tooltip> &
+  Omit<
+    DefaultTooltipContentProps<ValueType, NameType>,
+    'accessibilityLayer'
+  > & {
+    xCopr: string;
+    yCopr: string;
+  }) => {
   if (active && payload && payload.length > 1) {
     const teamKey = (
       payload[0].payload as { teamKey: string }

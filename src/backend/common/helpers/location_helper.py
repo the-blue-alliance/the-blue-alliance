@@ -76,13 +76,7 @@ class LocationHelper:
         )
 
     @classmethod
-    def update_event_location(cls, event: Event) -> None:
-        if not event.location:
-            return
-
-        if event.normalized_location:  # Only set normalized_location once
-            return
-
+    def get_event_location(cls, event: Event) -> Location | None:
         location_info, score = cls.get_event_location_info(event)
 
         # Log performance
@@ -103,8 +97,17 @@ class LocationHelper:
             else:
                 logging.warning("Event {} location failed!".format(event.key.id()))
 
-        # Update event
-        event.normalized_location = cls.build_normalized_location(location_info)
+        return cls.build_normalized_location(location_info)
+
+    @classmethod
+    def update_event_location(cls, event: Event) -> None:
+        if not event.location:
+            return
+
+        if event.normalized_location:  # Only set normalized_location once
+            return
+
+        event.normalized_location = cls.get_event_location(event)
 
     @classmethod
     def get_event_location_info(cls, event: Event) -> Tuple[LocationInfo, float]:

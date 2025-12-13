@@ -8,7 +8,7 @@ from backend.common.storage.clients.storage_client import StorageClient
 class InMemoryClient(StorageClient):
     CLIENT: Optional["InMemoryClient"] = None
 
-    data: Dict[str, str]
+    data: Dict[str, str | bytes]
 
     @classmethod
     def get(cls) -> "InMemoryClient":
@@ -19,10 +19,16 @@ class InMemoryClient(StorageClient):
     def __init__(self) -> None:
         self.data = {}
 
-    def write(self, file_name: str, content: str) -> None:
+    def write(
+        self,
+        file_name: str,
+        content: str | bytes,
+        content_type: str = "text/plain",
+        metadata: dict[str, str | None] | None = None,
+    ) -> None:
         self.data[file_name] = content
 
-    def read(self, file_name: str) -> Optional[str]:
+    def read(self, file_name: str) -> Optional[str | bytes]:
         return self.data.get(file_name)
 
     def get_files(self, path: Optional[str] = None) -> List[str]:

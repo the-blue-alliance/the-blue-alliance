@@ -446,7 +446,7 @@ def event_details(event_key: EventKey) -> Response:
     if not teams:
         # No teams found registered for this event
         teams = []
-    if type(teams) is not list:
+    if not isinstance(teams, list):
         teams = [teams]
 
     # Build EventTeams
@@ -502,7 +502,7 @@ def event_details(event_key: EventKey) -> Response:
     event_teams = EventTeamManipulator.createOrUpdate(
         event_teams, update_manual_attrs=False
     )
-    if type(event_teams) is not list:
+    if not isinstance(event_teams, list):
         event_teams = [event_teams]
 
     if event.year >= 2018:

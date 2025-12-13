@@ -57,7 +57,7 @@ export function leaderboardFromNotable(
     name: `typed_leaderboard_${notable.name}`,
     year: notable.year,
     data: {
-      key_type: 'Team',
+      key_type: 'team',
       rankings: rankings,
     },
   };

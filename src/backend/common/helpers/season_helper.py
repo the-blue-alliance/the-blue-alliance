@@ -87,8 +87,8 @@ class SeasonHelper(object):
         Kickoff is always the first Saturday in January after Jan 2nd.
         2026 and later, it is the second Saturday in January after Jan 2nd.
         """
-        jan_2nd = datetime(
-            year=year, month=1, day=2, hour=10, minute=30, second=0, tzinfo=EST
+        jan_2nd = EST.localize(
+            datetime(year=year, month=1, day=2, hour=10, minute=30, second=0)
         )
         # Since 2021, Kickoff starts at 12:00am EST
         if year >= 2021:

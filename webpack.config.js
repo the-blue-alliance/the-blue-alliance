@@ -7,12 +7,12 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const dev = process.env.NODE_ENV !== "production";
 
 module.exports = [
-  // Javascript
+  // Javascript and TypeScript
   {
     entry: {
       gameday2: "./src/frontend/gameday2/gameday2.js",
       apidocs: "./src/frontend/apidocs/apidocs.js",
-      eventwizard: "./src/frontend/eventwizard/eventwizard.js",
+      eventwizard: "./src/frontend/eventwizard/eventwizard.tsx",
       liveevent: "./src/frontend/liveevent/liveevent.js",
       zebramotionworks: "./src/frontend/zebramotionworks/zebramotionworks.js",
     },
@@ -22,8 +22,25 @@ module.exports = [
       sourceMapFilename: "[name].min.js.map",
     },
     devtool: dev ? "eval-cheap-module-source-map" : "source-map",
+    resolve: {
+      extensions: [".ts", ".tsx", ".js", ".jsx"],
+    },
     module: {
       rules: [
+        {
+          test: /\.(ts|tsx)$/,
+          exclude: /node_modules/,
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                "@babel/preset-env",
+                "@babel/preset-react",
+                "@babel/preset-typescript",
+              ],
+            },
+          },
+        },
         {
           test: /\.js$/,
           exclude: /node_modules/,

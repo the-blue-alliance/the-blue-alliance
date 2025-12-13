@@ -3,4 +3,5 @@
 # Don't require codeowners for dependencies so Dependabot can auto-merge.
 **/package.json
 **/package-lock.json
+**/pnpm-lock.yaml
 **/requirements.txt

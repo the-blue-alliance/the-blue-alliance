@@ -3,7 +3,7 @@ name: Update wiki
 on:
   push:
     branches:
-      - py3
+      - main
     paths:
       - "docs/**"
 

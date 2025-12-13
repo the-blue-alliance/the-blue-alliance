@@ -27,15 +27,15 @@ def test_parse_awards(test_data_importer, ndb_stub) -> None:
         if award.key.string_id() == "2017cmpmo_0":
             assert award.name_str == "Chairman's Award"
             assert award.award_type_enum == 0
-            assert not {"team_number": 2169, "awardee": None} in award.recipient_list
-            assert not {"team_number": 1885, "awardee": None} in award.recipient_list
+            assert {"team_number": 2169, "awardee": None} not in award.recipient_list
+            assert {"team_number": 1885, "awardee": None} not in award.recipient_list
             assert {"team_number": 2614, "awardee": None} in award.recipient_list
         elif award.key.string_id() == "2017cmpmo_69":
             assert award.name_str == "Chairman's Award Finalist"
             assert award.award_type_enum == 69
             assert {"team_number": 2169, "awardee": None} in award.recipient_list
             assert {"team_number": 1885, "awardee": None} in award.recipient_list
-            assert not {"team_number": 2614, "awardee": None} in award.recipient_list
+            assert {"team_number": 2614, "awardee": None} not in award.recipient_list
 
 
 def test_parse_awards_valid_team_nums(test_data_importer, ndb_stub) -> None:
@@ -59,8 +59,8 @@ def test_parse_awards_valid_team_nums(test_data_importer, ndb_stub) -> None:
     assert award.name_str == "Chairman's Award Finalist"
     assert award.award_type_enum == 69
     assert {"team_number": 2169, "awardee": None} in award.recipient_list
-    assert not {"team_number": 1885, "awardee": None} in award.recipient_list
-    assert not {"team_number": 2614, "awardee": None} in award.recipient_list
+    assert {"team_number": 1885, "awardee": None} not in award.recipient_list
+    assert {"team_number": 2614, "awardee": None} not in award.recipient_list
 
 
 def test_parse_awards_valid_award_type_enum(test_data_importer, ndb_stub) -> None:

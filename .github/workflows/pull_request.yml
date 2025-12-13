@@ -3,7 +3,7 @@ name: On pull request
 on:
   pull_request:
     branches:
-      - py3
+      - main
 
 concurrency:
   group: ci-${{ github.head_ref }}
@@ -97,7 +97,7 @@ jobs:
         run: ./ops/test_py3.sh --cov --splits 5 --group ${{ matrix.group }}
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -129,7 +129,7 @@ jobs:
           pip install -r requirements.txt
       - name: Download all artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
       - name: Combine coverage
         if: steps.changes.outputs.python == 'true'
         run: |
@@ -137,7 +137,7 @@ jobs:
           coverage xml
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.python == 'true'
-        uses: codecov/codecov-action@v5.5.1
+        uses: codecov/codecov-action@v5.5.2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
@@ -193,7 +193,7 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.node == 'true'
-        uses: codecov/codecov-action@v5.5.1
+        uses: codecov/codecov-action@v5.5.2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
@@ -202,134 +202,143 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
-        run: npm --prefix pwa ci
-      - name: Generate react-router types
-        run: npm --prefix pwa run typecheck
+        run: pnpm --dir pwa install --frozen-lockfile
       - name: Run Format
-        run: npm --prefix pwa run format
+        run: pnpm --dir pwa run format
       - name: Run Lint
-        run: npm --prefix pwa run lint
+        run: pnpm --dir pwa run lint
   pwa-type:
     name: "[pwa] Type Check"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
-        run: npm --prefix pwa ci
+        run: pnpm --dir pwa install --frozen-lockfile
       - name: Run Type Check
-        run: npm --prefix pwa run typecheck
+        run: pnpm --dir pwa run typecheck
   pwa-test:
     name: "[pwa] Test"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Install Dependencies
-        run: npm --prefix pwa ci
+        run: pnpm --dir pwa install --frozen-lockfile
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: TEST_KEY
       - name: Run Test
-        run: npm --prefix pwa test
+        run: pnpm --dir pwa test
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.5.1
+        uses: codecov/codecov-action@v5.5.2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
-  pwa-test-devbox:
-    name: "[pwa] Test w/ Devbox"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - name: Install devbox
-        uses: jetify-com/devbox-install-action@v0.14.0
-        with:
-          project-path: pwa
-          enable-cache: true
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
-      - name: Install dependencies
-        run: devbox run -- npm ci
-        working-directory: pwa
-      - name: Run tests
-        run: devbox run -- npm test
-        working-directory: pwa
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Install Dependencies
-        run: npm --prefix pwa ci
+        run: pnpm --dir pwa install --frozen-lockfile
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: TEST_KEY
       - name: Run Build
-        run: npm --prefix pwa run build
+        run: pnpm --dir pwa run build
 
-  # Disabled due to environment variables missing randomly
-  # https://github.com/the-blue-alliance/the-blue-alliance/actions/runs/16448655087/job/46500449900?
-  # pwa-e2e:
-  #   name: "[pwa] E2E Tests"
-  #   runs-on: ubuntu-24.04
-  #   if: ${{ github.actor != 'dependabot[bot]' }}
-  #   steps:
-  #     - uses: actions/checkout@v6
+  pwa-e2e:
+    name: "[pwa] E2E Tests"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
 
-  #     - name: Set up Node
-  #       uses: actions/setup-node@v6
-  #       with:
-  #         node-version: "24"
-  #         cache: "npm"
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
 
-  #     - name: Install Dependencies
-  #       working-directory: pwa
-  #       run: npm ci
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
 
-  #     - name: Install Playwright Browsers
-  #       working-directory: pwa
-  #       run: npx playwright install --with-deps chromium webkit
+      - name: Install Dependencies
+        working-directory: pwa
+        run: pnpm install --frozen-lockfile
 
-  #     - name: Run Playwright tests
-  #       working-directory: pwa
-  #       run: npx playwright test
-  #       env:
-  #         VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
-  #         VITE_FIREBASE_API_KEY: "fake-api-key"
-  #         VITE_FIREBASE_AUTH_DOMAIN: "demo-test"
-  #         VITE_FIREBASE_PROJECT_ID: "demo-test"
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pwa/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Browsers
+        working-directory: pwa
+        run: pnpm exec playwright install --with-deps chromium webkit
+
+      - name: Run Playwright tests
+        working-directory: pwa
+        run: pnpm exec playwright test
+        env:
+          VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+          VITE_FIREBASE_API_KEY: "fake-api-key"
+          VITE_FIREBASE_AUTH_DOMAIN: "demo-test"
+          VITE_FIREBASE_PROJECT_ID: "demo-test"
 
   check-pwa-api:
     name: "[pwa] Check API regeneration"
@@ -338,10 +347,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
 
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
@@ -350,11 +366,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: pwa
-        run: npm ci
-
-      - name: Generate react-router types
-        working-directory: pwa
-        run: npm run typecheck
+        run: pnpm install --frozen-lockfile
 
       - name: Run generate-api.sh
         working-directory: ./pwa
@@ -513,7 +525,7 @@ jobs:
         run: ./ops/pr_screenshots/capture_screenshots.py || true
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle

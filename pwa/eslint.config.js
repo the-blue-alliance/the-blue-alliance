@@ -19,7 +19,7 @@ export default tseslint.config([
   // Ignore files
   includeIgnoreFile(gitignorePath),
   {
-    ignores: ['app/api/tba/', 'eslint.config.js'],
+    ignores: ['app/api/tba/', 'eslint.config.js', 'pnpm-lock.yaml'],
   },
 
   // Typescript config
@@ -42,7 +42,7 @@ export default tseslint.config([
       '@typescript-eslint/only-throw-error': [
         'error',
         {
-          allow: ['Response'],
+          allow: ['NotFoundError', 'Redirect'],
         },
       ],
       '@typescript-eslint/no-non-null-assertion': ['error'],
@@ -105,12 +105,15 @@ export default tseslint.config([
           project: path.resolve(__dirname, 'tsconfig.json'),
         },
         node: {
-          paths: ['.', '.react-router/types'],
+          paths: ['.'],
         },
       },
     },
     rules: {
-      'import/no-unresolved': ['error', { ignore: ['^~icons/', '^virtual:'] }],
+      'import/no-unresolved': [
+        'error',
+        { ignore: ['^~icons/', '^virtual:', './build/'] },
+      ],
     },
   },
 

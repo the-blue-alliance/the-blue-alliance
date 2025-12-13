@@ -19,6 +19,7 @@
     {"site-package": "jinja2"},
     {"site-package": "markupsafe"},
     {"site-package": "numpy"},
+    {"site-package": "openpyxl"},
     {"site-package": "pytest"},
     {"site-package": "_pytest"},
     {"site-package": "pyre_extensions"},

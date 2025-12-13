@@ -1,5 +1,3 @@
-import { Link } from 'react-router';
-
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';
@@ -93,18 +91,18 @@ export default function TeamPageTeamInfo({
         <InlineIcon>
           <BiLink />
           Details on{' '}
-          <Link
-            to={`https://frc-events.firstinspires.org/team/${team.team_number}`}
+          <a
+            href={`https://frc-events.firstinspires.org/team/${team.team_number}`}
           >
             FRC Events
-          </Link>
+          </a>
         </InlineIcon>
 
         <InlineIcon>
           <BiGraphUp />
-          <Link to={`https://www.statbotics.io/team/${team.team_number}`}>
+          <a href={`https://www.statbotics.io/team/${team.team_number}`}>
             Statbotics
-          </Link>
+          </a>
         </InlineIcon>
       </div>
 

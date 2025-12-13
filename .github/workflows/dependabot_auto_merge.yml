@@ -23,7 +23,7 @@ jobs:
       - name: Generate merge bot token
         id: generate_token
         if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
-        uses: actions/create-github-app-token@v2.2.0
+        uses: actions/create-github-app-token@v2.2.1
         with:
           app-id: ${{ secrets.MERGE_BOT_APP_ID }}
           private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
@@ -34,9 +34,80 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Authenticate cli
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
         run: echo "${{ steps.generate_token.outputs.token }}" | gh auth login --with-token
       - name: Enable auto-merge for Dependabot PRs
-        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' && steps.dependabot_metadata.outputs.dependency-type == 'direct:development'
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
+
+  regenerate-pwa-api:
+    name: "[pwa] Regenerate API (Dependabot Only)"
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - name: Generate merge bot token
+        id: app-token
+        uses: actions/create-github-app-token@v2.2.1
+        with:
+          app-id: ${{ secrets.MERGE_BOT_APP_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.head_ref }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
+
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: TEST_KEY
+
+      - name: Install Dependencies
+        working-directory: pwa
+        run: pnpm install --frozen-lockfile
+
+      - name: Run generate-api.sh
+        working-directory: ./pwa
+        run: ./generate-api.sh
+
+      - name: Check for API changes
+        id: api-changes
+        run: |
+          CHANGED_FILES=$(git diff --name-only pwa/app/api)
+          if [[ -n "$CHANGED_FILES" ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Files changed in pwa/app/api:"
+            echo "$CHANGED_FILES"
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected in pwa/app/api."
+          fi
+
+      - name: Format, lint, and commit API changes (Dependabot only)
+        if: steps.api-changes.outputs.has_changes == 'true'
+        working-directory: pwa
+        run: |
+          # Format and lint the generated API
+          npm run format -- app/api
+          npm run lint -- --fix app/api || true
+
+          # Commit and push
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add app/api
+          git commit -m "chore: regenerate API after dependency update"
+          git push

@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate } from 'react-router';
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { Fragment } from 'react/jsx-runtime';
 
 import {
@@ -32,85 +32,78 @@ import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import { joinComponents } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/team.$teamNumber.history';
+export const Route = createFileRoute('/team/$teamNumber/history')({
+  loader: async ({ params }) => {
+    const teamKey = `frc${params.teamNumber}`;
 
-async function loadData(params: Route.LoaderArgs['params']) {
-  const teamKey = `frc${params.teamNumber}`;
+    const [team, history, yearsParticipated, socials] = await Promise.all([
+      getTeam({ path: { team_key: teamKey } }),
+      getTeamHistory({ path: { team_key: teamKey } }),
+      getTeamYearsParticipated({ path: { team_key: teamKey } }),
+      getTeamSocialMedia({ path: { team_key: teamKey } }),
+    ]);
 
-  const [team, history, yearsParticipated, socials] = await Promise.all([
-    getTeam({ path: { team_key: teamKey } }),
-    getTeamHistory({ path: { team_key: teamKey } }),
-    getTeamYearsParticipated({ path: { team_key: teamKey } }),
-    getTeamSocialMedia({ path: { team_key: teamKey } }),
-  ]);
+    if (team.data === undefined) {
+      throw notFound();
+    }
 
-  if (team.data === undefined) {
-    throw new Response(null, { status: 404 });
-  }
+    if (
+      history.data === undefined ||
+      yearsParticipated.data === undefined ||
+      socials.data === undefined
+    ) {
+      throw new Error('Failed to load team history');
+    }
 
-  if (
-    history.data === undefined ||
-    yearsParticipated.data === undefined ||
-    socials.data === undefined
-  ) {
-    throw new Response(null, { status: 500 });
-  }
+    history.data.events
+      .sort(
+        (a, b) =>
+          a.year - b.year ||
+          (a.week ?? 100) - (b.week ?? 100) ||
+          Date.parse(a.start_date) - Date.parse(b.start_date),
+      )
+      .reverse();
 
-  history.data.events
-    .sort(
-      (a, b) =>
-        a.year - b.year ||
-        (a.week ?? 100) - (b.week ?? 100) ||
-        Date.parse(a.start_date) - Date.parse(b.start_date),
-    )
-    .reverse();
+    return {
+      team: team.data,
+      history: history.data,
+      yearsParticipated: yearsParticipated.data,
+      socials: socials.data,
+    };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: 'Team History - The Blue Alliance' },
+          {
+            name: 'description',
+            content: 'Team history for the FIRST Robotics Competition.',
+          },
+        ],
+      };
+    }
 
-  return {
-    team: team.data,
-    history: history.data,
-    yearsParticipated: yearsParticipated.data,
-    socials: socials.data,
-  };
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.team.nickname} - Team ${loaderData.team.team_number} (History) - The Blue Alliance`,
+        },
+        {
+          name: 'description',
+          content:
+            `From ${loaderData.team.city}, ${loaderData.team.state_prov} ${loaderData.team.postal_code}, ${loaderData.team.country}.` +
+            ' Team information, match results, and match videos from the FIRST Robotics Competition.',
+        },
+      ],
+    };
+  },
+  component: TeamHistoryPage,
+});
 
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `Team History - The Blue Alliance`,
-      },
-      {
-        name: 'description',
-        content: `Team history for the FIRST Robotics Competition.`,
-      },
-    ];
-  }
-
-  return [
-    {
-      title: `${data.team.nickname} - Team ${data.team.team_number} (History) - The Blue Alliance`,
-    },
-    {
-      name: 'description',
-      content:
-        `From ${data.team.city}, ${data.team.state_prov} ${data.team.postal_code}, ${data.team.country}.` +
-        ' Team information, match results, and match videos from the FIRST Robotics Competition.',
-    },
-  ];
-}
-
-export default function TeamPage(): React.JSX.Element {
+function TeamHistoryPage(): React.JSX.Element {
   const navigate = useNavigate();
-  const { team, history, yearsParticipated, socials } =
-    useLoaderData<typeof loader>();
+  const { team, history, yearsParticipated, socials } = Route.useLoaderData();
 
   yearsParticipated.sort((a, b) => b - a);
   history.events.sort(sortEventsComparator).reverse();
@@ -132,7 +125,10 @@ export default function TeamPage(): React.JSX.Element {
       <div className="top-0 mr-4 pt-5 sm:sticky">
         <Select
           onValueChange={(value) => {
-            void navigate(`/team/${team.team_number}/${value}`);
+            void navigate({
+              to: '/team/$teamNumber/{-$year}',
+              params: { teamNumber: String(team.team_number), year: value },
+            });
           }}
         >
           <SelectTrigger className="w-[180px]">
@@ -225,14 +221,21 @@ export default function TeamPage(): React.JSX.Element {
           <div>
             {bannerAwards.length > 0 && (
               <div className="flex w-96 flex-row flex-wrap justify-center gap-2">
-                {bannerAwards.map((a) => (
-                  <AwardBanner
-                    key={`${a.award_type}-${a.event_key}`}
-                    award={a}
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    event={history.events.find((e) => e.key === a.event_key)!}
-                  />
-                ))}
+                {bannerAwards.map((a) => {
+                  const event = history.events.find(
+                    (e) => e.key === a.event_key,
+                  );
+                  if (event === undefined) {
+                    return null;
+                  }
+                  return (
+                    <AwardBanner
+                      key={`${a.award_type}-${a.event_key}`}
+                      award={a}
+                      event={event}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>

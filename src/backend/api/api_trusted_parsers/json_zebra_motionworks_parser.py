@@ -1,5 +1,3 @@
-from typing import AnyStr, List, Optional
-
 from pyre_extensions import safe_json
 
 from backend.common.datafeed_parsers.exceptions import ParserInputException
@@ -9,7 +7,7 @@ from backend.common.models.zebra_motionworks import ZebraData, ZebraTeamData
 
 class JSONZebraMotionWorksParser:
     @classmethod
-    def parse(cls, zebra_motion_json: AnyStr) -> List[ZebraData]:
+    def parse[T: (str, bytes)](cls, zebra_motion_json: T) -> list[ZebraData]:
         """
         Parse JSON that contains Zebra MotionWorks data
         Format is as follows:
@@ -35,11 +33,11 @@ class JSONZebraMotionWorksParser:
         }]
         """
         try:
-            data = safe_json.loads(zebra_motion_json, List[ZebraData], validate=False)
+            data = safe_json.loads(zebra_motion_json, list[ZebraData], validate=False)
         except safe_json.InvalidJson as e:
             raise ParserInputException(e.msg)
 
-        parsed_data: List[ZebraData] = []
+        parsed_data: list[ZebraData] = []
         for zebra_data in data:
             # Check that 'zebra_data' is a dict
             if not isinstance(zebra_data, dict):
@@ -84,8 +82,8 @@ class JSONZebraMotionWorksParser:
 
     @classmethod
     def _parse_alliance(
-        cls, alliance: List[ZebraTeamData], data_length: int
-    ) -> List[ZebraTeamData]:
+        cls, alliance: list[ZebraTeamData], data_length: int
+    ) -> list[ZebraTeamData]:
         if len(alliance) != 3:
             # Not necessarily true in the future, but encofing this for now
             raise ParserInputException("Must have 3 teams per alliance.")
@@ -122,8 +120,8 @@ class JSONZebraMotionWorksParser:
 
     @classmethod
     def _parse_coord(
-        cls, coords: List[Optional[float]], data_length: int
-    ) -> List[Optional[float]]:
+        cls, coords: list[float | None], data_length: int
+    ) -> list[float | None]:
         if len(coords) != data_length:
             raise ParserInputException("Length of coordinate data must be consistent.")
         for coord in coords:

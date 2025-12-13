@@ -20,7 +20,7 @@ class EventConverter(ConverterBase):
     EVENT_DATE_FORMAT_STR = "%Y-%m-%d"
 
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 7,
+        ApiMajorVersion.API_V3: 8,
     }
 
     @classmethod
@@ -78,6 +78,10 @@ class EventConverter(ConverterBase):
             "remap_teams": event.remap_teams,
         }
         event_dict.update(cls.constructLocation_v3(event))
+
+        # Use FRC API address + venue, fallback to geocoded location
+        event_dict["address"] = event.venue_address or event_dict.get("address")
+        event_dict["location_name"] = event.venue or event_dict.get("location_name")
 
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()

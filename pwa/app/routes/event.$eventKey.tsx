@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
 import { useMemo, useState } from 'react';
-import { Link, useLoaderData } from 'react-router';
 
 import BiCalendar from '~icons/bi/calendar';
 import BiGraphUp from '~icons/bi/graph-up';
@@ -24,6 +24,7 @@ import {
   Match,
   Media,
   Team,
+  Webcast,
   getEvent,
   getEventAlliances,
   getEventMatches,
@@ -39,6 +40,7 @@ import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
+import EliminationBracket from '~/components/tba/eliminationBracket';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { LocationLink, TeamLink } from '~/components/tba/links';
 import {
@@ -50,9 +52,11 @@ import {
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import RankingsTable from '~/components/tba/rankingsTable';
+import { WebcastIcon } from '~/components/tba/socialBadges';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -85,6 +89,7 @@ import {
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { PlayoffType } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
@@ -109,74 +114,65 @@ import {
   splitIntoNChunks,
 } from '~/lib/utils';
 
-import { Route } from '.react-router/types/app/routes/+types/event.$eventKey';
+export const Route = createFileRoute('/event/$eventKey')({
+  loader: async ({ params }) => {
+    if (!isValidEventKey(params.eventKey)) {
+      throw notFound();
+    }
 
-async function loadData(params: Route.LoaderArgs['params']) {
-  if (!isValidEventKey(params.eventKey)) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
+    const [event, matches, alliances] = await Promise.all([
+      getEvent({ path: { event_key: params.eventKey } }),
+      getEventMatches({ path: { event_key: params.eventKey } }),
+      getEventAlliances({ path: { event_key: params.eventKey } }),
+    ]);
 
-  const [event, matches, alliances] = await Promise.all([
-    getEvent({ path: { event_key: params.eventKey } }),
-    getEventMatches({ path: { event_key: params.eventKey } }),
-    getEventAlliances({ path: { event_key: params.eventKey } }),
-  ]);
+    if (event.data === undefined) {
+      throw notFound();
+    }
 
-  if (event.data === undefined) {
-    throw new Response(null, {
-      status: 404,
-    });
-  }
+    if (matches.data === undefined || alliances.data === undefined) {
+      throw new Error('Failed to load event data');
+    }
 
-  if (matches.data === undefined || alliances.data === undefined) {
-    throw new Response(null, {
-      status: 500,
-    });
-  }
+    return {
+      event: event.data,
+      matches: matches.data,
+      alliances: alliances.data ?? [],
+      shouldPreviewAwardsTab: SEASON_EVENT_TYPES.has(event.data.event_type),
+      shouldPreviewInsightsTab: matches.data.length > 0,
+      shouldPreviewRankingsTab: matches.data.length > 0,
+    };
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {
+        meta: [
+          { title: 'Event Not Found - The Blue Alliance' },
+          {
+            name: 'description',
+            content:
+              'Videos and match results for the FIRST Robotics Competition.',
+          },
+        ],
+      };
+    }
 
-  return {
-    event: event.data,
-    matches: matches.data,
-    alliances: alliances.data ?? [],
-    shouldPreviewAwardsTab: SEASON_EVENT_TYPES.has(event.data.event_type),
-    shouldPreviewInsightsTab: matches.data.length > 0,
-    shouldPreviewRankingsTab: matches.data.length > 0,
-  };
-}
+    return {
+      meta: [
+        {
+          title: `${loaderData.event.name} (${loaderData.event.year}) - The Blue Alliance`,
+        },
+        {
+          name: 'description',
+          content: `Videos and match results for the ${loaderData.event.year} ${loaderData.event.name} FIRST Robotics Competition.`,
+        },
+      ],
+    };
+  },
+  component: EventPage,
+});
 
-export async function loader({ params }: Route.LoaderArgs) {
-  return await loadData(params);
-}
-
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await loadData(params);
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) {
-    return [
-      {
-        title: `Event Not Found - The Blue Alliance`,
-      },
-      {
-        name: 'description',
-        content: `Videos and match results for the FIRST Robotics Competition.`,
-      },
-    ];
-  }
-
-  return [
-    { title: `${data.event.name} (${data.event.year}) - The Blue Alliance` },
-    {
-      name: 'description',
-      content: `Videos and match results for the ${data.event.year} ${data.event.name} FIRST Robotics Competition.`,
-    },
-  ];
-}
-
-export default function EventPage() {
+function EventPage() {
   const {
     event,
     alliances,
@@ -184,32 +180,32 @@ export default function EventPage() {
     shouldPreviewAwardsTab,
     shouldPreviewInsightsTab,
     shouldPreviewRankingsTab,
-  } = useLoaderData<Awaited<ReturnType<typeof loadData>>>();
+  } = Route.useLoaderData();
 
-  const awardsQuery = useQuery({
-    ...getEventAwardsOptions({ path: { event_key: event.key } }),
-  });
+  const awardsQuery = useQuery(
+    getEventAwardsOptions({ path: { event_key: event.key } }),
+  );
 
-  const coprsQuery = useQuery({
-    ...getEventCoprsOptions({ path: { event_key: event.key } }),
-  });
+  const coprsQuery = useQuery(
+    getEventCoprsOptions({ path: { event_key: event.key } }),
+  );
 
   const colorsQuery = useQuery({
     queryKey: ['eventColors', event.key],
     queryFn: () => getEventColors({ eventKey: event.key }),
   });
 
-  const rankingsQuery = useQuery({
-    ...getEventRankingsOptions({ path: { event_key: event.key } }),
-  });
+  const rankingsQuery = useQuery(
+    getEventRankingsOptions({ path: { event_key: event.key } }),
+  );
 
-  const teamsQuery = useQuery({
-    ...getEventTeamsOptions({ path: { event_key: event.key } }),
-  });
+  const teamsQuery = useQuery(
+    getEventTeamsOptions({ path: { event_key: event.key } }),
+  );
 
-  const teamMediaQuery = useQuery({
-    ...getEventTeamMediaOptions({ path: { event_key: event.key } }),
-  });
+  const teamMediaQuery = useQuery(
+    getEventTeamMediaOptions({ path: { event_key: event.key } }),
+  );
 
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
@@ -252,6 +248,10 @@ export default function EventPage() {
       />
     ) : null;
 
+  const showBracket =
+    alliances.length > 0 &&
+    event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
+
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">
@@ -272,9 +272,9 @@ export default function EventPage() {
         <BiPinMapFill />
 
         {event.gmaps_url ? (
-          <Link to={event.gmaps_url}>
+          <a href={event.gmaps_url}>
             {event.city}, {event.state_prov}, {event.country}
-          </Link>
+          </a>
         ) : (
           <>
             {event.city}, {event.state_prov}, {event.country}
@@ -284,7 +284,7 @@ export default function EventPage() {
       {event.website && (
         <InlineIcon>
           <BiLink />
-          <Link to={event.website}>{event.website}</Link>
+          <a href={event.website}>{event.website}</a>
         </InlineIcon>
       )}
 
@@ -292,28 +292,26 @@ export default function EventPage() {
         <InlineIcon>
           <BiInfoCircleFill />
           Details on{' '}
-          <Link
-            to={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+          <a
+            href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
           >
             FRC Events
-          </Link>
+          </a>
         </InlineIcon>
       )}
 
       <InlineIcon>
         <BiGraphUp />
-        <Link to={`https://www.statbotics.io/event/${event.key}`}>
-          Statbotics
-        </Link>
+        <a href={`https://www.statbotics.io/event/${event.key}`}>Statbotics</a>
       </InlineIcon>
 
       {event.webcasts.length > 0 &&
         getCurrentWeekEvents([event]).length > 0 && (
           <InlineIcon>
             <MdiVideo />
-            <Link to={`https://www.thebluealliance.com/gameday/${event.key}`}>
+            <a href={`https://www.thebluealliance.com/gameday/${event.key}`}>
               GameDay
-            </Link>
+            </a>
           </InlineIcon>
         )}
 
@@ -391,9 +389,42 @@ export default function EventPage() {
                   year={event.year}
                 />
               )}
+
+              {showBracket && (
+                <div className="my-4">
+                  <Button
+                    onClick={() => {
+                      const bracketElement = document.querySelector(
+                        '[data-bracket-section]',
+                      );
+                      if (bracketElement) {
+                        bracketElement.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }
+                    }}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    View Playoff Bracket →
+                  </Button>
+                </div>
+              )}
+
               {rightSideElims}
             </div>
           </div>
+
+          {showBracket && (
+            <div data-bracket-section>
+              <EliminationBracket
+                alliances={alliances}
+                matches={elims}
+                event={event}
+              />
+            </div>
+          )}
         </TabsContent>
 
         {rankingsQuery.data && (
@@ -440,7 +471,9 @@ export default function EventPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="media">media</TabsContent>
+        <TabsContent value="media">
+          <MediaTab webcasts={event.webcasts} />
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -736,6 +769,17 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
           />
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function MediaTab({ webcasts }: { webcasts: Webcast[] }) {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">Webcasts</h1>
+      {webcasts.map((w) => (
+        <WebcastIcon webcast={w} key={w.channel} />
+      ))}
     </div>
   );
 }

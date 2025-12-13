@@ -28,18 +28,18 @@ from google.appengine.ext.ndb.model import (
 
 
 def _sensible_value(attribute_type, value):
-    if type(attribute_type) is DateTimeProperty:
+    if isinstance(attribute_type, DateTimeProperty):
         retval = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
-    elif type(attribute_type) is TimeProperty:
+    elif isinstance(attribute_type, TimeProperty):
         try:
             dt = datetime.strptime(value, "%H:%M:%S")
         except ValueError:
             dt = datetime.strptime(value, "%H:%M")
         retval = time(dt.hour, dt.minute, dt.second)
-    elif type(attribute_type) is DateProperty:
+    elif isinstance(attribute_type, DateProperty):
         dt = datetime.strptime(value, "%Y-%m-%d")
         retval = date(dt.year, dt.month, dt.day)
-    elif type(attribute_type) is KeyProperty and value is not None:
+    elif isinstance(attribute_type, KeyProperty) and value is not None:
         retval = ndb.Key(attribute_type._kind, value)
     else:
         retval = value

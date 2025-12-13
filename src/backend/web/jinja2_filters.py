@@ -32,7 +32,7 @@ def defense_name(value: str) -> str:
 def digits(s: Optional[Union[int, str]]) -> Union[int, str]:
     if not s:
         return ""
-    if type(s) is int:
+    if isinstance(s, int):
         return s
     return re.sub("[^0-9]", "", s)
 

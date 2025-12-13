@@ -1,11 +1,11 @@
+import { Link } from '@tanstack/react-router';
 import React, { ReactNode } from 'react';
-import { Link } from 'react-router';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 
 import { LeaderboardInsight } from '~/api/tba/read';
-import { TeamLink } from '~/components/tba/links';
+import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {
   Card,
@@ -176,12 +176,21 @@ function LeaderboardKeyLink({
   keyVal: string;
   year: number;
 }) {
-  if (keyType === 'Team') {
+  if (keyType === 'team') {
     return (
       <TeamLink teamOrKey={keyVal} year={year}>
         {keyVal.substring(3)}
       </TeamLink>
     );
   }
-  return <Link to={`/${keyType}/${keyVal}`}>{keyVal}</Link>;
+  if (keyType === 'event') {
+    return (
+      <Link to="/event/$eventKey" params={{ eventKey: keyVal }}>
+        {keyVal}
+      </Link>
+    );
+  }
+  if (keyType === 'match') {
+    return <MatchLink matchOrKey={keyVal}>{keyVal}</MatchLink>;
+  }
 }
