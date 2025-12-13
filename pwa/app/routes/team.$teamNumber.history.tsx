@@ -30,7 +30,7 @@ import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
-import { joinComponents } from '~/lib/utils';
+import { joinComponents, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/history')({
   loader: async ({ params }) => {
@@ -71,6 +71,7 @@ export const Route = createFileRoute('/team/$teamNumber/history')({
       socials: socials.data,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

@@ -8,6 +8,7 @@ import {
 import EventListTable from '~/components/tba/eventListTable';
 import { KickoffCountdown } from '~/components/tba/kickoffCountdown';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/')({
   loader: async ({ context: { queryClient } }) => {
@@ -18,6 +19,7 @@ export const Route = createFileRoute('/')({
       }),
     );
   },
+  headers: publicCacheControlHeaders(),
   component: Home,
 });
 

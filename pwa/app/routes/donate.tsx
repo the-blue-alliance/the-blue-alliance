@@ -1,8 +1,10 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 
 import { Button } from '~/components/ui/button';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/donate')({
+  headers: publicCacheControlHeaders(),
   component: Donate,
 });
 
