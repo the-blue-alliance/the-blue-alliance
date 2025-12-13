@@ -1,7 +1,9 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
-import { Event, getEventsByYear } from '~/api/tba/read';
+import { Event } from '~/api/tba/read';
+import { getEventsByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import EventListTable from '~/components/tba/eventListTable';
 import {
   TableOfContents,
@@ -21,28 +23,24 @@ import {
   VALID_YEARS,
   parseParamsForYearElseDefault,
   pluralize,
+  publicCacheControlHeaders,
   slugify,
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/events/{-$year}')({
-  loader: async ({ params }) => {
-    const year = await parseParamsForYearElseDefault(params);
+  loader: async ({ params, context: { queryClient } }) => {
+    const year = await parseParamsForYearElseDefault(queryClient, params);
     if (year === undefined) {
       throw notFound();
     }
 
-    const events = await getEventsByYear({ path: { year } });
+    await Promise.all([
+      queryClient.ensureQueryData(getEventsByYearOptions({ path: { year } })),
+    ]);
 
-    if (events.data === undefined) {
-      throw new Error('Failed to load events');
-    }
-
-    if (events.data.length === 0) {
-      throw notFound();
-    }
-
-    return { year, events: events.data };
+    return { year };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
@@ -165,7 +163,10 @@ function groupBySections(events: Event[]): EventGroup[] {
 }
 
 function YearEventsPage() {
-  const { year, events } = Route.useLoaderData();
+  const { year } = Route.useLoaderData();
+  const { data: events } = useSuspenseQuery({
+    ...getEventsByYearOptions({ path: { year } }),
+  });
   const [inView, setInView] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
@@ -228,7 +229,7 @@ function YearEventsPage() {
       <div className="basis-full py-8 lg:basis-5/6">
         <h1 className="mb-3 text-3xl font-medium">
           {year} <i>FIRST</i> Robotics Competition Events{' '}
-          <small className="text-xl text-slate-500">
+          <small className="text-xl text-muted-foreground">
             {events.length} Events
           </small>
         </h1>
@@ -239,7 +240,7 @@ function YearEventsPage() {
               className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4"
             >
               Official Events{' '}
-              <small className="text-xl text-slate-500">
+              <small className="text-xl text-muted-foreground">
                 {officialGroups.reduce(
                   (acc, group) => acc + group.events.length,
                   0,
@@ -263,7 +264,7 @@ function YearEventsPage() {
               className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4"
             >
               Unofficial Events{' '}
-              <small className="text-xl text-slate-500">
+              <small className="text-xl text-muted-foreground">
                 {unofficialGroups.reduce(
                   (acc, group) => acc + group.events.length,
                   0,
@@ -300,7 +301,7 @@ function EventGroupSection({
     >
       <h2 className="mt-5 text-2xl">
         {group.groupName}{' '}
-        <small className="text-slate-500">
+        <small className="text-muted-foreground">
           {pluralize(group.events.length, 'Event', 'Events')}
         </small>
       </h2>

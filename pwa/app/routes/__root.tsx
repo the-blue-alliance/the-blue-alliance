@@ -48,20 +48,30 @@ import { MatchModal } from '~/components/tba/match/matchModal';
 import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
+import { createLogger } from '~/lib/utils';
+
+const logger = createLogger('root');
 
 // Configure request interceptor for auth
 client.interceptors.request.use((request) => {
   request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
+
+  logger.info(
+    {
+      method: request.method,
+      url: request.url,
+    },
+    'Sending request to TBA API',
+  );
+
   return request;
 });
 
 // Configure network cache middleware
 // Caches API responses in memory across sessions to reduce external API calls
+// Cache is a global singleton with 500 max entries and 3 hour TTL
 client.setConfig({
   fetch: createCachedFetch({
-    maxEntries: 500,
-    ttl: 10800000, // 3 hours
-    debug: false, // Set to true to enable debug logging
     cacheableMethods: ['GET'],
   }),
 });

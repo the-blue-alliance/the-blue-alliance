@@ -24,7 +24,10 @@ const getAwardKey = (
   return `${type_enum}_${name_str}_${team_key}_${awardee}`;
 };
 
-function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React.ReactElement {
+function AwardsTab({
+  selectedEvent,
+  makeTrustedRequest,
+}: AwardsTabProps): React.ReactElement {
   const [updating, setUpdating] = useState(false);
   const [awards, setAwards] = useState<Award[]>([]);
   const [awardsFetched, setAwardsFetched] = useState(false);
@@ -43,7 +46,10 @@ function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React
     const rawAwards: Array<{
       award_type: number;
       name: string;
-      recipient_list: Array<{ team_key: string | null; awardee: string | null }>;
+      recipient_list: Array<{
+        team_key: string | null;
+        awardee: string | null;
+      }>;
     }> = await response.json();
 
     // Store awards flattened, in the format for the trusted API.
@@ -112,7 +118,9 @@ function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React
     }
   };
 
-  const sortedAwards = [...awards].sort((a, b) => (a.type_enum || 0) - (b.type_enum || 0));
+  const sortedAwards = [...awards].sort(
+    (a, b) => (a.type_enum || 0) - (b.type_enum || 0)
+  );
 
   return (
     <div className="tab-pane" id="awards">
@@ -137,7 +145,7 @@ function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React
       <p>
         For a list of award type enums, see{" "}
         <a
-          href="https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/award_type.py"
+          href="https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -156,7 +164,9 @@ function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React
             className="form-control"
             id="award_type"
             value={newAwardType}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setNewAwardType(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setNewAwardType(e.target.value)
+            }
             placeholder="3"
           />
         </div>
@@ -170,7 +180,9 @@ function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React
             className="form-control"
             id="award_name"
             value={newAwardName}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setNewAwardName(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setNewAwardName(e.target.value)
+            }
             placeholder="Woodie Flowers Finalist Award"
           />
         </div>
@@ -184,7 +196,9 @@ function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React
             className="form-control"
             id="award_team"
             value={newAwardTeamNumber}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setNewAwardTeamNumber(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setNewAwardTeamNumber(e.target.value)
+            }
             placeholder="604"
           />
         </div>
@@ -198,7 +212,9 @@ function AwardsTab({ selectedEvent, makeTrustedRequest }: AwardsTabProps): React
             className="form-control"
             id="award_awardee"
             value={newAwardAwardee}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setNewAwardAwardee(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setNewAwardAwardee(e.target.value)
+            }
             placeholder="Helen Arrington"
           />
         </div>

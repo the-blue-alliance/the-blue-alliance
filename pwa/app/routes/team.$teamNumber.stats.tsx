@@ -25,6 +25,7 @@ import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import { sortMultipleEventsMatches } from '~/lib/matchUtils';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/stats')({
   loader: async ({ params }) => {
@@ -58,6 +59,7 @@ export const Route = createFileRoute('/team/$teamNumber/stats')({
       media: media.data,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

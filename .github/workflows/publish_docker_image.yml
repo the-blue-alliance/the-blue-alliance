@@ -2,7 +2,7 @@ name: Publish Docker Image
 
 on:
   push:
-    branches: [ py3 ]
+    branches: [ main ]
 
 concurrency: docker-publish-${{ github.ref }}
 

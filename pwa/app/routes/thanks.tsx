@@ -1,6 +1,9 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 
+import { publicCacheControlHeaders } from '~/lib/utils';
+
 export const Route = createFileRoute('/thanks')({
+  headers: publicCacheControlHeaders(),
   component: Thanks,
 });
 

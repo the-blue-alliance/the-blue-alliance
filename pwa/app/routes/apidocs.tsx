@@ -5,8 +5,10 @@ import {
   TableOfContents,
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/apidocs')({
+  headers: publicCacheControlHeaders(),
   component: ApiDocs,
   head: () => {
     return {
@@ -129,7 +131,7 @@ function ApiDocs(): React.JSX.Element {
             className="py-4"
           >
             <h2 className="mb-2 text-2xl font-medium">
-              <a href="/apidocs/v3">Read API (v3)</a>
+              <Link to="/apidocs/v3">Read API (v3)</Link>
             </h2>
             <p>
               Most people want to pull event listings, team information, match

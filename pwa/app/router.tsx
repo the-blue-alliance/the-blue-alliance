@@ -5,15 +5,54 @@ import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query
 import { routeTree } from 'app/routeTree.gen';
 import { useEffect } from 'react';
 
+import { createLogger } from '~/lib/utils';
+
+const queryCacheLogger = createLogger('queryCache');
+const routerLogger = createLogger('router');
+
 export function getRouter() {
   const queryClient = new QueryClient();
+  queryClient.getQueryCache().subscribe((event) => {
+    // Only log "added" events (new queries) and "updated" events when query completes successfully
+    // This reduces noise from intermediate state transitions (loading states)
+    if (event.type === 'added') {
+      queryCacheLogger.info(
+        {
+          type: event.type,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          queryKey: event.query.queryKey[0]._id,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          path: event.query.queryKey[0].path,
+        },
+        'Query cache event',
+      );
+    } else if (
+      event.type === 'updated' &&
+      event.query.state.status === 'success' &&
+      event.query.state.data !== undefined
+    ) {
+      // Only log successful updates with data (not loading states)
+      queryCacheLogger.info(
+        {
+          type: event.type,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          queryKey: event.query.queryKey[0]._id,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          path: event.query.queryKey[0].path,
+        },
+        'Query cache event',
+      );
+    }
+  });
 
   const router = createRouter({
     routeTree,
     context: {
       queryClient,
     },
-    scrollRestoration: true,
+    scrollRestoration: ({ location }) => {
+      return location.pathname !== '/apidocs/v3';
+    },
     caseSensitive: true,
     defaultErrorComponent: ErrorComponent,
     defaultNotFoundComponent: NotFoundComponent,
@@ -46,7 +85,7 @@ export function getRouter() {
 }
 
 function ErrorComponent({ error }: { error: Error }) {
-  console.error(error);
+  routerLogger.error(error, 'Router error');
 
   useEffect(() => {
     Sentry.captureException(error);

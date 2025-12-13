@@ -1,6 +1,7 @@
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 
-import { getStatus, getTeamsSimple } from '~/api/tba/read';
+import { getTeamsSimple } from '~/api/tba/read';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import TeamListTable from '~/components/tba/teamListTable';
 import {
   Select,
@@ -9,17 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { parseParamsForTeamPgNumElseDefault } from '~/lib/utils';
+import {
+  parseParamsForTeamPgNumElseDefault,
+  publicCacheControlHeaders,
+} from '~/lib/utils';
 
 export const Route = createFileRoute('/teams/{-$pgNum}')({
-  loader: async ({ params }) => {
-    const status = await getStatus({});
+  loader: async ({ params, context: { queryClient } }) => {
+    const status = await queryClient.ensureQueryData(getStatusOptions({}));
 
-    if (status.data === undefined) {
-      throw new Error('Failed to load status');
-    }
-
-    const maxPageNum = Math.floor(status.data.max_team_page / 2) + 1;
+    const maxPageNum = Math.floor(status.max_team_page / 2) + 1;
     const pageNum = parseParamsForTeamPgNumElseDefault(params, maxPageNum);
 
     if (pageNum === undefined) {
@@ -37,6 +37,7 @@ export const Route = createFileRoute('/teams/{-$pgNum}')({
 
     return { teams, pageNum, maxPageNum };
   },
+  headers: publicCacheControlHeaders(),
   head: () => {
     return {
       meta: [
@@ -96,7 +97,9 @@ function TeamsPage() {
       <div className="basis-full overflow-x-auto lg:basis-5/6 lg:py-8">
         <h1 className="mb-3 text-3xl font-medium">
           <i>FIRST</i> Robotics Teams {TeamPageNumberToRange(pageNum)}{' '}
-          <small className="text-xl text-slate-500">{teams.length} Teams</small>
+          <small className="text-xl text-muted-foreground">
+            {teams.length} Teams
+          </small>
         </h1>
         <TeamListTable teams={teams} />
       </div>

@@ -1,3 +1,4 @@
+import datetime
 import logging
 from io import BytesIO
 from pathlib import Path
@@ -9,6 +10,7 @@ from pyre_extensions import none_throws
 from backend.api.handlers.decorators import require_write_auth, validate_keys
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.auth import current_user
+from backend.common.consts.auth_type import AuthType
 from backend.common.models.keys import EventKey
 from backend.common.storage import (
     get_files as storage_get_files,
@@ -63,3 +65,50 @@ def add_fms_report_archive(event_key: EventKey, report_type: str) -> Response:
         )
 
     return profiled_jsonify({"Success": "FMS report successfully uploaded"})
+
+
+@require_write_auth({AuthType.EVENT_TEAMS}, file_param="companionDb")
+@validate_keys
+def add_fms_companion_db(event_key: EventKey) -> Response:
+    form_data = request.files.get("companionDb")
+    if not form_data:
+        return make_response(
+            profiled_jsonify({"Error": "Missing FMS Companion database file"}), 400
+        )
+
+    file_contents: bytes = form_data.read()
+
+    # Basic validation - check if it's a valid SQLite database file
+    # SQLite databases start with "SQLite format 3\x00"
+    if not file_contents.startswith(b"SQLite format 3"):
+        logging.warning("Uploaded file does not appear to be a valid SQLite database")
+        return make_response(
+            profiled_jsonify({"Error": "Uploaded file is not valid"}),
+            400,
+        )
+
+    filename = Path(form_data.filename or "fms_companion.db")
+    file_name = filename.stem
+    extension = ".".join(filename.suffixes)
+
+    # Use current timestamp for uniqueness
+    timestamp = datetime.datetime.utcnow().isoformat()
+
+    storage_dir = f"fms_companion/{event_key}"
+    storage_file = f"{file_name}.{timestamp}{extension}"
+    storage_path = f"{storage_dir}/{storage_file}"
+
+    user = current_user()
+    storage_write(
+        storage_path,
+        file_contents,
+        bucket="eventwizard-fms-companion",
+        content_type=none_throws(form_data.content_type),
+        metadata={
+            "X-TBA-Auth-User": str(user.uid) if user else None,
+            "X-TBA-Auth-User-Email": user.email if user else None,
+            "X-TBA-Auth-Id": request.headers.get("X-TBA-Auth-Id"),
+        },
+    )
+
+    return profiled_jsonify({"Success": "FMS Companion database successfully uploaded"})

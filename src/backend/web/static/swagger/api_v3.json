@@ -5308,7 +5308,7 @@
           },
           "event_type": {
             "type": "integer",
-            "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
+            "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8"
           },
           "district": {
             "$ref": "#/components/schemas/District",
@@ -5404,7 +5404,7 @@
           },
           "event_type": {
             "type": "integer",
-            "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
+            "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8"
           },
           "district": {
             "$ref": "#/components/schemas/District",
@@ -5571,7 +5571,7 @@
               "integer",
               "null"
             ],
-            "description": "Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/playoff_type.py#L37, or null."
+            "description": "Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py#L37, or null."
           },
           "playoff_type_string": {
             "type": [
@@ -9669,7 +9669,7 @@
           },
           "award_type": {
             "type": "integer",
-            "description": "Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6"
+            "description": "Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py#L8"
           },
           "event_key": {
             "type": "string",

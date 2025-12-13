@@ -35,13 +35,14 @@ import {
   USA_STATE_ABBREVIATION_TO_FULL,
   joinComponents,
   parseParamsForYearElseDefault,
+  publicCacheControlHeaders,
 } from '~/lib/utils';
 
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/{-$year}',
 )({
-  loader: async ({ params }) => {
-    const year = await parseParamsForYearElseDefault(params);
+  loader: async ({ params, context: { queryClient } }) => {
+    const year = await parseParamsForYearElseDefault(queryClient, params);
     if (year === undefined) {
       throw notFound();
     }
@@ -110,6 +111,7 @@ export const Route = createFileRoute(
       awards: awards.data,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

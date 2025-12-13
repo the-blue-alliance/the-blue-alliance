@@ -182,7 +182,7 @@ export type EventSimple = {
    */
   event_code: string;
   /**
-   * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2
+   * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8
    */
   event_type: EventType;
   district: District | null;
@@ -226,7 +226,7 @@ export type Event = {
    */
   event_code: string;
   /**
-   * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2
+   * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8
    */
   event_type: EventType;
   district: District | null;
@@ -320,7 +320,7 @@ export type Event = {
    */
   parent_event_key: string | null;
   /**
-   * Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/playoff_type.py#L37, or null.
+   * Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py#L37, or null.
    */
   playoff_type: number | null;
   /**
@@ -2138,7 +2138,7 @@ export type Award = {
    */
   name: string;
   /**
-   * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L6
+   * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py#L8
    */
   award_type: AwardType;
   /**

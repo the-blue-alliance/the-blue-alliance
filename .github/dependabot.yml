@@ -104,6 +104,10 @@ updates:
     testing:
       patterns:
         - "@playwright/test"
+    logging:
+      patterns:
+        - "pino"
+        - "pino-pretty"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

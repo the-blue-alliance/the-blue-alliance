@@ -5,6 +5,7 @@ import { EventLink } from '~/components/tba/links';
 import MatchDetails from '~/components/tba/match/matchDetails';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/match/$matchKey')({
   loader: async ({ params }) => {
@@ -28,6 +29,7 @@ export const Route = createFileRoute('/match/$matchKey')({
       match: match.data,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

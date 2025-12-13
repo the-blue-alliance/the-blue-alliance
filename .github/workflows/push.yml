@@ -3,7 +3,7 @@ name: On push
 on:
   push:
     branches:
-      - py3
+      - main
 
 jobs:
   py3-type:

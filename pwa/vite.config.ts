@@ -16,11 +16,26 @@ function getCommitHash(): string {
   }
 }
 
+const staticRoutes = [
+  '/about',
+  '/add-data',
+  '/apidocs',
+  '/contact',
+  '/donate',
+  '/gameday',
+  '/privacy',
+  '/thanks',
+];
+
 export default defineConfig({
   plugins: [
     tsconfigPaths(),
     tanstackStart({
       srcDirectory: 'app',
+      prerender: {
+        enabled: true,
+        filter: ({ path }) => staticRoutes.includes(path),
+      },
     }),
     viteReact({
       babel: {

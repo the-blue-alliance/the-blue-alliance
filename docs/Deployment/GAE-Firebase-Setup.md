@@ -27,13 +27,14 @@ $ gcloud auth application-default login
 ```
 
 5. Enable required (paid) APIs in your Google
-    * [Cloud Tasks](https://console.cloud.google.com/apis/library/cloudtasks.googleapis.com)
-    * [Cloud Scheduler](https://console.cloud.google.com/apis/library/cloudscheduler.googleapis.com)
+   - [Cloud Tasks](https://console.cloud.google.com/apis/library/cloudtasks.googleapis.com)
+   - [Cloud Scheduler](https://console.cloud.google.com/apis/library/cloudscheduler.googleapis.com)
+
 ## Deploying
 
 [NOTE: These steps should move to the `Manual Deployment` page and should go in to more detail. They're here now as a stop-gap.]
 
-The [`push.yml` GitHub Action](https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/.github/workflows/push.yml) contains the commands CI uses to deploy to production and can be used as a reference.
+The [`push.yml` GitHub Action](https://github.com/the-blue-alliance/the-blue-alliance/blob/main/.github/workflows/push.yml) contains the commands CI uses to deploy to production and can be used as a reference.
 
 TODO: Add notes about setting up a `src/env_variables.yaml` before deploying with a Flask secret key.
 

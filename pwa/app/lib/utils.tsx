@@ -1,8 +1,12 @@
+import { QueryClient } from '@tanstack/react-query';
+import { notFound } from '@tanstack/react-router';
 import { type ClassValue, clsx } from 'clsx';
+import pino from 'pino';
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
 
-import { WltRecord, getStatus } from '~/api/tba/read';
+import { WltRecord } from '~/api/tba/read';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { RequestResult } from '~/api/tba/read/client';
 
 // TODO: Generate this from the API
@@ -28,15 +32,15 @@ export function slugify(str: string): string {
     .replace(/-+$/, '');
 }
 
-export async function parseParamsForYearElseDefault(params: {
-  year?: string | undefined;
-}): Promise<number | undefined> {
+export async function parseParamsForYearElseDefault(
+  queryClient: QueryClient,
+  params: {
+    year?: string | undefined;
+  },
+): Promise<number | undefined> {
   if (params.year === undefined) {
-    // TODO: Cache this call
-    const status = await getStatus();
-    return status.data !== undefined
-      ? status.data.current_season
-      : new Date().getFullYear();
+    const status = await queryClient.ensureQueryData(getStatusOptions({}));
+    return status.current_season;
   }
 
   const year = Number(params.year);
@@ -282,4 +286,47 @@ export function confidence(ups: number, downs: number, z = 3): number {
       z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
     (1 + (z * z) / n)
   );
+}
+
+export function secondsToMilliseconds(seconds: number): number {
+  return seconds * 1000;
+}
+
+export function minutesToMilliseconds(minutes: number): number {
+  return secondsToMilliseconds(minutes * 60);
+}
+
+export function hoursToMilliseconds(hours: number): number {
+  return minutesToMilliseconds(hours * 60);
+}
+
+export function createLogger(name: string) {
+  const transport =
+    process.env.NODE_ENV !== 'production'
+      ? { transport: { target: 'pino-pretty' } }
+      : {};
+
+  return pino({
+    name,
+    ...transport,
+  });
+}
+
+export function doThrowNotFound(): never {
+  throw notFound();
+}
+
+// TODO: Increase the default max age once we are confident things work.
+// The end goal is for this to be relatively large, since the client will re-fetch data on load.
+export function publicCacheControlHeaders(maxAge: number = 61) {
+  return (): Record<string, string> => {
+    const isProd = process.env.NODE_ENV === 'production';
+    if (!isProd) {
+      return {};
+    }
+    return {
+      'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
+      'CDN-Cache-Control': `max-age=${maxAge}`, // Cloudflare-specific
+    };
+  };
 }

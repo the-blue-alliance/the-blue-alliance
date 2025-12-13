@@ -51,7 +51,7 @@ function UnsupportedEmbed({ type }: { type: string }) {
       <p className="text-lg">
         Webcast type &quot;{type}&quot; is not supported
       </p>
-      <p className="mt-2 text-sm text-slate-400">
+      <p className="mt-2 text-sm text-muted-foreground">
         Only YouTube and Twitch webcasts are supported
       </p>
     </div>

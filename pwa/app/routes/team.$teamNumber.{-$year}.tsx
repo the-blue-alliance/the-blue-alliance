@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/tanstackstart-react';
+import { useQueries, useSuspenseQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
   notFound,
@@ -7,25 +8,19 @@ import {
 } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
+import { Award, Event, Match, Team, WltRecord } from '~/api/tba/read';
 import {
-  Award,
-  EliminationAlliance,
-  Event,
-  EventDistrictPoints,
-  Match,
-  Team,
-  WltRecord,
-  getEventAlliances,
-  getEventDistrictPoints,
-  getTeam,
-  getTeamAwardsByYear,
-  getTeamEventsByYear,
-  getTeamEventsStatusesByYear,
-  getTeamMatchesByYear,
-  getTeamMediaByYear,
-  getTeamSocialMedia,
-  getTeamYearsParticipated,
-} from '~/api/tba/read';
+  getEventAlliancesOptions,
+  getEventDistrictPointsOptions,
+  getTeamAwardsByYearOptions,
+  getTeamEventsByYearOptions,
+  getTeamEventsStatusesByYearOptions,
+  getTeamMatchesByYearOptions,
+  getTeamMediaByYearOptions,
+  getTeamOptions,
+  getTeamSocialMediaOptions,
+  getTeamYearsParticipatedOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { AwardBanner } from '~/components/tba/banner';
 import {
   TableOfContents,
@@ -58,7 +53,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { EventType, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import {
@@ -67,61 +62,75 @@ import {
 } from '~/lib/matchUtils';
 import {
   addRecords,
+  doThrowNotFound,
   parseParamsForYearElseDefault,
   pluralize,
+  publicCacheControlHeaders,
   stringifyRecord,
   winrateFromRecord,
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     const startTime = Date.now();
     const teamKey = `frc${params.teamNumber}`;
-    const year = await parseParamsForYearElseDefault(params);
+    const year = await parseParamsForYearElseDefault(queryClient, params);
+
     Sentry.metrics.count('team.page.view', 1, {
       attributes: { team_number: params.teamNumber, year },
     });
+
     if (year === undefined) {
       throw notFound();
     }
 
-    const [
-      team,
-      media,
-      socials,
-      yearsParticipated,
-      events,
-      matches,
-      statuses,
-      awards,
-    ] = await Promise.all([
-      getTeam({ path: { team_key: teamKey } }),
-      getTeamMediaByYear({ path: { team_key: teamKey, year } }),
-      getTeamSocialMedia({ path: { team_key: teamKey } }),
-      getTeamYearsParticipated({ path: { team_key: teamKey } }),
-      getTeamEventsByYear({ path: { team_key: teamKey, year } }),
-      getTeamMatchesByYear({ path: { team_key: teamKey, year } }),
-      getTeamEventsStatusesByYear({ path: { team_key: teamKey, year } }),
-      getTeamAwardsByYear({ path: { team_key: teamKey, year } }),
+    // spawn these now, we don't need to await them yet though
+    const teamMediaQuery = queryClient
+      .ensureQueryData(
+        getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+      )
+      .catch(() => []);
+    const teamSocialsQuery = queryClient
+      .ensureQueryData(
+        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+      )
+      .catch(() => ({}));
+    const teamMatchesQuery = queryClient
+      .ensureQueryData(
+        getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+      )
+      .catch(() => []);
+    const teamStatusesQuery = queryClient
+      .ensureQueryData(
+        getTeamEventsStatusesByYearOptions({
+          path: { team_key: teamKey, year },
+        }),
+      )
+      .catch(() => ({}));
+    const teamAwardsQuery = queryClient
+      .ensureQueryData(
+        getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+      )
+      .catch(() => []);
+    const teamEventsQuery = queryClient
+      .ensureQueryData(
+        getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
+      )
+      .catch(() => []);
+
+    // these need to be awaited so we can validate the year
+    const [team, yearsParticipated] = await Promise.all([
+      queryClient
+        .ensureQueryData(getTeamOptions({ path: { team_key: teamKey } }))
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData(
+          getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
+        )
+        .catch((): number[] => []),
     ]);
 
-    if (team.data === undefined) {
-      throw notFound();
-    }
-
-    if (
-      media.data === undefined ||
-      socials.data === undefined ||
-      yearsParticipated.data === undefined ||
-      events.data === undefined ||
-      matches.data === undefined ||
-      statuses.data === undefined ||
-      awards.data === undefined
-    ) {
-      throw new Error('Failed to load team data');
-    }
-
-    if (!yearsParticipated.data.includes(year)) {
+    if (!yearsParticipated.includes(year)) {
       if (params.year === undefined) {
         throw redirect({
           to: '/team/$teamNumber/history',
@@ -131,33 +140,15 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       throw notFound();
     }
 
-    // TODO: fetch these in parallel after initial render
-    const eventDistrictPts: Record<string, EventDistrictPoints | null> = {};
-    await Promise.all(
-      events.data.map(async (e) => {
-        if (
-          [
-            EventType.DISTRICT,
-            EventType.DISTRICT_CMP,
-            EventType.DISTRICT_CMP_DIVISION,
-          ].includes(e.event_type)
-        ) {
-          const resp = await getEventDistrictPoints({
-            path: { event_key: e.key },
-          });
-          eventDistrictPts[e.key] = resp.data ?? null;
-        } else {
-          eventDistrictPts[e.key] = null;
-        }
-      }),
-    );
-    const eventAlliances: Record<string, EliminationAlliance[] | null> = {};
-    await Promise.all(
-      events.data.map(async (e) => {
-        const resp = await getEventAlliances({ path: { event_key: e.key } });
-        eventAlliances[e.key] = resp.data ?? null;
-      }),
-    );
+    await Promise.all([
+      // await the earlier queries
+      teamMediaQuery,
+      teamSocialsQuery,
+      teamMatchesQuery,
+      teamStatusesQuery,
+      teamAwardsQuery,
+      teamEventsQuery,
+    ]);
 
     const endTime = Date.now();
     const duration = endTime - startTime;
@@ -165,20 +156,14 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       attributes: { team_number: params.teamNumber, year },
     });
 
+    // team needs to be returned so we can access it in meta
     return {
+      teamKey,
       year,
-      team: team.data,
-      media: media.data,
-      socials: socials.data,
-      yearsParticipated: yearsParticipated.data,
-      events: events.data,
-      matches: matches.data,
-      statuses: statuses.data,
-      awards: awards.data,
-      eventDistrictPts: eventDistrictPts,
-      eventAlliances: eventAlliances,
+      team,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
@@ -211,22 +196,64 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 
 function TeamPage(): React.JSX.Element {
   const navigate = useNavigate();
-  const {
-    year,
-    team,
-    media,
-    socials,
-    yearsParticipated,
-    events,
-    matches,
-    statuses,
-    awards,
-    eventDistrictPts,
-    eventAlliances,
-  } = Route.useLoaderData();
-  const [inView, setInView] = useState(new Set<string>());
+  const { teamKey, year } = Route.useLoaderData();
 
-  events.sort(sortEventsComparator);
+  const { data: team } = useSuspenseQuery(
+    getTeamOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: media } = useSuspenseQuery(
+    getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+  );
+  const { data: socials } = useSuspenseQuery(
+    getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: yearsParticipated } = useSuspenseQuery(
+    getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: events } = useSuspenseQuery(
+    getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
+  );
+  const { data: matches } = useSuspenseQuery(
+    getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+  );
+  const { data: statuses } = useSuspenseQuery(
+    getTeamEventsStatusesByYearOptions({ path: { team_key: teamKey, year } }),
+  );
+  const { data: awards } = useSuspenseQuery(
+    getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+  );
+
+  // sort BEFORE launching queries that depend on it
+  const sortedEvents = useMemo(
+    () => events.sort(sortEventsComparator),
+    [events],
+  );
+
+  const eventDistrictPtsQueries = useQueries({
+    queries: sortedEvents.map((e) =>
+      getEventDistrictPointsOptions({ path: { event_key: e.key } }),
+    ),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          sortedEvents[index].key,
+          result.data ?? null,
+        ]),
+      ),
+  });
+  const eventAlliancesQueries = useQueries({
+    queries: sortedEvents.map((e) =>
+      getEventAlliancesOptions({ path: { event_key: e.key } }),
+    ),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          sortedEvents[index].key,
+          result.data ?? null,
+        ]),
+      ),
+  });
+  const [inView, setInView] = useState(new Set<string>());
 
   yearsParticipated.sort((a, b) => b - a);
 
@@ -255,12 +282,12 @@ function TeamPage(): React.JSX.Element {
   const tocItems = useMemo(
     () => [
       { slug: 'team-info', label: 'Team Info' },
-      ...events.map((e) => ({
+      ...sortedEvents.map((e) => ({
         slug: e.key,
         label: e.short_name?.trim() ? e.short_name : e.name,
       })),
     ],
-    [events],
+    [sortedEvents],
   );
 
   return (
@@ -312,7 +339,7 @@ function TeamPage(): React.JSX.Element {
           <Separator className="my-4" />
 
           <StatsSection
-            events={events}
+            events={sortedEvents}
             team={team}
             matches={matches}
             awards={awards}
@@ -328,10 +355,12 @@ function TeamPage(): React.JSX.Element {
                   awards={awards
                     .filter((a) => BLUE_BANNER_AWARDS.has(a.award_type))
                     .filter((a) => {
-                      const event = events.find((e) => e.key === a.event_key);
+                      const event = sortedEvents.find(
+                        (e) => e.key === a.event_key,
+                      );
                       return event && SEASON_EVENT_TYPES.has(event.event_type);
                     })}
-                  events={events}
+                  events={sortedEvents}
                 />
               </div>
             </>
@@ -341,7 +370,7 @@ function TeamPage(): React.JSX.Element {
         <div>
           <Separator className="mt-4 mb-8" />
 
-          {events.map((e) => (
+          {sortedEvents.map((e) => (
             <TableOfContentsSection
               key={e.key}
               id={e.key}
@@ -353,8 +382,8 @@ function TeamPage(): React.JSX.Element {
                 status={statuses[e.key]}
                 team={team}
                 awards={awards.filter((a) => a.event_key === e.key)}
-                maybeDistrictPoints={eventDistrictPts[e.key]}
-                maybeAlliances={eventAlliances[e.key]}
+                maybeDistrictPoints={eventDistrictPtsQueries[e.key]}
+                maybeAlliances={eventAlliancesQueries[e.key]}
               />
               <Separator className="my-4" />
             </TableOfContentsSection>
