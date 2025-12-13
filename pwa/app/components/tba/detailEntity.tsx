@@ -1,13 +1,20 @@
+import { cn } from '~/lib/utils';
+
 interface DetailEntityProps {
   icon: React.ReactNode;
+  className?: string;
   children?: React.ReactNode;
 }
 
-export default function DetailEntity({ icon, children }: DetailEntityProps) {
+export default function DetailEntity({
+  icon,
+  className,
+  children,
+}: DetailEntityProps) {
   return (
-    <div className="flex items-center gap-2 [&>svg]:size-4">
+    <div className={cn('flex items-center gap-2 [&>svg]:size-4', className)}>
       {icon}
-      <p>{children}</p>
+      <span>{children}</span>
     </div>
   );
 }

@@ -58,11 +58,9 @@ export default function TeamEventAppearance({
 
         <div className="mb-3 space-y-1">
           <DetailEntity icon={<DateIcon />}>
-            {getEventDateString(event, 'long')}
+            {getEventDateString(event, 'long')}{' '}
             {event.week !== null && (
-              <Badge variant={'secondary'} className="ml-2">
-                Week {event.week + 1}
-              </Badge>
+              <Badge variant={'secondary'}>Week {event.week + 1}</Badge>
             )}
           </DetailEntity>
           <DetailEntity icon={<LocationIcon />}>

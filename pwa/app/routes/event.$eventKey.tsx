@@ -13,9 +13,9 @@ import RankingsIcon from '~icons/lucide/list-ordered';
 import LocationIcon from '~icons/lucide/map-pin';
 import InsightsIcon from '~icons/lucide/scatter-chart';
 import AwardsIcon from '~icons/lucide/trophy';
+import LiveWebcastIcon from '~icons/lucide/video';
 import MediaIcon from '~icons/mdi/folder-media-outline';
 import ResultsIcon from '~icons/mdi/tournament';
-import VideoIcon from '~icons/mdi/video';
 
 import { getEventColors } from '~/api/colors';
 import { Award, EventCoprs, Match, Media, Team, Webcast } from '~/api/tba/read';
@@ -314,10 +314,9 @@ function EventPage() {
         </DetailEntity>
         {event.webcasts.length > 0 &&
           getCurrentWeekEvents([event]).length > 0 && (
-            <InlineIcon>
-              <VideoIcon />
-              <a href={`/gameday/${eventKey}`}>GameDay</a>
-            </InlineIcon>
+            <DetailEntity className="font-medium" icon={<LiveWebcastIcon />}>
+              Watch live on <a href={`/gameday/${eventKey}`}>TBA GameDay</a>
+            </DetailEntity>
           )}
       </div>
 

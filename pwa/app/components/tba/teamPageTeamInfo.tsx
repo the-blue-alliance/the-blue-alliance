@@ -1,4 +1,3 @@
-import BiInfoCircleFill from '~icons/bi/info-circle-fill';
 import SponsorsIcon from '~icons/lucide/anchor';
 import SourceIcon from '~icons/lucide/badge-check';
 import StatbotIcon from '~icons/lucide/chart-spline';
@@ -7,7 +6,6 @@ import RookieIcon from '~icons/lucide/sprout';
 
 import { Media, Team } from '~/api/tba/read';
 import DetailEntity from '~/components/tba/detailEntity';
-import InlineIcon from '~/components/tba/inlineIcon';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
 import {
