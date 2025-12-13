@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import CheckIcon from '~icons/lucide/check';
-import LayoutGridIcon from '~icons/lucide/layout-grid';
 import MessageSquareIcon from '~icons/lucide/message-square';
 import RotateCcwIcon from '~icons/lucide/rotate-ccw';
 
@@ -16,7 +15,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '~/components/ui/drawer';
-import { Separator } from '~/components/ui/separator';
 import TbaLamp from '~/images/tba/tba-lamp.svg';
 import { useGameday } from '~/lib/gameday/context';
 import { LAYOUT_DISPLAY_ORDER, getLayoutById } from '~/lib/gameday/layouts';
@@ -27,9 +25,9 @@ export function GamedayToolbar() {
 
   return (
     <>
-      <div
+      <header
         className="flex h-10 shrink-0 items-center gap-2 border-b
-          border-slate-700 bg-primary px-2"
+          border-slate-700 bg-primary px-4"
       >
         {/* TBA branding */}
         <a
@@ -37,12 +35,14 @@ export function GamedayToolbar() {
           className="flex items-center gap-2 text-white no-underline
             hover:no-underline"
         >
-          <img src={TbaLamp} alt="TBA" className="h-7 w-7" />
-          <span className="text-lg font-bold">GameDay</span>
+          <img src={TbaLamp} alt="TBA" className="size-6" />
+          <span className="text-lg font-medium">
+            GameDay{' '}
+            <span className="ml-1 text-sm text-white/70 max-sm:hidden">
+              by The Blue Alliance
+            </span>
+          </span>
         </a>
-        <span className="hidden text-xs text-white/70 sm:inline">
-          by The Blue Alliance
-        </span>
 
         <div className="flex-1" />
 
@@ -61,9 +61,9 @@ export function GamedayToolbar() {
             />
           )}
           <span className="hidden sm:inline">Configure Layout</span>
-          <LayoutGridIcon className="h-4 w-4 sm:hidden" />
+          <span className="sm:hidden">Layout</span>
         </Button>
-      </div>
+      </header>
 
       {/* Settings drawer */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="right">
@@ -79,87 +79,92 @@ export function GamedayToolbar() {
             </DrawerDescription>
           </DrawerHeader>
 
-          <div className="overflow-y-auto px-4">
+          <div
+            className="divide-y overflow-y-auto px-4 *:py-4 first:*:pt-0
+              last:*:pb-0"
+          >
             {/* Layout selection */}
-            <h3 className="mb-2 text-sm font-semibold text-primary">
-              Video Grid Layout
-            </h3>
-            <div className="grid grid-cols-1 gap-2">
-              {LAYOUT_DISPLAY_ORDER.map((layoutId) => {
-                const layout = getLayoutById(layoutId);
-                if (!layout) return null;
+            <section>
+              <h3 className="mb-2 text-sm font-semibold text-primary">
+                Video Grid Layout
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                {LAYOUT_DISPLAY_ORDER.map((layoutId) => {
+                  const layout = getLayoutById(layoutId);
+                  if (!layout) return null;
 
-                const isSelected = state.layoutId === layoutId;
+                  const isSelected = state.layoutId === layoutId;
 
-                return (
-                  <button
-                    key={layoutId}
-                    onClick={() => {
-                      setLayout(layoutId);
-                      setDrawerOpen(false);
-                    }}
-                    className={`flex cursor-pointer items-center gap-2
-                    rounded-md border p-2 transition-colors ${
-                      isSelected
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border hover:bg-accent'
-                    }`}
-                  >
-                    <LayoutIcon
-                      layoutId={layoutId}
-                      className="h-5 w-8 shrink-0"
-                    />
-                    <span className="truncate text-sm">{layout.name}</span>
-                    {isSelected && (
-                      <CheckIcon
-                        className="ml-auto h-4 w-4 shrink-0 text-primary"
+                  return (
+                    <button
+                      key={layoutId}
+                      onClick={() => {
+                        setLayout(layoutId);
+                        setDrawerOpen(false);
+                      }}
+                      className={`flex cursor-pointer items-center gap-2
+                      rounded-md border p-2 transition-colors ${
+                        isSelected
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border hover:bg-accent'
+                      }`}
+                    >
+                      <LayoutIcon
+                        layoutId={layoutId}
+                        className="h-5 w-8 shrink-0"
                       />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <Separator className="my-4" />
+                      <span className="truncate text-sm">{layout.name}</span>
+                      {isSelected && (
+                        <CheckIcon
+                          className="ml-auto h-4 w-4 shrink-0 text-primary"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
             {/* Sidebar toggles */}
-            <h3 className="mb-2 text-sm font-semibold text-primary">
-              Sidebars
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={toggleChatSidebar}
-                className="flex w-full cursor-pointer items-center
-                  justify-between rounded-md border border-border p-3
-                  transition-colors hover:bg-accent"
-              >
-                <div className="flex items-center gap-2">
-                  <MessageSquareIcon className="h-4 w-4" />
-                  <span>Twitch Chat</span>
-                </div>
-                <span
-                  className={`text-sm
-                    ${state.chatSidebarVisible ? 'text-green-600' : 'text-muted-foreground'}`}
+            <section className="max-md:hidden">
+              <h3 className="mb-2 text-sm font-semibold text-primary">
+                Sidebars
+              </h3>
+              <div className="space-y-2">
+                <button
+                  onClick={toggleChatSidebar}
+                  className="flex w-full cursor-pointer items-center
+                    justify-between rounded-md border border-border p-3
+                    transition-colors hover:bg-accent"
                 >
-                  {state.chatSidebarVisible ? 'Visible' : 'Hidden'}
-                </span>
-              </button>
-            </div>
+                  <div className="flex items-center gap-2">
+                    <MessageSquareIcon className="h-4 w-4" />
+                    <span>Twitch Chat</span>
+                  </div>
+                  <span
+                    className={`text-sm
+                      ${state.chatSidebarVisible ? 'text-green-600' : 'text-muted-foreground'}`}
+                  >
+                    {state.chatSidebarVisible ? 'Visible' : 'Hidden'}
+                  </span>
+                </button>
+              </div>
+            </section>
 
-            <Separator className="my-4" />
-
-            {/* Reset */}
-            <Button
-              variant="destructive"
-              className="w-full gap-2"
-              onClick={() => {
-                resetWebcasts();
-                setDrawerOpen(false);
-              }}
-            >
-              <RotateCcwIcon className="h-4 w-4" />
-              Reset All Webcasts
-            </Button>
+            {/* Controls */}
+            <section>
+              <Button
+                variant="destructive"
+                className="w-full gap-2"
+                onClick={() => {
+                  resetWebcasts();
+                  setDrawerOpen(false);
+                }}
+              >
+                <RotateCcwIcon className="h-4 w-4" />
+                Reset All Webcasts
+              </Button>
+            </section>
           </div>
 
           <DrawerFooter>
