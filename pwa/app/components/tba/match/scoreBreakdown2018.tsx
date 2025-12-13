@@ -1,9 +1,5 @@
 import { Match, MatchScoreBreakdown2018 } from '~/api/tba/read';
-import {
-  ConditionalBadge,
-  FoulDisplay,
-  fmtFouls,
-} from '~/components/tba/match/common';
+import { ConditionalBadge, FoulDisplay } from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
   ScoreBreakdownLabelCell,
@@ -439,26 +435,13 @@ export default function ScoreBreakdown2018({
         redValue={scoreBreakdown.red.foulPoints}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center gap-1">
-              <span className="text-xs opacity-70">Regular:</span>
-              <span>
-                {fmtFouls({
-                  foulCount: scoreBreakdown.blue.foulCount,
-                  pointsPerFoul: POINTS_PER_FOUL[2018],
-                })}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-xs opacity-70">Tech:</span>
-              <span>
-                {fmtFouls({
-                  foulCount: scoreBreakdown.blue.techFoulCount,
-                  pointsPerFoul: POINTS_PER_TECH_FOUL[2018],
-                })}
-              </span>
-            </div>
-          </div>
+          <FoulDisplay
+            foulsReceived={scoreBreakdown.red.foulCount}
+            pointsPerFoul={POINTS_PER_FOUL[2018]}
+            techFoulsReceived={scoreBreakdown.red.techFoulCount}
+            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2018]}
+            techOrMajor="tech"
+          />
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Fouls Received
