@@ -1,3 +1,5 @@
+import { DialogContentProps } from '@radix-ui/react-dialog';
+
 import {
   Dialog,
   DialogClose,
@@ -70,7 +72,11 @@ const CredenzaClose = ({ className, children, ...props }: CredenzaProps) => {
   );
 };
 
-const CredenzaContent = ({ className, children, ...props }: CredenzaProps) => {
+const CredenzaContent = ({
+  className,
+  children,
+  ...props
+}: DialogContentProps & CredenzaProps) => {
   const isDesktop = useMediaQuery(desktop);
   const CredenzaContent = isDesktop ? DialogContent : DrawerContent;
 

@@ -66,7 +66,7 @@ export default function AllianceSelectionTable(props: {
 
   return (
     <>
-      <div className="text-xl">Alliances</div>
+      <h2 className="mb-2 text-xl font-medium">Alliances</h2>
 
       <Table className="table-fixed">
         <TableHeader>

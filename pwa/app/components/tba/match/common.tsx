@@ -22,7 +22,7 @@ export function ConditionalCheckmark({
         <TooltipTrigger>
           {condition ? <MdiCheck /> : <MdiClose />}
         </TooltipTrigger>
-        <TooltipContent>{teamKey}</TooltipContent>
+        <TooltipContent>{teamKey.substring(3)}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

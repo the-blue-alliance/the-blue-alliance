@@ -75,27 +75,30 @@ export default function TeamListSubgrid({
   );
 }
 
-const teamCellVariants = cva('flex items-center justify-center', {
-  variants: {
-    dq: {
-      true: 'line-through',
-      false: '',
+const teamCellVariants = cva(
+  'flex items-center justify-center text-foreground',
+  {
+    variants: {
+      dq: {
+        true: 'line-through',
+        false: '',
+      },
+      surrogate: {
+        true: 'underline decoration-dashed',
+        false: '',
+      },
+      focus: {
+        true: 'underline',
+        false: '',
+      },
     },
-    surrogate: {
-      true: 'underline decoration-dashed',
-      false: '',
-    },
-    focus: {
-      true: 'underline',
-      false: '',
+    defaultVariants: {
+      dq: false,
+      surrogate: false,
+      focus: false,
     },
   },
-  defaultVariants: {
-    dq: false,
-    surrogate: false,
-    focus: false,
-  },
-});
+);
 
 interface TeamCellProps
   extends
@@ -114,10 +117,12 @@ function TeamCell({
   ...props
 }: TeamCellProps) {
   const content = (
-    <TeamLink teamOrKey={teamKey} year={year}>
-      <span className={cn(teamCellVariants({ dq, surrogate, focus }))}>
-        {teamKey.substring(3)}
-      </span>
+    <TeamLink
+      teamOrKey={teamKey}
+      year={year}
+      className={cn(teamCellVariants({ dq, surrogate, focus }))}
+    >
+      {teamKey.substring(3)}
     </TeamLink>
   );
 

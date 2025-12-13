@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { MatchLink } from 'app/components/tba/links';
 
-import PlayCircle from '~icons/bi/play-circle';
+import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
 import { Event, Match } from '~/api/tba/read';
 import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
@@ -108,8 +108,8 @@ export function MatchRow({
             bg-gray-100 xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
         >
           {maybeVideoURL && (
-            <Link to={maybeVideoURL}>
-              <PlayCircle className="inline" />
+            <Link to={maybeVideoURL} className="mx-2">
+              <PlayCircleIcon />
             </Link>
           )}
         </div>
@@ -119,11 +119,13 @@ export function MatchRow({
           className="row-span-2 flex items-center justify-center rounded-tr-lg
             bg-gray-100 p-2 xl:col-span-2 xl:row-span-1 xl:rounded-r-lg"
         >
-          <span className="text-center text-sm">
-            <MatchLink matchOrKey={match} event={event}>
-              {matchTitleShort(match, playoffType)}
-            </MatchLink>
-          </span>
+          <MatchLink
+            matchOrKey={match}
+            event={event}
+            className="text-center text-sm text-foreground"
+          >
+            {matchTitleShort(match, playoffType)}
+          </MatchLink>
         </div>
 
         {/* Red Team Players - Subgrid Component */}
@@ -330,8 +332,8 @@ export function BreakRow({ className, text, ...props }: BreakRowProps) {
       {...props}
     >
       <span
-        className="flex h-5 w-full items-center justify-center text-xs
-          font-bold"
+        className="flex h-8 w-full items-center justify-center text-xs
+          font-medium"
       >
         {text}
       </span>

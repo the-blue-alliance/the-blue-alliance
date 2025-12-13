@@ -1,6 +1,6 @@
 import React, { useImperativeHandle, useMemo, useRef, useState } from 'react';
 
-import PlayCircle from '~icons/bi/play-circle';
+import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
 import { EliminationAlliance, Event, Match } from '~/api/tba/read';
 import {
@@ -141,10 +141,9 @@ const PlayoffMatch = React.forwardRef<
                 key={match.key}
                 matchOrKey={match}
                 event={event}
-                className="flex items-center justify-center text-gray-600
-                  hover:text-gray-800"
+                className="flex items-center justify-center"
               >
-                <PlayCircle className="inline h-4 w-4" />
+                <PlayCircleIcon className="inline size-4" />
               </MatchLink>
             );
           })}
@@ -411,7 +410,7 @@ export default function EliminationBracket({
   }
 
   return (
-    <div className="mt-8">
+    <div className="mt-12">
       <h2 className="mb-4 text-2xl font-bold">Playoff Bracket</h2>
 
       <div className="overflow-x-auto overflow-y-hidden">
@@ -424,7 +423,7 @@ export default function EliminationBracket({
           <div className="relative z-1 space-y-4">
             {/* Upper Bracket */}
             <div className="space-y-4">
-              <h2 className="text-center text-xl font-bold">Upper Bracket</h2>
+              <h2 className="text-center text-xl font-medium">Upper Bracket</h2>
               <div className="flex items-start gap-8">
                 {/* Round 1 */}
                 <div className="flex flex-col items-center">
@@ -565,7 +564,7 @@ export default function EliminationBracket({
 
             {/* Lower Bracket */}
             <div className="space-y-4">
-              <h2 className="text-center text-xl font-bold">Lower Bracket</h2>
+              <h2 className="text-center text-xl font-medium">Lower Bracket</h2>
               <div className="ml-16 flex items-start gap-8">
                 {/* Round 2 */}
                 <div className="flex flex-col items-center">

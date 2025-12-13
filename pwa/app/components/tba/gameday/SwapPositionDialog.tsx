@@ -60,6 +60,7 @@ export function SwapPositionDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        // Auto focus on the content area and not first element
         onOpenAutoFocus={(e) => {
           e.preventDefault();
           (e.currentTarget as HTMLElement)?.focus();

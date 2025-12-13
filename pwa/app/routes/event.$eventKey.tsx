@@ -10,11 +10,11 @@ import BiInfoCircleFill from '~icons/bi/info-circle-fill';
 import BiLink from '~icons/bi/link';
 import BiListOl from '~icons/bi/list-ol';
 import BiPinMapFill from '~icons/bi/pin-map-fill';
-import BiTrophy from '~icons/bi/trophy';
+import RobotIcon from '~icons/lucide/bot';
 import MdiFolderMediaOutline from '~icons/mdi/folder-media-outline';
 import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
-import MdiRobot from '~icons/mdi/robot';
 import MdiTournament from '~icons/mdi/tournament';
+import TrophyIcon from '~icons/mdi/trophy-outline';
 import MdiVideo from '~icons/mdi/video';
 
 import { getEventColors } from '~/api/colors';
@@ -348,14 +348,14 @@ function EventPage() {
               awardsQuery.data.length > 0)) && (
             <TabsTrigger value="awards">
               <InlineIcon>
-                <BiTrophy />
+                <TrophyIcon />
                 Awards
               </InlineIcon>
             </TabsTrigger>
           )}
           <TabsTrigger value="teams">
             <InlineIcon>
-              <MdiRobot />
+              <RobotIcon />
               Teams
               <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
                 {teamsQuery.data?.length ?? '-'}
