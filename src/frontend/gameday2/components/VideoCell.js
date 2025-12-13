@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import RaisedButton from "material-ui/RaisedButton";
+import Button from "@mui/material/Button";
 import WebcastEmbed from "./WebcastEmbed";
 import VideoCellAnalyticsTracker from "./VideoCellAnalyticsTracker";
 import LivescoreDisplayContainer from "../containers/LivescoreDisplayContainer";
@@ -149,12 +149,14 @@ export default class VideoCell extends React.Component {
     return (
       <div style={cellStyle}>
         <div style={emptyContainerStyle}>
-          <RaisedButton
-            label={buttonLabel}
+          <Button
+            variant="contained"
             style={centerButtonStyle}
             disabled={!webcastsAreAvailable}
             onClick={() => this.onRequestOpenWebcastSelectionDialog()}
-          />
+          >
+            {buttonLabel}
+          </Button>
         </div>
         <WebcastSelectionDialogContainer
           open={this.state.webcastSelectionDialogOpen}

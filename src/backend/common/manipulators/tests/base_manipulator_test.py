@@ -3,12 +3,12 @@ from typing import Any, Dict, Generator, List, Optional, Set
 
 import pytest
 import six
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.helpers.deferred import run_from_task
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.models.cached_query_result import CachedQueryResult
@@ -106,9 +106,13 @@ class DummyManipulator(ManipulatorBase[DummyModel]):
 
     @classmethod
     def updateMerge(
-        cls, new_model: DummyModel, old_model: DummyModel, auto_union: bool
+        cls,
+        new_model: DummyModel,
+        old_model: DummyModel,
+        auto_union: bool,
+        update_manual_attrs: bool,
     ) -> DummyModel:
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
         return old_model
 
 
@@ -325,7 +329,7 @@ def test_cache_clearing(ndb_context, taskqueue_stub) -> None:
     six.ensure_text(tasks[0].payload)
 
     # Run cache clearing manually
-    deferred.run(tasks[0].payload)
+    run_from_task(tasks[0])
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None
@@ -344,7 +348,7 @@ def test_post_update_hook(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    deferred.run(tasks[0].payload)
+    run_from_task(tasks[0])
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
@@ -374,7 +378,7 @@ def test_update_hook_right_args(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    deferred.run(tasks[0].payload)
+    run_from_task(tasks[0])
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
@@ -401,7 +405,7 @@ def test_update_hook_creation(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    deferred.run(tasks[0].payload)
+    run_from_task(tasks[0])
 
     # Make sure the hook ran
     assert DummyManipulator.update_calls == 1
@@ -456,7 +460,7 @@ def test_delete_clears_cache(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run cache clearing manually
-    deferred.run(tasks[0].payload)
+    run_from_task(tasks[0])
 
     # We should have cleared the cached result
     assert CachedQueryResult.get_by_id(query.cache_key) is None
@@ -474,7 +478,7 @@ def test_delete_runs_hook(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    deferred.run(tasks[0].payload)
+    run_from_task(tasks[0])
 
     # Make sure the hook ran
     assert DummyManipulator.delete_calls == 1
@@ -509,7 +513,7 @@ def test_delete_hook_right_args(ndb_context, taskqueue_stub) -> None:
     assert len(tasks) == 1
 
     # Run the hooks manually
-    deferred.run(tasks[0].payload)
+    run_from_task(tasks[0])
 
     # Make sure the hook ran
     assert DummyManipulator.delete_calls == 1
@@ -534,3 +538,21 @@ def test_merge_models() -> None:
         DummyModel(id="k2"),
         DummyModel(id="k3"),
     ]
+
+
+def test_update_manual_attrs() -> None:
+    old = DummyModel(id="test", int_prop=42, manual_attrs=["int_prop"])
+    new = DummyModel(id="test", int_prop=604)
+
+    merged = DummyManipulator.updateMerge(new, old, True, True)
+    expected = DummyModel(id="test", int_prop=604, manual_attrs=["int_prop"])
+    assert merged == expected
+
+
+def test_no_update_manual_attrs() -> None:
+    old = DummyModel(id="test", int_prop=42, manual_attrs=["int_prop"])
+    new = DummyModel(id="test", int_prop=604)
+
+    merged = DummyManipulator.updateMerge(new, old, True, False)
+    expected = DummyModel(id="test", int_prop=42, manual_attrs=["int_prop"])
+    assert merged == expected

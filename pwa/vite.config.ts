@@ -1,7 +1,8 @@
 import { Schema, ValidateEnv } from '@julr/vite-plugin-validate-env';
-import { vitePlugin as remix } from '@remix-run/dev';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
-import { RemixVitePWA } from '@vite-pwa/remix';
+import tailwindcss from '@tailwindcss/vite';
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import viteReact from '@vitejs/plugin-react';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
 import { defineConfig } from 'vite';
@@ -15,63 +16,45 @@ function getCommitHash(): string {
   }
 }
 
-const { RemixVitePWAPlugin, RemixPWAPreset } = RemixVitePWA();
+const staticRoutes = [
+  '/about',
+  '/add-data',
+  '/apidocs',
+  '/contact',
+  '/donate',
+  '/gameday',
+  '/privacy',
+  '/thanks',
+];
 
 export default defineConfig({
   plugins: [
-    remix({
-      future: {
-        v3_fetcherPersist: true,
-        v3_relativeSplatPath: true,
-        v3_throwAbortReason: true,
-      },
-      presets: [RemixPWAPreset()],
-    }),
     tsconfigPaths(),
+    tanstackStart({
+      srcDirectory: 'app',
+      prerender: {
+        enabled: true,
+        filter: ({ path }) => staticRoutes.includes(path),
+      },
+    }),
+    viteReact({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
+    tailwindcss(),
     Icons({
       compiler: 'jsx',
       jsx: 'react',
     }),
-    RemixVitePWAPlugin({
-      strategies: 'generateSW',
-      manifest: {
-        name: 'The Blue Alliance',
-        short_name: 'TBA',
-        description:
-          'The Blue Alliance is the best way to scout, watch, and relive the FIRST Robotics Competition.',
-        start_url: '/?homescreen=1',
-        display: 'standalone',
-        theme_color: '#3F51B5',
-        background_color: '#3F51B5',
-        icons: [
-          {
-            src: 'icons/icon-64.png',
-            sizes: '64x64',
-            type: 'image/png',
-          },
-          {
-            src: 'icons/icon-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: 'icons/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: 'icons/maskable-icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
-        ],
-      },
-    }),
     sentryVitePlugin({
       org: 'the-blue-alliance',
       project: 'the-blue-alliance-pwa',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      sourcemaps: {
+        assets: ['./build/client/**/*'],
+        ignore: ['**/node_modules/**'],
+      },
     }),
     ValidateEnv({
       VITE_TBA_API_READ_KEY: Schema.string({
@@ -80,6 +63,7 @@ export default defineConfig({
     }),
   ],
   build: {
+    outDir: 'build',
     sourcemap: true,
   },
   define: {

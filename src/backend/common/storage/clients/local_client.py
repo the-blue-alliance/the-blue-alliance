@@ -8,14 +8,23 @@ class LocalStorageClient(StorageClient):
     def __init__(self, base_path: Path) -> None:
         self.base_path = base_path
 
-    def write(self, file_name: str, content: str) -> None:
+    def write(
+        self,
+        file_name: str,
+        content: str | bytes,
+        content_type: str = "text/plain",
+        metadata: dict[str, str | None] | None = None,
+    ) -> None:
         path = self.base_path / file_name
         if not path.parent.exists():
             Path.mkdir(path.parent, parents=True)
 
-        path.write_text(content)
+        if isinstance(content, bytes):
+            path.write_bytes(content)
+        else:
+            path.write_text(content)
 
-    def read(self, file_name: str) -> Optional[str]:
+    def read(self, file_name: str) -> Optional[str | bytes]:
         path = self.base_path / file_name
         if path.exists():
             with path.open() as f:
@@ -24,6 +33,8 @@ class LocalStorageClient(StorageClient):
         return None
 
     def get_files(self, path: Optional[str] = None) -> List[str]:
+        if not self.base_path.exists():
+            return []
         return [
             p.name
             for p in self.base_path.iterdir()

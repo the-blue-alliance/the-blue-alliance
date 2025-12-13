@@ -40,9 +40,10 @@ class DistrictTeamManipulator(ManipulatorBase[DistrictTeam]):
         new_model: DistrictTeam,
         old_model: DistrictTeam,
         auto_union: bool = True,
+        update_manual_attrs: bool = True,
     ) -> DistrictTeam:
         """
         Update and return DistrictTeams
         """
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
         return old_model

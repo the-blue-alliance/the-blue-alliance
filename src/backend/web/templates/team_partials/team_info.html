@@ -15,13 +15,9 @@
 <div class="row">
   <div class="col-sm-6">
     <p>
-      {% if team.city_state_country or (team.nl and team.nl.name and team.nl.city_state_country) %}
+      {% if team.city_state_country %}
         <span class="glyphicon glyphicon-map-marker"></span> From
-        {% if team.nl and team.nl.name %}
-          <a id="team-location" href="{{team.nl.place_details.url}}" target="_blank" rel="noopener noreferrer">{{team.nl.name}}</a> in {{team.nl.city_state_country}}
-        {% else %}
-          <a id="team-location" href="{% if team.nl and team.nl.name %}{{team.nl.place_details.url}}{% else %}//maps.google.com/maps?q={{ team.city_state_country|urlencode }}{% endif %}" target="_blank" rel="noopener noreferrer">{{team.city_state_country}}</a>
-        {% endif %}
+        <a id="team-location" href="//maps.google.com/maps?q={{ team.city_state_country|urlencode }}" target="_blank" rel="noopener noreferrer">{{team.city_state_country}}</a>
         <br>
       {% endif %}
       {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em id="team-name">{{ team.name }}</em><br>{% endif %}
@@ -65,6 +61,9 @@
         {{mtm.upcoming_match_table(matches_upcoming, cur_team_key=team.key.id())}}
       {% else %}
         No upcoming matches.
+      {% endif %}
+      {% if current_event_pit_location %}
+        <img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Location: <a href="https://frc.nexus/en/event/{{current_event.year}}{{current_event.first_api_code}}/team/{{team.team_number}}/map" target="_blank" rel="noopener noreferrer">{{current_event_pit_location}}</a>
       {% endif %}
       </div>
     </div>

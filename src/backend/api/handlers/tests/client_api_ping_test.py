@@ -28,7 +28,7 @@ def test_ping_no_device(api_client: Client, mock_clientapi_auth: User) -> None:
     assert resp["code"] == 404
 
 
-def test_ping_clinet(api_client: Client, mock_clientapi_auth: User, ndb_stub) -> None:
+def test_ping_client(api_client: Client, mock_clientapi_auth: User, ndb_stub) -> None:
     MobileClient(
         parent=mock_clientapi_auth.account_key,
         user_id=str(mock_clientapi_auth.uid),
@@ -39,7 +39,7 @@ def test_ping_clinet(api_client: Client, mock_clientapi_auth: User, ndb_stub) ->
     ).put()
 
     with patch.object(TBANSHelper, "ping") as mock_ping:
-        mock_ping.return_value = True
+        mock_ping.return_value = (True, True)
         req = PingRequest(
             mobile_id="abc123",
         )
@@ -48,7 +48,7 @@ def test_ping_clinet(api_client: Client, mock_clientapi_auth: User, ndb_stub) ->
     assert resp["code"] == 200
 
 
-def test_ping_clinet_fails(
+def test_ping_client_fails(
     api_client: Client, mock_clientapi_auth: User, ndb_stub
 ) -> None:
     MobileClient(
@@ -61,7 +61,7 @@ def test_ping_clinet_fails(
     ).put()
 
     with patch.object(TBANSHelper, "ping") as mock_ping:
-        mock_ping.return_value = False
+        mock_ping.return_value = (False, False)
         req = PingRequest(
             mobile_id="abc123",
         )

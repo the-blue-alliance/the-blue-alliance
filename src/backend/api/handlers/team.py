@@ -16,8 +16,10 @@ from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_tag import get_enum_from_url
+from backend.common.consts.teams import TEAM_PAGE_SIZE
 from backend.common.decorators import cached_public
 from backend.common.models.event_team import EventTeam
+from backend.common.models.history import History
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.queries.award_query import (
@@ -63,6 +65,26 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
     if model_type is not None:
         team = filter_team_properties([team], model_type)[0]
     return profiled_jsonify(team)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
+def team_history(team_key: TeamKey) -> Response:
+    track_call_after_response("team/history", team_key)
+
+    events_future = TeamEventsQuery(team_key=team_key).fetch_dict_async(
+        ApiMajorVersion.API_V3
+    )
+    awards_future = TeamAwardsQuery(team_key=team_key).fetch_dict_async(
+        ApiMajorVersion.API_V3
+    )
+
+    events = events_future.get_result()
+    awards = awards_future.get_result()
+
+    history: History = History(events=events, awards=awards)
+    return profiled_jsonify(history)
 
 
 @api_authenticated
@@ -341,7 +363,7 @@ def team_list_all(model_type: Optional[ModelType] = None) -> Response:
 
     max_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
     max_team_num = int(max_team_key.id()[3:])
-    max_team_page = int(max_team_num / 500)
+    max_team_page = int(max_team_num / TEAM_PAGE_SIZE)
 
     futures = []
     for page_num in range(max_team_page + 1):

@@ -13,6 +13,7 @@ from backend.common.consts.media_type import (
     TYPE_NAMES,
 )
 from backend.common.models.suggestion_dict import SuggestionDict
+from backend.common.sitevars.cd_request_user_agent import CdRequestUserAgent
 
 
 class MediaParser:
@@ -50,6 +51,7 @@ class MediaParser:
         MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)\/e\/", 1)],
         MediaType.INSTAGRAM_IMAGE: [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
         MediaType.GITLAB_PROFILE: [(r".*gitlab.com\/(.*)(\/(.*))?", 1)],
+        MediaType.CD_THREAD: [(r".*chiefdelphi\.com\/t\/(?:[^/]+\/)?(\d+)", 1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -62,6 +64,7 @@ class MediaParser:
         ("github.com/", MediaType.GITHUB_PROFILE),
         ("periscope.tv/", MediaType.PERISCOPE_PROFILE),
         ("chiefdelphi.com/media/photos/", MediaType.CD_PHOTO_THREAD),
+        ("chiefdelphi.com/t/", MediaType.CD_THREAD),
         ("youtube.com/watch", MediaType.YOUTUBE_VIDEO),
         ("youtu.be", MediaType.YOUTUBE_VIDEO),
         ("imgur.com/", MediaType.IMGUR),
@@ -109,6 +112,8 @@ class MediaParser:
                     return cls._partial_media_dict_from_onshape(url)
                 elif media_type in cls.OEMBED_PROVIDERS:
                     return cls._partial_media_dict_from_oembed(media_type, url)
+                elif media_type == MediaType.CD_THREAD:
+                    return cls._parse_cd_thread(url)
                 else:
                     return cls._create_media_dict(media_type, url)
 
@@ -346,3 +351,42 @@ class MediaParser:
         else:
             return None
         """
+
+    @classmethod
+    def _parse_cd_thread(cls, url: str) -> Optional[SuggestionDict]:
+        media_dict = cls._create_media_dict(MediaType.CD_THREAD, url)
+        if not media_dict:
+            return None
+
+        discourse_url = "https://www.chiefdelphi.com/t/{}.json".format(
+            media_dict["foreign_key"]
+        )
+
+        # The User-Agent here needs to be a specific value in order to avoid being blocked by CD cloudflare configuration.
+        # If you need to test this behavior locally, message TBA Admins.
+        discourse_data = requests.get(
+            discourse_url,
+            timeout=10,
+            headers={"User-Agent": CdRequestUserAgent.user_agent()},
+        )
+        if discourse_data.status_code != 200:
+            logging.warning(
+                "Unable to retreive url: {} (status code: {})".format(
+                    discourse_url, discourse_data.status_code
+                )
+            )
+            return None
+
+        discourse_data = discourse_data.json()
+        if not discourse_data:
+            logging.warning("No data returned from url: {}".format(discourse_url))
+            return None
+
+        media_dict["details_json"] = json.dumps(
+            {
+                "thread_title": discourse_data["title"],
+                "image_url": discourse_data["image_url"],
+            }
+        )
+
+        return media_dict

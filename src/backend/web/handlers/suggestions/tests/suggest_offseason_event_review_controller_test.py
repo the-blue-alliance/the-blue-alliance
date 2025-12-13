@@ -90,7 +90,7 @@ def test_accept_suggestion(
         web_client, f"review_{suggestion_id}"
     )
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["event_short"] = "test"
     form_fields["verdict"] = "accept"
@@ -109,6 +109,40 @@ def test_accept_suggestion(
     assert event is not None
 
 
+def test_accept_suggestion_normalize_event_short_and_first_code(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
+) -> None:
+    suggestion_id = createSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+    assert form_fields != {}
+
+    form_fields["event_short"] = "TEST"
+    form_fields["first_code"] = "frctest"
+    form_fields["verdict"] = "accept"
+    response = web_client.post(
+        "/suggest/offseason/review",
+        data=form_fields,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+
+    event = Event.get_by_id("2016test")
+    assert event is not None
+    assert event.event_short == "test"
+    assert event.official is True
+    assert event.first_code == "FRCTEST"
+
+
 def test_reject_suggestion(
     login_user_with_permission, web_client: Client, ndb_stub
 ) -> None:
@@ -117,7 +151,7 @@ def test_reject_suggestion(
         web_client, f"review_{suggestion_id}"
     )
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["event_short"] = "test"
     form_fields["verdict"] = "reject"

@@ -10,6 +10,7 @@ from backend.common import storage
 from backend.common.consts.comp_level import ELIM_LEVELS
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.memcache import MemcacheClient
+from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
 
@@ -103,6 +104,7 @@ class MatchTimePredictionHelper:
         unplayed_matches: List[Match],
         timezone: datetime.tzinfo,
         is_live: bool,
+        nexus_queue_info: Optional[EventQueueStatus],
     ) -> None:
         """
         Add match time predictions for future matches
@@ -193,6 +195,25 @@ class MatchTimePredictionHelper:
             if not match.time:
                 continue
 
+            if (
+                nexus_queue_info
+                and (
+                    nexus_match_timing := nexus_queue_info["matches"].get(
+                        match.key_name
+                    )
+                )
+                and (
+                    nexus_predicted_time_ms := nexus_match_timing["times"][
+                        "estimated_start_time_ms"
+                    ]
+                )
+            ):
+                nexus_predicted_time = cls.as_utc(
+                    datetime.datetime.fromtimestamp(nexus_predicted_time_ms / 1000.0)
+                )
+            else:
+                nexus_predicted_time = None
+
             if first_unplayed_timedelta is None:
                 first_unplayed_timedelta = now - cls.as_local(match.time, timezone)
             if first_unplayed_timedelta < datetime.timedelta(seconds=0):
@@ -205,7 +226,7 @@ class MatchTimePredictionHelper:
                 if i == 0:
                     write_logs = False
                 # Use predicted = scheduled once we exhaust all unplayed matches on this day or move to a new comp level
-                match.predicted_time = cls.as_utc(
+                match.predicted_time = nexus_predicted_time or cls.as_utc(
                     none_throws(cls.as_local(match.time, timezone))
                     + first_unplayed_timedelta
                 )
@@ -248,7 +269,7 @@ class MatchTimePredictionHelper:
                 if match.comp_level not in ELIM_LEVELS
                 else cls.as_local(cls.EPOCH, timezone)
             )
-            match.predicted_time = max(
+            match.predicted_time = nexus_predicted_time or max(
                 cls.as_utc(predicted), cls.as_utc(none_throws(earliest_possible))
             )
             last = match

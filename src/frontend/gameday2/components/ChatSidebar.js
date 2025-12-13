@@ -1,177 +1,153 @@
 import React from "react";
 import PropTypes from "prop-types";
-import muiThemeable from "material-ui/styles/muiThemeable";
-import IconButton from "material-ui/IconButton";
-import ArrowDropUp from "material-ui/svg-icons/navigation/arrow-drop-up";
-import { Toolbar, ToolbarGroup, ToolbarTitle } from "material-ui/Toolbar";
-import { white } from "material-ui/styles/colors";
+import { useTheme } from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import Toolbar from "@mui/material/Toolbar";
+const white = "#fff";
 import ChatAnalyticsTracker from "./ChatAnalyticsTracker";
 import TwitchChatEmbed from "./TwitchChatEmbed";
 import ChatSelector from "./ChatSelector";
 import { chatPropType } from "../utils/PropTypes";
 
-class ChatSidebar extends React.Component {
-  static propTypes = {
-    enabled: PropTypes.bool.isRequired,
-    hasBeenVisible: PropTypes.bool.isRequired,
-    chats: PropTypes.objectOf(chatPropType).isRequired,
-    displayOrderChats: PropTypes.arrayOf(chatPropType).isRequired,
-    renderedChats: PropTypes.arrayOf(PropTypes.string).isRequired,
-    currentChat: PropTypes.string.isRequired,
-    defaultChat: PropTypes.string.isRequired,
-    setTwitchChat: PropTypes.func.isRequired,
-    muiTheme: PropTypes.object.isRequired,
-    setChatSidebarVisibility: PropTypes.object.isRequired,
-    setHashtagSidebarVisibility: PropTypes.object.isRequired,
-  };
+const ChatSidebar = (props) => {
+  const theme = useTheme();
+  const [chatSelectorOpen, setChatSelectorOpen] = React.useState(false);
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      chatSelectorOpen: false,
-    };
-
-    this.onResize = this.onResize.bind(this);
-  }
-
-  componentDidMount() {
-    this.onResize();
-    window.addEventListener("resize", this.onResize);
-  }
-
-  onResize() {
-    if (window.innerWidth < 760) {
-      this.props.setChatSidebarVisibility(false);
-      this.props.setHashtagSidebarVisibility(false);
-    }
-  }
-
-  onRequestOpenChatSelector() {
-    this.setState({
-      chatSelectorOpen: true,
-    });
-  }
-
-  onRequestCloseChatSelector() {
-    this.setState({
-      chatSelectorOpen: false,
-    });
-  }
-
-  render() {
-    const metrics = {
-      switcherHeight: 36,
-    };
-
-    const panelContainerStyle = {
-      position: "absolute",
-      top: this.props.muiTheme.layout.appBarHeight,
-      right: 0,
-      bottom: 0,
-      width: this.props.muiTheme.layout.chatPanelWidth,
-      background: "#EFEEF1",
-      display: this.props.enabled ? null : "none",
-      zIndex: 1000,
-    };
-
-    const chatEmbedContainerStyle = {
-      position: "absolute",
-      top: 0,
-      bottom: metrics.switcherHeight,
-      width: "100%",
-    };
-
-    const switcherToolbarStyle = {
-      position: "absolute",
-      bottom: 0,
-      height: metrics.switcherHeight,
-      width: "100%",
-      background: this.props.muiTheme.palette.primary1Color,
-      cursor: "pointer",
-    };
-
-    const toolbarTitleStyle = {
-      color: white,
-      fontSize: 16,
-    };
-
-    const toolbarButtonStyle = {
-      width: metrics.switcherHeight,
-      height: metrics.switcherHeight,
-      padding: 8,
-    };
-
-    const toolbarButtonIconStyle = {
-      width: metrics.switcherHeight - 16,
-      height: metrics.switcherHeight - 16,
-    };
-
-    const renderedChats = [];
-    this.props.renderedChats.forEach((chat) => {
-      const visible = chat === this.props.currentChat;
-      renderedChats.push(
-        <TwitchChatEmbed channel={chat} key={chat} visible={visible} />
-      );
-    });
-
-    const currentChat = this.props.chats[this.props.currentChat];
-    let currentChatName = "UNKNOWN";
-    if (currentChat) {
-      currentChatName = `${currentChat.name} Chat`;
-      if (
-        currentChat.channel === "firstupdatesnow" &&
-        this.props.defaultChat === "firstupdatesnow"
-      ) {
-        currentChatName = "TBA GameDay / FUN";
-      } else if (
-        currentChat.channel === "firstinspires" &&
-        this.props.defaultChat === "firstinspires"
-      ) {
-        currentChatName = "TBA GameDay / FIRST";
+  React.useEffect(() => {
+    function onResize() {
+      if (window.innerWidth < 760) {
+        props.setChatSidebarVisibility(false);
+        props.setHashtagSidebarVisibility(false);
       }
     }
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [props]);
+  const metrics = {
+    switcherHeight: 36,
+  };
 
-    let content;
-    if (this.props.hasBeenVisible) {
-      content = (
-        <div style={panelContainerStyle}>
-          <div style={chatEmbedContainerStyle}>{renderedChats}</div>
-          <Toolbar
-            style={switcherToolbarStyle}
-            onClick={() => this.onRequestOpenChatSelector()}
-          >
-            <ToolbarGroup>
-              <ToolbarTitle text={currentChatName} style={toolbarTitleStyle} />
-            </ToolbarGroup>
-            <ToolbarGroup lastChild>
-              <IconButton
-                style={toolbarButtonStyle}
-                iconStyle={toolbarButtonIconStyle}
-              >
-                <ArrowDropUp color={white} />
-              </IconButton>
-            </ToolbarGroup>
-          </Toolbar>
-          <ChatSelector
-            chats={this.props.displayOrderChats}
-            currentChat={this.props.currentChat}
-            defaultChat={this.props.defaultChat}
-            setTwitchChat={this.props.setTwitchChat}
-            open={this.state.chatSelectorOpen}
-            onRequestClose={() => this.onRequestCloseChatSelector()}
-          />
-          {this.props.enabled && (
-            <ChatAnalyticsTracker currentChat={this.props.currentChat} />
-          )}
-        </div>
-      );
-    } else {
-      content = <div />;
+  const panelContainerStyle = {
+    position: "absolute",
+    top: theme.layout.appBarHeight,
+    right: 0,
+    bottom: 0,
+    width: theme.layout.chatPanelWidth,
+    background: "#EFEEF1",
+    display: props.enabled ? null : "none",
+    zIndex: 1000,
+  };
+
+  const chatEmbedContainerStyle = {
+    position: "absolute",
+    top: 0,
+    bottom: metrics.switcherHeight,
+    width: "100%",
+  };
+
+  const switcherToolbarStyle = {
+    position: "absolute",
+    bottom: 0,
+    height: metrics.switcherHeight,
+    width: "100%",
+    background:
+      (theme.palette && theme.palette.primary && theme.palette.primary.main) ||
+      undefined,
+    cursor: "pointer",
+  };
+
+  const toolbarTitleStyle = {
+    color: white,
+    fontSize: 16,
+  };
+
+  const toolbarButtonStyle = {
+    width: metrics.switcherHeight,
+    height: metrics.switcherHeight,
+    padding: 8,
+  };
+
+  const toolbarButtonIconStyle = {
+    width: metrics.switcherHeight - 16,
+    height: metrics.switcherHeight - 16,
+  };
+
+  const renderedChats = [];
+  props.renderedChats.forEach((chat) => {
+    const visible = chat === props.currentChat;
+    renderedChats.push(
+      <TwitchChatEmbed channel={chat} key={chat} visible={visible} />
+    );
+  });
+
+  const currentChat = props.chats[props.currentChat];
+  let currentChatName = "UNKNOWN";
+  if (currentChat) {
+    currentChatName = `${currentChat.name} Chat`;
+    if (
+      currentChat.channel === "firstupdatesnow" &&
+      props.defaultChat === "firstupdatesnow"
+    ) {
+      currentChatName = "TBA GameDay / FUN";
+    } else if (
+      currentChat.channel === "firstinspires" &&
+      props.defaultChat === "firstinspires"
+    ) {
+      currentChatName = "TBA GameDay / FIRST";
     }
-
-    return content;
   }
-}
 
-export default muiThemeable()(ChatSidebar);
+  let content;
+  if (props.hasBeenVisible) {
+    content = (
+      <div style={panelContainerStyle}>
+        <div style={chatEmbedContainerStyle}>{renderedChats}</div>
+        <Toolbar
+          style={switcherToolbarStyle}
+          onClick={() => setChatSelectorOpen(true)}
+        >
+          <div>
+            <div style={toolbarTitleStyle}>{currentChatName}</div>
+          </div>
+          <div>
+            <IconButton style={toolbarButtonStyle}>
+              <ArrowDropUpIcon style={toolbarButtonIconStyle} />
+            </IconButton>
+          </div>
+        </Toolbar>
+        <ChatSelector
+          chats={props.displayOrderChats}
+          currentChat={props.currentChat}
+          defaultChat={props.defaultChat}
+          setTwitchChat={props.setTwitchChat}
+          open={chatSelectorOpen}
+          onRequestClose={() => setChatSelectorOpen(false)}
+        />
+        {props.enabled && (
+          <ChatAnalyticsTracker currentChat={props.currentChat} />
+        )}
+      </div>
+    );
+  } else {
+    content = <div />;
+  }
+
+  return content;
+};
+
+ChatSidebar.propTypes = {
+  enabled: PropTypes.bool.isRequired,
+  hasBeenVisible: PropTypes.bool.isRequired,
+  chats: PropTypes.objectOf(chatPropType).isRequired,
+  displayOrderChats: PropTypes.arrayOf(chatPropType).isRequired,
+  renderedChats: PropTypes.arrayOf(PropTypes.string).isRequired,
+  currentChat: PropTypes.string.isRequired,
+  defaultChat: PropTypes.string.isRequired,
+  setTwitchChat: PropTypes.func.isRequired,
+  setChatSidebarVisibility: PropTypes.func.isRequired,
+  setHashtagSidebarVisibility: PropTypes.func.isRequired,
+};
+
+export default ChatSidebar;

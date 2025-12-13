@@ -87,18 +87,18 @@ else
     assert_google_application_credentials
 fi
 
-# dev_appserver doesn't support the python311 runtime yet
-# but will still point at the local system python3 binary
-runtime_version="python310"
+runtime_version="python313"
 
 set -x
 dev_appserver.py \
     --runtime_python_path=/usr/bin/python3 \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \
+    --max_module_instances=1 \
     --runtime="$runtime_version" \
     --application="$application" \
     "${env[@]}" \
+    --env_var HTTPLIB2_CA_CERTS="/usr/lib/google-cloud-sdk/platform/google_appengine/lib/httplib2/httplib2/cacerts.txt" \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \
     --env_var STORAGE_MODE="$storage_mode" \
@@ -108,4 +108,4 @@ dev_appserver.py \
     --env_var SAVE_FRC_API_RESPONSE="$save_frc_api_response" \
     --dev_appserver_log_level="$log_level" \
     --enable_task_running yes \
-    src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/tasks_cpu.yaml src/dispatch.yaml
+    src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/tasks_cpu_enqueue.yaml src/tasks_cpu.yaml src/dispatch.yaml

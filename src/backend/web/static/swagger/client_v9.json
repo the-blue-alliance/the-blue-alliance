@@ -1,0 +1,229 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TBA Mobile API",
+    "version": "v9",
+    "description": "API for TBA Mobile clients"
+  },
+  "servers": [],
+  "components": {
+    "schemas": {
+      "BaseResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "FavoriteCollection": {
+        "type": "object",
+        "properties": {
+          "favorites": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FavoriteMessage"
+            }
+          }
+        }
+      },
+      "FavoriteMessage": {
+        "type": "object",
+        "properties": {
+          "device_key": {
+            "type": "string"
+          },
+          "model_key": {
+            "type": "string"
+          },
+          "model_type": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      },
+      "SubscriptionCollection": {
+        "type": "object",
+        "properties": {
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionMessage"
+            }
+          }
+        }
+      },
+      "SubscriptionMessage": {
+        "type": "object",
+        "properties": {
+          "device_key": {
+            "type": "string"
+          },
+          "model_key": {
+            "type": "string"
+          },
+          "model_type": {
+            "type": "string",
+            "format": "int64"
+          },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "key"
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    },
+    {
+      "ApiKey": []
+    }
+  ],
+  "paths": {
+    "/favorites/list": {
+      "post": {
+        "summary": "List favorites",
+        "operationId": "listFavorites",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FavoriteCollection"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/model/setPreferences": {
+      "post": {
+        "summary": "Set model preferences",
+        "operationId": "setModelPreferences",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "model_key",
+                  "model_type",
+                  "device_key",
+                  "notifications",
+                  "favorite"
+                ],
+                "properties": {
+                  "model_key": {
+                    "type": "string",
+                    "description": "The key of the model to set preferences for"
+                  },
+                  "model_type": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7
+                    ],
+                    "description": "The type of model (0=Event, 1=Team, 2=Match, 3=EventTeam, 4=District, 5=DistrictTeam, 6=Award, 7=Media)"
+                  },
+                  "device_key": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "The device key to exclude from sync notifications"
+                  },
+                  "notifications": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "List of notification type names"
+                  },
+                  "favorite": {
+                    "type": "boolean",
+                    "description": "Whether to favorite the model"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/list": {
+      "post": {
+        "summary": "List subscriptions",
+        "operationId": "listSubscriptions",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionCollection"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

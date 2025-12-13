@@ -9,12 +9,16 @@ from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts.comp_level import COMP_LEVELS, COMP_LEVELS_VERBOSE_FULL
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType, TYPE_NAMES as EVENT_TYPE_NAMES
 from backend.common.consts.playoff_type import (
     PlayoffType,
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
 )
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
+    DistrictPointTiebreakersSortingHelper,
+)
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
@@ -27,6 +31,12 @@ from backend.common.manipulators.event_details_manipulator import (
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    EventNexusQueueStatusMemcache,
+)
+from backend.common.memcache_models.webcast_online_status_memcache import (
+    WebcastOnlineStatusMemcache,
+)
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -56,13 +66,13 @@ def event_list(year: Optional[Year]) -> str:
 
 
 def event_detail(event_key: EventKey) -> str:
-    if not Event.validate_key_name(event_key):
-        abort(404)
-
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
-    event.prep_awards_matches_teams()
+    event.prep_awards()
+    event.prep_matches()
+    event.prep_teams()
+    event.prep_details()
 
     reg_sitevar = ChampsRegistrationHacks.get()
     api_keys = ApiAuthAccess.query(
@@ -83,7 +93,7 @@ def event_detail(event_key: EventKey) -> str:
                 "event": event,
                 "playoff_advancement": event.playoff_advancement,
                 "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
-                    event.year
+                    event.year, []
                 ),
                 "bracket_table": event.playoff_bracket,
             },
@@ -109,6 +119,29 @@ def event_detail(event_key: EventKey) -> str:
                 ),
             }
         )
+
+    district_points_sorted = None
+    if event.district_key and (points := event.district_points):
+        district_points_sorted = DistrictPointTiebreakersSortingHelper.sorted_points(
+            points
+        )
+
+    is_regional_cmp_pool_eligible = (
+        SeasonHelper.is_valid_regional_pool_year(event.year)
+        and event.event_type_enum == EventType.REGIONAL
+    )
+    regional_champs_pool_points_sorted = None
+    if is_regional_cmp_pool_eligible and (points := event.regional_champs_pool_points):
+        regional_champs_pool_points_sorted = (
+            DistrictPointTiebreakersSortingHelper.sorted_points(points)
+        )
+
+    webcast_online_status = [
+        WebcastOnlineStatusMemcache(webcast).get() for webcast in event.webcast
+    ]
+    webcast_online_status = [w for w in webcast_online_status if w is not None]
+
+    nexus_queue_status = EventNexusQueueStatusMemcache(event.key_name).get()
 
     template_values = {
         "event": event,
@@ -138,15 +171,17 @@ def event_detail(event_key: EventKey) -> str:
         "advancement_html": advancement_html,
         "match_stats": match_stats,
         "deleted_count": request.args.get("deleted"),
+        "district_points_sorted": district_points_sorted,
+        "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
+        "webcast_online_status": webcast_online_status,
+        "nexus_queue_status": nexus_queue_status,
+        "event_sync_types": dict(EventSyncType.__members__.items()),
     }
 
     return render_template("admin/event_details.html", template_values)
 
 
 def event_edit(event_key: EventKey) -> Response:
-    if not Event.validate_key_name(event_key):
-        abort(404)
-
     event = Event.get_by_id(event_key)
     if not event:
         abort(404)
@@ -157,15 +192,15 @@ def event_edit(event_key: EventKey) -> Response:
         "rankings": json.dumps(event.rankings),
         "playoff_types": PLAYOFF_TYPE_NAMES,
         "event_types": EVENT_TYPE_NAMES,
+        "event_sync_types": dict(EventSyncType.__members__.items()),
     }
     return render_template("admin/event_edit.html", template_values)
 
 
 def event_delete(event_key: EventKey) -> Response:
     if request.method == "POST":
-        if not Event.validate_key_name(event_key):
-            abort(404)
-
+        # We do not check if the event key is valid due to the possibility of invalid events being written.
+        # See: https://github.com/the-blue-alliance/the-blue-alliance/issues/6735
         event = Event.get_by_id(event_key)
         if not event:
             abort(404)
@@ -180,9 +215,6 @@ def event_delete(event_key: EventKey) -> Response:
 
         return redirect(url_for("admin.event_list"))
     else:
-        if not Event.validate_key_name(event_key):
-            abort(404)
-
         event = Event.get_by_id(event_key)
         if not event:
             abort(404)
@@ -250,13 +282,22 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         else []
     )
 
-    website = WebsiteHelper.format_url(request.form.get("website"))
+    website = (
+        "None"
+        if request.form.get("website") == "None"
+        else WebsiteHelper.format_url(request.form.get("website"))
+    )
 
     key = str(request.form.get("year")) + str.lower(
         str(request.form.get("event_short"))
     )
     if event_key is not None and event_key != key:
         abort(400)
+
+    sync_disabled_flags = 0
+    for flag_name, flag_value in EventSyncType.__members__.items():
+        if request.form.get(f"sync_disabled::{flag_name}"):
+            sync_disabled_flags |= flag_value
 
     event = Event(
         id=key,
@@ -284,6 +325,7 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         official={"true": True, "false": False}.get(
             request.form.get("official", "false").lower()
         ),
+        disable_sync_flags=sync_disabled_flags,
         enable_predictions={"true": True, "false": False}.get(
             request.form.get("enable_predictions", "false").lower()
         ),
@@ -297,6 +339,9 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
             else None
         ),
         divisions=division_keys,
+        manual_attrs=[
+            x.strip() for x in request.form.get("manual_attrs_csv", "").split(",")
+        ],
     )
     event = EventManipulator.createOrUpdate(event, auto_union=False)
 
@@ -445,12 +490,12 @@ def event_add_webcast_post(event_key: EventKey) -> Response:
 
     webcast = Webcast(
         type=WebcastType(request.form.get("webcast_type")),
-        channel=request.form.get("webcast_channel"),
+        channel=none_throws(request.form.get("webcast_channel")),
     )
     if request.form.get("webcast_file"):
-        webcast["file"] = request.form.get("webcast_file")
+        webcast["file"] = none_throws(request.form.get("webcast_file"))
     if request.form.get("webcast_date"):
-        webcast["date"] = request.form.get("webcast_date")
+        webcast["date"] = none_throws(request.form.get("webcast_date"))
 
     EventWebcastAdder.add_webcast(event, webcast)
 
@@ -464,8 +509,8 @@ def event_remove_webcast_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    webcast_type = request.form.get("type")
-    webcast_channel = request.form.get("channel")
+    webcast_type = WebcastType(request.form.get("type"))
+    webcast_channel = none_throws(request.form.get("channel"))
     webcast_index = int(request.form.get("index")) - 1
     if request.form.get("file"):
         webcast_file = request.form.get("file")

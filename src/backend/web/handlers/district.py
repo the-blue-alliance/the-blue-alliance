@@ -15,6 +15,7 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictAbbreviation, Year
+from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.queries.district_query import (
     DistrictHistoryQuery,
     DistrictQuery,
@@ -136,6 +137,11 @@ def district_detail(
     if district.year == 2021:
         rankings = None
 
+    if rankings:
+        has_adjustments = any(r.get("adjustments", 0) > 0 for r in rankings)
+    else:
+        has_adjustments = False
+
     template_values = {
         "explicit_year": explicit_year,
         "year": year,
@@ -146,6 +152,7 @@ def district_detail(
         "week_events": week_events,
         "events_by_key": events_by_key,
         "rankings": rankings,
+        "has_adjustments": has_adjustments,
         "advancement": district.advancement,
         "num_teams": num_teams,
         "teams_a": teams_a,
@@ -174,6 +181,13 @@ def regional_detail(year: Optional[Year]) -> Response:
     # needed for valid_districts
     districts_in_year_future = DistrictsInYearQuery(year).fetch_async()
 
+    if SeasonHelper.is_valid_regional_pool_year(year):
+        regional_champs_pool_future = RegionalChampsPool.get_by_id_async(
+            RegionalChampsPool.render_key_name(year)
+        )
+    else:
+        regional_champs_pool_future = None
+
     current_year = False
     if year == datetime.datetime.now().year:  # Only show active teams for current year
         current_year = True
@@ -193,6 +207,17 @@ def regional_detail(year: Optional[Year]) -> Response:
         valid_districts.append((dist.display_name, dist.abbreviation))
     valid_districts = sorted(valid_districts, key=itemgetter(0))
 
+    if regional_champs_pool_future and (
+        regional_champs_pool := regional_champs_pool_future.get_result()
+    ):
+        rankings = regional_champs_pool.rankings
+        has_adjustments = any(r["adjustments"] > 0 for r in rankings)
+        cmp_advancement = regional_champs_pool.advancement
+    else:
+        rankings = None
+        has_adjustments = False
+        cmp_advancement = None
+
     template_values = {
         "events": events,
         "explicit_year": explicit_year,
@@ -200,6 +225,10 @@ def regional_detail(year: Optional[Year]) -> Response:
         "valid_years": valid_years,
         "valid_districts": valid_districts,
         "week_events": week_events,
+        "events_by_key": events_by_key,
+        "rankings": rankings,
+        "has_adjustments": has_adjustments,
+        "advancement": cmp_advancement,
     }
 
     return make_cached_response(

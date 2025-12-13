@@ -2,7 +2,7 @@
 
 {% block title %}{% if explicit_year %}{{selected_year}} {% endif %}FIRST Robotics Events{% if state_prov %} in {{state_prov}}{% endif %} - The Blue Alliance{% endblock %}
 
-{% block meta_description %}Information, match results, and videos for FIRST Robotics Competition events{% if state_prov %} in {{state_prov}}{% endif %}{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
+{% block meta_description %}Information, match results, and videos for FIRST Robotics Competition (FRC) events{% if state_prov %} in {{state_prov}}{% endif %}{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
 
 {% block more_head_tags %}
   <meta property="og:title" content="{{selected_year}} FRC Event List{% if state_prov %} in {{state_prov}}{% endif %}" />

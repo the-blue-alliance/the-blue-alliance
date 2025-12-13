@@ -33,3 +33,9 @@ WRITE_TYPE_NAMES = {
     AuthType.EVENT_INFO: "event info",
     AuthType.ZEBRA_MOTIONWORKS: "zebra motionworks",
 }
+
+# These are types which are not shown on the API Status Page
+ADMIN_SKIP_TYPES = {
+    AuthType.EVENT_DATA,
+    AuthType.READ_API,
+}

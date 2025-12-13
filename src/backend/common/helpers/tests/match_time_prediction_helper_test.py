@@ -49,7 +49,7 @@ def test_predict_times(
         played = matches[:i]
         unplayed = matches[i:]
         MatchTimePredictionHelper.predict_future_matches(
-            "2019nyny", played, unplayed, timezone, False
+            "2019nyny", played, unplayed, timezone, False, None
         )
 
         _mark_match_played(matches, original_matches, i)

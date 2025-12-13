@@ -10,7 +10,8 @@ def test_parse_district_rankings(test_data_importer):
     with open(path, "r") as f:
         data = json.load(f)
 
-    rankings, more_results = FMSAPIDistrictRankingsParser().parse(data)
+    data, more_results = FMSAPIDistrictRankingsParser().parse(data)
+    rankings = data.advancement
 
     assert len(rankings) == 65
     assert more_results
@@ -37,18 +38,39 @@ def test_parse_district_rankings_end(test_data_importer):
     with open(path, "r") as f:
         data = json.load(f)
 
-    rankings, more_results = FMSAPIDistrictRankingsParser().parse(data)
+    data, more_results = FMSAPIDistrictRankingsParser().parse(data)
+    rankings = data.advancement
 
     assert len(rankings) == 22
     assert more_results is False
 
 
-def test_parse_district_rankings_none(test_data_importer):
+def test_parse_district_rankings_empty(test_data_importer):
     path = test_data_importer._get_path(__file__, "data/2019fim_rankings_none.json")
     with open(path, "r") as f:
         data = json.load(f)
 
-    rankings, more_results = FMSAPIDistrictRankingsParser().parse(data)
+    data, more_results = FMSAPIDistrictRankingsParser().parse(data)
+    rankings = data.advancement
 
-    assert rankings is None
+    assert rankings == {}
     assert more_results is False
+
+
+def test_parse_district_rankings_adjustments(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2025fit_rankings.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    data, _ = FMSAPIDistrictRankingsParser().parse(data)
+    adjustments = data.adjustments
+
+    assert adjustments == {
+        "frc10014": 1,
+        "frc2158": 7,
+        "frc2689": 7,
+        "frc5261": 1,
+        "frc6672": 7,
+        "frc7691": 3,
+        "frc9658": 1,
+    }

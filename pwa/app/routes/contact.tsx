@@ -1,11 +1,17 @@
-import { Link } from '@remix-run/react';
+import { Link, createFileRoute } from '@tanstack/react-router';
 
 import { Button } from '~/components/ui/button';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
-export default function Contact(): React.JSX.Element {
+export const Route = createFileRoute('/contact')({
+  headers: publicCacheControlHeaders(),
+  component: Contact,
+});
+
+function Contact(): React.JSX.Element {
   return (
     <>
-      <div className="flex flex-col divide-y [&_*]:mt-4">
+      <div className="flex flex-col divide-y **:mt-4">
         <div>
           <h1 className="text-3xl font-medium">Contact us</h1>
           <p>
@@ -38,9 +44,8 @@ export default function Contact(): React.JSX.Element {
             FIRST Digital Kit of Parts to change robot names and approve or
             change media on your own team page. You can get the code for your
             team from the FIRST Digital Kit of Parts, and redeem it at the{' '}
-            <Link to="/mod">TBA Team Mod dashboard</Link> Only one TBA account
-            may be the &quot;team mod&quot; each year, so please choose
-            carefully.
+            <a href="/mod">TBA Team Mod dashboard</a> Only one TBA account may
+            be the &quot;team mod&quot; each year, so please choose carefully.
           </p>
         </div>
 

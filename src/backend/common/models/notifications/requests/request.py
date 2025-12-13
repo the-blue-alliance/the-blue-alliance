@@ -24,18 +24,21 @@ class Request(object):
         raise NotImplementedError("NotificationRequest subclass must implement send")
 
     def defer_track_notification(self, num_keys):
-        from google.appengine.ext import deferred
-
         from backend.common.consts.notification_type import (
             TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
         )
+        from backend.common.helpers.deferred import defer_safe
 
-        deferred.defer(
+        params = {
+            "action": NOTIFICATION_TYPE_NAMES[type(self.notification)._type()],
+            "value": num_keys,
+        }
+
+        defer_safe(
             GoogleAnalytics.track_event,
-            "tba-notification-tracking",
+            "tba_notification_tracking",
             "notification",
-            NOTIFICATION_TYPE_NAMES[type(self.notification)._type()],
-            event_value=num_keys,
+            params,
             _queue="api-track-call",
             _url="/_ah/queue/deferred_notification_track_send",
         )

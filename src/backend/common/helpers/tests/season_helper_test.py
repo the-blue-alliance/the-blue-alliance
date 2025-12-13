@@ -8,30 +8,63 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
 
 
-EST = timezone("EST")
+EST = timezone("US/Eastern")
 
 
 def test_kickoff_datetime() -> None:
-    # 2021 - Saturday the 9th, 12:00am EST (https://www.firstinspires.org/robotics/frc/blog/2021-kickoff)
-    kickoff_2021 = datetime(2021, 1, 9, 12, 00, 00, tzinfo=EST)
+    # For folks looking at this test later to confirm everything is right
+    # 2026 = Jan 10th
+    # 2025 = Jan 4th
+    # 2024 = Jan 6th
+    # 2023 = Jan 7th
+    # 2022 = Jan 8th
+    # 2021 = Jan 9th
+    # 2020 = Jan 4th
+    # 2019 = Jan 5th
+    # 2018 = Jan 6th
+    # 2017 = Jan 7th
+    # 2016 = Jan 9th
+    # 2015 = Jan 3rd
+    # 2014 = Jan 4th
+    # 2013 = Jan 5th
+    # 2012 = Jan 7th
+    # 2011 = Jan 8th
+    # 2010 = Jan 9th
+    # 2009 = Jan 3rd
+    # 2008 = Jan 5th
+    # 2007 = Jan 6th
+    # 2006 = Jan 7th
+    # 2005 = Jan 8th
+    # After this, things start to get hard to confirm online
+    # I'm sure I could dig through Chief posts
+    # ~zach
+
+    # 2026 - Saturday the 10th, 12:00pm (noon) EST
+    kickoff_2026 = EST.localize(datetime(2026, 1, 10, 12, 00, 00))
+    kickoff_2026_utc = kickoff_2026.astimezone(UTC)
+    assert SeasonHelper.kickoff_datetime_est(year=2026) == kickoff_2026
+    assert SeasonHelper.kickoff_datetime_utc(year=2026) == kickoff_2026_utc
+
+    # 2021 - Saturday the 9th, 12:00pm (noon) EST (https://www.firstinspires.org/robotics/frc/blog/2021-kickoff)
+    kickoff_2021 = EST.localize(datetime(2021, 1, 9, 12, 00, 00))
     kickoff_2021_utc = kickoff_2021.astimezone(UTC)
     assert SeasonHelper.kickoff_datetime_est(year=2021) == kickoff_2021
     assert SeasonHelper.kickoff_datetime_utc(year=2021) == kickoff_2021_utc
 
     # 2020 - Saturday the 4th, 10:30am EST (https://www.firstinspires.org/robotics/frc/blog/2020-kickoff-downloads)
-    kickoff_2020 = datetime(2020, 1, 4, 10, 30, 00, tzinfo=EST)
+    kickoff_2020 = EST.localize(datetime(2020, 1, 4, 10, 30, 00))
     kickoff_2020_utc = kickoff_2020.astimezone(UTC)
     assert SeasonHelper.kickoff_datetime_est(year=2020) == kickoff_2020
     assert SeasonHelper.kickoff_datetime_utc(year=2020) == kickoff_2020_utc
 
     # 2019 - Saturday the 5th, 10:30am EST (https://en.wikipedia.org/wiki/Logo_Motion)
-    kickoff_2019 = datetime(2019, 1, 5, 10, 30, 00, tzinfo=EST)
+    kickoff_2019 = EST.localize(datetime(2019, 1, 5, 10, 30, 00))
     kickoff_2019_utc = kickoff_2019.astimezone(UTC)
     assert SeasonHelper.kickoff_datetime_est(year=2019) == kickoff_2019
     assert SeasonHelper.kickoff_datetime_utc(year=2019) == kickoff_2019_utc
 
     # 2010 - Saturday the 9th, 10:30am EST (https://en.wikipedia.org/wiki/Breakaway_(FIRST))
-    kickoff_2010 = datetime(2010, 1, 9, 10, 30, 00, tzinfo=EST)
+    kickoff_2010 = EST.localize(datetime(2010, 1, 9, 10, 30, 00))
     kickoff_2010_utc = kickoff_2010.astimezone(UTC)
     assert SeasonHelper.kickoff_datetime_est(year=2010) == kickoff_2010
     assert SeasonHelper.kickoff_datetime_utc(year=2010) == kickoff_2010_utc

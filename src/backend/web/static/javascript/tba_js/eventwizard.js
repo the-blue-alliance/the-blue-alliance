@@ -1,6 +1,34 @@
 var ALLIANCE_PICKS_MAX = 3;
 var NUM_ALLIANCES = 8;
 
+DOUBLE_ELIM_MAPPING = {
+    // round 1
+    1: ["sf", 1, 1],
+    2: ["sf", 2, 1],
+    3: ["sf", 3, 1],
+    4: ["sf", 4, 1],
+    // round 2
+    5: ["sf", 5, 1],
+    6: ["sf", 6, 1],
+    7: ["sf", 7, 1],
+    8: ["sf", 8, 1],
+    // round 3
+    9: ["sf", 9, 1],
+    10: ["sf", 10, 1],
+    // round 4
+    11: ["sf", 11, 1],
+    12: ["sf", 12, 1],
+    // round 5
+    13: ["sf", 13, 1],
+    // finals
+    14: ["f", 1, 1],
+    15: ["f", 1, 2],
+    16: ["f", 1, 3],
+    17: ["f", 1, 4], // Overtime 1
+    18: ["f", 1, 5], // Overtime 2
+    19: ["f", 1, 6], // Overtime 3
+}
+
 ELIM_MAPPING = {
     1: [1, 1],  // (set, match)
     2: [2, 1],
@@ -128,17 +156,9 @@ function getCookie(name) {
     return "";
 }
 
-function playoffTypeFromNumber(matchNum, is_octo){
-    if (is_octo) {
-        if (matchNum > 0 && matchNum <= 24) return "ef";
-        if (matchNum > 24 && matchNum <= 36) return "qf";
-        if (matchNum > 36 && matchNum <= 42) return "sf";
-        return "f";
-    } else {
-        if (matchNum > 0 && matchNum <= 12) return "qf";
-        if (matchNum > 12 && matchNum <= 18) return "sf";
-        return "f";
-    }
+function playoffTypeFromNumber(matchNum){
+   const match_info = DOUBLE_ELIM_MAPPING[matchNum];
+   return match_info[0]; 
 }
 
 /* Returns one of {ef, qf, sf, f}
@@ -149,6 +169,7 @@ function playoffTypeFromMatchString(matchString){
     if(matchString.includes("Quarterfinal")) return "qf";
     if(matchString.includes("Semifinal")) return "sf";
     if(matchString.includes("Final")) return "f";
+    if(matchString.includes("Match")) return "sf";
     return null;
 }
 
@@ -156,30 +177,14 @@ function playoffTypeFromMatchString(matchString){
  * For use when some reports don't give the match number in the grid
  * ASSUMES 2016 label format, Quarter 1, Quarter 2, ..., Tiebreaker 1, Semi 1, ...
  */
-function playoffTypeMatchAndSet(is_octo, match_string, last_type) {
-    var set_num, match_num;
-    var match_type = playoffTypeFromMatchString(match_string);
-    if (match_type == null) {
-        // We've found a "Tiebreaker X" match, assume type is the same as the previous
-        match_type = last_type;
-        set_num = parseInt(match_string.split(" ")[1]);
-        match_num = 3;
-        return [match_type, set_num, match_num];
-    } else {
-        var schedule_number = parseInt(match_string.split(" ")[1]);
-        var overall_match_num = (is_octo ? OCTO_FIRST_MATCH[match_type] : FIRST_MATCH[match_type]) + schedule_number;
-        var match_and_set = playoffMatchAndSet(overall_match_num, is_octo);
-        return [match_type, match_and_set[0], match_and_set[1]]
-    }
+function playoffTypeMatchAndSet(match_num) {
+    return DOUBLE_ELIM_MAPPING[match_num];
 }
 
 /* Return [set #, match #] */
-function playoffMatchAndSet(totalMatchNum, is_octo){
-    if (is_octo) {
-        return OCTO_ELIM_MAPPING[totalMatchNum];
-    } else {
-        return ELIM_MAPPING[totalMatchNum];
-    }
+function playoffMatchAndSet(totalMatchNum){
+    const match_and_set = DOUBLE_ELIM_MAPPING[totalMatchNum];
+    return [match_and_set[1], match_and_set[2]];
 }
 
 /* Load all valid events for this user */
@@ -311,10 +316,11 @@ $('#rankings-ok').hide();
 $('#fetch-matches').click(function(e) {
   e.preventDefault();
   $('#match_play_load_status').html("Loading matches");
+  var auth_id = $('#auth_id').val();
   $.ajax({
-    url: '/api/v2/event/' + $('#event_key').val() + '/matches',
+    url: '/api/v3/event/' + $('#event_key').val() + '/matches/simple',
     dataType: 'json',
-    headers: {'X-TBA-App-Id': 'tba-web:match-input:v01'},
+    headers: {'X-TBA-Auth-Key': auth_id},
     success: function(matches) {
       $("#match-table").empty();
       $('#match_play_load_status').html("Loaded "+matches.length+" matches");
@@ -330,8 +336,8 @@ $('#fetch-matches').click(function(e) {
 
         var trRed = $('<tr>');
         trRed.append($('<td>', {rowspan: 2, text: match.key.split('_')[1], 'style': 'border-top-width: 4px;border-left-width:4px;border-bottom-width:4px;'}));
-        for (j in match.alliances.red.teams) {
-          trRed.append($('<td>', {'class': 'red', 'data-matchKey-redTeam': match.key, 'text': match.alliances.red.teams[j].substring(3), 'style':'border-top-width:4px;'}));
+        for (j in match.alliances.red.team_keys) {
+          trRed.append($('<td>', {'class': 'red', 'data-matchKey-redTeam': match.key, 'text': match.alliances.red.team_keys[j].substring(3), 'style':'border-top-width:4px;'}));
         }
         trRed.append($('<td>', {'style':'background-color: #FF9999;border-top-width:4px;'}).append($('<input>', {'id': match.key + '-redScore', 'type': 'text', 'type': 'number', 'value': match.alliances.red.score, 'tabIndex':tabIndex}).css('max-width', '50px')));
         trRed.append($('<td>', {rowspan: 2, 'style': 'border-top-width: 4px;border-right-width:4px;border-bottom-width:4px;width:17%'}).append($('<input>', {'id': match.key+"_video", 'placeholder': 'YouTube URL'})));
@@ -340,8 +346,8 @@ $('#fetch-matches').click(function(e) {
         $("#match-table").append(trRed);
 
         var trBlue = $('<tr>');
-        for (j in match.alliances.blue.teams) {
-          trBlue.append($('<td>', {'class': 'blue', 'data-matchKey-blueTeam': match.key, 'text': match.alliances.blue.teams[j].substring(3), 'style':'border-bottom-width:4px;'}));
+        for (j in match.alliances.blue.team_keys) {
+          trBlue.append($('<td>', {'class': 'blue', 'data-matchKey-blueTeam': match.key, 'text': match.alliances.blue.team_keys[j].substring(3), 'style':'border-bottom-width:4px;'}));
         }
         trBlue.append($('<td>', {'style':'background-color: #9999FF;border-bottom-width:4px;'}).append($('<input>', {'id': match.key + '-blueScore', 'type': 'text', 'type': 'number', 'value': match.alliances.blue.score,'tabIndex':tabIndex+1}).css('max-width', '50px')));
         $("#match-table").append(trBlue);
@@ -352,7 +358,7 @@ $('#fetch-matches').click(function(e) {
 
     },
     error: function(data) {
-      alert("Something went wrong! Please check your Event Key.");
+      alert("Something went wrong! Please check your Event Key and Auth Key.");
     }
   });
 });

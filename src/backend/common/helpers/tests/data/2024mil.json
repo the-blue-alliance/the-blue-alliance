@@ -1,0 +1,37 @@
+{
+  "address": "1001 Avenida De Las Americas, Houston, TX 77010, USA",
+  "city": "Houston",
+  "country": "USA",
+  "district": null,
+  "division_keys": [],
+  "end_date": "2024-04-20",
+  "event_code": "mil",
+  "event_type": 3,
+  "event_type_string": "Championship Division",
+  "first_event_code": "milstein",
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJgw3vTiK_QIYRsMwBp668_Lo",
+  "gmaps_url": "https://maps.google.com/?q=1001+Avenida+De+Las+Americas,+Houston,+TX+77010,+USA&ftid=0x8640bf224eef0d83:0xbafcbcaea701ccb0",
+  "key": "2024mil",
+  "lat": 29.7520006,
+  "lng": -95.3576434,
+  "location_name": "1001 Avenida De Las Americas",
+  "name": "Milstein Division",
+  "parent_event_key": "2024cmptx",
+  "playoff_type": 10,
+  "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+  "postal_code": "77010",
+  "short_name": "Milstein",
+  "start_date": "2024-04-17",
+  "state_prov": "TX",
+  "timezone": "America/Chicago",
+  "webcasts": [
+    {
+      "channel": "firstinspires_milstein",
+      "type": "twitch"
+    }
+  ],
+  "website": "https://www.firstchampionship.org",
+  "week": null,
+  "year": 2024
+}

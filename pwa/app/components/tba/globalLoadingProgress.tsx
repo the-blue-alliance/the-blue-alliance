@@ -1,4 +1,4 @@
-import { useNavigation } from '@remix-run/react';
+import { useRouterState } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { Progress } from '~/components/ui/progress';
@@ -7,8 +7,7 @@ import { Progress } from '~/components/ui/progress';
 export default function GlobalLoadingProgress() {
   const [hidden, setHidden] = useState(true);
   const [progress, setProgress] = useState(0);
-  const navigation = useNavigation();
-  const active = navigation.state !== 'idle';
+  const active = useRouterState({ select: (s) => s.isLoading });
 
   useEffect(() => {
     if (active) {
@@ -47,6 +46,9 @@ export default function GlobalLoadingProgress() {
     return null;
   }
   return (
-    <Progress className="fixed top-0 z-20 h-1 rounded-none" value={progress} />
+    <Progress
+      className="fixed top-0 z-20 h-0.5 rounded-none"
+      value={progress}
+    />
   );
 }

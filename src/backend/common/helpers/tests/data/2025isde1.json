@@ -1,0 +1,42 @@
+{
+  "address": null,
+  "city": "Hadera",
+  "country": "Israel",
+  "district": {
+    "abbreviation": "isr",
+    "display_name": "FIRST Israel",
+    "key": "2025isr",
+    "year": 2025
+  },
+  "division_keys": [],
+  "end_date": "2025-02-25",
+  "event_code": "isde1",
+  "event_type": 1,
+  "event_type_string": "District",
+  "first_event_code": "isde1",
+  "first_event_id": null,
+  "gmaps_place_id": null,
+  "gmaps_url": null,
+  "key": "2025isde1",
+  "lat": null,
+  "lng": null,
+  "location_name": null,
+  "name": "ISR District Event #1",
+  "parent_event_key": null,
+  "playoff_type": 10,
+  "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+  "postal_code": null,
+  "short_name": "ISR #1",
+  "start_date": "2025-02-23",
+  "state_prov": "M",
+  "timezone": "Asia/Jerusalem",
+  "webcasts": [
+    {
+      "channel": "firstisrael",
+      "type": "twitch"
+    }
+  ],
+  "website": "http://firstisrael.org.il",
+  "week": 0,
+  "year": 2025
+}

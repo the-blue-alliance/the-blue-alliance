@@ -65,6 +65,7 @@
             <br>
             Onshape documents that are public but require an Onshape account are not yet supported. To make them accessible, select <code>Share</code>, <code>Link Sharing</code>, then <code>Turn on link sharing</code>.
             </li>
+            <li><strong>Chief Delphi build/technical threads</strong>, like <code>https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115</code></li>
           </ul>
 
           <p><strong>Please do not submit:</strong></p>
@@ -134,10 +135,10 @@
           </div>
           {% endif %}
 
-          {% if medias_by_slugname.grabcad or medias_by_slugname.onshape %}
+          {% if medias_by_slugname.grabcad or medias_by_slugname.onshape or medias_by_slugname['cd-thread'] %}
           <div class="row">
             <div class="col-xs-12">
-              <h4>Existing CAD Models</h4>
+              <h4>Existing CAD Models & Discussion Threads</h4>
               {% for media in medias_by_slugname.grabcad %}
                 <div class="col-xs-12 col-md-6">
                 {% include "media_partials/grabcad_partial.html" %}
@@ -148,6 +149,11 @@
                 {% include "media_partials/onshape_partial.html" %}
                 </div>
                 {% endfor %}
+              {% for media in medias_by_slugname['cd-thread'] %}
+                <div class="col-xs-12 col-md-6">
+                {% include "media_partials/cd_thread_partial.html" %}
+                </div>
+              {% endfor %}
             </div>
           </div>
           {% endif %}

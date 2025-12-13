@@ -1,4 +1,4 @@
-// https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/playoff_type.py
+// https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py
 export enum PlayoffType {
   // Standard Brackets
   BRACKET_16_TEAM = 1,

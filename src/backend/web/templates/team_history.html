@@ -3,7 +3,7 @@
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}} (History) - The Blue Alliance{% endblock %}
 
-{% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team history from the FIRST Robotics Competition.{% endblock %}
+{% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team history from the FIRST Robotics Competition (FRC).{% endblock %}
 
 {% block more_head_tags %}
 {% include "team_partials/team_head_tags.html" %}
@@ -91,6 +91,17 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block footer_content %}
+{% if years and years|min >= 2015 %}
+<div class="text-left col-sm-9 col-lg-10 col-sm-offset-3 col-lg-offset-2" style="margin-bottom: 2rem;">
+  <p><span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank" rel="noopener noreferrer"><em>FIRST</em><sup>®</sup> Events API</a></p>
+  {% if current_event_pit_location %}
+    <p><img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Locations provided by the <a href="https://frc.nexus/en/api" target="_blank" rel="noopener noreferrer">Nexus API</a></p>
+  {% endif %}
+</div>
+{% endif %}
 {% endblock %}
 
 {% block inline_javascript %}

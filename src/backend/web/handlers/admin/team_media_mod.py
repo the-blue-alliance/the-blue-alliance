@@ -5,8 +5,8 @@ from io import StringIO
 from typing import List, Optional
 
 from flask import abort, redirect, request, url_for
-from google.appengine.ext import deferred
 
+from backend.common.helpers.deferred import defer_safe
 from backend.common.models.account import Account
 from backend.common.models.keys import TeamNumber, Year
 from backend.common.models.team_admin_access import TeamAdminAccess
@@ -75,7 +75,7 @@ def team_media_add_single(year: Year, csv_row: List[str]) -> None:
 
 def team_media_add_group(year: Year, csv_rows: List[List[str]]) -> None:
     for row in csv_rows:
-        deferred.defer(team_media_add_single, year, row, _queue="admin")
+        defer_safe(team_media_add_single, year, row, _queue="admin")
 
 
 def team_media_mod_add_post():
@@ -86,7 +86,7 @@ def team_media_mod_add_post():
     for row in itertools.batched(csv_data, 100):
         # defer the actual datastore write, because with a large number
         # of teams to add, we don't want to OOM the original request
-        deferred.defer(team_media_add_group, year, row, _queue="admin")
+        defer_safe(team_media_add_group, year, row, _queue="admin")
 
     return redirect(url_for("admin.team_media_mod_list", year=year))
 

@@ -108,6 +108,30 @@ def event_detail(event_key: EventKey, detail_type: str) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
+def event_advancement_points(event_key: EventKey) -> Response:
+    """
+    Returns details about one event, specified by |event_key| and |detail_type|.
+    """
+    track_call_after_response("event/advancement_points", event_key)
+
+    event_details = EventDetailsQuery(event_key=event_key).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+    if event_details is None:
+        return profiled_jsonify(None)
+
+    # This is a hybrid merging of regiona/district points
+    if regional_champs_pool_points := event_details.get("regional_champs_pool_points"):
+        return profiled_jsonify(regional_champs_pool_points)
+    elif district_points := event_details.get("district_points"):
+        return profiled_jsonify(district_points)
+    else:
+        return profiled_jsonify(None)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
 def event_teams(
     event_key: EventKey, model_type: Optional[ModelType] = None
 ) -> Response:

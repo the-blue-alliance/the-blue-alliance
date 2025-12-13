@@ -1,7 +1,9 @@
+from itertools import product
 from typing import Any, List, Set, Tuple, Type
 
 from google.appengine.ext import ndb
 
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -83,6 +85,7 @@ def event_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
 
     for year in years:
         queries.append(event_query.EventListQuery(year))
+        queries.append(event_query.RegionalEventsQuery(year))
 
     for event_district_key in event_district_keys:
         queries.append(event_query.DistrictEventsQuery(event_district_key.id()))
@@ -149,6 +152,7 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     reference_keys = _filter(affected_refs["references"])
     years = _filter(affected_refs["year"])
     media_tags = _filter(affected_refs["media_tag_enum"])
+    media_types = _filter(affected_refs["media_type_enum"])
 
     team_keys = list(filter(lambda x: x.kind() == "Team", reference_keys))
     event_team_keys_future = (
@@ -161,6 +165,10 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
 
     queries: List[CachedDatabaseQuery] = []
     for reference_key in reference_keys:
+        for year in years:
+            for media_type in media_types:
+                queries.append(media_query.MediaTypeYearQuery(media_type, year))
+
         if reference_key.kind() == "Team":
             for year in years:
                 queries.append(media_query.TeamYearMediaQuery(reference_key.id(), year))
@@ -174,6 +182,7 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
                 queries.append(
                     media_query.TeamTagMediasQuery(reference_key.id(), media_tag)
                 )
+
             queries.append(media_query.TeamSocialMediaQuery(reference_key.id()))
         if reference_key.kind() == "Event":
             queries.append(media_query.EventMediasQuery(reference_key.id()))
@@ -268,6 +277,28 @@ def districtteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAn
     return _queries_to_cache_keys_and_queries(queries)
 
 
+def regionalpoolteam_updated(
+    affected_refs: TAffectedReferences,
+) -> List[TCacheKeyAndQuery]:
+    years = _filter(affected_refs["year"])
+
+    queries: List[CachedDatabaseQuery] = []
+    for year in years:
+        queries.append(team_query.RegionalTeamsQuery(year))
+    return _queries_to_cache_keys_and_queries(queries)
+
+
+def regional_champs_pool_updated(
+    affected_refs: TAffectedReferences,
+) -> List[TCacheKeyAndQuery]:
+    years = _filter(affected_refs["year"])
+
+    queries: List[CachedDatabaseQuery] = []
+    for year in years:
+        queries.append(team_query.RegionalTeamsQuery(year))
+    return _queries_to_cache_keys_and_queries(queries)
+
+
 def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
     district_abbrevs = _filter(affected_refs["abbreviation"])
@@ -285,10 +316,15 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
         queries.append(district_query.DistrictsInYearQuery(year))
 
     for abbrev in district_abbrevs:
-        queries.append(district_query.DistrictHistoryQuery(abbrev))
+        for alt_abbrev in RenamedDistricts.get_equivalent_codes(abbrev):
+            queries.append(district_query.DistrictHistoryQuery(abbreviation=alt_abbrev))
+            queries.append(
+                district_query.DistrictAbbreviationQuery(abbreviation=alt_abbrev)
+            )
 
     for key in district_keys:
-        queries.append(district_query.DistrictQuery(key.id()))
+        for alt_key in RenamedDistricts.get_equivalent_keys(key.string_id()):
+            queries.append(district_query.DistrictQuery(district_key=alt_key))
 
     for dt_key in district_team_keys_future.get_result():
         team_key = dt_key.id().split("_")[1]
@@ -311,9 +347,23 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
 
 def insight_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
     years = _filter(affected_refs["year"])
+    district_abbreviations = _filter(affected_refs["district_abbreviation"])
+    names = _filter(affected_refs["name"])
 
     queries: List[CachedDatabaseQuery] = []
     for year in years:
         queries.append(insight_query.InsightsLeaderboardsYearQuery(year))
+        queries.append(insight_query.InsightsNotablesYearQuery(year))
+
+    for year, district_abbreviation, name in product(
+        years, district_abbreviations, names
+    ):
+        queries.append(
+            insight_query.DistrictInsightQuery(
+                name,
+                year,
+                district_abbreviation,
+            )
+        )
 
     return _queries_to_cache_keys_and_queries(queries)

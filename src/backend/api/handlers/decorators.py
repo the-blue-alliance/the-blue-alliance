@@ -1,6 +1,6 @@
 import json
 from functools import wraps
-from typing import Callable, Set, Type, TypeVar
+from typing import Callable, Type, TypeVar
 
 from flask import g, jsonify, request, Response
 
@@ -8,6 +8,8 @@ from backend.api.client_api_types import VoidRequest
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.event_code_exceptions import EventCodeExceptions
+from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
@@ -29,8 +31,10 @@ def api_authenticated(func):
 
             if auth_key:
                 auth = ApiAuthAccess.get_by_id(auth_key)
-                if auth and auth.is_read_key:
+                if auth:
                     auth_owner_id = auth.owner.id() if auth.owner else None
+                    # Set for our GA event tracking in `track_call_after_response`
+                    g.auth_description = auth.description
                 else:
                     return (
                         {
@@ -58,15 +62,24 @@ def api_authenticated(func):
     return decorated_function
 
 
-def require_write_auth(auth_types: Set[AuthType]):
+def require_write_auth(auth_types: set[AuthType] | None, file_param: str | None = None):
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
             with Span("require_write_auth"):
                 event_key = kwargs["event_key"]
+                fms_report_type = kwargs.get("report_type")
+                # Check if report_type is a valid FMS report type
+                if fms_report_type:
+                    try:
+                        FMSReportType(fms_report_type)
+                    except ValueError:
+                        fms_report_type = None
 
                 # This will abort the request on failure
-                TrustedApiAuthHelper.do_trusted_api_auth(event_key, auth_types)
+                TrustedApiAuthHelper.do_trusted_api_auth(
+                    event_key, fms_report_type, auth_types, file_param
+                )
             return func(*args, **kwargs)
 
         return decorated_function
@@ -131,6 +144,7 @@ def validate_keys(func):
 
             event_future = None
             if event_key:
+                event_key = EventCodeExceptions.resolve(event_key)
                 event_future = Event.get_by_id_async(event_key)
 
             match_future = None

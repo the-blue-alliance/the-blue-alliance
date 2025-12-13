@@ -4,7 +4,10 @@ import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 from google.appengine.ext import ndb
+from pytz import all_timezones_set as PYTZ_ALL_TIMEZONES
+from tzlocal.windows_tz import win_tz as WINDOWS_TO_IANA
 
+from backend.common.consts.event_code_exceptions import EVENT_CODE_EXCEPTIONS
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.event_short_name_helper import EventShortNameHelper
@@ -50,37 +53,6 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
     NON_OFFICIAL_EVENT_TYPES = ["offseason"]
 
-    # event_key (code, short_name)
-    EVENT_CODE_EXCEPTIONS = {
-        "archimedes": ("arc", "Archimedes"),
-        "arpky": ("arc", "Archimedes"),
-        "carson": ("cars", "Carson"),
-        "carver": ("carv", "Carver"),
-        "curie": ("cur", "Curie"),
-        "cpra": ("cur", "Curie"),
-        "daly": ("dal", "Daly"),
-        "dcmp": ("dal", "Daly"),
-        "darwin": ("dar", "Darwin"),
-        "galileo": ("gal", "Galileo"),
-        "gcmp": ("gal", "Galileo"),
-        "hopper": ("hop", "Hopper"),
-        "hcmp": ("hop", "Hopper"),
-        "jcmp": ("joh", "Johnson"),
-        "mpcia": ("mil", "Milstein"),
-        "newton": ("new", "Newton"),
-        "npfcmp": ("new", "Newton"),
-        "roebling": ("roe", "Roebling"),
-        "tesla": ("tes", "Tesla"),
-        "turing": ("tur", "Turing"),
-        "johnson": ("joh", "Johnson"),
-        "milstein": ("mil", "Milstein"),
-        # For Einstein, format with the name "Einstein" or "FIRST Championship" or whatever
-        "cmp": ("cmp", "{}"),
-        "cmpmi": ("cmpmi", "{} (Detroit)"),
-        "cmpmo": ("cmpmo", "{} (St. Louis)"),
-        "cmptx": ("cmptx", "{} (Houston)"),
-    }
-
     EINSTEIN_SHORT_NAME_DEFAULT = "Einstein"
     EINSTEIN_NAME_DEFAULT = "Einstein Field"
     EINSTEIN_CODES = {"cmp", "cmpmi", "cmpmo", "cmptx"}
@@ -93,7 +65,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         # Even though 2022/2023 Einstein is listed as "cmptx", we don't want it to say "(Houston)".
         if season >= 2022 and code == "cmptx":
             return (code, "{}")
-        return self.EVENT_CODE_EXCEPTIONS[code]
+        return EVENT_CODE_EXCEPTIONS[code]
 
     def get_playoff_type(self, year, alliance_count):
         playoff_type = None
@@ -169,10 +141,18 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                 for url in event.get("webcasts", [])
             ]
 
-            # TODO read timezone from API
+            # Attempt to convert our API (Windows) timezone -> IANA timezone
+            # We'll ensure it's capatiable with pytz as well, since that's what we use everywhere
+            timezone = None
+            if (
+                (api_timezone := event.get("timezone"))
+                and (iana_tz_name := WINDOWS_TO_IANA.get(api_timezone))
+                and iana_tz_name in PYTZ_ALL_TIMEZONES
+            ):
+                timezone = iana_tz_name
 
             # Special cases for champs
-            if code in self.EVENT_CODE_EXCEPTIONS:
+            if code in EVENT_CODE_EXCEPTIONS:
                 code, short_name = self.get_code_and_short_name(self.season, code)
 
                 # FIRST indicates CMP registration before divisions are assigned by adding all teams
@@ -212,6 +192,7 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
                     short_name=short_name,
                     event_short=code,
                     event_type_enum=event_type,
+                    timezone_id=timezone,
                     official=official,
                     playoff_type=playoff_type,
                     start_date=start,

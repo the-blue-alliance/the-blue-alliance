@@ -1,12 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { ListItem } from "material-ui/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 
 export default class WebcastSelectionDialogItem extends React.Component {
   static propTypes = {
     webcast: PropTypes.object.isRequired,
     webcastSelected: PropTypes.func.isRequired,
     secondaryText: PropTypes.string,
+    leftIcon: PropTypes.element,
     rightIcon: PropTypes.any,
   };
 
@@ -16,12 +20,20 @@ export default class WebcastSelectionDialogItem extends React.Component {
 
   render() {
     return (
-      <ListItem
-        primaryText={this.props.webcast.name}
-        secondaryText={this.props.secondaryText}
-        onClick={() => this.handleClick()}
-        rightIcon={this.props.rightIcon}
-      />
+      <ListItem button onClick={() => this.handleClick()}>
+        {this.props.leftIcon && (
+          <ListItemIcon>{this.props.leftIcon}</ListItemIcon>
+        )}
+        <ListItemText
+          primary={this.props.webcast.name}
+          secondary={this.props.secondaryText}
+        />
+        {this.props.rightIcon && (
+          <ListItemSecondaryAction>
+            {this.props.rightIcon}
+          </ListItemSecondaryAction>
+        )}
+      </ListItem>
     );
   }
 }

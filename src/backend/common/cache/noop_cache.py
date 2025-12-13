@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional
 
 from backend.common.cache.cache_if import CacheIf, CacheStats
+from backend.common.futures import InstantFuture, TypedFuture
 
 
 class NoopCache(CacheIf):
@@ -16,6 +17,11 @@ class NoopCache(CacheIf):
     def set(self, key: bytes, value: Any, time: Optional[int] = None) -> bool:
         return True
 
+    def set_async(
+        self, key: bytes, value: Any, time: Optional[int] = None
+    ) -> TypedFuture[bool]:
+        return InstantFuture(True)  # pyre-ignore[7]
+
     def set_multi(
         self,
         mapping: Dict[bytes, Any],
@@ -27,6 +33,10 @@ class NoopCache(CacheIf):
     def get(self, key: bytes) -> Optional[Any]:
         self.miss_count += 1
         return None
+
+    def get_async(self, key: bytes) -> Optional[Any]:
+        self.miss_count += 1
+        return InstantFuture(None)
 
     def get_multi(
         self,

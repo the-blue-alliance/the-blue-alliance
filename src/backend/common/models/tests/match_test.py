@@ -5,6 +5,7 @@ from typing import Optional
 import pytest
 from freezegun import freeze_time
 from google.appengine.ext import ndb
+from pyre_extensions.refinement import none_throws
 
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import AllianceColor
@@ -22,7 +23,7 @@ def get_base_elim_match(**kwargs) -> Match:
         comp_level=CompLevel.SF,
         set_number=1,
         match_number=2,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -34,7 +35,7 @@ def get_base_finals_match(**kwargs) -> Match:
         comp_level=CompLevel.F,
         set_number=1,
         match_number=3,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -46,7 +47,7 @@ def get_base_qual_match(**kwargs) -> Match:
         comp_level=CompLevel.QM,
         set_number=1,
         match_number=20,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -415,3 +416,294 @@ def test_youtube_videos_formatted_no_timestamp() -> None:
     # Test that nothing is changed if there is no timestamp
     match = Match(youtube_videos=["TqY324xLU4s"])
     assert match.youtube_videos_formatted == ["TqY324xLU4s"]
+
+
+def test_score_breakdown_lazy_load_none() -> None:
+    match = Match(id="2025miket_qm1", year=2025)
+    assert match.score_breakdown is None
+
+
+def test_score_breakdown_lazy_load_invalid() -> None:
+    match = Match(id="2025miket_qm1", year=2025, score_breakdown_json="")
+    assert match.score_breakdown is None
+
+
+def test_score_breakdown_lazy_load_json_missing_colors() -> None:
+    # Setup alliances for Match.has_been_played
+    alliance_dict = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"], score=-1, dqs=[], surrogates=[]
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=-1, dqs=[], surrogates=[]
+        ),
+    }
+    score_breakdown = {}
+    match = Match(
+        id="2025miket_qm1",
+        year=2025,
+        alliances_json=json.dumps(alliance_dict),
+        score_breakdown_json=json.dumps(score_breakdown),
+    )
+    assert match.score_breakdown is None
+    assert match._score_breakdown is None
+
+
+def test_score_breakdown_lazy_load_json() -> None:
+    # Setup alliances for Match.has_been_played
+    alliance_dict = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"], score=-1, dqs=[], surrogates=[]
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=-1, dqs=[], surrogates=[]
+        ),
+    }
+    score_breakdown = {AllianceColor.RED: {}, AllianceColor.BLUE: {}}
+    match = Match(
+        id="2025miket_qm1",
+        year=2025,
+        alliances_json=json.dumps(alliance_dict),
+        score_breakdown_json=json.dumps(score_breakdown),
+    )
+    # Order here is important - first checks our empty case, second inits, third checks init
+    assert match._score_breakdown is None
+    assert match.score_breakdown == score_breakdown
+    assert match._score_breakdown == score_breakdown
+
+
+def test_score_breakdown_2025_tba_fields() -> None:
+    # Setup alliances for Match.has_been_played
+    # Scores need to be not -1
+    alliance_dict = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"], score=1, dqs=[], surrogates=[]
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=2, dqs=[], surrogates=[]
+        ),
+    }
+    # Forgive me -
+    score_breakdown = {
+        AllianceColor.RED: {
+            "autoReef": {
+                "botRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+                "midRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+                "topRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+                "trough": 0,
+            },
+            "teleopReef": {
+                "botRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+                "midRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+                "topRow": {
+                    "nodeA": True,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+            },
+        },
+        AllianceColor.BLUE: {
+            "autoReef": {
+                "botRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+                "midRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+                "topRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": False,
+                    "nodeD": False,
+                    "nodeE": False,
+                    "nodeF": True,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": True,
+                },
+            },
+            "teleopReef": {
+                "botRow": {
+                    "nodeA": False,
+                    "nodeB": False,
+                    "nodeC": True,
+                    "nodeD": True,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": False,
+                    "nodeL": False,
+                },
+                "midRow": {
+                    "nodeA": True,
+                    "nodeB": True,
+                    "nodeC": True,
+                    "nodeD": True,
+                    "nodeE": False,
+                    "nodeF": False,
+                    "nodeG": False,
+                    "nodeH": False,
+                    "nodeI": False,
+                    "nodeJ": False,
+                    "nodeK": True,
+                    "nodeL": True,
+                },
+                "topRow": {
+                    "nodeA": False,
+                    "nodeB": True,
+                    "nodeC": True,
+                    "nodeD": True,
+                    "nodeE": True,
+                    "nodeF": True,
+                    "nodeG": True,
+                    "nodeH": True,
+                    "nodeI": True,
+                    "nodeJ": True,
+                    "nodeK": True,
+                    "nodeL": True,
+                },
+            },
+        },
+    }
+    expected = {
+        AllianceColor.RED: {
+            "autoReef": {
+                "tba_botRowCount": 0,
+                "tba_midRowCount": 0,
+                "tba_topRowCount": 0,
+            },
+            "teleopReef": {
+                "tba_botRowCount": 0,
+                "tba_midRowCount": 0,
+                "tba_topRowCount": 1,
+            },
+        },
+        AllianceColor.BLUE: {
+            "autoReef": {
+                "tba_botRowCount": 0,
+                "tba_midRowCount": 0,
+                "tba_topRowCount": 2,
+            },
+            "teleopReef": {
+                "tba_botRowCount": 2,
+                "tba_midRowCount": 6,
+                "tba_topRowCount": 11,
+            },
+        },
+    }
+    match = Match(
+        id="2025miket_qm1",
+        year=2025,
+        alliances_json=json.dumps(alliance_dict),
+        score_breakdown_json=json.dumps(score_breakdown),
+    )
+    computed_score_breakdown = none_throws(match.score_breakdown)
+    for color in expected:
+        for peroid in expected[color]:
+            for tba_key in expected[color][peroid]:
+                expected_value = expected[color][peroid][tba_key]
+                actual_value = computed_score_breakdown[color][peroid][tba_key]
+                assert_string = f"{color}/{peroid}/{tba_key} expected {expected_value} got {actual_value}"
+                assert expected_value == actual_value, assert_string

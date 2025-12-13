@@ -1,3 +1,4 @@
+import base64
 from unittest.mock import patch
 
 from flask import Flask
@@ -57,3 +58,20 @@ def test_handle_defer():
         handle_defer("/some/path")
 
     mock_post.assert_called_with(environ)
+
+
+def test_handle_defer_decodes_body():
+    app = Flask(__name__)
+    body = base64.b64encode(b"foo")
+    with app.test_request_context(data=body) as request_context, patch(
+        "google.appengine.ext.deferred.application.post"
+    ) as mock_post:
+        request_context.request.environ
+        environ = request_context.request.environ
+
+        handle_defer("/some/path")
+
+    mock_post.assert_called_with(environ)
+    mock_calls = mock_post.call_args_list
+    assert len(mock_calls) == 1
+    assert mock_calls[0].args[0]["wsgi.input"].read() == b"foo"

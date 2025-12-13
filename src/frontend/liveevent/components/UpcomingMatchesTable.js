@@ -31,10 +31,12 @@ class UpcomingMatchesTable extends React.PureComponent {
     const matchRows = [];
     this.props.matches.forEach((match) => {
       let etaStr = "?";
+      let queueString = match.q;
+
       if (this.state.currentTime && match.pt) {
         const etaMin = (match.pt - this.state.currentTime) / 60;
         if (etaMin < 2) {
-          etaStr = "<2 min";
+          etaStr = queueString ? queueString : "<2 min";
         } else if (etaMin > 120) {
           etaStr = `~${Math.round(etaMin / 60)} h`;
         } else {

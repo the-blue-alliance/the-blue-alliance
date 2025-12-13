@@ -7,7 +7,14 @@ import time
 import requests
 
 TIME_LIMIT = 10 * 60  # seconds
-MODULE_NAMES = {"default", "py3-web", "py3-api", "py3-tasks-io", "py3-tasks-cpu"}
+MODULE_NAMES = {
+    "default",
+    "py3-web",
+    "py3-api",
+    "py3-tasks-io",
+    "py3-tasks-cpu-enqueue",
+    "py3-tasks-cpu",
+}
 
 # Wait up to |TIME_LIMIT| for all modules to start and webpack to build
 start_time = time.time()
@@ -49,4 +56,8 @@ while time.time() - start_time < TIME_LIMIT:
         sys.exit(0)
 
 print("Fail: Didn't start up in time")
+container_logs = subprocess.run(
+    ["vagrant", "ssh", "--", "-t", "cat /var/log/tba.log"], stdout=subprocess.PIPE
+)
+print(f"Container Logs:\n{container_logs.stdout.decode()}")
 sys.exit(1)

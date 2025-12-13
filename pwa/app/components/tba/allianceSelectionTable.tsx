@@ -1,10 +1,11 @@
-import { Link } from '@remix-run/react';
 import { type VariantProps, cva } from 'class-variance-authority';
 import type React from 'react';
 
 import BiTrophy from '~icons/bi/trophy';
 
-import { EliminationAlliance } from '~/api/v3';
+import { EliminationAlliance } from '~/api/tba/read';
+import InlineIcon from '~/components/tba/inlineIcon';
+import { TeamLink } from '~/components/tba/links';
 import {
   Table,
   TableBody,
@@ -14,8 +15,6 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { cn } from '~/lib/utils';
-
-import InlineIcon from './inlineIcon';
 
 const rowVariants = cva('text-center', {
   variants: {
@@ -31,7 +30,8 @@ const rowVariants = cva('text-center', {
 });
 
 interface AllianceTableRowProps
-  extends React.HTMLAttributes<HTMLTableRowElement>,
+  extends
+    React.HTMLAttributes<HTMLTableRowElement>,
     VariantProps<typeof rowVariants> {}
 
 function AllianceTableRow({
@@ -59,6 +59,7 @@ function extractAllianceNumber(input: string): string {
 
 export default function AllianceSelectionTable(props: {
   alliances: EliminationAlliance[];
+  year?: number;
 }) {
   const allianceSize =
     Math.max(...props.alliances.map((a) => a.picks.length)) || 3;
@@ -69,18 +70,19 @@ export default function AllianceSelectionTable(props: {
 
       <Table className="table-fixed">
         <TableHeader>
-          <TableRow className="*:h-8 *:font-bold">
+          <TableRow className="*:h-8 *:text-center *:font-bold">
             <TableHead>Alliance</TableHead>
             <TableHead>Captain</TableHead>
-            {[...Array(allianceSize - 1).keys()].map((i) => (
-              <TableHead key={i}>Pick {i + 1}</TableHead>
-            ))}
+            {allianceSize > 1 &&
+              [...Array(allianceSize - 1).keys()].map((i) => (
+                <TableHead key={i}>Pick {i + 1}</TableHead>
+              ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {props.alliances.map((a, idx) => (
             <AllianceTableRow
-              key={a.name}
+              key={`alliance-${idx}`}
               variant={
                 a.status?.level === 'f'
                   ? a.status.status === 'won'
@@ -103,9 +105,9 @@ export default function AllianceSelectionTable(props: {
               {[...Array(allianceSize).keys()].map((i) =>
                 a.picks.length > i ? (
                   <TableCell key={a.picks[i]}>
-                    <Link to={`/team/${a.picks[i].substring(3)}`}>
+                    <TeamLink teamOrKey={a.picks[i]} year={props.year}>
                       {a.picks[i].substring(3)}
-                    </Link>
+                    </TeamLink>
                   </TableCell>
                 ) : (
                   <TableCell key={`${a.name ?? 'Alliance'}-${i}`}>-</TableCell>

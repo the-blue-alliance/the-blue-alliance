@@ -1,0 +1,37 @@
+{
+  "address": "200 S L St, Madera, CA 93637, USA",
+  "city": "Madera",
+  "country": "USA",
+  "district": null,
+  "division_keys": [],
+  "end_date": "2019-11-10",
+  "event_code": "mttd",
+  "event_type": 99,
+  "event_type_string": "Offseason",
+  "first_event_code": null,
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJQUM1hX8MlIARQAR44wGadBo",
+  "gmaps_url": "https://maps.google.com/?cid=1906317875186500672",
+  "key": "2019mttd",
+  "lat": 36.9553597,
+  "lng": -120.065666,
+  "location_name": "Madera High School",
+  "name": "MadTown Throwdown",
+  "parent_event_key": null,
+  "playoff_type": null,
+  "playoff_type_string": null,
+  "postal_code": "93637",
+  "short_name": "MadTown Throwdown",
+  "start_date": "2019-11-08",
+  "state_prov": "CA",
+  "timezone": "America/Los_Angeles",
+  "webcasts": [
+    {
+      "channel": "cvrobotics",
+      "type": "twitch"
+    }
+  ],
+  "website": "http://team1323.com/mttd/",
+  "week": null,
+  "year": 2019
+}

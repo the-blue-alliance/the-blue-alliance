@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form action="/admin/sitevar/edit/" method="post">
+<form action="/admin/sitevar/edit" method="post">
     <legend>Create new Sitevar</legend>
     <table class="table table-striped table-hover table-condensed">
         <tr>
@@ -21,6 +21,7 @@
         </tr>
     </table>
 
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Create Sitevar</button>
     <a href="/admin/sitevars" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Create</a>
 </form>

@@ -1,9 +1,16 @@
-import { Link } from '@remix-run/react';
+import { Link, createFileRoute } from '@tanstack/react-router';
 
-export default function Thanks(): React.JSX.Element {
+import { publicCacheControlHeaders } from '~/lib/utils';
+
+export const Route = createFileRoute('/thanks')({
+  headers: publicCacheControlHeaders(),
+  component: Thanks,
+});
+
+function Thanks(): React.JSX.Element {
   return (
     <>
-      <div className="flex flex-col divide-y [&_*]:mt-4">
+      <div className="flex flex-col divide-y **:mt-4">
         <div>
           <h1 className="text-3xl font-medium">Thanks</h1>
           <p>

@@ -4,13 +4,13 @@ from typing import Optional
 from unittest.mock import patch
 
 import pytest
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.models.award import Award
@@ -35,6 +35,14 @@ class TestAwardManipulator(unittest.TestCase):
         )
         self.event.put()
 
+        self.event2025 = Event(
+            id="2025casj",
+            event_short="casj",
+            year=2025,
+            event_type_enum=EventType.REGIONAL,
+        )
+        self.event2025.put()
+
         self.old_award = Award(
             id=Award.render_key_name(self.event.key_name, AwardType.WINNER),
             name_str="Regional Winner",
@@ -55,6 +63,17 @@ class TestAwardManipulator(unittest.TestCase):
             award_type_enum=AwardType.WINNER,
             year=2013,
             event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, "frc359")],
+            recipient_json_list=[json.dumps({"team_number": 359, "awardee": None})],
+        )
+
+        self.new_award2025 = Award(
+            id="2025casj_1",
+            name_str="Regional Champion",
+            award_type_enum=AwardType.WINNER,
+            year=2025,
+            event=self.event2025.key,
             event_type_enum=EventType.REGIONAL,
             team_list=[ndb.Key(Team, "frc359")],
             recipient_json_list=[json.dumps({"team_number": 359, "awardee": None})],
@@ -157,7 +176,7 @@ class TestAwardManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         # Ensure we have a district_points_calc test enqueued
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
@@ -167,6 +186,24 @@ class TestAwardManipulator(unittest.TestCase):
 
         task = tasks[0]
         assert task.url == "/tasks/math/do/district_points_calc/2013casj"
+
+    def test_postUpdateHook_regionalChampsPoints(self):
+        AwardManipulator.createOrUpdate(self.new_award2025)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            run_from_task(task)
+
+        # Ensure we have a district_points_calc test enqueued
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="default"
+        )
+
+        task_urls = {t.url for t in tasks}
+        assert "/tasks/math/do/regional_champs_pool_points_calc/2025casj" in task_urls
 
     def test_postUpdateHook_notifications(self):
         import datetime
@@ -184,7 +221,7 @@ class TestAwardManipulator(unittest.TestCase):
         assert len(tasks) == 1
 
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
             queue_names="push-notifications"
@@ -203,7 +240,7 @@ class TestAwardManipulator(unittest.TestCase):
 
         for task in tasks:
             with patch.object(TBANSHelper, "awards") as mock_awards:
-                deferred.run(task.payload)
+                run_from_task(task)
 
         # Event is not configured to be within a day - skip it
         mock_awards.assert_not_called()

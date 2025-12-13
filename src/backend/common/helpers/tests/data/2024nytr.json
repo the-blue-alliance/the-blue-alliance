@@ -1,0 +1,37 @@
+{
+  "address": "51 S Pearl St, Albany, NY 12207, USA",
+  "city": "Albany",
+  "country": "USA",
+  "district": null,
+  "division_keys": [],
+  "end_date": "2024-03-23",
+  "event_code": "nytr",
+  "event_type": 0,
+  "event_type_string": "Regional",
+  "first_event_code": "nytr",
+  "first_event_id": null,
+  "gmaps_place_id": "ChIJtYTUwSMK3okR_Xnl22th_2U",
+  "gmaps_url": "https://maps.google.com/?q=51+S+Pearl+St,+Albany,+NY+12207,+USA&ftid=0x89de0a23c1d484b5:0x65ff616bdbe579fd",
+  "key": "2024nytr",
+  "lat": 42.64846420000001,
+  "lng": -73.7549566,
+  "location_name": "51 S Pearl St",
+  "name": "New York Tech Valley Regional",
+  "parent_event_key": null,
+  "playoff_type": 10,
+  "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+  "postal_code": "12207",
+  "short_name": "New York Tech Valley",
+  "start_date": "2024-03-20",
+  "state_prov": "NY",
+  "timezone": "America/New_York",
+  "webcasts": [
+    {
+      "channel": "firstinspires9",
+      "type": "twitch"
+    }
+  ],
+  "website": "https://www.techvalleyfirst.org/",
+  "week": 3,
+  "year": 2024
+}

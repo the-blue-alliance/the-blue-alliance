@@ -55,7 +55,7 @@ export function DataTable<TData, TValue>({
                         tabIndex={0}
                         className={
                           header.column.getCanSort()
-                            ? 'cursor-pointer select-none text-center'
+                            ? 'cursor-pointer text-center select-none'
                             : ''
                         }
                         onClick={header.column.getToggleSortingHandler()}

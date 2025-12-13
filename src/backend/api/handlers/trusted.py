@@ -4,14 +4,16 @@ from typing import List, Optional, Set
 
 from flask import make_response, request, Response
 from google.appengine.ext import ndb
-from google.appengine.ext.deferred import defer
 from pyre_extensions import none_throws, safe_json
 
 from backend.api.api_trusted_parsers.json_alliance_selections_parser import (
     JSONAllianceSelectionsParser,
 )
 from backend.api.api_trusted_parsers.json_awards_parser import JSONAwardsParser
-from backend.api.api_trusted_parsers.json_event_info_parser import JSONEventInfoParser
+from backend.api.api_trusted_parsers.json_event_info_parser import (
+    EventInfoParsed,
+    JSONEventInfoParser,
+)
 from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
 from backend.api.api_trusted_parsers.json_matches_parser import JSONMatchesParser
 from backend.api.api_trusted_parsers.json_rankings_parser import JSONRankingsParser
@@ -25,8 +27,10 @@ from backend.api.handlers.decorators import require_write_auth, validate_keys
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.media_type import MediaType
 from backend.common.futures import TypedFuture
+from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.match_helper import MatchHelper
@@ -52,6 +56,7 @@ from backend.common.models.zebra_motionworks import ZebraMotionWorks
 @require_write_auth({AuthType.EVENT_TEAMS})
 @validate_keys
 def update_teams(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     team_key_names = JSONTeamListParser.parse(request.data)
     team_keys = [ndb.Key(Team, key_name) for key_name in team_key_names]
 
@@ -89,6 +94,7 @@ def update_teams(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.MATCH_VIDEO})
 @validate_keys
 def add_match_video(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     match_key_to_video = JSONMatchVideoParser.parse(event_key, request.data)
     match_keys = [ndb.Key(Match, k) for k in match_key_to_video.keys()]
     match_futures: List[TypedFuture[Match]] = ndb.get_multi_async(match_keys)
@@ -122,6 +128,7 @@ def add_match_video(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.EVENT_INFO})
 @validate_keys
 def update_event_info(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     parsed_info = JSONEventInfoParser.parse(request.data)
     event: Event = none_throws(Event.get_by_id(event_key))
 
@@ -134,22 +141,56 @@ def update_event_info(event_key: EventKey) -> Response:
 
     if "remap_teams" in parsed_info:
         event.remap_teams = parsed_info["remap_teams"]
-        defer(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
+        defer_safe(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
 
     if "first_event_code" in parsed_info:
         event.official = parsed_info["first_event_code"] is not None
         event.first_code = parsed_info["first_event_code"]
 
     if "playoff_type" in parsed_info:
-        event.playoff_type = parsed_info["playoff_type"]
+        playoff_type = parsed_info["playoff_type"]
+        if playoff_type is not None:
+            event.playoff_type = playoff_type
+            if event.official:
+                # If this event is pulling info from the FRC API, we want to prevent it from being clobbered
+                event.manual_attrs = list(set(event.manual_attrs) | {"playoff_type"})
+        else:
+            # We can clear the "manual attr" (and allow the API to re-clobber) by setting
+            # a None value in the API
+            if event.official:
+                event.manual_attrs = list(set(event.manual_attrs) - {"playoff_type"})
+
+    if "timezone" in parsed_info:
+        event.timezone_id = parsed_info["timezone"]
+
+    if "sync_disabled_flags" in parsed_info:
+        event.disable_sync_flags = parsed_info["sync_disabled_flags"]
 
     EventManipulator.createOrUpdate(event, auto_union=False)
     return profiled_jsonify({"Success": f"Event {event_key} updated"})
 
 
+@require_write_auth({AuthType.EVENT_INFO})
+@validate_keys
+def get_event_info(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
+    event: Event = none_throws(Event.get_by_id(event_key))
+    event_info: EventInfoParsed = {
+        "first_event_code": event.first_api_code if event.official else None,
+        "playoff_type": event.playoff_type,
+        "webcasts": event.webcast,
+        "remap_teams": event.remap_teams or {},
+        "timezone": event.timezone_id,
+        "sync_disabled_flags": event.disable_sync_flags or 0,
+    }
+
+    return profiled_jsonify(event_info)
+
+
 @require_write_auth({AuthType.EVENT_ALLIANCES})
 @validate_keys
 def update_event_alliances(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     alliance_selections = JSONAllianceSelectionsParser.parse(request.data)
     event: Event = none_throws(Event.get_by_id(event_key))
 
@@ -167,6 +208,7 @@ def update_event_alliances(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.EVENT_AWARDS})
 @validate_keys
 def update_event_awards(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     awards = JSONAwardsParser.parse(request.data, event_key)
     event: Event = none_throws(Event.get_by_id(event_key))
 
@@ -201,6 +243,7 @@ def update_event_awards(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.EVENT_MATCHES})
 @validate_keys
 def update_event_matches(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     event: Event = none_throws(Event.get_by_id(event_key))
     parsed_matches = JSONMatchesParser.parse(request.data, event.year)
 
@@ -224,6 +267,8 @@ def update_event_matches(event_key: EventKey) -> Response:
             score_breakdown_json=match["score_breakdown_json"],
             time_string=match["time_string"],
             time=match["time"],
+            actual_time=match["actual_start_time"],
+            post_result_time=match["post_results_time"],
             display_name=match["display_name"],
         )
 
@@ -248,6 +293,7 @@ def update_event_matches(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.EVENT_MATCHES})
 @validate_keys
 def delete_event_matches(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     keys_to_delete: Set[ndb.Key] = set()
     try:
         match_keys = safe_json.loads(request.data, List[str])
@@ -275,6 +321,7 @@ def delete_event_matches(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.EVENT_MATCHES})
 @validate_keys
 def delete_all_event_matches(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     if request.data.decode() != event_key:
         return make_response(
             profiled_jsonify(
@@ -296,6 +343,7 @@ def delete_all_event_matches(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.EVENT_RANKINGS})
 @validate_keys
 def update_event_rankings(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     event: Event = none_throws(Event.get_by_id(event_key))
     rankings = JSONRankingsParser.parse(event.year, request.data)
 
@@ -314,6 +362,7 @@ def update_event_rankings(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.MATCH_VIDEO})
 @validate_keys
 def add_event_media(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     event: Event = none_throws(Event.get_by_id(event_key))
 
     video_list = safe_json.loads(request.data, List[str])
@@ -339,6 +388,7 @@ def add_event_media(event_key: EventKey) -> Response:
 @require_write_auth({AuthType.ZEBRA_MOTIONWORKS})
 @validate_keys
 def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
     to_put: List[ZebraMotionWorks] = []
     for zebra_data in JSONZebraMotionWorksParser.parse(request.data):
         match_key = zebra_data["key"]

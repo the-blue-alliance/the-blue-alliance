@@ -41,6 +41,9 @@ def test_filter_event_properties(ndb_stub) -> None:
     key = filter_event_properties([event], ModelType("keys"))[0]
     assert key == "2020casj"
 
+    search = filter_event_properties([event], ModelType("search"))[0]
+    assert set(search.keys()).difference(set(simple_event_properties)) == set()
+
     assert filter_event_properties([], ModelType("bad_type")) == []
     with pytest.raises(Exception):
         filter_event_properties([event], ModelType("bad_type"))
@@ -87,6 +90,9 @@ def test_filter_team_properties(ndb_stub) -> None:
 
     key = filter_team_properties([team], ModelType("keys"))[0]
     assert key == "frc604"
+
+    search = filter_team_properties([team], ModelType("search"))[0]
+    assert set(search.keys()).difference(set(simple_team_properties)) == set()
 
     assert filter_team_properties([], ModelType("bad_type")) == []
     with pytest.raises(Exception):

@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Cached DB Queries - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>Cached Database Queries</h1>
+
+<table class="table table-striped">
+    <tr>
+        <th>Query Name</th>
+        <th>Cache Key Format</th>
+        <th>Version</th>
+        <th></th>
+    </tr>
+    {% for cached_query in cached_queries.values() %}
+        <tr>
+            <td><a href="/admin/cache/{{cached_query['class_name']}}">{{cached_query['class_name']}}</a></td>
+            <td><pre>{{cached_query['cache_key_format']}}</pre></td>
+            <td>{{cached_query['cache_version']}}</td>
+            <td>
+                <form class="form-inline" method="post" action="/admin/cache/{{cached_query['class_name']}}">
+                    <div class="form-group">
+                        <label for="cache_key">Cache Key: </label>
+                        <input class="form-control" name="cache_key" />
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Lookup</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

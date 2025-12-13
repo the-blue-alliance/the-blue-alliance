@@ -3,11 +3,11 @@ from typing import Optional
 from unittest.mock import patch
 
 import pytest
-from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -55,6 +55,14 @@ class TestEventDetailsManipulator(unittest.TestCase):
         )
         self.event.put()
 
+        self.event2025 = Event(
+            id="2025ct",
+            event_short="ct",
+            year=2025,
+            event_type_enum=EventType.REGIONAL,
+        )
+        self.event2025.put()
+
         self.old_event_details = EventDetails(
             id="2011ct",
             alliance_selections=self.old_alliance_selections,
@@ -72,6 +80,11 @@ class TestEventDetailsManipulator(unittest.TestCase):
                     "581": 18.513816255143144,
                 }
             },
+        )
+
+        self.old_event_details2025 = EventDetails(
+            id="2025ct",
+            alliance_selections=self.old_alliance_selections,
         )
 
     def assertMergedEventDetails(self, event_details):
@@ -122,7 +135,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
         )
         assert len(tasks) == 1
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         # Ensure we have a district_points_calc test enqueued
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
@@ -132,6 +145,27 @@ class TestEventDetailsManipulator(unittest.TestCase):
 
         assert tasks[0].url == "/tasks/math/do/event_team_status/2011ct"
         assert tasks[1].url == "/tasks/math/do/district_points_calc/2011ct"
+
+    def test_postUpdateHook_calcs_regionalChampsPoints(self):
+        EventDetailsManipulator.createOrUpdate(self.old_event_details2025)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            run_from_task(task)
+
+        # Ensure we have a district_points_calc test enqueued
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="default"
+        )
+        assert len(tasks) == 3
+
+        task_urls = {t.url for t in tasks}
+        assert "/tasks/math/do/event_team_status/2025ct" in task_urls
+        assert "/tasks/math/do/district_points_calc/2025ct" in task_urls
+        assert "/tasks/math/do/regional_champs_pool_points_calc/2025ct" in task_urls
 
     def test_postUpdateHook_notifications(self):
         import datetime
@@ -150,7 +184,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
         assert len(tasks) == 1
 
         for task in tasks:
-            deferred.run(task.payload)
+            run_from_task(task)
 
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
             queue_names="push-notifications"
@@ -172,7 +206,7 @@ class TestEventDetailsManipulator(unittest.TestCase):
             with patch.object(
                 TBANSHelper, "alliance_selection"
             ) as mock_alliance_selection:
-                deferred.run(task.payload)
+                run_from_task(task)
 
         # Event is not configured to be within a day - skip it
         mock_alliance_selection.assert_not_called()

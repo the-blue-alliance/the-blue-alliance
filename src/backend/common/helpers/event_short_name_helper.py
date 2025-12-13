@@ -24,6 +24,8 @@ class EventShortNameHelper:
             codes.add("FIT")
         if "IN" in codes:  # IN and FIN used interchangeably
             codes.add("FIN")
+        if "CHS" in codes:  # CHS and FCH used interchangeably
+            codes.add("FCH")
         return codes
 
     @classmethod
@@ -44,7 +46,6 @@ class EventShortNameHelper:
         # Strip out current year
         if year is not None:
             name_str = name_str.replace(str(year), "").strip()
-            print(name_str)
 
         # Special cases for district championship divisions
         if event_type == EventType.DISTRICT_CMP_DIVISION:
@@ -61,6 +62,8 @@ class EventShortNameHelper:
                 "".join(item[0].upper() for item in event_name.split()),
                 division_name,
             )
+            # Remove "presented by"
+            short_name = short_name.split("presented by")[0].strip()
             return short_name
 
         all_district_codes = cls._get_all_district_codes()

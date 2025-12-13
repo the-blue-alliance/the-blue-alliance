@@ -4,7 +4,10 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.sitevars.sitevar import Sitevar
 
 
-class TrustedApiConfig(Sitevar[Dict[str, bool]]):
+ContentType = Dict[str, bool]
+
+
+class TrustedApiConfig(Sitevar[ContentType]):
     """
     Keys in the dict are the stringified int value of an AuthType
     """

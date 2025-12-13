@@ -1,0 +1,218 @@
+[
+  {
+    "award_type": 1,
+    "event_key": "2024mil",
+    "name": "Championship Division Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc604"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9483"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1058"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc78"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 10,
+    "event_key": "2024mil",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9458"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 11,
+    "event_key": "2024mil",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5892"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 13,
+    "event_key": "2024mil",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1730"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 15,
+    "event_key": "2024mil",
+    "name": "Rookie Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9535"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 16,
+    "event_key": "2024mil",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1727"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 17,
+    "event_key": "2024mil",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1318"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 2,
+    "event_key": "2024mil",
+    "name": "Championship Division Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8033"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6329"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2713"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1730"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 20,
+    "event_key": "2024mil",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5885"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 21,
+    "event_key": "2024mil",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1114"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 27,
+    "event_key": "2024mil",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5461"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 29,
+    "event_key": "2024mil",
+    "name": "Innovation in Control Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3075"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 30,
+    "event_key": "2024mil",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3544"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 71,
+    "event_key": "2024mil",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc604"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 82,
+    "event_key": "2024mil",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2073"
+      }
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_key": "2024mil",
+    "name": "Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6413"
+      }
+    ],
+    "year": 2024
+  }
+]

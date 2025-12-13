@@ -72,7 +72,9 @@ class YouTubeVideoHelper(object):
             return f"qm{qual_match.group(2)}"
 
         elim_match = re.search(
-            r"[^\w\d]*(ef\dm\d|qf\dm\d|sf\dm\d|f\dm\d).*", video_title, re.IGNORECASE
+            r"[^\w\d]*(ef\d+m\d+|qf\d+m\d+|sf\d+m\d+|f\d+m\d+).*",
+            video_title,
+            re.IGNORECASE,
         )
         if elim_match is not None:
             return elim_match.group(1).lower()

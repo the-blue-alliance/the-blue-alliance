@@ -150,7 +150,7 @@ def ping_mobile_client(req: PingRequest) -> BaseResponse:
         )
     else:
         client: MobileClient = clients[0]
-        success = TBANSHelper.ping(client)
+        success, valid_client = TBANSHelper.ping(client)
         if success:
             return BaseResponse(code=200, message="Ping sent")
         else:

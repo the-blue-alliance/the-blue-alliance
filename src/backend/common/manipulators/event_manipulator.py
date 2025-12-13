@@ -32,9 +32,13 @@ class EventManipulator(ManipulatorBase[Event]):
 
     @classmethod
     def updateMerge(
-        cls, new_model: Event, old_model: Event, auto_union: bool = True
+        cls,
+        new_model: Event,
+        old_model: Event,
+        auto_union: bool = True,
+        update_manual_attrs: bool = True,
     ) -> Event:
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
 
         # Special case to handle webcast_json
         if not auto_union and new_model.webcast != old_model.webcast:
@@ -62,19 +66,23 @@ class EventManipulator(ManipulatorBase[Event]):
 def event_post_update_hook(updated_models: List[TUpdatedModel[Event]]) -> None:
     events = []
     for updated in updated_models:
-        event = updated.model
+        event: Event = updated.model
+
+        # Only unofficial events (not synced with API) need timezone updated
+        if event.official:
+            continue
+
+        location = None
         try:
-            LocationHelper.update_event_location(event)
+            location = LocationHelper.get_event_location(event)
         except Exception as e:
-            logging.error(
-                "update_event_location for {} errored!".format(event.key.id())
-            )
+            logging.error("get_event_location for {} errored!".format(event.key.id()))
             logging.exception(e)
 
         try:
-            if event.normalized_location and event.normalized_location.lat_lng:
+            if location and location.lat_lng:
                 timezone_id = LocationHelper.get_timezone_id(
-                    None, lat_lng=event.normalized_location.lat_lng
+                    None, lat_lng=location.lat_lng
                 )
                 if not timezone_id:
                     logging.warning(

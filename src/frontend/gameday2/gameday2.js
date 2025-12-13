@@ -1,15 +1,15 @@
+import { createRoot } from "react-dom/client";
 import "./gameday2.less";
 
 import React from "react";
-import ReactGA from "react-ga";
+import ReactGA from "react-ga4";
 import { Provider } from "react-redux";
-import thunk from "redux-thunk";
+import { thunk } from "redux-thunk";
 import { createStore, applyMiddleware, compose } from "redux";
 import ReactDOM from "react-dom";
 import queryString from "query-string";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import { indigo500, indigo700 } from "material-ui/styles/colors";
-import getMuiTheme from "material-ui/styles/getMuiTheme";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { indigo } from "@mui/material/colors";
 import GamedayFrame from "./components/GamedayFrame";
 import gamedayReducer, { firedux } from "./reducers";
 import {
@@ -38,10 +38,16 @@ const store = createStore(
 );
 firedux.dispatch = store.dispatch;
 
-const muiTheme = getMuiTheme({
+const muiTheme = createTheme({
   palette: {
-    primary1Color: indigo500,
-    primary2Color: indigo700,
+    primary: {
+      main: indigo[500],
+      dark: indigo[700],
+    },
+  },
+  appBar: {
+    // legacy theme key used by components migrated from material-ui v0
+    textColor: "#ffffff",
   },
   layout: {
     appBarHeight: 36,
@@ -50,13 +56,14 @@ const muiTheme = getMuiTheme({
   },
 });
 
-ReactDOM.render(
-  <MuiThemeProvider muiTheme={muiTheme}>
+const root = createRoot(document.getElementById("content"));
+
+root.render(
+  <ThemeProvider theme={muiTheme}>
     <Provider store={store}>
       <GamedayFrame />
     </Provider>
-  </MuiThemeProvider>,
-  document.getElementById("content")
+  </ThemeProvider>
 );
 
 // Subscribe to changes in state.videoGrid.displayed to watch the correct Firebase paths

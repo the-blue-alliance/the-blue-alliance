@@ -57,7 +57,7 @@ def test_send(fcm_app):
     )
     request = FCMRequest(fcm_app, notification=MockNotification(), tokens=["abc"])
     with patch.object(
-        messaging, "send_multicast", return_value=batch_response
+        messaging, "send_each_for_multicast", return_value=batch_response
     ) as mock_send, patch.object(request, "defer_track_notification") as mock_track:
         response = request.send()
     mock_send.assert_called_once()
@@ -71,7 +71,7 @@ def test_send_failed(fcm_app):
         fcm_app, notification=MockNotification(), tokens=["abc", "def"]
     )
     with patch.object(
-        messaging, "send_multicast", return_value=batch_response
+        messaging, "send_each_for_multicast", return_value=batch_response
     ) as mock_send, patch.object(request, "defer_track_notification") as mock_track:
         response = request.send()
     mock_send.assert_called_once()
@@ -90,7 +90,7 @@ def test_send_failed_partial(fcm_app):
         fcm_app, notification=MockNotification(), tokens=["abc", "def"]
     )
     with patch.object(
-        messaging, "send_multicast", return_value=batch_response
+        messaging, "send_each_for_multicast", return_value=batch_response
     ) as mock_send, patch.object(request, "defer_track_notification") as mock_track:
         response = request.send()
     mock_send.assert_called_once()

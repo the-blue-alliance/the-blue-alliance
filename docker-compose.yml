@@ -1,23 +1,51 @@
-version: "3"
+x-env-vars: &env-vars
+  PROJECT_ID: demo-test
 
 services:
-  tba:
-    # image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+  firebase:
     build:
       context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile
-    volumes:
-      - ./:/tba:delegated
-    tty: true
-    stdin_open: true
+      dockerfile: ./ops/dev/firebase/Dockerfile.firebase
+    environment:
+      <<: *env-vars
     ports:
-      # Firebase
       - "4000:4000"
       - "4400:4400"
       - "4500:4500"
       - "9005:9005"
       - "9000:9000"
       - "9099:9099"
+
+  datastore:
+    build:
+      context: ./
+      dockerfile: ./ops/dev/datastore/Dockerfile.datastore
+    environment:
+      <<: *env-vars
+    ports:
+      - "8089:8089"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  tba:
+    # image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+    build:
+      context: ./
+      dockerfile: ./ops/dev/docker/Dockerfile
+    depends_on:
+      firebase:
+        condition: service_started
+      datastore:
+        condition: service_healthy
+    volumes:
+      - ./:/tba:delegated
+    tty: true
+    stdin_open: true
+    ports:
       # GAE
       - "8080:8080"
       - "8081:8081"
@@ -28,14 +56,12 @@ services:
       - "8086:8086"
       - "8087:8087"
       - "8088:8088"
-      - "8089:8089"
       # GAE Admin
       - "8000:8000"
-      # RQ Dashboard
-      - "9181:9181"
     entrypoint: [ "sh", "/tba/ops/dev/docker/docker-entry.sh" ]
     command: [ "/usr/sbin/sshd", "-D" ]
     working_dir: /tba
     hostname: tba
     environment:
       - PUPPETEER_SKIP_DOWNLOAD=true
+      - TBA_DOCKER_COMPOSE=true

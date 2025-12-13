@@ -11,6 +11,7 @@ from backend.common.manipulators.district_team_manipulator import (
 )
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
+from backend.common.models.event import Event
 from backend.common.models.keys import DistrictKey, Year
 from backend.web.profiled_render import render_template
 
@@ -27,6 +28,16 @@ def district_list(year: Optional[Year]) -> str:
     }
 
     return render_template("admin/district_list.html", template_values)
+
+
+def district_details(district_key: DistrictKey) -> str:
+    district = District.get_by_id(district_key)
+    if not district:
+        abort(404)
+
+    events = Event.query(Event.district_key == district.key).fetch_async()
+    template_values = {"district": district, "events": events.get_result()}
+    return render_template("admin/district_details.html", template_values)
 
 
 def district_edit(district_key: DistrictKey) -> str:

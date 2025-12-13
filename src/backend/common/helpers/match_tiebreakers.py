@@ -67,6 +67,11 @@ class MatchTiebreakers(object):
         ):  # Finals can't be tiebroken. Only overtime
             tiebreakers = cls._tiebreak_2024(red_breakdown, blue_breakdown)
 
+        elif match.year == 2025 and not (
+            match.comp_level == CompLevel.F and match.match_number <= 3
+        ):  # Finals can't be tiebroken. Only overtime
+            tiebreakers = cls._tiebreak_2025(red_breakdown, blue_breakdown)
+
         else:
             tiebreakers = []
 
@@ -78,6 +83,48 @@ class MatchTiebreakers(object):
             elif tiebreaker[1] > tiebreaker[0]:
                 return AllianceColor.BLUE
         return ""
+
+    @classmethod
+    def _tiebreak_2025(
+        cls, red_breakdown: Dict, blue_breakdown: Dict
+    ) -> List[TCriteria]:
+        tiebreakers: List[TCriteria] = []
+
+        # TECH FOUL points due to opponent rule violations
+        # Since tech foul points are not provided, we use the count instead.
+        if "techFoulCount" in red_breakdown and "techFoulCount" in blue_breakdown:
+            tiebreakers.append(
+                (blue_breakdown["techFoulCount"], red_breakdown["techFoulCount"])
+            )
+        else:
+            tiebreakers.append(None)
+
+        # ALLIANCE AUTO points
+        if "autoPoints" in red_breakdown and "autoPoints" in blue_breakdown:
+            tiebreakers.append(
+                (
+                    red_breakdown["autoPoints"],
+                    blue_breakdown["autoPoints"],
+                )
+            )
+        else:
+            tiebreakers.append(None)
+
+        # ALLIANCE BARGE points
+        if (
+            "endGameBargePoints" in red_breakdown
+            and "endGameBargePoints" in blue_breakdown
+        ):
+            tiebreakers.append(
+                (
+                    red_breakdown["endGameBargePoints"],
+                    blue_breakdown["endGameBargePoints"],
+                )
+            )
+        else:
+            tiebreakers.append(None)
+
+        return tiebreakers
 
     @classmethod
     def _tiebreak_2024(

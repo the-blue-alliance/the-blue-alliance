@@ -57,6 +57,9 @@ class EventDetailsConverter(ConverterBase):
         event_details_dict = {
             "alliances": event_details.alliance_selections if event_details else [],
             "district_points": event_details.district_points if event_details else {},
+            "regional_champs_pool_points": (
+                event_details.regional_champs_pool_points if event_details else {}
+            ),
             "insights": (
                 event_details.insights if event_details else {"qual": {}, "playoff": {}}
             ),

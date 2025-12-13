@@ -19,7 +19,6 @@ from firebase_admin.messaging import (
     UnregisteredError,
 )
 from google.appengine.api.taskqueue import taskqueue
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
@@ -27,12 +26,12 @@ from backend.common.consts.award_type import AwardType
 from backend.common.consts.client_type import (
     ClientType,
     FCM_CLIENTS,
-    FCM_LEGACY_CLIENTS,
 )
 from backend.common.consts.client_type import NAMES as CLIENT_TYPE_NAMES
 from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import NotificationType
+from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.tbans_helper import _firebase_app, TBANSHelper
 from backend.common.models.account import Account
 from backend.common.models.award import Award
@@ -183,9 +182,8 @@ class TestTBANSHelper(unittest.TestCase):
 
         with patch.object(TBANSHelper, "_send") as mock_send:
             for task in tasks:
-                deferred.run(task.payload)
+                run_from_task(task)
 
-            TBANSHelper.alliance_selection(self.event)
             # Two calls total - First to the Event, second to frc7332, no call for frc1
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 2
@@ -272,7 +270,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         with patch.object(TBANSHelper, "_send") as mock_send:
             for task in tasks:
-                deferred.run(task.payload)
+                run_from_task(task)
 
             # Three calls total - First to the Event, second to frc7332 (two awards), third to frc1 (one award)
             mock_send.assert_called()
@@ -336,8 +334,8 @@ class TestTBANSHelper(unittest.TestCase):
 
             # Make sure our taskqueue tasks execute what we expect
             with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-                deferred.run(tasks[0].payload)
-                mock_send_fcm.assert_called_once_with([client], ANY, False)
+                run_from_task(tasks[0])
+                mock_send_fcm.assert_called_once_with([client], ANY)
                 # Make sure the notification is a BroadcastNotification
                 notification = mock_send_fcm.call_args[0][1]
                 assert isinstance(notification, BroadcastNotification)
@@ -372,8 +370,8 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_webhook") as mock_send_webhook:
-            deferred.run(tasks[0].payload)
-            mock_send_webhook.assert_called_once_with([client], ANY)
+            run_from_task(tasks[0])
+            mock_send_webhook.assert_called_once_with(client, ANY)
             # Make sure the notification is a BroadcastNotification
             notification = mock_send_webhook.call_args[0][1]
             assert isinstance(notification, BroadcastNotification)
@@ -409,7 +407,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         with patch.object(TBANSHelper, "_send") as mock_send:
             for task in tasks:
-                deferred.run(task.payload)
+                run_from_task(task)
 
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 1
@@ -451,7 +449,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         with patch.object(TBANSHelper, "_send") as mock_send:
             for task in tasks:
-                deferred.run(task.payload)
+                run_from_task(task)
 
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 1
@@ -474,7 +472,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         match_creator.createIncompleteQuals()
 
         # Test send called with user id
@@ -521,7 +520,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         with patch.object(TBANSHelper, "_send") as mock_send:
             for task in tasks:
-                deferred.run(task.payload)
+                run_from_task(task)
 
             # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
             mock_send.assert_called()
@@ -544,7 +543,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         match_creator.createIncompleteQuals()
 
         from backend.common.helpers.match_helper import MatchHelper
@@ -616,7 +616,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         with patch.object(TBANSHelper, "_send") as mock_send:
             for task in tasks:
-                deferred.run(task.payload)
+                run_from_task(task)
 
             # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
             mock_send.assert_called()
@@ -689,7 +689,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         with patch.object(TBANSHelper, "_send") as mock_send:
             for task in tasks:
-                deferred.run(task.payload)
+                run_from_task(task)
 
             # Three calls total - First to the Event, second to Team frc7332, third to Match 2020miket_qm1
             mock_send.assert_called()
@@ -784,36 +784,6 @@ class TestTBANSHelper(unittest.TestCase):
             success = TBANSHelper._ping_client(client)
 
             mock_fcm_request_constructor.assert_called_once()
-            assert (
-                mock_fcm_request_constructor.call_args[1]["legacy_data_format"] is False
-            )
-            mock_send.assert_called_once()
-            assert success
-
-    def test_ping_fcm_legacy(self):
-        client = MobileClient(
-            parent=ndb.Key(Account, "user_id"),
-            user_id="user_id",
-            messaging_id="token",
-            client_type=ClientType.OS_ANDROID,
-            device_uuid="uuid",
-            display_name="Phone",
-        )
-
-        batch_response = messaging.BatchResponse(
-            [messaging.SendResponse({"name": "abc"}, None)]
-        )
-        with patch.object(
-            FCMRequest, "__init__", mock.MagicMock(spec=FCMRequest, return_value=None)
-        ) as mock_fcm_request_constructor, patch.object(
-            FCMRequest, "send", return_value=batch_response
-        ) as mock_send:
-            success = TBANSHelper._ping_client(client)
-
-            mock_fcm_request_constructor.assert_called_once()
-            assert (
-                mock_fcm_request_constructor.call_args[1]["legacy_data_format"] is True
-            )
             mock_send.assert_called_once()
             assert success
 
@@ -831,9 +801,10 @@ class TestTBANSHelper(unittest.TestCase):
             [messaging.SendResponse(None, FirebaseError(500, "testing"))]
         )
         with patch.object(FCMRequest, "send", return_value=batch_response) as mock_send:
-            success = TBANSHelper._ping_client(client)
+            success, is_valid = TBANSHelper._ping_client(client)
             mock_send.assert_called_once()
             assert not success
+            assert not is_valid
 
     def test_ping_webhook_success(self):
         client = MobileClient(
@@ -849,10 +820,13 @@ class TestTBANSHelper(unittest.TestCase):
             WebhookRequest,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=True) as mock_send:
-            success = TBANSHelper._ping_webhook(client)
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
+            success, is_valid = TBANSHelper._ping_webhook(client)
             mock_send.assert_called_once()
             assert success
+            assert is_valid
 
     def test_ping_webhook_failure(self):
         client = MobileClient(
@@ -880,7 +854,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         match_creator.createIncompleteQuals()
 
         with patch.object(
@@ -896,7 +871,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         matches = match_creator.createIncompleteQuals()
 
         # Hack our first next upcoming match to be Match 1
@@ -918,7 +894,8 @@ class TestTBANSHelper(unittest.TestCase):
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(6)
         ]
-        self.event._teams = teams
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
         matches = match_creator.createIncompleteQuals()
 
         # Hack our first next upcoming match to be Match 1
@@ -973,7 +950,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "match_upcoming") as mockmatch_upcoming:
-            deferred.run(tasks[0].payload)
+            run_from_task(tasks[0])
             mockmatch_upcoming.assert_called_once_with(self.match, None)
 
     def test_schedule_upcoming_match_defer_user_id(self):
@@ -992,7 +969,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "match_upcoming") as mockmatch_upcoming:
-            deferred.run(tasks[0].payload)
+            run_from_task(tasks[0])
             mockmatch_upcoming.assert_called_once_with(self.match, "user_id")
 
     def test_verification(self):
@@ -1039,25 +1016,16 @@ class TestTBANSHelper(unittest.TestCase):
             c.put()
 
         expected_fcm = [c for c in clients if c.client_type in FCM_CLIENTS]
-        expected_legacy_fcm = [
-            c for c in clients if c.client_type in FCM_LEGACY_CLIENTS
-        ]
-        expected_webhook = [c for c in clients if c.client_type == ClientType.WEBHOOK]
+        expected_webhooks = [c for c in clients if c.client_type == ClientType.WEBHOOK]
 
         notification = MockNotification()
         with patch.object(TBANSHelper, "_defer_fcm") as mock_fcm, patch.object(
             TBANSHelper, "_defer_webhook"
         ) as mock_webhook:
             TBANSHelper._send(["user_id"], notification)
-            mock_fcm.assert_has_calls(
-                [
-                    mock.call(expected_fcm, notification),
-                    mock.call(
-                        expected_legacy_fcm, notification, legacy_data_format=True
-                    ),
-                ]
-            )
-            mock_webhook.assert_called_once_with(expected_webhook, notification)
+            mock_fcm.assert_called_once_with(expected_fcm, notification)
+            for webhook in expected_webhooks:
+                mock_webhook.assert_called_once_with(webhook, notification)
 
     def test_defer_fcm(self):
         client = MobileClient(
@@ -1076,8 +1044,8 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-            deferred.run(tasks[0].payload)
-            mock_send_fcm.assert_called_once_with([client], ANY, False)
+            run_from_task(tasks[0])
+            mock_send_fcm.assert_called_once_with([client], ANY)
 
     def test_defer_webhook(self):
         client = MobileClient(
@@ -1096,7 +1064,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "_send_webhook") as mock_send_webhook:
-            deferred.run(tasks[0].payload)
+            run_from_task(tasks[0])
             mock_send_webhook.assert_called_once_with([client], ANY)
 
     def test_send_fcm_disabled(self):
@@ -1121,10 +1089,7 @@ class TestTBANSHelper(unittest.TestCase):
     #     TBANSHelper._send_fcm([], MockNotification(), backoff_iteration=6)
 
     def test_send_fcm_filter_fcm_clients(self):
-        expected = [
-            "client_type_{}".format(client_type)
-            for client_type in (FCM_CLIENTS | FCM_LEGACY_CLIENTS)
-        ]
+        expected = ["client_type_{}".format(client_type) for client_type in FCM_CLIENTS]
         clients = [
             MobileClient(
                 parent=ndb.Key(Account, "user_id"),
@@ -1140,7 +1105,7 @@ class TestTBANSHelper(unittest.TestCase):
             autospec=True,
         ) as mock_init:
             TBANSHelper._send_fcm(clients, MockNotification())
-            mock_init.assert_called_once_with(ANY, ANY, expected, False)
+            mock_init.assert_called_once_with(ANY, ANY, expected)
 
     def test_send_fcm_filter_from_notification(self):
         clients = [
@@ -1274,7 +1239,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Make sure our taskqueue tasks execute what we expect
         # with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-        #     deferred.run(tasks[0].payload)
+        #     run_from_task(tasks[0])
         #     mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
 
     def test_send_fcm_third_party_auth_error(self):
@@ -1368,7 +1333,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Make sure our taskqueue tasks execute what we expect
         # with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-        #     deferred.run(tasks[0].payload)
+        #     run_from_task(tasks[0])
         #     mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
 
     def test_send_fcm_unavailable_error(self):
@@ -1402,7 +1367,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Make sure our taskqueue tasks execute what we expect
         # with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-        #     deferred.run(tasks[0].payload)
+        #     run_from_task(tasks[0])
         #     mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
 
     def test_send_fcm_unhandled_error(self):
@@ -1454,7 +1419,7 @@ class TestTBANSHelper(unittest.TestCase):
                 "logging.error"
             ):
                 # call_time = time.time()
-                TBANSHelper._send_fcm([client], MockNotification(), False, i)
+                TBANSHelper._send_fcm([client], MockNotification(), i)
 
                 # NOTE: Removed in https://github.com/the-blue-alliance/the-blue-alliance/pull/4620
                 # Check that we queue'd for a retry with the proper countdown time
@@ -1466,7 +1431,7 @@ class TestTBANSHelper(unittest.TestCase):
                 #
                 # Make sure our taskqueue tasks execute what we expect
                 # with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-                #     deferred.run(tasks[0].payload)
+                #     run_from_task(tasks[0])
                 #     mock_send_fcm.assert_called_once_with([client], ANY, False, i + 1)
 
                 self.taskqueue_stub.FlushQueue("push-notifications")
@@ -1500,7 +1465,8 @@ class TestTBANSHelper(unittest.TestCase):
             "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
             autospec=True,
         ) as mock_init:
-            TBANSHelper._send_webhook(clients, MockNotification())
+            for client in clients:
+                TBANSHelper._send_webhook(client, MockNotification())
             mock_init.assert_called_once_with(ANY, expected, ANY)
 
     def test_send_webhook_filter_webhook_clients_verified(self):
@@ -1525,7 +1491,8 @@ class TestTBANSHelper(unittest.TestCase):
             "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
             autospec=True,
         ) as mock_init:
-            TBANSHelper._send_webhook(clients, MockNotification())
+            for client in clients:
+                TBANSHelper._send_webhook(client, MockNotification())
             mock_init.assert_called_once_with(ANY, "verified", ANY)
 
     def test_send_webhook_filter_webhook_clients_from_notification(self):
@@ -1550,8 +1517,9 @@ class TestTBANSHelper(unittest.TestCase):
             "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
             autospec=True,
         ) as mock_init:
-            TBANSHelper._send_webhook(clients, MockNotification(should_send=False))
-            mock_init.assert_not_called()
+            for client in clients:
+                TBANSHelper._send_webhook(client, MockNotification(should_send=False))
+                mock_init.assert_not_called()
 
     def test_send_webhook_multiple(self):
         clients = [
@@ -1568,7 +1536,8 @@ class TestTBANSHelper(unittest.TestCase):
         with patch.object(
             WebhookRequest, "send", return_value=batch_response
         ) as mock_send:
-            TBANSHelper._send_webhook(clients, MockNotification())
+            for client in clients:
+                TBANSHelper._send_webhook(client, MockNotification())
             assert mock_send.call_count == 3
 
     def test_debug_string(self):

@@ -19,10 +19,6 @@ FCM_CLIENTS: Set[ClientType] = {
     ClientType.WEB,
 }
 
-FCM_LEGACY_CLIENTS: Set[ClientType] = {
-    ClientType.OS_ANDROID,
-}
-
 
 NAMES: Dict[ClientType, str] = {
     ClientType.OS_ANDROID: "Android",

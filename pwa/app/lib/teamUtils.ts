@@ -1,6 +1,5 @@
-import { Team } from '~/api/v3';
-
-import { removeNonNumeric } from './utils';
+import { Team } from '~/api/tba/read';
+import { removeNonNumeric } from '~/lib/utils';
 
 export function sortTeamsComparator(a: Team, b: Team) {
   return a.team_number - b.team_number;
@@ -8,6 +7,10 @@ export function sortTeamsComparator(a: Team, b: Team) {
 
 export function sortTeamKeysComparator(a: string, b: string) {
   return Number(removeNonNumeric(a)) - Number(removeNonNumeric(b));
+}
+
+export function sortTeams(teams: Team[]) {
+  return teams.sort((a, b) => sortTeamsComparator(a, b));
 }
 
 // Known problem: Does not work when the final company listed has an ampersand in its name

@@ -32,7 +32,7 @@ def defense_name(value: str) -> str:
 def digits(s: Optional[Union[int, str]]) -> Union[int, str]:
     if not s:
         return ""
-    if type(s) is int:
+    if isinstance(s, int):
         return s
     return re.sub("[^0-9]", "", s)
 
@@ -57,6 +57,12 @@ def limit_prob(prob: float) -> int:
     prob *= 100
     prob = min(95, max(prob, 5))
     return int(round(prob))
+
+
+def from_ms_timestamp(timestamp: Optional[int]) -> Optional[datetime]:
+    if timestamp is None:
+        return None
+    return datetime.fromtimestamp(timestamp / 1000)
 
 
 def strftime(dt: datetime, formatstr: str) -> str:
@@ -162,6 +168,7 @@ _filters = {
     "sort_by": sort_by,
     "get_item": get_item,
     "pprint_json": pprint_json,
+    "from_ms_timestamp": from_ms_timestamp,
 }
 
 

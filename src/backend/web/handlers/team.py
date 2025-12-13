@@ -17,7 +17,7 @@ from backend.web.profiled_render import render_template
 from backend.web.renderers.team_renderer import TeamRenderer
 
 MAX_TEAM_NUMBER_EXCLUSIVE = (
-    10000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1
+    11000  # Support between Team 0 and Team MAX_TEAM_NUMBER_EXCLUSIVE - 1
 )
 TEAMS_PER_PAGE = 1000
 VALID_PAGES = range(
@@ -46,7 +46,7 @@ def team_detail(
         abort(404)
     return make_cached_response(
         render_template("team_details.html", template_values),
-        ttl=timedelta(seconds=61) if short_cache else timedelta(days=1),
+        ttl=timedelta(seconds=61) if short_cache else timedelta(hours=6),
     )
 
 
@@ -63,7 +63,7 @@ def team_history(team_number: TeamNumber, is_canonical: bool = False) -> Respons
     template_values, short_cache = TeamRenderer.render_team_history(team, is_canonical)
     return make_cached_response(
         render_template("team_history.html", template_values),
-        ttl=timedelta(minutes=5) if short_cache else timedelta(days=1),
+        ttl=timedelta(minutes=5) if short_cache else timedelta(hours=6),
     )
 
 
@@ -85,7 +85,7 @@ def team_canonical(team_number: TeamNumber) -> Response:
     return team_detail(team_number, current_year, is_canonical=True)
 
 
-@cached_public(ttl=timedelta(days=7))
+@cached_public(ttl=timedelta(days=1))
 def team_list(page: int) -> str:
     page_labels = []
     cur_page_label = ""

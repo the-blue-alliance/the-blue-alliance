@@ -47,6 +47,8 @@
       <h2 id="request">Request Structure</h2>
         <p>Each request will contain a payload of JSON data containing information about the event that has been pushed to you. Each request will contain a <code>message_type</code> and <code>message_data</code> field. The <code>message_type</code> field can be used to determine the data being sent. The <code>message_data</code> is the data specific to the message being sent. Details of each type of supported event is below.</p>
         <p>Each request also contains a <code>X-TBA-HMAC</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that is set by the server when you create the webhook concatenated with the payload string. This is caculated using <a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf">NIST's HMAC algorithm</a>, using SHA256. You can see <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/7443c5bbfc817e9faa1b084aa9d5de267a45e785/src/backend/common/models/notifications/requests/webhook_request.py#L99" target="_blank">in the code</a> where this is calculated.
+      <h2 id="details">Implementation Details</h2>
+        <p>Each POST request has a timeout of 10s from TBA's servers. Not responding within this timeframe will be considered a failed request.</p>
 
       <h2 id="configuration">Configuration</h2>
         <p>Webhooks are tied to your TBA Account - you can create them from your <a href="/account">account overview</a>. You will have to enter a URL that will receive the pushed notification. You also have to enter a secret key used to secure requests - we recommend using a long randomly generated string. When you receive a webhook, TBA will send a HTTP POST request to the URL you have entered, so make sure you're listening. Not responding or returning an error code may cause your webhook to be deleted.</p>
@@ -62,7 +64,7 @@
         <p>You can see an example App Engine site that is subscribed to the Firehose, stores all the incoming data in the ndb, and displays it <a href="https://github.com/the-blue-alliance/the-blue-alliance-notification-firehose" target="_blank">here</a>.</p>
 
     <h2 id="notifications">Notification Types</h2>
-      <p>Please keep in mind that not all notification types have been implemented or enabled yet. Watch the <code>ENABLED_NOTIFICATIONS</code> dictionary of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/notification_type.py">this file</a> to see which types are enabled on the server.</p>
+      <p>Please keep in mind that not all notification types have been implemented or enabled yet. Watch the <code>ENABLED_NOTIFICATIONS</code> dictionary of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/notification_type.py">this file</a> to see which types are enabled on the server.</p>
 
       <h3 id="upcoming_match">Upcoming Match Notification</h3>
         <p>These notifications are after scores have been posted for match N - 2. In the case of a match schedule first being released or matches between days (ex: the first match on the second day of an event), this notification will be sent ~7m before the start of the match.</p>
@@ -261,7 +263,7 @@
                 </tr>
                 <tr>
                   <td><code>comp_level</code></td>
-                  <td>One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/comp_level.py#L6-L11">these strings</a> representing the competition level that is starting</td>
+                  <td>One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/comp_level.py#L6-L11">these strings</a> representing the competition level that is starting</td>
                   <td>qf</td>
                 </tr>
                 <tr>
@@ -320,7 +322,7 @@
 
           <h4>Example JSON</h4>
             <pre class="example-json">
-            {"message_data": {"event_name": "New England FRC Region Championship", "event_key": "2014necmp", "event": {"key": "2014necmp", "website": "http://www.nefirst.org/", "official": true, "end_date": "2014-04-12", "name": "New England FRC Region Championship", "short_name": "New England", "facebook_eid": null, "event_district_string": "New England", "venue_address": "Boston University\nAgganis Arena\nBoston, MA 02215\nUSA", "event_district": 3, "location": "Boston, MA, USA", "event_code": "necmp", "year": 2014, "webcast": [], "alliances": [{"declines": [], "picks": ["frc195", "frc558", "frc5122"]}, {"declines": [], "picks": ["frc1153", "frc125", "frc4048"]}, {"declines": [], "picks": ["frc230", "frc177", "frc4055"]}, {"declines": [], "picks": ["frc716", "frc78", "frc811"]}, {"declines": [], "picks": ["frc1519", "frc3467", "frc58"]}, {"declines": [], "picks": ["frc131", "frc175", "frc1073"]}, {"declines": [], "picks": ["frc228", "frc3525", "frc2168"]}, {"declines": [], "picks": ["frc172", "frc1058", "frc2067"]}], "event_type_string": "District Championship", "start_date": "2014-04-10", "event_type": 2} }, "message_type": "alliance_selection"}
+            {"message_data": {"event_name": "New England FRC Region Championship", "event_key": "2014necmp", "event": {"address": "Boston, MA 02215, USA", "city": "Boston", "country": "USA", "district": {"abbreviation": "ne", "display_name": "New England", "key": "2014ne", "year": 2014}, "division_keys": [], "end_date": "2014-04-12", "event_code": "necmp", "event_type": 2, "event_type_string": "District Championship", "first_event_code": "necmp", "first_event_id": "10871", "gmaps_place_id": "ChIJFzjlY_B544kRyL6j4ABuNCs", "gmaps_url": "https://maps.google.com/?cid=3113234192467738312", "key": "2014necmp", "lat": 42.3504997, "lng": -71.1053991, "location_name": "Boston University", "name": "New England FRC Region Championship", "parent_event_key": null, "playoff_type": null, "playoff_type_string": null, "postal_code": "02215", "short_name": "New England", "start_date": "2014-04-10", "state_prov": "MA", "timezone": "America/New_York", "webcasts": [{"channel": "7031031", "file": "2797186", "type": "livestream"}, {"channel": "7234441", "file": "2797207", "type": "livestream"}], "website": "http://www.nefirst.org/", "week": 6, "year": 2014}}, "message_type": "alliance_selection"}
             </pre>
             {% with type=types.alliance_selection, event_key='2014necmp' %}
               {% include "apidocs_partials/apidocs_webhooks_test.html" %}
@@ -637,7 +639,7 @@ $( document ).ready(function() {
             else if (data.responseJSON && data.responseJSON.Error) responseText = data.responseJSON.Error;
             else if (data.status === 401) responseText = 'Please log in before sending test notifications.';
             else responseText = 'Something went horribly wrong. Refresh the page and try again.';
-            
+
             $(this.form).find('.webhook-alert')
                 .addClass(data === 'ok' ? 'alert-success' : 'alert-danger')
                 .css('display', 'block')

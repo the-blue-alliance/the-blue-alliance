@@ -105,7 +105,7 @@ def test_reject_all(login_user_with_permission, web_client: Client, ndb_stub) ->
         web_client, "reject_all_2016necmp"
     )
     assert queue == [suggestion_id]
-    assert reject_fields is not {}
+    assert reject_fields != {}
 
     reject_fields["verdict"] = "reject_all"
     response = web_client.post(
@@ -137,7 +137,7 @@ def test_accept_with_default_details(
         web_client, f"review_{suggestion_id}"
     )
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["verdict"] = "accept"
     response = web_client.post(
@@ -169,7 +169,7 @@ def test_accept_with_different_details(
         web_client, f"review_{suggestion_id}"
     )
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["webcast_type"] = "youtube"
     form_fields["webcast_channel"] = "foobar"
@@ -209,7 +209,7 @@ def test_reject_single_webcast(
         web_client, f"review_{suggestion_id}"
     )
     assert queue == [suggestion_id]
-    assert form_fields is not {}
+    assert form_fields != {}
 
     form_fields["verdict"] = "reject"
     response = web_client.post(

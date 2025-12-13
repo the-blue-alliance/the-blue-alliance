@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Optional
+from typing import cast, Dict, List, Optional
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -14,7 +14,7 @@ from backend.common.models.alliance import EventAlliance
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_ranking import EventRanking
-from backend.common.models.keys import EventKey
+from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 
@@ -26,7 +26,9 @@ class EventRemapTeamsHelper:
         if not event or not event.remap_teams:
             return None
 
-        event.prep_awards_matches_teams()
+        event.prep_awards()
+        event.prep_matches()
+        event.prep_teams()
 
         # Remap matches
         cls.remapteams_matches(event.matches, event.remap_teams)
@@ -69,7 +71,7 @@ class EventRemapTeamsHelper:
                 # Convert `team_number` down to an int, if possible
                 recipient_team_number = recipient["team_number"]
                 if (
-                    type(recipient_team_number) is str
+                    isinstance(recipient_team_number, str)
                     and recipient_team_number.isdigit()
                 ):
                     award._dirty = True
@@ -97,9 +99,10 @@ class EventRemapTeamsHelper:
                 # Update alliances
                 for color in ALLIANCE_COLORS:
                     for attr in ["teams", "surrogates", "dqs"]:
-                        for i, key in enumerate(
-                            match.alliances[color].get(attr, [])  # pyre-ignore[26]
-                        ):
+                        team_keys = cast(
+                            List[TeamKey], match.alliances[color].get(attr, [])
+                        )
+                        for i, key in enumerate(team_keys):
                             if key == old_team:
                                 match._dirty = True
                                 match.alliances[color][attr][  # pyre-ignore[26]
@@ -125,7 +128,8 @@ class EventRemapTeamsHelper:
         for row in alliance_selections:
             for choice in ["picks", "declines"]:
                 for old_team, new_team in remap_teams.items():
-                    for i, key in enumerate(row.get(choice, [])):  # pyre-ignore[26]
+                    team_keys = cast(List[TeamKey], row.get(choice, []))
+                    for i, key in enumerate(team_keys):
                         if key == old_team:
                             row[choice][i] = new_team  # pyre-ignore[26,6]
 

@@ -77,6 +77,33 @@ def test_render_rankings_with_extra_stats() -> None:
     )
 
 
+def test_render_rankings_with_no_sort_orders() -> None:
+    details = EventDetails(
+        id="2019nyny",
+        rankings2=[
+            EventRanking(
+                rank=1,
+                team_key="frc254",
+                record=WLTRecord(
+                    wins=1,
+                    losses=0,
+                    ties=0,
+                ),
+                qual_average=None,
+                matches_played=1,
+                dq=0,
+                sort_orders=[],
+            )
+        ],
+    )
+    rankings = details.renderable_rankings
+    assert rankings == RenderedRankings(
+        rankings=details.rankings2,
+        sort_order_info=SORT_ORDER_INFO[2019],
+        extra_stats_info=[],
+    )
+
+
 def test_render_rankings_with_extra_stats_per_match() -> None:
     details = EventDetails(
         id="2016nyny",
@@ -243,6 +270,40 @@ def test_rankings_table_game_year_2021(ndb_context) -> None:
             "Power Port",
         ],
         [1, "254", "1.00", "2.00", "3.00", "4.00", "5.00", "6.00"],
+    ]
+
+
+def test_rankings_table_game_no_sort_orders(ndb_context) -> None:
+    event_key = "2024test"
+    _create_test_event(event_key)
+
+    details = EventDetails(
+        id=event_key,
+        rankings2=[
+            EventRanking(
+                rank=1,
+                team_key="frc254",
+                record=None,
+                qual_average=None,
+                matches_played=0,
+                dq=0,
+                sort_orders=[],
+            )
+        ],
+    )
+    assert details.rankings_table == [
+        [
+            "Rank",
+            "Team",
+            "Ranking Score",
+            "Avg Coop",
+            "Avg Match",
+            "Avg Auto",
+            "Avg Stage",
+            "DQ",
+            "Played",
+        ],
+        [1, "254", 0, 0],
     ]
 
 

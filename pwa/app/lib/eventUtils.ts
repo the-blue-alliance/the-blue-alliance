@@ -1,4 +1,6 @@
-import { Event } from '~/api/v3';
+import { Event } from '~/api/tba/read/types.gen';
+import { EventType } from '~/lib/api/EventType';
+import { convertMsToDays } from '~/lib/utils';
 
 export function isValidEventKey(key: string) {
   return /^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,3}$/.test(key);
@@ -22,6 +24,22 @@ export function sortEventsComparator(a: Event, b: Event) {
   if (end_date_a > end_date_b) {
     return 1;
   }
+
+  // If one of the events is DCMP finals or CMP finals, put it last
+  // e.g.: [2024necmp1, 2024necmp2, 2024necmp]
+  if (
+    (a.event_type === EventType.CMP_FINALS ||
+      a.event_type === EventType.DISTRICT_CMP ||
+      b.event_type === EventType.CMP_FINALS ||
+      b.event_type === EventType.DISTRICT_CMP) &&
+    a.event_type !== b.event_type
+  ) {
+    return a.event_type === EventType.CMP_FINALS ||
+      a.event_type === EventType.DISTRICT_CMP
+      ? 1
+      : -1;
+  }
+
   // Then sort by name
   if (a.name < b.name) {
     return -1;
@@ -87,4 +105,84 @@ export function getEventWeekString(event: Event) {
     default:
       return `Week ${event.week + 1}`;
   }
+}
+
+export function getCurrentWeekEvents(events: Event[]) {
+  const now = new Date();
+  const filteredEvents = [];
+
+  const diffFromWeekStart = now.getDay();
+  const closestStartMonday = new Date(now).setDate(
+    now.getDate() - diffFromWeekStart,
+  );
+
+  for (const event of events) {
+    const startDateMs = new Date(event.start_date).getTime();
+
+    const timeOffsetDays = Math.floor(
+      convertMsToDays(startDateMs - closestStartMonday),
+    );
+
+    if (timeOffsetDays >= 0 && timeOffsetDays < 7) {
+      filteredEvents.push(event);
+    }
+  }
+  return sortEvents(filteredEvents);
+}
+
+export function sortEvents(events: Event[]) {
+  return events.sort((a, b) => sortEventsComparator(a, b));
+}
+
+// Common division names and their shortforms for Einstein events
+export const DIVISION_SHORTFORMS: Record<string, string> = {
+  Newton: 'New',
+  Einstein: 'Ein',
+  Curie: 'Cur',
+  Galileo: 'Gal',
+  Hopper: 'Hop',
+  Tesla: 'Tes',
+  Turing: 'Tur',
+  Archimedes: 'Arc',
+  Carson: 'Car',
+  Carver: 'Crv',
+  Daly: 'Dal',
+  Darwin: 'Dar',
+  Johnson: 'Joh',
+  Milstein: 'Mil',
+  Roebling: 'Roe',
+};
+
+// Helper to get division shortform (e.g., "Newton Division" -> "New")
+export function getDivisionShortform(divisionName: string): string {
+  // Try to match the division name
+  for (const [fullName, shortForm] of Object.entries(DIVISION_SHORTFORMS)) {
+    if (divisionName.includes(fullName)) {
+      return shortForm;
+    }
+  }
+
+  // If no match found, take first 3 letters
+  return divisionName.substring(0, 3);
+}
+
+export function isEventWithinDays(
+  event: Event,
+  negativeDaysBefore: number,
+  positiveDaysAfter: number,
+): boolean {
+  if (event.start_date === null || event.end_date === null) {
+    return false;
+  }
+  const DAY_IN_MS = 24 * 60 * 60 * 1000;
+  const startDate = getLocalMidnightOnDate(event.start_date);
+  const endDate = getLocalMidnightOnDate(event.end_date);
+  const now = new Date();
+  const windowStart = startDate.getTime() - negativeDaysBefore * DAY_IN_MS;
+  const windowEnd = endDate.getTime() + positiveDaysAfter * 2 * DAY_IN_MS;
+  return now.getTime() >= windowStart && now.getTime() <= windowEnd;
+}
+
+export function isEventWithinADay(event: Event): boolean {
+  return isEventWithinDays(event, -1, 1);
 }

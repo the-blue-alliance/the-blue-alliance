@@ -2,7 +2,7 @@
 
 {% block title %}{% if explicit_year %}{{year}} {% endif %}FIRST Robotics {{district_name}} District - The Blue Alliance{% endblock %}
 
-{% block meta_description %}{{district_name}} district details for the FIRST Robotics Competition{% if explicit_year %} from {{year}}{% endif %}.{% endblock %}
+{% block meta_description %}{{district_name}} district details for the FIRST Robotics Competition (FRC){% if explicit_year %} from {{year}}{% endif %}.{% endblock %}
 
 {% block events_active %}active{% endblock %}
 
@@ -128,6 +128,7 @@
                 <th>District Champ</th>
                 <th>Rookie Bonus</th>
                 {% if year == 2022 %}<th>Other Bonus</th>{% endif %}
+                {% if has_adjustments %}<th>Adjustments</th>{% endif %}
                 <th>Total Points</th>
                 <th>Qualified for DCMP</th>
                 <th>Qualified for CMP</th>
@@ -177,6 +178,15 @@
                   --
                   {% endif %}
                 </td>
+                {% endif %}
+                {% if has_adjustments %}
+                  <td>
+                    {% if item.adjustments %}
+                      {{ item.adjustments }}
+                    {% else %}
+                      --
+                    {% endif %}
+                  </td>
                 {% endif %}
                 <td><strong>{{item.point_total}}</strong></td>
                 <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].dcmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>

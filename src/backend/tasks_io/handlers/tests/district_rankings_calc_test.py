@@ -6,6 +6,7 @@ from google.appengine.ext import testbed
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.helpers.district_helper import (
     DistrictHelper,
     DistrictRankingTeamTotal,
@@ -59,7 +60,7 @@ def test_enqueue_event(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
     ndb_stub,
 ) -> None:
-    district_rankings_mock.return_value = {}
+    district_rankings_mock.return_value = InstantFuture({})
     District(
         id="2020test",
         year=2020,
@@ -69,11 +70,7 @@ def test_enqueue_event(
     assert resp.status_code == 200
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
-    assert len(tasks) == 2
-    for task in tasks:
-        task_resp = tasks_client.get(task.url)
-        assert task_resp.status_code == 200
-
+    assert len(tasks) == 1
     taskqueue_stub.Clear()
 
 
@@ -87,7 +84,7 @@ def test_enqueue_default_year(
     ndb_stub,
 ) -> None:
     season_helper_mock.return_value = 2020
-    district_rankings_mock.return_value = {}
+    district_rankings_mock.return_value = InstantFuture({})
     District(
         id="2020test",
         year=2020,
@@ -97,11 +94,7 @@ def test_enqueue_default_year(
     assert resp.status_code == 200
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
-    assert len(tasks) == 2
-    for task in tasks:
-        task_resp = tasks_client.get(task.url)
-        assert task_resp.status_code == 200
-
+    assert len(tasks) == 1
     taskqueue_stub.Clear()
 
 
@@ -136,7 +129,7 @@ def test_calc(
                 (
                     event,
                     TeamAtEventDistrictPoints(
-                        event_key="",
+                        event_key=event.key_name,
                         district_cmp=False,
                         qual_points=0,
                         elim_points=0,
@@ -150,7 +143,9 @@ def test_calc(
             tiebreakers=[],
             qual_scores=[],
             rookie_bonus=0,
+            single_event_bonus=0,
             other_bonus=0,
+            adjustments=5,
         )
     }
 
@@ -176,6 +171,7 @@ def test_calc(
                 ),
             ],
             rookie_bonus=0,
+            adjustments=5,
             point_total=0,
         )
     ]
@@ -197,7 +193,9 @@ def test_calc_no_output_in_taskqueue(
             tiebreakers=[],
             qual_scores=[],
             rookie_bonus=0,
+            single_event_bonus=0,
             other_bonus=0,
+            adjustments=0,
         )
     }
 
@@ -209,3 +207,42 @@ def test_calc_no_output_in_taskqueue(
     )
     assert resp.status_code == 200
     assert resp.data == b""
+
+
+@mock.patch.object(DistrictHelper, "calculate_rankings")
+def test_calc_with_adjustments(calc_mock: mock.Mock, tasks_client: Client) -> None:
+    District(
+        id="2020ne",
+        year=2020,
+        abbreviation="ne",
+        adjustments={"frc254": 5},
+    ).put()
+    calc_mock.return_value = {
+        "frc254": DistrictRankingTeamTotal(
+            event_points=[],
+            point_total=5,
+            tiebreakers=[],
+            qual_scores=[],
+            rookie_bonus=0,
+            single_event_bonus=0,
+            other_bonus=0,
+            adjustments=5,
+        )
+    }
+
+    resp = tasks_client.get(
+        "/tasks/math/do/district_rankings_calc/2020ne",
+        headers={
+            "X-Appengine-Taskname": "test",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+    calc_mock.assert_called_once_with(
+        mock.ANY, mock.ANY, mock.ANY, adjustments={"frc254": 5}
+    )
+
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    assert district.rankings[0]["adjustments"] == 5

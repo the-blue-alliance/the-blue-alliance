@@ -16,25 +16,98 @@ updates:
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: swagger-ui
-  - dependency-name: firebase
-    versions:
-    - 8.4.0
-  - dependency-name: "@babel/preset-env"
-    versions:
-    - 7.13.0
+  groups:
+    react:
+      patterns:
+        - "react"
+        - "react-dom"
+        - "@types/react"
+        - "@types/react-dom"
+    mui:
+      patterns:
+        - "@mui/*"
 - package-ecosystem: npm
   directory: "/pwa"
   schedule:
     interval: daily
   open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@types/node"
+    update-types:
+      - version-update:semver-major
+  labels:
+    - PWA
   groups:
-    remix-run:
+    tanstack:
       patterns:
-        - "@remix-run/*"
+        - "@tanstack/*"
     embla-carousel:
       patterns:
         - "embla-carousel-autoplay"
         - "embla-carousel-react"
+    radix-ui:
+      patterns:
+        - "@radix-ui/*"
+    vite:
+      patterns:
+        - "vite"
+        - "vite-tsconfig-paths"
+        - "vitest"
+        - "@vitest/coverage-v8"
+        - "@julr/vite-plugin-validate-env"
+        - "@vitejs/plugin-react"
+        - "babel-plugin-react-compiler"
+    linting:
+      patterns:
+        - "@eslint/*"
+        - "eslint"
+        - "eslint-config-prettier"
+        - "eslint-import-resolver-typescript"
+        - "eslint-plugin-import"
+        - "eslint-plugin-jsx-a11y"
+        - "eslint-plugin-no-relative-import-paths"
+        - "eslint-plugin-react"
+        - "eslint-plugin-react-hooks"
+        - "globals"
+        - "typescript-eslint"
+        - "@typescript-eslint/*"
+        - "prettier"
+        - "prettier-plugin-classnames"
+        - "prettier-plugin-merge"
+        - "prettier-plugin-tailwindcss"
+        - "@trivago/prettier-plugin-sort-imports"
+    sentry:
+      patterns:
+        - "@sentry/*"
+    tailwind:
+      patterns:
+        - "@tailwindcss/*"
+        - "tailwindcss"
+        - "tailwind-merge"
+        - "tw-animate-css"
+    icons:
+      patterns:
+        - "@iconify/json"
+        - "lucide-react"
+        - "unplugin-icons"
+    react:
+      patterns:
+        - "react"
+        - "react-dom"
+        - "@types/react"
+        - "@types/react-dom"
+        - "react-intersection-observer"
+    firebase:
+      patterns:
+        - "firebase"
+        - "firebase-admin"
+    testing:
+      patterns:
+        - "@playwright/test"
+    logging:
+      patterns:
+        - "pino"
+        - "pino-pretty"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

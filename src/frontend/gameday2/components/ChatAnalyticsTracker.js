@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ReactGA from "react-ga";
+import ReactGA from "react-ga4";
 
 export default class ChatAnalyticsTracker extends React.Component {
   static propTypes = {

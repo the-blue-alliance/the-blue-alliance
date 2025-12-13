@@ -5,12 +5,10 @@ from typing import List, Optional
 
 import firebase_admin
 from firebase_admin.exceptions import FirebaseError
-from google.appengine.ext import deferred
 
 from backend.common.consts.client_type import (
     ClientType,
     FCM_CLIENTS,
-    FCM_LEGACY_CLIENTS,
 )
 from backend.common.consts.notification_type import (
     ENABLED_EVENT_NOTIFICATIONS,
@@ -18,6 +16,7 @@ from backend.common.consts.notification_type import (
     ENABLED_TEAM_NOTIFICATIONS,
     NotificationType,
 )
+from backend.common.helpers.deferred import defer_safe
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.mobile_client import MobileClient
@@ -195,7 +194,8 @@ class TBANSHelper:
                 MobileClient.client_type == ClientType.WEBHOOK
             ).fetch()
             if clients:
-                cls._defer_webhook(clients, notification)
+                for client in clients:
+                    cls._defer_webhook(client, notification)
 
     @classmethod
     def event_level(cls, match: Match, user_id: Optional[str] = None) -> None:
@@ -485,7 +485,7 @@ class TBANSHelper:
         )
 
     @staticmethod
-    def ping(client: MobileClient) -> bool:
+    def ping(client: MobileClient) -> tuple[bool, bool]:
         """Immediately dispatch a Ping to either FCM or a webhook"""
         if client.client_type == ClientType.WEBHOOK:
             return TBANSHelper._ping_webhook(client)
@@ -493,14 +493,13 @@ class TBANSHelper:
             return TBANSHelper._ping_client(client)
 
     @staticmethod
-    def _ping_client(client: MobileClient) -> bool:
+    def _ping_client(client: MobileClient) -> tuple[bool, bool]:
         client_type = client.client_type
-        if client_type in FCM_CLIENTS or client_type in FCM_LEGACY_CLIENTS:
+        if client_type in FCM_CLIENTS:
             from backend.common.models.notifications.ping import (
                 PingNotification,
             )
 
-            is_legacy_format = client_type in FCM_LEGACY_CLIENTS
             notification = PingNotification()
 
             from backend.common.models.notifications.requests.fcm_request import (
@@ -511,19 +510,18 @@ class TBANSHelper:
                 firebase_app,
                 notification,
                 tokens=[client.messaging_id],
-                legacy_data_format=is_legacy_format,
             )
 
             batch_response = fcm_request.send()
             if batch_response.failure_count > 0:
-                return False
+                return (False, False)
         else:
             raise Exception("Unsupported FCM client type: {}".format(client_type))
 
-        return True
+        return (True, True)
 
     @staticmethod
-    def _ping_webhook(client: MobileClient) -> bool:
+    def _ping_webhook(client: MobileClient) -> tuple[bool, bool]:
         from backend.common.models.notifications.ping import PingNotification
 
         notification = PingNotification()
@@ -562,7 +560,7 @@ class TBANSHelper:
             cls.match_upcoming(match, user_id)
         else:
             try:
-                deferred.defer(
+                defer_safe(
                     cls.match_upcoming,
                     match,
                     user_id,
@@ -629,7 +627,7 @@ class TBANSHelper:
         BATCH_SIZE = 500
 
         for batch in batch(subscriptions, BATCH_SIZE):
-            deferred.defer(
+            defer_safe(
                 cls._send_subscriptions,
                 batch,
                 notification,
@@ -652,9 +650,6 @@ class TBANSHelper:
         fcm_clients_future = MobileClientQuery(
             user_ids, client_types=list(FCM_CLIENTS)
         ).fetch_async()
-        legacy_fcm_clients_future = MobileClientQuery(
-            user_ids, client_types=list(FCM_LEGACY_CLIENTS)
-        ).fetch_async()
         webhook_clients_future = MobileClientQuery(
             user_ids, client_types=[ClientType.WEBHOOK]
         ).fetch_async()
@@ -664,39 +659,28 @@ class TBANSHelper:
         if fcm_clients:
             cls._defer_fcm(fcm_clients, notification)
 
-        # Send to Android clients
-        # These use the webhook data format, but over FCM
-        legacy_fcm_clients = legacy_fcm_clients_future.get_result()
-        if legacy_fcm_clients:
-            cls._defer_fcm(legacy_fcm_clients, notification, legacy_data_format=True)
-
         # Send to webhooks
         webhook_clients = webhook_clients_future.get_result()
         if webhook_clients:
-            cls._defer_webhook(webhook_clients, notification)
+            for webhook in webhook_clients:
+                cls._defer_webhook(webhook, notification)
 
     @classmethod
     def _defer_fcm(
-        cls,
-        clients: List[MobileClient],
-        notification: Notification,
-        legacy_data_format: bool = False,
+        cls, clients: List[MobileClient], notification: Notification
     ) -> None:
-        deferred.defer(
+        defer_safe(
             cls._send_fcm,
             clients,
             notification,
-            legacy_data_format,
             _target="py3-tasks-io",
             _queue="push-notifications",
             _url="/_ah/queue/deferred_notification_send",
         )
 
     @classmethod
-    def _defer_webhook(
-        cls, clients: List[MobileClient], notification: Notification
-    ) -> None:
-        deferred.defer(
+    def _defer_webhook(cls, clients: MobileClient, notification: Notification) -> None:
+        defer_safe(
             cls._send_webhook,
             clients,
             notification,
@@ -710,7 +694,6 @@ class TBANSHelper:
         cls,
         clients: List[MobileClient],
         notification: Notification,
-        legacy_data_format: bool = False,
         backoff_iteration: int = 0,
     ) -> None:
         # Only send to FCM clients if notifications are enabled
@@ -726,7 +709,7 @@ class TBANSHelper:
         clients = [
             client
             for client in clients
-            if client.client_type in (FCM_CLIENTS | FCM_LEGACY_CLIENTS)
+            if client.client_type in FCM_CLIENTS
             and notification.should_send_to_client(client)
         ]
 
@@ -744,7 +727,6 @@ class TBANSHelper:
                 firebase_app,
                 notification,
                 tokens=[client.messaging_id for client in subclients],
-                legacy_data_format=legacy_data_format,
             )
 
             logging.info(f"Sending FCM request: {time.strftime('%X')}")
@@ -814,11 +796,10 @@ class TBANSHelper:
 
             # if retry_clients:
             #     # Try again, with exponential backoff
-            #     deferred.defer(
+            #     defer_safe(
             #         cls._send_fcm,
             #         retry_clients,
             #         notification,
-            #         legacy_data_format,
             #         backoff_iteration + 1,
             #         _countdown=backoff_time,
             #         _target="py3-tasks-io",
@@ -829,31 +810,26 @@ class TBANSHelper:
         return
 
     @classmethod
-    def _send_webhook(
-        cls, clients: List[MobileClient], notification: Notification
-    ) -> None:
+    def _send_webhook(cls, client: MobileClient, notification: Notification) -> None:
         # Only send to webhooks if notifications are enabled
         if not cls._notifications_enabled():
             return
 
-        # Make sure we're only sending to webhook clients
-        clients = [
-            client
-            for client in clients
-            if client.client_type == ClientType.WEBHOOK
-            and client.verified
-            and notification.should_send_to_client(client)
-        ]
+        # Make sure we're only sending to verified webhook clients
+        if client.client_type != ClientType.WEBHOOK or not client.verified:
+            return
+
+        if not notification.should_send_to_client(client):
+            return
 
         from backend.common.models.notifications.requests.webhook_request import (
             WebhookRequest,
         )
 
-        for client in clients:
-            webhook_request = WebhookRequest(
-                notification, client.messaging_id, client.secret
-            )
-            webhook_request.send()
+        webhook_request = WebhookRequest(
+            notification, client.messaging_id, client.secret
+        )
+        webhook_request.send()
 
         return
 

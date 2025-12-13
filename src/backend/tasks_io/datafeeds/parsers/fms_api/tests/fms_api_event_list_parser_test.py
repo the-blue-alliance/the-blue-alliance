@@ -50,6 +50,7 @@ def test_parse_regional_event(test_data_importer):
     assert event.city == "New York"
     assert event.state_prov == "NY"
     assert event.country == "USA"
+    assert event.timezone_id == "America/New_York"
     assert event.year == 2015
     assert event.event_type_enum == EventType.REGIONAL
     assert event.district_key is None
@@ -78,6 +79,7 @@ def test_parse_regional_event_code_override(test_data_importer):
     assert event.city == "New York"
     assert event.state_prov == "NY"
     assert event.country == "USA"
+    assert event.timezone_id == "America/New_York"
     assert event.year == 2015
     assert event.event_type_enum == EventType.REGIONAL
     assert event.district_key is None

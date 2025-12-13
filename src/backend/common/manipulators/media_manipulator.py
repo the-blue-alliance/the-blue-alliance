@@ -19,7 +19,11 @@ class MediaManipulator(ManipulatorBase[Media]):
 
     @classmethod
     def updateMerge(
-        cls, new_model: Media, old_model: Media, auto_union: bool = True
+        cls,
+        new_model: Media,
+        old_model: Media,
+        auto_union: bool = True,
+        update_manual_attrs: bool = True,
     ) -> Media:
-        cls._update_attrs(new_model, old_model, auto_union)
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
         return old_model

@@ -1,24 +1,27 @@
 from typing import Dict, List, Set
 
 from firebase_admin import db as firebase_db
-from google.appengine.ext import deferred
-from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
+from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.environment import Environment
 from backend.common.firebase import app as get_firebase_app
-from backend.common.helpers.event_helper import EventHelper
-from backend.common.helpers.webcast_online_helper import WebcastOnlineHelper
+from backend.common.helpers.deferred import defer_safe
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    NexusMatchStatusMemcache,
+)
 from backend.common.models.event import Event
+from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
-from backend.common.models.webcast import Webcast
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import (
     MatchConverter,
     MatchDict,
 )
-from backend.common.sitevars.forced_live_events import ForcedLiveEvents
-from backend.common.sitevars.gameday_special_webcasts import GamedaySpecialWebcasts
+from backend.common.sitevars.gameday_special_webcasts import (
+    WebcastType as TSpecialWebcast,
+)
 
 
 class FirebasePusher:
@@ -69,16 +72,16 @@ class FirebasePusher:
         """
         Deletes a match from an event and event_team
         """
-        deferred.defer(
+        defer_safe(
             cls._delete_data,
             f"e/{match.event_key_name}/m/{match.short_key}",
             _target="py3-tasks-io",
             _queue="firebase",
-            _url="/_ah/queue/deferred_firebase_delete_match",
+            _url=f"/_ah/queue/deferred_firebase_delete_match:{match.key_name}",
         )
 
         # for team_key_name in match.team_key_names:
-        #     deferred.defer(
+        #     defer_safe(
         #     cls._delete_data,
         #     'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
         #     _queue="firebase")
@@ -114,7 +117,7 @@ class FirebasePusher:
             match_data[match.short_key] = cls._construct_match_dict(
                 MatchConverter.matchConverter_v3(match)
             )
-        deferred.defer(
+        defer_safe(
             cls._put_data,
             f"e/{event_key}/m",
             json.dumps(match_data),
@@ -125,7 +128,11 @@ class FirebasePusher:
     """
 
     @classmethod
-    def update_match(cls, match: Match, updated_attrs: Set[str]) -> None:
+    def update_match(
+        cls,
+        match: Match,
+        updated_attrs: Set[str],
+    ) -> None:
         """
         Updates a match in an event and event/team
         """
@@ -142,21 +149,46 @@ class FirebasePusher:
                 MatchConverter.matchConverter_v3(match)
             )
 
-        deferred.defer(
+        defer_safe(
             cls._patch_data,
             "e/{}/m/{}".format(match.event.id(), match.short_key),
             match_dict,
             _queue="firebase",
             _target="py3-tasks-io",
-            _url="/_ah/queue/deferred_firebase_update_match",
+            _url=f"/_ah/queue/deferred_firebase_update_match:{match.key_name}",
         )
 
         # for team_key_name in match.team_key_names:
-        #     deferred.defer(
+        #     defer_safe(
         #         cls._put_data,
         #         'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
         #         match_data_json,
         #         _queue="firebase")
+
+    @classmethod
+    def update_match_queue_status(
+        cls, match: Match, nexus_status: EventQueueStatus
+    ) -> None:
+        if match_status := nexus_status["matches"].get(match.key_name):
+            mc = NexusMatchStatusMemcache(match.key_name)
+            old_status = mc.get()
+            new_status = NexusMatchStatus(match_status["status"])
+            mc.put(new_status)
+
+            if old_status == new_status:
+                return
+
+            event_key = none_throws(match.event.string_id())
+            match_short = match.short_key
+            update_dict = {"q": new_status.to_string()}
+            defer_safe(
+                cls._patch_data,
+                f"e/{event_key}/m/{match_short}",
+                update_dict,
+                _queue="firebase",
+                _target="py3-tasks-io",
+                _url=f"/_ah/queue/deferred_firebase_update_match_queue_status:{match.key_name}",
+            )
 
     """
     @classmethod
@@ -170,7 +202,7 @@ class FirebasePusher:
 
         # event_details_json = json.dumps(EventDetailsConverter.convert(event_details, 3))
 
-        # deferred.defer(
+        # defer_safe(
         #     cls._patch_data,
         #     'events/{}/details'.format(event_details.key.id()),
         #     event_details_json,
@@ -198,7 +230,7 @@ class FirebasePusher:
 
         # status_json = json.dumps(status)
 
-        # deferred.defer(
+        # defer_safe(
         #     cls._put_data,
         #     'event_teams/{}/{}/status'.format(event_key, team_key),
         #     status_json,
@@ -206,27 +238,50 @@ class FirebasePusher:
     """
 
     @classmethod
-    def update_live_events(cls) -> None:
+    def update_live_event(cls, event: Event) -> None:
+        events_by_key: Dict[EventKey, Dict] = {
+            event.key_name: cls._convert_event(event),
+        }
+
+        defer_safe(
+            cls._put_data,
+            "live_events",
+            events_by_key,
+            _queue="firebase",
+            _target="py3-tasks-io",
+            _url=f"/_ah/queue/deferred_firebase_update_live_events:{event.key_name}",
+        )
+
+    @classmethod
+    def _convert_event(cls, event: Event) -> Dict:
+        converted_event = EventConverter.eventConverter_v3(event)
+        # Only what's needed to render webcast
+        partial_event = {
+            key: converted_event[key]
+            for key in ["key", "name", "short_name", "webcasts"]
+        }
+        # Hack in district code
+        if (district_key := event.district_key) and partial_event.get("short_name"):
+            partial_event["short_name"] = "[{}] {}".format(
+                none_throws(district_key.string_id())[4:].upper(),
+                partial_event["short_name"],
+            )
+
+        return partial_event
+
+    @classmethod
+    def update_live_events(
+        cls, events: Dict[EventKey, Event], special_webcasts: List[TSpecialWebcast]
+    ) -> None:
         """
         Updates live_events and special webcasts
         """
         events_by_key: Dict[EventKey, Dict] = {}
-        for event_key, event in cls._update_live_events_helper().items():
-            converted_event = EventConverter.eventConverter_v3(event)
-            # Only what's needed to render webcast
-            partial_event = {
-                key: converted_event[key]
-                for key in ["key", "name", "short_name", "webcasts"]
-            }
-            # Hack in district code
-            if event.district_key and partial_event.get("short_name"):
-                partial_event["short_name"] = "[{}] {}".format(
-                    event.district_key.id()[4:].upper(), partial_event["short_name"]
-                )
-
+        for event_key, event in events.items():
+            partial_event = cls._convert_event(event)
             events_by_key[event_key] = partial_event
 
-        deferred.defer(
+        defer_safe(
             cls._put_data,
             "live_events",
             events_by_key,
@@ -235,61 +290,42 @@ class FirebasePusher:
             _url="/_ah/queue/deferred_firebase_update_live_events",
         )
 
-        deferred.defer(
+        defer_safe(
             cls._put_data,
             "special_webcasts",
-            cls.get_special_webcasts(),
+            special_webcasts,
             _queue="firebase",
             _target="py3-tasks-io",
             _url="/_ah/queue/deferred_firebase_update_special_webcasts",
         )
 
     @classmethod
-    @ndb.toplevel
-    def _update_live_events_helper(cls) -> Dict[EventKey, Dict]:
-        week_events = EventHelper.week_events()
-        events_by_key: Dict[EventKey, Dict] = {}
-        live_events: List[Event] = []
-        for event in week_events:
-            if event.now:
-                event._webcast = event.current_webcasts  # Only show current webcasts
-                for webcast in event.webcast:
-                    WebcastOnlineHelper.add_online_status_async(webcast)
-                events_by_key[event.key.id()] = event
-            if event.within_a_day:
-                live_events.append(event)
-
-        # To get Champ events to show up before they are actually going on
-        forced_live_events = ForcedLiveEvents.get()
-        for event in ndb.get_multi(
-            [ndb.Key(Event, ekey) for ekey in forced_live_events]
-        ):
-            if event.webcast:
-                for webcast in event.webcast:
-                    WebcastOnlineHelper.add_online_status_async(webcast)
-            events_by_key[event.key.id()] = event
-
-        # # Add in the Fake TBA BlueZone event (watch for circular imports)
-        # from helpers.bluezone_helper import BlueZoneHelper
-        # bluezone_event = BlueZoneHelper.update_bluezone(live_events)
-        # if bluezone_event:
-        #     for webcast in bluezone_event.webcast:
-        #         WebcastOnlineHelper.add_online_status_async(webcast)
-        #     events_by_key[bluezone_event.key_name] = bluezone_event
-
-        return events_by_key
-
-    @classmethod
-    @ndb.toplevel
-    def get_special_webcasts(
-        cls,
-    ) -> List[Webcast]:  # TODO: Break this out of FirebasePusher 2017-03-01 -fangeugene
-        special_webcasts: List[Webcast] = []
-        for webcast in GamedaySpecialWebcasts.webcasts():
-            WebcastOnlineHelper.add_online_status_async(webcast)
-            special_webcasts.append(webcast)
-
-        return special_webcasts
+    def update_event_queue_status(
+        cls, event: Event, queue_status: EventQueueStatus
+    ) -> None:
+        if now_queuing := queue_status.get("now_queueing"):
+            update_data = {
+                "now_queuing": {
+                    "name": now_queuing["match_name"],
+                    "key": now_queuing["match_key"],
+                }
+            }
+            defer_safe(
+                cls._patch_data,
+                f"live_events/{event.key_name}",
+                update_data,
+                _queue="firebase",
+                _target="py3-tasks-io",
+                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status:{event.key_name}",
+            )
+        else:
+            defer_safe(
+                cls._delete_data,
+                f"live_events/{event.key_name}/now_queuing",
+                _queue="firebase",
+                _target="py3-tasks-io",
+                _url=f"/_ah/queue/deferred_firebase_update_event_queue_status:{event.key_name}",
+            )
 
     """
     @classmethod
@@ -297,7 +333,7 @@ class FirebasePusher:
         WebcastOnlineHelper.add_online_status(event.webcast)
 
         converted_event = EventConverter.eventConverter_v3(event)
-        deferred.defer(
+        defer_safe(
             cls._patch_data,
             "live_events/{}".format(event.key_name),
             json.dumps(

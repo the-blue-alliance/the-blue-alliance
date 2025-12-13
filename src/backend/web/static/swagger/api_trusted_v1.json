@@ -14,13 +14,46 @@
     }
   ],
   "paths": {
+    "/event/{eventKey}/info": {
+      "get": {
+        "tags": [
+          "Event Details"
+        ],
+        "summary": "Fetch top-level admin properties for the event",
+        "description": "An endpoint to fetch the current value of the event info. This lets you fetch the current value of fields that are settable via /event/{eventKey}/info/update",
+        "operationId": "getEventInfo",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventInfo"
+                }
+              } 
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
     "/event/{eventKey}/info/update": {
       "post": {
         "tags": [
           "Event Details"
         ],
         "summary": "Update top-level properties for the event",
-        "description": "An endpoint to overwrite certain event fields",
+        "description": "An endpoint to overwrite certain event fields. All fields are optional, set only the ones you wish to update",
         "operationId": "updateEventInfo",
         "parameters": [
           {
@@ -498,7 +531,7 @@
         "properties": {
           "type_enum": {
             "type": "integer",
-            "description": "Type enum of the award. If null, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/py3/src/backend/common/consts/award_type.py",
+            "description": "Type enum of the award. If null, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py",
             "example": "1"
           },
           "name_str": {
@@ -528,7 +561,8 @@
           },
           "playoff_type": {
             "type": "integer",
-            "description": "Integer constant representing the playoff format. References constants here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/playoff_type.py",
+            "nullable": true,
+            "description": "Integer constant representing the playoff format. References constants defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py#L37",
             "example": "0"
           },
           "webcasts": {
@@ -543,6 +577,42 @@
                   "description": "A webcast url",
                   "example": "https://youtu.be/abc123"
                 }
+              }
+            }
+          },
+          "remap_teams": {
+            "type": "object",
+            "description": "A mapping of temp key --> remapped key (including B team keys)",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "frc1337": "frc337B"
+            }
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Timezone name for the event",
+            "example": "America/New_York"
+          },
+          "disable_sync": {
+            "type": "object",
+            "description": "flags controlling disabling certain aspects of sync",
+            "properties": {
+              "event_alliances": {
+                "type": "boolean"
+              },
+              "event_rankings": {
+                "type": "boolean"
+              },
+              "event_qual_matches": {
+                "type": "boolean"
+              },
+              "event_playoff_matches": {
+                "type": "boolean"
+              },
+              "event_awards": {
+                "type": "boolean"
               }
             }
           }
@@ -650,7 +720,17 @@
           },
           "time_utc": {
             "type": "string",
-            "description": "UTC time of match in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
+            "description": "UTC time of the match's scheduled time in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
+            "example": "2008-01-02T10:30:00.000Z"
+          },
+          "actual_start_time_utc": {
+            "type": "string",
+            "description": "UTC time of when the match actually started in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
+            "example": "2008-01-02T10:30:00.000Z"
+          },
+          "post_results_time_utc": {
+            "type": "string",
+            "description": "UTC time of when the match results were shown to the audience in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
             "example": "2008-01-02T10:30:00.000Z"
           },
           "display_name": {

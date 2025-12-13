@@ -1,9 +1,10 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
-import { Event } from '~/api/v3';
+import { Event } from '~/api/tba/read';
 import {
   getEventDateString,
   getEventWeekString,
+  isEventWithinDays,
   isValidEventKey,
 } from '~/lib/eventUtils';
 
@@ -129,5 +130,55 @@ describe.concurrent('getEventWeekString', () => {
       week: 9,
     };
     expect(getEventWeekString(event)).toEqual('Awards');
+  });
+});
+
+describe('isEventWithinDays', () => {
+  test('includes current date within event range', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-11T12:00:00Z'));
+    expect(isEventWithinDays(event, 0, 0)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test('allows checking days before start date', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-09T12:00:00Z'));
+    expect(isEventWithinDays(event, 1, 0)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test('includes days after end date', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T12:00:00Z'));
+    expect(isEventWithinDays(event, 0, 1)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test('returns false when outside configured window', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-15T12:00:00Z'));
+    expect(isEventWithinDays(event, 1, 1)).toBe(false);
+    vi.useRealTimers();
   });
 });

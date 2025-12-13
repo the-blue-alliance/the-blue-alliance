@@ -49,7 +49,7 @@ $('#teams-ok').click(function(){
     var teams = $('#team_list').val().split("\n");
     for(var i=0; i<teams.length; i++){
         var teamNum = parseInt(teams[i]);
-        if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999){
+        if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 99999){
             alert("Invalid team "+teams[i]);
             return true;
         }
@@ -97,7 +97,7 @@ $('#schedule_file').change(function(){
 
         //parse the excel to array of matches
         //headers start on 5th row
-        var matches = XLSX.utils.sheet_to_json(sheet, {range:4});
+        var matches = XLSX.utils.sheet_to_json(sheet, {range:4, raw: false});
         var request_body = [];
 
         $('#schedule_preview').empty();
@@ -223,14 +223,13 @@ $('#results_file').change(function(){
 
             var compLevel, setNumber, matchNumber;
             var matchKey;
-            var has_octo = $('input[name="alliance-count-results"]:checked').val() == "16";
             if (match['Match'].includes("Qualification")) {
                 matchNumber = parseInt(match['Match'].split(" ")[1]);
                 compLevel = "qm";
                 setNumber = 1;
                 matchKey = "qm" + matchNumber;
             } else {
-                var levelSetAndMatch = playoffTypeMatchAndSet(has_octo, match['Match'], last_match_type);
+                var levelSetAndMatch = playoffTypeMatchAndSet(good_matches);
                 compLevel = levelSetAndMatch[0];
                 setNumber = levelSetAndMatch[1];
                 matchNumber = levelSetAndMatch[2];
@@ -326,8 +325,13 @@ $('#rankings_file').change(function(){
         //var is_num = [true, true, true, true, true, false, true, true];
 
         // 2019 Headers
-        var headers = ['Rank', 'Team', 'RS', 'Cargo Pts', 'Panel Pts', 'HAB Pts', 'Sandstorm', 'W-L-T', 'DQ', 'Played'];
-        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo', 'Hatch Panel', 'HAB Climb', 'Sandstorm Bonus', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var headers = ['Rank', 'Team', 'RS', 'Cargo Pts', 'Panel Pts', 'HAB Pts', 'Sandstorm', 'W-L-T', 'DQ', 'Played'];
+        //var display_headers = ['Rank', 'Team', 'Ranking Score', 'Cargo', 'Hatch Panel', 'HAB Climb', 'Sandstorm Bonus', 'Record (W-L-T)', 'DQ', 'Played'];
+        //var is_num = [true, true, true, true, true, false, true, true];
+
+        // 2024 Headers
+        var headers = ['Rank', 'Team', 'RS', 'CO-OP', 'Match Pts', 'Auto Pts', 'Stage Pts', 'W-L-T', 'DQ', 'Played'];
+        var display_headers = ['Rank', 'Team', 'Ranking Score', 'Avg Coop', 'Avg Match', 'Avg Auto', 'Avg Stage', 'Record (W-L-T)', 'DQ', 'Played'];
         var is_num = [true, true, true, true, true, false, true, true];
 
         $('#rankings_preview').empty();

@@ -176,3 +176,9 @@ class DistrictPointValues:
             AwardType.WEBSITE,
         ],
     }
+
+    REGIONAL_AWARD_VALUES = {
+        AwardType.CHAIRMANS: 45,
+        AwardType.ENGINEERING_INSPIRATION: 28,
+        AwardType.ROOKIE_ALL_STAR: 8,
+    }
