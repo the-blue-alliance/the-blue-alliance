@@ -5,8 +5,10 @@ import {
   TableOfContents,
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/apidocs')({
+  headers: publicCacheControlHeaders(),
   component: ApiDocs,
   head: () => {
     return {

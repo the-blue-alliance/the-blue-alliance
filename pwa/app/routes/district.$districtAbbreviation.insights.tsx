@@ -30,7 +30,7 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { confidence } from '~/lib/utils';
+import { confidence, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/insights',
@@ -58,6 +58,7 @@ export const Route = createFileRoute(
       insights: insights.data,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

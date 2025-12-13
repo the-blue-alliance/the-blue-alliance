@@ -105,6 +105,7 @@ import {
   camelCaseToHumanReadable,
   cn,
   doThrowNotFound,
+  publicCacheControlHeaders,
   splitIntoNChunks,
 } from '~/lib/utils';
 
@@ -137,6 +138,7 @@ export const Route = createFileRoute('/event/$eventKey')({
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

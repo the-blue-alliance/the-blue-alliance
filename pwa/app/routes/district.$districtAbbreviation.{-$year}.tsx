@@ -35,6 +35,7 @@ import {
   USA_STATE_ABBREVIATION_TO_FULL,
   joinComponents,
   parseParamsForYearElseDefault,
+  publicCacheControlHeaders,
 } from '~/lib/utils';
 
 export const Route = createFileRoute(
@@ -110,6 +111,7 @@ export const Route = createFileRoute(
       awards: awards.data,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

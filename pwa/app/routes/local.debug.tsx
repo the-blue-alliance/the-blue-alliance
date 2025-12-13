@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { Badge } from '~/components/ui/badge';
 import { getCacheEntries, getCacheStats } from '~/lib/middleware/network-cache';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 interface CacheInfo {
   key: string;
@@ -55,6 +56,7 @@ export const Route = createFileRoute('/local/debug')({
       timestamp: new Date().toISOString(),
     };
   },
+  headers: publicCacheControlHeaders(),
   component: LocalDebug,
   head: () => {
     return {

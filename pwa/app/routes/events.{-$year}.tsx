@@ -23,6 +23,7 @@ import {
   VALID_YEARS,
   parseParamsForYearElseDefault,
   pluralize,
+  publicCacheControlHeaders,
   slugify,
 } from '~/lib/utils';
 
@@ -39,6 +40,7 @@ export const Route = createFileRoute('/events/{-$year}')({
 
     return { year };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

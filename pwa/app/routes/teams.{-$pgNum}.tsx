@@ -10,7 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { parseParamsForTeamPgNumElseDefault } from '~/lib/utils';
+import {
+  parseParamsForTeamPgNumElseDefault,
+  publicCacheControlHeaders,
+} from '~/lib/utils';
 
 export const Route = createFileRoute('/teams/{-$pgNum}')({
   loader: async ({ params, context: { queryClient } }) => {
@@ -34,6 +37,7 @@ export const Route = createFileRoute('/teams/{-$pgNum}')({
 
     return { teams, pageNum, maxPageNum };
   },
+  headers: publicCacheControlHeaders(),
   head: () => {
     return {
       meta: [

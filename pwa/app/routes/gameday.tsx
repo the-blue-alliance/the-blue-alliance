@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { GamedayFrame } from '~/components/tba/gameday/GamedayFrame';
 import { GamedayProvider } from '~/lib/gameday/context';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 // Search params schema for gameday URL state
 const gamedaySearchSchema = z.object({
@@ -23,6 +24,7 @@ export type GamedaySearchParams = z.infer<typeof gamedaySearchSchema>;
 
 export const Route = createFileRoute('/gameday')({
   validateSearch: gamedaySearchSchema,
+  headers: publicCacheControlHeaders(),
   head: () => ({
     meta: [
       { title: 'GameDay - The Blue Alliance' },

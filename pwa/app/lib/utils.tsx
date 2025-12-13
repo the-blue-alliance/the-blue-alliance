@@ -315,3 +315,18 @@ export function createLogger(name: string) {
 export function doThrowNotFound(): never {
   throw notFound();
 }
+
+// TODO: Increase the default max age once we are confident things work.
+// The end goal is for this to be relatively large, since the client will re-fetch data on load.
+export function publicCacheControlHeaders(maxAge: number = 61) {
+  return (): Record<string, string> => {
+    const isProd = process.env.NODE_ENV === 'production';
+    if (!isProd) {
+      return {};
+    }
+    return {
+      'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
+      'CDN-Cache-Control': `max-age=${maxAge}`, // Cloudflare-specific
+    };
+  };
+}

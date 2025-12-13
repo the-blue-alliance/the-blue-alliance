@@ -7,8 +7,10 @@ import BiStarFill from '~icons/bi/star-fill';
 import SignInWithAppleButton from '~/components/tba/auth/signInWithAppleButton';
 import SignInWithGoogleButton from '~/components/tba/auth/signInWithGoogleButton';
 import InlineIcon from '~/components/tba/inlineIcon';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/account')({
+  headers: publicCacheControlHeaders(),
   component: Account,
 });
 
