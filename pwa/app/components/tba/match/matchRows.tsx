@@ -158,7 +158,7 @@ export function MatchRow({
           className="col-start-6 row-span-2 row-start-1 xl:col-span-2
             xl:col-start-auto xl:row-span-1 xl:row-start-auto"
         >
-          <span className="flex h-full items-center justify-center">
+          <span className="flex h-full items-center justify-center text-center">
             {match.predicted_time &&
               new Date(match.predicted_time * 1000).toLocaleTimeString(
                 'en-US',
@@ -267,7 +267,7 @@ export function SimpleMatchRow({
         {!isPlayed && (
           <div
             className="col-start-4 row-span-2 row-start-2 flex items-center
-              justify-center"
+              justify-center text-center"
           >
             <span>
               {match.predicted_time &&
