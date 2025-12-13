@@ -23,6 +23,7 @@ const allRoutes = defineAllRoutes([
   '/account',
   '/add-data',
   '/apidocs',
+  '/apidocs/v3',
   '/contact',
   '/district/$districtAbbreviation/{-$year}',
   '/district/$districtAbbreviation/insights',

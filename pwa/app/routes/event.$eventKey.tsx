@@ -105,6 +105,7 @@ import {
   camelCaseToHumanReadable,
   cn,
   doThrowNotFound,
+  publicCacheControlHeaders,
   splitIntoNChunks,
 } from '~/lib/utils';
 
@@ -137,6 +138,7 @@ export const Route = createFileRoute('/event/$eventKey')({
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
@@ -312,9 +314,7 @@ function EventPage() {
         getCurrentWeekEvents([event]).length > 0 && (
           <InlineIcon>
             <MdiVideo />
-            <a href={`https://www.thebluealliance.com/gameday/${eventKey}`}>
-              GameDay
-            </a>
+            <a href={`/gameday/${eventKey}`}>GameDay</a>
           </InlineIcon>
         )}
 

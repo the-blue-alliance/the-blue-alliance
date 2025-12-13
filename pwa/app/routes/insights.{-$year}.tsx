@@ -21,7 +21,11 @@ import {
   NOTABLE_NAME_TO_DISPLAY_NAME,
   leaderboardFromNotable,
 } from '~/lib/insightUtils';
-import { VALID_YEARS, joinComponents } from '~/lib/utils';
+import {
+  VALID_YEARS,
+  joinComponents,
+  publicCacheControlHeaders,
+} from '~/lib/utils';
 
 export const Route = createFileRoute('/insights/{-$year}')({
   loader: async ({ params }) => {
@@ -58,6 +62,7 @@ export const Route = createFileRoute('/insights/{-$year}')({
       notables: notables.data,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

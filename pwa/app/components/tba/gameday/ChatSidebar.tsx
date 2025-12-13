@@ -40,8 +40,8 @@ export function ChatSidebar() {
 
   return (
     <div
-      className="flex h-full flex-col border-l border-neutral-700
-        bg-neutral-950"
+      className="flex h-full flex-col border-l border-neutral-700 bg-neutral-950
+        max-md:hidden"
       style={{ width: SIDEBAR_WIDTH }}
     >
       {/* Chat iframe */}

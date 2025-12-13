@@ -222,7 +222,7 @@ export function SimpleMatchRow({
       {/* 3x4 grid with header row */}
       <div
         className="mx-auto grid w-full max-w-6xl grid-cols-[repeat(4,1fr)]
-          grid-rows-[auto_repeat(2,2.5em)] gap-x-1 text-sm"
+          grid-rows-[auto_repeat(2,2em)] gap-x-1 text-sm"
       >
         {/* Header: Teams */}
         <div

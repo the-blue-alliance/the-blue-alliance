@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 
 import BiBellFill from '~icons/bi/bell-fill';
@@ -7,8 +7,10 @@ import BiStarFill from '~icons/bi/star-fill';
 import SignInWithAppleButton from '~/components/tba/auth/signInWithAppleButton';
 import SignInWithGoogleButton from '~/components/tba/auth/signInWithGoogleButton';
 import InlineIcon from '~/components/tba/inlineIcon';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/account')({
+  headers: publicCacheControlHeaders(),
   component: Account,
 });
 
@@ -74,13 +76,9 @@ function Account(): React.JSX.Element {
         <p>
           Build on top of The Blue Alliance! When logged in, you can generate
           API keys and manage webhooks. Our{' '}
-          <a
-            href="https://www.thebluealliance.com/apidocs"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link to="/apidocs" target="_blank" rel="noopener noreferrer">
             API documentation
-          </a>{' '}
+          </Link>{' '}
           provides comprehensive guides and examples to help you integrate TBA
           data into your applications. Explore endpoints for team information,
           event details, match results, and more.

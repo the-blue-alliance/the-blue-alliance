@@ -65,6 +65,7 @@ import {
   doThrowNotFound,
   parseParamsForYearElseDefault,
   pluralize,
+  publicCacheControlHeaders,
   stringifyRecord,
   winrateFromRecord,
 } from '~/lib/utils';
@@ -162,6 +163,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       team,
     };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

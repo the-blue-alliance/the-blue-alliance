@@ -25,7 +25,7 @@ import { Badge } from '~/components/ui/badge';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
-import { cn, queryFromAPI } from '~/lib/utils';
+import { cn, publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
 
 export const Route = createFileRoute('/match_suggestion')({
   loader: async () => {
@@ -48,6 +48,7 @@ export const Route = createFileRoute('/match_suggestion')({
       events: filteredEvents,
     };
   },
+  headers: publicCacheControlHeaders(),
   component: MatchSuggestion,
 });
 

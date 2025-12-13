@@ -26,6 +26,7 @@ import { Route as LocalDebugRouteImport } from './routes/local.debug'
 import { Route as InsightsChar123YearChar125RouteImport } from './routes/insights.{-$year}'
 import { Route as EventsChar123YearChar125RouteImport } from './routes/events.{-$year}'
 import { Route as EventEventKeyRouteImport } from './routes/event.$eventKey'
+import { Route as ApidocsV3RouteImport } from './routes/apidocs_.v3'
 import { Route as TeamTeamNumberChar123YearChar125RouteImport } from './routes/team.$teamNumber.{-$year}'
 import { Route as TeamTeamNumberStatsRouteImport } from './routes/team.$teamNumber.stats'
 import { Route as TeamTeamNumberHistoryRouteImport } from './routes/team.$teamNumber.history'
@@ -120,6 +121,11 @@ const EventEventKeyRoute = EventEventKeyRouteImport.update({
   path: '/event/$eventKey',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApidocsV3Route = ApidocsV3RouteImport.update({
+  id: '/apidocs_/v3',
+  path: '/apidocs/v3',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeamTeamNumberChar123YearChar125Route =
   TeamTeamNumberChar123YearChar125RouteImport.update({
     id: '/team/$teamNumber/{-$year}',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/apidocs/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/apidocs/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/apidocs_/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/apidocs/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/apidocs/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/apidocs_/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
@@ -309,6 +321,7 @@ export interface RootRouteChildren {
   Match_suggestionRoute: typeof Match_suggestionRoute
   PrivacyRoute: typeof PrivacyRoute
   ThanksRoute: typeof ThanksRoute
+  ApidocsV3Route: typeof ApidocsV3Route
   EventEventKeyRoute: typeof EventEventKeyRoute
   EventsChar123YearChar125Route: typeof EventsChar123YearChar125Route
   InsightsChar123YearChar125Route: typeof InsightsChar123YearChar125Route
@@ -443,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventEventKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apidocs_/v3': {
+      id: '/apidocs_/v3'
+      path: '/apidocs/v3'
+      fullPath: '/apidocs/v3'
+      preLoaderRoute: typeof ApidocsV3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/team/$teamNumber/{-$year}': {
       id: '/team/$teamNumber/{-$year}'
       path: '/team/$teamNumber/{-$year}'
@@ -493,6 +513,7 @@ const rootRouteChildren: RootRouteChildren = {
   Match_suggestionRoute: Match_suggestionRoute,
   PrivacyRoute: PrivacyRoute,
   ThanksRoute: ThanksRoute,
+  ApidocsV3Route: ApidocsV3Route,
   EventEventKeyRoute: EventEventKeyRoute,
   EventsChar123YearChar125Route: EventsChar123YearChar125Route,
   InsightsChar123YearChar125Route: InsightsChar123YearChar125Route,

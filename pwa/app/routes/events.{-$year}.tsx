@@ -23,6 +23,7 @@ import {
   VALID_YEARS,
   parseParamsForYearElseDefault,
   pluralize,
+  publicCacheControlHeaders,
   slugify,
 } from '~/lib/utils';
 
@@ -39,6 +40,7 @@ export const Route = createFileRoute('/events/{-$year}')({
 
     return { year };
   },
+  headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
@@ -227,7 +229,7 @@ function YearEventsPage() {
       <div className="basis-full py-8 lg:basis-5/6">
         <h1 className="mb-3 text-3xl font-medium">
           {year} <i>FIRST</i> Robotics Competition Events{' '}
-          <small className="text-xl text-slate-500">
+          <small className="text-xl text-muted-foreground">
             {events.length} Events
           </small>
         </h1>
@@ -238,7 +240,7 @@ function YearEventsPage() {
               className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4"
             >
               Official Events{' '}
-              <small className="text-xl text-slate-500">
+              <small className="text-xl text-muted-foreground">
                 {officialGroups.reduce(
                   (acc, group) => acc + group.events.length,
                   0,
@@ -262,7 +264,7 @@ function YearEventsPage() {
               className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4"
             >
               Unofficial Events{' '}
-              <small className="text-xl text-slate-500">
+              <small className="text-xl text-muted-foreground">
                 {unofficialGroups.reduce(
                   (acc, group) => acc + group.events.length,
                   0,
@@ -299,7 +301,7 @@ function EventGroupSection({
     >
       <h2 className="mt-5 text-2xl">
         {group.groupName}{' '}
-        <small className="text-slate-500">
+        <small className="text-muted-foreground">
           {pluralize(group.events.length, 'Event', 'Events')}
         </small>
       </h2>

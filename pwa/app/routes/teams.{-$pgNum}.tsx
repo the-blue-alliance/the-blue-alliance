@@ -10,7 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { parseParamsForTeamPgNumElseDefault } from '~/lib/utils';
+import {
+  parseParamsForTeamPgNumElseDefault,
+  publicCacheControlHeaders,
+} from '~/lib/utils';
 
 export const Route = createFileRoute('/teams/{-$pgNum}')({
   loader: async ({ params, context: { queryClient } }) => {
@@ -34,6 +37,7 @@ export const Route = createFileRoute('/teams/{-$pgNum}')({
 
     return { teams, pageNum, maxPageNum };
   },
+  headers: publicCacheControlHeaders(),
   head: () => {
     return {
       meta: [
@@ -93,7 +97,9 @@ function TeamsPage() {
       <div className="basis-full overflow-x-auto lg:basis-5/6 lg:py-8">
         <h1 className="mb-3 text-3xl font-medium">
           <i>FIRST</i> Robotics Teams {TeamPageNumberToRange(pageNum)}{' '}
-          <small className="text-xl text-slate-500">{teams.length} Teams</small>
+          <small className="text-xl text-muted-foreground">
+            {teams.length} Teams
+          </small>
         </h1>
         <TeamListTable teams={teams} />
       </div>
