@@ -1,17 +1,17 @@
 import { ApiReferenceReact } from '@scalar/api-reference-react';
-import '@scalar/api-reference-react/style.css';
+import scalarCSS from '@scalar/api-reference-react/style.css?url';
 import { ReactRenderer } from '@scalar/react-renderer';
-import type { ApiReferencePlugin } from '@scalar/types/api-reference';
 import { createFileRoute } from '@tanstack/react-router';
+import { useMemo } from 'react';
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '~/components/ui/accordion';
 
 export const Route = createFileRoute('/apidocs_/v3')({
-  loader: async () => {
-    const response = await fetch(
-      'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance/refs/heads/main/src/backend/web/static/swagger/api_v3.json',
-    );
-    const json = await response.json();
-    return { json };
-  },
   head: () => {
     return {
       meta: [
@@ -28,7 +28,18 @@ export const Route = createFileRoute('/apidocs_/v3')({
   component: ApiDocsV3,
 });
 
-function ChangelogDisplay({ xChanges }: { xChanges: string }) {
+const ChangelogDisplay = ({ xChanges }: { xChanges: string }) => {
+  const entries = useMemo(() => {
+    // Match version + description pairs like "3.11.0: Description text"
+    // Versions can look like "3.11.0" or "3.11.0 - 3.12.0"
+    const pattern =
+      /(\d+\.\d+(?:\.\d+)?(?:\s*-\s*\d+\.\d+(?:\.\d+)?)?)\s*:\s*([^]*?)(?=\s+\d+\.\d+|\s*$)/g;
+    return Array.from(xChanges.matchAll(pattern), (match) => ({
+      version: match[1].trim(),
+      description: match[2].trim(),
+    }));
+  }, [xChanges]);
+
   return (
     <div
       style={{
@@ -38,19 +49,49 @@ function ChangelogDisplay({ xChanges }: { xChanges: string }) {
         margin: '16px 0',
       }}
     >
-      <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', fontWeight: 600 }}>
-        API Changelog
-      </h3>
-      <pre
-        style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', margin: 0 }}
-      >
-        {JSON.stringify(xChanges, null, 2)}
-      </pre>
+      <Accordion type="single" collapsible>
+        <AccordionItem value="changelog">
+          <AccordionTrigger
+            style={{
+              fontSize: '18px',
+              fontWeight: 600,
+              color: 'var(--scalar-color-1)',
+            }}
+          >
+            API Changelog
+          </AccordionTrigger>
+          <AccordionContent>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+            >
+              {entries.map((entry, index) => (
+                <div
+                  key={index}
+                  style={{
+                    padding: '8px',
+                    background: 'var(--scalar-background-1)',
+                    borderRadius: '4px',
+                  }}
+                >
+                  <strong style={{ color: 'var(--scalar-color-1)' }}>
+                    {entry.version}
+                  </strong>
+                  <div
+                    style={{ marginTop: '4px', color: 'var(--scalar-color-2)' }}
+                  >
+                    {entry.description}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
-}
+};
 
-const XChangesPlugin = (): ApiReferencePlugin => {
+const XChangesPlugin = () => {
   return () => {
     return {
       name: 'changelog-plugin',
@@ -66,20 +107,21 @@ const XChangesPlugin = (): ApiReferencePlugin => {
 };
 
 function ApiDocsV3(): React.JSX.Element {
-  const { json } = Route.useLoaderData();
-
   return (
     <>
       <ApiReferenceReact
         configuration={{
-          content: json,
+          url: 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance/refs/heads/main/src/backend/web/static/swagger/api_v3.json',
           hideClientButton: true,
           hideDarkModeToggle: true,
           showDeveloperTools: 'never',
           operationsSorter: 'alpha',
           plugins: [XChangesPlugin()],
+          searchHotKey: 'l', // to not conflict with the navbar search hotkey
+          telemetry: false,
         }}
       />
+      <link rel="stylesheet" href={scalarCSS} />
     </>
   );
 }
