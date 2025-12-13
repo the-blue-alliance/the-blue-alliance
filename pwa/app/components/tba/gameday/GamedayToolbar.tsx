@@ -27,9 +27,9 @@ export function GamedayToolbar() {
 
   return (
     <>
-      <div
+      <header
         className="flex h-10 shrink-0 items-center gap-2 border-b
-          border-slate-700 bg-primary px-2"
+          border-slate-700 bg-primary px-4"
       >
         {/* TBA branding */}
         <a
@@ -37,12 +37,14 @@ export function GamedayToolbar() {
           className="flex items-center gap-2 text-white no-underline
             hover:no-underline"
         >
-          <img src={TbaLamp} alt="TBA" className="h-7 w-7" />
-          <span className="text-lg font-bold">GameDay</span>
+          <img src={TbaLamp} alt="TBA" className="size-6" />
+          <span className="text-lg font-medium">
+            GameDay{' '}
+            <span className="ml-1 text-sm text-white/70">
+              by The Blue Alliance
+            </span>
+          </span>
         </a>
-        <span className="hidden text-xs text-white/70 sm:inline">
-          by The Blue Alliance
-        </span>
 
         <div className="flex-1" />
 
@@ -63,7 +65,7 @@ export function GamedayToolbar() {
           <span className="hidden sm:inline">Configure Layout</span>
           <LayoutGridIcon className="h-4 w-4 sm:hidden" />
         </Button>
-      </div>
+      </header>
 
       {/* Settings drawer */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="right">
