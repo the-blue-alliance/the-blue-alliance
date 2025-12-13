@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThanksRouteImport } from './routes/thanks'
-import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
 import { Route as GamedayRouteImport } from './routes/gameday'
 import { Route as DonateRouteImport } from './routes/donate'
@@ -23,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TeamsChar123PgNumChar125RouteImport } from './routes/teams.{-$pgNum}'
 import { Route as MatchMatchKeyRouteImport } from './routes/match.$matchKey'
 import { Route as LocalDebugRouteImport } from './routes/local.debug'
+import { Route as LegalPrivacyRouteImport } from './routes/legal_.privacy'
 import { Route as InsightsChar123YearChar125RouteImport } from './routes/insights.{-$year}'
 import { Route as EventsChar123YearChar125RouteImport } from './routes/events.{-$year}'
 import { Route as EventEventKeyRouteImport } from './routes/event.$eventKey'
@@ -36,11 +36,6 @@ import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './rout
 const ThanksRoute = ThanksRouteImport.update({
   id: '/thanks',
   path: '/thanks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Match_suggestionRoute = Match_suggestionRouteImport.update({
@@ -104,6 +99,11 @@ const LocalDebugRoute = LocalDebugRouteImport.update({
   path: '/local/debug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/legal_/privacy',
+  path: '/legal/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsChar123YearChar125Route =
   InsightsChar123YearChar125RouteImport.update({
     id: '/insights/{-$year}',
@@ -165,12 +165,12 @@ export interface FileRoutesByFullPath {
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
-  '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
   '/apidocs/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
+  '/legal/privacy': typeof LegalPrivacyRoute
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
@@ -190,12 +190,12 @@ export interface FileRoutesByTo {
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
-  '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
   '/apidocs/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
+  '/legal/privacy': typeof LegalPrivacyRoute
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
@@ -216,12 +216,12 @@ export interface FileRoutesById {
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
-  '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
   '/apidocs_/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
+  '/legal_/privacy': typeof LegalPrivacyRoute
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
@@ -243,12 +243,12 @@ export interface FileRouteTypes {
     | '/donate'
     | '/gameday'
     | '/match_suggestion'
-    | '/privacy'
     | '/thanks'
     | '/apidocs/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
+    | '/legal/privacy'
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
@@ -268,12 +268,12 @@ export interface FileRouteTypes {
     | '/donate'
     | '/gameday'
     | '/match_suggestion'
-    | '/privacy'
     | '/thanks'
     | '/apidocs/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
+    | '/legal/privacy'
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
@@ -293,12 +293,12 @@ export interface FileRouteTypes {
     | '/donate'
     | '/gameday'
     | '/match_suggestion'
-    | '/privacy'
     | '/thanks'
     | '/apidocs_/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
+    | '/legal_/privacy'
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
@@ -319,12 +319,12 @@ export interface RootRouteChildren {
   DonateRoute: typeof DonateRoute
   GamedayRoute: typeof GamedayRoute
   Match_suggestionRoute: typeof Match_suggestionRoute
-  PrivacyRoute: typeof PrivacyRoute
   ThanksRoute: typeof ThanksRoute
   ApidocsV3Route: typeof ApidocsV3Route
   EventEventKeyRoute: typeof EventEventKeyRoute
   EventsChar123YearChar125Route: typeof EventsChar123YearChar125Route
   InsightsChar123YearChar125Route: typeof InsightsChar123YearChar125Route
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
   LocalDebugRoute: typeof LocalDebugRoute
   MatchMatchKeyRoute: typeof MatchMatchKeyRoute
   TeamsChar123PgNumChar125Route: typeof TeamsChar123PgNumChar125Route
@@ -342,13 +342,6 @@ declare module '@tanstack/react-router' {
       path: '/thanks'
       fullPath: '/thanks'
       preLoaderRoute: typeof ThanksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/match_suggestion': {
@@ -435,6 +428,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocalDebugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal_/privacy': {
+      id: '/legal_/privacy'
+      path: '/legal/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights/{-$year}': {
       id: '/insights/{-$year}'
       path: '/insights/{-$year}'
@@ -511,12 +511,12 @@ const rootRouteChildren: RootRouteChildren = {
   DonateRoute: DonateRoute,
   GamedayRoute: GamedayRoute,
   Match_suggestionRoute: Match_suggestionRoute,
-  PrivacyRoute: PrivacyRoute,
   ThanksRoute: ThanksRoute,
   ApidocsV3Route: ApidocsV3Route,
   EventEventKeyRoute: EventEventKeyRoute,
   EventsChar123YearChar125Route: EventsChar123YearChar125Route,
   InsightsChar123YearChar125Route: InsightsChar123YearChar125Route,
+  LegalPrivacyRoute: LegalPrivacyRoute,
   LocalDebugRoute: LocalDebugRoute,
   MatchMatchKeyRoute: MatchMatchKeyRoute,
   TeamsChar123PgNumChar125Route: TeamsChar123PgNumChar125Route,

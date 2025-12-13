@@ -45,6 +45,7 @@ import { z } from 'zod';
 
 import { client } from '~/api/tba/read/client.gen';
 import { MatchModal } from '~/components/tba/match/matchModal';
+import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
@@ -341,6 +342,7 @@ function RootComponent() {
                 </div>
               </div>
             </TOCRendererProvider>
+            <Footer />
           </>
         )}
         <TanStackRouterDevtools position="bottom-right" />
