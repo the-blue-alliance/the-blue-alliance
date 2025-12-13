@@ -314,9 +314,7 @@ function EventPage() {
         getCurrentWeekEvents([event]).length > 0 && (
           <InlineIcon>
             <MdiVideo />
-            <a href={`https://www.thebluealliance.com/gameday/${eventKey}`}>
-              GameDay
-            </a>
+            <a href={`/gameday/${eventKey}`}>GameDay</a>
           </InlineIcon>
         )}
 
