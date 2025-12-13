@@ -74,11 +74,7 @@ function Account(): React.JSX.Element {
         <p>
           Build on top of The Blue Alliance! When logged in, you can generate
           API keys and manage webhooks. Our{' '}
-          <a
-            href="https://www.thebluealliance.com/apidocs"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="/apidocs" target="_blank" rel="noopener noreferrer">
             API documentation
           </a>{' '}
           provides comprehensive guides and examples to help you integrate TBA

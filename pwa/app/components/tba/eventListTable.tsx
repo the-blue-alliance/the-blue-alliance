@@ -53,7 +53,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
                     }
                   >
                     <a
-                      href={`https://www.thebluealliance.com/gameday/${event.key}`}
+                      href={`/gameday/${event.key}`}
                       target="_blank"
                       rel="noreferrer"
                       className="hover:no-underline"
