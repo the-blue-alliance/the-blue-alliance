@@ -1,10 +1,12 @@
+import { QueryClient } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
 import { type ClassValue, clsx } from 'clsx';
 import pino from 'pino';
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
 
-import { WltRecord, getStatus } from '~/api/tba/read';
+import { WltRecord } from '~/api/tba/read';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { RequestResult } from '~/api/tba/read/client';
 
 // TODO: Generate this from the API
@@ -30,14 +32,15 @@ export function slugify(str: string): string {
     .replace(/-+$/, '');
 }
 
-export async function parseParamsForYearElseDefault(params: {
-  year?: string | undefined;
-}): Promise<number | undefined> {
+export async function parseParamsForYearElseDefault(
+  queryClient: QueryClient,
+  params: {
+    year?: string | undefined;
+  },
+): Promise<number | undefined> {
   if (params.year === undefined) {
-    const status = await getStatus({});
-    return status.data?.current_season !== undefined
-      ? status.data.current_season
-      : new Date().getFullYear();
+    const status = await queryClient.ensureQueryData(getStatusOptions({}));
+    return status.current_season;
   }
 
   const year = Number(params.year);

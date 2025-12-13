@@ -1,6 +1,7 @@
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 
-import { getStatus, getTeamsSimple } from '~/api/tba/read';
+import { getTeamsSimple } from '~/api/tba/read';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import TeamListTable from '~/components/tba/teamListTable';
 import {
   Select,
@@ -12,14 +13,10 @@ import {
 import { parseParamsForTeamPgNumElseDefault } from '~/lib/utils';
 
 export const Route = createFileRoute('/teams/{-$pgNum}')({
-  loader: async ({ params }) => {
-    const status = await getStatus({});
+  loader: async ({ params, context: { queryClient } }) => {
+    const status = await queryClient.ensureQueryData(getStatusOptions({}));
 
-    if (status.data === undefined) {
-      throw new Error('Failed to load status');
-    }
-
-    const maxPageNum = Math.floor(status.data.max_team_page / 2) + 1;
+    const maxPageNum = Math.floor(status.max_team_page / 2) + 1;
     const pageNum = parseParamsForTeamPgNumElseDefault(params, maxPageNum);
 
     if (pageNum === undefined) {
