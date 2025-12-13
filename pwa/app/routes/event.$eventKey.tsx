@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
@@ -18,20 +18,13 @@ import MdiTournament from '~icons/mdi/tournament';
 import MdiVideo from '~icons/mdi/video';
 
 import { getEventColors } from '~/api/colors';
+import { Award, EventCoprs, Match, Media, Team, Webcast } from '~/api/tba/read';
 import {
-  Award,
-  EventCoprs,
-  Match,
-  Media,
-  Team,
-  Webcast,
-  getEvent,
-  getEventAlliances,
-  getEventMatches,
-} from '~/api/tba/read';
-import {
+  getEventAlliancesOptions,
   getEventAwardsOptions,
   getEventCoprsOptions,
+  getEventMatchesOptions,
+  getEventOptions,
   getEventRankingsOptions,
   getEventTeamMediaOptions,
   getEventTeamsOptions,
@@ -111,37 +104,38 @@ import {
   STATE_TO_ABBREVIATION,
   camelCaseToHumanReadable,
   cn,
+  doThrowNotFound,
   splitIntoNChunks,
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/event/$eventKey')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     if (!isValidEventKey(params.eventKey)) {
       throw notFound();
     }
 
-    const [event, matches, alliances] = await Promise.all([
-      getEvent({ path: { event_key: params.eventKey } }),
-      getEventMatches({ path: { event_key: params.eventKey } }),
-      getEventAlliances({ path: { event_key: params.eventKey } }),
-    ]);
+    // spawn these now, we don't need to await them yet though
+    const matchesQuery = queryClient
+      .ensureQueryData(
+        getEventMatchesOptions({ path: { event_key: params.eventKey } }),
+      )
+      .catch(() => []);
+    const alliancesQuery = queryClient
+      .ensureQueryData(
+        getEventAlliancesOptions({ path: { event_key: params.eventKey } }),
+      )
+      .catch(() => []);
 
-    if (event.data === undefined) {
-      throw notFound();
-    }
+    const event = await queryClient
+      .ensureQueryData(
+        getEventOptions({ path: { event_key: params.eventKey } }),
+      )
+      .catch(doThrowNotFound);
 
-    if (matches.data === undefined || alliances.data === undefined) {
-      throw new Error('Failed to load event data');
-    }
+    await Promise.all([matchesQuery, alliancesQuery]);
 
-    return {
-      event: event.data,
-      matches: matches.data,
-      alliances: alliances.data ?? [],
-      shouldPreviewAwardsTab: SEASON_EVENT_TYPES.has(event.data.event_type),
-      shouldPreviewInsightsTab: matches.data.length > 0,
-      shouldPreviewRankingsTab: matches.data.length > 0,
-    };
+    // event needs to be returned so we can access it in meta
+    return { eventKey: params.eventKey, event };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
@@ -173,38 +167,44 @@ export const Route = createFileRoute('/event/$eventKey')({
 });
 
 function EventPage() {
-  const {
-    event,
-    alliances,
-    matches,
-    shouldPreviewAwardsTab,
-    shouldPreviewInsightsTab,
-    shouldPreviewRankingsTab,
-  } = Route.useLoaderData();
+  const { eventKey } = Route.useLoaderData();
+
+  const { data: event } = useSuspenseQuery(
+    getEventOptions({ path: { event_key: eventKey } }),
+  );
+
+  const { data: matches } = useSuspenseQuery(
+    getEventMatchesOptions({ path: { event_key: eventKey } }),
+  );
+
+  const { data: unsafeAlliances } = useSuspenseQuery(
+    getEventAlliancesOptions({ path: { event_key: eventKey } }),
+  );
+  const alliances = unsafeAlliances ?? [];
 
   const awardsQuery = useQuery(
-    getEventAwardsOptions({ path: { event_key: event.key } }),
+    getEventAwardsOptions({ path: { event_key: eventKey } }),
   );
 
   const coprsQuery = useQuery(
-    getEventCoprsOptions({ path: { event_key: event.key } }),
+    getEventCoprsOptions({ path: { event_key: eventKey } }),
   );
 
   const colorsQuery = useQuery({
-    queryKey: ['eventColors', event.key],
-    queryFn: () => getEventColors({ eventKey: event.key }),
+    queryKey: ['eventColors', eventKey],
+    queryFn: () => getEventColors({ eventKey: eventKey }),
   });
 
   const rankingsQuery = useQuery(
-    getEventRankingsOptions({ path: { event_key: event.key } }),
+    getEventRankingsOptions({ path: { event_key: eventKey } }),
   );
 
   const teamsQuery = useQuery(
-    getEventTeamsOptions({ path: { event_key: event.key } }),
+    getEventTeamsOptions({ path: { event_key: eventKey } }),
   );
 
   const teamMediaQuery = useQuery(
-    getEventTeamMediaOptions({ path: { event_key: event.key } }),
+    getEventTeamMediaOptions({ path: { event_key: eventKey } }),
   );
 
   const sortedMatches = useMemo(
@@ -248,6 +248,9 @@ function EventPage() {
       />
     ) : null;
 
+  const shouldPreviewAwardsTab = SEASON_EVENT_TYPES.has(event.event_type);
+  const shouldPreviewInsightsTab = matches.length > 0;
+  const shouldPreviewRankingsTab = matches.length > 0;
   const showBracket =
     alliances.length > 0 &&
     event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
@@ -302,14 +305,14 @@ function EventPage() {
 
       <InlineIcon>
         <BiGraphUp />
-        <a href={`https://www.statbotics.io/event/${event.key}`}>Statbotics</a>
+        <a href={`https://www.statbotics.io/event/${eventKey}`}>Statbotics</a>
       </InlineIcon>
 
       {event.webcasts.length > 0 &&
         getCurrentWeekEvents([event]).length > 0 && (
           <InlineIcon>
             <MdiVideo />
-            <a href={`https://www.thebluealliance.com/gameday/${event.key}`}>
+            <a href={`https://www.thebluealliance.com/gameday/${eventKey}`}>
               GameDay
             </a>
           </InlineIcon>
