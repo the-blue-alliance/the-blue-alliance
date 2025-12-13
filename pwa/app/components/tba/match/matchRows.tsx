@@ -131,7 +131,8 @@ export function MatchRow({
       <TeamListSubgrid
         teamKeys={match.alliances.red.team_keys}
         allianceColor="red"
-        className="col-span-3 xl:col-span-3"
+        className="col-span-3 pt-0.5 xl:col-span-3 xl:pb-0.5"
+        teamCellClassName="max-xl:first:rounded-tl-lg max-xl:last:rounded-tr-lg xl:first:rounded-l-lg"
         winner={match.winning_alliance === 'red'}
         dq={match.alliances.red.dq_team_keys}
         surrogate={match.alliances.red.surrogate_team_keys}
@@ -143,7 +144,8 @@ export function MatchRow({
       <TeamListSubgrid
         teamKeys={match.alliances.blue.team_keys}
         allianceColor="blue"
-        className="col-span-3 xl:col-span-3"
+        className="col-span-3 pb-0.5 xl:col-span-3 xl:pt-0.5"
+        teamCellClassName="max-xl:first:rounded-bl-lg max-xl:last:rounded-br-lg xl:last:rounded-r-lg"
         winner={match.winning_alliance === 'blue'}
         dq={match.alliances.blue.dq_team_keys}
         surrogate={match.alliances.blue.surrogate_team_keys}
@@ -176,8 +178,9 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.red.score}
           allianceColor="red"
-          className="col-start-6 row-start-1 xl:col-span-1 xl:col-start-auto
-            xl:row-start-auto"
+          className="col-start-6 row-start-1 mt-0.5 max-lg:rounded-t-lg
+            xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5
+            xl:rounded-l-lg"
           winner={match.winning_alliance === 'red'}
           scoreBreakdown={match.score_breakdown?.red}
           year={year}
@@ -190,8 +193,9 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.blue.score}
           allianceColor="blue"
-          className="col-start-6 row-start-2 xl:col-span-1 xl:col-start-auto
-            xl:row-start-auto"
+          className="col-start-6 row-start-2 mb-0.5 max-lg:rounded-b-lg
+            xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5
+            xl:rounded-r-lg"
           winner={match.winning_alliance === 'blue'}
           scoreBreakdown={match.score_breakdown?.blue}
           year={year}
@@ -241,11 +245,11 @@ export function SimpleMatchRow({
           teamKeys={match.alliances.red.team_keys}
           allianceColor="red"
           className="col-span-3 col-start-1 row-start-2"
+          teamCellClassName="first:rounded-tl-lg last:rounded-tr-lg"
           winner={match.winning_alliance === 'red'}
           dq={match.alliances.red.dq_team_keys}
           surrogate={match.alliances.red.surrogate_team_keys}
           year={year}
-          teamCellClassName="xl:first:rounded-bl-none xl:last:rounded-br-none"
         />
 
         {/* Blue Team Players - Subgrid Component */}
@@ -253,11 +257,11 @@ export function SimpleMatchRow({
           teamKeys={match.alliances.blue.team_keys}
           allianceColor="blue"
           className="col-span-3 col-start-1 row-start-3"
+          teamCellClassName="first:rounded-bl-lg last:rounded-br-lg"
           winner={match.winning_alliance === 'blue'}
           dq={match.alliances.blue.dq_team_keys}
           surrogate={match.alliances.blue.surrogate_team_keys}
           year={year}
-          teamCellClassName="xl:first:rounded-tl-none xl:last:rounded-tr-none"
         />
 
         {!isPlayed && (
@@ -285,8 +289,7 @@ export function SimpleMatchRow({
           <ScoreCell
             score={match.alliances.red.score}
             allianceColor="red"
-            className="col-start-4 row-start-2 xl:rounded-br-none
-              xl:rounded-bl-none"
+            className="col-start-4 row-start-2 rounded-tl-lg rounded-tr-lg"
             winner={match.winning_alliance === 'red'}
             scoreBreakdown={match.score_breakdown?.red}
             year={year}
@@ -299,8 +302,7 @@ export function SimpleMatchRow({
           <ScoreCell
             score={match.alliances.blue.score}
             allianceColor="blue"
-            className="col-start-4 row-start-3 xl:rounded-tl-none
-              xl:rounded-tr-none"
+            className="col-start-4 row-start-3 rounded-br-lg rounded-bl-lg"
             winner={match.winning_alliance === 'blue'}
             scoreBreakdown={match.score_breakdown?.blue}
             year={year}
