@@ -11,10 +11,10 @@ import { cn } from '~/lib/utils';
 const teamListSubgridVariants = cva('flex items-center justify-center', {
   variants: {
     allianceColor: {
-      red: `bg-alliance-red-light first:rounded-tl-lg last:rounded-tr-lg
-      xl:first:rounded-l-lg xl:last:rounded-r-lg`,
-      blue: `bg-alliance-blue-light first:rounded-bl-lg last:rounded-br-lg
-      xl:first:rounded-l-lg xl:last:rounded-r-lg`,
+      red: `mt-0.5 bg-alliance-red/10 max-xl:first:rounded-tl-lg
+      max-xl:last:rounded-tr-lg xl:mb-0.5 xl:first:rounded-l-lg`,
+      blue: `mb-0.5 bg-alliance-blue/10 max-xl:mb-0.5 max-xl:first:rounded-bl-lg
+      max-xl:last:rounded-br-lg xl:mt-0.5 xl:last:rounded-r-lg`,
     },
     winner: {
       true: 'font-semibold',

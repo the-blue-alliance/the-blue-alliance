@@ -75,7 +75,7 @@ export default function SimpleMatchRowsWithBreaks({
     }
   }
 
-  return <div className="flex flex-col gap-y-1">{divs}</div>;
+  return <div className="flex flex-col divide-y *:odd:bg-gray-50">{divs}</div>;
 }
 
 export function MatchRow({
@@ -94,112 +94,110 @@ export function MatchRow({
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
 
+  /* Desktop: 1x11 grid, Mobile: 2x6 grid */
   return (
-    <div>
-      {/* Desktop: 1x11 grid, Mobile: 2x6 grid */}
+    <div
+      className="mx-auto grid w-full max-w-6xl
+        grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2.5em_2.5em] gap-0.5
+        text-sm xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
+    >
+      {/* Play Button */}
       <div
-        className="mx-auto grid w-full max-w-6xl
-          grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2.5em_2.5em] gap-x-1
-          text-sm xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
+        className="row-span-2 flex items-center justify-center rounded-tl-lg
+          xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
       >
-        {/* Play Button */}
-        <div
-          className="row-span-2 flex items-center justify-center rounded-tl-lg
-            bg-gray-100 xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
-        >
-          {maybeVideoURL && (
-            <Link to={maybeVideoURL} className="mx-2">
-              <PlayCircleIcon />
-            </Link>
-          )}
-        </div>
-
-        {/* Match Name */}
-        <div
-          className="row-span-2 flex items-center justify-center rounded-tr-lg
-            bg-gray-100 p-2 xl:col-span-2 xl:row-span-1 xl:rounded-r-lg"
-        >
-          <MatchLink
-            matchOrKey={match}
-            event={event}
-            className="text-center text-sm text-foreground"
-          >
-            {matchTitleShort(match, playoffType)}
-          </MatchLink>
-        </div>
-
-        {/* Red Team Players - Subgrid Component */}
-        <TeamListSubgrid
-          teamKeys={match.alliances.red.team_keys}
-          allianceColor="red"
-          className="col-span-3 xl:col-span-3"
-          winner={match.winning_alliance === 'red'}
-          dq={match.alliances.red.dq_team_keys}
-          surrogate={match.alliances.red.surrogate_team_keys}
-          year={year}
-          focusTeamKey={focusTeamKey}
-        />
-
-        {/* Blue Team Players - Subgrid Component */}
-        <TeamListSubgrid
-          teamKeys={match.alliances.blue.team_keys}
-          allianceColor="blue"
-          className="col-span-3 xl:col-span-3"
-          winner={match.winning_alliance === 'blue'}
-          dq={match.alliances.blue.dq_team_keys}
-          surrogate={match.alliances.blue.surrogate_team_keys}
-          year={year}
-          focusTeamKey={focusTeamKey}
-        />
-
-        {!isPlayed && (
-          <div
-            className="col-start-6 row-span-2 row-start-1 xl:col-span-2
-              xl:col-start-auto xl:row-span-1 xl:row-start-auto"
-          >
-            <span className="flex h-full items-center justify-center">
-              {match.predicted_time &&
-                new Date(match.predicted_time * 1000).toLocaleTimeString(
-                  'en-US',
-                  {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    weekday: 'short',
-                    hour12: true,
-                  },
-                )}
-            </span>
-          </div>
-        )}
-
-        {/* Red Score */}
-        {isPlayed && (
-          <ScoreCell
-            score={match.alliances.red.score}
-            allianceColor="red"
-            className="col-start-6 row-start-1 xl:col-span-1 xl:col-start-auto
-              xl:row-start-auto"
-            winner={match.winning_alliance === 'red'}
-            scoreBreakdown={match.score_breakdown?.red}
-            year={year}
-            compLevel={match.comp_level}
-          />
-        )}
-
-        {/* Blue Score */}
-        {isPlayed && (
-          <ScoreCell
-            score={match.alliances.blue.score}
-            allianceColor="blue"
-            className="col-start-6 row-start-2 xl:col-span-1 xl:col-start-auto
-              xl:row-start-auto"
-            winner={match.winning_alliance === 'blue'}
-            scoreBreakdown={match.score_breakdown?.blue}
-            year={year}
-            compLevel={match.comp_level}
-          />
+        {maybeVideoURL && (
+          <Link to={maybeVideoURL} className="mx-2">
+            <PlayCircleIcon />
+          </Link>
         )}
       </div>
+
+      {/* Match Name */}
+      <div
+        className="row-span-2 flex items-center justify-center p-1.5
+          xl:col-span-2 xl:row-span-1"
+      >
+        <MatchLink
+          matchOrKey={match}
+          event={event}
+          className="text-center text-sm text-foreground"
+        >
+          {matchTitleShort(match, playoffType)}
+        </MatchLink>
+      </div>
+
+      {/* Red Team Players - Subgrid Component */}
+      <TeamListSubgrid
+        teamKeys={match.alliances.red.team_keys}
+        allianceColor="red"
+        className="col-span-3 xl:col-span-3"
+        winner={match.winning_alliance === 'red'}
+        dq={match.alliances.red.dq_team_keys}
+        surrogate={match.alliances.red.surrogate_team_keys}
+        year={year}
+        focusTeamKey={focusTeamKey}
+      />
+
+      {/* Blue Team Players - Subgrid Component */}
+      <TeamListSubgrid
+        teamKeys={match.alliances.blue.team_keys}
+        allianceColor="blue"
+        className="col-span-3 xl:col-span-3"
+        winner={match.winning_alliance === 'blue'}
+        dq={match.alliances.blue.dq_team_keys}
+        surrogate={match.alliances.blue.surrogate_team_keys}
+        year={year}
+        focusTeamKey={focusTeamKey}
+      />
+
+      {!isPlayed && (
+        <div
+          className="col-start-6 row-span-2 row-start-1 xl:col-span-2
+            xl:col-start-auto xl:row-span-1 xl:row-start-auto"
+        >
+          <span className="flex h-full items-center justify-center">
+            {match.predicted_time &&
+              new Date(match.predicted_time * 1000).toLocaleTimeString(
+                'en-US',
+                {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  weekday: 'short',
+                  hour12: true,
+                },
+              )}
+          </span>
+        </div>
+      )}
+
+      {/* Red Score */}
+      {isPlayed && (
+        <ScoreCell
+          score={match.alliances.red.score}
+          allianceColor="red"
+          className="col-start-6 row-start-1 xl:col-span-1 xl:col-start-auto
+            xl:row-start-auto"
+          winner={match.winning_alliance === 'red'}
+          scoreBreakdown={match.score_breakdown?.red}
+          year={year}
+          compLevel={match.comp_level}
+        />
+      )}
+
+      {/* Blue Score */}
+      {isPlayed && (
+        <ScoreCell
+          score={match.alliances.blue.score}
+          allianceColor="blue"
+          className="col-start-6 row-start-2 xl:col-span-1 xl:col-start-auto
+            xl:row-start-auto"
+          winner={match.winning_alliance === 'blue'}
+          scoreBreakdown={match.score_breakdown?.blue}
+          year={year}
+          compLevel={match.comp_level}
+        />
+      )}
     </div>
   );
 }

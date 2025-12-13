@@ -9,6 +9,7 @@ import {
   useAdvancementPaths,
 } from '~/components/tba/eliminationBracketPaths';
 import { MatchLink, TeamLink } from '~/components/tba/links';
+import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { EventType } from '~/lib/api/EventType';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
@@ -96,11 +97,13 @@ const PlayoffMatch = React.forwardRef<
     <div
       ref={cardRef}
       className={cn(
-        `mb-2 min-w-[180px] rounded border border-gray-300 bg-white
+        `mb-2 min-w-45 overflow-hidden rounded border border-gray-300 bg-white
         transition-all duration-200`,
         {
-          'shadow-lg ring-2 ring-red-300': isHighlighted && result.redWon,
-          'shadow-lg ring-2 ring-blue-300': isHighlighted && result.blueWon,
+          'border-transparent shadow-lg ring-2 ring-red-300':
+            isHighlighted && result.redWon,
+          'border-transparent shadow-lg ring-2 ring-blue-300':
+            isHighlighted && result.blueWon,
         },
       )}
     >
@@ -150,11 +153,11 @@ const PlayoffMatch = React.forwardRef<
         </div>
       </div>
       <div
-        className={cn(
-          `flex cursor-pointer items-center justify-between
-          bg-alliance-red-light px-1 py-1 transition-colors duration-200`,
-          isRedHighlighted ? 'bg-red-300' : 'hover:bg-red-200',
-        )}
+        className={`group flex cursor-pointer items-center justify-between
+          bg-alliance-red/15 px-1 py-1 transition-colors duration-200
+          data-[highlight=true]:bg-alliance-red
+          data-[highlight=true]:text-white`}
+        data-highlight={isRedHighlighted}
         ref={redRowRef}
         onMouseEnter={() =>
           result.redAllianceNumber &&
@@ -173,10 +176,11 @@ const PlayoffMatch = React.forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    'w-12 text-center text-sm text-red-600',
+                    `w-12 text-center text-sm text-red-600
+                    group-data-[highlight=true]:text-white`,
                     result.redWon && 'font-bold',
                     !teamPlayed &&
-                      'underline decoration-red-600 decoration-dotted',
+                      'underline decoration-current decoration-dotted',
                   )}
                 >
                   <TeamLink
@@ -197,7 +201,7 @@ const PlayoffMatch = React.forwardRef<
               <span
                 key={i}
                 className={cn(
-                  'w-8 flex-shrink-0 text-center text-sm',
+                  'w-8 shrink-0 text-center text-sm',
                   r.won && 'font-bold',
                 )}
               >
@@ -208,11 +212,11 @@ const PlayoffMatch = React.forwardRef<
         </div>
       </div>
       <div
-        className={cn(
-          `flex cursor-pointer items-center justify-between
-          bg-alliance-blue-light px-1 py-1 transition-colors duration-200`,
-          isBlueHighlighted ? 'bg-blue-300' : 'hover:bg-blue-200',
-        )}
+        className={`group flex cursor-pointer items-center justify-between
+          bg-alliance-blue/15 px-1 py-1 transition-colors duration-200
+          data-[highlight=true]:bg-alliance-blue
+          data-[highlight=true]:text-white`}
+        data-highlight={isBlueHighlighted}
         ref={blueRowRef}
         onMouseEnter={() =>
           result.blueAllianceNumber &&
@@ -231,10 +235,11 @@ const PlayoffMatch = React.forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    'w-12 text-center text-sm text-blue-600',
+                    `w-12 text-center text-sm text-blue-600
+                    group-data-[highlight=true]:text-white`,
                     result.blueWon && 'font-bold',
                     !teamPlayed &&
-                      'underline decoration-blue-600 decoration-dotted',
+                      'underline decoration-current decoration-dotted',
                   )}
                 >
                   <TeamLink
@@ -410,8 +415,10 @@ export default function EliminationBracket({
   }
 
   return (
-    <div className="mt-12">
-      <h2 className="mb-4 text-2xl font-bold">Playoff Bracket</h2>
+    <Card className="mt-12 bg-gray-50/50 p-2">
+      <CardHeader>
+        <CardTitle>Playoff Bracket</CardTitle>
+      </CardHeader>
 
       <div className="overflow-x-auto overflow-y-hidden">
         <div
@@ -680,6 +687,6 @@ export default function EliminationBracket({
           />
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
