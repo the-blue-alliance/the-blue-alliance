@@ -118,7 +118,7 @@ const PlayoffMatch = React.forwardRef<
               (
               <span
                 className={cn(
-                  'text-red-600 transition-all duration-200',
+                  'text-alliance-red transition-all duration-200',
                   isRedHighlighted && 'rounded bg-red-100 px-1 text-sm',
                 )}
               >
@@ -127,7 +127,7 @@ const PlayoffMatch = React.forwardRef<
               vs{' '}
               <span
                 className={cn(
-                  'text-blue-600 transition-all duration-200',
+                  'text-alliance-blue transition-all duration-200',
                   isBlueHighlighted && 'rounded bg-blue-100 px-1 text-sm',
                 )}
               >
@@ -176,7 +176,7 @@ const PlayoffMatch = React.forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-red-600
+                    `w-12 text-center text-sm text-alliance-red
                     group-data-[highlight=true]:text-white`,
                     result.redWon && 'font-bold',
                     !teamPlayed &&
@@ -235,7 +235,7 @@ const PlayoffMatch = React.forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-blue-600
+                    `w-12 text-center text-sm text-alliance-blue
                     group-data-[highlight=true]:text-white`,
                     result.blueWon && 'font-bold',
                     !teamPlayed &&
@@ -434,7 +434,7 @@ export default function EliminationBracket({
               <div className="flex items-start gap-8">
                 {/* Round 1 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 1</h3>
+                  <h3 className="mb-4 text-center">Round 1</h3>
                   <div className="space-y-4">
                     <PlayoffMatch
                       ref={(node) => {
@@ -494,7 +494,7 @@ export default function EliminationBracket({
 
                 {/* Round 2 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 2</h3>
+                  <h3 className="mb-4 text-center">Round 2</h3>
                   <div className="space-y-4">
                     <div className="h-4"></div>
                     <PlayoffMatch
@@ -527,7 +527,7 @@ export default function EliminationBracket({
 
                 {/* Round 4 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 4</h3>
+                  <h3 className="mb-4 text-center">Round 4</h3>
                   <div className="space-y-4">
                     <div className="h-32"></div>
                     <PlayoffMatch
@@ -575,7 +575,7 @@ export default function EliminationBracket({
               <div className="ml-16 flex items-start gap-8">
                 {/* Round 2 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 2</h3>
+                  <h3 className="mb-4 text-center">Round 2</h3>
                   <div className="space-y-4">
                     <PlayoffMatch
                       ref={(node) => {
@@ -607,7 +607,7 @@ export default function EliminationBracket({
 
                 {/* Round 3 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 3</h3>
+                  <h3 className="mb-4 text-center">Round 3</h3>
                   <div className="space-y-4">
                     <PlayoffMatch
                       ref={(node) => {
@@ -639,7 +639,7 @@ export default function EliminationBracket({
 
                 {/* Round 4 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 4</h3>
+                  <h3 className="mb-4 text-center">Round 4</h3>
                   <div className="space-y-4">
                     <div className="h-8"></div>
                     <PlayoffMatch
@@ -659,7 +659,7 @@ export default function EliminationBracket({
 
                 {/* Round 5 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 5</h3>
+                  <h3 className="mb-4 text-center">Round 5</h3>
                   <div className="space-y-4">
                     <div className="h-8"></div>
                     <PlayoffMatch

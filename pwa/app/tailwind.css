@@ -39,7 +39,7 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
-  --color-alliance-blue: #2196f3;
+  --color-alliance-blue: #007cff;
   --color-alliance-red: #f44336;
 
   --color-alliance-blue-dark: #ddf;
