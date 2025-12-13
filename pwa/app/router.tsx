@@ -1,5 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sentry from '@sentry/tanstackstart-react';
-import { QueryClient } from '@tanstack/react-query';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import { QueryClient, isServer } from '@tanstack/react-query';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { routeTree } from 'app/routeTree.gen';
@@ -11,7 +14,26 @@ const queryCacheLogger = createLogger('queryCache');
 const routerLogger = createLogger('router');
 
 export function getRouter() {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 5, // 5 seconds (TODO: increase)
+        gcTime: 1000 * 60, // 1 minute
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+
+  if (!isServer) {
+    const localStoragePersister = createAsyncStoragePersister({
+      storage: AsyncStorage,
+    });
+    persistQueryClient({
+      queryClient: queryClient,
+      persister: localStoragePersister,
+    });
+  }
+
   queryClient.getQueryCache().subscribe((event) => {
     // Only log "added" events (new queries) and "updated" events when query completes successfully
     // This reduces noise from intermediate state transitions (loading states)
