@@ -2,7 +2,10 @@
 from flask import Blueprint
 from flask_cors import CORS
 
-from backend.api.handlers.eventwizard_internal import add_fms_report_archive
+from backend.api.handlers.eventwizard_internal import (
+    add_fms_companion_db,
+    add_fms_report_archive,
+)
 
 # Eventwizard Internal API
 eventwizard_api = Blueprint("eventwizard_api", __name__, url_prefix="/_eventwizard/")
@@ -17,4 +20,10 @@ eventwizard_api.add_url_rule(
     "/event/<string:event_key>/fms_reports/<string:report_type>",
     methods=["POST"],
     view_func=add_fms_report_archive,
+)
+
+eventwizard_api.add_url_rule(
+    "/event/<string:event_key>/fms_companion_db",
+    methods=["POST"],
+    view_func=add_fms_companion_db,
 )

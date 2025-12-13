@@ -7,6 +7,7 @@ import EventScheduleTabContainer from "../containers/EventScheduleTabContainer";
 import EventMatchResultsTabContainer from "../containers/EventMatchResultsTabContainer";
 import EventRankingsTabContainer from "../containers/EventRankingsTabContainer";
 import EventAlliancesTabContainer from "../containers/EventAlliancesTabContainer";
+import FmsCompanionContainer from "../containers/FmsCompanionContainer";
 
 const EventWizardTabFrame: React.FC = () => (
   <div>
@@ -53,6 +54,11 @@ const EventWizardTabFrame: React.FC = () => (
               Awards
             </a>
           </li>
+          <li>
+            <a href="#fms-companion" data-toggle="tab">
+              FMS Companion
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -65,6 +71,7 @@ const EventWizardTabFrame: React.FC = () => (
       <EventRankingsTabContainer />
       <EventAlliancesTabContainer />
       <AwardsTabContainer />
+      <FmsCompanionContainer />
     </div>
   </div>
 );
