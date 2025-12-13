@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 
 import BiBellFill from '~icons/bi/bell-fill';
@@ -74,9 +74,9 @@ function Account(): React.JSX.Element {
         <p>
           Build on top of The Blue Alliance! When logged in, you can generate
           API keys and manage webhooks. Our{' '}
-          <a href="/apidocs" target="_blank" rel="noopener noreferrer">
+          <Link to="/apidocs" target="_blank" rel="noopener noreferrer">
             API documentation
-          </a>{' '}
+          </Link>{' '}
           provides comprehensive guides and examples to help you integrate TBA
           data into your applications. Explore endpoints for team information,
           event details, match results, and more.
