@@ -99,8 +99,8 @@ export function MatchRow({
       {/* Desktop: 1x11 grid, Mobile: 2x6 grid */}
       <div
         className="mx-auto grid w-full max-w-6xl
-          grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2.5em_2.5em] gap-x-1
-          text-sm xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
+          grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2em_2em] gap-x-1
+          text-sm xl:h-8 xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
       >
         {/* Play Button */}
         <div
@@ -117,7 +117,7 @@ export function MatchRow({
         {/* Match Name */}
         <div
           className="row-span-2 flex items-center justify-center rounded-tr-lg
-            bg-gray-100 p-2 xl:col-span-2 xl:row-span-1 xl:rounded-r-lg"
+            bg-gray-100 px-2 py-1 xl:col-span-2 xl:row-span-1 xl:rounded-r-lg"
         >
           <span className="text-center text-sm">
             <MatchLink matchOrKey={match} event={event}>
@@ -218,7 +218,7 @@ export function SimpleMatchRow({
       {/* 3x4 grid with header row */}
       <div
         className="mx-auto grid w-full max-w-6xl grid-cols-[repeat(4,1fr)]
-          grid-rows-[auto_repeat(2,2.5em)] gap-x-1 text-sm"
+          grid-rows-[auto_repeat(2,2em)] gap-x-1 text-sm"
       >
         {/* Header: Teams */}
         <div
