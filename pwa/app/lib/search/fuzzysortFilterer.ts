@@ -10,11 +10,15 @@ function searchTeams(
   query: string,
   limit: number,
 ): SearchableTeam[] {
-  const results = fuzzysort.go(query, teams, {
-    limit,
-    keys: ['key', 'nickname'],
-    threshold: 0.5,
-  });
+  const results = fuzzysort.go(
+    query,
+    teams.map((t) => ({ ...t, team_number: Number(t.key.substring(3)) })),
+    {
+      limit,
+      keys: ['key', 'nickname', 'team_number'],
+      threshold: 0.5,
+    },
+  );
 
   return results.map((result) => result.obj);
 }
