@@ -260,7 +260,7 @@ function EventPage() {
 
   return (
     <div className="py-8">
-      <h1 className="mb-3 text-3xl font-medium">
+      <h1 className="mb-2 text-3xl font-medium">
         {event.name} {event.year}
       </h1>
 

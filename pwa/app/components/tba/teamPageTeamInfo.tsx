@@ -37,7 +37,7 @@ export default function TeamPageTeamInfo({
   return (
     <>
       <div>
-        <h1 className="mb-2.5 text-4xl">
+        <h1 className="mb-2 text-3xl font-medium">
           {maybeAvatar && <TeamAvatar media={maybeAvatar} className="mr-3" />}
           Team {team.team_number} - {team.nickname}
         </h1>
