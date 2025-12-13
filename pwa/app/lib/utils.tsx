@@ -1,3 +1,4 @@
+import { notFound } from '@tanstack/react-router';
 import { type ClassValue, clsx } from 'clsx';
 import pino from 'pino';
 import React from 'react';
@@ -306,4 +307,8 @@ export function createLogger(name: string) {
     name,
     ...transport,
   });
+}
+
+export function doThrowNotFound(): never {
+  throw notFound();
 }
