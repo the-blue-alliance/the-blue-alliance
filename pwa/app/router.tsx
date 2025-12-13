@@ -50,7 +50,9 @@ export function getRouter() {
     context: {
       queryClient,
     },
-    scrollRestoration: true,
+    scrollRestoration: ({ location }) => {
+      return location.pathname !== '/apidocs/v3';
+    },
     caseSensitive: true,
     defaultErrorComponent: ErrorComponent,
     defaultNotFoundComponent: NotFoundComponent,
