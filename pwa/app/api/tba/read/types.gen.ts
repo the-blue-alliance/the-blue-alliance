@@ -43,174 +43,315 @@ export type ApiStatusAppVersion = {
   latest_app_version: number;
 };
 
-export type TeamSimple = {
+export type AutoChargeStationRobot2023 = 'Docked' | 'None';
+
+export type AutoLineRobot2024 = 'No' | 'Yes';
+
+export type AutoRobot2018 = 'None' | 'AutoRun';
+
+export type Award = {
   /**
-   * TBA team key with the format `frcXXXX` with `XXXX` representing the team number.
-   */
-  key: string;
-  /**
-   * Official team number issued by FIRST.
-   */
-  team_number: number;
-  /**
-   * Team nickname provided by FIRST.
-   */
-  nickname: string;
-  /**
-   * Official long name registered with FIRST.
+   * The name of the award as provided by FIRST. May vary for the same award type.
    */
   name: string;
   /**
-   * City of team derived from parsing the address registered with FIRST.
+   * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py#L8
    */
-  city: string | null;
+  award_type: AwardType;
   /**
-   * State of team derived from parsing the address registered with FIRST.
+   * The event_key of the event the award was won at.
    */
-  state_prov: string | null;
+  event_key: string;
   /**
-   * Country of team derived from parsing the address registered with FIRST.
+   * A list of recipients of the award at the event. May have either a team_key or an awardee, both, or neither (in the case the award wasn't awarded at the event).
    */
-  country: string | null;
-};
-
-export type Team = {
+  recipient_list: Array<AwardRecipient>;
   /**
-   * TBA team key with the format `frcXXXX` with `XXXX` representing the team number.
-   */
-  key: string;
-  /**
-   * Official team number issued by FIRST.
-   */
-  team_number: number;
-  /**
-   * Team nickname provided by FIRST.
-   */
-  nickname: string;
-  /**
-   * Official long name registered with FIRST.
-   */
-  name: string;
-  /**
-   * Name of team school or affilited group registered with FIRST.
-   */
-  school_name: string | null;
-  /**
-   * City of team derived from parsing the address registered with FIRST.
-   */
-  city: string | null;
-  /**
-   * State of team derived from parsing the address registered with FIRST.
-   */
-  state_prov: string | null;
-  /**
-   * Country of team derived from parsing the address registered with FIRST.
-   */
-  country: string | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  address: string | null;
-  /**
-   * Postal code from the team address.
-   */
-  postal_code: string | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  gmaps_place_id: string | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  gmaps_url: string | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  lat: number | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  lng: number | null;
-  /**
-   * Will be NULL, for future development.
-   */
-  location_name: string | null;
-  /**
-   * Official website associated with the team.
-   */
-  website: string | null;
-  /**
-   * First year the team officially competed.
-   */
-  rookie_year: number | null;
-  /**
-   * Team's motto or tagline.
-   */
-  motto: string | null;
-};
-
-export type TeamRobot = {
-  /**
-   * Year this robot competed in.
+   * The year this award was won.
    */
   year: number;
+};
+
+/**
+ * An `Award_Recipient` object represents the team and/or person who received an award at an event.
+ */
+export type AwardRecipient = {
   /**
-   * Name of the robot as provided by the team.
+   * The TBA team key for the team that was given the award. May be null.
    */
-  robot_name: string;
+  team_key: string | null;
   /**
-   * Internal TBA identifier for this robot.
+   * The name of the individual given the award. May be null.
+   */
+  awardee: string | null;
+};
+
+export type Bay2019 = 'None' | 'Panel' | 'PanelAndCargo';
+
+export type BridgeState2023 = 'Level' | 'NotLevel';
+
+/**
+ * The competition level the match was played at.
+ */
+export type CompLevel = 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+
+export type District = {
+  /**
+   * The short identifier for the district.
+   */
+  abbreviation: string;
+  /**
+   * The long name for the district.
+   */
+  display_name: string;
+  /**
+   * Key for this district, e.g. `2016ne`.
    */
   key: string;
   /**
-   * TBA team key for this robot.
+   * Year this district participated.
+   */
+  year: number;
+};
+
+export type DistrictInsightRegionData = {
+  /**
+   * Map of year to number of active teams
+   */
+  yearly_active_team_count: {
+    [key: string]: number;
+  };
+  /**
+   * Map of year to number of events
+   */
+  yearly_event_count: {
+    [key: string]: number;
+  };
+  /**
+   * Map of year to list of team keys gained
+   */
+  yearly_gained_teams: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Map of year to list of team keys lost
+   */
+  yearly_lost_teams: {
+    [key: string]: Array<string>;
+  };
+};
+
+/**
+ * Advancement status of a team in a district.
+ */
+export type DistrictAdvancement = {
+  /**
+   * Whether or not the team qualified for their District Championship
+   */
+  dcmp: boolean;
+  /**
+   * Whether or not the team qualified for the FIRST Championship
+   */
+  cmp: boolean;
+};
+
+export type DistrictInsight = {
+  district_data: {
+    region_data: {
+      [key: string]: DistrictInsightRegionData;
+    } | null;
+    district_wide_data: DistrictInsightRegionData | null;
+  };
+  team_data: {
+    [key: string]: {
+      district_seasons: number;
+      total_district_points: number;
+      total_pre_dcmp_district_points: number;
+      district_event_wins: number;
+      dcmp_wins: number;
+      team_awards: number;
+      individual_awards: number;
+      quals_record: WltRecord;
+      elims_record: WltRecord;
+      in_district_extra_play_count: number;
+      total_matches_played: number;
+      dcmp_appearances: number;
+      cmp_appearances: number;
+    };
+  } | null;
+};
+
+/**
+ * Rank of a team in a district.
+ */
+export type DistrictRanking = {
+  /**
+   * TBA team key for the team.
    */
   team_key: string;
+  /**
+   * Numerical rank of the team, 1 being top rank.
+   */
+  rank: number;
+  /**
+   * Any points added to a team as a result of the rookie bonus.
+   */
+  rookie_bonus: number;
+  /**
+   * Total district points for the team.
+   */
+  point_total: number;
+  /**
+   * List of events that contributed to the point total for the team.
+   */
+  event_points: Array<{
+    /**
+     * `true` if this event is a District Championship event.
+     */
+    district_cmp: boolean;
+    /**
+     * Total points awarded at this event.
+     */
+    total: number;
+    /**
+     * Points awarded for alliance selection.
+     */
+    alliance_points: number;
+    /**
+     * Points awarded for elimination match performance.
+     */
+    elim_points: number;
+    /**
+     * Points awarded for event awards.
+     */
+    award_points: number;
+    /**
+     * TBA Event key for this event.
+     */
+    event_key: string;
+    /**
+     * Points awarded for qualification match performance.
+     */
+    qual_points: number;
+  }>;
+  /**
+   * Any points adjustments applied to the team.
+   */
+  adjustments?: number;
+  /**
+   * Any other bonus points awarded to the team.
+   */
+  other_bonus?: number;
 };
 
-export type EventSimple = {
+/**
+ * Double elimination round, if applicable.
+ */
+export type DoubleElimRound =
+  | 'Finals'
+  | 'Round 1'
+  | 'Round 2'
+  | 'Round 3'
+  | 'Round 4'
+  | 'Round 5';
+
+export type EliminationAlliance = {
   /**
-   * TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.
+   * Alliance name.
    */
-  key: string;
+  name?: string;
   /**
-   * Official name of event on record either provided by FIRST or organizers of offseason event.
+   * Backup team called in, may be null.
    */
-  name: string;
+  backup?: {
+    /**
+     * Team key that was called in as the backup.
+     */
+    in: string;
+    /**
+     * Team key that was replaced by the backup team.
+     */
+    out: string;
+  } | null;
   /**
-   * Event short code, as provided by FIRST.
+   * List of teams that declined the alliance.
    */
-  event_code: string;
+  declines: Array<string>;
   /**
-   * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8
+   * List of team keys picked for the alliance. First pick is captain.
    */
-  event_type: EventType;
-  district: District | null;
-  /**
-   * City, town, village, etc. the event is located in.
-   */
-  city: string | null;
-  /**
-   * State or Province the event is located in.
-   */
-  state_prov: string | null;
-  /**
-   * Country the event is located in.
-   */
-  country: string | null;
-  /**
-   * Event start date in `yyyy-mm-dd` format.
-   */
-  start_date: string;
-  /**
-   * Event end date in `yyyy-mm-dd` format.
-   */
-  end_date: string;
-  /**
-   * Year the event data is for.
-   */
-  year: number;
+  picks: Array<string>;
+  status?: {
+    /**
+     * Average match score during playoffs. Year specific. May be null.
+     */
+    playoff_average?: number | null;
+    /**
+     * Playoff type, may be null.
+     */
+    playoff_type: number | null;
+    /**
+     * Match level, qm/ef/qf/sf/f.
+     */
+    level: CompLevel;
+    /**
+     * W-L-T record for the alliance, may be null.
+     */
+    record: WltRecord | null;
+    /**
+     * W-L-T record for the alliance at the current level, may be null.
+     */
+    current_level_record: WltRecord | null;
+    /**
+     * Status of the alliance.
+     */
+    status: 'eliminated' | 'playing' | 'won';
+    /**
+     * Whether the alliance advanced to round robin finals.
+     */
+    advanced_to_round_robin_finals?: boolean;
+    double_elim_round?: DoubleElimRound;
+    /**
+     * Rank in round robin play.
+     */
+    round_robin_rank?: number;
+  };
 };
+
+export type EndGameChargeStationRobot2023 =
+  | 'Docked'
+  | 'None'
+  | 'Park'
+  | 'Parked';
+
+export type EndGameRobot2024 =
+  | 'CenterStage'
+  | 'None'
+  | 'Parked'
+  | 'StageLeft'
+  | 'StageRight';
+
+export type EndGameRobot2025 = 'DeepCage' | 'None' | 'Parked' | 'ShallowCage';
+
+export type EndgameRobot2018 =
+  | 'Climbing'
+  | 'Levitate'
+  | 'None'
+  | 'Parking'
+  | 'Unknown';
+
+export type EndgameRobot2019 =
+  | 'HabLevel1'
+  | 'HabLevel2'
+  | 'HabLevel3'
+  | 'None'
+  | 'Unknown';
+
+export type EndgameRobot2020 = 'Hang' | 'None' | 'Park';
+
+export type EndgameRobot2022 = 'High' | 'Low' | 'Mid' | 'None' | 'Traversal';
+
+export type EndgameRungIsLevel2020 = 'IsLevel' | 'NotLevel';
 
 export type Event = {
   /**
@@ -335,188 +476,13 @@ export type Event = {
   } | null;
 };
 
-export type TeamEventStatus = {
-  qual?: TeamEventStatusRank | null;
-  alliance?: TeamEventStatusAlliance | null;
-  playoff?: TeamEventStatusPlayoff | null;
-  /**
-   * An HTML formatted string suitable for display to the user containing the team's alliance pick status.
-   */
-  alliance_status_str?: string;
-  /**
-   * An HTML formatter string suitable for display to the user containing the team's playoff status.
-   */
-  playoff_status_str?: string;
-  /**
-   * An HTML formatted string suitable for display to the user containing the team's overall status summary of the event.
-   */
-  overall_status_str?: string;
-  /**
-   * TBA match key for the next match the team is scheduled to play in at this event, or null.
-   */
-  next_match_key?: string | null;
-  /**
-   * TBA match key for the last match the team played in at this event, or null.
-   */
-  last_match_key?: string | null;
-};
-
-export type TeamEventStatusRank = {
-  /**
-   * Number of teams ranked.
-   */
-  num_teams?: number;
-  ranking?: {
-    /**
-     * Number of matches played.
-     */
-    matches_played?: number;
-    /**
-     * For some years, average qualification score. Can be null.
-     */
-    qual_average?: number | null;
-    /**
-     * Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.
-     */
-    sort_orders?: Array<number> | null;
-    record?: WltRecord | null;
-    /**
-     * Relative rank of this team.
-     */
-    rank?: number | null;
-    /**
-     * Number of matches the team was disqualified for.
-     */
-    dq?: number | null;
-    /**
-     * TBA team key for this rank.
-     */
-    team_key?: string;
-  } | null;
-  /**
-   * Ordered list of names corresponding to the elements of the `sort_orders` array.
-   */
-  sort_order_info?: Array<{
-    /**
-     * The number of digits of precision used for this value, eg `2` would correspond to a value of `101.11` while `0` would correspond to `101`.
-     */
-    precision?: number;
-    /**
-     * The descriptive name of the value used to sort the ranking.
-     */
-    name?: string;
-  }> | null;
-  status?: string;
-};
-
-export type TeamEventStatusAlliance = {
-  /**
-   * Alliance name, may be null.
-   */
-  name?: string | null;
-  /**
-   * Alliance number.
-   */
-  number: number;
-  backup?: TeamEventStatusAllianceBackup;
-  /**
-   * Order the team was picked in the alliance from 0-2, with 0 being alliance captain.
-   */
-  pick: number;
-};
-
 /**
- * Backup status, may be null.
+ * Component OPRs for teams at the event.
  */
-export type TeamEventStatusAllianceBackup = null | {
-  /**
-   * TBA key for the team replaced by the backup.
-   */
-  out?: string;
-  /**
-   * TBA key for the backup team called in.
-   */
-  in?: string;
-};
-
-/**
- * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
- */
-export type TeamEventStatusPlayoff = null | {
-  level?: CompLevel;
-  current_level_record?: WltRecord | null;
-  record?: WltRecord | null;
-  /**
-   * Current competition status for the playoffs.
-   */
-  status?: 'won' | 'eliminated' | 'playing';
-  /**
-   * The average match score during playoffs. Year specific. May be null if not relevant for a given year.
-   */
-  playoff_average?: null | number;
-};
-
-export type EventRanking = {
-  /**
-   * List of rankings at the event.
-   */
-  rankings: Array<{
-    /**
-     * Number of matches played by this team.
-     */
-    matches_played: number;
-    /**
-     * The average match score during qualifications. Year specific. May be null if not relevant for a given year.
-     */
-    qual_average: number | null;
-    /**
-     * Additional special data on the team's performance calculated by TBA.
-     */
-    extra_stats: Array<number>;
-    /**
-     * Additional year-specific information. See parent `sort_order_info` for details.
-     */
-    sort_orders: Array<number>;
-    record: WltRecord | null;
-    /**
-     * The team's rank at the event as provided by FIRST.
-     */
-    rank: number;
-    /**
-     * Number of times disqualified.
-     */
-    dq: number;
-    /**
-     * The team with this rank.
-     */
-    team_key: string;
-  }>;
-  /**
-   * List of special TBA-generated values provided in the `extra_stats` array for each item.
-   */
-  extra_stats_info: Array<{
-    /**
-     * Integer expressing the number of digits of precision in the number provided in `sort_orders`.
-     */
-    precision: number;
-    /**
-     * Name of the field used in the `extra_stats` array.
-     */
-    name: string;
-  }>;
-  /**
-   * List of year-specific values provided in the `sort_orders` array for each team.
-   */
-  sort_order_info: Array<{
-    /**
-     * Integer expressing the number of digits of precision in the number provided in `sort_orders`.
-     */
-    precision: number;
-    /**
-     * Name of the field used in the `sort_order` array.
-     */
-    name: string;
-  }> | null;
+export type EventCoprs = {
+  [key: string]: {
+    [key: string]: number;
+  };
 };
 
 export type EventDistrictPoints = {
@@ -991,78 +957,157 @@ export type EventOprs = {
 };
 
 /**
- * Component OPRs for teams at the event.
- */
-export type EventCoprs = {
-  [key: string]: {
-    [key: string]: number;
-  };
-};
-
-/**
  * JSON Object containing prediction information for the event. Contains year-specific information and is subject to change.
  */
 export type EventPredictions = {
   [key: string]: unknown;
 };
 
-/**
- * The competition level the match was played at.
- */
-export type CompLevel = 'qm' | 'ef' | 'qf' | 'sf' | 'f';
-
-/**
- * Double elimination round, if applicable.
- */
-export type DoubleElimRound =
-  | 'Finals'
-  | 'Round 1'
-  | 'Round 2'
-  | 'Round 3'
-  | 'Round 4'
-  | 'Round 5';
-
-export type MatchSimple = {
+export type EventRanking = {
   /**
-   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
+   * List of rankings at the event.
+   */
+  rankings: Array<{
+    /**
+     * Number of matches played by this team.
+     */
+    matches_played: number;
+    /**
+     * The average match score during qualifications. Year specific. May be null if not relevant for a given year.
+     */
+    qual_average: number | null;
+    /**
+     * Additional special data on the team's performance calculated by TBA.
+     */
+    extra_stats: Array<number>;
+    /**
+     * Additional year-specific information. See parent `sort_order_info` for details.
+     */
+    sort_orders: Array<number>;
+    record: WltRecord | null;
+    /**
+     * The team's rank at the event as provided by FIRST.
+     */
+    rank: number;
+    /**
+     * Number of times disqualified.
+     */
+    dq: number;
+    /**
+     * The team with this rank.
+     */
+    team_key: string;
+  }>;
+  /**
+   * List of special TBA-generated values provided in the `extra_stats` array for each item.
+   */
+  extra_stats_info: Array<{
+    /**
+     * Integer expressing the number of digits of precision in the number provided in `sort_orders`.
+     */
+    precision: number;
+    /**
+     * Name of the field used in the `extra_stats` array.
+     */
+    name: string;
+  }>;
+  /**
+   * List of year-specific values provided in the `sort_orders` array for each team.
+   */
+  sort_order_info: Array<{
+    /**
+     * Integer expressing the number of digits of precision in the number provided in `sort_orders`.
+     */
+    precision: number;
+    /**
+     * Name of the field used in the `sort_order` array.
+     */
+    name: string;
+  }> | null;
+};
+
+export type EventSimple = {
+  /**
+   * TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.
    */
   key: string;
-  comp_level: CompLevel;
   /**
-   * The set number in a series of matches where more than one match is required in the match series.
+   * Official name of event on record either provided by FIRST or organizers of offseason event.
    */
-  set_number: number;
+  name: string;
   /**
-   * The match number of the match in the competition level.
+   * Event short code, as provided by FIRST.
    */
-  match_number: number;
+  event_code: string;
   /**
-   * A list of alliances, the teams on the alliances, and their score.
+   * Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8
    */
-  alliances: {
-    red: MatchAlliance;
-    blue: MatchAlliance;
+  event_type: EventType;
+  district: District | null;
+  /**
+   * City, town, village, etc. the event is located in.
+   */
+  city: string | null;
+  /**
+   * State or Province the event is located in.
+   */
+  state_prov: string | null;
+  /**
+   * Country the event is located in.
+   */
+  country: string | null;
+  /**
+   * Event start date in `yyyy-mm-dd` format.
+   */
+  start_date: string;
+  /**
+   * Event end date in `yyyy-mm-dd` format.
+   */
+  end_date: string;
+  /**
+   * Year the event data is for.
+   */
+  year: number;
+};
+
+export type HabLine2019 =
+  | 'CrossedHabLineInSandstorm'
+  | 'CrossedHabLineInTeleop'
+  | 'None'
+  | 'Unknown';
+
+export type History = {
+  events: Array<Event>;
+  awards: Array<Award>;
+};
+
+export type InitLineRobot2020 = 'Exited' | 'None';
+
+export type LeaderboardInsight = {
+  data: {
+    rankings: Array<{
+      /**
+       * Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played.
+       */
+      value: number;
+      /**
+       * Team/Event/Match keys that have the corresponding value.
+       */
+      keys: Array<string>;
+    }>;
+    /**
+     * What type of key is used in the rankings; either 'team', 'event', or 'match'.
+     */
+    key_type: 'team' | 'event' | 'match';
   };
   /**
-   * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
+   * Name of the insight.
    */
-  winning_alliance: 'red' | 'blue' | '';
+  name: string;
   /**
-   * Event key of the event the match was played at.
+   * Year the insight was measured in (year=0 for overall insights).
    */
-  event_key: string;
-  /**
-   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.
-   */
-  time: number | null;
-  /**
-   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.
-   */
-  predicted_time: number | null;
-  /**
-   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.
-   */
-  actual_time: number | null;
+  year: number;
 };
 
 export type Match = {
@@ -1138,170 +1183,6 @@ export type Match = {
      */
     key: string;
   }>;
-};
-
-export type MatchAlliance = {
-  /**
-   * Score for this alliance. Will be null or -1 for an unplayed match.
-   */
-  score: number;
-  team_keys: Array<string>;
-  /**
-   * TBA team keys (eg `frc254`) of any teams playing as a surrogate.
-   */
-  surrogate_team_keys: Array<string>;
-  /**
-   * TBA team keys (eg `frc254`) of any disqualified teams.
-   */
-  dq_team_keys: Array<string>;
-};
-
-export type Zebra = {
-  /**
-   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
-   */
-  key: string;
-  /**
-   * A list of relative timestamps for each data point. Each timestamp will correspond to the X and Y value at the same index in a team xs and ys arrays. `times`, all teams `xs` and all teams `ys` are guarenteed to be the same length.
-   */
-  times: Array<number>;
-  alliances: {
-    /**
-     * Zebra MotionWorks data for teams on the red alliance
-     */
-    red?: Array<ZebraTeam>;
-    /**
-     * Zebra data for teams on the blue alliance
-     */
-    blue?: Array<ZebraTeam>;
-  };
-};
-
-export type ZebraTeam = {
-  /**
-   * The TBA team key for the Zebra MotionWorks data.
-   */
-  team_key: string;
-  /**
-   * A list containing doubles and nulls representing a teams X position in feet at the corresponding timestamp. A null value represents no tracking data for a given timestamp.
-   */
-  xs: Array<number>;
-  /**
-   * A list containing doubles and nulls representing a teams Y position in feet at the corresponding timestamp. A null value represents no tracking data for a given timestamp.
-   */
-  ys: Array<number>;
-};
-
-export type AutoRobot2018 = 'None' | 'AutoRun';
-
-export type EndgameRobot2018 =
-  | 'Climbing'
-  | 'Levitate'
-  | 'None'
-  | 'Parking'
-  | 'Unknown';
-
-export type RobotAuto2016WithUnknown =
-  | 'Crossed'
-  | 'None'
-  | 'Reached'
-  | 'Unknown';
-
-export type RobotAuto2016WithoutUnknown = 'Crossed' | 'Reached' | 'None';
-
-export type Position2016 =
-  | ''
-  | 'A_ChevalDeFrise'
-  | 'A_Portcullis'
-  | 'B_Moat'
-  | 'B_Ramparts'
-  | 'C_Drawbridge'
-  | 'C_SallyPort'
-  | 'D_RockWall'
-  | 'D_RoughTerrain'
-  | 'NotSpecified';
-
-export type TowerFace2016 =
-  | 'Both'
-  | 'Challenged'
-  | 'None'
-  | 'Scaled'
-  | 'Unknown';
-
-export type RobotAuto2017 = 'Mobility' | 'None' | 'Unknown';
-
-export type Touchpad2017 = 'None' | 'ReadyForTakeoff';
-
-export type Bay2019 = 'None' | 'Panel' | 'PanelAndCargo';
-
-export type EndgameRobot2019 =
-  | 'HabLevel1'
-  | 'HabLevel2'
-  | 'HabLevel3'
-  | 'None'
-  | 'Unknown';
-
-export type HabLine2019 =
-  | 'CrossedHabLineInSandstorm'
-  | 'CrossedHabLineInTeleop'
-  | 'None'
-  | 'Unknown';
-
-export type PreMatchBay2019 = 'Cargo' | 'Panel' | 'Unknown';
-
-export type InitLineRobot2020 = 'Exited' | 'None';
-
-export type EndgameRobot2020 = 'Hang' | 'None' | 'Park';
-
-export type EndgameRungIsLevel2020 = 'IsLevel' | 'NotLevel';
-
-export type Stage3TargetColor2020 =
-  | 'Blue'
-  | 'Green'
-  | 'Red'
-  | 'Unknown'
-  | 'Yellow';
-
-export type EndgameRobot2022 = 'High' | 'Low' | 'Mid' | 'None' | 'Traversal';
-
-export type TaxiRobot2022 = 'No' | 'Yes';
-
-export type BridgeState2023 = 'Level' | 'NotLevel';
-
-export type AutoChargeStationRobot2023 = 'Docked' | 'None';
-
-export type EndGameChargeStationRobot2023 =
-  | 'Docked'
-  | 'None'
-  | 'Park'
-  | 'Parked';
-
-export type MobilityRobot2023 = 'No' | 'Yes';
-
-export type AutoLineRobot2024 = 'No' | 'Yes';
-
-export type EndGameRobot2024 =
-  | 'CenterStage'
-  | 'None'
-  | 'Parked'
-  | 'StageLeft'
-  | 'StageRight';
-
-export type EndGameRobot2025 = 'DeepCage' | 'None' | 'Parked' | 'ShallowCage';
-
-export type ReefRow2025 = {
-  nodeA: boolean;
-  nodeB: boolean;
-  nodeC: boolean;
-  nodeD: boolean;
-  nodeE: boolean;
-  nodeF: boolean;
-  nodeG: boolean;
-  nodeH: boolean;
-  nodeI: boolean;
-  nodeJ: boolean;
-  nodeK: boolean;
-  nodeL: boolean;
 };
 
 /**
@@ -1487,135 +1368,6 @@ export type MatchScoreBreakdown2018Alliance = {
    * Unofficial TBA-computed value of the FMS provided GameData given to the alliance teams at the start of the match. 3 Character String containing `L` and `R` only. The first character represents the near switch, the 2nd the scale, and the 3rd the far, opposing, switch from the alliance's perspective. An `L` in a position indicates the platform on the left will be lit for the alliance while an `R` will indicate the right platform will be lit for the alliance. See also [WPI Screen Steps](https://wpilib.screenstepslive.com/s/currentCS/m/getting_started/l/826278-2018-game-data-details).
    */
   tba_gameData?: '' | 'LLL' | 'LRL' | 'RLR' | 'RRR';
-};
-
-/**
- * Timeseries data for the 2018 game *FIRST* POWER UP.
- * *WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.
- * *WARNING:* This model is currently under active development and may change at any time, including in breaking ways.
- */
-export type MatchTimeseries2018 = {
-  /**
-   * TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.
-   */
-  event_key?: string;
-  /**
-   * Match ID consisting of the level, match number, and set number, eg `qm45` or `f1m1`.
-   */
-  match_id?: string;
-  /**
-   * Current mode of play, can be `pre_match`, `auto`, `telop`, or `post_match`.
-   */
-  mode?: string;
-  play?: number;
-  /**
-   * Amount of time remaining in the match, only valid during `auto` and `teleop` modes.
-   */
-  time_remaining?: number;
-  /**
-   * 1 if the blue alliance is credited with the AUTO QUEST, 0 if not.
-   */
-  blue_auto_quest?: number;
-  /**
-   * Number of POWER CUBES in the BOOST section of the blue alliance VAULT.
-   */
-  blue_boost_count?: number;
-  /**
-   * Returns 1 if the blue alliance BOOST was played, or 0 if not played.
-   */
-  blue_boost_played?: number;
-  /**
-   * Name of the current blue alliance POWER UP being played, or `null`.
-   */
-  blue_current_powerup?: string;
-  /**
-   * 1 if the blue alliance is credited with FACING THE BOSS, 0 if not.
-   */
-  blue_face_the_boss?: number;
-  /**
-   * Number of POWER CUBES in the FORCE section of the blue alliance VAULT.
-   */
-  blue_force_count?: number;
-  /**
-   * Returns 1 if the blue alliance FORCE was played, or 0 if not played.
-   */
-  blue_force_played?: number;
-  /**
-   * Number of POWER CUBES in the LEVITATE section of the blue alliance VAULT.
-   */
-  blue_levitate_count?: number;
-  /**
-   * Returns 1 if the blue alliance LEVITATE was played, or 0 if not played.
-   */
-  blue_levitate_played?: number;
-  /**
-   * Number of seconds remaining in the blue alliance POWER UP time, or 0 if none is active.
-   */
-  blue_powerup_time_remaining?: string;
-  /**
-   * 1 if the blue alliance owns the SCALE, 0 if not.
-   */
-  blue_scale_owned?: number;
-  /**
-   * Current score for the blue alliance.
-   */
-  blue_score?: number;
-  /**
-   * 1 if the blue alliance owns their SWITCH, 0 if not.
-   */
-  blue_switch_owned?: number;
-  /**
-   * 1 if the red alliance is credited with the AUTO QUEST, 0 if not.
-   */
-  red_auto_quest?: number;
-  /**
-   * Number of POWER CUBES in the BOOST section of the red alliance VAULT.
-   */
-  red_boost_count?: number;
-  /**
-   * Returns 1 if the red alliance BOOST was played, or 0 if not played.
-   */
-  red_boost_played?: number;
-  /**
-   * Name of the current red alliance POWER UP being played, or `null`.
-   */
-  red_current_powerup?: string;
-  /**
-   * 1 if the red alliance is credited with FACING THE BOSS, 0 if not.
-   */
-  red_face_the_boss?: number;
-  /**
-   * Number of POWER CUBES in the FORCE section of the red alliance VAULT.
-   */
-  red_force_count?: number;
-  /**
-   * Returns 1 if the red alliance FORCE was played, or 0 if not played.
-   */
-  red_force_played?: number;
-  /**
-   * Number of POWER CUBES in the LEVITATE section of the red alliance VAULT.
-   */
-  red_levitate_count?: number;
-  /**
-   * Returns 1 if the red alliance LEVITATE was played, or 0 if not played.
-   */
-  red_levitate_played?: number;
-  /**
-   * Number of seconds remaining in the red alliance POWER UP time, or 0 if none is active.
-   */
-  red_powerup_time_remaining?: string;
-  /**
-   * 1 if the red alliance owns the SCALE, 0 if not.
-   */
-  red_scale_owned?: number;
-  /**
-   * Current score for the red alliance.
-   */
-  red_score?: number;
-  /**
-   * 1 if the red alliance owns their SWITCH, 0 if not.
-   */
-  red_switch_owned?: number;
 };
 
 /**
@@ -1983,6 +1735,194 @@ export type MatchScoreBreakdown2025Alliance = {
   wallAlgaeCount: number;
 };
 
+export type MatchSimple = {
+  /**
+   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
+   */
+  key: string;
+  comp_level: CompLevel;
+  /**
+   * The set number in a series of matches where more than one match is required in the match series.
+   */
+  set_number: number;
+  /**
+   * The match number of the match in the competition level.
+   */
+  match_number: number;
+  /**
+   * A list of alliances, the teams on the alliances, and their score.
+   */
+  alliances: {
+    red: MatchAlliance;
+    blue: MatchAlliance;
+  };
+  /**
+   * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
+   */
+  winning_alliance: 'red' | 'blue' | '';
+  /**
+   * Event key of the event the match was played at.
+   */
+  event_key: string;
+  /**
+   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match time, as taken from the published schedule.
+   */
+  time: number | null;
+  /**
+   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted match start time.
+   */
+  predicted_time: number | null;
+  /**
+   * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start time.
+   */
+  actual_time: number | null;
+};
+
+/**
+ * Timeseries data for the 2018 game *FIRST* POWER UP.
+ * *WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.
+ * *WARNING:* This model is currently under active development and may change at any time, including in breaking ways.
+ */
+export type MatchTimeseries2018 = {
+  /**
+   * TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year, and EVENT_CODE is the event code of the event.
+   */
+  event_key?: string;
+  /**
+   * Match ID consisting of the level, match number, and set number, eg `qm45` or `f1m1`.
+   */
+  match_id?: string;
+  /**
+   * Current mode of play, can be `pre_match`, `auto`, `telop`, or `post_match`.
+   */
+  mode?: string;
+  play?: number;
+  /**
+   * Amount of time remaining in the match, only valid during `auto` and `teleop` modes.
+   */
+  time_remaining?: number;
+  /**
+   * 1 if the blue alliance is credited with the AUTO QUEST, 0 if not.
+   */
+  blue_auto_quest?: number;
+  /**
+   * Number of POWER CUBES in the BOOST section of the blue alliance VAULT.
+   */
+  blue_boost_count?: number;
+  /**
+   * Returns 1 if the blue alliance BOOST was played, or 0 if not played.
+   */
+  blue_boost_played?: number;
+  /**
+   * Name of the current blue alliance POWER UP being played, or `null`.
+   */
+  blue_current_powerup?: string;
+  /**
+   * 1 if the blue alliance is credited with FACING THE BOSS, 0 if not.
+   */
+  blue_face_the_boss?: number;
+  /**
+   * Number of POWER CUBES in the FORCE section of the blue alliance VAULT.
+   */
+  blue_force_count?: number;
+  /**
+   * Returns 1 if the blue alliance FORCE was played, or 0 if not played.
+   */
+  blue_force_played?: number;
+  /**
+   * Number of POWER CUBES in the LEVITATE section of the blue alliance VAULT.
+   */
+  blue_levitate_count?: number;
+  /**
+   * Returns 1 if the blue alliance LEVITATE was played, or 0 if not played.
+   */
+  blue_levitate_played?: number;
+  /**
+   * Number of seconds remaining in the blue alliance POWER UP time, or 0 if none is active.
+   */
+  blue_powerup_time_remaining?: string;
+  /**
+   * 1 if the blue alliance owns the SCALE, 0 if not.
+   */
+  blue_scale_owned?: number;
+  /**
+   * Current score for the blue alliance.
+   */
+  blue_score?: number;
+  /**
+   * 1 if the blue alliance owns their SWITCH, 0 if not.
+   */
+  blue_switch_owned?: number;
+  /**
+   * 1 if the red alliance is credited with the AUTO QUEST, 0 if not.
+   */
+  red_auto_quest?: number;
+  /**
+   * Number of POWER CUBES in the BOOST section of the red alliance VAULT.
+   */
+  red_boost_count?: number;
+  /**
+   * Returns 1 if the red alliance BOOST was played, or 0 if not played.
+   */
+  red_boost_played?: number;
+  /**
+   * Name of the current red alliance POWER UP being played, or `null`.
+   */
+  red_current_powerup?: string;
+  /**
+   * 1 if the red alliance is credited with FACING THE BOSS, 0 if not.
+   */
+  red_face_the_boss?: number;
+  /**
+   * Number of POWER CUBES in the FORCE section of the red alliance VAULT.
+   */
+  red_force_count?: number;
+  /**
+   * Returns 1 if the red alliance FORCE was played, or 0 if not played.
+   */
+  red_force_played?: number;
+  /**
+   * Number of POWER CUBES in the LEVITATE section of the red alliance VAULT.
+   */
+  red_levitate_count?: number;
+  /**
+   * Returns 1 if the red alliance LEVITATE was played, or 0 if not played.
+   */
+  red_levitate_played?: number;
+  /**
+   * Number of seconds remaining in the red alliance POWER UP time, or 0 if none is active.
+   */
+  red_powerup_time_remaining?: string;
+  /**
+   * 1 if the red alliance owns the SCALE, 0 if not.
+   */
+  red_scale_owned?: number;
+  /**
+   * Current score for the red alliance.
+   */
+  red_score?: number;
+  /**
+   * 1 if the red alliance owns their SWITCH, 0 if not.
+   */
+  red_switch_owned?: number;
+};
+
+export type MatchAlliance = {
+  /**
+   * Score for this alliance. Will be null or -1 for an unplayed match.
+   */
+  score: number;
+  team_keys: Array<string>;
+  /**
+   * TBA team keys (eg `frc254`) of any teams playing as a surrogate.
+   */
+  surrogate_team_keys: Array<string>;
+  /**
+   * TBA team keys (eg `frc254`) of any disqualified teams.
+   */
+  dq_team_keys: Array<string>;
+};
+
 /**
  * The `Media` object contains a reference for most any media associated with a team or event on TBA.
  */
@@ -2069,253 +2009,49 @@ export type Media = {
   view_url?: string;
 };
 
-export type EliminationAlliance = {
-  /**
-   * Alliance name.
-   */
-  name?: string;
-  /**
-   * Backup team called in, may be null.
-   */
-  backup?: {
-    /**
-     * Team key that was called in as the backup.
-     */
-    in: string;
-    /**
-     * Team key that was replaced by the backup team.
-     */
-    out: string;
-  } | null;
-  /**
-   * List of teams that declined the alliance.
-   */
-  declines: Array<string>;
-  /**
-   * List of team keys picked for the alliance. First pick is captain.
-   */
-  picks: Array<string>;
-  status?: {
-    /**
-     * Average match score during playoffs. Year specific. May be null.
-     */
-    playoff_average?: number | null;
-    /**
-     * Playoff type, may be null.
-     */
-    playoff_type: number | null;
-    /**
-     * Match level, qm/ef/qf/sf/f.
-     */
-    level: CompLevel;
-    /**
-     * W-L-T record for the alliance, may be null.
-     */
-    record: WltRecord | null;
-    /**
-     * W-L-T record for the alliance at the current level, may be null.
-     */
-    current_level_record: WltRecord | null;
-    /**
-     * Status of the alliance.
-     */
-    status: 'eliminated' | 'playing' | 'won';
-    /**
-     * Whether the alliance advanced to round robin finals.
-     */
-    advanced_to_round_robin_finals?: boolean;
-    double_elim_round?: DoubleElimRound;
-    /**
-     * Rank in round robin play.
-     */
-    round_robin_rank?: number;
-  };
-};
+export type MobilityRobot2023 = 'No' | 'Yes';
 
-export type Award = {
-  /**
-   * The name of the award as provided by FIRST. May vary for the same award type.
-   */
+export type NotablesInsight = {
+  data: {
+    entries: Array<{
+      /**
+       * A list of events this team achieved the notable at. This type may change over time.
+       */
+      context: Array<string>;
+      team_key: string;
+    }>;
+  };
   name: string;
-  /**
-   * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py#L8
-   */
-  award_type: AwardType;
-  /**
-   * The event_key of the event the award was won at.
-   */
-  event_key: string;
-  /**
-   * A list of recipients of the award at the event. May have either a team_key or an awardee, both, or neither (in the case the award wasn't awarded at the event).
-   */
-  recipient_list: Array<AwardRecipient>;
-  /**
-   * The year this award was won.
-   */
   year: number;
 };
 
-/**
- * An `Award_Recipient` object represents the team and/or person who received an award at an event.
- */
-export type AwardRecipient = {
-  /**
-   * The TBA team key for the team that was given the award. May be null.
-   */
-  team_key: string | null;
-  /**
-   * The name of the individual given the award. May be null.
-   */
-  awardee: string | null;
-};
+export type Position2016 =
+  | ''
+  | 'A_ChevalDeFrise'
+  | 'A_Portcullis'
+  | 'B_Moat'
+  | 'B_Ramparts'
+  | 'C_Drawbridge'
+  | 'C_SallyPort'
+  | 'D_RockWall'
+  | 'D_RoughTerrain'
+  | 'NotSpecified';
 
-export type District = {
-  /**
-   * The short identifier for the district.
-   */
-  abbreviation: string;
-  /**
-   * The long name for the district.
-   */
-  display_name: string;
-  /**
-   * Key for this district, e.g. `2016ne`.
-   */
-  key: string;
-  /**
-   * Year this district participated.
-   */
-  year: number;
-};
+export type PreMatchBay2019 = 'Cargo' | 'Panel' | 'Unknown';
 
-export type DistrictInsight = {
-  district_data: {
-    region_data: {
-      [key: string]: DistrictInsightRegionData;
-    } | null;
-    district_wide_data: DistrictInsightRegionData | null;
-  };
-  team_data: {
-    [key: string]: {
-      district_seasons: number;
-      total_district_points: number;
-      total_pre_dcmp_district_points: number;
-      district_event_wins: number;
-      dcmp_wins: number;
-      team_awards: number;
-      individual_awards: number;
-      quals_record: WltRecord;
-      elims_record: WltRecord;
-      in_district_extra_play_count: number;
-      total_matches_played: number;
-      dcmp_appearances: number;
-      cmp_appearances: number;
-    };
-  } | null;
-};
-
-export type DistrictInsightRegionData = {
-  /**
-   * Map of year to number of active teams
-   */
-  yearly_active_team_count: {
-    [key: string]: number;
-  };
-  /**
-   * Map of year to number of events
-   */
-  yearly_event_count: {
-    [key: string]: number;
-  };
-  /**
-   * Map of year to list of team keys gained
-   */
-  yearly_gained_teams: {
-    [key: string]: Array<string>;
-  };
-  /**
-   * Map of year to list of team keys lost
-   */
-  yearly_lost_teams: {
-    [key: string]: Array<string>;
-  };
-};
-
-/**
- * Rank of a team in a district.
- */
-export type DistrictRanking = {
-  /**
-   * TBA team key for the team.
-   */
-  team_key: string;
-  /**
-   * Numerical rank of the team, 1 being top rank.
-   */
-  rank: number;
-  /**
-   * Any points added to a team as a result of the rookie bonus.
-   */
-  rookie_bonus: number;
-  /**
-   * Total district points for the team.
-   */
-  point_total: number;
-  /**
-   * List of events that contributed to the point total for the team.
-   */
-  event_points: Array<{
-    /**
-     * `true` if this event is a District Championship event.
-     */
-    district_cmp: boolean;
-    /**
-     * Total points awarded at this event.
-     */
-    total: number;
-    /**
-     * Points awarded for alliance selection.
-     */
-    alliance_points: number;
-    /**
-     * Points awarded for elimination match performance.
-     */
-    elim_points: number;
-    /**
-     * Points awarded for event awards.
-     */
-    award_points: number;
-    /**
-     * TBA Event key for this event.
-     */
-    event_key: string;
-    /**
-     * Points awarded for qualification match performance.
-     */
-    qual_points: number;
-  }>;
-  /**
-   * Any points adjustments applied to the team.
-   */
-  adjustments?: number;
-  /**
-   * Any other bonus points awarded to the team.
-   */
-  other_bonus?: number;
-};
-
-/**
- * Advancement status of a team in a district.
- */
-export type DistrictAdvancement = {
-  /**
-   * Whether or not the team qualified for their District Championship
-   */
-  dcmp: boolean;
-  /**
-   * Whether or not the team qualified for the FIRST Championship
-   */
-  cmp: boolean;
+export type ReefRow2025 = {
+  nodeA: boolean;
+  nodeB: boolean;
+  nodeC: boolean;
+  nodeD: boolean;
+  nodeE: boolean;
+  nodeF: boolean;
+  nodeG: boolean;
+  nodeH: boolean;
+  nodeI: boolean;
+  nodeJ: boolean;
+  nodeK: boolean;
+  nodeL: boolean;
 };
 
 /**
@@ -2401,6 +2137,291 @@ export type RegionalRanking = {
   }>;
 };
 
+export type RobotAuto2016WithUnknown =
+  | 'Crossed'
+  | 'None'
+  | 'Reached'
+  | 'Unknown';
+
+export type RobotAuto2016WithoutUnknown = 'Crossed' | 'Reached' | 'None';
+
+export type RobotAuto2017 = 'Mobility' | 'None' | 'Unknown';
+
+export type SearchIndex = {
+  teams: Array<{
+    key: string;
+    nickname: string;
+  }>;
+  events: Array<{
+    key: string;
+    name: string;
+  }>;
+};
+
+export type Stage3TargetColor2020 =
+  | 'Blue'
+  | 'Green'
+  | 'Red'
+  | 'Unknown'
+  | 'Yellow';
+
+export type TaxiRobot2022 = 'No' | 'Yes';
+
+export type Team = {
+  /**
+   * TBA team key with the format `frcXXXX` with `XXXX` representing the team number.
+   */
+  key: string;
+  /**
+   * Official team number issued by FIRST.
+   */
+  team_number: number;
+  /**
+   * Team nickname provided by FIRST.
+   */
+  nickname: string;
+  /**
+   * Official long name registered with FIRST.
+   */
+  name: string;
+  /**
+   * Name of team school or affilited group registered with FIRST.
+   */
+  school_name: string | null;
+  /**
+   * City of team derived from parsing the address registered with FIRST.
+   */
+  city: string | null;
+  /**
+   * State of team derived from parsing the address registered with FIRST.
+   */
+  state_prov: string | null;
+  /**
+   * Country of team derived from parsing the address registered with FIRST.
+   */
+  country: string | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  address: string | null;
+  /**
+   * Postal code from the team address.
+   */
+  postal_code: string | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  gmaps_place_id: string | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  gmaps_url: string | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  lat: number | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  lng: number | null;
+  /**
+   * Will be NULL, for future development.
+   */
+  location_name: string | null;
+  /**
+   * Official website associated with the team.
+   */
+  website: string | null;
+  /**
+   * First year the team officially competed.
+   */
+  rookie_year: number | null;
+  /**
+   * Team's motto or tagline.
+   */
+  motto: string | null;
+};
+
+export type TeamEventStatus = {
+  qual?: TeamEventStatusRank | null;
+  alliance?: TeamEventStatusAlliance | null;
+  playoff?: TeamEventStatusPlayoff | null;
+  /**
+   * An HTML formatted string suitable for display to the user containing the team's alliance pick status.
+   */
+  alliance_status_str?: string;
+  /**
+   * An HTML formatter string suitable for display to the user containing the team's playoff status.
+   */
+  playoff_status_str?: string;
+  /**
+   * An HTML formatted string suitable for display to the user containing the team's overall status summary of the event.
+   */
+  overall_status_str?: string;
+  /**
+   * TBA match key for the next match the team is scheduled to play in at this event, or null.
+   */
+  next_match_key?: string | null;
+  /**
+   * TBA match key for the last match the team played in at this event, or null.
+   */
+  last_match_key?: string | null;
+};
+
+export type TeamEventStatusAlliance = {
+  /**
+   * Alliance name, may be null.
+   */
+  name?: string | null;
+  /**
+   * Alliance number.
+   */
+  number: number;
+  backup?: TeamEventStatusAllianceBackup;
+  /**
+   * Order the team was picked in the alliance from 0-2, with 0 being alliance captain.
+   */
+  pick: number;
+};
+
+/**
+ * Backup status, may be null.
+ */
+export type TeamEventStatusAllianceBackup = null | {
+  /**
+   * TBA key for the team replaced by the backup.
+   */
+  out?: string;
+  /**
+   * TBA key for the backup team called in.
+   */
+  in?: string;
+};
+
+/**
+ * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
+ */
+export type TeamEventStatusPlayoff = null | {
+  level?: CompLevel;
+  current_level_record?: WltRecord | null;
+  record?: WltRecord | null;
+  /**
+   * Current competition status for the playoffs.
+   */
+  status?: 'won' | 'eliminated' | 'playing';
+  /**
+   * The average match score during playoffs. Year specific. May be null if not relevant for a given year.
+   */
+  playoff_average?: null | number;
+};
+
+export type TeamEventStatusRank = {
+  /**
+   * Number of teams ranked.
+   */
+  num_teams?: number;
+  ranking?: {
+    /**
+     * Number of matches played.
+     */
+    matches_played?: number;
+    /**
+     * For some years, average qualification score. Can be null.
+     */
+    qual_average?: number | null;
+    /**
+     * Ordered list of values used to determine the rank. See the `sort_order_info` property for the name of each value.
+     */
+    sort_orders?: Array<number> | null;
+    record?: WltRecord | null;
+    /**
+     * Relative rank of this team.
+     */
+    rank?: number | null;
+    /**
+     * Number of matches the team was disqualified for.
+     */
+    dq?: number | null;
+    /**
+     * TBA team key for this rank.
+     */
+    team_key?: string;
+  } | null;
+  /**
+   * Ordered list of names corresponding to the elements of the `sort_orders` array.
+   */
+  sort_order_info?: Array<{
+    /**
+     * The number of digits of precision used for this value, eg `2` would correspond to a value of `101.11` while `0` would correspond to `101`.
+     */
+    precision?: number;
+    /**
+     * The descriptive name of the value used to sort the ranking.
+     */
+    name?: string;
+  }> | null;
+  status?: string;
+};
+
+export type TeamRobot = {
+  /**
+   * Year this robot competed in.
+   */
+  year: number;
+  /**
+   * Name of the robot as provided by the team.
+   */
+  robot_name: string;
+  /**
+   * Internal TBA identifier for this robot.
+   */
+  key: string;
+  /**
+   * TBA team key for this robot.
+   */
+  team_key: string;
+};
+
+export type TeamSimple = {
+  /**
+   * TBA team key with the format `frcXXXX` with `XXXX` representing the team number.
+   */
+  key: string;
+  /**
+   * Official team number issued by FIRST.
+   */
+  team_number: number;
+  /**
+   * Team nickname provided by FIRST.
+   */
+  nickname: string;
+  /**
+   * Official long name registered with FIRST.
+   */
+  name: string;
+  /**
+   * City of team derived from parsing the address registered with FIRST.
+   */
+  city: string | null;
+  /**
+   * State of team derived from parsing the address registered with FIRST.
+   */
+  state_prov: string | null;
+  /**
+   * Country of team derived from parsing the address registered with FIRST.
+   */
+  country: string | null;
+};
+
+export type Touchpad2017 = 'None' | 'ReadyForTakeoff';
+
+export type TowerFace2016 =
+  | 'Both'
+  | 'Challenged'
+  | 'None'
+  | 'Scaled'
+  | 'Unknown';
+
 /**
  * A Win-Loss-Tie record for a team, or an alliance.
  */
@@ -2450,72 +2471,41 @@ export type Webcast = {
   file?: string | null;
 };
 
-export type LeaderboardInsight = {
-  data: {
-    rankings: Array<{
-      /**
-       * Value of the insight that the corresponding team/event/matches have, e.g. number of blue banners, or number of matches played.
-       */
-      value: number;
-      /**
-       * Team/Event/Match keys that have the corresponding value.
-       */
-      keys: Array<string>;
-    }>;
+export type Zebra = {
+  /**
+   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
+   */
+  key: string;
+  /**
+   * A list of relative timestamps for each data point. Each timestamp will correspond to the X and Y value at the same index in a team xs and ys arrays. `times`, all teams `xs` and all teams `ys` are guarenteed to be the same length.
+   */
+  times: Array<number>;
+  alliances: {
     /**
-     * What type of key is used in the rankings; either 'team', 'event', or 'match'.
+     * Zebra MotionWorks data for teams on the red alliance
      */
-    key_type: 'team' | 'event' | 'match';
+    red?: Array<ZebraTeam>;
+    /**
+     * Zebra data for teams on the blue alliance
+     */
+    blue?: Array<ZebraTeam>;
   };
+};
+
+export type ZebraTeam = {
   /**
-   * Name of the insight.
+   * The TBA team key for the Zebra MotionWorks data.
    */
-  name: string;
+  team_key: string;
   /**
-   * Year the insight was measured in (year=0 for overall insights).
+   * A list containing doubles and nulls representing a teams X position in feet at the corresponding timestamp. A null value represents no tracking data for a given timestamp.
    */
-  year: number;
+  xs: Array<number>;
+  /**
+   * A list containing doubles and nulls representing a teams Y position in feet at the corresponding timestamp. A null value represents no tracking data for a given timestamp.
+   */
+  ys: Array<number>;
 };
-
-export type NotablesInsight = {
-  data: {
-    entries: Array<{
-      /**
-       * A list of events this team achieved the notable at. This type may change over time.
-       */
-      context: Array<string>;
-      team_key: string;
-    }>;
-  };
-  name: string;
-  year: number;
-};
-
-export type History = {
-  events: Array<Event>;
-  awards: Array<Award>;
-};
-
-export type SearchIndex = {
-  teams: Array<{
-    key: string;
-    nickname: string;
-  }>;
-  events: Array<{
-    key: string;
-    name: string;
-  }>;
-};
-
-/**
- * Competition Year (or Season). Must be 4 digits.
- */
-export type Year = number;
-
-/**
- * Media Tag which describes the Media.
- */
-export type MediaTag = string;
 
 /**
  * Value of the `ETag` header in the most recently cached response by the client.
@@ -2523,14 +2513,9 @@ export type MediaTag = string;
 export type IfNoneMatch = string;
 
 /**
- * Page number of results to return, zero-indexed
+ * District abbreviation, eg `ne` or `fim`
  */
-export type PageNum = number;
-
-/**
- * TBA Match Key, eg `2016nytr_qm1`
- */
-export type MatchKey = string;
+export type DistrictAbbreviation = string;
 
 /**
  * TBA District Key, eg `2016fim`
@@ -2538,21 +2523,36 @@ export type MatchKey = string;
 export type DistrictKey = string;
 
 /**
- * TBA Team Key, eg `frc254`
- */
-export type TeamKey = string;
-
-/**
  * TBA Event Key, eg `2016nytr`
  */
 export type EventKey = string;
 
 /**
- * District abbreviation, eg `ne` or `fim`
+ * TBA Match Key, eg `2016nytr_qm1`
  */
-export type DistrictAbbreviation = string;
+export type MatchKey = string;
 
-export type GetStatusData = {
+/**
+ * Media Tag which describes the Media.
+ */
+export type MediaTag = string;
+
+/**
+ * Page number of results to return, zero-indexed
+ */
+export type PageNum = number;
+
+/**
+ * TBA Team Key, eg `frc254`
+ */
+export type TeamKey = string;
+
+/**
+ * Competition Year (or Season). Must be 4 digits.
+ */
+export type Year = number;
+
+export type GetDistrictDcmpHistoryData = {
   body?: never;
   headers?: {
     /**
@@ -2560,12 +2560,17 @@ export type GetStatusData = {
      */
     'If-None-Match'?: string;
   };
-  path?: never;
+  path: {
+    /**
+     * District abbreviation, eg `ne` or `fim`
+     */
+    district_abbreviation: string;
+  };
   query?: never;
-  url: '/status';
+  url: '/district/{district_abbreviation}/dcmp_history';
 };
 
-export type GetStatusErrors = {
+export type GetDistrictDcmpHistoryErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -2581,18 +2586,23 @@ export type GetStatusErrors = {
   404: unknown;
 };
 
-export type GetStatusError = GetStatusErrors[keyof GetStatusErrors];
+export type GetDistrictDcmpHistoryError =
+  GetDistrictDcmpHistoryErrors[keyof GetDistrictDcmpHistoryErrors];
 
-export type GetStatusResponses = {
+export type GetDistrictDcmpHistoryResponses = {
   /**
    * Successful response
    */
-  200: ApiStatus;
+  200: Array<{
+    awards?: Array<Award>;
+    event?: Event;
+  }>;
 };
 
-export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
+export type GetDistrictDcmpHistoryResponse =
+  GetDistrictDcmpHistoryResponses[keyof GetDistrictDcmpHistoryResponses];
 
-export type GetTeamsData = {
+export type GetDistrictHistoryData = {
   body?: never;
   headers?: {
     /**
@@ -2602,15 +2612,15 @@ export type GetTeamsData = {
   };
   path: {
     /**
-     * Page number of results to return, zero-indexed
+     * District abbreviation, eg `ne` or `fim`
      */
-    page_num: number;
+    district_abbreviation: string;
   };
   query?: never;
-  url: '/teams/{page_num}';
+  url: '/district/{district_abbreviation}/history';
 };
 
-export type GetTeamsErrors = {
+export type GetDistrictHistoryErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -2626,496 +2636,20 @@ export type GetTeamsErrors = {
   404: unknown;
 };
 
-export type GetTeamsError = GetTeamsErrors[keyof GetTeamsErrors];
+export type GetDistrictHistoryError =
+  GetDistrictHistoryErrors[keyof GetDistrictHistoryErrors];
 
-export type GetTeamsResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Team>;
-};
-
-export type GetTeamsResponse = GetTeamsResponses[keyof GetTeamsResponses];
-
-export type GetTeamsSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Page number of results to return, zero-indexed
-     */
-    page_num: number;
-  };
-  query?: never;
-  url: '/teams/{page_num}/simple';
-};
-
-export type GetTeamsSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamsSimpleError =
-  GetTeamsSimpleErrors[keyof GetTeamsSimpleErrors];
-
-export type GetTeamsSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<TeamSimple>;
-};
-
-export type GetTeamsSimpleResponse =
-  GetTeamsSimpleResponses[keyof GetTeamsSimpleResponses];
-
-export type GetTeamsKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Page number of results to return, zero-indexed
-     */
-    page_num: number;
-  };
-  query?: never;
-  url: '/teams/{page_num}/keys';
-};
-
-export type GetTeamsKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamsKeysError = GetTeamsKeysErrors[keyof GetTeamsKeysErrors];
-
-export type GetTeamsKeysResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<string>;
-};
-
-export type GetTeamsKeysResponse =
-  GetTeamsKeysResponses[keyof GetTeamsKeysResponses];
-
-export type GetTeamsByYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-    /**
-     * Page number of results to return, zero-indexed
-     */
-    page_num: number;
-  };
-  query?: never;
-  url: '/teams/{year}/{page_num}';
-};
-
-export type GetTeamsByYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamsByYearError =
-  GetTeamsByYearErrors[keyof GetTeamsByYearErrors];
-
-export type GetTeamsByYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Team>;
-};
-
-export type GetTeamsByYearResponse =
-  GetTeamsByYearResponses[keyof GetTeamsByYearResponses];
-
-export type GetTeamsByYearSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-    /**
-     * Page number of results to return, zero-indexed
-     */
-    page_num: number;
-  };
-  query?: never;
-  url: '/teams/{year}/{page_num}/simple';
-};
-
-export type GetTeamsByYearSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamsByYearSimpleError =
-  GetTeamsByYearSimpleErrors[keyof GetTeamsByYearSimpleErrors];
-
-export type GetTeamsByYearSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<TeamSimple>;
-};
-
-export type GetTeamsByYearSimpleResponse =
-  GetTeamsByYearSimpleResponses[keyof GetTeamsByYearSimpleResponses];
-
-export type GetTeamsByYearKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-    /**
-     * Page number of results to return, zero-indexed
-     */
-    page_num: number;
-  };
-  query?: never;
-  url: '/teams/{year}/{page_num}/keys';
-};
-
-export type GetTeamsByYearKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamsByYearKeysError =
-  GetTeamsByYearKeysErrors[keyof GetTeamsByYearKeysErrors];
-
-export type GetTeamsByYearKeysResponses = {
-  /**
-   * Array of Team Keys
-   */
-  200: Array<string>;
-};
-
-export type GetTeamsByYearKeysResponse =
-  GetTeamsByYearKeysResponses[keyof GetTeamsByYearKeysResponses];
-
-export type GetTeamData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}';
-};
-
-export type GetTeamErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamError = GetTeamErrors[keyof GetTeamErrors];
-
-export type GetTeamResponses = {
-  /**
-   * Successful response
-   */
-  200: Team;
-};
-
-export type GetTeamResponse = GetTeamResponses[keyof GetTeamResponses];
-
-export type GetTeamSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/simple';
-};
-
-export type GetTeamSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamSimpleError = GetTeamSimpleErrors[keyof GetTeamSimpleErrors];
-
-export type GetTeamSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: TeamSimple;
-};
-
-export type GetTeamSimpleResponse =
-  GetTeamSimpleResponses[keyof GetTeamSimpleResponses];
-
-export type GetTeamHistoryData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/history';
-};
-
-export type GetTeamHistoryErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamHistoryError =
-  GetTeamHistoryErrors[keyof GetTeamHistoryErrors];
-
-export type GetTeamHistoryResponses = {
-  /**
-   * Successful response with team's history including events and awards.
-   */
-  200: History;
-};
-
-export type GetTeamHistoryResponse =
-  GetTeamHistoryResponses[keyof GetTeamHistoryResponses];
-
-export type GetTeamYearsParticipatedData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/years_participated';
-};
-
-export type GetTeamYearsParticipatedErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamYearsParticipatedError =
-  GetTeamYearsParticipatedErrors[keyof GetTeamYearsParticipatedErrors];
-
-export type GetTeamYearsParticipatedResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<number>;
-};
-
-export type GetTeamYearsParticipatedResponse =
-  GetTeamYearsParticipatedResponses[keyof GetTeamYearsParticipatedResponses];
-
-export type GetTeamDistrictsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/districts';
-};
-
-export type GetTeamDistrictsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamDistrictsError =
-  GetTeamDistrictsErrors[keyof GetTeamDistrictsErrors];
-
-export type GetTeamDistrictsResponses = {
+export type GetDistrictHistoryResponses = {
   /**
    * Successful response
    */
   200: Array<District>;
 };
 
-export type GetTeamDistrictsResponse =
-  GetTeamDistrictsResponses[keyof GetTeamDistrictsResponses];
+export type GetDistrictHistoryResponse =
+  GetDistrictHistoryResponses[keyof GetDistrictHistoryResponses];
 
-export type GetTeamRobotsData = {
+export type GetDistrictInsightsData = {
   body?: never;
   headers?: {
     /**
@@ -3125,15 +2659,15 @@ export type GetTeamRobotsData = {
   };
   path: {
     /**
-     * TBA Team Key, eg `frc254`
+     * District abbreviation, eg `ne` or `fim`
      */
-    team_key: string;
+    district_abbreviation: string;
   };
   query?: never;
-  url: '/team/{team_key}/robots';
+  url: '/district/{district_abbreviation}/insights';
 };
 
-export type GetTeamRobotsErrors = {
+export type GetDistrictInsightsErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -3149,19 +2683,20 @@ export type GetTeamRobotsErrors = {
   404: unknown;
 };
 
-export type GetTeamRobotsError = GetTeamRobotsErrors[keyof GetTeamRobotsErrors];
+export type GetDistrictInsightsError =
+  GetDistrictInsightsErrors[keyof GetDistrictInsightsErrors];
 
-export type GetTeamRobotsResponses = {
+export type GetDistrictInsightsResponses = {
   /**
    * Successful response
    */
-  200: Array<TeamRobot>;
+  200: DistrictInsight;
 };
 
-export type GetTeamRobotsResponse =
-  GetTeamRobotsResponses[keyof GetTeamRobotsResponses];
+export type GetDistrictInsightsResponse =
+  GetDistrictInsightsResponses[keyof GetDistrictInsightsResponses];
 
-export type GetTeamEventsData = {
+export type GetDistrictAdvancementData = {
   body?: never;
   headers?: {
     /**
@@ -3171,15 +2706,15 @@ export type GetTeamEventsData = {
   };
   path: {
     /**
-     * TBA Team Key, eg `frc254`
+     * TBA District Key, eg `2016fim`
      */
-    team_key: string;
+    district_key: string;
   };
   query?: never;
-  url: '/team/{team_key}/events';
+  url: '/district/{district_key}/advancement';
 };
 
-export type GetTeamEventsErrors = {
+export type GetDistrictAdvancementErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -3195,19 +2730,22 @@ export type GetTeamEventsErrors = {
   404: unknown;
 };
 
-export type GetTeamEventsError = GetTeamEventsErrors[keyof GetTeamEventsErrors];
+export type GetDistrictAdvancementError =
+  GetDistrictAdvancementErrors[keyof GetDistrictAdvancementErrors];
 
-export type GetTeamEventsResponses = {
+export type GetDistrictAdvancementResponses = {
   /**
-   * Successful response
+   * A mapping of team key to District_Advancement
    */
-  200: Array<Event>;
+  200: null | {
+    [key: string]: DistrictAdvancement;
+  };
 };
 
-export type GetTeamEventsResponse =
-  GetTeamEventsResponses[keyof GetTeamEventsResponses];
+export type GetDistrictAdvancementResponse =
+  GetDistrictAdvancementResponses[keyof GetDistrictAdvancementResponses];
 
-export type GetTeamEventsSimpleData = {
+export type GetDistrictAwardsData = {
   body?: never;
   headers?: {
     /**
@@ -3217,15 +2755,15 @@ export type GetTeamEventsSimpleData = {
   };
   path: {
     /**
-     * TBA Team Key, eg `frc254`
+     * TBA District Key, eg `2016fim`
      */
-    team_key: string;
+    district_key: string;
   };
   query?: never;
-  url: '/team/{team_key}/events/simple';
+  url: '/district/{district_key}/awards';
 };
 
-export type GetTeamEventsSimpleErrors = {
+export type GetDistrictAwardsErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -3241,477 +2779,20 @@ export type GetTeamEventsSimpleErrors = {
   404: unknown;
 };
 
-export type GetTeamEventsSimpleError =
-  GetTeamEventsSimpleErrors[keyof GetTeamEventsSimpleErrors];
+export type GetDistrictAwardsError =
+  GetDistrictAwardsErrors[keyof GetDistrictAwardsErrors];
 
-export type GetTeamEventsSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<EventSimple>;
-};
-
-export type GetTeamEventsSimpleResponse =
-  GetTeamEventsSimpleResponses[keyof GetTeamEventsSimpleResponses];
-
-export type GetTeamEventsKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/events/keys';
-};
-
-export type GetTeamEventsKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventsKeysError =
-  GetTeamEventsKeysErrors[keyof GetTeamEventsKeysErrors];
-
-export type GetTeamEventsKeysResponses = {
-  /**
-   * Array of Event Keys
-   */
-  200: Array<string>;
-};
-
-export type GetTeamEventsKeysResponse =
-  GetTeamEventsKeysResponses[keyof GetTeamEventsKeysResponses];
-
-export type GetTeamEventsByYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/events/{year}';
-};
-
-export type GetTeamEventsByYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventsByYearError =
-  GetTeamEventsByYearErrors[keyof GetTeamEventsByYearErrors];
-
-export type GetTeamEventsByYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Event>;
-};
-
-export type GetTeamEventsByYearResponse =
-  GetTeamEventsByYearResponses[keyof GetTeamEventsByYearResponses];
-
-export type GetTeamEventsByYearSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/events/{year}/simple';
-};
-
-export type GetTeamEventsByYearSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventsByYearSimpleError =
-  GetTeamEventsByYearSimpleErrors[keyof GetTeamEventsByYearSimpleErrors];
-
-export type GetTeamEventsByYearSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<EventSimple>;
-};
-
-export type GetTeamEventsByYearSimpleResponse =
-  GetTeamEventsByYearSimpleResponses[keyof GetTeamEventsByYearSimpleResponses];
-
-export type GetTeamEventsByYearKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/events/{year}/keys';
-};
-
-export type GetTeamEventsByYearKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventsByYearKeysError =
-  GetTeamEventsByYearKeysErrors[keyof GetTeamEventsByYearKeysErrors];
-
-export type GetTeamEventsByYearKeysResponses = {
-  /**
-   * Array of Event Keys
-   */
-  200: Array<string>;
-};
-
-export type GetTeamEventsByYearKeysResponse =
-  GetTeamEventsByYearKeysResponses[keyof GetTeamEventsByYearKeysResponses];
-
-export type GetTeamEventsStatusesByYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/events/{year}/statuses';
-};
-
-export type GetTeamEventsStatusesByYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventsStatusesByYearError =
-  GetTeamEventsStatusesByYearErrors[keyof GetTeamEventsStatusesByYearErrors];
-
-export type GetTeamEventsStatusesByYearResponses = {
-  /**
-   * A key-value pair of `Team_Event_Status` objects with the event key as the key.
-   */
-  200: {
-    [key: string]: TeamEventStatus | null;
-  };
-};
-
-export type GetTeamEventsStatusesByYearResponse =
-  GetTeamEventsStatusesByYearResponses[keyof GetTeamEventsStatusesByYearResponses];
-
-export type GetTeamEventMatchesData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/event/{event_key}/matches';
-};
-
-export type GetTeamEventMatchesErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventMatchesError =
-  GetTeamEventMatchesErrors[keyof GetTeamEventMatchesErrors];
-
-export type GetTeamEventMatchesResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Match>;
-};
-
-export type GetTeamEventMatchesResponse =
-  GetTeamEventMatchesResponses[keyof GetTeamEventMatchesResponses];
-
-export type GetTeamEventMatchesSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/event/{event_key}/matches/simple';
-};
-
-export type GetTeamEventMatchesSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventMatchesSimpleError =
-  GetTeamEventMatchesSimpleErrors[keyof GetTeamEventMatchesSimpleErrors];
-
-export type GetTeamEventMatchesSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Match>;
-};
-
-export type GetTeamEventMatchesSimpleResponse =
-  GetTeamEventMatchesSimpleResponses[keyof GetTeamEventMatchesSimpleResponses];
-
-export type GetTeamEventMatchesKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/event/{event_key}/matches/keys';
-};
-
-export type GetTeamEventMatchesKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventMatchesKeysError =
-  GetTeamEventMatchesKeysErrors[keyof GetTeamEventMatchesKeysErrors];
-
-export type GetTeamEventMatchesKeysResponses = {
-  /**
-   * Array of Match Keys
-   */
-  200: Array<string>;
-};
-
-export type GetTeamEventMatchesKeysResponse =
-  GetTeamEventMatchesKeysResponses[keyof GetTeamEventMatchesKeysResponses];
-
-export type GetTeamEventAwardsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/event/{event_key}/awards';
-};
-
-export type GetTeamEventAwardsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamEventAwardsError =
-  GetTeamEventAwardsErrors[keyof GetTeamEventAwardsErrors];
-
-export type GetTeamEventAwardsResponses = {
+export type GetDistrictAwardsResponses = {
   /**
    * Successful response
    */
   200: Array<Award>;
 };
 
-export type GetTeamEventAwardsResponse =
-  GetTeamEventAwardsResponses[keyof GetTeamEventAwardsResponses];
+export type GetDistrictAwardsResponse =
+  GetDistrictAwardsResponses[keyof GetDistrictAwardsResponses];
 
-export type GetTeamEventStatusData = {
+export type GetDistrictEventsData = {
   body?: never;
   headers?: {
     /**
@@ -3721,19 +2802,15 @@ export type GetTeamEventStatusData = {
   };
   path: {
     /**
-     * TBA Team Key, eg `frc254`
+     * TBA District Key, eg `2016fim`
      */
-    team_key: string;
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
+    district_key: string;
   };
   query?: never;
-  url: '/team/{team_key}/event/{event_key}/status';
+  url: '/district/{district_key}/events';
 };
 
-export type GetTeamEventStatusErrors = {
+export type GetDistrictEventsErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -3749,521 +2826,20 @@ export type GetTeamEventStatusErrors = {
   404: unknown;
 };
 
-export type GetTeamEventStatusError =
-  GetTeamEventStatusErrors[keyof GetTeamEventStatusErrors];
+export type GetDistrictEventsError =
+  GetDistrictEventsErrors[keyof GetDistrictEventsErrors];
 
-export type GetTeamEventStatusResponses = {
-  /**
-   * Successful response
-   */
-  200: TeamEventStatus | null;
-};
-
-export type GetTeamEventStatusResponse =
-  GetTeamEventStatusResponses[keyof GetTeamEventStatusResponses];
-
-export type GetTeamAwardsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/awards';
-};
-
-export type GetTeamAwardsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamAwardsError = GetTeamAwardsErrors[keyof GetTeamAwardsErrors];
-
-export type GetTeamAwardsResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Award>;
-};
-
-export type GetTeamAwardsResponse =
-  GetTeamAwardsResponses[keyof GetTeamAwardsResponses];
-
-export type GetTeamAwardsByYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/awards/{year}';
-};
-
-export type GetTeamAwardsByYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamAwardsByYearError =
-  GetTeamAwardsByYearErrors[keyof GetTeamAwardsByYearErrors];
-
-export type GetTeamAwardsByYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Award>;
-};
-
-export type GetTeamAwardsByYearResponse =
-  GetTeamAwardsByYearResponses[keyof GetTeamAwardsByYearResponses];
-
-export type GetTeamMatchesByYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/matches/{year}';
-};
-
-export type GetTeamMatchesByYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamMatchesByYearError =
-  GetTeamMatchesByYearErrors[keyof GetTeamMatchesByYearErrors];
-
-export type GetTeamMatchesByYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Match>;
-};
-
-export type GetTeamMatchesByYearResponse =
-  GetTeamMatchesByYearResponses[keyof GetTeamMatchesByYearResponses];
-
-export type GetTeamMatchesByYearSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/matches/{year}/simple';
-};
-
-export type GetTeamMatchesByYearSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamMatchesByYearSimpleError =
-  GetTeamMatchesByYearSimpleErrors[keyof GetTeamMatchesByYearSimpleErrors];
-
-export type GetTeamMatchesByYearSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<MatchSimple>;
-};
-
-export type GetTeamMatchesByYearSimpleResponse =
-  GetTeamMatchesByYearSimpleResponses[keyof GetTeamMatchesByYearSimpleResponses];
-
-export type GetTeamMatchesByYearKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/matches/{year}/keys';
-};
-
-export type GetTeamMatchesByYearKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamMatchesByYearKeysError =
-  GetTeamMatchesByYearKeysErrors[keyof GetTeamMatchesByYearKeysErrors];
-
-export type GetTeamMatchesByYearKeysResponses = {
-  /**
-   * Array of Match Keys
-   */
-  200: Array<string>;
-};
-
-export type GetTeamMatchesByYearKeysResponse =
-  GetTeamMatchesByYearKeysResponses[keyof GetTeamMatchesByYearKeysResponses];
-
-export type GetTeamMediaByYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/media/{year}';
-};
-
-export type GetTeamMediaByYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamMediaByYearError =
-  GetTeamMediaByYearErrors[keyof GetTeamMediaByYearErrors];
-
-export type GetTeamMediaByYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Media>;
-};
-
-export type GetTeamMediaByYearResponse =
-  GetTeamMediaByYearResponses[keyof GetTeamMediaByYearResponses];
-
-export type GetTeamMediaByTagData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Media Tag which describes the Media.
-     */
-    media_tag: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/media/tag/{media_tag}';
-};
-
-export type GetTeamMediaByTagErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamMediaByTagError =
-  GetTeamMediaByTagErrors[keyof GetTeamMediaByTagErrors];
-
-export type GetTeamMediaByTagResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Media>;
-};
-
-export type GetTeamMediaByTagResponse =
-  GetTeamMediaByTagResponses[keyof GetTeamMediaByTagResponses];
-
-export type GetTeamMediaByTagYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-    /**
-     * Media Tag which describes the Media.
-     */
-    media_tag: string;
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/team/{team_key}/media/tag/{media_tag}/{year}';
-};
-
-export type GetTeamMediaByTagYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamMediaByTagYearError =
-  GetTeamMediaByTagYearErrors[keyof GetTeamMediaByTagYearErrors];
-
-export type GetTeamMediaByTagYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Media>;
-};
-
-export type GetTeamMediaByTagYearResponse =
-  GetTeamMediaByTagYearResponses[keyof GetTeamMediaByTagYearResponses];
-
-export type GetTeamSocialMediaData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Team Key, eg `frc254`
-     */
-    team_key: string;
-  };
-  query?: never;
-  url: '/team/{team_key}/social_media';
-};
-
-export type GetTeamSocialMediaErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetTeamSocialMediaError =
-  GetTeamSocialMediaErrors[keyof GetTeamSocialMediaErrors];
-
-export type GetTeamSocialMediaResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Media>;
-};
-
-export type GetTeamSocialMediaResponse =
-  GetTeamSocialMediaResponses[keyof GetTeamSocialMediaResponses];
-
-export type GetEventsByYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/events/{year}';
-};
-
-export type GetEventsByYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetEventsByYearError =
-  GetEventsByYearErrors[keyof GetEventsByYearErrors];
-
-export type GetEventsByYearResponses = {
+export type GetDistrictEventsResponses = {
   /**
    * Successful response
    */
   200: Array<Event>;
 };
 
-export type GetEventsByYearResponse =
-  GetEventsByYearResponses[keyof GetEventsByYearResponses];
+export type GetDistrictEventsResponse =
+  GetDistrictEventsResponses[keyof GetDistrictEventsResponses];
 
-export type GetEventsByYearSimpleData = {
+export type GetDistrictEventsKeysData = {
   body?: never;
   headers?: {
     /**
@@ -4273,15 +2849,15 @@ export type GetEventsByYearSimpleData = {
   };
   path: {
     /**
-     * Competition Year (or Season). Must be 4 digits.
+     * TBA District Key, eg `2016fim`
      */
-    year: number;
+    district_key: string;
   };
   query?: never;
-  url: '/events/{year}/simple';
+  url: '/district/{district_key}/events/keys';
 };
 
-export type GetEventsByYearSimpleErrors = {
+export type GetDistrictEventsKeysErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -4297,65 +2873,300 @@ export type GetEventsByYearSimpleErrors = {
   404: unknown;
 };
 
-export type GetEventsByYearSimpleError =
-  GetEventsByYearSimpleErrors[keyof GetEventsByYearSimpleErrors];
+export type GetDistrictEventsKeysError =
+  GetDistrictEventsKeysErrors[keyof GetDistrictEventsKeysErrors];
 
-export type GetEventsByYearSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<EventSimple>;
-};
-
-export type GetEventsByYearSimpleResponse =
-  GetEventsByYearSimpleResponses[keyof GetEventsByYearSimpleResponses];
-
-export type GetEventsByYearKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/events/{year}/keys';
-};
-
-export type GetEventsByYearKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetEventsByYearKeysError =
-  GetEventsByYearKeysErrors[keyof GetEventsByYearKeysErrors];
-
-export type GetEventsByYearKeysResponses = {
+export type GetDistrictEventsKeysResponses = {
   /**
    * Array of Event Keys
    */
   200: Array<string>;
 };
 
-export type GetEventsByYearKeysResponse =
-  GetEventsByYearKeysResponses[keyof GetEventsByYearKeysResponses];
+export type GetDistrictEventsKeysResponse =
+  GetDistrictEventsKeysResponses[keyof GetDistrictEventsKeysResponses];
+
+export type GetDistrictEventsSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA District Key, eg `2016fim`
+     */
+    district_key: string;
+  };
+  query?: never;
+  url: '/district/{district_key}/events/simple';
+};
+
+export type GetDistrictEventsSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetDistrictEventsSimpleError =
+  GetDistrictEventsSimpleErrors[keyof GetDistrictEventsSimpleErrors];
+
+export type GetDistrictEventsSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<EventSimple>;
+};
+
+export type GetDistrictEventsSimpleResponse =
+  GetDistrictEventsSimpleResponses[keyof GetDistrictEventsSimpleResponses];
+
+export type GetDistrictRankingsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA District Key, eg `2016fim`
+     */
+    district_key: string;
+  };
+  query?: never;
+  url: '/district/{district_key}/rankings';
+};
+
+export type GetDistrictRankingsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetDistrictRankingsError =
+  GetDistrictRankingsErrors[keyof GetDistrictRankingsErrors];
+
+export type GetDistrictRankingsResponses = {
+  /**
+   * Successful response
+   */
+  200: null | Array<DistrictRanking>;
+};
+
+export type GetDistrictRankingsResponse =
+  GetDistrictRankingsResponses[keyof GetDistrictRankingsResponses];
+
+export type GetDistrictTeamsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA District Key, eg `2016fim`
+     */
+    district_key: string;
+  };
+  query?: never;
+  url: '/district/{district_key}/teams';
+};
+
+export type GetDistrictTeamsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetDistrictTeamsError =
+  GetDistrictTeamsErrors[keyof GetDistrictTeamsErrors];
+
+export type GetDistrictTeamsResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Team>;
+};
+
+export type GetDistrictTeamsResponse =
+  GetDistrictTeamsResponses[keyof GetDistrictTeamsResponses];
+
+export type GetDistrictTeamsKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA District Key, eg `2016fim`
+     */
+    district_key: string;
+  };
+  query?: never;
+  url: '/district/{district_key}/teams/keys';
+};
+
+export type GetDistrictTeamsKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetDistrictTeamsKeysError =
+  GetDistrictTeamsKeysErrors[keyof GetDistrictTeamsKeysErrors];
+
+export type GetDistrictTeamsKeysResponses = {
+  /**
+   * Array of Team Keys
+   */
+  200: Array<string>;
+};
+
+export type GetDistrictTeamsKeysResponse =
+  GetDistrictTeamsKeysResponses[keyof GetDistrictTeamsKeysResponses];
+
+export type GetDistrictTeamsSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA District Key, eg `2016fim`
+     */
+    district_key: string;
+  };
+  query?: never;
+  url: '/district/{district_key}/teams/simple';
+};
+
+export type GetDistrictTeamsSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetDistrictTeamsSimpleError =
+  GetDistrictTeamsSimpleErrors[keyof GetDistrictTeamsSimpleErrors];
+
+export type GetDistrictTeamsSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<TeamSimple>;
+};
+
+export type GetDistrictTeamsSimpleResponse =
+  GetDistrictTeamsSimpleResponses[keyof GetDistrictTeamsSimpleResponses];
+
+export type GetDistrictsByYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/districts/{year}';
+};
+
+export type GetDistrictsByYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetDistrictsByYearError =
+  GetDistrictsByYearErrors[keyof GetDistrictsByYearErrors];
+
+export type GetDistrictsByYearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<District>;
+};
+
+export type GetDistrictsByYearResponse =
+  GetDistrictsByYearResponses[keyof GetDistrictsByYearResponses];
 
 export type GetEventData = {
   body?: never;
@@ -4402,7 +3213,7 @@ export type GetEventResponses = {
 
 export type GetEventResponse = GetEventResponses[keyof GetEventResponses];
 
-export type GetEventSimpleData = {
+export type GetEventAdvancementPointsData = {
   body?: never;
   headers?: {
     /**
@@ -4417,10 +3228,10 @@ export type GetEventSimpleData = {
     event_key: string;
   };
   query?: never;
-  url: '/event/{event_key}/simple';
+  url: '/event/{event_key}/advancement_points';
 };
 
-export type GetEventSimpleErrors = {
+export type GetEventAdvancementPointsErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -4436,18 +3247,18 @@ export type GetEventSimpleErrors = {
   404: unknown;
 };
 
-export type GetEventSimpleError =
-  GetEventSimpleErrors[keyof GetEventSimpleErrors];
+export type GetEventAdvancementPointsError =
+  GetEventAdvancementPointsErrors[keyof GetEventAdvancementPointsErrors];
 
-export type GetEventSimpleResponses = {
+export type GetEventAdvancementPointsResponses = {
   /**
    * Successful response
    */
-  200: EventSimple;
+  200: EventDistrictPoints | null;
 };
 
-export type GetEventSimpleResponse =
-  GetEventSimpleResponses[keyof GetEventSimpleResponses];
+export type GetEventAdvancementPointsResponse =
+  GetEventAdvancementPointsResponses[keyof GetEventAdvancementPointsResponses];
 
 export type GetEventAlliancesData = {
   body?: never;
@@ -4496,6 +3307,146 @@ export type GetEventAlliancesResponses = {
 export type GetEventAlliancesResponse =
   GetEventAlliancesResponses[keyof GetEventAlliancesResponses];
 
+export type GetEventAwardsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/awards';
+};
+
+export type GetEventAwardsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventAwardsError =
+  GetEventAwardsErrors[keyof GetEventAwardsErrors];
+
+export type GetEventAwardsResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Award>;
+};
+
+export type GetEventAwardsResponse =
+  GetEventAwardsResponses[keyof GetEventAwardsResponses];
+
+export type GetEventCoprsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/coprs';
+};
+
+export type GetEventCoprsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventCoprsError = GetEventCoprsErrors[keyof GetEventCoprsErrors];
+
+export type GetEventCoprsResponses = {
+  /**
+   * Successful response
+   */
+  200: EventCoprs | null;
+};
+
+export type GetEventCoprsResponse =
+  GetEventCoprsResponses[keyof GetEventCoprsResponses];
+
+export type GetEventDistrictPointsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/district_points';
+};
+
+export type GetEventDistrictPointsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventDistrictPointsError =
+  GetEventDistrictPointsErrors[keyof GetEventDistrictPointsErrors];
+
+export type GetEventDistrictPointsResponses = {
+  /**
+   * Successful response
+   */
+  200: EventDistrictPoints | null;
+};
+
+export type GetEventDistrictPointsResponse =
+  GetEventDistrictPointsResponses[keyof GetEventDistrictPointsResponses];
+
 export type GetEventInsightsData = {
   body?: never;
   headers?: {
@@ -4543,6 +3494,194 @@ export type GetEventInsightsResponses = {
 export type GetEventInsightsResponse =
   GetEventInsightsResponses[keyof GetEventInsightsResponses];
 
+export type GetEventMatchesData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches';
+};
+
+export type GetEventMatchesErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventMatchesError =
+  GetEventMatchesErrors[keyof GetEventMatchesErrors];
+
+export type GetEventMatchesResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Match>;
+};
+
+export type GetEventMatchesResponse =
+  GetEventMatchesResponses[keyof GetEventMatchesResponses];
+
+export type GetEventMatchesKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/keys';
+};
+
+export type GetEventMatchesKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventMatchesKeysError =
+  GetEventMatchesKeysErrors[keyof GetEventMatchesKeysErrors];
+
+export type GetEventMatchesKeysResponses = {
+  /**
+   * Array of Match Keys
+   */
+  200: Array<string>;
+};
+
+export type GetEventMatchesKeysResponse =
+  GetEventMatchesKeysResponses[keyof GetEventMatchesKeysResponses];
+
+export type GetEventMatchesSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/simple';
+};
+
+export type GetEventMatchesSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventMatchesSimpleError =
+  GetEventMatchesSimpleErrors[keyof GetEventMatchesSimpleErrors];
+
+export type GetEventMatchesSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<MatchSimple>;
+};
+
+export type GetEventMatchesSimpleResponse =
+  GetEventMatchesSimpleResponses[keyof GetEventMatchesSimpleResponses];
+
+export type GetEventMatchTimeseriesData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/timeseries';
+};
+
+export type GetEventMatchTimeseriesErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventMatchTimeseriesError =
+  GetEventMatchTimeseriesErrors[keyof GetEventMatchTimeseriesErrors];
+
+export type GetEventMatchTimeseriesResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<string>;
+};
+
+export type GetEventMatchTimeseriesResponse =
+  GetEventMatchTimeseriesResponses[keyof GetEventMatchTimeseriesResponses];
+
 export type GetEventOprsData = {
   body?: never;
   headers?: {
@@ -4588,52 +3727,6 @@ export type GetEventOprsResponses = {
 
 export type GetEventOprsResponse =
   GetEventOprsResponses[keyof GetEventOprsResponses];
-
-export type GetEventCoprsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
-  };
-  query?: never;
-  url: '/event/{event_key}/coprs';
-};
-
-export type GetEventCoprsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetEventCoprsError = GetEventCoprsErrors[keyof GetEventCoprsErrors];
-
-export type GetEventCoprsResponses = {
-  /**
-   * Successful response
-   */
-  200: EventCoprs | null;
-};
-
-export type GetEventCoprsResponse =
-  GetEventCoprsResponses[keyof GetEventCoprsResponses];
 
 export type GetEventPredictionsData = {
   body?: never;
@@ -4729,53 +3822,6 @@ export type GetEventRankingsResponses = {
 export type GetEventRankingsResponse =
   GetEventRankingsResponses[keyof GetEventRankingsResponses];
 
-export type GetEventDistrictPointsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
-  };
-  query?: never;
-  url: '/event/{event_key}/district_points';
-};
-
-export type GetEventDistrictPointsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetEventDistrictPointsError =
-  GetEventDistrictPointsErrors[keyof GetEventDistrictPointsErrors];
-
-export type GetEventDistrictPointsResponses = {
-  /**
-   * Successful response
-   */
-  200: EventDistrictPoints | null;
-};
-
-export type GetEventDistrictPointsResponse =
-  GetEventDistrictPointsResponses[keyof GetEventDistrictPointsResponses];
-
 export type GetRegionalChampsPoolPointsData = {
   body?: never;
   headers?: {
@@ -4823,7 +3869,7 @@ export type GetRegionalChampsPoolPointsResponses = {
 export type GetRegionalChampsPoolPointsResponse =
   GetRegionalChampsPoolPointsResponses[keyof GetRegionalChampsPoolPointsResponses];
 
-export type GetEventAdvancementPointsData = {
+export type GetEventSimpleData = {
   body?: never;
   headers?: {
     /**
@@ -4838,10 +3884,10 @@ export type GetEventAdvancementPointsData = {
     event_key: string;
   };
   query?: never;
-  url: '/event/{event_key}/advancement_points';
+  url: '/event/{event_key}/simple';
 };
 
-export type GetEventAdvancementPointsErrors = {
+export type GetEventSimpleErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -4857,18 +3903,65 @@ export type GetEventAdvancementPointsErrors = {
   404: unknown;
 };
 
-export type GetEventAdvancementPointsError =
-  GetEventAdvancementPointsErrors[keyof GetEventAdvancementPointsErrors];
+export type GetEventSimpleError =
+  GetEventSimpleErrors[keyof GetEventSimpleErrors];
 
-export type GetEventAdvancementPointsResponses = {
+export type GetEventSimpleResponses = {
   /**
    * Successful response
    */
-  200: EventDistrictPoints | null;
+  200: EventSimple;
 };
 
-export type GetEventAdvancementPointsResponse =
-  GetEventAdvancementPointsResponses[keyof GetEventAdvancementPointsResponses];
+export type GetEventSimpleResponse =
+  GetEventSimpleResponses[keyof GetEventSimpleResponses];
+
+export type GetEventTeamMediaData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/team_media';
+};
+
+export type GetEventTeamMediaErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventTeamMediaError =
+  GetEventTeamMediaErrors[keyof GetEventTeamMediaErrors];
+
+export type GetEventTeamMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Media>;
+};
+
+export type GetEventTeamMediaResponse =
+  GetEventTeamMediaResponses[keyof GetEventTeamMediaResponses];
 
 export type GetEventTeamsData = {
   body?: never;
@@ -4916,53 +4009,6 @@ export type GetEventTeamsResponses = {
 export type GetEventTeamsResponse =
   GetEventTeamsResponses[keyof GetEventTeamsResponses];
 
-export type GetEventTeamsSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
-  };
-  query?: never;
-  url: '/event/{event_key}/teams/simple';
-};
-
-export type GetEventTeamsSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetEventTeamsSimpleError =
-  GetEventTeamsSimpleErrors[keyof GetEventTeamsSimpleErrors];
-
-export type GetEventTeamsSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<TeamSimple>;
-};
-
-export type GetEventTeamsSimpleResponse =
-  GetEventTeamsSimpleResponses[keyof GetEventTeamsSimpleResponses];
-
 export type GetEventTeamsKeysData = {
   body?: never;
   headers?: {
@@ -5009,6 +4055,53 @@ export type GetEventTeamsKeysResponses = {
 
 export type GetEventTeamsKeysResponse =
   GetEventTeamsKeysResponses[keyof GetEventTeamsKeysResponses];
+
+export type GetEventTeamsSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/teams/simple';
+};
+
+export type GetEventTeamsSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventTeamsSimpleError =
+  GetEventTeamsSimpleErrors[keyof GetEventTeamsSimpleErrors];
+
+export type GetEventTeamsSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<TeamSimple>;
+};
+
+export type GetEventTeamsSimpleResponse =
+  GetEventTeamsSimpleResponses[keyof GetEventTeamsSimpleResponses];
 
 export type GetEventTeamsStatusesData = {
   body?: never;
@@ -5059,7 +4152,7 @@ export type GetEventTeamsStatusesResponses = {
 export type GetEventTeamsStatusesResponse =
   GetEventTeamsStatusesResponses[keyof GetEventTeamsStatusesResponses];
 
-export type GetEventMatchesData = {
+export type GetEventsByYearData = {
   body?: never;
   headers?: {
     /**
@@ -5069,15 +4162,15 @@ export type GetEventMatchesData = {
   };
   path: {
     /**
-     * TBA Event Key, eg `2016nytr`
+     * Competition Year (or Season). Must be 4 digits.
      */
-    event_key: string;
+    year: number;
   };
   query?: never;
-  url: '/event/{event_key}/matches';
+  url: '/events/{year}';
 };
 
-export type GetEventMatchesErrors = {
+export type GetEventsByYearErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -5093,20 +4186,20 @@ export type GetEventMatchesErrors = {
   404: unknown;
 };
 
-export type GetEventMatchesError =
-  GetEventMatchesErrors[keyof GetEventMatchesErrors];
+export type GetEventsByYearError =
+  GetEventsByYearErrors[keyof GetEventsByYearErrors];
 
-export type GetEventMatchesResponses = {
+export type GetEventsByYearResponses = {
   /**
    * Successful response
    */
-  200: Array<Match>;
+  200: Array<Event>;
 };
 
-export type GetEventMatchesResponse =
-  GetEventMatchesResponses[keyof GetEventMatchesResponses];
+export type GetEventsByYearResponse =
+  GetEventsByYearResponses[keyof GetEventsByYearResponses];
 
-export type GetEventMatchesSimpleData = {
+export type GetEventsByYearKeysData = {
   body?: never;
   headers?: {
     /**
@@ -5116,15 +4209,15 @@ export type GetEventMatchesSimpleData = {
   };
   path: {
     /**
-     * TBA Event Key, eg `2016nytr`
+     * Competition Year (or Season). Must be 4 digits.
      */
-    event_key: string;
+    year: number;
   };
   query?: never;
-  url: '/event/{event_key}/matches/simple';
+  url: '/events/{year}/keys';
 };
 
-export type GetEventMatchesSimpleErrors = {
+export type GetEventsByYearKeysErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -5140,67 +4233,20 @@ export type GetEventMatchesSimpleErrors = {
   404: unknown;
 };
 
-export type GetEventMatchesSimpleError =
-  GetEventMatchesSimpleErrors[keyof GetEventMatchesSimpleErrors];
+export type GetEventsByYearKeysError =
+  GetEventsByYearKeysErrors[keyof GetEventsByYearKeysErrors];
 
-export type GetEventMatchesSimpleResponses = {
+export type GetEventsByYearKeysResponses = {
   /**
-   * Successful response
-   */
-  200: Array<MatchSimple>;
-};
-
-export type GetEventMatchesSimpleResponse =
-  GetEventMatchesSimpleResponses[keyof GetEventMatchesSimpleResponses];
-
-export type GetEventMatchesKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA Event Key, eg `2016nytr`
-     */
-    event_key: string;
-  };
-  query?: never;
-  url: '/event/{event_key}/matches/keys';
-};
-
-export type GetEventMatchesKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetEventMatchesKeysError =
-  GetEventMatchesKeysErrors[keyof GetEventMatchesKeysErrors];
-
-export type GetEventMatchesKeysResponses = {
-  /**
-   * Array of Match Keys
+   * Array of Event Keys
    */
   200: Array<string>;
 };
 
-export type GetEventMatchesKeysResponse =
-  GetEventMatchesKeysResponses[keyof GetEventMatchesKeysResponses];
+export type GetEventsByYearKeysResponse =
+  GetEventsByYearKeysResponses[keyof GetEventsByYearKeysResponses];
 
-export type GetEventMatchTimeseriesData = {
+export type GetEventsByYearSimpleData = {
   body?: never;
   headers?: {
     /**
@@ -5210,15 +4256,15 @@ export type GetEventMatchTimeseriesData = {
   };
   path: {
     /**
-     * TBA Event Key, eg `2016nytr`
+     * Competition Year (or Season). Must be 4 digits.
      */
-    event_key: string;
+    year: number;
   };
   query?: never;
-  url: '/event/{event_key}/matches/timeseries';
+  url: '/events/{year}/simple';
 };
 
-export type GetEventMatchTimeseriesErrors = {
+export type GetEventsByYearSimpleErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -5234,20 +4280,20 @@ export type GetEventMatchTimeseriesErrors = {
   404: unknown;
 };
 
-export type GetEventMatchTimeseriesError =
-  GetEventMatchTimeseriesErrors[keyof GetEventMatchTimeseriesErrors];
+export type GetEventsByYearSimpleError =
+  GetEventsByYearSimpleErrors[keyof GetEventsByYearSimpleErrors];
 
-export type GetEventMatchTimeseriesResponses = {
+export type GetEventsByYearSimpleResponses = {
   /**
    * Successful response
    */
-  200: Array<string>;
+  200: Array<EventSimple>;
 };
 
-export type GetEventMatchTimeseriesResponse =
-  GetEventMatchTimeseriesResponses[keyof GetEventMatchTimeseriesResponses];
+export type GetEventsByYearSimpleResponse =
+  GetEventsByYearSimpleResponses[keyof GetEventsByYearSimpleResponses];
 
-export type GetEventAwardsData = {
+export type GetInsightsLeaderboardsYearData = {
   body?: never;
   headers?: {
     /**
@@ -5257,15 +4303,15 @@ export type GetEventAwardsData = {
   };
   path: {
     /**
-     * TBA Event Key, eg `2016nytr`
+     * Competition Year (or Season). Must be 4 digits.
      */
-    event_key: string;
+    year: number;
   };
   query?: never;
-  url: '/event/{event_key}/awards';
+  url: '/insights/leaderboards/{year}';
 };
 
-export type GetEventAwardsErrors = {
+export type GetInsightsLeaderboardsYearErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -5281,20 +4327,20 @@ export type GetEventAwardsErrors = {
   404: unknown;
 };
 
-export type GetEventAwardsError =
-  GetEventAwardsErrors[keyof GetEventAwardsErrors];
+export type GetInsightsLeaderboardsYearError =
+  GetInsightsLeaderboardsYearErrors[keyof GetInsightsLeaderboardsYearErrors];
 
-export type GetEventAwardsResponses = {
+export type GetInsightsLeaderboardsYearResponses = {
   /**
    * Successful response
    */
-  200: Array<Award>;
+  200: Array<LeaderboardInsight>;
 };
 
-export type GetEventAwardsResponse =
-  GetEventAwardsResponses[keyof GetEventAwardsResponses];
+export type GetInsightsLeaderboardsYearResponse =
+  GetInsightsLeaderboardsYearResponses[keyof GetInsightsLeaderboardsYearResponses];
 
-export type GetEventTeamMediaData = {
+export type GetInsightsNotablesYearData = {
   body?: never;
   headers?: {
     /**
@@ -5304,15 +4350,15 @@ export type GetEventTeamMediaData = {
   };
   path: {
     /**
-     * TBA Event Key, eg `2016nytr`
+     * Competition Year (or Season). Must be 4 digits.
      */
-    event_key: string;
+    year: number;
   };
   query?: never;
-  url: '/event/{event_key}/team_media';
+  url: '/insights/notables/{year}';
 };
 
-export type GetEventTeamMediaErrors = {
+export type GetInsightsNotablesYearErrors = {
   /**
    * Authorization information is missing or invalid.
    */
@@ -5328,18 +4374,18 @@ export type GetEventTeamMediaErrors = {
   404: unknown;
 };
 
-export type GetEventTeamMediaError =
-  GetEventTeamMediaErrors[keyof GetEventTeamMediaErrors];
+export type GetInsightsNotablesYearError =
+  GetInsightsNotablesYearErrors[keyof GetInsightsNotablesYearErrors];
 
-export type GetEventTeamMediaResponses = {
+export type GetInsightsNotablesYearResponses = {
   /**
    * Successful response
    */
-  200: Array<Media>;
+  200: Array<NotablesInsight>;
 };
 
-export type GetEventTeamMediaResponse =
-  GetEventTeamMediaResponses[keyof GetEventTeamMediaResponses];
+export type GetInsightsNotablesYearResponse =
+  GetInsightsNotablesYearResponses[keyof GetInsightsNotablesYearResponses];
 
 export type GetMatchData = {
   body?: never;
@@ -5528,622 +4574,6 @@ export type GetMatchZebraResponses = {
 export type GetMatchZebraResponse =
   GetMatchZebraResponses[keyof GetMatchZebraResponses];
 
-export type GetDistrictsByYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/districts/{year}';
-};
-
-export type GetDistrictsByYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictsByYearError =
-  GetDistrictsByYearErrors[keyof GetDistrictsByYearErrors];
-
-export type GetDistrictsByYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<District>;
-};
-
-export type GetDistrictsByYearResponse =
-  GetDistrictsByYearResponses[keyof GetDistrictsByYearResponses];
-
-export type GetDistrictHistoryData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * District abbreviation, eg `ne` or `fim`
-     */
-    district_abbreviation: string;
-  };
-  query?: never;
-  url: '/district/{district_abbreviation}/history';
-};
-
-export type GetDistrictHistoryErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictHistoryError =
-  GetDistrictHistoryErrors[keyof GetDistrictHistoryErrors];
-
-export type GetDistrictHistoryResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<District>;
-};
-
-export type GetDistrictHistoryResponse =
-  GetDistrictHistoryResponses[keyof GetDistrictHistoryResponses];
-
-export type GetDistrictInsightsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * District abbreviation, eg `ne` or `fim`
-     */
-    district_abbreviation: string;
-  };
-  query?: never;
-  url: '/district/{district_abbreviation}/insights';
-};
-
-export type GetDistrictInsightsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictInsightsError =
-  GetDistrictInsightsErrors[keyof GetDistrictInsightsErrors];
-
-export type GetDistrictInsightsResponses = {
-  /**
-   * Successful response
-   */
-  200: DistrictInsight;
-};
-
-export type GetDistrictInsightsResponse =
-  GetDistrictInsightsResponses[keyof GetDistrictInsightsResponses];
-
-export type GetDistrictEventsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/events';
-};
-
-export type GetDistrictEventsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictEventsError =
-  GetDistrictEventsErrors[keyof GetDistrictEventsErrors];
-
-export type GetDistrictEventsResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Event>;
-};
-
-export type GetDistrictEventsResponse =
-  GetDistrictEventsResponses[keyof GetDistrictEventsResponses];
-
-export type GetDistrictAwardsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/awards';
-};
-
-export type GetDistrictAwardsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictAwardsError =
-  GetDistrictAwardsErrors[keyof GetDistrictAwardsErrors];
-
-export type GetDistrictAwardsResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Award>;
-};
-
-export type GetDistrictAwardsResponse =
-  GetDistrictAwardsResponses[keyof GetDistrictAwardsResponses];
-
-export type GetDistrictEventsSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/events/simple';
-};
-
-export type GetDistrictEventsSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictEventsSimpleError =
-  GetDistrictEventsSimpleErrors[keyof GetDistrictEventsSimpleErrors];
-
-export type GetDistrictEventsSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<EventSimple>;
-};
-
-export type GetDistrictEventsSimpleResponse =
-  GetDistrictEventsSimpleResponses[keyof GetDistrictEventsSimpleResponses];
-
-export type GetDistrictEventsKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/events/keys';
-};
-
-export type GetDistrictEventsKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictEventsKeysError =
-  GetDistrictEventsKeysErrors[keyof GetDistrictEventsKeysErrors];
-
-export type GetDistrictEventsKeysResponses = {
-  /**
-   * Array of Event Keys
-   */
-  200: Array<string>;
-};
-
-export type GetDistrictEventsKeysResponse =
-  GetDistrictEventsKeysResponses[keyof GetDistrictEventsKeysResponses];
-
-export type GetDistrictTeamsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/teams';
-};
-
-export type GetDistrictTeamsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictTeamsError =
-  GetDistrictTeamsErrors[keyof GetDistrictTeamsErrors];
-
-export type GetDistrictTeamsResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<Team>;
-};
-
-export type GetDistrictTeamsResponse =
-  GetDistrictTeamsResponses[keyof GetDistrictTeamsResponses];
-
-export type GetDistrictTeamsSimpleData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/teams/simple';
-};
-
-export type GetDistrictTeamsSimpleErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictTeamsSimpleError =
-  GetDistrictTeamsSimpleErrors[keyof GetDistrictTeamsSimpleErrors];
-
-export type GetDistrictTeamsSimpleResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<TeamSimple>;
-};
-
-export type GetDistrictTeamsSimpleResponse =
-  GetDistrictTeamsSimpleResponses[keyof GetDistrictTeamsSimpleResponses];
-
-export type GetDistrictTeamsKeysData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/teams/keys';
-};
-
-export type GetDistrictTeamsKeysErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictTeamsKeysError =
-  GetDistrictTeamsKeysErrors[keyof GetDistrictTeamsKeysErrors];
-
-export type GetDistrictTeamsKeysResponses = {
-  /**
-   * Array of Team Keys
-   */
-  200: Array<string>;
-};
-
-export type GetDistrictTeamsKeysResponse =
-  GetDistrictTeamsKeysResponses[keyof GetDistrictTeamsKeysResponses];
-
-export type GetDistrictRankingsData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/rankings';
-};
-
-export type GetDistrictRankingsErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictRankingsError =
-  GetDistrictRankingsErrors[keyof GetDistrictRankingsErrors];
-
-export type GetDistrictRankingsResponses = {
-  /**
-   * Successful response
-   */
-  200: null | Array<DistrictRanking>;
-};
-
-export type GetDistrictRankingsResponse =
-  GetDistrictRankingsResponses[keyof GetDistrictRankingsResponses];
-
-export type GetDistrictAdvancementData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * TBA District Key, eg `2016fim`
-     */
-    district_key: string;
-  };
-  query?: never;
-  url: '/district/{district_key}/advancement';
-};
-
-export type GetDistrictAdvancementErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictAdvancementError =
-  GetDistrictAdvancementErrors[keyof GetDistrictAdvancementErrors];
-
-export type GetDistrictAdvancementResponses = {
-  /**
-   * A mapping of team key to District_Advancement
-   */
-  200: null | {
-    [key: string]: DistrictAdvancement;
-  };
-};
-
-export type GetDistrictAdvancementResponse =
-  GetDistrictAdvancementResponses[keyof GetDistrictAdvancementResponses];
-
-export type GetDistrictDcmpHistoryData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * District abbreviation, eg `ne` or `fim`
-     */
-    district_abbreviation: string;
-  };
-  query?: never;
-  url: '/district/{district_abbreviation}/dcmp_history';
-};
-
-export type GetDistrictDcmpHistoryErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetDistrictDcmpHistoryError =
-  GetDistrictDcmpHistoryErrors[keyof GetDistrictDcmpHistoryErrors];
-
-export type GetDistrictDcmpHistoryResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<{
-    awards?: Array<Award>;
-    event?: Event;
-  }>;
-};
-
-export type GetDistrictDcmpHistoryResponse =
-  GetDistrictDcmpHistoryResponses[keyof GetDistrictDcmpHistoryResponses];
-
 export type GetRegionalAdvancementData = {
   body?: never;
   headers?: {
@@ -6240,100 +4670,6 @@ export type GetRegionalRankingsResponses = {
 export type GetRegionalRankingsResponse =
   GetRegionalRankingsResponses[keyof GetRegionalRankingsResponses];
 
-export type GetInsightsLeaderboardsYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/insights/leaderboards/{year}';
-};
-
-export type GetInsightsLeaderboardsYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetInsightsLeaderboardsYearError =
-  GetInsightsLeaderboardsYearErrors[keyof GetInsightsLeaderboardsYearErrors];
-
-export type GetInsightsLeaderboardsYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<LeaderboardInsight>;
-};
-
-export type GetInsightsLeaderboardsYearResponse =
-  GetInsightsLeaderboardsYearResponses[keyof GetInsightsLeaderboardsYearResponses];
-
-export type GetInsightsNotablesYearData = {
-  body?: never;
-  headers?: {
-    /**
-     * Value of the `ETag` header in the most recently cached response by the client.
-     */
-    'If-None-Match'?: string;
-  };
-  path: {
-    /**
-     * Competition Year (or Season). Must be 4 digits.
-     */
-    year: number;
-  };
-  query?: never;
-  url: '/insights/notables/{year}';
-};
-
-export type GetInsightsNotablesYearErrors = {
-  /**
-   * Authorization information is missing or invalid.
-   */
-  401: {
-    /**
-     * Authorization error description.
-     */
-    Error: string;
-  };
-  /**
-   * Not Found
-   */
-  404: unknown;
-};
-
-export type GetInsightsNotablesYearError =
-  GetInsightsNotablesYearErrors[keyof GetInsightsNotablesYearErrors];
-
-export type GetInsightsNotablesYearResponses = {
-  /**
-   * Successful response
-   */
-  200: Array<NotablesInsight>;
-};
-
-export type GetInsightsNotablesYearResponse =
-  GetInsightsNotablesYearResponses[keyof GetInsightsNotablesYearResponses];
-
 export type GetSearchIndexData = {
   body?: never;
   headers?: {
@@ -6375,3 +4711,1667 @@ export type GetSearchIndexResponses = {
 
 export type GetSearchIndexResponse =
   GetSearchIndexResponses[keyof GetSearchIndexResponses];
+
+export type GetStatusData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/status';
+};
+
+export type GetStatusErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetStatusError = GetStatusErrors[keyof GetStatusErrors];
+
+export type GetStatusResponses = {
+  /**
+   * Successful response
+   */
+  200: ApiStatus;
+};
+
+export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
+
+export type GetTeamData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}';
+};
+
+export type GetTeamErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamError = GetTeamErrors[keyof GetTeamErrors];
+
+export type GetTeamResponses = {
+  /**
+   * Successful response
+   */
+  200: Team;
+};
+
+export type GetTeamResponse = GetTeamResponses[keyof GetTeamResponses];
+
+export type GetTeamAwardsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/awards';
+};
+
+export type GetTeamAwardsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamAwardsError = GetTeamAwardsErrors[keyof GetTeamAwardsErrors];
+
+export type GetTeamAwardsResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Award>;
+};
+
+export type GetTeamAwardsResponse =
+  GetTeamAwardsResponses[keyof GetTeamAwardsResponses];
+
+export type GetTeamAwardsByYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/awards/{year}';
+};
+
+export type GetTeamAwardsByYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamAwardsByYearError =
+  GetTeamAwardsByYearErrors[keyof GetTeamAwardsByYearErrors];
+
+export type GetTeamAwardsByYearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Award>;
+};
+
+export type GetTeamAwardsByYearResponse =
+  GetTeamAwardsByYearResponses[keyof GetTeamAwardsByYearResponses];
+
+export type GetTeamDistrictsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/districts';
+};
+
+export type GetTeamDistrictsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamDistrictsError =
+  GetTeamDistrictsErrors[keyof GetTeamDistrictsErrors];
+
+export type GetTeamDistrictsResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<District>;
+};
+
+export type GetTeamDistrictsResponse =
+  GetTeamDistrictsResponses[keyof GetTeamDistrictsResponses];
+
+export type GetTeamEventAwardsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/event/{event_key}/awards';
+};
+
+export type GetTeamEventAwardsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventAwardsError =
+  GetTeamEventAwardsErrors[keyof GetTeamEventAwardsErrors];
+
+export type GetTeamEventAwardsResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Award>;
+};
+
+export type GetTeamEventAwardsResponse =
+  GetTeamEventAwardsResponses[keyof GetTeamEventAwardsResponses];
+
+export type GetTeamEventMatchesData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/event/{event_key}/matches';
+};
+
+export type GetTeamEventMatchesErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventMatchesError =
+  GetTeamEventMatchesErrors[keyof GetTeamEventMatchesErrors];
+
+export type GetTeamEventMatchesResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Match>;
+};
+
+export type GetTeamEventMatchesResponse =
+  GetTeamEventMatchesResponses[keyof GetTeamEventMatchesResponses];
+
+export type GetTeamEventMatchesKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/event/{event_key}/matches/keys';
+};
+
+export type GetTeamEventMatchesKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventMatchesKeysError =
+  GetTeamEventMatchesKeysErrors[keyof GetTeamEventMatchesKeysErrors];
+
+export type GetTeamEventMatchesKeysResponses = {
+  /**
+   * Array of Match Keys
+   */
+  200: Array<string>;
+};
+
+export type GetTeamEventMatchesKeysResponse =
+  GetTeamEventMatchesKeysResponses[keyof GetTeamEventMatchesKeysResponses];
+
+export type GetTeamEventMatchesSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/event/{event_key}/matches/simple';
+};
+
+export type GetTeamEventMatchesSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventMatchesSimpleError =
+  GetTeamEventMatchesSimpleErrors[keyof GetTeamEventMatchesSimpleErrors];
+
+export type GetTeamEventMatchesSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Match>;
+};
+
+export type GetTeamEventMatchesSimpleResponse =
+  GetTeamEventMatchesSimpleResponses[keyof GetTeamEventMatchesSimpleResponses];
+
+export type GetTeamEventStatusData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/event/{event_key}/status';
+};
+
+export type GetTeamEventStatusErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventStatusError =
+  GetTeamEventStatusErrors[keyof GetTeamEventStatusErrors];
+
+export type GetTeamEventStatusResponses = {
+  /**
+   * Successful response
+   */
+  200: TeamEventStatus | null;
+};
+
+export type GetTeamEventStatusResponse =
+  GetTeamEventStatusResponses[keyof GetTeamEventStatusResponses];
+
+export type GetTeamEventsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/events';
+};
+
+export type GetTeamEventsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventsError = GetTeamEventsErrors[keyof GetTeamEventsErrors];
+
+export type GetTeamEventsResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Event>;
+};
+
+export type GetTeamEventsResponse =
+  GetTeamEventsResponses[keyof GetTeamEventsResponses];
+
+export type GetTeamEventsKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/events/keys';
+};
+
+export type GetTeamEventsKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventsKeysError =
+  GetTeamEventsKeysErrors[keyof GetTeamEventsKeysErrors];
+
+export type GetTeamEventsKeysResponses = {
+  /**
+   * Array of Event Keys
+   */
+  200: Array<string>;
+};
+
+export type GetTeamEventsKeysResponse =
+  GetTeamEventsKeysResponses[keyof GetTeamEventsKeysResponses];
+
+export type GetTeamEventsSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/events/simple';
+};
+
+export type GetTeamEventsSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventsSimpleError =
+  GetTeamEventsSimpleErrors[keyof GetTeamEventsSimpleErrors];
+
+export type GetTeamEventsSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<EventSimple>;
+};
+
+export type GetTeamEventsSimpleResponse =
+  GetTeamEventsSimpleResponses[keyof GetTeamEventsSimpleResponses];
+
+export type GetTeamEventsByYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/events/{year}';
+};
+
+export type GetTeamEventsByYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventsByYearError =
+  GetTeamEventsByYearErrors[keyof GetTeamEventsByYearErrors];
+
+export type GetTeamEventsByYearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Event>;
+};
+
+export type GetTeamEventsByYearResponse =
+  GetTeamEventsByYearResponses[keyof GetTeamEventsByYearResponses];
+
+export type GetTeamEventsByYearKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/events/{year}/keys';
+};
+
+export type GetTeamEventsByYearKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventsByYearKeysError =
+  GetTeamEventsByYearKeysErrors[keyof GetTeamEventsByYearKeysErrors];
+
+export type GetTeamEventsByYearKeysResponses = {
+  /**
+   * Array of Event Keys
+   */
+  200: Array<string>;
+};
+
+export type GetTeamEventsByYearKeysResponse =
+  GetTeamEventsByYearKeysResponses[keyof GetTeamEventsByYearKeysResponses];
+
+export type GetTeamEventsByYearSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/events/{year}/simple';
+};
+
+export type GetTeamEventsByYearSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventsByYearSimpleError =
+  GetTeamEventsByYearSimpleErrors[keyof GetTeamEventsByYearSimpleErrors];
+
+export type GetTeamEventsByYearSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<EventSimple>;
+};
+
+export type GetTeamEventsByYearSimpleResponse =
+  GetTeamEventsByYearSimpleResponses[keyof GetTeamEventsByYearSimpleResponses];
+
+export type GetTeamEventsStatusesByYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/events/{year}/statuses';
+};
+
+export type GetTeamEventsStatusesByYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamEventsStatusesByYearError =
+  GetTeamEventsStatusesByYearErrors[keyof GetTeamEventsStatusesByYearErrors];
+
+export type GetTeamEventsStatusesByYearResponses = {
+  /**
+   * A key-value pair of `Team_Event_Status` objects with the event key as the key.
+   */
+  200: {
+    [key: string]: TeamEventStatus | null;
+  };
+};
+
+export type GetTeamEventsStatusesByYearResponse =
+  GetTeamEventsStatusesByYearResponses[keyof GetTeamEventsStatusesByYearResponses];
+
+export type GetTeamHistoryData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/history';
+};
+
+export type GetTeamHistoryErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamHistoryError =
+  GetTeamHistoryErrors[keyof GetTeamHistoryErrors];
+
+export type GetTeamHistoryResponses = {
+  /**
+   * Successful response with team's history including events and awards.
+   */
+  200: History;
+};
+
+export type GetTeamHistoryResponse =
+  GetTeamHistoryResponses[keyof GetTeamHistoryResponses];
+
+export type GetTeamMatchesByYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/matches/{year}';
+};
+
+export type GetTeamMatchesByYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamMatchesByYearError =
+  GetTeamMatchesByYearErrors[keyof GetTeamMatchesByYearErrors];
+
+export type GetTeamMatchesByYearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Match>;
+};
+
+export type GetTeamMatchesByYearResponse =
+  GetTeamMatchesByYearResponses[keyof GetTeamMatchesByYearResponses];
+
+export type GetTeamMatchesByYearKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/matches/{year}/keys';
+};
+
+export type GetTeamMatchesByYearKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamMatchesByYearKeysError =
+  GetTeamMatchesByYearKeysErrors[keyof GetTeamMatchesByYearKeysErrors];
+
+export type GetTeamMatchesByYearKeysResponses = {
+  /**
+   * Array of Match Keys
+   */
+  200: Array<string>;
+};
+
+export type GetTeamMatchesByYearKeysResponse =
+  GetTeamMatchesByYearKeysResponses[keyof GetTeamMatchesByYearKeysResponses];
+
+export type GetTeamMatchesByYearSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/matches/{year}/simple';
+};
+
+export type GetTeamMatchesByYearSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamMatchesByYearSimpleError =
+  GetTeamMatchesByYearSimpleErrors[keyof GetTeamMatchesByYearSimpleErrors];
+
+export type GetTeamMatchesByYearSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<MatchSimple>;
+};
+
+export type GetTeamMatchesByYearSimpleResponse =
+  GetTeamMatchesByYearSimpleResponses[keyof GetTeamMatchesByYearSimpleResponses];
+
+export type GetTeamMediaByTagData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Media Tag which describes the Media.
+     */
+    media_tag: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/media/tag/{media_tag}';
+};
+
+export type GetTeamMediaByTagErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamMediaByTagError =
+  GetTeamMediaByTagErrors[keyof GetTeamMediaByTagErrors];
+
+export type GetTeamMediaByTagResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Media>;
+};
+
+export type GetTeamMediaByTagResponse =
+  GetTeamMediaByTagResponses[keyof GetTeamMediaByTagResponses];
+
+export type GetTeamMediaByTagYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Media Tag which describes the Media.
+     */
+    media_tag: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/media/tag/{media_tag}/{year}';
+};
+
+export type GetTeamMediaByTagYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamMediaByTagYearError =
+  GetTeamMediaByTagYearErrors[keyof GetTeamMediaByTagYearErrors];
+
+export type GetTeamMediaByTagYearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Media>;
+};
+
+export type GetTeamMediaByTagYearResponse =
+  GetTeamMediaByTagYearResponses[keyof GetTeamMediaByTagYearResponses];
+
+export type GetTeamMediaByYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/team/{team_key}/media/{year}';
+};
+
+export type GetTeamMediaByYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamMediaByYearError =
+  GetTeamMediaByYearErrors[keyof GetTeamMediaByYearErrors];
+
+export type GetTeamMediaByYearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Media>;
+};
+
+export type GetTeamMediaByYearResponse =
+  GetTeamMediaByYearResponses[keyof GetTeamMediaByYearResponses];
+
+export type GetTeamRobotsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/robots';
+};
+
+export type GetTeamRobotsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamRobotsError = GetTeamRobotsErrors[keyof GetTeamRobotsErrors];
+
+export type GetTeamRobotsResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<TeamRobot>;
+};
+
+export type GetTeamRobotsResponse =
+  GetTeamRobotsResponses[keyof GetTeamRobotsResponses];
+
+export type GetTeamSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/simple';
+};
+
+export type GetTeamSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamSimpleError = GetTeamSimpleErrors[keyof GetTeamSimpleErrors];
+
+export type GetTeamSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: TeamSimple;
+};
+
+export type GetTeamSimpleResponse =
+  GetTeamSimpleResponses[keyof GetTeamSimpleResponses];
+
+export type GetTeamSocialMediaData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/social_media';
+};
+
+export type GetTeamSocialMediaErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamSocialMediaError =
+  GetTeamSocialMediaErrors[keyof GetTeamSocialMediaErrors];
+
+export type GetTeamSocialMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Media>;
+};
+
+export type GetTeamSocialMediaResponse =
+  GetTeamSocialMediaResponses[keyof GetTeamSocialMediaResponses];
+
+export type GetTeamYearsParticipatedData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Team Key, eg `frc254`
+     */
+    team_key: string;
+  };
+  query?: never;
+  url: '/team/{team_key}/years_participated';
+};
+
+export type GetTeamYearsParticipatedErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamYearsParticipatedError =
+  GetTeamYearsParticipatedErrors[keyof GetTeamYearsParticipatedErrors];
+
+export type GetTeamYearsParticipatedResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<number>;
+};
+
+export type GetTeamYearsParticipatedResponse =
+  GetTeamYearsParticipatedResponses[keyof GetTeamYearsParticipatedResponses];
+
+export type GetTeamsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Page number of results to return, zero-indexed
+     */
+    page_num: number;
+  };
+  query?: never;
+  url: '/teams/{page_num}';
+};
+
+export type GetTeamsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamsError = GetTeamsErrors[keyof GetTeamsErrors];
+
+export type GetTeamsResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Team>;
+};
+
+export type GetTeamsResponse = GetTeamsResponses[keyof GetTeamsResponses];
+
+export type GetTeamsKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Page number of results to return, zero-indexed
+     */
+    page_num: number;
+  };
+  query?: never;
+  url: '/teams/{page_num}/keys';
+};
+
+export type GetTeamsKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamsKeysError = GetTeamsKeysErrors[keyof GetTeamsKeysErrors];
+
+export type GetTeamsKeysResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<string>;
+};
+
+export type GetTeamsKeysResponse =
+  GetTeamsKeysResponses[keyof GetTeamsKeysResponses];
+
+export type GetTeamsSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Page number of results to return, zero-indexed
+     */
+    page_num: number;
+  };
+  query?: never;
+  url: '/teams/{page_num}/simple';
+};
+
+export type GetTeamsSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamsSimpleError =
+  GetTeamsSimpleErrors[keyof GetTeamsSimpleErrors];
+
+export type GetTeamsSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<TeamSimple>;
+};
+
+export type GetTeamsSimpleResponse =
+  GetTeamsSimpleResponses[keyof GetTeamsSimpleResponses];
+
+export type GetTeamsByYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+    /**
+     * Page number of results to return, zero-indexed
+     */
+    page_num: number;
+  };
+  query?: never;
+  url: '/teams/{year}/{page_num}';
+};
+
+export type GetTeamsByYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamsByYearError =
+  GetTeamsByYearErrors[keyof GetTeamsByYearErrors];
+
+export type GetTeamsByYearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Team>;
+};
+
+export type GetTeamsByYearResponse =
+  GetTeamsByYearResponses[keyof GetTeamsByYearResponses];
+
+export type GetTeamsByYearKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+    /**
+     * Page number of results to return, zero-indexed
+     */
+    page_num: number;
+  };
+  query?: never;
+  url: '/teams/{year}/{page_num}/keys';
+};
+
+export type GetTeamsByYearKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamsByYearKeysError =
+  GetTeamsByYearKeysErrors[keyof GetTeamsByYearKeysErrors];
+
+export type GetTeamsByYearKeysResponses = {
+  /**
+   * Array of Team Keys
+   */
+  200: Array<string>;
+};
+
+export type GetTeamsByYearKeysResponse =
+  GetTeamsByYearKeysResponses[keyof GetTeamsByYearKeysResponses];
+
+export type GetTeamsByYearSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+    /**
+     * Page number of results to return, zero-indexed
+     */
+    page_num: number;
+  };
+  query?: never;
+  url: '/teams/{year}/{page_num}/simple';
+};
+
+export type GetTeamsByYearSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetTeamsByYearSimpleError =
+  GetTeamsByYearSimpleErrors[keyof GetTeamsByYearSimpleErrors];
+
+export type GetTeamsByYearSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<TeamSimple>;
+};
+
+export type GetTeamsByYearSimpleResponse =
+  GetTeamsByYearSimpleResponses[keyof GetTeamsByYearSimpleResponses];
