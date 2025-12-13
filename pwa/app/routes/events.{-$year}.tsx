@@ -28,7 +28,7 @@ import {
 
 export const Route = createFileRoute('/events/{-$year}')({
   loader: async ({ params, context: { queryClient } }) => {
-    const year = await parseParamsForYearElseDefault(params);
+    const year = await parseParamsForYearElseDefault(queryClient, params);
     if (year === undefined) {
       throw notFound();
     }

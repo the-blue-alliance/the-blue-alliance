@@ -73,7 +73,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
   loader: async ({ params, context: { queryClient } }) => {
     const startTime = Date.now();
     const teamKey = `frc${params.teamNumber}`;
-    const year = await parseParamsForYearElseDefault(params);
+    const year = await parseParamsForYearElseDefault(queryClient, params);
 
     Sentry.metrics.count('team.page.view', 1, {
       attributes: { team_number: params.teamNumber, year },

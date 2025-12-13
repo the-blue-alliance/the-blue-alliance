@@ -40,8 +40,8 @@ import {
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/{-$year}',
 )({
-  loader: async ({ params }) => {
-    const year = await parseParamsForYearElseDefault(params);
+  loader: async ({ params, context: { queryClient } }) => {
+    const year = await parseParamsForYearElseDefault(queryClient, params);
     if (year === undefined) {
       throw notFound();
     }
