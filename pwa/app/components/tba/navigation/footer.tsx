@@ -55,7 +55,10 @@ export const Footer = () => {
   });
 
   return (
-    <footer className="mt-16 flex flex-col space-y-3 border-t bg-gray-50">
+    <footer
+      className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t
+        bg-gray-50"
+    >
       <div
         className="mx-auto w-full px-6 sm:max-w-160 md:max-w-3xl md:px-8
           lg:max-w-5xl"
