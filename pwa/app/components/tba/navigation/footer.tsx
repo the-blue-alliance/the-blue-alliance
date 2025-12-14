@@ -1,22 +1,42 @@
 import { Link } from '@tanstack/react-router';
 import { Fragment } from 'react/jsx-runtime';
 
-const links = [
+import GithubIcon from '~icons/logos/github-icon';
+
+import andymarkLogo from '~/images/images/andymark-logo.png';
+import { FileRouteTypes } from '~/routeTree.gen';
+
+interface InternalLink {
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  label: string;
+  to: FileRouteTypes['to'];
+}
+
+interface ExternalLink {
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  label: string;
+  href: string;
+}
+
+type NavigationLink = InternalLink | ExternalLink;
+
+const links: NavigationLink[] = [
   {
+    icon: GithubIcon,
     label: 'GitHub',
     href: 'https://github.com/the-blue-alliance/the-blue-alliance',
   },
-  { label: 'About us', href: '/about' },
-  { label: 'Donate', href: '/donate' },
-  { label: 'Contact', href: '/contact' },
-  { label: 'Thanks', href: '/thanks' },
-  { label: 'Add Data', href: '/add-data' },
-  { label: 'API Documentation', href: '/apidocs' },
+  { label: 'About us', to: '/about' },
+  { label: 'Donate', to: '/donate' },
+  { label: 'Contact', to: '/contact' },
+  { label: 'Thanks', to: '/thanks' },
+  { label: 'Add Data', to: '/add-data' },
+  { label: 'API Documentation', to: '/apidocs' },
   {
     label: 'Blog',
     href: 'https://blog.thebluealliance.com',
   },
-  { label: 'Privacy Policy', href: '/legal/privacy' },
+  { label: 'Privacy Policy', to: '/legal/privacy' },
 ];
 
 // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
@@ -41,21 +61,29 @@ export const Footer = () => {
           lg:max-w-5xl"
       >
         <div className="flex flex-wrap gap-2 py-6 text-center text-sm">
-          {links.map(({ label, href }, index) => (
-            <Fragment key={label}>
-              {href.startsWith('http') ? (
+          {links.map((link, index) => (
+            <Fragment key={link.label}>
+              {'href' in link ? (
                 <a
-                  key={label}
-                  className="text-gray-800"
-                  href={href}
+                  key={link.label}
+                  className="flex items-center gap-1 text-gray-800
+                    hover:underline"
+                  href={link.href}
                   target="_blank"
                   rel="noreferrer noopener"
                 >
-                  {label}
+                  {link.icon && <link.icon className="size-3" />}
+                  {link.label}
                 </a>
               ) : (
-                <Link key={label} className="text-gray-800" to={href}>
-                  {label}
+                <Link
+                  key={link.label}
+                  className="flex items-center gap-1 text-gray-800
+                    hover:underline"
+                  to={link.to}
+                >
+                  {link.icon && <link.icon className="size-3" />}
+                  {link.label}
                 </Link>
               )}
               {index < links.length - 1 && (
@@ -69,8 +97,20 @@ export const Footer = () => {
           className="relative isolate flex justify-between border-t
             border-gray-600/10 py-6 text-sm max-md:flex-col md:items-center"
         >
-          <p>© {new Date().getFullYear()} The Blue Alliance</p>
-
+          <div>
+            Thanks to our platinum sponsor
+            <a
+              href="https://www.andymark.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img
+                src={andymarkLogo}
+                alt="AndyMark"
+                className="ml-2 inline h-4"
+              />
+            </a>
+          </div>
           <p className="text-xs text-gray-600">
             Generated on {renderTime}. Commit:{' '}
             <a
