@@ -107,7 +107,12 @@ export function MatchRow({
           xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
       >
         {maybeVideoURL && (
-          <Link to={maybeVideoURL} className="mx-2">
+          <Link
+            to={maybeVideoURL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mx-2"
+          >
             <PlayCircleIcon />
           </Link>
         )}
