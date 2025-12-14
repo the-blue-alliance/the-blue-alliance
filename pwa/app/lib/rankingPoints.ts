@@ -1,5 +1,7 @@
 import {
   Match,
+  MatchScoreBreakdown2015,
+  MatchScoreBreakdown2015Alliance,
   MatchScoreBreakdown2016,
   MatchScoreBreakdown2016Alliance,
   MatchScoreBreakdown2017,
@@ -37,6 +39,24 @@ export type MatchScoreBreakdown = Match['score_breakdown'];
 export type MatchScoreBreakdownAlliance =
   NonNullable<MatchScoreBreakdown>['red'];
 
+export function isScoreBreakdown2015(
+  scoreBreakdown: MatchScoreBreakdown,
+): scoreBreakdown is MatchScoreBreakdown2015 {
+  return (
+    scoreBreakdown !== null &&
+    (scoreBreakdown.red as MatchScoreBreakdown2015Alliance)
+      .container_count_level1 !== undefined
+  );
+}
+
+export function isScoreBreakdown2015Alliance(
+  scoreBreakdown: MatchScoreBreakdownAlliance,
+): scoreBreakdown is MatchScoreBreakdown2015Alliance {
+  return (
+    (scoreBreakdown as MatchScoreBreakdown2015Alliance)
+      .container_count_level1 !== undefined
+  );
+}
 export function isScoreBreakdown2016(
   scoreBreakdown: MatchScoreBreakdown,
 ): scoreBreakdown is MatchScoreBreakdown2016 {

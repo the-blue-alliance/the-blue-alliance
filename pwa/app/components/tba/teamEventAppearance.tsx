@@ -1,5 +1,5 @@
-import BiCalendar from '~icons/bi/calendar';
-import BiPinMapFill from '~icons/bi/pin-map-fill';
+import DateIcon from '~icons/lucide/calendar-days';
+import LocationIcon from '~icons/lucide/map-pin';
 
 import {
   Award,
@@ -11,7 +11,7 @@ import {
   TeamEventStatus,
 } from '~/api/tba/read';
 import { AwardBanner } from '~/components/tba/banner';
-import InlineIcon from '~/components/tba/inlineIcon';
+import DetailEntity from '~/components/tba/detailEntity';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
@@ -55,25 +55,24 @@ export default function TeamEventAppearance({
         <h2 className="text-2xl font-medium">
           <EventLink eventOrKey={event.key}>{event.name}</EventLink>
         </h2>
-        <InlineIcon>
-          <BiCalendar />
-          {getEventDateString(event, 'long')}
-          {event.week !== null && (
-            <Badge variant={'secondary'} className="ml-2">
-              Week {event.week + 1}
-            </Badge>
-          )}
-        </InlineIcon>
-        <InlineIcon>
-          <BiPinMapFill />
-          <a
-            href={`https://maps.google.com/?q=${event.city}, ${event.state_prov}, ${event.country}`}
-          >
-            {event.city}, {event.state_prov}, {event.country}
-          </a>
-        </InlineIcon>
 
-        <div className="mt-4" />
+        <div className="mb-3 space-y-1">
+          <DetailEntity icon={<DateIcon />}>
+            {getEventDateString(event, 'long')}{' '}
+            {event.week !== null && (
+              <Badge variant={'secondary'}>Week {event.week + 1}</Badge>
+            )}
+          </DetailEntity>
+          <DetailEntity icon={<LocationIcon />}>
+            <a
+              href={`https://maps.google.com/maps?q=${encodeURIComponent(`${event.city}, ${event.state_prov}, ${event.country}`)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {event.city}, {event.state_prov}, {event.country}
+            </a>
+          </DetailEntity>
+        </div>
 
         <TeamStatus
           event={event}

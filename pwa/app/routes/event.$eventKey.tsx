@@ -4,18 +4,18 @@ import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
 import { useMemo, useState } from 'react';
 
-import BiCalendar from '~icons/bi/calendar';
-import BiGraphUp from '~icons/bi/graph-up';
-import BiInfoCircleFill from '~icons/bi/info-circle-fill';
-import BiLink from '~icons/bi/link';
-import BiListOl from '~icons/bi/list-ol';
-import BiPinMapFill from '~icons/bi/pin-map-fill';
-import RobotIcon from '~icons/lucide/bot';
-import MdiFolderMediaOutline from '~icons/mdi/folder-media-outline';
-import MdiGraphBoxOutline from '~icons/mdi/graph-box-outline';
-import MdiTournament from '~icons/mdi/tournament';
-import TrophyIcon from '~icons/mdi/trophy-outline';
-import MdiVideo from '~icons/mdi/video';
+import SourceIcon from '~icons/lucide/badge-check';
+import TeamsIcon from '~icons/lucide/bot';
+import DateIcon from '~icons/lucide/calendar-days';
+import StatbotIcon from '~icons/lucide/chart-spline';
+import WebsiteIcon from '~icons/lucide/globe';
+import RankingsIcon from '~icons/lucide/list-ordered';
+import LocationIcon from '~icons/lucide/map-pin';
+import InsightsIcon from '~icons/lucide/scatter-chart';
+import AwardsIcon from '~icons/lucide/trophy';
+import LiveWebcastIcon from '~icons/lucide/video';
+import MediaIcon from '~icons/mdi/folder-media-outline';
+import ResultsIcon from '~icons/mdi/tournament';
 
 import { getEventColors } from '~/api/colors';
 import { Award, EventCoprs, Match, Media, Team, Webcast } from '~/api/tba/read';
@@ -33,6 +33,7 @@ import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
+import DetailEntity from '~/components/tba/detailEntity';
 import EliminationBracket from '~/components/tba/eliminationBracket';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { LocationLink, TeamLink } from '~/components/tba/links';
@@ -259,64 +260,65 @@ function EventPage() {
 
   return (
     <div className="py-8">
-      <h1 className="mb-3 text-3xl font-medium">
+      <h1 className="mb-2 text-3xl font-medium">
         {event.name} {event.year}
       </h1>
 
-      <InlineIcon>
-        <BiCalendar />
-        {getEventDateString(event, 'long')}
-        {event.week !== null && (
-          <Badge className="mx-2 h-[1.5em] align-text-top">
-            Week {event.week + 1}
-          </Badge>
+      <div className="mb-4 space-y-1">
+        <DetailEntity icon={<DateIcon />}>
+          {getEventDateString(event, 'long')}
+          {event.week !== null && (
+            <Badge className="mx-2 h-[1.5em] align-text-top">
+              Week {event.week + 1}
+            </Badge>
+          )}
+        </DetailEntity>
+        <DetailEntity icon={<LocationIcon />}>
+          {event.gmaps_url ? (
+            <a href={event.gmaps_url}>
+              {event.city}, {event.state_prov}, {event.country}
+            </a>
+          ) : (
+            <>
+              {event.city}, {event.state_prov}, {event.country}
+            </>
+          )}
+        </DetailEntity>
+        {event.website && (
+          <DetailEntity icon={<WebsiteIcon />}>
+            <a href={event.website} target="_blank" rel="noreferrer">
+              View event&apos;s website
+            </a>
+          </DetailEntity>
         )}
-      </InlineIcon>
-
-      <InlineIcon>
-        <BiPinMapFill />
-
-        {event.gmaps_url ? (
-          <a href={event.gmaps_url}>
-            {event.city}, {event.state_prov}, {event.country}
-          </a>
-        ) : (
-          <>
-            {event.city}, {event.state_prov}, {event.country}
-          </>
+        {event.first_event_code && (
+          <DetailEntity icon={<SourceIcon />}>
+            Details on{' '}
+            <a
+              href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              FRC Events
+            </a>
+          </DetailEntity>
         )}
-      </InlineIcon>
-      {event.website && (
-        <InlineIcon>
-          <BiLink />
-          <a href={event.website}>{event.website}</a>
-        </InlineIcon>
-      )}
-
-      {event.first_event_code && (
-        <InlineIcon>
-          <BiInfoCircleFill />
-          Details on{' '}
+        <DetailEntity icon={<StatbotIcon />}>
           <a
-            href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+            href={`https://www.statbotics.io/event/${event.key}`}
+            target="_blank"
+            rel="noreferrer"
           >
-            FRC Events
+            Statbotics
           </a>
-        </InlineIcon>
-      )}
-
-      <InlineIcon>
-        <BiGraphUp />
-        <a href={`https://www.statbotics.io/event/${eventKey}`}>Statbotics</a>
-      </InlineIcon>
-
-      {event.webcasts.length > 0 &&
-        getCurrentWeekEvents([event]).length > 0 && (
-          <InlineIcon>
-            <MdiVideo />
-            <a href={`/gameday/${eventKey}`}>GameDay</a>
-          </InlineIcon>
-        )}
+        </DetailEntity>
+        {event.webcasts.length > 0 &&
+          getCurrentWeekEvents([event]).length > 0 && (
+            <DetailEntity className="font-medium" icon={<LiveWebcastIcon />}>
+              Watch live on <a href={`/gameday/${eventKey}`}>TBA GameDay</a>
+            </DetailEntity>
+          )}
+      </div>
 
       <Tabs
         defaultValue={matches.length > 0 ? 'results' : 'teams'}
@@ -329,7 +331,7 @@ function EventPage() {
           {(matches.length > 0 || alliances.length > 0) && (
             <TabsTrigger value="results">
               <InlineIcon>
-                <MdiTournament />
+                <ResultsIcon />
                 Results
               </InlineIcon>
             </TabsTrigger>
@@ -338,7 +340,7 @@ function EventPage() {
             (rankingsQuery.data && rankingsQuery.data.rankings.length > 0)) && (
             <TabsTrigger value="rankings">
               <InlineIcon>
-                <BiListOl />
+                <RankingsIcon />
                 Rankings
               </InlineIcon>
             </TabsTrigger>
@@ -348,14 +350,14 @@ function EventPage() {
               awardsQuery.data.length > 0)) && (
             <TabsTrigger value="awards">
               <InlineIcon>
-                <TrophyIcon />
+                <AwardsIcon />
                 Awards
               </InlineIcon>
             </TabsTrigger>
           )}
           <TabsTrigger value="teams">
             <InlineIcon>
-              <RobotIcon />
+              <TeamsIcon />
               Teams
               <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
                 {teamsQuery.data?.length ?? '-'}
@@ -368,14 +370,14 @@ function EventPage() {
             matches.length > 0 && (
               <TabsTrigger value="insights">
                 <InlineIcon>
-                  <MdiGraphBoxOutline />
+                  <InsightsIcon />
                   Insights
                 </InlineIcon>
               </TabsTrigger>
             )}
           <TabsTrigger value="media">
             <InlineIcon>
-              <MdiFolderMediaOutline />
+              <MediaIcon />
               Media
             </InlineIcon>
           </TabsTrigger>

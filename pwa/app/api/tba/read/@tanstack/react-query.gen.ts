@@ -368,149 +368,24 @@ const createQueryKey = <TOptions extends Options>(
   return [params];
 };
 
-export const getStatusQueryKey = (options?: Options<GetStatusData>) =>
-  createQueryKey('getStatus', options);
+export const getDistrictDcmpHistoryQueryKey = (
+  options: Options<GetDistrictDcmpHistoryData>,
+) => createQueryKey('getDistrictDcmpHistory', options);
 
 /**
- * Returns API status, and TBA status information.
+ * Gets a list of DCMP events and awards for the given district abbreviation.
  */
-export const getStatusOptions = (options?: Options<GetStatusData>) =>
-  queryOptions<
-    GetStatusResponse,
-    GetStatusError,
-    GetStatusResponse,
-    ReturnType<typeof getStatusQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getStatus({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getStatusQueryKey(options),
-  });
-
-export const getTeamsQueryKey = (options: Options<GetTeamsData>) =>
-  createQueryKey('getTeams', options);
-
-/**
- * Gets a list of `Team` objects, paginated in groups of 500.
- */
-export const getTeamsOptions = (options: Options<GetTeamsData>) =>
-  queryOptions<
-    GetTeamsResponse,
-    GetTeamsError,
-    GetTeamsResponse,
-    ReturnType<typeof getTeamsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeams({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamsQueryKey(options),
-  });
-
-export const getTeamsSimpleQueryKey = (options: Options<GetTeamsSimpleData>) =>
-  createQueryKey('getTeamsSimple', options);
-
-/**
- * Gets a list of short form `Team_Simple` objects, paginated in groups of 500.
- */
-export const getTeamsSimpleOptions = (options: Options<GetTeamsSimpleData>) =>
-  queryOptions<
-    GetTeamsSimpleResponse,
-    GetTeamsSimpleError,
-    GetTeamsSimpleResponse,
-    ReturnType<typeof getTeamsSimpleQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamsSimple({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamsSimpleQueryKey(options),
-  });
-
-export const getTeamsKeysQueryKey = (options: Options<GetTeamsKeysData>) =>
-  createQueryKey('getTeamsKeys', options);
-
-/**
- * Gets a list of Team keys, paginated in groups of 500. (Note, each page will not have 500 teams, but will include the teams within that range of 500.)
- */
-export const getTeamsKeysOptions = (options: Options<GetTeamsKeysData>) =>
-  queryOptions<
-    GetTeamsKeysResponse,
-    GetTeamsKeysError,
-    GetTeamsKeysResponse,
-    ReturnType<typeof getTeamsKeysQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamsKeys({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamsKeysQueryKey(options),
-  });
-
-export const getTeamsByYearQueryKey = (options: Options<GetTeamsByYearData>) =>
-  createQueryKey('getTeamsByYear', options);
-
-/**
- * Gets a list of `Team` objects that competed in the given year, paginated in groups of 500.
- */
-export const getTeamsByYearOptions = (options: Options<GetTeamsByYearData>) =>
-  queryOptions<
-    GetTeamsByYearResponse,
-    GetTeamsByYearError,
-    GetTeamsByYearResponse,
-    ReturnType<typeof getTeamsByYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamsByYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamsByYearQueryKey(options),
-  });
-
-export const getTeamsByYearSimpleQueryKey = (
-  options: Options<GetTeamsByYearSimpleData>,
-) => createQueryKey('getTeamsByYearSimple', options);
-
-/**
- * Gets a list of short form `Team_Simple` objects that competed in the given year, paginated in groups of 500.
- */
-export const getTeamsByYearSimpleOptions = (
-  options: Options<GetTeamsByYearSimpleData>,
+export const getDistrictDcmpHistoryOptions = (
+  options: Options<GetDistrictDcmpHistoryData>,
 ) =>
   queryOptions<
-    GetTeamsByYearSimpleResponse,
-    GetTeamsByYearSimpleError,
-    GetTeamsByYearSimpleResponse,
-    ReturnType<typeof getTeamsByYearSimpleQueryKey>
+    GetDistrictDcmpHistoryResponse,
+    GetDistrictDcmpHistoryError,
+    GetDistrictDcmpHistoryResponse,
+    ReturnType<typeof getDistrictDcmpHistoryQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamsByYearSimple({
+      const { data } = await getDistrictDcmpHistory({
         ...options,
         ...queryKey[0],
         signal,
@@ -518,27 +393,27 @@ export const getTeamsByYearSimpleOptions = (
       });
       return data;
     },
-    queryKey: getTeamsByYearSimpleQueryKey(options),
+    queryKey: getDistrictDcmpHistoryQueryKey(options),
   });
 
-export const getTeamsByYearKeysQueryKey = (
-  options: Options<GetTeamsByYearKeysData>,
-) => createQueryKey('getTeamsByYearKeys', options);
+export const getDistrictHistoryQueryKey = (
+  options: Options<GetDistrictHistoryData>,
+) => createQueryKey('getDistrictHistory', options);
 
 /**
- * Gets a list Team Keys that competed in the given year, paginated in groups of 500.
+ * Gets a list of District objects with the given district abbreviation. This accounts for district abbreviation changes, such as MAR to FMA.
  */
-export const getTeamsByYearKeysOptions = (
-  options: Options<GetTeamsByYearKeysData>,
+export const getDistrictHistoryOptions = (
+  options: Options<GetDistrictHistoryData>,
 ) =>
   queryOptions<
-    GetTeamsByYearKeysResponse,
-    GetTeamsByYearKeysError,
-    GetTeamsByYearKeysResponse,
-    ReturnType<typeof getTeamsByYearKeysQueryKey>
+    GetDistrictHistoryResponse,
+    GetDistrictHistoryError,
+    GetDistrictHistoryResponse,
+    ReturnType<typeof getDistrictHistoryQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamsByYearKeys({
+      const { data } = await getDistrictHistory({
         ...options,
         ...queryKey[0],
         signal,
@@ -546,102 +421,27 @@ export const getTeamsByYearKeysOptions = (
       });
       return data;
     },
-    queryKey: getTeamsByYearKeysQueryKey(options),
+    queryKey: getDistrictHistoryQueryKey(options),
   });
 
-export const getTeamQueryKey = (options: Options<GetTeamData>) =>
-  createQueryKey('getTeam', options);
+export const getDistrictInsightsQueryKey = (
+  options: Options<GetDistrictInsightsData>,
+) => createQueryKey('getDistrictInsights', options);
 
 /**
- * Gets a `Team` object for the team referenced by the given key.
+ * Gets insights for a given district.
  */
-export const getTeamOptions = (options: Options<GetTeamData>) =>
-  queryOptions<
-    GetTeamResponse,
-    GetTeamError,
-    GetTeamResponse,
-    ReturnType<typeof getTeamQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeam({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamQueryKey(options),
-  });
-
-export const getTeamSimpleQueryKey = (options: Options<GetTeamSimpleData>) =>
-  createQueryKey('getTeamSimple', options);
-
-/**
- * Gets a `Team_Simple` object for the team referenced by the given key.
- */
-export const getTeamSimpleOptions = (options: Options<GetTeamSimpleData>) =>
-  queryOptions<
-    GetTeamSimpleResponse,
-    GetTeamSimpleError,
-    GetTeamSimpleResponse,
-    ReturnType<typeof getTeamSimpleQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamSimple({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamSimpleQueryKey(options),
-  });
-
-export const getTeamHistoryQueryKey = (options: Options<GetTeamHistoryData>) =>
-  createQueryKey('getTeamHistory', options);
-
-/**
- * Gets the history for the team referenced by the given key, including their events and awards.
- */
-export const getTeamHistoryOptions = (options: Options<GetTeamHistoryData>) =>
-  queryOptions<
-    GetTeamHistoryResponse,
-    GetTeamHistoryError,
-    GetTeamHistoryResponse,
-    ReturnType<typeof getTeamHistoryQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamHistory({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamHistoryQueryKey(options),
-  });
-
-export const getTeamYearsParticipatedQueryKey = (
-  options: Options<GetTeamYearsParticipatedData>,
-) => createQueryKey('getTeamYearsParticipated', options);
-
-/**
- * Gets a list of years in which the team participated in at least one competition.
- */
-export const getTeamYearsParticipatedOptions = (
-  options: Options<GetTeamYearsParticipatedData>,
+export const getDistrictInsightsOptions = (
+  options: Options<GetDistrictInsightsData>,
 ) =>
   queryOptions<
-    GetTeamYearsParticipatedResponse,
-    GetTeamYearsParticipatedError,
-    GetTeamYearsParticipatedResponse,
-    ReturnType<typeof getTeamYearsParticipatedQueryKey>
+    GetDistrictInsightsResponse,
+    GetDistrictInsightsError,
+    GetDistrictInsightsResponse,
+    ReturnType<typeof getDistrictInsightsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamYearsParticipated({
+      const { data } = await getDistrictInsights({
         ...options,
         ...queryKey[0],
         signal,
@@ -649,27 +449,27 @@ export const getTeamYearsParticipatedOptions = (
       });
       return data;
     },
-    queryKey: getTeamYearsParticipatedQueryKey(options),
+    queryKey: getDistrictInsightsQueryKey(options),
   });
 
-export const getTeamDistrictsQueryKey = (
-  options: Options<GetTeamDistrictsData>,
-) => createQueryKey('getTeamDistricts', options);
+export const getDistrictAdvancementQueryKey = (
+  options: Options<GetDistrictAdvancementData>,
+) => createQueryKey('getDistrictAdvancement', options);
 
 /**
- * Gets an array of districts representing each year the team was in a district. Will return an empty array if the team was never in a district.
+ * Gets a list of advancement information per team in a district.
  */
-export const getTeamDistrictsOptions = (
-  options: Options<GetTeamDistrictsData>,
+export const getDistrictAdvancementOptions = (
+  options: Options<GetDistrictAdvancementData>,
 ) =>
   queryOptions<
-    GetTeamDistrictsResponse,
-    GetTeamDistrictsError,
-    GetTeamDistrictsResponse,
-    ReturnType<typeof getTeamDistrictsQueryKey>
+    GetDistrictAdvancementResponse,
+    GetDistrictAdvancementError,
+    GetDistrictAdvancementResponse,
+    ReturnType<typeof getDistrictAdvancementQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamDistricts({
+      const { data } = await getDistrictAdvancement({
         ...options,
         ...queryKey[0],
         signal,
@@ -677,77 +477,27 @@ export const getTeamDistrictsOptions = (
       });
       return data;
     },
-    queryKey: getTeamDistrictsQueryKey(options),
+    queryKey: getDistrictAdvancementQueryKey(options),
   });
 
-export const getTeamRobotsQueryKey = (options: Options<GetTeamRobotsData>) =>
-  createQueryKey('getTeamRobots', options);
+export const getDistrictAwardsQueryKey = (
+  options: Options<GetDistrictAwardsData>,
+) => createQueryKey('getDistrictAwards', options);
 
 /**
- * Gets a list of year and robot name pairs for each year that a robot name was provided. Will return an empty array if the team has never named a robot.
+ * Gets a list of awards in the given district.
  */
-export const getTeamRobotsOptions = (options: Options<GetTeamRobotsData>) =>
-  queryOptions<
-    GetTeamRobotsResponse,
-    GetTeamRobotsError,
-    GetTeamRobotsResponse,
-    ReturnType<typeof getTeamRobotsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamRobots({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamRobotsQueryKey(options),
-  });
-
-export const getTeamEventsQueryKey = (options: Options<GetTeamEventsData>) =>
-  createQueryKey('getTeamEvents', options);
-
-/**
- * Gets a list of all events this team has competed at.
- */
-export const getTeamEventsOptions = (options: Options<GetTeamEventsData>) =>
-  queryOptions<
-    GetTeamEventsResponse,
-    GetTeamEventsError,
-    GetTeamEventsResponse,
-    ReturnType<typeof getTeamEventsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEvents({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamEventsQueryKey(options),
-  });
-
-export const getTeamEventsSimpleQueryKey = (
-  options: Options<GetTeamEventsSimpleData>,
-) => createQueryKey('getTeamEventsSimple', options);
-
-/**
- * Gets a short-form list of all events this team has competed at.
- */
-export const getTeamEventsSimpleOptions = (
-  options: Options<GetTeamEventsSimpleData>,
+export const getDistrictAwardsOptions = (
+  options: Options<GetDistrictAwardsData>,
 ) =>
   queryOptions<
-    GetTeamEventsSimpleResponse,
-    GetTeamEventsSimpleError,
-    GetTeamEventsSimpleResponse,
-    ReturnType<typeof getTeamEventsSimpleQueryKey>
+    GetDistrictAwardsResponse,
+    GetDistrictAwardsError,
+    GetDistrictAwardsResponse,
+    ReturnType<typeof getDistrictAwardsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventsSimple({
+      const { data } = await getDistrictAwards({
         ...options,
         ...queryKey[0],
         signal,
@@ -755,27 +505,27 @@ export const getTeamEventsSimpleOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventsSimpleQueryKey(options),
+    queryKey: getDistrictAwardsQueryKey(options),
   });
 
-export const getTeamEventsKeysQueryKey = (
-  options: Options<GetTeamEventsKeysData>,
-) => createQueryKey('getTeamEventsKeys', options);
+export const getDistrictEventsQueryKey = (
+  options: Options<GetDistrictEventsData>,
+) => createQueryKey('getDistrictEvents', options);
 
 /**
- * Gets a list of the event keys for all events this team has competed at.
+ * Gets a list of events in the given district.
  */
-export const getTeamEventsKeysOptions = (
-  options: Options<GetTeamEventsKeysData>,
+export const getDistrictEventsOptions = (
+  options: Options<GetDistrictEventsData>,
 ) =>
   queryOptions<
-    GetTeamEventsKeysResponse,
-    GetTeamEventsKeysError,
-    GetTeamEventsKeysResponse,
-    ReturnType<typeof getTeamEventsKeysQueryKey>
+    GetDistrictEventsResponse,
+    GetDistrictEventsError,
+    GetDistrictEventsResponse,
+    ReturnType<typeof getDistrictEventsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventsKeys({
+      const { data } = await getDistrictEvents({
         ...options,
         ...queryKey[0],
         signal,
@@ -783,27 +533,27 @@ export const getTeamEventsKeysOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventsKeysQueryKey(options),
+    queryKey: getDistrictEventsQueryKey(options),
   });
 
-export const getTeamEventsByYearQueryKey = (
-  options: Options<GetTeamEventsByYearData>,
-) => createQueryKey('getTeamEventsByYear', options);
+export const getDistrictEventsKeysQueryKey = (
+  options: Options<GetDistrictEventsKeysData>,
+) => createQueryKey('getDistrictEventsKeys', options);
 
 /**
- * Gets a list of events this team has competed at in the given year.
+ * Gets a list of event keys for events in the given district.
  */
-export const getTeamEventsByYearOptions = (
-  options: Options<GetTeamEventsByYearData>,
+export const getDistrictEventsKeysOptions = (
+  options: Options<GetDistrictEventsKeysData>,
 ) =>
   queryOptions<
-    GetTeamEventsByYearResponse,
-    GetTeamEventsByYearError,
-    GetTeamEventsByYearResponse,
-    ReturnType<typeof getTeamEventsByYearQueryKey>
+    GetDistrictEventsKeysResponse,
+    GetDistrictEventsKeysError,
+    GetDistrictEventsKeysResponse,
+    ReturnType<typeof getDistrictEventsKeysQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventsByYear({
+      const { data } = await getDistrictEventsKeys({
         ...options,
         ...queryKey[0],
         signal,
@@ -811,27 +561,27 @@ export const getTeamEventsByYearOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventsByYearQueryKey(options),
+    queryKey: getDistrictEventsKeysQueryKey(options),
   });
 
-export const getTeamEventsByYearSimpleQueryKey = (
-  options: Options<GetTeamEventsByYearSimpleData>,
-) => createQueryKey('getTeamEventsByYearSimple', options);
+export const getDistrictEventsSimpleQueryKey = (
+  options: Options<GetDistrictEventsSimpleData>,
+) => createQueryKey('getDistrictEventsSimple', options);
 
 /**
- * Gets a short-form list of events this team has competed at in the given year.
+ * Gets a short-form list of events in the given district.
  */
-export const getTeamEventsByYearSimpleOptions = (
-  options: Options<GetTeamEventsByYearSimpleData>,
+export const getDistrictEventsSimpleOptions = (
+  options: Options<GetDistrictEventsSimpleData>,
 ) =>
   queryOptions<
-    GetTeamEventsByYearSimpleResponse,
-    GetTeamEventsByYearSimpleError,
-    GetTeamEventsByYearSimpleResponse,
-    ReturnType<typeof getTeamEventsByYearSimpleQueryKey>
+    GetDistrictEventsSimpleResponse,
+    GetDistrictEventsSimpleError,
+    GetDistrictEventsSimpleResponse,
+    ReturnType<typeof getDistrictEventsSimpleQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventsByYearSimple({
+      const { data } = await getDistrictEventsSimple({
         ...options,
         ...queryKey[0],
         signal,
@@ -839,27 +589,27 @@ export const getTeamEventsByYearSimpleOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventsByYearSimpleQueryKey(options),
+    queryKey: getDistrictEventsSimpleQueryKey(options),
   });
 
-export const getTeamEventsByYearKeysQueryKey = (
-  options: Options<GetTeamEventsByYearKeysData>,
-) => createQueryKey('getTeamEventsByYearKeys', options);
+export const getDistrictRankingsQueryKey = (
+  options: Options<GetDistrictRankingsData>,
+) => createQueryKey('getDistrictRankings', options);
 
 /**
- * Gets a list of the event keys for events this team has competed at in the given year.
+ * Gets a list of team district rankings for the given district.
  */
-export const getTeamEventsByYearKeysOptions = (
-  options: Options<GetTeamEventsByYearKeysData>,
+export const getDistrictRankingsOptions = (
+  options: Options<GetDistrictRankingsData>,
 ) =>
   queryOptions<
-    GetTeamEventsByYearKeysResponse,
-    GetTeamEventsByYearKeysError,
-    GetTeamEventsByYearKeysResponse,
-    ReturnType<typeof getTeamEventsByYearKeysQueryKey>
+    GetDistrictRankingsResponse,
+    GetDistrictRankingsError,
+    GetDistrictRankingsResponse,
+    ReturnType<typeof getDistrictRankingsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventsByYearKeys({
+      const { data } = await getDistrictRankings({
         ...options,
         ...queryKey[0],
         signal,
@@ -867,27 +617,27 @@ export const getTeamEventsByYearKeysOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventsByYearKeysQueryKey(options),
+    queryKey: getDistrictRankingsQueryKey(options),
   });
 
-export const getTeamEventsStatusesByYearQueryKey = (
-  options: Options<GetTeamEventsStatusesByYearData>,
-) => createQueryKey('getTeamEventsStatusesByYear', options);
+export const getDistrictTeamsQueryKey = (
+  options: Options<GetDistrictTeamsData>,
+) => createQueryKey('getDistrictTeams', options);
 
 /**
- * Gets a key-value list of the event statuses for events this team has competed at in the given year.
+ * Gets a list of `Team` objects that competed in events in the given district.
  */
-export const getTeamEventsStatusesByYearOptions = (
-  options: Options<GetTeamEventsStatusesByYearData>,
+export const getDistrictTeamsOptions = (
+  options: Options<GetDistrictTeamsData>,
 ) =>
   queryOptions<
-    GetTeamEventsStatusesByYearResponse,
-    GetTeamEventsStatusesByYearError,
-    GetTeamEventsStatusesByYearResponse,
-    ReturnType<typeof getTeamEventsStatusesByYearQueryKey>
+    GetDistrictTeamsResponse,
+    GetDistrictTeamsError,
+    GetDistrictTeamsResponse,
+    ReturnType<typeof getDistrictTeamsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventsStatusesByYear({
+      const { data } = await getDistrictTeams({
         ...options,
         ...queryKey[0],
         signal,
@@ -895,27 +645,27 @@ export const getTeamEventsStatusesByYearOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventsStatusesByYearQueryKey(options),
+    queryKey: getDistrictTeamsQueryKey(options),
   });
 
-export const getTeamEventMatchesQueryKey = (
-  options: Options<GetTeamEventMatchesData>,
-) => createQueryKey('getTeamEventMatches', options);
+export const getDistrictTeamsKeysQueryKey = (
+  options: Options<GetDistrictTeamsKeysData>,
+) => createQueryKey('getDistrictTeamsKeys', options);
 
 /**
- * Gets a list of matches for the given team and event.
+ * Gets a list of `Team` objects that competed in events in the given district.
  */
-export const getTeamEventMatchesOptions = (
-  options: Options<GetTeamEventMatchesData>,
+export const getDistrictTeamsKeysOptions = (
+  options: Options<GetDistrictTeamsKeysData>,
 ) =>
   queryOptions<
-    GetTeamEventMatchesResponse,
-    GetTeamEventMatchesError,
-    GetTeamEventMatchesResponse,
-    ReturnType<typeof getTeamEventMatchesQueryKey>
+    GetDistrictTeamsKeysResponse,
+    GetDistrictTeamsKeysError,
+    GetDistrictTeamsKeysResponse,
+    ReturnType<typeof getDistrictTeamsKeysQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventMatches({
+      const { data } = await getDistrictTeamsKeys({
         ...options,
         ...queryKey[0],
         signal,
@@ -923,27 +673,27 @@ export const getTeamEventMatchesOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventMatchesQueryKey(options),
+    queryKey: getDistrictTeamsKeysQueryKey(options),
   });
 
-export const getTeamEventMatchesSimpleQueryKey = (
-  options: Options<GetTeamEventMatchesSimpleData>,
-) => createQueryKey('getTeamEventMatchesSimple', options);
+export const getDistrictTeamsSimpleQueryKey = (
+  options: Options<GetDistrictTeamsSimpleData>,
+) => createQueryKey('getDistrictTeamsSimple', options);
 
 /**
- * Gets a short-form list of matches for the given team and event.
+ * Gets a short-form list of `Team` objects that competed in events in the given district.
  */
-export const getTeamEventMatchesSimpleOptions = (
-  options: Options<GetTeamEventMatchesSimpleData>,
+export const getDistrictTeamsSimpleOptions = (
+  options: Options<GetDistrictTeamsSimpleData>,
 ) =>
   queryOptions<
-    GetTeamEventMatchesSimpleResponse,
-    GetTeamEventMatchesSimpleError,
-    GetTeamEventMatchesSimpleResponse,
-    ReturnType<typeof getTeamEventMatchesSimpleQueryKey>
+    GetDistrictTeamsSimpleResponse,
+    GetDistrictTeamsSimpleError,
+    GetDistrictTeamsSimpleResponse,
+    ReturnType<typeof getDistrictTeamsSimpleQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventMatchesSimple({
+      const { data } = await getDistrictTeamsSimple({
         ...options,
         ...queryKey[0],
         signal,
@@ -951,27 +701,27 @@ export const getTeamEventMatchesSimpleOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventMatchesSimpleQueryKey(options),
+    queryKey: getDistrictTeamsSimpleQueryKey(options),
   });
 
-export const getTeamEventMatchesKeysQueryKey = (
-  options: Options<GetTeamEventMatchesKeysData>,
-) => createQueryKey('getTeamEventMatchesKeys', options);
+export const getDistrictsByYearQueryKey = (
+  options: Options<GetDistrictsByYearData>,
+) => createQueryKey('getDistrictsByYear', options);
 
 /**
- * Gets a list of match keys for matches for the given team and event.
+ * Gets a list of districts and their corresponding district key, for the given year.
  */
-export const getTeamEventMatchesKeysOptions = (
-  options: Options<GetTeamEventMatchesKeysData>,
+export const getDistrictsByYearOptions = (
+  options: Options<GetDistrictsByYearData>,
 ) =>
   queryOptions<
-    GetTeamEventMatchesKeysResponse,
-    GetTeamEventMatchesKeysError,
-    GetTeamEventMatchesKeysResponse,
-    ReturnType<typeof getTeamEventMatchesKeysQueryKey>
+    GetDistrictsByYearResponse,
+    GetDistrictsByYearError,
+    GetDistrictsByYearResponse,
+    ReturnType<typeof getDistrictsByYearQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventMatchesKeys({
+      const { data } = await getDistrictsByYear({
         ...options,
         ...queryKey[0],
         signal,
@@ -979,394 +729,7 @@ export const getTeamEventMatchesKeysOptions = (
       });
       return data;
     },
-    queryKey: getTeamEventMatchesKeysQueryKey(options),
-  });
-
-export const getTeamEventAwardsQueryKey = (
-  options: Options<GetTeamEventAwardsData>,
-) => createQueryKey('getTeamEventAwards', options);
-
-/**
- * Gets a list of awards the given team won at the given event.
- */
-export const getTeamEventAwardsOptions = (
-  options: Options<GetTeamEventAwardsData>,
-) =>
-  queryOptions<
-    GetTeamEventAwardsResponse,
-    GetTeamEventAwardsError,
-    GetTeamEventAwardsResponse,
-    ReturnType<typeof getTeamEventAwardsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventAwards({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamEventAwardsQueryKey(options),
-  });
-
-export const getTeamEventStatusQueryKey = (
-  options: Options<GetTeamEventStatusData>,
-) => createQueryKey('getTeamEventStatus', options);
-
-/**
- * Gets the competition rank and status of the team at the given event.
- */
-export const getTeamEventStatusOptions = (
-  options: Options<GetTeamEventStatusData>,
-) =>
-  queryOptions<
-    GetTeamEventStatusResponse,
-    GetTeamEventStatusError,
-    GetTeamEventStatusResponse,
-    ReturnType<typeof getTeamEventStatusQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamEventStatus({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamEventStatusQueryKey(options),
-  });
-
-export const getTeamAwardsQueryKey = (options: Options<GetTeamAwardsData>) =>
-  createQueryKey('getTeamAwards', options);
-
-/**
- * Gets a list of awards the given team has won.
- */
-export const getTeamAwardsOptions = (options: Options<GetTeamAwardsData>) =>
-  queryOptions<
-    GetTeamAwardsResponse,
-    GetTeamAwardsError,
-    GetTeamAwardsResponse,
-    ReturnType<typeof getTeamAwardsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamAwards({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamAwardsQueryKey(options),
-  });
-
-export const getTeamAwardsByYearQueryKey = (
-  options: Options<GetTeamAwardsByYearData>,
-) => createQueryKey('getTeamAwardsByYear', options);
-
-/**
- * Gets a list of awards the given team has won in a given year.
- */
-export const getTeamAwardsByYearOptions = (
-  options: Options<GetTeamAwardsByYearData>,
-) =>
-  queryOptions<
-    GetTeamAwardsByYearResponse,
-    GetTeamAwardsByYearError,
-    GetTeamAwardsByYearResponse,
-    ReturnType<typeof getTeamAwardsByYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamAwardsByYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamAwardsByYearQueryKey(options),
-  });
-
-export const getTeamMatchesByYearQueryKey = (
-  options: Options<GetTeamMatchesByYearData>,
-) => createQueryKey('getTeamMatchesByYear', options);
-
-/**
- * Gets a list of matches for the given team and year.
- */
-export const getTeamMatchesByYearOptions = (
-  options: Options<GetTeamMatchesByYearData>,
-) =>
-  queryOptions<
-    GetTeamMatchesByYearResponse,
-    GetTeamMatchesByYearError,
-    GetTeamMatchesByYearResponse,
-    ReturnType<typeof getTeamMatchesByYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamMatchesByYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamMatchesByYearQueryKey(options),
-  });
-
-export const getTeamMatchesByYearSimpleQueryKey = (
-  options: Options<GetTeamMatchesByYearSimpleData>,
-) => createQueryKey('getTeamMatchesByYearSimple', options);
-
-/**
- * Gets a short-form list of matches for the given team and year.
- */
-export const getTeamMatchesByYearSimpleOptions = (
-  options: Options<GetTeamMatchesByYearSimpleData>,
-) =>
-  queryOptions<
-    GetTeamMatchesByYearSimpleResponse,
-    GetTeamMatchesByYearSimpleError,
-    GetTeamMatchesByYearSimpleResponse,
-    ReturnType<typeof getTeamMatchesByYearSimpleQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamMatchesByYearSimple({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamMatchesByYearSimpleQueryKey(options),
-  });
-
-export const getTeamMatchesByYearKeysQueryKey = (
-  options: Options<GetTeamMatchesByYearKeysData>,
-) => createQueryKey('getTeamMatchesByYearKeys', options);
-
-/**
- * Gets a list of match keys for matches for the given team and year.
- */
-export const getTeamMatchesByYearKeysOptions = (
-  options: Options<GetTeamMatchesByYearKeysData>,
-) =>
-  queryOptions<
-    GetTeamMatchesByYearKeysResponse,
-    GetTeamMatchesByYearKeysError,
-    GetTeamMatchesByYearKeysResponse,
-    ReturnType<typeof getTeamMatchesByYearKeysQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamMatchesByYearKeys({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamMatchesByYearKeysQueryKey(options),
-  });
-
-export const getTeamMediaByYearQueryKey = (
-  options: Options<GetTeamMediaByYearData>,
-) => createQueryKey('getTeamMediaByYear', options);
-
-/**
- * Gets a list of Media (videos / pictures) for the given team and year.
- */
-export const getTeamMediaByYearOptions = (
-  options: Options<GetTeamMediaByYearData>,
-) =>
-  queryOptions<
-    GetTeamMediaByYearResponse,
-    GetTeamMediaByYearError,
-    GetTeamMediaByYearResponse,
-    ReturnType<typeof getTeamMediaByYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamMediaByYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamMediaByYearQueryKey(options),
-  });
-
-export const getTeamMediaByTagQueryKey = (
-  options: Options<GetTeamMediaByTagData>,
-) => createQueryKey('getTeamMediaByTag', options);
-
-/**
- * Gets a list of Media (videos / pictures) for the given team and tag.
- */
-export const getTeamMediaByTagOptions = (
-  options: Options<GetTeamMediaByTagData>,
-) =>
-  queryOptions<
-    GetTeamMediaByTagResponse,
-    GetTeamMediaByTagError,
-    GetTeamMediaByTagResponse,
-    ReturnType<typeof getTeamMediaByTagQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamMediaByTag({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamMediaByTagQueryKey(options),
-  });
-
-export const getTeamMediaByTagYearQueryKey = (
-  options: Options<GetTeamMediaByTagYearData>,
-) => createQueryKey('getTeamMediaByTagYear', options);
-
-/**
- * Gets a list of Media (videos / pictures) for the given team, tag and year.
- */
-export const getTeamMediaByTagYearOptions = (
-  options: Options<GetTeamMediaByTagYearData>,
-) =>
-  queryOptions<
-    GetTeamMediaByTagYearResponse,
-    GetTeamMediaByTagYearError,
-    GetTeamMediaByTagYearResponse,
-    ReturnType<typeof getTeamMediaByTagYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamMediaByTagYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamMediaByTagYearQueryKey(options),
-  });
-
-export const getTeamSocialMediaQueryKey = (
-  options: Options<GetTeamSocialMediaData>,
-) => createQueryKey('getTeamSocialMedia', options);
-
-/**
- * Gets a list of Media (social media) for the given team.
- */
-export const getTeamSocialMediaOptions = (
-  options: Options<GetTeamSocialMediaData>,
-) =>
-  queryOptions<
-    GetTeamSocialMediaResponse,
-    GetTeamSocialMediaError,
-    GetTeamSocialMediaResponse,
-    ReturnType<typeof getTeamSocialMediaQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getTeamSocialMedia({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getTeamSocialMediaQueryKey(options),
-  });
-
-export const getEventsByYearQueryKey = (
-  options: Options<GetEventsByYearData>,
-) => createQueryKey('getEventsByYear', options);
-
-/**
- * Gets a list of events in the given year.
- */
-export const getEventsByYearOptions = (options: Options<GetEventsByYearData>) =>
-  queryOptions<
-    GetEventsByYearResponse,
-    GetEventsByYearError,
-    GetEventsByYearResponse,
-    ReturnType<typeof getEventsByYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventsByYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getEventsByYearQueryKey(options),
-  });
-
-export const getEventsByYearSimpleQueryKey = (
-  options: Options<GetEventsByYearSimpleData>,
-) => createQueryKey('getEventsByYearSimple', options);
-
-/**
- * Gets a short-form list of events in the given year.
- */
-export const getEventsByYearSimpleOptions = (
-  options: Options<GetEventsByYearSimpleData>,
-) =>
-  queryOptions<
-    GetEventsByYearSimpleResponse,
-    GetEventsByYearSimpleError,
-    GetEventsByYearSimpleResponse,
-    ReturnType<typeof getEventsByYearSimpleQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventsByYearSimple({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getEventsByYearSimpleQueryKey(options),
-  });
-
-export const getEventsByYearKeysQueryKey = (
-  options: Options<GetEventsByYearKeysData>,
-) => createQueryKey('getEventsByYearKeys', options);
-
-/**
- * Gets a list of event keys in the given year.
- */
-export const getEventsByYearKeysOptions = (
-  options: Options<GetEventsByYearKeysData>,
-) =>
-  queryOptions<
-    GetEventsByYearKeysResponse,
-    GetEventsByYearKeysError,
-    GetEventsByYearKeysResponse,
-    ReturnType<typeof getEventsByYearKeysQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventsByYearKeys({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getEventsByYearKeysQueryKey(options),
+    queryKey: getDistrictsByYearQueryKey(options),
   });
 
 export const getEventQueryKey = (options: Options<GetEventData>) =>
@@ -1394,21 +757,24 @@ export const getEventOptions = (options: Options<GetEventData>) =>
     queryKey: getEventQueryKey(options),
   });
 
-export const getEventSimpleQueryKey = (options: Options<GetEventSimpleData>) =>
-  createQueryKey('getEventSimple', options);
+export const getEventAdvancementPointsQueryKey = (
+  options: Options<GetEventAdvancementPointsData>,
+) => createQueryKey('getEventAdvancementPoints', options);
 
 /**
- * Gets a short-form Event.
+ * Depending on the type of event (district/regional), this will return either district points or regional CMP points
  */
-export const getEventSimpleOptions = (options: Options<GetEventSimpleData>) =>
+export const getEventAdvancementPointsOptions = (
+  options: Options<GetEventAdvancementPointsData>,
+) =>
   queryOptions<
-    GetEventSimpleResponse,
-    GetEventSimpleError,
-    GetEventSimpleResponse,
-    ReturnType<typeof getEventSimpleQueryKey>
+    GetEventAdvancementPointsResponse,
+    GetEventAdvancementPointsError,
+    GetEventAdvancementPointsResponse,
+    ReturnType<typeof getEventAdvancementPointsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventSimple({
+      const { data } = await getEventAdvancementPoints({
         ...options,
         ...queryKey[0],
         signal,
@@ -1416,7 +782,7 @@ export const getEventSimpleOptions = (options: Options<GetEventSimpleData>) =>
       });
       return data;
     },
-    queryKey: getEventSimpleQueryKey(options),
+    queryKey: getEventAdvancementPointsQueryKey(options),
   });
 
 export const getEventAlliancesQueryKey = (
@@ -1447,6 +813,84 @@ export const getEventAlliancesOptions = (
     queryKey: getEventAlliancesQueryKey(options),
   });
 
+export const getEventAwardsQueryKey = (options: Options<GetEventAwardsData>) =>
+  createQueryKey('getEventAwards', options);
+
+/**
+ * Gets a list of awards from the given event.
+ */
+export const getEventAwardsOptions = (options: Options<GetEventAwardsData>) =>
+  queryOptions<
+    GetEventAwardsResponse,
+    GetEventAwardsError,
+    GetEventAwardsResponse,
+    ReturnType<typeof getEventAwardsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventAwards({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventAwardsQueryKey(options),
+  });
+
+export const getEventCoprsQueryKey = (options: Options<GetEventCoprsData>) =>
+  createQueryKey('getEventCoprs', options);
+
+/**
+ * Gets a set of Event Component OPRs for the given Event.
+ */
+export const getEventCoprsOptions = (options: Options<GetEventCoprsData>) =>
+  queryOptions<
+    GetEventCoprsResponse,
+    GetEventCoprsError,
+    GetEventCoprsResponse,
+    ReturnType<typeof getEventCoprsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventCoprs({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventCoprsQueryKey(options),
+  });
+
+export const getEventDistrictPointsQueryKey = (
+  options: Options<GetEventDistrictPointsData>,
+) => createQueryKey('getEventDistrictPoints', options);
+
+/**
+ * Gets a list of district points for the Event. These are always calculated, regardless of event type, and may/may not be actually useful.
+ */
+export const getEventDistrictPointsOptions = (
+  options: Options<GetEventDistrictPointsData>,
+) =>
+  queryOptions<
+    GetEventDistrictPointsResponse,
+    GetEventDistrictPointsError,
+    GetEventDistrictPointsResponse,
+    ReturnType<typeof getEventDistrictPointsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventDistrictPoints({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventDistrictPointsQueryKey(options),
+  });
+
 export const getEventInsightsQueryKey = (
   options: Options<GetEventInsightsData>,
 ) => createQueryKey('getEventInsights', options);
@@ -1475,6 +919,118 @@ export const getEventInsightsOptions = (
     queryKey: getEventInsightsQueryKey(options),
   });
 
+export const getEventMatchesQueryKey = (
+  options: Options<GetEventMatchesData>,
+) => createQueryKey('getEventMatches', options);
+
+/**
+ * Gets a list of matches for the given event.
+ */
+export const getEventMatchesOptions = (options: Options<GetEventMatchesData>) =>
+  queryOptions<
+    GetEventMatchesResponse,
+    GetEventMatchesError,
+    GetEventMatchesResponse,
+    ReturnType<typeof getEventMatchesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventMatches({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventMatchesQueryKey(options),
+  });
+
+export const getEventMatchesKeysQueryKey = (
+  options: Options<GetEventMatchesKeysData>,
+) => createQueryKey('getEventMatchesKeys', options);
+
+/**
+ * Gets a list of match keys for the given event.
+ */
+export const getEventMatchesKeysOptions = (
+  options: Options<GetEventMatchesKeysData>,
+) =>
+  queryOptions<
+    GetEventMatchesKeysResponse,
+    GetEventMatchesKeysError,
+    GetEventMatchesKeysResponse,
+    ReturnType<typeof getEventMatchesKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventMatchesKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventMatchesKeysQueryKey(options),
+  });
+
+export const getEventMatchesSimpleQueryKey = (
+  options: Options<GetEventMatchesSimpleData>,
+) => createQueryKey('getEventMatchesSimple', options);
+
+/**
+ * Gets a short-form list of matches for the given event.
+ */
+export const getEventMatchesSimpleOptions = (
+  options: Options<GetEventMatchesSimpleData>,
+) =>
+  queryOptions<
+    GetEventMatchesSimpleResponse,
+    GetEventMatchesSimpleError,
+    GetEventMatchesSimpleResponse,
+    ReturnType<typeof getEventMatchesSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventMatchesSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventMatchesSimpleQueryKey(options),
+  });
+
+export const getEventMatchTimeseriesQueryKey = (
+  options: Options<GetEventMatchTimeseriesData>,
+) => createQueryKey('getEventMatchTimeseries', options);
+
+/**
+ * Gets an array of Match Keys for the given event key that have timeseries data. Returns an empty array if no matches have timeseries data.
+ * *WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.
+ * *WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.
+ */
+export const getEventMatchTimeseriesOptions = (
+  options: Options<GetEventMatchTimeseriesData>,
+) =>
+  queryOptions<
+    GetEventMatchTimeseriesResponse,
+    GetEventMatchTimeseriesError,
+    GetEventMatchTimeseriesResponse,
+    ReturnType<typeof getEventMatchTimeseriesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventMatchTimeseries({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventMatchTimeseriesQueryKey(options),
+  });
+
 export const getEventOprsQueryKey = (options: Options<GetEventOprsData>) =>
   createQueryKey('getEventOprs', options);
 
@@ -1498,31 +1054,6 @@ export const getEventOprsOptions = (options: Options<GetEventOprsData>) =>
       return data;
     },
     queryKey: getEventOprsQueryKey(options),
-  });
-
-export const getEventCoprsQueryKey = (options: Options<GetEventCoprsData>) =>
-  createQueryKey('getEventCoprs', options);
-
-/**
- * Gets a set of Event Component OPRs for the given Event.
- */
-export const getEventCoprsOptions = (options: Options<GetEventCoprsData>) =>
-  queryOptions<
-    GetEventCoprsResponse,
-    GetEventCoprsError,
-    GetEventCoprsResponse,
-    ReturnType<typeof getEventCoprsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventCoprs({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getEventCoprsQueryKey(options),
   });
 
 export const getEventPredictionsQueryKey = (
@@ -1581,34 +1112,6 @@ export const getEventRankingsOptions = (
     queryKey: getEventRankingsQueryKey(options),
   });
 
-export const getEventDistrictPointsQueryKey = (
-  options: Options<GetEventDistrictPointsData>,
-) => createQueryKey('getEventDistrictPoints', options);
-
-/**
- * Gets a list of district points for the Event. These are always calculated, regardless of event type, and may/may not be actually useful.
- */
-export const getEventDistrictPointsOptions = (
-  options: Options<GetEventDistrictPointsData>,
-) =>
-  queryOptions<
-    GetEventDistrictPointsResponse,
-    GetEventDistrictPointsError,
-    GetEventDistrictPointsResponse,
-    ReturnType<typeof getEventDistrictPointsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventDistrictPoints({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getEventDistrictPointsQueryKey(options),
-  });
-
 export const getRegionalChampsPoolPointsQueryKey = (
   options: Options<GetRegionalChampsPoolPointsData>,
 ) => createQueryKey('getRegionalChampsPoolPoints', options);
@@ -1637,24 +1140,21 @@ export const getRegionalChampsPoolPointsOptions = (
     queryKey: getRegionalChampsPoolPointsQueryKey(options),
   });
 
-export const getEventAdvancementPointsQueryKey = (
-  options: Options<GetEventAdvancementPointsData>,
-) => createQueryKey('getEventAdvancementPoints', options);
+export const getEventSimpleQueryKey = (options: Options<GetEventSimpleData>) =>
+  createQueryKey('getEventSimple', options);
 
 /**
- * Depending on the type of event (district/regional), this will return either district points or regional CMP points
+ * Gets a short-form Event.
  */
-export const getEventAdvancementPointsOptions = (
-  options: Options<GetEventAdvancementPointsData>,
-) =>
+export const getEventSimpleOptions = (options: Options<GetEventSimpleData>) =>
   queryOptions<
-    GetEventAdvancementPointsResponse,
-    GetEventAdvancementPointsError,
-    GetEventAdvancementPointsResponse,
-    ReturnType<typeof getEventAdvancementPointsQueryKey>
+    GetEventSimpleResponse,
+    GetEventSimpleError,
+    GetEventSimpleResponse,
+    ReturnType<typeof getEventSimpleQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventAdvancementPoints({
+      const { data } = await getEventSimple({
         ...options,
         ...queryKey[0],
         signal,
@@ -1662,7 +1162,35 @@ export const getEventAdvancementPointsOptions = (
       });
       return data;
     },
-    queryKey: getEventAdvancementPointsQueryKey(options),
+    queryKey: getEventSimpleQueryKey(options),
+  });
+
+export const getEventTeamMediaQueryKey = (
+  options: Options<GetEventTeamMediaData>,
+) => createQueryKey('getEventTeamMedia', options);
+
+/**
+ * Gets a list of media objects that correspond to teams at this event.
+ */
+export const getEventTeamMediaOptions = (
+  options: Options<GetEventTeamMediaData>,
+) =>
+  queryOptions<
+    GetEventTeamMediaResponse,
+    GetEventTeamMediaError,
+    GetEventTeamMediaResponse,
+    ReturnType<typeof getEventTeamMediaQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventTeamMedia({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventTeamMediaQueryKey(options),
   });
 
 export const getEventTeamsQueryKey = (options: Options<GetEventTeamsData>) =>
@@ -1688,34 +1216,6 @@ export const getEventTeamsOptions = (options: Options<GetEventTeamsData>) =>
       return data;
     },
     queryKey: getEventTeamsQueryKey(options),
-  });
-
-export const getEventTeamsSimpleQueryKey = (
-  options: Options<GetEventTeamsSimpleData>,
-) => createQueryKey('getEventTeamsSimple', options);
-
-/**
- * Gets a short-form list of `Team` objects that competed in the given event.
- */
-export const getEventTeamsSimpleOptions = (
-  options: Options<GetEventTeamsSimpleData>,
-) =>
-  queryOptions<
-    GetEventTeamsSimpleResponse,
-    GetEventTeamsSimpleError,
-    GetEventTeamsSimpleResponse,
-    ReturnType<typeof getEventTeamsSimpleQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventTeamsSimple({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getEventTeamsSimpleQueryKey(options),
   });
 
 export const getEventTeamsKeysQueryKey = (
@@ -1746,6 +1246,34 @@ export const getEventTeamsKeysOptions = (
     queryKey: getEventTeamsKeysQueryKey(options),
   });
 
+export const getEventTeamsSimpleQueryKey = (
+  options: Options<GetEventTeamsSimpleData>,
+) => createQueryKey('getEventTeamsSimple', options);
+
+/**
+ * Gets a short-form list of `Team` objects that competed in the given event.
+ */
+export const getEventTeamsSimpleOptions = (
+  options: Options<GetEventTeamsSimpleData>,
+) =>
+  queryOptions<
+    GetEventTeamsSimpleResponse,
+    GetEventTeamsSimpleError,
+    GetEventTeamsSimpleResponse,
+    ReturnType<typeof getEventTeamsSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventTeamsSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventTeamsSimpleQueryKey(options),
+  });
+
 export const getEventTeamsStatusesQueryKey = (
   options: Options<GetEventTeamsStatusesData>,
 ) => createQueryKey('getEventTeamsStatuses', options);
@@ -1774,22 +1302,22 @@ export const getEventTeamsStatusesOptions = (
     queryKey: getEventTeamsStatusesQueryKey(options),
   });
 
-export const getEventMatchesQueryKey = (
-  options: Options<GetEventMatchesData>,
-) => createQueryKey('getEventMatches', options);
+export const getEventsByYearQueryKey = (
+  options: Options<GetEventsByYearData>,
+) => createQueryKey('getEventsByYear', options);
 
 /**
- * Gets a list of matches for the given event.
+ * Gets a list of events in the given year.
  */
-export const getEventMatchesOptions = (options: Options<GetEventMatchesData>) =>
+export const getEventsByYearOptions = (options: Options<GetEventsByYearData>) =>
   queryOptions<
-    GetEventMatchesResponse,
-    GetEventMatchesError,
-    GetEventMatchesResponse,
-    ReturnType<typeof getEventMatchesQueryKey>
+    GetEventsByYearResponse,
+    GetEventsByYearError,
+    GetEventsByYearResponse,
+    ReturnType<typeof getEventsByYearQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventMatches({
+      const { data } = await getEventsByYear({
         ...options,
         ...queryKey[0],
         signal,
@@ -1797,27 +1325,27 @@ export const getEventMatchesOptions = (options: Options<GetEventMatchesData>) =>
       });
       return data;
     },
-    queryKey: getEventMatchesQueryKey(options),
+    queryKey: getEventsByYearQueryKey(options),
   });
 
-export const getEventMatchesSimpleQueryKey = (
-  options: Options<GetEventMatchesSimpleData>,
-) => createQueryKey('getEventMatchesSimple', options);
+export const getEventsByYearKeysQueryKey = (
+  options: Options<GetEventsByYearKeysData>,
+) => createQueryKey('getEventsByYearKeys', options);
 
 /**
- * Gets a short-form list of matches for the given event.
+ * Gets a list of event keys in the given year.
  */
-export const getEventMatchesSimpleOptions = (
-  options: Options<GetEventMatchesSimpleData>,
+export const getEventsByYearKeysOptions = (
+  options: Options<GetEventsByYearKeysData>,
 ) =>
   queryOptions<
-    GetEventMatchesSimpleResponse,
-    GetEventMatchesSimpleError,
-    GetEventMatchesSimpleResponse,
-    ReturnType<typeof getEventMatchesSimpleQueryKey>
+    GetEventsByYearKeysResponse,
+    GetEventsByYearKeysError,
+    GetEventsByYearKeysResponse,
+    ReturnType<typeof getEventsByYearKeysQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventMatchesSimple({
+      const { data } = await getEventsByYearKeys({
         ...options,
         ...queryKey[0],
         signal,
@@ -1825,27 +1353,27 @@ export const getEventMatchesSimpleOptions = (
       });
       return data;
     },
-    queryKey: getEventMatchesSimpleQueryKey(options),
+    queryKey: getEventsByYearKeysQueryKey(options),
   });
 
-export const getEventMatchesKeysQueryKey = (
-  options: Options<GetEventMatchesKeysData>,
-) => createQueryKey('getEventMatchesKeys', options);
+export const getEventsByYearSimpleQueryKey = (
+  options: Options<GetEventsByYearSimpleData>,
+) => createQueryKey('getEventsByYearSimple', options);
 
 /**
- * Gets a list of match keys for the given event.
+ * Gets a short-form list of events in the given year.
  */
-export const getEventMatchesKeysOptions = (
-  options: Options<GetEventMatchesKeysData>,
+export const getEventsByYearSimpleOptions = (
+  options: Options<GetEventsByYearSimpleData>,
 ) =>
   queryOptions<
-    GetEventMatchesKeysResponse,
-    GetEventMatchesKeysError,
-    GetEventMatchesKeysResponse,
-    ReturnType<typeof getEventMatchesKeysQueryKey>
+    GetEventsByYearSimpleResponse,
+    GetEventsByYearSimpleError,
+    GetEventsByYearSimpleResponse,
+    ReturnType<typeof getEventsByYearSimpleQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventMatchesKeys({
+      const { data } = await getEventsByYearSimple({
         ...options,
         ...queryKey[0],
         signal,
@@ -1853,29 +1381,27 @@ export const getEventMatchesKeysOptions = (
       });
       return data;
     },
-    queryKey: getEventMatchesKeysQueryKey(options),
+    queryKey: getEventsByYearSimpleQueryKey(options),
   });
 
-export const getEventMatchTimeseriesQueryKey = (
-  options: Options<GetEventMatchTimeseriesData>,
-) => createQueryKey('getEventMatchTimeseries', options);
+export const getInsightsLeaderboardsYearQueryKey = (
+  options: Options<GetInsightsLeaderboardsYearData>,
+) => createQueryKey('getInsightsLeaderboardsYear', options);
 
 /**
- * Gets an array of Match Keys for the given event key that have timeseries data. Returns an empty array if no matches have timeseries data.
- * *WARNING:* This is *not* official data, and is subject to a significant possibility of error, or missing data. Do not rely on this data for any purpose. In fact, pretend we made it up.
- * *WARNING:* This endpoint and corresponding data models are under *active development* and may change at any time, including in breaking ways.
+ * Gets a list of `LeaderboardInsight` objects from a specific year. Use year=0 for overall.
  */
-export const getEventMatchTimeseriesOptions = (
-  options: Options<GetEventMatchTimeseriesData>,
+export const getInsightsLeaderboardsYearOptions = (
+  options: Options<GetInsightsLeaderboardsYearData>,
 ) =>
   queryOptions<
-    GetEventMatchTimeseriesResponse,
-    GetEventMatchTimeseriesError,
-    GetEventMatchTimeseriesResponse,
-    ReturnType<typeof getEventMatchTimeseriesQueryKey>
+    GetInsightsLeaderboardsYearResponse,
+    GetInsightsLeaderboardsYearError,
+    GetInsightsLeaderboardsYearResponse,
+    ReturnType<typeof getInsightsLeaderboardsYearQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventMatchTimeseries({
+      const { data } = await getInsightsLeaderboardsYear({
         ...options,
         ...queryKey[0],
         signal,
@@ -1883,52 +1409,27 @@ export const getEventMatchTimeseriesOptions = (
       });
       return data;
     },
-    queryKey: getEventMatchTimeseriesQueryKey(options),
+    queryKey: getInsightsLeaderboardsYearQueryKey(options),
   });
 
-export const getEventAwardsQueryKey = (options: Options<GetEventAwardsData>) =>
-  createQueryKey('getEventAwards', options);
+export const getInsightsNotablesYearQueryKey = (
+  options: Options<GetInsightsNotablesYearData>,
+) => createQueryKey('getInsightsNotablesYear', options);
 
 /**
- * Gets a list of awards from the given event.
+ * Gets a list of `NotablesInsight` objects from a specific year. Use year=0 for overall.
  */
-export const getEventAwardsOptions = (options: Options<GetEventAwardsData>) =>
-  queryOptions<
-    GetEventAwardsResponse,
-    GetEventAwardsError,
-    GetEventAwardsResponse,
-    ReturnType<typeof getEventAwardsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventAwards({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getEventAwardsQueryKey(options),
-  });
-
-export const getEventTeamMediaQueryKey = (
-  options: Options<GetEventTeamMediaData>,
-) => createQueryKey('getEventTeamMedia', options);
-
-/**
- * Gets a list of media objects that correspond to teams at this event.
- */
-export const getEventTeamMediaOptions = (
-  options: Options<GetEventTeamMediaData>,
+export const getInsightsNotablesYearOptions = (
+  options: Options<GetInsightsNotablesYearData>,
 ) =>
   queryOptions<
-    GetEventTeamMediaResponse,
-    GetEventTeamMediaError,
-    GetEventTeamMediaResponse,
-    ReturnType<typeof getEventTeamMediaQueryKey>
+    GetInsightsNotablesYearResponse,
+    GetInsightsNotablesYearError,
+    GetInsightsNotablesYearResponse,
+    ReturnType<typeof getInsightsNotablesYearQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getEventTeamMedia({
+      const { data } = await getInsightsNotablesYear({
         ...options,
         ...queryKey[0],
         signal,
@@ -1936,7 +1437,7 @@ export const getEventTeamMediaOptions = (
       });
       return data;
     },
-    queryKey: getEventTeamMediaQueryKey(options),
+    queryKey: getInsightsNotablesYearQueryKey(options),
   });
 
 export const getMatchQueryKey = (options: Options<GetMatchData>) =>
@@ -2044,370 +1545,6 @@ export const getMatchZebraOptions = (options: Options<GetMatchZebraData>) =>
     queryKey: getMatchZebraQueryKey(options),
   });
 
-export const getDistrictsByYearQueryKey = (
-  options: Options<GetDistrictsByYearData>,
-) => createQueryKey('getDistrictsByYear', options);
-
-/**
- * Gets a list of districts and their corresponding district key, for the given year.
- */
-export const getDistrictsByYearOptions = (
-  options: Options<GetDistrictsByYearData>,
-) =>
-  queryOptions<
-    GetDistrictsByYearResponse,
-    GetDistrictsByYearError,
-    GetDistrictsByYearResponse,
-    ReturnType<typeof getDistrictsByYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictsByYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictsByYearQueryKey(options),
-  });
-
-export const getDistrictHistoryQueryKey = (
-  options: Options<GetDistrictHistoryData>,
-) => createQueryKey('getDistrictHistory', options);
-
-/**
- * Gets a list of District objects with the given district abbreviation. This accounts for district abbreviation changes, such as MAR to FMA.
- */
-export const getDistrictHistoryOptions = (
-  options: Options<GetDistrictHistoryData>,
-) =>
-  queryOptions<
-    GetDistrictHistoryResponse,
-    GetDistrictHistoryError,
-    GetDistrictHistoryResponse,
-    ReturnType<typeof getDistrictHistoryQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictHistory({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictHistoryQueryKey(options),
-  });
-
-export const getDistrictInsightsQueryKey = (
-  options: Options<GetDistrictInsightsData>,
-) => createQueryKey('getDistrictInsights', options);
-
-/**
- * Gets insights for a given district.
- */
-export const getDistrictInsightsOptions = (
-  options: Options<GetDistrictInsightsData>,
-) =>
-  queryOptions<
-    GetDistrictInsightsResponse,
-    GetDistrictInsightsError,
-    GetDistrictInsightsResponse,
-    ReturnType<typeof getDistrictInsightsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictInsights({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictInsightsQueryKey(options),
-  });
-
-export const getDistrictEventsQueryKey = (
-  options: Options<GetDistrictEventsData>,
-) => createQueryKey('getDistrictEvents', options);
-
-/**
- * Gets a list of events in the given district.
- */
-export const getDistrictEventsOptions = (
-  options: Options<GetDistrictEventsData>,
-) =>
-  queryOptions<
-    GetDistrictEventsResponse,
-    GetDistrictEventsError,
-    GetDistrictEventsResponse,
-    ReturnType<typeof getDistrictEventsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictEvents({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictEventsQueryKey(options),
-  });
-
-export const getDistrictAwardsQueryKey = (
-  options: Options<GetDistrictAwardsData>,
-) => createQueryKey('getDistrictAwards', options);
-
-/**
- * Gets a list of awards in the given district.
- */
-export const getDistrictAwardsOptions = (
-  options: Options<GetDistrictAwardsData>,
-) =>
-  queryOptions<
-    GetDistrictAwardsResponse,
-    GetDistrictAwardsError,
-    GetDistrictAwardsResponse,
-    ReturnType<typeof getDistrictAwardsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictAwards({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictAwardsQueryKey(options),
-  });
-
-export const getDistrictEventsSimpleQueryKey = (
-  options: Options<GetDistrictEventsSimpleData>,
-) => createQueryKey('getDistrictEventsSimple', options);
-
-/**
- * Gets a short-form list of events in the given district.
- */
-export const getDistrictEventsSimpleOptions = (
-  options: Options<GetDistrictEventsSimpleData>,
-) =>
-  queryOptions<
-    GetDistrictEventsSimpleResponse,
-    GetDistrictEventsSimpleError,
-    GetDistrictEventsSimpleResponse,
-    ReturnType<typeof getDistrictEventsSimpleQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictEventsSimple({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictEventsSimpleQueryKey(options),
-  });
-
-export const getDistrictEventsKeysQueryKey = (
-  options: Options<GetDistrictEventsKeysData>,
-) => createQueryKey('getDistrictEventsKeys', options);
-
-/**
- * Gets a list of event keys for events in the given district.
- */
-export const getDistrictEventsKeysOptions = (
-  options: Options<GetDistrictEventsKeysData>,
-) =>
-  queryOptions<
-    GetDistrictEventsKeysResponse,
-    GetDistrictEventsKeysError,
-    GetDistrictEventsKeysResponse,
-    ReturnType<typeof getDistrictEventsKeysQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictEventsKeys({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictEventsKeysQueryKey(options),
-  });
-
-export const getDistrictTeamsQueryKey = (
-  options: Options<GetDistrictTeamsData>,
-) => createQueryKey('getDistrictTeams', options);
-
-/**
- * Gets a list of `Team` objects that competed in events in the given district.
- */
-export const getDistrictTeamsOptions = (
-  options: Options<GetDistrictTeamsData>,
-) =>
-  queryOptions<
-    GetDistrictTeamsResponse,
-    GetDistrictTeamsError,
-    GetDistrictTeamsResponse,
-    ReturnType<typeof getDistrictTeamsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictTeams({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictTeamsQueryKey(options),
-  });
-
-export const getDistrictTeamsSimpleQueryKey = (
-  options: Options<GetDistrictTeamsSimpleData>,
-) => createQueryKey('getDistrictTeamsSimple', options);
-
-/**
- * Gets a short-form list of `Team` objects that competed in events in the given district.
- */
-export const getDistrictTeamsSimpleOptions = (
-  options: Options<GetDistrictTeamsSimpleData>,
-) =>
-  queryOptions<
-    GetDistrictTeamsSimpleResponse,
-    GetDistrictTeamsSimpleError,
-    GetDistrictTeamsSimpleResponse,
-    ReturnType<typeof getDistrictTeamsSimpleQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictTeamsSimple({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictTeamsSimpleQueryKey(options),
-  });
-
-export const getDistrictTeamsKeysQueryKey = (
-  options: Options<GetDistrictTeamsKeysData>,
-) => createQueryKey('getDistrictTeamsKeys', options);
-
-/**
- * Gets a list of `Team` objects that competed in events in the given district.
- */
-export const getDistrictTeamsKeysOptions = (
-  options: Options<GetDistrictTeamsKeysData>,
-) =>
-  queryOptions<
-    GetDistrictTeamsKeysResponse,
-    GetDistrictTeamsKeysError,
-    GetDistrictTeamsKeysResponse,
-    ReturnType<typeof getDistrictTeamsKeysQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictTeamsKeys({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictTeamsKeysQueryKey(options),
-  });
-
-export const getDistrictRankingsQueryKey = (
-  options: Options<GetDistrictRankingsData>,
-) => createQueryKey('getDistrictRankings', options);
-
-/**
- * Gets a list of team district rankings for the given district.
- */
-export const getDistrictRankingsOptions = (
-  options: Options<GetDistrictRankingsData>,
-) =>
-  queryOptions<
-    GetDistrictRankingsResponse,
-    GetDistrictRankingsError,
-    GetDistrictRankingsResponse,
-    ReturnType<typeof getDistrictRankingsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictRankings({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictRankingsQueryKey(options),
-  });
-
-export const getDistrictAdvancementQueryKey = (
-  options: Options<GetDistrictAdvancementData>,
-) => createQueryKey('getDistrictAdvancement', options);
-
-/**
- * Gets a list of advancement information per team in a district.
- */
-export const getDistrictAdvancementOptions = (
-  options: Options<GetDistrictAdvancementData>,
-) =>
-  queryOptions<
-    GetDistrictAdvancementResponse,
-    GetDistrictAdvancementError,
-    GetDistrictAdvancementResponse,
-    ReturnType<typeof getDistrictAdvancementQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictAdvancement({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictAdvancementQueryKey(options),
-  });
-
-export const getDistrictDcmpHistoryQueryKey = (
-  options: Options<GetDistrictDcmpHistoryData>,
-) => createQueryKey('getDistrictDcmpHistory', options);
-
-/**
- * Gets a list of DCMP events and awards for the given district abbreviation.
- */
-export const getDistrictDcmpHistoryOptions = (
-  options: Options<GetDistrictDcmpHistoryData>,
-) =>
-  queryOptions<
-    GetDistrictDcmpHistoryResponse,
-    GetDistrictDcmpHistoryError,
-    GetDistrictDcmpHistoryResponse,
-    ReturnType<typeof getDistrictDcmpHistoryQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getDistrictDcmpHistory({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getDistrictDcmpHistoryQueryKey(options),
-  });
-
 export const getRegionalAdvancementQueryKey = (
   options: Options<GetRegionalAdvancementData>,
 ) => createQueryKey('getRegionalAdvancement', options);
@@ -2464,62 +1601,6 @@ export const getRegionalRankingsOptions = (
     queryKey: getRegionalRankingsQueryKey(options),
   });
 
-export const getInsightsLeaderboardsYearQueryKey = (
-  options: Options<GetInsightsLeaderboardsYearData>,
-) => createQueryKey('getInsightsLeaderboardsYear', options);
-
-/**
- * Gets a list of `LeaderboardInsight` objects from a specific year. Use year=0 for overall.
- */
-export const getInsightsLeaderboardsYearOptions = (
-  options: Options<GetInsightsLeaderboardsYearData>,
-) =>
-  queryOptions<
-    GetInsightsLeaderboardsYearResponse,
-    GetInsightsLeaderboardsYearError,
-    GetInsightsLeaderboardsYearResponse,
-    ReturnType<typeof getInsightsLeaderboardsYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getInsightsLeaderboardsYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getInsightsLeaderboardsYearQueryKey(options),
-  });
-
-export const getInsightsNotablesYearQueryKey = (
-  options: Options<GetInsightsNotablesYearData>,
-) => createQueryKey('getInsightsNotablesYear', options);
-
-/**
- * Gets a list of `NotablesInsight` objects from a specific year. Use year=0 for overall.
- */
-export const getInsightsNotablesYearOptions = (
-  options: Options<GetInsightsNotablesYearData>,
-) =>
-  queryOptions<
-    GetInsightsNotablesYearResponse,
-    GetInsightsNotablesYearError,
-    GetInsightsNotablesYearResponse,
-    ReturnType<typeof getInsightsNotablesYearQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getInsightsNotablesYear({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getInsightsNotablesYearQueryKey(options),
-  });
-
 export const getSearchIndexQueryKey = (options?: Options<GetSearchIndexData>) =>
   createQueryKey('getSearchIndex', options);
 
@@ -2543,4 +1624,923 @@ export const getSearchIndexOptions = (options?: Options<GetSearchIndexData>) =>
       return data;
     },
     queryKey: getSearchIndexQueryKey(options),
+  });
+
+export const getStatusQueryKey = (options?: Options<GetStatusData>) =>
+  createQueryKey('getStatus', options);
+
+/**
+ * Returns API status, and TBA status information.
+ */
+export const getStatusOptions = (options?: Options<GetStatusData>) =>
+  queryOptions<
+    GetStatusResponse,
+    GetStatusError,
+    GetStatusResponse,
+    ReturnType<typeof getStatusQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getStatus({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getStatusQueryKey(options),
+  });
+
+export const getTeamQueryKey = (options: Options<GetTeamData>) =>
+  createQueryKey('getTeam', options);
+
+/**
+ * Gets a `Team` object for the team referenced by the given key.
+ */
+export const getTeamOptions = (options: Options<GetTeamData>) =>
+  queryOptions<
+    GetTeamResponse,
+    GetTeamError,
+    GetTeamResponse,
+    ReturnType<typeof getTeamQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeam({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamQueryKey(options),
+  });
+
+export const getTeamAwardsQueryKey = (options: Options<GetTeamAwardsData>) =>
+  createQueryKey('getTeamAwards', options);
+
+/**
+ * Gets a list of awards the given team has won.
+ */
+export const getTeamAwardsOptions = (options: Options<GetTeamAwardsData>) =>
+  queryOptions<
+    GetTeamAwardsResponse,
+    GetTeamAwardsError,
+    GetTeamAwardsResponse,
+    ReturnType<typeof getTeamAwardsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamAwards({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamAwardsQueryKey(options),
+  });
+
+export const getTeamAwardsByYearQueryKey = (
+  options: Options<GetTeamAwardsByYearData>,
+) => createQueryKey('getTeamAwardsByYear', options);
+
+/**
+ * Gets a list of awards the given team has won in a given year.
+ */
+export const getTeamAwardsByYearOptions = (
+  options: Options<GetTeamAwardsByYearData>,
+) =>
+  queryOptions<
+    GetTeamAwardsByYearResponse,
+    GetTeamAwardsByYearError,
+    GetTeamAwardsByYearResponse,
+    ReturnType<typeof getTeamAwardsByYearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamAwardsByYear({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamAwardsByYearQueryKey(options),
+  });
+
+export const getTeamDistrictsQueryKey = (
+  options: Options<GetTeamDistrictsData>,
+) => createQueryKey('getTeamDistricts', options);
+
+/**
+ * Gets an array of districts representing each year the team was in a district. Will return an empty array if the team was never in a district.
+ */
+export const getTeamDistrictsOptions = (
+  options: Options<GetTeamDistrictsData>,
+) =>
+  queryOptions<
+    GetTeamDistrictsResponse,
+    GetTeamDistrictsError,
+    GetTeamDistrictsResponse,
+    ReturnType<typeof getTeamDistrictsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamDistricts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamDistrictsQueryKey(options),
+  });
+
+export const getTeamEventAwardsQueryKey = (
+  options: Options<GetTeamEventAwardsData>,
+) => createQueryKey('getTeamEventAwards', options);
+
+/**
+ * Gets a list of awards the given team won at the given event.
+ */
+export const getTeamEventAwardsOptions = (
+  options: Options<GetTeamEventAwardsData>,
+) =>
+  queryOptions<
+    GetTeamEventAwardsResponse,
+    GetTeamEventAwardsError,
+    GetTeamEventAwardsResponse,
+    ReturnType<typeof getTeamEventAwardsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventAwards({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventAwardsQueryKey(options),
+  });
+
+export const getTeamEventMatchesQueryKey = (
+  options: Options<GetTeamEventMatchesData>,
+) => createQueryKey('getTeamEventMatches', options);
+
+/**
+ * Gets a list of matches for the given team and event.
+ */
+export const getTeamEventMatchesOptions = (
+  options: Options<GetTeamEventMatchesData>,
+) =>
+  queryOptions<
+    GetTeamEventMatchesResponse,
+    GetTeamEventMatchesError,
+    GetTeamEventMatchesResponse,
+    ReturnType<typeof getTeamEventMatchesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventMatches({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventMatchesQueryKey(options),
+  });
+
+export const getTeamEventMatchesKeysQueryKey = (
+  options: Options<GetTeamEventMatchesKeysData>,
+) => createQueryKey('getTeamEventMatchesKeys', options);
+
+/**
+ * Gets a list of match keys for matches for the given team and event.
+ */
+export const getTeamEventMatchesKeysOptions = (
+  options: Options<GetTeamEventMatchesKeysData>,
+) =>
+  queryOptions<
+    GetTeamEventMatchesKeysResponse,
+    GetTeamEventMatchesKeysError,
+    GetTeamEventMatchesKeysResponse,
+    ReturnType<typeof getTeamEventMatchesKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventMatchesKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventMatchesKeysQueryKey(options),
+  });
+
+export const getTeamEventMatchesSimpleQueryKey = (
+  options: Options<GetTeamEventMatchesSimpleData>,
+) => createQueryKey('getTeamEventMatchesSimple', options);
+
+/**
+ * Gets a short-form list of matches for the given team and event.
+ */
+export const getTeamEventMatchesSimpleOptions = (
+  options: Options<GetTeamEventMatchesSimpleData>,
+) =>
+  queryOptions<
+    GetTeamEventMatchesSimpleResponse,
+    GetTeamEventMatchesSimpleError,
+    GetTeamEventMatchesSimpleResponse,
+    ReturnType<typeof getTeamEventMatchesSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventMatchesSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventMatchesSimpleQueryKey(options),
+  });
+
+export const getTeamEventStatusQueryKey = (
+  options: Options<GetTeamEventStatusData>,
+) => createQueryKey('getTeamEventStatus', options);
+
+/**
+ * Gets the competition rank and status of the team at the given event.
+ */
+export const getTeamEventStatusOptions = (
+  options: Options<GetTeamEventStatusData>,
+) =>
+  queryOptions<
+    GetTeamEventStatusResponse,
+    GetTeamEventStatusError,
+    GetTeamEventStatusResponse,
+    ReturnType<typeof getTeamEventStatusQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventStatus({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventStatusQueryKey(options),
+  });
+
+export const getTeamEventsQueryKey = (options: Options<GetTeamEventsData>) =>
+  createQueryKey('getTeamEvents', options);
+
+/**
+ * Gets a list of all events this team has competed at.
+ */
+export const getTeamEventsOptions = (options: Options<GetTeamEventsData>) =>
+  queryOptions<
+    GetTeamEventsResponse,
+    GetTeamEventsError,
+    GetTeamEventsResponse,
+    ReturnType<typeof getTeamEventsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEvents({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventsQueryKey(options),
+  });
+
+export const getTeamEventsKeysQueryKey = (
+  options: Options<GetTeamEventsKeysData>,
+) => createQueryKey('getTeamEventsKeys', options);
+
+/**
+ * Gets a list of the event keys for all events this team has competed at.
+ */
+export const getTeamEventsKeysOptions = (
+  options: Options<GetTeamEventsKeysData>,
+) =>
+  queryOptions<
+    GetTeamEventsKeysResponse,
+    GetTeamEventsKeysError,
+    GetTeamEventsKeysResponse,
+    ReturnType<typeof getTeamEventsKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventsKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventsKeysQueryKey(options),
+  });
+
+export const getTeamEventsSimpleQueryKey = (
+  options: Options<GetTeamEventsSimpleData>,
+) => createQueryKey('getTeamEventsSimple', options);
+
+/**
+ * Gets a short-form list of all events this team has competed at.
+ */
+export const getTeamEventsSimpleOptions = (
+  options: Options<GetTeamEventsSimpleData>,
+) =>
+  queryOptions<
+    GetTeamEventsSimpleResponse,
+    GetTeamEventsSimpleError,
+    GetTeamEventsSimpleResponse,
+    ReturnType<typeof getTeamEventsSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventsSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventsSimpleQueryKey(options),
+  });
+
+export const getTeamEventsByYearQueryKey = (
+  options: Options<GetTeamEventsByYearData>,
+) => createQueryKey('getTeamEventsByYear', options);
+
+/**
+ * Gets a list of events this team has competed at in the given year.
+ */
+export const getTeamEventsByYearOptions = (
+  options: Options<GetTeamEventsByYearData>,
+) =>
+  queryOptions<
+    GetTeamEventsByYearResponse,
+    GetTeamEventsByYearError,
+    GetTeamEventsByYearResponse,
+    ReturnType<typeof getTeamEventsByYearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventsByYear({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventsByYearQueryKey(options),
+  });
+
+export const getTeamEventsByYearKeysQueryKey = (
+  options: Options<GetTeamEventsByYearKeysData>,
+) => createQueryKey('getTeamEventsByYearKeys', options);
+
+/**
+ * Gets a list of the event keys for events this team has competed at in the given year.
+ */
+export const getTeamEventsByYearKeysOptions = (
+  options: Options<GetTeamEventsByYearKeysData>,
+) =>
+  queryOptions<
+    GetTeamEventsByYearKeysResponse,
+    GetTeamEventsByYearKeysError,
+    GetTeamEventsByYearKeysResponse,
+    ReturnType<typeof getTeamEventsByYearKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventsByYearKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventsByYearKeysQueryKey(options),
+  });
+
+export const getTeamEventsByYearSimpleQueryKey = (
+  options: Options<GetTeamEventsByYearSimpleData>,
+) => createQueryKey('getTeamEventsByYearSimple', options);
+
+/**
+ * Gets a short-form list of events this team has competed at in the given year.
+ */
+export const getTeamEventsByYearSimpleOptions = (
+  options: Options<GetTeamEventsByYearSimpleData>,
+) =>
+  queryOptions<
+    GetTeamEventsByYearSimpleResponse,
+    GetTeamEventsByYearSimpleError,
+    GetTeamEventsByYearSimpleResponse,
+    ReturnType<typeof getTeamEventsByYearSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventsByYearSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventsByYearSimpleQueryKey(options),
+  });
+
+export const getTeamEventsStatusesByYearQueryKey = (
+  options: Options<GetTeamEventsStatusesByYearData>,
+) => createQueryKey('getTeamEventsStatusesByYear', options);
+
+/**
+ * Gets a key-value list of the event statuses for events this team has competed at in the given year.
+ */
+export const getTeamEventsStatusesByYearOptions = (
+  options: Options<GetTeamEventsStatusesByYearData>,
+) =>
+  queryOptions<
+    GetTeamEventsStatusesByYearResponse,
+    GetTeamEventsStatusesByYearError,
+    GetTeamEventsStatusesByYearResponse,
+    ReturnType<typeof getTeamEventsStatusesByYearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamEventsStatusesByYear({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamEventsStatusesByYearQueryKey(options),
+  });
+
+export const getTeamHistoryQueryKey = (options: Options<GetTeamHistoryData>) =>
+  createQueryKey('getTeamHistory', options);
+
+/**
+ * Gets the history for the team referenced by the given key, including their events and awards.
+ */
+export const getTeamHistoryOptions = (options: Options<GetTeamHistoryData>) =>
+  queryOptions<
+    GetTeamHistoryResponse,
+    GetTeamHistoryError,
+    GetTeamHistoryResponse,
+    ReturnType<typeof getTeamHistoryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamHistory({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamHistoryQueryKey(options),
+  });
+
+export const getTeamMatchesByYearQueryKey = (
+  options: Options<GetTeamMatchesByYearData>,
+) => createQueryKey('getTeamMatchesByYear', options);
+
+/**
+ * Gets a list of matches for the given team and year.
+ */
+export const getTeamMatchesByYearOptions = (
+  options: Options<GetTeamMatchesByYearData>,
+) =>
+  queryOptions<
+    GetTeamMatchesByYearResponse,
+    GetTeamMatchesByYearError,
+    GetTeamMatchesByYearResponse,
+    ReturnType<typeof getTeamMatchesByYearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamMatchesByYear({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamMatchesByYearQueryKey(options),
+  });
+
+export const getTeamMatchesByYearKeysQueryKey = (
+  options: Options<GetTeamMatchesByYearKeysData>,
+) => createQueryKey('getTeamMatchesByYearKeys', options);
+
+/**
+ * Gets a list of match keys for matches for the given team and year.
+ */
+export const getTeamMatchesByYearKeysOptions = (
+  options: Options<GetTeamMatchesByYearKeysData>,
+) =>
+  queryOptions<
+    GetTeamMatchesByYearKeysResponse,
+    GetTeamMatchesByYearKeysError,
+    GetTeamMatchesByYearKeysResponse,
+    ReturnType<typeof getTeamMatchesByYearKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamMatchesByYearKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamMatchesByYearKeysQueryKey(options),
+  });
+
+export const getTeamMatchesByYearSimpleQueryKey = (
+  options: Options<GetTeamMatchesByYearSimpleData>,
+) => createQueryKey('getTeamMatchesByYearSimple', options);
+
+/**
+ * Gets a short-form list of matches for the given team and year.
+ */
+export const getTeamMatchesByYearSimpleOptions = (
+  options: Options<GetTeamMatchesByYearSimpleData>,
+) =>
+  queryOptions<
+    GetTeamMatchesByYearSimpleResponse,
+    GetTeamMatchesByYearSimpleError,
+    GetTeamMatchesByYearSimpleResponse,
+    ReturnType<typeof getTeamMatchesByYearSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamMatchesByYearSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamMatchesByYearSimpleQueryKey(options),
+  });
+
+export const getTeamMediaByTagQueryKey = (
+  options: Options<GetTeamMediaByTagData>,
+) => createQueryKey('getTeamMediaByTag', options);
+
+/**
+ * Gets a list of Media (videos / pictures) for the given team and tag.
+ */
+export const getTeamMediaByTagOptions = (
+  options: Options<GetTeamMediaByTagData>,
+) =>
+  queryOptions<
+    GetTeamMediaByTagResponse,
+    GetTeamMediaByTagError,
+    GetTeamMediaByTagResponse,
+    ReturnType<typeof getTeamMediaByTagQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamMediaByTag({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamMediaByTagQueryKey(options),
+  });
+
+export const getTeamMediaByTagYearQueryKey = (
+  options: Options<GetTeamMediaByTagYearData>,
+) => createQueryKey('getTeamMediaByTagYear', options);
+
+/**
+ * Gets a list of Media (videos / pictures) for the given team, tag and year.
+ */
+export const getTeamMediaByTagYearOptions = (
+  options: Options<GetTeamMediaByTagYearData>,
+) =>
+  queryOptions<
+    GetTeamMediaByTagYearResponse,
+    GetTeamMediaByTagYearError,
+    GetTeamMediaByTagYearResponse,
+    ReturnType<typeof getTeamMediaByTagYearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamMediaByTagYear({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamMediaByTagYearQueryKey(options),
+  });
+
+export const getTeamMediaByYearQueryKey = (
+  options: Options<GetTeamMediaByYearData>,
+) => createQueryKey('getTeamMediaByYear', options);
+
+/**
+ * Gets a list of Media (videos / pictures) for the given team and year.
+ */
+export const getTeamMediaByYearOptions = (
+  options: Options<GetTeamMediaByYearData>,
+) =>
+  queryOptions<
+    GetTeamMediaByYearResponse,
+    GetTeamMediaByYearError,
+    GetTeamMediaByYearResponse,
+    ReturnType<typeof getTeamMediaByYearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamMediaByYear({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamMediaByYearQueryKey(options),
+  });
+
+export const getTeamRobotsQueryKey = (options: Options<GetTeamRobotsData>) =>
+  createQueryKey('getTeamRobots', options);
+
+/**
+ * Gets a list of year and robot name pairs for each year that a robot name was provided. Will return an empty array if the team has never named a robot.
+ */
+export const getTeamRobotsOptions = (options: Options<GetTeamRobotsData>) =>
+  queryOptions<
+    GetTeamRobotsResponse,
+    GetTeamRobotsError,
+    GetTeamRobotsResponse,
+    ReturnType<typeof getTeamRobotsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamRobots({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamRobotsQueryKey(options),
+  });
+
+export const getTeamSimpleQueryKey = (options: Options<GetTeamSimpleData>) =>
+  createQueryKey('getTeamSimple', options);
+
+/**
+ * Gets a `Team_Simple` object for the team referenced by the given key.
+ */
+export const getTeamSimpleOptions = (options: Options<GetTeamSimpleData>) =>
+  queryOptions<
+    GetTeamSimpleResponse,
+    GetTeamSimpleError,
+    GetTeamSimpleResponse,
+    ReturnType<typeof getTeamSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamSimpleQueryKey(options),
+  });
+
+export const getTeamSocialMediaQueryKey = (
+  options: Options<GetTeamSocialMediaData>,
+) => createQueryKey('getTeamSocialMedia', options);
+
+/**
+ * Gets a list of Media (social media) for the given team.
+ */
+export const getTeamSocialMediaOptions = (
+  options: Options<GetTeamSocialMediaData>,
+) =>
+  queryOptions<
+    GetTeamSocialMediaResponse,
+    GetTeamSocialMediaError,
+    GetTeamSocialMediaResponse,
+    ReturnType<typeof getTeamSocialMediaQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamSocialMedia({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamSocialMediaQueryKey(options),
+  });
+
+export const getTeamYearsParticipatedQueryKey = (
+  options: Options<GetTeamYearsParticipatedData>,
+) => createQueryKey('getTeamYearsParticipated', options);
+
+/**
+ * Gets a list of years in which the team participated in at least one competition.
+ */
+export const getTeamYearsParticipatedOptions = (
+  options: Options<GetTeamYearsParticipatedData>,
+) =>
+  queryOptions<
+    GetTeamYearsParticipatedResponse,
+    GetTeamYearsParticipatedError,
+    GetTeamYearsParticipatedResponse,
+    ReturnType<typeof getTeamYearsParticipatedQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamYearsParticipated({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamYearsParticipatedQueryKey(options),
+  });
+
+export const getTeamsQueryKey = (options: Options<GetTeamsData>) =>
+  createQueryKey('getTeams', options);
+
+/**
+ * Gets a list of `Team` objects, paginated in groups of 500.
+ */
+export const getTeamsOptions = (options: Options<GetTeamsData>) =>
+  queryOptions<
+    GetTeamsResponse,
+    GetTeamsError,
+    GetTeamsResponse,
+    ReturnType<typeof getTeamsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeams({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamsQueryKey(options),
+  });
+
+export const getTeamsKeysQueryKey = (options: Options<GetTeamsKeysData>) =>
+  createQueryKey('getTeamsKeys', options);
+
+/**
+ * Gets a list of Team keys, paginated in groups of 500. (Note, each page will not have 500 teams, but will include the teams within that range of 500.)
+ */
+export const getTeamsKeysOptions = (options: Options<GetTeamsKeysData>) =>
+  queryOptions<
+    GetTeamsKeysResponse,
+    GetTeamsKeysError,
+    GetTeamsKeysResponse,
+    ReturnType<typeof getTeamsKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamsKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamsKeysQueryKey(options),
+  });
+
+export const getTeamsSimpleQueryKey = (options: Options<GetTeamsSimpleData>) =>
+  createQueryKey('getTeamsSimple', options);
+
+/**
+ * Gets a list of short form `Team_Simple` objects, paginated in groups of 500.
+ */
+export const getTeamsSimpleOptions = (options: Options<GetTeamsSimpleData>) =>
+  queryOptions<
+    GetTeamsSimpleResponse,
+    GetTeamsSimpleError,
+    GetTeamsSimpleResponse,
+    ReturnType<typeof getTeamsSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamsSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamsSimpleQueryKey(options),
+  });
+
+export const getTeamsByYearQueryKey = (options: Options<GetTeamsByYearData>) =>
+  createQueryKey('getTeamsByYear', options);
+
+/**
+ * Gets a list of `Team` objects that competed in the given year, paginated in groups of 500.
+ */
+export const getTeamsByYearOptions = (options: Options<GetTeamsByYearData>) =>
+  queryOptions<
+    GetTeamsByYearResponse,
+    GetTeamsByYearError,
+    GetTeamsByYearResponse,
+    ReturnType<typeof getTeamsByYearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamsByYear({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamsByYearQueryKey(options),
+  });
+
+export const getTeamsByYearKeysQueryKey = (
+  options: Options<GetTeamsByYearKeysData>,
+) => createQueryKey('getTeamsByYearKeys', options);
+
+/**
+ * Gets a list Team Keys that competed in the given year, paginated in groups of 500.
+ */
+export const getTeamsByYearKeysOptions = (
+  options: Options<GetTeamsByYearKeysData>,
+) =>
+  queryOptions<
+    GetTeamsByYearKeysResponse,
+    GetTeamsByYearKeysError,
+    GetTeamsByYearKeysResponse,
+    ReturnType<typeof getTeamsByYearKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamsByYearKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamsByYearKeysQueryKey(options),
+  });
+
+export const getTeamsByYearSimpleQueryKey = (
+  options: Options<GetTeamsByYearSimpleData>,
+) => createQueryKey('getTeamsByYearSimple', options);
+
+/**
+ * Gets a list of short form `Team_Simple` objects that competed in the given year, paginated in groups of 500.
+ */
+export const getTeamsByYearSimpleOptions = (
+  options: Options<GetTeamsByYearSimpleData>,
+) =>
+  queryOptions<
+    GetTeamsByYearSimpleResponse,
+    GetTeamsByYearSimpleError,
+    GetTeamsByYearSimpleResponse,
+    ReturnType<typeof getTeamsByYearSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTeamsByYearSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTeamsByYearSimpleQueryKey(options),
   });
