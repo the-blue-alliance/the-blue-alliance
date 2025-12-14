@@ -39,15 +39,17 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
-  --color-alliance-blue-light: #eef;
-  --color-alliance-blue-dark: #ddf;
-
-  --color-alliance-red-light: #fee;
-  --color-alliance-red-dark: #fdd;
-
+  /* Red Alliance */
   --color-first-avatar-red: #ed1c24;
+  --color-alliance-red: #f44336;
+  --color-alliance-red-light: --alpha(var(--color-alliance-red) / 10%);
+  --color-alliance-red-dark: --alpha(var(--color-alliance-red) / 20%);
 
+  /* Blue Alliance */
   --color-first-avatar-blue: #0066b3;
+  --color-alliance-blue: #007cff;
+  --color-alliance-blue-light: --alpha(var(--color-alliance-blue) / 10%);
+  --color-alliance-blue-dark: --alpha(var(--color-alliance-blue) / 20%);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);

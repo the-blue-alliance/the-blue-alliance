@@ -1,6 +1,6 @@
 import React, { useImperativeHandle, useMemo, useRef, useState } from 'react';
 
-import PlayCircle from '~icons/bi/play-circle';
+import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
 import { EliminationAlliance, Event, Match } from '~/api/tba/read';
 import {
@@ -9,6 +9,7 @@ import {
   useAdvancementPaths,
 } from '~/components/tba/eliminationBracketPaths';
 import { MatchLink, TeamLink } from '~/components/tba/links';
+import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { EventType } from '~/lib/api/EventType';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
@@ -96,11 +97,13 @@ const PlayoffMatch = React.forwardRef<
     <div
       ref={cardRef}
       className={cn(
-        `mb-2 min-w-[180px] rounded border border-gray-300 bg-white
+        `mb-2 min-w-45 overflow-hidden rounded border border-gray-300 bg-white
         transition-all duration-200`,
         {
-          'shadow-lg ring-2 ring-red-300': isHighlighted && result.redWon,
-          'shadow-lg ring-2 ring-blue-300': isHighlighted && result.blueWon,
+          'border-transparent shadow-lg ring-2 ring-red-300':
+            isHighlighted && result.redWon,
+          'border-transparent shadow-lg ring-2 ring-blue-300':
+            isHighlighted && result.blueWon,
         },
       )}
     >
@@ -115,7 +118,7 @@ const PlayoffMatch = React.forwardRef<
               (
               <span
                 className={cn(
-                  'text-red-600 transition-all duration-200',
+                  'text-alliance-red transition-all duration-200',
                   isRedHighlighted && 'rounded bg-red-100 px-1 text-sm',
                 )}
               >
@@ -124,7 +127,7 @@ const PlayoffMatch = React.forwardRef<
               vs{' '}
               <span
                 className={cn(
-                  'text-blue-600 transition-all duration-200',
+                  'text-alliance-blue transition-all duration-200',
                   isBlueHighlighted && 'rounded bg-blue-100 px-1 text-sm',
                 )}
               >
@@ -141,21 +144,20 @@ const PlayoffMatch = React.forwardRef<
                 key={match.key}
                 matchOrKey={match}
                 event={event}
-                className="flex items-center justify-center text-gray-600
-                  hover:text-gray-800"
+                className="flex items-center justify-center"
               >
-                <PlayCircle className="inline h-4 w-4" />
+                <PlayCircleIcon className="inline size-4" />
               </MatchLink>
             );
           })}
         </div>
       </div>
       <div
-        className={cn(
-          `flex cursor-pointer items-center justify-between
-          bg-alliance-red-light px-1 py-1 transition-colors duration-200`,
-          isRedHighlighted ? 'bg-red-300' : 'hover:bg-red-200',
-        )}
+        className={`group flex cursor-pointer items-center justify-between
+          bg-alliance-red/15 px-1 py-1 transition-colors duration-200
+          data-[highlight=true]:bg-alliance-red
+          data-[highlight=true]:text-white`}
+        data-highlight={isRedHighlighted}
         ref={redRowRef}
         onMouseEnter={() =>
           result.redAllianceNumber &&
@@ -174,10 +176,11 @@ const PlayoffMatch = React.forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    'w-12 text-center text-sm text-red-600',
+                    `w-12 text-center text-sm text-alliance-red
+                    group-data-[highlight=true]:text-white`,
                     result.redWon && 'font-bold',
                     !teamPlayed &&
-                      'underline decoration-red-600 decoration-dotted',
+                      'underline decoration-current decoration-dotted',
                   )}
                 >
                   <TeamLink
@@ -198,7 +201,7 @@ const PlayoffMatch = React.forwardRef<
               <span
                 key={i}
                 className={cn(
-                  'w-8 flex-shrink-0 text-center text-sm',
+                  'w-8 shrink-0 text-center text-sm',
                   r.won && 'font-bold',
                 )}
               >
@@ -209,11 +212,11 @@ const PlayoffMatch = React.forwardRef<
         </div>
       </div>
       <div
-        className={cn(
-          `flex cursor-pointer items-center justify-between
-          bg-alliance-blue-light px-1 py-1 transition-colors duration-200`,
-          isBlueHighlighted ? 'bg-blue-300' : 'hover:bg-blue-200',
-        )}
+        className={`group flex cursor-pointer items-center justify-between
+          bg-alliance-blue/15 px-1 py-1 transition-colors duration-200
+          data-[highlight=true]:bg-alliance-blue
+          data-[highlight=true]:text-white`}
+        data-highlight={isBlueHighlighted}
         ref={blueRowRef}
         onMouseEnter={() =>
           result.blueAllianceNumber &&
@@ -232,10 +235,11 @@ const PlayoffMatch = React.forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    'w-12 text-center text-sm text-blue-600',
+                    `w-12 text-center text-sm text-alliance-blue
+                    group-data-[highlight=true]:text-white`,
                     result.blueWon && 'font-bold',
                     !teamPlayed &&
-                      'underline decoration-blue-600 decoration-dotted',
+                      'underline decoration-current decoration-dotted',
                   )}
                 >
                   <TeamLink
@@ -411,8 +415,10 @@ export default function EliminationBracket({
   }
 
   return (
-    <div className="mt-8">
-      <h2 className="mb-4 text-2xl font-bold">Playoff Bracket</h2>
+    <Card className="mt-12 bg-gray-50/50 p-2">
+      <CardHeader>
+        <CardTitle>Playoff Bracket</CardTitle>
+      </CardHeader>
 
       <div className="overflow-x-auto overflow-y-hidden">
         <div
@@ -424,11 +430,11 @@ export default function EliminationBracket({
           <div className="relative z-1 space-y-4">
             {/* Upper Bracket */}
             <div className="space-y-4">
-              <h2 className="text-center text-xl font-bold">Upper Bracket</h2>
+              <h2 className="text-center text-xl font-medium">Upper Bracket</h2>
               <div className="flex items-start gap-8">
                 {/* Round 1 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 1</h3>
+                  <h3 className="mb-4 text-center">Round 1</h3>
                   <div className="space-y-4">
                     <PlayoffMatch
                       ref={(node) => {
@@ -488,7 +494,7 @@ export default function EliminationBracket({
 
                 {/* Round 2 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 2</h3>
+                  <h3 className="mb-4 text-center">Round 2</h3>
                   <div className="space-y-4">
                     <div className="h-4"></div>
                     <PlayoffMatch
@@ -521,7 +527,7 @@ export default function EliminationBracket({
 
                 {/* Round 4 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 4</h3>
+                  <h3 className="mb-4 text-center">Round 4</h3>
                   <div className="space-y-4">
                     <div className="h-32"></div>
                     <PlayoffMatch
@@ -565,11 +571,11 @@ export default function EliminationBracket({
 
             {/* Lower Bracket */}
             <div className="space-y-4">
-              <h2 className="text-center text-xl font-bold">Lower Bracket</h2>
+              <h2 className="text-center text-xl font-medium">Lower Bracket</h2>
               <div className="ml-16 flex items-start gap-8">
                 {/* Round 2 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 2</h3>
+                  <h3 className="mb-4 text-center">Round 2</h3>
                   <div className="space-y-4">
                     <PlayoffMatch
                       ref={(node) => {
@@ -601,7 +607,7 @@ export default function EliminationBracket({
 
                 {/* Round 3 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 3</h3>
+                  <h3 className="mb-4 text-center">Round 3</h3>
                   <div className="space-y-4">
                     <PlayoffMatch
                       ref={(node) => {
@@ -633,7 +639,7 @@ export default function EliminationBracket({
 
                 {/* Round 4 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 4</h3>
+                  <h3 className="mb-4 text-center">Round 4</h3>
                   <div className="space-y-4">
                     <div className="h-8"></div>
                     <PlayoffMatch
@@ -653,7 +659,7 @@ export default function EliminationBracket({
 
                 {/* Round 5 */}
                 <div className="flex flex-col items-center">
-                  <h3 className="mb-4 text-center font-bold">Round 5</h3>
+                  <h3 className="mb-4 text-center">Round 5</h3>
                   <div className="space-y-4">
                     <div className="h-8"></div>
                     <PlayoffMatch
@@ -681,6 +687,6 @@ export default function EliminationBracket({
           />
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

@@ -11,8 +11,8 @@ const scoreCellVariants = cva('relative flex items-center justify-center', {
       false: '',
     },
     allianceColor: {
-      red: 'rounded-t-lg bg-alliance-red-light xl:rounded-lg',
-      blue: 'rounded-b-lg bg-alliance-blue-light xl:rounded-lg',
+      red: 'bg-alliance-red/15',
+      blue: 'bg-alliance-blue/15',
     },
   },
   defaultVariants: {

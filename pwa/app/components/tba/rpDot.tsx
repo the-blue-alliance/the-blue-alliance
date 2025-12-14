@@ -21,7 +21,12 @@ function RpDot({
     <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <svg className="h-[5px] w-[5px]">
+          <svg
+            className="size-1"
+            viewBox="0 0 5 5"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <circle
               cx={2.5}
               cy={2.5}
@@ -51,7 +56,7 @@ export default function RpDots({
   const tooltipTexts = RANKING_POINT_LABELS[year];
 
   return (
-    <div className="absolute top-[2px] left-[3px] flex gap-[2px]">
+    <div className="absolute top-[2px] left-[6px] flex gap-[2px]">
       {rpsAchieved.map((achieved, index) => (
         <RpDot
           key={index}
