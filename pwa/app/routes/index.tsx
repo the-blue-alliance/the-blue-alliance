@@ -32,11 +32,6 @@ function Home() {
   );
   const weekEvents = getCurrentWeekEvents(events);
 
-  // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  const commitHash = __COMMIT_HASH__ as string;
-
   return (
     <div>
       <div className="px-6 py-10 sm:py-16 lg:px-8">
@@ -64,14 +59,6 @@ function Home() {
           <EventListTable events={weekEvents} />
         </div>
       )}
-
-      <a
-        href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
-        target="_blank"
-        rel="noreferrer"
-      >
-        Commit: {commitHash}
-      </a>
     </div>
   );
 }

@@ -55,6 +55,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
+  --header-height: 4rem;
+  --footer-inset-top: 4rem;
+  --footer-min-height: calc(7rem + 2px); /* we have 2 borders of 1px each */
+
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-navigation-item-fade-in: navigation-item-fade-in 150ms ease-in

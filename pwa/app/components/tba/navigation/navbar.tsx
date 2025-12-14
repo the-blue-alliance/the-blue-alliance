@@ -29,7 +29,10 @@ export function Navbar() {
     <>
       <GlobalLoadingProgress />
       <NavigationMenu value={selected} onValueChange={setSelected} asChild>
-        <header className="sticky top-0 z-10 h-14 w-full bg-primary shadow-md">
+        <header
+          className="sticky top-0 z-10 h-14 w-full overflow-hidden bg-primary
+            shadow-md"
+        >
           <div className="container">
             <NavigationMenuList
               asChild

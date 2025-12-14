@@ -45,6 +45,7 @@ import { z } from 'zod';
 
 import { client } from '~/api/tba/read/client.gen';
 import { MatchModal } from '~/components/tba/match/matchModal';
+import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
@@ -334,13 +335,18 @@ function RootComponent() {
           <>
             <Navbar />
             <TOCRendererProvider>
-              <div className="container mx-auto px-4 text-sm">
+              <div
+                className="container mx-auto
+                  min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
+                  px-4 text-sm"
+              >
                 <div vaul-drawer-wrapper="" className="bg-background">
                   <Outlet />
                   <MatchModal />
                 </div>
               </div>
             </TOCRendererProvider>
+            <Footer />
           </>
         )}
         <TanStackRouterDevtools position="bottom-right" />
