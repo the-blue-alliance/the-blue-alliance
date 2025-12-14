@@ -20,6 +20,7 @@ const staticRoutes = [
   '/about',
   '/add-data',
   '/apidocs',
+  '/apidocs/v3',
   '/contact',
   '/donate',
   '/gameday',
