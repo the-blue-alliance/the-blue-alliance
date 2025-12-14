@@ -41,44 +41,25 @@ const ChangelogDisplay = ({ xChanges }: { xChanges: string }) => {
   }, [xChanges]);
 
   return (
-    <div
-      style={{
-        background: 'var(--scalar-background-2)',
-        borderRadius: '8px',
-        padding: '16px',
-        margin: '16px 0',
-      }}
-    >
+    <div className="my-4 rounded-lg bg-(--scalar-background-2) p-4">
       <Accordion type="single" collapsible>
         <AccordionItem value="changelog">
           <AccordionTrigger
-            style={{
-              fontSize: '18px',
-              fontWeight: 600,
-              color: 'var(--scalar-color-1)',
-            }}
+            className="text-lg font-semibold text-(--scalar-color-1)"
           >
             API Changelog
           </AccordionTrigger>
           <AccordionContent>
-            <div
-              style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
-            >
+            <div className="flex flex-col gap-3">
               {entries.map((entry, index) => (
                 <div
                   key={index}
-                  style={{
-                    padding: '8px',
-                    background: 'var(--scalar-background-1)',
-                    borderRadius: '4px',
-                  }}
+                  className="rounded bg-(--scalar-background-1) p-2"
                 >
-                  <strong style={{ color: 'var(--scalar-color-1)' }}>
+                  <strong className="text-(--scalar-color-1)">
                     {entry.version}
                   </strong>
-                  <div
-                    style={{ marginTop: '4px', color: 'var(--scalar-color-2)' }}
-                  >
+                  <div className="mt-1 text-(--scalar-color-2)">
                     {entry.description}
                   </div>
                 </div>
