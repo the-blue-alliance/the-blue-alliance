@@ -55,7 +55,7 @@
 
   --header-height: 4rem;
   --footer-inset-top: 4rem;
-  --footer-min-height: calc(8rem + 2px); /* we have 2 borders of 1px each */
+  --footer-min-height: calc(7rem + 2px); /* we have 2 borders of 1px each */
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;

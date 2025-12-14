@@ -98,7 +98,7 @@ export const Footer = () => {
 
         <div
           className="relative isolate flex justify-between border-t
-            border-gray-600/10 py-6 text-sm max-md:flex-col md:items-center"
+            border-gray-600/10 py-4 text-sm max-md:flex-col md:items-center"
         >
           <div>
             Thanks to our platinum sponsor
