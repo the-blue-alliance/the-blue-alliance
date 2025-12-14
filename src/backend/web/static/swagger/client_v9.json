@@ -5,7 +5,11 @@
     "version": "v9",
     "description": "API for TBA Mobile clients"
   },
-  "servers": [],
+  "servers": [
+    {
+      "url": "https://www.thebluealliance.com/clientapi/tbaClient/v9"
+    }
+  ],
   "components": {
     "schemas": {
       "BaseResponse": {

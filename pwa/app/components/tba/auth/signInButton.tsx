@@ -1,7 +1,9 @@
 import { AuthProvider, signInWithPopup } from 'firebase/auth';
 
 import { auth } from '~/firebase/firebaseConfig';
-import { cn } from '~/lib/utils';
+import { cn, createLogger } from '~/lib/utils';
+
+const authLogger = createLogger('auth');
 
 export default function SignInButton({
   provider,
@@ -15,13 +17,10 @@ export default function SignInButton({
   className: string;
 }) {
   const handleSignIn = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log('User signed in:', result.user);
-      })
-      .catch((error: unknown) => {
-        console.error('Error during sign-in:', error);
-      });
+    if (!auth) return;
+    signInWithPopup(auth, provider).catch((error: unknown) => {
+      authLogger.error({ error }, 'Error during sign-in');
+    });
   };
 
   return (
