@@ -98,8 +98,8 @@ export function MatchRow({
   return (
     <div
       className="mx-auto grid w-full max-w-6xl
-        grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2.5em_2.5em] gap-0.5
-        text-sm xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
+        grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2em_2em] gap-0.5 text-sm
+        xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
     >
       {/* Play Button */}
       <div
