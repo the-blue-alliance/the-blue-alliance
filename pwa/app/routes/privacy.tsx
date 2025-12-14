@@ -2,7 +2,7 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 
 import { publicCacheControlHeaders } from '~/lib/utils';
 
-export const Route = createFileRoute('/legal_/privacy')({
+export const Route = createFileRoute('/privacy')({
   headers: publicCacheControlHeaders(),
   component: Privacy,
 });
