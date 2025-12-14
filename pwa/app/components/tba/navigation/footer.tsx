@@ -60,7 +60,7 @@ export const Footer = () => {
         bg-gray-50"
     >
       <div
-        className="mx-auto w-full px-6 sm:max-w-160 md:max-w-3xl md:px-8
+        className="mx-auto w-full px-4 sm:max-w-160 md:max-w-3xl md:px-8
           lg:max-w-5xl"
       >
         <div className="flex flex-wrap gap-2 py-6 text-center text-sm">
@@ -97,7 +97,7 @@ export const Footer = () => {
         </div>
 
         <div
-          className="relative isolate flex justify-between border-t
+          className="relative isolate flex justify-between gap-0.5 border-t
             border-gray-600/10 py-4 text-sm max-md:flex-col md:items-center"
         >
           <div>
