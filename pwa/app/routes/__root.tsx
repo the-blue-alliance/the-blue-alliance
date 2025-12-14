@@ -335,7 +335,11 @@ function RootComponent() {
           <>
             <Navbar />
             <TOCRendererProvider>
-              <div className="container mx-auto px-4 text-sm">
+              <div
+                className="container mx-auto
+                  min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
+                  px-4 text-sm"
+              >
                 <div vaul-drawer-wrapper="" className="bg-background">
                   <Outlet />
                   <MatchModal />
