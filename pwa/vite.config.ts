@@ -23,7 +23,7 @@ const staticRoutes = [
   '/contact',
   '/donate',
   '/gameday',
-  '/legal/privacy',
+  '/privacy',
   '/thanks',
 ];
 

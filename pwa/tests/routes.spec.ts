@@ -35,7 +35,7 @@ const allRoutes = defineAllRoutes([
   '/local/debug',
   '/match_suggestion',
   '/match/$matchKey',
-  '/legal/privacy',
+  '/privacy',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
   '/team/$teamNumber/stats',

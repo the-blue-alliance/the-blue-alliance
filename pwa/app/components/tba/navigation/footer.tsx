@@ -36,7 +36,7 @@ const links: NavigationLink[] = [
     label: 'Blog',
     href: 'https://blog.thebluealliance.com',
   },
-  { label: 'Privacy Policy', to: '/legal/privacy' },
+  { label: 'Privacy Policy', to: '/privacy' },
 ];
 
 // Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
