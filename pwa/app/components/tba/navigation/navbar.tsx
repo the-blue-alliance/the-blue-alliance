@@ -15,7 +15,7 @@ import lamp from '~/images/tba/tba-lamp.svg';
 import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 
 export function Navbar() {
-  const [selected, setSelected] = useState<string | undefined>(undefined);
+  const [selected, setSelected] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
