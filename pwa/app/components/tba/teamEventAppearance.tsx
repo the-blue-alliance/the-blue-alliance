@@ -164,7 +164,7 @@ function TeamStatus({
               <ul
                 className={cn({
                   'list-none': awards.length == 1,
-                  'list-disc': awards.length > 1,
+                  'list-inside list-disc': awards.length > 1,
                 })}
               >
                 {awards.map((award) => {
