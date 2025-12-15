@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
 import { type ClassValue, clsx } from 'clsx';
 import pino from 'pino';
@@ -9,12 +9,13 @@ import { WltRecord } from '~/api/tba/read';
 import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { RequestResult } from '~/api/tba/read/client';
 
-// TODO: Generate this from the API
-const VALID_YEARS: number[] = [];
-for (let i = 2025; i >= 1992; i--) {
-  VALID_YEARS.push(i);
+export function useValidYears() {
+  const { data: status } = useSuspenseQuery(getStatusOptions({}));
+  return Array.from(
+    { length: status.max_season - 1992 + 1 },
+    (_, i) => status.max_season - i,
+  );
 }
-export { VALID_YEARS };
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

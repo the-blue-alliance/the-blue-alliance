@@ -20,11 +20,11 @@ import {
 import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
 import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
 import {
-  VALID_YEARS,
   parseParamsForYearElseDefault,
   pluralize,
   publicCacheControlHeaders,
   slugify,
+  useValidYears,
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/events/{-$year}')({
@@ -167,6 +167,7 @@ function YearEventsPage() {
   const { data: events } = useSuspenseQuery({
     ...getEventsByYearOptions({ path: { year } }),
   });
+  const validYears = useValidYears();
   const [inView, setInView] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
@@ -218,7 +219,7 @@ function YearEventsPage() {
             <SelectValue placeholder={year} />
           </SelectTrigger>
           <SelectContent className="max-h-[30vh] overflow-y-auto">
-            {VALID_YEARS.map((y) => (
+            {validYears.map((y) => (
               <SelectItem key={y} value={`${y}`}>
                 {y}
               </SelectItem>
