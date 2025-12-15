@@ -24,6 +24,31 @@
           }
         }
       },
+      "ModelType": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "description": "The type of model (0=Event, 1=Team, 2=Match, 3=EventTeam, 4=District, 5=DistrictTeam, 6=Award, 7=Media)"
+      },
+      "NotificationType": {
+        "type": "string",
+        "enum": [
+          "upcoming_match",
+          "match_score",
+          "alliance_selection",
+          "awards_posted",
+          "match_video_added"
+        ],
+        "description": "Notification type (upcoming_match=Upcoming Match, match_score=Match Score, alliance_selection=Alliance Selection, awards_posted=Awards Posted, match_video_added=Match Video Added)"
+      },
       "FavoriteCollection": {
         "type": "object",
         "properties": {
@@ -37,6 +62,10 @@
       },
       "FavoriteMessage": {
         "type": "object",
+        "required": [
+          "model_key",
+          "model_type"
+        ],
         "properties": {
           "device_key": {
             "type": "string"
@@ -45,8 +74,7 @@
             "type": "string"
           },
           "model_type": {
-            "type": "string",
-            "format": "int64"
+            "$ref": "#/components/schemas/ModelType"
           }
         }
       },
@@ -63,6 +91,10 @@
       },
       "SubscriptionMessage": {
         "type": "object",
+        "required": [
+          "model_key",
+          "model_type"
+        ],
         "properties": {
           "device_key": {
             "type": "string"
@@ -71,13 +103,12 @@
             "type": "string"
           },
           "model_type": {
-            "type": "string",
-            "format": "int64"
+            "$ref": "#/components/schemas/ModelType"
           },
           "notifications": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/NotificationType"
             }
           }
         }
@@ -156,18 +187,7 @@
                     "description": "The key of the model to set preferences for"
                   },
                   "model_type": {
-                    "type": "integer",
-                    "enum": [
-                      0,
-                      1,
-                      2,
-                      3,
-                      4,
-                      5,
-                      6,
-                      7
-                    ],
-                    "description": "The type of model (0=Event, 1=Team, 2=Match, 3=EventTeam, 4=District, 5=DistrictTeam, 6=Award, 7=Media)"
+                    "$ref": "#/components/schemas/ModelType"
                   },
                   "device_key": {
                     "type": [
@@ -179,7 +199,7 @@
                   "notifications": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/NotificationType"
                     },
                     "description": "List of notification type names"
                   },

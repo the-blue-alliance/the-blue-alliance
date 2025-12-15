@@ -17,6 +17,8 @@ export type {
   ListSubscriptionsData,
   ListSubscriptionsResponse,
   ListSubscriptionsResponses,
+  ModelType,
+  NotificationType,
   SetModelPreferencesData,
   SetModelPreferencesResponse,
   SetModelPreferencesResponses,
