@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/tanstackstart-react';
 import { QueryClient } from '@tanstack/react-query';
 import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
+import registerServiceWorker from 'app/lib/serviceWorkerRegistration';
 import { routeTree } from 'app/routeTree.gen';
 import { useEffect } from 'react';
 
@@ -79,6 +80,7 @@ export function getRouter() {
       ],
       enabled: process.env.NODE_ENV === 'production',
     });
+    void registerServiceWorker();
   }
 
   return router;

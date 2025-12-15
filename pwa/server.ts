@@ -36,6 +36,17 @@ app.use(
   express.static('build/client/favicon.ico', { maxAge: '1w' }),
 );
 
+// Service worker should never be cached
+app.use(
+  '/sw.js',
+  express.static('build/client/sw.js', {
+    maxAge: 0,
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'no-cache');
+    },
+  }),
+);
+
 // Everything else is cached for 24 hours.
 app.use(express.static('build/client', { maxAge: '24h' }));
 

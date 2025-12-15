@@ -52,6 +52,14 @@ export default tseslint.config([
     },
   },
 
+  // Scripts directory - allow console
+  {
+    files: ['scripts/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
   // React
   {
     files: ['**/*.{ts,tsx}'],
