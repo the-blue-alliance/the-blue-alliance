@@ -2,7 +2,7 @@ import { ElementType } from 'react';
 
 import EventsIcon from '~icons/lucide/calendar';
 import InsightsIcon from '~icons/lucide/chart-line';
-import AccountIcon from '~icons/lucide/star';
+import myTBAIcon from '~icons/lucide/star';
 import TeamsIcon from '~icons/lucide/users-round';
 import WebcastIcon from '~icons/lucide/video';
 
@@ -18,7 +18,7 @@ export const NAV_ITEMS_LIST: NavItemChild[] = [
   {
     title: 'myTBA',
     to: '/account',
-    icon: AccountIcon,
+    icon: myTBAIcon,
   },
   {
     title: 'Events',

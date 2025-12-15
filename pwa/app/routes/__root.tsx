@@ -44,6 +44,7 @@ import appCss from 'app/tailwind.css?url';
 import { z } from 'zod';
 
 import { client } from '~/api/tba/read/client.gen';
+import { AuthContextProvider } from '~/components/tba/auth/auth';
 import { MatchModal } from '~/components/tba/match/matchModal';
 import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
@@ -329,26 +330,28 @@ function RootComponent() {
         <HeadContent />
       </head>
       <body>
-        {isFullscreen ? (
-          <Outlet />
-        ) : (
-          <>
-            <Navbar />
-            <TOCRendererProvider>
-              <div
-                className="container mx-auto
-                  min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
-                  px-4 text-sm"
-              >
-                <div vaul-drawer-wrapper="" className="bg-background">
-                  <Outlet />
-                  <MatchModal />
+        <AuthContextProvider>
+          {isFullscreen ? (
+            <Outlet />
+          ) : (
+            <>
+              <Navbar />
+              <TOCRendererProvider>
+                <div
+                  className="container mx-auto
+                    min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
+                    px-4 text-sm"
+                >
+                  <div vaul-drawer-wrapper="" className="bg-background">
+                    <Outlet />
+                    <MatchModal />
+                  </div>
                 </div>
-              </div>
-            </TOCRendererProvider>
-            <Footer />
-          </>
-        )}
+              </TOCRendererProvider>
+              <Footer />
+            </>
+          )}
+        </AuthContextProvider>
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />
