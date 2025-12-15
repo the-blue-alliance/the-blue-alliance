@@ -10,7 +10,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 function getCommitHash(): string {
   try {
-    return child.execSync('git rev-parse --short HEAD').toString();
+    return child.execSync('git rev-parse --short HEAD').toString().trim();
   } catch {
     return 'unknown';
   }

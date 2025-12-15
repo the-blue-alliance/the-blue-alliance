@@ -75,7 +75,7 @@ export function SearchModal({ ...props }: DialogProps) {
           className={cn(
             `bg-surface relative h-9 w-full justify-start rounded-lg bg-white
             pl-4 font-normal text-muted-foreground shadow-none hover:bg-white
-            max-md:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
+            max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
           )}
           onClick={() => setOpen(true)}
           {...props}
@@ -97,7 +97,7 @@ export function SearchModal({ ...props }: DialogProps) {
 
       <DialogTrigger
         className="z-30 cursor-pointer rounded-full p-2 text-white
-          transition-colors duration-200 hover:bg-black/20 md:hidden"
+          transition-colors duration-200 hover:bg-black/20 lg:hidden"
       >
         <SearchIcon className="size-5" />
       </DialogTrigger>
