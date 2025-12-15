@@ -22,9 +22,9 @@ import {
   leaderboardFromNotable,
 } from '~/lib/insightUtils';
 import {
-  VALID_YEARS,
   joinComponents,
   publicCacheControlHeaders,
+  useValidYears,
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/insights/{-$year}')({
@@ -114,6 +114,7 @@ function SingleYearInsights({
   leaderboards: LeaderboardInsight[];
   notables: NotablesInsight[];
 }) {
+  const validYears = useValidYears();
   const navigate = useNavigate();
 
   const notableDiv =
@@ -148,7 +149,7 @@ function SingleYearInsights({
             <SelectItem value="Overall" className="cursor-pointer">
               Overall
             </SelectItem>
-            {VALID_YEARS.map((y) => (
+            {validYears.map((y) => (
               <SelectItem key={y} value={`${y}`} className="cursor-pointer">
                 {y}
               </SelectItem>
