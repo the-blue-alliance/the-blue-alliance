@@ -21,6 +21,7 @@ const allRoutes = defineAllRoutes([
   '/',
   '/about',
   '/account',
+  '/account/mytba',
   '/add-data',
   '/apidocs',
   '/apidocs/v3',

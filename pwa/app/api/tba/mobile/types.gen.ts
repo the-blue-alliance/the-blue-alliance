@@ -11,14 +11,29 @@ export type BaseResponse = {
   message?: string;
 };
 
+/**
+ * The type of model (0=Event, 1=Team, 2=Match, 3=EventTeam, 4=District, 5=DistrictTeam, 6=Award, 7=Media)
+ */
+export type ModelType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+/**
+ * Notification type (upcoming_match=Upcoming Match, match_score=Match Score, alliance_selection=Alliance Selection, awards_posted=Awards Posted, match_video_added=Match Video Added)
+ */
+export type NotificationType =
+  | 'upcoming_match'
+  | 'match_score'
+  | 'alliance_selection'
+  | 'awards_posted'
+  | 'match_video_added';
+
 export type FavoriteCollection = {
   favorites?: Array<FavoriteMessage>;
 };
 
 export type FavoriteMessage = {
   device_key?: string;
-  model_key?: string;
-  model_type?: string;
+  model_key: string;
+  model_type: ModelType;
 };
 
 export type SubscriptionCollection = {
@@ -27,9 +42,9 @@ export type SubscriptionCollection = {
 
 export type SubscriptionMessage = {
   device_key?: string;
-  model_key?: string;
-  model_type?: string;
-  notifications?: Array<string>;
+  model_key: string;
+  model_type: ModelType;
+  notifications?: Array<NotificationType>;
 };
 
 export type ListFavoritesData = {
@@ -55,10 +70,7 @@ export type SetModelPreferencesData = {
      * The key of the model to set preferences for
      */
     model_key: string;
-    /**
-     * The type of model (0=Event, 1=Team, 2=Match, 3=EventTeam, 4=District, 5=DistrictTeam, 6=Award, 7=Media)
-     */
-    model_type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+    model_type: ModelType;
     /**
      * The device key to exclude from sync notifications
      */
@@ -66,7 +78,7 @@ export type SetModelPreferencesData = {
     /**
      * List of notification type names
      */
-    notifications: Array<string>;
+    notifications: Array<NotificationType>;
     /**
      * Whether to favorite the model
      */

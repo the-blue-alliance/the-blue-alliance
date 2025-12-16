@@ -17,6 +17,17 @@ export function useValidYears() {
   );
 }
 
+export const MODEL_TYPE = {
+  EVENT: 0,
+  TEAM: 1,
+  MATCH: 2,
+  EVENT_TEAM: 3,
+  DISTRICT: 4,
+  DISTRICT_TEAM: 5,
+  AWARD: 6,
+  MEDIA: 7,
+} as const;
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

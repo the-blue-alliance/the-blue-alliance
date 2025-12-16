@@ -17,9 +17,9 @@ import { Route as DonateRouteImport } from './routes/donate'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ApidocsRouteImport } from './routes/apidocs'
 import { Route as AddDataRouteImport } from './routes/add-data'
-import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as TeamsChar123PgNumChar125RouteImport } from './routes/teams.{-$pgNum}'
 import { Route as MatchMatchKeyRouteImport } from './routes/match.$matchKey'
 import { Route as LocalDebugRouteImport } from './routes/local.debug'
@@ -27,6 +27,7 @@ import { Route as InsightsChar123YearChar125RouteImport } from './routes/insight
 import { Route as EventsChar123YearChar125RouteImport } from './routes/events.{-$year}'
 import { Route as EventEventKeyRouteImport } from './routes/event.$eventKey'
 import { Route as ApidocsV3RouteImport } from './routes/apidocs_.v3'
+import { Route as AccountMytbaRouteImport } from './routes/account.mytba'
 import { Route as TeamTeamNumberChar123YearChar125RouteImport } from './routes/team.$teamNumber.{-$year}'
 import { Route as TeamTeamNumberStatsRouteImport } from './routes/team.$teamNumber.stats'
 import { Route as TeamTeamNumberHistoryRouteImport } from './routes/team.$teamNumber.history'
@@ -73,11 +74,6 @@ const AddDataRoute = AddDataRouteImport.update({
   path: '/add-data',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -86,6 +82,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TeamsChar123PgNumChar125Route =
@@ -126,6 +127,11 @@ const ApidocsV3Route = ApidocsV3RouteImport.update({
   path: '/apidocs/v3',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountMytbaRoute = AccountMytbaRouteImport.update({
+  id: '/account/mytba',
+  path: '/account/mytba',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeamTeamNumberChar123YearChar125Route =
   TeamTeamNumberChar123YearChar125RouteImport.update({
     id: '/team/$teamNumber/{-$year}',
@@ -158,7 +164,6 @@ const DistrictDistrictAbbreviationInsightsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
@@ -167,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/account/mytba': typeof AccountMytbaRoute
   '/apidocs/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
+  '/account': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -183,7 +190,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
@@ -192,6 +198,7 @@ export interface FileRoutesByTo {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/account/mytba': typeof AccountMytbaRoute
   '/apidocs/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
+  '/account': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -209,7 +217,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
@@ -218,6 +225,7 @@ export interface FileRoutesById {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/account/mytba': typeof AccountMytbaRoute
   '/apidocs_/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
@@ -225,6 +233,7 @@ export interface FileRoutesById {
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
+  '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -236,7 +245,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/account'
     | '/add-data'
     | '/apidocs'
     | '/contact'
@@ -245,6 +253,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/account/mytba'
     | '/apidocs/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
+    | '/account'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/team/$teamNumber/history'
@@ -261,7 +271,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/account'
     | '/add-data'
     | '/apidocs'
     | '/contact'
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/account/mytba'
     | '/apidocs/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
@@ -277,6 +287,7 @@ export interface FileRouteTypes {
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
+    | '/account'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/team/$teamNumber/history'
@@ -286,7 +297,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/account'
     | '/add-data'
     | '/apidocs'
     | '/contact'
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/account/mytba'
     | '/apidocs_/v3'
     | '/event/$eventKey'
     | '/events/{-$year}'
@@ -302,6 +313,7 @@ export interface FileRouteTypes {
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
+    | '/account/'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/team/$teamNumber/history'
@@ -312,7 +324,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AccountRoute: typeof AccountRoute
   AddDataRoute: typeof AddDataRoute
   ApidocsRoute: typeof ApidocsRoute
   ContactRoute: typeof ContactRoute
@@ -321,6 +332,7 @@ export interface RootRouteChildren {
   Match_suggestionRoute: typeof Match_suggestionRoute
   PrivacyRoute: typeof PrivacyRoute
   ThanksRoute: typeof ThanksRoute
+  AccountMytbaRoute: typeof AccountMytbaRoute
   ApidocsV3Route: typeof ApidocsV3Route
   EventEventKeyRoute: typeof EventEventKeyRoute
   EventsChar123YearChar125Route: typeof EventsChar123YearChar125Route
@@ -328,6 +340,7 @@ export interface RootRouteChildren {
   LocalDebugRoute: typeof LocalDebugRoute
   MatchMatchKeyRoute: typeof MatchMatchKeyRoute
   TeamsChar123PgNumChar125Route: typeof TeamsChar123PgNumChar125Route
+  AccountIndexRoute: typeof AccountIndexRoute
   DistrictDistrictAbbreviationInsightsRoute: typeof DistrictDistrictAbbreviationInsightsRoute
   DistrictDistrictAbbreviationChar123YearChar125Route: typeof DistrictDistrictAbbreviationChar123YearChar125Route
   TeamTeamNumberHistoryRoute: typeof TeamTeamNumberHistoryRoute
@@ -393,13 +406,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AddDataRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -412,6 +418,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/teams/{-$pgNum}': {
@@ -463,6 +476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApidocsV3RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/mytba': {
+      id: '/account/mytba'
+      path: '/account/mytba'
+      fullPath: '/account/mytba'
+      preLoaderRoute: typeof AccountMytbaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/team/$teamNumber/{-$year}': {
       id: '/team/$teamNumber/{-$year}'
       path: '/team/$teamNumber/{-$year}'
@@ -504,7 +524,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AccountRoute: AccountRoute,
   AddDataRoute: AddDataRoute,
   ApidocsRoute: ApidocsRoute,
   ContactRoute: ContactRoute,
@@ -513,6 +532,7 @@ const rootRouteChildren: RootRouteChildren = {
   Match_suggestionRoute: Match_suggestionRoute,
   PrivacyRoute: PrivacyRoute,
   ThanksRoute: ThanksRoute,
+  AccountMytbaRoute: AccountMytbaRoute,
   ApidocsV3Route: ApidocsV3Route,
   EventEventKeyRoute: EventEventKeyRoute,
   EventsChar123YearChar125Route: EventsChar123YearChar125Route,
@@ -520,6 +540,7 @@ const rootRouteChildren: RootRouteChildren = {
   LocalDebugRoute: LocalDebugRoute,
   MatchMatchKeyRoute: MatchMatchKeyRoute,
   TeamsChar123PgNumChar125Route: TeamsChar123PgNumChar125Route,
+  AccountIndexRoute: AccountIndexRoute,
   DistrictDistrictAbbreviationInsightsRoute:
     DistrictDistrictAbbreviationInsightsRoute,
   DistrictDistrictAbbreviationChar123YearChar125Route:
