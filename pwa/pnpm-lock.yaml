@@ -168,8 +168,8 @@ importers:
         specifier: 7.4.0
         version: 7.4.0
       zod:
-        specifier: 4.2.0
-        version: 4.2.0
+        specifier: 4.2.1
+        version: 4.2.1
     devDependencies:
       '@eslint/compat':
         specifier: 2.0.0
@@ -7568,8 +7568,8 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zod@4.2.0:
-    resolution: {integrity: sha512-Bd5fw9wlIhtqCCxotZgdTOMwGm1a0u75wARVEY9HMs1X17trvA/lMi4+MGK5EUfYkXVTbX8UDiDKW4OgzHVUZw==}
+  zod@4.2.1:
+    resolution: {integrity: sha512-0wZ1IRqGGhMP76gLqz8EyfBXKk0J2qo2+H3fi4mcUP/KtTocoX08nmIAHl1Z2kJIZbZee8KOpBCSNPRgauucjw==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -10214,7 +10214,7 @@ snapshots:
 
   '@scalar/analytics-client@1.0.1':
     dependencies:
-      zod: 4.2.0
+      zod: 4.2.1
 
   '@scalar/api-client@2.15.0(tailwindcss@4.1.18)(typescript@5.9.3)':
     dependencies:
@@ -10256,7 +10256,7 @@ snapshots:
       vue-router: 4.6.2(vue@3.5.25(typescript@5.9.3))
       whatwg-mimetype: 4.0.0
       yaml: 2.8.2
-      zod: 4.2.0
+      zod: 4.2.1
     transitivePeerDependencies:
       - '@vue/composition-api'
       - async-validator
@@ -10325,7 +10325,7 @@ snapshots:
       nanoid: 5.1.5
       type-fest: 5.0.0
       vue: 3.5.25(typescript@5.9.3)
-      zod: 4.2.0
+      zod: 4.2.1
     transitivePeerDependencies:
       - '@vue/composition-api'
       - async-validator
@@ -10426,7 +10426,7 @@ snapshots:
       flatted: 3.3.3
       type-fest: 5.0.0
       yaml: 2.8.2
-      zod: 4.2.0
+      zod: 4.2.1
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -10452,7 +10452,7 @@ snapshots:
 
   '@scalar/openapi-types@0.5.3':
     dependencies:
-      zod: 4.2.0
+      zod: 4.2.1
 
   '@scalar/openapi-upgrader@0.1.6':
     dependencies:
@@ -10503,7 +10503,7 @@ snapshots:
     dependencies:
       nanoid: 5.1.5
       type-fest: 5.0.0
-      zod: 4.2.0
+      zod: 4.2.1
 
   '@scalar/use-codemirror@0.13.2(typescript@5.9.3)':
     dependencies:
@@ -10535,7 +10535,7 @@ snapshots:
       cva: 1.0.0-beta.2(typescript@5.9.3)
       tailwind-merge: 2.6.0
       vue: 3.5.25(typescript@5.9.3)
-      zod: 4.2.0
+      zod: 4.2.1
     transitivePeerDependencies:
       - typescript
 
@@ -12805,8 +12805,8 @@ snapshots:
       '@babel/parser': 7.28.5
       eslint: 9.39.2(jiti@2.6.1)
       hermes-parser: 0.25.1
-      zod: 4.2.0
-      zod-validation-error: 4.0.2(zod@4.2.0)
+      zod: 4.2.1
+      zod-validation-error: 4.0.2(zod@4.2.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -16250,14 +16250,14 @@ snapshots:
 
   zhead@2.2.4: {}
 
-  zod-validation-error@4.0.2(zod@4.2.0):
+  zod-validation-error@4.0.2(zod@4.2.1):
     dependencies:
-      zod: 4.2.0
+      zod: 4.2.1
 
   zod@3.22.4: {}
 
   zod@3.25.76: {}
 
-  zod@4.2.0: {}
+  zod@4.2.1: {}
 
   zwitch@2.0.4: {}
