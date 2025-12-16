@@ -18,7 +18,16 @@ import MediaIcon from '~icons/mdi/folder-media-outline';
 import ResultsIcon from '~icons/mdi/tournament';
 
 import { getEventColors } from '~/api/colors';
-import { Award, EventCoprs, Match, Media, Team, Webcast } from '~/api/tba/read';
+import {
+  Award,
+  EliminationAlliance,
+  Event,
+  EventCoprs,
+  Match,
+  Media,
+  Team,
+  Webcast,
+} from '~/api/tba/read';
 import {
   getEventAlliancesOptions,
   getEventAwardsOptions,
@@ -47,10 +56,13 @@ import {
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import RankingsTable from '~/components/tba/rankingsTable';
 import { WebcastIcon } from '~/components/tba/socialBadges';
+import {
+  TableOfContents,
+  TableOfContentsSection,
+} from '~/components/tba/tableOfContents';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -215,48 +227,9 @@ function EventPage() {
     [matches],
   );
 
-  const quals = useMemo(
-    () => sortedMatches.filter((m) => m.comp_level === 'qm'),
-    [sortedMatches],
-  );
-
-  const elims = useMemo(
-    () => sortedMatches.filter((m) => m.comp_level !== 'qm'),
-    [sortedMatches],
-  );
-
-  const leftSideMatches = (
-    <SimpleMatchRowsWithBreaks
-      matches={quals.length > 0 ? quals : elims}
-      event={event}
-      breakers={[
-        END_OF_DAY_BREAKER,
-        START_OF_QUALS_BREAKER,
-        CHANGE_IN_COMP_LEVEL_BREAKER,
-      ]}
-    />
-  );
-
-  const rightSideElims =
-    elims.length > 0 ? (
-      <SimpleMatchRowsWithBreaks
-        matches={elims}
-        event={event}
-        breakers={[
-          END_OF_DAY_BREAKER,
-          START_OF_ELIMS_BREAKER,
-          CHANGE_IN_COMP_LEVEL_BREAKER,
-          CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
-        ]}
-      />
-    ) : null;
-
   const shouldPreviewAwardsTab = SEASON_EVENT_TYPES.has(event.event_type);
   const shouldPreviewInsightsTab = matches.length > 0;
   const shouldPreviewRankingsTab = matches.length > 0;
-  const showBracket =
-    alliances.length > 0 &&
-    event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
 
   return (
     <div className="py-8">
@@ -384,52 +357,11 @@ function EventPage() {
         </TabsList>
 
         <TabsContent value="results">
-          <div className="flex flex-wrap gap-4 lg:flex-nowrap">
-            <div className="basis-full lg:basis-1/2">{leftSideMatches}</div>
-
-            <div className="basis-full lg:basis-1/2">
-              {alliances.length > 0 && (
-                <AllianceSelectionTable
-                  alliances={alliances}
-                  year={event.year}
-                />
-              )}
-
-              {showBracket && (
-                <div className="my-4">
-                  <Button
-                    onClick={() => {
-                      const bracketElement = document.querySelector(
-                        '[data-bracket-section]',
-                      );
-                      if (bracketElement) {
-                        bracketElement.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        });
-                      }
-                    }}
-                    variant="secondary"
-                    className="w-full"
-                  >
-                    View Playoff Bracket →
-                  </Button>
-                </div>
-              )}
-
-              {rightSideElims}
-            </div>
-          </div>
-
-          {showBracket && (
-            <div data-bracket-section>
-              <EliminationBracket
-                alliances={alliances}
-                matches={elims}
-                event={event}
-              />
-            </div>
-          )}
+          <ResultsTab
+            event={event}
+            sortedMatches={sortedMatches}
+            alliances={alliances}
+          />
         </TabsContent>
 
         {rankingsQuery.data && (
@@ -481,6 +413,105 @@ function EventPage() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function ResultsTab({
+  event,
+  sortedMatches,
+  alliances,
+}: {
+  event: Event;
+  sortedMatches: Match[];
+  alliances: EliminationAlliance[];
+}) {
+  const [inView, setInView] = useState<Set<string>>(new Set());
+
+  const quals = useMemo(
+    () => sortedMatches.filter((m) => m.comp_level === 'qm'),
+    [sortedMatches],
+  );
+
+  const elims = useMemo(
+    () => sortedMatches.filter((m) => m.comp_level !== 'qm'),
+    [sortedMatches],
+  );
+
+  const leftSideMatches = (
+    <SimpleMatchRowsWithBreaks
+      matches={quals.length > 0 ? quals : elims}
+      event={event}
+      breakers={[
+        END_OF_DAY_BREAKER,
+        START_OF_QUALS_BREAKER,
+        CHANGE_IN_COMP_LEVEL_BREAKER,
+      ]}
+    />
+  );
+
+  const rightSideElims =
+    elims.length > 0 ? (
+      <SimpleMatchRowsWithBreaks
+        matches={elims}
+        event={event}
+        breakers={[
+          END_OF_DAY_BREAKER,
+          START_OF_ELIMS_BREAKER,
+          CHANGE_IN_COMP_LEVEL_BREAKER,
+          CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
+        ]}
+      />
+    ) : null;
+
+  const showBracket =
+    alliances.length > 0 &&
+    event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
+
+  const tocItems = [
+    { slug: 'qual-matches', label: 'Qualification Matches' },
+    { slug: 'alliances', label: 'Alliances' },
+    { slug: 'playoff-matches', label: 'Playoff Matches' },
+    { slug: 'playoff-bracket', label: 'Playoff Bracket' },
+  ];
+
+  return (
+    <>
+      <TableOfContents tocItems={tocItems} inView={inView} mobileOnly />
+
+      <div className="flex flex-wrap gap-4 lg:flex-nowrap">
+        <TableOfContentsSection
+          id="qual-matches"
+          setInView={setInView}
+          className="basis-full lg:basis-1/2"
+        >
+          <h2 className="mb-2 text-xl font-medium">Qualification Matches</h2>
+          {leftSideMatches}
+        </TableOfContentsSection>
+
+        <div className="basis-full lg:basis-1/2">
+          {alliances.length > 0 && (
+            <TableOfContentsSection id="alliances" setInView={setInView}>
+              <AllianceSelectionTable alliances={alliances} year={event.year} />
+            </TableOfContentsSection>
+          )}
+
+          <TableOfContentsSection id="playoff-matches" setInView={setInView}>
+            <h2 className="mb-2 text-xl font-medium">Playoff Matches</h2>
+            {rightSideElims}
+          </TableOfContentsSection>
+        </div>
+      </div>
+
+      {showBracket && (
+        <TableOfContentsSection id="playoff-bracket" setInView={setInView}>
+          <EliminationBracket
+            alliances={alliances}
+            matches={elims}
+            event={event}
+          />
+        </TableOfContentsSection>
+      )}
+    </>
   );
 }
 

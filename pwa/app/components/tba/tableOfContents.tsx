@@ -75,10 +75,12 @@ export function TableOfContents({
   children,
   tocItems,
   inView,
+  mobileOnly = false,
 }: {
   children?: React.ReactNode;
   tocItems: TocNode[];
   inView: Set<string>;
+  mobileOnly?: boolean;
 }) {
   const [mobilePopoverOpen, setMobilePopoverOpen] = useState<boolean>(false);
   const router = useRouter();
@@ -112,12 +114,14 @@ export function TableOfContents({
   return (
     <>
       {/* Desktop TOC - Split screen */}
-      <div className="basis-full max-lg:hidden lg:basis-1/6">
-        <div className="sticky top-14 space-y-6 pt-8">
-          {children}
-          <TOCContent tocItems={tocItems} activeItem={activeItem} />
+      {!mobileOnly && (
+        <div className="basis-full max-lg:hidden lg:basis-1/6">
+          <div className="sticky top-14 space-y-6 pt-8">
+            {children}
+            <TOCContent tocItems={tocItems} activeItem={activeItem} />
+          </div>
         </div>
-      </div>
+      )}
       {/* Mobile TOC - Sticky header */}
       <TOCRenderPortal>
         <div

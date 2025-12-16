@@ -423,8 +423,8 @@ export default function EliminationBracket({
       <div className="overflow-x-auto overflow-y-hidden">
         <div
           ref={containerRef}
-          className="relative flex min-w-max items-start justify-start gap-6
-            px-4"
+          className="relative isolate flex min-w-max items-start justify-start
+            gap-6 px-4"
         >
           {/* Bracket Layout */}
           <div className="relative z-1 space-y-4">
