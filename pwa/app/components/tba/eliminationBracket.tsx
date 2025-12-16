@@ -415,7 +415,7 @@ export default function EliminationBracket({
   }
 
   return (
-    <Card className="mt-12 bg-gray-50/50 p-2">
+    <Card className="mt-12 bg-gray-50/50 p-2 dark:bg-gray-900/50">
       <CardHeader>
         <CardTitle>Playoff Bracket</CardTitle>
       </CardHeader>

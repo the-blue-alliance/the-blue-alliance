@@ -80,11 +80,11 @@ export function KickoffCountdown({
 
   return (
     <div
-      className="mx-auto max-w-[600px] rounded-xl bg-gradient-to-br
-        from-slate-100 to-slate-200 p-6 text-slate-800 shadow-lg"
+      className="mx-auto max-w-[600px] rounded-xl border border-border bg-card
+        p-6 text-card-foreground shadow-lg"
     >
       <h2
-        className="mb-4 text-center text-2xl font-bold text-slate-900
+        className="mb-4 text-center text-2xl font-bold text-foreground
           sm:text-3xl"
       >
         Kickoff {year}!
@@ -119,11 +119,11 @@ export function KickoffCountdown({
             />
           </div>
 
-          <p className="mb-1 text-center text-sm font-medium text-slate-700">
+          <p className="mb-1 text-center text-sm font-medium text-foreground">
             until Kickoff
           </p>
 
-          <p className="text-center text-sm text-slate-600">
+          <p className="text-center text-sm text-muted-foreground">
             Come back at{' '}
             <ClientOnly fallback={kickoffTimeEST}>{kickoffTime}</ClientOnly> on{' '}
             <ClientOnly fallback={kickoffDateEST}>{kickoffDate}</ClientOnly> to
@@ -138,9 +138,9 @@ export function KickoffCountdown({
           className={`inline-flex items-center gap-2 rounded-lg px-6 py-3
             text-lg font-semibold transition-colors hover:no-underline ${
               isWithin24Hours
-                ? 'bg-green-500 text-white hover:bg-green-600'
-                : `pointer-events-none cursor-not-allowed bg-slate-300
-                  text-slate-400`
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : `pointer-events-none cursor-not-allowed bg-muted
+                  text-muted-foreground`
             }`}
           aria-disabled={!isWithin24Hours}
           tabIndex={isWithin24Hours ? undefined : -1}
@@ -156,8 +156,8 @@ export function KickoffCountdown({
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center gap-2 rounded-lg
-            bg-blue-100 px-4 py-2 text-sm font-medium text-primary
-            transition-colors hover:bg-blue-200 hover:no-underline"
+            bg-accent px-4 py-2 text-sm font-medium text-accent-foreground
+            transition-colors hover:bg-accent/80 hover:no-underline"
         >
           <BiInfoCircleFill className="h-4 w-4" />
           <span>{year} FRC Game Resources</span>
@@ -180,18 +180,22 @@ function CountdownUnit({
     <div className="flex flex-col items-center">
       <div
         className="flex h-16 w-16 items-center justify-center rounded-lg
-          bg-slate-300 sm:h-20 sm:w-20"
+          bg-secondary sm:h-20 sm:w-20"
       >
         <span
-          className="font-mono text-3xl font-bold text-slate-800 sm:text-4xl"
+          className="font-mono text-3xl font-bold text-secondary-foreground
+            sm:text-4xl"
         >
           <ClientOnly fallback="--">{value}</ClientOnly>
         </span>
       </div>
-      <span className="mt-1 text-xs font-medium text-slate-600 sm:hidden">
+      <span className="mt-1 text-xs font-medium text-muted-foreground sm:hidden">
         {label}
       </span>
-      <span className="mt-1 hidden text-xs font-medium text-slate-600 sm:block">
+      <span
+        className="mt-1 hidden text-xs font-medium text-muted-foreground
+          sm:block"
+      >
         {fullLabel}
       </span>
     </div>
