@@ -25,7 +25,12 @@ async function buildServiceWorker() {
       cacheId: 'tba-pwa',
 
       // Ignore specific files
-      globIgnores: ['**/sw.js', '**/workbox-*.js', '**/*.map'],
+      globIgnores: [
+        '**/sw.js',
+        '**/workbox-*.js',
+        '**/*.map',
+        '**/apple-splash-*',
+      ],
 
       // Maximum file size to precache (2MB)
       maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
@@ -40,7 +45,7 @@ async function buildServiceWorker() {
     );
 
     if (result.warnings.length > 0) {
-      console.warn('⚠️  Warnings:');
+      console.warn('⚠️ Warnings:');
       result.warnings.forEach((warning) => console.warn(`   - ${warning}`));
     }
   } catch (error) {
