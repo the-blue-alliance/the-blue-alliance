@@ -1,12 +1,11 @@
-import { useSuspenseQueries } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
-import { Suspense, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import MdiCog from '~icons/mdi/cog';
 import MdiRobotExcited from '~icons/mdi/robot-excited';
 
-import { Event } from '~/api/tba/read';
 import { getTeamMatchesByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import {
   getTeam,
@@ -78,7 +77,15 @@ export const Route = createFileRoute('/team/$teamNumber/stats')({
   component: TeamStatsPage,
 });
 
-function MatchStatsLoadingState() {
+function MatchStatsLoadingState({
+  numLoaded,
+  total,
+}: {
+  numLoaded: number;
+  total: number;
+}) {
+  const progress = total > 0 ? (numLoaded / total) * 100 : 0;
+
   return (
     <div className="flex flex-col items-center justify-center py-16">
       <div className="relative mb-6">
@@ -94,66 +101,16 @@ function MatchStatsLoadingState() {
       <div className="mb-3 text-lg font-medium text-foreground">
         Compiling match data...
       </div>
-      <div className="flex gap-1">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="size-2 animate-pulse rounded-full bg-blue-500"
-            style={{ animationDelay: `${i * 200}ms` }}
-          />
-        ))}
+      <div className="mb-2 text-sm text-muted-foreground">
+        {numLoaded} / {total} years loaded
+      </div>
+      <div className="h-2 w-64 overflow-hidden rounded-full bg-gray-200">
+        <div
+          className="h-full bg-blue-500 transition-all duration-300 ease-out"
+          style={{ width: `${progress}%` }}
+        />
       </div>
     </div>
-  );
-}
-
-function MatchStatsWithData({
-  teamKey,
-  allEvents,
-  usedEvents,
-  minYear,
-  maxYear,
-}: {
-  teamKey: string;
-  allEvents: Event[];
-  usedEvents: Event[];
-  minYear: number;
-  maxYear: number;
-}) {
-  const matchQueries = useSuspenseQueries({
-    queries: uniq(allEvents.map((e) => e.year)).map((year) =>
-      getTeamMatchesByYearOptions({
-        path: { team_key: teamKey, year },
-      }),
-    ),
-  });
-
-  const allMatchesByYear = useMemo(
-    () => matchQueries.map((q) => q.data ?? []),
-    [matchQueries],
-  );
-
-  const usedMatches = useMemo(() => {
-    const eventKeys = new Set(usedEvents.map((event) => event.key));
-    return sortMultipleEventsMatches(
-      allMatchesByYear
-        .flat()
-        .filter(
-          (match) =>
-            eventKeys.has(match.event_key) &&
-            Number(match.event_key.slice(0, 4)) >= minYear &&
-            Number(match.event_key.slice(0, 4)) <= maxYear,
-        ),
-      usedEvents,
-    );
-  }, [allMatchesByYear, usedEvents, minYear, maxYear]);
-
-  return (
-    <TeamMatchStats
-      teamKey={teamKey}
-      matches={usedMatches}
-      events={usedEvents}
-    />
   );
 }
 
@@ -191,6 +148,38 @@ function TeamStatsPage() {
       usedEvents,
     );
   }, [allAwards, usedEvents, minYear, maxYear]);
+
+  const matchQueries = useQueries({
+    queries: uniq(allEvents.map((e) => e.year)).map((year) =>
+      getTeamMatchesByYearOptions({
+        path: { team_key: team.key, year },
+      }),
+    ),
+  });
+
+  const matchQueriesNumLoaded = useMemo(() => {
+    return matchQueries.filter((q) => q.isSuccess).length;
+  }, [matchQueries]);
+
+  const allMatchesByYear = useMemo(
+    () => matchQueries.map((q) => q.data ?? []),
+    [matchQueries],
+  );
+
+  const usedMatches = useMemo(() => {
+    const eventKeys = new Set(usedEvents.map((event) => event.key));
+    return sortMultipleEventsMatches(
+      allMatchesByYear
+        .flat()
+        .filter(
+          (match) =>
+            eventKeys.has(match.event_key) &&
+            Number(match.event_key.slice(0, 4)) >= minYear &&
+            Number(match.event_key.slice(0, 4)) <= maxYear,
+        ),
+      usedEvents,
+    );
+  }, [allMatchesByYear, usedEvents, minYear, maxYear]);
 
   return (
     <div>
@@ -232,15 +221,18 @@ function TeamStatsPage() {
       <Divider className="my-4" />
       <TeamAwardsSummary awards={usedAwards} events={usedEvents} />
       <Divider className="my-4" />
-      <Suspense fallback={<MatchStatsLoadingState />}>
-        <MatchStatsWithData
-          teamKey={team.key}
-          allEvents={allEvents}
-          usedEvents={usedEvents}
-          minYear={minYear}
-          maxYear={maxYear}
+      {matchQueriesNumLoaded < matchQueries.length ? (
+        <MatchStatsLoadingState
+          numLoaded={matchQueriesNumLoaded}
+          total={matchQueries.length}
         />
-      </Suspense>
+      ) : (
+        <TeamMatchStats
+          teamKey={team.key}
+          matches={usedMatches}
+          events={usedEvents}
+        />
+      )}
     </div>
   );
 }
