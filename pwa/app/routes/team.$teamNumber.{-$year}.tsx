@@ -309,6 +309,7 @@ function TeamPage(): React.JSX.Element {
           </SelectTrigger>
           <SelectContent className="max-h-[30vh] overflow-y-auto">
             <SelectItem value="history">History</SelectItem>
+            <SelectItem value="stats">Stats</SelectItem>
             {yearsParticipated.map((y) => (
               <SelectItem key={y} value={`${y}`}>
                 {y}

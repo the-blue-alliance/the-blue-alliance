@@ -136,7 +136,8 @@ function TeamHistoryPage(): React.JSX.Element {
             <SelectValue placeholder={'History'} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="History">History</SelectItem>
+            <SelectItem value="history">History</SelectItem>
+            <SelectItem value="stats">Stats</SelectItem>
             {yearsParticipated.map((y) => (
               <SelectItem key={y} value={`${y}`}>
                 {y}
