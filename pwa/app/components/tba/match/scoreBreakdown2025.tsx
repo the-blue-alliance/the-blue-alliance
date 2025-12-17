@@ -43,7 +43,9 @@ export default function ScoreBreakdown2025({
             />
             (+{scoreBreakdown.red.autoMobilityPoints})
           </TableCell>
-          <TableCell className="bg-gray-200">Auto Leave</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Auto Leave
+          </TableCell>
           <TableCell
             colSpan={2}
             className="bg-alliance-blue-dark whitespace-nowrap *:align-middle"
@@ -70,7 +72,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-light">
             {scoreBreakdown.red.autoReef?.tba_topRowCount}
           </TableCell>
-          <TableCell className="bg-gray-50" rowSpan={4}>
+          <TableCell className="bg-gray-50 dark:bg-gray-950" rowSpan={4}>
             Auto Coral Count
           </TableCell>
           <TableCell className="bg-alliance-blue-light">
@@ -114,7 +116,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-dark" colSpan={2}>
             {scoreBreakdown.red.autoCoralPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Auto Coral Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Auto Coral Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark" colSpan={2}>
             {scoreBreakdown.blue.autoCoralPoints}
           </TableCell>
@@ -125,7 +129,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-dark" colSpan={2}>
             {scoreBreakdown.red.autoPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Total Auto</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Total Auto
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark" colSpan={2}>
             {scoreBreakdown.blue.autoPoints}
           </TableCell>
@@ -137,7 +143,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-light">
             {scoreBreakdown.red.teleopReef?.tba_topRowCount}
           </TableCell>
-          <TableCell className="bg-gray-50" rowSpan={4}>
+          <TableCell className="bg-gray-50 dark:bg-gray-950" rowSpan={4}>
             Teleop Coral Count
           </TableCell>
           <TableCell className="bg-alliance-blue-light">
@@ -181,7 +187,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-dark" colSpan={2}>
             {scoreBreakdown.red.teleopCoralPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Teleop Coral Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Teleop Coral Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark" colSpan={2}>
             {scoreBreakdown.blue.teleopCoralPoints}
           </TableCell>
@@ -192,7 +200,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-light" colSpan={2}>
             {scoreBreakdown.red.wallAlgaeCount}
           </TableCell>
-          <TableCell className="bg-gray-50">Processor Algae Count</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Processor Algae Count
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             {scoreBreakdown.blue.wallAlgaeCount}
           </TableCell>
@@ -203,7 +213,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-light" colSpan={2}>
             {scoreBreakdown.red.netAlgaeCount}
           </TableCell>
-          <TableCell className="bg-gray-50">Net Algae Count</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Net Algae Count
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             {scoreBreakdown.blue.netAlgaeCount}
           </TableCell>
@@ -214,7 +226,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-dark" colSpan={2}>
             {scoreBreakdown.red.algaePoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Algae Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Algae Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark" colSpan={2}>
             {scoreBreakdown.blue.algaePoints}
           </TableCell>
@@ -228,7 +242,9 @@ export default function ScoreBreakdown2025({
               teamKey={match.alliances.red.team_keys[0]}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Robot 1 Endgame</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Robot 1 Endgame
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot1}
@@ -245,7 +261,9 @@ export default function ScoreBreakdown2025({
               teamKey={match.alliances.red.team_keys[1]}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Robot 2 Endgame</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Robot 2 Endgame
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot2}
@@ -262,7 +280,9 @@ export default function ScoreBreakdown2025({
               teamKey={match.alliances.red.team_keys[2]}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Robot 3 Endgame</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Robot 3 Endgame
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot3}
@@ -276,7 +296,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-dark" colSpan={2}>
             {scoreBreakdown.red.endGameBargePoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Barge Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Barge Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark" colSpan={2}>
             {scoreBreakdown.blue.endGameBargePoints}
           </TableCell>
@@ -287,7 +309,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-dark" colSpan={2}>
             {scoreBreakdown.red.teleopPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Total Teleop</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Total Teleop
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark" colSpan={2}>
             {scoreBreakdown.blue.teleopPoints}
           </TableCell>
@@ -300,7 +324,7 @@ export default function ScoreBreakdown2025({
               condition={scoreBreakdown.red.coopertitionCriteriaMet ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
             Coopertition Criteria Met
           </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
@@ -317,7 +341,9 @@ export default function ScoreBreakdown2025({
               condition={scoreBreakdown.red.autoBonusAchieved ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Auto Bonus</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Auto Bonus
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.autoBonusAchieved ?? false}
@@ -332,7 +358,9 @@ export default function ScoreBreakdown2025({
               condition={scoreBreakdown.red.coralBonusAchieved ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Coral Bonus</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Coral Bonus
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.coralBonusAchieved ?? false}
@@ -347,7 +375,9 @@ export default function ScoreBreakdown2025({
               condition={scoreBreakdown.red.bargeBonusAchieved ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Barge Bonus</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Barge Bonus
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.bargeBonusAchieved ?? false}
@@ -360,7 +390,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-light" colSpan={2}>
             {scoreBreakdown.red.foulCount} / {scoreBreakdown.red.techFoulCount}
           </TableCell>
-          <TableCell className="bg-gray-50">Fouls / Major Fouls</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Fouls / Major Fouls
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             {scoreBreakdown.blue.foulCount} /{' '}
             {scoreBreakdown.blue.techFoulCount}
@@ -372,7 +404,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-dark" colSpan={2}>
             {scoreBreakdown.red.foulPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Foul Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Foul Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark" colSpan={2}>
             {scoreBreakdown.blue.foulPoints}
           </TableCell>
@@ -383,7 +417,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-light" colSpan={2}>
             {scoreBreakdown.red.adjustPoints}
           </TableCell>
-          <TableCell className="bg-gray-50">Adjustments</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Adjustments
+          </TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             {scoreBreakdown.blue.adjustPoints}
           </TableCell>
@@ -394,7 +430,9 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-dark" colSpan={2}>
             {scoreBreakdown.red.totalPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Total Score</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Total Score
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark" colSpan={2}>
             {scoreBreakdown.blue.totalPoints}
           </TableCell>
@@ -405,7 +443,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-light" colSpan={2}>
             +{scoreBreakdown.red.rp} RP
           </TableCell>
-          <TableCell className="bg-gray-50">RP</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">RP</TableCell>
           <TableCell className="bg-alliance-blue-light" colSpan={2}>
             +{scoreBreakdown.blue.rp} RP
           </TableCell>

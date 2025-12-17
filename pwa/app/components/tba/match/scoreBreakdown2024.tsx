@@ -44,7 +44,9 @@ export default function ScoreBreakdown2024({
             />
             (+{scoreBreakdown.red.autoLeavePoints})
           </TableCell>
-          <TableCell className="bg-gray-200">Auto Leave</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Auto Leave
+          </TableCell>
           <TableCell
             className="bg-alliance-blue-dark whitespace-nowrap *:align-middle"
           >
@@ -69,7 +71,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-light">
             {scoreBreakdown.red.autoAmpNoteCount}
           </TableCell>
-          <TableCell className="bg-gray-50">Auto Amp Note Count</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Auto Amp Note Count
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             {scoreBreakdown.blue.autoAmpNoteCount}
           </TableCell>
@@ -80,7 +84,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-light">
             {scoreBreakdown.red.autoSpeakerNoteCount}
           </TableCell>
-          <TableCell className="bg-gray-50">Auto Speaker Note Count</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Auto Speaker Note Count
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             {scoreBreakdown.blue.autoSpeakerNoteCount}
           </TableCell>
@@ -91,7 +97,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-dark">
             {scoreBreakdown.red.autoTotalNotePoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Auto Note Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Auto Note Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark">
             {scoreBreakdown.blue.autoTotalNotePoints}
           </TableCell>
@@ -102,7 +110,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-dark">
             {scoreBreakdown.red.autoPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Total Auto</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Total Auto
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark">
             {scoreBreakdown.blue.autoPoints}
           </TableCell>
@@ -113,7 +123,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-light">
             {scoreBreakdown.red.teleopAmpNoteCount}
           </TableCell>
-          <TableCell className="bg-gray-50">Teleop Amp Note Count</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Teleop Amp Note Count
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             {scoreBreakdown.blue.teleopAmpNoteCount}
           </TableCell>
@@ -134,7 +146,7 @@ export default function ScoreBreakdown2024({
               {scoreBreakdown.red.teleopSpeakerNoteCount}
             </InlineIcon>
           </TableCell>
-          <TableCell className="bg-gray-50">
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
             Teleop Speaker Note Count
           </TableCell>
 
@@ -158,7 +170,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-dark">
             {scoreBreakdown.red.teleopTotalNotePoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Teleop Note Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Teleop Note Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark">
             {scoreBreakdown.blue.teleopTotalNotePoints}
           </TableCell>
@@ -175,7 +189,9 @@ export default function ScoreBreakdown2024({
               trapStageRight={scoreBreakdown.red.trapStageRight ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Robot 1 Endgame</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Robot 1 Endgame
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot1}
@@ -198,7 +214,9 @@ export default function ScoreBreakdown2024({
               trapStageRight={scoreBreakdown.red.trapStageRight ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Robot 2 Endgame</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Robot 2 Endgame
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot2}
@@ -221,7 +239,9 @@ export default function ScoreBreakdown2024({
               trapStageRight={scoreBreakdown.red.trapStageRight ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Robot 3 Endgame</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Robot 3 Endgame
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot3}
@@ -238,7 +258,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-dark">
             {scoreBreakdown.red.endGameHarmonyPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Harmony Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Harmony Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark">
             {scoreBreakdown.blue.endGameHarmonyPoints}
           </TableCell>
@@ -249,7 +271,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-dark">
             {scoreBreakdown.red.endGameNoteInTrapPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Trap Points</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Trap Points
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark">
             {scoreBreakdown.blue.endGameNoteInTrapPoints}
           </TableCell>
@@ -260,7 +284,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-dark">
             {scoreBreakdown.red.teleopPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Total Teleop</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Total Teleop
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark">
             {scoreBreakdown.blue.teleopPoints}
           </TableCell>
@@ -273,7 +299,7 @@ export default function ScoreBreakdown2024({
               condition={scoreBreakdown.red.coopertitionCriteriaMet ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
             Coopertition Criteria Met
           </TableCell>
           <TableCell className="bg-alliance-blue-light">
@@ -290,7 +316,9 @@ export default function ScoreBreakdown2024({
               condition={scoreBreakdown.red.melodyBonusAchieved ?? false}
             />
           </TableCell>
-          <TableCell className="bg-gray-50">Melody Bonus</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Melody Bonus
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.melodyBonusAchieved ?? false}
@@ -306,7 +334,9 @@ export default function ScoreBreakdown2024({
             {scoreBreakdown.red.techFoulCount} (+
             {(scoreBreakdown.red.techFoulCount ?? 0) * 5})
           </TableCell>
-          <TableCell className="bg-gray-50">Fouls / Tech Fouls</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Fouls / Tech Fouls
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             {scoreBreakdown.blue.foulCount} (+
             {(scoreBreakdown.blue.foulCount ?? 0) * 2}) /{' '}
@@ -320,7 +350,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-light">
             {scoreBreakdown.red.adjustPoints}
           </TableCell>
-          <TableCell className="bg-gray-50">Adjustments</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">
+            Adjustments
+          </TableCell>
           <TableCell className="bg-alliance-blue-light">
             {scoreBreakdown.blue.adjustPoints}
           </TableCell>
@@ -331,7 +363,9 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-dark">
             {scoreBreakdown.red.totalPoints}
           </TableCell>
-          <TableCell className="bg-gray-200">Total Score</TableCell>
+          <TableCell className="bg-gray-200 dark:bg-gray-800">
+            Total Score
+          </TableCell>
           <TableCell className="bg-alliance-blue-dark">
             {scoreBreakdown.blue.totalPoints}
           </TableCell>
@@ -342,7 +376,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-light">
             +{scoreBreakdown.red.rp} RP
           </TableCell>
-          <TableCell className="bg-gray-50">RP</TableCell>
+          <TableCell className="bg-gray-50 dark:bg-gray-950">RP</TableCell>
           <TableCell className="bg-alliance-blue-light">
             +{scoreBreakdown.blue.rp} RP
           </TableCell>
