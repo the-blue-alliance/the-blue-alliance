@@ -12,7 +12,7 @@ import {
 } from '~/api/tba/read';
 import { AwardBanner } from '~/components/tba/banner';
 import DetailEntity from '~/components/tba/detailEntity';
-import { EventLink, TeamLink } from '~/components/tba/links';
+import { EventLink, EventLocationLink, TeamLink } from '~/components/tba/links';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
   END_OF_DAY_BREAKER,
@@ -64,13 +64,7 @@ export default function TeamEventAppearance({
             )}
           </DetailEntity>
           <DetailEntity icon={<LocationIcon />}>
-            <a
-              href={`https://maps.google.com/maps?q=${encodeURIComponent(`${event.city}, ${event.state_prov}, ${event.country}`)}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {event.city}, {event.state_prov}, {event.country}
-            </a>
+            <EventLocationLink event={event} />
           </DetailEntity>
         </div>
 
