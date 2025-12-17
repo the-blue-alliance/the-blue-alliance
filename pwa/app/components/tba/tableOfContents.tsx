@@ -12,6 +12,7 @@ import {
 } from 'app/components/ui/toc';
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -21,6 +22,8 @@ import {
 import { InView, type PlainChildrenProps } from 'react-intersection-observer';
 
 import TableOfContentsIcon from '~icons/mdi/table-of-contents';
+
+import { cn } from '~/lib/utils';
 
 const TOCRendererContext = createContext<{
   content: React.ReactNode;
@@ -149,7 +152,11 @@ export function TableOfContents({
                 sideOffset={0}
                 className="max-h-[70vh] w-60 overflow-y-auto lg:hidden"
               >
-                <TOCContent tocItems={tocItems} activeItem={activeItem} />
+                <TOCContent
+                  tocItems={tocItems}
+                  activeItem={activeItem}
+                  onItemClick={() => setMobilePopoverOpen(false)}
+                />
               </PopoverContent>
             </Popover>
           </div>
@@ -173,13 +180,14 @@ export function TableOfContentsSection({
   children,
   id,
   setInView,
+  className,
   ...props
 }: TableOfContentsSectionProps) {
   return (
     <InView
       as="section"
       id={id}
-      className="scroll-mt-12 lg:scroll-mt-4"
+      className={cn('scroll-mt-12 lg:scroll-mt-4', className)}
       rootMargin="-15% 0px 0px 0px"
       onChange={(inView) => {
         setInView((prev) => {
@@ -201,9 +209,11 @@ export function TableOfContentsSection({
 function TOCContent({
   tocItems,
   activeItem,
+  onItemClick,
 }: {
   tocItems: TocNode[];
   activeItem: TocNode | undefined;
+  onItemClick?: () => void;
 }) {
   return (
     <TableOfContentsList>
@@ -213,6 +223,7 @@ function TOCContent({
           node={node}
           activeItem={activeItem}
           depth={0}
+          onItemClick={onItemClick}
         />
       ))}
     </TableOfContentsList>
@@ -223,10 +234,12 @@ function TOCNode({
   node,
   activeItem,
   depth,
+  onItemClick,
 }: {
   node: TocNode;
   activeItem: TocNode | undefined;
   depth: number;
+  onItemClick?: () => void;
 }) {
   // Check if this node or any of its descendants is active
   const isNodeOrDescendantActive = useMemo(() => {
@@ -242,6 +255,18 @@ function TOCNode({
     return checkActive(node);
   }, [node, activeItem]);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      const element = document.getElementById(node.slug);
+      if (element) {
+        element.scrollIntoView({ behavior: 'instant', block: 'start' });
+      }
+      onItemClick?.();
+    },
+    [node.slug, onItemClick],
+  );
+
   return (
     <>
       <TableOfContentsItem className="first:pt-0" indent={depth}>
@@ -249,6 +274,7 @@ function TOCNode({
           hash={node.slug}
           replace={true}
           isActive={isNodeOrDescendantActive}
+          onClick={handleClick}
         >
           {node.label}
         </TableOfContentsLink>
@@ -262,6 +288,7 @@ function TOCNode({
                 node={child}
                 activeItem={activeItem}
                 depth={depth + 1}
+                onItemClick={onItemClick}
               />
             ))}
           </TableOfContentsList>
