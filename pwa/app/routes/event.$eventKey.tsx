@@ -36,7 +36,11 @@ import { DataTable } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import EliminationBracket from '~/components/tba/eliminationBracket';
 import InlineIcon from '~/components/tba/inlineIcon';
-import { LocationLink, TeamLink } from '~/components/tba/links';
+import {
+  EventLocationLink,
+  TeamLink,
+  TeamLocationLink,
+} from '~/components/tba/links';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
   CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
@@ -102,7 +106,6 @@ import {
 } from '~/lib/rankingPoints';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import {
-  STATE_TO_ABBREVIATION,
   camelCaseToHumanReadable,
   cn,
   doThrowNotFound,
@@ -274,15 +277,7 @@ function EventPage() {
           )}
         </DetailEntity>
         <DetailEntity icon={<LocationIcon />}>
-          {event.gmaps_url ? (
-            <a href={event.gmaps_url}>
-              {event.city}, {event.state_prov}, {event.country}
-            </a>
-          ) : (
-            <>
-              {event.city}, {event.state_prov}, {event.country}
-            </>
-          )}
+          <EventLocationLink event={event} />
         </DetailEntity>
         {event.website && (
           <DetailEntity icon={<WebsiteIcon />}>
@@ -449,7 +444,11 @@ function EventPage() {
 
         <TabsContent value="teams">
           {teamsQuery.data && teamMediaQuery.data && (
-            <TeamsTab teams={teamsQuery.data} media={teamMediaQuery.data} />
+            <TeamsTab
+              teams={teamsQuery.data}
+              media={teamMediaQuery.data}
+              year={event.year}
+            />
           )}
         </TabsContent>
 
@@ -524,7 +523,15 @@ function AwardsTab({ awards }: { awards: Award[] }) {
   );
 }
 
-function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
+function TeamsTab({
+  teams,
+  media,
+  year,
+}: {
+  teams: Team[];
+  media: Media[];
+  year: number;
+}) {
   teams.sort(sortTeamsComparator);
 
   const teamChunks = splitIntoNChunks(teams, 2);
@@ -550,11 +557,6 @@ function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
               const maybeAvatar = teamMedia.find((m) => m.type === 'avatar');
               const maybeRobotPic = getTeamPreferredRobotPicMedium(teamMedia);
 
-              const abbreviatedStateProv =
-                STATE_TO_ABBREVIATION.get(t.state_prov ?? '') ?? t.state_prov;
-
-              const teamLocation = `${t.city}, ${abbreviatedStateProv}, ${t.country}`;
-
               return (
                 <TableRow key={t.key}>
                   <TableCell
@@ -572,17 +574,13 @@ function TeamsTab({ teams, media }: { teams: Team[]; media: Media[] }) {
                     )}
                   </TableCell>
                   <TableCell className="mt-1 flex flex-col">
-                    <TeamLink teamOrKey={t.key}>{t.team_number}</TeamLink>
+                    <TeamLink teamOrKey={t.key} year={year}>
+                      {t.team_number}
+                    </TeamLink>
                     <div>{t.nickname}</div>
                   </TableCell>
                   <TableCell className={'text-xs'}>
-                    <LocationLink
-                      city={t.city ?? ''}
-                      state_prov={t.state_prov ?? ''}
-                      country={t.country ?? ''}
-                    >
-                      {teamLocation}
-                    </LocationLink>
+                    <TeamLocationLink team={t} />
                   </TableCell>
                   {maybeRobotPic && (
                     <TableCell>

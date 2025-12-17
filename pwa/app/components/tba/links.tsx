@@ -7,7 +7,7 @@ import {
   getEventQueryKey,
   getMatchQueryKey,
 } from '~/api/tba/read/@tanstack/react-query.gen';
-import { removeNonNumeric } from '~/lib/utils';
+import { STATE_TO_ABBREVIATION, removeNonNumeric } from '~/lib/utils';
 
 const TeamLink = React.forwardRef<
   HTMLAnchorElement,
@@ -18,16 +18,21 @@ const TeamLink = React.forwardRef<
     } & React.AnchorHTMLAttributes<HTMLAnchorElement>
   >
 >(({ teamOrKey, year, ...props }, ref) => {
-  const teamNumber =
+  const teamNumber: string =
     typeof teamOrKey === 'string'
       ? removeNonNumeric(teamOrKey)
-      : teamOrKey.team_number;
+      : teamOrKey.team_number.toString();
 
-  const yearSuffix =
-    year === undefined ? '' : year === 0 ? 'history' : year.toString();
+  const yearSuffix = year === 0 ? 'history' : year?.toString();
 
-  const href = `/team/${teamNumber}/${yearSuffix}`;
-  return <Link to={href} {...props} ref={ref} />;
+  return (
+    <Link
+      to="/team/$teamNumber/{-$year}"
+      params={{ teamNumber, year: yearSuffix }}
+      {...props}
+      ref={ref}
+    />
+  );
 });
 TeamLink.displayName = 'TeamLink';
 
@@ -46,29 +51,56 @@ const EventLink = React.forwardRef<
 });
 EventLink.displayName = 'EventLink';
 
-const LocationLink = React.forwardRef<
-  HTMLAnchorElement,
-  React.PropsWithChildren<{
-    city: string;
-    state_prov: string;
-    country: string;
-    hideUSA?: boolean;
-  }>
->(({ city, state_prov, country, hideUSA, children, ...props }, ref) => {
-  const url = `https://maps.google.com/?q=${city}, ${state_prov}, ${country}`;
+const EventLocationLink = ({
+  event,
+  hideUSA = false,
+  hideVenue = false,
+}: {
+  event: Event;
+  hideUSA?: boolean;
+  hideVenue?: boolean;
+}) => {
+  const href = `https://maps.google.com/?q=${encodeURIComponent(`${event.location_name}, ${event.address}, ${event.city}, ${event.state_prov}, ${event.country}`)}`;
 
-  return children ? (
-    <Link to={url} {...props} ref={ref}>
-      {children}
-    </Link>
-  ) : (
-    <Link to={url} {...props} ref={ref}>
-      {city}, {state_prov}
-      {hideUSA && country === 'USA' ? '' : `, ${country}`}
-    </Link>
+  if (hideVenue) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer">
+        {event.city}, {event.state_prov}
+        {hideUSA && event.country === 'USA' ? '' : `, ${event.country}`}
+      </a>
+    );
+  }
+
+  return (
+    <span>
+      <a href={href} target="_blank" rel="noreferrer">
+        {event.location_name}
+      </a>{' '}
+      in {event.city}, {event.state_prov}
+      {hideUSA && event.country === 'USA' ? '' : `, ${event.country}`}
+    </span>
   );
-});
-LocationLink.displayName = 'LocationLink';
+};
+EventLocationLink.displayName = 'EventLocationLink';
+
+const TeamLocationLink = ({
+  team,
+  hideUSA = false,
+}: {
+  team: Team;
+  hideUSA?: boolean;
+}) => {
+  const href = `https://maps.google.com/?q=${encodeURIComponent(`${team.city}, ${team.state_prov}, ${team.country}`)}`;
+  const abbreviatedStateProv =
+    STATE_TO_ABBREVIATION.get(team.state_prov ?? '') ?? team.state_prov;
+  return (
+    <a href={href} target="_blank" rel="noreferrer">
+      {team.city}, {abbreviatedStateProv}
+      {hideUSA && team.country === 'USA' ? '' : `, ${team.country}`}
+    </a>
+  );
+};
+TeamLocationLink.displayName = 'TeamLocationLink';
 
 const MatchLink = React.forwardRef<
   HTMLAnchorElement,
@@ -134,4 +166,4 @@ const MatchLink = React.forwardRef<
 });
 MatchLink.displayName = 'MatchLink';
 
-export { EventLink, LocationLink, MatchLink, TeamLink };
+export { EventLink, EventLocationLink, TeamLocationLink, MatchLink, TeamLink };

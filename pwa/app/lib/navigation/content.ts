@@ -1,3 +1,4 @@
+import { LinkOptions } from '@tanstack/react-router';
 import { ElementType } from 'react';
 
 import EventsIcon from '~icons/lucide/calendar';
@@ -6,13 +7,10 @@ import myTBAIcon from '~icons/lucide/star';
 import TeamsIcon from '~icons/lucide/users-round';
 import WebcastIcon from '~icons/lucide/video';
 
-import { FileRouteTypes } from '~/routeTree.gen';
-
-export type NavItemChild = {
+type NavItemChild = {
   title: string;
-  to: FileRouteTypes['to'];
   icon: ElementType;
-};
+} & Pick<LinkOptions, 'to' | 'params'>;
 
 export const NAV_ITEMS_LIST: NavItemChild[] = [
   {
@@ -23,11 +21,13 @@ export const NAV_ITEMS_LIST: NavItemChild[] = [
   {
     title: 'Events',
     to: '/events/{-$year}',
+    params: { year: undefined },
     icon: EventsIcon,
   },
   {
     title: 'Teams',
     to: '/teams/{-$pgNum}',
+    params: { pgNum: undefined },
     icon: TeamsIcon,
   },
   {
@@ -38,6 +38,7 @@ export const NAV_ITEMS_LIST: NavItemChild[] = [
   {
     title: 'Insights',
     to: '/insights/{-$year}',
+    params: { year: undefined },
     icon: InsightsIcon,
   },
 ];

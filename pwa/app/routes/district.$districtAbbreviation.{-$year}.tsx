@@ -14,7 +14,12 @@ import {
 } from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { DataTable } from '~/components/tba/dataTable';
-import { EventLink, LocationLink, TeamLink } from '~/components/tba/links';
+import {
+  EventLink,
+  EventLocationLink,
+  TeamLink,
+  TeamLocationLink,
+} from '~/components/tba/links';
 import { Badge } from '~/components/ui/badge';
 import { Divider } from '~/components/ui/divider';
 import {
@@ -405,12 +410,7 @@ function DistrictEventsTable({
               <EventLink eventOrKey={event.key}>{event.name}</EventLink>
             </TableCell>
             <TableCell>
-              <LocationLink
-                city={event.city ?? ''}
-                state_prov={event.state_prov ?? ''}
-                country={event.country ?? ''}
-                hideUSA
-              />
+              <EventLocationLink event={event} hideUSA hideVenue />
             </TableCell>
             <TableCell>
               {event.week !== null && (
@@ -490,12 +490,7 @@ function DistrictTeamsTable({ teams, year }: { teams: Team[]; year: number }) {
               </TeamLink>
             </TableCell>
             <TableCell>
-              <LocationLink
-                city={team.city ?? ''}
-                state_prov={team.state_prov ?? ''}
-                country={team.country ?? ''}
-                hideUSA
-              />
+              <TeamLocationLink team={team} hideUSA />
             </TableCell>
             <TableCell>{team.rookie_year}</TableCell>
           </TableRow>

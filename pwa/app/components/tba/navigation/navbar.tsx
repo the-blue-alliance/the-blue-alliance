@@ -61,7 +61,7 @@ export function Navbar() {
                   className="flex list-none flex-row items-center gap-1 px-6
                     max-sm:hidden"
                 >
-                  {NAV_ITEMS_LIST.map(({ title, to, icon: Icon }) => (
+                  {NAV_ITEMS_LIST.map(({ title, to, params, icon: Icon }) => (
                     <NavigationMenuItem key={title}>
                       <NavigationMenuLink
                         className={`flex cursor-pointer items-center
@@ -69,7 +69,11 @@ export function Navbar() {
                         text-white hover:bg-black/20 hover:text-white`}
                         asChild
                       >
-                        <Link to={to} className="hover:no-underline">
+                        <Link
+                          to={to}
+                          params={params}
+                          className="hover:no-underline"
+                        >
                           <Icon className="text-inherit" />
                           <span>{title}</span>
                         </Link>

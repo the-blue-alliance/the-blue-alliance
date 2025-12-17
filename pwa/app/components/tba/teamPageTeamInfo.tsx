@@ -1,3 +1,5 @@
+import { TeamLocationLink } from 'app/components/tba/links';
+
 import SponsorsIcon from '~icons/lucide/anchor';
 import SourceIcon from '~icons/lucide/badge-check';
 import StatbotIcon from '~icons/lucide/chart-spline';
@@ -44,11 +46,7 @@ export default function TeamPageTeamInfo({
 
         <div className="mb-2 space-y-1">
           <DetailEntity icon={<LocationIcon />}>
-            <a
-              href={`https://maps.google.com/maps?q=${team.city}, ${team.state_prov}, ${team.country}`}
-            >
-              {team.city}, {team.state_prov}, {team.country}
-            </a>
+            <TeamLocationLink team={team} />
           </DetailEntity>
 
           {sponsors.length > 0 ? (

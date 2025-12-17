@@ -123,7 +123,7 @@ test.describe('/team/604/2024', () => {
   test('Header', async ({ page }) => {
     await expect(page.locator('h1')).toHaveText('Team 604 - Quixilver');
     await expect(
-      page.getByRole('link', { name: 'San Jose, California, USA' }),
+      page.getByRole('link', { name: 'San Jose, CA, USA' }),
     ).toBeVisible();
 
     await expect(

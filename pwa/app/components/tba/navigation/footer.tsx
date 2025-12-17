@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, LinkOptions } from '@tanstack/react-router';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { Fragment } from 'react/jsx-runtime';
 
@@ -13,13 +13,11 @@ import {
 } from '~/components/ui/dropdown-menu';
 import andymarkLogo from '~/images/images/andymark-logo.png';
 import { useTheme } from '~/lib/theme';
-import { FileRouteTypes } from '~/routeTree.gen';
 
-interface InternalLink {
+type InternalLink = {
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
-  to: FileRouteTypes['to'];
-}
+} & Pick<LinkOptions, 'to' | 'params'>;
 
 interface ExternalLink {
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
