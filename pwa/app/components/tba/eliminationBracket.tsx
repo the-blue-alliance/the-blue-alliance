@@ -97,8 +97,8 @@ const PlayoffMatch = React.forwardRef<
     <div
       ref={cardRef}
       className={cn(
-        `mb-2 min-w-45 overflow-hidden rounded border border-gray-300 bg-white
-        transition-all duration-200`,
+        `mb-2 min-w-45 overflow-hidden rounded border border-gray-300
+        bg-background transition-all duration-200`,
         {
           'border-transparent shadow-lg ring-2 ring-red-300':
             isHighlighted && result.redWon,
@@ -108,7 +108,7 @@ const PlayoffMatch = React.forwardRef<
       )}
     >
       <div
-        className="flex items-center justify-between border-b bg-gray-100 px-2
+        className="flex items-center justify-between border-b bg-secondary px-2
           py-1 text-sm font-bold"
       >
         <div className="flex items-center gap-1">
@@ -119,7 +119,9 @@ const PlayoffMatch = React.forwardRef<
               <span
                 className={cn(
                   'text-alliance-red transition-all duration-200',
-                  isRedHighlighted && 'rounded bg-red-100 px-1 text-sm',
+                  isRedHighlighted &&
+                    `rounded bg-red-100 px-1 text-sm dark:bg-red-900
+                    dark:text-white`,
                 )}
               >
                 {getAllianceDisplayName(result.redAllianceNumber)}
@@ -128,7 +130,9 @@ const PlayoffMatch = React.forwardRef<
               <span
                 className={cn(
                   'text-alliance-blue transition-all duration-200',
-                  isBlueHighlighted && 'rounded bg-blue-100 px-1 text-sm',
+                  isBlueHighlighted &&
+                    `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900
+                    dark:text-white`,
                 )}
               >
                 {getAllianceDisplayName(result.blueAllianceNumber)}
