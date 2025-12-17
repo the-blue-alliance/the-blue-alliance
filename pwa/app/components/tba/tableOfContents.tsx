@@ -1,15 +1,4 @@
 import { useRouter } from '@tanstack/react-router';
-import { Button } from 'app/components/ui/button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from 'app/components/ui/popover';
-import {
-  TableOfContentsItem,
-  TableOfContentsLink,
-  TableOfContentsList,
-} from 'app/components/ui/toc';
 import {
   createContext,
   useCallback,
@@ -23,6 +12,17 @@ import { InView, type PlainChildrenProps } from 'react-intersection-observer';
 
 import TableOfContentsIcon from '~icons/mdi/table-of-contents';
 
+import { Button } from '~/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '~/components/ui/popover';
+import {
+  TableOfContentsItem,
+  TableOfContentsLink,
+  TableOfContentsList,
+} from '~/components/ui/toc';
 import { cn } from '~/lib/utils';
 
 const TOCRendererContext = createContext<{

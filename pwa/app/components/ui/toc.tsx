@@ -1,14 +1,18 @@
 import { Link } from '@tanstack/react-router';
-import * as React from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  forwardRef,
+} from 'react';
 
 import { cn } from '~/lib/utils';
 
-interface TableOfContentsListProps extends React.ComponentPropsWithoutRef<'ul'> {
+interface TableOfContentsListProps extends ComponentPropsWithoutRef<'ul'> {
   indent?: number;
 }
 
-const TableOfContentsList = React.forwardRef<
-  React.ElementRef<'ul'>,
+const TableOfContentsList = forwardRef<
+  ElementRef<'ul'>,
   TableOfContentsListProps
 >(({ className, indent, ...props }, ref) => {
   const paddingClass = indent
@@ -30,9 +34,9 @@ const TableOfContentsList = React.forwardRef<
 });
 TableOfContentsList.displayName = 'TableOfContentsList';
 
-const TableOfContentsTitle = React.forwardRef<
-  React.ElementRef<'li'>,
-  React.ComponentPropsWithoutRef<'li'>
+const TableOfContentsTitle = forwardRef<
+  ElementRef<'li'>,
+  ComponentPropsWithoutRef<'li'>
 >(({ className, ...props }, ref) => (
   <li
     ref={ref}
@@ -42,12 +46,12 @@ const TableOfContentsTitle = React.forwardRef<
 ));
 TableOfContentsTitle.displayName = 'TableOfContentsTitle';
 
-interface TableOfContentsItemProps extends React.ComponentPropsWithoutRef<'li'> {
+interface TableOfContentsItemProps extends ComponentPropsWithoutRef<'li'> {
   indent?: number;
 }
 
-const TableOfContentsItem = React.forwardRef<
-  React.ElementRef<'li'>,
+const TableOfContentsItem = forwardRef<
+  ElementRef<'li'>,
   TableOfContentsItemProps
 >(({ className, indent, ...props }, ref) => {
   const marginClass = indent
@@ -69,14 +73,14 @@ const TableOfContentsItem = React.forwardRef<
 });
 TableOfContentsItem.displayName = 'TableOfContentsItem';
 
-interface TableOfContentsLinkProps extends React.ComponentPropsWithoutRef<
+interface TableOfContentsLinkProps extends ComponentPropsWithoutRef<
   typeof Link
 > {
   isActive?: boolean;
 }
 
-const TableOfContentsLink = React.forwardRef<
-  React.ElementRef<typeof Link>,
+const TableOfContentsLink = forwardRef<
+  ElementRef<typeof Link>,
   TableOfContentsLinkProps
 >(({ className, isActive, ...props }, ref) => (
   <Link

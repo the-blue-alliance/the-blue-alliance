@@ -1,13 +1,13 @@
+import { describe, expect, test } from 'vitest';
+
+import { MAX_VIEWS } from '~/lib/gameday/layouts';
+import { createEmptyPositionArray } from '~/lib/gameday/reducer';
 import {
   type GamedayUrlState,
   hasUrlStateToRestore,
   parseSearchParams,
   serializeToSearchParams,
-} from 'app/lib/gameday/useGamedayUrlSync';
-import { describe, expect, test } from 'vitest';
-
-import { MAX_VIEWS } from '~/lib/gameday/layouts';
-import { createEmptyPositionArray } from '~/lib/gameday/reducer';
+} from '~/lib/gameday/useGamedayUrlSync';
 import type { GamedaySearchParams } from '~/routes/gameday';
 
 function createEmptyUrlState(): GamedayUrlState {

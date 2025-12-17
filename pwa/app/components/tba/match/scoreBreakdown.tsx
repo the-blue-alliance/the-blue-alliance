@@ -1,5 +1,12 @@
 import { type VariantProps, cva } from 'class-variance-authority';
-import React from 'react';
+import {
+  Children,
+  type ComponentPropsWithoutRef,
+  type ReactElement,
+  type ReactNode,
+  cloneElement,
+  isValidElement,
+} from 'react';
 
 import MdiArrowLeft from '~icons/mdi/arrow-left';
 import MdiArrowRight from '~icons/mdi/arrow-right';
@@ -11,7 +18,7 @@ export function ScoreBreakdownTable({
   children,
   className,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }) {
   return (
@@ -36,7 +43,7 @@ export function ScoreBreakdownRow({
   blueValue = undefined,
   redValue = undefined,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   blueValue?: number;
   redValue?: number;
 }) {
@@ -52,10 +59,10 @@ export function ScoreBreakdownRow({
         '[&>*:first-child]:font-normal [&>*:last-child]:font-bold': blueWon,
       })}
     >
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(
-            child as React.ReactElement<{
+      {Children.map(children, (child) => {
+        if (isValidElement(child)) {
+          return cloneElement(
+            child as ReactElement<{
               redWon?: boolean;
               blueWon?: boolean;
             }>,
@@ -128,10 +135,10 @@ const cellVariants = cva('', {
 
 interface ScoreBreakdownCellProps
   extends
-    React.ComponentPropsWithoutRef<typeof TableCell>,
+    ComponentPropsWithoutRef<typeof TableCell>,
     Omit<VariantProps<typeof cellVariants>, 'color'> {
   color: 'red' | 'blue' | 'neutral';
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export function ScoreBreakdownAllianceCell({

@@ -1,12 +1,12 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter, useSearch } from '@tanstack/react-router';
-import { MatchLink } from 'app/components/tba/links';
 import { Suspense, useRef } from 'react';
 
 import {
   getEventOptions,
   getMatchOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
+import { MatchLink } from '~/components/tba/links';
 import MatchDetails from '~/components/tba/match/matchDetails';
 import {
   Credenza,

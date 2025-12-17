@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import {
+  type JSX,
+  type MutableRefObject,
+  type RefObject,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { Match } from '~/api/tba/read';
 import { MatchLabel, SeriesResult } from '~/components/tba/eliminationBracket';
@@ -50,8 +57,8 @@ export function useAdvancementPaths({
   finalsMatches,
   getSeriesResult,
 }: {
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  matchRefs: React.MutableRefObject<Record<string, PlayoffMatchHandle | null>>;
+  containerRef: RefObject<HTMLDivElement | null>;
+  matchRefs: MutableRefObject<Record<string, PlayoffMatchHandle | null>>;
   matchesBySet: Record<number, Match[]>;
   finalsMatches: Match[];
   getSeriesResult: (matches: Match[] | undefined) => SeriesResult | null;
@@ -158,7 +165,7 @@ export function EliminationBracketPaths({
   paths: AdvancementPath[];
   svgSize: { width: number; height: number };
   hoveredAlliance: number | null;
-}): React.JSX.Element | null {
+}): JSX.Element | null {
   if (svgSize.width === 0 || svgSize.height === 0) {
     return null;
   }

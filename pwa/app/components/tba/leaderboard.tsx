@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import React, { ReactNode } from 'react';
+import { Fragment, type ReactNode, useState } from 'react';
 
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
@@ -43,7 +43,7 @@ export function Leaderboard({
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
 }) {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const displayName =
     LEADERBOARD_NAME_TO_DISPLAY_NAME[leaderboard.name] || leaderboard.name;
@@ -120,7 +120,7 @@ function LeaderboardKeyList({
   return (
     <>
       {keyVals.slice(0, cutoffSize).map((k, i) => (
-        <React.Fragment key={k}>
+        <Fragment key={k}>
           {i > 0 && ', '}
           <TooltipProvider>
             <Tooltip>
@@ -134,7 +134,7 @@ function LeaderboardKeyList({
               ) : null}
             </Tooltip>
           </TooltipProvider>
-        </React.Fragment>
+        </Fragment>
       ))}
       {keyVals.length > cutoffSize && (
         <TooltipProvider>
@@ -149,14 +149,14 @@ function LeaderboardKeyList({
             >
               <p>
                 {keyVals.map((k, i) => (
-                  <React.Fragment key={k}>
+                  <Fragment key={k}>
                     {i > 0 && ', '}
                     <LeaderboardKeyLink
                       keyType={keyType}
                       keyVal={k}
                       year={year}
                     />
-                  </React.Fragment>
+                  </Fragment>
                 ))}
               </p>
             </TooltipContent>

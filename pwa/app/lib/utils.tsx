@@ -2,7 +2,7 @@ import { QueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
 import { type ClassValue, clsx } from 'clsx';
 import pino from 'pino';
-import React from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 import { WltRecord } from '~/api/tba/read';
@@ -150,14 +150,14 @@ export function winrateFromRecord(record: WltRecord): number {
 }
 
 export function joinComponents(
-  components: React.ReactNode[],
-  joinString: string | React.ReactNode,
+  components: ReactNode[],
+  joinString: string | ReactNode,
 ) {
   return components.map((comp, index) => (
-    <React.Fragment key={index}>
+    <Fragment key={index}>
       {comp}
       {index !== components.length - 1 && joinString}
-    </React.Fragment>
+    </Fragment>
   ));
 }
 

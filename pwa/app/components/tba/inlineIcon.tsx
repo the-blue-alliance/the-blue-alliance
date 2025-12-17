@@ -1,5 +1,5 @@
 import { VariantProps, cva } from 'class-variance-authority';
-import React, { ReactNode } from 'react';
+import { type HTMLAttributes, type ReactNode } from 'react';
 
 import { cn } from '~/lib/utils';
 
@@ -24,7 +24,7 @@ const inlineIconVariants = cva('', {
 
 interface InlineIconProps
   extends
-    React.HTMLAttributes<HTMLDivElement>,
+    HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof inlineIconVariants> {
   children: ReactNode[];
 }

@@ -1,6 +1,3 @@
-import ScoreBreakdown2025 from 'app/components/tba/match/scoreBreakdown2025';
-import { YoutubeEmbed } from 'app/components/tba/videoEmbeds';
-import { Checkbox } from 'app/components/ui/checkbox';
 import { useState } from 'react';
 
 import { Event, Match } from '~/api/tba/read';
@@ -9,6 +6,9 @@ import { ScoreBreakdown2015 } from '~/components/tba/match/scoreBreakdown2015';
 import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
+import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
+import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
+import { Checkbox } from '~/components/ui/checkbox';
 import {
   isScoreBreakdown2015,
   isScoreBreakdown2018,

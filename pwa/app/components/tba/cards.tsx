@@ -1,10 +1,10 @@
-import React, { ReactNode } from 'react';
+import { type HTMLAttributes, type ReactNode, forwardRef } from 'react';
 
 import { cn } from '~/lib/utils';
 
-const TitledCard = React.forwardRef<
+const TitledCard = forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
+  HTMLAttributes<HTMLDivElement> & {
     cardTitle: ReactNode;
     cardSubtitle: ReactNode;
   }

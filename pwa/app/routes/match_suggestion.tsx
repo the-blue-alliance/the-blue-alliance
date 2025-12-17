@@ -1,7 +1,13 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import React, { useState } from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  type JSX,
+  forwardRef,
+  useState,
+} from 'react';
 
 import {
   Event,
@@ -87,9 +93,9 @@ interface MatchInfo {
   eventPredictions?: EventPredictions | null;
 }
 
-const Progress = React.forwardRef<
-  React.ElementRef<typeof ProgressPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
+const Progress = forwardRef<
+  ElementRef<typeof ProgressPrimitive.Root>,
+  ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
 >(({ className, value, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
@@ -389,7 +395,7 @@ function MatchSuggestionRow({
   );
 }
 
-function MatchSuggestion(): React.JSX.Element {
+function MatchSuggestion(): JSX.Element {
   const { events } = Route.useLoaderData();
 
   const eventMatchesQuery = useQuery({
