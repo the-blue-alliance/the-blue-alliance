@@ -36,13 +36,10 @@ function Home() {
     <div>
       <div className="px-6 py-10 sm:py-16 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <h2
-            className="mt-2 text-4xl font-bold tracking-tight text-gray-900
-              sm:text-5xl"
-          >
+          <h2 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">
             The Blue Alliance
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-lg leading-6 text-gray-600">
+          <p className="mx-auto mt-4 max-w-lg text-lg leading-6">
             The Blue Alliance is the best way to scout, watch, and relive the{' '}
             <em>FIRST</em> Robotics Competition.
           </p>

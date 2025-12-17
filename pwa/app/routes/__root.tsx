@@ -50,6 +50,7 @@ import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
+import { ThemeProvider } from '~/lib/theme';
 import { createLogger } from '~/lib/utils';
 
 const logger = createLogger('root');
@@ -93,6 +94,10 @@ export const Route = createRootRouteWithContext<{
     meta: [
       {
         charSet: 'utf-8',
+      },
+      {
+        name: 'color-scheme',
+        content: 'light dark',
       },
       {
         name: 'robots',
@@ -325,33 +330,52 @@ function RootComponent() {
   );
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          // This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded.
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  var isDark = theme === 'dark' || 
+                    (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <HeadContent />
       </head>
       <body>
-        <AuthContextProvider>
-          {isFullscreen ? (
-            <Outlet />
-          ) : (
-            <>
-              <Navbar />
-              <TOCRendererProvider>
-                <div
-                  className="container mx-auto
-                    min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
-                    px-4 text-sm"
-                >
-                  <div vaul-drawer-wrapper="" className="bg-background">
-                    <Outlet />
-                    <MatchModal />
+        <ThemeProvider>
+          <AuthContextProvider>
+            {isFullscreen ? (
+              <Outlet />
+            ) : (
+              <>
+                <Navbar />
+                <TOCRendererProvider>
+                  <div
+                    className="container mx-auto
+                      min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
+                      px-4 text-sm"
+                  >
+                    <div vaul-drawer-wrapper="" className="bg-background">
+                      <Outlet />
+                      <MatchModal />
+                    </div>
                   </div>
-                </div>
-              </TOCRendererProvider>
-              <Footer />
-            </>
-          )}
-        </AuthContextProvider>
+                </TOCRendererProvider>
+                <Footer />
+              </>
+            )}
+          </AuthContextProvider>
+        </ThemeProvider>
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />

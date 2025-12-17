@@ -75,7 +75,13 @@ export default function SimpleMatchRowsWithBreaks({
     }
   }
 
-  return <div className="flex flex-col divide-y *:odd:bg-gray-50">{divs}</div>;
+  return (
+    <div
+      className="flex flex-col divide-y *:odd:bg-gray-50 dark:*:odd:bg-gray-900"
+    >
+      {divs}
+    </div>
+  );
 }
 
 export function MatchRow({

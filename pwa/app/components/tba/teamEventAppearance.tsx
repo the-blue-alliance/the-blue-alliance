@@ -128,8 +128,8 @@ function TeamStatus({
       <dl className="-my-3 divide-y divide-gray-300 text-sm">
         {status?.qual?.ranking?.rank && (
           <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Rank</dt>
-            <dd className="text-gray-700 sm:col-span-2">
+            <dt className="font-medium">Rank</dt>
+            <dd className="sm:col-span-2">
               <span className="font-bold">{status.qual.ranking.rank}</span>
               <span className="text-muted-foreground">
                 {' '}
@@ -141,8 +141,8 @@ function TeamStatus({
 
         {status?.qual?.ranking?.record && (
           <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Record</dt>
-            <dd className="text-gray-700 sm:col-span-2">
+            <dt className="font-medium">Record</dt>
+            <dd className="sm:col-span-2">
               {status.qual.ranking.record.wins +
                 (status.playoff?.record?.wins ?? 0)}
               -
@@ -157,10 +157,10 @@ function TeamStatus({
 
         {awards.length > 0 && (
           <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">
+            <dt className="font-medium">
               {pluralize(awards.length, 'Award', 'Awards', false)}
             </dt>
-            <dd className="text-gray-700 sm:col-span-2">
+            <dd className="sm:col-span-2">
               <ul
                 className={cn({
                   'list-none': awards.length == 1,
@@ -196,10 +196,8 @@ function TeamStatus({
 
         {status?.alliance && maybeAlliances && maybeAlliances.length > 0 && (
           <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">
-              {status.alliance.name}
-            </dt>
-            <dd className="text-gray-700 sm:col-span-2">
+            <dt className="font-medium">{status.alliance.name}</dt>
+            <dd className="sm:col-span-2">
               <div className="flex flex-wrap gap-1">
                 {maybeAlliances
                   .find((a) => a.picks.includes(team.key))
@@ -217,8 +215,8 @@ function TeamStatus({
 
         {maybeDistrictPoints?.points[team.key] && (
           <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">District Points</dt>
-            <dd className="text-gray-700 sm:col-span-2">
+            <dt className="font-medium">District Points</dt>
+            <dd className="sm:col-span-2">
               <DistrictPointsTable
                 districtPoints={maybeDistrictPoints.points[team.key]}
               />
@@ -239,29 +237,29 @@ function DistrictPointsTable({
     <div className="flow-root">
       <dl className="my-0 text-sm">
         <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
-          <dt className="col-span-1 font-medium text-gray-900">Quals</dt>
-          <dd className="col-span-2 text-right text-gray-700">
+          <dt className="col-span-1 font-medium">Quals</dt>
+          <dd className="col-span-2 text-right">
             {districtPoints.qual_points}
           </dd>
         </div>
 
         <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
-          <dt className="col-span-1 font-medium text-gray-900">Alliance</dt>
-          <dd className="col-span-2 text-right text-gray-700">
+          <dt className="col-span-1 font-medium">Alliance</dt>
+          <dd className="col-span-2 text-right">
             {districtPoints.alliance_points}
           </dd>
         </div>
 
         <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
-          <dt className="col-span-1 font-medium text-gray-900">Playoff</dt>
-          <dd className="col-span-2 text-right text-gray-700">
+          <dt className="col-span-1 font-medium">Playoff</dt>
+          <dd className="col-span-2 text-right">
             {districtPoints.elim_points}
           </dd>
         </div>
 
         <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
-          <dt className="col-span-1 font-medium text-gray-900">Award</dt>
-          <dd className="col-span-2 text-right text-gray-700">
+          <dt className="col-span-1 font-medium">Award</dt>
+          <dd className="col-span-2 text-right">
             {districtPoints.award_points}
           </dd>
         </div>
@@ -270,8 +268,8 @@ function DistrictPointsTable({
           className="grid grid-cols-3 gap-2 border-t-2 border-gray-300 py-0.5
             pt-1"
         >
-          <dt className="col-span-1 font-semibold text-gray-900">Total</dt>
-          <dd className="col-span-2 text-right font-bold text-gray-900">
+          <dt className="col-span-1 font-semibold">Total</dt>
+          <dd className="col-span-2 text-right font-bold">
             {districtPoints.total}
           </dd>
         </div>
