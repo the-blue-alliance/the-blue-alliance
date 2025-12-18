@@ -14,6 +14,7 @@ cache_control_header_enabled=$(get_config_prop cache_control_header_enabled)
 storage_mode=$(get_config_prop storage_mode)
 storage_path=$(get_config_prop storage_path)
 save_frc_api_response=$(get_config_prop save_frc_api_response)
+cloud_run_region=$(get_config_prop cloud_run_region)
 application=""
 env=()
 
@@ -106,6 +107,7 @@ dev_appserver.py \
     --env_var CACHE_CONTROL_HEADER_ENABLED="$cache_control_header_enabled" \
     --env_var GCLOUD_PROJECT="$application" \
     --env_var SAVE_FRC_API_RESPONSE="$save_frc_api_response" \
+    --env_var CLOUDRUN_REGION="$cloud_run_region" \
     --dev_appserver_log_level="$log_level" \
     --enable_task_running yes \
     src/default.yaml src/web.yaml src/api.yaml src/tasks_io.yaml src/tasks_cpu_enqueue.yaml src/tasks_cpu.yaml src/dispatch.yaml

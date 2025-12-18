@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import ensureRequestSuccess from "../../net/EnsureRequestSuccess";
 import { calculateFileDigest } from "../../utils/fileDigest";
 
@@ -18,6 +18,64 @@ const FmsCompanionTab: React.FC<FmsCompanionTabProps> = ({
   const [uploading, setUploading] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [statusClass, setStatusClass] = useState<string>("");
+  const [jobName, setJobName] = useState<string | null>(null);
+  const [executionId, setExecutionId] = useState<string | null>(null);
+  const [jobStatus, setJobStatus] = useState<string>("");
+
+  // Poll for job status
+  useEffect(() => {
+    if (!jobName || !executionId) {
+      return;
+    }
+
+    const pollJobStatus = async () => {
+      try {
+        const response = await makeTrustedRequest(
+          `/api/_eventwizard/_cloudrun/status/${selectedEvent}/${jobName}/${executionId}`,
+          ""
+        );
+        
+        // Stop polling on non-200 HTTP status
+        if (!response.ok) {
+          console.error(`Failed to fetch job status: HTTP ${response.status}`);
+          setJobStatus("ERROR");
+          setJobName(null);
+          setExecutionId(null);
+          return;
+        }
+        
+        await ensureRequestSuccess(response);
+        const data = await response.json();
+        
+        if (data.status) {
+          setJobStatus(data.status);
+          
+          // Stop polling if we've reached a terminal state
+          if (
+            data.status === "CONDITION_SUCCEEDED" ||
+            data.status === "CONDITION_FAILED"
+          ) {
+            setJobName(null);
+            setExecutionId(null);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching job status:", error);
+        setJobStatus("ERROR");
+        setJobName(null);
+        setExecutionId(null);
+      }
+    };
+
+    // Poll immediately
+    pollJobStatus();
+
+    // Then poll every 5 seconds
+    const intervalId = setInterval(pollJobStatus, 5000);
+
+    // Clean up interval on unmount or when job completes
+    return () => clearInterval(intervalId);
+  }, [jobName, executionId, makeTrustedRequest]);
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>): void => {
     const files = event.target.files;
@@ -68,6 +126,14 @@ const FmsCompanionTab: React.FC<FmsCompanionTabProps> = ({
         data.Success || "FMS Companion database successfully uploaded"
       );
       setStatusClass("alert-success");
+      
+      // Start job status polling if job details are present
+      if (data.job_name && data.execution_id) {
+        setJobName(data.job_name);
+        setExecutionId(data.execution_id);
+        setJobStatus("PENDING");
+      }
+      
       setSelectedFile(null);
       // Reset file input
       const fileInput = document.getElementById(
@@ -90,6 +156,11 @@ const FmsCompanionTab: React.FC<FmsCompanionTabProps> = ({
       {statusMessage && (
         <div className={`alert ${statusClass}`} role="alert">
           {statusMessage}
+        </div>
+      )}
+      {jobStatus && (
+        <div className="alert alert-info" role="alert">
+          <strong>Import Job Status:</strong> {jobStatus}
         </div>
       )}
       <div className="panel panel-default">

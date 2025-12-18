@@ -15,6 +15,7 @@
     {"site-package": "google/auth"},
     {"site-package": "google/cloud/logging"},
     {"site-package": "google/cloud/logging_v2"},
+    {"site-package": "google/cloud/run_v2"},
     {"site-package": "google/cloud/storage"},
     {"site-package": "jinja2"},
     {"site-package": "markupsafe"},
