@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import React from 'react';
+import { type JSX } from 'react';
 
 import BiBellFill from '~icons/bi/bell-fill';
 import BiStarFill from '~icons/bi/star-fill';
@@ -8,7 +8,7 @@ import SignInWithAppleButton from '~/components/tba/auth/signInWithAppleButton';
 import SignInWithGoogleButton from '~/components/tba/auth/signInWithGoogleButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 
-export default function LoginPage(): React.JSX.Element {
+export default function LoginPage(): JSX.Element {
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-medium">

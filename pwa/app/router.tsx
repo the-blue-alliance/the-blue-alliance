@@ -2,11 +2,11 @@ import * as Sentry from '@sentry/tanstackstart-react';
 import { QueryClient } from '@tanstack/react-query';
 import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
-import registerServiceWorker from 'app/lib/serviceWorkerRegistration';
-import { routeTree } from 'app/routeTree.gen';
 import { useEffect } from 'react';
 
+import registerServiceWorker from '~/lib/serviceWorkerRegistration';
 import { createLogger } from '~/lib/utils';
+import { routeTree } from '~/routeTree.gen';
 
 const queryCacheLogger = createLogger('queryCache');
 const routerLogger = createLogger('router');

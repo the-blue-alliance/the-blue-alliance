@@ -1,6 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import React from 'react';
+import {
+  type AnchorHTMLAttributes,
+  type PropsWithChildren,
+  type ReactNode,
+  forwardRef,
+} from 'react';
 
 import { Event, Match, Team } from '~/api/tba/read';
 import {
@@ -9,13 +14,13 @@ import {
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { STATE_TO_ABBREVIATION, removeNonNumeric } from '~/lib/utils';
 
-const TeamLink = React.forwardRef<
+const TeamLink = forwardRef<
   HTMLAnchorElement,
-  React.PropsWithChildren<
+  PropsWithChildren<
     {
       teamOrKey: Team | string;
       year?: number;
-    } & React.AnchorHTMLAttributes<HTMLAnchorElement>
+    } & AnchorHTMLAttributes<HTMLAnchorElement>
   >
 >(({ teamOrKey, year, ...props }, ref) => {
   const teamNumber: string =
@@ -36,12 +41,12 @@ const TeamLink = React.forwardRef<
 });
 TeamLink.displayName = 'TeamLink';
 
-const EventLink = React.forwardRef<
+const EventLink = forwardRef<
   HTMLAnchorElement,
-  React.PropsWithChildren<
+  PropsWithChildren<
     {
       eventOrKey: Event | string;
-    } & React.AnchorHTMLAttributes<HTMLAnchorElement>
+    } & AnchorHTMLAttributes<HTMLAnchorElement>
   >
 >(({ eventOrKey, ...props }, ref) => {
   const eventKey = typeof eventOrKey === 'string' ? eventOrKey : eventOrKey.key;
@@ -102,14 +107,14 @@ const TeamLocationLink = ({
 };
 TeamLocationLink.displayName = 'TeamLocationLink';
 
-const MatchLink = React.forwardRef<
+const MatchLink = forwardRef<
   HTMLAnchorElement,
   {
     matchOrKey: Match | string;
     event?: Event;
-    children: React.ReactNode;
+    children: ReactNode;
     noModal?: boolean;
-  } & React.AnchorHTMLAttributes<HTMLAnchorElement>
+  } & AnchorHTMLAttributes<HTMLAnchorElement>
 >(({ matchOrKey, event, children, noModal, ...props }, ref) => {
   const queryClient = useQueryClient();
   const isMatch = typeof matchOrKey !== 'string';

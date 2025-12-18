@@ -1,4 +1,13 @@
-import React, { useImperativeHandle, useMemo, useRef, useState } from 'react';
+import {
+  type Dispatch,
+  type JSX,
+  type SetStateAction,
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
@@ -49,14 +58,14 @@ export interface SeriesResult {
   matchBlueTeams: string[];
 }
 
-const PlayoffMatch = React.forwardRef<
+const PlayoffMatch = forwardRef<
   PlayoffMatchHandle,
   {
     matchLabel: MatchLabel;
     matches: Match[] | undefined;
     event: Event;
     hoveredAlliance: number | null;
-    setHoveredAlliance: React.Dispatch<React.SetStateAction<number | null>>;
+    setHoveredAlliance: Dispatch<SetStateAction<number | null>>;
     getSeriesResult: (matches: Match[] | undefined) => SeriesResult | null;
     getAllianceDisplayName: (allianceNumber: number) => string;
     showFullAllliance?: boolean;
@@ -73,7 +82,7 @@ const PlayoffMatch = React.forwardRef<
     showFullAllliance = false,
   },
   ref,
-): React.JSX.Element | null {
+): JSX.Element | null {
   const cardRef = useRef<HTMLDivElement>(null);
   const redRowRef = useRef<HTMLDivElement>(null);
   const blueRowRef = useRef<HTMLDivElement>(null);
@@ -286,7 +295,7 @@ export default function EliminationBracket({
   alliances: EliminationAlliance[];
   matches: Match[];
   event: Event;
-}): React.JSX.Element {
+}): JSX.Element {
   const [hoveredAlliance, setHoveredAlliance] = useState<number | null>(null);
   const matchRefs = useRef<Record<MatchLabel, PlayoffMatchHandle | null>>({
     'Match 1': null,

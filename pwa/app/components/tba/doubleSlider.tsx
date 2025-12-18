@@ -1,5 +1,5 @@
 import * as SliderPrimitive from '@radix-ui/react-slider';
-import React, { useState } from 'react';
+import { type RefObject, forwardRef, useState } from 'react';
 
 import { cn } from '~/lib/utils';
 
@@ -14,7 +14,7 @@ type SliderProps = {
   onValueChange?: (values: number[]) => void;
 };
 
-const DoubleSlider = React.forwardRef(
+const DoubleSlider = forwardRef(
   (
     {
       className,
@@ -40,7 +40,7 @@ const DoubleSlider = React.forwardRef(
 
     return (
       <SliderPrimitive.Root
-        ref={ref as React.RefObject<HTMLDivElement>}
+        ref={ref as RefObject<HTMLDivElement>}
         min={min}
         max={max}
         step={step}

@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router';
-import { MatchLink } from 'app/components/tba/links';
 
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
 import { Event, Match } from '~/api/tba/read';
+import { MatchLink } from '~/components/tba/links';
 import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
 import ScoreCell from '~/components/tba/match/scoreCell';
 import TeamListSubgrid from '~/components/tba/match/teamListSubgrid';

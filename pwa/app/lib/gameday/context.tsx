@@ -1,9 +1,4 @@
 import {
-  type GamedayState,
-  gamedayReducer,
-  initialState,
-} from 'app/lib/gameday/reducer';
-import {
   createContext,
   useCallback,
   useContext,
@@ -13,6 +8,11 @@ import {
   useRef,
 } from 'react';
 
+import {
+  type GamedayState,
+  gamedayReducer,
+  initialState,
+} from '~/lib/gameday/reducer';
 import type { WebcastWithMeta } from '~/lib/gameday/types';
 import { useFirebaseWebcasts } from '~/lib/gameday/useFirebaseWebcasts';
 import {

@@ -75,6 +75,26 @@ export default tseslint.config([
         'error',
         { ignore: ['vaul-drawer-wrapper'] },
       ],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'react',
+              importNames: ['default'],
+              message:
+                'Import specific React components instead (e.g., import { useState } from "react")',
+            },
+          ],
+          patterns: [
+            {
+              group: ['app/*'],
+              message:
+                'Use ~/ alias instead of app/ (e.g., ~/components instead of app/components)',
+            },
+          ],
+        },
+      ],
     },
   },
 

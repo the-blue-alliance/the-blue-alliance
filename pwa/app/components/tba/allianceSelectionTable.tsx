@@ -1,5 +1,5 @@
 import { type VariantProps, cva } from 'class-variance-authority';
-import type React from 'react';
+import { type HTMLAttributes, type JSX } from 'react';
 
 import BiTrophy from '~icons/bi/trophy';
 
@@ -32,14 +32,14 @@ const rowVariants = cva('text-center', {
 
 interface AllianceTableRowProps
   extends
-    React.HTMLAttributes<HTMLTableRowElement>,
+    HTMLAttributes<HTMLTableRowElement>,
     VariantProps<typeof rowVariants> {}
 
 function AllianceTableRow({
   className,
   variant,
   ...props
-}: AllianceTableRowProps): React.JSX.Element {
+}: AllianceTableRowProps): JSX.Element {
   return (
     <TableRow className={cn(rowVariants({ variant, className }))} {...props} />
   );
