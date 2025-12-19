@@ -7,7 +7,6 @@ import GithubIcon from '~icons/logos/github-icon';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
 import { useTheme } from '~/lib/theme';
-import { cn } from '~/lib/utils';
 
 type InternalLink = {
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -69,11 +68,10 @@ function ThemeToggle() {
             key={key}
             fill="currentColor"
             data-active={value === key}
-            className={cn(
-              'size-6.5 rounded-full p-1.5 text-muted-foreground',
-              `data-[active=true]:bg-accent
-              data-[active=true]:text-accent-foreground`,
-            )}
+            className={`size-6.5 rounded-full p-1.5 text-muted-foreground
+            data-[active=true]:bg-black/5
+            data-[active=true]:text-accent-foreground
+            dark:data-[active=true]:bg-accent`}
           />
         );
       })}
