@@ -49,13 +49,13 @@ export function Leaderboard({
     LEADERBOARD_NAME_TO_DISPLAY_NAME[leaderboard.name] || leaderboard.name;
 
   return (
-    <Card className="border-gray-300">
+    <Card>
       <CardHeader className="px-6 pt-4 pb-1">
         <CardTitle>
           <div className="flex justify-between align-middle">
             <div className="self-center">{displayName}</div>
             <Button
-              variant={'ghost'}
+              variant="ghost"
               onClick={() => {
                 setExpanded(!expanded);
               }}

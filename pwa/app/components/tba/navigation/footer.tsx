@@ -1,16 +1,10 @@
 import { Link, LinkOptions } from '@tanstack/react-router';
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { MoonIcon, SunIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
 import GithubIcon from '~icons/logos/github-icon';
 
-import { Button } from '~/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu';
 import andymarkLogo from '~/images/images/andymark-logo.png';
 import { useTheme } from '~/lib/theme';
 
@@ -51,49 +45,39 @@ const links: NavigationLink[] = [
 // @ts-expect-error
 const commitHash = __COMMIT_HASH__ as string;
 
+const themes = [['light', SunIcon] as const, ['dark', MoonIcon] as const];
+
 function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState<boolean>(false);
+  const value = mounted ? resolvedTheme : null;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8"
-          aria-label="Toggle theme"
-        >
-          {resolvedTheme === 'dark' ? (
-            <Moon className="size-4" />
-          ) : (
-            <Sun className="size-4" />
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onClick={() => setTheme('light')}
-          className={theme === 'light' ? 'bg-accent' : ''}
-        >
-          <Sun className="mr-2 size-4" />
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => setTheme('dark')}
-          className={theme === 'dark' ? 'bg-accent' : ''}
-        >
-          <Moon className="mr-2 size-4" />
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => setTheme('system')}
-          className={theme === 'system' ? 'bg-accent' : ''}
-        >
-          <Monitor className="mr-2 size-4" />
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <button
+      className="group inline-flex cursor-pointer items-center rounded-full
+        border p-1"
+      aria-label="Toggle Theme"
+      onClick={() => setTheme(value === 'light' ? 'dark' : 'light')}
+    >
+      {themes.map(([key, Icon]) => {
+        return (
+          <Icon
+            key={key}
+            fill="currentColor"
+            data-active={value === key}
+            className={`size-6.5 rounded-full p-1.5 text-muted-foreground
+            transition-colors group-hover:text-accent-foreground
+            data-[active=true]:bg-black/5
+            data-[active=true]:text-accent-foreground
+            dark:data-[active=true]:bg-accent`}
+          />
+        );
+      })}
+    </button>
   );
 }
 
@@ -110,68 +94,71 @@ export const Footer = () => {
   return (
     <footer
       className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t
-        bg-gray-50 dark:bg-gray-900"
+        bg-neutral-50 dark:bg-neutral-900"
     >
       <div
         className="mx-auto w-full px-4 sm:max-w-160 md:max-w-3xl md:px-8
           lg:max-w-5xl"
       >
-        <div className="flex flex-wrap gap-2 py-6 text-center text-sm">
-          {links.map((link, index) => (
-            <Fragment key={link.label}>
-              {'href' in link ? (
-                <a
-                  key={link.label}
-                  className="flex items-center gap-1 text-gray-800
-                    hover:underline dark:text-gray-200"
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {link.icon && <link.icon className="size-3" />}
-                  {link.label}
-                </a>
-              ) : (
-                <Link
-                  key={link.label}
-                  className="flex items-center gap-1 text-gray-800
-                    hover:underline dark:text-gray-200"
-                  to={link.to}
-                >
-                  {link.icon && <link.icon className="size-3" />}
-                  {link.label}
-                </Link>
-              )}
-              {index < links.length - 1 && (
-                <span className="text-gray-300 dark:text-gray-600">/</span>
-              )}
-            </Fragment>
-          ))}
+        <div className="flex items-center gap-8">
+          <div className="flex flex-1 flex-wrap gap-2 py-6 text-center text-sm">
+            {links.map((link, index) => (
+              <Fragment key={link.label}>
+                {'href' in link ? (
+                  <a
+                    key={link.label}
+                    className="flex items-center gap-1 text-neutral-800
+                      hover:underline dark:text-neutral-200"
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {link.icon && (
+                      <link.icon className="size-3 *:fill-current" />
+                    )}
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.label}
+                    className="flex items-center gap-1 text-neutral-800
+                      hover:underline dark:text-neutral-200"
+                    to={link.to}
+                  >
+                    {link.icon && <link.icon className="size-3" />}
+                    {link.label}
+                  </Link>
+                )}
+                {index < links.length - 1 && (
+                  <span className="text-neutral-300 dark:text-neutral-600">
+                    /
+                  </span>
+                )}
+              </Fragment>
+            ))}
+          </div>
+          <ThemeToggle />
         </div>
-
         <div
           className="relative isolate flex justify-between gap-0.5 border-t
-            border-gray-600/10 py-4 text-sm max-md:flex-col md:items-center"
+            border-neutral-600/10 py-5 text-sm max-md:flex-col md:items-center"
         >
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <span className="text-gray-600 dark:text-gray-400">|</span>
-            <span>
-              Thanks to our platinum sponsor
-              <a
-                href="https://www.andymark.com/"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <img
-                  src={andymarkLogo}
-                  alt="AndyMark"
-                  className="ml-2 inline h-4"
-                />
-              </a>
-            </span>
-          </div>
-          <p className="text-xs text-gray-600 dark:text-gray-400">
+          <span>
+            Thanks to our platinum sponsor
+            <a
+              href="https://www.andymark.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <img
+                src={andymarkLogo}
+                alt="AndyMark"
+                className="ml-2 inline h-4"
+              />
+            </a>
+          </span>
+
+          <p className="text-xs text-neutral-600 dark:text-neutral-400">
             Generated on {renderTime}. Commit:{' '}
             <a
               href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}

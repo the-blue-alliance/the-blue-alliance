@@ -493,7 +493,7 @@ function StatsSection({
             // left-47.5 looks significantly better than left-1/2
             className={`relative flex flex-wrap *:w-full before:absolute
             before:inset-y-0 before:left-[47.5%] before:hidden before:w-px
-            before:bg-gray-200 sm:mt-0 lg:*:w-1/2 lg:before:block`}
+            before:bg-neutral-200 sm:mt-0 lg:*:w-1/2 lg:before:block`}
           >
             <div className="grid grid-cols-2 items-center gap-y-4">
               <Stat
@@ -619,11 +619,8 @@ function Stat({ label, value }: { label: string; value: string | number }) {
       className="mx-auto flex min-w-[16ch] flex-col text-center"
       data-testid={`test_${label}`}
     >
-      <dt className="text-gray-500">{label}</dt>
-      <dd
-        className="order-first text-2xl font-semibold tracking-tight
-          text-gray-900"
-      >
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="order-first text-2xl font-semibold tracking-tight">
         {value}
       </dd>
     </div>

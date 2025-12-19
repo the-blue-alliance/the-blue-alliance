@@ -7,7 +7,7 @@ const Divider = forwardRef<HTMLSpanElement, ComponentPropsWithoutRef<'span'>>(
     <span className={cn('relative flex justify-center', className)} ref={ref}>
       <div
         className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2
-          bg-transparent bg-gradient-to-r from-transparent via-gray-500
+          bg-transparent bg-gradient-to-r from-transparent via-border
           to-transparent opacity-75"
       ></div>
 

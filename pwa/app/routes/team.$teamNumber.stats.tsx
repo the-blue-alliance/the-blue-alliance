@@ -104,7 +104,7 @@ function MatchStatsLoadingState({
       <div className="mb-2 text-sm text-muted-foreground">
         {numLoaded} / {total} years loaded
       </div>
-      <div className="h-2 w-64 overflow-hidden rounded-full bg-gray-200">
+      <div className="h-2 w-64 overflow-hidden rounded-full bg-neutral-200">
         <div
           className="h-full bg-blue-500 transition-all duration-300 ease-out"
           style={{ width: `${progress}%` }}

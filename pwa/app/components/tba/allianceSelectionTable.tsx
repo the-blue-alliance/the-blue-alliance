@@ -21,7 +21,7 @@ const rowVariants = cva('text-center', {
     variant: {
       winner: `bg-yellow-100 font-bold shadow-inner shadow-yellow-200
       dark:bg-yellow-800`,
-      finalist: 'bg-gray-100 shadow-inner shadow-gray-200 dark:bg-gray-800',
+      finalist: 'bg-neutral-100 shadow-inner shadow-border dark:bg-neutral-800',
       default: '',
     },
   },

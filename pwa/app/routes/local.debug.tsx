@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { Badge } from '~/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { getCacheEntries, getCacheStats } from '~/lib/middleware/network-cache';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
@@ -116,17 +117,19 @@ function CacheEntryRow({
   const expiryDate = new Date(entry.expiresAt);
 
   return (
-    <tr key={entry.key} className="border-b hover:bg-gray-50">
+    <tr key={entry.key} className="border-b hover:bg-muted">
       <td className="px-4 py-2 font-mono text-sm">
         <Badge variant="outline">{entry.method}</Badge>
       </td>
       <td className="px-4 py-2 font-mono text-xs break-all">{entry.url}</td>
-      <td className="px-4 py-2 font-mono text-xs break-all text-gray-500">
+      <td className="px-4 py-2 font-mono text-xs break-all">
         {entry.dataPreview}
       </td>
-      <td className="px-4 py-2 font-mono text-xs text-gray-700">
+      <td className="px-4 py-2 font-mono text-xs">
         <div>{formatTimeRemaining(timeRemaining)}</div>
-        <div className="text-gray-500">{expiryDate.toLocaleString()}</div>
+        <div className="text-muted-foreground">
+          {expiryDate.toLocaleString()}
+        </div>
       </td>
     </tr>
   );
@@ -141,83 +144,79 @@ function LocalDebug(): React.JSX.Element {
     <div className="container max-w-6xl py-8">
       <h1 className="mb-4 text-3xl font-medium">Network Cache Debug</h1>
 
-      <div className="mb-6 rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-2xl font-medium">Cache Statistics</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-lg border p-4">
-            <div className="text-sm text-gray-600">Cache Size</div>
-            <div className="text-3xl font-bold">{stats.size}</div>
-            <div className="text-sm text-gray-500">entries</div>
-          </div>
-          <div className="rounded-lg border p-4">
-            <div className="text-sm text-gray-600">Max Entries</div>
-            <div className="text-3xl font-bold">{stats.maxEntries}</div>
-            <div className="text-sm text-gray-500">limit</div>
-          </div>
-          <div className="rounded-lg border p-4">
-            <div className="text-sm text-gray-600">Cache Usage</div>
-            <div className="text-3xl font-bold">
-              {stats.maxEntries > 0
-                ? Math.round((stats.size / stats.maxEntries) * 100)
-                : 0}
-              %
+      <Card>
+        <CardHeader>
+          <CardTitle>Cache Statistics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Cache Size</div>
+              <div className="text-3xl font-bold">{stats.size}</div>
+              <div className="text-sm text-muted-foreground">entries</div>
             </div>
-            <div className="text-sm text-gray-500">capacity</div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Max Entries</div>
+              <div className="text-3xl font-bold">{stats.maxEntries}</div>
+              <div className="text-sm text-muted-foreground">limit</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Cache Usage</div>
+              <div className="text-3xl font-bold">
+                {stats.maxEntries > 0
+                  ? Math.round((stats.size / stats.maxEntries) * 100)
+                  : 0}
+                %
+              </div>
+              <div className="text-sm text-muted-foreground">capacity</div>
+            </div>
           </div>
-        </div>
-        <div className="mt-4 text-sm text-gray-500">
-          Last updated: {new Date(timestamp).toLocaleString()}
-        </div>
-      </div>
+          <div className="mt-4 text-sm text-muted-foreground">
+            Last updated: {new Date(timestamp).toLocaleString()}
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-2xl font-medium">Cache Entries</h2>
-        {cacheEntries.length === 0 ? (
-          <p className="text-gray-500">No cache entries found</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto border-collapse">
-              <thead>
-                <tr className="border-b bg-gray-50">
-                  <th
-                    className="px-4 py-2 text-left text-sm font-medium
-                      text-gray-700"
-                  >
-                    Method
-                  </th>
-                  <th
-                    className="px-4 py-2 text-left text-sm font-medium
-                      text-gray-700"
-                  >
-                    URL
-                  </th>
-                  <th
-                    className="px-4 py-2 text-left text-sm font-medium
-                      text-gray-700"
-                  >
-                    Data Preview
-                  </th>
-                  <th
-                    className="px-4 py-2 text-left text-sm font-medium
-                      text-gray-700"
-                  >
-                    TTL
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {cacheEntries.map((entry) => (
-                  <CacheEntryRow
-                    key={entry.key}
-                    entry={entry}
-                    loadTime={loadTime}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <Card className="mt-4">
+        <CardHeader>
+          <CardTitle>Cache Entries</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {cacheEntries.length === 0 ? (
+            <p className="text-muted-foreground">No cache entries found</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full table-auto border-collapse">
+                <thead>
+                  <tr className="border-b bg-neutral-50">
+                    <th className="px-4 py-2 text-left text-sm font-medium">
+                      Method
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">
+                      URL
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">
+                      Data Preview
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">
+                      TTL
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cacheEntries.map((entry) => (
+                    <CacheEntryRow
+                      key={entry.key}
+                      entry={entry}
+                      loadTime={loadTime}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
