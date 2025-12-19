@@ -106,19 +106,19 @@ const PlayoffMatch = forwardRef<
     <div
       ref={cardRef}
       className={cn(
-        `mb-2 min-w-45 overflow-hidden rounded border border-gray-300
-        bg-background transition-all duration-200`,
+        `mb-2 min-w-45 overflow-hidden rounded-md border border-neutral-200
+        bg-background transition-all duration-200 dark:border-neutral-700`,
         {
-          'border-transparent shadow-lg ring-2 ring-red-300':
-            isHighlighted && result.redWon,
-          'border-transparent shadow-lg ring-2 ring-blue-300':
-            isHighlighted && result.blueWon,
+          [`border-transparent shadow-lg ring-2 ring-alliance-red/75
+          dark:border-transparent`]: isHighlighted && result.redWon,
+          [`border-transparent shadow-lg ring-2 ring-alliance-blue/75
+          dark:border-transparent`]: isHighlighted && result.blueWon,
         },
       )}
     >
       <div
-        className="flex items-center justify-between border-b bg-secondary px-2
-          py-1 text-sm font-bold"
+        className="flex items-center justify-between border-b px-2 py-1 text-sm
+          font-bold"
       >
         <div className="flex items-center gap-1">
           <span>{matchLabel}</span>
@@ -428,7 +428,7 @@ export default function EliminationBracket({
   }
 
   return (
-    <Card className="mt-12 bg-gray-50/50 p-2 dark:bg-gray-900/50">
+    <Card className="mt-12 bg-neutral-50/50 p-2 dark:bg-neutral-900/50">
       <CardHeader>
         <CardTitle>Playoff Bracket</CardTitle>
       </CardHeader>

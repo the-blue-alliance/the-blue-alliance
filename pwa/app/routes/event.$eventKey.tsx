@@ -519,17 +519,15 @@ function AwardsTab({ awards }: { awards: Award[] }) {
   return (
     <div className="flex flex-wrap-reverse">
       <div className="mt-1 flow-root w-full">
-        <dl className="divide-y divide-gray-100 text-sm">
+        <dl className="divide-y text-sm">
           {awards.map((award) => (
             <div
               key={award.name}
               className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4
-                sm:px-10"
+                sm:px-4"
             >
-              <dt className="font-medium text-gray-900 sm:col-span-2">
-                {award.name}
-              </dt>
-              <dd className="text-gray-700 sm:text-right">
+              <dt className=":col-span-2 font-medium">{award.name}</dt>
+              <dd className="text-muted-foreground sm:text-right">
                 {award.recipient_list
                   .sort((a, b) =>
                     sortTeamKeysComparator(

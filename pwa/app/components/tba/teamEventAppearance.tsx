@@ -119,7 +119,7 @@ function TeamStatus({
 }) {
   return (
     <div className="flow-root">
-      <dl className="-my-3 divide-y divide-gray-300 text-sm">
+      <dl className="-my-3 divide-y text-sm">
         {status?.qual?.ranking?.rank && (
           <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
             <dt className="font-medium">Rank</dt>
@@ -230,38 +230,35 @@ function DistrictPointsTable({
   return (
     <div className="flow-root">
       <dl className="my-0 text-sm">
-        <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
+        <div className="grid grid-cols-3 gap-2 py-0.5">
           <dt className="col-span-1 font-medium">Quals</dt>
           <dd className="col-span-2 text-right">
             {districtPoints.qual_points}
           </dd>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
+        <div className="grid grid-cols-3 gap-2 py-0.5">
           <dt className="col-span-1 font-medium">Alliance</dt>
           <dd className="col-span-2 text-right">
             {districtPoints.alliance_points}
           </dd>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
+        <div className="grid grid-cols-3 gap-2 py-0.5">
           <dt className="col-span-1 font-medium">Playoff</dt>
           <dd className="col-span-2 text-right">
             {districtPoints.elim_points}
           </dd>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 border-gray-200 py-0.5">
+        <div className="grid grid-cols-3 gap-2 py-0.5">
           <dt className="col-span-1 font-medium">Award</dt>
           <dd className="col-span-2 text-right">
             {districtPoints.award_points}
           </dd>
         </div>
 
-        <div
-          className="grid grid-cols-3 gap-2 border-t-2 border-gray-300 py-0.5
-            pt-1"
-        >
+        <div className="grid grid-cols-3 gap-2 border-t-2 py-0.5 pt-1">
           <dt className="col-span-1 font-semibold">Total</dt>
           <dd className="col-span-2 text-right font-bold">
             {districtPoints.total}

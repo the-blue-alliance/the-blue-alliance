@@ -105,7 +105,7 @@ export function SearchModal({ ...props }: DialogProps) {
       <DialogContent
         showCloseButton={false}
         className="top-[10%] translate-y-0 rounded-2xl border-none
-          bg-clip-padding p-2 shadow-2xl"
+          bg-neutral-900 bg-clip-padding p-2 shadow-2xl"
       >
         <DialogHeader className="sr-only">
           <DialogTitle>Search...</DialogTitle>
