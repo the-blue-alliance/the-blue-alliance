@@ -8,7 +8,9 @@ from backend.api.handlers.eventwizard_internal import (
 )
 
 # Eventwizard Internal API
-eventwizard_api = Blueprint("eventwizard_api", __name__, url_prefix="/_eventwizard/")
+eventwizard_api = Blueprint(
+    "eventwizard_api", __name__, url_prefix="/api/_eventwizard/"
+)
 CORS(
     eventwizard_api,
     origins="*",
@@ -18,7 +20,7 @@ CORS(
 
 eventwizard_api.add_url_rule(
     "/event/<string:event_key>/fms_reports/<string:report_type>",
-    methods=["POST"],
+    methods=["POST", "GET"],
     view_func=add_fms_report_archive,
 )
 

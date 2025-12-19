@@ -94,7 +94,7 @@ def test_upload_companion_db_success(
     file_content = create_sqlite_db()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -135,7 +135,7 @@ def test_upload_missing_file(
         expiration=None,
     )
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     resp = api_client.post(
         request_path,
@@ -168,7 +168,7 @@ def test_upload_invalid_sqlite_file(
     file_content = b"This is not a SQLite database file"
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -210,7 +210,7 @@ def test_upload_wrong_permission(
     file_content = create_sqlite_db()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -253,7 +253,7 @@ def test_upload_mismatched_digest(
     wrong_digest = hashlib.sha256(b"wrong content").hexdigest()
     correct_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -295,7 +295,7 @@ def test_upload_with_metadata(
     file_content = create_sqlite_db()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -335,7 +335,7 @@ def test_upload_not_authenticated(ndb_stub, api_client: Client) -> None:
     file_content = create_sqlite_db()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -371,7 +371,7 @@ def test_upload_with_different_filename_and_extensions(
     file_content = create_sqlite_db()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     # Test with .sqlite3 extension
     file_storage = FileStorage(
@@ -420,7 +420,7 @@ def test_upload_stores_in_correct_bucket(
     file_content = create_sqlite_db()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -465,7 +465,7 @@ def test_upload_storage_path_format(
     file_content = create_sqlite_db()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_companion_db"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),

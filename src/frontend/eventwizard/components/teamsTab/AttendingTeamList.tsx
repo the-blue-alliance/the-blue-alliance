@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { ApiTeam } from "../../constants/ApiTeam";
-import ensureRequestSuccess from "../../net/EnsureRequestSuccess";
 import TeamList from "./TeamList";
 
 interface AttendingTeamListProps {
   selectedEvent: string | null;
   hasFetchedTeams: boolean;
   teams: ApiTeam[];
+  fetchTeams: () => Promise<ApiTeam[]>; 
   updateTeams: (teams: ApiTeam[]) => void;
   showErrorMessage: (message: string) => void;
 }
@@ -15,6 +15,7 @@ const AttendingTeamList: React.FC<AttendingTeamListProps> = ({
   selectedEvent,
   hasFetchedTeams,
   teams,
+  fetchTeams,
   updateTeams,
   showErrorMessage,
 }) => {
@@ -37,11 +38,7 @@ const AttendingTeamList: React.FC<AttendingTeamListProps> = ({
 
     try {
       setButtonClass("btn-warning");
-      const response = await fetch(`/api/v3/event/${selectedEvent}/teams/simple`, {
-        credentials: "same-origin",
-      });
-      await ensureRequestSuccess(response);
-      const data: ApiTeam[] = await response.json();
+      const data: ApiTeam[] = await fetchTeams();
       const sortedData = data.sort((a, b) => a.team_number - b.team_number);
       updateTeams(sortedData);
       setButtonClass("btn-success");
