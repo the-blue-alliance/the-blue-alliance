@@ -100,8 +100,8 @@ export const Footer = () => {
         className="mx-auto w-full px-4 sm:max-w-160 md:max-w-3xl md:px-8
           lg:max-w-5xl"
       >
-        <div className="flex items-center py-4">
-          <div className="flex flex-1 flex-wrap gap-2 text-center text-sm">
+        <div className="flex items-center gap-8">
+          <div className="flex flex-1 flex-wrap gap-2 py-6 text-center text-sm">
             {links.map((link, index) => (
               <Fragment key={link.label}>
                 {'href' in link ? (
@@ -113,7 +113,9 @@ export const Footer = () => {
                     target="_blank"
                     rel="noreferrer noopener"
                   >
-                    {link.icon && <link.icon className="size-3" />}
+                    {link.icon && (
+                      <link.icon className="size-3 *:fill-current" />
+                    )}
                     {link.label}
                   </a>
                 ) : (
@@ -139,7 +141,7 @@ export const Footer = () => {
         </div>
         <div
           className="relative isolate flex justify-between gap-0.5 border-t
-            border-neutral-600/10 py-4 text-sm max-md:flex-col md:items-center"
+            border-neutral-600/10 py-5 text-sm max-md:flex-col md:items-center"
         >
           <span>
             Thanks to our platinum sponsor
