@@ -58,7 +58,8 @@ function ThemeToggle() {
 
   return (
     <button
-      className="inline-flex items-center rounded-full border p-1"
+      className="group inline-flex cursor-pointer items-center rounded-full
+        border p-1"
       aria-label="Toggle Theme"
       onClick={() => setTheme(value === 'light' ? 'dark' : 'light')}
     >
@@ -69,6 +70,7 @@ function ThemeToggle() {
             fill="currentColor"
             data-active={value === key}
             className={`size-6.5 rounded-full p-1.5 text-muted-foreground
+            transition-colors group-hover:text-accent-foreground
             data-[active=true]:bg-black/5
             data-[active=true]:text-accent-foreground
             dark:data-[active=true]:bg-accent`}
