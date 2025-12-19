@@ -1,4 +1,3 @@
-import { isServer } from '@tanstack/react-query';
 import {
   type AuthProvider,
   type User,
@@ -29,10 +28,13 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(auth?.currentUser ?? null);
-  const [isInitialLoading, setIsInitialLoading] = useState(!isServer);
+  // Start with false to match server render; set true after hydration while waiting for auth
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
 
   useEffect(() => {
     if (!auth) return;
+    // Set loading after hydration to avoid server/client mismatch
+    setIsInitialLoading(true);
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       flushSync(() => {
         setUser(user);

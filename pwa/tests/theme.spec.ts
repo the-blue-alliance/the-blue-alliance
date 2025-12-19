@@ -14,12 +14,8 @@ test.describe('Dark mode toggle', () => {
     // Initially should not have dark class (system default is usually light in tests)
     const html = page.locator('html');
 
-    // Open the theme dropdown
-    const toggleButton = page.getByRole('button', { name: 'Toggle theme' });
+    const toggleButton = page.getByRole('button', { name: 'Toggle Theme' });
     await toggleButton.click();
-
-    // Click on Dark option
-    await page.getByRole('menuitem', { name: 'Dark' }).click();
 
     // Verify dark class is applied
     await expect(html).toHaveClass(/dark/);
@@ -27,16 +23,14 @@ test.describe('Dark mode toggle', () => {
 
   test('toggle changes theme to light mode', async ({ page }) => {
     const html = page.locator('html');
-    const toggleButton = page.getByRole('button', { name: 'Toggle theme' });
+    const toggleButton = page.getByRole('button', { name: 'Toggle Theme' });
 
     // First set to dark
     await toggleButton.click();
-    await page.getByRole('menuitem', { name: 'Dark' }).click();
     await expect(html).toHaveClass(/dark/);
 
     // Then switch to light
     await toggleButton.click();
-    await page.getByRole('menuitem', { name: 'Light' }).click();
 
     // Verify dark class is removed
     await expect(html).not.toHaveClass(/dark/);
@@ -44,11 +38,10 @@ test.describe('Dark mode toggle', () => {
 
   test('theme persists across page reload', async ({ page }) => {
     const html = page.locator('html');
-    const toggleButton = page.getByRole('button', { name: 'Toggle theme' });
+    const toggleButton = page.getByRole('button', { name: 'Toggle Theme' });
 
     // Set to dark mode
     await toggleButton.click();
-    await page.getByRole('menuitem', { name: 'Dark' }).click();
     await expect(html).toHaveClass(/dark/);
 
     // Reload the page
@@ -60,11 +53,10 @@ test.describe('Dark mode toggle', () => {
 
   test('theme persists after navigation', async ({ page }) => {
     const html = page.locator('html');
-    const toggleButton = page.getByRole('button', { name: 'Toggle theme' });
+    const toggleButton = page.getByRole('button', { name: 'Toggle Theme' });
 
     // Set to dark mode
     await toggleButton.click();
-    await page.getByRole('menuitem', { name: 'Dark' }).click();
     await expect(html).toHaveClass(/dark/);
 
     // Navigate to another page using footer link
