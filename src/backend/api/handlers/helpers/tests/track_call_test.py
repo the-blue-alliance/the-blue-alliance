@@ -38,7 +38,9 @@ def test_track_call_after_response(mock_defer_safe_async, app: Flask) -> None:
 
 
 @patch("backend.api.handlers.helpers.track_call.defer_safe_async")
-def test_track_call_after_response_with_model_type(mock_defer_safe_async, app: Flask) -> None:
+def test_track_call_after_response_with_model_type(
+    mock_defer_safe_async, app: Flask
+) -> None:
     with app.app_context():
         g.auth_owner_id = "owner123"
         g.auth_description = "Test API Key"

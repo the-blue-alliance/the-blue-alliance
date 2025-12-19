@@ -27,6 +27,7 @@ describe("makeApiV3Request", () => {
     expect(mockFetch).toHaveBeenCalledWith(requestPath, {
       method: "GET",
       headers: expect.any(Headers),
+      credentials: "same-origin",
     });
   });
 
@@ -62,14 +63,16 @@ describe("makeApiV3Request", () => {
     const requestPath = "/api/v3/event/2024nytr/matches/simple";
 
     const result = await makeApiV3Request(authId, requestPath);
+    const data = await result.json();
 
-    expect(result).toEqual(mockData);
+    expect(data).toEqual(mockData);
   });
 
   it("throws error when response is not ok", async () => {
     const mockResponse = {
       ok: false,
       status: 404,
+      statusText: "Not Found",
     };
     mockFetch.mockResolvedValue(mockResponse);
 
@@ -77,7 +80,7 @@ describe("makeApiV3Request", () => {
     const requestPath = "/api/v3/event/2024invalid/matches/simple";
 
     await expect(makeApiV3Request(authId, requestPath)).rejects.toThrow(
-      "HTTP error! status: 404"
+      "Not Found"
     );
   });
 
@@ -92,7 +95,7 @@ describe("makeApiV3Request", () => {
     );
   });
 
-  it("throws error when JSON parsing fails", async () => {
+  it("returns response that can throw error when JSON parsing fails", async () => {
     const mockResponse = {
       ok: true,
       json: jest.fn().mockRejectedValue(new Error("Invalid JSON")),
@@ -102,9 +105,8 @@ describe("makeApiV3Request", () => {
     const authId = "test-auth-id";
     const requestPath = "/api/v3/event/2024nytr/matches/simple";
 
-    await expect(makeApiV3Request(authId, requestPath)).rejects.toThrow(
-      "Invalid JSON"
-    );
+    const response = await makeApiV3Request(authId, requestPath);
+    await expect(response.json()).rejects.toThrow("Invalid JSON");
   });
 
   it("uses GET method for all requests", async () => {

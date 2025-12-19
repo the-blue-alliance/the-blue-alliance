@@ -1,6 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Typeahead } from "react-bootstrap-typeahead";
+import React, { useState, useEffect } from "react";
+import AsyncSelect from "react-select/async";
 import { ApiTeam } from "../../constants/ApiTeam";
+
+interface TeamOption {
+  value: string;
+  label: string;
+}
 
 interface AddRemoveSingleTeamProps {
   selectedEvent: string | null;
@@ -23,20 +28,27 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
   clearTeams,
   showErrorMessage,
 }) => {
-  const [teamTypeaheadOptions, setTeamTypeaheadOptions] = useState<string[]>([]);
+  const [teamOptions, setTeamOptions] = useState<TeamOption[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState<TeamOption | null>(null);
   const [selectedTeamKey, setSelectedTeamKey] = useState("");
   const [addButtonClass, setAddButtonClass] = useState("btn-primary");
   const [removeButtonClass, setRemoveButtonClass] = useState("btn-primary");
-  const teamTypeahead = useRef<any>(null);
 
   useEffect(() => {
     // Load team typeahead data
-    const loadTeams = async () => {
+    const loadTeamsData = async () => {
       const resp = await fetch("/_/typeahead/teams-all");
       const json: string[] = await resp.json();
-      setTeamTypeaheadOptions(json);
+      const options = json.map((team) => {
+        const teamNumber = team.split("|")[0].trim();
+        return {
+          value: `frc${teamNumber}`,
+          label: team,
+        };
+      });
+      setTeamOptions(options);
     };
-    loadTeams();
+    loadTeamsData();
   }, []);
 
   useEffect(() => {
@@ -46,11 +58,16 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
     }
   }, [hasFetchedTeams]);
 
-  const handleTeamSelectionChanged = (selected: any[]): void => {
-    if (selected && selected.length > 0) {
-      const teamValue = typeof selected[0] === 'string' ? selected[0] : String(selected[0]);
-      const teamNumber = teamValue.split("|")[0].trim();
-      setSelectedTeamKey(`frc${teamNumber}`);
+  const loadTeams = async (search: string): Promise<TeamOption[]> => {
+    return teamOptions.filter((team) =>
+      team.label.toLowerCase().includes(search.toLowerCase())
+    );
+  };
+
+  const handleTeamSelectionChanged = (newTeam: TeamOption | null): void => {
+    setSelectedTeam(newTeam);
+    if (newTeam) {
+      setSelectedTeamKey(newTeam.value);
     } else {
       setSelectedTeamKey("");
     }
@@ -79,7 +96,9 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
       existingTeamKeys,
       () => {
         setAddButtonClass("btn-success");
-        teamTypeahead.current?.clear();
+        setSelectedTeam(null);
+        setSelectedTeamKey("");
+        hasFetchedTeams = false;
         if (clearTeams) {
           clearTeams();
         }
@@ -111,7 +130,9 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
       existingTeamKeys,
       () => {
         setRemoveButtonClass("btn-success");
-        teamTypeahead.current?.clear();
+        setSelectedTeam(null);
+        setSelectedTeamKey("");
+        hasFetchedTeams = false;
         if (clearTeams) {
           clearTeams();
         }
@@ -119,6 +140,8 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
       (error: string) => showErrorMessage(`${error}`)
     );
   };
+
+  const isTeamAttending = (selectedTeam !== null && currentTeams.some(team => team.key === selectedTeam.value));
 
   return (
     <div>
@@ -129,13 +152,15 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
           removing a team
         </p>
       )}
-      <Typeahead
-        ref={teamTypeahead}
-        id="teamTypeahead"
+      <AsyncSelect<TeamOption>
+        name="selectTeam"
         placeholder="Enter team name or number..."
-        options={teamTypeaheadOptions}
+        noOptionsMessage={() => "Start typing..."}
+        value={selectedTeam}
+        loadOptions={loadTeams}
+        defaultOptions={teamOptions}
         onChange={handleTeamSelectionChanged}
-        disabled={!selectedEvent}
+        isDisabled={!selectedEvent || !hasFetchedTeams}
       />
       <button
         className={`btn ${addButtonClass}`}
@@ -143,7 +168,8 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
         disabled={
           !selectedEvent ||
           !hasFetchedTeams ||
-          !selectedTeamKey
+          !selectedTeamKey || 
+          isTeamAttending
         }
       >
         Add Team
@@ -154,7 +180,8 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
         disabled={
           !selectedEvent ||
           !hasFetchedTeams ||
-          !selectedTeamKey
+          !selectedTeamKey ||
+          !isTeamAttending
         }
       >
         Remove Team

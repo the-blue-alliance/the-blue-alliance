@@ -14,10 +14,14 @@ interface TeamListTabProps {
     path: string,
     body: string | FormData
   ) => Promise<Response>;
+  makeApiV3Request: (
+    path: string,
+  ) => Promise<Response>;
 }
 
 const TeamListTab: React.FC<TeamListTabProps> = ({
   selectedEvent,
+  makeApiV3Request,
   makeTrustedRequest,
 }) => {
   const [teams, setTeams] = useState<ApiTeam[]>([]);
@@ -62,6 +66,22 @@ const TeamListTab: React.FC<TeamListTabProps> = ({
     setTeams(newTeams);
     setHasFetchedTeams(true);
   };
+
+  const handleFetchTeams = async (): Promise<ApiTeam[]> => {
+    if (!selectedEvent) {
+      return [];
+    }
+    const response = await makeApiV3Request(
+      `/api/v3/event/${selectedEvent}/teams/simple`
+    );
+    if (!response.ok) {
+      setErrorMessage(`Error fetching teams: ${response.statusText}`);
+      setShowErrorDialog(true);
+      return [];
+    }
+    const data: ApiTeam[] = await response.json();
+    return data;
+  }
 
   const handleClearTeams = (): void => {
     setTeams([]);
@@ -122,6 +142,7 @@ const TeamListTab: React.FC<TeamListTabProps> = ({
             selectedEvent={selectedEvent}
             hasFetchedTeams={hasFetchedTeams}
             teams={teams}
+            fetchTeams={handleFetchTeams}
             updateTeams={handleUpdateTeams}
             showErrorMessage={handleShowError}
           />

@@ -23,9 +23,7 @@ def _serialize(obj: Any, *args, **kwargs) -> bytes:
 
 
 @ndb.tasklet
-def defer_safe_async(
-    obj: Any, *args, **kwargs
-) -> Generator[Any, Any, UserRPC]:
+def defer_safe_async(obj: Any, *args, **kwargs) -> Generator[Any, Any, UserRPC]:
     """
     A wrapper around app enginer's deferred.defer, but will also base64 encode the payload
     Which avoids some unicode errors when passing arguments with certain types of binary properties

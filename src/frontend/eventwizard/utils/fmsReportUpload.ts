@@ -21,7 +21,7 @@ export async function uploadFmsReport(
   formData.append("fileDigest", fileDigest);
   
   await makeTrustedRequest(
-    `/_eventwizard/event/${eventKey}/fms_reports/${reportType}`,
+    `/api/_eventwizard/event/${eventKey}/fms_reports/${reportType}`,
     formData
   );
 }

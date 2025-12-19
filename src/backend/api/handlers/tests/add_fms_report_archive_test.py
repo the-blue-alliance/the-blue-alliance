@@ -101,7 +101,7 @@ def test_upload_qual_rankings_success(
     file_content = create_excel_file()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -147,7 +147,7 @@ def test_upload_missing_file(
         expiration=None,
     )
 
-    request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
     resp = api_client.post(
         request_path,
@@ -180,7 +180,7 @@ def test_upload_invalid_excel_file(
     file_content = b"This is not an Excel file"
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -222,7 +222,7 @@ def test_upload_wrong_permission(
     file_content = create_excel_file()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -265,7 +265,7 @@ def test_upload_mismatched_digest(
     wrong_digest = hashlib.sha256(b"wrong content").hexdigest()
     correct_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -307,7 +307,7 @@ def test_upload_duplicate_file_not_written(
     file_content = create_excel_file()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -362,7 +362,7 @@ def test_upload_with_metadata(
     file_content = create_excel_file()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
@@ -407,7 +407,7 @@ def test_upload_not_authenticated(ndb_stub, api_client: Client) -> None:
     file_content = create_excel_file()
     file_digest = hashlib.sha256(file_content).hexdigest()
 
-    request_path = "/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
+    request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
 
     file_storage = FileStorage(
         stream=io.BytesIO(file_content),
