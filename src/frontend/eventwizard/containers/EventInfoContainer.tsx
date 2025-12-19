@@ -5,6 +5,7 @@ import makeApiV3Request from "../net/ApiV3Request";
 import { RootState } from "../reducers";
 
 const mapStateToProps = (state: RootState) => ({
+  authId: state.auth.authId,
   selectedEvent: state.auth.selectedEvent,
   makeTrustedRequest: (
     requestPath: string,
@@ -17,10 +18,10 @@ const mapStateToProps = (state: RootState) => ({
       requestBody
     );
   },
-  makeApiV3Request: <T = unknown>(
+  makeApiV3Request: (
     requestPath: string
   ) => {
-    return makeApiV3Request<T>(state.auth.authId || "", requestPath);
+    return makeApiV3Request(state.auth.authId || "", requestPath);
   },
 });
 

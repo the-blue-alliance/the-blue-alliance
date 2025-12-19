@@ -34,6 +34,7 @@ const PlayoffTypeDropdown: React.FC<PlayoffTypeDropdownProps> = ({
           placeholder="Choose playoff type..."
           // @ts-ignore - react-select v2 loadingPlaceholder prop
           loadingPlaceholder="Loading playoff types..."
+          controlShouldRenderValue={true}
           isClearable={false}
           isSearchable={false}
           value={

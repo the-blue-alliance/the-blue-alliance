@@ -7,14 +7,15 @@ import { ApiEvent } from "../../constants/ApiEvent";
 import ensureRequestSuccess from "../../net/EnsureRequestSuccess";
 
 interface EventInfoTabProps {
+  authId: string | null;
   selectedEvent: string | null;
   makeTrustedRequest: (
     path: string,
     body: string
   ) => Promise<Response>;
-  makeApiV3Request: <T = unknown>(
+  makeApiV3Request: (
     path: string
-  ) => Promise<T>;
+  ) => Promise<Response>;
 }
 
 interface PlayoffType {
@@ -23,6 +24,7 @@ interface PlayoffType {
 }
 
 const EventInfoTab: React.FC<EventInfoTabProps> = ({
+  authId,
   selectedEvent,
   makeTrustedRequest,
   makeApiV3Request,
@@ -32,29 +34,22 @@ const EventInfoTab: React.FC<EventInfoTabProps> = ({
   const [buttonClass, setButtonClass] = useState("btn-primary");
 
   useEffect(() => {
-    if (selectedEvent === null) {
+    if (selectedEvent === null || authId === null) {
       setEventInfo(null);
       setButtonClass("btn-primary");
     } else {
       loadEventInfo(selectedEvent);
       setButtonClass("btn-primary");
     }
-  }, [selectedEvent]);
+  }, [selectedEvent, authId]);
 
   const loadEventInfo = async (newEventKey: string): Promise<void> => {
     setStatus("Loading event info...");
 
     try {
-      const data1 = await makeApiV3Request<ApiEvent>(`/api/v3/event/${newEventKey}`);
-
-      // Merge in remap_teams
-      const response2 = await fetch(`/_/remap_teams/${newEventKey}`);
-      await ensureRequestSuccess(response2);
-      const data2: Record<string, string> = await response2.json();
-
-      const data = Object.assign({}, data1);
-      data.remap_teams = data2;
-
+      const response = await makeApiV3Request(`/api/v3/event/${newEventKey}`);
+      ensureRequestSuccess(response);
+      const data: ApiEvent = await response.json();
       setEventInfo(data);
       setStatus("");
     } catch (error) {
