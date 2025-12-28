@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align: center;">
+  <table style="margin: 0 auto;">
+    <thead>
+      <tr>
+        {% for header in headers %}
+        <th style="text-align: center;">{{header}}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for cell in row %}
+        <td>{{cell}}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
