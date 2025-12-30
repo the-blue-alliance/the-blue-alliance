@@ -1,15 +1,9 @@
-import re
-import tempfile
-from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
 from backend.common import storage
-from backend.common.storage.clients.gcloud_client import GCloudStorageClient
-from backend.common.storage.clients.in_memory_client import InMemoryClient
-from backend.common.storage.clients.local_client import LocalStorageClient
 
 
 @pytest.fixture
@@ -40,84 +34,6 @@ def set_storage_mode_remote(monkeypatch: MonkeyPatch) -> None:
 @pytest.fixture
 def set_storage_path(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("STORAGE_PATH", "some/fake/path")
-
-
-def test_client_for_env_unit_test():
-    client = storage._client_for_env()
-    assert isinstance(client, InMemoryClient)
-
-
-def test_client_for_env_unit_test_remote(set_storage_mode_remote):
-    client = storage._client_for_env()
-    assert isinstance(client, InMemoryClient)
-
-
-def test_client_for_env_dev(set_override_tba_test, set_dev, set_project):
-    client = storage._client_for_env()
-    assert isinstance(client, LocalStorageClient)
-    assert (
-        client.base_path
-        == Path(tempfile.gettempdir()) / "tbatv-prod-hrd" / "tbatv-prod-hrd.appspot.com"
-    )
-
-
-def test_client_for_env_dev_path(
-    set_override_tba_test, set_dev, set_storage_path, set_project
-):
-    client = storage._client_for_env()
-    assert isinstance(client, LocalStorageClient)
-    assert (
-        client.base_path
-        == Path("some/fake/path") / "tbatv-prod-hrd" / "tbatv-prod-hrd.appspot.com"
-    )
-
-
-def test_client_for_env_dev_remote_no_project(
-    set_override_tba_test, set_dev, set_storage_mode_remote
-):
-    with pytest.raises(
-        Exception,
-        match=re.escape(
-            "Environment.project (GOOGLE_CLOUD_PROJECT) unset - should be set when using remote storage mode."
-        ),
-    ):
-        storage._client_for_env()
-
-
-def test_client_for_env_dev_remote(
-    set_override_tba_test, set_dev, set_storage_mode_remote, set_project
-):
-    with patch.object(
-        GCloudStorageClient, "__init__", return_value=None
-    ) as gcloud_storage_client_init:
-        client = storage._client_for_env()
-
-    gcloud_storage_client_init.assert_called_with(
-        "tbatv-prod-hrd", "tbatv-prod-hrd.appspot.com"
-    )
-    assert isinstance(client, GCloudStorageClient)
-
-
-def test_client_for_env_production_no_project(set_override_tba_test, set_prod):
-    with pytest.raises(
-        Exception,
-        match=re.escape(
-            "Environment.project (GOOGLE_CLOUD_PROJECT) unset - should be set in production."
-        ),
-    ):
-        storage._client_for_env()
-
-
-def test_client_for_env_production(set_override_tba_test, set_prod, set_project):
-    with patch.object(
-        GCloudStorageClient, "__init__", return_value=None
-    ) as gcloud_storage_client_init:
-        client = storage._client_for_env()
-
-    gcloud_storage_client_init.assert_called_with(
-        "tbatv-prod-hrd", "tbatv-prod-hrd.appspot.com"
-    )
-    assert isinstance(client, GCloudStorageClient)
 
 
 def test_write():

@@ -1,0 +1,5 @@
+This is a copy of the app engine legacy cloudstorage library, updated to work in a modern project
+
+Original source: https://github.com/GoogleCloudPlatform/appengine-gcs-client
+
+This also includes the cloudstorage stub that ships with `dev_appserver`, to be used in unit tests

@@ -32,6 +32,11 @@ from backend.common.models.keys import EventKey
 from backend.common.models.webcast import Webcast
 
 
+@pytest.fixture(autouse=True)
+def auto_use_gcs_stub(gcs_stub):
+    pass
+
+
 def setup_event(
     event_type: EventType = EventType.OFFSEASON,
     official: bool = False,

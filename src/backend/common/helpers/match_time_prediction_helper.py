@@ -4,6 +4,7 @@ from typing import List, Optional
 
 import numpy as np
 import pytz
+import six
 from pyre_extensions import none_throws
 
 from backend.common import storage
@@ -280,9 +281,9 @@ class MatchTimePredictionHelper:
         # Log to cloudstorage, but only if we have something new
         if not write_logs:
             return
-        log_dir = "/tbatv-prod-hrd.appspot.com/tba-logging/match-time-predictions/"
+        log_dir = "tba-logging/match-time-predictions/"
         log_file = "{}.txt".format(event_key)
         full_path = log_dir + log_file
 
-        existing_contents = storage.read(full_path) or ""
-        storage.write(full_path, existing_contents + to_log)
+        existing_contents = six.ensure_str(storage.read(full_path) or b"")
+        storage.write(full_path, six.ensure_binary(existing_contents + to_log))
