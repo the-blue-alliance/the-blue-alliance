@@ -57,7 +57,7 @@ const FmsCompanionTab: React.FC<FmsCompanionTabProps> = ({
       formData.append("fileDigest", fileDigest);
 
       const response = await makeTrustedRequest(
-        `/_eventwizard/event/${selectedEvent}/fms_companion_db`,
+        `/api/_eventwizard/event/${selectedEvent}/fms_companion_db`,
         formData
       );
 
