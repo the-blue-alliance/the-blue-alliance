@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/tanstackstart-react';
 import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { toNodeHandler } from 'srvx/node';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -54,7 +55,11 @@ app.use(morgan('tiny'));
 
 // handle SSR requests
 const { default: handler } = await import('./build/server/server.js');
-const nodeHandler = toNodeHandler((request) => handler.fetch(request));
+const nodeHandler = toNodeHandler((request) => handler.fetch(request)) as (
+  req: IncomingMessage,
+  res: ServerResponse,
+) => Promise<void>;
+
 app.use(async (req, res, next) => {
   // Enable JavaScript profiling for Sentry browser profiling
   res.setHeader('Document-Policy', 'js-profiling');
