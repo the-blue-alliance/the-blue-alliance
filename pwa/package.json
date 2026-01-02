@@ -88,7 +88,7 @@
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/vite": "4.1.18",
-    "@trivago/prettier-plugin-sort-imports": "6.0.0",
+    "@trivago/prettier-plugin-sort-imports": "6.0.1",
     "@types/compression": "1.8.1",
     "@types/express": "5.0.6",
     "@types/morgan": "1.9.10",
