@@ -6,6 +6,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 # Get base system dependencies
 RUN apt-get update && apt-get install -y \
+    build-essential \
     wget \
     curl \
     unzip \
