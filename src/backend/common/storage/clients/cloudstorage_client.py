@@ -45,8 +45,10 @@ class CloudStorageClient(StorageClient):
         list_path = Path(self.bucket)
         if path:
             list_path /= Path(path)
+
+        bucket_prefix = f"/{self.bucket}/"
         return [
-            obj.filename.lstrip(f"/{self.bucket}/")
+            obj.filename[len(bucket_prefix) :]
             for obj in listbucket(
                 f"/{str(list_path)}/",
                 delimiter="/" if path else None,

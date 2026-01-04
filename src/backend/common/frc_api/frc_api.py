@@ -22,7 +22,6 @@ TCompLevel = Literal["qual", "playoff"]
 
 class FRCAPI:
     BASE_URL = "https://frc-api.firstinspires.org"
-    STORAGE_BUCKET_PATH = "tbatv-prod-hrd.appspot.com"
     STORAGE_BUCKET_BASE_DIR = "frc-api-response"
 
     class ValidationError(Exception):
