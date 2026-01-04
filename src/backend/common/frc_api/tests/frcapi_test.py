@@ -9,7 +9,10 @@ from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
 )
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
-from backend.common.storage.clients.in_memory_client import InMemoryClient
+from backend.common.storage import (
+    get_files as cloud_storage_get_files,
+    read as cloud_storage_read,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -20,9 +23,8 @@ def auto_add_urlfetch_stub(
 
 
 @pytest.fixture(autouse=True)
-def reset_gcs_client():
-    yield
-    InMemoryClient.CLIENT = None
+def auto_use_gcs_stub(gcs_stub):
+    pass
 
 
 def test_init_no_fmsapi_secrets(ndb_stub) -> None:
@@ -207,6 +209,44 @@ def test_get(
     assert called_headers == expected_headers
 
 
+def _mock_frc_api(
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+    content: dict,
+    overwrite_idx: int | None = None,
+) -> int:
+
+    def is_frc_api(url: str) -> bool:
+        if "frc-api.firstinspires.org" in url:
+            return True
+        return False
+
+    def mock_fetch_fn(
+        url,
+        payload,
+        method,
+        headers,
+        request,
+        response,
+        follow_redirects,
+        deadline,
+        validate_certificate,
+    ):
+        response.StatusCode = 200
+        response.Content = json.dumps(content).encode()
+
+    if overwrite_idx is not None:
+        urlfetch_stub._urlmatchers_to_fetch_functions[overwrite_idx] = (
+            is_frc_api,
+            mock_fetch_fn,
+        )
+        return overwrite_idx
+    else:
+        urlfetch_stub._urlmatchers_to_fetch_functions.append(
+            (is_frc_api, mock_fetch_fn)
+        )
+        return len(urlfetch_stub._urlmatchers_to_fetch_functions) - 1
+
+
 def test_save_response(
     monkeypatch: pytest.MonkeyPatch,
     urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
@@ -220,20 +260,15 @@ def test_save_response(
         "status": "normal",
     }
 
-    def mock_fetch_fn(request, response):
-        response.StatusCode = 200
-        response.Content = json.dumps(content).encode()
+    _mock_frc_api(urlfetch_stub, content)
 
     api = FRCAPI("zach", save_response=True)
-    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
-        mock_fetch.side_effect = mock_fetch_fn
-        api.root().get_result()
+    api.root().get_result()
 
-    client = InMemoryClient.get()
-    files = client.get_files()
+    files = cloud_storage_get_files("frc-api-response/v3.0/")
     assert len(files) == 1
 
-    f = client.read(files[0])
+    f = cloud_storage_read(files[0])
     assert f is not None
     assert f == json.dumps(content).encode()
 
@@ -251,26 +286,17 @@ def test_save_response_unchanged(
         "status": "normal",
     }
 
-    def mock_fetch_fn(request, response):
-        response.StatusCode = 200
-        response.Content = json.dumps(content).encode()
-
+    _mock_frc_api(urlfetch_stub, content)
     api = FRCAPI("zach", save_response=True)
-    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
-        mock_fetch.side_effect = mock_fetch_fn
-        api.root().get_result()
+    api.root().get_result()
 
-    client = InMemoryClient.get()
-    files = client.get_files()
+    files = cloud_storage_get_files("frc-api-response/v3.0/")
     assert len(files) == 1
     f_name = files[0]
 
-    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
-        mock_fetch.side_effect = mock_fetch_fn
-        api.root().get_result()
-
     # Since the content didn't change, we shouldn't have written another
-    assert client.get_files() == [f_name]
+    api.root().get_result()
+    assert cloud_storage_get_files("frc-api-response/v3.0/") == [f_name]
 
 
 def test_save_response_updated(
@@ -286,17 +312,11 @@ def test_save_response_updated(
         "status": "normal",
     }
 
-    def mock_fetch_fn(request, response):
-        response.StatusCode = 200
-        response.Content = json.dumps(content).encode()
-
+    idx = _mock_frc_api(urlfetch_stub, content)
     api = FRCAPI("zach", save_response=True)
-    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
-        mock_fetch.side_effect = mock_fetch_fn
-        api.root().get_result()
+    api.root().get_result()
 
-    client = InMemoryClient.get()
-    files = client.get_files()
+    files = cloud_storage_get_files("frc-api-response/v3.0/")
     assert len(files) == 1
 
     content2 = {
@@ -307,22 +327,17 @@ def test_save_response_updated(
         "status": "normal",
     }
 
-    def mock_fetch_fn2(request, response):
-        response.StatusCode = 200
-        response.Content = json.dumps(content2).encode()
-
-    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
-        mock_fetch.side_effect = mock_fetch_fn2
-        api.root().get_result()
+    _mock_frc_api(urlfetch_stub, content2, overwrite_idx=idx)
+    api.root().get_result()
 
     # Since the content is different, we should have two items
-    files = client.get_files()
+    files = cloud_storage_get_files("frc-api-response/v3.0/")
     assert len(files) == 2
 
-    f = client.read(files[0])
+    f = cloud_storage_read(files[0])
     assert f is not None
     assert f == json.dumps(content).encode()
 
-    f2 = client.read(files[1])
+    f2 = cloud_storage_read(files[1])
     assert f2 is not None
     assert f2 == json.dumps(content2).encode()

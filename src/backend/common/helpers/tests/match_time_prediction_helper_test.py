@@ -2,6 +2,7 @@ import copy
 import json
 from typing import List
 
+import pytest
 from dateutil import tz
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
@@ -12,6 +13,11 @@ from backend.common.helpers.match_time_prediction_helper import (
     MatchTimePredictionHelper,
 )
 from backend.common.models.match import Match
+
+
+@pytest.fixture(autouse=True)
+def auto_use_gcs_stub(gcs_stub):
+    pass
 
 
 def _mark_match_unplayed(match: Match) -> None:

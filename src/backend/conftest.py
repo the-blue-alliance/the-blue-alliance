@@ -9,6 +9,9 @@ from google.appengine.ext import ndb, testbed
 
 from backend.common.context_cache import context_cache
 from backend.common.models.cached_query_result import CachedQueryResult
+from backend.common.storage.clients.cloudstorage.stub_dispatcher import (
+    dispatch as dispatch_gcs_stub,
+)
 from backend.tests.json_data_importer import JsonDataImporter
 
 
@@ -93,6 +96,54 @@ def memcache_stub(
     gae_testbed.init_memcache_stub()
     stub = gae_testbed.get_stub(testbed.MEMCACHE_SERVICE_NAME)
     return stub
+
+
+@pytest.fixture()
+def blobstorage_stub(
+    gae_testbed: testbed.Testbed,
+) -> testbed.blobstore_stub.BlobstoreServiceStub:
+    gae_testbed.init_blobstore_stub()
+    return gae_testbed.get_stub(testbed.BLOBSTORE_SERVICE_NAME)
+
+
+@pytest.fixture()
+def gcs_stub(
+    gae_testbed: testbed.Testbed,
+    memcache_stub,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+):
+    gae_testbed.init_blobstore_stub()
+    gae_testbed.init_datastore_v3_stub()
+
+    def is_gcs(url: str) -> bool:
+        if "/_ah/gcs/" in url:
+            return True
+        return False
+
+    def fetch_gcs(
+        url,
+        payload,
+        method,
+        headers,
+        request,
+        response,
+        follow_redirects,
+        deadline,
+        validate_certificate,
+    ):
+        stub_response = dispatch_gcs_stub(
+            method, {h.Key: h.Value for h in headers}, url, payload
+        )
+        response.StatusCode = stub_response.status_code
+        for header_key, header_value in stub_response.headers.items():
+            response.header.add(Key=header_key, Value=str(header_value))
+        response.Content = (
+            stub_response.content
+            if isinstance(stub_response.content, bytes)
+            else stub_response.content.encode("utf-8")
+        )
+
+    urlfetch_stub._urlmatchers_to_fetch_functions.append((is_gcs, fetch_gcs))
 
 
 @pytest.fixture()
