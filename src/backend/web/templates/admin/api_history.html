@@ -1,0 +1,172 @@
+{% extends "admin/base.html" %}
+
+{% block title %}API History - {{event.key_name}}{% endblock %}
+
+{% block content %}
+
+<h1>API History - {{event.key_name}}</h1>
+<h2>{{ event.name }}</h2>
+
+<div class="btn-group" style="margin-bottom: 20px;">
+  <a href="/admin/event/{{event.key_name}}" class="btn btn-default">
+    <span class="glyphicon glyphicon-arrow-left"></span> Back to Event
+  </a>
+  <a href="/event/{{event.key_name}}" class="btn btn-default">
+    <span class="glyphicon glyphicon-eye-open"></span> View on TBA
+  </a>
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-sm-12">
+    <ul class="nav nav-tabs nav-justified">
+      <li class="active"><a href="#frc-api" data-toggle="tab">FRC API</a></li>
+      <li><a href="#fms-reports" data-toggle="tab">FMS Reports</a></li>
+      <li><a href="#companion-db" data-toggle="tab">Companion DB</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="tab-content" style="margin-top: 20px;">
+  <!-- FRC API Tab -->
+  <div class="tab-pane active" id="frc-api">
+    
+    {% macro render_api_section(title, files, path_description) %}
+      <h3>{{ title }}</h3>
+      {% if files %}
+        <p>Found {{ files|length }} saved API responses</p>
+        
+        <div class="list-group">
+          {% for file in files %}
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <span class="glyphicon glyphicon-time"></span>
+                {{ file.timestamp }}
+              </h4>
+              <p class="list-group-item-text">
+                <a href="{{ file.public_url }}" target="_blank" class="btn btn-primary btn-sm">
+                  <span class="glyphicon glyphicon-download-alt"></span>
+                  View in Cloud Storage
+                </a>
+                <br/>
+                <small class="text-muted" style="margin-top: 5px; display: block;">
+                  <strong>Path:</strong> <code>{{ file.path }}</code>
+                </small>
+              </p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-info">
+          <p><strong>No responses found</strong></p>
+          <p>{{ path_description }}</p>
+        </div>
+      {% endif %}
+      <hr/>
+    {% endmacro %}
+
+    {{ render_api_section(
+      "Event Details",
+      frc_api_data.event_details,
+      "Endpoint: /v3.0/" ~ event.year ~ "/events?eventCode=" ~ event.event_short
+    ) }}
+
+    {{ render_api_section(
+      "Alliance Selection",
+      frc_api_data.alliances,
+      "Endpoint: /v3.0/" ~ event.year ~ "/alliances/" ~ event.event_short
+    ) }}
+
+    {{ render_api_section(
+      "Hybrid Schedule - Qualification",
+      frc_api_data.schedule_qual,
+      "Endpoint: /v3.0/" ~ event.year ~ "/schedule/" ~ event.event_short ~ "/qual/hybrid"
+    ) }}
+
+    {{ render_api_section(
+      "Hybrid Schedule - Playoff",
+      frc_api_data.schedule_playoff,
+      "Endpoint: /v3.0/" ~ event.year ~ "/schedule/" ~ event.event_short ~ "/playoff/hybrid"
+    ) }}
+
+    {{ render_api_section(
+      "Match Scores - Qualification",
+      frc_api_data.scores_qual,
+      "Endpoint: /v3.0/" ~ event.year ~ "/scores/" ~ event.event_short ~ "/qual"
+    ) }}
+
+    {{ render_api_section(
+      "Match Scores - Playoff",
+      frc_api_data.scores_playoff,
+      "Endpoint: /v3.0/" ~ event.year ~ "/scores/" ~ event.event_short ~ "/playoff"
+    ) }}
+
+    {{ render_api_section(
+      "Event Awards",
+      frc_api_data.awards,
+      "Endpoint: /v3.0/" ~ event.year ~ "/awards/event/" ~ event.event_short
+    ) }}
+
+  </div>
+
+  <!-- FMS Reports Tab -->
+  <div class="tab-pane" id="fms-reports">
+    
+    {{ render_api_section(
+      "Team List",
+      fms_reports_data.team_list,
+      "Report Type: team_list"
+    ) }}
+
+    {{ render_api_section(
+      "Qualification Schedule",
+      fms_reports_data.qual_schedule,
+      "Report Type: qual_schedule"
+    ) }}
+
+    {{ render_api_section(
+      "Playoff Schedule",
+      fms_reports_data.playoff_schedule,
+      "Report Type: playoff_schedule"
+    ) }}
+
+    {{ render_api_section(
+      "Qualification Results",
+      fms_reports_data.qual_results,
+      "Report Type: qual_results"
+    ) }}
+
+    {{ render_api_section(
+      "Playoff Results",
+      fms_reports_data.playoff_results,
+      "Report Type: playoff_results"
+    ) }}
+
+    {{ render_api_section(
+      "Qualification Rankings",
+      fms_reports_data.qual_rankings,
+      "Report Type: qual_rankings"
+    ) }}
+
+    {{ render_api_section(
+      "Playoff Alliances",
+      fms_reports_data.playoff_alliances,
+      "Report Type: playoff_alliances"
+    ) }}
+
+  </div>
+
+  <!-- Companion DB Tab -->
+  <div class="tab-pane" id="companion-db">
+    
+    {{ render_api_section(
+      "FMS Companion Database",
+      companion_db_data,
+      "Database files from the FMS Companion application"
+    ) }}
+
+  </div>
+</div>
+
+{% endblock %}

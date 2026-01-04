@@ -10,6 +10,7 @@ from backend.web.handlers.admin.api_auth import (
     api_auth_edit_post,
     api_auth_manage,
 )
+from backend.web.handlers.admin.api_history import api_history
 from backend.web.handlers.admin.apistatus import apistatus_get, apistatus_post
 from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
 from backend.web.handlers.admin.awards import (
@@ -175,6 +176,9 @@ admin_routes.add_url_rule(
     "/api_auth/manage/<regex('(read|write|admin)'):key_type>",
     view_func=api_auth_manage,
     methods=["GET"],
+)
+admin_routes.add_url_rule(
+    "/api_history/<event_key>", view_func=api_history, methods=["GET"]
 )
 admin_routes.add_url_rule("/apistatus", view_func=apistatus_get, methods=["GET"])
 admin_routes.add_url_rule("/apistatus", view_func=apistatus_post, methods=["POST"])
