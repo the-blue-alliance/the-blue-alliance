@@ -16,7 +16,7 @@ class FMSReportHelper:
     """Helper class for managing FMS report files in cloud storage."""
 
     # Constants
-    FMS_REPORT_BUCKET_TEMPLATE = "eventwizard-fms-reports.{project_id}.appspot.com"
+    FMS_REPORT_BUCKET_TEMPLATE = "{project_id}-eventwizard-fms-reports"
     FMS_REPORT_DIR_TEMPLATE = "fms_reports/{event_key}/{report_type}/"
 
     @staticmethod

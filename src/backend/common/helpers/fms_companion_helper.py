@@ -16,7 +16,7 @@ class FMSCompanionHelper:
     """Helper class for managing FMS Companion database files in cloud storage."""
 
     # Constants
-    FMS_COMPANION_BUCKET_TEMPLATE = "eventwizard-fms-companion.{project_id}.appspot.com"
+    FMS_COMPANION_BUCKET_TEMPLATE = "{project_id}-eventwizard-fms-companion"
     FMS_COMPANION_DIR_TEMPLATE = "fms_companion/{event_key}/"
 
     @staticmethod
