@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+from backend.common.environment import Environment
 from backend.common.models.keys import EventKey
 from backend.common.storage import (
     get_files as storage_get_files,
@@ -15,8 +16,15 @@ class FMSCompanionHelper:
     """Helper class for managing FMS Companion database files in cloud storage."""
 
     # Constants
-    FMS_COMPANION_BUCKET = "eventwizard-fms-companion"
-    FMS_COMPANION_DIR_TEMPLATE = "fms_companion/{event_key}"
+    FMS_COMPANION_BUCKET_TEMPLATE = "eventwizard-fms-companion.{project_id}.appspot.com"
+    FMS_COMPANION_DIR_TEMPLATE = "fms_companion/{event_key}/"
+
+    @staticmethod
+    def get_bucket() -> str:
+        project = Environment.project()
+        return FMSCompanionHelper.FMS_COMPANION_BUCKET_TEMPLATE.format(
+            project_id=project
+        )
 
     @staticmethod
     def get_storage_dir(event_key: EventKey) -> str:
@@ -39,7 +47,7 @@ class FMSCompanionHelper:
         try:
             files = storage_get_files(
                 path=storage_dir,
-                bucket=FMSCompanionHelper.FMS_COMPANION_BUCKET,
+                bucket=FMSCompanionHelper.get_bucket(),
             )
             logging.info(f"Found files for event {event_key} in {storage_dir}: {files}")
         except Exception as e:
@@ -71,7 +79,7 @@ class FMSCompanionHelper:
         try:
             content = storage_read(
                 newest_file,
-                bucket=FMSCompanionHelper.FMS_COMPANION_BUCKET,
+                bucket=FMSCompanionHelper.get_bucket(),
             )
             return content
         except Exception as e:
