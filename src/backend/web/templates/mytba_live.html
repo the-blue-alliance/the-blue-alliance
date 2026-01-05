@@ -12,7 +12,7 @@
     <div class="col-xs-12">
       <p class="pull-right">
         <a disabled="true" class="btn btn-default">{{user.email}}</a>
-        <a class="btn btn-warning" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
+        <a class="btn btn-warning" href="{{ url_for('account.logout') }}"><span class="glyphicon glyphicon-remove"></span> Logout</a>
       </p>
       <h1>myTBA Dashboard</h1>
       <p>Keep up to date with where your favorite teams are competing and how they're doing!</p>
