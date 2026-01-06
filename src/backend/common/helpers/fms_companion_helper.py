@@ -81,7 +81,8 @@ class FMSCompanionHelper:
                 newest_file,
                 bucket=FMSCompanionHelper.get_bucket(),
             )
-            return content
+            # storage_read can return str or bytes, but we know this is a binary file
+            return content if isinstance(content, bytes) else None
         except Exception as e:
             logging.exception(f"Error reading file from storage: {e}")
             return None
@@ -122,7 +123,7 @@ class FMSCompanionHelper:
         storage_write(
             storage_path,
             file_contents,
-            bucket=FMSCompanionHelper.FMS_COMPANION_BUCKET,
+            bucket=FMSCompanionHelper.get_bucket(),
             content_type=content_type,
             metadata=metadata or {},
         )

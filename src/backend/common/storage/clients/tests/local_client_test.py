@@ -29,7 +29,7 @@ def test_write_mkdir():
     ) as mock_write_text:
         client.write(file_name, file_content)
 
-    mock_mkdir.assert_called_with(tmp_path, parents=True)
+    mock_mkdir.assert_called_with(parents=True, exist_ok=True)
     mock_write_text.assert_called_with(file_content)
 
 
@@ -45,7 +45,7 @@ def test_write(tmp_path):
     ) as mock_write_text:
         client.write(file_name, file_content)
 
-    mock_mkdir.assert_not_called()
+    mock_mkdir.assert_called_with(parents=True, exist_ok=True)
     mock_write_text.assert_called_with(file_content)
 
 
@@ -65,7 +65,7 @@ def test_read(tmp_path):
     client = LocalStorageClient(tmp_path)
     assert client.read(file_name) is None
     client.write(file_name, file_content)
-    assert client.read(file_name) == file_content
+    assert client.read(file_name) == file_content.encode()
 
 
 def test_get_files(tmp_path):

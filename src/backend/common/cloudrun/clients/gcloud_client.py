@@ -46,22 +46,23 @@ class GCloudRunClient(CloudRunClient):
         full_job_name = f"{parent}/jobs/{job_name}"
 
         # Build RunJobRequest with overrides if args or env are provided
-        request = RunJobRequest(name=full_job_name)
+        request = RunJobRequest()
+        request.name = full_job_name
 
         if args is not None or env is not None:
             container_override = RunJobRequest.Overrides.ContainerOverride()
 
             if args is not None:
-                container_override.args = args
+                container_override.args.extend(args)
 
             if env is not None:
-                container_override.env = [
-                    EnvVar(name=key, value=value) for key, value in env.items()
-                ]
+                for key, value in env.items():
+                    env_var = EnvVar()
+                    env_var.name = key
+                    env_var.value = value
+                    container_override.env.append(env_var)
 
-            request.overrides = RunJobRequest.Overrides(
-                container_overrides=[container_override]
-            )
+            request.overrides.container_overrides.append(container_override)
 
         operation = self.jobs_client.run_job(request=request)
 
@@ -90,7 +91,7 @@ class GCloudRunClient(CloudRunClient):
             if execution.conditions:
                 # The first condition typically contains the overall status
                 condition = execution.conditions[0]
-                return condition.state if condition.state else None
+                return str(condition.state) if condition.state else None
             return None
         except Exception:
             return None

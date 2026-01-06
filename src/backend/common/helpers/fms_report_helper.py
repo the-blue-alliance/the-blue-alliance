@@ -1,7 +1,7 @@
 import datetime
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import cast, Optional, Union
 
 from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.environment import Environment
@@ -41,17 +41,24 @@ class FMSReportHelper:
         )
 
     @staticmethod
-    def get_existing_reports(event_key: EventKey, report_type: FMSReportType) -> list[str]:
+    def get_existing_reports(
+        event_key: EventKey, report_type: Union[str, FMSReportType]
+    ) -> list[str]:
         """Get a list of existing FMS report files for an event and report type.
 
         Args:
             event_key: The event key to get the reports for
-            report_type: The type of report
+            report_type: The type of report (str or FMSReportType enum)
 
         Returns:
             A list of file paths in storage
         """
-        storage_dir = FMSReportHelper.get_storage_dir(event_key, report_type)
+        report_type_enum = (
+            FMSReportType(report_type) if isinstance(report_type, str) else report_type
+        )
+        storage_dir = FMSReportHelper.get_storage_dir(
+            event_key, cast(FMSReportType, report_type_enum)
+        )
 
         try:
             files = storage_get_files(
@@ -70,7 +77,7 @@ class FMSReportHelper:
     @staticmethod
     def write_report(
         event_key: EventKey,
-        report_type: FMSReportType,
+        report_type: Union[str, FMSReportType],
         file_contents: bytes,
         filename: str,
         mtime: datetime.datetime,
@@ -81,7 +88,7 @@ class FMSReportHelper:
 
         Args:
             event_key: The event key to store the report for
-            report_type: The type of report
+            report_type: The type of report (str or FMSReportType enum)
             file_contents: The report file contents
             filename: The original filename
             mtime: The modification time from the Excel file
@@ -96,14 +103,23 @@ class FMSReportHelper:
         file_name = parsed_filename.stem
         extension = "".join(parsed_filename.suffixes)
 
-        storage_dir = FMSReportHelper.get_storage_dir(event_key, report_type)
+        report_type_enum = (
+            FMSReportType(report_type) if isinstance(report_type, str) else report_type
+        )
+        storage_dir = FMSReportHelper.get_storage_dir(
+            event_key, cast(FMSReportType, report_type_enum)
+        )
         storage_file = f"{file_name}.{mtime}{extension}"
         storage_path = f"{storage_dir}/{storage_file}"
 
         # Check if file already exists
         existing_reports = FMSReportHelper.get_existing_reports(event_key, report_type)
-        if any(existing.split("/")[-1] == storage_file for existing in existing_reports):
-            logging.info(f"Report file already exists at {storage_path}, skipping write")
+        if any(
+            existing.split("/")[-1] == storage_file for existing in existing_reports
+        ):
+            logging.info(
+                f"Report file already exists at {storage_path}, skipping write"
+            )
             return storage_path, False
 
         logging.info(f"Writing FMS report to {storage_path}")

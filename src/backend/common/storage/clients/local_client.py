@@ -33,10 +33,20 @@ class LocalStorageClient(StorageClient):
 
         return None
 
-    def get_files(self, path_name: Optional[str] = None) -> List[str]:
-        path = self.base_path / Path(path_name)
-        logging.info(f"Getting files from local storage at {path}")
-        if not path.exists():
-            logging.info(f"Base path {path} does not exist.")
+    def get_files(self, path: Optional[str] = None) -> List[str]:
+        logging.info(f"Getting files from local storage with prefix: {path}")
+        if not self.base_path.exists():
+            logging.info(f"Base path {self.base_path} does not exist.")
             return []
-        return [path_name + "/" + p.name for p in path.iterdir() if p.is_file()]
+
+        # Get all files recursively
+        all_files = []
+        for p in self.base_path.rglob("*"):
+            if p.is_file():
+                # Get relative path from base_path
+                rel_path = str(p.relative_to(self.base_path))
+                # If prefix is specified, filter by it
+                if path is None or rel_path.startswith(path):
+                    all_files.append(rel_path)
+
+        return all_files

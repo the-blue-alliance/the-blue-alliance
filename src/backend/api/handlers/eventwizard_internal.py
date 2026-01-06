@@ -11,7 +11,6 @@ from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.auth import current_user
 from backend.common.cloudrun import get_job_status, start_job
 from backend.common.consts.auth_type import AuthType
-from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
 from backend.common.helpers.fms_report_helper import FMSReportHelper
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -20,7 +19,7 @@ from backend.common.models.keys import EventKey
 
 @require_write_auth(None, file_param="reportFile")
 @validate_keys
-def add_fms_report_archive(event_key: EventKey, report_type: FMSReportType) -> Response:
+def add_fms_report_archive(event_key: EventKey, report_type: str) -> Response:
     form_data = request.files.get("reportFile")
     if not form_data:
         return make_response(profiled_jsonify({"Error": "Missing report file"}), 400)
@@ -78,10 +77,11 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
 
     newest_db_contents = FMSCompanionHelper.read_newest_companion_db(event_key)
     if newest_db_contents == file_contents:
+        newest_file_path = FMSCompanionHelper.get_newest_file_path(event_key)
         storage_path = (
-            FMSCompanionHelper.FMS_COMPANION_BUCKET
-            + "/"
-            + FMSCompanionHelper.get_newest_file_path(event_key)
+            f"{FMSCompanionHelper.get_bucket()}/{newest_file_path}"
+            if newest_file_path
+            else ""
         )
     else:
         filename = Path(form_data.filename or "fms_companion.db")
@@ -98,13 +98,13 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
                 "X-TBA-Auth-Id": request.headers.get("X-TBA-Auth-Id"),
             },
         )
-        storage_path = FMSCompanionHelper.FMS_COMPANION_BUCKET + "/" + storage_path
+        storage_path = FMSCompanionHelper.get_bucket() + "/" + storage_path
 
     # Trigger Cloud Run job for companion database import
     job_name = "tba-offseason-companion-import"
     auth_id = request.headers.get("X-TBA-Auth-Id")
-    auth = ApiAuthAccess.get_by_id(auth_id)
-    if auth:
+    auth = ApiAuthAccess.get_by_id(auth_id) if auth_id else None
+    if auth and auth_id and auth.secret:
         execution_id = start_job(
             job_name,
             args=[f"gs://{storage_path}"],
@@ -133,7 +133,9 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
 
 
 @require_write_auth({AuthType.EVENT_TEAMS})
-def get_cloudrun_job_status(event_key: EventKey, job_name: str, execution_id: str) -> Response:
+def get_cloudrun_job_status(
+    event_key: EventKey, job_name: str, execution_id: str
+) -> Response:
     """Get the status of a Cloud Run job execution.
 
     Args:

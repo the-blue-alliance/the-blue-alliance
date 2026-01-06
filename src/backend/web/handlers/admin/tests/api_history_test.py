@@ -45,7 +45,7 @@ def test_api_history_with_files(
         bucket = kwargs.get("bucket", None)
 
         # Check FMS Reports bucket first (most specific)
-        if bucket == "eventwizard-fms-reports":
+        if bucket == "testbed-test-eventwizard-fms-reports":
             if "team_list" in path:
                 return [
                     "fms_reports/2020nyny/team_list/team_list.2020-03-14T08:00:00.xlsx",
@@ -58,7 +58,7 @@ def test_api_history_with_files(
                 return []
 
         # Check FMS Companion bucket
-        if bucket == "eventwizard-fms-companion":
+        if bucket == "testbed-test-eventwizard-fms-companion":
             if "fms_companion" in path:
                 return [
                     "fms_companion/2020nyny/fms_companion.2020-03-15T14:30:00.db",
@@ -133,11 +133,11 @@ def test_api_history_with_files(
         in content
     )
     assert (
-        "https://storage.googleapis.com/eventwizard-fms-reports/fms_reports/2020nyny/team_list/team_list.2020-03-14T08:00:00.xlsx"
+        "https://storage.googleapis.com/testbed-test-eventwizard-fms-reports/fms_reports/2020nyny/team_list/team_list.2020-03-14T08:00:00.xlsx"
         in content
     )
     assert (
-        "https://storage.googleapis.com/eventwizard-fms-companion/fms_companion/2020nyny/fms_companion.2020-03-15T14:30:00.db"
+        "https://storage.googleapis.com/testbed-test-eventwizard-fms-companion/fms_companion/2020nyny/fms_companion.2020-03-15T14:30:00.db"
         in content
     )
 

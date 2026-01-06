@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const fetch = require("node-fetch");
 const fs = require("fs");
 const os = require("os");
@@ -24,7 +26,7 @@ describe("FMS Companion Import", () => {
   });
 
   it("should create a test offseason event", async () => {
-    const testEventKey = '2025test';
+    const testEventKey = "2025test";
 
     const response = await fetch(
       `http://0.0.0.0:8080/local/create_test_event/${testEventKey}`,

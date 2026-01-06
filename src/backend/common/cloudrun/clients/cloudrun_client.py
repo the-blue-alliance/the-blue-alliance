@@ -1,4 +1,5 @@
 import abc
+from typing import Optional
 
 
 class CloudRunClient(abc.ABC):
@@ -6,8 +7,8 @@ class CloudRunClient(abc.ABC):
     def start_job(
         self,
         job_name: str,
-        args: list[str] = None,
-        env: dict[str, str] = None,
+        args: Optional[list[str]] = None,
+        env: Optional[dict[str, str]] = None,
     ) -> str: ...
 
     @abc.abstractmethod
