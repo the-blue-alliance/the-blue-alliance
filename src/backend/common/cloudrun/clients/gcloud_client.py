@@ -1,10 +1,8 @@
-import logging
-
 from google.auth.credentials import Credentials
 from google.cloud.run_v2 import ExecutionsClient, JobsClient
-from google.cloud.run_v2.types import EnvVar, RunJobRequest
+from google.cloud.run_v2.types import Condition, EnvVar, RunJobRequest
 
-from backend.common.cloudrun.clients.cloudrun_client import CloudRunClient
+from backend.common.cloudrun.clients.cloudrun_client import CloudRunClient, JobStatus
 
 
 class GCloudRunClient(CloudRunClient):
@@ -74,7 +72,7 @@ class GCloudRunClient(CloudRunClient):
 
         return execution_id
 
-    def get_job_status(self, job_name: str, execution_id: str) -> str | None:
+    def get_job_status(self, job_name: str, execution_id: str) -> JobStatus | None:
         """Get the status of a Cloud Run job execution.
 
         Args:
@@ -82,24 +80,75 @@ class GCloudRunClient(CloudRunClient):
             execution_id: The ID of the execution.
 
         Returns:
-            The execution State enum value or None if not found.
+            JobStatus dict with state, message, and completion status, or None if not found.
         """
         parent = f"projects/{self.project}/locations/{self.region}"
         full_execution_name = f"{parent}/jobs/{job_name}/executions/{execution_id}"
 
         try:
             execution = self.executions_client.get_execution(name=full_execution_name)
-            logging.info(f"Retrieved cloud run execution: {execution}")
-            # Get the state from the conditions if available
+
+            # Determine if job is complete by checking task counts
+            is_complete = (
+                execution.succeeded_count
+                + execution.failed_count
+                + execution.cancelled_count
+                >= execution.task_count
+            )
+
+            # Determine overall state based on task counts
+            if not is_complete:
+                state = "RUNNING"
+                message = "Job is running"
+            elif execution.succeeded_count == execution.task_count:
+                state = "SUCCEEDED"
+                message = f"Job completed successfully ({execution.succeeded_count}/{execution.task_count} tasks succeeded)"
+            elif execution.failed_count > 0:
+                state = "FAILED"
+                message = f"Job failed ({execution.failed_count}/{execution.task_count} tasks failed, {execution.succeeded_count} succeeded)"
+            elif execution.cancelled_count > 0:
+                state = "CANCELLED"
+                message = f"Job was cancelled ({execution.cancelled_count}/{execution.task_count} tasks cancelled)"
+            else:
+                state = "UNKNOWN"
+                message = "Job status unknown"
+
+            # Get additional details from the newest condition if available
             if execution.conditions:
-                # The first condition typically contains the overall status
-                condition = execution.conditions[0]
-                if condition.state is not None:
-                    # Get the symbolic name of the state enum value
-                    # Protobuf enum values have a .name attribute
-                    # pyre-ignore[16]: Protobuf enum has .name attribute
-                    return condition.state.name
-                return None
-            return None
+                newest_condition = execution.conditions[0]
+
+                # Collect reason information from the condition
+                reason_parts = []
+                if newest_condition.message:
+                    reason_parts.append(newest_condition.message)
+
+                # Check for reason enums (only one will be set due to oneof)
+                if newest_condition.reason and newest_condition.reason != 0:
+                    # pyre-ignore[19,16]: Proto-plus enums have dynamic name attribute
+                    reason_name = Condition.CommonReason(newest_condition.reason).name
+                    reason_parts.append(f"Reason: {reason_name}")
+                elif (
+                    newest_condition.revision_reason
+                    and newest_condition.revision_reason != 0
+                ):
+                    # pyre-ignore[19,16]: Proto-plus enums have dynamic name attribute
+                    reason_name = Condition.RevisionReason(
+                        newest_condition.revision_reason
+                    ).name
+                    reason_parts.append(f"Revision reason: {reason_name}")
+                elif (
+                    newest_condition.execution_reason
+                    and newest_condition.execution_reason != 0
+                ):
+                    # pyre-ignore[19,16]: Proto-plus enums have dynamic name attribute
+                    reason_name = Condition.ExecutionReason(
+                        newest_condition.execution_reason
+                    ).name
+                    reason_parts.append(f"Execution reason: {reason_name}")
+
+                if reason_parts:
+                    message = f"{message}. {'. '.join(reason_parts)}"
+
+            return JobStatus(state=state, message=message, is_complete=is_complete)
         except Exception:
             return None

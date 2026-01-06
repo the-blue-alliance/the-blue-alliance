@@ -48,13 +48,10 @@ const FmsCompanionTab: React.FC<FmsCompanionTabProps> = ({
         const data = await response.json();
         
         if (data.status) {
-          setJobStatus(data.status);
+          setJobStatus("Job State: " + data.status.state + " - " + data.status.message);
           
           // Stop polling if we've reached a terminal state
-          if (
-            data.status === "CONDITION_SUCCEEDED" ||
-            data.status === "CONDITION_FAILED"
-          ) {
+          if (data.status.is_complete) {
             setJobName(null);
             setExecutionId(null);
           }

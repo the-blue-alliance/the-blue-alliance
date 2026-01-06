@@ -1,4 +1,4 @@
-from backend.common.cloudrun.clients.cloudrun_client import CloudRunClient
+from backend.common.cloudrun.clients.cloudrun_client import CloudRunClient, JobStatus
 
 
 class LocalCloudRunClient(CloudRunClient):
@@ -20,7 +20,7 @@ class LocalCloudRunClient(CloudRunClient):
         """
         return "test-execution-id"
 
-    def get_job_status(self, job_name: str, execution_id: str) -> str | None:
+    def get_job_status(self, job_name: str, execution_id: str) -> JobStatus | None:
         """Get the status of a Cloud Run job execution locally (stubbed).
 
         Args:
@@ -30,4 +30,8 @@ class LocalCloudRunClient(CloudRunClient):
         Returns:
             The execution status or None if not found.
         """
-        return "CONDITION_SUCCEEDED"
+        return JobStatus(
+            state="SUCCEEDED",
+            message="Job completed successfully (1/1 tasks succeeded)",
+            is_complete=True,
+        )

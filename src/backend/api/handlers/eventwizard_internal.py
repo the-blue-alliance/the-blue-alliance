@@ -109,7 +109,6 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
             job_name,
             args=[f"gs://{storage_path}"],
             env={
-                "LOG_LEVEL": "debug",
                 "TBA_TRUSTED_AUTH_ID": auth_id,
                 "TBA_TRUSTED_AUTH_SECRET": auth.secret,
             },
@@ -152,7 +151,7 @@ def get_cloudrun_job_status(
             return make_response(
                 profiled_jsonify({"Error": "Job execution not found"}), 404
             )
-        return profiled_jsonify({"status": str(status)})
+        return profiled_jsonify({"status": status})
     except Exception as e:
         logging.exception("Failed to fetch Cloud Run job status")
         return make_response(

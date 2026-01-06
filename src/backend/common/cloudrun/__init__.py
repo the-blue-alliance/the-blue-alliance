@@ -1,6 +1,9 @@
 from typing import Optional
 
-from backend.common.cloudrun.clients.cloudrun_client import CloudRunClient
+from backend.common.cloudrun.clients.cloudrun_client import (
+    CloudRunClient,
+    JobStatus,
+)
 from backend.common.cloudrun.clients.gcloud_client import GCloudRunClient
 from backend.common.cloudrun.clients.local_client import LocalCloudRunClient
 from backend.common.environment import Environment
@@ -19,6 +22,9 @@ def _client_for_env() -> CloudRunClient:
     if Environment.is_unit_test():
         return LocalCloudRunClient()
 
+    if Environment.is_dev():
+        return LocalCloudRunClient()
+
     project = Environment.project()
     if not project:
         raise ValueError(
@@ -30,9 +36,6 @@ def _client_for_env() -> CloudRunClient:
         raise ValueError(
             "GoogleCloudRunConfig.region must be set to use Cloud Run client."
         )
-
-    if Environment.is_dev():
-        return LocalCloudRunClient()
 
     return GCloudRunClient(project, region)
 
@@ -54,7 +57,7 @@ def start_job(
     return client.start_job(job_name, args, env)
 
 
-def get_job_status(job_name: str, execution_id: str) -> Optional[str]:
+def get_job_status(job_name: str, execution_id: str) -> Optional[JobStatus]:
     """Get the status of a Cloud Run job execution.
 
     Args:
@@ -62,7 +65,7 @@ def get_job_status(job_name: str, execution_id: str) -> Optional[str]:
         execution_id: The ID of the execution.
 
     Returns:
-        The execution state (e.g., 'RUNNING', 'SUCCEEDED', 'FAILED') or None if not found.
+        A JobStatus dict with 'state', 'message', and 'is_complete' fields, or None if not found.
     """
     client = _client_for_env()
     return client.get_job_status(job_name, execution_id)

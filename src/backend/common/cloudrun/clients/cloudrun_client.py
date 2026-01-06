@@ -1,5 +1,13 @@
 import abc
-from typing import Optional
+from typing import Optional, TypedDict
+
+
+class JobStatus(TypedDict):
+    """Status information for a Cloud Run job execution."""
+
+    state: str  # e.g., "RUNNING", "SUCCEEDED", "FAILED"
+    message: str  # Human-readable status message
+    is_complete: bool  # Whether the job has finished (success or failure)
 
 
 class CloudRunClient(abc.ABC):
@@ -12,4 +20,4 @@ class CloudRunClient(abc.ABC):
     ) -> str: ...
 
     @abc.abstractmethod
-    def get_job_status(self, job_name: str, execution_id: str) -> str | None: ...
+    def get_job_status(self, job_name: str, execution_id: str) -> JobStatus | None: ...
