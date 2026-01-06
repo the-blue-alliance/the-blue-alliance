@@ -86,7 +86,3 @@ class Environment:
         if Environment.is_prod():
             return True
         return bool(os.environ.get("SAVE_FRC_API_RESPONSE", False))
-
-    @staticmethod
-    def cloudrun_region() -> Optional[str]:
-        return os.environ.get("CLOUDRUN_REGION", None)
