@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Dependabot metadata
         id: dependabot-metadata
-        uses: dependabot/fetch-metadata@v2.4.0
+        uses: dependabot/fetch-metadata@v2.5.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       # Auto-approve and auto-merge for patch and minor updates if all checks pass
@@ -30,7 +30,7 @@ jobs:
       - name: Dependabot metadata
         id: dependabot_metadata
         if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
-        uses: dependabot/fetch-metadata@v2.4.0
+        uses: dependabot/fetch-metadata@v2.5.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Authenticate cli
