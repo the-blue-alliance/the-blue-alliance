@@ -109,6 +109,7 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
             job_name,
             args=[f"gs://{storage_path}"],
             env={
+                "LOG_LEVEL": "debug",
                 "TBA_TRUSTED_AUTH_ID": auth_id,
                 "TBA_TRUSTED_AUTH_SECRET": auth.secret,
             },

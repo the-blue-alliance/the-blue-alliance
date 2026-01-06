@@ -1,3 +1,5 @@
+import logging
+
 from google.auth.credentials import Credentials
 from google.cloud.run_v2 import ExecutionsClient, JobsClient
 from google.cloud.run_v2.types import EnvVar, RunJobRequest
@@ -87,11 +89,17 @@ class GCloudRunClient(CloudRunClient):
 
         try:
             execution = self.executions_client.get_execution(name=full_execution_name)
+            logging.info(f"Retrieved cloud run execution: {execution}")
             # Get the state from the conditions if available
             if execution.conditions:
                 # The first condition typically contains the overall status
                 condition = execution.conditions[0]
-                return str(condition.state) if condition.state else None
+                if condition.state is not None:
+                    # Get the symbolic name of the state enum value
+                    # Protobuf enum values have a .name attribute
+                    # pyre-ignore[16]: Protobuf enum has .name attribute
+                    return condition.state.name
+                return None
             return None
         except Exception:
             return None
