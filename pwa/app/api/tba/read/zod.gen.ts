@@ -561,9 +561,39 @@ export const zMatchSimple = z.object({
   }),
   winning_alliance: z.enum(['red', 'blue', '']),
   event_key: z.string(),
-  time: z.union([z.coerce.bigint(), z.null()]),
-  predicted_time: z.union([z.coerce.bigint(), z.null()]),
-  actual_time: z.union([z.coerce.bigint(), z.null()]),
+  time: z.union([
+    z.coerce
+      .bigint()
+      .min(BigInt('-9223372036854775808'), {
+        error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+      })
+      .max(BigInt('9223372036854775807'), {
+        error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+      }),
+    z.null(),
+  ]),
+  predicted_time: z.union([
+    z.coerce
+      .bigint()
+      .min(BigInt('-9223372036854775808'), {
+        error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+      })
+      .max(BigInt('9223372036854775807'), {
+        error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+      }),
+    z.null(),
+  ]),
+  actual_time: z.union([
+    z.coerce
+      .bigint()
+      .min(BigInt('-9223372036854775808'), {
+        error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+      })
+      .max(BigInt('9223372036854775807'), {
+        error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+      }),
+    z.null(),
+  ]),
 });
 
 /**
@@ -1219,10 +1249,50 @@ export const zMatch = z.object({
   }),
   winning_alliance: z.enum(['red', 'blue', '']),
   event_key: z.string(),
-  time: z.union([z.coerce.bigint(), z.null()]),
-  actual_time: z.union([z.coerce.bigint(), z.null()]),
-  predicted_time: z.union([z.coerce.bigint(), z.null()]),
-  post_result_time: z.union([z.coerce.bigint(), z.null()]),
+  time: z.union([
+    z.coerce
+      .bigint()
+      .min(BigInt('-9223372036854775808'), {
+        error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+      })
+      .max(BigInt('9223372036854775807'), {
+        error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+      }),
+    z.null(),
+  ]),
+  actual_time: z.union([
+    z.coerce
+      .bigint()
+      .min(BigInt('-9223372036854775808'), {
+        error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+      })
+      .max(BigInt('9223372036854775807'), {
+        error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+      }),
+    z.null(),
+  ]),
+  predicted_time: z.union([
+    z.coerce
+      .bigint()
+      .min(BigInt('-9223372036854775808'), {
+        error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+      })
+      .max(BigInt('9223372036854775807'), {
+        error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+      }),
+    z.null(),
+  ]),
+  post_result_time: z.union([
+    z.coerce
+      .bigint()
+      .min(BigInt('-9223372036854775808'), {
+        error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
+      })
+      .max(BigInt('9223372036854775807'), {
+        error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+      }),
+    z.null(),
+  ]),
   score_breakdown: z.union([
     zMatchScoreBreakdown2015,
     zMatchScoreBreakdown2016,
@@ -1300,7 +1370,18 @@ export const zEliminationAlliance = z.object({
   status: z.optional(
     z.object({
       playoff_average: z.optional(z.union([z.number(), z.null()])),
-      playoff_type: z.union([z.number(), z.null()]),
+      playoff_type: z.union([
+        z.coerce
+          .bigint()
+          .min(BigInt('-9223372036854775808'), {
+            error:
+              'Invalid value: Expected int64 to be >= -9223372036854775808',
+          })
+          .max(BigInt('9223372036854775807'), {
+            error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
+          }),
+        z.null(),
+      ]),
       level: zCompLevel,
       record: z.union([zWltRecord, z.null()]),
       current_level_record: z.union([zWltRecord, z.null()]),
