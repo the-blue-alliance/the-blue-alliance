@@ -17,6 +17,6 @@ pytz==2025.2
 tzlocal==5.3.1
 requests==2.32.5
 typing-extensions==4.15.0
-Werkzeug==3.1.4
+Werkzeug==3.1.5
 appengine-python-standard==1.1.10
 openpyxl==3.1.5
