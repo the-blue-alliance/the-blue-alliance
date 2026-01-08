@@ -8,6 +8,5 @@
     "storage_mode": "local",
     "storage_path": "ops/dev/storage",
     "save_frc_api_response": "false",
-    "min_gcloud_sdk_version": "380.0.0",
-    "cloud_run_region": "us-central1"
+    "min_gcloud_sdk_version": "380.0.0"
 }

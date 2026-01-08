@@ -15,7 +15,7 @@ eventwizard_api = Blueprint(
 CORS(
     eventwizard_api,
     origins="*",
-    methods=["OPTIONS", "GET", "POST"],
+    methods=["OPTIONS", "POST"],
     allow_headers=["Content-Type", "X-TBA-Auth-Id", "X-TBA-Auth-Sig"],
 )
 
