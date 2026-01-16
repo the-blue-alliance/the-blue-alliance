@@ -69,7 +69,7 @@
     "pino": "10.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-intersection-observer": "10.0.0",
+    "react-intersection-observer": "10.0.2",
     "recharts": "3.6.0",
     "srvx": "0.10.0",
     "tailwind-merge": "3.4.0",
