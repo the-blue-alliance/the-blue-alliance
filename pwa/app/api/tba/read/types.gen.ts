@@ -333,6 +333,29 @@ export type EndGameRobot2024 =
 
 export type EndGameRobot2025 = 'DeepCage' | 'None' | 'Parked' | 'ShallowCage';
 
+export type TowerRobot2026 = 'Level1' | 'Level2' | 'Level3' | 'None';
+
+export type HubScore2026 = {
+  autoCount: number;
+  autoPoints: number;
+  endgameCount: number;
+  endgamePoints: number;
+  shift1Count: number;
+  shift1Points: number;
+  shift2Count: number;
+  shift2Points: number;
+  shift3Count: number;
+  shift3Points: number;
+  shift4Count: number;
+  shift4Points: number;
+  teleopCount: number;
+  teleopPoints: number;
+  totalCount: number;
+  totalPoints: number;
+  transitionCount: number;
+  transitionPoints: number;
+};
+
 export type EndgameRobot2018 =
   | 'Climbing'
   | 'Levitate'
@@ -1733,6 +1756,39 @@ export type MatchScoreBreakdown2025Alliance = {
   };
   totalPoints: number;
   wallAlgaeCount: number;
+};
+
+/**
+ * See the 2026 FMS API documentation for a description of each value. https://frc-api-docs.firstinspires.org
+ */
+export type MatchScoreBreakdown2026 = {
+  blue: MatchScoreBreakdown2026Alliance;
+  red: MatchScoreBreakdown2026Alliance;
+};
+
+export type MatchScoreBreakdown2026Alliance = {
+  adjustPoints: number;
+  autoTowerPoints: number;
+  autoTowerRobot1: TowerRobot2026;
+  autoTowerRobot2: TowerRobot2026;
+  autoTowerRobot3: TowerRobot2026;
+  endGameTowerPoints: number;
+  endGameTowerRobot1: TowerRobot2026;
+  endGameTowerRobot2: TowerRobot2026;
+  endGameTowerRobot3: TowerRobot2026;
+  energizedAchieved: boolean;
+  foulPoints: number;
+  g206Penalty: boolean;
+  hubScore: HubScore2026;
+  majorFoulCount: number;
+  minorFoulCount: number;
+  rp: number;
+  superchargedAchieved: boolean;
+  totalAutoPoints: number;
+  totalPoints: number;
+  totalTeleopPoints: number;
+  totalTowerPoints: number;
+  traversalAchieved: boolean;
 };
 
 export type MatchSimple = {

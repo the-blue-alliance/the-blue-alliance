@@ -126,6 +126,29 @@ export const zEndGameRobot2025 = z.enum([
   'ShallowCage',
 ]);
 
+export const zTowerRobot2026 = z.enum(['Level1', 'Level2', 'Level3', 'None']);
+
+export const zHubScore2026 = z.object({
+  autoCount: z.int(),
+  autoPoints: z.int(),
+  endgameCount: z.int(),
+  endgamePoints: z.int(),
+  shift1Count: z.int(),
+  shift1Points: z.int(),
+  shift2Count: z.int(),
+  shift2Points: z.int(),
+  shift3Count: z.int(),
+  shift3Points: z.int(),
+  shift4Count: z.int(),
+  shift4Points: z.int(),
+  teleopCount: z.int(),
+  teleopPoints: z.int(),
+  totalCount: z.int(),
+  totalPoints: z.int(),
+  transitionCount: z.int(),
+  transitionPoints: z.int(),
+});
+
 export const zEndgameRobot2018 = z.enum([
   'Climbing',
   'Levitate',
@@ -502,6 +525,39 @@ export const zMatchScoreBreakdown2024Alliance = z.object({
 export const zMatchScoreBreakdown2024 = z.object({
   blue: zMatchScoreBreakdown2024Alliance,
   red: zMatchScoreBreakdown2024Alliance,
+});
+
+export const zMatchScoreBreakdown2026Alliance = z.object({
+  adjustPoints: z.int(),
+  autoTowerPoints: z.int(),
+  autoTowerRobot1: zTowerRobot2026,
+  autoTowerRobot2: zTowerRobot2026,
+  autoTowerRobot3: zTowerRobot2026,
+  endGameTowerPoints: z.int(),
+  endGameTowerRobot1: zTowerRobot2026,
+  endGameTowerRobot2: zTowerRobot2026,
+  endGameTowerRobot3: zTowerRobot2026,
+  energizedAchieved: z.boolean(),
+  foulPoints: z.int(),
+  g206Penalty: z.boolean(),
+  hubScore: zHubScore2026,
+  majorFoulCount: z.int(),
+  minorFoulCount: z.int(),
+  rp: z.int(),
+  superchargedAchieved: z.boolean(),
+  totalAutoPoints: z.int(),
+  totalPoints: z.int(),
+  totalTeleopPoints: z.int(),
+  totalTowerPoints: z.int(),
+  traversalAchieved: z.boolean(),
+});
+
+/**
+ * See the 2026 FMS API documentation for a description of each value. https://frc-api-docs.firstinspires.org
+ */
+export const zMatchScoreBreakdown2026 = z.object({
+  blue: zMatchScoreBreakdown2026Alliance,
+  red: zMatchScoreBreakdown2026Alliance,
 });
 
 /**
