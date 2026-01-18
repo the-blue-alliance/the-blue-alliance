@@ -42,6 +42,19 @@ def test_parse_id_from_url() -> None:
         == "1v8_2dW7Kik"
     )
 
+    # YouTube Shorts
+    assert (
+        YouTubeVideoHelper.parse_id_from_url(
+            "https://www.youtube.com/shorts/S8m53ArvTRc"
+        )
+        == "S8m53ArvTRc"
+    )
+    # YouTube Shorts without www
+    assert (
+        YouTubeVideoHelper.parse_id_from_url("https://youtube.com/shorts/S8m53ArvTRc")
+        == "S8m53ArvTRc"
+    )
+
     # Standard with start time
     assert (
         YouTubeVideoHelper.parse_id_from_url(
