@@ -3,7 +3,7 @@
 
 {% block title %}{{match.verbose_name}} - {{event.name}} {{event.year}} - The Blue Alliance{% endblock %}
 
-{% block meta_description %}Match results and video for {{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition (FRC) in {{event.location}}.{% endblock %}
+{% block meta_description %}{{meta_description}}{% endblock %}
 
 {% block more_head_tags %}
   <meta property="og:title" content="{{match.verbose_name}} - {{event.year}} {{event.name}}" />
@@ -14,7 +14,7 @@
   {% else %}
     <meta property="og:image" content="https://www.thebluealliance.com/images/logo_square_512.png" />
   {% endif %}
-  <meta property="og:description" content="{{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
+  <meta property="og:description" content="{{meta_description}}"/>
   <meta property="og:site_name" content="The Blue Alliance" />
   {% if match.youtube_videos_formatted %}
     <meta property="og:video" content="https://www.youtube.com/v/{{match.youtube_videos_formatted.0}}" />
