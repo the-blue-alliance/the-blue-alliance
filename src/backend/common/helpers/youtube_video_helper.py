@@ -16,6 +16,14 @@ class YouTubePlaylistItem(TypedDict):
 
 
 class YouTubeVideoHelper(object):
+    # Patterns to extract YouTube video ID from various URL formats
+    VIDEO_ID_PATTERNS = [
+        r".*youtu\.be\/([a-zA-Z0-9_-]*)",  # Short links: youtu.be/ID
+        r".*v=([a-zA-Z0-9_-]*)",  # Standard: youtube.com/watch?v=ID
+        r".*/embed/([a-zA-Z0-9_-]*)",  # Embed: youtube.com/embed/ID
+        r".*/shorts/([a-zA-Z0-9_-]*)",  # Shorts: youtube.com/shorts/ID
+    ]
+
     @classmethod
     def parse_id_from_url(cls, youtube_url: str) -> Optional[str]:
         """
@@ -25,18 +33,12 @@ class YouTubeVideoHelper(object):
         """
         youtube_id = None
 
-        # Try to parse for ID
-        regex1 = re.match(r".*youtu\.be\/([a-zA-Z0-9_-]*)", youtube_url)
-        if regex1 is not None:
-            youtube_id = regex1.group(1)
-        else:
-            regex2 = re.match(r".*v=([a-zA-Z0-9_-]*)", youtube_url)
-            if regex2 is not None:
-                youtube_id = regex2.group(1)
-            else:
-                regex3 = re.match(r".*/embed/([a-zA-Z0-9_-]*)", youtube_url)
-                if regex3 is not None:
-                    youtube_id = regex3.group(1)
+        # Try to parse for ID using each pattern
+        for pattern in cls.VIDEO_ID_PATTERNS:
+            match = re.match(pattern, youtube_url)
+            if match is not None:
+                youtube_id = match.group(1)
+                break
 
         # Try to parse for time
         if youtube_id is not None:

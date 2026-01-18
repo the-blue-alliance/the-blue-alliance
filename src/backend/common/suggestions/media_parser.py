@@ -40,6 +40,7 @@ class MediaParser:
         MediaType.YOUTUBE_VIDEO: [
             (r".*youtu\.be\/(.*)", 1),
             (r".*v=([a-zA-Z0-9_-]*)", 1),
+            (r".*/shorts/([a-zA-Z0-9_-]*)", 1),
         ],
         MediaType.IMGUR: [
             (r".*imgur.com\/(\w+)\/?\Z", 1),
@@ -66,6 +67,7 @@ class MediaParser:
         ("chiefdelphi.com/media/photos/", MediaType.CD_PHOTO_THREAD),
         ("chiefdelphi.com/t/", MediaType.CD_THREAD),
         ("youtube.com/watch", MediaType.YOUTUBE_VIDEO),
+        ("youtube.com/shorts", MediaType.YOUTUBE_VIDEO),
         ("youtu.be", MediaType.YOUTUBE_VIDEO),
         ("imgur.com/", MediaType.IMGUR),
         ("grabcad.com/library/", MediaType.GRABCAD),

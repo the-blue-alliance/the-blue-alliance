@@ -39,6 +39,14 @@ class TestMediaUrlParser(unittest.TestCase):
         self.assertEqual(yt_from_playlist["media_type_enum"], MediaType.YOUTUBE_VIDEO)
         self.assertEqual(yt_from_playlist["foreign_key"], "VP992UKFbko")
 
+    def test_youtube_parse_shorts(self) -> None:
+        yt_shorts = MediaParser.partial_media_dict_from_url(
+            "https://www.youtube.com/shorts/S8m53ArvTRc"
+        )
+        self.assertIsNotNone(yt_shorts)
+        self.assertEqual(yt_shorts["media_type_enum"], MediaType.YOUTUBE_VIDEO)
+        self.assertEqual(yt_shorts["foreign_key"], "S8m53ArvTRc")
+
     @pytest.mark.skip(reason="CD media is dead")
     def test_cdphotothread_parsetest_cdphotothread_parse(self):
         cd = MediaParser.partial_media_dict_from_url(
