@@ -122,6 +122,9 @@ describe("FMS Companion Import", () => {
       // If we get here, the command executed successfully
       console.log("Docker container output:", output);
       expect(output).toBeDefined();
+
+      // Wait for data to be processed
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     } catch (error) {
       // Log the error output for debugging
       console.error("Docker execution failed:", error.message);
@@ -129,5 +132,26 @@ describe("FMS Companion Import", () => {
       if (error.stderr) console.error("stderr:", error.stderr);
       throw error;
     }
+  });
+
+  it("should have matches written", async () => {
+    expect(eventKey).not.toBeNull();
+    expect(authId).not.toBeNull();
+
+    const response = await fetch(
+      `http://0.0.0.0:8080/api/v3/event/${eventKey}/matches`,
+      {
+        method: "GET",
+        headers: {
+          "X-TBA-Auth-Key": authId,
+        },
+      }
+    );
+
+    expect(response.status).toEqual(200);
+
+    const matches = await response.json();
+    expect(Array.isArray(matches)).toBe(true);
+    expect(matches.length).toBeGreaterThan(0);
   });
 });
