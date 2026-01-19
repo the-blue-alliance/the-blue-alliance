@@ -710,7 +710,7 @@ class Event(CachedModel):
         if self.event_type_enum in CMP_EVENT_TYPES:
             return f"https://www.firstchampionship.org/sites/default/files/{self.year}/{self.year}-FIRST-Robotics-Competition-Addendum.pdf"
 
-        return f"http://firstinspires.org/sites/default/files/uploads/frc/{self.year}-events/{self.year}_{self.event_short.upper()}_Agenda.pdf"
+        return f"https://info.firstinspires.org/hubfs/web/event/frc/{self.year}/{self.year}_{self.event_short.upper()}_Agenda.pdf"
 
     @property
     def hashtag(self) -> str:
