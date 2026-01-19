@@ -109,9 +109,9 @@ def test_upload_qual_rankings_success(
         content_type="application/vnd.ms-excel",
     )
 
-    with patch("backend.api.handlers.eventwizard_internal.storage_write") as mock_write:
+    with patch("backend.common.helpers.fms_report_helper.storage_write") as mock_write:
         with patch(
-            "backend.api.handlers.eventwizard_internal.storage_get_files"
+            "backend.common.helpers.fms_report_helper.storage_get_files"
         ) as mock_get_files:
             mock_get_files.return_value = []
 
@@ -321,9 +321,9 @@ def test_upload_duplicate_file_not_written(
         "fms_reports/2019nyny/qual_rankings/rankings.2019-06-01 00:00:00.xlsx"
     ]
 
-    with patch("backend.api.handlers.eventwizard_internal.storage_write") as mock_write:
+    with patch("backend.common.helpers.fms_report_helper.storage_write") as mock_write:
         with patch(
-            "backend.api.handlers.eventwizard_internal.storage_get_files"
+            "backend.common.helpers.fms_report_helper.storage_get_files"
         ) as mock_get_files:
             mock_get_files.return_value = existing_files
 
@@ -370,9 +370,9 @@ def test_upload_with_metadata(
         content_type="application/vnd.ms-excel",
     )
 
-    with patch("backend.api.handlers.eventwizard_internal.storage_write") as mock_write:
+    with patch("backend.common.helpers.fms_report_helper.storage_write") as mock_write:
         with patch(
-            "backend.api.handlers.eventwizard_internal.storage_get_files"
+            "backend.common.helpers.fms_report_helper.storage_get_files"
         ) as mock_get_files:
             mock_get_files.return_value = []
 

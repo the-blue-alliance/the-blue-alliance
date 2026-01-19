@@ -5,6 +5,7 @@ from flask_cors import CORS
 from backend.api.handlers.eventwizard_internal import (
     add_fms_companion_db,
     add_fms_report_archive,
+    get_cloudrun_job_status,
 )
 
 # Eventwizard Internal API
@@ -28,4 +29,10 @@ eventwizard_api.add_url_rule(
     "/event/<string:event_key>/fms_companion_db",
     methods=["POST"],
     view_func=add_fms_companion_db,
+)
+
+eventwizard_api.add_url_rule(
+    "/_cloudrun/status/<string:event_key>/<string:job_name>/<string:execution_id>",
+    methods=["POST"],
+    view_func=get_cloudrun_job_status,
 )

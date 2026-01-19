@@ -1,6 +1,5 @@
 import datetime
 import hashlib
-import logging
 from typing import Optional
 
 from flask import abort, make_response, request
@@ -116,7 +115,6 @@ class TrustedApiAuthHelper:
             file_contents = file.read()
             file.seek(0)
             request_data = hashlib.sha256(file_contents).hexdigest()
-            logging.info(f"Computed file digest: {request_data}")
             file_digest = request.form.get("fileDigest")
             if request_data != file_digest:
                 abort(

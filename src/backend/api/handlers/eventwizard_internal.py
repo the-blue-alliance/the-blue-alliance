@@ -1,4 +1,3 @@
-import datetime
 import logging
 from io import BytesIO
 from pathlib import Path
@@ -10,12 +9,12 @@ from pyre_extensions import none_throws
 from backend.api.handlers.decorators import require_write_auth, validate_keys
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.common.auth import current_user
+from backend.common.cloudrun import get_job_status, start_job
 from backend.common.consts.auth_type import AuthType
+from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
+from backend.common.helpers.fms_report_helper import FMSReportHelper
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.keys import EventKey
-from backend.common.storage import (
-    get_files as storage_get_files,
-    write as storage_write,
-)
 
 
 @require_write_auth(None, file_param="reportFile")
@@ -37,32 +36,21 @@ def add_fms_report_archive(event_key: EventKey, report_type: str) -> Response:
         )
 
     filename = Path(form_data.filename or "fms_report.xlsx")
-    file_name = filename.stem
-    extension = ".".join(filename.suffixes)
 
-    storage_dir = f"fms_reports/{event_key}/{report_type}"
-    storage_file = f"{file_name}.{mtime}{extension}"
-    storage_path = f"{storage_dir}/{storage_file}"
-
-    existing_reports = storage_get_files(
-        path=storage_dir,
-        bucket="eventwizard-fms-reports",
+    user = current_user()
+    FMSReportHelper.write_report(
+        event_key,
+        report_type,
+        file_contents,
+        filename=str(filename),
+        mtime=mtime,
+        content_type=none_throws(form_data.content_type),
+        metadata={
+            "X-TBA-Auth-User": str(user.uid) if user else None,
+            "X-TBA-Auth-User-Email": user.email if user else None,
+            "X-TBA-Auth-Id": request.headers.get("X-TBA-Auth-Id"),
+        },
     )
-    if not any(
-        existing.split("/")[-1] == storage_file for existing in existing_reports
-    ):
-        user = current_user()
-        storage_write(
-            storage_path,
-            file_contents,
-            bucket="eventwizard-fms-reports",
-            content_type=none_throws(form_data.content_type),
-            metadata={
-                "X-TBA-Auth-User": str(user.uid) if user else None,
-                "X-TBA-Auth-User-Email": user.email if user else None,
-                "X-TBA-Auth-Id": request.headers.get("X-TBA-Auth-Id"),
-            },
-        )
 
     return profiled_jsonify({"Success": "FMS report successfully uploaded"})
 
@@ -87,28 +75,85 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
             400,
         )
 
-    filename = Path(form_data.filename or "fms_companion.db")
-    file_name = filename.stem
-    extension = ".".join(filename.suffixes)
+    newest_db_contents = FMSCompanionHelper.read_newest_companion_db(event_key)
+    if newest_db_contents == file_contents:
+        newest_file_path = FMSCompanionHelper.get_newest_file_path(event_key)
+        storage_path = (
+            f"{FMSCompanionHelper.get_bucket()}/{newest_file_path}"
+            if newest_file_path
+            else ""
+        )
+    else:
+        filename = Path(form_data.filename or "fms_companion.db")
 
-    # Use current timestamp for uniqueness
-    timestamp = datetime.datetime.utcnow().isoformat()
+        user = current_user()
+        storage_path = FMSCompanionHelper.write_companion_db(
+            event_key,
+            file_contents,
+            filename=str(filename),
+            content_type=none_throws(form_data.content_type),
+            metadata={
+                "X-TBA-Auth-User": str(user.uid) if user else None,
+                "X-TBA-Auth-User-Email": user.email if user else None,
+                "X-TBA-Auth-Id": request.headers.get("X-TBA-Auth-Id"),
+            },
+        )
+        storage_path = FMSCompanionHelper.get_bucket() + "/" + storage_path
 
-    storage_dir = f"fms_companion/{event_key}"
-    storage_file = f"{file_name}.{timestamp}{extension}"
-    storage_path = f"{storage_dir}/{storage_file}"
+    # Trigger Cloud Run job for companion database import
+    job_name = "tba-offseason-companion-import"
+    auth_id = request.headers.get("X-TBA-Auth-Id")
+    auth = ApiAuthAccess.get_by_id(auth_id) if auth_id else None
+    if auth and auth_id and auth.secret:
+        execution_id = start_job(
+            job_name,
+            args=[f"gs://{storage_path}"],
+            env={
+                "TBA_TRUSTED_AUTH_ID": auth_id,
+                "TBA_TRUSTED_AUTH_SECRET": auth.secret,
+            },
+        )
+        job_params = {
+            "job_name": job_name,
+            "execution_id": execution_id,
+        }
+    else:
+        job_params = {}
+        logging.warning(
+            "No X-TBA-Auth-Id header provided, skipping Cloud Run job start"
+        )
 
-    user = current_user()
-    storage_write(
-        storage_path,
-        file_contents,
-        bucket="eventwizard-fms-companion",
-        content_type=none_throws(form_data.content_type),
-        metadata={
-            "X-TBA-Auth-User": str(user.uid) if user else None,
-            "X-TBA-Auth-User-Email": user.email if user else None,
-            "X-TBA-Auth-Id": request.headers.get("X-TBA-Auth-Id"),
-        },
+    return profiled_jsonify(
+        {
+            "Success": "FMS Companion database successfully uploaded",
+            "storage_path": storage_path,
+            **job_params,
+        }
     )
 
-    return profiled_jsonify({"Success": "FMS Companion database successfully uploaded"})
+
+@require_write_auth({AuthType.EVENT_TEAMS})
+def get_cloudrun_job_status(
+    event_key: EventKey, job_name: str, execution_id: str
+) -> Response:
+    """Get the status of a Cloud Run job execution.
+
+    Args:
+        job_name: The name of the Cloud Run job.
+        execution_id: The execution ID.
+
+    Returns:
+        JSON response with the job status.
+    """
+    try:
+        status = get_job_status(job_name, execution_id)
+        if status is None:
+            return make_response(
+                profiled_jsonify({"Error": "Job execution not found"}), 404
+            )
+        return profiled_jsonify({"status": status})
+    except Exception as e:
+        logging.exception("Failed to fetch Cloud Run job status")
+        return make_response(
+            profiled_jsonify({"Error": f"Failed to fetch job status: {str(e)}"}), 500
+        )

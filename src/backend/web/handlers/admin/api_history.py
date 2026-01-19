@@ -4,7 +4,10 @@ from typing import Any, Dict, List, Optional
 from flask import abort
 from google.appengine.api.blobstore import blobstore_stub
 
+from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.environment import Environment
+from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
+from backend.common.helpers.fms_report_helper import FMSReportHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.storage import get_files
@@ -52,45 +55,50 @@ def api_history(event_key: EventKey) -> str:
     }
 
     # Get FMS Reports from eventwizard-fms-reports bucket
+    fms_reports_bucket = FMSReportHelper.get_bucket()
     fms_reports_data = {
         "team_list": _get_storage_files(
-            event, f"fms_reports/{event_key}/team_list/", "eventwizard-fms-reports"
+            event,
+            FMSReportHelper.get_storage_dir(event_key, FMSReportType.TEAM_LIST),
+            fms_reports_bucket,
         ),
         "qual_schedule": _get_storage_files(
             event,
-            f"fms_reports/{event_key}/qual_schedule/",
-            "eventwizard-fms-reports",
+            FMSReportHelper.get_storage_dir(event_key, FMSReportType.QUAL_SCHEDULE),
+            fms_reports_bucket,
         ),
         "playoff_schedule": _get_storage_files(
             event,
-            f"fms_reports/{event_key}/playoff_schedule/",
-            "eventwizard-fms-reports",
+            FMSReportHelper.get_storage_dir(event_key, FMSReportType.PLAYOFF_SCHEDULE),
+            fms_reports_bucket,
         ),
         "qual_results": _get_storage_files(
             event,
-            f"fms_reports/{event_key}/qual_results/",
-            "eventwizard-fms-reports",
+            FMSReportHelper.get_storage_dir(event_key, FMSReportType.QUAL_RESULTS),
+            fms_reports_bucket,
         ),
         "playoff_results": _get_storage_files(
             event,
-            f"fms_reports/{event_key}/playoff_results/",
-            "eventwizard-fms-reports",
+            FMSReportHelper.get_storage_dir(event_key, FMSReportType.PLAYOFF_RESULTS),
+            fms_reports_bucket,
         ),
         "qual_rankings": _get_storage_files(
             event,
-            f"fms_reports/{event_key}/qual_rankings/",
-            "eventwizard-fms-reports",
+            FMSReportHelper.get_storage_dir(event_key, FMSReportType.QUAL_RANKINGS),
+            fms_reports_bucket,
         ),
         "playoff_alliances": _get_storage_files(
             event,
-            f"fms_reports/{event_key}/playoff_alliances/",
-            "eventwizard-fms-reports",
+            FMSReportHelper.get_storage_dir(event_key, FMSReportType.PLAYOFF_ALLIANCES),
+            fms_reports_bucket,
         ),
     }
 
     # Get FMS Companion DB from eventwizard-fms-companion bucket
     companion_db_data = _get_storage_files(
-        event, f"fms_companion/{event_key}/", "eventwizard-fms-companion"
+        event,
+        FMSCompanionHelper.get_storage_dir(event_key),
+        FMSCompanionHelper.get_bucket(),
     )
 
     template_values = {

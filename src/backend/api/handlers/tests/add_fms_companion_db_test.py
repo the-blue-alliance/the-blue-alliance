@@ -21,6 +21,7 @@ from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common import auth
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
@@ -102,7 +103,9 @@ def test_upload_companion_db_success(
         content_type="application/octet-stream",
     )
 
-    with patch("backend.api.handlers.eventwizard_internal.storage_write") as mock_write:
+    with patch(
+        "backend.common.helpers.fms_companion_helper.storage_write"
+    ) as mock_write:
         resp = api_client.post(
             request_path,
             headers={
@@ -303,7 +306,9 @@ def test_upload_with_metadata(
         content_type="application/octet-stream",
     )
 
-    with patch("backend.api.handlers.eventwizard_internal.storage_write") as mock_write:
+    with patch(
+        "backend.common.helpers.fms_companion_helper.storage_write"
+    ) as mock_write:
         resp = api_client.post(
             request_path,
             headers={
@@ -380,7 +385,9 @@ def test_upload_with_different_filename_and_extensions(
         content_type="application/octet-stream",
     )
 
-    with patch("backend.api.handlers.eventwizard_internal.storage_write") as mock_write:
+    with patch(
+        "backend.common.helpers.fms_companion_helper.storage_write"
+    ) as mock_write:
         resp = api_client.post(
             request_path,
             headers={
@@ -428,7 +435,9 @@ def test_upload_stores_in_correct_bucket(
         content_type="application/octet-stream",
     )
 
-    with patch("backend.api.handlers.eventwizard_internal.storage_write") as mock_write:
+    with patch(
+        "backend.common.helpers.fms_companion_helper.storage_write"
+    ) as mock_write:
         resp = api_client.post(
             request_path,
             headers={
@@ -446,7 +455,7 @@ def test_upload_stores_in_correct_bucket(
     assert resp.status_code == 200
     mock_write.assert_called_once()
     call_args = mock_write.call_args
-    assert call_args[1]["bucket"] == "eventwizard-fms-companion"
+    assert call_args[1]["bucket"] == FMSCompanionHelper.get_bucket()
 
 
 @freeze_time("2019-06-01")
@@ -473,7 +482,9 @@ def test_upload_storage_path_format(
         content_type="application/octet-stream",
     )
 
-    with patch("backend.api.handlers.eventwizard_internal.storage_write") as mock_write:
+    with patch(
+        "backend.common.helpers.fms_companion_helper.storage_write"
+    ) as mock_write:
         resp = api_client.post(
             request_path,
             headers={
