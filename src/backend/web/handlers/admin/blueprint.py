@@ -135,7 +135,9 @@ def admin_home() -> str:
 
     memcache_stats = MemcacheClient.get().get_stats() or {"hits": 0, "misses": 0}
 
-    users = Account.query().order(-Account.created).fetch(5)
+    # Negation for descending order is valid NDB syntax, but Pyre doesn't understand it
+    # https://docs.cloud.google.com/appengine/docs/standard/services/ndb/queries?tab=python#order
+    users = Account.query().order(-Account.created).fetch(5)  # pyre-ignore[16]
 
     template_values = {
         "memcache_stats": memcache_stats,
