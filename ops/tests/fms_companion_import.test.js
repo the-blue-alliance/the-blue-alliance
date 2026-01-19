@@ -97,16 +97,21 @@ describe("FMS Companion Import", () => {
   it("should run the companion import docker container", async () => {
     expect(storagePath).not.toBeNull();
 
+    // Use --net=host and localhost in GitHub Actions, host.containers.internal otherwise
+    const dockerHost = process.env.GITHUB_ACTIONS
+      ? "172.17.0.1"
+      : "host.containers.internal";
+
     try {
       const output = execSync(
         `\
         docker run --rm \
           --env LOG_LEVEL=debug \
-          --env TBA_URL=http://host.containers.internal:8080/api/trusted/v1 \
+          --env TBA_URL=http://${dockerHost}:8080/api/trusted/v1 \
           --env TBA_TRUSTED_AUTH_ID=${authId} \
           --env TBA_TRUSTED_AUTH_SECRET=${authSecret} \
           gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest \
-          http://host.containers.internal:8080/_ah/gcs/${storagePath}\
+          http://${dockerHost}:8080/_ah/gcs/${storagePath}\
         `,
         {
           encoding: "utf-8",

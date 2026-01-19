@@ -17,7 +17,7 @@ class FMSCompanionHelper:
 
     # Constants
     FMS_COMPANION_BUCKET_TEMPLATE = "{project_id}-eventwizard-fms-companion"
-    FMS_COMPANION_DIR_TEMPLATE = "fms_companion/{event_key}/"
+    FMS_COMPANION_DIR_TEMPLATE = "fms_companion/{event_key}"
 
     @staticmethod
     def get_bucket() -> str:
