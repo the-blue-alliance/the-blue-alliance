@@ -105,7 +105,7 @@ describe("FMS Companion Import", () => {
           --env TBA_URL=http://host.containers.internal:8080/api/trusted/v1 \
           --env TBA_TRUSTED_AUTH_ID=${authId} \
           --env TBA_TRUSTED_AUTH_SECRET=${authSecret} \
-          phillopreiato/tba-offseason-companion-import:latest \
+          gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest \
           http://host.containers.internal:8080/_ah/gcs/${storagePath}\
         `,
         {
