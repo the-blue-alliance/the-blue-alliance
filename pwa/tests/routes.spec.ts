@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { skipWithoutApiKey } from 'tests/utils';
 
 import type { FileRouteTypes } from '~/routeTree.gen';
+
+// Skip all tests in this file if API key is not available
+test.beforeAll(skipWithoutApiKey);
 
 // Extract all route paths from the generated route tree types
 type RoutePath = FileRouteTypes['fullPaths'];
