@@ -76,7 +76,7 @@ describe("EventWizard2", () => {
     const browser = await puppeteer.launch({ headless: "new" });
     page = await browser.newPage();
 
-    await page.goto("http://localhost:8080/eventwizard2");
+    await page.goto("http://localhost:8080/eventwizard");
     await page.waitForSelector("#eventwizard");
   });
 
