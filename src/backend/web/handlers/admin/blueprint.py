@@ -2,7 +2,6 @@ from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
 from backend.common.consts.suggestion_state import SuggestionState
-from backend.common.environment import Environment
 from backend.common.memcache import MemcacheClient
 from backend.common.models.account import Account
 from backend.common.models.suggestion import Suggestion
@@ -143,15 +142,6 @@ def admin_home() -> str:
         "memcache_stats": memcache_stats,
         "users": users,
         "suggestions_count": suggestions_count,
-        "contbuild_enabled": False,
-        "git_branch_name": "",
-        "build_time": "",
-        "build_number": "",
-        "commit_hash": "",
-        "commit_author": "",
-        "commit_date": "",
-        "commit_msg": "",
-        "debug": Environment.is_dev(),
     }
     return render_template("admin/index.html", template_values)
 
