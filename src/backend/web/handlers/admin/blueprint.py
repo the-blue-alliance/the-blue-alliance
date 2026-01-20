@@ -1,7 +1,11 @@
 from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
+from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.environment import Environment
+from backend.common.memcache import MemcacheClient
+from backend.common.models.account import Account
+from backend.common.models.suggestion import Suggestion
 from backend.web.handlers.admin.api_auth import (
     api_auth_add,
     api_auth_delete,
@@ -123,17 +127,22 @@ def require_gae_admin() -> None:
 
 @admin_routes.route("/")
 def admin_home() -> str:
+    suggestions_count = (
+        Suggestion.query()
+        .filter(Suggestion.review_state == SuggestionState.REVIEW_PENDING)
+        .count()
+    )
+
+    memcache_stats = MemcacheClient.get().get_stats() or {"hits": 0, "misses": 0}
+
+    # Negation for descending order is valid NDB syntax, but Pyre doesn't understand it
+    # https://docs.cloud.google.com/appengine/docs/standard/services/ndb/queries?tab=python#order
+    users = Account.query().order(-Account.created).fetch(5)  # pyre-ignore[16]
+
     template_values = {
-        "memcache_stats": {
-            "hits": 0,
-            "misses": 0,
-        },
-        "databasequery_stats": {
-            "hits": 0,
-            "misses": 0,
-        },
-        "users": [],
-        "suggestions_count": 0,
+        "memcache_stats": memcache_stats,
+        "users": users,
+        "suggestions_count": suggestions_count,
         "contbuild_enabled": False,
         "git_branch_name": "",
         "build_time": "",
