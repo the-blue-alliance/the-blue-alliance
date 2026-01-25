@@ -1,3 +1,4 @@
+import logging
 from typing import List, Tuple
 
 from backend.common.futures import TypedFuture
@@ -8,11 +9,17 @@ from backend.common.queries.event_query import EventListQuery
 
 class OffseasonEventHelper:
     @classmethod
-    def is_direct_match(cls, tba_event: Event, first_event: Event) -> None:
-        return tba_event.key_name == first_event.key_name or (
-            tba_event.first_code
-            and tba_event.first_code.lower() == first_event.event_short
-        )
+    def is_direct_match(cls, tba_event: Event, first_event: Event) -> bool:
+        try:
+            return tba_event.key_name == first_event.key_name or (
+                tba_event.first_code
+                and tba_event.first_code.lower() == first_event.event_short
+            )
+        except Exception as e:
+            logging.exception(
+                f"Error checking direct match between TBA event {tba_event.key_name} and FIRST event {first_event.key_name}: {e}\n{tba_event}"
+            )
+            return False
 
     @classmethod
     def is_maybe_match(cls, tba_event: Event, first_event: Event) -> bool:
