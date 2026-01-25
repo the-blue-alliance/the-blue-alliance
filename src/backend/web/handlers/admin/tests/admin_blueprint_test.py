@@ -69,7 +69,9 @@ def test_admin_home_shows_pending_suggestions_count(
         resp.data,
     )
     assert match is not None, "Could not find pending suggestions badge"
-    assert match.group(1) == b"2", f"Expected 2 pending suggestions, got {match.group(1)}"
+    assert (
+        match.group(1) == b"2"
+    ), f"Expected 2 pending suggestions, got {match.group(1)}"
 
 
 def test_admin_home_shows_recent_users(
