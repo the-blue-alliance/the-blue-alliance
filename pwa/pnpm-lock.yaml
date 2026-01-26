@@ -178,8 +178,8 @@ importers:
         specifier: 9.39.2
         version: 9.39.2
       '@hey-api/openapi-ts':
-        specifier: 0.90.9
-        version: 0.90.9(magicast@0.5.1)(typescript@5.9.3)
+        specifier: 0.90.10
+        version: 0.90.10(magicast@0.5.1)(typescript@5.9.3)
       '@iconify/json':
         specifier: 2.2.432
         version: 2.2.432
@@ -1617,8 +1617,8 @@ packages:
     resolution: {integrity: sha512-oS+5yAdwnK20lSeFO1d53Ku+yaGCsY8PcrmSq2GtSs3bsBfRnHAbpPKSVzQcaxAOrzj5NB+f34WhZglVrNayBA==}
     engines: {node: '>= 16'}
 
-  '@hey-api/openapi-ts@0.90.9':
-    resolution: {integrity: sha512-tEnsMvTLMsO8s+VAW/59XehUOP/flRGzwmOPTV8weSEWqDOpj6/txnZpwDBFmvhZfPOc5ZsV8lV3bJuG11DNYA==}
+  '@hey-api/openapi-ts@0.90.10':
+    resolution: {integrity: sha512-o0wlFxuLt1bcyIV/ZH8DQ1wrgODTnUYj/VfCHOOYgXUQlLp9Dm2PjihOz+WYrZLowhqUhSKeJRArOGzvLuOTsg==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -9208,7 +9208,7 @@ snapshots:
       js-yaml: 4.1.1
       lodash: 4.17.23
 
-  '@hey-api/openapi-ts@0.90.9(magicast@0.5.1)(typescript@5.9.3)':
+  '@hey-api/openapi-ts@0.90.10(magicast@0.5.1)(typescript@5.9.3)':
     dependencies:
       '@hey-api/codegen-core': 0.5.5(magicast@0.5.1)(typescript@5.9.3)
       '@hey-api/json-schema-ref-parser': 1.2.2
