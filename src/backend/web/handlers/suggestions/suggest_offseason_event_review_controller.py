@@ -65,11 +65,12 @@ class SuggestOffseasonEventReviewController(
         first_code = request.form.get("first_code")
         if first_code:
             first_code = first_code.upper()
+        event_type_enum = int(request.form.get("event_type_enum", EventType.OFFSEASON))
         event = Event(
             id=event_key,
             end_date=end_date,
             event_short=event_short,
-            event_type_enum=EventType.OFFSEASON,
+            event_type_enum=EventType(event_type_enum),
             district_key=None,
             venue=request.form.get("venue"),
             venue_address=request.form.get("venue_address"),
@@ -196,9 +197,10 @@ The Blue Alliance Admins\
         state = suggestion.contents["state"]
         country = suggestion.contents["country"]
         address = "{}\n{}\n{}, {}, {}".format(venue, address, city, state, country)
+        event_type = suggestion.contents.get("event_type", EventType.OFFSEASON)
         return none_throws(suggestion.key.id()), Event(
             end_date=end_date,
-            event_type_enum=EventType.OFFSEASON,
+            event_type_enum=event_type or EventType.OFFSEASON,
             district_key=None,
             venue=venue,
             city=city,

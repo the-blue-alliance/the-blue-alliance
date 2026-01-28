@@ -1,6 +1,7 @@
 from typing import List, Optional, TypedDict
 
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.models.keys import Year
 from backend.common.models.webcast import Webcast
@@ -30,6 +31,7 @@ class SuggestionDict(TypedDict, total=False):
     state: str
     country: str
     venue_name: str
+    event_type: Optional[EventType]
 
     # For apiwrite suggestions
     event_key: str

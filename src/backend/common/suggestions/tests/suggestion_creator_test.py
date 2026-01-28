@@ -484,6 +484,50 @@ class TestOffseasonEventSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(status, "validation_failure")
         self.assertTrue("end_date" in none_throws(failures))
 
+    def test_event_type_preseason(self) -> None:
+        """Events in January or February should be classified as PRESEASON"""
+        status, _ = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Preseason Event",
+            "2016-02-15",
+            "2016-02-16",
+            "http://foo.bar.com",
+            "The Venue",
+            "123 Fake Street",
+            "New York",
+            "NY",
+            "USA",
+        )
+        self.assertEqual(status, "success")
+
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertEqual(suggestion.contents["event_type"], EventType.PRESEASON)
+
+    def test_event_type_offseason(self) -> None:
+        """Events in March or later should be classified as OFFSEASON"""
+        status, _ = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Offseason Event",
+            "2016-05-15",
+            "2016-05-16",
+            "http://foo.bar.com",
+            "The Venue",
+            "123 Fake Street",
+            "New York",
+            "NY",
+            "USA",
+        )
+        self.assertEqual(status, "success")
+
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertEqual(suggestion.contents["event_type"], EventType.OFFSEASON)
+
 
 class TestApiWriteSuggestionCreator(SuggestionCreatorTest):
     def test_create_suggestion(self) -> None:

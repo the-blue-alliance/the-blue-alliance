@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from werkzeug.test import Client
 
+from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.suggestion_dict import SuggestionDict
@@ -125,4 +126,5 @@ def test_suggest_event(
         country="USA",
         venue_name="This is a Venue",
         first_code=None,
+        event_type=EventType.OFFSEASON,
     )

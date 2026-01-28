@@ -6,7 +6,7 @@ from typing import cast, Dict, List, Optional, Tuple
 from google.appengine.ext import ndb
 
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
-from backend.common.consts.event_type import SEASON_EVENT_TYPES
+from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.consts.media_type import MediaType, ROBOT_TYPES, SLUG_NAMES
 from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.suggestion_state import SuggestionState
@@ -399,6 +399,13 @@ class SuggestionCreator:
             # Be more lenient with auto-added suggestions
             return SuggestionCreationStatus.VALIDATION_FAILURE, failures
 
+        # Determine event type based on start date
+        # Preseason events are before March (January, February)
+        # Offseason events are March or later
+        event_type = EventType.OFFSEASON
+        if start_datetime and start_datetime.month < 3:
+            event_type = EventType.PRESEASON
+
         # Note that we don't typically specify an explicit key for event suggestions
         # We don't trust users to input correct event keys (that's for the moderator to do)
         suggestion = Suggestion(id=suggestion_id) if suggestion_id else Suggestion()
@@ -415,6 +422,7 @@ class SuggestionCreator:
             "state": state,
             "country": country,
             "first_code": first_code,
+            "event_type": event_type,
         }
         suggestion.put()
         return SuggestionCreationStatus.SUCCESS, None
