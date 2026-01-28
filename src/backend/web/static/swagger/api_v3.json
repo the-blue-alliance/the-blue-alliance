@@ -9326,7 +9326,7 @@
         "properties": {
           "score": {
             "type": "integer",
-            "description": "Score for this alliance. Will be null or -1 for an unplayed match."
+            "description": "Score for this alliance. Will be -1 for an unplayed match."
           },
           "team_keys": {
             "type": "array",

@@ -1965,7 +1965,7 @@ export type MatchTimeseries2018 = {
 
 export type MatchAlliance = {
   /**
-   * Score for this alliance. Will be null or -1 for an unplayed match.
+   * Score for this alliance. Will be -1 for an unplayed match.
    */
   score: number;
   team_keys: Array<string>;
