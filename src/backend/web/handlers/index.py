@@ -208,11 +208,12 @@ def avatar_list(year: Optional[Year] = None) -> Response:
 
     memcache = MemcacheClient.get()
 
+    NUM_SHARDS = 20
     avatars = []
     shards = memcache.get_multi(
-        [f"{year}avatars_{i}".encode("utf-8") for i in range(10)]
+        [f"{year}avatars_{i}".encode("utf-8") for i in range(NUM_SHARDS)]
     )
-    if len(shards) == 10:  # If missing a shard, must refetch all
+    if len(shards) == NUM_SHARDS:  # If missing a shard, must refetch all
         for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
             avatars += shard
 
@@ -225,8 +226,8 @@ def avatar_list(year: Optional[Year] = None) -> Response:
         avatars = sorted(avatars, key=lambda a: int(a.references[0].id()[3:]))
 
         shards = {}
-        size = len(avatars) / 10 + 1
-        for i in range(10):
+        size = len(avatars) / NUM_SHARDS + 1
+        for i in range(NUM_SHARDS):
             start = i * size
             end = start + size
             shards[f"{year}avatars_{i}"] = avatars[int(start) : int(end)]
