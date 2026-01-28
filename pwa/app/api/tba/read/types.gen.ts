@@ -2525,6 +2525,18 @@ export type Webcast = {
    * File identification as may be required for some types. May be null.
    */
   file?: string | null;
+  /**
+   * The online status of the webcast, fetched from the streaming provider's API. May be null if not available.
+   */
+  status?: 'unknown' | 'online' | 'offline';
+  /**
+   * The title of the stream from the streaming provider. May be null.
+   */
+  stream_title?: string | null;
+  /**
+   * The current viewer count from the streaming provider. May be null.
+   */
+  viewer_count?: number | null;
 };
 
 export type Zebra = {
