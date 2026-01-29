@@ -101,3 +101,27 @@ def test_GoogleAnalytics_track_event(run_after) -> None:
 
     expected_client_id = str(uuid.uuid3(uuid.NAMESPACE_X500, "testbed"))
     assert payload["client_id"] == expected_client_id
+
+
+def test_GoogleAnalytics_track_event_urlfetch_failure() -> None:
+    from backend.common.sitevars.google_analytics_id import GoogleAnalyticsID
+
+    sitevar = GoogleAnalyticsID._fetch_sitevar()
+    sitevar.contents["GOOGLE_ANALYTICS_ID"] = "G-ABC123DEF4"
+    sitevar.contents["API_SECRET"] = "test_secret"
+
+    mock_future = MagicMock()
+    mock_future.get_result.side_effect = Exception("urlfetch deadline exceeded")
+    mock_context = MagicMock()
+    mock_context.urlfetch.return_value = mock_future
+
+    with patch("google.appengine.ext.ndb.get_context", return_value=mock_context):
+        with patch("logging.warning") as mock_warning:
+            # Should not raise
+            GoogleAnalytics.track_event(
+                "testbed",
+                "test_event",
+                {"test_param": "test_value"},
+            )
+            mock_warning.assert_called_once()
+            assert "Failed to send GA4 event" in mock_warning.call_args[0][0]

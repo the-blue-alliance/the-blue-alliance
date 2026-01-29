@@ -54,13 +54,16 @@ class GoogleAnalytics:
                 "https://www.google-analytics.com/mp/collect"
                 f"?measurement_id={google_analytics_id}&api_secret={api_secret}"
             )
-            ndb.get_context().urlfetch(
-                url,
-                method="POST",
-                headers={"Content-Type": "application/json"},
-                payload=json.dumps(payload).encode("utf-8"),
-                deadline=10,
-            ).get_result()
+            try:
+                ndb.get_context().urlfetch(
+                    url,
+                    method="POST",
+                    headers={"Content-Type": "application/json"},
+                    payload=json.dumps(payload).encode("utf-8"),
+                    deadline=10,
+                ).get_result()
+            except Exception:
+                logging.warning("Failed to send GA4 event", exc_info=True)
 
         if run_after:
             run_after_response(make_request)
