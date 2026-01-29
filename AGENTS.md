@@ -110,4 +110,5 @@ docker-compose exec tba bash
 - The PWA (Progressive Web App) is a separate project in `pwa/` with its own AGENTS.md
 - GAE deployment via `ops/deploy/` scripts (maintainers only)
 - Production data can be seeded locally (see docs/Developing/Development-Runbook.md)
+- [tba-cli](https://github.com/the-blue-alliance/tba-cli) is a CLI tool for accessing TBA data via the API, useful when agents need to look at data from TBA
 
