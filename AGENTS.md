@@ -68,6 +68,8 @@ docker-compose exec tba bash
 ```
 
 ## Testing & Linting
+**Note**: Tests must be run inside the dev container (docker-compose or devcontainer). They will not work on the host due to missing `google.appengine` dependencies.
+
 ```bash
 # Run tests
 ./ops/test_py3.sh
