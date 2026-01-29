@@ -13,7 +13,16 @@
             <td><input type="text" name="first_code" {% if event.first_code%}value="{{ event.first_code }}{% endif %}"/></td>
             <td><p><strong>Example:</strong><br>IRI</p></td>
         </tr>
-        <tr><td>&nbsp;</td></tr>
+        <tr>
+            <td>Event Type</td>
+            <td>
+                <select name="event_type_enum">
+                    <option value="100" {% if event.event_type_enum == 100 %}selected{% endif %}>Preseason</option>
+                    <option value="99" {% if event.event_type_enum == 99 or event.event_type_enum != 100 %}selected{% endif %}>Offseason</option>
+                </select>
+            </td>
+            <td><p><strong>Preseason:</strong> Jan-Feb<br><strong>Offseason:</strong> Mar+</p></td>
+        </tr>
         <tr>
             <td>Name</td>
             <td><input type="text" name="name" {% if event.name %}value="{{ event.name }}"{% endif %}/></td>
@@ -26,17 +35,17 @@
         </tr>
         <tr>
             <td>Dates</td>
-            <td>
+            <td colspan="2">
                 <input type="text" name="start_date" {% if event.start_date %}value="{{ event.start_date.strftime("%Y-%m-%d")}}"{% endif %} placeholder="2012-04-04"/> to <input type="text" name="end_date" {% if event.end_date %}value="{{ event.end_date.strftime("%Y-%m-%d")}}" {% endif %}placeholder="2012-04-06"/>
             </td>
         </tr>
         <tr>
             <td>Website</td>
-            <td><input type="text" name="website" {% if event.website %}value="{{ event.website }}"{% endif %}/></td>
+            <td colspan="2"><input type="text" name="website" {% if event.website %}value="{{ event.website }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Year</td>
-            <td><input type="text" name="year" {% if event.year %}value="{{ event.year }}"{% endif %}/></td>
+            <td colspan="2"><input type="text" name="year" {% if event.year %}value="{{ event.year }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Event Venue</td>

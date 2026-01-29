@@ -8,6 +8,7 @@ from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
+from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
@@ -168,3 +169,121 @@ def test_reject_suggestion(
 
     event = Event.get_by_id("2016test")
     assert event is None
+
+
+def createPreseasonSuggestion(logged_in_user) -> int:
+    """Create a suggestion with a January date (should be PRESEASON)"""
+    status = SuggestionCreator.createOffseasonEventSuggestion(
+        logged_in_user.account_key,
+        "Preseason Event",
+        "2016-02-12",
+        "2016-02-13",
+        "http://foo.bar.com",
+        "Venue Name",
+        "123 Fake St",
+        "New York",
+        "NY",
+        "USA",
+    )
+    assert status[0] == SuggestionCreationStatus.SUCCESS
+    return none_throws(Suggestion.query().fetch(keys_only=True)[0].integer_id())
+
+
+def test_accept_suggestion_preseason(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
+) -> None:
+    """Verify that accepting a preseason suggestion creates a PRESEASON event"""
+    suggestion_id = createPreseasonSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+    assert form_fields != {}
+
+    form_fields["event_short"] = "pretest"
+    form_fields["event_type_enum"] = str(EventType.PRESEASON)
+    form_fields["verdict"] = "accept"
+    response = web_client.post(
+        "/suggest/offseason/review",
+        data=form_fields,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+
+    event = Event.get_by_id("2016pretest")
+    assert event is not None
+    assert event.event_type_enum == EventType.PRESEASON
+
+
+def test_accept_suggestion_default_offseason(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
+) -> None:
+    """Verify that accepting without specifying event_type defaults to OFFSEASON"""
+    suggestion_id = createSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+    assert form_fields != {}
+
+    form_fields["event_short"] = "test"
+    form_fields["verdict"] = "accept"
+    # Remove event_type_enum to test default behavior
+    form_fields.pop("event_type_enum", None)
+    response = web_client.post(
+        "/suggest/offseason/review",
+        data=form_fields,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+
+    event = Event.get_by_id("2016test")
+    assert event is not None
+    assert event.event_type_enum == EventType.OFFSEASON
+
+
+def test_accept_suggestion_override_to_offseason(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
+) -> None:
+    """Verify that admin can override a preseason suggestion to offseason"""
+    suggestion_id = createPreseasonSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+    assert form_fields != {}
+
+    form_fields["event_short"] = "overtest"
+    form_fields["event_type_enum"] = str(EventType.OFFSEASON)
+    form_fields["verdict"] = "accept"
+    response = web_client.post(
+        "/suggest/offseason/review",
+        data=form_fields,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_ACCEPTED
+
+    event = Event.get_by_id("2016overtest")
+    assert event is not None
+    assert event.event_type_enum == EventType.OFFSEASON
