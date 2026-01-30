@@ -1552,6 +1552,9 @@ export const zWebcast = z.object({
   channel: z.string(),
   date: z.optional(z.union([z.string(), z.null()])),
   file: z.optional(z.union([z.string(), z.null()])),
+  status: z.optional(z.enum(['unknown', 'online', 'offline'])),
+  stream_title: z.optional(z.union([z.string(), z.null()])),
+  viewer_count: z.optional(z.union([z.int(), z.null()])),
 });
 
 export const zEvent = z.object({
