@@ -42,7 +42,7 @@
     "@scalar/react-renderer": "0.3.0",
     "@sentry/tanstackstart-react": "10.38.0",
     "@tanstack/react-query": "5.90.20",
-    "@tanstack/react-query-devtools": "5.91.2",
+    "@tanstack/react-query-devtools": "5.91.3",
     "@tanstack/react-router": "1.157.16",
     "@tanstack/react-router-devtools": "1.157.16",
     "@tanstack/react-router-ssr-query": "1.157.16",
