@@ -72,7 +72,7 @@ fi
 # Setup Firebase auth emulator
 if [ -z "$auth_use_prod" ]; then
     echo "Running with Firebase auth emulator"
-    firebase_auth_host="${FIREBASE_AUTH_EMULATOR_HOST:-firebase:9099}"
+    firebase_auth_host="${FIREBASE_AUTH_EMULATOR_HOST:-$(get_config_prop firebase_auth_emulator_host)}"
     env+=("--env_var=FIREBASE_AUTH_EMULATOR_HOST=$firebase_auth_host")
 else
     echo "Using upstream authentication accounts"
@@ -82,7 +82,7 @@ fi
 # Setup Firebase realtime db emulator
 if [ -z "$firebase_db_use_prod" ]; then
     echo "Running with Firebase realtime db emulator"
-    firebase_db_host="${FIREBASE_DATABASE_EMULATOR_HOST:-firebase:9000}"
+    firebase_db_host="${FIREBASE_DATABASE_EMULATOR_HOST:-$(get_config_prop firebase_database_emulator_host)}"
     env+=("--env_var=FIREBASE_DATABASE_EMULATOR_HOST=$firebase_db_host")
 else
     echo "Using upstream authentication accounts"
