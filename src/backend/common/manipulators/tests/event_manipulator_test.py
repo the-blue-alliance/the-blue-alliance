@@ -106,6 +106,35 @@ def test_updateWebcast_noUnion(old_event: Event, new_event: Event) -> None:
 
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
+def test_clear_first_code() -> None:
+    event_with_code = Event(
+        id="2011ct",
+        end_date=datetime.datetime(2011, 4, 2, 0, 0),
+        event_short="ct",
+        event_type_enum=EventType.REGIONAL,
+        first_code="my_code",
+        name="Test Event",
+        start_date=datetime.datetime(2011, 3, 31, 0, 0),
+        year=2011,
+    )
+    EventManipulator.createOrUpdate(event_with_code)
+    assert none_throws(Event.get_by_id("2011ct")).first_code == "my_code"
+
+    event_without_code = Event(
+        id="2011ct",
+        end_date=datetime.datetime(2011, 4, 2, 0, 0),
+        event_short="ct",
+        event_type_enum=EventType.REGIONAL,
+        first_code=None,
+        name="Test Event",
+        start_date=datetime.datetime(2011, 3, 31, 0, 0),
+        year=2011,
+    )
+    EventManipulator.createOrUpdate(event_without_code, auto_union=False)
+    assert none_throws(Event.get_by_id("2011ct")).first_code is None
+
+
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 @pytest.mark.parametrize("official", [True, False])
 @patch.object(LocationHelper, "get_timezone_id")
 @patch.object(LocationHelper, "get_event_location")
