@@ -281,6 +281,73 @@ class TestMediaUrlParser(unittest.TestCase):
             self.assertIsNone(result)
 
 
+class TestOnshapeParser(unittest.TestCase):
+    ONSHAPE_URL = "https://cad.onshape.com/documents/5481081f48161555332968ff/w/a466cec29af372ec09c44333/e/abc123"
+
+    def test_onshape_api_non_200(self) -> None:
+        mock_response = Mock()
+        mock_response.status_code = 404
+
+        with patch(
+            "backend.common.suggestions.media_parser.requests.get",
+            return_value=mock_response,
+        ):
+            result = MediaParser.partial_media_dict_from_url(self.ONSHAPE_URL)
+            self.assertIsNone(result)
+
+    def test_onshape_api_empty_response(self) -> None:
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.content = b"{}"
+
+        with patch(
+            "backend.common.suggestions.media_parser.requests.get",
+            return_value=mock_response,
+        ):
+            result = MediaParser.partial_media_dict_from_url(self.ONSHAPE_URL)
+            self.assertIsNone(result)
+
+    def test_onshape_api_missing_fields(self) -> None:
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.content = json.dumps({"id": "abc"}).encode()
+
+        with patch(
+            "backend.common.suggestions.media_parser.requests.get",
+            return_value=mock_response,
+        ):
+            result = MediaParser.partial_media_dict_from_url(self.ONSHAPE_URL)
+            self.assertIsNotNone(result)
+            details = json.loads(result["details_json"])
+            self.assertEqual(details["model_name"], "")
+            self.assertEqual(details["model_description"], "")
+            self.assertEqual(details["model_created"], "")
+
+    def test_onshape_api_success(self) -> None:
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.content = json.dumps(
+            {
+                "name": "Test Model",
+                "description": "A test CAD model",
+                "createdAt": "2024-01-01T00:00:00Z",
+            }
+        ).encode()
+
+        with patch(
+            "backend.common.suggestions.media_parser.requests.get",
+            return_value=mock_response,
+        ):
+            result = MediaParser.partial_media_dict_from_url(self.ONSHAPE_URL)
+            self.assertIsNotNone(result)
+            self.assertEqual(result["media_type_enum"], MediaType.ONSHAPE)
+            details = json.loads(result["details_json"])
+            self.assertEqual(details["model_name"], "Test Model")
+            self.assertEqual(details["model_description"], "A test CAD model")
+            self.assertEqual(details["model_created"], "2024-01-01T00:00:00Z")
+            self.assertIn("model_image", details)
+
+
 class TestWebcastUrlParser(unittest.TestCase):
     def testTwitchUrl(self) -> None:
         res = WebcastParser.webcast_dict_from_url("http://twitch.tv/frcgamesense")
