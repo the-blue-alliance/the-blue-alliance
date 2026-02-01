@@ -170,6 +170,7 @@ class Event(CachedModel):
 
     _allow_none_attrs: Set[str] = {
         "district_key",
+        "first_code",
     }
 
     _list_attrs: Set[str] = {
