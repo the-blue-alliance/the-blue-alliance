@@ -157,7 +157,15 @@ def login() -> Response:
         if current_user():
             return redirect(url_for("account.overview"))
 
-        auth_emulator_host = Environment.auth_emulator_host()
+        # The backend uses a Docker-internal hostname (e.g. firebase:9099)
+        # but the browser needs localhost since it runs on the host machine.
+        # In prod, auth_emulator_host() returns None and this is a no-op.
+        backend_host = Environment.auth_emulator_host()
+        if backend_host:
+            port = backend_host.split(":")[-1]
+            auth_emulator_host = f"localhost:{port}"
+        else:
+            auth_emulator_host = None
         return make_response(
             render_template(
                 "account_login_required.html",
