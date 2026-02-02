@@ -60,17 +60,19 @@
         return comps;
     }
 
-    // Set visibility for a column (header + all cells)
+    // Set column visibility (manual approach for old tablesorter)
     function setColumnVisibility(key, visible) {
-        const cls = colClass(key);
-        const table = document.getElementById('coprTable');
-        if (!table) return;
-        // header
-        const th = table.querySelector('thead th.' + cls);
-        if (th) th.style.display = visible ? '' : 'none';
-        // cells
-        table.querySelectorAll('tbody td.' + cls).forEach(td => {
-            td.style.display = visible ? '' : 'none';
+        const displayVal = visible ? '' : 'none';
+        const className = colClass(key);
+        
+        // Hide/show header cells with this class
+        document.querySelectorAll(`#coprTable thead th.${className}`).forEach(el => {
+            el.style.display = displayVal;
+        });
+        
+        // Hide/show body cells with this class
+        document.querySelectorAll(`#coprTable tbody td.${className}`).forEach(el => {
+            el.style.display = displayVal;
         });
     }
 
@@ -84,11 +86,13 @@
         const thRank = document.createElement('th');
         thRank.innerText = '#';
         thRank.classList.add(colClass('rank'));
+        thRank.setAttribute('data-column', 'rank');
         theadRow.appendChild(thRank);
 
         const thTeam = document.createElement('th');
         thTeam.innerText = 'Team';
         thTeam.classList.add(colClass('team'));
+        thTeam.setAttribute('data-column', 'team');
         theadRow.appendChild(thTeam);
 
         allComponents.forEach(comp => {
@@ -96,6 +100,7 @@
             th.innerHTML = `<abbr title="Component Offensive Power Rating">${comp.readable}</abbr>`;
             th.classList.add(colClass(comp.key));
             th.setAttribute('data-key', comp.key);
+            th.setAttribute('data-column', comp.key);
             theadRow.appendChild(th);
         });
 
@@ -140,21 +145,9 @@
 
             tbody.appendChild(tr);
         });
-
-        // Re-init tablesorter after table is rebuilt
-        $('#coprTable').trigger('updateAll');
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        // Initialize tablesorter on the COPR table
-        $("#coprTable").tablesorter({
-            theme: 'bootstrap',
-            headerTemplate: '{content}',
-            sortList: [[0,0]], // default sort by rank asc
-            widgets: ['zebra'],
-            // Let tablesorter auto-detect column types; we'll call updateAll after rebuilding headers
-        });
-
         // Initialize: wire up checkboxes and derive initial selection from current DOM state
         const checkboxNodes = document.querySelectorAll('.copr-select');
 
@@ -188,11 +181,20 @@
         // Build table with all components once
         buildCoprTable(allComponents, primaryKey);
 
-        // Apply visibility for each component according to checkbox state
-        checkboxNodes.forEach(node => {
-            const k = node.getAttribute('data-key');
-            const cb = node.querySelector('input[type=checkbox]');
-            setColumnVisibility(k, !!(cb && cb.checked));
+        // Apply initial visibility for each component according to checkbox state
+        allComponents.forEach(comp => {
+            const node = document.querySelector(`.copr-select[data-key="${comp.key}"]`);
+            const cb = node ? node.querySelector('input[type=checkbox]') : null;
+            const visible = !!(cb && cb.checked);
+            setColumnVisibility(comp.key, visible);
+        });
+
+        // Initialize tablesorter AFTER table is built AND visibility is set
+        $("#coprTable").tablesorter({
+            theme: 'bootstrap',
+            headerTemplate: '{content}',
+            sortList: [[0,0]], // default sort by rank asc
+            widgets: ['zebra']
         });
 
         // Update selector text helper
@@ -210,92 +212,97 @@
             else el.innerText = selected.map(c => c.readable).join(', ');
         }
 
-        // Checkbox change handler: toggle visibility, update selector text, and notify tablesorter
+        // Initial selector text
+        updateSelectorTextFromCheckboxes();
+
+        // Checkbox change handler: toggle column visibility manually
         checkboxNodes.forEach(node => {
             const input = node.querySelector('input[type=checkbox]');
             if (!input) return;
             input.addEventListener('change', function(e) {
                 const k = node.getAttribute('data-key');
-                setColumnVisibility(k, !!input.checked);
-                // Let tablesorter recalc parsers after visibility change
-                $('#coprTable').trigger('updateAll');
+                const visible = !!input.checked;
+                setColumnVisibility(k, visible);
                 updateSelectorTextFromCheckboxes();
+                // Trigger tablesorter update after visibility change
+                $("#coprTable").trigger("update");
             });
         });
 
-            // CSV download handler: export current table view
-            const csvBtn = document.getElementById('copr_csv');
-            if (csvBtn) {
-                csvBtn.addEventListener('click', function() {
-                    const table = document.getElementById('coprTable');
-                    if (!table) return;
-                    const rows = [];
+        // CSV download handler: export current table view
+        const csvBtn = document.getElementById('copr_csv');
+        if (csvBtn) {
+            csvBtn.addEventListener('click', function() {
+                const table = document.getElementById('coprTable');
+                if (!table) return;
+                const rows = [];
 
-                    // Determine visible header columns and their indices
-                    const headerThs = Array.from(table.querySelectorAll('thead th'));
-                    const visibleIndices = [];
-                    const headers = [];
-                    headerThs.forEach((th, idx) => {
-                        const style = window.getComputedStyle(th);
-                        if (style && style.display === 'none') return;
-                        visibleIndices.push(idx);
-                        headers.push(th.innerText.replace(/▲|▼/g, '').trim());
-                    });
-                    rows.push(headers);
-
-                    // Body: only include visible columns
-                    const bodyRows = Array.from(table.querySelectorAll('tbody tr'));
-                    bodyRows.forEach(tr => {
-                        const cells = Array.from(tr.children).filter((td, idx) => visibleIndices.indexOf(idx) !== -1).map(td => td.innerText.replace(/\n/g, ' ').trim());
-                        rows.push(cells);
-                    });
-
-                    // Convert to CSV with proper escaping
-                    const csvLines = rows.map(cols => cols.map(val => {
-                        if (val == null) return '';
-                        const s = String(val);
-                        // escape double quotes
-                        const escaped = s.replace(/"/g, '""');
-                        // wrap in quotes if contains comma, quote, or newline
-                        if (/[",\n]/.test(s)) {
-                            return '"' + escaped + '"';
-                        }
-                        return escaped;
-                    }).join(','));
-
-                    // Prepend BOM for Excel compatibility
-                    const bom = '\uFEFF';
-                    const csvContent = bom + csvLines.join('\n');
-                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    const filename = `team_stats_{{ event.key_name }}.csv`;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    URL.revokeObjectURL(url);
+                // Determine visible header columns and their indices
+                const headerThs = Array.from(table.querySelectorAll('thead th'));
+                const visibleIndices = [];
+                const headers = [];
+                headerThs.forEach((th, idx) => {
+                    const style = window.getComputedStyle(th);
+                    if (style && style.display === 'none') return;
+                    visibleIndices.push(idx);
+                    headers.push(th.innerText.replace(/▲|▼/g, '').trim());
                 });
-            }
+                rows.push(headers);
+
+                // Body: only include visible columns
+                const bodyRows = Array.from(table.querySelectorAll('tbody tr'));
+                bodyRows.forEach(tr => {
+                    const cells = Array.from(tr.children).filter((td, idx) => visibleIndices.indexOf(idx) !== -1).map(td => td.innerText.replace(/\n/g, ' ').trim());
+                    rows.push(cells);
+                });
+
+                // Convert to CSV with proper escaping
+                const csvLines = rows.map(cols => cols.map(val => {
+                    if (val == null) return '';
+                    const s = String(val);
+                    // escape double quotes
+                    const escaped = s.replace(/"/g, '""');
+                    // wrap in quotes if contains comma, quote, or newline
+                    if (/[",\n]/.test(s)) {
+                        return '"' + escaped + '"';
+                    }
+                    return escaped;
+                }).join(','));
+
+                // Prepend BOM for Excel compatibility
+                const bom = '\uFEFF';
+                const csvContent = bom + csvLines.join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const filename = `team_stats_{{ event.key_name }}.csv`;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            });
+        }
 
         // Clear handler: reset to only OPR selected
         const clearEl = document.getElementById('copr_clear');
         if (clearEl) {
             clearEl.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Uncheck everything except OPR
+                // Uncheck everything except OPR and update visibility
                 document.querySelectorAll('.copr-select').forEach(n => {
                     const k = n.getAttribute('data-key');
                     const icb = n.querySelector('input[type=checkbox]');
                     if (icb) {
-                        icb.checked = (k === 'OPR');
-                        setColumnVisibility(k, (k === 'OPR'));
+                        const shouldBeChecked = (k === 'OPR');
+                        icb.checked = shouldBeChecked;
+                        setColumnVisibility(k, shouldBeChecked);
                     }
                 });
-                // Recalculate tablesorter and selector text
-                $('#coprTable').trigger('updateAll');
                 updateSelectorTextFromCheckboxes();
+                // Trigger tablesorter update after visibility changes
+                $("#coprTable").trigger("update");
             });
         }
     });
