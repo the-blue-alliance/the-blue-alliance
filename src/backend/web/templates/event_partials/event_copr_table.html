@@ -23,7 +23,7 @@
     <button type="button" class="btn btn-default pull-right" id="copr_csv" style="margin-left:8px;">Download CSV</button>
 </div>
 
-<table class="table table-condensed table-striped table-center table-hover" style="table-layout: fixed;">
+<table id="coprTable" class="table table-condensed table-striped table-center table-hover" style="table-layout: fixed;">
     <thead>
         <tr>
             <th>#</th>
@@ -38,113 +38,86 @@
 <script>
     const coprs = JSON.parse('{{ coprs_json|safe }}');
 
-    // Sorting state: index (column index), dir (1 = asc, -1 = desc)
-    let sortState = { index: null, dir: 1 };
-
-    function clearSortIndicators() {
-        document.querySelectorAll('#coprTableBody').forEach(() => {}); // noop to keep consistent selection usage
-        const ths = document.querySelectorAll('table thead tr th');
-        ths.forEach(t => {
-            const ind = t.querySelector('.sort-indicator');
-            if (ind) ind.remove();
-        });
-    }
-
-    function setSortIndicator(th, dir) {
-        // remove existing indicators first
-        clearSortIndicators();
-        const span = document.createElement('span');
-        span.className = 'sort-indicator';
-        span.style.marginLeft = '6px';
-        span.innerText = dir === 1 ? '▲' : '▼';
-        th.appendChild(span);
-    }
-
-    function getCellValueForSort(cell, type) {
-        if (!cell) return null;
-        const txt = cell.innerText.trim();
-        if (type === 'number') {
-            const n = parseFloat(txt.replace(',', ''));
-            return Number.isFinite(n) ? n : NaN;
-        }
-        // default: string
-        return txt.toLowerCase();
-    }
-
-    function sortTableRows(tbody, colIndex, type, dir) {
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.sort((a, b) => {
-            const aCell = a.children[colIndex];
-            const bCell = b.children[colIndex];
-            const aVal = getCellValueForSort(aCell, type);
-            const bVal = getCellValueForSort(bCell, type);
-
-            // Handle NaN for numeric by pushing to bottom
-            if (type === 'number') {
-                const aNaN = Number.isNaN(aVal);
-                const bNaN = Number.isNaN(bVal);
-                if (aNaN && bNaN) return 0;
-                if (aNaN) return 1;
-                if (bNaN) return -1;
-            }
-
-            if (aVal < bVal) return -1 * dir;
-            if (aVal > bVal) return 1 * dir;
-            return 0;
-        });
-
-        // Re-append in sorted order
-        rows.forEach(r => tbody.appendChild(r));
-    }
-
     // Helper: return teams in the order of the primary component (first selected)
     function getPrimaryTeamList(primaryComponent) {
         if (!coprs[primaryComponent]) return [];
         return coprs[primaryComponent].map(e => e[0]);
     }
 
-    function buildCoprTable(selectedComponents) {
+    // Normalize a key into a safe column class
+    function colClass(key) {
+        return 'copr-col-' + String(key).replace(/[^a-zA-Z0-9_-]/g, '_');
+    }
+
+    // Get all components from the DOM (preserves dropdown ordering & readable names)
+    function getAllComponentsFromDOM() {
+        const comps = [];
+        document.querySelectorAll('.copr-select').forEach(n => {
+            const k = n.getAttribute('data-key');
+            const r = n.getAttribute('data-name');
+            comps.push({ key: k, readable: r });
+        });
+        return comps;
+    }
+
+    // Set visibility for a column (header + all cells)
+    function setColumnVisibility(key, visible) {
+        const cls = colClass(key);
+        const table = document.getElementById('coprTable');
+        if (!table) return;
+        // header
+        const th = table.querySelector('thead th.' + cls);
+        if (th) th.style.display = visible ? '' : 'none';
+        // cells
+        table.querySelectorAll('tbody td.' + cls).forEach(td => {
+            td.style.display = visible ? '' : 'none';
+        });
+    }
+
+    // Build the table with ALL components (we will hide/show based on checkboxes)
+    function buildCoprTable(allComponents, primaryKey) {
         const theadRow = document.querySelector('#coprTableBody').parentElement.querySelector('thead tr');
         const tbody = document.getElementById('coprTableBody');
 
-        // Build header: fixed columns + one per selected component
+        // Build header: fixed columns + one per component
         theadRow.innerHTML = '';
         const thRank = document.createElement('th');
         thRank.innerText = '#';
+        thRank.classList.add(colClass('rank'));
         theadRow.appendChild(thRank);
 
         const thTeam = document.createElement('th');
         thTeam.innerText = 'Team';
+        thTeam.classList.add(colClass('team'));
         theadRow.appendChild(thTeam);
 
-        selectedComponents.forEach(comp => {
+        allComponents.forEach(comp => {
             const th = document.createElement('th');
             th.innerHTML = `<abbr title="Component Offensive Power Rating">${comp.readable}</abbr>`;
-            // mark component columns as sortable (type=number)
-            th.setAttribute('data-sort-type', 'number');
+            th.classList.add(colClass(comp.key));
+            th.setAttribute('data-key', comp.key);
             theadRow.appendChild(th);
         });
 
         // Build body
         tbody.innerHTML = '';
-        if (selectedComponents.length === 0) {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 2;
-            td.innerText = 'No components selected';
-            tr.appendChild(td);
-            tbody.appendChild(tr);
-            return;
+
+        // Choose primary key ordering
+        let orderKey = primaryKey;
+        if (!orderKey || !coprs[orderKey]) {
+            // prefer OPR if available
+            if (coprs.OPR) orderKey = 'OPR';
+            else orderKey = allComponents.length ? allComponents[0].key : null;
         }
 
-        const primaryKey = selectedComponents[0].key;
-        const teams = getPrimaryTeamList(primaryKey);
+        const teams = orderKey ? getPrimaryTeamList(orderKey) : [];
 
         teams.forEach((teamId, idx) => {
             const tr = document.createElement('tr');
 
             const rankTd = document.createElement('td');
             rankTd.innerText = idx + 1;
+            rankTd.classList.add(colClass('rank'));
             tr.appendChild(rankTd);
 
             const teamLink = document.createElement('a');
@@ -152,11 +125,13 @@
             teamLink.innerText = teamId;
             const teamTd = document.createElement('td');
             teamTd.appendChild(teamLink);
+            teamTd.classList.add(colClass('team'));
             tr.appendChild(teamTd);
 
-            // For each selected component, find value for this team
-            selectedComponents.forEach(comp => {
+            // For each component, add value cell (may be hidden later)
+            allComponents.forEach(comp => {
                 const coprTd = document.createElement('td');
+                coprTd.classList.add(colClass(comp.key));
                 const list = coprs[comp.key] || [];
                 const found = list.find(e => e[0] === teamId);
                 coprTd.innerText = found ? found[1].toFixed(2) : '-';
@@ -166,61 +141,25 @@
             tbody.appendChild(tr);
         });
 
-        // After building header/body, attach sorting handlers to headers.
-        const ths = theadRow.querySelectorAll('th');
-        ths.forEach((th, idx) => {
-            // determine column type: rank (number), team (string), others (number)
-            let type = th.getAttribute('data-sort-type');
-            if (!type) {
-                if (idx === 0) type = 'number';
-                else if (idx === 1) type = 'string';
-                else type = 'number';
-            }
-            th.style.cursor = 'pointer';
-            th.addEventListener('click', function() {
-                // toggle sort
-                if (sortState.index === idx) {
-                    sortState.dir = -sortState.dir;
-                } else {
-                    sortState.index = idx;
-                    sortState.dir = 1;
-                }
-                setSortIndicator(th, sortState.dir);
-                sortTableRows(tbody, idx, type, sortState.dir);
-            });
-        });
+        // Re-init tablesorter after table is rebuilt
+        $('#coprTable').trigger('updateAll');
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+        // Initialize tablesorter on the COPR table
+        $("#coprTable").tablesorter({
+            theme: 'bootstrap',
+            headerTemplate: '{content}',
+            sortList: [[0,0]], // default sort by rank asc
+            widgets: ['zebra'],
+            // Let tablesorter auto-detect column types; we'll call updateAll after rebuilding headers
+        });
+
         // Initialize: wire up checkboxes and derive initial selection from current DOM state
         const checkboxNodes = document.querySelectorAll('.copr-select');
-        // Helper to compute and apply selection state
-        function handleSelectionChange() {
-            const newSelected = [];
-            document.querySelectorAll('.copr-select').forEach(n => {
-                const c = n.getAttribute('data-key');
-                const r = n.getAttribute('data-name');
-                const icb = n.querySelector('input[type=checkbox]');
-                if (icb && icb.checked) {
-                    newSelected.push({ key: c, readable: r });
-                }
-            });
-            buildCoprTable(newSelected);
-        }
 
-        checkboxNodes.forEach(node => {
-            const key = node.getAttribute('data-key');
-            const name = node.getAttribute('data-name');
-            const input = node.querySelector('input[type=checkbox]');
-
-            // Respond to direct checkbox interactions. Rely on change events for accessibility and simplicity.
-            if (input) {
-                input.addEventListener('change', function(e) {
-                    e.stopPropagation();
-                    handleSelectionChange();
-                });
-            }
-        });
+        // Derive all components (DOM order)
+        const allComponents = getAllComponentsFromDOM();
 
         // Compute initial selected components from current checkbox states (honor server-rendered checked attrs)
         const initialSelected = [];
@@ -243,28 +182,71 @@
             }
         }
 
-        buildCoprTable(initialSelected);
+        // Choose primary key for ordering
+        const primaryKey = initialSelected.length ? initialSelected[0].key : (allComponents.length ? allComponents[0].key : null);
+
+        // Build table with all components once
+        buildCoprTable(allComponents, primaryKey);
+
+        // Apply visibility for each component according to checkbox state
+        checkboxNodes.forEach(node => {
+            const k = node.getAttribute('data-key');
+            const cb = node.querySelector('input[type=checkbox]');
+            setColumnVisibility(k, !!(cb && cb.checked));
+        });
+
+        // Update selector text helper
+        function updateSelectorTextFromCheckboxes() {
+            const selected = [];
+            document.querySelectorAll('.copr-select').forEach(n => {
+                const c = n.getAttribute('data-key');
+                const r = n.getAttribute('data-name');
+                const icb = n.querySelector('input[type=checkbox]');
+                if (icb && icb.checked) selected.push({ key: c, readable: r });
+            });
+            const el = document.getElementById('coprSelector');
+            if (!el) return;
+            if (selected.length === 0) el.innerText = 'Choose component(s)';
+            else el.innerText = selected.map(c => c.readable).join(', ');
+        }
+
+        // Checkbox change handler: toggle visibility, update selector text, and notify tablesorter
+        checkboxNodes.forEach(node => {
+            const input = node.querySelector('input[type=checkbox]');
+            if (!input) return;
+            input.addEventListener('change', function(e) {
+                const k = node.getAttribute('data-key');
+                setColumnVisibility(k, !!input.checked);
+                // Let tablesorter recalc parsers after visibility change
+                $('#coprTable').trigger('updateAll');
+                updateSelectorTextFromCheckboxes();
+            });
+        });
 
             // CSV download handler: export current table view
             const csvBtn = document.getElementById('copr_csv');
             if (csvBtn) {
                 csvBtn.addEventListener('click', function() {
-                    const table = document.querySelector('table');
+                    const table = document.getElementById('coprTable');
                     if (!table) return;
                     const rows = [];
 
-                    // Headers
+                    // Determine visible header columns and their indices
                     const headerThs = Array.from(table.querySelectorAll('thead th'));
-                    const headers = headerThs.map(th => {
-                        // remove sort indicator arrows
-                        return th.innerText.replace(/▲|▼/g, '').trim();
+                    const visibleIndices = [];
+                    const headers = [];
+                    headerThs.forEach((th, idx) => {
+                        const style = window.getComputedStyle(th);
+                        if (style && style.display === 'none') return;
+                        visibleIndices.push(idx);
+                        headers.push(th.innerText.replace(/▲|▼/g, '').trim());
                     });
                     rows.push(headers);
 
-                    // Body
+                    // Body: only include visible columns
                     const bodyRows = Array.from(table.querySelectorAll('tbody tr'));
                     bodyRows.forEach(tr => {
-                        const cells = Array.from(tr.children).map(td => td.innerText.replace(/\n/g, ' ').trim());
+                        const cells = Array.from(tr.children).filter((td, idx) => visibleIndices.indexOf(idx) !== -1).map(td => td.innerText.replace(/\n/g, ' ').trim());
                         rows.push(cells);
                     });
 
@@ -308,10 +290,12 @@
                     const icb = n.querySelector('input[type=checkbox]');
                     if (icb) {
                         icb.checked = (k === 'OPR');
+                        setColumnVisibility(k, (k === 'OPR'));
                     }
                 });
-                // Apply change
-                handleSelectionChange();
+                // Recalculate tablesorter and selector text
+                $('#coprTable').trigger('updateAll');
+                updateSelectorTextFromCheckboxes();
             });
         }
     });
