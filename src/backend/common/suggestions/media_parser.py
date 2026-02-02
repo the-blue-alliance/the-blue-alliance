@@ -245,17 +245,21 @@ class MediaParser:
 
         if urlfetch_result.status_code != 200:
             logging.warning("Unable to retreive url: {}".format(url))
+            return None
 
         onshape_data = json.loads(urlfetch_result.content)
+        if not onshape_data:
+            return None
+
         image_url_base = "https://cad.onshape.com/api/thumbnails/d/{}/s/{}"
         image_url = image_url_base.format(media_dict["foreign_key"], "300x300")
 
         media_dict["details_json"] = json.dumps(
             {
-                "model_name": onshape_data["name"],
-                "model_description": onshape_data["description"],
+                "model_name": onshape_data.get("name", ""),
+                "model_description": onshape_data.get("description", ""),
                 "model_image": image_url,
-                "model_created": onshape_data["createdAt"],
+                "model_created": onshape_data.get("createdAt", ""),
             }
         )
         return media_dict
