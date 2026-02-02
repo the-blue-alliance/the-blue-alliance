@@ -4,7 +4,7 @@ from typing import Dict, List, NewType, Optional
 from google.appengine.ext import ndb
 
 from backend.common.consts.api_version import ApiMajorVersion
-from backend.common.consts.media_type import SLUG_NAME_TO_TYPE
+from backend.common.consts.media_type import PROFILE_URLS, SLUG_NAME_TO_TYPE
 from backend.common.models.keys import TeamKey
 from backend.common.models.media import Media
 from backend.common.models.team import Team
@@ -15,7 +15,7 @@ MediaDict = NewType("MediaDict", Dict)
 
 class MediaConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 6,
+        ApiMajorVersion.API_V3: 7,
     }
 
     @classmethod
@@ -47,6 +47,12 @@ class MediaConverter(ConverterBase):
                 media.foreign_key
             )
             dict["view_url"] = media.youtube_url_link
+        elif media.media_type_enum in PROFILE_URLS:
+            profile_url = PROFILE_URLS[media.media_type_enum].format(
+                media.foreign_key
+            )
+            dict["direct_url"] = profile_url
+            dict["view_url"] = profile_url
         else:
             dict["direct_url"] = media.image_direct_url
             dict["view_url"] = media.view_image_url
