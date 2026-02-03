@@ -23,7 +23,8 @@
     <button type="button" class="btn btn-default pull-right" id="copr_csv" style="margin-left:8px;">Download CSV</button>
 </div>
 
-<table id="coprTable" class="table table-condensed table-striped table-center table-hover" style="table-layout: fixed;">
+<div style="overflow-x: auto;">
+<table id="coprTable" class="table table-condensed table-striped table-center table-hover">
     <thead>
         <tr>
             <th>#</th>
@@ -34,6 +35,7 @@
     <tbody id="coprTableBody">
     </tbody>
 </table>
+</div>
 
 <script>
     const coprs = JSON.parse('{{ coprs_json|safe }}');
@@ -83,12 +85,6 @@
 
         // Build header: fixed columns + one per component
         theadRow.innerHTML = '';
-        const thRank = document.createElement('th');
-        thRank.innerText = '#';
-        thRank.classList.add(colClass('rank'));
-        thRank.setAttribute('data-column', 'rank');
-        theadRow.appendChild(thRank);
-
         const thTeam = document.createElement('th');
         thTeam.innerText = 'Team';
         thTeam.classList.add(colClass('team'));
@@ -119,11 +115,6 @@
 
         teams.forEach((teamId, idx) => {
             const tr = document.createElement('tr');
-
-            const rankTd = document.createElement('td');
-            rankTd.innerText = idx + 1;
-            rankTd.classList.add(colClass('rank'));
-            tr.appendChild(rankTd);
 
             const teamLink = document.createElement('a');
             teamLink.href = `/team/${teamId}/{{ event.year }}`;
@@ -197,24 +188,6 @@
             widgets: ['zebra']
         });
 
-        // Update selector text helper
-        function updateSelectorTextFromCheckboxes() {
-            const selected = [];
-            document.querySelectorAll('.copr-select').forEach(n => {
-                const c = n.getAttribute('data-key');
-                const r = n.getAttribute('data-name');
-                const icb = n.querySelector('input[type=checkbox]');
-                if (icb && icb.checked) selected.push({ key: c, readable: r });
-            });
-            const el = document.getElementById('coprSelector');
-            if (!el) return;
-            if (selected.length === 0) el.innerText = 'Choose component(s)';
-            else el.innerText = selected.map(c => c.readable).join(', ');
-        }
-
-        // Initial selector text
-        updateSelectorTextFromCheckboxes();
-
         // Checkbox change handler: toggle column visibility manually
         checkboxNodes.forEach(node => {
             const input = node.querySelector('input[type=checkbox]');
@@ -223,7 +196,6 @@
                 const k = node.getAttribute('data-key');
                 const visible = !!input.checked;
                 setColumnVisibility(k, visible);
-                updateSelectorTextFromCheckboxes();
                 // Trigger tablesorter update after visibility change
                 $("#coprTable").trigger("update");
             });
@@ -300,7 +272,6 @@
                         setColumnVisibility(k, shouldBeChecked);
                     }
                 });
-                updateSelectorTextFromCheckboxes();
                 // Trigger tablesorter update after visibility changes
                 $("#coprTable").trigger("update");
             });
