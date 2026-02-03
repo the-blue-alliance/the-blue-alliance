@@ -26,6 +26,7 @@ function update_countdown() {
   }
 
   $('.countdown-days').text(days);
+  $('.day-label').text(days === 1 ? ' Day ' : ' Days ');
   $('.countdown-hours').text(hours);
   $('.countdown-minutes').text(minutes);
   $('.countdown-seconds').text(seconds);
