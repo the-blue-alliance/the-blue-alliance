@@ -1,0 +1,31 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SportsTeam",
+  "@id": "https://www.thebluealliance.com/team/{{ team.team_number }}",
+  "name": "{% if team.nickname %}{{ team.nickname }}{% else %}Team {{ team.team_number }}{% endif %}",
+  "alternateName": "FRC Team {{ team.team_number }}",
+  "sport": "Robotics",
+  {% if team.rookie_year %}"foundingDate": "{{ team.rookie_year }}",{% endif %}
+  {% if team.city or team.state_prov or team.country %}
+  "location": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress"
+      {% if team.city %}, "addressLocality": "{{ team.city }}"{% endif %}
+      {% if team.state_prov %}, "addressRegion": "{{ team.state_prov }}"{% endif %}
+      {% if team.country %}, "addressCountry": "{{ team.country }}"{% endif %}
+    }
+  },
+  {% endif %}
+  "memberOf": {
+    "@type": "SportsOrganization",
+    "name": "FIRST",
+    "url": "https://www.firstinspires.org"
+  },
+  {% if team.website %}"url": "{{ team.website }}",{% endif %}
+  "sameAs": [
+    "https://frc-events.firstinspires.org/team/{{ team.team_number }}"
+  ]
+}
+</script>

@@ -1,3 +1,6 @@
+import json
+
+from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from werkzeug.test import Client
 
@@ -138,3 +141,79 @@ def test_team_participation_event_details(web_client: Client, ndb_stub) -> None:
     assert resp.status_code == 200
     event_info = helpers.get_team_event_participation(resp.data, "2020test")
     assert event_info.event_name == "Test Event"
+
+
+def test_schema_org_sports_team(web_client: Client, ndb_stub) -> None:
+    """Test that team pages include schema.org SportsTeam JSON-LD markup."""
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    # Find the JSON-LD script tag
+    schema_scripts = soup.find_all("script", {"type": "application/ld+json"})
+    assert len(schema_scripts) >= 1
+
+    # Find the SportsTeam schema
+    sports_team_schema = None
+    for script in schema_scripts:
+        data = json.loads(script.string)
+        if data.get("@type") == "SportsTeam":
+            sports_team_schema = data
+            break
+
+    assert sports_team_schema is not None
+    assert sports_team_schema["@context"] == "https://schema.org"
+    assert sports_team_schema["@type"] == "SportsTeam"
+    assert sports_team_schema["@id"] == "https://www.thebluealliance.com/team/254"
+    assert sports_team_schema["name"] == "The 254 Team"
+    assert sports_team_schema["alternateName"] == "FRC Team 254"
+    assert sports_team_schema["sport"] == "Robotics"
+    assert sports_team_schema["foundingDate"] == "2008"
+
+    # Check location
+    assert "location" in sports_team_schema
+    assert sports_team_schema["location"]["@type"] == "Place"
+    assert sports_team_schema["location"]["address"]["@type"] == "PostalAddress"
+    assert sports_team_schema["location"]["address"]["addressLocality"] == "New York"
+    assert sports_team_schema["location"]["address"]["addressRegion"] == "NY"
+    assert sports_team_schema["location"]["address"]["addressCountry"] == "USA"
+
+    # Check memberOf
+    assert sports_team_schema["memberOf"]["@type"] == "SportsOrganization"
+    assert sports_team_schema["memberOf"]["name"] == "FIRST"
+    assert sports_team_schema["memberOf"]["url"] == "https://www.firstinspires.org"
+
+    # Check sameAs
+    assert "https://frc-events.firstinspires.org/team/254" in sports_team_schema["sameAs"]
+
+    # Check website
+    assert sports_team_schema["url"] == "https://www.thebluealliance.com"
+
+
+def test_schema_org_sports_team_full_data(web_client: Client, setup_full_team) -> None:
+    """Test schema.org markup with full team data."""
+    resp = web_client.get("/team/148/2019")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    # Find the SportsTeam schema
+    schema_scripts = soup.find_all("script", {"type": "application/ld+json"})
+    sports_team_schema = None
+    for script in schema_scripts:
+        data = json.loads(script.string)
+        if data.get("@type") == "SportsTeam":
+            sports_team_schema = data
+            break
+
+    assert sports_team_schema is not None
+    assert sports_team_schema["name"] == "Robowranglers"
+    assert sports_team_schema["alternateName"] == "FRC Team 148"
+    assert sports_team_schema["foundingDate"] == "1992"
+    assert sports_team_schema["location"]["address"]["addressLocality"] == "Greenville"
+    assert sports_team_schema["location"]["address"]["addressRegion"] == "Texas"
+    assert sports_team_schema["location"]["address"]["addressCountry"] == "USA"
