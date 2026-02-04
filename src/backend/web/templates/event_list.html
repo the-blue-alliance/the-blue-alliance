@@ -11,6 +11,10 @@
   <meta property="og:site_name" content="The Blue Alliance" />
 {% endblock %}
 
+{% block schema_org_markup %}
+{% include "event_partials/event_list_breadcrumb_schema.html" %}
+{% endblock %}
+
 {% block events_active %}active{% endblock %}
 
 {% block content %}
