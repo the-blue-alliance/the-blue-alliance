@@ -1,0 +1,50 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SportsEvent",
+  "name": "{{ event.year }} {{ event.name }} - {{ match.verbose_name }}",
+  "description": "{{ match.verbose_name }} at the {{ event.year }} {{ event.name }} FIRST Robotics Competition",
+  "sport": "Robotics",
+  {% if match.time %}"startDate": "{{ match.time.strftime('%Y-%m-%dT%H:%M:%SZ') }}",{% endif %}
+  {% if event.venue or event.city or event.state_prov or event.country %}
+  "location": {
+    "@type": "Place"
+    {% if event.venue %},"name": "{{ event.venue }}"{% endif %}
+    {% if event.city or event.state_prov or event.country %}
+    ,"address": {
+      "@type": "PostalAddress"
+      {% if event.city %},"addressLocality": "{{ event.city }}"{% endif %}
+      {% if event.state_prov %},"addressRegion": "{{ event.state_prov }}"{% endif %}
+      {% if event.country %},"addressCountry": "{{ event.country }}"{% endif %}
+    }
+    {% endif %}
+  },
+  {% endif %}
+  "competitor": [
+    {% for team_key in match.team_key_names %}
+    {"@type": "SportsTeam", "@id": "https://www.thebluealliance.com/team/{{ team_key|strip_frc }}"}{% if not loop.last %},{% endif %}
+
+    {% endfor %}
+  ],
+  "superEvent": {
+    "@type": "SportsEvent",
+    "@id": "https://www.thebluealliance.com/event/{{ event.key_name }}"
+  },
+  "url": "https://www.thebluealliance.com/match/{{ match.key_name }}"
+}
+</script>
+{% if match.youtube_videos_formatted %}
+{% for video_id in match.youtube_videos_formatted %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "{{ event.year }} {{ event.name }} - {{ match.verbose_name }}",
+  "description": "{{ match.verbose_name }} video from the {{ event.year }} {{ event.name }} FIRST Robotics Competition",
+  "thumbnailUrl": "https://img.youtube.com/vi/{{ video_id.split('?')[0] }}/hqdefault.jpg",
+  "contentUrl": "https://www.youtube.com/watch?v={{ video_id.split('?')[0] }}",
+  "embedUrl": "https://www.youtube.com/embed/{{ video_id }}"
+}
+</script>
+{% endfor %}
+{% endif %}
