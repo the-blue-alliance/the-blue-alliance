@@ -1,0 +1,13 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Teams", "item": "https://www.thebluealliance.com/teams"},
+    {"@type": "ListItem", "position": 2, "name": "Team {{ team.team_number }}", "item": "https://www.thebluealliance.com/team/{{ team.team_number }}"}
+    {% if not is_canonical %}
+    ,{"@type": "ListItem", "position": 3, "name": "{{ year }} Season", "item": "https://www.thebluealliance.com/team/{{ team.team_number }}/{{ year }}"}
+    {% endif %}
+  ]
+}
+</script>

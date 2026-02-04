@@ -1,0 +1,12 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Events", "item": "https://www.thebluealliance.com/events"},
+    {"@type": "ListItem", "position": 2, "name": "{{ event.year }} Events", "item": "https://www.thebluealliance.com/events/{{ event.year }}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ event.name }}", "item": "https://www.thebluealliance.com/event/{{ event.key_name }}"},
+    {"@type": "ListItem", "position": 4, "name": "{{ match.verbose_name }}", "item": "https://www.thebluealliance.com/match/{{ match.key_name }}"}
+  ]
+}
+</script>
