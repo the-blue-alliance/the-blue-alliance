@@ -4,6 +4,14 @@
 
 {% block meta_description %}Regional Events for the FIRST Robotics Competition (FRC){% if explicit_year %} from {{year}}{% endif %}.{% endblock %}
 
+{% block more_head_tags %}
+<meta property="og:title" content="{% if explicit_year %}{{year}} {% endif %}FIRST Robotics Regional Events" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://www.thebluealliance.com/images/logo_square_512.png" />
+<meta property="og:description" content="Regional Events for the FIRST Robotics Competition (FRC){% if explicit_year %} from {{year}}{% endif %}." />
+<meta property="og:site_name" content="The Blue Alliance" />
+{% endblock %}
+
 {% block events_active %}active{% endblock %}
 
 {% block inline_javascript %}
