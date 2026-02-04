@@ -20,6 +20,10 @@
   {% if event.venue %}<meta property="og:fn" content="{{event.venue}}" />{% endif %}
 {% endblock %}
 
+{% block schema_org_markup %}
+{% include "event_partials/event_schema_org_markup.html" %}
+{% endblock %}
+
 {% block content %}
 {% if event_down %}
   <div id="fixed-alert-container">
@@ -31,13 +35,13 @@
     </div>
   </div>
 {% endif %}
-<div class="container" itemscope itemtype="http://data-vocabulary.org/Event">
+<div class="container">
   <div class="row">
     <div class="col-sm-12">
       {% if event.year == 2016 and event.event_type_enum == 3 %}
       <p class="pull-right"><a class="btn btn-primary" href="/event/{{event.key_name}}/insights"><span class="glyphicon glyphicon-align-left"></span> Advanced Insights</a></p>
       {% endif %}
-      <h1 itemprop="summary" id="event-name">{{event.name}} {{event.year}}</h1>
+      <h1 id="event-name">{{event.name}} {{event.year}}</h1>
       {% if event_divisions %}
       <div class="btn-group division-button">
         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
@@ -69,7 +73,7 @@
         {% if event.public_agenda_url and (event.within_a_day or event.future) %}<br><span class="glyphicon glyphicon-paperclip"></span> <a href="{{event.public_agenda_url}}" target="_blank" rel="noopener noreferrer">Public Agenda</a>{% endif %}
         {% if event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
-          <span itemprop="location">
+          <span>
           {% if event.venue_address_safe %}
             <a href="http://maps.google.com/maps?q={{ event.venue_address_safe|urlencode }}" target="_blank" rel="noopener noreferrer">{{ event.venue_or_venue_from_address }}</a>{% if event.location %} in {{event.location}}{% endif %}
           {% else %}

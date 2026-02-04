@@ -1,0 +1,31 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SportsEvent",
+  "name": "{{ event.name }} {{ event.year }}",
+  "description": "FIRST Robotics Competition event{% if event.location %} in {{ event.location }}{% endif %}",
+  "sport": "Robotics",
+  {% if event.start_date %}"startDate": "{{ event.start_date.strftime('%Y-%m-%d') }}",{% endif %}
+  {% if event.end_date %}"endDate": "{{ event.end_date.strftime('%Y-%m-%d') }}",{% endif %}
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  {% if event.venue or event.city or event.state_prov or event.country %}
+  "location": {
+    "@type": "Place",
+    {% if event.venue %}"name": "{{ event.venue }}",{% endif %}
+    "address": {
+      "@type": "PostalAddress"
+      {% if event.city %}, "addressLocality": "{{ event.city }}"{% endif %}
+      {% if event.state_prov %}, "addressRegion": "{{ event.state_prov }}"{% endif %}
+      {% if event.country %}, "addressCountry": "{{ event.country }}"{% endif %}
+    }
+  },
+  {% endif %}
+  "organizer": {
+    "@type": "SportsOrganization",
+    "name": "FIRST",
+    "url": "https://www.firstinspires.org"
+  },
+  "url": "https://www.thebluealliance.com/event/{{ event.key_name }}"
+}
+</script>
