@@ -9,10 +9,10 @@
   {% if event.end_date %}"endDate": "{{ event.end_date.strftime('%Y-%m-%d') }}",{% endif %}
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-  {% if event.venue or event.city or event.state_prov or event.country %}
+  {% if event.venue_or_venue_from_address or event.city or event.state_prov or event.country %}
   "location": {
     "@type": "Place",
-    {% if event.venue %}"name": "{{ event.venue }}",{% endif %}
+    {% if event.venue_or_venue_from_address %}"name": "{{ event.venue_or_venue_from_address }}",{% endif %}
     "address": {
       "@type": "PostalAddress"
       {% if event.city %}, "addressLocality": "{{ event.city }}"{% endif %}
