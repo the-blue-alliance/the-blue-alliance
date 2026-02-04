@@ -93,7 +93,7 @@
     "@types/express": "5.0.6",
     "@types/morgan": "1.9.10",
     "@types/node": "24.10.10",
-    "@types/react": "19.2.10",
+    "@types/react": "19.2.11",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.54.0",
     "@typescript-eslint/parser": "8.54.0",
