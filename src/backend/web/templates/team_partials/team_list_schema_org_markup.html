@@ -1,0 +1,38 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "FIRST Robotics Competition Teams {{ cur_page_label }}",
+  "description": "List of FIRST Robotics Competition teams",
+  "url": "https://www.thebluealliance.com/teams{% if current_page > 1 %}/{{ current_page }}{% endif %}",
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": {{ num_teams }},
+    "itemListElement": [
+      {% for team in teams_a %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "item": {
+          "@type": "SportsTeam",
+          "@id": "https://www.thebluealliance.com/team/{{ team.team_number }}",
+          "name": "{% if team.nickname %}{{ team.nickname }}{% else %}Team {{ team.team_number }}{% endif %}"
+        }
+      },
+      {% endfor %}
+      {% for team in teams_b %}
+      {
+        "@type": "ListItem",
+        "position": {{ teams_a|length + loop.index }},
+        "item": {
+          "@type": "SportsTeam",
+          "@id": "https://www.thebluealliance.com/team/{{ team.team_number }}",
+          "name": "{% if team.nickname %}{{ team.nickname }}{% else %}Team {{ team.team_number }}{% endif %}"
+        }
+      }{% if not loop.last %},{% endif %}
+
+      {% endfor %}
+    ]
+  }
+}
+</script>
