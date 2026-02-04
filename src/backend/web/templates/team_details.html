@@ -11,6 +11,10 @@
 {% include "team_partials/team_head_tags.html" %}
 {% endblock %}
 
+{% block schema_org_markup %}
+{% include "team_partials/team_schema_org_markup.html" %}
+{% endblock %}
+
 {% block content %}
 <button class="tba-fab tba-fab-team" data-team="{{team.key.id()}}" data-csrf-token="{{csrf_token()}}">
   <span class="glyphicon glyphicon-star favorite"></span>
