@@ -1,0 +1,14 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "Team 27 Awards",
+            "body": "Team 27 won the Excellence in Engineering Award at the 2024 Kettering University #1 District."
+        },
+        "data": {
+            "notification_type": "awards_posted",
+            "event_key": "2024miket",
+            "team_key": "frc27"
+        }
+    }
+}

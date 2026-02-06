@@ -1,0 +1,13 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "MIKET Awards",
+            "body": "2024 Kettering University #1 District awards have been posted."
+        },
+        "data": {
+            "notification_type": "awards_posted",
+            "event_key": "2024miket"
+        }
+    }
+}

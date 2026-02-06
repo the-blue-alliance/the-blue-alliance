@@ -1,0 +1,14 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "MIKET Qualification Matches Starting",
+            "body": "Qualification matches at the Kettering University #1 District are scheduled for 11:00 EST."
+        },
+        "data": {
+            "notification_type": "starting_comp_level",
+            "event_key": "2024miket",
+            "comp_level": "qm"
+        }
+    }
+}

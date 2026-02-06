@@ -1,0 +1,13 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "Title",
+            "body": "Message"
+        },
+        "data": {
+            "notification_type": "broadcast",
+            "url": "https://www.thebluealliance.com/"
+        }
+    }
+}

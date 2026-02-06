@@ -1,0 +1,14 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "MIKET Match Video",
+            "body": "Video for MIKET Quals 1 has been posted."
+        },
+        "data": {
+            "notification_type": "match_video",
+            "event_key": "2024miket",
+            "match_key": "2024miket_qm1"
+        }
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "MIKET Q1 Starting Soon",
+            "body": "Kettering University #1 District Quals 1: 5282, 5538, 5213 will play 5697, 70, 9242, scheduled for 11:00 EST."
+        },
+        "data": {
+            "notification_type": "upcoming_match",
+            "event_key": "2024miket",
+            "match_key": "2024miket_qm1",
+            "team_key": "frc70"
+        }
+    }
+}

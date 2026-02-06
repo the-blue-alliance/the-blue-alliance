@@ -1,0 +1,13 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "MIKET Schedule Updated",
+            "body": "The Kettering University #1 District match schedule has been updated. The next match starts at 11:00 EST."
+        },
+        "data": {
+            "notification_type": "schedule_updated",
+            "event_key": "2024miket"
+        }
+    }
+}

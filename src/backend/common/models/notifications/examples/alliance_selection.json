@@ -1,0 +1,13 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "MIKET Alliances Updated",
+            "body": "Kettering University #1 District alliances have been updated."
+        },
+        "data": {
+            "notification_type": "alliance_selection",
+            "event_key": "2024miket"
+        }
+    }
+}
