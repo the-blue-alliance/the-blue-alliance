@@ -43,7 +43,8 @@
   "description": "{{ match.verbose_name }} video from the {{ event.year }} {{ event.name }} FIRST Robotics Competition",
   "thumbnailUrl": "https://img.youtube.com/vi/{{ video_id.split('?')[0] }}/hqdefault.jpg",
   "contentUrl": "https://www.youtube.com/watch?v={{ video_id.split('?')[0] }}",
-  "embedUrl": "https://www.youtube.com/embed/{{ video_id }}"
+  "embedUrl": "https://www.youtube.com/embed/{{ video_id }}",
+  "uploadDate": "{% if match.actual_time %}{{ match.actual_time.strftime('%Y-%m-%dT%H:%M:%SZ') }}{% elif match.time %}{{ match.time.strftime('%Y-%m-%dT%H:%M:%SZ') }}{% else %}{{ event.year }}-01-01T00:00:00Z{% endif %}"
 }
 </script>
 {% endfor %}
