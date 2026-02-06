@@ -1,0 +1,13 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "FIM District Points Updated",
+            "body": "FIRST in Michigan district point calculations have been updated."
+        },
+        "data": {
+            "notification_type": "district_points_updated",
+            "district_key": "2024fim"
+        }
+    }
+}

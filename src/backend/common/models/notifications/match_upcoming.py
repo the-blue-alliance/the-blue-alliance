@@ -1,4 +1,5 @@
 import calendar
+import logging
 from typing import Any, cast, Dict, Optional
 
 from pyre_extensions import none_throws
@@ -37,6 +38,17 @@ class MatchUpcomingNotification(Notification):
         )
         if scheduled_time:
             time = scheduled_time.strftime("%H:%M")
+            # Add timezone, if possible
+            if self.event.timezone_id:
+                try:
+                    import pytz
+
+                    timezone = pytz.timezone(self.event.timezone_id)
+                    time += timezone.localize(scheduled_time).strftime(" %Z")
+                except Exception as e:
+                    logging.warning(
+                        f"Unable to add timezone to event level notification: {e}"
+                    )
             ending = ", scheduled for {}.".format(time)
         else:
             ending = "."

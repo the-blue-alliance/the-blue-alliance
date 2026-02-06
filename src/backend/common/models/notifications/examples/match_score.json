@@ -1,0 +1,14 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "MIKET QM 1 Results",
+            "body": "5697, 70, 9242 beat 5282, 5538, 5213 scoring 28-26"
+        },
+        "data": {
+            "notification_type": "match_score",
+            "event_key": "2024miket",
+            "match_key": "2024miket_qm1"
+        }
+    }
+}

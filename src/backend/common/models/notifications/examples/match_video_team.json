@@ -1,0 +1,15 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "Team 70 Match Video",
+            "body": "Video for MIKET Quals 1 featuring Team 70 has been posted."
+        },
+        "data": {
+            "notification_type": "match_video",
+            "event_key": "2024miket",
+            "match_key": "2024miket_qm1",
+            "team_key": "frc70"
+        }
+    }
+}

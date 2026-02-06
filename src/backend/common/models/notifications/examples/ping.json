@@ -1,0 +1,12 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "Test Notification",
+            "body": "This is a test message ensuring your device can recieve push messages from The Blue Alliance."
+        },
+        "data": {
+            "notification_type": "ping"
+        }
+    }
+}
