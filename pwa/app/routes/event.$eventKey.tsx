@@ -67,6 +67,7 @@ import {
 import TeamAvatar from '~/components/tba/teamAvatar';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -408,7 +409,7 @@ function EventPage() {
         </TabsContent>
 
         <TabsContent value="media">
-          <MediaTab webcasts={event.webcasts} />
+          <MediaTab webcasts={event.webcasts} eventKey={event.key} />
         </TabsContent>
       </Tabs>
     </div>
@@ -805,13 +806,27 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
   );
 }
 
-function MediaTab({ webcasts }: { webcasts: Webcast[] }) {
+function MediaTab({
+  webcasts,
+  eventKey,
+}: {
+  webcasts: Webcast[];
+  eventKey: string;
+}) {
   return (
     <div>
       <h1 className="text-2xl font-bold">Webcasts</h1>
-      {webcasts.map((w) => (
-        <WebcastIcon webcast={w} key={w.channel} />
-      ))}
+      {webcasts.length > 0 ? (
+        webcasts.map((w) => <WebcastIcon webcast={w} key={w.channel} />)
+      ) : (
+        <Button variant="secondary" asChild>
+          <a
+            href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
+          >
+            Add Webcast
+          </a>
+        </Button>
+      )}
     </div>
   );
 }
