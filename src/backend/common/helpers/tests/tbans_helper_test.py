@@ -1227,7 +1227,7 @@ class TestTBANSHelper(unittest.TestCase):
             "logging.error"
         ) as mock_error:
             TBANSHelper._send_fcm([client], MockNotification())
-            mock_error.assert_called_once_with("Qutoa exceeded - retrying client...")
+            mock_error.assert_called_once_with("Quota exceeded - retrying client...")
 
         # Sanity check
         assert fcm_messaging_ids("user_id") == ["messaging_id"]
@@ -1321,7 +1321,7 @@ class TestTBANSHelper(unittest.TestCase):
             "logging.error"
         ) as mock_error:
             TBANSHelper._send_fcm([client], MockNotification())
-            mock_error.assert_called_once_with("Interal FCM error - retrying client...")
+            mock_error.assert_called_once_with("Internal FCM error - retrying client...")
 
         # Sanity check
         assert fcm_messaging_ids("user_id") == ["messaging_id"]

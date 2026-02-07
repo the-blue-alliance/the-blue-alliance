@@ -757,16 +757,16 @@ class TBANSHelper:
                 client = subclients[index]
                 if isinstance(response.exception, UnregisteredError):
                     logging.info(
-                        f"Deleting mobile client with ID: f{client.messaging_id}"
+                        f"Deleting mobile client with ID: {client.messaging_id}"
                     )
                     MobileClientQuery.delete_for_messaging_id(client.messaging_id)
                 elif isinstance(response.exception, SenderIdMismatchError):
                     logging.info(
-                        f"Deleting mobile client with ID: f{client.messaging_id}"
+                        f"Deleting mobile client with ID: {client.messaging_id}"
                     )
                     MobileClientQuery.delete_for_messaging_id(client.messaging_id)
                 elif isinstance(response.exception, QuotaExceededError):
-                    logging.error("Qutoa exceeded - retrying client...")
+                    logging.error("Quota exceeded - retrying client...")
                     retry_clients.append(client)
                 elif isinstance(response.exception, ThirdPartyAuthError):
                     logging.critical(
@@ -781,7 +781,7 @@ class TBANSHelper:
                         )
                     )
                 elif isinstance(response.exception, InternalError):
-                    logging.error("Interal FCM error - retrying client...")
+                    logging.error("Internal FCM error - retrying client...")
                     retry_clients.append(client)
                 elif isinstance(response.exception, UnavailableError):
                     logging.error("FCM unavailable - retrying client...")
