@@ -79,9 +79,8 @@ services:
     entrypoint:
       - /bin/bash
       - -c
-      - 'pytest "$@"'
+      - './ops/test_py3.sh "$@"'
       - --
-    command: ["src", "--cov=src", "--cov-report=xml"]
 
   lint:
     build:
@@ -94,13 +93,7 @@ services:
     entrypoint:
       - /bin/bash
       - -c
-      - |
-        if [[ " $* " == *" --fix "* ]]; then
-          black ./ --exclude '/(old_py2|stubs|subtrees|venv|.venv|node_modules)/'
-        else
-          black ./ --check --diff --exclude '/(old_py2|stubs|subtrees|venv|.venv|node_modules)/'
-        fi
-        flake8 ./
+      - './ops/lint_py3.sh "$@"'
       - --
 
   # (Note from Zach): pyre is currently busted somehow with this setup.
