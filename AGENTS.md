@@ -68,20 +68,32 @@ docker-compose exec tba bash
 ```
 
 ## Testing & Linting
-**Note**: Tests must be run inside the dev container (docker-compose or devcontainer). They will not work on the host due to missing `google.appengine` dependencies.
+Run tests via make:
 
 ```bash
-# Run tests
-./ops/test_py3.sh
+# Run all tests
+make test
 
-# Lint Python
-./ops/lint_py3.sh
+# Run a specific test file
+make test ARGS='src/backend/common/helpers/tests/tbans_helper_test.py'
+
+# Run a specific test class
+make test ARGS='src/backend/common/helpers/tests/tbans_helper_test.py::TestTBANSHelper'
+
+# Run a specific test method
+make test ARGS='src/backend/common/helpers/tests/tbans_helper_test.py::TestTBANSHelper::test_ping_webhook'
+
+# Run tests matching a name pattern
+make test ARGS='src/ -k "test_ping"'
+
+# Lint Python (black --check + flake8)
+make lint
+
+# Auto-fix formatting with black, then run flake8
+make lint ARGS='--fix'
 
 # Type check
-./ops/typecheck_py3.sh
-
-# All checks (test + lint + typecheck)
-./ops/test_py3.sh && ./ops/lint_py3.sh && ./ops/typecheck_py3.sh
+make typecheck
 ```
 
 ## File Organization

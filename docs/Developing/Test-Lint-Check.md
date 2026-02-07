@@ -1,43 +1,44 @@
-The documentation for running tests, lints, and checks assumes that dependencies have been installed in a local environment outside of the development container. See the [[Repo Setup|Repo-Setup]] page for details. Tests and type checks can be run either in the development container or in your local environment. Lints are recommended to be run in your local environment since Vagrant will not sync fixes done automatically by the linter (the `--fix` option) in the container back out to your local environment.
+Tests and linting can be run via `make` commands, which use Docker Compose services under the hood. These services use a pre-built image with all Python dependencies installed, so tests run quickly without needing to install dependencies each time.
 
-## Python
+# Python
 
-### Tests
-
-Python tests are run using [pytest](https://docs.pytest.org/en/latest/). You can specify a single file to test, or a directory to run all downstream tests (`test_*.py` files) for. The `--relevant` flag can be used to only test modified codepaths.
+## Tests
 
 ```bash
-# Run all tests in src/ folder
-> pytest src/
+# Run all tests
+$ make test
 
-# Run only tests for downstream code changes in the src/ folder
-> pytest src/ --relevant
+# Run a specific test file
+$ make test ARGS='src/backend/common/helpers/tests/tbans_helper_test.py'
+
+# Run a specific test class
+$ make test ARGS='src/backend/common/helpers/tests/tbans_helper_test.py::TestTBANSHelper'
+
+# Run a specific test method
+$ make test ARGS='src/backend/common/helpers/tests/tbans_helper_test.py::TestTBANSHelper::test_ping_webhook'
+
+# Run tests matching a name pattern
+$ make test ARGS='src/ -k "test_ping"'
 ```
 
-### Lint
-
-Python linting is a two-step process - running [`black`](https://black.readthedocs.io/en/stable/) and [`flake8`](https://flake8.pycqa.org/en/latest/). Run them together with the `lint_py3.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style guide requirements.
+## Lint
 
 ```bash
-# Check for linter errors
-> ./ops/lint_py3.sh
+# Run linter (black --check + flake8)
+$ make lint
 
-# Fixing linter errors automatically
-> ./ops/lint_py3.sh --fix
+# Auto-fix formatting with black, then run flake8
+$ make lint ARGS='--fix'
 ```
 
-### Type Checker
+## Type Checker
 
-The Blue Alliance's Python codebases enforces the use of [type hints](https://www.python.org/dev/peps/pep-0484/) using [pyre](https://pyre-check.org/).
+The Blue Alliance's Python codebase enforces the use of [type hints](https://www.python.org/dev/peps/pep-0484/) using [pyre](https://pyre-check.org/).
 
-```bash
-> ./ops/typecheck_py3.sh
-```
-
-By default, `pyre` will attempt to spin up `watchman` to speed up subsequent `pyre` runs. This behavior can be avoided by using `pyre check`.
+Note: Type checking via Docker is currently unavailable. Run pyre directly if needed:
 
 ```bash
-> pyre check
+$ pyre check
 ```
 
 #### Generating Type Checker Stubs
@@ -72,9 +73,9 @@ Changes can then be applied via `git patch`. After generating new stubs for a li
 $ git apply stubs/patch/*.patch
 ```
 
-## Node
+# Node
 
-### Tests
+## Tests
 
 Node tests are run using [Jest](https://jestjs.io/).
 
@@ -82,7 +83,7 @@ Node tests are run using [Jest](https://jestjs.io/).
 > ./ops/test_node.sh
 ```
 
-### Lint
+## Lint
 
 Node linting runs using [ESLint](https://eslint.org/). Run using the `ops/lint_node.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style guide requirements.
 
@@ -93,9 +94,9 @@ Node linting runs using [ESLint](https://eslint.org/). Run using the `ops/lint_n
 > ./ops/lint_node.sh --fix
 ```
 
-## Bash
+# Bash
 
-### Lint
+## Lint
 
 Formatting bash requires [shfmt](https://github.com/mvdan/sh) to be install on the local system. Run using the `ops/lint_bash.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style.
 

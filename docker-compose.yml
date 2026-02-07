@@ -33,6 +33,7 @@ services:
 
   tba:
     # image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+    image: tba
     build:
       context: ./
       dockerfile: ./ops/dev/docker/Dockerfile
@@ -66,3 +67,55 @@ services:
       - PUPPETEER_SKIP_DOWNLOAD=true
       - TBA_DOCKER_COMPOSE=true
       - FIREBASE_AUTH_EMULATOR_HOST=firebase:9099
+
+  test:
+    build:
+      context: ./
+      dockerfile: ./ops/dev/docker/Dockerfile.test
+    profiles: ["tools"]
+    volumes:
+      - ./:/tba:delegated
+    working_dir: /tba
+    entrypoint:
+      - /bin/bash
+      - -c
+      - 'pytest "$@"'
+      - --
+    command: ["src", "--cov=src", "--cov-report=xml"]
+
+  lint:
+    build:
+      context: ./
+      dockerfile: ./ops/dev/docker/Dockerfile.test
+    profiles: ["tools"]
+    volumes:
+      - ./:/tba:delegated
+    working_dir: /tba
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        if [[ " $* " == *" --fix "* ]]; then
+          black ./ --exclude '/(old_py2|stubs|subtrees|venv|.venv|node_modules)/'
+        else
+          black ./ --check --diff --exclude '/(old_py2|stubs|subtrees|venv|.venv|node_modules)/'
+        fi
+        flake8 ./
+      - --
+
+  # (Note from Zach): pyre is currently busted somehow with this setup.
+  # I'm gonna push on it later, but also pyre kind of sucks, and it would
+  # be great to move away from it, so I'm not going to put any effort into
+  # fixing this right now.
+  #
+  # typecheck:
+  #   build:
+  #     context: ./
+  #     dockerfile: ./ops/dev/docker/Dockerfile.test
+  #   depends_on:
+  #   - tba
+  #   volumes:
+  #     - ./:/tba:delegated
+  #   working_dir: /tba
+  #   entrypoint: ["/bin/bash", "-c"]
+  #   command: ["pyre --version none check"]
