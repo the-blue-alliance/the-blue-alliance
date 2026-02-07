@@ -3,7 +3,6 @@ import csv
 import io
 import json
 import re
-from collections import OrderedDict
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
@@ -182,122 +181,12 @@ def event_detail(event_key: EventKey) -> Response:
         middle_value += 1
     teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
 
-    # Helper to convert OrderedDict list to CSV string
-    def dicts_to_csv(rows: List[OrderedDict]) -> str:
-        if not rows:
-            return ""
-        output = io.StringIO()
-        writer = csv.DictWriter(output, fieldnames=list(rows[0].keys()))
-        writer.writeheader()
-        writer.writerows(rows)
-        return output.getvalue()
-
-    # Build Team List CSV
-    team_rows = []
-    for team, medias in team_and_medias:
-        preferred_media = next(
-            (m for m in medias if m.is_image and team.key in m.preferred_references),
-            None,
-        )
-        team_rows.append(
-            OrderedDict(
-                [
-                    ("team_number", team.team_number),
-                    ("team_name", (team.nickname or "").replace(",", ";")),
-                    ("city", (team.city or "").replace(",", ";")),
-                    ("state_prov", (team.state_prov or "").replace(",", ";")),
-                    ("country", (team.country or "").replace(",", ";")),
-                    (
-                        "robot_image_url",
-                        preferred_media.image_direct_url_med if preferred_media else "",
-                    ),
-                ]
-            )
-        )
-    team_list_csv = dicts_to_csv(team_rows)
-
-    # Build Schedule CSV
-    event_tz = pytz.timezone(event.timezone_id) if event.timezone_id else None
-    all_matches_list = [
-        match
-        for comp_level_enum in COMP_LEVELS
-        if matches.get(comp_level_enum)
-        for match in matches[comp_level_enum]
-    ]
-
-    # Determine max teams per alliance (usually 3, but can be 2 or 5)
-    max_teams = max(
-        (
-            len(match.alliances[color]["teams"])
-            for match in all_matches_list
-            for color in [AllianceColor.RED, AllianceColor.BLUE]
-        ),
-        default=3,
+    # Build CSV data using shared functions
+    team_list_csv = _rows_to_csv(_build_team_list_data(team_and_medias))
+    schedule_csv = _rows_to_csv(_build_schedule_data(matches, event.timezone_id))
+    flat_schedule_csv = _rows_to_csv(
+        _build_flat_schedule_data(matches, event.timezone_id)
     )
-
-    def format_match_time(match_time: Optional[datetime]) -> Tuple[str, str]:
-        if not match_time or not event_tz:
-            return "", ""
-        local_time = MatchTimePredictionHelper.as_local(match_time, event_tz)
-        return (
-            (local_time.strftime("%Y-%m-%d"), local_time.strftime("%I:%M %p"))
-            if local_time
-            else ("", "")
-        )
-
-    # Build Schedule CSV
-    schedule_rows = []
-    for match in all_matches_list:
-        date_str, time_str = format_match_time(match.time)
-        red_teams = [
-            t.replace("frc", "") for t in match.alliances[AllianceColor.RED]["teams"]
-        ]
-        blue_teams = [
-            t.replace("frc", "") for t in match.alliances[AllianceColor.BLUE]["teams"]
-        ]
-        red_teams.extend([""] * (max_teams - len(red_teams)))
-        blue_teams.extend([""] * (max_teams - len(blue_teams)))
-        red_score = match.alliances[AllianceColor.RED]["score"]
-        blue_score = match.alliances[AllianceColor.BLUE]["score"]
-        row = OrderedDict(
-            [
-                ("match_key", match.key_name),
-                ("scheduled_date", date_str),
-                ("scheduled_time", time_str),
-                ("comp_level", match.comp_level),
-                ("match_number", match.match_number),
-                ("set_number", match.set_number),
-            ]
-        )
-        for i in range(max_teams):
-            row[f"red{i + 1}"] = red_teams[i]
-            row[f"blue{i + 1}"] = blue_teams[i]
-        row["red_score"] = str(red_score) if red_score >= 0 else ""
-        row["blue_score"] = str(blue_score) if blue_score >= 0 else ""
-        schedule_rows.append(row)
-    schedule_csv = dicts_to_csv(schedule_rows)
-
-    # Build Flat Schedule CSV
-    flat_schedule_rows = []
-    for match in all_matches_list:
-        date_str, time_str = format_match_time(match.time)
-        for color in [AllianceColor.RED, AllianceColor.BLUE]:
-            for team in match.alliances[color]["teams"]:
-                flat_schedule_rows.append(
-                    OrderedDict(
-                        [
-                            ("match_key", match.key_name),
-                            ("scheduled_date", date_str),
-                            ("scheduled_time", time_str),
-                            ("comp_level", match.comp_level),
-                            ("match_number", match.match_number),
-                            ("set_number", match.set_number),
-                            ("color", color.value),
-                            ("team", team.replace("frc", "")),
-                        ]
-                    )
-                )
-    flat_schedule_csv = dicts_to_csv(flat_schedule_rows)
 
     oprs = []
     copr_leaders: Dict[Component, List[Tuple[TeamId, float]]] = {}
@@ -575,3 +464,214 @@ def event_agenda(event_key: EventKey) -> Response:
         abort(404)
 
     return redirect(agenda_url)
+
+
+def _rows_to_csv(rows: List[List[str]]) -> str:
+    """Convert list of lists to CSV string."""
+    if not rows:
+        return ""
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerows(rows)
+    return output.getvalue()
+
+
+def _build_team_list_data(team_and_medias: List[Tuple]) -> List[List[str]]:
+    """Build Team List data from team_and_medias list. Returns list of rows (first row is headers)."""
+    rows = [
+        [
+            "team_number",
+            "team_name",
+            "city",
+            "state_prov",
+            "country",
+            "robot_image_url",
+        ]
+    ]
+    for team, medias in team_and_medias:
+        preferred_media = next(
+            (m for m in medias if m.is_image and team.key in m.preferred_references),
+            None,
+        )
+        rows.append(
+            [
+                str(team.team_number),
+                (team.nickname or "").replace(",", ";"),
+                (team.city or "").replace(",", ";"),
+                (team.state_prov or "").replace(",", ";"),
+                (team.country or "").replace(",", ";"),
+                preferred_media.image_direct_url_med if preferred_media else "",
+            ]
+        )
+    return rows
+
+
+def _build_schedule_data(matches: Dict, timezone_id: Optional[str]) -> List[List[str]]:
+    event_tz = pytz.timezone(timezone_id) if timezone_id else None
+    all_matches_list = [
+        match
+        for comp_level_enum in COMP_LEVELS
+        if matches.get(comp_level_enum)
+        for match in matches[comp_level_enum]
+    ]
+    max_teams = max(
+        (
+            len(match.alliances[color]["teams"])
+            for match in all_matches_list
+            for color in [AllianceColor.RED, AllianceColor.BLUE]
+        ),
+        default=3,
+    )
+    headers = [
+        "match_key",
+        "scheduled_date",
+        "scheduled_time",
+        "comp_level",
+        "match_number",
+        "set_number",
+    ]
+    for i in range(max_teams):
+        headers.extend([f"red{i + 1}", f"blue{i + 1}"])
+    headers.extend(["red_score", "blue_score"])
+    rows = [headers]
+    for match in all_matches_list:
+        date_str, time_str = "", ""
+        if match.time and event_tz:
+            local_time = MatchTimePredictionHelper.as_local(match.time, event_tz)
+            if local_time:
+                date_str = local_time.strftime("%Y-%m-%d")
+                time_str = local_time.strftime("%I:%M %p")
+        red_teams = [
+            t.replace("frc", "") for t in match.alliances[AllianceColor.RED]["teams"]
+        ]
+        blue_teams = [
+            t.replace("frc", "") for t in match.alliances[AllianceColor.BLUE]["teams"]
+        ]
+        red_teams.extend([""] * (max_teams - len(red_teams)))
+        blue_teams.extend([""] * (max_teams - len(blue_teams)))
+        row = [
+            match.key_name,
+            date_str,
+            time_str,
+            match.comp_level,
+            match.match_number,
+            match.set_number,
+        ]
+        for i in range(max_teams):
+            row.extend([red_teams[i], blue_teams[i]])
+        red_score = match.alliances[AllianceColor.RED]["score"]
+        blue_score = match.alliances[AllianceColor.BLUE]["score"]
+        row.extend(
+            [
+                str(red_score) if red_score >= 0 else "",
+                str(blue_score) if blue_score >= 0 else "",
+            ]
+        )
+        rows.append(row)
+    return rows
+
+
+def _build_flat_schedule_data(
+    matches: Dict, timezone_id: Optional[str]
+) -> List[List[str]]:
+    event_tz = pytz.timezone(timezone_id) if timezone_id else None
+    all_matches_list = [
+        match
+        for comp_level_enum in COMP_LEVELS
+        if matches.get(comp_level_enum)
+        for match in matches[comp_level_enum]
+    ]
+    rows = [
+        [
+            "match_key",
+            "scheduled_date",
+            "scheduled_time",
+            "comp_level",
+            "match_number",
+            "set_number",
+            "color",
+            "team",
+        ]
+    ]
+    for match in all_matches_list:
+        date_str, time_str = "", ""
+        if match.time and event_tz:
+            local_time = MatchTimePredictionHelper.as_local(match.time, event_tz)
+            if local_time:
+                date_str = local_time.strftime("%Y-%m-%d")
+                time_str = local_time.strftime("%I:%M %p")
+        for color in [AllianceColor.RED, AllianceColor.BLUE]:
+            for team in match.alliances[color]["teams"]:
+                rows.append(
+                    [
+                        match.key_name,
+                        date_str,
+                        time_str,
+                        match.comp_level,
+                        match.match_number,
+                        match.set_number,
+                        color.value,
+                        team.replace("frc", ""),
+                    ]
+                )
+    return rows
+
+
+@cached_public
+def simple_event_teams(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    if not event:
+        abort(404)
+    event.prep_teams()
+    medias_future = media_query.EventTeamsPreferredMediasQuery(
+        event.key_name
+    ).fetch_async()
+    teams = TeamHelper.sort_teams(event.teams)  # pyre-ignore[6]
+    image_medias = MediaHelper.get_images(
+        [media for media in medias_future.get_result()]
+    )
+    team_medias = collections.defaultdict(list)
+    for image_media in image_medias:
+        for reference in image_media.references:
+            team_medias[reference].append(image_media)
+    team_and_medias = [(team, team_medias.get(team.key, [])) for team in teams]
+    data = _build_team_list_data(team_and_medias)
+    headers, rows = data[0], data[1:]
+    return make_cached_response(
+        render_template("simple_event_teams.html", {"headers": headers, "rows": rows}),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
+    )
+
+
+@cached_public
+def simple_event_schedule(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    if not event:
+        abort(404)
+    event.prep_matches()
+    _, matches = MatchHelper.organized_matches(event.matches)
+    data = _build_schedule_data(matches, event.timezone_id)
+    headers, rows = data[0], data[1:]
+    return make_cached_response(
+        render_template(
+            "simple_event_schedule.html", {"headers": headers, "rows": rows}
+        ),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
+    )
+
+
+@cached_public
+def simple_event_flat_schedule(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    if not event:
+        abort(404)
+    event.prep_matches()
+    _, matches = MatchHelper.organized_matches(event.matches)
+    data = _build_flat_schedule_data(matches, event.timezone_id)
+    headers, rows = data[0], data[1:]
+    return make_cached_response(
+        render_template(
+            "simple_event_flat_schedule.html", {"headers": headers, "rows": rows}
+        ),
+        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
+    )
