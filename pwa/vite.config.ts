@@ -58,7 +58,7 @@ export default defineConfig({
       },
     }),
     ValidateEnv({
-      VITE_TBA_API_READ_KEY: Schema.string({
+      VITE_TBA_API_READ_KEY: Schema.string.optional({
         message: 'Get your API key at https://www.thebluealliance.com/account',
       }),
     }),

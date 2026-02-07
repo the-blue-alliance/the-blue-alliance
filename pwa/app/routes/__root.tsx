@@ -57,7 +57,10 @@ const logger = createLogger('root');
 
 // Configure request interceptor for auth
 client.interceptors.request.use((request) => {
-  request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
+  const apiKey = import.meta.env.VITE_TBA_API_READ_KEY;
+  if (apiKey) {
+    request.headers.set('X-TBA-Auth-Key', apiKey);
+  }
 
   logger.info(
     {
