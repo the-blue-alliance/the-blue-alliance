@@ -1,3 +1,5 @@
+import json
+
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from werkzeug.test import Client
@@ -226,3 +228,40 @@ def test_render_match_meta_description(web_client: Client, setup_full_match) -> 
     og_desc = soup.find("meta", {"property": "og:description"})
     assert og_desc is not None
     assert og_desc.get("content") == content
+
+
+def test_schema_org_match_sports_event(web_client: Client, setup_full_match) -> None:
+    """Test that match pages include valid SportsEvent JSON-LD with superEvent."""
+    setup_full_match("2019nyny_qm1")
+
+    resp = web_client.get("/match/2019nyny_qm1")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    schema_scripts = soup.find_all("script", {"type": "application/ld+json"})
+    assert len(schema_scripts) >= 1
+
+    # Find the match SportsEvent schema
+    match_schema = None
+    for script in schema_scripts:
+        data = json.loads(script.string)
+        if data.get("@type") == "SportsEvent" and "superEvent" in data:
+            match_schema = data
+            break
+
+    assert match_schema is not None
+
+    # Main match event should have required fields
+    assert "name" in match_schema
+    assert "startDate" in match_schema
+    assert "location" in match_schema
+    assert match_schema["location"]["@type"] == "Place"
+
+    # superEvent should also have required fields (GSC errors if missing)
+    super_event = match_schema["superEvent"]
+    assert super_event["@type"] == "SportsEvent"
+    assert "name" in super_event
+    assert "startDate" in super_event
+    assert "location" in super_event
+    assert super_event["location"]["@type"] == "Place"
+    assert "url" in super_event
