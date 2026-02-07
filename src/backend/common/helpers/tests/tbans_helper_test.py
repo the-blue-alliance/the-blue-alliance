@@ -1176,6 +1176,57 @@ class TestTBANSHelper(unittest.TestCase):
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 0
 
+    def test_send_fcm_unregister_error_multi_client(self):
+        """Regression test: when the first client succeeds and the second fails
+        with UnregisteredError, only the failing client's token should be deleted."""
+        client_ok = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="messaging_id_ok",
+            client_type=ClientType.OS_IOS,
+        )
+        client_ok.put()
+
+        client_bad = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="messaging_id_bad",
+            client_type=ClientType.OS_IOS,
+        )
+        client_bad.put()
+
+        # Sanity check - both clients exist
+        assert set(fcm_messaging_ids("user_id")) == {
+            "messaging_id_ok",
+            "messaging_id_bad",
+        }
+
+        batch_response = messaging.BatchResponse(
+            [
+                messaging.SendResponse({"name": "abc"}, None),  # first succeeds
+                messaging.SendResponse(
+                    None, UnregisteredError("code", "message")
+                ),  # second fails
+            ]
+        )
+        with patch.object(
+            FCMRequest, "send", return_value=batch_response
+        ), patch.object(
+            MobileClientQuery,
+            "delete_for_messaging_id",
+            wraps=MobileClientQuery.delete_for_messaging_id,
+        ) as mock_delete:
+            TBANSHelper._send_fcm([client_ok, client_bad], MockNotification())
+            # Only the bad client should be deleted
+            mock_delete.assert_called_once_with("messaging_id_bad")
+
+        # The good client should still exist, the bad one should be gone
+        assert fcm_messaging_ids("user_id") == ["messaging_id_ok"]
+
+        # Make sure we haven't queued for a retry
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+        assert len(tasks) == 0
+
     def test_send_fcm_sender_id_mismatch_error(self):
         client = MobileClient(
             parent=ndb.Key(Account, "user_id"),

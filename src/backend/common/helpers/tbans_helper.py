@@ -747,13 +747,9 @@ class TBANSHelper:
                 UnregisteredError,
             )
 
-            for index, response in enumerate(
-                [
-                    response
-                    for response in batch_response.responses
-                    if not response.success
-                ]
-            ):
+            for index, response in enumerate(batch_response.responses):
+                if response.success:
+                    continue
                 client = subclients[index]
                 if isinstance(response.exception, UnregisteredError):
                     logging.info(
