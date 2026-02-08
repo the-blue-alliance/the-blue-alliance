@@ -21,10 +21,10 @@
     {"site-package": "markupsafe"},
     {"site-package": "numpy"},
     {"site-package": "openpyxl"},
+    {"site-package": "packaging"},
     {"site-package": "pytest"},
     {"site-package": "_pytest"},
     {"site-package": "pyre_extensions"},
-    {"site-package": "pkg_resources"},
     {"site-package": "six", "is_toplevel_module": true},
     {"site-package": "requests_mock"},
     {"site-package": "werkzeug"}
