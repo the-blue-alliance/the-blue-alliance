@@ -5,11 +5,11 @@
   "name": "{{ event.year }} {{ event.name }} - {{ match.verbose_name }}",
   "description": "{{ match.verbose_name }} at the {{ event.year }} {{ event.name }} FIRST Robotics Competition",
   "sport": "Robotics",
-  {% if match.time %}"startDate": "{{ match.time.strftime('%Y-%m-%dT%H:%M:%SZ') }}",{% endif %}
-  {% if event.venue or event.city or event.state_prov or event.country %}
+  {% if match.time %}"startDate": "{{ match.time.strftime('%Y-%m-%dT%H:%M:%SZ') }}",{% elif event.start_date %}"startDate": "{{ event.start_date.strftime('%Y-%m-%d') }}",{% endif %}
+  {% if event.venue_or_venue_from_address or event.city or event.state_prov or event.country %}
   "location": {
     "@type": "Place"
-    {% if event.venue %},"name": "{{ event.venue }}"{% endif %}
+    {% if event.venue_or_venue_from_address %},"name": "{{ event.venue_or_venue_from_address }}"{% endif %}
     {% if event.city or event.state_prov or event.country %}
     ,"address": {
       "@type": "PostalAddress"
@@ -28,7 +28,25 @@
   ],
   "superEvent": {
     "@type": "SportsEvent",
-    "@id": "https://www.thebluealliance.com/event/{{ event.key_name }}"
+    "@id": "https://www.thebluealliance.com/event/{{ event.key_name }}",
+    "name": "{{ event.name }} {{ event.year }}",
+    {% if event.start_date %}"startDate": "{{ event.start_date.strftime('%Y-%m-%d') }}",{% endif %}
+    {% if event.end_date %}"endDate": "{{ event.end_date.strftime('%Y-%m-%d') }}",{% endif %}
+    {% if event.venue_or_venue_from_address or event.city or event.state_prov or event.country %}
+    "location": {
+      "@type": "Place"
+      {% if event.venue_or_venue_from_address %},"name": "{{ event.venue_or_venue_from_address }}"{% endif %}
+      {% if event.city or event.state_prov or event.country %}
+      ,"address": {
+        "@type": "PostalAddress"
+        {% if event.city %},"addressLocality": "{{ event.city }}"{% endif %}
+        {% if event.state_prov %},"addressRegion": "{{ event.state_prov }}"{% endif %}
+        {% if event.country %},"addressCountry": "{{ event.country }}"{% endif %}
+      }
+      {% endif %}
+    },
+    {% endif %}
+    "url": "https://www.thebluealliance.com/event/{{ event.key_name }}"
   },
   "url": "https://www.thebluealliance.com/match/{{ match.key_name }}"
 }
