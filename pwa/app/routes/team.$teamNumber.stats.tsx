@@ -1,5 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
 import { useMemo, useState } from 'react';
 
@@ -25,6 +25,7 @@ import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import { sortMultipleEventsMatches } from '~/lib/matchUtils';
 import { publicCacheControlHeaders } from '~/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 
 export const Route = createFileRoute('/team/$teamNumber/stats')({
   loader: async ({ params }) => {
@@ -117,9 +118,13 @@ function MatchStatsLoadingState({
 function TeamStatsPage() {
   const { team, allEvents, allAwards, socials, media } = Route.useLoaderData();
 
+  const navigate = useNavigate();
+
   const [includeOffseasons, setIncludeOffseasons] = useState(false);
   const [minYear, setMinYear] = useState(allEvents[0].year);
   const [maxYear, setMaxYear] = useState(allEvents[allEvents.length - 1].year);
+
+  const [yearsParticipated, setYearsParticipated] = useState([...new Set(allEvents.map((event, i) => event.year))].sort((a, b) => b - a));
 
   const maybeAvatar = useMemo(() => {
     return media.find((m) => m.type === 'avatar');
@@ -183,15 +188,39 @@ function TeamStatsPage() {
 
   return (
     <div>
-      <div className="mt-8 flex w-full flex-row justify-between">
-        <div>
+      <div className=" flex w-full flex-row justify-between gap-[5px]">
+        <div className="top-0 pt-5 sm:sticky">
+          <Select
+            onValueChange={(value) => {
+              void navigate({
+                to: '/team/$teamNumber/{-$year}',
+                params: { teamNumber: String(team.team_number), year: value },
+              });
+            }}
+            value='stats'
+          >
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder={'Stats'} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="history">History</SelectItem>
+              <SelectItem value="stats">Stats</SelectItem>
+              {yearsParticipated.map((y) => (
+                <SelectItem key={y} value={`${y}`}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="mt-8">
           <TeamPageTeamInfo
             team={team}
             maybeAvatar={maybeAvatar}
             socials={socials}
           />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 mt-8">
           <div className="flex flex-row items-center gap-2">
             <Checkbox
               checked={includeOffseasons}

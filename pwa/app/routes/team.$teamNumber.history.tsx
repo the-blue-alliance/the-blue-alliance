@@ -131,6 +131,7 @@ function TeamHistoryPage(): React.JSX.Element {
               params: { teamNumber: String(team.team_number), year: value },
             });
           }}
+          value='history'
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={'History'} />
@@ -220,8 +221,9 @@ function TeamHistoryPage(): React.JSX.Element {
               ))}
             </TableBody>
           </Table>
-          <div>
-            {bannerAwards.length > 0 && (
+          {bannerAwards.length > 0 && (
+            <div>
+              <h1 className="text-xl w-full text-center mb-3"><span className="font-bold">{bannerAwards.length}</span> Blue Banners</h1>
               <div className="flex w-96 flex-row flex-wrap justify-center gap-2">
                 {bannerAwards.map((a) => {
                   const event = history.events.find(
@@ -239,8 +241,8 @@ function TeamHistoryPage(): React.JSX.Element {
                   );
                 })}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
