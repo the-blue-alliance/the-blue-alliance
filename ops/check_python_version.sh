@@ -40,11 +40,11 @@ UPDATED=0
 
 # Update a file in-place with sed
 update_file() {
-    local file="$1"
-    local pattern="$2"
+    _uf_file="$1"
+    _uf_pattern="$2"
 
-    sed -i "$pattern" "$file"
-    echo "UPDATED: $file"
+    sed -i "$_uf_pattern" "$_uf_file"
+    echo "UPDATED: $_uf_file"
     UPDATED=$((UPDATED + 1))
 }
 
@@ -102,7 +102,7 @@ done
 for workflow in "$REPO_ROOT"/.github/workflows/*.yml; do
     if [ -f "$workflow" ]; then
         # Count mismatched python-version entries
-        MISMATCHES=$(grep -E "python-version:[[:space:]]*[\"']?[0-9.]+" "$workflow" | grep -v "$PYTHON_VERSION" | wc -l | tr -d ' ')
+        MISMATCHES=$(grep -E "python-version:[[:space:]]*[\"']?[0-9.]+" "$workflow" | grep -cv "$PYTHON_VERSION" || true)
         if [ "$MISMATCHES" -gt 0 ]; then
             if [ "$UPDATE_MODE" = true ]; then
                 # Update all python-version entries (handles both quoted styles)
