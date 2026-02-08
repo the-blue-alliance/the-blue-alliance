@@ -1,5 +1,5 @@
 import json
-from typing import Mapping, Optional
+from typing import Generic, Mapping, Optional, TypeVar
 
 from google.appengine.api import urlfetch_service_pb2
 from google.appengine.api.urlfetch import _URLFetchResult
@@ -17,9 +17,12 @@ class URLFetchMethod(StrEnum):
     PATCH = "PATCH"
 
 
-class URLFetchResult:
+T = TypeVar("T")
+
+
+class TypedURLFetchResult(Generic[T]):
     """
-    A strongly typed abstraction of GAE's URLFetchResult
+    A URLFetchResult with a typed JSON response.
     """
 
     request_url: str
@@ -33,7 +36,7 @@ class URLFetchResult:
     # If a redirect was followed, the ultimate URL
     final_url: Optional[str]
 
-    def __init__(self, url: str, res: _URLFetchResult) -> None:
+    def __init__(self, url: str, res: _URLFetchResult, json_type: type[T]) -> None:
         self.request_url = url
         self.content = res.content
         self.status_code = res.status_code
@@ -41,24 +44,23 @@ class URLFetchResult:
         self.final_url = res.final_url
         self.header_msg = res.header_msg
         self.headers = res.headers
+        self._json_type = json_type
 
     @property
     def url(self) -> str:
         return self.final_url or self.request_url
 
-    def json(self) -> Optional[JSON]:
+    def json(self) -> T | None:
         if not self.content:
             return None
         return json.loads(self.content)
 
     @classmethod
-    def mock_for_content(
-        cls, url: str, status_code: int, content: str
-    ) -> "URLFetchResult":
-        response_proto = urlfetch_service_pb2.URLFetchResponse()
-        response_proto.Content = content.encode()
-        response_proto.StatusCode = status_code
-        return cls(url, _URLFetchResult(response_proto))
+    def typed_mock_for_content(
+        cls, url: str, status_code: int, content: str, json_type: type[T]
+    ) -> "TypedURLFetchResult[T]":
+        response_proto = cls.mock_urlfetch_result(url, status_code, content)
+        return cls(url, _URLFetchResult(response_proto), json_type)
 
     @classmethod
     def mock_urlfetch_result(
@@ -69,3 +71,16 @@ class URLFetchResult:
         response_proto.Content = content.encode()
         response_proto.StatusCode = status_code
         return _URLFetchResult(response_proto)
+
+
+class URLFetchResult(TypedURLFetchResult[JSON]):
+
+    def __init__(self, url: str, res: _URLFetchResult) -> None:
+        super().__init__(url, res, JSON)
+
+    @classmethod
+    def mock_for_content(
+        cls, url: str, status_code: int, content: str
+    ) -> "URLFetchResult":
+        response_proto = cls.mock_urlfetch_result(url, status_code, content)
+        return cls(url, _URLFetchResult(response_proto))

@@ -3,20 +3,64 @@ import json
 import logging
 import os
 import re
-from typing import Any, cast, Dict, Generator, Literal, Optional
+from typing import Any, cast, Dict, Generator, Literal, Optional, TypeVar
 
 from google.appengine.ext import ndb
-from pyre_extensions import none_throws
+from pyre_extensions import JSON, none_throws
 
 from backend.common.environment import Environment
+from backend.common.frc_api.types import (
+    AllianceListModelV2,
+    ApiIndexModelV2,
+    AwardAssignmentListModelV2,
+    DistrictRankingListModelV2,
+    EventRankingListModelV2,
+    EventScheduleHybridModelV2,
+    MatchResultListModelV2,
+    ScheduleListModelV31,
+    ScoreDetailModel2015,
+    ScoreDetailModel2016,
+    ScoreDetailModel2017,
+    ScoreDetailModel2018,
+    ScoreDetailModel2019,
+    ScoreDetailModel2020,
+    ScoreDetailModel2021,
+    ScoreDetailModel2022,
+    ScoreDetailModel2023,
+    ScoreDetailModel2024,
+    ScoreDetailModel2025,
+    ScoreDetailModel2026,
+    SeasonDistrictListModelV2,
+    SeasonEventListModelV31,
+    SeasonTeamListModelV2,
+    TeamAvatarListingsModelV2,
+)
 from backend.common.futures import TypedFuture
 from backend.common.models.keys import Year
 from backend.common.profiler import Span
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 from backend.common.tasklets import typed_tasklet
-from backend.common.urlfetch import URLFetchResult
+from backend.common.urlfetch import TypedURLFetchResult
 
 TCompLevel = Literal["qual", "playoff"]
+
+T = TypeVar("T", bound=JSON)
+
+
+TScoreDetailUnion = (
+    ScoreDetailModel2015
+    | ScoreDetailModel2016
+    | ScoreDetailModel2017
+    | ScoreDetailModel2018
+    | ScoreDetailModel2019
+    | ScoreDetailModel2020
+    | ScoreDetailModel2021
+    | ScoreDetailModel2022
+    | ScoreDetailModel2023
+    | ScoreDetailModel2024
+    | ScoreDetailModel2025
+    | ScoreDetailModel2026
+)
 
 
 class FRCAPI:
@@ -53,80 +97,92 @@ class FRCAPI:
         self._sim_api_version = sim_api_version
         self._save_response = save_response
 
-    def root(self) -> TypedFuture[URLFetchResult]:
-        return self._get("/")
+    def root(self) -> TypedFuture[TypedURLFetchResult[ApiIndexModelV2]]:
+        return self._get("/", ApiIndexModelV2)
 
-    def team_details(self, year: Year, team_number: int) -> TypedFuture[URLFetchResult]:
+    def team_details(
+        self, year: Year, team_number: int
+    ) -> TypedFuture[TypedURLFetchResult[SeasonTeamListModelV2]]:
         endpoint = f"/{year}/teams?teamNumber={team_number}"
-        return self._get(endpoint)
+        return self._get(endpoint, SeasonTeamListModelV2)
 
-    def team_avatar(self, year: Year, team_number: int) -> TypedFuture[URLFetchResult]:
+    def team_avatar(
+        self, year: Year, team_number: int
+    ) -> TypedFuture[TypedURLFetchResult[TeamAvatarListingsModelV2]]:
         endpoint = f"/{year}/avatars?teamNumber={team_number}"
-        return self._get(endpoint)
+        return self._get(endpoint, TeamAvatarListingsModelV2)
 
-    def event_list(self, year: Year) -> TypedFuture[URLFetchResult]:
+    def event_list(
+        self, year: Year
+    ) -> TypedFuture[TypedURLFetchResult[SeasonEventListModelV31]]:
         endpoint = f"/{year}/events"
-        return self._get(endpoint)
+        return self._get(endpoint, SeasonEventListModelV31)
 
-    def event_info(self, year: Year, event_short: str) -> TypedFuture[URLFetchResult]:
+    def event_info(
+        self, year: Year, event_short: str
+    ) -> TypedFuture[TypedURLFetchResult[SeasonEventListModelV31]]:
         endpoint = f"/{year}/events?eventCode={event_short}"
-        return self._get(endpoint)
+        return self._get(endpoint, SeasonEventListModelV31)
 
     def event_teams(
         self, year: Year, event_short: str, page: int
-    ) -> TypedFuture[URLFetchResult]:
+    ) -> TypedFuture[TypedURLFetchResult[SeasonTeamListModelV2]]:
         endpoint = f"/{year}/teams?eventCode={event_short}&page={page}"
-        return self._get(endpoint)
+        return self._get(endpoint, SeasonTeamListModelV2)
 
     def event_team_avatars(
         self, year: Year, event_short: str, page: int
-    ) -> TypedFuture[URLFetchResult]:
+    ) -> TypedFuture[TypedURLFetchResult[TeamAvatarListingsModelV2]]:
         endpoint = f"/{year}/avatars?eventCode={event_short}&page={page}"
-        return self._get(endpoint)
+        return self._get(endpoint, TeamAvatarListingsModelV2)
 
-    def alliances(self, year: Year, event_short: str) -> TypedFuture[URLFetchResult]:
+    def alliances(
+        self, year: Year, event_short: str
+    ) -> TypedFuture[TypedURLFetchResult[AllianceListModelV2]]:
         endpoint = f"/{year}/alliances/{event_short}"
-        return self._get(endpoint)
+        return self._get(endpoint, AllianceListModelV2)
 
-    def rankings(self, year: Year, event_short: str) -> TypedFuture[URLFetchResult]:
+    def rankings(
+        self, year: Year, event_short: str
+    ) -> TypedFuture[TypedURLFetchResult[EventRankingListModelV2]]:
         endpoint = f"/{year}/rankings/{event_short}"
-        return self._get(endpoint)
+        return self._get(endpoint, EventRankingListModelV2)
 
     def hybrid_schedule(
         self, year: Year, event_short: str, level: TCompLevel
-    ) -> TypedFuture[URLFetchResult]:
+    ) -> TypedFuture[TypedURLFetchResult[EventScheduleHybridModelV2]]:
         endpoint = f"/{year}/schedule/{event_short}/{level}/hybrid"
-        return self._get(endpoint)
+        return self._get(endpoint, EventScheduleHybridModelV2)
 
     def match_schedule(
         self, year: Year, event_short: str, level: TCompLevel
-    ) -> TypedFuture[URLFetchResult]:
+    ) -> TypedFuture[TypedURLFetchResult[ScheduleListModelV31]]:
         # This does not include results
         endpoint = f"/{year}/schedule/{event_short}?tournamentLevel={level}"
-        return self._get(endpoint)
+        return self._get(endpoint, ScheduleListModelV31)
 
     def matches(
         self, year: Year, event_short: str, level: TCompLevel
-    ) -> TypedFuture[URLFetchResult]:
+    ) -> TypedFuture[TypedURLFetchResult[MatchResultListModelV2]]:
         # This includes both played/unplayed matches at the event
         # but doesn't include full results
         endpoint = f"/{year}/matches/{event_short}?tournamentLevel={level}"
-        return self._get(endpoint)
+        return self._get(endpoint, MatchResultListModelV2)
 
     def match_scores(
         self, year: Year, event_short: str, level: TCompLevel
-    ) -> TypedFuture[URLFetchResult]:
+    ) -> TypedFuture[TypedURLFetchResult[TScoreDetailUnion]]:
         # technically "qual"/"playoff" are invalid tournament levels as per the docs,
         # but they seem to work?
         endpoint = f"/{year}/scores/{event_short}/{level}"
-        return self._get(endpoint)
+        return self._get(endpoint, TScoreDetailUnion)
 
     def awards(
         self,
         year: Year,
         event_code: Optional[str] = None,
         team_number: Optional[int] = None,
-    ) -> TypedFuture[URLFetchResult]:
+    ) -> TypedFuture[TypedURLFetchResult[AwardAssignmentListModelV2]]:
         if not event_code and not team_number:
             raise FRCAPI.ValidationError(
                 "awards expects either an event_code, team_number, or both"
@@ -139,19 +195,21 @@ class FRCAPI:
         else:  # team_number is not None
             endpoint = f"/{year}/awards/team/{team_number}"
 
-        return self._get(endpoint)
+        return self._get(endpoint, AwardAssignmentListModelV2)
 
-    def district_list(self, year: Year) -> TypedFuture[URLFetchResult]:
+    def district_list(
+        self, year: Year
+    ) -> TypedFuture[TypedURLFetchResult[SeasonDistrictListModelV2]]:
         endpoint = f"/{year}/districts"
-        return self._get(endpoint)
+        return self._get(endpoint, SeasonDistrictListModelV2)
 
     def district_rankings(
         self, year: Year, district_short: str, page: int
-    ) -> TypedFuture[URLFetchResult]:
+    ) -> TypedFuture[TypedURLFetchResult[DistrictRankingListModelV2]]:
         endpoint = (
             f"/{year}/rankings/district?districtCode={district_short}&page={page}"
         )
-        return self._get(endpoint)
+        return self._get(endpoint, DistrictRankingListModelV2)
 
     """ Attempt to fetch the endpoint from the FRC API
 
@@ -161,12 +219,14 @@ class FRCAPI:
 
     @typed_tasklet
     def _get(
-        self, endpoint: str, version: str = "v3.0"
-    ) -> Generator[Any, Any, URLFetchResult]:
+        self, endpoint: str, return_type: type, version: str = "v3.0"
+    ) -> Generator[Any, Any, TypedURLFetchResult]:
         # Remove any leading / - we'll add it later (safer then adding a slash)
         versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
         if self._sim_time is not None:
-            return self._get_simulated(endpoint, self._sim_api_version or version)
+            return self._get_simulated(
+                endpoint, return_type, self._sim_api_version or version
+            )
 
         url = f"{self.BASE_URL}/{versioned_endpoint}"
         headers = {
@@ -178,7 +238,7 @@ class FRCAPI:
 
         with Span(f"frc_api_fetch:{endpoint}"):
             r = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
-            response = URLFetchResult(url, r)
+            response = TypedURLFetchResult(url, r, return_type)
             if response.status_code == 200:
                 with Span(f"maybe_save_fmsapi_response:{response.url}"):
                     self._maybe_save_response(response.url, response.content)
@@ -251,7 +311,9 @@ class FRCAPI:
                     files.append(f"{safe_dir_name}/{safe_file_name}")
         return sorted(files)
 
-    def _get_simulated(self, endpoint: str, version: str) -> URLFetchResult:
+    def _get_simulated(
+        self, endpoint: str, return_type: type, version: str
+    ) -> TypedURLFetchResult:
         sim_year = none_throws(self._sim_time).year
         if version == "v2.0" and "/schedule" in endpoint and "hybrid" not in endpoint:
             # The hybrid schedule endpoint doesn't exist in newer versions,
@@ -270,21 +332,25 @@ class FRCAPI:
             # The hybrid schedule endpoint didn't exist in v3 until the 2025 season, so merge scores/schedule
             return self._simulate_v3_hybrid_schedule(endpoint, version)
 
-        return self._get_api_response_from_gcs(endpoint, version)
+        return self._get_api_response_from_gcs(endpoint, version, return_type)
 
     def _simulate_v3_hybrid_schedule(
         self, endpoint: str, version: str
-    ) -> URLFetchResult:
+    ) -> TypedURLFetchResult[EventScheduleHybridModelV2]:
         url_parts = endpoint.split("/")
         year = int(url_parts[1])
         event_code = url_parts[3]
         comp_level = url_parts[4]
 
         schedule_result = self._get_api_response_from_gcs(
-            f"/{year}/schedule/{event_code}?tournamentLevel={comp_level}", version
+            f"/{year}/schedule/{event_code}?tournamentLevel={comp_level}",
+            version,
+            ScheduleListModelV31,
         )
         matches_result = self._get_api_response_from_gcs(
-            f"/{year}/matches/{event_code}?tournamentLevel={comp_level}", version
+            f"/{year}/matches/{event_code}?tournamentLevel={comp_level}",
+            version,
+            MatchResultListModelV2,
         )
         merged_content = self._merge_match_schedule_and_results(
             cast(Dict, schedule_result.json()), cast(Dict, matches_result.json())
@@ -292,11 +358,13 @@ class FRCAPI:
 
         versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
         hybrid_url = f"{self.BASE_URL}/{versioned_endpoint}"
-        return URLFetchResult.mock_for_content(
-            hybrid_url, 200, json.dumps(merged_content)
+        return TypedURLFetchResult.typed_mock_for_content(
+            hybrid_url, 200, json.dumps(merged_content), EventScheduleHybridModelV2
         )
 
-    def _get_api_response_from_gcs(self, endpoint: str, version: str) -> URLFetchResult:
+    def _get_api_response_from_gcs(
+        self, endpoint: str, version: str, return_type: type
+    ) -> TypedURLFetchResult:
         versioned_endpoint = f"{version}/{endpoint.lstrip('/')}"
         url = f"{self.BASE_URL}/{versioned_endpoint}"
         try:
@@ -328,12 +396,16 @@ class FRCAPI:
                     content = f.read()
 
             if content is None:
-                return URLFetchResult.mock_for_content(url, 200, "{}")
+                return TypedURLFetchResult.typed_mock_for_content(
+                    url, 200, "{}", return_type
+                )
 
-            return URLFetchResult.mock_for_content(url, 200, content)
+            return TypedURLFetchResult.typed_mock_for_content(
+                url, 200, content, return_type
+            )
         except Exception:
             logging.exception("Error fetching sim frc api")
-            return URLFetchResult.mock_for_content(url, 500, "")
+            return TypedURLFetchResult.typed_mock_for_content(url, 500, "", return_type)
 
     def _merge_match_schedule_and_results(self, schedule: Dict, matches: Dict) -> Dict:
         scheduled_matches = schedule["Schedule"]
