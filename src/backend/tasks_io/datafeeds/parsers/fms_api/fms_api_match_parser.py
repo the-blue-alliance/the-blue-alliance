@@ -199,7 +199,9 @@ class FMSAPIHybridScheduleParser(
             youtube_videos = []
             video_link = match.get("matchVideoLink")
             if video_link:
-                video_suggestion = MediaParser.partial_media_dict_from_url(video_link)
+                video_suggestion = MediaParser.partial_media_dict_from_url(
+                    video_link
+                ).get_result()
                 if (
                     video_suggestion
                     and video_suggestion["media_type_enum"] == MediaType.YOUTUBE_VIDEO

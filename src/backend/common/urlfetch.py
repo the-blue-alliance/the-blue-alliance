@@ -59,3 +59,13 @@ class URLFetchResult:
         response_proto.Content = content.encode()
         response_proto.StatusCode = status_code
         return cls(url, _URLFetchResult(response_proto))
+
+    @classmethod
+    def mock_urlfetch_result(
+        cls, url: str, status_code: int, content: str
+    ) -> _URLFetchResult:
+        """Create a mock _URLFetchResult for testing urlfetch calls."""
+        response_proto = urlfetch_service_pb2.URLFetchResponse()
+        response_proto.Content = content.encode()
+        response_proto.StatusCode = status_code
+        return _URLFetchResult(response_proto)

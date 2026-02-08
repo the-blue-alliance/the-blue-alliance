@@ -7,7 +7,6 @@ from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
 )
 
-
 URL = "https://foo.bar.com/"
 
 

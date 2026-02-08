@@ -23,7 +23,6 @@ from backend.common.manipulators.insight_manipulator import InsightManipulator
 from backend.common.models.insight import Insight, LeaderboardKeyType
 from backend.common.models.keys import Year
 
-
 blueprint = Blueprint("insights", __name__)
 
 

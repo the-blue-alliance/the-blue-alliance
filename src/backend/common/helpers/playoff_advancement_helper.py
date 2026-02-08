@@ -375,7 +375,7 @@ class PlayoffAdvancementHelper:
                         complete_alliances, alliance_names, alliance, alliance_name
                     )
 
-                    (_, scores, _, _) = per_alliance_advancement[comp_level][
+                    _, scores, _, _ = per_alliance_advancement[comp_level][
                         alliance_index
                     ]
                     scores.append(match.alliances[color]["score"])

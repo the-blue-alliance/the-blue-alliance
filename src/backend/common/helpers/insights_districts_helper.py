@@ -24,7 +24,6 @@ from backend.common.queries.event_query import (
 )
 from backend.common.queries.team_query import DistrictTeamsQuery
 
-
 # Exclude these teams from these districts in these years. They are one-off exceptions that mess up region growth insights.
 # Generally, these teams have current locations that are dramatically different than where they were in these years.
 TEAM_YEAR_EXCEPTIONS = [

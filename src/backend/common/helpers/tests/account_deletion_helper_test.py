@@ -36,7 +36,7 @@ def test_deletes_account(account_key) -> None:
 def test_auto_reject_pending_suggestions(account_key) -> None:
     status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
         account_key, "http://imgur.com/ruRAxDm", "frc1124", "2016"
-    )
+    ).get_result()
     assert status == SuggestionCreationStatus.SUCCESS
     assert suggestion is not None
 

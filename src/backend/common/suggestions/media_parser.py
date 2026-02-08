@@ -1,10 +1,10 @@
 import json
 import logging
 import re
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, Generator, List, Optional, Set, Tuple
 from urllib.parse import urlencode, urlparse
 
-import requests
+from google.appengine.ext import ndb
 
 from backend.common.consts.media_type import (
     MediaType,
@@ -14,6 +14,8 @@ from backend.common.consts.media_type import (
 )
 from backend.common.models.suggestion_dict import SuggestionDict
 from backend.common.sitevars.cd_request_user_agent import CdRequestUserAgent
+from backend.common.tasklets import typed_tasklet
+from backend.common.urlfetch import URLFetchResult
 
 
 class MediaParser:
@@ -94,7 +96,10 @@ class MediaParser:
     OEMBED_DETAIL_URL: Dict[MediaType, str] = {}
 
     @classmethod
-    def partial_media_dict_from_url(cls, url: str) -> Optional[SuggestionDict]:
+    @typed_tasklet
+    def partial_media_dict_from_url(
+        cls, url: str
+    ) -> Generator[Any, Any, Optional[SuggestionDict]]:
         """
         Takes a url, and turns it into a partial Media object dict
         """
@@ -105,23 +110,28 @@ class MediaParser:
                 if media_type == MediaType.CD_PHOTO_THREAD:
                     # CD images are special - they need to do an additional urlfetch because the given url
                     # doesn't contain the foreign key
-                    return cls._partial_media_dict_from_cd_photo_thread(url)
+                    result = yield cls._partial_media_dict_from_cd_photo_thread(url)
+                    return result
                 elif media_type == MediaType.GRABCAD:
                     # GrabCAD images are special - we'll need to do a second fetch to a SUPER HACKY
                     # API so we can get embed images and titles and stuff
-                    return cls._partial_media_dict_from_grabcad(url)
+                    result = yield cls._partial_media_dict_from_grabcad(url)
+                    return result
                 elif media_type == MediaType.ONSHAPE:
-                    return cls._partial_media_dict_from_onshape(url)
+                    result = yield cls._partial_media_dict_from_onshape(url)
+                    return result
                 elif media_type in cls.OEMBED_PROVIDERS:
-                    return cls._partial_media_dict_from_oembed(media_type, url)
+                    result = yield cls._partial_media_dict_from_oembed(media_type, url)
+                    return result
                 elif media_type == MediaType.CD_THREAD:
-                    return cls._parse_cd_thread(url)
+                    result = yield cls._parse_cd_thread(url)
+                    return result
                 else:
-                    return cls._create_media_dict(media_type, url)
+                    raise ndb.Return(cls._create_media_dict(media_type, url))
 
         if url:
             logging.warning("Failed to determine media type from url: {}".format(url))
-        return None
+        raise ndb.Return(None)
 
     @classmethod
     def _create_media_dict(
@@ -197,11 +207,14 @@ class MediaParser:
         return clean_url
 
     @classmethod
+    @typed_tasklet
     def _partial_media_dict_from_cd_photo_thread(
         cls, url: str
-    ) -> Optional[SuggestionDict]:
+    ) -> Generator[Any, Any, Optional[SuggestionDict]]:
         # This is broken with new CD, cd-media is no more
-        return None
+        if False:  # Make this a generator
+            yield
+        raise ndb.Return(None)
         """
         foreign_key = cls._parse_cdphotothread_foreign_key(url)
         if foreign_key is None:
@@ -229,10 +242,13 @@ class MediaParser:
         """
 
     @classmethod
-    def _partial_media_dict_from_onshape(cls, url: str) -> Optional[SuggestionDict]:
+    @typed_tasklet
+    def _partial_media_dict_from_onshape(
+        cls, url: str
+    ) -> Generator[Any, Any, Optional[SuggestionDict]]:
         media_dict = cls._create_media_dict(MediaType.ONSHAPE, url)
         if not media_dict:
-            return None
+            raise ndb.Return(None)
 
         # 5481081f48161555332968ff/w/a466cec29af372ec09c44333 -> 5481081f48161555332968ff
         document_key = media_dict["foreign_key"].split("/")[0]
@@ -241,15 +257,18 @@ class MediaParser:
         # as of now, it can only fetch data from documents that are visible to anyone with a link and do not require to be logged in to an onshape account
         # to fetch data from documents that require users to be logged in, we will need to include api keys
         url = cls.ONSHAPE_DETAIL_URL.format(document_key)
-        urlfetch_result = requests.get(url, timeout=10)
+
+        ndb_context = ndb.get_context()
+        urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
+        urlfetch_result = URLFetchResult(url, urlfetch_response)
 
         if urlfetch_result.status_code != 200:
             logging.warning("Unable to retreive url: {}".format(url))
-            return None
+            raise ndb.Return(None)
 
         onshape_data = json.loads(urlfetch_result.content)
         if not onshape_data:
-            return None
+            raise ndb.Return(None)
 
         image_url_base = "https://cad.onshape.com/api/thumbnails/d/{}/s/{}"
         image_url = image_url_base.format(media_dict["foreign_key"], "300x300")
@@ -262,22 +281,30 @@ class MediaParser:
                 "model_created": onshape_data.get("createdAt", ""),
             }
         )
-        return media_dict
+        raise ndb.Return(media_dict)
 
     @classmethod
-    def _partial_media_dict_from_grabcad(cls, url: str) -> Optional[SuggestionDict]:
+    @typed_tasklet
+    def _partial_media_dict_from_grabcad(
+        cls, url: str
+    ) -> Generator[Any, Any, Optional[SuggestionDict]]:
         media_dict = cls._create_media_dict(MediaType.GRABCAD, url)
         if not media_dict:
-            return None
+            raise ndb.Return(None)
 
         url = cls.GRABCAD_DETAIL_URL.format(media_dict["foreign_key"])
-        urlfetch_result = requests.get(url, timeout=10)
+
+        ndb_context = ndb.get_context()
+        urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
+        urlfetch_result = URLFetchResult(url, urlfetch_response)
+
         if urlfetch_result.status_code != 200:
             logging.warning("Unable to retreive url: {}".format(url))
+            raise ndb.Return(None)
 
         grabcad_data = json.loads(urlfetch_result.content)
         if not grabcad_data:
-            return None
+            raise ndb.Return(None)
 
         media_dict["details_json"] = json.dumps(
             {
@@ -287,27 +314,33 @@ class MediaParser:
                 "model_created": grabcad_data["created_at"],
             }
         )
-        return media_dict
+        raise ndb.Return(media_dict)
 
     @classmethod
+    @typed_tasklet
     def _partial_media_dict_from_oembed(
         cls, media_type: MediaType, url: str
-    ) -> Optional[SuggestionDict]:
+    ) -> Generator[Any, Any, Optional[SuggestionDict]]:
         media_dict = cls._create_media_dict(media_type, url)
         if not media_dict:
-            return None
+            raise ndb.Return(None)
 
         url = cls.OEMBED_DETAIL_URL[media_type].format(media_dict["foreign_key"])
-        urlfetch_result = requests.get(url, timeout=10)
+
+        ndb_context = ndb.get_context()
+        urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
+        urlfetch_result = URLFetchResult(url, urlfetch_response)
+
         if urlfetch_result.status_code != 200:
             logging.warning("Unable to retreive url: {}".format(url))
+            raise ndb.Return(None)
 
         oembed_data = json.loads(urlfetch_result.content)
         if not oembed_data:
-            return None
+            raise ndb.Return(None)
 
         media_dict["details_json"] = json.dumps(oembed_data)
-        return media_dict
+        raise ndb.Return(media_dict)
 
     @classmethod
     def _parse_cdphotothread_foreign_key(cls, url: str) -> Optional[str]:
@@ -359,10 +392,13 @@ class MediaParser:
         """
 
     @classmethod
-    def _parse_cd_thread(cls, url: str) -> Optional[SuggestionDict]:
+    @typed_tasklet
+    def _parse_cd_thread(
+        cls, url: str
+    ) -> Generator[Any, Any, Optional[SuggestionDict]]:
         media_dict = cls._create_media_dict(MediaType.CD_THREAD, url)
         if not media_dict:
-            return None
+            raise ndb.Return(None)
 
         discourse_url = "https://www.chiefdelphi.com/t/{}.json".format(
             media_dict["foreign_key"]
@@ -370,23 +406,26 @@ class MediaParser:
 
         # The User-Agent here needs to be a specific value in order to avoid being blocked by CD cloudflare configuration.
         # If you need to test this behavior locally, message TBA Admins.
-        discourse_data = requests.get(
+        ndb_context = ndb.get_context()
+        urlfetch_response = yield ndb_context.urlfetch(
             discourse_url,
-            timeout=10,
+            deadline=10,
             headers={"User-Agent": CdRequestUserAgent.user_agent()},
         )
-        if discourse_data.status_code != 200:
+        urlfetch_result = URLFetchResult(discourse_url, urlfetch_response)
+
+        if urlfetch_result.status_code != 200:
             logging.warning(
                 "Unable to retreive url: {} (status code: {})".format(
-                    discourse_url, discourse_data.status_code
+                    discourse_url, urlfetch_result.status_code
                 )
             )
-            return None
+            raise ndb.Return(None)
 
-        discourse_data = discourse_data.json()
-        if not discourse_data:
+        discourse_data = urlfetch_result.json()
+        if discourse_data is None or not isinstance(discourse_data, dict):
             logging.warning("No data returned from url: {}".format(discourse_url))
-            return None
+            raise ndb.Return(None)
 
         media_dict["details_json"] = json.dumps(
             {
@@ -395,4 +434,4 @@ class MediaParser:
             }
         )
 
-        return media_dict
+        raise ndb.Return(media_dict)

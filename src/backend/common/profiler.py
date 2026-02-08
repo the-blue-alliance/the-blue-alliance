@@ -10,7 +10,6 @@ from werkzeug.local import Local
 
 from backend.common.environment import Environment
 
-
 # create a request-local global context
 trace_context = Local()
 

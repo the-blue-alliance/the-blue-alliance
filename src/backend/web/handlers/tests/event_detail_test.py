@@ -163,7 +163,9 @@ def test_schema_org_sports_event(ndb_stub, web_client: Client) -> None:
         sports_event_schema["eventAttendanceMode"]
         == "https://schema.org/OfflineEventAttendanceMode"
     )
-    assert sports_event_schema["url"] == "https://www.thebluealliance.com/event/2020nyny"
+    assert (
+        sports_event_schema["url"] == "https://www.thebluealliance.com/event/2020nyny"
+    )
 
     # Check organizer
     assert sports_event_schema["organizer"]["@type"] == "SportsOrganization"

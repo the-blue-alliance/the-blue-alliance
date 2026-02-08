@@ -2,7 +2,6 @@ from typing import Any, Dict, Optional, Set
 
 from google.appengine.ext import ndb
 
-
 TAffectedReferences = Dict[str, Set[Any]]
 
 

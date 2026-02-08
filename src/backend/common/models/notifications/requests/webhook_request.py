@@ -4,7 +4,6 @@ from google.appengine.api import urlfetch
 
 from backend.common.models.notifications.requests.request import Request
 
-
 WEBHOOK_VERSION = 1
 
 

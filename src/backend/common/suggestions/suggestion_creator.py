@@ -1,7 +1,7 @@
 import enum
 import logging
 from datetime import datetime
-from typing import cast, Dict, List, Optional, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
@@ -20,6 +20,7 @@ from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.suggestion_dict import SuggestionDict
 from backend.common.suggestions.media_parser import MediaParser
+from backend.common.tasklets import typed_tasklet
 
 
 @enum.unique
@@ -39,6 +40,7 @@ class SuggestionCreationStatus(StrEnum):
 
 class SuggestionCreator:
     @classmethod
+    @typed_tasklet
     def createTeamMediaSuggestion(
         cls,
         author_account_key: ndb.Key,
@@ -48,11 +50,11 @@ class SuggestionCreator:
         private_details_json: Optional[str] = None,
         is_social: bool = False,
         default_preferred: bool = False,
-    ) -> Tuple[SuggestionCreationStatus, Optional[Suggestion]]:
+    ) -> Generator[Any, Any, Tuple[SuggestionCreationStatus, Optional[Suggestion]]]:
         """Create a Team Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
 
         year = int(year_str) if year_str else None
-        media_dict = MediaParser.partial_media_dict_from_url(media_url)
+        media_dict = yield MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
             if media_dict.get("is_social", False) != is_social:
                 return SuggestionCreationStatus.BAD_URL, None
@@ -109,16 +111,17 @@ class SuggestionCreator:
             return SuggestionCreationStatus.BAD_URL, None
 
     @classmethod
+    @typed_tasklet
     def createEventMediaSuggestion(
         cls,
         author_account_key: ndb.Key,
         media_url: str,
         event_key: EventKey,
         private_details_json: Optional[str] = None,
-    ) -> Tuple[SuggestionCreationStatus, Optional[Suggestion]]:
+    ) -> Generator[Any, Any, Tuple[SuggestionCreationStatus, Optional[Suggestion]]]:
         """Create an Event Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
 
-        media_dict = MediaParser.partial_media_dict_from_url(media_url)
+        media_dict = yield MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
             if media_dict["media_type_enum"] != MediaType.YOUTUBE_VIDEO:
                 return SuggestionCreationStatus.BAD_URL, None

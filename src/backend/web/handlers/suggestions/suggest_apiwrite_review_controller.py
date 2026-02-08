@@ -90,9 +90,7 @@ If you have any questions, please don't heasitate to reach out to us at contact@
 
 Thanks,
 TBA Admins
-            """.format(
-            user.display_name, event.year, event.name, message
-        )
+            """.format(user.display_name, event.year, event.name, message)
 
         return ApiWriteTargetModel(
             auth_id=auth_id, user=user, event_key=event_key, message=email_message
@@ -167,11 +165,7 @@ If you have any questions, please don't hesitate to reach out to us at contact@t
 
 Thanks,
 TBA Admins
-""".format(
-                user.display_name, event.year, event.name, message
-            ).encode(
-                "utf-8"
-            )
+""".format(user.display_name, event.year, event.name, message).encode("utf-8")
 
             admin_email_body = """{} ({}) has rejected this request with the following reason:  # noqa: F841
 {}

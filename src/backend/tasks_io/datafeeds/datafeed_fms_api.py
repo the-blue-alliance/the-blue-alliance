@@ -128,7 +128,7 @@ class DatafeedFMSAPI:
         api_response = yield self.api.team_avatar(year, team_number)
         result = self._parse(api_response, FMSAPITeamAvatarParser(year))
         if result:
-            (avatar_result, _) = result
+            avatar_result, _ = result
             if avatar_result:
                 return avatar_result
         return [], set()
@@ -363,7 +363,7 @@ class DatafeedFMSAPI:
                 break
 
             parser_result, more_pages = result
-            (partial_avatars, partial_keys_to_delete) = parser_result or ([], {})
+            partial_avatars, partial_keys_to_delete = parser_result or ([], {})
             avatars.extend(partial_avatars)
             keys_to_delete = keys_to_delete.union(partial_keys_to_delete)
 

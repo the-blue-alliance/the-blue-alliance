@@ -27,7 +27,9 @@ class AwardInfoParsed(TypedDict):
 
 class JSONAwardsParser:
     @staticmethod
-    def parse[T: (str, bytes)](awards_json: T, event_key: EventKey) -> list[AwardInfoParsed]:  # fmt: skip
+    def parse[
+        T: (str, bytes)
+    ](awards_json: T, event_key: EventKey) -> list[AwardInfoParsed]:  # fmt: skip
         """
         Parse JSON that contains a list of awards where each award is a dict of:
         name_str: String of award name. ex: "Tournament Winner" or "Dean's List Finalist"

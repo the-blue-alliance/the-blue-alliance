@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional, Tuple, TypeVar
 
 from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
-
 TParsedResponse = TypeVar("TParsedResponse")
 
 

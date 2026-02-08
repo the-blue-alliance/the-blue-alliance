@@ -9,7 +9,6 @@ import requests
 
 from artifact_data import ARTIFACT_FILENAME, ArtifactData
 
-
 MESSAGE_FILENAME = "ci_screenshots_message.md"
 
 

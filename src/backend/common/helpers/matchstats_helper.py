@@ -34,7 +34,6 @@ from backend.common.models.match import Match
 from backend.common.models.stats import EventMatchStats, StatType
 from backend.common.queries import event_query
 
-
 TTeamIdMap = Dict[TeamId, int]
 StatAccessor = Callable[[Match, AllianceColor], float]
 

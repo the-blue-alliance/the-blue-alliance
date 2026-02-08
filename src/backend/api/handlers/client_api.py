@@ -182,13 +182,13 @@ def suggest_team_media(request: MediaSuggestionMessage) -> BaseResponse:
             private_details = {"deletehash": incoming_details.pop("deletehash")}
         private_details_json = json.dumps(private_details) if private_details else None
 
-    (status, _) = SuggestionCreator.createTeamMediaSuggestion(
+    status, _ = SuggestionCreator.createTeamMediaSuggestion(
         author_account_key=account_key,
         media_url=request["media_url"],
         team_key=request["reference_key"],
         year_str=str(request["year"]),
         private_details_json=private_details_json,
-    )
+    ).get_result()
 
     if status == SuggestionCreationStatus.BAD_URL:
         return BaseResponse(code=400, message="Bad suggestion url")

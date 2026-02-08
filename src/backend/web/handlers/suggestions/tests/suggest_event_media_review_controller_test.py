@@ -59,7 +59,7 @@ def createSuggestion(logged_in_user) -> str:
         logged_in_user.account_key,
         "https://www.youtube.com/watch?v=foobar",
         "2016nyny",
-    )
+    ).get_result()
     assert status[0] == SuggestionCreationStatus.SUCCESS
     return Suggestion.render_media_key_name(
         2016, "event", "2016nyny", "youtube", "foobar"

@@ -20,7 +20,6 @@ from backend.api.handlers.trusted import (
 )
 from backend.common.datafeed_parsers.exceptions import ParserInputException
 
-
 # Trusted API
 trusted_api = Blueprint("trusted_api", __name__, url_prefix="/api/trusted/v1")
 CORS(

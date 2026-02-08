@@ -5,7 +5,6 @@ from typing import TypeVar
 
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
-
 TParsedResponse = TypeVar("TParsedResponse")
 
 

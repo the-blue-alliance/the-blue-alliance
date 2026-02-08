@@ -62,7 +62,7 @@ def createSuggestion(logged_in_user) -> str:
         None,
         None,
         True,
-    )
+    ).get_result()
     assert status[0] == SuggestionCreationStatus.SUCCESS
     return Suggestion.render_media_key_name(
         None, "team", "frc1124", "twitter-profile", "frc1124"

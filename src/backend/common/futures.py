@@ -3,7 +3,6 @@ from typing import Generic, Optional, TypeVar
 
 from google.appengine.ext import ndb
 
-
 T = TypeVar("T")
 
 

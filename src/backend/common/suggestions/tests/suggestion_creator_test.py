@@ -40,7 +40,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
     def test_create_suggestion(self) -> None:
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key, "http://imgur.com/ruRAxDm", "frc1124", "2016"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -50,7 +50,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         suggestion = Suggestion.get_by_id(suggestion_id)
         expected_dict = MediaParser.partial_media_dict_from_url(
             "http://imgur.com/ruRAxDm"
-        )
+        ).get_result()
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
         self.assertEqual(suggestion.author, self.account.key)
@@ -63,7 +63,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
     def test_create_suggestion_banned(self) -> None:
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account_banned.key, "http://imgur.com/ruRAxDm", "frc1124", "2016"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -73,7 +73,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         suggestion = Suggestion.get_by_id(suggestion_id)
         expected_dict = MediaParser.partial_media_dict_from_url(
             "http://imgur.com/ruRAxDm"
-        )
+        ).get_result()
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_AUTOREJECTED)
         self.assertEqual(suggestion.author, self.account_banned.key)
@@ -89,7 +89,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
             "https://www.youtube.com/watch?v=VP992UKFbko",
             "frc1124",
             "2016",
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -99,7 +99,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         suggestion = Suggestion.get_by_id(suggestion_id)
         expected_dict = MediaParser.partial_media_dict_from_url(
             "https://www.youtube.com/watch?v=VP992UKFbko"
-        )
+        ).get_result()
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
         self.assertEqual(suggestion.author, self.account.key)
@@ -115,7 +115,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
             " http://imgur.com/ruRAxDm?foo=bar#meow ",
             "frc1124",
             "2016",
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -135,7 +135,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
             "frc1124",
             None,
             is_social=True,
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -162,7 +162,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
 
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key, "http://imgur.com/ruRAxDm", "frc1124", "2016"
-        )
+        ).get_result()
         self.assertEqual(status, "suggestion_exists")
 
     def test_media_exists(self) -> None:
@@ -175,13 +175,13 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         ).put()
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key, "http://imgur.com/ruRAxDm", "frc1124", "2016"
-        )
+        ).get_result()
         self.assertEqual(status, "media_exists")
 
     def test_bad_url(self) -> None:
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key, "http://foo.com/blah", "frc1124", "2016"
-        )
+        ).get_result()
         self.assertEqual(status, "bad_url")
 
 
@@ -189,7 +189,7 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
     def test_create_suggestion(self) -> None:
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key, "https://www.youtube.com/watch?v=H-54KMwMKY0", "2016nyny"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -199,7 +199,7 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         suggestion = Suggestion.get_by_id(suggestion_id)
         expected_dict = MediaParser.partial_media_dict_from_url(
             "https://www.youtube.com/watch?v=H-54KMwMKY0"
-        )
+        ).get_result()
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
         self.assertEqual(suggestion.author, self.account.key)
@@ -214,7 +214,7 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
             self.account_banned.key,
             "https://www.youtube.com/watch?v=H-54KMwMKY0",
             "2016nyny",
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -224,7 +224,7 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         suggestion = Suggestion.get_by_id(suggestion_id)
         expected_dict = MediaParser.partial_media_dict_from_url(
             "https://www.youtube.com/watch?v=H-54KMwMKY0"
-        )
+        ).get_result()
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_AUTOREJECTED)
         self.assertEqual(suggestion.author, self.account_banned.key)
@@ -237,7 +237,7 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
     def test_create_non_video_suggestion(self) -> None:
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key, "http://imgur.com/ruRAxDm", "2016nyny"
-        )
+        ).get_result()
         self.assertEqual(status, "bad_url")
 
     def test_duplicate_suggestion(self) -> None:
@@ -254,7 +254,7 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
 
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key, "https://www.youtube.com/watch?v=H-54KMwMKY0", "2016nyny"
-        )
+        ).get_result()
         self.assertEqual(status, "suggestion_exists")
 
     def test_media_exists(self) -> None:
@@ -267,13 +267,13 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         ).put()
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key, "https://www.youtube.com/watch?v=H-54KMwMKY0", "2016nyny"
-        )
+        ).get_result()
         self.assertEqual(status, "media_exists")
 
     def test_create_bad_url(self) -> None:
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key, "http://foobar.com/ruRAxDm", "2016nyny"
-        )
+        ).get_result()
         self.assertEqual(status, "bad_url")
 
 

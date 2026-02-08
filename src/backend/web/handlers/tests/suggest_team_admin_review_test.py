@@ -29,21 +29,25 @@ def test_login_redirect(web_client):
     assert urlparse(resp.headers["Location"]).path == "/account/login"
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def mock_grabcad_api(monkeypatch: pytest.MonkeyPatch) -> None:
-    def mock_grabcad_dict(url: str) -> SuggestionDict:
-        return SuggestionDict(
-            media_type_enum=MediaType.GRABCAD,
-            foreign_key="2016-148-robowranglers-1",
-            year=2016,
-            details_json=json.dumps(
-                {
-                    "model_name": "2016 | 148 - Robowranglers",
-                    "model_description": "Renegade",
-                    "model_image": "https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/bf832651cc688c27a78c224fbd07d9d7/card.jpg",
-                    "model_created": "2016-09-19T11:52:23Z",
-                }
-            ),
+    from backend.common.futures import InstantFuture
+
+    def mock_grabcad_dict(url: str) -> InstantFuture[SuggestionDict]:
+        return InstantFuture(
+            SuggestionDict(
+                media_type_enum=MediaType.GRABCAD,
+                foreign_key="2016-148-robowranglers-1",
+                year=2016,
+                details_json=json.dumps(
+                    {
+                        "model_name": "2016 | 148 - Robowranglers",
+                        "model_description": "Renegade",
+                        "model_image": "https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/bf832651cc688c27a78c224fbd07d9d7/card.jpg",
+                        "model_created": "2016-09-19T11:52:23Z",
+                    }
+                ),
+            )
         )
 
     monkeypatch.setattr(
@@ -88,7 +92,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
             "http://imgur.com/foobar",
             "frc1124",
             str(self.now.year),
-        )
+        ).get_result()
         self.assertEqual(status[0], "success")
         return Suggestion.query().fetch(keys_only=True)[0].id()
 
@@ -100,7 +104,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
             None,
             None,
             True,
-        )
+        ).get_result()
         self.assertEqual(status[0], "success")
         return Suggestion.query().fetch(keys_only=True)[0].id()
 
@@ -110,7 +114,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
             "https://grabcad.com/library/2016-148-robowranglers-1",
             "frc1124",
             "2016",
-        )
+        ).get_result()
         self.assertEqual(status[0], "success")
         return Suggestion.render_media_key_name(
             2016, "team", "frc1124", "grabcad", "2016-148-robowranglers-1"

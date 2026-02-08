@@ -17,7 +17,6 @@ from backend.common.models.keys import Year
 from backend.common.models.match import Match
 from backend.common.queries.event_query import EventListQuery
 
-
 CounterDictType = DefaultDict[Any, int] | DefaultDict[Any, float] | Dict[Any, int]
 
 

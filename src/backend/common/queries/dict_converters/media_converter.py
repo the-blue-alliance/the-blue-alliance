@@ -48,9 +48,7 @@ class MediaConverter(ConverterBase):
             )
             dict["view_url"] = media.youtube_url_link
         elif media.media_type_enum in PROFILE_URLS:
-            profile_url = PROFILE_URLS[media.media_type_enum].format(
-                media.foreign_key
-            )
+            profile_url = PROFILE_URLS[media.media_type_enum].format(media.foreign_key)
             dict["direct_url"] = profile_url
             dict["view_url"] = profile_url
         else:

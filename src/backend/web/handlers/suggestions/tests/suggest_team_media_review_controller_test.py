@@ -59,7 +59,7 @@ def get_suggestion_queue(web_client: Client) -> List[str]:
 def createSuggestion(logged_in_user) -> str:
     status = SuggestionCreator.createTeamMediaSuggestion(
         logged_in_user.account_key, "http://imgur.com/foobar", "frc1124", "2016"
-    )
+    ).get_result()
     assert status[0] == SuggestionCreationStatus.SUCCESS
     return Suggestion.render_media_key_name(2016, "team", "frc1124", "imgur", "foobar")
 

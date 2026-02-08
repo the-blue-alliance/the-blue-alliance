@@ -188,7 +188,9 @@ def test_schema_org_sports_team(web_client: Client, ndb_stub) -> None:
     assert sports_team_schema["memberOf"]["url"] == "https://www.firstinspires.org"
 
     # Check sameAs
-    assert "https://frc-events.firstinspires.org/team/254" in sports_team_schema["sameAs"]
+    assert (
+        "https://frc-events.firstinspires.org/team/254" in sports_team_schema["sameAs"]
+    )
 
     # Check website
     assert sports_team_schema["url"] == "https://www.thebluealliance.com"

@@ -3,7 +3,6 @@ from typing import Dict, Set
 from backend.common.consts.auth_type import AuthType
 from backend.common.sitevars.sitevar import Sitevar
 
-
 ContentType = Dict[str, bool]
 
 

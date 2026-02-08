@@ -16,7 +16,6 @@ from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import URLFetchResult
 
-
 TCompLevel = Literal["qual", "playoff"]
 
 

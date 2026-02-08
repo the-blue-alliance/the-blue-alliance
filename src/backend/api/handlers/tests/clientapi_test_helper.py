@@ -6,7 +6,6 @@ from werkzeug.test import Client
 
 from backend.api.client_api_types import BaseResponse
 
-
 T = TypeVar("T", bound=BaseResponse)
 
 

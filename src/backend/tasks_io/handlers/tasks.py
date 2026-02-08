@@ -21,7 +21,6 @@ from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
 from backend.common.sitevars.website_blacklist import WebsiteBlacklist
 
-
 blueprint = Blueprint("tasks", __name__)
 
 

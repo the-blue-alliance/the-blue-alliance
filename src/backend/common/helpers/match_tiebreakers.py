@@ -11,7 +11,6 @@ from backend.common.consts.alliance_color import (
 from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.models.match import Match
 
-
 # Tuples of (red_tiebreaker, blue_tiebreaker) or None. Higher value wins.
 TCriteria = Optional[Tuple[int, int]]
 

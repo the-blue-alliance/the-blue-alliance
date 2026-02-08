@@ -92,7 +92,7 @@ def test_suggest_already_exists(
         "http://imgur.com/ruRAxDm",
         "frc1124",
         "2016",
-    )
+    ).get_result()
     assert status == SuggestionCreationStatus.SUCCESS
 
     req = MediaSuggestionMessage(

@@ -23,7 +23,6 @@ from backend.common.suggestions.suggestion_creator import (
 from backend.web.decorators import enforce_login, require_login
 from backend.web.profiled_render import render_template
 
-
 blueprint = Blueprint("suggestions", __name__)
 
 
@@ -250,7 +249,7 @@ def submit_event_media() -> Response:
         author_account_key=none_throws(user.account_key),
         media_url=request.form.get("media_url", ""),
         event_key=event_key,
-    )
+    ).get_result()
 
     return redirect(
         url_for(".suggest_event_media", event_key=event_key, status=status.value)
@@ -312,7 +311,7 @@ def submit_team_media() -> Response:
         media_url=request.form.get("media_url", ""),
         team_key=team_key,
         year_str=year_str,
-    )
+    ).get_result()
     return redirect(
         url_for(
             ".suggest_team_media", team_key=team_key, year=year_str, status=status.value
@@ -364,7 +363,7 @@ def submit_team_social_media() -> Response:
         team_key=team_key,
         year_str=None,
         is_social=True,
-    )
+    ).get_result()
     return redirect(
         url_for(".suggest_team_social_media", team_key=team_key, status=status.value)
     )
