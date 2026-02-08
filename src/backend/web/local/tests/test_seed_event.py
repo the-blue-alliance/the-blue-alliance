@@ -1,8 +1,6 @@
-from unittest.mock import patch
-
-from flask.testing import FlaskClient
 from freezegun import freeze_time
 from google.appengine.ext import ndb
+from werkzeug.test import Client
 
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -10,30 +8,22 @@ from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
-def test_seed_blocked_in_prod(web_client: FlaskClient, login_gae_admin) -> None:
-    with patch(
-        "backend.web.handlers.admin.dev_tools.Environment.is_dev", return_value=False
-    ):
-        resp = web_client.post("/admin/dev/events/seed_test_event")
-    assert resp.status_code == 403
-
-
 @freeze_time("2025-03-15")
-def test_seed_creates_event_and_matches(
-    web_client: FlaskClient, login_gae_admin, taskqueue_stub
-) -> None:
-    with patch(
-        "backend.web.handlers.admin.dev_tools.Environment.is_dev", return_value=True
-    ):
-        resp = web_client.post("/admin/dev/events/seed_test_event")
+def test_seed_creates_event_and_matches(local_client: Client, taskqueue_stub) -> None:
+    resp = local_client.post("/local/seed_test_event")
     assert resp.status_code == 302
-    assert "/admin/event/2025test" in resp.headers["Location"]
+    assert "/event/2025test" in resp.headers["Location"]
 
     # Verify event
     event = Event.get_by_id("2025test")
     assert event is not None
     assert event.name == "North Pole Regional"
     assert event.year == 2025
+
+    # Verify webcasts
+    assert len(event.webcast) == 2
+    assert event.webcast[0] == {"type": "twitch", "channel": "firstinspires"}
+    assert event.webcast[1] == {"type": "youtube", "channel": "dQw4w9WgXcQ"}
 
     # Verify matches: 15 completed + 8 scheduled + 5 unscheduled = 28
     matches = Match.query(Match.event == ndb.Key(Event, "2025test")).fetch()
@@ -62,17 +52,12 @@ def test_seed_creates_event_and_matches(
 
 
 @freeze_time("2025-03-15")
-def test_seed_with_existing_teams(
-    web_client: FlaskClient, login_gae_admin, taskqueue_stub
-) -> None:
+def test_seed_with_existing_teams(local_client: Client, taskqueue_stub) -> None:
     # Pre-create some teams
     for i in range(1, 10):
         Team(id=f"frc{i}", team_number=i, nickname=f"Team {i}").put()
 
-    with patch(
-        "backend.web.handlers.admin.dev_tools.Environment.is_dev", return_value=True
-    ):
-        resp = web_client.post("/admin/dev/events/seed_test_event")
+    resp = local_client.post("/local/seed_test_event")
     assert resp.status_code == 302
 
     # Verify matches were created using existing teams
@@ -89,14 +74,9 @@ def test_seed_with_existing_teams(
 
 
 @freeze_time("2025-03-15")
-def test_seed_idempotent(
-    web_client: FlaskClient, login_gae_admin, taskqueue_stub
-) -> None:
-    with patch(
-        "backend.web.handlers.admin.dev_tools.Environment.is_dev", return_value=True
-    ):
-        resp1 = web_client.post("/admin/dev/events/seed_test_event")
-        resp2 = web_client.post("/admin/dev/events/seed_test_event")
+def test_seed_idempotent(local_client: Client, taskqueue_stub) -> None:
+    resp1 = local_client.post("/local/seed_test_event")
+    resp2 = local_client.post("/local/seed_test_event")
 
     assert resp1.status_code == 302
     assert resp2.status_code == 302

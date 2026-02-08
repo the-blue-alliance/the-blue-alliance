@@ -3,13 +3,12 @@ import json
 import random
 from typing import List
 
-from flask import abort, redirect
+from flask import redirect
 from google.appengine.ext import ndb
 from werkzeug import Response
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.environment import Environment
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
@@ -27,9 +26,6 @@ MATCH_SPACING_MINUTES = 8
 
 
 def seed_test_event() -> Response:
-    if not Environment.is_dev():
-        abort(403)
-
     now = datetime.datetime.now()
     year = now.year
     event_key = f"{year}test"
@@ -49,6 +45,12 @@ def seed_test_event() -> Response:
         end_date=datetime.datetime(year, now.month, now.day)
         + datetime.timedelta(days=1),
         official=False,
+        webcast_json=json.dumps(
+            [
+                {"type": "twitch", "channel": "firstinspires"},
+                {"type": "youtube", "channel": "dQw4w9WgXcQ"},
+            ]
+        ),
     )
     EventManipulator.createOrUpdate(event)
 
@@ -177,7 +179,7 @@ def seed_test_event() -> Response:
     ]
     EventTeamManipulator.createOrUpdate(event_teams)
 
-    return redirect(f"/admin/event/{event_key}")
+    return redirect(f"/event/{event_key}")
 
 
 def _get_or_create_teams() -> List[Team]:
