@@ -41,8 +41,7 @@ services:
     build:
       context: ./
       dockerfile: ./ops/dev/docker/Dockerfile
-      args:
-        PYTHON_VERSION: *python-version
+
     depends_on:
       firebase:
         condition: service_started
