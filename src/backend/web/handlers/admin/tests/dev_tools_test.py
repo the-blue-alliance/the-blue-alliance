@@ -45,25 +45,19 @@ def test_seed_creates_event_and_matches(
         assert m.alliances["red"]["score"] >= 20
         assert m.alliances["blue"]["score"] >= 20
 
-    scheduled = [
-        m for m in matches if m.actual_time is None and m.time is not None
-    ]
+    scheduled = [m for m in matches if m.actual_time is None and m.time is not None]
     assert len(scheduled) == 8
     for m in scheduled:
         assert m.alliances["red"]["score"] == -1
         assert m.alliances["blue"]["score"] == -1
 
-    unscheduled = [
-        m for m in matches if m.actual_time is None and m.time is None
-    ]
+    unscheduled = [m for m in matches if m.actual_time is None and m.time is None]
     assert len(unscheduled) == 5
     for m in unscheduled:
         assert m.alliances["red"]["score"] == -1
 
     # Verify EventTeam records
-    event_teams = EventTeam.query(
-        EventTeam.event == ndb.Key(Event, "2025test")
-    ).fetch()
+    event_teams = EventTeam.query(EventTeam.event == ndb.Key(Event, "2025test")).fetch()
     assert len(event_teams) == 21
 
 

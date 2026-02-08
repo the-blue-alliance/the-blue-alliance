@@ -22,7 +22,6 @@ from backend.web.handlers.admin.awards import (
     award_edit,
     award_edit_post,
 )
-from backend.web.handlers.admin.dev_tools import seed_test_event
 from backend.web.handlers.admin.cache import (
     cached_query_delete,
     cached_query_detail,
@@ -32,6 +31,7 @@ from backend.web.handlers.admin.cache import (
     cached_query_purge_version,
     clear_model_cache,
 )
+from backend.web.handlers.admin.dev_tools import seed_test_event
 from backend.web.handlers.admin.districts import (
     district_create,
     district_delete,

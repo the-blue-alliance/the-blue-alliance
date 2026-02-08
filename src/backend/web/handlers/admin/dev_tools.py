@@ -198,9 +198,7 @@ def _get_or_create_teams() -> List[Team]:
     return teams
 
 
-def _teams_for_match(
-    teams: List[Team], match_number: int
-) -> tuple:
+def _teams_for_match(teams: List[Team], match_number: int) -> tuple:
     """Cycle through teams for match assignments, 6 per match."""
     n = len(teams)
     offset = ((match_number - 1) * 6) % n
