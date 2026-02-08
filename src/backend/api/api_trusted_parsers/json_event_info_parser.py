@@ -44,7 +44,7 @@ class JSONEventInfoParser:
     @staticmethod
     def _parse_webcast(webcast: _WebcastUrlDict) -> Webcast:
         if url := webcast.get("url"):
-            parsed_webcast = WebcastParser.webcast_dict_from_url(url)
+            parsed_webcast = WebcastParser.webcast_dict_from_url(url).get_result()
             if not parsed_webcast:
                 raise ParserInputException(f"Unknown webcast url {url}!")
         elif (webcast_type := webcast.get("type")) and (

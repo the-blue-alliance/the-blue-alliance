@@ -170,18 +170,19 @@ class SuggestionCreator:
             return SuggestionCreationStatus.BAD_URL, None
 
     @classmethod
+    @typed_tasklet
     def createEventWebcastSuggestion(
         cls,
         author_account_key: ndb.Key,
         webcast_url: str,
         webcast_date: str,
         event_key: EventKey,
-    ) -> SuggestionCreationStatus:
+    ) -> Generator[Any, Any, SuggestionCreationStatus]:
         """Create a Event Webcast Suggestion. Returns status string"""
 
         clean_url = WebsiteHelper.format_url(webcast_url)
         if not clean_url:
-            return SuggestionCreationStatus.BAD_URL
+            raise ndb.Return(SuggestionCreationStatus.BAD_URL)
 
         webcast_date = webcast_date.strip()
         if webcast_date:
@@ -189,12 +190,12 @@ class SuggestionCreator:
                 datetime.strptime(webcast_date, "%Y-%m-%d")
                 clean_date = webcast_date
             except ValueError:
-                return SuggestionCreationStatus.INVALID_DATE
+                raise ndb.Return(SuggestionCreationStatus.INVALID_DATE)
         else:
             clean_date = None
 
         try:
-            webcast_dict = WebcastParser.webcast_dict_from_url(webcast_url)
+            webcast_dict = yield WebcastParser.webcast_dict_from_url(webcast_url)
         except Exception as e:
             logging.exception(e)
             webcast_dict = None
@@ -203,9 +204,9 @@ class SuggestionCreator:
             # Check if webcast already exists in event
             event = Event.get_by_id(event_key)
             if not event:
-                return SuggestionCreationStatus.BAD_EVENT
+                raise ndb.Return(SuggestionCreationStatus.BAD_EVENT)
             if event.webcast and webcast_dict in event.webcast:
-                return SuggestionCreationStatus.WEBCAST_EXISTS
+                raise ndb.Return(SuggestionCreationStatus.WEBCAST_EXISTS)
             else:
                 suggestion_id = Suggestion.render_webcast_key_name(
                     event_key, webcast_dict
@@ -228,9 +229,9 @@ class SuggestionCreator:
                         "webcast_date": clean_date,
                     }
                     suggestion.put()
-                    return SuggestionCreationStatus.SUCCESS
+                    raise ndb.Return(SuggestionCreationStatus.SUCCESS)
                 else:
-                    return SuggestionCreationStatus.SUGGESTION_EXISTS
+                    raise ndb.Return(SuggestionCreationStatus.SUGGESTION_EXISTS)
         else:  # Can't parse URL -- could be an obscure webcast. Save URL and let a human deal with it.
             contents: SuggestionDict = {
                 "webcast_url": webcast_url,
@@ -252,7 +253,7 @@ class SuggestionCreator:
             )
             suggestion.contents = contents
             suggestion.put()
-            return SuggestionCreationStatus.SUCCESS
+            raise ndb.Return(SuggestionCreationStatus.SUCCESS)
 
     @classmethod
     def createMatchVideoYouTubeSuggestion(
