@@ -26,6 +26,7 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.sitevars.apiv3_key import Apiv3Key
 from backend.web.local.bootstrap import LocalDataBootstrap
+from backend.web.local.dev_tools import seed_test_event
 from backend.web.profiled_render import render_template
 
 """
@@ -108,9 +109,9 @@ def get_fms_companion_db(event_key: str) -> Response:
 
     response = make_response(file_contents)
     response.headers["Content-Type"] = "application/x-sqlite3"
-    response.headers["Content-Disposition"] = (
-        f"attachment; filename={f'{event_key}_companion.db'}"
-    )
+    response.headers[
+        "Content-Disposition"
+    ] = f"attachment; filename={f'{event_key}_companion.db'}"
     return response
 
 
@@ -190,6 +191,13 @@ def create_test_event(event_key: str) -> Response:
             "auth_secret": auth_secret,
         }
     )
+
+
+local_routes.add_url_rule(
+    "/seed_test_event",
+    view_func=seed_test_event,
+    methods=["POST"],
+)
 
 
 def maybe_register(app: Flask, csrf: CSRFProtect) -> None:
