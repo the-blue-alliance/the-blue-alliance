@@ -70,6 +70,7 @@ def apidocs_webhooks() -> str:
         webhooks = MobileClient.query(
             MobileClient.user_id == str(user.uid),
             MobileClient.client_type == ClientType.WEBHOOK,
+            MobileClient.verified == True,
         ).fetch()
 
     template_values = {
