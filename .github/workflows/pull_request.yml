@@ -333,7 +333,7 @@ jobs:
         if: steps.changes.outputs.bash == 'true'
         run: make lint-bash
   check-python-version:
-    name: "Check Python Version Consistency"
+    name: "[py3] Check Python Version Consistency"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6

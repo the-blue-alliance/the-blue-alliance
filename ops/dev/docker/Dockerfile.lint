@@ -5,8 +5,8 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 WORKDIR /tba
 
-COPY requirements-lint.txt .
+COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements-lint.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["/bin/bash"]

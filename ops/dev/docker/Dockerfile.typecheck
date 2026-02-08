@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends git \
 WORKDIR /tba
 
 # Copy and install pyre-check
-COPY requirements-typecheck.txt .
-RUN pip install --no-cache-dir -r requirements-typecheck.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Clone typeshed (shallow clone for speed)
 RUN git clone --depth 1 https://github.com/python/typeshed.git /typeshed

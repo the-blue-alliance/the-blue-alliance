@@ -3,13 +3,13 @@ FROM python:${PYTHON_VERSION}-slim
 
 WORKDIR /tba
 
-COPY requirements-test.txt .
+COPY requirements.txt .
 COPY src/requirements.txt src/
 
 # Install Python dependencies
 RUN python -m pip config set global.break-system-packages true && \
     pip install --upgrade setuptools && \
-    pip install --ignore-installed -r requirements-test.txt && \
+    pip install --ignore-installed -r requirements.txt && \
     pip install --ignore-installed -r src/requirements.txt
 
 CMD ["/bin/bash"]

@@ -15,5 +15,3 @@ pytest-split
 pytest-testmon
 PyYAML==6.0.3
 requests-mock==1.12.1
-shellcheck-py
-six
