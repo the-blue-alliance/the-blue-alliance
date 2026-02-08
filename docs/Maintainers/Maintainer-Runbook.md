@@ -1,11 +1,15 @@
 ## Bumping the GAE/Python Runtime
 
-Bumping the Python version requires that Google App Engine supports the new Python version in the [Python 3 runtime](https://cloud.google.com/appengine/docs/standard/python3/runtime) and that our dependencies support the new Python version. If the new Python version is supported and can be bumped safely, follow the following steps to bump the Python version -
+Bumping the Python version requires that Google App Engine supports the new Python version in the [Python 3 runtime](https://cloud.google.com/appengine/docs/standard/python3/runtime) and that our dependencies support the new Python version. If the new Python version is supported and can be bumped safely, follow these steps:
 
-1. Update the [`runtime` directive in the service `.yaml` files](https://cloud.google.com/appengine/docs/standard/python3/config/appref)
-2. Update the [`python-version`](https://docs.github.com/en/actions/guides/building-and-testing-python#specifying-a-python-version) in the GitHub Actions (`.github/workflows/*.yml`) files
-3. Update the `runtime_version` variable in [`ops/dev/vagrant/dev_appserver.sh`](https://github.com/the-blue-alliance/the-blue-alliance/blob/93540b694209c98b3f65cbbbef9c585593ef5761/ops/dev/vagrant/dev_appserver.sh#L92)
-4. Update the [[Repo Setup|Repo-Setup]] docs to reflect the new Python version
+1. Update the version in `.python-version`
+2. Run `make check-python-version ARGS='--update'` to update all dependent files:
+   - GAE service `.yaml` files (`runtime:` directive)
+   - Dockerfiles (`ARG PYTHON_VERSION=`)
+   - `docker-compose.yml` (`x-python-version:`)
+   - GitHub Actions workflow files (`python-version:`)
+3. Verify the changes: `make check-python-version`
+4. Update the [[Repo Setup|Repo-Setup]] docs if they reference a specific Python version
 
 ## Building a New Development Container Version
 

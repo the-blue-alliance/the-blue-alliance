@@ -1,0 +1,12 @@
+ARG PYTHON_VERSION=3.13
+FROM python:${PYTHON_VERSION}-slim
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+WORKDIR /tba
+
+COPY requirements-lint.txt .
+
+RUN pip install --no-cache-dir -r requirements-lint.txt
+
+CMD ["/bin/bash"]

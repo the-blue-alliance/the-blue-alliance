@@ -1,6 +1,8 @@
 x-env-vars: &env-vars
   PROJECT_ID: demo-test
 
+x-python-version: &python-version "3.13"
+
 services:
   firebase:
     build:
@@ -24,6 +26,8 @@ services:
       <<: *env-vars
     ports:
       - "8089:8089"
+    volumes:
+      - datastore-data:/data/datastore
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8089/"]
       interval: 10s
@@ -37,6 +41,8 @@ services:
     build:
       context: ./
       dockerfile: ./ops/dev/docker/Dockerfile
+      args:
+        PYTHON_VERSION: *python-version
     depends_on:
       firebase:
         condition: service_started
@@ -67,6 +73,9 @@ services:
       - PUPPETEER_SKIP_DOWNLOAD=true
       - TBA_DOCKER_COMPOSE=true
       - FIREBASE_AUTH_EMULATOR_HOST=firebase:9099
+    profiles: ["tools"] # TODO: Remove...
+
+  ### Tools
 
   test:
     build:
@@ -75,7 +84,6 @@ services:
     profiles: ["tools"]
     volumes:
       - ./:/tba:delegated
-    working_dir: /tba
     entrypoint:
       - /bin/bash
       - -c
@@ -85,11 +93,12 @@ services:
   lint:
     build:
       context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile.test
+      dockerfile: ./ops/dev/docker/Dockerfile.lint
+      args:
+        PYTHON_VERSION: *python-version
     profiles: ["tools"]
     volumes:
       - ./:/tba:delegated
-    working_dir: /tba
     entrypoint:
       - /bin/bash
       - -c
@@ -104,11 +113,43 @@ services:
   # typecheck:
   #   build:
   #     context: ./
-  #     dockerfile: ./ops/dev/docker/Dockerfile.test
-  #   depends_on:
-  #   - tba
+  #     dockerfile: ./ops/dev/docker/Dockerfile.typecheck
+  #     args:
+  #       PYTHON_VERSION: *python-version
+  #   profiles: ["tools"]
   #   volumes:
   #     - ./:/tba:delegated
-  #   working_dir: /tba
-  #   entrypoint: ["/bin/bash", "-c"]
-  #   command: ["pyre --version none check"]
+  #   entrypoint:
+  #     - /bin/bash
+  #     - -c
+  #     - 'pyre check "$@"'
+  #     - --
+
+  lint-bash:
+    build:
+      context: ./
+      dockerfile: ./ops/dev/docker/Dockerfile.lint_bash
+    profiles: ["tools"]
+    volumes:
+      - ./:/tba:delegated
+    working_dir: /tba
+    entrypoint:
+      - /bin/bash
+      - -c
+      - './ops/lint_bash.sh "$@"'
+      - --
+
+  check-python-version:
+    image: alpine:latest
+    profiles: ["tools"]
+    volumes:
+      - ./:/tba:delegated
+    working_dir: /tba
+    entrypoint:
+      - /bin/sh
+      - -c
+      - './ops/check_python_version.sh "$@"'
+      - --
+
+volumes:
+  datastore-data:

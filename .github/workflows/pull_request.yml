@@ -323,23 +323,22 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
-          python-version: "3.13"
-          cache: "pip"
-      - name: Install Shellcheck
-        run: |
-          python -m pip install --upgrade pip
-          pip install shellcheck-py
-      - name: Install shfmt
-        run: |
-          mkdir -p $HOME/.local/bin
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          wget "https://github.com/mvdan/sh/releases/download/v3.2.2/shfmt_v3.2.2_linux_amd64" -O $HOME/.local/bin/shfmt
-          chmod +x $HOME/.local/bin/shfmt
+          filters: |
+            bash:
+              - 'ops/**/*.sh'
       - name: Run Lint
-        run: ./ops/lint_bash.sh
+        if: steps.changes.outputs.bash == 'true'
+        run: make lint-bash
+  check-python-version:
+    name: "Check Python Version Consistency"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check Python Version
+        run: make check-python-version
 
   build-web:
     name: Build Web

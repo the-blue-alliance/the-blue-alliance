@@ -1,13 +1,17 @@
-.PHONY: test lint typecheck help
+.PHONY: test lint lint-bash check-python-version help
 
 # Default target
 help:
 	@echo "Available targets:"
-	@echo "  make test              - Run all tests"
-	@echo "  make test ARGS='...'   - Run tests with custom arguments"
-	@echo "  make lint              - Check code formatting (black + flake8)"
-	@echo "  make lint ARGS='--fix' - Auto-fix formatting with black, then run flake8"
-	@echo "  make typecheck         - Run pyre type checker"
+	@echo "  make test                       - Run all tests"
+	@echo "  make test ARGS='...'            - Run tests with custom arguments"
+	@echo "  make lint                       - Check code formatting (black + flake8)"
+	@echo "  make lint ARGS='--fix'          - Auto-fix formatting with black, then run flake8"
+# 	@echo "  make typecheck                  - Run pyre type checker"
+	@echo "  make lint-bash                  - Check bash script formatting (shellcheck + shfmt)"
+	@echo "  make lint-bash ARGS='--fix'     - Auto-fix bash formatting with shfmt"
+	@echo "  make check-python-version       - Check Python version consistency"
+	@echo "  make check-python-version ARGS='--update' - Update all files to match .python-version"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make test"
@@ -33,10 +37,18 @@ endif
 # Run linter (black + flake8)
 # Use ARGS='--fix' to auto-fix formatting issues
 lint:
-	@docker compose build tba
 	docker compose run --rm lint $(ARGS)
 
+# Run bash linter (shellcheck + shfmt)
+# Use ARGS='--fix' to auto-fix formatting issues
+lint-bash:
+	docker compose run --rm lint-bash $(ARGS)
+
 # Run pyre type checker
-typecheck:
-	@docker compose build tba
-	docker compose run --rm typecheck
+# typecheck:
+# 	docker compose run --rm typecheck
+
+# Check Python version consistency across config files
+# Use ARGS='--update' to update all files to match .python-version
+check-python-version:
+	docker compose run --rm check-python-version $(ARGS)

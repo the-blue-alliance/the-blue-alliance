@@ -98,11 +98,26 @@ Node linting runs using [ESLint](https://eslint.org/). Run using the `ops/lint_n
 
 ## Lint
 
-Formatting bash requires [shfmt](https://github.com/mvdan/sh) to be install on the local system. Run using the `ops/lint_bash.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style.
+Bash linting runs [shellcheck](https://www.shellcheck.net/) for static analysis and [shfmt](https://github.com/mvdan/sh) for formatting.
 
 ```bash
-# Check for errors
-> ./ops_lint_bash.sh
-# Fix formatting errors automatically
-> ./ops_lint_bash.sh --fix
+# Run bash linter (shellcheck + shfmt)
+$ make lint-bash
+
+# Auto-fix formatting with shfmt
+$ make lint-bash ARGS='--fix'
 ```
+
+# Python Version Consistency
+
+The project maintains consistent Python versions across all configuration files (GAE yamls, Docker configs, CI workflows). Use the provided script to check or update versions:
+
+```bash
+# Check Python version consistency
+$ make check-python-version
+
+# Update all files to match .python-version
+$ make check-python-version ARGS='--update'
+```
+
+The source of truth for the Python version is the `.python-version` file in the repository root.

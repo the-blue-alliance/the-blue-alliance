@@ -1,0 +1,19 @@
+# Minimal Dockerfile for pyre typecheck
+# pyre-check only has x86_64 binaries, so this must run under linux/amd64
+ARG PYTHON_VERSION=3.13
+FROM python:${PYTHON_VERSION}-slim
+
+# Install git for cloning typeshed
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tba
+
+# Copy and install pyre-check
+COPY requirements-typecheck.txt .
+RUN pip install --no-cache-dir -r requirements-typecheck.txt
+
+# Clone typeshed (shallow clone for speed)
+RUN git clone --depth 1 https://github.com/python/typeshed.git /typeshed
+
+CMD ["/bin/bash"]
