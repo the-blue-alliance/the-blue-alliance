@@ -22,6 +22,7 @@ from backend.web.handlers.admin.awards import (
     award_edit,
     award_edit_post,
 )
+from backend.web.handlers.admin.dev_tools import seed_test_event
 from backend.web.handlers.admin.cache import (
     cached_query_delete,
     cached_query_detail,
@@ -392,3 +393,8 @@ admin_routes.add_url_rule("/user/lookup", methods=["POST"], view_func=user_looku
 admin_routes.add_url_rule("/users", view_func=user_list, defaults={"page_num": 0})
 admin_routes.add_url_rule("/users/<int:page_num>", view_func=user_list)
 admin_routes.add_url_rule("/users/permissions", view_func=user_permissions_list)
+admin_routes.add_url_rule(
+    "/dev/events/seed_test_event",
+    view_func=seed_test_event,
+    methods=["POST"],
+)
