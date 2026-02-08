@@ -45,7 +45,7 @@ def test_nag(
         media_url="https://imgur.com/abc1234",
         team_key="frc254",
         year_str="2020",
-    )
+    ).get_result()
     none_throws(suggestion).put()
 
     resp = tasks_client.get("/tasks/do/nag_suggestions")

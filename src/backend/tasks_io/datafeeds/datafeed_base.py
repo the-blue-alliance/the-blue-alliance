@@ -11,7 +11,6 @@ from backend.common.profiler import Span
 from backend.common.urlfetch import URLFetchMethod, URLFetchResult
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
 
-
 TReturn = TypeVar("TReturn")
 
 

@@ -25,7 +25,6 @@ from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
 from backend.common.queries.mobile_client_query import MobileClientQuery
 
-
 MAXIMUM_BACKOFF = 32
 MATCH_UPCOMING_MINUTES = datetime.timedelta(minutes=-7)
 

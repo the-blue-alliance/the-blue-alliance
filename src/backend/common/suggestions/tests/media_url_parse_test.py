@@ -1,12 +1,14 @@
 import json
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 
 from backend.common.consts.media_type import MediaType, TYPE_NAMES
+from backend.common.futures import InstantFuture
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.suggestions.media_parser import MediaParser
+from backend.common.urlfetch import URLFetchResult
 
 
 @pytest.fixture(autouse=True)
@@ -18,7 +20,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_youtube_parse_long(self) -> None:
         yt_long = MediaParser.partial_media_dict_from_url(
             "http://www.youtube.com/watch?v=I-IrVbsl_K8"
-        )
+        ).get_result()
         self.assertIsNotNone(yt_long)
         self.assertEqual(yt_long["media_type_enum"], MediaType.YOUTUBE_VIDEO)
         self.assertEqual(yt_long["foreign_key"], "I-IrVbsl_K8")
@@ -26,7 +28,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_youtube_parse_short(self) -> None:
         yt_short = MediaParser.partial_media_dict_from_url(
             "http://youtu.be/I-IrVbsl_K8"
-        )
+        ).get_result()
         self.assertIsNotNone(yt_short)
         self.assertEqual(yt_short["media_type_enum"], MediaType.YOUTUBE_VIDEO)
         self.assertEqual(yt_short["foreign_key"], "I-IrVbsl_K8")
@@ -34,7 +36,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_youtube_parse_playlist(self) -> None:
         yt_from_playlist = MediaParser.partial_media_dict_from_url(
             "https://www.youtube.com/watch?v=VP992UKFbko&index=1&list=PLZT9pIgNOV6ZE0EgstWeoRWGWT3uoaszm"
-        )
+        ).get_result()
         self.assertIsNotNone(yt_from_playlist)
         self.assertEqual(yt_from_playlist["media_type_enum"], MediaType.YOUTUBE_VIDEO)
         self.assertEqual(yt_from_playlist["foreign_key"], "VP992UKFbko")
@@ -42,7 +44,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_youtube_parse_shorts(self) -> None:
         yt_shorts = MediaParser.partial_media_dict_from_url(
             "https://www.youtube.com/shorts/S8m53ArvTRc"
-        )
+        ).get_result()
         self.assertIsNotNone(yt_shorts)
         self.assertEqual(yt_shorts["media_type_enum"], MediaType.YOUTUBE_VIDEO)
         self.assertEqual(yt_shorts["foreign_key"], "S8m53ArvTRc")
@@ -61,29 +63,37 @@ class TestMediaUrlParser(unittest.TestCase):
         )
 
     def test_imgur_parse(self) -> None:
-        imgur_img = MediaParser.partial_media_dict_from_url("http://imgur.com/zYqWbBh")
+        imgur_img = MediaParser.partial_media_dict_from_url(
+            "http://imgur.com/zYqWbBh"
+        ).get_result()
         self.assertIsNotNone(imgur_img)
         self.assertEqual(imgur_img["media_type_enum"], MediaType.IMGUR)
         self.assertEqual(imgur_img["foreign_key"], "zYqWbBh")
 
         imgur_img = MediaParser.partial_media_dict_from_url(
             "http://i.imgur.com/zYqWbBh.png"
-        )
+        ).get_result()
         self.assertIsNotNone(imgur_img)
         self.assertEqual(imgur_img["media_type_enum"], MediaType.IMGUR)
         self.assertEqual(imgur_img["foreign_key"], "zYqWbBh")
 
         self.assertEqual(
-            MediaParser.partial_media_dict_from_url("http://imgur.com/r/aww"), None
+            MediaParser.partial_media_dict_from_url(
+                "http://imgur.com/r/aww"
+            ).get_result(),
+            None,
         )
         self.assertEqual(
-            MediaParser.partial_media_dict_from_url("http://imgur.com/a/album"), None
+            MediaParser.partial_media_dict_from_url(
+                "http://imgur.com/a/album"
+            ).get_result(),
+            None,
         )
 
     def test_fb_profile_parse(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "http://facebook.com/theuberbots"
-        )
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.FACEBOOK_PROFILE)
         self.assertEqual(result["is_social"], True)
@@ -92,7 +102,9 @@ class TestMediaUrlParser(unittest.TestCase):
         self.assertEqual(result["profile_url"], "https://www.facebook.com/theuberbots")
 
     def test_twitter_profile_parse(self) -> None:
-        result = MediaParser.partial_media_dict_from_url("https://twitter.com/team1124")
+        result = MediaParser.partial_media_dict_from_url(
+            "https://twitter.com/team1124"
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.TWITTER_PROFILE)
         self.assertEqual(result["is_social"], True)
@@ -103,7 +115,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_youtube_profile_parse(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "https://www.youtube.com/Uberbots1124"
-        )
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.YOUTUBE_CHANNEL)
         self.assertEqual(result["is_social"], True)
@@ -113,7 +125,7 @@ class TestMediaUrlParser(unittest.TestCase):
 
         short_result = MediaParser.partial_media_dict_from_url(
             "https://www.youtube.com/Uberbots1124"
-        )
+        ).get_result()
         self.assertIsNotNone(short_result)
         self.assertEqual(short_result["media_type_enum"], MediaType.YOUTUBE_CHANNEL)
         self.assertEqual(short_result["is_social"], True)
@@ -127,7 +139,7 @@ class TestMediaUrlParser(unittest.TestCase):
 
         gapps_result = MediaParser.partial_media_dict_from_url(
             "https://www.youtube.com/c/tnt3102org"
-        )
+        ).get_result()
         self.assertIsNotNone(gapps_result)
         self.assertEqual(gapps_result["media_type_enum"], MediaType.YOUTUBE_CHANNEL)
         self.assertEqual(gapps_result["is_social"], True)
@@ -140,7 +152,9 @@ class TestMediaUrlParser(unittest.TestCase):
         )
 
     def test_github_profile_parse(self) -> None:
-        result = MediaParser.partial_media_dict_from_url("https://github.com/frc1124")
+        result = MediaParser.partial_media_dict_from_url(
+            "https://github.com/frc1124"
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.GITHUB_PROFILE)
         self.assertEqual(result["is_social"], True)
@@ -149,7 +163,9 @@ class TestMediaUrlParser(unittest.TestCase):
         self.assertEqual(result["profile_url"], "https://github.com/frc1124")
 
     def test_gitlab_profile_parse(self) -> None:
-        result = MediaParser.partial_media_dict_from_url("https://gitlab.com/frc1124")
+        result = MediaParser.partial_media_dict_from_url(
+            "https://gitlab.com/frc1124"
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.GITLAB_PROFILE)
         self.assertEqual(result["is_social"], True)
@@ -163,7 +179,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_instagram_profile_parse(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "https://www.instagram.com/4hteamneutrino"
-        )
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.INSTAGRAM_PROFILE)
         self.assertEqual(result["is_social"], True)
@@ -176,7 +192,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_periscope_profile_parse(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "https://www.periscope.tv/evolution2626"
-        )
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.PERISCOPE_PROFILE)
         self.assertEqual(result["is_social"], True)
@@ -190,7 +206,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_grabcad_link(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "https://grabcad.com/library/2016-148-robowranglers-1"
-        )
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.GRABCAD)
         self.assertEqual(result["is_social"], False)
@@ -208,7 +224,7 @@ class TestMediaUrlParser(unittest.TestCase):
     def test_instagram_image(self) -> None:
         result = MediaParser.partial_media_dict_from_url(
             "https://www.instagram.com/p/BUnZiriBYre/"
-        )
+        ).get_result()
         self.assertIsNotNone(result)
         self.assertEqual(result["media_type_enum"], MediaType.INSTAGRAM_IMAGE)
         self.assertEqual(result["foreign_key"], "BUnZiriBYre")
@@ -219,7 +235,7 @@ class TestMediaUrlParser(unittest.TestCase):
 
     def test_unsupported_url_parse(self) -> None:
         self.assertEqual(
-            MediaParser.partial_media_dict_from_url("http://foo.bar"), None
+            MediaParser.partial_media_dict_from_url("http://foo.bar").get_result(), None
         )
 
     def test_cd_thread_parse_success(self) -> None:
@@ -233,20 +249,25 @@ class TestMediaUrlParser(unittest.TestCase):
             "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115/10?u=1234",
         ]
 
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "title": "Team 254 presents 2025 Undertow technical binder code Q&A",
-            "image_url": "https://www.chiefdelphi.com/uploads/default/optimized/4X/8/6/8/8681c45bd475d3f1b23f3af4f7b3a77df8a0e1cf_2_1024x750.jpeg",
-        }
+        mock_content = json.dumps(
+            {
+                "title": "Team 254 presents 2025 Undertow technical binder code Q&A",
+                "image_url": "https://www.chiefdelphi.com/uploads/default/optimized/4X/8/6/8/8681c45bd475d3f1b23f3af4f7b3a77df8a0e1cf_2_1024x750.jpeg",
+            }
+        )
 
         for url in urls:
             with self.subTest(url=url):
+                mock_urlfetch_result = URLFetchResult.mock_urlfetch_result(
+                    "https://www.chiefdelphi.com/t/506115.json", 200, mock_content
+                )
+                mock_future = InstantFuture(mock_urlfetch_result)
+
                 with patch(
-                    "backend.common.suggestions.media_parser.requests.get",
-                    return_value=mock_response,
+                    "google.appengine.ext.ndb.Context.urlfetch",
+                    return_value=mock_future,
                 ):
-                    result = MediaParser.partial_media_dict_from_url(url)
+                    result = MediaParser.partial_media_dict_from_url(url).get_result()
                     self.assertIsNotNone(result)
                     self.assertEqual(result["media_type_enum"], MediaType.CD_THREAD)
                     self.assertEqual(result["foreign_key"], "506115")
@@ -267,17 +288,17 @@ class TestMediaUrlParser(unittest.TestCase):
                     )
 
     def test_cd_thread_parse_cd_unavailable(self) -> None:
-        mock_response = Mock()
-        mock_response.status_code = 500
-        mock_response.json.return_value = None
+        mock_urlfetch_result = URLFetchResult.mock_urlfetch_result(
+            "https://www.chiefdelphi.com/t/506115.json", 500, ""
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.common.suggestions.media_parser.requests.get",
-            return_value=mock_response,
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
         ):
             result = MediaParser.partial_media_dict_from_url(
                 "https://www.chiefdelphi.com/t/team-254-presents-2025-undertow-technical-binder-code-q-a/506115/10"
-            )
+            ).get_result()
             self.assertIsNone(result)
 
 
@@ -285,38 +306,49 @@ class TestOnshapeParser(unittest.TestCase):
     ONSHAPE_URL = "https://cad.onshape.com/documents/5481081f48161555332968ff/w/a466cec29af372ec09c44333/e/abc123"
 
     def test_onshape_api_non_200(self) -> None:
-        mock_response = Mock()
-        mock_response.status_code = 404
+        mock_urlfetch_result = URLFetchResult.mock_urlfetch_result(
+            "https://cad.onshape.com/api/documents/d/5481081f48161555332968ff", 404, ""
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.common.suggestions.media_parser.requests.get",
-            return_value=mock_response,
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
         ):
-            result = MediaParser.partial_media_dict_from_url(self.ONSHAPE_URL)
+            result = MediaParser.partial_media_dict_from_url(
+                self.ONSHAPE_URL
+            ).get_result()
             self.assertIsNone(result)
 
     def test_onshape_api_empty_response(self) -> None:
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.content = b"{}"
+        mock_urlfetch_result = URLFetchResult.mock_urlfetch_result(
+            "https://cad.onshape.com/api/documents/d/5481081f48161555332968ff",
+            404,
+            "",
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.common.suggestions.media_parser.requests.get",
-            return_value=mock_response,
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
         ):
-            result = MediaParser.partial_media_dict_from_url(self.ONSHAPE_URL)
+            result = MediaParser.partial_media_dict_from_url(
+                self.ONSHAPE_URL
+            ).get_result()
             self.assertIsNone(result)
 
     def test_onshape_api_missing_fields(self) -> None:
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.content = json.dumps({"id": "abc"}).encode()
+        mock_urlfetch_result = URLFetchResult.mock_urlfetch_result(
+            "https://cad.onshape.com/api/documents/d/5481081f48161555332968ff",
+            200,
+            json.dumps({"id": "abc"}),
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.common.suggestions.media_parser.requests.get",
-            return_value=mock_response,
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
         ):
-            result = MediaParser.partial_media_dict_from_url(self.ONSHAPE_URL)
+            result = MediaParser.partial_media_dict_from_url(
+                self.ONSHAPE_URL
+            ).get_result()
             self.assertIsNotNone(result)
             details = json.loads(result["details_json"])
             self.assertEqual(details["model_name"], "")
@@ -324,21 +356,26 @@ class TestOnshapeParser(unittest.TestCase):
             self.assertEqual(details["model_created"], "")
 
     def test_onshape_api_success(self) -> None:
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.content = json.dumps(
+        mock_content = json.dumps(
             {
                 "name": "Test Model",
                 "description": "A test CAD model",
                 "createdAt": "2024-01-01T00:00:00Z",
             }
-        ).encode()
+        )
+        mock_urlfetch_result = URLFetchResult.mock_urlfetch_result(
+            "https://cad.onshape.com/api/documents/d/5481081f48161555332968ff",
+            200,
+            mock_content,
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.common.suggestions.media_parser.requests.get",
-            return_value=mock_response,
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
         ):
-            result = MediaParser.partial_media_dict_from_url(self.ONSHAPE_URL)
+            result = MediaParser.partial_media_dict_from_url(
+                self.ONSHAPE_URL
+            ).get_result()
             self.assertIsNotNone(result)
             self.assertEqual(result["media_type_enum"], MediaType.ONSHAPE)
             details = json.loads(result["details_json"])

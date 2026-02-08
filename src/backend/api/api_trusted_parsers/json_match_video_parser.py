@@ -13,7 +13,9 @@ class JSONMatchVideoParser:
     """
 
     @staticmethod
-    def parse[T: (str, bytes)](event_key: EventKey, videos_json: T) -> dict[MatchKey, str]:  # fmt: skip
+    def parse[
+        T: (str, bytes)
+    ](event_key: EventKey, videos_json: T) -> dict[MatchKey, str]:  # fmt: skip
         video_dict = safe_json.loads(videos_json, dict[str, str])
         bad_match_ids = [
             match_partial

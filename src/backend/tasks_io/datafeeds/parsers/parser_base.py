@@ -1,7 +1,6 @@
 import abc
 from typing import Any, Generic, TypeVar
 
-
 TParsedResponse = TypeVar("TParsedResponse")
 
 

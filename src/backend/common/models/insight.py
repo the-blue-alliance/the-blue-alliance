@@ -13,7 +13,6 @@ from backend.common.models.keys import (
 )
 from backend.common.models.wlt import WLTRecord
 
-
 LeaderboardKeyType = Literal["team"] | Literal["event"] | Literal["match"]
 InsightEnumId: TypeAlias = int
 

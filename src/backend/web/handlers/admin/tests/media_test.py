@@ -29,7 +29,7 @@ def test_delete_reference(
 ) -> None:
     media_reference = Media.create_reference("team", "frc1124")
     media_dict = none_throws(
-        MediaParser.partial_media_dict_from_url("http://imgur.com/aF8T5ZE")
+        MediaParser.partial_media_dict_from_url("http://imgur.com/qwe123").get_result()
     )
     media = Media(
         id=Media.render_key_name(
@@ -79,7 +79,7 @@ def test_make_preferred(
 ) -> None:
     media_reference = Media.create_reference("team", "frc1124")
     media_dict = none_throws(
-        MediaParser.partial_media_dict_from_url("http://imgur.com/aF8T5ZE")
+        MediaParser.partial_media_dict_from_url("http://imgur.com/aF8T5ZE").get_result()
     )
     media = Media(
         id=Media.render_key_name(
@@ -129,7 +129,7 @@ def test_remove_preferred(
 ) -> None:
     media_reference = Media.create_reference("team", "frc1124")
     media_dict = none_throws(
-        MediaParser.partial_media_dict_from_url("http://imgur.com/aF8T5ZE")
+        MediaParser.partial_media_dict_from_url("http://imgur.com/aF8T5ZE").get_result()
     )
     media = Media(
         id=Media.render_key_name(

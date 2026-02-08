@@ -8,7 +8,6 @@ import time
 
 from artifact_data import ARTIFACT_FILENAME, ArtifactData
 
-
 CAPTURE_URLS = [
     ("Homepage", "http://localhost:8080"),
     ("GameDay", "http://localhost:8080/gameday"),

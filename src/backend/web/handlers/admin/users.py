@@ -10,7 +10,6 @@ from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.web.profiled_render import render_template
 
-
 USER_PAGE_SIZE = 1000
 
 

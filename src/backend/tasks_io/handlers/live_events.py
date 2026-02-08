@@ -41,7 +41,7 @@ blueprint = Blueprint("live_events", __name__)
 
 @blueprint.route("/tasks/do/update_live_events")
 def update_live_events() -> str:
-    (events, special_webcasts) = LiveEventHelper.get_live_events_with_current_webcasts()
+    events, special_webcasts = LiveEventHelper.get_live_events_with_current_webcasts()
     FirebasePusher.update_live_events(events, special_webcasts)
     return ""
 

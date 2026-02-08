@@ -12,7 +12,6 @@ from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 
-
 AUTH_ID = "tEsT_id_0"
 AUTH_SECRET = "321tEsTsEcReT"
 REQUEST_PATH = "/api/trusted/v1/event/2014casj/info"

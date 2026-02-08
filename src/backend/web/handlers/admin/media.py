@@ -63,7 +63,7 @@ def media_remove_preferred(media_key_name: str) -> Response:
 
 def media_add() -> Response:
     media_url = request.form["media_url"].strip()
-    media_dict = MediaParser.partial_media_dict_from_url(media_url)
+    media_dict = MediaParser.partial_media_dict_from_url(media_url).get_result()
     if media_dict is None:
         abort(400)
 

@@ -3,7 +3,6 @@ from google.appengine.api import users as gae_login
 
 from backend.tasks_io.handlers.admin.tasks import admin_clear_eventteams
 
-
 """
 This is a special interface available to TBA admins to manage data
 """

@@ -4,7 +4,6 @@ from backend.common.consts import client_type
 from backend.common.consts.client_type import ClientType
 from backend.common.models.mobile_client import MobileClient
 
-
 SHORT_ID_LENGTH = 50
 
 

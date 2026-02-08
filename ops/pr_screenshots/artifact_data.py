@@ -1,6 +1,5 @@
 from typing import TypedDict
 
-
 ARTIFACT_FILENAME = "ci_screenshots.pickle"
 
 

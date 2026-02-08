@@ -1,6 +1,5 @@
 from typing import Iterable, Sequence, Tuple
 
-
 CITY_STATE_COUNTRY_PARAMETERS: Tuple[str, Iterable[Sequence[object]]] = (
     "city, state, country, output",
     [

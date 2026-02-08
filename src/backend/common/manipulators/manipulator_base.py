@@ -27,7 +27,6 @@ from backend.common.helpers.listify import delistify, listify
 from backend.common.models.cached_model import CachedModel, TAffectedReferences
 from backend.common.queries.database_query import CachedDatabaseQuery
 
-
 TModel = TypeVar("TModel", bound=CachedModel)
 
 

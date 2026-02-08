@@ -20,7 +20,6 @@ from backend.common.models.event import Event
 from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
 
-
 TOrganizedMatches = Dict[CompLevel, List[Match]]
 TOrganizedLegacyDoubleElimMatches = Mapping[
     LegacyDoubleElimBracket, Mapping[CompLevel, List[Match]]

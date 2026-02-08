@@ -23,7 +23,6 @@ from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.web.decorators import enforce_login
 from backend.web.profiled_render import render_template
 
-
 blueprint = Blueprint("apidocs", __name__, url_prefix="/apidocs")
 
 

@@ -13,7 +13,6 @@ from backend.tasks_io.handlers.nexus_api import blueprint as nexus_api_blueprint
 from backend.tasks_io.handlers.regional_advancement_api import blueprint as ra_blueprint
 from backend.tasks_io.handlers.tasks import blueprint as tasks_blueprint
 
-
 configure_logging()
 
 app = Flask(__name__)

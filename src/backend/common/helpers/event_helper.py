@@ -13,7 +13,6 @@ from backend.common.models.event_team_status import WLTRecord
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.match import Match
 
-
 CHAMPIONSHIP_EVENTS_LABEL = "FIRST Championship"
 TWO_CHAMPS_LABEL = "FIRST Championship - {}"
 FOC_LABEL = "FIRST Festival of Champions"

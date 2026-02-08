@@ -2,7 +2,6 @@ from typing import Any, AnyStr, Dict, Optional, Union
 
 from google.appengine.ext import ndb
 
-
 CACHE_DATA: Dict[Union[str, bytes], Any] = {}
 
 

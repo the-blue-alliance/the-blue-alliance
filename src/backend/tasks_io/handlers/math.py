@@ -43,7 +43,6 @@ from backend.common.queries.event_query import (
 )
 from backend.common.queries.team_query import DistrictTeamsQuery, RegionalTeamsQuery
 
-
 blueprint = Blueprint("math", __name__)
 
 

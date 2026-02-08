@@ -12,7 +12,6 @@ from backend.api.handlers.client_api import (
     update_model_preferences,
 )
 
-
 # This is a port of the cloud endpoints API service, used by mobile apps
 client_api = Blueprint("client_api", __name__, url_prefix="/clientapi/tbaClient/v9/")
 CORS(

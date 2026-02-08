@@ -7,7 +7,6 @@ from backend.common.middleware import install_middleware
 from backend.tasks_cpu.handlers.insights import blueprint as insights_blueprint
 from backend.tasks_cpu.handlers.typeahead import blueprint as typeahead_blueprint
 
-
 configure_logging()
 
 app = Flask(__name__)

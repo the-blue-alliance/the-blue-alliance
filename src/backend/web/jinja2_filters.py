@@ -10,7 +10,6 @@ from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
 
-
 defense_render_names_2016 = {
     "A_ChevalDeFrise": "Cheval De Frise",
     "A_Portcullis": "Portcullis",

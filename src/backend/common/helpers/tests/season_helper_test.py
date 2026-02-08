@@ -7,7 +7,6 @@ from backend.common.consts.event_type import EventType
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
 
-
 EST = timezone("US/Eastern")
 
 

@@ -12,7 +12,6 @@ import requests
 
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
-
 TModel = TypeVar("TModel")
 TParser = TypeVar("TParser", bound=ParserBase)
 
