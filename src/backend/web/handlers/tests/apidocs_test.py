@@ -175,7 +175,10 @@ def unverified_webhook(login_user, ndb_stub) -> MobileClient:
 
 
 def test_apidocs_webhooks_shows_user_webhooks(
-    login_user, verified_webhook, web_client: Client, captured_templates: List[CapturedTemplate]
+    login_user,
+    verified_webhook,
+    web_client: Client,
+    captured_templates: List[CapturedTemplate],
 ) -> None:
     resp = web_client.get("/apidocs/webhooks")
     assert resp.status_code == 200
@@ -212,7 +215,11 @@ def test_apidocs_webhooks_notification_with_unverified_webhook(
 
 @pytest.mark.parametrize("type", event_notification_types)
 def test_apidocs_webhooks_notification_event_with_webhook(
-    type: NotificationType, apidocs_event, login_user, verified_webhook, web_client: Client
+    type: NotificationType,
+    apidocs_event,
+    login_user,
+    verified_webhook,
+    web_client: Client,
 ) -> None:
     with patch.object(TBANSHelper, "send_webhook_test", return_value=True) as mock_send:
         response = web_client.post(
@@ -236,7 +243,11 @@ def test_apidocs_webhooks_notification_event_with_webhook(
 
 @pytest.mark.parametrize("type", match_notification_types)
 def test_apidocs_webhooks_notification_match_with_webhook(
-    type: NotificationType, apidocs_match, login_user, verified_webhook, web_client: Client
+    type: NotificationType,
+    apidocs_match,
+    login_user,
+    verified_webhook,
+    web_client: Client,
 ) -> None:
     with patch.object(TBANSHelper, "send_webhook_test", return_value=True) as mock_send:
         response = web_client.post(
@@ -261,7 +272,9 @@ def test_apidocs_webhooks_notification_match_with_webhook(
 def test_apidocs_webhooks_notification_with_webhook_send_failure(
     apidocs_match, login_user, verified_webhook, web_client: Client
 ) -> None:
-    with patch.object(TBANSHelper, "send_webhook_test", return_value=False) as mock_send:
+    with patch.object(
+        TBANSHelper, "send_webhook_test", return_value=False
+    ) as mock_send:
         response = web_client.post(
             f"/apidocs/webhooks/test/{NotificationType.MATCH_SCORE.value}",
             data={

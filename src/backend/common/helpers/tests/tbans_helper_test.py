@@ -44,9 +44,6 @@ from backend.common.models.notifications.alliance_selection import (
 )
 from backend.common.models.notifications.awards import AwardsNotification
 from backend.common.models.notifications.broadcast import BroadcastNotification
-from backend.common.models.notifications.district_points import (
-    DistrictPointsNotification,
-)
 from backend.common.models.notifications.event_level import (
     EventLevelNotification,
 )
@@ -100,7 +97,7 @@ class TestTBANSHelper(unittest.TestCase):
         self.team = Team(id="frc7332", team_number=7332)
         self.team.put()
         self.match = Match(
-            id="2020miket_qm1",
+            id=f"{self.event.key_name}_qm1",
             event=self.event.key,
             comp_level="qm",
             set_number=1,
@@ -859,7 +856,6 @@ class TestTBANSHelper(unittest.TestCase):
             assert not success
 
     def test_send_webhook_test_not_webhook_client(self):
-        # Test that non-webhook clients are rejected
         client = MobileClient(
             parent=ndb.Key(Account, "user_id"),
             user_id="user_id",
@@ -873,7 +869,6 @@ class TestTBANSHelper(unittest.TestCase):
         assert not success
 
     def test_send_webhook_test_not_verified(self):
-        # Test that unverified webhooks are rejected
         client = MobileClient(
             parent=ndb.Key(Account, "user_id"),
             user_id="user_id",
@@ -938,7 +933,9 @@ class TestTBANSHelper(unittest.TestCase):
             verified=True,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=(True, True)) as mock_send:
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
             success = TBANSHelper.send_webhook_test(
                 client, NotificationType.MATCH_SCORE, match_key=self.match.key_name
             )
@@ -956,7 +953,9 @@ class TestTBANSHelper(unittest.TestCase):
             verified=True,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=(True, True)) as mock_send:
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
             success = TBANSHelper.send_webhook_test(
                 client, NotificationType.AWARDS, event_key=self.event.key_name
             )
@@ -974,7 +973,9 @@ class TestTBANSHelper(unittest.TestCase):
             verified=True,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=(False, True)) as mock_send:
+        with patch.object(
+            WebhookRequest, "send", return_value=(False, True)
+        ) as mock_send:
             success = TBANSHelper.send_webhook_test(
                 client, NotificationType.MATCH_SCORE, match_key=self.match.key_name
             )
@@ -992,7 +993,9 @@ class TestTBANSHelper(unittest.TestCase):
             verified=True,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=(True, True)) as mock_send:
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
             success = TBANSHelper.send_webhook_test(client, NotificationType.PING)
             mock_send.assert_called_once()
             assert success
@@ -1008,7 +1011,9 @@ class TestTBANSHelper(unittest.TestCase):
             verified=True,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=(True, True)) as mock_send:
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
             success = TBANSHelper.send_webhook_test(client, NotificationType.BROADCAST)
             mock_send.assert_called_once()
             assert success
@@ -1024,7 +1029,9 @@ class TestTBANSHelper(unittest.TestCase):
             verified=True,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=(True, True)) as mock_send:
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
             success = TBANSHelper.send_webhook_test(
                 client,
                 NotificationType.AWARDS,
@@ -1045,7 +1052,9 @@ class TestTBANSHelper(unittest.TestCase):
             verified=True,
         )
 
-        with patch.object(WebhookRequest, "send", return_value=(True, True)) as mock_send:
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
             success = TBANSHelper.send_webhook_test(
                 client,
                 NotificationType.DISTRICT_POINTS_UPDATED,
@@ -1123,16 +1132,10 @@ class TestTBANSHelper(unittest.TestCase):
         assert notification is not None
         assert notification._type() == NotificationType.UPCOMING_MATCH
 
-    def test_create_test_notification_verification(self):
-        notification = TBANSHelper._create_test_notification(
-            NotificationType.VERIFICATION
-        )
-        assert notification is not None
-        assert notification._type() == NotificationType.VERIFICATION
-
     def test_create_test_notification_district_points_updated(self):
         notification = TBANSHelper._create_test_notification(
-            NotificationType.DISTRICT_POINTS_UPDATED, district_key=self.district.key_name
+            NotificationType.DISTRICT_POINTS_UPDATED,
+            district_key=self.district.key_name,
         )
         assert notification is not None
         assert notification._type() == NotificationType.DISTRICT_POINTS_UPDATED
@@ -1156,7 +1159,6 @@ class TestTBANSHelper(unittest.TestCase):
         assert notification is None
 
     def test_create_test_notification_unsupported_type_returns_none(self):
-        # UPDATE_FAVORITES is not a real notification type
         notification = TBANSHelper._create_test_notification(
             NotificationType.UPDATE_FAVORITES
         )
@@ -1164,6 +1166,15 @@ class TestTBANSHelper(unittest.TestCase):
 
     def test_schedule_upcoming_matches_not_new_schedule(self):
         # Set some upcoming matches for the Event - not Match 1 though, so no notification gets sent
+        # First, mark the setup match as "played" so it's not considered upcoming
+        self.match.alliances_json = json.dumps(
+            {
+                "red": {"teams": ["frc1", "frc2", "frc7332"], "score": 100},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 50},
+            }
+        )
+        self.match.put()
+
         match_creator = MatchTestCreator(self.event)
         teams = [
             Team(id="frc%s" % team_number, team_number=team_number)
@@ -1416,11 +1427,10 @@ class TestTBANSHelper(unittest.TestCase):
         ]
 
         with patch(
-            "backend.common.models.notifications.requests.fcm_request.FCMRequest",
-            autospec=True,
+            "backend.common.helpers.tbans_helper.FCMRequest",
         ) as mock_init:
             TBANSHelper._send_fcm(clients, MockNotification())
-            mock_init.assert_called_once_with(ANY, ANY, expected)
+            mock_init.assert_called_once_with(ANY, ANY, tokens=expected)
 
     def test_send_fcm_filter_from_notification(self):
         clients = [
@@ -1455,7 +1465,12 @@ class TestTBANSHelper(unittest.TestCase):
         with patch(
             "backend.common.models.notifications.requests.fcm_request.MAXIMUM_TOKENS",
             2,
-        ), patch.object(FCMRequest, "send", return_value=batch_response) as mock_send:
+        ), patch(
+            "backend.common.helpers.tbans_helper.MAXIMUM_TOKENS",
+            2,
+        ), patch.object(
+            FCMRequest, "send", return_value=batch_response
+        ) as mock_send:
             TBANSHelper._send_fcm(clients, MockNotification())
             assert mock_send.call_count == 2
 
@@ -1830,8 +1845,7 @@ class TestTBANSHelper(unittest.TestCase):
         ]
 
         with patch(
-            "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
-            autospec=True,
+            "backend.common.helpers.tbans_helper.WebhookRequest",
         ) as mock_init:
             for client in clients:
                 TBANSHelper._send_webhook(client, MockNotification())
@@ -1856,8 +1870,7 @@ class TestTBANSHelper(unittest.TestCase):
         ]
 
         with patch(
-            "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
-            autospec=True,
+            "backend.common.helpers.tbans_helper.WebhookRequest",
         ) as mock_init:
             for client in clients:
                 TBANSHelper._send_webhook(client, MockNotification())

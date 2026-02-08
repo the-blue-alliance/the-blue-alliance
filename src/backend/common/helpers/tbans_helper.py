@@ -510,9 +510,7 @@ class TBANSHelper:
         return webhook_request.send()
 
     @classmethod
-    def schedule_upcoming_match(
-        cls, match: Match, user_id: str | None = None
-    ) -> None:
+    def schedule_upcoming_match(cls, match: Match, user_id: str | None = None) -> None:
         from google.appengine.api import taskqueue
 
         queue = taskqueue.Queue("push-notifications")
@@ -646,10 +644,6 @@ class TBANSHelper:
 
         Returns None if required keys are missing or entities not found.
         """
-        district = None
-        if district_key:
-            district = District.get_by_id(district_key)
-
         event = None
         if event_key:
             event = Event.get_by_id(event_key)
@@ -661,6 +655,10 @@ class TBANSHelper:
         match = None
         if match_key:
             match = Match.get_by_id(match_key)
+
+        district = None
+        if district_key:
+            district = District.get_by_id(district_key)
 
         if notification_type == NotificationType.ALLIANCE_SELECTION:
             if event is None:
@@ -674,7 +672,9 @@ class TBANSHelper:
         elif notification_type == NotificationType.AWARDS:
             if event is None:
                 return None
-            return AwardsNotification(event, team) if team else AwardsNotification(event)
+            return (
+                AwardsNotification(event, team) if team else AwardsNotification(event)
+            )
 
         elif notification_type == NotificationType.BROADCAST:
             return BroadcastNotification(
