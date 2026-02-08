@@ -1,18 +1,17 @@
 import json
 import os
-from typing import Dict
-from urllib.parse import urlencode
+from unittest.mock import patch
 
 import pytest
-import requests
 from _pytest.monkeypatch import MonkeyPatch
-from requests_mock.mocker import Mocker as RequestsMocker
 
+from backend.common.futures import InstantFuture
 from backend.common.helpers.youtube_video_helper import (
     YouTubePlaylistItem,
     YouTubeVideoHelper,
 )
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
+from backend.common.urlfetch import URLFetchResult
 
 
 def test_parse_id_from_url() -> None:
@@ -227,35 +226,15 @@ def mock_google_api_secret(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setattr(GoogleApiSecret, "secret_key", mock_secret)
 
 
-def mock_youtube_api(
-    m: RequestsMocker,
-    playlist_id: str,
-    result: Dict,
-    status_code: int = 200,
-    next_token: str = "",
-) -> None:
-    query = {
-        "playlistId": playlist_id,
-        "pageToken": next_token,
-        "key": "google_api_secret",
-    }
-    m.register_uri(
-        "GET",
-        f"https://www.googleapis.com/youtube/v3/playlistItems?{urlencode(query)}",
-        status_code=status_code,
-        json=result,
-    )
-
-
 def test_get_playlist_videos_no_secret(ndb_context) -> None:
     with pytest.raises(
         Exception, match="No Google API secret, unable to resolve playlist"
     ):
-        YouTubeVideoHelper.videos_in_playlist("playlist")
+        YouTubeVideoHelper.videos_in_playlist("playlist").get_result()
 
 
 def test_get_playlist_videos_unauthorized(
-    ndb_context, mock_google_api_secret, requests_mock: RequestsMocker
+    ndb_context, mock_google_api_secret
 ) -> None:
     error_resp = {
         "error": {
@@ -271,26 +250,30 @@ def test_get_playlist_videos_unauthorized(
         }
     }
 
-    mock_youtube_api(requests_mock, "playlist_id", error_resp, status_code=403)
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/playlistItems", 403, json.dumps(error_resp)
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
 
-    with pytest.raises(requests.exceptions.HTTPError) as exinfo:
-        YouTubeVideoHelper.videos_in_playlist("playlist_id")
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        with pytest.raises(Exception, match="Unable to call Youtube API"):
+            YouTubeVideoHelper.videos_in_playlist("playlist_id").get_result()
 
-    assert exinfo.value.response.status_code == 403
 
-
-def test_get_playlist_videos(
-    ndb_context, mock_google_api_secret, requests_mock: RequestsMocker
-) -> None:
+def test_get_playlist_videos(ndb_context, mock_google_api_secret) -> None:
     with open(
         os.path.join(os.path.dirname(__file__), "data/youtube_playlist_response.json"),
         "r",
     ) as f:
         api_resp = json.load(f)
 
-    mock_youtube_api(requests_mock, "playlist_id", api_resp)
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/playlistItems", 200, json.dumps(api_resp)
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
 
-    videos = YouTubeVideoHelper.videos_in_playlist("playlist_id")
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        videos = YouTubeVideoHelper.videos_in_playlist("playlist_id").get_result()
     assert len(videos) == 86
     assert videos[0] == YouTubePlaylistItem(
         video_id="JQcGEsOXNd4",
@@ -305,7 +288,7 @@ def test_get_playlist_videos(
 
 
 def test_get_playlist_videos_paginate(
-    ndb_context, mock_google_api_secret, requests_mock: RequestsMocker
+    ndb_context, mock_google_api_secret
 ) -> None:
     with open(
         os.path.join(os.path.dirname(__file__), "data/youtube_playlist_response.json"),
@@ -321,10 +304,22 @@ def test_get_playlist_videos_paginate(
     resp2 = {
         "items": full_api_resp["items"][50:],
     }
-    mock_youtube_api(requests_mock, "playlist_id", resp1, next_token="")
-    mock_youtube_api(requests_mock, "playlist_id", resp2, next_token="nextPage")
 
-    videos = YouTubeVideoHelper.videos_in_playlist("playlist_id")
+    # Create mock responses for both pages
+    mock_urlfetch_result1 = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/playlistItems", 200, json.dumps(resp1)
+    )
+    mock_urlfetch_result2 = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/playlistItems", 200, json.dumps(resp2)
+    )
+
+    # Mock urlfetch to return different results on successive calls
+    with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+        mock_urlfetch.side_effect = [
+            InstantFuture(mock_urlfetch_result1),
+            InstantFuture(mock_urlfetch_result2),
+        ]
+        videos = YouTubeVideoHelper.videos_in_playlist("playlist_id").get_result()
     assert len(videos) == 86
     assert videos[0] == YouTubePlaylistItem(
         video_id="JQcGEsOXNd4",

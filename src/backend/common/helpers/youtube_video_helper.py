@@ -1,12 +1,14 @@
 import logging
 import re
-from typing import Dict, List, Optional, TypedDict
+from typing import Any, cast, Dict, Generator, List, Optional, TypedDict
 from urllib import parse as urlparse
 
-import requests
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
+from backend.common.tasklets import typed_tasklet
+from backend.common.urlfetch import URLFetchResult
 
 
 class YouTubePlaylistItem(TypedDict):
@@ -84,7 +86,10 @@ class YouTubeVideoHelper(object):
         return ""
 
     @classmethod
-    def videos_in_playlist(cls, playlist_id: str) -> List[YouTubePlaylistItem]:
+    @typed_tasklet
+    def videos_in_playlist(
+        cls, playlist_id: str
+    ) -> Generator[Any, Any, List[YouTubePlaylistItem]]:
         videos: List[Dict] = []
         yt_secret = GoogleApiSecret.secret_key()
         if not yt_secret:
@@ -98,22 +103,39 @@ class YouTubeVideoHelper(object):
 
         while i < 10:  # Precent runaway looping
             try:
-                result = requests.get(
-                    base_url,
-                    params={
-                        "playlistId": playlist_id,
-                        "part": "id,snippet",
-                        "maxResults": 50,
-                        "pageToken": next_page_token,
-                        "key": yt_secret,
-                    },
+                # Build URL with query parameters
+                params = {
+                    "playlistId": playlist_id,
+                    "part": "id,snippet",
+                    "maxResults": "50",
+                    "pageToken": next_page_token,
+                    "key": yt_secret,
+                }
+                query_string = "&".join(
+                    f"{k}={v}" for k, v in params.items() if v
                 )
-                result.raise_for_status()
+                url = f"{base_url}?{query_string}"
+
+                ndb_context = ndb.get_context()
+                urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
+                urlfetch_result = URLFetchResult(url, urlfetch_response)
+
+                if urlfetch_result.status_code != 200:
+                    logging.error(
+                        f"YouTube API returned status {urlfetch_result.status_code}"
+                    )
+                    raise Exception(
+                        f"Unable to call Youtube API for videos in playlist: status {urlfetch_result.status_code}"
+                    )
             except Exception:
                 logging.exception("Unable to call Youtube API for videos in playlist")
                 raise
 
-            video_result = result.json()
+            video_result = cast(Optional[dict], urlfetch_result.json())
+            if video_result is None:
+                logging.error("YouTube API returned no data")
+                break
+
             videos += [
                 video
                 for video in video_result["items"]
@@ -125,11 +147,15 @@ class YouTubeVideoHelper(object):
             next_page_token = video_result["nextPageToken"]
             i += 1
 
-        return [
-            YouTubePlaylistItem(
-                video_id=video["snippet"]["resourceId"]["videoId"],
-                video_title=video["snippet"]["title"],
-                guessed_match_partial=cls.guessMatchPartial(video["snippet"]["title"]),
-            )
-            for video in videos
-        ]
+        raise ndb.Return(
+            [
+                YouTubePlaylistItem(
+                    video_id=video["snippet"]["resourceId"]["videoId"],
+                    video_title=video["snippet"]["title"],
+                    guessed_match_partial=cls.guessMatchPartial(
+                        video["snippet"]["title"]
+                    ),
+                )
+                for video in videos
+            ]
+        )

@@ -11,6 +11,7 @@ from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.futures import InstantFuture
 from backend.common.helpers.youtube_video_helper import YouTubePlaylistItem
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -272,7 +273,7 @@ def test_ajax_resolve_playlist(login_user, web_client: Client) -> None:
     with patch(
         "backend.common.helpers.youtube_video_helper.YouTubeVideoHelper.videos_in_playlist"
     ) as playlist_mock:
-        playlist_mock.return_value = expected
+        playlist_mock.return_value = InstantFuture(expected)
 
         resp = web_client.get("/suggest/_/yt/playlist/videos?playlist_id=plist1234")
         assert resp.status_code == 200

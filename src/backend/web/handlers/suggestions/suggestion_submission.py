@@ -157,7 +157,7 @@ def resolve_youtube_playlist() -> Response:
     if not playlist_id:
         abort(400)
 
-    playlist_videos = YouTubeVideoHelper.videos_in_playlist(playlist_id)
+    playlist_videos = YouTubeVideoHelper.videos_in_playlist(playlist_id).get_result()
     return jsonify(playlist_videos)
 
 
