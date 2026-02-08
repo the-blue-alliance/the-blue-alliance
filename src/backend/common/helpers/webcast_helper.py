@@ -1,11 +1,13 @@
 import logging
 import re
-from typing import Optional, Tuple
+from typing import Any, Generator, Optional, Tuple
 
-import requests
+from google.appengine.ext import ndb
 
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.webcast import Webcast
+from backend.common.tasklets import typed_tasklet
+from backend.common.urlfetch import URLFetchResult
 
 
 class WebcastParser:
@@ -15,21 +17,26 @@ class WebcastParser:
     LIVESTREAM_URL_PATTERNS = ["livestream.com/"]
 
     @classmethod
-    def webcast_dict_from_url(cls, url: str) -> Optional[Webcast]:
+    @typed_tasklet
+    def webcast_dict_from_url(cls, url: str) -> Generator[Any, Any, Optional[Webcast]]:
         """
         Takes a url, and turns it into a webcast dict (as defined in models.event)
         """
         if any(s in url for s in cls.TWITCH_URL_PATTERNS):
-            return cls._webcast_dict_from_twitch(url)
+            result = cls._webcast_dict_from_twitch(url)
+            raise ndb.Return(result)
         elif any(s in url for s in cls.YOUTUBE_URL_PATTERNS):
-            return cls._webcast_dict_from_youtube(url)
+            result = cls._webcast_dict_from_youtube(url)
+            raise ndb.Return(result)
         elif any(s in url for s in cls.USTREAM_URL_PATTERNS):
-            return cls._webcast_dict_from_ustream(url)
+            result = yield cls._webcast_dict_from_ustream(url)
+            raise ndb.Return(result)
         elif any(s in url for s in cls.LIVESTREAM_URL_PATTERNS):
-            return cls._webcast_dict_from_livestream(url)
+            result = yield cls._webcast_dict_from_livestream(url)
+            raise ndb.Return(result)
         else:
             logging.warning("Failed to determine webcast type from url: {}".format(url))
-            return None
+            raise ndb.Return(None)
 
     @classmethod
     def _webcast_dict_from_twitch(cls, url: str) -> Optional[Webcast]:
@@ -56,42 +63,52 @@ class WebcastParser:
         return webcast_dict
 
     @classmethod
-    def _webcast_dict_from_ustream(cls, url: str) -> Optional[Webcast]:
-        urlfetch_result = requests.get(url, timeout=10)
+    @typed_tasklet
+    def _webcast_dict_from_ustream(
+        cls, url: str
+    ) -> Generator[Any, Any, Optional[Webcast]]:
+        ndb_context = ndb.get_context()
+        urlfetch_result_future = ndb_context.urlfetch(url, deadline=10)
+        urlfetch_result: URLFetchResult = yield urlfetch_result_future
         if urlfetch_result.status_code != 200:
             logging.warning("Unable to retrieve url: {}".format(url))
-            return None
+            raise ndb.Return(None)
 
         channel = cls._parse_ustream_channel(urlfetch_result.content)
         if channel is None:
             logging.warning("Failed to determine channel from url: {}".format(url))
-            return None
+            raise ndb.Return(None)
         webcast_dict: Webcast = {
             "type": WebcastType.USTREAM,
             "channel": channel,
         }
-        return webcast_dict
+        raise ndb.Return(webcast_dict)
 
     @classmethod
-    def _webcast_dict_from_livestream(cls, url: str) -> Optional[Webcast]:
-        urlfetch_result = requests.get(url, timeout=10)
+    @typed_tasklet
+    def _webcast_dict_from_livestream(
+        cls, url: str
+    ) -> Generator[Any, Any, Optional[Webcast]]:
+        ndb_context = ndb.get_context()
+        urlfetch_result_future = ndb_context.urlfetch(url, deadline=10)
+        urlfetch_result: URLFetchResult = yield urlfetch_result_future
         if urlfetch_result.status_code != 200:
             logging.warning("Unable to retrieve url: {}".format(url))
-            return None
+            raise ndb.Return(None)
 
         channel_and_file = cls._parse_livestream_channel(urlfetch_result.content)
         if channel_and_file is None:
             logging.warning(
                 "Failed to determine channel and file from url: {}".format(url)
             )
-            return None
+            raise ndb.Return(None)
         channel, file = channel_and_file
         webcast_dict: Webcast = {
             "type": WebcastType.LIVESTREAM,
             "channel": channel,
             "file": file,
         }
-        return webcast_dict
+        raise ndb.Return(webcast_dict)
 
     @classmethod
     def _parse_twitch_channel(cls, url: str) -> Optional[str]:
@@ -123,10 +140,10 @@ class WebcastParser:
             return youtube_id
 
     @classmethod
-    def _parse_ustream_channel(cls, html: bytes) -> Optional[str]:
+    def _parse_ustream_channel(cls, html: str) -> Optional[str]:
         from bs4 import BeautifulSoup
 
-        content = html.decode("utf-8", "replace")
+        content = html
 
         # parse html for the channel id
         soup = BeautifulSoup(content, "html.parser")
@@ -141,10 +158,10 @@ class WebcastParser:
                 return None
 
     @classmethod
-    def _parse_livestream_channel(cls, html: bytes) -> Optional[Tuple[str, str]]:
+    def _parse_livestream_channel(cls, html: str) -> Optional[Tuple[str, str]]:
         from bs4 import BeautifulSoup
 
-        content = html.decode("utf-8", "replace")
+        content = html
 
         # parse html for the channel id
         soup = BeautifulSoup(content, "html.parser")

@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 from pytz import all_timezones_set as PYTZ_ALL_TIMEZONES
@@ -15,7 +15,9 @@ from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.keys import DistrictKey, Year
+from backend.common.models.webcast import Webcast
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
+from backend.common.tasklets import typed_tasklet
 from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
 
 
@@ -79,6 +81,18 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
 
         return playoff_type
 
+    @staticmethod
+    @typed_tasklet
+    def _parse_webcasts_async(
+        webcast_urls: List[str],
+    ) -> Generator[Any, Any, List[Optional[Webcast]]]:
+        """Parse webcast URLs in parallel."""
+        webcast_futures = tuple(
+            WebcastParser.webcast_dict_from_url(url) for url in webcast_urls
+        )
+        webcasts = yield webcast_futures
+        raise ndb.Return(list(webcasts))
+
     def parse(self, response: Dict[str, Any]) -> Tuple[List[Event], List[District]]:
         events: List[Event] = []
         districts: Dict[DistrictKey, District] = {}
@@ -136,10 +150,9 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             start = datetime.datetime.strptime(event["dateStart"], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event["dateEnd"], self.DATE_FORMAT_STR)
             website = event.get("website")
-            webcasts = [
-                WebcastParser.webcast_dict_from_url(url)
-                for url in event.get("webcasts", [])
-            ]
+            webcasts = self._parse_webcasts_async(
+                event.get("webcasts", [])
+            ).get_result()
 
             # Attempt to convert our API (Windows) timezone -> IANA timezone
             # We'll ensure it's capatiable with pytz as well, since that's what we use everywhere

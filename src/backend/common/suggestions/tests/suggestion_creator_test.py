@@ -663,7 +663,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
     def test_bad_event(self) -> None:
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "bad_event")
 
     def test_create_suggestion(self) -> None:
@@ -678,7 +678,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -707,7 +707,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account_banned.key, "http://twitch.tv/frcgamesense", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
 
         # Ensure the Suggestion gets created
@@ -736,7 +736,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "twitch.tv/frcgamesense", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
         expected_key = "webcast_2016test_twitch_frcgamesense_None"
         suggestion = Suggestion.get_by_id(expected_key)
@@ -760,7 +760,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://myweb.site/somewebcast", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
         suggestions = Suggestion.query().fetch()
         self.assertIsNotNone(suggestions)
@@ -787,7 +787,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "webcast_exists")
 
     def test_duplicate_suggestion(self) -> None:
@@ -802,11 +802,11 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "suggestion_exists")
 
     def test_duplicate_unknown_suggestion_type(self) -> None:
@@ -821,11 +821,11 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://myweb.site/somewebcast", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "success")
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://myweb.site/somewebcast", "", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "suggestion_exists")
 
     def test_webcast_bad_date(self) -> None:
@@ -841,7 +841,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://twitch.tv/frcgamesense", "BAD DATE", "2016test"
-        )
+        ).get_result()
         self.assertEqual(status, "invalid_date")
 
     def test_webcast_good_date(self) -> None:
@@ -856,7 +856,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             self.account.key, "http://twitch.tv/frcgamesense", "2017-02-28", "2016test"
-        )
+        ).get_result()
 
         self.assertEqual(status, "success")
         suggestions = Suggestion.query().fetch()
