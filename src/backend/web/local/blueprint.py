@@ -26,7 +26,7 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.sitevars.apiv3_key import Apiv3Key
 from backend.web.local.bootstrap import LocalDataBootstrap
-from backend.web.local.dev_tools import seed_test_event
+from backend.web.local.dev_tools import seed_test_event, seed_test_team
 from backend.web.profiled_render import render_template
 
 """
@@ -196,6 +196,12 @@ def create_test_event(event_key: str) -> Response:
 local_routes.add_url_rule(
     "/seed_test_event",
     view_func=seed_test_event,
+    methods=["POST"],
+)
+
+local_routes.add_url_rule(
+    "/seed_test_team",
+    view_func=seed_test_team,
     methods=["POST"],
 )
 
