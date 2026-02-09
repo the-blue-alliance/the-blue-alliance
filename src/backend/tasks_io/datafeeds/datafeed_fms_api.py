@@ -24,7 +24,7 @@ from backend.common.models.team import Team
 from backend.common.profiler import Span
 from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
 from backend.common.tasklets import typed_tasklet
-from backend.common.urlfetch import URLFetchResult
+from backend.common.urlfetch import TypedURLFetchResult, URLFetchResult
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_awards_parser import (
     FMSAPIAwardsParser,
 )
@@ -58,7 +58,11 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_avatar_parser impor
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
     FMSAPITeamDetailsParser,
 )
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
+from backend.tasks_io.datafeeds.parsers.parser_base import (
+    ParserBase,
+    TParsedResponse,
+    TParserInput,
+)
 
 
 class DatafeedFMSAPI:
@@ -416,13 +420,18 @@ class DatafeedFMSAPI:
         return Event.compute_first_api_code(year, event_short)
 
     def _parse(
-        self, response: URLFetchResult, parser: ParserBase[TParsedResponse]
+        self,
+        response: TypedURLFetchResult[TParserInput],
+        parser: ParserBase[TParserInput, TParsedResponse],
     ) -> Optional[TParsedResponse]:
         if response.status_code == 200:
             ApiStatusFMSApiDown.set_down(False)
 
             with Span(f"datafeed_fmsapi_parser:{type(parser).__name__}"):
-                return parser.parse(response.json())
+                resp_body = response.json()
+                if not resp_body:
+                    return None
+                return parser.parse(resp_body)
 
         elif response.status_code // 100 == 5:
             # 5XX error - something is wrong with the server

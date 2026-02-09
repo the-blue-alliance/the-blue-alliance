@@ -10,13 +10,13 @@ from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class DummyParser(ParserBase[Any]):
+class DummyParser(ParserBase[Any, Any]):
 
     def parse(self, response: Any) -> Any:
         return response
 
 
-class DummyDatafeed(DatafeedBase[Any]):
+class DummyDatafeed(DatafeedBase[Any, Any]):
 
     def url(self):
         return "https://example.com/test"

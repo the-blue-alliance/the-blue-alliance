@@ -27,7 +27,7 @@ from backend.tasks_io.datafeeds.parsers.nexus_api.queue_status_parser import (
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class DummyDatafeedNexus(_DatafeedNexus[Any]):
+class DummyDatafeedNexus(_DatafeedNexus[Any, Any]):
 
     def endpoint(self) -> str:
         return "/"

@@ -4,7 +4,7 @@ from backend.common.models.twitch_access_token import TwitchAccessToken
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class TwitchAccessTokenParser(ParserBase[TwitchAccessToken]):
+class TwitchAccessTokenParser(ParserBase[dict, TwitchAccessToken]):
     """
     See: https://dev.twitch.tv/docs/api/reference/#get-streams
     """
