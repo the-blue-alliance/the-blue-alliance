@@ -61,7 +61,23 @@ def apidocs_v3() -> str:
 # @cached_public(ttl=timedelta(weeks=1))
 # TODO: Figure out how we can cache this despite having a CSRF token in the form
 def apidocs_webhooks() -> str:
-    template_values = {"enabled": ENABLED_NOTIFICATIONS, "types": NOTIFICATION_TYPES}
+    from backend.common.consts.client_type import ClientType
+    from backend.common.models.mobile_client import MobileClient
+
+    user = current_user()
+    webhooks = []
+    if user:
+        webhooks = MobileClient.query(
+            MobileClient.user_id == str(user.uid),
+            MobileClient.client_type == ClientType.WEBHOOK,
+            MobileClient.verified == True,
+        ).fetch()
+
+    template_values = {
+        "enabled": ENABLED_NOTIFICATIONS,
+        "types": NOTIFICATION_TYPES,
+        "webhooks": webhooks,
+    }
     return render_template("apidocs_webhooks.html", template_values)
 
 
@@ -69,13 +85,13 @@ def apidocs_webhooks() -> str:
 @enforce_login
 def apidocs_webhooks_notification(type: int) -> Response:
     event_key = request.form.get("event_key")
+    team_key = request.form.get("team_key")
     match_key = request.form.get("match_key")
-    # district_key = request.form.get("district_key")
+    district_key = request.form.get("district_key")
+    webhook_client_id = request.form.get("webhook_client_id")
 
     user = none_throws(current_user())
     user_id = str(user.uid)
-
-    success_response = make_response("ok", 200)
 
     def error_response(message: str):
         return make_response(jsonify({"Error": message}), 400)
@@ -85,63 +101,31 @@ def apidocs_webhooks_notification(type: int) -> Response:
     except ValueError:
         return error_response("Invalid notification type")
 
-    if notification_type in [
-        NotificationType.ALLIANCE_SELECTION,
-        NotificationType.AWARDS,
-        NotificationType.SCHEDULE_UPDATED,
-    ]:
-        # Handle our Event dispatches
-        if not event_key:
-            return error_response("Event key not specified")
+    if not webhook_client_id:
+        return error_response("Webhook not specified")
 
-        from backend.common.models.event import Event
+    from backend.common.consts.client_type import ClientType
+    from backend.common.models.mobile_client import MobileClient
 
-        event = Event.get_by_id(event_key)
-        if not event:
-            return error_response(f"Event {event_key} not found")
+    webhook = MobileClient.get_by_id(int(webhook_client_id), parent=user.account_key)
+    if not webhook:
+        return error_response("Webhook not found")
+    if webhook.client_type != ClientType.WEBHOOK:
+        return error_response("Client is not a webhook")
+    if webhook.user_id != user_id:
+        return error_response("Webhook does not belong to current user")
+    if not webhook.verified:
+        return error_response("Webhook is not verified")
 
-        if notification_type == NotificationType.ALLIANCE_SELECTION:
-            TBANSHelper.alliance_selection(event, user_id=user_id)
-            return success_response
-        elif notification_type == NotificationType.AWARDS:
-            TBANSHelper.awards(event, user_id=user_id)
-            return success_response
-        elif notification_type == NotificationType.SCHEDULE_UPDATED:
-            TBANSHelper.event_schedule(event, user_id=user_id)
-            return success_response
-
-        return error_response("Unexpected error")
-    elif notification_type in [
-        NotificationType.UPCOMING_MATCH,
-        NotificationType.MATCH_SCORE,
-        NotificationType.LEVEL_STARTING,
-        NotificationType.MATCH_VIDEO,
-    ]:
-        # Handle our Match dispatches
-        if not match_key:
-            return error_response("Match key not specified")
-
-        from backend.common.models.match import Match
-
-        match = Match.get_by_id(match_key)
-        if not match:
-            return error_response(f"Match {match_key} not found")
-
-        if notification_type == NotificationType.UPCOMING_MATCH:
-            TBANSHelper.match_upcoming(match, user_id=user_id)
-            return success_response
-        elif notification_type == NotificationType.MATCH_SCORE:
-            TBANSHelper.match_score(match, user_id=user_id)
-            return success_response
-        elif notification_type == NotificationType.LEVEL_STARTING:
-            TBANSHelper.event_level(match, user_id=user_id)
-            return success_response
-        elif notification_type == NotificationType.MATCH_VIDEO:
-            TBANSHelper.match_video(match, user_id=user_id)
-            return success_response
-
-        return error_response("Unexpected error")
-
-    # TODO: Need to handle district_points_updated here as well
-
-    return error_response(f"Unknown notification_type {notification_type}")
+    success = TBANSHelper.send_webhook_test(
+        webhook,
+        notification_type,
+        event_key=event_key,
+        team_key=team_key,
+        match_key=match_key,
+        district_key=district_key,
+    )
+    if success:
+        return make_response("ok", 200)
+    else:
+        return error_response("Failed to send notification to webhook")

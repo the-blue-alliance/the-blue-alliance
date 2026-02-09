@@ -35,6 +35,7 @@ from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.tbans_helper import _firebase_app, TBANSHelper
 from backend.common.models.account import Account
 from backend.common.models.award import Award
+from backend.common.models.district import District
 from backend.common.models.event_details import EventDetails
 from backend.common.models.match import Match
 from backend.common.models.mobile_client import MobileClient
@@ -96,7 +97,7 @@ class TestTBANSHelper(unittest.TestCase):
         self.team = Team(id="frc7332", team_number=7332)
         self.team.put()
         self.match = Match(
-            id="2020miket_qm1",
+            id=f"{self.event.key_name}_qm1",
             event=self.event.key,
             comp_level="qm",
             set_number=1,
@@ -116,6 +117,13 @@ class TestTBANSHelper(unittest.TestCase):
             ),
             year=2020,
         )
+        self.match.put()
+        self.district = District(
+            id="2020fim",
+            year=2020,
+            abbreviation="fim",
+        )
+        self.district.put()
 
     def tearDown(self):
         self.gae_testbed.deactivate()
@@ -847,8 +855,326 @@ class TestTBANSHelper(unittest.TestCase):
             mock_send.assert_called_once()
             assert not success
 
+    def test_send_webhook_test_not_webhook_client(self):
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="fcm_token",
+            client_type=ClientType.OS_ANDROID,
+            verified=True,
+        )
+        success = TBANSHelper.send_webhook_test(
+            client, NotificationType.MATCH_SCORE, match_key=self.match.key_name
+        )
+        assert not success
+
+    def test_send_webhook_test_not_verified(self):
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=False,
+        )
+        success = TBANSHelper.send_webhook_test(
+            client, NotificationType.MATCH_SCORE, match_key=self.match.key_name
+        )
+        assert not success
+
+    def test_send_webhook_test_missing_keys(self):
+        # Test that missing keys return False
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+        # Event-based notification without event_key
+        success = TBANSHelper.send_webhook_test(client, NotificationType.AWARDS)
+        assert not success
+
+        # Match-based notification without match_key
+        success = TBANSHelper.send_webhook_test(client, NotificationType.MATCH_SCORE)
+        assert not success
+
+    def test_send_webhook_test_nonexistent_entity(self):
+        # Test that nonexistent entities return False
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+        # Nonexistent event
+        success = TBANSHelper.send_webhook_test(
+            client, NotificationType.AWARDS, event_key="nonexistent"
+        )
+        assert not success
+
+        # Nonexistent match
+        success = TBANSHelper.send_webhook_test(
+            client, NotificationType.MATCH_SCORE, match_key="nonexistent"
+        )
+        assert not success
+
+    def test_send_webhook_test_success(self):
+        # Test that a verified webhook sends successfully
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
+            success = TBANSHelper.send_webhook_test(
+                client, NotificationType.MATCH_SCORE, match_key=self.match.key_name
+            )
+            mock_send.assert_called_once()
+            assert success
+
+    def test_send_webhook_test_event_notification(self):
+        # Test that event-based notifications work
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
+            success = TBANSHelper.send_webhook_test(
+                client, NotificationType.AWARDS, event_key=self.event.key_name
+            )
+            mock_send.assert_called_once()
+            assert success
+
+    def test_send_webhook_test_failure(self):
+        # Test that a failed send returns False
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+
+        with patch.object(
+            WebhookRequest, "send", return_value=(False, True)
+        ) as mock_send:
+            success = TBANSHelper.send_webhook_test(
+                client, NotificationType.MATCH_SCORE, match_key=self.match.key_name
+            )
+            mock_send.assert_called_once()
+            assert not success
+
+    def test_send_webhook_test_ping_notification(self):
+        # Test that PING notifications work without any keys
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
+            success = TBANSHelper.send_webhook_test(client, NotificationType.PING)
+            mock_send.assert_called_once()
+            assert success
+
+    def test_send_webhook_test_broadcast_notification(self):
+        # Test that BROADCAST notifications work without any keys
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
+            success = TBANSHelper.send_webhook_test(client, NotificationType.BROADCAST)
+            mock_send.assert_called_once()
+            assert success
+
+    def test_send_webhook_test_with_team_key(self):
+        # Test that team-specific notifications work
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
+            success = TBANSHelper.send_webhook_test(
+                client,
+                NotificationType.AWARDS,
+                event_key=self.event.key_name,
+                team_key=self.team.key_name,
+            )
+            mock_send.assert_called_once()
+            assert success
+
+    def test_send_webhook_test_with_district_key(self):
+        # Test that district-specific notifications work
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="https://example.com/webhook",
+            client_type=ClientType.WEBHOOK,
+            secret="secret",
+            verified=True,
+        )
+
+        with patch.object(
+            WebhookRequest, "send", return_value=(True, True)
+        ) as mock_send:
+            success = TBANSHelper.send_webhook_test(
+                client,
+                NotificationType.DISTRICT_POINTS_UPDATED,
+                district_key=self.district.key_name,
+            )
+            mock_send.assert_called_once()
+            assert success
+
+    def test_create_test_notification_alliance_selection(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.ALLIANCE_SELECTION, event_key=self.event.key_name
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.ALLIANCE_SELECTION
+
+    def test_create_test_notification_alliance_selection_with_team(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.ALLIANCE_SELECTION,
+            event_key=self.event.key_name,
+            team_key=self.team.key_name,
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.ALLIANCE_SELECTION
+        assert notification.team == self.team
+
+    def test_create_test_notification_awards(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.AWARDS, event_key=self.event.key_name
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.AWARDS
+
+    def test_create_test_notification_broadcast(self):
+        notification = TBANSHelper._create_test_notification(NotificationType.BROADCAST)
+        assert notification is not None
+        assert notification._type() == NotificationType.BROADCAST
+
+    def test_create_test_notification_level_starting(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.LEVEL_STARTING, match_key=self.match.key_name
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.LEVEL_STARTING
+
+    def test_create_test_notification_match_score(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.MATCH_SCORE, match_key=self.match.key_name
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.MATCH_SCORE
+
+    def test_create_test_notification_match_video(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.MATCH_VIDEO, match_key=self.match.key_name
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.MATCH_VIDEO
+
+    def test_create_test_notification_ping(self):
+        notification = TBANSHelper._create_test_notification(NotificationType.PING)
+        assert notification is not None
+        assert notification._type() == NotificationType.PING
+
+    def test_create_test_notification_schedule_updated(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.SCHEDULE_UPDATED, event_key=self.event.key_name
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.SCHEDULE_UPDATED
+
+    def test_create_test_notification_upcoming_match(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.UPCOMING_MATCH, match_key=self.match.key_name
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.UPCOMING_MATCH
+
+    def test_create_test_notification_district_points_updated(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.DISTRICT_POINTS_UPDATED,
+            district_key=self.district.key_name,
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.DISTRICT_POINTS_UPDATED
+
+    def test_create_test_notification_missing_district_returns_none(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.DISTRICT_POINTS_UPDATED, district_key="nonexistent"
+        )
+        assert notification is None
+
+    def test_create_test_notification_missing_event_returns_none(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.AWARDS, event_key="nonexistent"
+        )
+        assert notification is None
+
+    def test_create_test_notification_missing_match_returns_none(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.MATCH_SCORE, match_key="nonexistent"
+        )
+        assert notification is None
+
+    def test_create_test_notification_unsupported_type_returns_none(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.UPDATE_FAVORITES
+        )
+        assert notification is None
+
     def test_schedule_upcoming_matches_not_new_schedule(self):
         # Set some upcoming matches for the Event - not Match 1 though, so no notification gets sent
+        # First, mark the setup match as "played" so it's not considered upcoming
+        self.match.alliances_json = json.dumps(
+            {
+                "red": {"teams": ["frc1", "frc2", "frc7332"], "score": 100},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 50},
+            }
+        )
+        self.match.put()
+
         match_creator = MatchTestCreator(self.event)
         teams = [
             Team(id="frc%s" % team_number, team_number=team_number)
@@ -1101,11 +1427,10 @@ class TestTBANSHelper(unittest.TestCase):
         ]
 
         with patch(
-            "backend.common.models.notifications.requests.fcm_request.FCMRequest",
-            autospec=True,
+            "backend.common.helpers.tbans_helper.FCMRequest",
         ) as mock_init:
             TBANSHelper._send_fcm(clients, MockNotification())
-            mock_init.assert_called_once_with(ANY, ANY, expected)
+            mock_init.assert_called_once_with(ANY, ANY, tokens=expected)
 
     def test_send_fcm_filter_from_notification(self):
         clients = [
@@ -1140,7 +1465,12 @@ class TestTBANSHelper(unittest.TestCase):
         with patch(
             "backend.common.models.notifications.requests.fcm_request.MAXIMUM_TOKENS",
             2,
-        ), patch.object(FCMRequest, "send", return_value=batch_response) as mock_send:
+        ), patch(
+            "backend.common.helpers.tbans_helper.MAXIMUM_TOKENS",
+            2,
+        ), patch.object(
+            FCMRequest, "send", return_value=batch_response
+        ) as mock_send:
             TBANSHelper._send_fcm(clients, MockNotification())
             assert mock_send.call_count == 2
 
@@ -1515,8 +1845,7 @@ class TestTBANSHelper(unittest.TestCase):
         ]
 
         with patch(
-            "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
-            autospec=True,
+            "backend.common.helpers.tbans_helper.WebhookRequest",
         ) as mock_init:
             for client in clients:
                 TBANSHelper._send_webhook(client, MockNotification())
@@ -1541,8 +1870,7 @@ class TestTBANSHelper(unittest.TestCase):
         ]
 
         with patch(
-            "backend.common.models.notifications.requests.webhook_request.WebhookRequest",
-            autospec=True,
+            "backend.common.helpers.tbans_helper.WebhookRequest",
         ) as mock_init:
             for client in clients:
                 TBANSHelper._send_webhook(client, MockNotification())
