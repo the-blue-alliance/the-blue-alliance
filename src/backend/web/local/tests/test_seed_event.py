@@ -18,7 +18,7 @@ def test_seed_creates_event_and_matches(local_client: Client, taskqueue_stub) ->
     # Verify event
     event = Event.get_by_id("2025test")
     assert event is not None
-    assert event.name == "North Pole Regional"
+    assert event.name == "North Pole Showdown"
     assert event.year == 2025
     assert event.event_type_enum == EventType.OFFSEASON
 
