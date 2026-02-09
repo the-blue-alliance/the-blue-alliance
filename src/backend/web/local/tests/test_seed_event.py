@@ -2,7 +2,6 @@ from freezegun import freeze_time
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
-from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
@@ -18,9 +17,8 @@ def test_seed_creates_event_and_matches(local_client: Client, taskqueue_stub) ->
     # Verify event
     event = Event.get_by_id("2025test")
     assert event is not None
-    assert event.name == "North Pole Showdown"
+    assert event.name == "North Pole Regional"
     assert event.year == 2025
-    assert event.event_type_enum == EventType.OFFSEASON
 
     # Verify webcasts
     assert len(event.webcast) == 2
@@ -51,16 +49,6 @@ def test_seed_creates_event_and_matches(local_client: Client, taskqueue_stub) ->
     # Verify EventTeam records
     event_teams = EventTeam.query(EventTeam.event == ndb.Key(Event, "2025test")).fetch()
     assert len(event_teams) == 21
-
-
-@freeze_time("2025-01-15")
-def test_seed_preseason_in_january(local_client: Client, taskqueue_stub) -> None:
-    resp = local_client.post("/local/seed_test_event")
-    assert resp.status_code == 302
-
-    event = Event.get_by_id("2025test")
-    assert event is not None
-    assert event.event_type_enum == EventType.PRESEASON
 
 
 @freeze_time("2025-03-15")

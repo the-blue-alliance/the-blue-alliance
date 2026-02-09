@@ -78,7 +78,7 @@ def createSuggestion(logged_in_user) -> str:
         "https://twitch.tv/frcgamesense",
         "",
         "2016necmp",
-    )
+    ).get_result()
     assert status == SuggestionCreationStatus.SUCCESS
     return "webcast_2016necmp_twitch_frcgamesense_None"
 

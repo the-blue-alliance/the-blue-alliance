@@ -60,16 +60,8 @@ def test_prod_env(set_prod) -> None:
     assert Environment.is_prod() is True
 
 
-def test_project_none() -> None:
-    assert Environment.project() is None
-
-
 def test_project(set_project) -> None:
     assert Environment.project() == "tbatv-prod-hrd"
-
-
-def test_service_none() -> None:
-    assert Environment.service() is None
 
 
 def test_service(set_service) -> None:

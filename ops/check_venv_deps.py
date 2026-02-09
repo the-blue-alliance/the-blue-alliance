@@ -1,7 +1,9 @@
 import sys
+from importlib.metadata import distribution, PackageNotFoundError
 from pathlib import Path
 
-import pkg_resources
+from packaging.requirements import Requirement
+
 
 REQUIREMENTS_FILES = [
     Path(__file__).parent.parent / "requirements.txt",
@@ -9,16 +11,20 @@ REQUIREMENTS_FILES = [
 ]
 
 
-def test_requirements():
+def test_requirements() -> None:
     missing_requirements = []
     for requirement_file in REQUIREMENTS_FILES:
-        requirements = pkg_resources.parse_requirements(requirement_file.read_text())
-        for requirement in requirements:
-            requirement = str(requirement)
+        for line in requirement_file.read_text().splitlines():
+            line = line.strip()
+            # Skip empty lines and comments
+            if not line or line.startswith("#"):
+                continue
             try:
-                pkg_resources.require(requirement)
-            except pkg_resources.DistributionNotFound:
-                missing_requirements.append(requirement)
+                req = Requirement(line)
+                # Check if the distribution is installed
+                distribution(req.name)
+            except PackageNotFoundError:
+                missing_requirements.append(line)
 
     if missing_requirements:
         print(f"Missing requirements! {missing_requirements}")

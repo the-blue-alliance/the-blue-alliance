@@ -74,7 +74,7 @@ def submit_webcast() -> Response:
         webcast_url=webcast_url,
         webcast_date=webcast_date,
         event_key=event_key,
-    )
+    ).get_result()
 
     return redirect(
         url_for(".suggest_webcast", event_key=event_key, status=status.value)

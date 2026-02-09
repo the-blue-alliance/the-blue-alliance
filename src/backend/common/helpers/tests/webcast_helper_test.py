@@ -32,5 +32,5 @@ from backend.common.helpers.webcast_helper import (
     ],
 )
 def test_youtube_webcast_dict_from_url(url: str) -> None:
-    webcast = WebcastParser.webcast_dict_from_url(url)
+    webcast = WebcastParser.webcast_dict_from_url(url).get_result()
     assert webcast is not None and webcast["channel"] == "1v8_2dW7Kik"

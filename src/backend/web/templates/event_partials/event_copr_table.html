@@ -1,20 +1,30 @@
 {% if has_coprs %}
 <h3><abbr title="Component Offensive Power Ratings">COPRs</abbr> (<a href="/opr">?</a>)</h3>
-<div class="btn-group">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">
-    <span id="coprSelector">Choose component</span> <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu">
-    {% for copr_item in copr_items %}
-        <li>
-            <a href="#" id="dropdown_{{ copr_item[1] }}">{{ copr_item[2] }}</a>
-        </li>
-    {% endfor %}
-  </ul>
+<div class="clearfix">
+    <div class="btn-group pull-left">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+            <span id="coprSelector">Statistics</span> <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                    <a href="#" id="copr_clear">Clear (reset to OPR)</a>
+            </li>
+            <li role="separator" class="divider"></li>
+            {% for copr_item in copr_items %}
+                    <li>
+                            <label class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}" for="checkbox_{{ copr_item[1] }}" style="display:block; padding:3px 12px; cursor:pointer;">
+                                    <input type="checkbox" id="checkbox_{{ copr_item[1] }}" style="margin-right:6px;">{{ copr_item[2] }}
+                            </label>
+                    </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <button type="button" class="btn btn-default pull-right" id="copr_csv" style="margin-left:8px;">Download CSV</button>
 </div>
 
-<table class="table table-condensed table-striped table-center table-hover" style="table-layout: fixed;">
+<div style="overflow-x: auto;">
+<table id="coprTable" class="table table-condensed table-striped table-center table-hover">
     <thead>
         <tr>
             <th>#</th>
@@ -25,46 +35,247 @@
     <tbody id="coprTableBody">
     </tbody>
 </table>
+</div>
 
 <script>
     const coprs = JSON.parse('{{ coprs_json|safe }}');
 
-    function buildCoprTable(component, readableName) {
-        document.getElementById('componentColHeader').innerHTML = readableName;
-        document.getElementById('coprSelector').innerText = readableName;
-        document.getElementById('coprTableBody').innerHTML = '';
-        coprs[component].forEach((e, idx) => {
-            const rankTd = document.createElement('td');
-            rankTd.innerText = idx + 1;
+    // Helper: return teams in the order of the primary component (first selected)
+    function getPrimaryTeamList(primaryComponent) {
+        if (!coprs[primaryComponent]) return [];
+        return coprs[primaryComponent].map(e => e[0]);
+    }
 
-            const teamId = e[0];
+    // Normalize a key into a safe column class
+    function colClass(key) {
+        return 'copr-col-' + String(key).replace(/[^a-zA-Z0-9_-]/g, '_');
+    }
+
+    // Get all components from the DOM (preserves dropdown ordering & readable names)
+    function getAllComponentsFromDOM() {
+        const comps = [];
+        document.querySelectorAll('.copr-select').forEach(n => {
+            const k = n.getAttribute('data-key');
+            const r = n.getAttribute('data-name');
+            comps.push({ key: k, readable: r });
+        });
+        return comps;
+    }
+
+    // Set column visibility (manual approach for old tablesorter)
+    function setColumnVisibility(key, visible) {
+        const displayVal = visible ? '' : 'none';
+        const className = colClass(key);
+        
+        // Hide/show header cells with this class
+        document.querySelectorAll(`#coprTable thead th.${className}`).forEach(el => {
+            el.style.display = displayVal;
+        });
+        
+        // Hide/show body cells with this class
+        document.querySelectorAll(`#coprTable tbody td.${className}`).forEach(el => {
+            el.style.display = displayVal;
+        });
+    }
+
+    // Build the table with ALL components (we will hide/show based on checkboxes)
+    function buildCoprTable(allComponents, primaryKey) {
+        const theadRow = document.querySelector('#coprTableBody').parentElement.querySelector('thead tr');
+        const tbody = document.getElementById('coprTableBody');
+
+        // Build header: fixed columns + one per component
+        theadRow.innerHTML = '';
+        const thTeam = document.createElement('th');
+        thTeam.innerText = 'Team';
+        thTeam.classList.add(colClass('team'));
+        thTeam.setAttribute('data-column', 'team');
+        theadRow.appendChild(thTeam);
+
+        allComponents.forEach(comp => {
+            const th = document.createElement('th');
+            th.innerHTML = `<abbr title="Component Offensive Power Rating">${comp.readable}</abbr>`;
+            th.classList.add(colClass(comp.key));
+            th.setAttribute('data-key', comp.key);
+            th.setAttribute('data-column', comp.key);
+            theadRow.appendChild(th);
+        });
+
+        // Build body
+        tbody.innerHTML = '';
+
+        // Choose primary key ordering
+        let orderKey = primaryKey;
+        if (!orderKey || !coprs[orderKey]) {
+            // prefer OPR if available
+            if (coprs.OPR) orderKey = 'OPR';
+            else orderKey = allComponents.length ? allComponents[0].key : null;
+        }
+
+        const teams = orderKey ? getPrimaryTeamList(orderKey) : [];
+
+        teams.forEach((teamId, idx) => {
+            const tr = document.createElement('tr');
+
             const teamLink = document.createElement('a');
             teamLink.href = `/team/${teamId}/{{ event.year }}`;
             teamLink.innerText = teamId;
             const teamTd = document.createElement('td');
             teamTd.appendChild(teamLink);
-
-            const coprTd = document.createElement('td');
-            coprTd.innerText = e[1].toFixed(2); // round to 2 decimal places
-
-            const tr = document.createElement('tr');
-            tr.appendChild(rankTd);
+            teamTd.classList.add(colClass('team'));
             tr.appendChild(teamTd);
-            tr.appendChild(coprTd);
-            document.getElementById('coprTableBody').appendChild(tr);
+
+            // For each component, add value cell (may be hidden later)
+            allComponents.forEach(comp => {
+                const coprTd = document.createElement('td');
+                coprTd.classList.add(colClass(comp.key));
+                const list = coprs[comp.key] || [];
+                const found = list.find(e => e[0] === teamId);
+                coprTd.innerText = found ? found[1].toFixed(2) : '-';
+                tr.appendChild(coprTd);
+            });
+
+            tbody.appendChild(tr);
         });
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        {% for copr_item in copr_items %}
-            $("#dropdown_{{ copr_item[1] }}").click(function(e) {
-               e.preventDefault();
-               buildCoprTable("{{ copr_item[0] }}", "{{ copr_item[2] }}");
+        // Initialize: wire up checkboxes and derive initial selection from current DOM state
+        const checkboxNodes = document.querySelectorAll('.copr-select');
+
+        // Derive all components (DOM order)
+        const allComponents = getAllComponentsFromDOM();
+
+        // Compute initial selected components from current checkbox states (honor server-rendered checked attrs)
+        const initialSelected = [];
+        document.querySelectorAll('.copr-select').forEach(n => {
+            const c = n.getAttribute('data-key');
+            const r = n.getAttribute('data-name');
+            const icb = n.querySelector('input[type=checkbox]');
+            if (icb && icb.checked) {
+                initialSelected.push({ key: c, readable: r });
+            }
+        });
+
+        // If nothing was pre-selected, select OPR by default if exists in list
+        if (initialSelected.length === 0) {
+            const oprNode = document.querySelector('.copr-select[data-key="OPR"]');
+            if (oprNode) {
+                const cb = oprNode.querySelector('input[type=checkbox]');
+                if (cb) { cb.checked = true; }
+                initialSelected.push({ key: 'OPR', readable: 'OPR' });
+            }
+        }
+
+        // Choose primary key for ordering
+        const primaryKey = initialSelected.length ? initialSelected[0].key : (allComponents.length ? allComponents[0].key : null);
+
+        // Build table with all components once
+        buildCoprTable(allComponents, primaryKey);
+
+        // Apply initial visibility for each component according to checkbox state
+        allComponents.forEach(comp => {
+            const node = document.querySelector(`.copr-select[data-key="${comp.key}"]`);
+            const cb = node ? node.querySelector('input[type=checkbox]') : null;
+            const visible = !!(cb && cb.checked);
+            setColumnVisibility(comp.key, visible);
+        });
+
+        // Initialize tablesorter AFTER table is built AND visibility is set
+        $("#coprTable").tablesorter({
+            theme: 'bootstrap',
+            headerTemplate: '{content}',
+            sortList: [[0,0]], // default sort by rank asc
+            widgets: ['zebra']
+        });
+
+        // Checkbox change handler: toggle column visibility manually
+        checkboxNodes.forEach(node => {
+            const input = node.querySelector('input[type=checkbox]');
+            if (!input) return;
+            input.addEventListener('change', function(e) {
+                const k = node.getAttribute('data-key');
+                const visible = !!input.checked;
+                setColumnVisibility(k, visible);
+                // Trigger tablesorter update after visibility change
+                $("#coprTable").trigger("update");
             });
+        });
 
-        {% endfor %}
+        // CSV download handler: export current table view
+        const csvBtn = document.getElementById('copr_csv');
+        if (csvBtn) {
+            csvBtn.addEventListener('click', function() {
+                const table = document.getElementById('coprTable');
+                if (!table) return;
+                const rows = [];
 
-        buildCoprTable("OPR", "OPR");
+                // Determine visible header columns and their indices
+                const headerThs = Array.from(table.querySelectorAll('thead th'));
+                const visibleIndices = [];
+                const headers = [];
+                headerThs.forEach((th, idx) => {
+                    const style = window.getComputedStyle(th);
+                    if (style && style.display === 'none') return;
+                    visibleIndices.push(idx);
+                    headers.push(th.innerText.replace(/▲|▼/g, '').trim());
+                });
+                rows.push(headers);
+
+                // Body: only include visible columns
+                const bodyRows = Array.from(table.querySelectorAll('tbody tr'));
+                bodyRows.forEach(tr => {
+                    const cells = Array.from(tr.children).filter((td, idx) => visibleIndices.indexOf(idx) !== -1).map(td => td.innerText.replace(/\n/g, ' ').trim());
+                    rows.push(cells);
+                });
+
+                // Convert to CSV with proper escaping
+                const csvLines = rows.map(cols => cols.map(val => {
+                    if (val == null) return '';
+                    const s = String(val);
+                    // escape double quotes
+                    const escaped = s.replace(/"/g, '""');
+                    // wrap in quotes if contains comma, quote, or newline
+                    if (/[",\n]/.test(s)) {
+                        return '"' + escaped + '"';
+                    }
+                    return escaped;
+                }).join(','));
+
+                // Prepend BOM for Excel compatibility
+                const bom = '\uFEFF';
+                const csvContent = bom + csvLines.join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const filename = `team_stats_{{ event.key_name }}.csv`;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Clear handler: reset to only OPR selected
+        const clearEl = document.getElementById('copr_clear');
+        if (clearEl) {
+            clearEl.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Uncheck everything except OPR and update visibility
+                document.querySelectorAll('.copr-select').forEach(n => {
+                    const k = n.getAttribute('data-key');
+                    const icb = n.querySelector('input[type=checkbox]');
+                    if (icb) {
+                        const shouldBeChecked = (k === 'OPR');
+                        icb.checked = shouldBeChecked;
+                        setColumnVisibility(k, shouldBeChecked);
+                    }
+                });
+                // Trigger tablesorter update after visibility changes
+                $("#coprTable").trigger("update");
+            });
+        }
     });
 </script>
 

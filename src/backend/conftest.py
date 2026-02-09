@@ -146,9 +146,16 @@ def gcs_stub(
     urlfetch_stub._urlmatchers_to_fetch_functions.append((is_gcs, fetch_gcs))
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def ndb_context(ndb_stub):
-    pass
+    # Clear NDB context cache before each test to prevent async operation pollution
+    ctx = ndb.get_context()
+    if hasattr(ctx, "clear_cache"):
+        ctx.clear_cache()
+    yield
+    # After test completes, ensure all pending operations are flushed
+    if hasattr(ctx, "flush"):
+        ctx.flush()
 
 
 @pytest.fixture()
