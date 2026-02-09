@@ -83,17 +83,37 @@ done
 
 # Check/update Dockerfile defaults
 for dockerfile in "$REPO_ROOT"/ops/dev/docker/Dockerfile*; do
+    # Handle ARG-based Python version defaults
     if grep -q "ARG PYTHON_VERSION=" "$dockerfile"; then
         DEFAULT=$(grep "ARG PYTHON_VERSION=" "$dockerfile" | sed 's/ARG PYTHON_VERSION=//')
         if [ "$DEFAULT" != "$PYTHON_VERSION" ]; then
             if [ "$UPDATE_MODE" = true ]; then
                 update_file "$dockerfile" "s/ARG PYTHON_VERSION=[0-9.]*/ARG PYTHON_VERSION=$PYTHON_VERSION/"
             else
-                echo "ERROR: $dockerfile has default PYTHON_VERSION=$DEFAULT (expected $PYTHON_VERSION)"
+                echo "ERROR: $dockerfile has default ARG PYTHON_VERSION=$DEFAULT (expected $PYTHON_VERSION)"
                 ERRORS=$((ERRORS + 1))
             fi
         else
-            echo "OK: $dockerfile"
+            echo "OK: $dockerfile (ARG PYTHON_VERSION)"
+        fi
+    fi
+
+    # Handle ENV-based Python version defaults (e.g., ENV PYTHON_VERSION=python3.13)
+    if grep -q "ENV PYTHON_VERSION=" "$dockerfile"; then
+        ENV_DEFAULT=$(grep "ENV PYTHON_VERSION=" "$dockerfile" | sed 's/ENV PYTHON_VERSION=//')
+        EXPECTED_ENV_VALUE="python$PYTHON_VERSION"
+        if [ "$ENV_DEFAULT" != "$EXPECTED_ENV_VALUE" ]; then
+            if [ "$UPDATE_MODE" = true ]; then
+                # Replace the value part of ENV PYTHON_VERSION=...
+                sed -i "s|ENV PYTHON_VERSION=.*|ENV PYTHON_VERSION=$EXPECTED_ENV_VALUE|" "$dockerfile"
+                echo "UPDATED: $dockerfile (ENV PYTHON_VERSION)"
+                UPDATED=$((UPDATED + 1))
+            else
+                echo "ERROR: $dockerfile has ENV PYTHON_VERSION=$ENV_DEFAULT (expected $EXPECTED_ENV_VALUE)"
+                ERRORS=$((ERRORS + 1))
+            fi
+        else
+            echo "OK: $dockerfile (ENV PYTHON_VERSION)"
         fi
     fi
 done
