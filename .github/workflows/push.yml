@@ -341,7 +341,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Check Python Version
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: make check-python-version
+        run: ./ops/check_python_version.sh
 
   build-web:
     name: Build Web

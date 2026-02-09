@@ -3,12 +3,12 @@
 Bumping the Python version requires that Google App Engine supports the new Python version in the [Python 3 runtime](https://cloud.google.com/appengine/docs/standard/python3/runtime) and that our dependencies support the new Python version. If the new Python version is supported and can be bumped safely, follow these steps:
 
 1. Update the version in `.python-version`
-2. Run `make check-python-version ARGS='--update'` to update all dependent files:
+2. Run `./ops/check_python_version.sh --update` to update all dependent files:
    - GAE service `.yaml` files (`runtime:` directive)
    - `docker-compose.yml` (`x-python-version:`)
    - Dockerfiles (`ARG PYTHON_VERSION=`)
    - GitHub Actions workflow files (`python-version:`)
-3. Verify the changes: `make check-python-version`
+3. Verify the changes: `./ops/check_python_version.sh`
 4. Update the [[Repo Setup|Repo-Setup]] docs if they reference a specific Python version
 
 ## Building a New Development Container Version

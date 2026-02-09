@@ -138,17 +138,5 @@ services:
       - './ops/lint_bash.sh "$@"'
       - --
 
-  check-python-version:
-    image: alpine:latest
-    profiles: ["tools"]
-    volumes:
-      - ./:/tba:delegated
-    working_dir: /tba
-    entrypoint:
-      - /bin/sh
-      - -c
-      - './ops/check_python_version.sh "$@"'
-      - --
-
 volumes:
   datastore-data:

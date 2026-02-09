@@ -114,10 +114,10 @@ The project maintains consistent Python versions across all configuration files 
 
 ```bash
 # Check Python version consistency
-$ make check-python-version
+$ ./ops/check_python_version.sh
 
 # Update all files to match .python-version
-$ make check-python-version ARGS='--update'
+$ ./ops/check_python_version.sh --update
 ```
 
 The source of truth for the Python version is the `.python-version` file in the repository root.

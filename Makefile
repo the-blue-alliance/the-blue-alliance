@@ -1,4 +1,4 @@
-.PHONY: test lint lint-bash check-python-version help
+.PHONY: test lint lint-bash help
 
 # Default target
 help:
@@ -10,8 +10,6 @@ help:
 # 	@echo "  make typecheck                  - Run pyre type checker"
 	@echo "  make lint-bash                  - Check bash script formatting (shellcheck + shfmt)"
 	@echo "  make lint-bash ARGS='--fix'     - Auto-fix bash formatting with shfmt"
-	@echo "  make check-python-version       - Check Python version consistency"
-	@echo "  make check-python-version ARGS='--update' - Update all files to match .python-version"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make test"
@@ -47,8 +45,3 @@ lint-bash:
 # Run pyre type checker
 # typecheck:
 # 	docker compose run --rm typecheck
-
-# Check Python version consistency across config files
-# Use ARGS='--update' to update all files to match .python-version
-check-python-version:
-	docker compose run --rm check-python-version $(ARGS)

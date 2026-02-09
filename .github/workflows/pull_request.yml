@@ -338,7 +338,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Check Python Version
-        run: make check-python-version
+        run: ./ops/check_python_version.sh
 
   build-web:
     name: Build Web
