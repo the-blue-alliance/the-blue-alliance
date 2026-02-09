@@ -47,6 +47,12 @@
 
   <div class="row">
     <h2>Dev Tools</h2>
+    <div class="well">
+        <h4>Dev Read API Key</h4>
+        <p>A stable read API key is auto-created for local development:</p>
+        <pre id="dev-auth-key">{{ dev_auth_key }}</pre>
+        <small class="text-muted">Use this key with <code>X-TBA-Auth-Key</code> header or the PWA's <code>.env</code> file.</small>
+    </div>
     <form method="POST" action="/local/seed_test_event" style="display: inline-block; margin-right: 10px;">
         <button type="submit" class="btn btn-success">Seed Test Event</button>
         <p class="help-block">Creates "North Pole Showdown" with completed, upcoming, and unscheduled matches.</p>
