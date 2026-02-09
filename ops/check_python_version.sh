@@ -102,7 +102,7 @@ done
 for workflow in "$REPO_ROOT"/.github/workflows/*.yml; do
     if [ -f "$workflow" ]; then
         # Count mismatched python-version entries
-        MISMATCHES=$(grep -E "python-version:[[:space:]]*[\"']?[0-9.]+" "$workflow" | grep -cv "$PYTHON_VERSION" || true)
+        MISMATCHES=$(grep -E "python-version:[[:space:]]*[\"']?[0-9.]+" "$workflow" | grep -Fcv -- "$PYTHON_VERSION" || true)
         if [ "$MISMATCHES" -gt 0 ]; then
             if [ "$UPDATE_MODE" = true ]; then
                 # Update all python-version entries (handles both quoted styles)
