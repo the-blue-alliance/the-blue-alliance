@@ -39,7 +39,7 @@ def seed_test_event() -> Response:
         event_short="test",
         year=year,
         name="North Pole Regional",
-        event_type_enum=EventType.REGIONAL,
+        event_type_enum=EventType.PRESEASON if now.month <= 2 else EventType.OFFSEASON,
         start_date=datetime.datetime(year, now.month, now.day)
         - datetime.timedelta(days=1),
         end_date=datetime.datetime(year, now.month, now.day)
