@@ -90,8 +90,8 @@ importers:
         specifier: 4.17.12
         version: 4.17.12
       cache-control-parser:
-        specifier: 2.0.6
-        version: 2.0.6
+        specifier: 2.2.0
+        version: 2.2.0
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -4160,8 +4160,8 @@ packages:
       magicast:
         optional: true
 
-  cache-control-parser@2.0.6:
-    resolution: {integrity: sha512-N4rxCk7V8NLfUVONXG0d7S4IyTQh3KEDW5k2I4CAcEUcMQCmVkfAMn37JSWfUQudiR883vDBy5XM5+TS2Xo7uQ==}
+  cache-control-parser@2.2.0:
+    resolution: {integrity: sha512-Me01OJfiZiyGT42qApiunD9fKiE8WMk9w+zhu1LZlRHuDGW1gvy/IA+GcdJbWXVhZbQkn6NmZKomVaO7BFdl1g==}
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -12433,7 +12433,7 @@ snapshots:
     optionalDependencies:
       magicast: 0.5.1
 
-  cache-control-parser@2.0.6: {}
+  cache-control-parser@2.2.0: {}
 
   call-bind-apply-helpers@1.0.2:
     dependencies:
