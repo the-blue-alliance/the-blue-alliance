@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import re
-from typing import Any, cast, Dict, Generator, Literal, Optional, TypeVar
+from typing import Any, cast, Dict, Generator, Literal, Optional, TypedDict, TypeVar
 
 from google.appengine.ext import ndb
 from pyre_extensions import JSON, none_throws
@@ -61,6 +61,10 @@ TScoreDetailUnion = (
     | ScoreDetailModel2025
     | ScoreDetailModel2026
 )
+
+
+class TScoreDetailReturn(TypedDict):
+    MatchScores: list[TScoreDetailUnion]
 
 
 class FRCAPI:
@@ -171,11 +175,11 @@ class FRCAPI:
 
     def match_scores(
         self, year: Year, event_short: str, level: TCompLevel
-    ) -> TypedFuture[TypedURLFetchResult[TScoreDetailUnion]]:
+    ) -> TypedFuture[TypedURLFetchResult[TScoreDetailReturn]]:
         # technically "qual"/"playoff" are invalid tournament levels as per the docs,
         # but they seem to work?
         endpoint = f"/{year}/scores/{event_short}/{level}"
-        return self._get(endpoint, TScoreDetailUnion)
+        return self._get(endpoint, TScoreDetailReturn)
 
     def awards(
         self,

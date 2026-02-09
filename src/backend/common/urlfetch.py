@@ -60,7 +60,7 @@ class TypedURLFetchResult(Generic[T]):
         cls, url: str, status_code: int, content: str, json_type: type[T]
     ) -> "TypedURLFetchResult[T]":
         response_proto = cls.mock_urlfetch_result(url, status_code, content)
-        return cls(url, _URLFetchResult(response_proto), json_type)
+        return cls(url, response_proto, json_type)
 
     @classmethod
     def mock_urlfetch_result(
@@ -83,4 +83,4 @@ class URLFetchResult(TypedURLFetchResult[JSON]):
         cls, url: str, status_code: int, content: str
     ) -> "URLFetchResult":
         response_proto = cls.mock_urlfetch_result(url, status_code, content)
-        return cls(url, _URLFetchResult(response_proto))
+        return cls(url, response_proto)
