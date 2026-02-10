@@ -81,7 +81,7 @@
     "@eslint/compat": "2.0.2",
     "@eslint/js": "9.39.2",
     "@hey-api/openapi-ts": "0.92.3",
-    "@iconify/json": "2.2.437",
+    "@iconify/json": "2.2.438",
     "@julr/vite-plugin-validate-env": "2.2.0",
     "@playwright/test": "1.58.2",
     "@sentry/vite-plugin": "4.9.0",
