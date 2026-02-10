@@ -67,6 +67,7 @@ services:
       - PUPPETEER_SKIP_DOWNLOAD=true
       - TBA_DOCKER_COMPOSE=true
       - FIREBASE_AUTH_EMULATOR_HOST=firebase:9099
+      - FIREBASE_DATABASE_EMULATOR_HOST=firebase:9000
 
   test:
     build:
