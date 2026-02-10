@@ -8,8 +8,8 @@
   {% if match.time %}"startDate": "{{ match.time.strftime('%Y-%m-%dT%H:%M:%SZ') }}",{% elif event.start_date %}"startDate": "{{ event.start_date.strftime('%Y-%m-%d') }}",{% endif %}
   {% if event.venue_or_venue_from_address or event.city or event.state_prov or event.country %}
   "location": {
-    "@type": "Place"
-    {% if event.venue_or_venue_from_address %},"name": "{{ event.venue_or_venue_from_address }}"{% endif %}
+    "@type": "Place",
+    "name": "{{ event.venue_or_venue_from_address or [event.city, event.state_prov, event.country]|select|join(', ') }}"
     {% if event.city or event.state_prov or event.country %}
     ,"address": {
       "@type": "PostalAddress"
@@ -34,8 +34,8 @@
     {% if event.end_date %}"endDate": "{{ event.end_date.strftime('%Y-%m-%d') }}",{% endif %}
     {% if event.venue_or_venue_from_address or event.city or event.state_prov or event.country %}
     "location": {
-      "@type": "Place"
-      {% if event.venue_or_venue_from_address %},"name": "{{ event.venue_or_venue_from_address }}"{% endif %}
+      "@type": "Place",
+      "name": "{{ event.venue_or_venue_from_address or [event.city, event.state_prov, event.country]|select|join(', ') }}"
       {% if event.city or event.state_prov or event.country %}
       ,"address": {
         "@type": "PostalAddress"
