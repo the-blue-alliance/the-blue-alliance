@@ -1,6 +1,6 @@
 import { isServer } from '@tanstack/react-query';
 import { getApps, initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 
 const firebaseConfig = {
@@ -18,6 +18,14 @@ if (!getApps().length) {
 }
 
 const auth = isServer ? null : getAuth(app);
+
+if (auth && import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST) {
+  connectAuthEmulator(
+    auth,
+    import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST,
+    { disableWarnings: true },
+  );
+}
 
 const database = getDatabase(app);
 

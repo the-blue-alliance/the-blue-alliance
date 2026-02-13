@@ -22,6 +22,7 @@ import {
   getTeamYearsParticipatedOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { AwardBanner } from '~/components/tba/banner';
+import FavoriteButton from '~/components/tba/favoriteButton';
 import {
   TableOfContents,
   TableOfContentsSection,
@@ -63,6 +64,7 @@ import {
 import {
   addRecords,
   doThrowNotFound,
+  MODEL_TYPE,
   parseParamsForYearElseDefault,
   pluralize,
   publicCacheControlHeaders,
@@ -326,11 +328,19 @@ function TeamPage(): React.JSX.Element {
               sm:justify-between"
           >
             <div className="flex flex-col justify-between">
-              <TeamPageTeamInfo
-                team={team}
-                socials={socials}
-                maybeAvatar={maybeAvatar}
-              />
+              <div className="flex items-start">
+                <div className="flex-1">
+                  <TeamPageTeamInfo
+                    team={team}
+                    socials={socials}
+                    maybeAvatar={maybeAvatar}
+                  />
+                </div>
+                <FavoriteButton
+                  modelKey={teamKey}
+                  modelType={MODEL_TYPE.TEAM}
+                />
+              </div>
             </div>
             <div className="flex-none">
               <TeamRobotPicsCarousel media={robotPics} />

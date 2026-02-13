@@ -39,6 +39,7 @@ import {
   getEventTeamsOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
+import FavoriteButton from '~/components/tba/favoriteButton';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
@@ -122,6 +123,7 @@ import {
   camelCaseToHumanReadable,
   cn,
   doThrowNotFound,
+  MODEL_TYPE,
   publicCacheControlHeaders,
   splitIntoNChunks,
 } from '~/lib/utils';
@@ -237,9 +239,12 @@ function EventPage() {
 
   return (
     <div className="py-8">
-      <h1 className="mb-2 text-3xl font-medium">
-        {event.name} {event.year}
-      </h1>
+      <div className="mb-2 flex items-center gap-2">
+        <h1 className="text-3xl font-medium">
+          {event.name} {event.year}
+        </h1>
+        <FavoriteButton modelKey={eventKey} modelType={MODEL_TYPE.EVENT} />
+      </div>
 
       <div className="mb-4 space-y-1">
         <DetailEntity icon={<DateIcon />}>
