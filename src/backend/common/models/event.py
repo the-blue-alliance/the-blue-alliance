@@ -123,7 +123,7 @@ class Event(CachedModel):
         ndb.KeyProperty()
     )  # This is the division -> event champs relationship
     # event champs -> all divisions
-    divisions: List[ndb.Key] = ndb.KeyProperty(repeated=True)  # pyre-ignore[8]
+    divisions: List[ndb.Key] = ndb.KeyProperty(repeated=True)  # type: ignore
     facebook_eid = ndb.TextProperty(indexed=False)  # from Facebook
     custom_hashtag = ndb.TextProperty(indexed=False)  # Custom HashTag
     website = ndb.TextProperty(indexed=False)

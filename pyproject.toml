@@ -1,0 +1,17 @@
+[tool.ty]
+
+[tool.ty.environment]
+python-version = "3.13"
+extra-paths = ["stubs"]
+
+[tool.ty.rules]
+# Start with all rules as warnings. ty is in beta and produces many
+# false positives. Gradually promote rules to "error" as the codebase
+# is cleaned up and ty matures.
+all = "warn"
+
+# Keep unresolved imports as errors — these indicate real problems
+unresolved-import = "error"
+
+[tool.ty.terminal]
+error-on-warning = false

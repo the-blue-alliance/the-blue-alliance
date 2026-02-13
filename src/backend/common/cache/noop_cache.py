@@ -20,7 +20,7 @@ class NoopCache(CacheIf):
     def set_async(
         self, key: bytes, value: Any, time: Optional[int] = None
     ) -> TypedFuture[bool]:
-        return InstantFuture(True)  # pyre-ignore[7]
+        return InstantFuture(True)  # type: ignore
 
     def set_multi(
         self,

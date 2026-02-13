@@ -1,12 +1,11 @@
 #!/bin/bash
 set -e
 
-if [ -n "$CI" ]; then
-    echo "::add-matcher::./ops/problem_matchers/pyre_error.json"
-fi
+# Detect the site-packages path so ty can find installed third-party packages
+SITE_PACKAGES=$(python3 -c "import sysconfig; print(sysconfig.get_path('purelib'))")
 
-if ! command -v watchman &>/dev/null; then
-    pyre --version none check
+if [ -n "$CI" ]; then
+    ty check --extra-search-path "$SITE_PACKAGES" --output-format github src/ ops/
 else
-    pyre --version none incremental
+    ty check --extra-search-path "$SITE_PACKAGES" src/ ops/
 fi

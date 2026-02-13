@@ -74,7 +74,7 @@ def event_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
     event_district_keys = _filter(affected_refs["district_key"])
 
     event_team_keys_future = EventTeam.query(
-        EventTeam.event.IN([event_key for event_key in event_keys])  # pyre-ignore[16]
+        EventTeam.event.IN([event_key for event_key in event_keys])  # type: ignore
     ).fetch_async(None, keys_only=True)
     events_future = ndb.get_multi_async(event_keys)
 
@@ -156,7 +156,7 @@ def media_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
 
     team_keys = list(filter(lambda x: x.kind() == "Team", reference_keys))
     event_team_keys_future = (
-        EventTeam.query(EventTeam.team.IN(team_keys)).fetch_async(  # pyre-ignore[16]
+        EventTeam.query(EventTeam.team.IN(team_keys)).fetch_async(  # type: ignore
             None, keys_only=True
         )
         if team_keys
@@ -212,7 +212,7 @@ def team_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
     team_keys = _filter(affected_refs["key"])
 
     event_team_keys_future = EventTeam.query(
-        EventTeam.team.IN([team_key for team_key in team_keys])  # pyre-ignore[16]
+        EventTeam.team.IN([team_key for team_key in team_keys])  # type: ignore
     ).fetch_async(None, keys_only=True)
     district_team_keys_future = DistrictTeam.query(
         DistrictTeam.team.IN([team_key for team_key in team_keys])
@@ -308,7 +308,7 @@ def district_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQue
         DistrictTeam.district_key.IN(list(district_keys))
     ).fetch_async(None, keys_only=True)
     district_event_keys_future = Event.query(
-        Event.district_key.IN(list(district_keys))  # pyre-ignore[16]
+        Event.district_key.IN(list(district_keys))  # type: ignore
     ).fetch_async(keys_only=True)
 
     queries: List[CachedDatabaseQuery] = []

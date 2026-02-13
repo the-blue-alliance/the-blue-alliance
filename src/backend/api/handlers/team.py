@@ -255,7 +255,7 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
         if status is not None:
             status_strings = event_team.status_strings
             status.update(
-                {  # pyre-ignore[55]
+                {  # type: ignore
                     "alliance_status_str": status_strings["alliance"],
                     "playoff_status_str": status_strings["playoff"],
                     "overall_status_str": status_strings["overall"],

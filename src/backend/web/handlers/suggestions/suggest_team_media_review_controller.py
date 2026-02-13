@@ -66,7 +66,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
             # Find existing preferred images
             existing_preferred_keys_futures.append(
                 Media.query(
-                    Media.media_type_enum.IN(IMAGE_TYPES),  # pyre-ignore[16]
+                    Media.media_type_enum.IN(IMAGE_TYPES),  # type: ignore
                     Media.references == reference,
                     Media.preferred_references == reference,
                     Media.year == suggestion.contents["year"],

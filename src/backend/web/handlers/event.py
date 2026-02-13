@@ -162,7 +162,7 @@ def event_detail(event_key: EventKey) -> Response:
     cleaned_matches = event.matches
     # MatchHelper.delete_invalid_matches(event.matches, event)
     match_count, matches = MatchHelper.organized_matches(cleaned_matches)
-    teams = TeamHelper.sort_teams(event.teams)  # pyre-ignore[6]
+    teams = TeamHelper.sort_teams(event.teams)  # type: ignore
 
     # Organize medias by team
     image_medias = MediaHelper.get_images(

@@ -118,7 +118,7 @@ def create_excel_file() -> bytes:
 
 
 def test_no_event(ndb_stub, api_client: Client) -> None:
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 404
@@ -128,7 +128,7 @@ def test_no_event(ndb_stub, api_client: Client) -> None:
 def test_not_authenticated(ndb_stub, api_client: Client) -> None:
     setup_event()
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
@@ -140,7 +140,7 @@ def test_not_authenticated(ndb_stub, api_client: Client) -> None:
 def test_has_auth_id_but_no_sig(ndb_stub, api_client: Client) -> None:
     setup_event()
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post(
             "/api/trusted/v1/event/2019nyny/team_list/update",
             headers={"X-TBA-Auth-Id": "auth_id"},
@@ -162,7 +162,7 @@ def test_admin_superpower(
     setup_event(event_type=EventType.REGIONAL)
     setup_user(monkeypatch, is_admin=True)
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post(
             "/api/trusted/v1/event/2019nyny/team_list/update",
             data=json.dumps([]),
@@ -183,7 +183,7 @@ def test_eventwizard_permission_not_offseason(
     setup_event(event_type=EventType.REGIONAL)
     setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
@@ -201,7 +201,7 @@ def test_eventwizard_permission_not_this_year(
     setup_event(event_type=EventType.OFFSEASON)
     setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
@@ -219,7 +219,7 @@ def test_eventwizard_permission_passes(
     setup_event(event_type=EventType.OFFSEASON)
     setup_user(monkeypatch, permissions=[AccountPermission.OFFSEASON_EVENTWIZARD])
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post(
             "/api/trusted/v1/event/2019nyny/team_list/update", data=json.dumps([])
         )
@@ -240,7 +240,7 @@ def test_webcast_permission_not_offseason(ndb_stub, api_client: Client) -> None:
         "2019other", auth_types=[AuthType.MATCH_VIDEO], webcasts=[webcast]
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps({})
         request_path = "/api/trusted/v1/event/2019nyny/match_videos/add"
         resp = api_client.post(
@@ -269,7 +269,7 @@ def test_webcast_permission_not_this_year(ndb_stub, api_client: Client) -> None:
         "2019other", auth_types=[AuthType.MATCH_VIDEO], webcasts=[webcast]
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps({})
         request_path = "/api/trusted/v1/event/2019nyny/match_videos/add"
         resp = api_client.post(
@@ -300,7 +300,7 @@ def test_webcast_permission_wrong_permission(ndb_stub, api_client: Client) -> No
         webcasts=[webcast],
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps({})
         request_path = "/api/trusted/v1/event/2019nyny/info/update"
         resp = api_client.post(
@@ -329,7 +329,7 @@ def test_webcast_permission_passes(ndb_stub, api_client: Client) -> None:
         "2019other", auth_types=[AuthType.MATCH_VIDEO], webcasts=[webcast]
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps({})
         request_path = "/api/trusted/v1/event/2019nyny/match_videos/add"
         resp = api_client.post(
@@ -359,7 +359,7 @@ def test_account_permission_logged_in_wrong_events(
     account_key = setup_user(monkeypatch, permissions=[])
     setup_api_auth("2019other", auth_types=[AuthType.EVENT_TEAMS], owner=account_key)
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
@@ -378,7 +378,7 @@ def test_account_permission_logged_in_wrong_permissions(
     account_key = setup_user(monkeypatch, permissions=[])
     setup_api_auth("2019nyny", auth_types=[AuthType.EVENT_RANKINGS], owner=account_key)
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
@@ -402,7 +402,7 @@ def test_account_permission_logged_in_auth_expired(
         expiration=datetime.datetime(2019, 1, 1),
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
@@ -426,7 +426,7 @@ def test_account_permission_logged_in_good_forever(
         expiration=None,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post(
             "/api/trusted/v1/event/2019nyny/team_list/update", data=json.dumps([])
         )
@@ -452,7 +452,7 @@ def test_account_permission_logged_in_not_expired_yet(
         expiration=datetime.datetime(2019, 7, 1),
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         resp = api_client.post(
             "/api/trusted/v1/event/2019nyny/team_list/update", data=json.dumps([])
         )
@@ -473,7 +473,7 @@ def test_explicit_auth_bad_id(
     setup_user(monkeypatch, permissions=[])
     auth_id, auth_secret = setup_api_auth("2019nyny", auth_types=[AuthType.EVENT_TEAMS])
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -503,7 +503,7 @@ def test_explicit_auth_bad_secret(
     setup_user(monkeypatch, permissions=[])
     auth_id, auth_secret = setup_api_auth("2019nyny", auth_types=[AuthType.EVENT_TEAMS])
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -536,7 +536,7 @@ def test_explicit_auth_wrong_event(
         "2019other", auth_types=[AuthType.EVENT_TEAMS]
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -568,7 +568,7 @@ def test_explicit_auth_wrong_permission(
         "2019nyny", auth_types=[AuthType.EVENT_RANKINGS]
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -602,7 +602,7 @@ def test_explicit_auth_expired(
         expiration=datetime.datetime(2019, 1, 1),
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -636,7 +636,7 @@ def test_explicit_auth_good_forever(
         expiration=None,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -670,7 +670,7 @@ def test_explicit_auth_not_expired(
         expiration=datetime.datetime(2019, 7, 1),
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -705,7 +705,7 @@ def test_explicit_auth_all_official_events(
         all_official_events=True,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -740,7 +740,7 @@ def test_explicit_auth_with_event_code_override(
         all_official_events=True,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019curie/team_list/update"
         resp = api_client.post(
@@ -775,7 +775,7 @@ def test_explicit_auth_all_official_events_not_current_year_fails(
         all_official_events=True,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = json.dumps([])
         request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
         resp = api_client.post(
@@ -811,7 +811,7 @@ def test_file_upload_no_file_param(
         expiration=None,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         request_data = ""
         request_path = "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings"
         resp = api_client.post(
@@ -844,7 +844,7 @@ def test_file_upload_mismatched_digest(
         expiration=None,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         file_content = create_excel_file()
         wrong_digest = hashlib.sha256(b"wrong content").hexdigest()
         correct_digest = hashlib.sha256(file_content).hexdigest()
@@ -891,7 +891,7 @@ def test_file_upload_correct_digest(
         expiration=None,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         file_content = create_excel_file()
         file_digest = hashlib.sha256(file_content).hexdigest()
 
@@ -948,7 +948,7 @@ def test_file_upload_succeeds_with_correct_permission(
         expiration=None,
     )
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():  # type: ignore
         file_content = create_excel_file()
         file_digest = hashlib.sha256(file_content).hexdigest()
 

@@ -49,7 +49,7 @@ def utc_timezone_datetime(dt: datetime) -> datetime:
     Used with Python 3 for <time datetime= tag where the datetime does not have a timezone
     already associated with it. Adds a UTC timezone to the given datetime
     """
-    return dt.astimezone(timezone.utc)  # pyre-ignore[16]
+    return dt.astimezone(timezone.utc)  # type: ignore
 
 
 def limit_prob(prob: float) -> int:

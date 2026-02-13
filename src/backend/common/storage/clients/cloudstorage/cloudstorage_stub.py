@@ -9,7 +9,7 @@ import datetime
 import hashlib
 
 import six
-import six.moves.http_client  # pyre-ignore[21]
+import six.moves.http_client  # type: ignore
 
 from google.appengine.api import datastore
 from google.appengine.api import namespace_manager

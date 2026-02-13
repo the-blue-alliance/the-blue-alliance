@@ -38,7 +38,7 @@ __all__ = [
     "TransientError",
 ]
 
-from six.moves import http_client  # pyre-ignore[21]
+from six.moves import http_client  # type: ignore
 
 
 class Error(Exception):

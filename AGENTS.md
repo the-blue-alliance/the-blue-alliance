@@ -12,7 +12,7 @@ The Blue Alliance (TBA) is a FIRST Robotics Competition (FRC) data archive and s
 - **Tasks**: Google Cloud Tasks (async execution)
 - **Data Source**: FRC Events API
 - **Testing**: pytest, pytest-cov
-- **Linting**: flake8, black (formatting), pyre-check (type checking)
+- **Linting**: flake8, black (formatting), ty (type checking)
 
 ## Project Structure
 ```
@@ -42,7 +42,7 @@ ops/                    # Build, deploy, and dev scripts
 
 ## Key Conventions
 - Python 3 (migrated from Python 2, see docs/Developing/Py2ToPy3.md)
-- **All Python code must be well-typed** - use type hints and pass `pyre-check`
+- **All Python code must be well-typed** - use type hints and pass `ty`
 - **Tests must accompany every change** - no code changes without corresponding tests
 - Use manipulators for all database writes
 - Use queries for database reads

@@ -37,10 +37,10 @@ class Award(CachedModel):
         choices=event_type.EVENT_TYPES,
     )  # needed to query for awards from events of a certain event type
 
-    team_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
+    team_list: List[ndb.Key] = ndb.KeyProperty(  # type: ignore
         kind=Team, repeated=True
     )  # key of team(s) that won the award (if applicable)
-    recipient_json_list: List[str] = ndb.StringProperty(  # pyre-ignore[8]
+    recipient_json_list: List[str] = ndb.StringProperty(  # type: ignore
         repeated=True
     )  # JSON dict(s) with team_number and/or awardee
 

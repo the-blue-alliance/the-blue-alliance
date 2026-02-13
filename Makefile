@@ -7,7 +7,7 @@ help:
 	@echo "  make test ARGS='...'   - Run tests with custom arguments"
 	@echo "  make lint              - Check code formatting (black + flake8)"
 	@echo "  make lint ARGS='--fix' - Auto-fix formatting with black, then run flake8"
-	@echo "  make typecheck         - Run pyre type checker"
+	@echo "  make typecheck         - Run ty type checker"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make test"
@@ -36,7 +36,6 @@ lint:
 	@docker compose build tba
 	docker compose run --rm lint $(ARGS)
 
-# Run pyre type checker
+# Run ty type checker
 typecheck:
-	@docker compose build tba
-	docker compose run --rm typecheck
+	./ops/typecheck_py3.sh
