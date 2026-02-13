@@ -21,8 +21,8 @@ class DummyModel(CachedModel):
     str_prop: str = ndb.StringProperty()
     mutable_str_prop: str = ndb.StringProperty()
     can_be_none: Optional[int] = ndb.IntegerProperty()
-    repeated_prop: List[int] = ndb.IntegerProperty(repeated=True)  # pyre-ignore[8]
-    union_prop: List[int] = ndb.IntegerProperty(repeated=True)  # pyre-ignore[8]
+    repeated_prop: List[int] = ndb.IntegerProperty(repeated=True)  # type: ignore
+    union_prop: List[int] = ndb.IntegerProperty(repeated=True)  # type: ignore
 
     prop_json: str = ndb.StringProperty()
 

@@ -43,7 +43,7 @@ from google.appengine.ext.ndb import eventloop
 from google.appengine.ext.ndb import tasklets
 from google.appengine.ext.ndb import utils
 from google.appengine.runtime import apiproxy_errors
-from six.moves import http_client  # pyre-ignore[21]
+from six.moves import http_client  # type: ignore
 
 _RETRIABLE_EXCEPTIONS = (
     urlfetch.DownloadError,
@@ -55,7 +55,7 @@ _RETRIABLE_EXCEPTIONS = (
 
 _thread_local_settings = threading.local()
 # Used to save default retry setting for each thread.
-_thread_local_settings.default_retry_params = None  # pyre-ignore[16]
+_thread_local_settings.default_retry_params = None  # type: ignore
 
 
 def set_default_retry_params(retry_params):

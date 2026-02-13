@@ -416,7 +416,7 @@ def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
             match_teams = match.alliances[AllianceColor(color)]["teams"]
             zebra_teams = [
                 team["team_key"]
-                for team in zebra_data["alliances"][color]  # pyre-ignore
+                for team in zebra_data["alliances"][color]  # type: ignore
             ]
             if len(set(match_teams).difference(set(zebra_teams))) > 1:
                 return make_response(

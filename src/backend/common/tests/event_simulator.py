@@ -251,7 +251,7 @@ class EventSimulator:
                 }
                 for i in range(new_match.match_number):
                     win_counts[
-                        none_throws(  # pyre-ignore[6]
+                        none_throws(  # type: ignore
                             Match.get_by_id(
                                 Match.render_key_name(
                                     none_throws(new_match.event.string_id()),
@@ -324,7 +324,7 @@ class EventSimulator:
                 }
                 for i in range(new_match.match_number):
                     win_counts[
-                        none_throws(  # pyre-ignore[6]
+                        none_throws(  # type: ignore
                             Match.get_by_id(
                                 Match.render_key_name(
                                     none_throws(new_match.event.string_id()),

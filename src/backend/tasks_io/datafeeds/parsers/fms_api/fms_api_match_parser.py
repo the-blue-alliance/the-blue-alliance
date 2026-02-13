@@ -367,9 +367,9 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
             }
             # TODO better type hinting for per-year breakdowns
             if "coopertition" in match:
-                breakdown["coopertition"] = match["coopertition"]  # pyre-ignore[6]
+                breakdown["coopertition"] = match["coopertition"]  # type: ignore
             if "coopertitionPoints" in match:
-                breakdown["coopertition_points"] = match[  # pyre-ignore[6]
+                breakdown["coopertition_points"] = match[  # type: ignore
                     "coopertitionPoints"
                 ]
 

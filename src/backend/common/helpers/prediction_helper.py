@@ -919,7 +919,7 @@ class PredictionHelper:
                             score_differences.append(
                                 abs(
                                     match.alliances[alliance_color]["score"]
-                                    - prediction[alliance_color][  # pyre-ignore[6]
+                                    - prediction[alliance_color][  # type: ignore
                                         "score"
                                     ]
                                 )
@@ -930,7 +930,7 @@ class PredictionHelper:
 
                     for color in ALLIANCE_COLORS:
                         score_breakdown = none_throws(match.score_breakdown)
-                        color_prediction = prediction[str(color)]  # pyre-ignore[26]
+                        color_prediction = prediction[str(color)]  # type: ignore
                         if event.year == 2016:
                             if score_breakdown[color]["teleopDefensesBreached"]:
                                 brier_sums["breach"] += pow(
@@ -1167,7 +1167,7 @@ class PredictionHelper:
                         sampled_winner = OPPONENT[prediction["winning_alliance"]]
 
                     for alliance_color in ALLIANCE_COLORS:
-                        color_prediction = prediction[alliance_color]  # pyre-ignore[6]
+                        color_prediction = prediction[alliance_color]  # type: ignore
                         if match.year == 2016:
                             sampled_rp1[alliance_color] = (
                                 np.random.uniform(high=1)

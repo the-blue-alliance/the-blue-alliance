@@ -45,7 +45,7 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
             )
 
         # See https://github.com/facebook/pyre-check/issues/267
-        return self.DICT_CONVERTER(res).convert(_dict_version)  # pyre-ignore[45]
+        return self.DICT_CONVERTER(res).convert(_dict_version)  # type: ignore
 
     def fetch(self) -> QueryReturn:
         return self.fetch_async().get_result()
@@ -157,7 +157,7 @@ class CachedDatabaseQuery(
                 query_result = yield self._query_async(*args, **kwargs)
 
                 # See https://github.com/facebook/pyre-check/issues/267
-                converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
+                converted_result = none_throws(self.DICT_CONVERTER)(  # type: ignore
                     query_result
                 ).convert(_dict_version)
 

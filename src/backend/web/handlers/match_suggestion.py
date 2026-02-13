@@ -184,9 +184,9 @@ def match_suggestion() -> Response:
                     "qual" if match.comp_level == "qm" else "playoff"
                 ]
             ):
-                # pyre-ignore[16]
+                # type: ignore
                 match.prediction = defaultdict(lambda: defaultdict(float))
-                # pyre-ignore[16]
+                # type: ignore
                 match.bluezone_score = 0
             else:
                 match.prediction = event.details.predictions["match_predictions"][

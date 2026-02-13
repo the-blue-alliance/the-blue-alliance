@@ -26,7 +26,7 @@ class MemcacheModel(abc.ABC, Generic[DT]):
     def put(self, val: DT) -> bool:
         return self.put_async(val).get_result()
 
-    @typed_tasklet  # pyre-ignore[56]
+    @typed_tasklet  # type: ignore
     def _put_async(self, val: DT) -> Generator[Any, Any, bool]:
         mc_key = self.key()
         ttl_seconds = self.ttl().seconds
@@ -39,7 +39,7 @@ class MemcacheModel(abc.ABC, Generic[DT]):
     def get(self) -> Optional[DT]:
         return self.get_async().get_result()
 
-    @typed_tasklet  # pyre-ignore[56]
+    @typed_tasklet  # type: ignore
     def _get_async(self) -> Generator[Any, Any, Optional[DT]]:
         mc_key = self.key()
         ret = yield self.mc_client.get_async(mc_key)

@@ -207,12 +207,12 @@ class MyTBA:
         )
 
     def favorite(self, model_type: ModelType, model_key: str) -> Optional[Favorite]:
-        return self._first_model(Favorite, model_type, model_key)  # pyre-ignore[7]
+        return self._first_model(Favorite, model_type, model_key)  # type: ignore
 
     def subscription(
         self, model_type: ModelType, model_key: str
     ) -> Optional[Subscription]:
-        return self._first_model(Subscription, model_type, model_key)  # pyre-ignore[7]
+        return self._first_model(Subscription, model_type, model_key)  # type: ignore
 
     def _first_model(
         self,

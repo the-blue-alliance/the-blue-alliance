@@ -66,7 +66,7 @@ def test_do_bad_year(tasks_cpu_client: Client) -> None:
     assert resp.status_code == 404
 
 
-@pytest.mark.parametrize("insight_type", list(InsightType))  # pyre-ignore[6]
+@pytest.mark.parametrize("insight_type", list(InsightType))  # type: ignore
 def test_calc(tasks_cpu_client: Client, insight_type: InsightType) -> None:
     resp = tasks_cpu_client.get(
         f"/backend-tasks-b2/do/math/insights/{insight_type}/2023"

@@ -8,7 +8,7 @@ freezegun==1.5.5
 packaging==26.0
 click==8.1.8
 pre-commit
-pyre-check==0.9.25
+ty
 pytest
 pytest-cov
 pytest-custom_exit_code

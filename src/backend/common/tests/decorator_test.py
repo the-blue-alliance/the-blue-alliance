@@ -185,7 +185,7 @@ def test_flask_cache_with_memcache(app: Flask, memcache_stub) -> None:
         return "Hello!"
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # type: ignore
 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
@@ -202,7 +202,7 @@ def test_flask_cache_with_memcache_static_timeout(app: Flask, memcache_stub) -> 
         return "Hello!"
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # type: ignore
 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
@@ -222,7 +222,7 @@ def test_flask_cache_with_memcache_dynamic_timeout(app: Flask, memcache_stub) ->
         return CachedResponse(make_response("Hello!"), 2)
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # type: ignore
 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
@@ -247,7 +247,7 @@ def test_flask_cache_with_query_string(app: Flask, memcache_stub) -> None:
         return "Hello!"
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # type: ignore
 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
@@ -279,7 +279,7 @@ def test_flask_cache_with_memcache_skips_errors(app: Flask, memcache_stub) -> No
         return "Hello!", 500
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # type: ignore
 
     resp = app.test_client().get("/")
     assert resp.status_code == 500

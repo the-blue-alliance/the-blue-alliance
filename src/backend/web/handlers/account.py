@@ -482,7 +482,7 @@ def mytba_eventteam_get(team_number: TeamNumber) -> str:
 
     favorites = Favorite.query(
         Favorite.model_type == ModelType.EVENT_TEAM,
-        Favorite.model_key.IN(  # pyre-ignore[16]
+        Favorite.model_key.IN(  # type: ignore
             [f"{event.key.string_id()}_{team.key.string_id()}" for event in team_events]
         ),
         ancestor=none_throws(user.account_key),

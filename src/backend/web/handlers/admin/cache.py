@@ -86,11 +86,11 @@ def cached_query_detail(query_class_name: str) -> str:
     cached_item_keys = (
         CachedQueryResult.query()
         .filter(
-            CachedQueryResult.key  # pyre-ignore[58]
+            CachedQueryResult.key  # type: ignore
             > ndb.Key(CachedQueryResult, cache_key_prefix)
         )
         .filter(
-            CachedQueryResult.key  # pyre-ignore[58]
+            CachedQueryResult.key  # type: ignore
             < ndb.Key(CachedQueryResult, cache_key_prefix + "_:")
         )
         .fetch(keys_only=True)
@@ -161,11 +161,11 @@ def cached_query_purge_version(
     cached_item_keys = (
         CachedQueryResult.query()
         .filter(
-            CachedQueryResult.key  # pyre-ignore[58]
+            CachedQueryResult.key  # type: ignore
             > ndb.Key(CachedQueryResult, cache_key_prefix)
         )
         .filter(
-            CachedQueryResult.key  # pyre-ignore[58]
+            CachedQueryResult.key  # type: ignore
             < ndb.Key(CachedQueryResult, cache_key_prefix + "_:")
         )
         .fetch(keys_only=True)

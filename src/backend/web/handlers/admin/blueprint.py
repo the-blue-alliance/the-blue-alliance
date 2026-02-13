@@ -135,7 +135,7 @@ def admin_home() -> str:
 
     # Negation for descending order is valid NDB syntax, but Pyre doesn't understand it
     # https://docs.cloud.google.com/appengine/docs/standard/services/ndb/queries?tab=python#order
-    users = Account.query().order(-Account.created).fetch(5)  # pyre-ignore[16]
+    users = Account.query().order(-Account.created).fetch(5)  # type: ignore
 
     template_values = {
         "memcache_stats": memcache_stats,

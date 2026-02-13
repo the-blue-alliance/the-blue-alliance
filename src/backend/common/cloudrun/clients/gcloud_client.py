@@ -124,14 +124,14 @@ class GCloudRunClient(CloudRunClient):
 
                 # Check for reason enums (only one will be set due to oneof)
                 if newest_condition.reason and newest_condition.reason != 0:
-                    # pyre-ignore[19,16]: Proto-plus enums have dynamic name attribute
+                    # type: ignore: Proto-plus enums have dynamic name attribute
                     reason_name = Condition.CommonReason(newest_condition.reason).name
                     reason_parts.append(f"Reason: {reason_name}")
                 elif (
                     newest_condition.revision_reason
                     and newest_condition.revision_reason != 0
                 ):
-                    # pyre-ignore[19,16]: Proto-plus enums have dynamic name attribute
+                    # type: ignore: Proto-plus enums have dynamic name attribute
                     reason_name = Condition.RevisionReason(
                         newest_condition.revision_reason
                     ).name
@@ -140,7 +140,7 @@ class GCloudRunClient(CloudRunClient):
                     newest_condition.execution_reason
                     and newest_condition.execution_reason != 0
                 ):
-                    # pyre-ignore[19,16]: Proto-plus enums have dynamic name attribute
+                    # type: ignore: Proto-plus enums have dynamic name attribute
                     reason_name = Condition.ExecutionReason(
                         newest_condition.execution_reason
                     ).name

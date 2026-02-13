@@ -56,7 +56,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            dict(suggestion.contents, **none_throws(expected_dict)),  # type: ignore
             suggestion.contents,
         )
 
@@ -79,7 +79,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account_banned.key)
         self.assertEqual(suggestion.target_model, "media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            dict(suggestion.contents, **none_throws(expected_dict)),  # type: ignore
             suggestion.contents,
         )
 
@@ -105,7 +105,7 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            dict(suggestion.contents, **none_throws(expected_dict)),  # type: ignore
             suggestion.contents,
         )
 
@@ -205,7 +205,7 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "event_media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            dict(suggestion.contents, **none_throws(expected_dict)),  # type: ignore
             suggestion.contents,
         )
 
@@ -230,7 +230,7 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account_banned.key)
         self.assertEqual(suggestion.target_model, "event_media")
         self.assertEqual(
-            dict(suggestion.contents, **none_throws(expected_dict)),  # pyre-ignore[6]
+            dict(suggestion.contents, **none_throws(expected_dict)),  # type: ignore
             suggestion.contents,
         )
 
