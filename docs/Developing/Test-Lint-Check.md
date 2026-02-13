@@ -1,4 +1,10 @@
-Tests and linting can be run via `make` commands, which use Docker Compose services under the hood. These services use a pre-built image with all Python dependencies installed, so tests run quickly without needing to install dependencies each time.
+Tests and linting run via `make` commands, which use [`uv`](https://docs.astral.sh/uv/) to manage a local virtualenv. Dependencies are synced automatically on first run — just run `make test` or `make lint` and everything bootstraps itself.
+
+If you want to sync all dev dependencies explicitly (test + lint + typecheck + pre-commit):
+
+```bash
+$ make sync
+```
 
 # Python
 
@@ -35,10 +41,8 @@ $ make lint ARGS='--fix'
 
 The Blue Alliance's Python codebase enforces the use of [type hints](https://www.python.org/dev/peps/pep-0484/) using [pyre](https://pyre-check.org/).
 
-Note: Type checking via Docker is currently unavailable. Run pyre directly if needed:
-
 ```bash
-$ pyre check
+$ make typecheck
 ```
 
 #### Generating Type Checker Stubs

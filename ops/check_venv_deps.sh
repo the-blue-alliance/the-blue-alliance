@@ -1,17 +1,16 @@
 #! /bin/bash
 
 function help_on_error() {
-    echo "You have mismatched dependencies!"
-    echo "Try running using a venv: https://github.com/the-blue-alliance/the-blue-alliance/wiki/Repo-Setup#virtualenv-install"
-    echo "And make sure everything is up to date by running: pip install -r requirements.txt && pip install -r src/requirements.txt"
+    echo "Your dependencies are out of sync!"
+    echo "Run 'uv sync --group dev' or 'make sync' to update."
 }
 
 set -eE
 trap 'help_on_error' ERR
 
-if [[ -z "$VIRTUAL_ENV" ]]; then
-    echo "No venv detected, exiting..."
-    exit 0
+if ! command -v uv &> /dev/null; then
+    echo "uv is not installed. Install it: https://docs.astral.sh/uv/getting-started/installation/"
+    exit 1
 fi
 
-python3 ops/check_venv_deps.py
+uv sync --check --group dev

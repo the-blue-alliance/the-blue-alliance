@@ -21,22 +21,14 @@ jobs:
           filters: |
             python:
               - '**/*.py'
-              - '**/requirements.txt'
-      - name: Set up Python 3.13
+              - 'pyproject.toml'
+              - 'uv.lock'
+      - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-          cache: "pip"
-      - name: Install Dependencies
-        if: steps.changes.outputs.python == 'true'
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r src/requirements.txt
+        uses: astral-sh/setup-uv@v6
       - name: Run Type Check
         if: steps.changes.outputs.python == 'true'
-        run: ./ops/typecheck_py3.sh
+        run: make typecheck
   py3-lint:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-24.04
@@ -48,7 +40,11 @@ jobs:
           filters: |
             python:
               - '**/*.py'
-              - '**/requirements.txt'
+              - 'pyproject.toml'
+              - 'uv.lock'
+      - name: Set up uv
+        if: steps.changes.outputs.python == 'true'
+        uses: astral-sh/setup-uv@v6
       - name: Run Format & Lint
         if: steps.changes.outputs.python == 'true'
         run: make lint
@@ -66,8 +62,12 @@ jobs:
           filters: |
             python:
               - '**/*.py'
-              - '**/requirements.txt'
+              - 'pyproject.toml'
+              - 'uv.lock'
               - '.test_durations'
+      - name: Set up uv
+        if: steps.changes.outputs.python == 'true'
+        uses: astral-sh/setup-uv@v6
       - name: Run Tests
         if: steps.changes.outputs.python == 'true'
         run: make test ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
@@ -90,27 +90,20 @@ jobs:
           filters: |
             python:
               - '**/*.py'
-              - '**/requirements.txt'
+              - 'pyproject.toml'
+              - 'uv.lock'
               - '.test_durations'
-      - name: Set up Python 3.13
+      - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-          cache: "pip"
-      - name: Install Dependencies
-        if: steps.changes.outputs.python == 'true'
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        uses: astral-sh/setup-uv@v6
       - name: Download all artifacts
         if: steps.changes.outputs.python == 'true'
         uses: actions/download-artifact@v7
       - name: Combine coverage
         if: steps.changes.outputs.python == 'true'
         run: |
-          coverage combine coverage*/.coverage*
-          coverage xml
+          uv run --frozen --group test coverage combine coverage*/.coverage*
+          uv run --frozen --group test coverage xml
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.python == 'true'
         uses: codecov/codecov-action@v5.5.2
@@ -353,7 +346,7 @@ jobs:
               - 'ops/**'
               - 'src/**'
               - 'package.json'
-              - 'requirements.txt'
+              - 'pyproject.toml'
       - name: Set up Python 3.13
         if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-python@v6
@@ -390,7 +383,7 @@ jobs:
               - 'ops/**'
               - 'src/**'
               - 'package.json'
-              - 'requirements.txt'
+              - 'pyproject.toml'
       # See https://github.com/puppeteer/puppeteer/issues/12818
       # Ubuntu 23+ doesn't like running puppeteer without disabling AppArmor.
       - name: Disable AppArmor
@@ -405,7 +398,7 @@ jobs:
         if: steps.changes.outputs.web == 'true'
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install requests
       - name: Set up Node
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-node@v6

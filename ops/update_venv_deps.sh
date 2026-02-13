@@ -1,10 +1,9 @@
 #! /bin/bash
 set -e
 
-if [[ -z "$VIRTUAL_ENV" ]]; then
-    echo "No venv detected, exiting..."
+if ! command -v uv &> /dev/null; then
+    echo "uv is not installed, skipping dependency sync..."
     exit 0
 fi
 
-pip install -r requirements.txt
-pip install -r src/requirements.txt
+uv sync --group dev

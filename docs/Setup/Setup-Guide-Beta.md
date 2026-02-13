@@ -1,7 +1,16 @@
 ## Install Tools
-Local development for The Blue Alliance uses a [Docker](https://www.docker.com/) container setup. This allows for isolation of all dependencies and tools required to run The Blue Alliance locally to be installed in a self-contained instance.
+Local development for The Blue Alliance requires two tools:
 
-1. Install [Docker](https://docs.docker.com/get-docker/)
+1. **[Docker](https://docs.docker.com/get-docker/)** — for running the local dev server (App Engine emulator, Datastore, Firebase)
+2. **[uv](https://docs.astral.sh/uv/)** — for managing Python dependencies and running tests/linting
+
+### Install Docker
+Install [Docker](https://docs.docker.com/get-docker/) for your platform.
+
+### Install uv
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+`uv` will automatically download the correct Python version (from `.python-version`) and manage a virtual environment for you. You do **not** need to install Python separately.
 
 ## Fork/Clone
 This section assumes a minimal setup and knowledge of Git/GitHub. For those that are unfamiliar with either, see the [Getting started with GitHub](https://help.github.com/en/github/getting-started-with-github) guide and the [Git Handbook](https://guides.github.com/introduction/git-handbook/)

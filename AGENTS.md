@@ -52,9 +52,9 @@ ops/                    # Build, deploy, and dev scripts
 - Configuration via `tba_dev_config.json` for local dev
 
 ## Development Setup
-**Recommended**: Use devcontainers or docker-compose for local development.
+**Recommended**: Use docker-compose for the local dev server, and `uv` for Python tooling (tests, linting).
 
-See docs/Setup/Setup-Guide-Beta.md for docker-compose or docs/Setup/Setup-Guide.md for vagrant setup.
+See docs/Setup/Setup-Guide-Beta.md for setup instructions.
 
 ```bash
 # Start dev environment with docker-compose
@@ -68,9 +68,12 @@ docker-compose exec tba bash
 ```
 
 ## Testing & Linting
-Run tests via make:
+Tests and linting use `uv` for dependency management. Dependencies are synced automatically on first `make` invocation.
 
 ```bash
+# Sync all dev dependencies explicitly
+make sync
+
 # Run all tests
 make test
 

@@ -1,8 +1,6 @@
 x-env-vars: &env-vars
   PROJECT_ID: demo-test
 
-x-python-version: &python-version "3.13"
-
 services:
   firebase:
     build:
@@ -76,54 +74,6 @@ services:
     profiles: ["tools"] # TODO: Remove...
 
   ### Tools
-
-  test:
-    build:
-      context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile.test
-    profiles: ["tools"]
-    volumes:
-      - ./:/tba:delegated
-    entrypoint:
-      - /bin/bash
-      - -c
-      - './ops/test_py3.sh "$@"'
-      - --
-
-  lint:
-    build:
-      context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile.lint
-      args:
-        PYTHON_VERSION: *python-version
-    profiles: ["tools"]
-    volumes:
-      - ./:/tba:delegated
-    entrypoint:
-      - /bin/bash
-      - -c
-      - './ops/lint_py3.sh "$@"'
-      - --
-
-  # (Note from Zach): pyre is currently busted somehow with this setup.
-  # I'm gonna push on it later, but also pyre kind of sucks, and it would
-  # be great to move away from it, so I'm not going to put any effort into
-  # fixing this right now.
-  #
-  # typecheck:
-  #   build:
-  #     context: ./
-  #     dockerfile: ./ops/dev/docker/Dockerfile.typecheck
-  #     args:
-  #       PYTHON_VERSION: *python-version
-  #   profiles: ["tools"]
-  #   volumes:
-  #     - ./:/tba:delegated
-  #   entrypoint:
-  #     - /bin/bash
-  #     - -c
-  #     - 'pyre check "$@"'
-  #     - --
 
   lint-bash:
     build:

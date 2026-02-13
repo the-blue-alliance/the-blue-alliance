@@ -48,21 +48,6 @@ update_file() {
     UPDATED=$((UPDATED + 1))
 }
 
-# Check/update docker-compose.yml
-COMPOSE_FILE="$REPO_ROOT/docker-compose.yml"
-if [[ -f "$COMPOSE_FILE" ]]; then
-    COMPOSE_VERSION=$(grep 'x-python-version:' "$COMPOSE_FILE" | sed 's/.*"\([0-9.]*\)".*/\1/')
-    if [[ "$COMPOSE_VERSION" != "$PYTHON_VERSION" ]]; then
-        if [[ "$UPDATE_MODE" == true ]]; then
-            update_file "$COMPOSE_FILE" "s/x-python-version: &python-version \"[0-9.]*\"/x-python-version: \&python-version \"$PYTHON_VERSION\"/"
-        else
-            echo "ERROR: $COMPOSE_FILE has x-python-version: \"$COMPOSE_VERSION\" (expected \"$PYTHON_VERSION\")"
-            ERRORS=$((ERRORS + 1))
-        fi
-    else
-        echo "OK: $COMPOSE_FILE"
-    fi
-fi
 
 # Check/update GAE yaml files
 for yaml in "$REPO_ROOT"/src/*.yaml; do

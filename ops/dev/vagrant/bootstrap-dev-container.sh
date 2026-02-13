@@ -8,8 +8,8 @@ mkdir -p /datastore
 apt-get update && apt-get upgrade -y
 
 python -m pip config set global.break-system-packages true
-pip install --upgrade setuptools
-pip install --ignore-installed -r requirements.txt
+pip install --upgrade setuptools uv
+uv export --no-dev --no-hashes --frozen -o src/requirements.txt
 pip install --ignore-installed -r src/requirements.txt
 
 # Create empty keys file if one does not already exist
