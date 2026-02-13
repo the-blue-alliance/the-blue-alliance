@@ -4,7 +4,6 @@ from pathlib import Path
 
 from packaging.requirements import Requirement
 
-
 REQUIREMENTS_FILES = [
     Path(__file__).parent.parent / "requirements.txt",
     Path(__file__).parent.parent / "src/requirements.txt",

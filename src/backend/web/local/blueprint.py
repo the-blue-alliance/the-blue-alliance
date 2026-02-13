@@ -126,9 +126,9 @@ def get_fms_companion_db(event_key: str) -> Response:
 
     response = make_response(file_contents)
     response.headers["Content-Type"] = "application/x-sqlite3"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={f'{event_key}_companion.db'}"
+    response.headers["Content-Disposition"] = (
+        f"attachment; filename={f'{event_key}_companion.db'}"
+    )
     return response
 
 
