@@ -111,9 +111,7 @@ class YouTubeVideoHelper(object):
                     "pageToken": next_page_token,
                     "key": yt_secret,
                 }
-                query_string = "&".join(
-                    f"{k}={v}" for k, v in params.items() if v
-                )
+                query_string = "&".join(f"{k}={v}" for k, v in params.items() if v)
                 url = f"{base_url}?{query_string}"
 
                 ndb_context = ndb.get_context()

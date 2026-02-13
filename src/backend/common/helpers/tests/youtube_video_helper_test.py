@@ -233,9 +233,7 @@ def test_get_playlist_videos_no_secret(ndb_context) -> None:
         YouTubeVideoHelper.videos_in_playlist("playlist").get_result()
 
 
-def test_get_playlist_videos_unauthorized(
-    ndb_context, mock_google_api_secret
-) -> None:
+def test_get_playlist_videos_unauthorized(ndb_context, mock_google_api_secret) -> None:
     error_resp = {
         "error": {
             "code": 403,
@@ -251,7 +249,9 @@ def test_get_playlist_videos_unauthorized(
     }
 
     mock_urlfetch_result = URLFetchResult.mock_for_content(
-        "https://www.googleapis.com/youtube/v3/playlistItems", 403, json.dumps(error_resp)
+        "https://www.googleapis.com/youtube/v3/playlistItems",
+        403,
+        json.dumps(error_resp),
     )
     mock_future = InstantFuture(mock_urlfetch_result)
 
@@ -287,9 +287,7 @@ def test_get_playlist_videos(ndb_context, mock_google_api_secret) -> None:
     )
 
 
-def test_get_playlist_videos_paginate(
-    ndb_context, mock_google_api_secret
-) -> None:
+def test_get_playlist_videos_paginate(ndb_context, mock_google_api_secret) -> None:
     with open(
         os.path.join(os.path.dirname(__file__), "data/youtube_playlist_response.json"),
         "r",
