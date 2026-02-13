@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y \
 ENV HTTPLIB2_CA_CERTS="/usr/lib/google-cloud-sdk/platform/google_appengine/lib/httplib2/httplib2/cacerts.txt"
 
 # Install JDK for firebase-tools
-RUN apt-get install default-jre -y
+RUN apt-get update && apt-get install default-jre -y
 
 # Set up nvm and nodejs
 ENV NVM_DIR=/nvm

@@ -7,7 +7,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^7.3.7",
+    "@mui/icons-material": "^7.3.8",
     "@mui/material": "^7.3.5",
     "classnames": "^2.5.1",
     "element-resize-event": "^3.0.6",
@@ -44,7 +44,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/md5": "^2.3.5",
-    "@types/react": "^19.2.13",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.0.2",
     "@types/react-redux": "^7.1.34",
     "babel-loader": "^10.0.0",
@@ -63,11 +63,11 @@
     "mini-css-extract-plugin": "^2.10.0",
     "node-fetch": "^2.7.0",
     "process": "^0.11.10",
-    "puppeteer": "^24.37.2",
+    "puppeteer": "^24.37.3",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.7.2",
-    "webpack": "^5.105.0",
+    "webpack": "^5.105.2",
     "webpack-cli": "^6.0.1"
   },
   "scripts": {

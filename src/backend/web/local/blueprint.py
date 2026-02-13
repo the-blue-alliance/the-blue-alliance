@@ -26,13 +26,15 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.sitevars.apiv3_key import Apiv3Key
 from backend.web.local.bootstrap import LocalDataBootstrap
-from backend.web.local.dev_tools import seed_test_event
+from backend.web.local.dev_tools import seed_test_event, seed_test_team
 from backend.web.profiled_render import render_template
 
 """
 These are special handlers that only get installed when running locally
 and are used as dev/unit test helpers
 """
+
+DEV_AUTH_KEY = "tba-dev-key"
 
 local_routes = Blueprint("local", __name__, url_prefix="/local")
 
@@ -44,11 +46,26 @@ def before_request() -> None:
         abort(403)
 
 
+def ensure_dev_api_key() -> str:
+    if not Environment.is_dev():
+        raise RuntimeError("ensure_dev_api_key must only be called in dev mode")
+    existing = ApiAuthAccess.get_by_id(DEV_AUTH_KEY)
+    if not existing:
+        ApiAuthAccess(
+            id=DEV_AUTH_KEY,
+            auth_types_enum=[AuthType.READ_API],
+            description="Auto-created dev read API key",
+        ).put()
+    return DEV_AUTH_KEY
+
+
 @local_routes.route("/bootstrap", methods=["GET"])
 def bootstrap() -> str:
+    dev_auth_key = ensure_dev_api_key()
     apiv3_key = Apiv3Key.api_key()
     template_values = {
         "apiv3_key": apiv3_key,
+        "dev_auth_key": dev_auth_key,
         "status": request.args.get("status"),
         "view_url": request.args.get("url"),
     }
@@ -109,9 +126,9 @@ def get_fms_companion_db(event_key: str) -> Response:
 
     response = make_response(file_contents)
     response.headers["Content-Type"] = "application/x-sqlite3"
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename={f'{event_key}_companion.db'}"
+    response.headers["Content-Disposition"] = (
+        f"attachment; filename={f'{event_key}_companion.db'}"
+    )
     return response
 
 
@@ -196,6 +213,12 @@ def create_test_event(event_key: str) -> Response:
 local_routes.add_url_rule(
     "/seed_test_event",
     view_func=seed_test_event,
+    methods=["POST"],
+)
+
+local_routes.add_url_rule(
+    "/seed_test_team",
+    view_func=seed_test_team,
     methods=["POST"],
 )
 

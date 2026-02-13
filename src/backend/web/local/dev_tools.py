@@ -9,13 +9,16 @@ from werkzeug import Response
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.consts.media_type import MediaType
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.team import Team
 
 NUM_COMPLETED = 15
@@ -38,8 +41,8 @@ def seed_test_event() -> Response:
         id=event_key,
         event_short="test",
         year=year,
-        name="North Pole Regional",
-        event_type_enum=EventType.REGIONAL,
+        name="North Pole Showdown",
+        event_type_enum=EventType.PRESEASON if now.month <= 2 else EventType.OFFSEASON,
         start_date=datetime.datetime(year, now.month, now.day)
         - datetime.timedelta(days=1),
         end_date=datetime.datetime(year, now.month, now.day)
@@ -198,6 +201,68 @@ def _get_or_create_teams() -> List[Team]:
         teams.append(team)
     TeamManipulator.createOrUpdate(teams)
     return teams
+
+
+def seed_test_team() -> Response:
+    now = datetime.datetime.now()
+    year = now.year
+
+    team = Team(
+        id="frc2",
+        team_number=2,
+        nickname="The Reindeer",
+        name="North Pole High School & The Reindeer",
+        city="North Pole",
+        state_prov="AK",
+        country="USA",
+        school_name="North Pole High School",
+        website="https://www.thebluealliance.com/team/2",
+        rookie_year=1997,
+        motto="Dasher, Dancer, Prancer, Vixen!",
+    )
+    TeamManipulator.createOrUpdate(team)
+
+    team_ref = Media.create_reference("team", "frc2")
+    media_list = [
+        Media(
+            id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, "dQw4w9WgXcQ"),
+            media_type_enum=MediaType.YOUTUBE_VIDEO,
+            foreign_key="dQw4w9WgXcQ",
+            year=year,
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.IMGUR, "aF8T5ZE"),
+            media_type_enum=MediaType.IMGUR,
+            foreign_key="aF8T5ZE",
+            year=year,
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.INSTAGRAM_IMAGE, "B9ZUsERhIWi"),
+            media_type_enum=MediaType.INSTAGRAM_IMAGE,
+            foreign_key="B9ZUsERhIWi",
+            year=year,
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.YOUTUBE_CHANNEL, "bobcatrobotics"),
+            media_type_enum=MediaType.YOUTUBE_CHANNEL,
+            foreign_key="bobcatrobotics",
+            year=year,
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.INSTAGRAM_PROFILE, "bobcatrobotics"),
+            media_type_enum=MediaType.INSTAGRAM_PROFILE,
+            foreign_key="bobcatrobotics",
+            year=year,
+            references=[team_ref],
+        ),
+    ]
+    MediaManipulator.createOrUpdate(media_list)
+
+    return redirect("/team/2")
 
 
 def _teams_for_match(teams: List[Team], match_number: int) -> tuple:

@@ -12,9 +12,11 @@ class ClientType(enum.IntEnum):
     WEBHOOK = 2
     WEB = 3
     TEST = 4
+    OS_ANDROID_FCM = 5
 
 
 FCM_CLIENTS: Set[ClientType] = {
+    ClientType.OS_ANDROID_FCM,
     ClientType.OS_IOS,
     ClientType.WEB,
 }
@@ -26,6 +28,7 @@ NAMES: Dict[ClientType, str] = {
     ClientType.WEBHOOK: "Webhook",
     ClientType.WEB: "Web",
     ClientType.TEST: "Test",
+    ClientType.OS_ANDROID_FCM: "Android-FCM",
 }
 
 ENUMS: Dict[str, ClientType] = {
@@ -34,4 +37,5 @@ ENUMS: Dict[str, ClientType] = {
     "webhook": ClientType.WEBHOOK,
     "web": ClientType.WEB,
     "test": ClientType.TEST,
+    "android-fcm": ClientType.OS_ANDROID_FCM,
 }
