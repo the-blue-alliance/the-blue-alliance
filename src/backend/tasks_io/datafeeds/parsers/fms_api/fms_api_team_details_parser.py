@@ -46,7 +46,7 @@ class FMSAPITeamDetailsParser(
 
             name_full = teamData["nameFull"]
             name_short = teamData["nameShort"]
-            home_cmp = teamData["homeCMP"]
+            home_cmp = teamData.get("homeCMP")
 
             team = Team(
                 id="frc{}".format(teamData["teamNumber"]),

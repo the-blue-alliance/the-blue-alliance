@@ -75,7 +75,7 @@ def test_parse_awards_valid_award_type_enum(test_data_importer, ndb_stub) -> Non
     )
     awards = FMSAPIAwardsParser(event).parse(data)
 
-    assert awards is None
+    assert awards == []
 
 
 def test_parse_awards_awardee(test_data_importer, ndb_stub) -> None:
@@ -124,7 +124,7 @@ def test_parse_awards_none(test_data_importer, ndb_stub) -> None:
 
     awards = FMSAPIAwardsParser(event).parse(data)
 
-    assert awards is None
+    assert awards == []
 
 
 def test_parse_awards_duplicate_teams(test_data_importer, ndb_stub) -> None:

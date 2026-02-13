@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Tuple
+from typing import cast, Dict, List, Tuple
 
 from backend.common.frc_api.types import (
     DistrictRankingListModelV2,
@@ -28,7 +28,9 @@ class FMSAPIDistrictRankingsParser(
         district_ranks: DistrictAdvancement = {}
         adjustments: Dict[TeamKey, int] = {}
 
-        api_ranks: list[DistrictRankingTeamModelV2] = response["DistrictRanks"] or []
+        api_ranks = cast(
+            List[DistrictRankingTeamModelV2], response.get("districtRanks") or []
+        )
         for ranking in api_ranks:
             team_key = f"frc{ranking["teamNumber"]}"
             district_ranks[team_key] = {

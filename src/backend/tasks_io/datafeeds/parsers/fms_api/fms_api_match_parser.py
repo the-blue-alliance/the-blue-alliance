@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import cast, Dict, List, Tuple
+from typing import Any, cast, Dict, List, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -120,9 +120,10 @@ class FMSAPIHybridScheduleParser(
             team_key_names: List[TeamKey] = []
 
             # Sort by station to ensure correct ordering. Kind of hacky.
+            teams_data = cast(List[Any], match.get("Teams") or match.get("teams") or [])
             sorted_teams = list(
                 sorted(
-                    match["Teams"] or [],
+                    teams_data,
                     key=lambda team: team["station"],
                 )
             )
@@ -419,7 +420,9 @@ class FMSAPIMatchDetailsParser(
                     for color in ALLIANCE_COLORS:
                         breakdown[color][key] = match_data_2024[key]  # pyre-ignore[26]
 
-            api_alliances = match["Alliances"] or []
+            api_alliances = cast(
+                List[Any], match.get("Alliances") or match.get("alliances") or []
+            )
             for alliance in api_alliances:
                 color = alliance["alliance"].lower()
                 for key, value in alliance.items():

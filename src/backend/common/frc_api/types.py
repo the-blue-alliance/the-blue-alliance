@@ -910,7 +910,7 @@ class AwardAssignmentListModelV2(TypedDict):
 
 
 class DistrictRankingListModelV2(TypedDict):
-    DistrictRanks: list[DistrictRankingTeamModelV2] | None
+    districtRanks: list[DistrictRankingTeamModelV2] | None
     rankingCountTotal: int
     rankingCountPage: int
     pageCurrent: int

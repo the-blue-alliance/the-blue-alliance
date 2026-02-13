@@ -33,7 +33,7 @@ class DummyDatafeedNexus(_DatafeedNexus[Any, Any]):
         return "/"
 
     def parser(self):
-        class DummyParser(ParserBase[Any]):
+        class DummyParser(ParserBase[Any, Any]):
             def parse(self, response):
                 return response
 

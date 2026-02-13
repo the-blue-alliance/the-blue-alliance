@@ -468,7 +468,7 @@ class DatafeedFMSAPI:
 
             with Span(f"datafeed_fmsapi_parser:{type(parser).__name__}"):
                 resp_body = response.json()
-                if not resp_body:
+                if resp_body is None:
                     return None
                 return parser.parse(resp_body)
 
