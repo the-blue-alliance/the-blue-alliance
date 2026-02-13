@@ -18,7 +18,10 @@ interface UseMyTBAResult {
   isFavorite: boolean;
   notifications: NotificationType[];
   toggleFavorite: () => void;
-  setPreferences: (favorite: boolean, notifications: NotificationType[]) => void;
+  setPreferences: (
+    favorite: boolean,
+    notifications: NotificationType[],
+  ) => void;
   isPending: boolean;
 }
 
@@ -55,8 +58,7 @@ export function useMyTBA(
   });
 
   const isFavorite = useMemo(
-    () =>
-      favorites?.favorites?.some((f) => f.model_key === modelKey) ?? false,
+    () => favorites?.favorites?.some((f) => f.model_key === modelKey) ?? false,
     [favorites, modelKey],
   );
 
@@ -95,22 +97,17 @@ export function useMyTBA(
       const prevFavorites =
         queryClient.getQueryData<FavoriteCollection>(favoritesQueryKey);
       const prevSubscriptions =
-        queryClient.getQueryData<SubscriptionCollection>(
-          subscriptionsQueryKey,
-        );
+        queryClient.getQueryData<SubscriptionCollection>(subscriptionsQueryKey);
 
-      queryClient.setQueryData<FavoriteCollection>(
-        favoritesQueryKey,
-        (old) => {
-          const existing = old?.favorites ?? [];
-          const filtered = existing.filter((f) => f.model_key !== modelKey);
-          return {
-            favorites: favorite
-              ? [...filtered, { model_key: modelKey, model_type: modelType }]
-              : filtered,
-          };
-        },
-      );
+      queryClient.setQueryData<FavoriteCollection>(favoritesQueryKey, (old) => {
+        const existing = old?.favorites ?? [];
+        const filtered = existing.filter((f) => f.model_key !== modelKey);
+        return {
+          favorites: favorite
+            ? [...filtered, { model_key: modelKey, model_type: modelType }]
+            : filtered,
+        };
+      });
 
       queryClient.setQueryData<SubscriptionCollection>(
         subscriptionsQueryKey,

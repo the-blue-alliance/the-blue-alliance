@@ -62,9 +62,9 @@ import {
   getTeamsUnpenalizedHighScore,
 } from '~/lib/matchUtils';
 import {
+  MODEL_TYPE,
   addRecords,
   doThrowNotFound,
-  MODEL_TYPE,
   parseParamsForYearElseDefault,
   pluralize,
   publicCacheControlHeaders,

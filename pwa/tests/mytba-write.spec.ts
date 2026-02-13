@@ -22,8 +22,6 @@ test.describe('Favorite button unauthenticated behavior', () => {
   }) => {
     await page.goto('/team/604/2024');
     await page.getByRole('button', { name: /add to favorites/i }).click();
-    await expect(
-      page.getByText('Sign in to use myTBA'),
-    ).toBeVisible();
+    await expect(page.getByText('Sign in to use myTBA')).toBeVisible();
   });
 });

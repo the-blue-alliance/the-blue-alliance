@@ -39,12 +39,12 @@ import {
   getEventTeamsOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
-import FavoriteButton from '~/components/tba/favoriteButton';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import EliminationBracket from '~/components/tba/eliminationBracket';
+import FavoriteButton from '~/components/tba/favoriteButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
   EventLocationLink,
@@ -120,10 +120,10 @@ import {
 } from '~/lib/rankingPoints';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import {
+  MODEL_TYPE,
   camelCaseToHumanReadable,
   cn,
   doThrowNotFound,
-  MODEL_TYPE,
   publicCacheControlHeaders,
   splitIntoNChunks,
 } from '~/lib/utils';

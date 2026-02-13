@@ -33,8 +33,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { useMyTBA } from '~/lib/hooks/useMyTBA';
 import {
-  SUBSCRIPTION_TYPE_DISPLAY_NAMES,
   SUBSCRIPTION_TYPES,
+  SUBSCRIPTION_TYPE_DISPLAY_NAMES,
 } from '~/lib/myTBAConstants';
 import { MODEL_TYPE, pluralize } from '~/lib/utils';
 
@@ -182,8 +182,7 @@ function RemoveButton({
 
 function MyTeams({ favorites, subscriptions }: ModelListProps) {
   const combinedItems = buildCombinedItems(favorites, subscriptions).toSorted(
-    (a, b) =>
-      Number(a.modelKey.substring(3)) - Number(b.modelKey.substring(3)),
+    (a, b) => Number(a.modelKey.substring(3)) - Number(b.modelKey.substring(3)),
   );
 
   if (combinedItems.length === 0) {

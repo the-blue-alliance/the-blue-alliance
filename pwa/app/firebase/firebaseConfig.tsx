@@ -20,11 +20,9 @@ if (!getApps().length) {
 const auth = isServer ? null : getAuth(app);
 
 if (auth && import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST) {
-  connectAuthEmulator(
-    auth,
-    import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST,
-    { disableWarnings: true },
-  );
+  connectAuthEmulator(auth, import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST, {
+    disableWarnings: true,
+  });
 }
 
 const database = getDatabase(app);

@@ -16,8 +16,8 @@ import {
 } from '~/components/ui/credenza';
 import { useMyTBA } from '~/lib/hooks/useMyTBA';
 import {
-  SUBSCRIPTION_TYPE_DISPLAY_NAMES,
   SUBSCRIPTION_TYPES,
+  SUBSCRIPTION_TYPE_DISPLAY_NAMES,
 } from '~/lib/myTBAConstants';
 
 interface PreferencesDialogProps {
