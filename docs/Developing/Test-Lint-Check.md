@@ -1,4 +1,10 @@
-Tests and linting can be run via `make` commands, which use Docker Compose services under the hood. These services use a pre-built image with all Python dependencies installed, so tests run quickly without needing to install dependencies each time.
+Tests and linting run via `make` commands, which use [`uv`](https://docs.astral.sh/uv/) to manage a local virtualenv. Dependencies are synced automatically on first run — just run `make test` or `make lint` and everything bootstraps itself.
+
+If you want to sync all dev dependencies explicitly (test + lint + typecheck + pre-commit):
+
+```bash
+$ make sync
+```
 
 # Python
 
@@ -35,10 +41,8 @@ $ make lint ARGS='--fix'
 
 The Blue Alliance's Python codebase enforces the use of [type hints](https://www.python.org/dev/peps/pep-0484/) using [pyre](https://pyre-check.org/).
 
-Note: Type checking via Docker is currently unavailable. Run pyre directly if needed:
-
 ```bash
-$ pyre check
+$ make typecheck
 ```
 
 #### Generating Type Checker Stubs
@@ -98,11 +102,26 @@ Node linting runs using [ESLint](https://eslint.org/). Run using the `ops/lint_n
 
 ## Lint
 
-Formatting bash requires [shfmt](https://github.com/mvdan/sh) to be install on the local system. Run using the `ops/lint_bash.sh` script. Using the `--fix` flag will automatically reformat code that doesn't meet the style.
+Bash linting runs [shellcheck](https://www.shellcheck.net/) for static analysis and [shfmt](https://github.com/mvdan/sh) for formatting.
 
 ```bash
-# Check for errors
-> ./ops_lint_bash.sh
-# Fix formatting errors automatically
-> ./ops_lint_bash.sh --fix
+# Run bash linter (shellcheck + shfmt)
+$ make lint-bash
+
+# Auto-fix formatting with shfmt
+$ make lint-bash ARGS='--fix'
 ```
+
+# Python Version Consistency
+
+The project maintains consistent Python versions across all configuration files (GAE yamls, Docker configs, CI workflows). Use the provided script to check or update versions:
+
+```bash
+# Check Python version consistency
+$ ./ops/check_python_version.sh
+
+# Update all files to match .python-version
+$ ./ops/check_python_version.sh --update
+```
+
+The source of truth for the Python version is the `.python-version` file in the repository root.

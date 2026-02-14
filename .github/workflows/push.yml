@@ -11,25 +11,18 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-          cache: "pip"
-      - name: Install Dependencies
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r src/requirements.txt
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
       - name: Run Type Check
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/typecheck_py3.sh
+        run: make typecheck
   py3-lint:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
       - name: Run Format & Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make lint
@@ -41,9 +34,11 @@ jobs:
         group: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v6
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: make test ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
+        run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
         uses: actions/upload-artifact@v6.0.0
         with:
@@ -56,23 +51,15 @@ jobs:
     needs: [py3-test]
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-          cache: "pip"
-      - name: Install Dependencies
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
       - name: Download all artifacts
         uses: actions/download-artifact@v7
       - name: Combine coverage
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
-          coverage combine coverage*/.coverage*
-          coverage xml
+          uv run --frozen --group ci coverage combine coverage*/.coverage*
+          uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         uses: codecov/codecov-action@v5.5.2
@@ -331,23 +318,17 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-          cache: "pip"
-      - name: Install Shellcheck
-        run: |
-          python -m pip install --upgrade pip
-          pip install shellcheck-py
-      - name: Install shfmt
-        run: |
-          mkdir -p $HOME/.local/bin
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          wget "https://github.com/mvdan/sh/releases/download/v3.2.2/shfmt_v3.2.2_linux_amd64" -O $HOME/.local/bin/shfmt
-          chmod +x $HOME/.local/bin/shfmt
       - name: Run Lint
-        run: ./ops/lint_bash.sh
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: make lint-bash
+  check-python-version:
+    name: "[py3] Check Python Version Consistency"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check Python Version
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: ./ops/check_python_version.sh
 
   build-web:
     name: Build Web
@@ -529,12 +510,15 @@ jobs:
               - 'ops/**'
               - 'src/**'
               - 'package.json'
-              - 'requirements.txt'
+              - 'pyproject.toml'
       - name: Set up Python 3.13
         if: steps.changes.outputs.default == 'true'
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+      - name: Set up uv
+        if: steps.changes.outputs.default == 'true'
+        uses: astral-sh/setup-uv@v6
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.default == 'true'
         uses: google-github-actions/auth@v3
@@ -576,12 +560,15 @@ jobs:
               - 'ops/**'
               - 'src/**'
               - 'package.json'
-              - 'requirements.txt'
+              - 'pyproject.toml'
       - name: Set up Python 3.13
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+      - name: Set up uv
+        if: steps.changes.outputs.web == 'true'
+        uses: astral-sh/setup-uv@v6
       - name: Download production artifacts
         if: steps.changes.outputs.web == 'true'
         uses: actions/download-artifact@v7
@@ -623,12 +610,15 @@ jobs:
               - 'ops/**'
               - 'src/**'
               - 'package.json'
-              - 'requirements.txt'
+              - 'pyproject.toml'
       - name: Set up Python 3.13
         if: steps.changes.outputs.api == 'true'
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+      - name: Set up uv
+        if: steps.changes.outputs.api == 'true'
+        uses: astral-sh/setup-uv@v6
       - name: Update env_variables.yaml
         if: steps.changes.outputs.api == 'true'
         run: ./ops/deploy/update_env_variables_yaml.sh
@@ -664,12 +654,15 @@ jobs:
               - 'ops/**'
               - 'src/**'
               - 'package.json'
-              - 'requirements.txt'
+              - 'pyproject.toml'
       - name: Set up Python 3.13
         if: steps.changes.outputs.tasks-io == 'true'
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+      - name: Set up uv
+        if: steps.changes.outputs.tasks-io == 'true'
+        uses: astral-sh/setup-uv@v6
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-io == 'true'
         uses: google-github-actions/auth@v3
@@ -700,12 +693,15 @@ jobs:
               - 'ops/**'
               - 'src/**'
               - 'package.json'
-              - 'requirements.txt'
+              - 'pyproject.toml'
       - name: Set up Python 3.13
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+      - name: Set up uv
+        if: steps.changes.outputs.tasks-cpu == 'true'
+        uses: astral-sh/setup-uv@v6
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: google-github-actions/auth@v3

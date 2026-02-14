@@ -28,13 +28,15 @@ def test_get_event_teams() -> None:
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "event_team_avatars", return_value=InstantFuture(response)
-    ) as mock_api, patch.object(
-        FMSAPITeamAvatarParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPITeamAvatarParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "event_team_avatars", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(
+            FMSAPITeamAvatarParser, "__init__", return_value=None
+        ) as mock_init,
+        patch.object(FMSAPITeamAvatarParser, "parse") as mock_parse,
+    ):
         mock_parse.side_effect = [(([], []), False)]
         df.get_event_team_avatars("2020miket").get_result()
 
@@ -51,13 +53,15 @@ def test_get_event_teams_paginated() -> None:
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "event_team_avatars", return_value=InstantFuture(response)
-    ) as mock_api, patch.object(
-        FMSAPITeamAvatarParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPITeamAvatarParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "event_team_avatars", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(
+            FMSAPITeamAvatarParser, "__init__", return_value=None
+        ) as mock_init,
+        patch.object(FMSAPITeamAvatarParser, "parse") as mock_parse,
+    ):
         mock_parse.side_effect = [(([], []), True), (([], []), False)]
         df.get_event_team_avatars("2020miket").get_result()
 
@@ -74,13 +78,15 @@ def test_get_event_teams_cmp() -> None:
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "event_team_avatars", return_value=InstantFuture(response)
-    ) as mock_api, patch.object(
-        FMSAPITeamAvatarParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPITeamAvatarParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "event_team_avatars", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(
+            FMSAPITeamAvatarParser, "__init__", return_value=None
+        ) as mock_init,
+        patch.object(FMSAPITeamAvatarParser, "parse") as mock_parse,
+    ):
         mock_parse.side_effect = [(([], []), False)]
         df.get_event_team_avatars("2014gal").get_result()
 

@@ -28,13 +28,15 @@ def test_get_event_alliances() -> None:
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "alliances", return_value=InstantFuture(response)
-    ) as mock_api, patch.object(
-        FMSAPIEventAlliancesParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIEventAlliancesParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "alliances", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(
+            FMSAPIEventAlliancesParser, "__init__", return_value=None
+        ) as mock_init,
+        patch.object(FMSAPIEventAlliancesParser, "parse") as mock_parse,
+    ):
         mock_parse.side_effect = [([], False)]
         df.get_event_alliances("2020miket").get_result()
 
@@ -51,13 +53,15 @@ def test_get_event_alliances_cmp() -> None:
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "alliances", return_value=InstantFuture(response)
-    ) as mock_api, patch.object(
-        FMSAPIEventAlliancesParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIEventAlliancesParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "alliances", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(
+            FMSAPIEventAlliancesParser, "__init__", return_value=None
+        ) as mock_init,
+        patch.object(FMSAPIEventAlliancesParser, "parse") as mock_parse,
+    ):
         mock_parse.side_effect = [([], False)]
         df.get_event_alliances("2014gal").get_result()
 

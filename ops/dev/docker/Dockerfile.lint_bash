@@ -1,0 +1,7 @@
+FROM alpine:latest
+
+RUN apk add --no-cache shellcheck shfmt bash
+
+WORKDIR /tba
+
+CMD ["/bin/bash"]
