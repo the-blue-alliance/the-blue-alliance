@@ -1,23 +1,26 @@
 import json
 
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
 
 from backend.common.consts.media_type import MediaType
+from backend.common.frc_api.types import TeamAvatarListingsModelV2, TeamAvatarModelV2
 from backend.common.models.media import Media
 from backend.common.models.team import Team
-from backend.tasks_io.datafeeds.parsers.json.parser_paginated_json import (
-    ParserPaginatedJSON,
+from backend.tasks_io.datafeeds.parsers.parser_paginated import (
+    ParserPaginated,
 )
 
 
-class FMSAPITeamAvatarParser(ParserPaginatedJSON[Tuple[List[Media], Set[ndb.Key]]]):
+class FMSAPITeamAvatarParser(
+    ParserPaginated[TeamAvatarListingsModelV2, Tuple[List[Media], Set[ndb.Key]]]
+):
     def __init__(self, year: int):
         self.year = year
 
     def parse(
-        self, response: Dict[str, Any]
+        self, response: TeamAvatarListingsModelV2
     ) -> Tuple[Optional[Tuple[List[Media], Set[ndb.Key]]], bool]:
         current_page = response["pageCurrent"]
         total_pages = response["pageTotal"]
@@ -25,7 +28,8 @@ class FMSAPITeamAvatarParser(ParserPaginatedJSON[Tuple[List[Media], Set[ndb.Key]
         avatars: List[Media] = []
         media_keys_to_delete: Set[ndb.Key] = set()
 
-        for teamData in response["teams"]:
+        api_avatars: list[TeamAvatarModelV2] = response["teams"] or []
+        for teamData in api_avatars:
             team_number = teamData["teamNumber"]
             foreign_key = "avatar_{}_frc{}".format(self.year, team_number)
             media_key = ndb.Key(

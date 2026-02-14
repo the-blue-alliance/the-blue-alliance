@@ -36,7 +36,7 @@ def test_get_awards_event(first_code, event_short):
     response = URLFetchResult.mock_for_content(
         "https://frc-api.firstinspires.org/v3.0/2020/awards/MIKET/0",
         200,
-        "",
+        "[]",
     )
 
     df = DatafeedFMSAPI()
@@ -44,13 +44,12 @@ def test_get_awards_event(first_code, event_short):
         patch.object(
             FRCAPI, "awards", return_value=InstantFuture(response)
         ) as mock_awards,
-        patch.object(FMSAPIAwardsParser, "__init__", return_value=None) as mock_init,
         patch.object(FMSAPIAwardsParser, "parse") as mock_parse,
     ):
+        mock_parse.return_value = []
         df.get_awards(event).get_result()
 
     mock_awards.assert_called_once_with(2020, event_code="miket")
-    mock_init.assert_called_once_with(event)
     mock_parse.assert_called_once_with(response.json())
 
 
@@ -66,7 +65,7 @@ def test_get_awards_event_cmp(first_code, event_short):
     response = URLFetchResult.mock_for_content(
         "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/0",
         200,
-        "",
+        "[]",
     )
 
     df = DatafeedFMSAPI()
@@ -74,13 +73,12 @@ def test_get_awards_event_cmp(first_code, event_short):
         patch.object(
             FRCAPI, "awards", return_value=InstantFuture(response)
         ) as mock_awards,
-        patch.object(FMSAPIAwardsParser, "__init__", return_value=None) as mock_init,
         patch.object(FMSAPIAwardsParser, "parse") as mock_parse,
     ):
+        mock_parse.return_value = []
         df.get_awards(event).get_result()
 
     mock_awards.assert_called_once_with(2014, event_code="galileo")
-    mock_init.assert_called_once_with(event)
     mock_parse.assert_called_once_with(response.json())
 
 
@@ -106,7 +104,7 @@ def test_get_awards_event_cmp_2015(teams):
     response = URLFetchResult.mock_for_content(
         "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/7332",
         200,
-        "",
+        "[]",
     )
 
     df = DatafeedFMSAPI()
@@ -114,15 +112,14 @@ def test_get_awards_event_cmp_2015(teams):
         patch.object(
             FRCAPI, "awards", return_value=InstantFuture(response)
         ) as mock_awards,
-        patch.object(FMSAPIAwardsParser, "__init__", return_value=None) as mock_init,
         patch.object(FMSAPIAwardsParser, "parse") as mock_parse,
     ):
+        mock_parse.return_value = []
         df.get_awards(event).get_result()
 
     mock_awards.assert_has_calls(
         [call(2015, event_code="gaca"), call(2015, event_code="galileo")]
     )
-    mock_init.assert_has_calls([call(event, set(teams)), call(event)])
     assert mock_parse.call_count == 2
 
 
@@ -148,7 +145,7 @@ def test_get_awards_event_cmp_2017(teams):
     response = URLFetchResult.mock_for_content(
         "https://frc-api.firstinspires.org/v3.0/2014/awards/GALILEO/7332",
         200,
-        "",
+        "[]",
     )
 
     df = DatafeedFMSAPI()
@@ -156,13 +153,12 @@ def test_get_awards_event_cmp_2017(teams):
         patch.object(
             FRCAPI, "awards", return_value=InstantFuture(response)
         ) as mock_awards,
-        patch.object(FMSAPIAwardsParser, "__init__", return_value=None) as mock_init,
         patch.object(FMSAPIAwardsParser, "parse") as mock_parse,
     ):
+        mock_parse.return_value = []
         df.get_awards(event).get_result()
 
     mock_awards.assert_has_calls(
         [call(2017, event_code="garo"), call(2017, event_code="galileo")]
     )
-    mock_init.assert_has_calls([call(event, set(teams)), call(event)])
     assert mock_parse.call_count == 2

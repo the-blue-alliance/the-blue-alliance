@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, cast, Dict, List, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -10,6 +10,12 @@ from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import DOUBLE_ELIM_TYPES
+from backend.common.frc_api.frc_api import TScoreDetailReturn, TScoreDetailUnion
+from backend.common.frc_api.types import (
+    EventScheduleHybridModelV2,
+    ScoreDetailModel2018,
+    ScoreDetailModel2024,
+)
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
@@ -18,7 +24,7 @@ from backend.common.models.keys import MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
 from backend.common.suggestions.media_parser import MediaParser
-from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
+from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 QF_SF_MAP = {
     1: (1, 3),  # in sf1, qf seeds 2 and 4 play. 0-indexed becomes 1, 3
@@ -35,7 +41,7 @@ TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
 
 
 class FMSAPIHybridScheduleParser(
-    ParserJSON[Tuple[List[Match], Dict[MatchKey, MatchKey]]]
+    ParserBase[EventScheduleHybridModelV2, Tuple[List[Match], Dict[MatchKey, MatchKey]]]
 ):
     def __init__(self, year: Year, event_short: str):
         self.year = year
@@ -60,11 +66,11 @@ class FMSAPIHybridScheduleParser(
         return True
 
     def parse(
-        self, response: Dict[str, Any]
+        self, response: EventScheduleHybridModelV2
     ) -> Tuple[List[Match], Dict[MatchKey, MatchKey]]:
         import pytz
 
-        matches = response["Schedule"]
+        matches = response["Schedule"] or []
 
         event_key = f"{self.year}{self.event_short}"
         event = none_throws(Event.get_by_id(event_key))
@@ -114,9 +120,10 @@ class FMSAPIHybridScheduleParser(
             team_key_names: List[TeamKey] = []
 
             # Sort by station to ensure correct ordering. Kind of hacky.
+            teams_data = cast(List[Any], match.get("Teams") or match.get("teams") or [])
             sorted_teams = list(
                 sorted(
-                    match.get("teams", match.get("Teams", [])),
+                    teams_data,
                     key=lambda team: team["station"],
                 )
             )
@@ -135,13 +142,16 @@ class FMSAPIHybridScheduleParser(
 
                 team_key = "frc{}".format(team["teamNumber"])
                 team_key_names.append(team_key)
-                if "Red" in team["station"]:
+                team_station = team["station"]
+                if team_station is None:
+                    continue
+                elif "Red" in team_station:
                     red_teams.append(team_key)
                     if team.get("surrogate", None):
                         red_surrogates.append(team_key)
                     if team.get("dq", None):
                         red_dqs.append(team_key)
-                elif "Blue" in team["station"]:
+                elif "Blue" in team_station:
                     blue_teams.append(team_key)
                     if team.get("surrogate", None):
                         blue_surrogates.append(team_key)
@@ -168,11 +178,14 @@ class FMSAPIHybridScheduleParser(
             ]:  # no startTime means it's an unneeded rubber match
                 continue
 
-            time = datetime.datetime.strptime(
-                match["startTime"].split(".")[0], TIME_PATTERN
-            )
-            if event_tz is not None:
-                time = time - event_tz.utcoffset(time)
+            if api_start_time := match["startTime"]:
+                time = datetime.datetime.strptime(
+                    api_start_time.split(".")[0], TIME_PATTERN
+                )
+                if event_tz is not None:
+                    time = time - event_tz.utcoffset(time)
+            else:
+                time = None
 
             actual_time_raw = (
                 match["actualStartTime"] if "actualStartTime" in match else None
@@ -197,10 +210,9 @@ class FMSAPIHybridScheduleParser(
                     )
 
             youtube_videos = []
-            video_link = match.get("matchVideoLink")
-            if video_link:
+            if video_link := match.get("matchVideoLink"):
                 video_suggestion = MediaParser.partial_media_dict_from_url(
-                    video_link
+                    cast(str, video_link)
                 ).get_result()
                 if (
                     video_suggestion
@@ -341,13 +353,17 @@ class FMSAPIHybridScheduleParser(
         return parsed_matches, remapped_matches
 
 
-class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
+class FMSAPIMatchDetailsParser(
+    ParserBase[TScoreDetailReturn, Dict[MatchKey, MatchScoreBreakdown]]
+):
     def __init__(self, year, event_short):
         self.year = year
         self.event_short = event_short
 
-    def parse(self, response: Dict[str, Any]) -> Dict[MatchKey, MatchScoreBreakdown]:
-        matches = response["MatchScores"]
+    def parse(
+        self, response: TScoreDetailReturn
+    ) -> Dict[MatchKey, MatchScoreBreakdown]:
+        matches: list[TScoreDetailUnion] = response["MatchScores"]
 
         event_key = "{}{}".format(self.year, self.event_short)
         event = none_throws(Event.get_by_id(event_key))
@@ -356,7 +372,9 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
 
         for match in matches:
             comp_level = PlayoffTypeHelper.get_comp_level(
-                event.playoff_type, match["matchLevel"], match["matchNumber"]
+                event.playoff_type,
+                none_throws(match["matchLevel"]),
+                none_throws(match["matchNumber"]),
             )
             set_number, match_number = PlayoffTypeHelper.get_set_match_number(
                 event.playoff_type, comp_level, match["matchNumber"]
@@ -365,20 +383,22 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
                 AllianceColor.RED: {},
                 AllianceColor.BLUE: {},
             }
-            # TODO better type hinting for per-year breakdowns
-            if "coopertition" in match:
-                breakdown["coopertition"] = match["coopertition"]  # pyre-ignore[6]
-            if "coopertitionPoints" in match:
-                breakdown["coopertition_points"] = match[  # pyre-ignore[6]
-                    "coopertitionPoints"
-                ]
+
+            if api_coopertition := match.get("coopertition"):
+                breakdown["coopertition"] = api_coopertition  # pyre-ignore[6]
+
+            if api_coopertition_points := match.get("coopertitionPoints"):
+                breakdown["coopertition_points"] = (  # pyre-ignore[6]
+                    api_coopertition_points  # pyre-ignore[6]
+                )
 
             game_data = None
             if self.year == 2018:
                 # Switches should be the same, but parse individually in case FIRST change things
-                right_switch_red = match["switchRightNearColor"] == "Red"
-                scale_red = match["scaleNearColor"] == "Red"
-                left_switch_red = match["switchLeftNearColor"] == "Red"
+                match_data_2018 = cast(ScoreDetailModel2018, match)
+                right_switch_red = match_data_2018["switchRightNearColor"] == "Red"
+                scale_red = match_data_2018["scaleNearColor"] == "Red"
+                left_switch_red = match_data_2018["switchLeftNearColor"] == "Red"
                 game_data = "{}{}{}".format(
                     "L" if right_switch_red else "R",
                     "L" if scale_red else "R",
@@ -388,6 +408,7 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
             elif self.year == 2024:
                 # Bonus thresholds and coop status are in the top level Match object,
                 # duplicate them into each alliance breakdown
+                match_data_2024 = cast(ScoreDetailModel2024, match)
                 for key in [
                     "coopertitionBonusAchieved",
                     "melodyBonusThresholdCoop",
@@ -397,9 +418,12 @@ class FMSAPIMatchDetailsParser(ParserJSON[Dict[MatchKey, MatchScoreBreakdown]]):
                     "ensembleBonusOnStageRobotsThreshold",
                 ]:
                     for color in ALLIANCE_COLORS:
-                        breakdown[color][key] = match[key]
+                        breakdown[color][key] = match_data_2024[key]  # pyre-ignore[26]
 
-            for alliance in match.get("alliances", match.get("Alliances", [])):
+            api_alliances = cast(
+                List[Any], match.get("Alliances") or match.get("alliances") or []
+            )
+            for alliance in api_alliances:
                 color = alliance["alliance"].lower()
                 for key, value in alliance.items():
                     if key != "alliance":

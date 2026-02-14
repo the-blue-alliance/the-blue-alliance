@@ -18,7 +18,7 @@ class TParsedRegionalAdvancement:
     adjustments: Dict[TeamKey, int]
 
 
-class RegionalAdvancementParser(ParserBase[TParsedRegionalAdvancement]):
+class RegionalAdvancementParser(ParserBase[JSON, TParsedRegionalAdvancement]):
 
     def parse(self, response: JSON) -> TParsedRegionalAdvancement:
         if not isinstance(response, dict):

@@ -29,4 +29,4 @@ def test_parse_district_list_none(test_data_importer, ndb_stub) -> None:
 
     districts = FMSAPIDistrictListParser(2018).parse(data)
 
-    assert districts is None
+    assert districts == []

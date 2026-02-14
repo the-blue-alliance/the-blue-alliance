@@ -1,16 +1,18 @@
+from typing import Any
+
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.keys import Year
 from backend.common.sitevars.regional_advancement_api_secrets import (
     RegionalAdvancementApiSecret,
 )
-from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase, TReturn
+from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase, TAPIResponse, TReturn
 from backend.tasks_io.datafeeds.parsers.ra.regional_advancement_parser import (
     RegionalAdvancementParser,
     TParsedRegionalAdvancement,
 )
 
 
-class _DatafeedRegionalAdvancement(DatafeedBase[TReturn]):
+class _DatafeedRegionalAdvancement(DatafeedBase[TAPIResponse, TReturn]):
 
     def __init__(self, year: Year) -> None:
         super().__init__()
@@ -27,7 +29,7 @@ class _DatafeedRegionalAdvancement(DatafeedBase[TReturn]):
 
 
 class RegionalChampsAdvancement(
-    _DatafeedRegionalAdvancement[TParsedRegionalAdvancement]
+    _DatafeedRegionalAdvancement[Any, TParsedRegionalAdvancement]
 ):
 
     def __init__(self, year: Year) -> None:

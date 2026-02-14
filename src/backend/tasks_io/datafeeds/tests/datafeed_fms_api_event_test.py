@@ -24,7 +24,7 @@ def test_get_event_list() -> None:
     response = URLFetchResult.mock_for_content(
         "https://frc-api.firstinspires.org/v3.0/2020/events",
         200,
-        "",
+        "[]",
     )
 
     df = DatafeedFMSAPI()
@@ -32,13 +32,12 @@ def test_get_event_list() -> None:
         patch.object(
             FRCAPI, "event_list", return_value=InstantFuture(response)
         ) as mock_api,
-        patch.object(FMSAPIEventListParser, "__init__", return_value=None) as mock_init,
         patch.object(FMSAPIEventListParser, "parse") as mock_parse,
     ):
+        mock_parse.return_value = []
         df.get_event_list(2020).get_result()
 
     mock_api.assert_called_once_with(2020)
-    mock_init.assert_called_once_with(2020)
     mock_parse.assert_called_once_with(response.json())
 
 
@@ -46,7 +45,7 @@ def test_get_event_details() -> None:
     response = URLFetchResult.mock_for_content(
         "https://frc-api.firstinspires.org/v3.0/2020/events?eventCode=MIKET",
         200,
-        "",
+        "[]",
     )
 
     df = DatafeedFMSAPI()
@@ -54,13 +53,12 @@ def test_get_event_details() -> None:
         patch.object(
             FRCAPI, "event_info", return_value=InstantFuture(response)
         ) as mock_api,
-        patch.object(FMSAPIEventListParser, "__init__", return_value=None) as mock_init,
         patch.object(FMSAPIEventListParser, "parse") as mock_parse,
     ):
+        mock_parse.return_value = []
         df.get_event_details("2020miket").get_result()
 
     mock_api.assert_called_once_with(2020, "miket")
-    mock_init.assert_called_once_with(2020, short="miket")
     mock_parse.assert_called_once_with(response.json())
 
 
@@ -68,7 +66,7 @@ def test_get_event_details_cmp() -> None:
     response = URLFetchResult.mock_for_content(
         "https://frc-api.firstinspires.org/v3.0/2014/events?eventCode=GALILEO",
         200,
-        "",
+        "[]",
     )
 
     df = DatafeedFMSAPI()
@@ -76,11 +74,10 @@ def test_get_event_details_cmp() -> None:
         patch.object(
             FRCAPI, "event_info", return_value=InstantFuture(response)
         ) as mock_api,
-        patch.object(FMSAPIEventListParser, "__init__", return_value=None) as mock_init,
         patch.object(FMSAPIEventListParser, "parse") as mock_parse,
     ):
+        mock_parse.return_value = []
         df.get_event_details("2014gal").get_result()
 
     mock_api.assert_called_once_with(2014, "galileo")
-    mock_init.assert_called_once_with(2014, short="gal")
     mock_parse.assert_called_once_with(response.json())
