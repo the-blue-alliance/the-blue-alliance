@@ -1,50 +1,39 @@
-# GitHub Copilot Setup Steps
-# This file configures the development environment setup for GitHub Copilot Workspace
-# ensuring Python, Node.js, and PWA tests can all run successfully.
+name: Development Environment Setup
+description: Complete setup for The Blue Alliance development environment including Python, Node.js, and PWA
 
-setup:
+steps:
   # Python environment setup
   - name: Install uv (Python package manager)
     run: python3 -m pip install uv
-    description: Install uv for Python dependency management
 
   - name: Sync Python dependencies
     run: make sync
-    description: Install all Python development dependencies using uv
 
   # Node.js environment setup for main project
   - name: Install Node.js dependencies
     run: npm ci
-    description: Install Node.js dependencies for the main project
 
   # PWA environment setup
   - name: Install pnpm
     run: npm install -g pnpm@10.24.0
-    description: Install pnpm package manager for PWA
 
   - name: Create PWA environment file
-    run: |
-      ./ops/pwa/create_dotenv.sh --env
+    run: ./ops/pwa/create_dotenv.sh --env
     env:
-      TBA_API_READ_KEY: "TEST_KEY"
-      FIREBASE_API_KEY: "fake-api-key"
-      GCLOUD_PROJECT_ID: "demo-test"
-    description: Create .env file for PWA development
+      TBA_API_READ_KEY: TEST_KEY
+      FIREBASE_API_KEY: fake-api-key
+      GCLOUD_PROJECT_ID: demo-test
 
   - name: Install PWA dependencies
     run: pnpm --dir pwa install --frozen-lockfile
-    description: Install PWA dependencies using pnpm
 
-# Validation steps to ensure everything is set up correctly
-validate:
-  - name: Run Python tests
+# Test commands to validate the setup
+tests:
+  - name: Python tests
     run: make test
-    description: Run all Python tests to verify setup
 
-  - name: Run Node.js tests
+  - name: Node.js tests
     run: npm run test
-    description: Run Node.js tests for the main project
 
-  - name: Run PWA tests
+  - name: PWA tests
     run: pnpm --dir pwa test
-    description: Run PWA tests to verify setup
