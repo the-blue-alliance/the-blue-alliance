@@ -469,7 +469,10 @@
       <div class="row">
         <div class="col-sm-12">
           <h2>Scouting</h2>
-          <p>Copy the CSV data below for scouting purposes:</p>
+          <p>Copy the CSV data below for scouting purposes, or use <code>IMPORTHTML()</code>:</p>
+          <pre>=IMPORTHTML("https://www.thebluealliance.com/event/{{ event.key_name }}/html/teams", "table")</pre>
+          <pre>=IMPORTHTML("https://www.thebluealliance.com/event/{{ event.key_name }}/html/schedule", "table")</pre>
+          <pre>=IMPORTHTML("https://www.thebluealliance.com/event/{{ event.key_name }}/html/flat_schedule", "table")</pre>
           <div class="form-group">
             <div class="clearfix">
               <label class="control-label" style="display:inline-block; margin:0; padding-top:6px;">Team List</label>
