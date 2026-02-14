@@ -4,12 +4,11 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
 
 1. Update the version in `.python-version`
 2. Run `./ops/check_python_version.sh --update` to update all dependent files:
+   - `pyproject.toml` (`requires-python`)
    - GAE service `.yaml` files (`runtime:` directive)
-   - `docker-compose.yml` (`x-python-version:`)
-   - Dockerfiles (`ARG PYTHON_VERSION=`)
+   - Dockerfiles (`ENV PYTHON_VERSION=`)
    - GitHub Actions workflow files (`python-version:`)
 3. Verify the changes: `./ops/check_python_version.sh`
-4. Update the [[Repo Setup|Repo-Setup]] docs if they reference a specific Python version
 
 ## Building a New Development Container Version
 
