@@ -1,5 +1,12 @@
 name: Development Environment Setup
-description: Complete setup for The Blue Alliance development environment including Python, Node.js, and PWA
+description: |
+  Complete setup for The Blue Alliance development environment.
+  This file configures the environment to ensure Python, Node.js, and PWA tests all pass.
+  
+  Prerequisites:
+  - Python 3.13 or higher
+  - Node.js 22 or higher
+  - Git
 
 steps:
   # Python environment setup
