@@ -143,6 +143,17 @@ def test_apidocs_webhooks_notification_no_webhook_specified(
     assert b"Webhook not specified" in response.data
 
 
+def test_apidocs_webhooks_notification_invalid_webhook_id(
+    login_user, web_client: Client
+) -> None:
+    response = web_client.post(
+        f"/apidocs/webhooks/test/{NotificationType.MATCH_SCORE.value}",
+        data={"match_key": "2019nyny_qm1", "webhook_client_id": "not_a_number"},
+    )
+    assert response.status_code == 400
+    assert b"Invalid webhook_client_id" in response.data
+
+
 # Tests for webhook-specific test notifications
 @pytest.fixture
 def verified_webhook(login_user, ndb_stub) -> MobileClient:

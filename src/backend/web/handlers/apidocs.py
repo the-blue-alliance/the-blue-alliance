@@ -71,6 +71,7 @@ def apidocs_webhooks() -> str:
             MobileClient.user_id == str(user.uid),
             MobileClient.client_type == ClientType.WEBHOOK,
             MobileClient.verified == True,
+            ancestor=user.account_key,
         ).fetch()
 
     template_values = {
@@ -107,7 +108,12 @@ def apidocs_webhooks_notification(type: int) -> Response:
     from backend.common.consts.client_type import ClientType
     from backend.common.models.mobile_client import MobileClient
 
-    webhook = MobileClient.get_by_id(int(webhook_client_id), parent=user.account_key)
+    try:
+        webhook_id = int(webhook_client_id)
+    except ValueError:
+        return error_response("Invalid webhook_client_id")
+
+    webhook = MobileClient.get_by_id(webhook_id, parent=user.account_key)
     if not webhook:
         return error_response("Webhook not found")
     if webhook.client_type != ClientType.WEBHOOK:
@@ -128,4 +134,8 @@ def apidocs_webhooks_notification(type: int) -> Response:
     if success:
         return make_response("ok", 200)
     else:
-        return error_response("Failed to send notification to webhook")
+        return error_response(
+            "Failed to send notification to webhook. Verify that the required "
+            "keys (event_key, team_key, match_key, district_key) are provided "
+            "and valid for the selected notification type."
+        )
