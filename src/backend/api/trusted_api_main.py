@@ -16,6 +16,7 @@ from backend.api.handlers.trusted import (
     update_event_info,
     update_event_matches,
     update_event_rankings,
+    update_event_webcasts,
     update_teams,
 )
 from backend.common.datafeed_parsers.exceptions import ParserInputException
@@ -25,7 +26,7 @@ trusted_api = Blueprint("trusted_api", __name__, url_prefix="/api/trusted/v1")
 CORS(
     trusted_api,
     origins="*",
-    methods=["OPTIONS", "POST"],
+    methods=["OPTIONS", "POST", "PATCH", "DELETE"],
     allow_headers=["Content-Type", "X-TBA-Auth-Id", "X-TBA-Auth-Sig"],
 )
 trusted_api.add_url_rule(
@@ -82,6 +83,11 @@ trusted_api.add_url_rule(
     "/event/<string:event_key>/team_list/update",
     methods=["POST"],
     view_func=update_teams,
+)
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/webcasts/update",
+    methods=["PATCH", "DELETE"],
+    view_func=update_event_webcasts,
 )
 trusted_api.add_url_rule(
     "/event/<string:event_key>/zebra_motionworks/add",
