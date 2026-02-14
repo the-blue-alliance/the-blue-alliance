@@ -4,7 +4,7 @@ set -e
 # Create empty keys file if one does not already exist
 if [ ! -f src/backend/web/static/javascript/tba_js/tba_keys.js ]; then
     cp src/backend/web/static/javascript/tba_js/tba_keys_template.js \
-       src/backend/web/static/javascript/tba_js/tba_keys.js
+        src/backend/web/static/javascript/tba_js/tba_keys.js
 fi
 
 echo "Installing node dependencies..."
