@@ -70,7 +70,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
       - name: Run Tests
         if: steps.changes.outputs.python == 'true'
-        run: make test ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
+        run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
         uses: actions/upload-artifact@v6.0.0
@@ -102,8 +102,8 @@ jobs:
       - name: Combine coverage
         if: steps.changes.outputs.python == 'true'
         run: |
-          uv run --frozen --group test coverage combine coverage*/.coverage*
-          uv run --frozen --group test coverage xml
+          uv run --frozen --group ci coverage combine coverage*/.coverage*
+          uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.python == 'true'
         uses: codecov/codecov-action@v5.5.2

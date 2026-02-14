@@ -1,7 +1,7 @@
 [project]
 name = "the-blue-alliance"
 version = "0.1.0"
-description = "The Blue Alliance - FIRST Robotics Competition data archive and scouting tool"
+requires-python = ">=3.13"
 dependencies = [
     "appengine-python-standard==1.1.10",
     "beautifulsoup4==4.14.3",
@@ -34,11 +34,14 @@ dependencies = [
 test = [
     "freezegun==1.5.5",
     "pytest",
-    "pytest-cov",
     "pytest-custom_exit_code",
     "pytest-split",
     "pytest-testmon",
     "requests-mock==1.12.1",
+]
+ci = [
+    { include-group = "test" },
+    "pytest-cov",
 ]
 lint = [
     "black==26.1.0",

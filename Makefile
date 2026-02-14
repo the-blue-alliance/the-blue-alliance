@@ -37,6 +37,14 @@ else
 	uv run --group test ./ops/test_py3.sh
 endif
 
+# Run tests with coverage (CI only)
+test-ci:
+ifdef ARGS
+	uv run --group ci ./ops/test_py3.sh $(ARGS)
+else
+	uv run --group ci ./ops/test_py3.sh
+endif
+
 # Run linter (black + flake8)
 # Use ARGS='--fix' to auto-fix formatting issues
 lint:

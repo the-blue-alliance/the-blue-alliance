@@ -1855,6 +1855,15 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+ci = [
+    { name = "freezegun" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-custom-exit-code" },
+    { name = "pytest-split" },
+    { name = "pytest-testmon" },
+    { name = "requests-mock" },
+]
 dev = [
     { name = "black" },
     { name = "flake8" },
@@ -1864,7 +1873,6 @@ dev = [
     { name = "pre-commit" },
     { name = "pyre-check" },
     { name = "pytest" },
-    { name = "pytest-cov" },
     { name = "pytest-custom-exit-code" },
     { name = "pytest-split" },
     { name = "pytest-testmon" },
@@ -1879,7 +1887,6 @@ lint = [
 test = [
     { name = "freezegun" },
     { name = "pytest" },
-    { name = "pytest-cov" },
     { name = "pytest-custom-exit-code" },
     { name = "pytest-split" },
     { name = "pytest-testmon" },
@@ -1919,6 +1926,15 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+ci = [
+    { name = "freezegun", specifier = "==1.5.5" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-custom-exit-code" },
+    { name = "pytest-split" },
+    { name = "pytest-testmon" },
+    { name = "requests-mock", specifier = "==1.12.1" },
+]
 dev = [
     { name = "black", specifier = "==26.1.0" },
     { name = "flake8", specifier = "==7.3.0" },
@@ -1928,7 +1944,6 @@ dev = [
     { name = "pre-commit" },
     { name = "pyre-check", specifier = "==0.9.25" },
     { name = "pytest" },
-    { name = "pytest-cov" },
     { name = "pytest-custom-exit-code" },
     { name = "pytest-split" },
     { name = "pytest-testmon" },
@@ -1943,7 +1958,6 @@ lint = [
 test = [
     { name = "freezegun", specifier = "==1.5.5" },
     { name = "pytest" },
-    { name = "pytest-cov" },
     { name = "pytest-custom-exit-code" },
     { name = "pytest-split" },
     { name = "pytest-testmon" },

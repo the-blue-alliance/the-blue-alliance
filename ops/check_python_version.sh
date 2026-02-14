@@ -48,6 +48,30 @@ update_file() {
     UPDATED=$((UPDATED + 1))
 }
 
+# Check/update requires-python in pyproject.toml
+PYPROJECT="$REPO_ROOT/pyproject.toml"
+if [[ -f "$PYPROJECT" ]]; then
+    EXPECTED_REQUIRES_PYTHON=">=${PYTHON_VERSION}"
+    CURRENT_REQUIRES_PYTHON=$(grep 'requires-python' "$PYPROJECT" | sed 's/.*"\(.*\)".*/\1/' || true)
+    if [[ "$CURRENT_REQUIRES_PYTHON" != "$EXPECTED_REQUIRES_PYTHON" ]]; then
+        if [[ "$UPDATE_MODE" == true ]]; then
+            if grep -q 'requires-python' "$PYPROJECT"; then
+                sed -i '' "s|requires-python = \".*\"|requires-python = \"$EXPECTED_REQUIRES_PYTHON\"|" "$PYPROJECT"
+            else
+                sed -i '' "/^description/a\\
+requires-python = \"$EXPECTED_REQUIRES_PYTHON\"" "$PYPROJECT"
+            fi
+            echo "UPDATED: $PYPROJECT (requires-python = \"$EXPECTED_REQUIRES_PYTHON\")"
+            UPDATED=$((UPDATED + 1))
+        else
+            echo "ERROR: $PYPROJECT has requires-python = \"$CURRENT_REQUIRES_PYTHON\" (expected \"$EXPECTED_REQUIRES_PYTHON\")"
+            ERRORS=$((ERRORS + 1))
+        fi
+    else
+        echo "OK: $PYPROJECT (requires-python)"
+    fi
+fi
+
 # Check/update GAE yaml files
 for yaml in "$REPO_ROOT"/src/*.yaml; do
     if grep -q "^runtime:" "$yaml"; then

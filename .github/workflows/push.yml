@@ -38,7 +38,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: make test ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
+        run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
         uses: actions/upload-artifact@v6.0.0
         with:
@@ -58,8 +58,8 @@ jobs:
       - name: Combine coverage
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
-          uv run --frozen --group test coverage combine coverage*/.coverage*
-          uv run --frozen --group test coverage xml
+          uv run --frozen --group ci coverage combine coverage*/.coverage*
+          uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         uses: codecov/codecov-action@v5.5.2
