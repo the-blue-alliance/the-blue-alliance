@@ -20,7 +20,7 @@ function defineAllRoutes<T extends readonly RoutePath[]>(
 const allRoutes = defineAllRoutes([
   '/',
   '/about',
-  '/account',
+  '/account/',
   '/account/mytba',
   '/add-data',
   '/apidocs',
