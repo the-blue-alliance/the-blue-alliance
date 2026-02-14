@@ -18,8 +18,8 @@ services:
 
   datastore:
     build:
-      context: ./
-      dockerfile: ./ops/dev/datastore/Dockerfile.datastore
+      context: ./ops/dev/datastore/
+      dockerfile: Dockerfile.datastore
     environment:
       <<: *env-vars
     ports:
@@ -35,8 +35,8 @@ services:
 
   tba:
     build:
-      context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile
+      context: ./ops/dev/docker/
+      dockerfile: Dockerfile
     depends_on:
       firebase:
         condition: service_started
@@ -66,20 +66,21 @@ services:
 
   webpack:
     build:
-      context: ./
-      dockerfile: ./ops/dev/webpack/Dockerfile.webpack
+      context: ./ops/dev/webpack/
+      dockerfile: Dockerfile.webpack
     volumes:
       - ./:/tba:delegated
     working_dir: /tba
     environment:
       - WATCH=true
+      - PUPPETEER_SKIP_DOWNLOAD=true
 
   ### Tools
 
   lint-bash:
     build:
-      context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile.lint_bash
+      context: ./ops/dev/docker/
+      dockerfile: Dockerfile.lint_bash
     profiles: ["tools"]
     volumes:
       - ./:/tba:delegated
