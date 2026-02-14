@@ -1,0 +1,11 @@
+FROM node:24-alpine
+
+# Python 3 is needed for do_compress.py (legacy JS concatenation)
+RUN apk add --no-cache python3
+
+# uglify-js is needed by do_compress.py
+RUN npm install -g uglify-js@3.17.4
+
+WORKDIR /tba
+
+ENTRYPOINT ["./ops/dev/webpack/entrypoint.sh"]

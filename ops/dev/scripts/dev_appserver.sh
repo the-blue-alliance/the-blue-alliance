@@ -1,7 +1,11 @@
 #! /bin/bash
 set -e
 
-source ops/dev/vagrant/config.sh
+# Generate src/requirements.txt from pyproject.toml before starting the dev server
+echo "Generating src/requirements.txt..."
+uv export --no-dev --no-hashes --frozen -o src/requirements.txt
+
+source ops/dev/scripts/config.sh
 
 auth_use_prod=$(get_config_prop auth_use_prod)
 firebase_db_use_prod=$(get_config_prop firebase_db_use_prod)
@@ -46,7 +50,8 @@ function assert_local_storage_path {
 if [ "$datastore_mode" == "local" ]; then
     echo "Starting with datastore emulator"
     emulator_port=8089
-    env+=("--env_var=DATASTORE_EMULATOR_HOST=localhost:$emulator_port" "--env_var=DATASTORE_DATASET=test")
+    emulator_host="${DATASTORE_EMULATOR_HOST:-localhost:$emulator_port}"
+    env+=("--env_var=DATASTORE_EMULATOR_HOST=$emulator_host" "--env_var=DATASTORE_DATASET=test")
 elif [ "$datastore_mode" == "remote" ]; then
     echo "Starting with remote datastore"
     assert_google_application_credentials

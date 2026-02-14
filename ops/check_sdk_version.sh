@@ -1,13 +1,13 @@
 #! /bin/bash
 
-source ops/dev/vagrant/config.sh
+source ops/dev/scripts/config.sh
 
 min_version=$(get_config_prop min_gcloud_sdk_version)
 
 function help_on_error() {
     echo "Your dev container is running an outdated Google Cloud SDK!"
     echo "The Blue Alliance requires at least version ${min_version}"
-    echo "Update your container by running: vagrant halt && vagrant up --provision"
+    echo "Update your container by running: docker-compose down && docker-compose up --build"
 }
 
 set -eE

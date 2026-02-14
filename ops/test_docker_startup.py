@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# /// script
+# dependencies = ["requests"]
+# ///
+
 import re
 import subprocess
 import sys
@@ -21,11 +25,9 @@ start_time = time.time()
 while time.time() - start_time < TIME_LIMIT:
     # Check for started modules
     result = subprocess.run(
-        ["vagrant", "ssh", "--", "-t", "cat /var/log/tba.log"], stdout=subprocess.PIPE
+        ["docker", "compose", "logs", "tba"], capture_output=True, text=True
     )
-    started = set(
-        re.findall(r"Starting module \"(.*)\"", result.stdout.decode("utf-8"))
-    )
+    started = set(re.findall(r'Starting module "(.*)"', result.stdout))
     not_started = MODULE_NAMES.difference(started)
     if not_started:
         print(f"Not started modules: {not_started}")
@@ -35,11 +37,10 @@ while time.time() - start_time < TIME_LIMIT:
 
     # Check for webpack build
     result = subprocess.run(
-        ["vagrant", "ssh", "--", "-t", "cat /var/log/webpack.log"],
-        stdout=subprocess.PIPE,
+        ["docker", "compose", "logs", "webpack"], capture_output=True, text=True
     )
     m = re.search(
-        r"webpack .* compiled successfully in .*", result.stdout.decode("utf-8")
+        r"webpack .* compiled successfully in .*", result.stdout + result.stderr
     )
     if not m:
         print("Webpack not compiled")
@@ -49,15 +50,20 @@ while time.time() - start_time < TIME_LIMIT:
 
     # Check that homepage returns a 200
     url = "http://localhost:8080"
-    r = requests.get(url)
-    print(f"Status code: {r.status_code}")
-    if r.status_code == 200:
-        print("Startup successful!")
-        sys.exit(0)
+    try:
+        r = requests.get(url)
+        print(f"Status code: {r.status_code}")
+        if r.status_code == 200:
+            print("Startup successful!")
+            sys.exit(0)
+    except requests.ConnectionError:
+        print("Connection refused, retrying...")
+        time.sleep(5)
+        continue
 
 print("Fail: Didn't start up in time")
 container_logs = subprocess.run(
-    ["vagrant", "ssh", "--", "-t", "cat /var/log/tba.log"], stdout=subprocess.PIPE
+    ["docker", "compose", "logs", "tba"], capture_output=True, text=True
 )
-print(f"Container Logs:\n{container_logs.stdout.decode()}")
+print(f"Container Logs:\n{container_logs.stdout}")
 sys.exit(1)

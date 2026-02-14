@@ -6,15 +6,15 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
 2. Run `./ops/check_python_version.sh --update` to update all dependent files:
    - `pyproject.toml` (`requires-python`)
    - GAE service `.yaml` files (`runtime:` directive)
-   - Dockerfiles (`ENV PYTHON_VERSION=`)
-   - GitHub Actions workflow files (`python-version:`)
 3. Verify the changes: `./ops/check_python_version.sh`
 
-## Building a New Development Container Version
+## Rebuilding the Development Container
 
-We host built container images with [GitHub Container Registry](https://github.com/features/packages). The `Dockerfile` is defined [here](https://github.com/the-blue-alliance/the-blue-alliance/tree/main/ops/dev/docker). After the `Dockerfile` is updated, we'll need to trigger a rebuild + push by including `[dockerpublish]` in the commit message.
+The development container is defined in [`ops/dev/docker/Dockerfile`](https://github.com/the-blue-alliance/the-blue-alliance/tree/main/ops/dev/docker). After updating the Dockerfile, rebuild locally with:
 
-Images are published to `ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest` and can be managed from the [on GitHub](https://github.com/the-blue-alliance/the-blue-alliance/pkgs/container/the-blue-alliance%2Ftba-py3-dev).
+```bash
+docker-compose down && docker-compose up --build
+```
 
 ## Running One-Off Data Migrations/Cleanups
 
