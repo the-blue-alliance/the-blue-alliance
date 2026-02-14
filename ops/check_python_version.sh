@@ -48,7 +48,6 @@ update_file() {
     UPDATED=$((UPDATED + 1))
 }
 
-
 # Check/update GAE yaml files
 for yaml in "$REPO_ROOT"/src/*.yaml; do
     if grep -q "^runtime:" "$yaml"; then
