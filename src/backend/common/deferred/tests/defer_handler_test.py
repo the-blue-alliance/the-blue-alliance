@@ -37,13 +37,16 @@ def test_install_defer_routes_regex_already_installed():
 
     install_regex_url_converter(app)
 
-    with patch(
-        "backend.common.deferred.defer_handler.has_regex_url_converter",
-        return_value=True,
-    ), patch(
-        "backend.common.deferred.defer_handler.install_regex_url_converter",
-        wraps=install_regex_url_converter,
-    ) as mock_install_regex_url_converter:
+    with (
+        patch(
+            "backend.common.deferred.defer_handler.has_regex_url_converter",
+            return_value=True,
+        ),
+        patch(
+            "backend.common.deferred.defer_handler.install_regex_url_converter",
+            wraps=install_regex_url_converter,
+        ) as mock_install_regex_url_converter,
+    ):
         install_defer_routes(app)
 
     mock_install_regex_url_converter.assert_not_called()
@@ -51,9 +54,10 @@ def test_install_defer_routes_regex_already_installed():
 
 def test_handle_defer():
     app = Flask(__name__)
-    with app.test_request_context() as request_context, patch(
-        "google.appengine.ext.deferred.application.post"
-    ) as mock_post:
+    with (
+        app.test_request_context() as request_context,
+        patch("google.appengine.ext.deferred.application.post") as mock_post,
+    ):
         environ = request_context.request.environ
         handle_defer("/some/path")
 
@@ -63,9 +67,10 @@ def test_handle_defer():
 def test_handle_defer_decodes_body():
     app = Flask(__name__)
     body = base64.b64encode(b"foo")
-    with app.test_request_context(data=body) as request_context, patch(
-        "google.appengine.ext.deferred.application.post"
-    ) as mock_post:
+    with (
+        app.test_request_context(data=body) as request_context,
+        patch("google.appengine.ext.deferred.application.post") as mock_post,
+    ):
         request_context.request.environ
         environ = request_context.request.environ
 

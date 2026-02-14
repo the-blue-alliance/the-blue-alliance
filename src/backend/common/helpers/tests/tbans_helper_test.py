@@ -477,9 +477,12 @@ class TestTBANSHelper(unittest.TestCase):
         match_creator.createIncompleteQuals()
 
         # Test send called with user id
-        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
-            TBANSHelper, "schedule_upcoming_match"
-        ) as schedule_upcoming_match:
+        with (
+            patch.object(TBANSHelper, "_send") as mock_send,
+            patch.object(
+                TBANSHelper, "schedule_upcoming_match"
+            ) as schedule_upcoming_match,
+        ):
             TBANSHelper.match_score(self.match, "user_id")
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -573,9 +576,10 @@ class TestTBANSHelper(unittest.TestCase):
         self.match.match_number = 1
 
         # Test send called with user id
-        with patch.object(TBANSHelper, "_send") as mock_send, patch.object(
-            TBANSHelper, "event_level"
-        ) as mock_event_level:
+        with (
+            patch.object(TBANSHelper, "_send") as mock_send,
+            patch.object(TBANSHelper, "event_level") as mock_event_level,
+        ):
             TBANSHelper.match_upcoming(self.match, "user_id")
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
@@ -776,11 +780,14 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse({"name": "abc"}, None)]
         )
-        with patch.object(
-            FCMRequest, "__init__", mock.MagicMock(spec=FCMRequest, return_value=None)
-        ) as mock_fcm_request_constructor, patch.object(
-            FCMRequest, "send", return_value=batch_response
-        ) as mock_send:
+        with (
+            patch.object(
+                FCMRequest,
+                "__init__",
+                mock.MagicMock(spec=FCMRequest, return_value=None),
+            ) as mock_fcm_request_constructor,
+            patch.object(FCMRequest, "send", return_value=batch_response) as mock_send,
+        ):
             success = TBANSHelper._ping_client(client)
 
             mock_fcm_request_constructor.assert_called_once()
@@ -986,9 +993,10 @@ class TestTBANSHelper(unittest.TestCase):
 
     def test_send_empty(self):
         notification = MockNotification()
-        with patch.object(TBANSHelper, "_defer_fcm") as mock_fcm, patch.object(
-            TBANSHelper, "_defer_webhook"
-        ) as mock_webhook:
+        with (
+            patch.object(TBANSHelper, "_defer_fcm") as mock_fcm,
+            patch.object(TBANSHelper, "_defer_webhook") as mock_webhook,
+        ):
             TBANSHelper._send([], notification)
             mock_fcm.assert_not_called()
             mock_webhook.assert_not_called()
@@ -1019,9 +1027,10 @@ class TestTBANSHelper(unittest.TestCase):
         expected_webhooks = [c for c in clients if c.client_type == ClientType.WEBHOOK]
 
         notification = MockNotification()
-        with patch.object(TBANSHelper, "_defer_fcm") as mock_fcm, patch.object(
-            TBANSHelper, "_defer_webhook"
-        ) as mock_webhook:
+        with (
+            patch.object(TBANSHelper, "_defer_fcm") as mock_fcm,
+            patch.object(TBANSHelper, "_defer_webhook") as mock_webhook,
+        ):
             TBANSHelper._send(["user_id"], notification)
             mock_fcm.assert_called_once_with(expected_fcm, notification)
             for webhook in expected_webhooks:
@@ -1137,10 +1146,13 @@ class TestTBANSHelper(unittest.TestCase):
         ]
 
         batch_response = messaging.BatchResponse([])
-        with patch(
-            "backend.common.models.notifications.requests.fcm_request.MAXIMUM_TOKENS",
-            2,
-        ), patch.object(FCMRequest, "send", return_value=batch_response) as mock_send:
+        with (
+            patch(
+                "backend.common.models.notifications.requests.fcm_request.MAXIMUM_TOKENS",
+                2,
+            ),
+            patch.object(FCMRequest, "send", return_value=batch_response) as mock_send,
+        ):
             TBANSHelper._send_fcm(clients, MockNotification())
             assert mock_send.call_count == 2
 
@@ -1159,13 +1171,14 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse(None, UnregisteredError("code", "message"))]
         )
-        with patch.object(
-            FCMRequest, "send", return_value=batch_response
-        ), patch.object(
-            MobileClientQuery,
-            "delete_for_messaging_id",
-            wraps=MobileClientQuery.delete_for_messaging_id,
-        ) as mock_delete:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch.object(
+                MobileClientQuery,
+                "delete_for_messaging_id",
+                wraps=MobileClientQuery.delete_for_messaging_id,
+            ) as mock_delete,
+        ):
             TBANSHelper._send_fcm([client], MockNotification())
             mock_delete.assert_called_once_with("messaging_id")
 
@@ -1209,13 +1222,14 @@ class TestTBANSHelper(unittest.TestCase):
                 ),  # second fails
             ]
         )
-        with patch.object(
-            FCMRequest, "send", return_value=batch_response
-        ), patch.object(
-            MobileClientQuery,
-            "delete_for_messaging_id",
-            wraps=MobileClientQuery.delete_for_messaging_id,
-        ) as mock_delete:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch.object(
+                MobileClientQuery,
+                "delete_for_messaging_id",
+                wraps=MobileClientQuery.delete_for_messaging_id,
+            ) as mock_delete,
+        ):
             TBANSHelper._send_fcm([client_ok, client_bad], MockNotification())
             # Only the bad client should be deleted
             mock_delete.assert_called_once_with("messaging_id_bad")
@@ -1242,13 +1256,14 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse(None, SenderIdMismatchError("code", "message"))]
         )
-        with patch.object(
-            FCMRequest, "send", return_value=batch_response
-        ), patch.object(
-            MobileClientQuery,
-            "delete_for_messaging_id",
-            wraps=MobileClientQuery.delete_for_messaging_id,
-        ) as mock_delete:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch.object(
+                MobileClientQuery,
+                "delete_for_messaging_id",
+                wraps=MobileClientQuery.delete_for_messaging_id,
+            ) as mock_delete,
+        ):
             TBANSHelper._send_fcm([client], MockNotification())
             mock_delete.assert_called_once_with("messaging_id")
 
@@ -1274,9 +1289,10 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse(None, QuotaExceededError("code", "message"))]
         )
-        with patch.object(FCMRequest, "send", return_value=batch_response), patch(
-            "logging.error"
-        ) as mock_error:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch("logging.error") as mock_error,
+        ):
             TBANSHelper._send_fcm([client], MockNotification())
             mock_error.assert_called_once_with("Quota exceeded - retrying client...")
 
@@ -1308,9 +1324,10 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse(None, ThirdPartyAuthError("code", "message"))]
         )
-        with patch.object(FCMRequest, "send", return_value=batch_response), patch(
-            "logging.critical"
-        ) as mock_critical:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch("logging.critical") as mock_critical,
+        ):
             TBANSHelper._send_fcm([client], MockNotification())
             mock_critical.assert_called_once_with(
                 "Third party error sending to FCM - code"
@@ -1338,9 +1355,10 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse(None, InvalidArgumentError("code", "message"))]
         )
-        with patch.object(FCMRequest, "send", return_value=batch_response), patch(
-            "logging.critical"
-        ) as mock_critical:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch("logging.critical") as mock_critical,
+        ):
             TBANSHelper._send_fcm([client], MockNotification())
             mock_critical.assert_called_once_with(
                 "Invalid argument when sending to FCM - code"
@@ -1368,9 +1386,10 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse(None, InternalError("code", "message"))]
         )
-        with patch.object(FCMRequest, "send", return_value=batch_response), patch(
-            "logging.error"
-        ) as mock_error:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch("logging.error") as mock_error,
+        ):
             TBANSHelper._send_fcm([client], MockNotification())
             mock_error.assert_called_once_with(
                 "Internal FCM error - retrying client..."
@@ -1404,9 +1423,10 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse(None, UnavailableError("code", "message"))]
         )
-        with patch.object(FCMRequest, "send", return_value=batch_response), patch(
-            "logging.error"
-        ) as mock_error:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch("logging.error") as mock_error,
+        ):
             TBANSHelper._send_fcm([client], MockNotification())
             mock_error.assert_called_once_with("FCM unavailable - retrying client...")
 
@@ -1438,9 +1458,10 @@ class TestTBANSHelper(unittest.TestCase):
         batch_response = messaging.BatchResponse(
             [messaging.SendResponse(None, FirebaseError("code", "message"))]
         )
-        with patch.object(FCMRequest, "send", return_value=batch_response), patch(
-            "logging.error"
-        ) as mock_error:
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch("logging.error") as mock_error,
+        ):
             TBANSHelper._send_fcm([client], MockNotification())
             mock_error.assert_called_once_with(
                 "Unhandled FCM error for messaging_id - code / message"
@@ -1468,8 +1489,9 @@ class TestTBANSHelper(unittest.TestCase):
             [messaging.SendResponse(None, QuotaExceededError("code", "message"))]
         )
         for i in range(0, 6):
-            with patch.object(FCMRequest, "send", return_value=batch_response), patch(
-                "logging.error"
+            with (
+                patch.object(FCMRequest, "send", return_value=batch_response),
+                patch("logging.error"),
             ):
                 # call_time = time.time()
                 TBANSHelper._send_fcm([client], MockNotification(), i)

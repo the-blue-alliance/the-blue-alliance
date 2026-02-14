@@ -40,13 +40,13 @@ def test_get_awards_event(first_code, event_short):
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "awards", return_value=InstantFuture(response)
-    ) as mock_awards, patch.object(
-        FMSAPIAwardsParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIAwardsParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "awards", return_value=InstantFuture(response)
+        ) as mock_awards,
+        patch.object(FMSAPIAwardsParser, "__init__", return_value=None) as mock_init,
+        patch.object(FMSAPIAwardsParser, "parse") as mock_parse,
+    ):
         df.get_awards(event).get_result()
 
     mock_awards.assert_called_once_with(2020, event_code="miket")
@@ -70,13 +70,13 @@ def test_get_awards_event_cmp(first_code, event_short):
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "awards", return_value=InstantFuture(response)
-    ) as mock_awards, patch.object(
-        FMSAPIAwardsParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIAwardsParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "awards", return_value=InstantFuture(response)
+        ) as mock_awards,
+        patch.object(FMSAPIAwardsParser, "__init__", return_value=None) as mock_init,
+        patch.object(FMSAPIAwardsParser, "parse") as mock_parse,
+    ):
         df.get_awards(event).get_result()
 
     mock_awards.assert_called_once_with(2014, event_code="galileo")
@@ -110,13 +110,13 @@ def test_get_awards_event_cmp_2015(teams):
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "awards", return_value=InstantFuture(response)
-    ) as mock_awards, patch.object(
-        FMSAPIAwardsParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIAwardsParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "awards", return_value=InstantFuture(response)
+        ) as mock_awards,
+        patch.object(FMSAPIAwardsParser, "__init__", return_value=None) as mock_init,
+        patch.object(FMSAPIAwardsParser, "parse") as mock_parse,
+    ):
         df.get_awards(event).get_result()
 
     mock_awards.assert_has_calls(
@@ -152,13 +152,13 @@ def test_get_awards_event_cmp_2017(teams):
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "awards", return_value=InstantFuture(response)
-    ) as mock_awards, patch.object(
-        FMSAPIAwardsParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIAwardsParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "awards", return_value=InstantFuture(response)
+        ) as mock_awards,
+        patch.object(FMSAPIAwardsParser, "__init__", return_value=None) as mock_init,
+        patch.object(FMSAPIAwardsParser, "parse") as mock_parse,
+    ):
         df.get_awards(event).get_result()
 
     mock_awards.assert_has_calls(

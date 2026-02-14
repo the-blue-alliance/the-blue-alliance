@@ -290,9 +290,10 @@ def test_edit_no_display_name_follow_redirect(
 def test_edit_success(login_user, web_client: FlaskClient) -> None:
     login_user.uid = "abc"
 
-    with web_client, patch.object(
-        login_user, "update_display_name"
-    ) as mock_update_display_name:
+    with (
+        web_client,
+        patch.object(login_user, "update_display_name") as mock_update_display_name,
+    ):
         response = web_client.post(
             "/account/edit", data={"account_id": login_user.uid, "display_name": "Zach"}
         )
@@ -430,9 +431,10 @@ def test_login_success(web_client: FlaskClient) -> None:
 
 
 def test_read_key_add_no_description(login_user, web_client: FlaskClient) -> None:
-    with patch.object(
-        login_user, "add_api_read_key"
-    ) as mock_add_api_read_key, web_client:
+    with (
+        patch.object(login_user, "add_api_read_key") as mock_add_api_read_key,
+        web_client,
+    ):
         response = web_client.post("/account/api/read_key_add")
     with web_client.session_transaction() as session:
         assert session.get("account_status") == "read_key_add_no_description"
@@ -444,9 +446,12 @@ def test_read_key_add_no_description(login_user, web_client: FlaskClient) -> Non
 
 
 def test_read_key_add_no_api_key(login_user, web_client: FlaskClient) -> None:
-    with patch.object(
-        login_user, "add_api_read_key", side_effect=Exception()
-    ) as mock_add_api_read_key, web_client:
+    with (
+        patch.object(
+            login_user, "add_api_read_key", side_effect=Exception()
+        ) as mock_add_api_read_key,
+        web_client,
+    ):
         response = web_client.post(
             "/account/api/read_key_add", data={"description": "Testing"}
         )
@@ -460,9 +465,10 @@ def test_read_key_add_no_api_key(login_user, web_client: FlaskClient) -> None:
 
 
 def test_read_key_add(login_user, web_client: FlaskClient) -> None:
-    with patch.object(
-        login_user, "add_api_read_key"
-    ) as mock_add_api_read_key, web_client:
+    with (
+        patch.object(login_user, "add_api_read_key") as mock_add_api_read_key,
+        web_client,
+    ):
         response = web_client.post(
             "/account/api/read_key_add", data={"description": "Testing"}
         )
@@ -488,11 +494,11 @@ def test_read_key_delete_no_key_id(login_user, web_client: FlaskClient) -> None:
 
 
 def test_read_key_delete_no_api_key(login_user, web_client: FlaskClient) -> None:
-    with patch.object(
-        login_user, "delete_api_key"
-    ) as mock_delete_api_key, patch.object(
-        login_user, "api_read_key", return_value=None
-    ), web_client:
+    with (
+        patch.object(login_user, "delete_api_key") as mock_delete_api_key,
+        patch.object(login_user, "api_read_key", return_value=None),
+        web_client,
+    ):
         response = web_client.post(
             "/account/api/read_key_delete", data={"key_id": "abcd"}
         )
@@ -507,11 +513,11 @@ def test_read_key_delete_no_api_key(login_user, web_client: FlaskClient) -> None
 
 def test_read_key_delete(login_user, web_client: FlaskClient) -> None:
     mock_api_key = Mock()
-    with patch.object(
-        login_user, "delete_api_key"
-    ) as mock_delete_api_key, patch.object(
-        login_user, "api_read_key", return_value=mock_api_key
-    ), web_client:
+    with (
+        patch.object(login_user, "delete_api_key") as mock_delete_api_key,
+        patch.object(login_user, "api_read_key", return_value=mock_api_key),
+        web_client,
+    ):
         response = web_client.post(
             "/account/api/read_key_delete", data={"key_id": "abcd"}
         )
@@ -584,19 +590,23 @@ def test_mytba(
 
     mock_year = 2012
 
-    with patch.object(
-        backend.common.helpers.event_helper.EventHelper,
-        "sorted_events",
-        return_value=[mock_event_sorted],
-    ) as mock_sorted_events, patch.object(
-        backend.common.helpers.match_helper.MatchHelper,
-        "natural_sorted_matches",
-        return_value=[mock_match_sorted],
-    ) as mock_natural_sorted_matches, patch.object(
-        backend.common.helpers.season_helper.SeasonHelper,
-        "effective_season_year",
-        return_value=mock_year,
-    ) as mock_effective_season_year:
+    with (
+        patch.object(
+            backend.common.helpers.event_helper.EventHelper,
+            "sorted_events",
+            return_value=[mock_event_sorted],
+        ) as mock_sorted_events,
+        patch.object(
+            backend.common.helpers.match_helper.MatchHelper,
+            "natural_sorted_matches",
+            return_value=[mock_match_sorted],
+        ) as mock_natural_sorted_matches,
+        patch.object(
+            backend.common.helpers.season_helper.SeasonHelper,
+            "effective_season_year",
+            return_value=mock_year,
+        ) as mock_effective_season_year,
+    ):
         response = web_client.get("/account/mytba")
 
     assert response.status_code == 200
@@ -643,9 +653,10 @@ def test_ping_client(
     )
     c1.put()
 
-    with web_client, patch.object(
-        TBANSHelper, "ping", return_value=ping_sent
-    ) as mock_ping:
+    with (
+        web_client,
+        patch.object(TBANSHelper, "ping", return_value=ping_sent) as mock_ping,
+    ):
         response = web_client.post(
             "/account/ping", data={"mobile_client_id": c1.key.id()}
         )
@@ -679,9 +690,10 @@ def test_ping_not_our_client(
     )
     c1.put()
 
-    with web_client, patch.object(
-        TBANSHelper, "ping", return_value=(True, True)
-    ) as mock_ping:
+    with (
+        web_client,
+        patch.object(TBANSHelper, "ping", return_value=(True, True)) as mock_ping,
+    ):
         response = web_client.post(
             "/account/ping", data={"mobile_client_id": c1.key.id()}
         )
@@ -702,13 +714,13 @@ def test_delete_confirmation(login_user, web_client: FlaskClient) -> None:
 
 
 def test_delete_post(login_user, web_client: FlaskClient) -> None:
-    with patch.object(
-        backend.web.handlers.account, "revoke_session_cookie"
-    ) as mock_revoke_session_cookie, patch.object(
-        AccountDeletionHelper, "delete_account"
-    ) as mock_delete_account, patch.object(
-        auth, "_delete_user"
-    ) as mock_delete_user:
+    with (
+        patch.object(
+            backend.web.handlers.account, "revoke_session_cookie"
+        ) as mock_revoke_session_cookie,
+        patch.object(AccountDeletionHelper, "delete_account") as mock_delete_account,
+        patch.object(auth, "_delete_user") as mock_delete_user,
+    ):
         response = web_client.post("/account/delete")
 
     # make sure we log out the current user and that we call the deletion function

@@ -32,13 +32,15 @@ def test_get_district_list() -> None:
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "district_list", return_value=InstantFuture(response)
-    ) as mock_api, patch.object(
-        FMSAPIDistrictListParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIDistrictListParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "district_list", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(
+            FMSAPIDistrictListParser, "__init__", return_value=None
+        ) as mock_init,
+        patch.object(FMSAPIDistrictListParser, "parse") as mock_parse,
+    ):
         df.get_district_list(2020).get_result()
 
     mock_api.assert_called_once_with(2020)
@@ -54,13 +56,15 @@ def test_get_district_rankings() -> None:
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "district_rankings", return_value=InstantFuture(response)
-    ) as mock_api, patch.object(
-        FMSAPIDistrictRankingsParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIDistrictRankingsParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "district_rankings", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(
+            FMSAPIDistrictRankingsParser, "__init__", return_value=None
+        ) as mock_init,
+        patch.object(FMSAPIDistrictRankingsParser, "parse") as mock_parse,
+    ):
         mock_parse.side_effect = ({}, False)
         df.get_district_rankings("2020ne").get_result()
 
@@ -77,13 +81,15 @@ def test_get_district_rankings_paginated() -> None:
     )
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "district_rankings", return_value=InstantFuture(response)
-    ) as mock_api, patch.object(
-        FMSAPIDistrictRankingsParser, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        FMSAPIDistrictRankingsParser, "parse"
-    ) as mock_parse:
+    with (
+        patch.object(
+            FRCAPI, "district_rankings", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(
+            FMSAPIDistrictRankingsParser, "__init__", return_value=None
+        ) as mock_init,
+        patch.object(FMSAPIDistrictRankingsParser, "parse") as mock_parse,
+    ):
         mock_parse.side_effect = [
             (TParsedDistrictAdvancement(advancement={}, adjustments={}), True),
             (TParsedDistrictAdvancement(advancement={}, adjustments={}), False),
