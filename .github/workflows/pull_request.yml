@@ -403,13 +403,13 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
       - name: Test Docker Startup
         if: steps.changes.outputs.web == 'true'
-        run: uv run ./ops/test_docker_startup.py
+        run: uv run --no-project ./ops/test_docker_startup.py
       - name: Test Ops Fullstack
         if: steps.changes.outputs.web == 'true'
         run: ./ops/test_ops.sh
       - name: Capture screenshots
         if: steps.changes.outputs.web == 'true'
-        run: uv run ./ops/pr_screenshots/capture_screenshots.py
+        run: uv run --no-project ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
         uses: actions/upload-artifact@v6.0.0
