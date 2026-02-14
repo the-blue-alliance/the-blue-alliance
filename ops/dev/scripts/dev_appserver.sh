@@ -49,9 +49,11 @@ function assert_local_storage_path {
 # Setup Cloud Datastore emulator/remote
 if [ "$datastore_mode" == "local" ]; then
     echo "Starting with datastore emulator"
-    emulator_port=8089
-    emulator_host="${DATASTORE_EMULATOR_HOST:-localhost:$emulator_port}"
-    env+=("--env_var=DATASTORE_EMULATOR_HOST=$emulator_host" "--env_var=DATASTORE_DATASET=test")
+    if [ -z "$DATASTORE_EMULATOR_HOST" ]; then
+        echo "DATASTORE_EMULATOR_HOST must be set (provided by docker-compose)"
+        exit 1
+    fi
+    env+=("--env_var=DATASTORE_EMULATOR_HOST=$DATASTORE_EMULATOR_HOST" "--env_var=DATASTORE_DATASET=test")
 elif [ "$datastore_mode" == "remote" ]; then
     echo "Starting with remote datastore"
     assert_google_application_credentials
@@ -77,8 +79,11 @@ fi
 # Setup Firebase auth emulator
 if [ -z "$auth_use_prod" ]; then
     echo "Running with Firebase auth emulator"
-    firebase_auth_host="${FIREBASE_AUTH_EMULATOR_HOST:-$(get_config_prop firebase_auth_emulator_host)}"
-    env+=("--env_var=FIREBASE_AUTH_EMULATOR_HOST=$firebase_auth_host")
+    if [ -z "$FIREBASE_AUTH_EMULATOR_HOST" ]; then
+        echo "FIREBASE_AUTH_EMULATOR_HOST must be set (provided by docker-compose)"
+        exit 1
+    fi
+    env+=("--env_var=FIREBASE_AUTH_EMULATOR_HOST=$FIREBASE_AUTH_EMULATOR_HOST")
 else
     echo "Using upstream authentication accounts"
     assert_google_application_credentials
@@ -87,8 +92,11 @@ fi
 # Setup Firebase realtime db emulator
 if [ -z "$firebase_db_use_prod" ]; then
     echo "Running with Firebase realtime db emulator"
-    firebase_db_host="${FIREBASE_DATABASE_EMULATOR_HOST:-$(get_config_prop firebase_database_emulator_host)}"
-    env+=("--env_var=FIREBASE_DATABASE_EMULATOR_HOST=$firebase_db_host")
+    if [ -z "$FIREBASE_DATABASE_EMULATOR_HOST" ]; then
+        echo "FIREBASE_DATABASE_EMULATOR_HOST must be set (provided by docker-compose)"
+        exit 1
+    fi
+    env+=("--env_var=FIREBASE_DATABASE_EMULATOR_HOST=$FIREBASE_DATABASE_EMULATOR_HOST")
 else
     echo "Using upstream authentication accounts"
     assert_google_application_credentials
@@ -98,7 +106,7 @@ runtime_version="python313"
 
 set -x
 dev_appserver.py \
-    --runtime_python_path=/usr/bin/python3 \
+    --runtime_python_path=$(which python3) \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \
     --max_module_instances=1 \

@@ -8,14 +8,6 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
    - GAE service `.yaml` files (`runtime:` directive)
 3. Verify the changes: `./ops/check_python_version.sh`
 
-## Rebuilding the Development Container
-
-The development container is defined in [`ops/dev/docker/Dockerfile`](https://github.com/the-blue-alliance/the-blue-alliance/tree/main/ops/dev/docker). After updating the Dockerfile, rebuild locally with:
-
-```bash
-docker-compose down && docker-compose up --build
-```
-
 ## Running One-Off Data Migrations/Cleanups
 
 See the [[Local Shell|Local-Shell]] documentation for running one-off cleanup or migration scripts against the production database. You will need a production service account key to run scripts against the production database. **Be extremely careful before running scripts against the production database.**
