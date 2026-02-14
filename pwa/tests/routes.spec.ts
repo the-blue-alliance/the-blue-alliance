@@ -20,7 +20,7 @@ function defineAllRoutes<T extends readonly RoutePath[]>(
 const allRoutes = defineAllRoutes([
   '/',
   '/about',
-  '/account',
+  '/account/',
   '/account/mytba',
   '/add-data',
   '/apidocs',
@@ -37,6 +37,7 @@ const allRoutes = defineAllRoutes([
   '/match_suggestion',
   '/match/$matchKey',
   '/privacy',
+  '/search',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
   '/team/$teamNumber/stats',
