@@ -11,12 +11,12 @@ echo "Installing node dependencies..."
 npm ci
 
 # Build legacy concatenated JS bundles
-python3 ./ops/build/do_compress.py
+uv run --group webpack python3 ./ops/build/do_compress.py
 
 # Run webpack in watch mode (dev) or one-shot build (CI/deploy)
 if [ "${WATCH}" = "true" ]; then
     # Watch legacy JS files for changes and recompress in the background
-    python3 ./ops/build/do_compress.py --watch &
+    uv run --group webpack python3 ./ops/build/do_compress.py --watch &
     echo "Starting webpack in watch mode..."
     npm run dev
 else

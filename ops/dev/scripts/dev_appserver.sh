@@ -106,7 +106,7 @@ runtime_version="python313"
 
 set -x
 dev_appserver.py \
-    --runtime_python_path=$(which python3) \
+    --runtime_python_path="$(which python3)" \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \
     --max_module_instances=1 \

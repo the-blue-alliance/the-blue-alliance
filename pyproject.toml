@@ -50,7 +50,11 @@ lint = [
     "flake8-tidy-imports",
 ]
 typecheck = [
+    { include-group = "webpack" },
     "pyre-check==0.9.25",
+]
+webpack = [
+    "watchdog==6.0.0",
 ]
 dev = [
     { include-group = "test" },
